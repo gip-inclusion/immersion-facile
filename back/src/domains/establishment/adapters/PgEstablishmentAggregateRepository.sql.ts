@@ -6,22 +6,23 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 
 export const withEstablishmentLocationsSubQuery = `
-SELECT
-  establishment_siret,
-  JSON_AGG(
-    JSON_BUILD_OBJECT(
-      'id', id,
-      'position', JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
-      'address', JSON_BUILD_OBJECT(
-          'streetNumberAndAddress', street_number_and_address,
-          'postcode', post_code,
-          'city', city,
-          'departmentCode', department_code
-      )
-    )
-  ) AS locations
-FROM establishments_location_infos
-GROUP BY establishment_siret
+    SELECT establishment_siret,
+           JSON_AGG(
+                   JSON_BUILD_OBJECT(
+                           'id', id,
+                           'position',
+                           JSON_BUILD_OBJECT('lon', lon, 'lat', lat),
+                           'address', JSON_BUILD_OBJECT(
+                                   'streetNumberAndAddress',
+                                   street_number_and_address,
+                                   'postcode', post_code,
+                                   'city', city,
+                                   'departmentCode', department_code
+                                      )
+                   )
+           ) AS locations
+    FROM establishments_location_infos
+    GROUP BY establishment_siret
 `;
 
 export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
@@ -64,15 +65,18 @@ export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
             ),
             sourceProvider: ref("e.source_provider"),
             numberEmployeesRange: ref("e.number_employees"),
-            updatedAt: sql<string>`TO_CHAR( ${ref(
+            updatedAt: sql<string>`TO_CHAR
+            ( ${ref(
               "e.update_date",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
-            createdAt: sql<string>`TO_CHAR( ${ref(
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+            createdAt: sql<string>`TO_CHAR
+            ( ${ref(
               "e.created_at",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
-            lastInseeCheckDate: sql<string>`TO_CHAR( ${ref(
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+            lastInseeCheckDate: sql<string>`TO_CHAR
+            ( ${ref(
               "e.last_insee_check_date",
-            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+            )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
             isOpen: ref("e.is_open"),
             isMaxDiscussionsForPeriodReached: ref(
               "e.is_max_discussions_for_period_reached",
@@ -80,9 +84,8 @@ export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
             isCommited: ref("e.is_commited"),
             fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
             maxContactsPerMonth: ref("e.max_contacts_per_month"),
-            nextAvailabilityDate: sql<string>`date_to_iso(${ref(
-              "e.next_availability_date",
-            )})`,
+            nextAvailabilityDate: sql<string>`date_to_iso
+                (${ref("e.next_availability_date")})`,
             searchableBy: jsonBuildObject({
               jobSeekers: ref("e.searchable_by_job_seekers"),
               students: ref("e.searchable_by_students"),
@@ -114,9 +117,10 @@ export const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                     "io.appellation_code",
                   )}::text`,
                   appellationLabel: ref("pad.libelle_appellation_long"),
-                  createdAt: sql<string>`TO_CHAR( ${ref(
+                  createdAt: sql<string>`TO_CHAR
+                  ( ${ref(
                     "io.created_at",
-                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"' )`,
+                  )}::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
                 }).as("offer"),
               )
               .orderBy("io.appellation_code asc"),
@@ -165,8 +169,10 @@ export const updateAllEstablishmentScoresQuery = async (
         .where("d.created_at", ">=", sql<Date>`NOW() - INTERVAL '1 year'`)
         .select([
           "siret",
-          sql`COUNT(DISTINCT d.id)`.as("total_discussions"),
-          sql`COUNT(DISTINCT CASE WHEN exchanges.sender = 'establishment'::exchange_role THEN d.id END)`.as(
+          sql`COUNT
+              (DISTINCT d.id)`.as("total_discussions"),
+          sql`COUNT
+          (DISTINCT CASE WHEN exchanges.sender = 'establishment'::exchange_role THEN d.id END)`.as(
             "answered_discussions",
           ),
         ])
@@ -174,19 +180,18 @@ export const updateAllEstablishmentScoresQuery = async (
     )
     .updateTable("establishments as e")
     .set({
-      score: sql`ROUND(
-          (${minimumScore} + COALESCE((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0))
-          * (COALESCE((
-            SELECT
+      score: sql`ROUND
+      (
+          (${minimumScore} + COALESCE ((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0)) * (COALESCE ((
+              SELECT
               CASE
-                WHEN total_discussions > 0
-                THEN (answered_discussions::float / total_discussions)
-                ELSE 1
+              WHEN total_discussions > 0
+              THEN (answered_discussions::float / total_discussions)
+              ELSE 1
               END
-            FROM discussion_counts
-            WHERE siret = e.siret
-          ), 1)
-        ))`,
+              FROM discussion_counts
+              WHERE siret = e.siret
+              ), 1)))`,
     })
     .execute();
 };
@@ -199,11 +204,14 @@ export const deactivateUnresponsiveEstablishmentsQuery = (db: KyselyDb) =>
         .innerJoin("exchanges as e", "d.id", "e.discussion_id")
         .select([
           "d.siret",
-          sql<number>`COUNT(DISTINCT d.id)`.as("total_discussions"),
-          sql<number>`COUNT(DISTINCT CASE WHEN e.sender = 'establishment'::exchange_role THEN d.id END)`.as(
+          sql<number>`COUNT
+              (DISTINCT d.id)`.as("total_discussions"),
+          sql<number>`COUNT
+          (DISTINCT CASE WHEN e.sender = 'establishment'::exchange_role THEN d.id END)`.as(
             "answered_discussions",
           ),
         ])
+        .where("d.created_at", ">=", sql<Date>`NOW() - INTERVAL '5 months'`)
         .groupBy("d.siret"),
     )
     .with("recent_conventions", (qb) =>

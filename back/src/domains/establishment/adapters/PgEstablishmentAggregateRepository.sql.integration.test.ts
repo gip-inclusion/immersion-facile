@@ -5,6 +5,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   Exchange,
+  User,
   UserBuilder,
   expectToEqual,
 } from "shared";
@@ -14,6 +15,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
@@ -30,10 +32,8 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
   let pgConventionRepository: PgConventionRepository;
   let pgAgencyRepository: PgAgencyRepository;
   let pgUserRepository: PgUserRepository;
-  let testUser: ReturnType<typeof UserBuilder.prototype.build>;
-  let establishment: ReturnType<
-    typeof EstablishmentAggregateBuilder.prototype.build
-  >;
+  let testUser: User;
+  let establishment: EstablishmentAggregate;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -170,6 +170,8 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
 
   describe("deactivateUnresponsiveEstablishmentsQuery", () => {
     let agency: ReturnType<typeof AgencyDtoBuilder.prototype.build>;
+    const createDiscussionIdFromIndex = (index: number) =>
+      `00000000-0000-4000-b000-00000000${index.toString().padStart(4, "0")}`;
 
     beforeEach(async () => {
       agency = new AgencyDtoBuilder().build();
@@ -179,9 +181,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
         new DiscussionBuilder()
           .withSiret(establishment.establishment.siret)
           .withCreatedAt(new Date())
-          .withId(
-            `00000000-0000-4000-b000-00000000${i.toString().padStart(4, "0")}`,
-          )
+          .withId(createDiscussionIdFromIndex(i))
           .withExchanges([
             {
               subject: "Hello",
@@ -200,7 +200,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       );
     });
 
-    it("deactivates establishments with 50+ unanswered discussions and no recent conventions", async () => {
+    it("deactivates establishments with 50 or more recently unanswered discussions and no recent conventions", async () => {
       const updatedEstablishments =
         await deactivateUnresponsiveEstablishmentsQuery(db);
 
@@ -215,6 +215,19 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       expectToEqual(result?.max_contacts_per_month, 0);
       expectToEqual(result?.status, "DEACTIVATED_FOR_LACK_OF_RESPONSES");
       expect(result?.status_updated_at).toBeDefined();
+    });
+
+    it("does not deactivates establishments with less than 50 recently unanswered discussions and no recent conventions", async () => {
+      await db
+        .updateTable("discussions")
+        .set({ created_at: subMonths(new Date(), 6) })
+        .where("id", "=", createDiscussionIdFromIndex(0))
+        .execute();
+
+      const updatedEstablishments =
+        await deactivateUnresponsiveEstablishmentsQuery(db);
+
+      expectToEqual(updatedEstablishments.length, 0);
     });
 
     it("does not deactivate establishments with recent conventions", async () => {
