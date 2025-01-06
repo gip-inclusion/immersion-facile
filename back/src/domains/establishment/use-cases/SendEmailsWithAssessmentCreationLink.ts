@@ -69,6 +69,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         params.conventionEndDate,
         "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
       );
+
     logger.info({
       message: `[${now.toISOString()}]: About to send assessment email to ${
         conventions.length

@@ -47,14 +47,14 @@ export const assessmentSlice = createSlice({
       state.isLoading = false;
       state.currentAssessment = action.payload;
     },
+    noAssessmentForConventionFound: (state) => {
+      state.isLoading = false;
+    },
     getAssessmentFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
-    },
-    setIsLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload;
     },
   },
 });

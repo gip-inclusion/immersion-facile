@@ -4,7 +4,6 @@ import React from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
   ConventionJwtPayload,
-  Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -32,11 +31,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   });
   const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
-  const hasRight =
-    role === "establishment-tutor" ||
-    // TODO : keep this temporary for old JWT support until 2023/10
-    role === ("establishment" as Role);
-  // ---------------------------
+  const hasRight = role === "establishment-tutor";
 
   if (fetchConventionError)
     return (
@@ -53,7 +48,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         <Alert
           severity="error"
           title="Erreur"
-          description="Vous n'êtes pas autorisé a accéder à cette page"
+          description="Vous n'êtes pas autorisé à accéder à cette page"
         />
       ) : (
         <>

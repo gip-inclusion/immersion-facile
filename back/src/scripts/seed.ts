@@ -443,21 +443,6 @@ const conventionSeed = async (uow: UnitOfWork) => {
     },
   });
 
-  // const peConventionAssessment: AssessmentEntity = {
-  //   _entityName: "Assessment",
-  //   contractStartDate: new Date("2023-03-27").toISOString(),
-  //   conventionId: peConvention.id,
-  //   status: "PARTIALLY_COMPLETED",
-  //   lastDayOfPresence: null,
-  //   numberOfMissedHours: 0,
-  //   endedWithAJob: true,
-  //   typeOfContract: "CDI",
-  //   establishmentAdvices: "RAS",
-  //   establishmentFeedback: "Très bien",
-  // };
-
-  // await uow.assessmentRepository.save(peConventionAssessment);
-
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
   console.log("done");
 };

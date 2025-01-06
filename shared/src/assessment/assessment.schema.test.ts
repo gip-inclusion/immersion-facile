@@ -50,6 +50,34 @@ describe("Assessment schema", () => {
     expectToEqual(assessment, parsedAssessment);
   });
 
+  it("accepts an assessment of a partially completed immersion", () => {
+    const assessment: AssessmentDto = {
+      status: "PARTIALLY_COMPLETED",
+      conventionId: "my-convention-id",
+      endedWithAJob: true,
+      typeOfContract: "CDI",
+      contractStartDate: "2024-01-01",
+      lastDayOfPresence: "2024-01-01",
+      numberOfMissedHours: 10,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+    };
+    const parsedAssessment = assessmentSchema.parse(assessment);
+    expectToEqual(assessment, parsedAssessment);
+  });
+
+  it("accepts an assessment of a did not show immersion", () => {
+    const assessment: AssessmentDto = {
+      status: "DID_NOT_SHOW",
+      conventionId: "my-convention-id",
+      endedWithAJob: false,
+      establishmentAdvices: "establishment advices",
+      establishmentFeedback: "establishment feedback",
+    };
+    const parsedAssessment = assessmentSchema.parse(assessment);
+    expectToEqual(assessment, parsedAssessment);
+  });
+
   it("rejects an invalid assessment", () => {
     const assessment = {
       status: "PARTIALLY_COMPLETED",

@@ -1,7 +1,6 @@
 import {
   AssessmentDto,
   ConventionJwtPayload,
-  ForbiddenError,
   currentJwtVersions,
   errors,
   expectPromiseToFailWithError,
@@ -9,7 +8,10 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { GetAssessment, makeGetAssessment } from "./GetAssessment";
+import {
+  GetAssessmentByConventionId,
+  makeGetAssessmentByConventionId,
+} from "./GetAssessmentByConventionId";
 
 const conventionId = "11111111-1111-4111-1111-111111111111";
 const validPayload: ConventionJwtPayload = {
@@ -19,15 +21,15 @@ const validPayload: ConventionJwtPayload = {
   version: currentJwtVersions.convention,
 };
 
-describe("GetAssessment", () => {
-  let getAssessment: GetAssessment;
+describe("GetAssessmentByConventionId", () => {
+  let getAssessment: GetAssessmentByConventionId;
   let uowPerformer: InMemoryUowPerformer;
   let uow: UnitOfWork;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     uowPerformer = new InMemoryUowPerformer(uow);
-    getAssessment = makeGetAssessment({
+    getAssessment = makeGetAssessmentByConventionId({
       uowPerformer,
     });
   });
@@ -35,7 +37,7 @@ describe("GetAssessment", () => {
   it("throws forbidden if no magicLink payload is provided", async () => {
     await expectPromiseToFailWithError(
       getAssessment.execute({ conventionId }, undefined),
-      new ForbiddenError("No magic link provided"),
+      errors.user.noJwtProvided(),
     );
   });
 
@@ -45,9 +47,7 @@ describe("GetAssessment", () => {
         applicationId: "otherId",
         role: "establishment-tutor",
       } as ConventionJwtPayload),
-      new ForbiddenError(
-        "Convention provided in DTO is not the same as application linked to it",
-      ),
+      errors.assessment.conventionIdMismatch(),
     );
   });
 
@@ -57,9 +57,7 @@ describe("GetAssessment", () => {
         applicationId: conventionId,
         role: "beneficiary",
       } as ConventionJwtPayload),
-      new ForbiddenError(
-        "Only an establishment tutor can create or get an assessment",
-      ),
+      errors.assessment.forbidden(),
     );
   });
 

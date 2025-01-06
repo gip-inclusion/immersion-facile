@@ -35,11 +35,12 @@ import {
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
-import { useAssessment } from "src/app/hooks/assessment.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";
 
@@ -76,7 +77,11 @@ export const AssessmentForm = ({
 }: AssessmentFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
-  const { createAssessment, isLoading, currentAssessment } = useAssessment(jwt);
+
+  const isLoading = useAppSelector(assessmentSelectors.isLoading);
+  const currentAssessment = useAppSelector(
+    assessmentSelectors.currentAssessment,
+  );
   const initialValues: AssessmentDto = {
     conventionId: convention.id,
     status: "COMPLETED",
@@ -92,7 +97,15 @@ export const AssessmentForm = ({
   const { handleSubmit, trigger } = methods;
 
   const onSubmit = (values: AssessmentDto) => {
-    createAssessment(values);
+    dispatch(
+      assessmentSlice.actions.creationRequested({
+        assessmentAndJwt: {
+          assessment: values,
+          jwt,
+        },
+        feedbackTopic: "assessment",
+      }),
+    );
   };
   const onStepChange: OnStepChange = async (step, fieldsToValidate) => {
     if (step && currentStep && step < currentStep) {
@@ -100,9 +113,7 @@ export const AssessmentForm = ({
       return;
     }
     const validatedFields = await Promise.all(
-      fieldsToValidate.map(async (key) => {
-        return trigger(key);
-      }),
+      fieldsToValidate.map(async (key) => trigger(key)),
     );
     if (validatedFields.every((validatedField) => validatedField)) {
       setCurrentStep(step);
@@ -124,6 +135,7 @@ export const AssessmentForm = ({
     <>
       {isLoading && <Loader />}
       {currentAssessment && (
+        // @TODO: remove this when really use feedback slice for assessment
         <Alert
           severity="error"
           title="Erreur"
@@ -214,6 +226,7 @@ const getLabels = (
     wordingByIntershipKind[internshipKind].PARTIALLY_COMPLETED,
   DID_NOT_SHOW: wordingByIntershipKind[internshipKind].DID_NOT_SHOW,
 });
+
 const AssessmentStatusSection = ({
   convention,
   onStepChange,

@@ -48,6 +48,14 @@ export const errors = {
       new NotFoundError(
         `Il n'y a pas de bilan pour la convention ${conventionId}`,
       ),
+    forbidden: () =>
+      new ForbiddenError(
+        "Only an establishment tutor can create or get an assessment",
+      ),
+    conventionIdMismatch: () =>
+      new ForbiddenError(
+        "Convention provided in DTO is not the same as application linked to it",
+      ),
   },
   inclusionConnect: {
     missingOAuth: ({

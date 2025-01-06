@@ -24,11 +24,11 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
-  sharedRouter.getAssessment(
+  sharedRouter.getAssessmentByConventionId(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getAssessment.execute(
+        deps.useCases.getAssessmentByConventionId.execute(
           {
             conventionId: req.params.conventionId,
           },
