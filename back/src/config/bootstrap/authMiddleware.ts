@@ -17,8 +17,10 @@ import { AppConfig } from "./appConfig";
 
 const logger = createLogger(__filename);
 
-const convertRouteToLog = (originalUrl: string) =>
-  `/${originalUrl.split("/")[1]}`;
+const convertRouteToLog = (originalUrl: string) => {
+  const [_domain, ...rest] = originalUrl.split("/");
+  return rest.join("/").split("?")[0];
+};
 
 export type AuthorisationStatus =
   | "authorised"
