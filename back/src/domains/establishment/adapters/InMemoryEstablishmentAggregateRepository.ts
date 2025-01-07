@@ -81,7 +81,7 @@ export class InMemoryEstablishmentAggregateRepository
     );
   }
 
-  public async getSearchImmersionResultDtoBySearchQuery(
+  public async getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
   ): Promise<SearchResultDto | undefined> {

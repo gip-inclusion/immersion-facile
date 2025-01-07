@@ -1244,7 +1244,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
 
-    describe("getSearchImmersionResultDtoBySearchQuery", () => {
+    describe("getSearchResultBySearchQuery", () => {
       beforeEach(async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentWithOfferA1101_AtPosition,
@@ -1255,7 +1255,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingSiret = "11111111111111";
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             missingSiret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1269,7 +1269,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingLocationId = "55555555-5555-4444-5555-555555555666";
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             missingLocationId,
@@ -1282,7 +1282,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         const missingAppellationCode = artisteCirqueOffer.appellationCode;
 
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             missingAppellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1294,7 +1294,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       it("Returns reconstructed SearchImmersionResultDto for given siret, appellationCode and location id", async () => {
         expectToEqual(
-          await pgEstablishmentAggregateRepository.getSearchImmersionResultDtoBySearchQuery(
+          await pgEstablishmentAggregateRepository.getSearchResultBySearchQuery(
             establishmentWithOfferA1101_AtPosition.establishment.siret,
             establishmentWithOfferA1101_AtPosition.offers[0].appellationCode,
             establishmentWithOfferA1101_AtPosition.establishment.locations[0]
