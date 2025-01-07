@@ -4,9 +4,6 @@
   "main": "src/index.ts",
   "scripts": {
     "includecheck": "./check_includes.sh",
-    "format:check": "pnpm -w prettier:glob --check ./shared/src",
-    "lint": "pnpm -w lintconfig:glob ./shared/src",
-    "prettier": "pnpm -w prettier:glob --write ./shared/src",
     "check": "pnpm -w check:glob ./shared/src",
     "typecheck": "tsc --noEmit",
     "test": "jest --testRegex=.unit.test.ts",
