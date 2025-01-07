@@ -57,7 +57,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<AppellationAndRomeDto[]>;
 
   //SearchResult & SearchImmersionResults
-  getSearchImmersionResultDtoBySearchQuery(
+  getSearchResultBySearchQuery(
     siret: SiretDto,
     appellationCode: AppellationCode,
     locationId: LocationId,
