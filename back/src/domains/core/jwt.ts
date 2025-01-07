@@ -27,7 +27,6 @@ type JwtTokenMapping<
   payload: JwtPayload;
 };
 
-//prettier-ignore
 type JwtMap =
   | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
   | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>

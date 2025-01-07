@@ -13,7 +13,6 @@ describe("Notify Discord", () => {
         "TESTING NOTIFY DISCORD - Invalid syntax for action !",
       );
     } catch (e: unknown) {
-      //eslint-disable-next-line jest/no-conditional-expect
       expect(e).toBeInstanceOf(SyntaxError);
       notifyObjectDiscord(e as Error);
     }
@@ -59,9 +58,8 @@ describe("Notify Discord", () => {
         "TESTING NOTIFY DISCORD - Invalid syntax for action !",
       );
     } catch (e: unknown) {
-      //eslint-disable-next-line jest/no-conditional-expect
       expect(e).toBeInstanceOf(SyntaxError);
-      //eslint-disable-next-line jest/no-conditional-expect
+
       expect(() => notifyAndThrowErrorDiscord(e as Error)).toThrow();
     }
   });

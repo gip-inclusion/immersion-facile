@@ -26,7 +26,6 @@ export class GetDashboardUrl extends UseCase<
     this.#timeGateway = timeGateway;
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   protected async _execute(
     params: GetDashboardParams,
   ): Promise<DashboardUrlAndName> {

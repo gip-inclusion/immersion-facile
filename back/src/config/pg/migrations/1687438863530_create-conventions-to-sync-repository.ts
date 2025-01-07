@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
 const tableName = "conventions_to_sync_with_pe";

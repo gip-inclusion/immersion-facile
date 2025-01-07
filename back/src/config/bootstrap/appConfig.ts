@@ -61,7 +61,6 @@ export class AppConfig {
 
   readonly #throwIfNotInArray;
 
-  // eslint-disable-next-line no-restricted-syntax
   private constructor(private readonly env: ProcessEnv) {
     this.#throwIfNotInArray = makeThrowIfNotInArray(env);
     this.#throwIfNotDefinedOrDefault = makeThrowIfNotDefinedOrDefault(env);

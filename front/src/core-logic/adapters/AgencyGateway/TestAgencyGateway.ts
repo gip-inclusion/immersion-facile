@@ -1,4 +1,3 @@
-/* eslint-disable  @typescript-eslint/require-await */
 import { Observable, Subject, from } from "rxjs";
 import {
   AgencyDto,

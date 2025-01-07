@@ -44,7 +44,6 @@ export const GroupPage = ({ route }: GroupPageProps) => {
   }, [groupSlug]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getInitialGroupData()
       .catch(setError) // can't throw here, react-error-boundary do not catch errors in async code https://github.com/bvaughn/react-error-boundary/issues/116#issuecomment-1478172983
       .finally(() => {

@@ -1,5 +1,4 @@
 // Read this to understand the typings : https://dev.to/tipsy_dev/advanced-typescript-reinventing-lodash-get-4fhe
-// prettier-ignore
 type GetFieldType<Obj, Path> = Path extends `${infer Left}.${infer Right}`
   ? Left extends keyof Obj
     ?
@@ -10,16 +9,15 @@ type GetFieldType<Obj, Path> = Path extends `${infer Left}.${infer Right}`
     ? Obj[Path]
     : undefined;
 
-// prettier-ignore
 export function path<Path extends string, Obj>(
   strPath: Path,
   obj: Obj,
 ): GetFieldType<Obj, Path>;
-// prettier-ignore
+
 export function path<Path extends string, Obj>(
   strPath: Path,
 ): (obj: Obj) => GetFieldType<Obj, Path>;
-// prettier-ignore
+
 export function path<Path extends string, Obj>(strPath: Path, obj?: Obj): any {
   const f = (obj: Obj) =>
     strPath
@@ -33,18 +31,17 @@ export function path<Path extends string, Obj>(strPath: Path, obj?: Obj): any {
   return f(obj);
 }
 
-// prettier-ignore
 export function pathEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,
   obj: Obj,
 ): boolean;
-// prettier-ignore
+
 export function pathEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,
 ): (obj: Obj) => boolean;
-// prettier-ignore
+
 export function pathEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,
@@ -56,18 +53,17 @@ export function pathEq<Path extends string, Obj>(
   return f(obj);
 }
 
-// prettier-ignore
 export function pathNotEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,
   obj: Obj,
 ): boolean;
-// prettier-ignore
+
 export function pathNotEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,
 ): (obj: Obj) => boolean;
-// prettier-ignore
+
 export function pathNotEq<Path extends string, Obj>(
   strPath: Path,
   value: GetFieldType<Obj, Path>,

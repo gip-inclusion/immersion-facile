@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
 const old_SQL_view_contact_requests = `

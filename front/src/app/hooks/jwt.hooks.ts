@@ -11,7 +11,6 @@ import { Route } from "type-route";
 // this hook should be use only in admin route
 export const useAdminToken = () => {
   const rawToken = useAppSelector(authSelectors.inclusionConnectToken);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return rawToken;
 };
 

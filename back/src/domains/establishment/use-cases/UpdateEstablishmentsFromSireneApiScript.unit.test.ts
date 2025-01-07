@@ -14,7 +14,6 @@ import {
 import { UpdateEstablishmentsFromSirenApiScript } from "./UpdateEstablishmentsFromSirenApiScript";
 
 // This use case is kept as inspiration for when we'll need to update establishments from SIREN API (ours not LBB)
-// eslint-disable-next-line jest/no-disabled-tests
 
 const maxEstablishmentsPerBatch = 1;
 const maxEstablishmentsPerFullRun = 2;

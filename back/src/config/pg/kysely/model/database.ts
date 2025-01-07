@@ -200,13 +200,11 @@ export interface BroadcastFeedbacks {
   response: JSONColumnType<BroadcastFeedbackResponse> | null;
 }
 
-// prettier-ignore
 type ConventionObjectiveType =
   | "Confirmer un projet professionnel"
   | "Découvrir un métier ou un secteur d'activité"
   | "Initier une démarche de recrutement";
 
-// prettier-ignore
 type ConventionStatusType =
   | "ACCEPTED_BY_COUNSELLOR"
   | "ACCEPTED_BY_VALIDATOR"

@@ -30,7 +30,6 @@ const triggerRefreshMaterializedViews = async () => {
   await pool.end();
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "refresh materialized views",
   config,

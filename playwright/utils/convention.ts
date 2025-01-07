@@ -149,7 +149,6 @@ export const signConvention = async (
   magicLinks: string[],
   signatoryIndex: number,
 ) => {
-  // eslint-disable-next-line no-console
   console.info(
     "Signing convention with magic link ==>",
     magicLinks[signatoryIndex],

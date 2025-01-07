@@ -101,7 +101,6 @@ const executeUsecase = async (): Promise<{
   };
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "importProConnectExternalIds",
   config,

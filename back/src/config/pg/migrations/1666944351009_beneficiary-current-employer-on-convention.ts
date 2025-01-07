@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 
 const columnName = "beneficiary_current_employer_id";

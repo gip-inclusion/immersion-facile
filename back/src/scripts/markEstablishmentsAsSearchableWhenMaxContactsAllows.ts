@@ -27,7 +27,6 @@ const startScript = async () => {
   return { numberOfEstablishmentsUpdated };
 };
 
-/* eslint-disable-next-line @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "markEstablishmentsAsSearchableWhenMaxContactsAllows",
   config,

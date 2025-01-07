@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 import { ConventionDto, ConventionId, Email } from "shared";
 
 export interface ConventionRepository {

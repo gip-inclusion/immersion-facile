@@ -17,19 +17,18 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
-// prettier-ignore
 const formSearchResult1 = {
   siret: "form1",
   rome: "A",
   voluntaryToImmersion: true,
 } as SearchResultDto;
-// prettier-ignore
+
 const formSearchResult2 = {
   siret: "form2",
   rome: "A",
   voluntaryToImmersion: true,
 } as SearchResultDto;
-// prettier-ignore
+
 const lbbSearchResult = {
   siret: "lbb1",
   rome: "A",

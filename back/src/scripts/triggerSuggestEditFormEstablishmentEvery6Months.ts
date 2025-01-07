@@ -54,7 +54,6 @@ const startScript = async (): Promise<Report> => {
   return suggestEditEstablishmentsScript.execute();
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "triggerSuggestEditFormEstablishmentEvery6Months",
   config,

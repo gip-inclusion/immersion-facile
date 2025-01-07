@@ -1,4 +1,3 @@
-/* eslint-disable  @typescript-eslint/require-await */
 import { values } from "ramda";
 import { Observable, Subject, from, of, throwError } from "rxjs";
 import {

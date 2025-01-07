@@ -132,7 +132,7 @@ const notifyDiscordPipelineReport = async (rawContent: string) => {
   const content = rawContent.slice(0, discordSizeLimit);
 
   // This is intentionaly not awaited following a fire and forget logic.
-  //eslint-disable-next-line @typescript-eslint/no-floating-promises
+
   await axios.post(
     discordPipelineReportsWebhookUrl,
     {

@@ -91,7 +91,7 @@ export const exhaustiveCheck = (
     value: shouldBeNever,
   });
   const errorMessage = `Should not have been reached, but was reached with : ${unexpectedDataAsString}`;
-  // eslint-disable-next-line no-console
+
   console.error(errorMessage);
 
   if (options.throwIfReached) throw new Error(errorMessage);

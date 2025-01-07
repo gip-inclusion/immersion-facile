@@ -381,7 +381,6 @@ const getNumberEmployeesRange = ({
   return employeeRangeByTefenCode[<TefenCode>+tefenCode];
 };
 
-// prettier-ignore
 // tefenCode is a French standard code for the number of employees in a company.
 type TefenCode =
   | -1

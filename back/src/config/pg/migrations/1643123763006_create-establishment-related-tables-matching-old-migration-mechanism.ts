@@ -36,7 +36,6 @@ const makeAddForeighKey =
 
 export const up = (pgm: MigrationBuilder) => {
   const addForeignKey = makeAddForeighKey(pgm);
-  // prettier-ignore
   pgm.createType("data_source", [
     "form",
     "api_sirene",

@@ -205,7 +205,7 @@ export const makeConsumerMiddleware = (
       req.apiConsumer = apiConsumer;
 
       return await userLimiter
-        // eslint-disable-next-line @typescript-eslint/require-await
+
         .schedule(async () => next())
         .catch((error) => {
           logger.error({

@@ -67,7 +67,6 @@ const triggerEstablishmentLeadReminders = async () => {
   return { firstReminderResult, secondReminderResult };
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "sendEstablishmentLeadFirstReminderScript",
   config,

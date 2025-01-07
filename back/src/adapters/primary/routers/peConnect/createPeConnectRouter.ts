@@ -11,7 +11,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
     sendRedirectResponseWithManagedErrors(
       req,
       res,
-      // eslint-disable-next-line @typescript-eslint/require-await
+
       async () => makePeConnectLoginPageUrl(deps.config),
       deps.errorHandlers.handleManagedRedirectResponseError,
       deps.errorHandlers.handleRawRedirectResponseError,

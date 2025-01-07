@@ -26,7 +26,6 @@ const executeConventionReminder = () => {
   ).execute();
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "conventionReminderScript",
   config,

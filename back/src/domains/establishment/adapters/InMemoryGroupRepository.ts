@@ -35,7 +35,6 @@ export const stubSearchResult: SearchResultDto = {
   createdAt: new Date().toISOString(),
 };
 
-/* eslint-disable @typescript-eslint/require-await */
 export class InMemoryGroupRepository implements GroupRepository {
   // for test purpose
   #groupsBySlug: Record<GroupSlug, GroupEntity> = {};

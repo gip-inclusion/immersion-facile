@@ -10,7 +10,6 @@ import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/hel
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-// prettier-ignore
 export type RenewMagicLinkPayload = {
   internshipKind: InternshipKind;
   emails: string[];

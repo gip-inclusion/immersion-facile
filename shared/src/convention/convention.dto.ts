@@ -345,7 +345,7 @@ export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithoutJustification
   | UpdateConventionStatusWithJustification
   | UpdateConventionStatusWithValidator;
-// prettier-ignore
+
 const _isAssignable = (
   isValid: UpdateConventionStatusRequestDto,
 ): { status: ConventionStatus } => isValid;

@@ -70,5 +70,4 @@ export const up = async (pgm: MigrationBuilder) => {
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export const down = () => {};

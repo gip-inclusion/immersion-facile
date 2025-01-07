@@ -55,7 +55,7 @@ describe("HttpSirenGateway", () => {
     const toDate = now;
 
     const testSiret = "32085382300013";
-    // prettier-ignore
+
     const sirets = [
       testSiret,
       // there are about 1000 sirets below

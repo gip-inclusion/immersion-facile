@@ -69,7 +69,6 @@ export const AppellationAutocomplete = ({
     }
   }, [initialOption, selectedOption]);
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
       if (

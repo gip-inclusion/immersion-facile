@@ -36,7 +36,7 @@ export type SiretEstablishmentDto = {
 };
 
 export type NumberEmployeesRange = (typeof numberEmployeesRanges)[number];
-// prettier-ignore
+
 export const numberEmployeesRanges = [
   "",
   "0",
