@@ -31,5 +31,7 @@ export const toDisplayedDate = ({
 
 export const isStringDate = (string: string) => isValid(new Date(string));
 
-export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date =>
-  addHours(date, date.getTimezoneOffset() / 60);
+export const convertLocaleDateToUtcTimezoneDate = (date: Date): Date => {
+  if (date.getTimezoneOffset() < 0) return date; // if browser's timezone is ahead of UTC, return the date as is
+  return addHours(date, date.getTimezoneOffset() / 60);
+};
