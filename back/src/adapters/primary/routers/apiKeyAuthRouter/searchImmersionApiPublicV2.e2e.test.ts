@@ -125,7 +125,7 @@ describe("search route", () => {
                     id: "123",
                   },
                 ])
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .build(),
             )
             .withUserRights([
@@ -146,7 +146,7 @@ describe("search route", () => {
             naf: defaultNafCode,
             nafLabel: "NAFRev2",
             name: "Company inside repository",
-            website: "www.jobs.fr",
+            website: "https://www.jobs.fr",
             additionalInformation: "",
             rome: "M1808",
             romeLabel: "test_rome_label",
@@ -261,7 +261,7 @@ describe("search route", () => {
             naf: defaultNafCode,
             nafLabel: "NAFRev2",
             name: "Company inside repository",
-            website: "www.jobs.fr",
+            website: "https://www.jobs.fr",
             additionalInformation: "",
             rome: "M1808",
             romeLabel: "test_rome_label",
@@ -317,7 +317,7 @@ describe("search route", () => {
                         id: "123",
                       },
                     ])
-                    .withWebsite("www.jobs.fr")
+                    .withWebsite("https://www.jobs.fr")
                     .build(),
                 )
                 .withUserRights([
@@ -346,7 +346,7 @@ describe("search route", () => {
                         id: "123",
                       },
                     ])
-                    .withWebsite("www.jobs.fr")
+                    .withWebsite("https://www.jobs.fr")
                     .withSearchableBy({ students: true, jobSeekers: false })
                     .build(),
                 )
@@ -376,7 +376,7 @@ describe("search route", () => {
                         id: "123",
                       },
                     ])
-                    .withWebsite("www.jobs.fr")
+                    .withWebsite("https://www.jobs.fr")
                     .withSearchableBy({ students: false, jobSeekers: true })
                     .build(),
                 )

@@ -81,7 +81,7 @@ test.describe("Establishment creation and modification workflow", () => {
         rawAddress: "6 rue de la chaîne 86000 Poitiers",
       },
     ],
-    website: faker.internet.domainName(),
+    website: `https://${faker.internet.domainName()}`,
     fitForDisabledWorkers: true,
     isEngagedEnterprise: true,
   };

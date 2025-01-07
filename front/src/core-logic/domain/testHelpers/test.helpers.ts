@@ -10,7 +10,7 @@ const defaultFlagsInFront: FeatureFlags = {
     imageAlt: "imageAlt",
     imageUrl: "https://imageUrl",
     message: "message",
-    redirectUrl: "https://redirectUrl",
+    redirectUrl: "https://redirect-url",
     overtitle: "overtitle",
     title: "title",
   }),

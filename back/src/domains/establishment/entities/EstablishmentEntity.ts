@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   ContactMethod,
   DateTimeIsoString,
   EstablishmentSearchableBy,
@@ -33,7 +34,7 @@ export type EstablishmentEntity = {
   sourceProvider: SourceProvider;
   updatedAt: Date;
   voluntaryToImmersion: boolean;
-  website?: string;
+  website?: AbsoluteUrl | "";
   score: number;
   contactMethod: ContactMethod;
 } & WithAcquisition;

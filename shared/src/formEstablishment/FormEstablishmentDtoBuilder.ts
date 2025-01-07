@@ -41,7 +41,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
   isEngagedEnterprise: false,
   fitForDisabledWorkers: false,
   siret: "01234567890123",
-  website: "www@super.com/jobs",
+  website: "https://www@super.com/jobs",
   additionalInformation: "",
   appellations: [
     {

@@ -47,7 +47,7 @@ const toSearchImmersionResults = (
     naf: defaultNafCode,
     nafLabel: "NAFRev2",
     name: "Company inside repository",
-    website: "www.jobs.fr",
+    website: "https://www.jobs.fr",
     additionalInformation: "",
     rome: offer.romeCode,
     romeLabel: "test_rome_label",
@@ -125,7 +125,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
           id: "1",
         },
       ])
-      .withWebsite("www.jobs.fr")
+      .withWebsite("https://www.jobs.fr")
       .withScore(score20)
       .build(),
   )
@@ -272,7 +272,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret1)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .build(),
             )
             .withUserRights([
@@ -291,7 +291,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret2)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
             )
@@ -311,7 +311,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret3)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
             )
@@ -430,7 +430,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret1)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .build(),
             )
             .withUserRights([
@@ -449,7 +449,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret2)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .withSearchableBy({ students: true, jobSeekers: false })
                 .build(),
             )
@@ -469,7 +469,7 @@ describe("search-immersion route", () => {
               new EstablishmentEntityBuilder()
                 .withSiret(siret3)
                 .withScore(score20)
-                .withWebsite("www.jobs.fr")
+                .withWebsite("https://www.jobs.fr")
                 .withSearchableBy({ students: false, jobSeekers: true })
                 .build(),
             )

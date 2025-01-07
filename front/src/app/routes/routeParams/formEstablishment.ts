@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   AppellationAndRomeDto,
   ContactMethod,
   Email,
@@ -91,7 +92,7 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
     contactMethod: params.bcContactMethod as ContactMethod,
     copyEmails: params.bcCopyEmails ?? [],
   },
-  website: params.website,
+  website: params.website as AbsoluteUrl | "",
   additionalInformation: params.additionalInformation,
   appellations: params.appellations ?? [],
   searchableBy: {

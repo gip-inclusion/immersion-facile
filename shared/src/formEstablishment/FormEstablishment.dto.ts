@@ -1,3 +1,4 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { WithAcquisition } from "../acquisition.dto";
 import { LocationId } from "../address/address.dto";
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
@@ -66,7 +67,7 @@ export type FormEstablishmentDto = {
   nextAvailabilityDate?: DateTimeIsoString;
   siret: SiretDto; // 14 characters string
   source: FormEstablishmentSource;
-  website?: string;
+  website?: AbsoluteUrl | "";
   searchableBy: EstablishmentSearchableBy;
 } & WithAcquisition;
 

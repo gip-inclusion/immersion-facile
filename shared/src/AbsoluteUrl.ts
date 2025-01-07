@@ -6,6 +6,8 @@ export type AbsoluteUrl = `${Http}${string}`;
 
 export const absoluteUrlSchema: z.Schema<AbsoluteUrl> = z
   .string()
+  .toLowerCase()
+  .trim()
   .regex(
     /^https?:\/\/.+?$/,
     "Le format de saisie est invalide. Exemple : https://www.exemple.fr/chemin-du-lien",

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf";
@@ -73,7 +74,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
         "Le nom sous lequel vous souhaitez apparaitre dans les résultats de recherche ne peut pas être la raison sociale seule",
       )
       .optional(),
-    website: zStringCanBeEmpty.optional(),
+    website: absoluteUrlSchema.or(z.literal("")).optional(),
     additionalInformation: zStringCanBeEmpty.optional(),
     businessAddresses: z
       .array(
