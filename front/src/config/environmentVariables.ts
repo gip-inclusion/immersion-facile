@@ -27,6 +27,5 @@ export const ENV = {
 };
 
 Object.entries(ENV).forEach(([key, value]) =>
-  //eslint-disable-next-line no-console
   console.info(`ENV.${key} >>> `, value),
 );

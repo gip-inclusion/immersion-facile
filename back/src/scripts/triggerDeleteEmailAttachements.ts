@@ -24,7 +24,6 @@ const executeTriggerDeleteEmailAttachements = async () => {
   };
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "deleteEmailAttachements",
   config,

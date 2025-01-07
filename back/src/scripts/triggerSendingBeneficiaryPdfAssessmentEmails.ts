@@ -69,7 +69,6 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
   });
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "sendBeneficiaryPdfAssessmentEmailsScript",
   config,

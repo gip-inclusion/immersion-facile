@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { MigrationBuilder } from "node-pg-migrate";
 const viewEstablishments = "view_establishments";
 const viewEstablishmentsWithAggregatedOffers =

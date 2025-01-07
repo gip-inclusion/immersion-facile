@@ -60,7 +60,6 @@ export const logHttpResponse = ({
       response.status() >= 400 &&
       response.url().includes("/api/")
     ) {
-      // eslint-disable-next-line no-console
       console.info(
         "<<",
         response.request().method(),
@@ -69,7 +68,6 @@ export const logHttpResponse = ({
         (await response.body()).toString(),
       );
     } else if (response.url().includes("/api/")) {
-      // eslint-disable-next-line no-console
       console.info(
         "<<",
         response.request().method(),

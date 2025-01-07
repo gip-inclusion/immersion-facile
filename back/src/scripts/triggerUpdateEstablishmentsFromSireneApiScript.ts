@@ -68,7 +68,6 @@ const main = async () => {
   return report;
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "update-establishments-from-insee-api",
   config,

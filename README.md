@@ -109,7 +109,7 @@ Documentation locale [.husky.md](.husky/husky.md)
 
 ##### Lint-staged
 
-Lint stage permet de ne jouer le lint et le prettier que sur les fichiers qui ont été stage dans Git
+Lint stage permet de ne jouer Biome que sur les fichiers qui ont été stage dans Git
 La configuration lint-stage est présente ici [.tooling/.lint-staged/.lintstagedrc](.tooling/.lint-staged/.lintstagedrc)
 [Documentation officielle](https://github.com/okonet/lint-staged)
 

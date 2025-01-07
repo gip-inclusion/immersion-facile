@@ -117,7 +117,6 @@ const createParamsByKind = (
 
 type ParamByKind = {
   [K in NotificationKind]: {
-    // prettier-ignore
     expectedTemplatedContent: Array<
       Extract<Notification, { kind: K }>["templatedContent"]
     >;

@@ -41,7 +41,6 @@ const executeUsecase = async () => {
   return resyncOldConventionsToPeUsecase.execute();
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "resyncOldConventionToPE",
   config,

@@ -30,7 +30,6 @@ const triggerDeleteOldDiscussionMessages = async () => {
   return { numberOfMessagesDeleted };
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "triggerDeleteOldDiscussionMessages",
   config,

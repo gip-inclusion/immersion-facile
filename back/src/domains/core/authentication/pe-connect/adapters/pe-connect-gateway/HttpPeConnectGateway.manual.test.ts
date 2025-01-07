@@ -185,7 +185,6 @@ describe("HttpPeConnectGateway", () => {
 
     describe("Wrong path", () => {
       describe("Errors on getUserInfo", () => {
-        // eslint-disable-next-line jest/no-disabled-tests
         // it(`Timeout on getUserInfo -> Retry`, async () => {
         //   mock
         //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
@@ -204,8 +203,6 @@ describe("HttpPeConnectGateway", () => {
         //     user: peConnectUser(true),
         //   });
         // });
-
-        // eslint-disable-next-line jest/no-disabled-tests
 
         it("Zod Error -> OK with undefined", async () => {
           mock
@@ -303,7 +300,6 @@ describe("HttpPeConnectGateway", () => {
       });
 
       describe("Errors on getAdvisorsInfo", () => {
-        // eslint-disable-next-line jest/no-disabled-tests
         // it(`Timeout on getAdvisorsInfo -> Retry`, async () => {
         //   mock
         //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)

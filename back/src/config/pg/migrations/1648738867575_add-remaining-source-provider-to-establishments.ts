@@ -24,5 +24,4 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 export async function down(): Promise<void> {}

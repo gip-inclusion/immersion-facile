@@ -480,7 +480,6 @@ const spyOnTopic = (
   subscriptionId: string,
 ): DomainEvent[] => {
   const publishedEvents: DomainEvent[] = [];
-  //eslint-disable-next-line @typescript-eslint/require-await
   eventBus.subscribe(topic, subscriptionId, async (event) => {
     publishedEvents.push(event);
   });

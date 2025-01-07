@@ -10,7 +10,6 @@ import { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
 import { DateTimeIsoString } from "../utils/date";
 
-// prettier-ignore
 export type ImmersionContactInEstablishmentId = Flavor<
   string,
   "ImmersionContactInEstablishmentId"

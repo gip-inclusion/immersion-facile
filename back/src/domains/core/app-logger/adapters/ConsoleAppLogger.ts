@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { AppLogger } from "../ports/AppLogger";
 
 export class ConsoleAppLogger implements AppLogger {

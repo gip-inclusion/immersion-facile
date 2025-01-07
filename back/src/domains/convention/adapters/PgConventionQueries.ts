@@ -48,7 +48,6 @@ export class PgConventionQueries implements ConventionQueries {
       "CANCELLED",
     ];
 
-    //prettier-ignore
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.siret", "=", params.siret)
       .where("conventions.immersion_appellation", "=", +params.codeAppellation)

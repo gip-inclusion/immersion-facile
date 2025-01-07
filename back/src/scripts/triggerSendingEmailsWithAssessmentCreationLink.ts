@@ -79,7 +79,6 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
   });
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "sendEmailsWithAssessmentCreationLinkScript",
   config,

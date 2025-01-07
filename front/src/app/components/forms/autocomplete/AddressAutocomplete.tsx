@@ -182,7 +182,7 @@ const effectDebounceSearchTerm = (
   ) {
     return;
   }
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+
   getAddressesFromApi(debounceSearchTerm, setOptions, setIsSearching);
 };
 
@@ -220,7 +220,6 @@ const effectInitialSearchTerm = ({
           setFormValue(firstAddress);
       })
       .catch((error: any) => {
-        // eslint-disable-next-line no-console
         console.error("getAddressesFromApi", error);
       });
 };

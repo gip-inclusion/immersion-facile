@@ -136,7 +136,6 @@ const rootReducer: typeof appReducer = (state, action) =>
 const rootEpic: Epic = (action$, store$, dependencies) =>
   combineEpics(...allEpics)(action$, store$, dependencies).pipe(
     catchError((error, source) => {
-      //eslint-disable-next-line no-console
       console.error("combineEpic", error);
       Sentry.captureException(error);
       return source;

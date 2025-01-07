@@ -172,7 +172,7 @@ export const ConventionDocumentPage = ({
       downloadLink.click();
     } catch (e) {
       alert("Erreur lors de la génération du PDF >> voir la console.");
-      // eslint-disable-next-line no-console
+
       console.error(JSON.stringify(e));
     } finally {
       setIsPdfLoading(false);

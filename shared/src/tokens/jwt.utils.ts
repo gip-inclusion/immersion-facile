@@ -25,7 +25,6 @@ export const decodeJwtWithoutSignatureCheck = <T>(jwtToken: string): T => {
     const [_header, payload, _authentication] = jwtToken.split(".");
     return JSON.parse(decode(toBase64(payload)));
   } catch (error) {
-    //eslint-disable-next-line no-console
     console.error(decodeMagicLinkJwtWithoutSignatureCheck, error);
     throw new Error("401 Malformed JWT payload");
   }

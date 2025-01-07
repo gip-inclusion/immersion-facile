@@ -66,8 +66,6 @@ export function pipeWithValue<A, B, C, D, E, F, G, H, I>(
   hi: (h: H) => I,
 ): I;
 
-/* eslint-disable */
-
 // biome-ignore format: better readability without formatting
 export function pipeWithValue(
   a: unknown,
@@ -81,7 +79,7 @@ export function pipeWithValue(
   hi?: AnyFunction,
 ): unknown {
   // biome-ignore lint/style/noArguments: <explanation>
-  switch  (arguments.length) {
+  switch (arguments.length) {
     case 1:
       return a;
     case 2:

@@ -39,7 +39,6 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async uploadFile(
     file: File,
     renameFileToId: boolean,

@@ -351,7 +351,6 @@ export const ConventionForm = ({
 
   useEffect(() => {
     if (mode !== "create") {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);

@@ -5,7 +5,7 @@ export const logBodyAndThrow = <R extends HttpResponse<number, unknown>>({
   body,
 }: R): never => {
   const stringifiedBody = JSON.stringify(body, null, 2);
-  // eslint-disable-next-line no-console
+
   console.error(stringifiedBody);
   throw new Error(stringifiedBody);
 };
@@ -25,7 +25,7 @@ export const throwBadRequestWithExplicitMessage = <
 export const otherwiseThrow = (unhandledResponse: never): never => {
   const message: string | undefined = (unhandledResponse as any)?.body?.message;
   const status: number | undefined = (unhandledResponse as any)?.body?.status;
-  // eslint-disable-next-line no-console
+
   console.error(JSON.stringify(unhandledResponse, null, 2));
   throw new Error(
     message

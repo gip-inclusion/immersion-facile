@@ -77,11 +77,10 @@ export const writeTsFile = (componentName: string, filePath: string) => {
   const content = makeTsFileContent(componentName, filePath);
   fs.writeFile(makeTsFileName(filePath), content, (error) => {
     if (error) {
-      // eslint-disable-next-line no-console
       console.error(error);
       return;
     }
-    // eslint-disable-next-line no-console
+
     console.info(`${makeTsFileName(filePath)} created`);
   });
 };
@@ -89,11 +88,10 @@ export const writeTsFile = (componentName: string, filePath: string) => {
 export const processScssFiles = (componentName: string, folder = "./") => {
   fs.readdirSync(folder).forEach((filePath) => {
     if (!filePath.includes(".scss")) return;
-    // eslint-disable-next-line no-console
+
     console.info(filePath);
     writeTsFile(componentName, folder + filePath);
     fs.watch(folder + filePath, (_, filename) => {
-      // eslint-disable-next-line no-console
       console.info(`${filename} file changed`);
       writeTsFile(componentName, folder + filePath);
     });

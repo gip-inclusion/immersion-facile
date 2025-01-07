@@ -31,7 +31,6 @@ const executeContactRequestReminder = () => {
   }).execute("7days");
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "contactRequestReminderScript7Days",
   config,

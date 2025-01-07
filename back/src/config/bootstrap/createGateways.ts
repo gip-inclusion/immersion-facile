@@ -136,7 +136,6 @@ const configureCreateFetchHttpClientForExternalAPIs =
       onResponseSideEffect: logPartnerResponses(partnerName),
     });
 
-// prettier-ignore
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
   infer T
 >
@@ -146,7 +145,6 @@ export type Gateways = ReturnType<typeof createGateways> extends Promise<
 export const createGateways = async (
   config: AppConfig,
   uuidGenerator: UuidGenerator,
-  // eslint-disable-next-line @typescript-eslint/require-await
 ) => {
   //TODO: toujours nécéssaire de log ces configs d'adapters?
   logger.info({

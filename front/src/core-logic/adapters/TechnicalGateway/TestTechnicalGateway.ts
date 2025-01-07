@@ -19,7 +19,6 @@ export class TestTechnicalGateway implements TechnicalGateway {
     _jwt: ConventionSupportedJwt,
   ): Promise<string> => Promise.resolve("YWJjZA==");
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async getEmailStatus(email: Email): Promise<ValidateEmailFeedback> {
     const emailWithErrorStatus: ValidateEmailFeedback = {
       status: "invalid_email",
@@ -37,7 +36,6 @@ export class TestTechnicalGateway implements TechnicalGateway {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   public async uploadFile(
     file: File,
     renameFileToId: boolean,

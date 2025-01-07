@@ -12,7 +12,7 @@ export const useCopyButton = (defaultLabel = "Copier cet ID") => {
           setIsCopied(false);
         }, 3_000);
       })
-      // eslint-disable-next-line no-console
+
       .catch((error) => console.error(error));
   };
 

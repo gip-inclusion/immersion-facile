@@ -54,7 +54,6 @@ export type InMemoryGateways = {
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :
-// prettier-ignore
 const _isAssignable = (inMemoryRepos: InMemoryGateways): Gateways =>
   inMemoryRepos;
 

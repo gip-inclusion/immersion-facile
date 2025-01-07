@@ -93,7 +93,6 @@ export class PgConventionRepository implements ConventionRepository {
     if (alreadyExistingConvention)
       throw errors.convention.conflict({ conventionId: convention.id });
 
-    // prettier-ignore
     const {
       signatories: {
         beneficiary,

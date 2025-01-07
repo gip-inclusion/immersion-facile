@@ -29,7 +29,6 @@ const triggerMarkOldConventionAsDeprecated = async () => {
   return { numberOfUpdatedConventions };
 };
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
 handleCRONScript(
   "triggerMarkOldConventionAsDeprecated",
   config,

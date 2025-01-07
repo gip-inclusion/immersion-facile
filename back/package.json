@@ -18,7 +18,6 @@
     "includecheck": "src/scripts/check_includes.sh",
     "mark-establishments-as-searchable-when-max-contacts-allows": "ts-node src/scripts/markEstablishmentsAsSearchableWhenMaxContactsAllows.ts",
     "migrate": "pnpm db:migrate",
-    "prettier": "pnpm -w prettier:glob --write ./back/src",
     "check": "pnpm -w check:glob ./back/src",
     "start-prod": "NODE_ENV=production node -r ts-node/register --max-old-space-size=1536 src/scripts/startServer.ts",
     "start": "NODE_ENV=local node -r ts-node/register --max-old-space-size=1536 src/scripts/startServer.ts",

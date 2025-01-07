@@ -31,7 +31,6 @@ export default {
 export const Default: Story = {
   args: {
     idToCopy: "",
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     onCopyButtonClick: () => {},
     copyButtonLabel: "Copier cet ID",
     copyButtonIsDisabled: false,
