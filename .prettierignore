@@ -1,9 +1,0 @@
-/dist
-coverage/
-node_modules/
-front/src/assets/
-public/assets/
-public/dsfr/
-.git/
-.idea/
-.angular/

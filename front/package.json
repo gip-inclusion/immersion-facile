@@ -15,9 +15,6 @@
     "typecheck": "tsc --noEmit",
     "includecheck": "./check_includes.sh",
     "check": "pnpm -w check:glob ./front/src",
-    "prettier": "pnpm -w prettier:glob --write ./front/src",
-    "format:check": "pnpm -w prettier:glob --check ./front/src",
-    "lint": "pnpm -w lintconfig:glob ./front/src",
     "fullcheck": "pnpm -w fullcheck --filter=front",
     "predev": "react-dsfr update-icons",
     "prebuild": "react-dsfr update-icons"
@@ -52,8 +49,6 @@
     "axios": "^1.6.0",
     "babel-jest": "^29.5.0",
     "date-fns": "2.28.0",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^8.10.0",
     "html-templates": "workspace:*",
     "jest": "^29.5.0",
     "leaflet": "^1.9.4",
