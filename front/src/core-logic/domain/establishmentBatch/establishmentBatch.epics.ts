@@ -1,5 +1,6 @@
 import { filter, map, switchMap } from "rxjs";
 import {
+  AbsoluteUrl,
   CSVBoolean,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -92,7 +93,7 @@ export const candidateEstablishmentMapper = (
         code: establishmentRow.naf_code,
         nomenclature: "NAFRev2",
       },
-      website: establishmentRow.website,
+      website: establishmentRow.website as AbsoluteUrl | "",
       source: "immersion-facile" as FormEstablishmentSource,
       appellations: establishmentAppellationsFromCSVToDto(
         establishmentRow.appellations_code,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
@@ -27,7 +28,7 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
   distance_m: z.number().optional(),
   numberOfEmployeeRange: z.string().optional(),
-  website: zStringCanBeEmpty.optional(),
+  website: absoluteUrlSchema.or(z.literal("")).optional(),
   additionalInformation: zStringCanBeEmpty.optional(),
   fitForDisabledWorkers: z.boolean().optional(),
   urlOfPartner: z.string().optional(),

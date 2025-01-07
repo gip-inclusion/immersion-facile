@@ -1,4 +1,5 @@
 import {
+  AbsoluteUrl,
   Builder,
   ContactMethod,
   EstablishmentSearchableBy,
@@ -192,7 +193,7 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, updatedAt });
   }
 
-  public withWebsite(website?: string) {
+  public withWebsite(website?: AbsoluteUrl | "") {
     return new EstablishmentEntityBuilder({ ...this.entity, website });
   }
 

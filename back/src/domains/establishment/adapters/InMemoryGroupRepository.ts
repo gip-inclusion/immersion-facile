@@ -8,7 +8,7 @@ export const stubSearchResult: SearchResultDto = {
   siret: "11112222111122",
   distance_m: 0,
   name: "Company inside repository",
-  website: "www.jobs.fr",
+  website: "https://www.jobs.fr",
   additionalInformation: "",
   voluntaryToImmersion: true,
   position: { lon: 50, lat: 35 },

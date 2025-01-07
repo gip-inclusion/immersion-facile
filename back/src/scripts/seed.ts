@@ -142,7 +142,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
     enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
       message: "message",
       imageUrl: "https://imageUrl",
-      redirectUrl: "https://redirectUrl",
+      redirectUrl: "https://redirect-url",
       imageAlt: "",
       title: "",
       overtitle: "",

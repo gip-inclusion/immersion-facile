@@ -12,7 +12,7 @@ export const defaultFlags: FeatureFlags = {
     imageAlt: "altImage",
     imageUrl: "https://imageUrl",
     message: "message",
-    redirectUrl: "https://redirectUrl",
+    redirectUrl: "https://redirect-url",
     overtitle: "overtitle",
     title: "title",
   }),

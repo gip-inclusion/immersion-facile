@@ -1631,7 +1631,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 .withNextAvailabilityDate(new Date())
                 .withMaxContactsPerMonth(2)
                 .withUpdatedAt(new Date())
-                .withWebsite("www.truc.com")
+                .withWebsite("https://www.truc.com")
                 .withAcquisition(aquisition)
                 .build(),
             )
@@ -1650,7 +1650,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withNextAvailabilityDate(new Date())
                   .withMaxContactsPerMonth(5)
                   .withUpdatedAt(new Date())
-                  .withWebsite("www.truc.com")
+                  .withWebsite("https://www.truc.com")
                   .withAcquisition(aquisition)
                   .build(),
               )
