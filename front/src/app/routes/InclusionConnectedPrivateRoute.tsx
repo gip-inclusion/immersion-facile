@@ -149,6 +149,8 @@ export const InclusionConnectedPrivateRoute = ({
           feedbackTopic: "auth-global",
         }),
       );
+      const { token: _, ...routeParams } = route.params;
+      routes[route.name](routeParams as any).replace();
     }
   }, [route.params, dispatch, afterLoginRedirectionUrl]);
 
