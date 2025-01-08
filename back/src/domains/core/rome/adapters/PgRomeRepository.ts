@@ -72,6 +72,35 @@ export class PgRomeRepository implements RomeRepository {
       );
   }
 
+  public async getAppellationAndRomeLegacyV3(
+    appellationCode: AppellationCode,
+  ): Promise<AppellationAndRomeDto | undefined> {
+    return this.transaction
+      .selectFrom("public_appellations_data as appellations")
+      .innerJoin(
+        "public_romes_data as romes",
+        "appellations.legacy_code_rome_v3",
+        "romes.code_rome",
+      )
+      .where("appellations.ogr_appellation", "=", parseInt(appellationCode))
+      .select([
+        "appellations.ogr_appellation",
+        "appellations.libelle_appellation_long",
+        "romes.libelle_rome",
+        "romes.code_rome",
+      ])
+      .executeTakeFirst()
+      .then((result) => {
+        if (!result) return;
+        return {
+          appellationCode: result.ogr_appellation.toString(),
+          appellationLabel: result.libelle_appellation_long,
+          romeCode: result.code_rome,
+          romeLabel: result.libelle_rome,
+        } satisfies AppellationAndRomeDto;
+      });
+  }
+
   public searchAppellation(query: string): Promise<AppellationAndRomeDto[]> {
     const [queryBeginning, lastWord] = prepareQueryParams(query);
     const sanitizedQuery = toTsQuery(queryBeginning);

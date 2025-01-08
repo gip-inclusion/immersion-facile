@@ -104,4 +104,10 @@ export class InMemoryRomeRepository implements RomeRepository {
       )
       .map(appellationDtoToRomeDto);
   }
+
+  public async getAppellationAndRomeLegacyV3(appellationCode: AppellationCode) {
+    return this.appellations.find(
+      (appellation) => appellation.appellationCode === appellationCode,
+    );
+  }
 }
