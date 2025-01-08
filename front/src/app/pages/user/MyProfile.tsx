@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AbsoluteUrl, UserParamsForAgency } from "shared";
-import { UserDetail } from "src/app/components/UserDetail";
+import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
@@ -69,7 +69,7 @@ export const MyProfile = (_: MyProfileProps) => {
 
   return (
     <>
-      <UserDetail
+      <UserProfile
         title={`Mon profil : ${userDisplayed}`}
         currentUser={currentUser}
         userWithRights={currentUser}

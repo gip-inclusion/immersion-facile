@@ -9,7 +9,6 @@ import {
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
-import { MyProfile } from "src/app/pages/MyProfile";
 import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
@@ -29,6 +28,7 @@ import { EstablishmentEditionFormPage } from "src/app/pages/establishment/Establ
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
+import { MyProfile } from "src/app/pages/user/MyProfile";
 import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
