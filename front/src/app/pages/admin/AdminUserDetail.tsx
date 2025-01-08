@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { UserParamsForAgency } from "shared";
-import { UserDetail } from "src/app/components/UserDetail";
+import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
@@ -61,7 +61,7 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
       : icUser.email;
 
   return (
-    <UserDetail
+    <UserProfile
       title={title}
       currentUser={currentUser}
       userWithRights={icUser}
