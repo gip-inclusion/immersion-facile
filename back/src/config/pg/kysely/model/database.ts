@@ -136,6 +136,7 @@ interface Discussions extends WithAcquisition {
 }
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";
+
 interface Exchanges {
   discussion_id: string;
   message: string;
@@ -410,11 +411,13 @@ interface Establishments extends WithAcquisition {
 interface PublicAppellationsData {
   ogr_appellation: Generated<number>;
   code_rome: string;
+  legacy_code_rome_v3: string | null;
   libelle_appellation_long: string;
   libelle_appellation_court: string;
   libelle_appellation_long_tsvector: string | null;
   libelle_appellation_long_without_special_char: string;
 }
+
 interface PublicRomesData {
   code_rome: string;
   libelle_rome: string;
@@ -513,6 +516,7 @@ interface SearchesMadeAppellationCode {
 
 type SortedBy = "date" | "distance" | "score";
 type SearchableBy = "jobSeekers" | "students";
+
 interface SearchesMade extends WithAcquisition {
   address: string | null;
   api_consumer_name: string | null;
@@ -569,6 +573,7 @@ interface NotificationsEmailAttachments {
 }
 
 type RecipientType = "cc" | "to";
+
 interface NotificationsEmailRecipients {
   notifications_email_id: string;
   email: string;
@@ -630,6 +635,7 @@ interface EstablishmentsDeleted {
   created_at: Timestamp;
   deleted_at: Timestamp;
 }
+
 interface ImmersionAssessments {
   convention_id: string;
   status: string;

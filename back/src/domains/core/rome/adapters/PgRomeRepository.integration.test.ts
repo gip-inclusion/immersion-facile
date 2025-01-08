@@ -1,17 +1,22 @@
 import { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import {
+  KyselyDb,
+  makeKyselyDb,
+} from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { PgRomeRepository } from "./PgRomeRepository";
 
 describe("Postgres implementation of Rome Gateway", () => {
   let pool: Pool;
+  let db: KyselyDb;
   let pgRomeRepository: PgRomeRepository;
 
   beforeAll(async () => {
     //We do not empty the data because the table data is static as it public data
     pool = getTestPgPool();
-    pgRomeRepository = new PgRomeRepository(makeKyselyDb(pool));
+    db = makeKyselyDb(pool);
+    pgRomeRepository = new PgRomeRepository(db);
   });
 
   afterAll(async () => {
@@ -49,6 +54,42 @@ describe("Postgres implementation of Rome Gateway", () => {
           },
         ],
       );
+    });
+  });
+
+  describe("getAppellationAndRomeLegacyV3", () => {
+    it("gets undefined when the legacy_rome_code_v3 is not provided", async () => {
+      const appellationAndRomeV3 =
+        await pgRomeRepository.getAppellationAndRomeLegacyV3("38745");
+      expectToEqual(appellationAndRomeV3, undefined);
+    });
+
+    it("gets the AppellationAndRomeCode for legacy ROME 3 when it exists", async () => {
+      const devMobileAppellationCode = "38745";
+      await db
+        .updateTable("public_appellations_data")
+        .set({
+          legacy_code_rome_v3: "M1804", // pour l'exemple, c'est pas un rome v3
+        })
+        .where("ogr_appellation", "=", +devMobileAppellationCode)
+        .execute();
+
+      const appellationAndRomeV3 =
+        await pgRomeRepository.getAppellationAndRomeLegacyV3(
+          devMobileAppellationCode,
+        );
+      expectToEqual(appellationAndRomeV3, {
+        appellationCode: devMobileAppellationCode,
+        appellationLabel: "Développeur / Développeuse web mobile",
+        romeCode: "M1804",
+        romeLabel: "Études et développement de réseaux de télécoms",
+      });
+
+      await db
+        .updateTable("public_appellations_data")
+        .set({ legacy_code_rome_v3: null })
+        .where("ogr_appellation", "=", +devMobileAppellationCode)
+        .execute();
     });
   });
 
