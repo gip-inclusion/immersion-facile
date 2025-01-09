@@ -15,6 +15,7 @@ import {
   WithAgencyId,
   WithAgencyIdAndUserId,
   errors,
+  toAgencyDtoForAgencyUsersAndAdmins,
   toAgencyPublicDisplayDto,
 } from "shared";
 import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
@@ -82,12 +83,15 @@ const simulatedUsers: InclusionConnectedUser[] = [
     lastName: "Bon",
     agencyRights: [
       {
-        agency: MISSION_LOCAL_AGENCY_ACTIVE,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(
+          MISSION_LOCAL_AGENCY_ACTIVE,
+          [],
+        ),
         isNotifiedByEmail: true,
         roles: ["agency-admin"],
       },
       {
-        agency: PE_AGENCY_ACTIVE,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(PE_AGENCY_ACTIVE, []),
         isNotifiedByEmail: true,
         roles: ["validator"],
       },
@@ -113,7 +117,7 @@ const simulatedUsers: InclusionConnectedUser[] = [
     lastName: "Jeplante",
     agencyRights: [
       {
-        agency: PE_AGENCY_ACTIVE,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(PE_AGENCY_ACTIVE, []),
         isNotifiedByEmail: true,
         roles: ["agency-admin"],
       },

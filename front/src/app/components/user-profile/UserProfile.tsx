@@ -1,6 +1,6 @@
 import React from "react";
 import { InclusionConnectedUser, UserParamsForAgency } from "shared";
-import { AgenciesTablesSection } from "./AgenciesTablesSection";
+import { AgenciesTablesSection } from "../agency/agencies-table/AgenciesTablesSection";
 import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
 
 type UserProfileProps = {

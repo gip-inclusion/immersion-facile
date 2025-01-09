@@ -5,6 +5,7 @@ import {
   InclusionConnectedUserBuilder,
   UserParamsForAgency,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -26,7 +27,7 @@ describe("UpdateUserOnAgency slice", () => {
   const agency = new AgencyDtoBuilder().build();
 
   const agencyRight: AgencyRight = {
-    agency,
+    agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
     roles: ["validator"],
     isNotifiedByEmail: false,
   };

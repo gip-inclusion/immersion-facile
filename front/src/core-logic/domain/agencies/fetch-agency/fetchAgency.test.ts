@@ -5,6 +5,7 @@ import {
   AgencyRight,
   InclusionConnectedUser,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import {
   NormalizedIcUserById,
@@ -30,6 +31,7 @@ import {
 import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const agencyDto = new AgencyDtoBuilder().build();
+const agencyWithAdminEmails = toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []);
 
 const user1: NormalizedInclusionConnectedUser = {
   id: "fake-user-id-1",
@@ -38,7 +40,7 @@ const user1: NormalizedInclusionConnectedUser = {
   lastName: "Bon",
   agencyRights: {
     [agencyDto.id]: {
-      agency: agencyDto,
+      agency: agencyWithAdminEmails,
       isNotifiedByEmail: true,
       roles: ["agency-admin"],
     },
@@ -55,7 +57,7 @@ const user2: NormalizedInclusionConnectedUser = {
   lastName: "Jeplante",
   agencyRights: {
     [agencyDto.id]: {
-      agency: agencyDto,
+      agency: agencyWithAdminEmails,
       isNotifiedByEmail: true,
       roles: ["agency-admin"],
     },
@@ -301,7 +303,7 @@ describe("fetchAgency", () => {
         });
 
         const agencyRight: AgencyRight = {
-          agency: agencyDto,
+          agency: agencyWithAdminEmails,
           roles: ["validator"],
           isNotifiedByEmail: false,
         };
@@ -346,7 +348,7 @@ describe("fetchAgency", () => {
               ...icUser,
               agencyRights: {
                 [agencyDto.id]: {
-                  agency: agencyDto,
+                  agency: agencyWithAdminEmails,
                   roles: ["validator"],
                   isNotifiedByEmail: false,
                 },
@@ -365,7 +367,7 @@ describe("fetchAgency", () => {
         expectFetchAgencyStateToMatch(fetchAgencyInitialState);
 
         const agencyRight: AgencyRight = {
-          agency: agencyDto,
+          agency: agencyWithAdminEmails,
           roles: ["validator"],
           isNotifiedByEmail: false,
         };
@@ -571,8 +573,8 @@ describe("fetchAgency", () => {
     );
   };
 
-  const feedWithFetchedAgency = (agencyDto: AgencyDto) => {
-    dependencies.agencyGateway.fetchedAgency$.next(agencyDto);
+  const feedWithFetchedAgency = (agency: AgencyDto) => {
+    dependencies.agencyGateway.fetchedAgency$.next(agency);
   };
   const feedWithFetchedAgencyUsers = (agencyUsers: NormalizedIcUserById) => {
     dependencies.agencyGateway.fetchedAgencyUsers$.next(
