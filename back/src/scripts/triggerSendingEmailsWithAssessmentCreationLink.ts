@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { keys } from "ramda";
 import { DateRange } from "shared";
@@ -27,18 +28,18 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
 
   const timeGateway = new RealTimeGateway();
   const now = timeGateway.now();
-  const yesterday = {
+  const todayAndAround = {
     from: subDays(now, 1),
-    to: now,
+    to: addDays(now, 1),
   };
-  const conventionEndDate: DateRange =
+  const conventionFinishingRange: DateRange =
     getDateRangeFromScriptParams({
       scriptParams: process.argv,
-    }) ?? yesterday;
+    }) ?? todayAndAround;
 
-  if (conventionEndDate.to > now) {
+  if (conventionFinishingRange.to > addDays(now, 1)) {
     const message =
-      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
+      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne seront pas terminées demain.";
     logger.error({
       message,
     });
@@ -74,7 +75,7 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     );
 
   return sendEmailsWithAssessmentCreationLink.execute({
-    conventionEndDate,
+    conventionEndDate: conventionFinishingRange,
   });
 };
 

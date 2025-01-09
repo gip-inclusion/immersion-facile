@@ -322,10 +322,12 @@ const AssessmentStatusSection = ({
               />
             </>
           )}
-          <ConventionTotalHours
-            totalHours={totalHours}
-            illustration={<img src={commonIllustrations.warning} alt="" />}
-          />
+          {formValues.status !== "DID_NOT_SHOW" && (
+            <ConventionTotalHours
+              totalHours={totalHours}
+              illustration={<img src={commonIllustrations.warning} alt="" />}
+            />
+          )}
         </div>
       </div>
       {printWeekSchedule({

@@ -77,15 +77,15 @@ export class PgConventionQueries implements ConventionQueries {
   }
 
   public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    dateEnd: DateRange,
+    finishingRange: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.status", "in", validatedConventionStatuses)
       .where(
         sql`conventions.date_end`,
-        "<",
-        dateEnd.to.toISOString().split("T")[0],
+        "<=",
+        finishingRange.to.toISOString().split("T")[0],
       )
       .where(({ selectFrom, not, exists }) =>
         not(
@@ -96,12 +96,12 @@ export class PgConventionQueries implements ConventionQueries {
               .where(
                 sql`notifications_email.created_at`,
                 ">=",
-                subDays(dateEnd.from, 1).toISOString().split("T")[0],
+                subDays(finishingRange.from, 1).toISOString().split("T")[0],
               )
               .where(
                 sql`notifications_email.created_at`,
                 "<=",
-                addDays(dateEnd.to, 2).toISOString().split("T")[0],
+                addDays(finishingRange.to, 2).toISOString().split("T")[0],
               )
               .whereRef(
                 "conventions.id",
@@ -116,7 +116,7 @@ export class PgConventionQueries implements ConventionQueries {
           eb(
             sql`conventions.date_end`,
             ">=",
-            dateEnd.from.toISOString().split("T")[0],
+            finishingRange.from.toISOString().split("T")[0],
           ),
           eb.exists(
             eb
@@ -130,12 +130,12 @@ export class PgConventionQueries implements ConventionQueries {
               .where(
                 sql`notifications_email.created_at`,
                 ">=",
-                subDays(dateEnd.from, 1).toISOString().split("T")[0],
+                subDays(finishingRange.from, 1).toISOString().split("T")[0],
               )
               .where(
                 sql`notifications_email.created_at`,
                 "<=",
-                addDays(dateEnd.to, 1).toISOString().split("T")[0],
+                addDays(finishingRange.to, 1).toISOString().split("T")[0],
               )
               .whereRef(
                 "conventions.id",
