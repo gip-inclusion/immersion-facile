@@ -60,6 +60,27 @@ const defaultAppellations: AppellationAndRomeDto[] = [
   cartographeAppellationAndRome,
 ];
 
+const appellationCodeToLegacyRome3: Record<AppellationCode, RomeDto> = {
+  "12694": {
+    romeCode: "V3000",
+    romeLabel: "Label V3 - Coiffeur",
+  },
+  "14704": { romeCode: "V3001", romeLabel: "Label V3 - Eleveur de lapin" },
+  "16067": { romeCode: "V3002", romeLabel: "Label V3 - Jardinier" },
+  "20560": {
+    romeCode: "V3003",
+    romeLabel: "Label V3 - Vendeur en boulangerie",
+  },
+  "20567": { romeCode: "V3004", romeLabel: "Label V3 - Vendeur de chocolat" },
+  "20714": { romeCode: "V3005", romeLabel: "Label V3 - Vitrailliste" },
+  "13252": { romeCode: "V3006", romeLabel: "Label V3 - Conducteur d'engins" },
+  "19540": { romeCode: "V3007", romeLabel: "Label V3 - Styliste" },
+  [cartographeAppellationAndRome.appellationCode]: {
+    romeCode: "V3008",
+    romeLabel: "Label V3 - Cartographe",
+  },
+};
+
 const appellationDtoToRomeDto = ({
   romeCode,
   romeLabel,
@@ -106,8 +127,14 @@ export class InMemoryRomeRepository implements RomeRepository {
   }
 
   public async getAppellationAndRomeLegacyV3(appellationCode: AppellationCode) {
-    return this.appellations.find(
+    const appellationV4 = this.appellations.find(
       (appellation) => appellation.appellationCode === appellationCode,
     );
+    if (!appellationV4) return;
+
+    return {
+      ...appellationV4,
+      ...appellationCodeToLegacyRome3[appellationV4.appellationCode],
+    };
   }
 }

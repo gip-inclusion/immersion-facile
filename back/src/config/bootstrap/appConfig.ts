@@ -78,6 +78,12 @@ export class AppConfig {
     });
   }
 
+  public get apiConsumerNameUsingRomeV3(): string[] {
+    return parseStringList(
+      this.#throwIfNotDefinedOrDefault("API_CONSUMER_NAME_USING_ROME_V3", ""),
+    );
+  }
+
   public get appellationsGateway() {
     return this.#throwIfNotInArray({
       variableName: "APPELLATIONS_GATEWAY",

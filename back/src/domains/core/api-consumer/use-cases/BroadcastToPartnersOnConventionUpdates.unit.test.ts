@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
   SubscriptionParams,
+  cartographeAppellationAndRome,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -166,6 +167,7 @@ describe("Broadcast to partners on updated convention", () => {
       uowPerformer,
       subscribersGateway,
       timeGateway,
+      [apiConsumer2.name],
     );
     uow.userRepository.users = [
       counsellor1,
@@ -237,6 +239,44 @@ describe("Broadcast to partners on updated convention", () => {
     ];
 
     expectToEqual(subscribersGateway.calls, expectedCallsAfterSecondExecute);
+  });
+
+  it("broadcast with Legacy Rome V3 when the consumer is still with this version", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withId("22222222-ee70-4c90-b3f4-668d492f7395")
+      .withAgencyId(agency2.id)
+      .withImmersionAppellation(cartographeAppellationAndRome)
+      .build();
+
+    uow.conventionRepository.setConventions([convention]);
+    uow.apiConsumerRepository.consumers = [apiConsumer2];
+
+    await broadcastUpdatedConvention.execute({ convention });
+
+    expectToEqual(subscribersGateway.calls, [
+      {
+        body: {
+          subscribedEvent: "convention.updated",
+          payload: {
+            convention: {
+              ...convention,
+              agencyName: agency2.name,
+              agencyDepartment: agency2.address.departmentCode,
+              agencyKind: agency2.kind,
+              agencySiret: agency2.agencySiret,
+              agencyCounsellorEmails: [counsellor2.email],
+              agencyValidatorEmails: [validator2.email],
+              immersionAppellation: {
+                ...cartographeAppellationAndRome,
+                romeCode: "V3008",
+                romeLabel: "Label V3 - Cartographe",
+              },
+            },
+          },
+        },
+        subscriptionParams,
+      },
+    ]);
   });
 
   it("save webhook error", async () => {

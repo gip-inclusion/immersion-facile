@@ -1,6 +1,7 @@
 import { filter } from "ramda";
 import {
   ApiConsumer,
+  AppellationAndRomeDto,
   ConventionReadDto,
   WithConventionDto,
   errors,
@@ -36,14 +37,18 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
 
   readonly #timeGateway: TimeGateway;
 
+  readonly #consumerNamesUsingRomeV3: string[];
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     subscribersGateway: SubscribersGateway,
     timeGateway: TimeGateway,
+    consumerNamesUsingRomeV3: string[],
   ) {
     super(uowPerformer);
     this.#subscribersGateway = subscribersGateway;
     this.#timeGateway = timeGateway;
+    this.#consumerNamesUsingRomeV3 = consumerNamesUsingRomeV3;
   }
 
   protected async _execute({ convention }: WithConventionDto, uow: UnitOfWork) {
@@ -92,8 +97,35 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
     );
   }
 
+  async #getImmersionAppellation({
+    uow,
+    conventionRead,
+    apiConsumer,
+  }: {
+    uow: UnitOfWork;
+    conventionRead: ConventionReadDto;
+    apiConsumer: ApiConsumer;
+  }): Promise<AppellationAndRomeDto> {
+    if (this.#consumerNamesUsingRomeV3.includes(apiConsumer.name)) {
+      const appellationAndRome =
+        await uow.romeRepository.getAppellationAndRomeLegacyV3(
+          conventionRead.immersionAppellation.appellationCode,
+        );
+
+      if (appellationAndRome) return appellationAndRome;
+    }
+
+    return conventionRead.immersionAppellation;
+  }
+
   #notifySubscriber(uow: UnitOfWork, conventionRead: ConventionReadDto) {
     return async (apiConsumer: ApiConsumer) => {
+      const immersionAppellation = await this.#getImmersionAppellation({
+        uow,
+        conventionRead,
+        apiConsumer,
+      });
+
       const conventionUpdatedCallbackParams =
         apiConsumer.rights.convention.subscriptions.find(
           (sub) => sub.subscribedEvent === "convention.updated",
@@ -105,11 +137,14 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         );
       }
 
+      const convention = {
+        ...conventionRead,
+        immersionAppellation,
+      };
+
       const response = await this.#subscribersGateway.notify(
         {
-          payload: {
-            convention: conventionRead,
-          },
+          payload: { convention },
           subscribedEvent: "convention.updated",
         },
         {
