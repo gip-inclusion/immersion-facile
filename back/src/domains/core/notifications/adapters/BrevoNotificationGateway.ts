@@ -70,7 +70,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
     };
   }
 
-  public async getAttachmentContent(downloadToken: string): Promise<Base64> {
+  public async getAttachmentContent(
+    downloadToken: string,
+  ): Promise<Base64 | null> {
     const response = await this.config.httpClient.getAttachmentContent({
       urlParams: { downloadToken },
       headers: {
@@ -86,6 +88,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
           2,
         )}`,
       );
+    if (!(response.body instanceof Blob)) {
+      return null;
+    }
 
     const blob: Blob = response.body;
     return Buffer.from(await blob.arrayBuffer()).toString("base64");

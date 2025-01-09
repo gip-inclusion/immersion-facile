@@ -91,6 +91,15 @@ describe("BrevoNotificationGateway manual", () => {
     expect(base64).toBe(ifLogoInBase64);
   });
 
+  it("should not retrieve attachment if it is not a blob", async () => {
+    const downloadToken =
+      "eyJmb2xkZXIiOiIyMDI1MDEwOTA5MDQ1OC45Ni45MTM3NjE2OTgiLCJmaWxlbmFtZSI6Ii4rQ0lERitCRUxGT1JUKy52Y2YifQ";
+
+    const attachment =
+      await notificationGateway.getAttachmentContent(downloadToken);
+    expect(attachment).toBe(null);
+  });
+
   it("should send email with attachment correctly", async () => {
     const response = await notificationGateway.sendEmail({
       kind: "EDIT_FORM_ESTABLISHMENT_LINK",

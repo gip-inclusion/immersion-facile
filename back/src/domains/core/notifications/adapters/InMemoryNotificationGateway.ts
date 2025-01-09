@@ -22,9 +22,10 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     private readonly numberOfEmailToKeep: number | null = null,
   ) {}
 
-  public async getAttachmentContent(link: string): Promise<Base64> {
+  public async getAttachmentContent(link: string): Promise<Base64 | null> {
     const attachment = this.attachmentsByLinks[link];
     if (!attachment) throw new Error(`No attachment found by link ${link}.`);
+    if (attachment === "not-a-blob") return null;
     return attachment;
   }
 
