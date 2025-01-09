@@ -304,7 +304,7 @@ const AssessmentStatusSection = ({
               <Input
                 label={`L'immersion représente actuellement ${convention.schedule.totalHours} heures, pouvez-vous indiquer le nombre d'heures manquées ?`}
                 hintText={`Nombre total d'heures indiquées dans la convention : ${hoursValueToHoursDisplayed(
-                  convention.schedule.totalHours,
+                  { hoursValue: convention.schedule.totalHours },
                 )}`}
                 nativeInputProps={{
                   ...register("numberOfMissedHours", {
@@ -376,12 +376,18 @@ const computeTotalHours = (
 ) =>
   match(assessmentStatus)
     .with("COMPLETED", () =>
-      hoursValueToHoursDisplayed(convention.schedule.totalHours),
+      hoursValueToHoursDisplayed({
+        hoursValue: convention.schedule.totalHours,
+        padWithZero: false,
+      }),
     )
     .with("PARTIALLY_COMPLETED", () =>
-      hoursValueToHoursDisplayed(convention.schedule.totalHours - missedHours),
+      hoursValueToHoursDisplayed({
+        hoursValue: convention.schedule.totalHours - missedHours,
+        padWithZero: false,
+      }),
     )
-    .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed(0))
+    .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
     .exhaustive();
 
 const AssessmentContractSection = ({

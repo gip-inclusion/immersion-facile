@@ -54,10 +54,16 @@ export const hoursDisplayedToHoursValue = (hoursDisplayed: string): number => {
   );
 };
 
-export const hoursValueToHoursDisplayed = (hoursValue: number): string => {
+export const hoursValueToHoursDisplayed = ({
+  hoursValue,
+  padWithZero = true,
+}: {
+  hoursValue: number;
+  padWithZero?: boolean;
+}): string => {
   const hours = Math.floor(hoursValue);
   const minutes = Math.round((hoursValue - hours) * 60);
-  const hoursDisplayed = `${hours < 10 ? `0${hours}` : hours}`;
+  const hoursDisplayed = `${hours < 10 && padWithZero ? `0${hours}` : hours}`;
   if (minutes === 0) return `${hoursDisplayed}${hourDisplayedSeparator}`;
   return `${hoursDisplayed}${hourDisplayedSeparator}${
     minutes < 10 ? `0${minutes}` : minutes
