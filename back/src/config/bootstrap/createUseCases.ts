@@ -562,7 +562,7 @@ export const createUseCases = (
           uowPerformer,
           gateways.subscribersGateway,
           gateways.timeGateway,
-          config.apiConsumerNameUsingRomeV3,
+          config.apiConsumerNamesUsingRomeV3,
         ),
       subscribeToWebhook: new SubscribeToWebhook(
         uowPerformer,

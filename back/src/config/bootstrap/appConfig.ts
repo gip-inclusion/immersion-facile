@@ -78,9 +78,9 @@ export class AppConfig {
     });
   }
 
-  public get apiConsumerNameUsingRomeV3(): string[] {
+  public get apiConsumerNamesUsingRomeV3(): string[] {
     return parseStringList(
-      this.#throwIfNotDefinedOrDefault("API_CONSUMER_NAME_USING_ROME_V3", ""),
+      this.#throwIfNotDefinedOrDefault("API_CONSUMER_NAMES_USING_ROME_V3", ""),
     );
   }
 
