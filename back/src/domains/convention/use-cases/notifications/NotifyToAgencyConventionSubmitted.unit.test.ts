@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  AgencyWithUsersRights,
   ConventionDto,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
@@ -15,7 +16,6 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";

@@ -2,6 +2,7 @@ import { partition } from "ramda";
 import {
   AgencyGroup,
   AgencyRight,
+  AgencyWithUsersRights,
   InclusionConnectedUser,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
@@ -11,7 +12,6 @@ import {
   agencyWithRightToAgencyDto,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
-import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserAuthenticatedPayload } from "../../core/events/events";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

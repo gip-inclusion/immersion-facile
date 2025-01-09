@@ -1,5 +1,8 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AgencyDtoWithoutEmails, AgencyId } from "../agency/agency.dto";
+import {
+  AgencyDtoForAgencyUsersAndAdmins,
+  AgencyId,
+} from "../agency/agency.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
@@ -18,7 +21,7 @@ export const allAgencyRoles = [
 ] as const;
 
 export type AgencyRight = {
-  agency: AgencyDtoWithoutEmails;
+  agency: AgencyDtoForAgencyUsersAndAdmins;
   roles: AgencyRole[];
   isNotifiedByEmail: boolean;
 };

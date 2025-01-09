@@ -6,6 +6,7 @@ import {
   AgencyOption,
   AgencyPositionFilter,
   AgencyStatus,
+  AgencyWithUsersRights,
   DepartmentCode,
   GeoPositionDto,
   PartialAgencyDto,
@@ -21,7 +22,6 @@ import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetwe
 import {
   AgencyRepository,
   AgencyRightOfUser,
-  AgencyWithUsersRights,
   GetAgenciesFilters,
 } from "../ports/AgencyRepository";
 

@@ -1,6 +1,5 @@
-import { ConflictError } from "shared";
+import { AgencyWithUsersRights, ConflictError } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { AgencyWithUsersRights } from "../ports/AgencyRepository";
 
 export const throwConflictErrorOnSimilarAgencyFound = async ({
   uow,

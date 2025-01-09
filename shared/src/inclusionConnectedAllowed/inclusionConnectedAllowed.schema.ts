@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { agencyWithoutEmailSchema } from "../agency/agency.schema";
+import { agencyDtoForAgencyUsersAndAdminsSchema } from "../agency/agency.schema";
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
 import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
@@ -25,7 +25,7 @@ import {
 export const agencyRoleSchema = z.enum(allAgencyRoles);
 
 const agencyRightSchema: z.Schema<AgencyRight> = z.object({
-  agency: agencyWithoutEmailSchema,
+  agency: agencyDtoForAgencyUsersAndAdminsSchema,
   roles: z.array(agencyRoleSchema),
   isNotifiedByEmail: z.boolean(),
 });

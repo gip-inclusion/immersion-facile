@@ -1,4 +1,5 @@
 import {
+  AgencyWithUsersRights,
   ApiConsumer,
   ApiConsumerName,
   InclusionConnectedUser,
@@ -7,7 +8,6 @@ import {
   userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
-import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 

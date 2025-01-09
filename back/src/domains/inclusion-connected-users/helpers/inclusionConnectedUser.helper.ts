@@ -2,15 +2,13 @@ import { uniq, values } from "ramda";
 import {
   AgencyId,
   AgencyRight,
+  AgencyWithUsersRights,
   InclusionConnectedUser,
   UserId,
   errors,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
-import {
-  AgencyRightOfUser,
-  AgencyWithUsersRights,
-} from "../../agency/ports/AgencyRepository";
+import { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 

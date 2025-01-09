@@ -1,9 +1,11 @@
 import { values } from "ramda";
-import { AgencyId, AgencyRole, errors } from "shared";
 import {
+  AgencyId,
+  AgencyRole,
   AgencyUsersRights,
   AgencyWithUsersRights,
-} from "../../agency/ports/AgencyRepository";
+  errors,
+} from "shared";
 
 export const rejectIfEditionOfValidatorsOfAgencyWithRefersTo = (
   agency: AgencyWithUsersRights,

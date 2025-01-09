@@ -2,6 +2,7 @@ import {
   AgencyKind,
   AgencyKindFilter,
   AgencyOption,
+  AgencyWithUsersRights,
   ListAgencyOptionsRequestDto,
   activeAgencyStatuses,
   agencyKindList,
@@ -11,10 +12,7 @@ import {
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import {
-  AgencyWithUsersRights,
-  GetAgenciesFilters,
-} from "../ports/AgencyRepository";
+import { GetAgenciesFilters } from "../ports/AgencyRepository";
 
 export class ListAgencyOptionsByFilter extends TransactionalUseCase<
   ListAgencyOptionsRequestDto,

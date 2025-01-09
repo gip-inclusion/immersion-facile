@@ -2,6 +2,7 @@ import { sql } from "kysely";
 import {
   AgencyId,
   AgencyKind,
+  AgencyRole,
   AppellationCode,
   AppellationLabel,
   Beneficiary,
@@ -15,7 +16,9 @@ import {
   RomeLabel,
   ScheduleDto,
   SiretDto,
+  UserId,
   conventionReadSchema,
+  pipeWithValue,
 } from "shared";
 import {
   KyselyDb,
@@ -25,10 +28,6 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../utils/schema.utils";
-import {
-  getEmailsFromUsersWithAgencyRoles,
-  getUsersWithAgencyRole,
-} from "../../core/authentication/inclusion-connect/adapters/agencyUsers.helpers";
 
 export const createConventionQueryBuilder = (transaction: KyselyDb) => {
   // biome-ignore format: reads better without formatting
@@ -347,3 +346,62 @@ export const makeGetLastConventionWithSiretInList =
       )
       .where("conventions.status", "=", "ACCEPTED_BY_VALIDATOR")
       .where("conventions.siret", "in", sirets);
+
+type UserWithAgencyRole = {
+  userId: UserId;
+  email: Email;
+  agencyId: AgencyId;
+  roles: AgencyRole[];
+  isNotifiedByEmail: boolean;
+};
+
+const getUsersWithAgencyRole = async (
+  transaction: KyselyDb,
+  {
+    agencyIds,
+    isNotifiedByEmail,
+  }: {
+    agencyIds: AgencyId[];
+    isNotifiedByEmail?: boolean;
+  },
+): Promise<UserWithAgencyRole[]> => {
+  if (agencyIds.length === 0) return [];
+
+  return pipeWithValue(
+    transaction
+      .selectFrom("users__agencies")
+      .innerJoin("users", "users.id", "users__agencies.user_id")
+      .where("agency_id", "in", agencyIds)
+      .orderBy("users.email")
+      .select([
+        "users.id as userId",
+        "users.email",
+        sql<AgencyRole[]>`users__agencies.roles`.as("roles"),
+        "users__agencies.agency_id as agencyId",
+        "users__agencies.is_notified_by_email as isNotifiedByEmail",
+      ]),
+    (builder) => {
+      if (isNotifiedByEmail !== undefined)
+        return builder.where("is_notified_by_email", "=", isNotifiedByEmail);
+      return builder;
+    },
+    (builder) => builder.execute(),
+  );
+};
+
+type AgencyMatchingCriteria = {
+  agencyIdToMatch: AgencyId;
+  roleToMatch: AgencyRole;
+};
+
+const getEmailsFromUsersWithAgencyRoles = (
+  usersWithAgencyRole: UserWithAgencyRole[],
+  { agencyIdToMatch, roleToMatch }: AgencyMatchingCriteria,
+) => {
+  return usersWithAgencyRole
+    .filter(
+      (user) =>
+        user.agencyId === agencyIdToMatch && user.roles.includes(roleToMatch),
+    )
+    .map((user) => user.email);
+};

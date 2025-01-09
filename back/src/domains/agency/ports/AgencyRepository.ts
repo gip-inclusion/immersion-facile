@@ -5,8 +5,8 @@ import type {
   AgencyKind,
   AgencyPositionFilter,
   AgencyRight,
-  AgencyRole,
   AgencyStatus,
+  AgencyWithUsersRights,
   DepartmentCode,
   OmitFromExistingKeys,
   SiretDto,
@@ -39,23 +39,6 @@ export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
 export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
   agencyId: AgencyId;
 };
-
-export type AgencyUserRight = {
-  roles: AgencyRole[];
-  isNotifiedByEmail: boolean;
-};
-
-export type AgencyUsersRights = Partial<Record<UserId, AgencyUserRight>>;
-
-export type WithAgencyUserRights = {
-  usersRights: AgencyUsersRights;
-};
-
-export type AgencyWithUsersRights = OmitFromExistingKeys<
-  AgencyDto,
-  "counsellorEmails" | "validatorEmails"
-> &
-  WithAgencyUserRights;
 
 export interface AgencyRepository {
   insert(agency: AgencyWithUsersRights): Promise<AgencyId | undefined>;

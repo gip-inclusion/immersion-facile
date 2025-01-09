@@ -6,6 +6,7 @@ import {
   UpdateAgencyStatusParams,
   UpdateAgencyStatusParamsWithoutId,
 } from "../admin/admin.dto";
+import { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -18,7 +19,7 @@ import {
 } from "../zodUtils";
 import {
   AgencyDto,
-  AgencyDtoWithoutEmails,
+  AgencyDtoForAgencyUsersAndAdmins,
   AgencyId,
   AgencyIdResponse,
   AgencyKind,
@@ -131,20 +132,26 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   )
   .and(withAcquisitionSchema);
 
-export const agencyWithoutEmailSchema: z.Schema<AgencyDtoWithoutEmails> = z
-  .object(commonAgencyShape)
-  .merge(
-    z.object({
-      agencySiret: siretSchema,
-      questionnaireUrl: absoluteUrlSchema.or(z.null()),
-      status: agencyStatusSchema,
-      codeSafir: zStringMinLength1.or(z.null()),
-      refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
-      refersToAgencyName: zStringMinLength1.or(z.null()),
-      rejectionJustification: z.string().or(z.null()),
-    }),
-  )
-  .and(withAcquisitionSchema);
+const withAdminEmailsSchema: z.Schema<{ admins: Email[] }> = z.object({
+  admins: z.array(emailSchema),
+});
+
+export const agencyDtoForAgencyUsersAndAdminsSchema: z.Schema<AgencyDtoForAgencyUsersAndAdmins> =
+  z
+    .object(commonAgencyShape)
+    .merge(
+      z.object({
+        agencySiret: siretSchema,
+        questionnaireUrl: absoluteUrlSchema.or(z.null()),
+        status: agencyStatusSchema,
+        codeSafir: zStringMinLength1.or(z.null()),
+        refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
+        refersToAgencyName: zStringMinLength1.or(z.null()),
+        rejectionJustification: z.string().or(z.null()),
+      }),
+    )
+    .and(withAcquisitionSchema)
+    .and(withAdminEmailsSchema);
 
 export const agencySchema: z.ZodSchema<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })

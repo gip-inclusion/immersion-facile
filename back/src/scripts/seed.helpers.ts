@@ -3,9 +3,9 @@ import {
   AgencyDtoBuilder,
   AgencyId,
   AgencyKind,
+  AgencyUsersRights,
   UserId,
 } from "shared";
-import { AgencyUsersRights } from "../domains/agency/ports/AgencyRepository";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { toAgencyWithRights } from "../utils/agency";

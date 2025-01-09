@@ -1,5 +1,7 @@
 import { toPairs, uniq } from "ramda";
 import {
+  AgencyUsersRights,
+  AgencyWithUsersRights,
   InclusionConnectedUser,
   WithAgencyId,
   errors,
@@ -10,10 +12,6 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import {
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-} from "../ports/AgencyRepository";
 
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyId,

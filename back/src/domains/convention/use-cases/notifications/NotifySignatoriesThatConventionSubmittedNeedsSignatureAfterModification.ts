@@ -1,5 +1,6 @@
 import { values } from "ramda";
 import {
+  AgencyWithUsersRights,
   ConventionDto,
   ConventionJwtPayload,
   Signatory,
@@ -11,7 +12,6 @@ import {
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";

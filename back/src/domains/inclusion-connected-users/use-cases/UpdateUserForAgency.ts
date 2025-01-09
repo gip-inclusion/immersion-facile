@@ -1,11 +1,11 @@
 import {
+  AgencyUsersRights,
   Email,
   InclusionConnectedUser,
   UserParamsForAgency,
   errors,
   userParamsForAgencySchema,
 } from "shared";
-import { AgencyUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";

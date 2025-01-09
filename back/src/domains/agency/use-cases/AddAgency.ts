@@ -2,6 +2,8 @@ import { toPairs } from "ramda";
 import {
   AgencyId,
   AgencyRole,
+  AgencyUsersRights,
+  AgencyWithUsersRights,
   CreateAgencyDto,
   UserId,
   createAgencySchema,
@@ -16,10 +18,6 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { throwConflictErrorOnSimilarAgencyFound } from "../entities/Agency";
-import {
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-} from "../ports/AgencyRepository";
 
 type WithUserIdAndIsNotified = {
   userId: UserId;
