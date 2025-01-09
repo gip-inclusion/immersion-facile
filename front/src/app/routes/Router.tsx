@@ -140,6 +140,7 @@ const getPageByRouteName: {
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,
+  conventionMiniStage: (route) => <ConventionMiniStagePage route={route} />,
   conventionConfirmation: (route) => (
     <ConventionConfirmationPage route={route} />
   ),
@@ -147,7 +148,6 @@ const getPageByRouteName: {
     <ConventionPageForExternals route={route} />
   ),
   conventionDocument: (route) => <ConventionDocumentPage route={route} />,
-  conventionMiniStage: () => <ConventionMiniStagePage />,
   conventionStatusDashboard: (route) => (
     <ConventionStatusDashboardPage route={route} />
   ),
