@@ -1,6 +1,7 @@
 import { uniq } from "ramda";
 import {
   AgencyDto,
+  AgencyWithUsersRights,
   ApiConsumer,
   ConventionDto,
   ConventionReadDto,
@@ -10,7 +11,7 @@ import {
   errors,
   statusTransitionConfigs,
 } from "shared";
-import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
+
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfTransitionNotAllowed = ({

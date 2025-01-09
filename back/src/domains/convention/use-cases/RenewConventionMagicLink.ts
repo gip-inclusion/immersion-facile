@@ -1,5 +1,6 @@
 import { TokenExpiredError, decode } from "jsonwebtoken";
 import {
+  AgencyWithUsersRights,
   BadRequestError,
   ConventionDto,
   ConventionId,
@@ -19,7 +20,6 @@ import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicL
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
 import { createLogger } from "../../../utils/logger";
-import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";

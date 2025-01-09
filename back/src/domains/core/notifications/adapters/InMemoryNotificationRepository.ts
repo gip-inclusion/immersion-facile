@@ -1,6 +1,7 @@
 import { parseISO } from "date-fns";
 import {
   AgencyDto,
+  AgencyWithUsersRights,
   ConventionDto,
   EmailNotification,
   Notification,
@@ -15,7 +16,6 @@ import {
   expectToEqual,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import {
   EmailNotificationFilters,

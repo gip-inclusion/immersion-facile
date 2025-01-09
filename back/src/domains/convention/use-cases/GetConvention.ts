@@ -1,5 +1,6 @@
 import { toPairs } from "ramda";
 import {
+  AgencyWithUsersRights,
   ConventionDomainPayload,
   ConventionId,
   ConventionReadDto,
@@ -14,7 +15,6 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRole } from "../../../utils/convention";
-import { AgencyWithUsersRights } from "../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

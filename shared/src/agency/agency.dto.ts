@@ -1,9 +1,13 @@
-import { keys } from "ramda";
+import { keys, omit } from "ramda";
 import { AbsoluteUrl } from "../AbsoluteUrl";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, DepartmentCode } from "../address/address.dto";
 import { Email } from "../email/email.dto";
 import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
+import {
+  AgencyRole,
+  UserId,
+} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
@@ -46,12 +50,31 @@ export type WithAgencyDto = {
 };
 export type AgencyDto = CreateAgencyDto & AgencyDtoSensitiveFields;
 
-export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
-
-export type AgencyDtoWithoutEmails = OmitFromExistingKeys<
+export type AgencyUserRight = {
+  roles: AgencyRole[];
+  isNotifiedByEmail: boolean;
+};
+export type AgencyUsersRights = Partial<Record<UserId, AgencyUserRight>>;
+export type WithAgencyUserRights = {
+  usersRights: AgencyUsersRights;
+};
+export type AgencyWithUsersRights = OmitFromExistingKeys<
   AgencyDto,
   "counsellorEmails" | "validatorEmails"
->;
+> &
+  WithAgencyUserRights;
+
+export type PartialAgencyDto = Partial<AgencyDto> & { id: AgencyId };
+
+type WithAdminEmails = {
+  admins: Email[];
+};
+
+export type AgencyDtoForAgencyUsersAndAdmins = OmitFromExistingKeys<
+  AgencyDto,
+  "counsellorEmails" | "validatorEmails"
+> &
+  WithAdminEmails;
 
 export type AgencyId = Flavor<string, "AgencyId">;
 export type AgencyIdResponse = AgencyId | undefined;
@@ -161,3 +184,13 @@ export const agencyStatusToLabel: Record<AgencyStatus, string> = {
   needsReview: "En attende d'activation",
   "from-api-PE": "Import Api",
 };
+
+export const toAgencyDtoForAgencyUsersAndAdmins = (
+  agency: AgencyDto | AgencyWithUsersRights,
+  admins: Email[],
+): AgencyDtoForAgencyUsersAndAdmins => ({
+  ...("usersRights" in agency
+    ? omit(["usersRights"], agency)
+    : omit(["counsellorEmails", "validatorEmails"], agency)),
+  admins,
+});

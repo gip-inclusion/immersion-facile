@@ -1,6 +1,7 @@
 import {
   AbsoluteUrl,
   AgencyDtoBuilder,
+  AgencyWithUsersRights,
   ConventionDto,
   ConventionDtoBuilder,
   EstablishmentRepresentative,
@@ -24,7 +25,6 @@ import {
   ExpectSavedNotificationsBatchAndEvent,
   makeExpectSavedNotificationsBatchAndEvent,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";

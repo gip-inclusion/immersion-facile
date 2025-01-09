@@ -1,4 +1,5 @@
 import {
+  AgencyWithUsersRights,
   ConventionDto,
   ConventionDtoBuilder,
   frontRoutes,
@@ -9,7 +10,6 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { AgencyWithUsersRights } from "../../../../agency/ports/AgencyRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";

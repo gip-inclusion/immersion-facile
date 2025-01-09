@@ -1,9 +1,12 @@
 import { toPairs } from "ramda";
-import { AgencyDto, AgencyRight, UserId, errors } from "shared";
 import {
+  AgencyDto,
+  AgencyRight,
   AgencyUsersRights,
   AgencyWithUsersRights,
-} from "../domains/agency/ports/AgencyRepository";
+  UserId,
+  errors,
+} from "shared";
 import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 

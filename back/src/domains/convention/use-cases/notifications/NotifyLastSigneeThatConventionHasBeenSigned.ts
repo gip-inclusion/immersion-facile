@@ -1,4 +1,5 @@
 import {
+  AgencyWithUsersRights,
   ConventionDto,
   Signatory,
   SignatoryRole,
@@ -9,7 +10,6 @@ import {
   withConventionSchema,
 } from "shared";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

@@ -8,6 +8,8 @@ import {
   AgencyKind,
   AgencyRole,
   AgencyStatus,
+  AgencyUsersRights,
+  AgencyWithUsersRights,
   ConflictError,
   DepartmentCode,
   OmitFromExistingKeys,
@@ -28,8 +30,6 @@ import { createLogger } from "../../../utils/logger";
 import {
   AgencyRepository,
   AgencyRightOfUser,
-  AgencyUsersRights,
-  AgencyWithUsersRights,
   GetAgenciesFilters,
   PartialAgencyWithUsersRights,
 } from "../ports/AgencyRepository";

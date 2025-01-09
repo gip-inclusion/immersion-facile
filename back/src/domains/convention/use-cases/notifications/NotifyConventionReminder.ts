@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import {
   type AgencyDto,
+  type AgencyWithUsersRights,
   type Beneficiary,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
@@ -23,7 +24,6 @@ import {
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { AgencyWithUsersRights } from "../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { ConventionReminderPayload } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
