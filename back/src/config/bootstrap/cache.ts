@@ -7,14 +7,21 @@ import { type AppConfig } from "./appConfig";
 
 const logger = createLogger(__filename);
 
-export const getWithCache = async (config: AppConfig): Promise<WithCache> => {
+export const getWithCache = async (
+  config: AppConfig,
+): Promise<{ withCache: WithCache; disconnectCache: () => Promise<void> }> => {
   const defaultCacheDurationInHours = 24;
-  if (config.cache === "NONE") return withNoCache;
+  if (config.cache === "NONE")
+    return { withCache: withNoCache, disconnectCache: async () => {} };
   if (config.cache === "REDIS") {
-    return makeRedisWithCache({
-      defaultCacheDurationInHours,
-      redisClient: await makeConnectedRedisClient(config),
-    });
+    const redisClient = await makeConnectedRedisClient(config);
+    return {
+      withCache: makeRedisWithCache({
+        defaultCacheDurationInHours,
+        redisClient: redisClient,
+      }),
+      disconnectCache: () => redisClient.disconnect(),
+    };
   }
   return config.cache satisfies never;
 };

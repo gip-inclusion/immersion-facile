@@ -188,7 +188,7 @@ export const createGateways = async (
         )
       : new InMemoryPoleEmploiGateway();
 
-  const withCache = await getWithCache(config);
+  const { withCache, disconnectCache } = await getWithCache(config);
 
   const peConnectGateway: PeConnectGateway =
     config.peConnectGateway === "HTTPS"
@@ -381,6 +381,7 @@ export const createGateways = async (
   };
 
   return {
+    disconnectCache: disconnectCache,
     addressApi: addressGateway,
     appellationsGateway: appellationsGateway(config),
     dashboardGateway: createDashboardGateway(config),

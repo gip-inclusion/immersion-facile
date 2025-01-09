@@ -107,6 +107,7 @@ const seed = async () => {
   });
 
   await pool.end();
+  await deps.gateways.disconnectCache();
 };
 
 const inclusionConnectUserSeed = async (db: KyselyDb) => {
