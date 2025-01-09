@@ -1044,7 +1044,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         beneficiaryLastName,
         businessName,
         internshipKind,
-        agencyAssessmentDocumentLink,
       }) => ({
         subject: `Remplissez le bilan de fin ${
           internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
@@ -1058,22 +1057,13 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           internshipKind === "immersion"
             ? "immersion professionnelle"
             : "mini-stage"
-        } au sein de l'entreprise ${businessName} est bientôt finie.
+        } au sein de l'entreprise ${businessName} se termine.
         
-        Prenez quelques instants pour remplir le bilan avec votre tuteur. Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier. Renvoyez-le ensuite à votre conseiller par email.
+        Prenez quelques instants avec votre tuteur : il a reçu par mail l'accès au formulaire de bilan qu'il devra compléter en votre présence.
+        Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
+        
+        À la fin de votre immersion, contactez votre conseiller pour faire part de vos impressions et finaliser ainsi votre bilan.
         `,
-        buttons: [
-          {
-            label: "Télécharger la fiche bilan",
-            url:
-              agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
-              }`,
-          },
-        ],
         subContent: defaultSignature(internshipKind),
       }),
     },

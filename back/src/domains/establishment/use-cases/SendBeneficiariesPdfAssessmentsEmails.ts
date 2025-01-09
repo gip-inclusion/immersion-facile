@@ -105,7 +105,6 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
           beneficiaryLastName: convention.signatories.beneficiary.lastName,
           businessName: convention.businessName,
           conventionId: convention.id,
-          agencyAssessmentDocumentLink: agency.questionnaireUrl ?? undefined,
           internshipKind: convention.internshipKind,
         },
       },
