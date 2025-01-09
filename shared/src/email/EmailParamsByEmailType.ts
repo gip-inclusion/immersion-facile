@@ -72,7 +72,6 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     internshipKind: InternshipKind;
-    agencyAssessmentDocumentLink: string | undefined;
   };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;

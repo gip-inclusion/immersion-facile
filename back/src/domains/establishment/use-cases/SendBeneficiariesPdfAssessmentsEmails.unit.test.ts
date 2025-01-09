@@ -107,8 +107,6 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
               conventionEndingTomorrow.signatories.beneficiary.firstName,
             businessName: conventionEndingTomorrow.businessName,
             internshipKind: conventionEndingTomorrow.internshipKind,
-            agencyAssessmentDocumentLink:
-              expectedAgency.questionnaireUrl ?? undefined,
           },
           recipients: [conventionEndingTomorrow.signatories.beneficiary.email],
           sender: {
@@ -146,7 +144,6 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
         beneficiaryFirstName: signatories.beneficiary.firstName,
         beneficiaryLastName: signatories.beneficiary.lastName,
         conventionId: conventionEndingTomorrow.id,
-        agencyAssessmentDocumentLink: undefined,
         businessName: "my super company",
       },
       recipients: [signatories.beneficiary.email],
