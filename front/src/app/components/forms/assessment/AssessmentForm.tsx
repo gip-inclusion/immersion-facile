@@ -200,20 +200,20 @@ export const AssessmentForm = ({
   );
 };
 
-const wordingByIntershipKind: Record<
+const wordingByInternshipKind: Record<
   InternshipKind,
   Record<AssessmentStatus, string>
 > = {
   immersion: {
-    COMPLETED: "Oui, l'immersion a eue lieu aux horaires prévus",
+    COMPLETED: "Oui, l'immersion a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changé (abandon en cours, absences, retard, etc.)",
+      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
   "mini-stage-cci": {
     COMPLETED: "Oui, le mini-stage a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changé (abandon en cours, absences, retard, etc.)",
+      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
 };
@@ -221,10 +221,10 @@ const wordingByIntershipKind: Record<
 const getLabels = (
   internshipKind: InternshipKind,
 ): Record<AssessmentStatus, string> => ({
-  COMPLETED: wordingByIntershipKind[internshipKind].COMPLETED,
+  COMPLETED: wordingByInternshipKind[internshipKind].COMPLETED,
   PARTIALLY_COMPLETED:
-    wordingByIntershipKind[internshipKind].PARTIALLY_COMPLETED,
-  DID_NOT_SHOW: wordingByIntershipKind[internshipKind].DID_NOT_SHOW,
+    wordingByInternshipKind[internshipKind].PARTIALLY_COMPLETED,
+  DID_NOT_SHOW: wordingByInternshipKind[internshipKind].DID_NOT_SHOW,
 });
 
 const AssessmentStatusSection = ({
@@ -285,7 +285,7 @@ const AssessmentStatusSection = ({
           {formValues.status === "PARTIALLY_COMPLETED" && (
             <>
               <Input
-                label="Dernier jour de presence"
+                label="Dernier jour de présence"
                 hintText={`Date indiquée dans la convention : ${toDisplayedDate(
                   {
                     date: convertLocaleDateToUtcTimezoneDate(
@@ -302,7 +302,7 @@ const AssessmentStatusSection = ({
                 {...getFieldError("lastDayOfPresence")}
               />
               <Input
-                label={`L'immersion représente actuellement ${convention.schedule.totalHours} heures, pouvez vous indiquer le nombre d'heure manquées ?`}
+                label={`L'immersion représente actuellement ${convention.schedule.totalHours} heures, pouvez-vous indiquer le nombre d'heures manquées ?`}
                 hintText={`Nombre total d'heures indiquées dans la convention : ${hoursValueToHoursDisplayed(
                   convention.schedule.totalHours,
                 )}`}
@@ -558,7 +558,7 @@ const AssessmentSuccessMessage = ({
     >
       <h2>Merci d'avoir rempli le bilan !</h2>
       <p>
-        Nous vous remercions d`avoir utilisé Immersion Facilitée pour
+        Nous vous remercions d'avoir utilisé Immersion Facilitée pour
         accompagner {firstName} {lastName} dans son immersion. Votre implication
         contribue à améliorer notre site et à enrichir le dossier du candidat.
       </p>
