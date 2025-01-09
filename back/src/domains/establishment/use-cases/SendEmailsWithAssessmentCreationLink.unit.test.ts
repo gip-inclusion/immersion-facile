@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
@@ -30,8 +31,6 @@ import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGenerato
 import { SendEmailsWithAssessmentCreationLink } from "./SendEmailsWithAssessmentCreationLink";
 
 describe("SendEmailWithAssessmentCreationLink", () => {
-  const id: ConventionId = "immersion-ending-yesterday-id";
-
   let uow: InMemoryUnitOfWork;
   let sendEmailWithAssessmentCreationLink: SendEmailsWithAssessmentCreationLink;
   let timeGateway: CustomTimeGateway;
@@ -64,8 +63,10 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       );
   });
 
-  it("Sends an email to immersions that end yesterday", async () => {
+  it("Sends an email to immersions that end tomorrow", async () => {
     // Arrange
+    const conventionEndingTomorrowId = "convention-ending-tomorrow";
+    const conventionEndingInTwoDaysId = "convention-ending-in-two-days";
     const expectedAgency = new AgencyDtoBuilder()
       .withLogoUrl("http://LOGO AGENCY IF URL")
       .build();
@@ -74,16 +75,17 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       .withEmail("counsellor@mail.com")
       .build();
 
-    const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
+    const immersionApplicationEndingInTwoDays = new ConventionDtoBuilder()
+      .withId(conventionEndingInTwoDaysId)
       .withAgencyId(expectedAgency.id)
       .withDateStart("2021-05-13T10:00:00.000Z")
-      .withDateEnd("2021-05-14T10:00:00.000Z")
-      .withId(id)
+      .withDateEnd("2021-05-17T10:00:00.000Z")
       .withEstablishmentTutorFirstName("Tom")
       .withEstablishmentTutorLastName("Cruise")
       .validated()
       .build();
     const immersionApplicationEndingTomorrow = new ConventionDtoBuilder()
+      .withId(conventionEndingTomorrowId)
       .withAgencyId(expectedAgency.id)
       .withDateEnd("2021-05-16T10:00:00.000Z")
       .validated()
@@ -97,15 +99,15 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     uow.userRepository.users = [counsellor];
 
     await uow.conventionRepository.save(immersionApplicationEndingTomorrow);
-    await uow.conventionRepository.save(immersionApplicationEndingYesterday);
+    await uow.conventionRepository.save(immersionApplicationEndingInTwoDays);
     const now = new Date("2021-05-15T08:00:00.000Z");
     timeGateway.setNextDates([now, now]);
 
     // Act
     await sendEmailWithAssessmentCreationLink.execute({
       conventionEndDate: {
-        from: subDays(now, 1),
-        to: now,
+        from: now,
+        to: addDays(now, 1),
       },
     });
 
@@ -119,10 +121,9 @@ describe("SendEmailWithAssessmentCreationLink", () => {
             agencyLogoUrl: expectedAgency.logoUrl!,
             beneficiaryFirstName: "Esteban",
             beneficiaryLastName: "Ocon",
-            conventionId: "immersion-ending-yesterday-id",
-            establishmentTutorName: "Tom Cruise",
-            assessmentCreationLink:
-              "http://fake-magic-link/bilan-immersion/immersion-ending-yesterday-id/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com",
+            conventionId: "convention-ending-tomorrow",
+            establishmentTutorName: "Alain Prost",
+            assessmentCreationLink: `http://fake-magic-link/bilan-immersion/${conventionEndingTomorrowId}/establishment-tutor/2021-05-15T08:00:00.000Z/establishment@example.com`,
             internshipKind: "immersion",
           },
           recipients: ["establishment@example.com"],
@@ -137,16 +138,17 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     expect(uow.outboxRepository.events).toHaveLength(2);
     expectToEqual(uow.outboxRepository.events[0].topic, "NotificationAdded");
     expect(uow.outboxRepository.events[1].payload).toMatchObject({
-      id,
+      id: conventionEndingTomorrowId,
     });
     expectObjectsToMatch(uow.outboxRepository.events[1], {
       topic: "EmailWithLinkToCreateAssessmentSent",
-      payload: { id },
+      payload: { id: conventionEndingTomorrowId },
     });
   });
 
   it("Does not send an email to immersions having already received one", async () => {
     // Arrange
+    const id: ConventionId = "immersion-ending-yesterday-id";
     const agency = new AgencyDtoBuilder().build();
     const immersionApplicationEndingYesterday = new ConventionDtoBuilder()
       .withDateEnd("2021-05-14T10:00:00.000Z")
