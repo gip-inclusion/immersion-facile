@@ -6,6 +6,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -64,7 +65,11 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+        {
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
+          roles: ["to-review"],
+          isNotifiedByEmail: false,
+        },
       ],
       dashboards: {
         agencies: {},
@@ -104,7 +109,11 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+        {
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
+          roles: ["to-review"],
+          isNotifiedByEmail: false,
+        },
       ],
       dashboards: {
         agencies: {},
@@ -131,7 +140,11 @@ describe("reject IcUser for agency", () => {
     const icUser: InclusionConnectedUser = {
       ...user,
       agencyRights: [
-        { agency: agency1, roles: ["to-review"], isNotifiedByEmail: false },
+        {
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
+          roles: ["to-review"],
+          isNotifiedByEmail: false,
+        },
       ],
       dashboards: {
         agencies: {},

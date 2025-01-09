@@ -14,6 +14,7 @@ import {
   inclusionConnectTokenExpiredMessage,
   inclusionConnectedAllowedRoutes,
   queryParamsAsString,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -29,11 +30,7 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
   const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
-  const {
-    counsellorEmails: _,
-    validatorEmails: __,
-    ...agencyWithoutEmails
-  } = agency;
+  const agencyForUsers = toAgencyDtoForAgencyUsersAndAdmins(agency, []);
   const agencyUser: User = {
     id: "123",
     email: "joe@mail.com",
@@ -118,7 +115,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           },
           agencyRights: [
             {
-              agency: agencyWithoutEmails,
+              agency: agencyForUsers,
               roles: ["validator"],
               isNotifiedByEmail: true,
             },

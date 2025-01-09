@@ -4,6 +4,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -50,7 +51,7 @@ describe("getAgencyByIdForDashboard", () => {
     .withEmail("agencyAdminUser@email.com")
     .withAgencyRights([
       {
-        agency: agencyWithRefersTo,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithRefersTo, []),
         isNotifiedByEmail: true,
         roles: ["agency-admin"],
       },

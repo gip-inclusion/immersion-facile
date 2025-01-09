@@ -9,6 +9,7 @@ import {
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -43,7 +44,7 @@ describe("Update agency", () => {
   const icAgencyAdmin = agencyAdminBuilder
     .withAgencyRights([
       {
-        agency: initialAgencyInRepo,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(initialAgencyInRepo, []),
         roles: ["agency-admin"],
         isNotifiedByEmail: true,
       },

@@ -4,6 +4,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -62,23 +63,6 @@ const agencyWithRefersTo = new AgencyDtoBuilder()
     refersToAgencyName: agency2.name,
   })
   .build();
-const {
-  validatorEmails: _,
-  counsellorEmails: __,
-  ...agency1WithoutEmails
-} = agency1;
-const {
-  validatorEmails: ___,
-  counsellorEmails: ____,
-  ...agency2WithoutEmails
-} = agency2;
-
-const {
-  validatorEmails: _____,
-  counsellorEmails: ______,
-  ...agencyWithRefersToWithoutEmails
-} = agencyWithRefersTo;
-
 const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
   .withId("agency-admin")
   .withFirstName("Jack")
@@ -88,7 +72,7 @@ const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
   .withExternalId("jack-admin-external-id")
   .withAgencyRights([
     {
-      agency: agencyWithRefersTo,
+      agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithRefersTo, []),
       roles: ["agency-admin"],
       isNotifiedByEmail: true,
     },
@@ -180,12 +164,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -208,12 +192,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -223,12 +207,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icPaul,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -260,7 +244,9 @@ describe("GetInclusionConnectedUsers", () => {
         ...icAgencyAdmin,
         agencyRights: [
           {
-            agency: agencyWithRefersToWithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithRefersTo, [
+              agencyAdminUser.email,
+            ]),
             isNotifiedByEmail: true,
             roles: ["agency-admin"],
           },
@@ -328,12 +314,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icGenericUser,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -343,12 +329,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icJohn,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["to-review"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },
@@ -358,12 +344,12 @@ describe("GetInclusionConnectedUsers", () => {
         ...icPaul,
         agencyRights: [
           {
-            agency: agency1WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
             isNotifiedByEmail: true,
             roles: ["counsellor"],
           },
           {
-            agency: agency2WithoutEmails,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             isNotifiedByEmail: true,
             roles: ["validator"],
           },

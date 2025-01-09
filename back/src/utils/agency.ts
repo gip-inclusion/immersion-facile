@@ -4,8 +4,10 @@ import {
   AgencyRight,
   AgencyUsersRights,
   AgencyWithUsersRights,
+  Email,
   UserId,
   errors,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
@@ -95,15 +97,17 @@ export const getAgencyRightByUserId = async (
     await uow.agencyRepository.getAgenciesRightsByUserId(userId);
 
   return Promise.all(
-    agenciesRightsForUser.map(
+    agenciesRightsForUser.map<Promise<AgencyRight>>(
       async ({ isNotifiedByEmail, roles, agencyId }) => {
-        const agency = await uow.agencyRepository.getById(agencyId);
-        if (!agency) throw errors.agency.notFound({ agencyId });
-        const { usersRights: _, ...rest } = agency;
+        const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+        if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
         return {
           isNotifiedByEmail,
           roles,
-          agency: rest,
+          agency: toAgencyDtoForAgencyUsersAndAdmins(
+            agencyWithRights,
+            await getAgencyAdminEmails(agencyWithRights, uow),
+          ),
         };
       },
     ),
@@ -130,4 +134,19 @@ export const updateRightsOnMultipleAgenciesForUser = async (
       },
     ),
   );
+};
+
+export const getAgencyAdminEmails = async (
+  agencyWithRights: AgencyWithUsersRights,
+  uow: UnitOfWork,
+): Promise<Email[]> => {
+  const adminUserIds = toPairs(agencyWithRights.usersRights)
+    .filter(([_, rights]) => rights?.roles.includes("agency-admin"))
+    .map(([id]) => id);
+
+  const users = await uow.userRepository.getByIds(
+    adminUserIds,
+    await makeProvider(uow),
+  );
+  return users.map((user) => user.email);
 };

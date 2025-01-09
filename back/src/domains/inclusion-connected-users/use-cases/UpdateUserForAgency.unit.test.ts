@@ -10,6 +10,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -165,6 +166,7 @@ describe("UpdateUserForAgency", () => {
 
     it("throws forbidden if user who isn't IF admin or agency admin attempts to update another user email", async () => {
       const agency = new AgencyDtoBuilder().build();
+
       const userToUpdate: UserWithAdminRights = {
         ...notAdminUser,
         id: "user-to-update",
@@ -192,7 +194,7 @@ describe("UpdateUserForAgency", () => {
             ...icNotAdmin,
             agencyRights: [
               {
-                agency,
+                agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
                 roles: ["validator"],
                 isNotifiedByEmail: true,
               },
@@ -312,7 +314,7 @@ describe("UpdateUserForAgency", () => {
           ...icAgencyAdmin,
           agencyRights: [
             {
-              agency,
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
               roles: ["agency-admin"],
               isNotifiedByEmail: false,
             },
@@ -518,7 +520,7 @@ describe("UpdateUserForAgency", () => {
           ...icAgencyAdmin,
           agencyRights: [
             {
-              agency,
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
               roles: ["agency-admin"],
               isNotifiedByEmail: false,
             },
@@ -978,7 +980,7 @@ describe("UpdateUserForAgency", () => {
         ...notAdminUser,
         externalId: null,
       };
-      uow.userRepository.users = [nonIcUser];
+      uow.userRepository.users = [nonIcUser, icAdmin];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [nonIcUser.id]: { roles: ["validator"], isNotifiedByEmail: true },
@@ -1033,7 +1035,7 @@ describe("UpdateUserForAgency", () => {
           ...icAgencyAdmin,
           agencyRights: [
             {
-              agency,
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
               roles: ["agency-admin", "validator"],
               isNotifiedByEmail: false,
             },
@@ -1076,7 +1078,7 @@ describe("UpdateUserForAgency", () => {
           ...icNotAdmin,
           agencyRights: [
             {
-              agency,
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
               roles: ["validator"],
               isNotifiedByEmail: true,
             },
