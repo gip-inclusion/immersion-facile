@@ -1,9 +1,10 @@
-import { uniq, values } from "ramda";
+import { toPairs, uniq, values } from "ramda";
 import {
   AgencyId,
   AgencyRight,
   AgencyWithUsersRights,
   InclusionConnectedUser,
+  OAuthGatewayProvider,
   UserId,
   errors,
 } from "shared";
@@ -32,10 +33,8 @@ export const getIcUsersByUserIds = async (
   uow: UnitOfWork,
   userIds: UserId[],
 ): Promise<InclusionConnectedUser[]> => {
-  const users = await uow.userRepository.getByIds(
-    userIds,
-    await makeProvider(uow),
-  );
+  const provider = await makeProvider(uow);
+  const users = await uow.userRepository.getByIds(userIds, provider);
 
   const userRightsByUser = (
     await Promise.all(
@@ -62,18 +61,44 @@ export const getIcUsersByUserIds = async (
     {},
   );
 
-  return users.map<InclusionConnectedUser>((user) => ({
-    ...user,
-    agencyRights: userRightsByUser[user.id].map<AgencyRight>(
-      ({ agencyId, ...rights }) => {
-        const { usersRights: _, ...agency } =
-          agenciesRelatedToUsersByAgencyId[agencyId];
-        return {
-          ...rights,
-          agency,
-        };
-      },
-    ),
-    dashboards: { agencies: {}, establishments: {} },
-  }));
+  return Promise.all(
+    users.map<Promise<InclusionConnectedUser>>(async (user) => ({
+      ...user,
+      agencyRights: await makeAgencyRights(
+        userRightsByUser[user.id],
+        agenciesRelatedToUsersByAgencyId,
+        uow,
+        provider,
+      ),
+      dashboards: { agencies: {}, establishments: {} },
+    })),
+  );
 };
+
+const makeAgencyRights = (
+  userRights: AgencyRightOfUser[],
+  agenciesRelatedToUsersByAgencyId: Record<AgencyId, AgencyWithUsersRights>,
+  uow: UnitOfWork,
+  provider: OAuthGatewayProvider,
+): Promise<AgencyRight[]> =>
+  Promise.all(
+    userRights.map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
+      const { usersRights, ...agency } =
+        agenciesRelatedToUsersByAgencyId[agencyId];
+
+      const adminUsers = await uow.userRepository.getByIds(
+        toPairs(usersRights)
+          .filter(([_, userRight]) => userRight?.roles.includes("agency-admin"))
+          .map(([id]) => id),
+        provider,
+      );
+
+      return {
+        ...rights,
+        agency: {
+          ...agency,
+          admins: adminUsers.map((user) => user.email),
+        },
+      };
+    }),
+  );

@@ -6,10 +6,11 @@ import {
   InclusionConnectedUser,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { z } from "zod";
 import {
-  agencyWithRightToAgencyDto,
+  getAgencyAdminEmails,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -95,7 +96,10 @@ const updateAgenciesOfGroup = async (
           agencyRoleIsNotToReview(existingAgencyRight.roles)
           ? existingAgencyRight
           : {
-              agency: await agencyWithRightToAgencyDto(uow, agency),
+              agency: toAgencyDtoForAgencyUsersAndAdmins(
+                agency,
+                await getAgencyAdminEmails(agency, uow),
+              ),
               roles: ["agency-viewer"],
               isNotifiedByEmail: false,
             };

@@ -6,6 +6,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
@@ -57,7 +58,7 @@ describe("CreateUserForAgency", () => {
     .withIsAdmin(false)
     .withAgencyRights([
       {
-        agency: agencyWithCounsellor,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithCounsellor, []),
         roles: ["agency-admin"],
         isNotifiedByEmail: true,
       },
@@ -264,7 +265,7 @@ describe("CreateUserForAgency", () => {
         externalId: null,
         createdAt: timeGateway.now().toISOString(),
       };
-      uow.userRepository.users = [validator, counsellor];
+      uow.userRepository.users = [validator, counsellor, icAgencyAdminUser];
 
       const anotherAgency = new AgencyDtoBuilder()
         .withId("another-agency-id")

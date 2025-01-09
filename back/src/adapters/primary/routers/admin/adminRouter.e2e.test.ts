@@ -24,6 +24,7 @@ import {
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
   technicalRoutes,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
@@ -545,7 +546,11 @@ describe("Admin router", () => {
         firstName: "John",
         lastName: "Doe",
         agencyRights: [
-          { agency, roles: ["to-review"], isNotifiedByEmail: false },
+          {
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+            roles: ["to-review"],
+            isNotifiedByEmail: false,
+          },
         ],
         dashboards: { agencies: {}, establishments: {} },
         externalId: "john-external-id",

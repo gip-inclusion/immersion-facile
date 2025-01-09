@@ -7,6 +7,7 @@ import {
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
@@ -39,7 +40,7 @@ describe("BroadcastConventionAgain", () => {
     .withIsAdmin(false)
     .withAgencyRights([
       {
-        agency: agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
         roles: ["validator", "counsellor"],
         isNotifiedByEmail: true,
       },

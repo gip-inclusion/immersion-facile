@@ -8,6 +8,7 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -46,7 +47,7 @@ describe("RemoveUserFromAgency", () => {
     .withIsAdmin(false)
     .withAgencyRights([
       {
-        agency: agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
         roles: ["agency-admin"],
         isNotifiedByEmail: true,
       },
