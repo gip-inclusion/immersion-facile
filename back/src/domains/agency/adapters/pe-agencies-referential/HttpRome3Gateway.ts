@@ -1,12 +1,11 @@
-import { AbsoluteUrl, AppellationDto, withAuthorizationHeaders } from "shared";
+import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
+import { createLogger } from "../../../../utils/logger";
 import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
+import type { AppellationWithShortLabel } from "./HttpRome4Gateway";
 
-export type AppellationWithShortLabel = AppellationDto & {
-  romeCode: string;
-  appellationLabelShort: string;
-};
+const logger = createLogger(__filename);
 
 interface Rome3Gateway {
   getAllAppellations(): Promise<AppellationWithShortLabel[]>;
@@ -69,7 +68,7 @@ export class HttpRome3Gateway implements Rome3Gateway {
         })),
       )
       .catch((error) => {
-        console.error("Error getting appellations", error.response.data);
+        logger.error({ message: "Error getting appellations", error });
         throw error;
       });
   }

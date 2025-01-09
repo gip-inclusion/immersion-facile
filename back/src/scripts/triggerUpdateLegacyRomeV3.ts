@@ -1,4 +1,5 @@
 import axios from "axios";
+import { sql } from "kysely";
 import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
 import { AppellationCode, RomeCode, pipeWithValue } from "shared";
@@ -7,8 +8,8 @@ import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import {
   KyselyDb,
-  executeKyselyRawSqlQuery,
   makeKyselyDb,
+  values,
 } from "../config/pg/kysely/kyselyUtils";
 import {
   HttpRome3Gateway,
@@ -74,24 +75,18 @@ const main = async () => {
 const updateAppellations =
   (db: KyselyDb) =>
   (appellations: { appellationCode: AppellationCode; romeCode: RomeCode }[]) =>
-    executeKyselyRawSqlQuery(
-      db,
-      `
-      WITH appellation_rome_mapping AS (
-        SELECT rome_v3, appellation
-        FROM (VALUES ${appellations
-          .map(
-            ({ romeCode, appellationCode }) =>
-              `('${romeCode}', '${appellationCode}')`,
-          )
-          .join(", ")}) as t(rome_v3, appellation)
+    db
+      .updateTable("public_appellations_data")
+      .from(values(appellations, "rome_v3_mapping"))
+      .set((eb) => ({
+        legacy_code_rome_v3: eb.ref("rome_v3_mapping.romeCode"),
+      }))
+      .whereRef(
+        sql`"ogr_appellation"::text`,
+        "=",
+        "rome_v3_mapping.appellationCode",
       )
-      UPDATE public_appellations_data
-      SET legacy_code_rome_v3 = appellation_rome_mapping.rome_v3
-      FROM appellation_rome_mapping
-      WHERE public_appellations_data.ogr_appellation = appellation_rome_mapping.appellation::int
-    `,
-    );
+      .execute();
 
 handleCRONScript(
   "update-rome-legacy-rome-v3-data-from-france-travail-API",
