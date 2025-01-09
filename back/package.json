@@ -45,6 +45,7 @@
     "trigger-update-establishments-from-sirene": "ts-node src/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
     "trigger-update-all-establishments-scores": "ts-node src/scripts/triggerUpdateAllEstablishmentsScores.ts",
     "trigger-update-rome-data": "ts-node src/scripts/triggerUpdateRomeData.ts",
+    "trigger-update-legacy-rome-v3": "ts-node src/scripts/triggerUpdateLegacyRomeV3.ts",
     "trigger-import-pro-connect-external-ids": "ts-node src/scripts/triggerImportProConnectExternalIds",
     "trigger-deactivate-unresponsive-establishments": "ts-node src/scripts/triggerDeactivateUnresponsiveEstablishments.ts",
     "typecheck": "tsc --noEmit",
