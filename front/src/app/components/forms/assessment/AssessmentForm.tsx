@@ -505,19 +505,19 @@ const AssessmentCommentsSection = ({
           textArea
           label="Avez-vous une appréciation générale à donner sur l'immersion ?"
           nativeTextAreaProps={{
-            ...register("establishmentAdvices"),
+            ...register("establishmentFeedback"),
             id: domElementIds.assessment.establishmentAdvicesInput,
           }}
-          {...getFieldError("establishmentAdvices")}
+          {...getFieldError("establishmentFeedback")}
         />
         <Input
           textArea
           label="Sur la base de l'objectif de l'immersion et du métier observé, quels conseils donneriez-vous au candidat pour la suite de son parcours professionnel ?"
           nativeTextAreaProps={{
-            ...register("establishmentFeedback"),
+            ...register("establishmentAdvices"),
             id: domElementIds.assessment.establishmentFeedbackInput,
           }}
-          {...getFieldError("establishmentFeedback")}
+          {...getFieldError("establishmentAdvices")}
         />
         <ButtonsGroup
           inlineLayoutWhen="always"
