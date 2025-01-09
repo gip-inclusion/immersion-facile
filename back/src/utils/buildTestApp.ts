@@ -33,6 +33,7 @@ import { AppConfigBuilder } from "./AppConfigBuilder";
 import { toAgencyWithRights } from "./agency";
 
 export type InMemoryGateways = {
+  disconnectCache: () => Promise<void>;
   notification: InMemoryNotificationGateway;
   peConnectGateway: InMemoryPeConnectGateway;
   siret: InMemorySiretGateway;
