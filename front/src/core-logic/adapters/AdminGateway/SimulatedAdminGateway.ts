@@ -17,32 +17,42 @@ import {
   UserInList,
   UserParamsForAgency,
   WithAgencyIdAndUserId,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
-const simulatedAgencyDtos: AgencyRight[] = [
+const simulatedAgencyRights: AgencyRight[] = [
   {
     roles: ["to-review"],
-    agency: new AgencyDtoBuilder()
-      .withName("Agence de Bourg en Bresse")
-      .withId("fake-agency-id-1")
-      .build(),
+    agency: toAgencyDtoForAgencyUsersAndAdmins(
+      new AgencyDtoBuilder()
+        .withName("Agence de Bourg en Bresse")
+        .withId("fake-agency-id-1")
+        .build(),
+      [],
+    ),
     isNotifiedByEmail: true,
   },
   {
     roles: ["validator"],
-    agency: new AgencyDtoBuilder()
-      .withName("Mission locale qu'on ne devrait pas voir")
-      .withId("fake-agency-id-not-shown")
-      .build(),
+    agency: toAgencyDtoForAgencyUsersAndAdmins(
+      new AgencyDtoBuilder()
+        .withName("Mission locale qu'on ne devrait pas voir")
+        .withId("fake-agency-id-not-shown")
+        .build(),
+      [],
+    ),
     isNotifiedByEmail: true,
   },
   {
     roles: ["to-review"],
-    agency: new AgencyDtoBuilder()
-      .withName("CCI de Quimper")
-      .withId("fake-agency-id-3")
-      .build(),
+    agency: toAgencyDtoForAgencyUsersAndAdmins(
+      new AgencyDtoBuilder()
+        .withName("CCI de Quimper")
+        .withId("fake-agency-id-3")
+        .build(),
+      [],
+    ),
     isNotifiedByEmail: true,
   },
 ];
@@ -114,7 +124,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         email: "jbon8745@wanadoo.fr",
         firstName: "Jean",
         lastName: "Bon",
-        agencyRights: simulatedAgencyDtos,
+        agencyRights: simulatedAgencyRights,
         dashboards: { agencies: {}, establishments: {} },
         externalId: "fake-user-external-id-1",
         createdAt: new Date().toISOString(),
@@ -137,10 +147,13 @@ export class SimulatedAdminGateway implements AdminGateway {
         agencyRights: [
           {
             roles: ["to-review"],
-            agency: new AgencyDtoBuilder()
-              .withName("Mission locale qui plante")
-              .withId("non-existing-agency-id")
-              .build(),
+            agency: toAgencyDtoForAgencyUsersAndAdmins(
+              new AgencyDtoBuilder()
+                .withName("Mission locale qui plante")
+                .withId("non-existing-agency-id")
+                .build(),
+              [],
+            ),
             isNotifiedByEmail: true,
           },
         ],
@@ -216,7 +229,10 @@ export class SimulatedAdminGateway implements AdminGateway {
       ...icUser,
       agencyRights: [
         {
-          agency: new AgencyDtoBuilder().build(),
+          agency: toAgencyDtoForAgencyUsersAndAdmins(
+            new AgencyDtoBuilder().build(),
+            [],
+          ),
           roles: ["validator"],
           isNotifiedByEmail: true,
         },

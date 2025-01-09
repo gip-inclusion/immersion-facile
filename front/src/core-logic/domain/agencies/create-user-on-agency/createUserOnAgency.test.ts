@@ -3,6 +3,7 @@ import {
   InclusionConnectedUser,
   errors,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
@@ -65,7 +66,7 @@ describe("CreateUserOnAgency", () => {
       ...userToCreate,
       agencyRights: [
         {
-          agency: agencyDto,
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []),
           roles: ["validator"],
           isNotifiedByEmail: false,
         },

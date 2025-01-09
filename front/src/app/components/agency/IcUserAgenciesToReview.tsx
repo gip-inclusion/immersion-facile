@@ -8,7 +8,7 @@ import { createPortal } from "react-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDtoWithoutEmails,
+  AgencyDtoForAgencyUsersAndAdmins,
   AgencyId,
   AgencyRight,
   RejectIcUserRoleForAgencyParams,
@@ -32,77 +32,75 @@ type IcUserAgenciesToReviewModalProps = {
   mode: "register" | "reject";
 };
 
-function AgencyReviewForm({
+const AgencyReviewForm = ({
   agency,
   setSelectedAgency,
   selectedUser,
   setModalProps,
 }: {
-  agency: AgencyDtoWithoutEmails;
+  agency: AgencyDtoForAgencyUsersAndAdmins;
   selectedUser: User;
-  setSelectedAgency: (agency: AgencyDtoWithoutEmails) => void;
+  setSelectedAgency: (agency: AgencyDtoForAgencyUsersAndAdmins) => void;
   setModalProps: (modalProps: IcUserAgenciesToReviewModalProps) => void;
-}) {
-  return (
-    <div className={fr.cx("fr-col-4")}>
-      <div className={fr.cx("fr-card")}>
-        <div className={fr.cx("fr-card__body")}>
-          <div className={fr.cx("fr-card__content")}>
-            <h3 className={fr.cx("fr-card__title")}>{agency.name}</h3>
-            <p className={fr.cx("fr-card__desc")}>
-              {agency.address.streetNumberAndAddress} {agency.address.postcode}{" "}
-              {agency.address.city}
-            </p>
-            <p className={fr.cx("fr-card__desc")}>
-              <a
-                {...routes.adminAgencyDetail({ agencyId: agency.id }).link}
-                target="_blank"
-              >
-                Voir les détails de l'agence
-              </a>
-            </p>
-          </div>
-          <div className={fr.cx("fr-card__footer")}>
-            <ButtonsGroup
-              alignment="center"
-              inlineLayoutWhen="always"
-              buttonsSize="small"
-              buttons={[
-                {
-                  type: "button",
-                  priority: "primary",
-                  id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUser.id}`,
-                  onClick: () => {
-                    setModalProps({
-                      title: "Rattacher cet utilisateur",
-                      mode: "register",
-                    });
-                    setSelectedAgency(agency);
-                    openIcUserRegistrationToAgencyModal();
-                  },
-                  children: "Valider",
+}) => (
+  <div className={fr.cx("fr-col-4")}>
+    <div className={fr.cx("fr-card")}>
+      <div className={fr.cx("fr-card__body")}>
+        <div className={fr.cx("fr-card__content")}>
+          <h3 className={fr.cx("fr-card__title")}>{agency.name}</h3>
+          <p className={fr.cx("fr-card__desc")}>
+            {agency.address.streetNumberAndAddress} {agency.address.postcode}{" "}
+            {agency.address.city}
+          </p>
+          <p className={fr.cx("fr-card__desc")}>
+            <a
+              {...routes.adminAgencyDetail({ agencyId: agency.id }).link}
+              target="_blank"
+            >
+              Voir les détails de l'agence
+            </a>
+          </p>
+        </div>
+        <div className={fr.cx("fr-card__footer")}>
+          <ButtonsGroup
+            alignment="center"
+            inlineLayoutWhen="always"
+            buttonsSize="small"
+            buttons={[
+              {
+                type: "button",
+                priority: "primary",
+                id: `${domElementIds.admin.agencyTab.registerIcUserToAgencyButton}-${agency.id}-${selectedUser.id}`,
+                onClick: () => {
+                  setModalProps({
+                    title: "Rattacher cet utilisateur",
+                    mode: "register",
+                  });
+                  setSelectedAgency(agency);
+                  openIcUserRegistrationToAgencyModal();
                 },
-                {
-                  type: "button",
-                  priority: "secondary",
-                  onClick: () => {
-                    setModalProps({
-                      title: "Refuser le rattachement",
-                      mode: "reject",
-                    });
-                    setSelectedAgency(agency);
-                    openIcUserRegistrationToAgencyModal();
-                  },
-                  children: "Refuser",
+                children: "Valider",
+              },
+              {
+                type: "button",
+                priority: "secondary",
+                onClick: () => {
+                  setModalProps({
+                    title: "Refuser le rattachement",
+                    mode: "reject",
+                  });
+                  setSelectedAgency(agency);
+                  openIcUserRegistrationToAgencyModal();
                 },
-              ]}
-            />
-          </div>
+                children: "Refuser",
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
-  );
-}
+  </div>
+);
 
 export const IcUserAgenciesToReview = ({
   agenciesNeedingReviewForUser,
@@ -110,7 +108,7 @@ export const IcUserAgenciesToReview = ({
 }: IcUserAgenciesToReviewProps) => {
   const dispatch = useDispatch();
   const [selectedAgency, setSelectedAgency] =
-    useState<AgencyDtoWithoutEmails>();
+    useState<AgencyDtoForAgencyUsersAndAdmins>();
   const [modalProps, setModalProps] =
     useState<IcUserAgenciesToReviewModalProps | null>(null);
 

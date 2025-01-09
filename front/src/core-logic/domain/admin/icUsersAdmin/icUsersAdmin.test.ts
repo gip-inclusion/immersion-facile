@@ -10,6 +10,7 @@ import {
   UserParamsForAgency,
   errors,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
@@ -36,12 +37,12 @@ const agency3 = new AgencyDtoBuilder().withId("agency-3").build();
 const agency4 = new AgencyDtoBuilder().withId("agency-4").build();
 
 const agency1Right: AgencyRight = {
-  agency: agency1,
+  agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
   roles: ["to-review"],
   isNotifiedByEmail: true,
 };
 const agency2Right: AgencyRight = {
-  agency: agency2,
+  agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
   roles: ["validator"],
   isNotifiedByEmail: true,
 };
@@ -51,12 +52,12 @@ const user1AgencyRights: Record<AgencyId, AgencyRight> = {
 };
 
 const agency3Right: AgencyRight = {
-  agency: agency3,
+  agency: toAgencyDtoForAgencyUsersAndAdmins(agency3, []),
   roles: ["to-review"],
   isNotifiedByEmail: true,
 };
 const agency4Right: AgencyRight = {
-  agency: agency4,
+  agency: toAgencyDtoForAgencyUsersAndAdmins(agency4, []),
   roles: ["to-review"],
   isNotifiedByEmail: true,
 };
@@ -597,7 +598,7 @@ describe("Agency registration for authenticated users", () => {
         ...userToCreate,
         agencyRights: [
           {
-            agency: agency2,
+            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
             roles: ["validator"],
             isNotifiedByEmail: false,
           },
@@ -612,7 +613,7 @@ describe("Agency registration for authenticated users", () => {
           ...icUser,
           agencyRights: {
             [agency2.id]: {
-              agency: agency2,
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
               roles: ["validator"],
               isNotifiedByEmail: false,
             },

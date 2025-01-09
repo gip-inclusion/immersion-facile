@@ -4,6 +4,7 @@ import {
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   expectToEqual,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
@@ -49,7 +50,7 @@ describe("Admin Users slice", () => {
     it("if this other user is in the state, update this user rights successfully", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
-        agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
         roles: ["validator"],
         isNotifiedByEmail: false,
       };
@@ -102,7 +103,7 @@ describe("Admin Users slice", () => {
     it("if it is not user in state, do nothing", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
-        agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
         roles: ["validator"],
         isNotifiedByEmail: false,
       };

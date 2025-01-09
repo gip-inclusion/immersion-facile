@@ -9,6 +9,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
+  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
@@ -41,7 +42,10 @@ describe("InclusionConnected", () => {
     agencyRights: [
       {
         roles: ["agency-admin"],
-        agency: new AgencyDtoBuilder().build(),
+        agency: toAgencyDtoForAgencyUsersAndAdmins(
+          new AgencyDtoBuilder().build(),
+          [],
+        ),
         isNotifiedByEmail: true,
       },
     ],
@@ -294,7 +298,10 @@ describe("InclusionConnected", () => {
       agencyRights: [
         {
           roles: ["agency-admin", "validator"],
-          agency: new AgencyDtoBuilder().build(),
+          agency: toAgencyDtoForAgencyUsersAndAdmins(
+            new AgencyDtoBuilder().build(),
+            [],
+          ),
           isNotifiedByEmail: true,
         },
       ],
@@ -324,7 +331,10 @@ describe("InclusionConnected", () => {
     it("if it is himself, update the user rights successfully", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
-        agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(
+          new AgencyDtoBuilder().build(),
+          [],
+        ),
         roles: ["validator"],
         isNotifiedByEmail: false,
       };
@@ -376,7 +386,10 @@ describe("InclusionConnected", () => {
     it("if it is not himself, do nothing", () => {
       const agency = new AgencyDtoBuilder().build();
       const agencyRight: AgencyRight = {
-        agency,
+        agency: toAgencyDtoForAgencyUsersAndAdmins(
+          new AgencyDtoBuilder().build(),
+          [],
+        ),
         roles: ["validator"],
         isNotifiedByEmail: false,
       };
