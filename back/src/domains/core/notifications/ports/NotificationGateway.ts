@@ -11,5 +11,5 @@ export interface NotificationGateway {
     sendSmsParams: TemplatedSms,
     notificationId?: NotificationId,
   ): Promise<void>;
-  getAttachmentContent(downloadToken: string): Promise<Base64>;
+  getAttachmentContent(downloadToken: string): Promise<Base64 | null>;
 }

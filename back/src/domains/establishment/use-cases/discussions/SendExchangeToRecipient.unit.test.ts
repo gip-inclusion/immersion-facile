@@ -53,9 +53,13 @@ describe("SendExchangeToRecipient", () => {
       "base64",
     );
     const link = "pdf";
+    const notABlobLink = "notABlobLink";
 
     beforeEach(() => {
-      notificationGateway.attachmentsByLinks = { [link]: base64RawContent };
+      notificationGateway.attachmentsByLinks = {
+        [link]: base64RawContent,
+        [notABlobLink]: "not-a-blob",
+      };
     });
 
     it("sends the email to the right recipient (response from establishment to potential beneficiary)", async () => {
@@ -183,6 +187,66 @@ describe("SendExchangeToRecipient", () => {
                 content: base64RawContent,
               },
             ],
+          },
+        ],
+      });
+    });
+
+    it("sends the email to the right recipient without attachment", async () => {
+      const lastExchange: Exchange = {
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        sentAt: "2023-06-28T08:06:52.000Z",
+        message: "message",
+        subject: "subject",
+        attachments: [{ link: notABlobLink, name: "VCard" }],
+      };
+      const discussion = new DiscussionBuilder()
+        .withAppellationCode("20567")
+        .withId(uuid())
+        .withExchanges([
+          {
+            subject: "My subject - discussion 1",
+            message: "Hello",
+            sender: "potentialBeneficiary",
+            sentAt: addHours(timeGateway.now(), -2).toISOString(),
+            recipient: "establishment",
+            attachments: [],
+          },
+          lastExchange,
+        ])
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await useCase.execute({
+        discussionId: discussion.id,
+      });
+
+      expectToEqual(uow.discussionRepository.discussions, [discussion]);
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "DISCUSSION_EXCHANGE",
+            params: {
+              htmlContent: `<div style="color: #b5b5b5; font-size: 12px">Pour rappel, voici les informations liées à cette mise en relation :
+                  <br /><ul>
+                  <li>Candidat : ali baba</li>
+                  <li>Métier : Vendeur / Vendeuse en chocolaterie</li>
+                  <li>Entreprise : My default business name - 1 rue de la Paix 75001 Paris</li>
+                  </ul><br /></div>
+            ${lastExchange.message}`,
+              subject: lastExchange.subject,
+            },
+            recipients: [discussion.potentialBeneficiary.email],
+            replyTo: {
+              email: `${discussion.id}_e@reply.my-domain.com`,
+              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
+            },
+            sender: immersionFacileNoReplyEmailSender,
+            cc: [],
+            attachments: [],
           },
         ],
       });

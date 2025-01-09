@@ -1,4 +1,5 @@
 import {
+  EmailAttachment,
   Exchange,
   WithDiscussionId,
   createOpaqueEmail,
@@ -60,12 +61,16 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
         appellationCode: discussion.appellationCode,
       });
 
-    const attachments = await Promise.all(
-      lastExchange.attachments.map(async ({ name, link }) => ({
-        name,
-        content: await this.#notificationGateway.getAttachmentContent(link),
-      })),
-    );
+    const attachments = (
+      await Promise.all(
+        lastExchange.attachments.map(async ({ name, link }) => ({
+          name,
+          content: await this.#notificationGateway.getAttachmentContent(link),
+        })),
+      )
+    ).filter(
+      (emailAttachment) => emailAttachment.content !== null,
+    ) as EmailAttachment[];
 
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
