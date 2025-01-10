@@ -16,6 +16,23 @@ type ConventionWeeklyScheduleProps = {
   useWrapper: boolean;
 };
 
+const hourDisplayedSeparator = "h";
+const hoursValueToHoursDisplayed = ({
+  hoursValue,
+  padWithZero = true,
+}: {
+  hoursValue: number;
+  padWithZero?: boolean;
+}): string => {
+  const hours = Math.floor(hoursValue);
+  const minutes = Math.round((hoursValue - hours) * 60);
+  const hoursDisplayed = `${hours < 10 && padWithZero ? `0${hours}` : hours}`;
+  if (minutes === 0) return `${hoursDisplayed}${hourDisplayedSeparator}`;
+  return `${hoursDisplayed}${hourDisplayedSeparator}${
+    minutes < 10 ? `0${minutes}` : minutes
+  }`;
+};
+
 export const ConventionWeeklySchedule = ({
   weeklySchedule,
   useWrapper,
@@ -51,7 +68,11 @@ export const ConventionWeeklySchedule = ({
             --
           </div>
           <p className={fr.cx("fr-text--xs", "fr-mb-3v")}>
-            {week.weeklyHours} heures de travail hebdomadaires
+            {hoursValueToHoursDisplayed({
+              hoursValue: week.weeklyHours,
+              padWithZero: false,
+            })}{" "}
+            heures de travail hebdomadaires
           </p>
           <ul
             style={{

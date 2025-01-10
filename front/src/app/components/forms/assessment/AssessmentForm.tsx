@@ -313,8 +313,11 @@ const AssessmentStatusSection = ({
               />
               <p className={fr.cx("fr-mb-2w")}>
                 L'immersion représente actuellement{" "}
-                {convention.schedule.totalHours} heures, pouvez-vous indiquer le
-                nombre d'heures manquées ?
+                {hoursValueToHoursDisplayed({
+                  hoursValue: convention.schedule.totalHours,
+                  padWithZero: false,
+                })}
+                , pouvez-vous indiquer le nombre d'heures manquées ?
               </p>
               <Input
                 label="Heures manquées"
