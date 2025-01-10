@@ -35,6 +35,7 @@ const createContactAttributesSchema: z.Schema<CreateContactAttributes> =
     ENT_ROMES: z.string().or(z.literal("")).optional(),
     ENT_SECTEUR: z.string().or(z.literal("")).optional(),
     ENT_SIRET: z.string().or(z.literal("")).optional(),
+    ENT_SUPER_ENTREPRISE: z.boolean().or(z.literal("")).optional(),
     ENT_TYPE_PUBLIC_ACCUEILLIS: z
       .enum(typesPublic)
       .or(z.literal(""))
@@ -86,6 +87,7 @@ const getContactInfoAttributesSchema: z.Schema<GetContactInfoAttributes> =
     ENT_ROMES: z.string().optional(),
     ENT_SECTEUR: z.string().optional(),
     ENT_SIRET: z.string().optional(),
+    ENT_SUPER_ENTREPRISE: z.boolean().optional(),
     ENT_TYPE_PUBLIC_ACCUEILLIS: z.enum(typesPublic).optional(),
     NOM: z.string().optional(),
     PRENOM: z.string().optional(),

@@ -91,6 +91,7 @@ export class BrevoEstablishmentMarketingGateway
         ENT_TYPE_PUBLIC_ACCUEILLIS: dto.isRegistered
           ? searchableToTypePublic[dto.searchableBy]
           : "",
+        ENT_SUPER_ENTREPRISE: dto.isRegistered ? dto.isSuperEstablishment : "",
       },
       updateEnabled: !!existingContact,
     };
@@ -246,6 +247,7 @@ export class BrevoEstablishmentMarketingGateway
               romes: attributes.ENT_ROMES
                 ? attributes.ENT_ROMES.split(",")
                 : [],
+              isSuperEstablishment: attributes.ENT_SUPER_ENTREPRISE ?? false,
             }
           : { isRegistered }),
       },

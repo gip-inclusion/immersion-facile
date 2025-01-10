@@ -129,6 +129,7 @@ const makeEstablishmentMarketingGatewayDto = (
         nextAvailabilityDate: new Date("2024-07-18"),
         departmentCode: "95",
         romes: ["A2310", "B7040"],
+        isSuperEstablishment: true,
       }
     : { isRegistered: false }),
 });

@@ -30,6 +30,7 @@ export type CreateContactAttributes = Partial<{
   ENT_REFERENCE_SITE: boolean | BrevoDeleteAttribute;
   ENT_ROMES: string | BrevoDeleteAttribute;
   ENT_SIRET: string | BrevoDeleteAttribute;
+  ENT_SUPER_ENTREPRISE: boolean | BrevoDeleteAttribute;
   ENT_TYPE_PUBLIC_ACCUEILLIS: TypePublic | BrevoDeleteAttribute;
   NOM: string | BrevoDeleteAttribute;
   PRENOM: string | BrevoDeleteAttribute;
@@ -64,6 +65,7 @@ export type GetContactInfoAttributes = Partial<{
   ENT_NOMBRE_REPONSES_MER: number;
   ENT_REFERENCE_SITE: boolean;
   ENT_ROMES: string;
+  ENT_SUPER_ENTREPRISE: boolean;
   ENT_SIRET: string;
   ENT_TYPE_PUBLIC_ACCUEILLIS: TypePublic;
   NOM: string;
