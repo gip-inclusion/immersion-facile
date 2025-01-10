@@ -319,46 +319,50 @@ const AssessmentStatusSection = ({
                 })}
                 , pouvez-vous indiquer le nombre d'heures manquées ?
               </p>
-              <Input
-                label="Heures manquées"
-                nativeInputProps={{
-                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                    const value = +event.target.value;
-                    setNumberOfMissedHoursDisplayed(value);
-                    setValue(
-                      "numberOfMissedHours",
-                      value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
-                    );
-                  },
-                  min: 0,
-                  max: convention.schedule.totalHours,
-                  pattern: "\\d*",
-                  type: "number",
-                  id: domElementIds.assessment.numberOfMissedHoursInput,
-                  value: numberOfMissedHoursDisplayed ?? "",
-                }}
-                {...getFieldError("numberOfMissedHours")}
-              />
-              <Input
-                label="Minutes manquées"
-                nativeInputProps={{
-                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-                    const value = +event.target.value;
-                    setNumberOfMissedMinutesDisplayed(value);
-                    setValue(
-                      "numberOfMissedHours",
-                      (numberOfMissedHoursDisplayed ?? 0) + value / 60,
-                    );
-                  },
-                  min: 0,
-                  max: 60,
-                  pattern: "\\d*",
-                  type: "number",
-                  id: domElementIds.assessment.numberOfMissedMinutesInput,
-                  value: numberOfMissedMinutesDisplayed ?? "",
-                }}
-                {...getFieldError("numberOfMissedHours")}
-              />
+              <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+                <Input
+                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                  label="Heures manquées"
+                  nativeInputProps={{
+                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = +event.target.value;
+                      setNumberOfMissedHoursDisplayed(value);
+                      setValue(
+                        "numberOfMissedHours",
+                        value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
+                      );
+                    },
+                    min: 0,
+                    max: convention.schedule.totalHours,
+                    pattern: "\\d*",
+                    type: "number",
+                    id: domElementIds.assessment.numberOfMissedHoursInput,
+                    value: numberOfMissedHoursDisplayed ?? "",
+                  }}
+                  {...getFieldError("numberOfMissedHours")}
+                />
+                <Input
+                  className={fr.cx("fr-col-12", "fr-col-sm-6")}
+                  label="Minutes manquées"
+                  nativeInputProps={{
+                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                      const value = +event.target.value;
+                      setNumberOfMissedMinutesDisplayed(value);
+                      setValue(
+                        "numberOfMissedHours",
+                        (numberOfMissedHoursDisplayed ?? 0) + value / 60,
+                      );
+                    },
+                    min: 0,
+                    max: 60,
+                    pattern: "\\d*",
+                    type: "number",
+                    id: domElementIds.assessment.numberOfMissedMinutesInput,
+                    value: numberOfMissedMinutesDisplayed ?? "",
+                  }}
+                  {...getFieldError("numberOfMissedHours")}
+                />
+              </div>
             </>
           )}
           {formValues.status !== "DID_NOT_SHOW" && (
