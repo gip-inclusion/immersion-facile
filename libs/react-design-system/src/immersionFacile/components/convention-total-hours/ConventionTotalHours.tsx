@@ -12,7 +12,7 @@ export const ConventionTotalHours = ({
 }) => {
   const { cx } = useStyles();
   return (
-    <div className={cx(fr.cx("fr-p-2w"), Styles.root)}>
+    <div className={cx(fr.cx("fr-mt-2w", "fr-p-2w"), Styles.root)}>
       <div className={cx(fr.cx("fr-mr-1w"), Styles.illustrationWrapper)}>
         {illustration}
       </div>
