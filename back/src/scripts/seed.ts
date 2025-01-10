@@ -13,7 +13,10 @@ import {
   reasonableSchedule,
 } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { createAppDependencies } from "../config/bootstrap/createAppDependencies";
+import {
+  AppDependencies,
+  createAppDependencies,
+} from "../config/bootstrap/createAppDependencies";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
@@ -30,6 +33,55 @@ import {
   insertAgencies,
   insertAgencySeed,
 } from "./seed.helpers";
+
+const executeSeedTasks = async (db: KyselyDb, deps: AppDependencies) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Seed start");
+
+  await inclusionConnectUserSeed(db);
+
+  await deps.uowPerformer.perform(async (uow) => {
+    await featureFlagsSeed(uow);
+    await agencySeed(uow);
+    await establishmentSeed(uow);
+    await conventionSeed(uow);
+  });
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Seed end");
+};
+
+const resetDb = async (db: KyselyDb) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Reset Db start");
+
+  await db.deleteFrom("immersion_assessments").execute();
+  await db.deleteFrom("api_consumers_subscriptions").execute();
+  await db.deleteFrom("api_consumers").execute();
+  await db.deleteFrom("users_ongoing_oauths").execute();
+  await db.deleteFrom("users").execute();
+  await db.deleteFrom("users_admins").execute();
+  await db.deleteFrom("conventions").execute();
+  await db.deleteFrom("agency_groups__agencies").execute();
+  await db.deleteFrom("agency_groups").execute();
+  await db.deleteFrom("agencies").execute();
+  await db.deleteFrom("discussions").execute();
+  await db.deleteFrom("establishments__users").execute();
+  await db.deleteFrom("form_establishments").execute();
+  await db.deleteFrom("establishments").execute();
+  await db.deleteFrom("groups").execute();
+  await db.deleteFrom("feature_flags").execute();
+  await db.deleteFrom("notifications_email_recipients").execute();
+  await db.deleteFrom("notifications_email_attachments").execute();
+  await db.deleteFrom("notifications_email").execute();
+  await db.deleteFrom("notifications_sms").execute();
+  await db.deleteFrom("outbox_failures").execute();
+  await db.deleteFrom("outbox_publications").execute();
+  await db.deleteFrom("outbox").execute();
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Reset Db done");
+};
 
 const icUser = new InclusionConnectedUserBuilder()
   .withIsAdmin(false)
@@ -62,55 +114,24 @@ const decathlonUser = new UserBuilder()
   .build();
 
 const seed = async () => {
-  const config = AppConfig.createFromEnv();
-  const deps = await createAppDependencies(config);
-
+  const deps = await createAppDependencies(AppConfig.createFromEnv());
   const pool = deps.getPgPoolFn();
   const db = makeKyselyDb(pool);
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("Reset Db start");
-  await db.deleteFrom("immersion_assessments").execute();
-  await db.deleteFrom("api_consumers_subscriptions").execute();
-  await db.deleteFrom("api_consumers").execute();
-  await db.deleteFrom("users_ongoing_oauths").execute();
-  await db.deleteFrom("users").execute();
-  await db.deleteFrom("users_admins").execute();
-  await db.deleteFrom("conventions").execute();
-  await db.deleteFrom("agency_groups__agencies").execute();
-  await db.deleteFrom("agency_groups").execute();
-  await db.deleteFrom("agencies").execute();
-  await db.deleteFrom("discussions").execute();
-  await db.deleteFrom("establishments__users").execute();
-  await db.deleteFrom("form_establishments").execute();
-  await db.deleteFrom("establishments").execute();
-  await db.deleteFrom("groups").execute();
-  await db.deleteFrom("feature_flags").execute();
-  await db.deleteFrom("notifications_email_recipients").execute();
-  await db.deleteFrom("notifications_email_attachments").execute();
-  await db.deleteFrom("notifications_email").execute();
-  await db.deleteFrom("notifications_sms").execute();
-  await db.deleteFrom("outbox_failures").execute();
-  await db.deleteFrom("outbox_publications").execute();
-  await db.deleteFrom("outbox").execute();
-
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("Reset Db end");
-
-  await inclusionConnectUserSeed(db);
-
-  await deps.uowPerformer.perform(async (uow) => {
-    await featureFlagsSeed(uow);
-    await agencySeed(uow);
-    await establishmentSeed(uow);
-    await conventionSeed(uow);
-  });
+  await resetDb(db);
+  await executeSeedTasks(db, deps);
 
   await pool.end();
   await deps.gateways.disconnectCache();
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("Pool end");
 };
 
 const inclusionConnectUserSeed = async (db: KyselyDb) => {
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("inclusionConnectUserSeed start ...");
+
   await db
     .insertInto("users")
     .values(
@@ -132,11 +153,14 @@ const inclusionConnectUserSeed = async (db: KyselyDb) => {
       user_id: adminUser.id,
     })
     .execute();
+
+  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  console.log("inclusionConnectUserSeed end");
 };
 
 const featureFlagsSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("seeding feature flags...");
+  console.log("featureFlagsSeed start ...");
 
   const featureFlags: FeatureFlags = {
     enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
@@ -159,13 +183,15 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
+
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("done");
+  console.log("featureFlagsSeed done");
 };
 
 const agencySeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("seeding agencies...");
+  console.log("agencySeed start ...");
+
   const agenciesCountByKind = 10;
 
   const insertQueries = [...Array(agenciesCountByKind).keys()].flatMap(() => {
@@ -196,12 +222,12 @@ const agencySeed = async (uow: UnitOfWork) => {
   ]);
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("done");
+  console.log("agencySeed done");
 };
 
 const establishmentSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("seeding establishments ...");
+  console.log("establishmentSeed start ...");
 
   const franceMerguez = new EstablishmentAggregateBuilder()
     .withEstablishment(
@@ -342,12 +368,13 @@ const establishmentSeed = async (uow: UnitOfWork) => {
   );
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("done");
+  console.log("establishmentSeed done");
 };
 
 const conventionSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("seeding conventions...");
+  console.log("conventionSeed start...");
+
   const config = AppConfig.createFromEnv();
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
@@ -445,7 +472,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
   });
 
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("done");
+  console.log("conventionSeed done");
 };
 
 seed()
