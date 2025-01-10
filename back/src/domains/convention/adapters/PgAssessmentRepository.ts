@@ -1,5 +1,15 @@
-import { ConventionId, assessmentSchema, errors } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { sql } from "kysely";
+import {
+  AssessmentStatus,
+  ConventionId,
+  DateString,
+  assessmentSchema,
+  errors,
+} from "shared";
+import {
+  KyselyDb,
+  jsonBuildObject,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { AssessmentRepository } from "../ports/AssessmentRepository";
 
@@ -11,29 +21,42 @@ export class PgAssessmentRepository implements AssessmentRepository {
   ): Promise<AssessmentEntity | undefined> {
     const result = await this.transaction
       .selectFrom("immersion_assessments")
-      .selectAll()
+      .select((eb) => [
+        jsonBuildObject({
+          conventionId: eb.ref("convention_id"),
+          status: eb.ref("status").$castTo<AssessmentStatus[]>(),
+          establishmentFeedback: eb.ref("establishment_feedback"),
+          establishmentAdvices: eb.ref("establishment_advices"),
+          endedWithAJob: eb.ref("ended_with_a_job"),
+          contractStartDate: sql<DateString>`date_to_iso(contract_start_date)`,
+          typeOfContract: eb.ref("type_of_contract"),
+          lastDayOfPresence: sql<DateString>`date_to_iso(last_day_of_presence)`,
+          numberOfMissedHours: eb.ref("number_of_missed_hours"),
+        }).as("assessment"),
+      ])
       .where("convention_id", "=", conventionId)
       .executeTakeFirst();
 
-    if (!result) return;
+    const assessment = result?.assessment;
+    if (!assessment) return;
 
     const dto = assessmentSchema.parse({
-      conventionId: result.convention_id,
-      status: result.status,
-      establishmentFeedback: result.establishment_feedback,
-      establishmentAdvices: result.establishment_advices,
-      endedWithAJob: result.ended_with_a_job,
-      ...(result.contract_start_date
-        ? { contractStartDate: result.contract_start_date.toISOString() }
+      conventionId: assessment.conventionId,
+      status: assessment.status,
+      establishmentFeedback: assessment.establishmentFeedback,
+      establishmentAdvices: assessment.establishmentAdvices,
+      endedWithAJob: assessment.endedWithAJob,
+      ...(assessment.contractStartDate
+        ? { contractStartDate: assessment.contractStartDate }
         : {}),
-      ...(result.type_of_contract
-        ? { typeOfContract: result.type_of_contract }
+      ...(assessment.typeOfContract
+        ? { typeOfContract: assessment.typeOfContract }
         : {}),
-      ...(result.last_day_of_presence
-        ? { lastDayOfPresence: result.last_day_of_presence.toISOString() }
+      ...(assessment.lastDayOfPresence
+        ? { lastDayOfPresence: assessment.lastDayOfPresence }
         : {}),
-      ...(result.number_of_missed_hours
-        ? { numberOfMissedHours: result.number_of_missed_hours }
+      ...(assessment.numberOfMissedHours
+        ? { numberOfMissedHours: assessment.numberOfMissedHours }
         : {}),
     });
 
