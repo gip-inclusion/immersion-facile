@@ -7,7 +7,7 @@ import {
   Tag as ImTag,
   useStyleUtils,
 } from "react-design-system";
-import { SearchResultDto, domElementIds } from "shared";
+import { SearchResultDto, domElementIds, isSuperEstablishment } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -124,9 +124,9 @@ export const SearchListResults = ({
                           }
                         >
                           <div className={fr.cx("fr-p-1v")}>
-                            {searchResult.establishmentScore > 50 && (
-                              <ImTag theme="superEnterprise" />
-                            )}
+                            {isSuperEstablishment(
+                              searchResult.establishmentScore,
+                            ) && <ImTag theme="superEnterprise" />}
                             {searchResult.fitForDisabledWorkers && (
                               <ImTag theme="rqth" />
                             )}

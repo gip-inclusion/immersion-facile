@@ -6,6 +6,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  isSuperEstablishment,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -47,6 +48,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
   const establishment = new EstablishmentAggregateBuilder()
     .withSearchableBy({ jobSeekers: true, students: false })
     .withUserRights([establishmentRight])
+    .withScore(51)
     .build();
 
   const firstConventionValidationDate = new Date("2024-05-25");
@@ -112,6 +114,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       searchableBy: "jobSeekers",
       siret: establishment.establishment.siret,
       romes: establishment.offers.map(({ romeCode }) => romeCode),
+      isSuperEstablishment: isSuperEstablishment(
+        establishment.establishment.score,
+      ),
     };
 
     const marketingContact: MarketingContact = {
@@ -191,6 +196,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           nextAvailabilityDate: new Date(),
           numberEmployeesRange: "+10000",
           romes: establishment.offers.map(({ romeCode }) => romeCode),
+          isSuperEstablishment: isSuperEstablishment(
+            establishment.establishment.score,
+          ),
         },
       ];
 
@@ -504,6 +512,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           isCommited: false,
           nextAvailabilityDate: new Date(),
           numberEmployeesRange: "+10000",
+          isSuperEstablishment: isSuperEstablishment(
+            establishment.establishment.score,
+          ),
         },
       ];
 
