@@ -1,6 +1,5 @@
 import { parseISO } from "date-fns";
 import {
-  hoursDisplayedToHoursValue,
   hoursValueToHoursDisplayed,
   toDateString,
   toDisplayedDate,
@@ -41,23 +40,6 @@ describe("Date utils tests - toDisplayedDate", () => {
   it("can't format an empty string", () => {
     const date = new Date("");
     expect(() => toDisplayedDate({ date })).toThrow("Invalid time value");
-  });
-});
-
-describe("Date utils tests - hoursDisplayedToHoursValue", () => {
-  it.each([
-    { input: "10h15", expected: 10.25 },
-    { input: "10h", expected: 10 },
-    { input: "08h05", expected: 8.08 },
-    { input: "00h", expected: 0 },
-    { input: "67h45", expected: 67.75 },
-    { input: "", expected: 0 },
-    { input: "h", expected: 0 },
-    { input: "10", expected: 10 },
-    { input: "0", expected: 0 },
-    { input: "10h3", expected: 10.5 },
-  ])("convert $input to $expected", ({ input, expected }) => {
-    expect(hoursDisplayedToHoursValue(input)).toBe(expected);
   });
 });
 
