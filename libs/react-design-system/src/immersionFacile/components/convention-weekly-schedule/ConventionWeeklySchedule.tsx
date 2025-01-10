@@ -72,7 +72,7 @@ export const ConventionWeeklySchedule = ({
               hoursValue: week.weeklyHours,
               padWithZero: false,
             })}{" "}
-            heures de travail hebdomadaires
+            de travail hebdomadaires
           </p>
           <ul
             style={{
