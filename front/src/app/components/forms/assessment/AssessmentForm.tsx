@@ -27,7 +27,6 @@ import {
   assessmentStatuses,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
-  hoursDisplayedToHoursValue,
   hoursValueToHoursDisplayed,
   toDisplayedDate,
   typeOfContracts,
@@ -239,22 +238,33 @@ const AssessmentStatusSection = ({
   const getFieldError = makeFieldError(formState);
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
-    useState("");
+    useState<number | null>(null);
+  const [numberOfMissedMinutesDisplayed, setNumberOfMissedMinutesDisplayed] =
+    useState<number | null>(null);
   const assessmentStatus = watch("status");
-  const handleHoursChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    let input = event.target.value;
-    input = input.replace(/[^0-9h]/g, "");
-    if (/^\d{2}$/.test(input)) {
-      input = `${input}h`;
+
+  useEffect(() => {
+    if (
+      formValues.status === "PARTIALLY_COMPLETED" &&
+      formValues.numberOfMissedHours > 0
+    ) {
+      setNumberOfMissedHoursDisplayed(
+        Math.floor(formValues.numberOfMissedHours),
+      );
+      setNumberOfMissedMinutesDisplayed(
+        +(
+          (formValues.numberOfMissedHours -
+            Math.floor(formValues.numberOfMissedHours)) *
+          60
+        ).toFixed(2),
+      );
     }
-    if (!/^(\d{1,2}h?(\d{1,2})?)?$/.test(input)) {
-      return;
-    }
-    setNumberOfMissedHoursDisplayed(input);
-  };
+  }, [formValues]);
+
   const totalHours = computeTotalHours(
     convention,
-    hoursDisplayedToHoursValue(numberOfMissedHoursDisplayed),
+    (numberOfMissedHoursDisplayed ?? 0) +
+      (numberOfMissedMinutesDisplayed ?? 0) / 60,
     assessmentStatus,
   );
   return (
@@ -301,22 +311,48 @@ const AssessmentStatusSection = ({
                 }}
                 {...getFieldError("lastDayOfPresence")}
               />
+              <p className={fr.cx("fr-mb-2w")}>
+                L'immersion représente actuellement{" "}
+                {convention.schedule.totalHours} heures, pouvez-vous indiquer le
+                nombre d'heures manquées ?
+              </p>
               <Input
-                label={`L'immersion représente actuellement ${convention.schedule.totalHours} heures, pouvez-vous indiquer le nombre d'heures manquées ?`}
-                hintText={`Nombre total d'heures indiquées dans la convention : ${hoursValueToHoursDisplayed(
-                  { hoursValue: convention.schedule.totalHours },
-                )}`}
+                label="Heures manquées"
                 nativeInputProps={{
-                  ...register("numberOfMissedHours", {
-                    setValueAs: (value) => {
-                      if (typeof value !== "string") return 0;
-                      return hoursDisplayedToHoursValue(value);
-                    },
-                  }),
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = +event.target.value;
+                    setNumberOfMissedHoursDisplayed(value);
+                    setValue(
+                      "numberOfMissedHours",
+                      value + (numberOfMissedMinutesDisplayed ?? 0) / 60,
+                    );
+                  },
+                  min: 0,
+                  max: convention.schedule.totalHours,
+                  pattern: "\\d*",
+                  type: "number",
                   id: domElementIds.assessment.numberOfMissedHoursInput,
-
-                  value: numberOfMissedHoursDisplayed,
-                  onChange: handleHoursChange,
+                  value: numberOfMissedHoursDisplayed ?? "",
+                }}
+                {...getFieldError("numberOfMissedHours")}
+              />
+              <Input
+                label="Minutes manquées"
+                nativeInputProps={{
+                  onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    const value = +event.target.value;
+                    setNumberOfMissedMinutesDisplayed(value);
+                    setValue(
+                      "numberOfMissedHours",
+                      (numberOfMissedHoursDisplayed ?? 0) + value / 60,
+                    );
+                  },
+                  min: 0,
+                  max: 60,
+                  pattern: "\\d*",
+                  type: "number",
+                  id: domElementIds.assessment.numberOfMissedMinutesInput,
+                  value: numberOfMissedMinutesDisplayed ?? "",
                 }}
                 {...getFieldError("numberOfMissedHours")}
               />

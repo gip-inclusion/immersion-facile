@@ -512,6 +512,8 @@ export const domElementIds = {
     lastDayOfPresenceInput: "im-assessment-form__last-day-of-presence-input",
     numberOfMissedHoursInput:
       "im-assessment-form__number-of-missed-hours-input",
+    numberOfMissedMinutesInput:
+      "im-assessment-form__number-of-missed-minutes-input",
     endedWithAJobInput: "im-assessment-form__ended-with-a-job-input",
     typeOfContractInput: "im-assessment-form__type-of-contract-input",
     contractStartDateInput: "im-assessment-form__contract-start-date-input",
