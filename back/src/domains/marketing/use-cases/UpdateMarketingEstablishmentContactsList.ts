@@ -4,6 +4,7 @@ import {
   SiretDto,
   WithSiretDto,
   errors,
+  isSuperEstablishment,
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -209,6 +210,9 @@ const onEstablishment = async (
     numberEmployeesRange:
       establishmentAggregate.establishment.numberEmployeesRange,
     romes: establishmentAggregate.offers.map(({ romeCode }) => romeCode),
+    isSuperEstablishment: isSuperEstablishment(
+      establishmentAggregate.establishment.score,
+    ),
   });
 };
 

@@ -139,3 +139,4 @@ export * from "./utils/searchResult";
 export * from "./utils/string";
 export * from "./utils/toDotNotation";
 export * from "./zodUtils";
+export * from "./establishment/superEstablishment";
