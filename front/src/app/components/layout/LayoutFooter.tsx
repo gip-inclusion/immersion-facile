@@ -46,7 +46,7 @@ const PartnersLogos = () => {
           src={franceTravailLogo}
           alt="France Travail"
           className={cx(
-            fr.cx("fr-footer__logo", "fr-mx-1w"),
+            fr.cx("fr-footer__logo", "fr-mx-md-1w"),
             FooterStyles.default.logo,
             classes.partnerLogo,
           )}
