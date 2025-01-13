@@ -86,7 +86,7 @@ const rawAgencyDashboardTabs = ({
           },
         ]
       : []),
-    ...(agenciesUserIsAdminOn
+    ...(agenciesUserIsAdminOn.length
       ? [
           {
             tabId: "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
