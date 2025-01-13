@@ -33,6 +33,10 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Tableau de bord",
         route: routes.agencyDashboardMain(),
       },
+      agencyDashboardAgencyDetails: {
+        label: "Détail de l'organisme",
+        route: routes.agencyDashboardAgencyDetails({ agencyId: "" }),
+      },
     },
   },
   homeCandidates: {
