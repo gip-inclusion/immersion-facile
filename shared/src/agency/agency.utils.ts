@@ -1,3 +1,5 @@
+import { partition } from "ramda";
+import { AgencyRight } from "..";
 import { errors } from "../errors/errors";
 import { AgencyDto } from "./agency.dto";
 import { AgencyPublicDisplayDto } from "./publicAgency.dto";
@@ -49,4 +51,12 @@ export const getCounsellorsAndValidatorsEmailsDeduplicated = (
   );
 
   return [...new Set(allEmails)];
+};
+
+export const distinguishAgencyRights = (agencyRights: AgencyRight[]) => {
+  const [toReviewAgencyRights, activeAgencyRights] = partition(
+    (agency) => agency.roles.includes("to-review"),
+    agencyRights,
+  );
+  return { toReviewAgencyRights, activeAgencyRights };
 };

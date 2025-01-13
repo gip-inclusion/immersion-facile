@@ -1,7 +1,13 @@
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { AgencyRight, User, UserParamsForAgency, domElementIds } from "shared";
+import {
+  AgencyRight,
+  User,
+  UserParamsForAgency,
+  distinguishAgencyRights,
+  domElementIds,
+} from "shared";
 import { Feedback } from "../../feedback/Feedback";
 import { AgencyUserModificationForm } from "../AgencyUserModificationForm";
 import { ActiveAgencyRightsTable } from "./ActiveAgencyRightsTable";
@@ -34,12 +40,8 @@ export const AgenciesTablesSection = ({
     manageUserModal.open();
   };
 
-  const toReviewAgencyRights = agencyRights.filter((agencyRight) =>
-    agencyRight.roles.includes("to-review"),
-  );
-  const activeAgencyRights = agencyRights.filter(
-    (agencyRight) => !agencyRight.roles.includes("to-review"),
-  );
+  const { toReviewAgencyRights, activeAgencyRights } =
+    distinguishAgencyRights(agencyRights);
 
   return (
     <>
