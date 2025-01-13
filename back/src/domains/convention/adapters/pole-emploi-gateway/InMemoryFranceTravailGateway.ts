@@ -1,17 +1,17 @@
 import { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import {
-  PoleEmploiBroadcastResponse,
-  PoleEmploiConvention,
-  PoleEmploiGateway,
-} from "../../ports/PoleEmploiGateway";
+  FranceTravailBroadcastResponse,
+  FranceTravailConvention,
+  FranceTravailGateway,
+} from "../../ports/FranceTravailGateway";
 
-export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
-  #nextResponse: PoleEmploiBroadcastResponse = {
+export class InMemoryFranceTravailGateway implements FranceTravailGateway {
+  #nextResponse: FranceTravailBroadcastResponse = {
     status: 200,
-    body: { succes: true },
+    body: { success: true },
   };
 
-  constructor(public notifications: PoleEmploiConvention[] = []) {}
+  constructor(public notifications: FranceTravailConvention[] = []) {}
 
   public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return {
@@ -21,8 +21,8 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
   }
 
   public async notifyOnConventionUpdated(
-    convention: PoleEmploiConvention,
-  ): Promise<PoleEmploiBroadcastResponse> {
+    convention: FranceTravailConvention,
+  ): Promise<FranceTravailBroadcastResponse> {
     if (convention.statut === "DEMANDE_OBSOLETE") {
       throw new Error("fake axios error");
     }
@@ -32,7 +32,7 @@ export class InMemoryPoleEmploiGateway implements PoleEmploiGateway {
 
   //For testing purpose
 
-  public setNextResponse(response: PoleEmploiBroadcastResponse) {
+  public setNextResponse(response: FranceTravailBroadcastResponse) {
     this.#nextResponse = response;
   }
 }

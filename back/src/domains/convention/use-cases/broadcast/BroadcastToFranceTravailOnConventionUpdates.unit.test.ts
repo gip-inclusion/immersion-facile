@@ -17,8 +17,8 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryPoleEmploiGateway } from "../../adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
-import { AgencyKindForPe } from "../../ports/PoleEmploiGateway";
+import { InMemoryFranceTravailGateway } from "../../adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
+import { AgencyKindForPe } from "../../ports/FranceTravailGateway";
 import { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 
 describe("Broadcasts events to France Travail", () => {
@@ -27,7 +27,7 @@ describe("Broadcasts events to France Travail", () => {
     .withKind("pole-emploi")
     .build();
 
-  let poleEmploiGateWay: InMemoryPoleEmploiGateway;
+  let poleEmploiGateWay: InMemoryFranceTravailGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
@@ -53,7 +53,7 @@ describe("Broadcasts events to France Travail", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    poleEmploiGateWay = new InMemoryPoleEmploiGateway();
+    poleEmploiGateWay = new InMemoryFranceTravailGateway();
     timeGateway = new CustomTimeGateway();
     broadcastToFranceTravailOnConventionUpdates =
       new BroadcastToFranceTravailOnConventionUpdates(

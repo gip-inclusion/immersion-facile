@@ -6,7 +6,7 @@ import {
 } from "shared";
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
+import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 
 export type AppellationWithShortLabel = AppellationDto & {
   romeCode: string;
@@ -50,12 +50,12 @@ export const makeRome4Routes = (peApiUrl: AbsoluteUrl) =>
 
 export class HttpRome4Gateway implements Rome4Gateway {
   #httpClient: HttpClient<Rome4Routes>;
-  #poleEmploiGateway: PoleEmploiGateway;
+  #poleEmploiGateway: FranceTravailGateway;
   #poleEmploiClientId: string;
 
   constructor(
     httpClient: HttpClient<Rome4Routes>,
-    poleEmploiGateway: PoleEmploiGateway,
+    poleEmploiGateway: FranceTravailGateway,
     poleEmploiClientId: string,
   ) {
     this.#httpClient = httpClient;

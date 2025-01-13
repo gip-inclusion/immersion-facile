@@ -41,7 +41,7 @@ export const chooseValidAdvisor = (
   const preferredAdvisor = sortedValidAdvisors.at(0);
   if (!preferredAdvisor) {
     logger.error({
-      peConnect: {
+      ftConnect: {
         peExternalId,
       },
       message: "getAdvisorsInfo - peConnectNoValidAdvisor",

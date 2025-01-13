@@ -1,8 +1,8 @@
 import { createFetchSharedClient } from "shared-routes/fetch";
-import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
+import { createFranceTravailRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/FrancetTravailRoutes";
 import { AppConfig } from "../bootstrap/appConfig";
 
 export const createPeFetchSharedClient = (config: AppConfig) => {
-  const poleEmploiRoutes = createPoleEmploiRoutes(config.peApiUrl);
+  const poleEmploiRoutes = createFranceTravailRoutes(config.peApiUrl);
   return createFetchSharedClient(poleEmploiRoutes, fetch);
 };

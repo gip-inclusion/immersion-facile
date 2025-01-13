@@ -15,11 +15,11 @@ import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
-  PoleEmploiConvention,
-  PoleEmploiGateway,
-  conventionStatusToPoleEmploiStatus,
+  FranceTravailConvention,
+  FranceTravailGateway,
+  conventionStatusToFranceTravailStatus,
   isBroadcastResponseOk,
-} from "../../ports/PoleEmploiGateway";
+} from "../../ports/FranceTravailGateway";
 
 const conventionObjectiveToObjectifDeImmersion: Record<
   ImmersionObjective,
@@ -35,7 +35,7 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private poleEmploiGateway: PoleEmploiGateway,
+    private poleEmploiGateway: FranceTravailGateway,
     private timeGateway: TimeGateway,
     private options: { resyncMode: boolean },
   ) {
@@ -70,11 +70,11 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
     const externalId =
       await uow.conventionExternalIdRepository.getByConventionId(convention.id);
 
-    const poleEmploiConvention: PoleEmploiConvention = {
+    const poleEmploiConvention: FranceTravailConvention = {
       id: externalId ?? "no-external-id",
       originalId: convention.id,
       peConnectId: beneficiary.federatedIdentity?.token,
-      statut: conventionStatusToPoleEmploiStatus[convention.status],
+      statut: conventionStatusToFranceTravailStatus[convention.status],
       email: beneficiary.email,
       telephone: beneficiary.phone,
       prenom: beneficiary.firstName,

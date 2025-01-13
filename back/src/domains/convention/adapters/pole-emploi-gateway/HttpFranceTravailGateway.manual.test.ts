@@ -12,12 +12,12 @@ import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/I
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {
-  PoleEmploiBroadcastResponse,
-  PoleEmploiConvention,
+  FranceTravailBroadcastResponse,
+  FranceTravailConvention,
   isBroadcastResponseOk,
-} from "../../ports/PoleEmploiGateway";
-import { HttpPoleEmploiGateway } from "./HttpPoleEmploiGateway";
-import { createPoleEmploiRoutes } from "./PoleEmploiRoutes";
+} from "../../ports/FranceTravailGateway";
+import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
+import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
 describe("HttpPoleEmploiGateway", () => {
   it.each([
@@ -57,7 +57,7 @@ describe("HttpPoleEmploiGateway", () => {
   ] satisfies TestCase[])(
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
-      const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
+      const httpPoleEmploiGateway = new HttpFranceTravailGateway(
         createPeAxiosSharedClient(config),
         cachingGateway,
         config.peApiUrl,
@@ -110,7 +110,7 @@ describe("HttpPoleEmploiGateway", () => {
   ] satisfies TestCase[])(
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
-      const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
+      const httpPoleEmploiGateway = new HttpFranceTravailGateway(
         createPeAxiosSharedClient(config),
         cachingGateway,
         config.peApiUrl,
@@ -132,7 +132,7 @@ describe("HttpPoleEmploiGateway", () => {
   it("error feedback axios timeout", async () => {
     const peApiUrl = "https://fake-pe.fr";
     const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
-    const routes = createPoleEmploiRoutes(peApiUrl);
+    const routes = createFranceTravailRoutes(peApiUrl);
 
     const httpClient = createAxiosSharedClient(routes, axios, {
       skipResponseValidation: true,
@@ -152,7 +152,7 @@ describe("HttpPoleEmploiGateway", () => {
       clientSecret: "",
     };
 
-    const poleEmploiGateway = new HttpPoleEmploiGateway(
+    const poleEmploiGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
       peApiUrl,
@@ -185,7 +185,7 @@ describe("HttpPoleEmploiGateway", () => {
   it("error feedback on bad response code", async () => {
     const peApiUrl = "https://fake-pe.fr";
     const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
-    const routes = createPoleEmploiRoutes(peApiUrl);
+    const routes = createFranceTravailRoutes(peApiUrl);
 
     const httpClient = createAxiosSharedClient(routes, axios, {
       skipResponseValidation: true,
@@ -205,7 +205,7 @@ describe("HttpPoleEmploiGateway", () => {
       clientSecret: "",
     };
 
-    const poleEmploiGateway = new HttpPoleEmploiGateway(
+    const poleEmploiGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
       peApiUrl,
@@ -245,7 +245,7 @@ const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
   "expires_in",
 );
 
-const peConvention: PoleEmploiConvention = {
+const peConvention: FranceTravailConvention = {
   activitesObservees: "Tenir une conversation client",
   originalId: "31bd445d-54fa-4b53-8875-0ada1673fe3c",
   adresseImmersion: "5 avenue du Général",
@@ -288,8 +288,11 @@ const peConvention: PoleEmploiConvention = {
 
 type TestCase = {
   fields: Partial<
-    Pick<PoleEmploiConvention, "id" | "email" | "dateNaissance" | "peConnectId">
+    Pick<
+      FranceTravailConvention,
+      "id" | "email" | "dateNaissance" | "peConnectId"
+    >
   >;
-  expected: PoleEmploiBroadcastResponse;
+  expected: FranceTravailBroadcastResponse;
   testMessage?: string;
 };

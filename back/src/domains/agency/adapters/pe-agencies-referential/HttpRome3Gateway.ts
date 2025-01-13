@@ -2,7 +2,7 @@ import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
-import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
+import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import type { AppellationWithShortLabel } from "./HttpRome4Gateway";
 
 const logger = createLogger(__filename);
@@ -35,12 +35,12 @@ export const makeRome3Routes = (peApiUrl: AbsoluteUrl) =>
 
 export class HttpRome3Gateway implements Rome3Gateway {
   #httpClient: HttpClient<Rome4Routes>;
-  #poleEmploiGateway: PoleEmploiGateway;
+  #poleEmploiGateway: FranceTravailGateway;
   #poleEmploiClientId: string;
 
   constructor(
     httpClient: HttpClient<Rome4Routes>,
-    poleEmploiGateway: PoleEmploiGateway,
+    poleEmploiGateway: FranceTravailGateway,
     poleEmploiClientId: string,
   ) {
     this.#httpClient = httpClient;

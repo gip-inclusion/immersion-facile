@@ -6,7 +6,7 @@ import {
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
-import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
+import { HttpFranceTravailGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -20,7 +20,7 @@ describe("HttpRome3Gateway", () => {
     "expires_in",
   );
 
-  const franceTravailGateway = new HttpPoleEmploiGateway(
+  const franceTravailGateway = new HttpFranceTravailGateway(
     createPeAxiosSharedClient(config),
     cachingGateway,
     config.peApiUrl,

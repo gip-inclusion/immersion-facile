@@ -5,7 +5,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { PoleEmploiGateway } from "../ports/PoleEmploiGateway";
+import { FranceTravailGateway } from "../ports/FranceTravailGateway";
 import { BroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
 
 type ResyncOldConventionToPeReport = {
@@ -34,7 +34,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
 
   constructor(
     uowPerform: UnitOfWorkPerformer,
-    poleEmploiGateway: PoleEmploiGateway,
+    poleEmploiGateway: FranceTravailGateway,
     timeGateway: TimeGateway,
     limit: number,
   ) {

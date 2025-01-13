@@ -14,11 +14,11 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryPoleEmploiGateway } from "../adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
+import { InMemoryFranceTravailGateway } from "../adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
 import {
-  PoleEmploiConvention,
-  conventionStatusToPoleEmploiStatus,
-} from "../ports/PoleEmploiGateway";
+  FranceTravailConvention,
+  conventionStatusToFranceTravailStatus,
+} from "../ports/FranceTravailGateway";
 import { ResyncOldConventionsToPe } from "./ResyncOldConventionsToPe";
 
 describe("ResyncOldConventionsToPe use case", () => {
@@ -43,13 +43,13 @@ describe("ResyncOldConventionsToPe use case", () => {
   let uow: InMemoryUnitOfWork;
   let useCase: ResyncOldConventionsToPe;
   let timeGateway: CustomTimeGateway;
-  let peGateway: InMemoryPoleEmploiGateway;
+  let peGateway: InMemoryFranceTravailGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
 
     timeGateway = new CustomTimeGateway();
-    peGateway = new InMemoryPoleEmploiGateway();
+    peGateway = new InMemoryFranceTravailGateway();
     useCase = new ResyncOldConventionsToPe(
       new InMemoryUowPerformer(uow),
       peGateway,
@@ -389,12 +389,12 @@ describe("ResyncOldConventionsToPe use case", () => {
 function conventionToConventionNotification(
   convention: ConventionDto,
   agency: AgencyDto,
-): PoleEmploiConvention {
+): FranceTravailConvention {
   return {
     id: "no-external-id",
     originalId: convention.id,
     peConnectId: convention.signatories.beneficiary.federatedIdentity?.token,
-    statut: conventionStatusToPoleEmploiStatus[convention.status],
+    statut: conventionStatusToFranceTravailStatus[convention.status],
     email: convention.signatories.beneficiary.email,
     telephone: convention.signatories.beneficiary.phone,
     prenom: convention.signatories.beneficiary.firstName,
