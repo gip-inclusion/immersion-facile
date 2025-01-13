@@ -7,7 +7,7 @@ export * from "./admin/admin.routes";
 export * from "./admin/admin.schema";
 export * from "./admin/adminTabs";
 export * from "./agency-group/agencyGroup";
-export * from "./agency/agency";
+export * from "./agency/agency.utils";
 export * from "./agency/agency.dto";
 export * from "./agency/agency.schema";
 export * from "./agency/AgencyDtoBuilder";
