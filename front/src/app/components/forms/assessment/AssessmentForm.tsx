@@ -295,7 +295,7 @@ const AssessmentStatusSection = ({
           {formValues.status === "PARTIALLY_COMPLETED" && (
             <>
               <Input
-                label="Dernier jour de présence"
+                label="Quelle a été la date du dernier jour de présence en entreprise ?"
                 hintText={`Date indiquée dans la convention : ${toDisplayedDate(
                   {
                     date: convertLocaleDateToUtcTimezoneDate(
@@ -471,30 +471,32 @@ const AssessmentContractSection = ({
         ]}
       />
       {endedWithAJobValue && (
-        <>
-          <Select
-            label="Type de contrat associé à l’embauche :"
-            id={domElementIds.assessment.typeOfContractInput}
-            options={typeOfContracts.map((contractType) => ({
-              label: contractType,
-              value: contractType,
-            }))}
-            nativeSelectProps={{
-              ...register("typeOfContract"),
-            }}
-            {...getFieldError("typeOfContract")}
-          />
+        <div className={fr.cx("fr-grid-row", "fr-mb-4w")}>
+          <div className={fr.cx("fr-col-lg-5")}>
+            <Select
+              label="Type de contrat associé à l’embauche :"
+              id={domElementIds.assessment.typeOfContractInput}
+              options={typeOfContracts.map((contractType) => ({
+                label: contractType,
+                value: contractType,
+              }))}
+              nativeSelectProps={{
+                ...register("typeOfContract"),
+              }}
+              {...getFieldError("typeOfContract")}
+            />
 
-          <Input
-            label="Date de début du contrat :"
-            nativeInputProps={{
-              ...register("contractStartDate"),
-              id: domElementIds.assessment.contractStartDateInput,
-              type: "date",
-            }}
-            {...getFieldError("contractStartDate")}
-          />
-        </>
+            <Input
+              label="Date de début du contrat :"
+              nativeInputProps={{
+                ...register("contractStartDate"),
+                id: domElementIds.assessment.contractStartDateInput,
+                type: "date",
+              }}
+              {...getFieldError("contractStartDate")}
+            />
+          </div>
+        </div>
       )}
       <ButtonsGroup
         inlineLayoutWhen="always"
