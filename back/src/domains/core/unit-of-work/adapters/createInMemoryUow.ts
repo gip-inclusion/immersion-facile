@@ -19,7 +19,7 @@ import { InMemoryEstablishementMarketingRepository } from "../../../marketing/ad
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/InMemoryOngoingOAuthRepository";
 import { InMemoryUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryUserRepository";
-import { InMemoryConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/InMemoryConventionPoleEmploiAdvisorRepository";
+import { InMemoryConventionFranceTravailAdvisorRepository } from "../../authentication/pe-connect/adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
@@ -55,7 +55,7 @@ export const createInMemoryUow = () => {
     conventionQueries,
     conventionRepository,
     conventionPoleEmploiAdvisorRepository:
-      new InMemoryConventionPoleEmploiAdvisorRepository(),
+      new InMemoryConventionFranceTravailAdvisorRepository(),
     conventionsToSyncRepository: new InMemoryConventionsToSyncRepository(),
     delegationContactRepository: new InMemoryDelegationContactRepository(),
     discussionRepository: new InMemoryDiscussionRepository(),

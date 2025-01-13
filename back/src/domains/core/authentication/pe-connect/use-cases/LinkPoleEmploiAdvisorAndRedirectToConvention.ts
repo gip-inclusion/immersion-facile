@@ -10,12 +10,12 @@ import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
-  ConventionPeConnectFields,
-  PeUserAndAdvisor,
+  ConventionFtConnectFields,
+  FtUserAndAdvisor,
   toPartialConventionDtoWithPeIdentity,
-} from "../dto/PeConnect.dto";
-import { chooseValidAdvisor } from "../entities/ConventionPoleEmploiAdvisorEntity";
-import { PeConnectGateway } from "../port/PeConnectGateway";
+} from "../dto/FtConnect.dto";
+import { chooseValidAdvisor } from "../entities/ConventionFranceTravailAdvisorEntity";
+import { FtConnectGateway } from "../port/FtConnectGateway";
 
 export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalUseCase<
   string,
@@ -23,13 +23,13 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
 > {
   protected inputSchema = z.string();
 
-  readonly #peConnectGateway: PeConnectGateway;
+  readonly #peConnectGateway: FtConnectGateway;
 
   readonly #baseUrlForRedirect: AbsoluteUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    peConnectGateway: PeConnectGateway,
+    peConnectGateway: FtConnectGateway,
     baseUrlForRedirect: AbsoluteUrl,
   ) {
     super(uowPerformer);
@@ -52,10 +52,10 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
         });
   }
 
-  #makeRedirectUrl(fields: Partial<ConventionPeConnectFields>): AbsoluteUrl {
+  #makeRedirectUrl(fields: Partial<ConventionFtConnectFields>): AbsoluteUrl {
     return `${this.#baseUrlForRedirect}/${
       frontRoutes.conventionImmersionRoute
-    }?${queryParamsAsString<Partial<ConventionPeConnectFields>>(fields)}`;
+    }?${queryParamsAsString<Partial<ConventionFtConnectFields>>(fields)}`;
   }
 
   async #onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
@@ -68,7 +68,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
       });
     const { user, advisors } = userAndAdvisors;
 
-    const peUserAndAdvisor: PeUserAndAdvisor = {
+    const peUserAndAdvisor: FtUserAndAdvisor = {
       user,
       advisor: user.isJobseeker
         ? chooseValidAdvisor(user, advisors)

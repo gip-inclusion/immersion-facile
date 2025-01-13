@@ -12,7 +12,7 @@ import {
   HttpRome4Gateway,
   makeRome4Routes,
 } from "../domains/agency/adapters/pe-agencies-referential/HttpRome4Gateway";
-import { HttpFranceTravailGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
+import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";

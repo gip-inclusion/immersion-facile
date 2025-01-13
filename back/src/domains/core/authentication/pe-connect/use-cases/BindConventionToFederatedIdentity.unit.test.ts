@@ -15,16 +15,16 @@ import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemory
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   CONVENTION_ID_DEFAULT_UUID,
-  InMemoryConventionPoleEmploiAdvisorRepository,
-} from "../adapters/InMemoryConventionPoleEmploiAdvisorRepository";
-import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
-import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
+  InMemoryConventionFranceTravailAdvisorRepository,
+} from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
+import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
+import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: BindConventionToFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
-  let conventionPoleEmploiAdvisorRepo: InMemoryConventionPoleEmploiAdvisorRepository;
+  let conventionPoleEmploiAdvisorRepo: InMemoryConventionFranceTravailAdvisorRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
   beforeEach(() => {
@@ -88,7 +88,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
     conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
-      conventionPoleEmploiUserAdvisorFromDto(
+      conventionFranceTravailUserAdvisorFromDto(
         userAdvisorDto,
         CONVENTION_ID_DEFAULT_UUID,
       ),
@@ -115,7 +115,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
   it("should save event PeConnectFederatedIdentityAssociated", async () => {
     conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
-      conventionPoleEmploiUserAdvisorFromDto(
+      conventionFranceTravailUserAdvisorFromDto(
         userAdvisorDto,
         CONVENTION_ID_DEFAULT_UUID,
       ),
@@ -144,7 +144,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
   it("without advisor", async () => {
     conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
-      conventionPoleEmploiUserAdvisorFromDto(
+      conventionFranceTravailUserAdvisorFromDto(
         {
           ...userAdvisorDto,
           advisor: undefined,
@@ -202,7 +202,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
 const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const userAdvisorDto: PeUserAndAdvisor = {
+const userAdvisorDto: FtUserAndAdvisor = {
   advisor: {
     email: "elsa.oldenburg@pole-emploi.net",
     firstName: "Elsa",

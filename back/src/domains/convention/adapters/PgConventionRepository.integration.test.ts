@@ -10,7 +10,7 @@ import {
   ConventionId,
   EstablishmentRepresentative,
   EstablishmentTutor,
-  PeConnectToken,
+  FtConnectToken,
   WithAcquisition,
   errors,
   expectPromiseToFailWithError,
@@ -428,7 +428,7 @@ describe("PgConventionRepository", () => {
   });
 
   it("Retrieves federated identity if exists", async () => {
-    const peConnectId: PeConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+    const peConnectId: FtConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = conventionStylisteBuilder
       .withFederatedIdentity({
         provider: "peConnect",

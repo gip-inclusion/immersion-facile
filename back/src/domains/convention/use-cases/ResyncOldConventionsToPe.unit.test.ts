@@ -14,7 +14,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryFranceTravailGateway } from "../adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
+import { InMemoryFranceTravailGateway } from "../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import {
   FranceTravailConvention,
   conventionStatusToFranceTravailStatus,

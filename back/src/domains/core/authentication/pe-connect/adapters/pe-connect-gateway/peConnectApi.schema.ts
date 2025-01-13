@@ -2,9 +2,9 @@ import { emailSchema, zStringMinLength1 } from "shared";
 import { z } from "zod";
 import { BearerToken } from "../../dto/BearerToken";
 import {
-  PeConnectAdvisorsKind,
-  peAdvisorKinds,
-} from "../../dto/PeConnectAdvisor.dto";
+  FtConnectAdvisorsKind,
+  ftAdvisorKinds,
+} from "../../dto/FtConnectAdvisor.dto";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectAdvisors,
@@ -32,8 +32,8 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
     ]),
   });
 
-const peAdvisorKindSchema: z.Schema<PeConnectAdvisorsKind> =
-  z.enum(peAdvisorKinds);
+const peAdvisorKindSchema: z.Schema<FtConnectAdvisorsKind> =
+  z.enum(ftAdvisorKinds);
 
 const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
   z.object({

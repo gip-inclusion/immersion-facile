@@ -3,7 +3,7 @@ import supertest from "supertest";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { Gateways } from "../config/bootstrap/createGateways";
 import { createApp } from "../config/bootstrap/server";
-import { InMemoryFranceTravailGateway } from "../domains/convention/adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
+import { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";

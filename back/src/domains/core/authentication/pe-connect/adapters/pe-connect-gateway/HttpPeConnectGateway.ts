@@ -12,10 +12,10 @@ import {
 import { notifyObjectDiscord } from "../../../../../../utils/notifyDiscord";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../dto/PeConnectUser.dto";
+import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import { externalAccessTokenSchema } from "../../port/AccessToken.schema";
-import { PeConnectGateway } from "../../port/PeConnectGateway";
+import { FtConnectGateway } from "../../port/FtConnectGateway";
 import {
   ExternalPeConnectAdvisor,
   ExternalPeConnectUser,
@@ -86,7 +86,7 @@ const peConnectMaxRequestsPerInterval = 1;
 const rate_ms = 1250;
 
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
-export class HttpPeConnectGateway implements PeConnectGateway {
+export class HttpPeConnectGateway implements FtConnectGateway {
   // PE Connect limit rate at 1 call per 1.2s
   #limiter = new Bottleneck({
     reservoir: peConnectMaxRequestsPerInterval,
@@ -151,8 +151,8 @@ export class HttpPeConnectGateway implements PeConnectGateway {
 
   public async getUserAndAdvisors(accessToken: AccessTokenDto): Promise<
     | {
-        user: PeConnectUserDto;
-        advisors: PeConnectAdvisorDto[];
+        user: FtConnectUserDto;
+        advisors: FtConnectAdvisorDto[];
       }
     | undefined
   > {

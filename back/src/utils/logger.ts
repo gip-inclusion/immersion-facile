@@ -7,7 +7,7 @@ import { complement, isNil, pickBy } from "ramda";
 import {
   AgencyId,
   ConventionId,
-  PeExternalId,
+  FtExternalId,
   SearchQueryParamsDto,
   SiretDto,
 } from "shared";
@@ -116,7 +116,7 @@ type LoggerParams = Partial<{
   ftConnect: Partial<{
     ftId: ConventionId;
     originalId: ConventionId;
-    peExternalId: PeExternalId;
+    peExternalId: FtExternalId;
     isJobSeeker: boolean;
   }>;
   reportContent: string;
