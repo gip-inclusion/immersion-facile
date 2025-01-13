@@ -6,14 +6,13 @@ import {
   ftAdvisorKinds,
 } from "../../dto/FtConnectAdvisor.dto";
 import {
-  ExternalPeConnectAdvisor,
-  ExternalPeConnectAdvisors,
-  ExternalPeConnectStatut,
-  ExternalPeConnectUser,
-  PeConnectHeaders,
-} from "./peConnectApi.dto";
+  ExternalFtConnectAdvisor,
+  ExternalFtConnectStatut,
+  ExternalFtConnectUser,
+  FtConnectHeaders,
+} from "./ftConnectApi.dto";
 
-export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
+export const externalPeConnectUserSchema: z.Schema<ExternalFtConnectUser> =
   z.object({
     email: emailSchema.optional(),
     family_name: zStringMinLength1,
@@ -23,7 +22,7 @@ export const externalPeConnectUserSchema: z.Schema<ExternalPeConnectUser> =
     sub: zStringMinLength1,
   });
 
-export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut> =
+export const externalPeConnectUserStatutSchema: z.Schema<ExternalFtConnectStatut> =
   z.object({
     codeStatutIndividu: z.enum(["0", "1"]),
     libelleStatutIndividu: z.enum([
@@ -35,7 +34,7 @@ export const externalPeConnectUserStatutSchema: z.Schema<ExternalPeConnectStatut
 const peAdvisorKindSchema: z.Schema<FtConnectAdvisorsKind> =
   z.enum(ftAdvisorKinds);
 
-const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
+const externalPeConnectAdvisorSchema: z.Schema<ExternalFtConnectAdvisor> =
   z.object({
     nom: zStringMinLength1,
     prenom: zStringMinLength1,
@@ -44,12 +43,13 @@ const externalPeConnectAdvisorSchema: z.Schema<ExternalPeConnectAdvisor> =
     type: peAdvisorKindSchema,
   });
 
-export const externalPeConnectAdvisorsSchema: z.Schema<ExternalPeConnectAdvisors> =
-  z.array(externalPeConnectAdvisorSchema);
+export const externalPeConnectAdvisorsSchema: z.Schema<
+  ExternalFtConnectAdvisor[]
+> = z.array(externalPeConnectAdvisorSchema);
 
 const bearerSchema = z.string().regex(/^Bearer .+$/) as z.Schema<BearerToken>;
 
-export const peConnectHeadersSchema: z.Schema<PeConnectHeaders> = z
+export const peConnectHeadersSchema: z.Schema<FtConnectHeaders> = z
   .object({
     "Content-Type": z.literal("application/json"),
     Accept: z.literal("application/json"),

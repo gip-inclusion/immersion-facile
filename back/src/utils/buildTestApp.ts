@@ -6,8 +6,8 @@ import { createApp } from "../config/bootstrap/server";
 import { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import { InMemoryPeConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryPeConnectGateway";
 import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { InMemoryPeConnectGateway } from "../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
@@ -40,7 +40,7 @@ export type InMemoryGateways = {
   pdfGeneratorGateway: InMemoryPdfGeneratorGateway;
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;
   passEmploiGateway: InMemoryPassEmploiGateway;
-  poleEmploiGateway: InMemoryFranceTravailGateway;
+  franceTravailGateway: InMemoryFranceTravailGateway;
   oAuthGateway: InMemoryOAuthGateway;
   documentGateway: NotImplementedDocumentGateway;
   dashboardGateway: StubDashboardGateway;

@@ -19,7 +19,7 @@ import {
   FranceTravailConvention,
   conventionStatusToFranceTravailStatus,
 } from "../ports/FranceTravailGateway";
-import { ResyncOldConventionsToPe } from "./ResyncOldConventionsToPe";
+import { ResyncOldConventionsToFt } from "./ResyncOldConventionsToFt";
 
 describe("ResyncOldConventionsToPe use case", () => {
   const agencyPE = new AgencyDtoBuilder().withKind("pole-emploi").build();
@@ -41,7 +41,7 @@ describe("ResyncOldConventionsToPe use case", () => {
     .build();
 
   let uow: InMemoryUnitOfWork;
-  let useCase: ResyncOldConventionsToPe;
+  let useCase: ResyncOldConventionsToFt;
   let timeGateway: CustomTimeGateway;
   let peGateway: InMemoryFranceTravailGateway;
 
@@ -50,7 +50,7 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     timeGateway = new CustomTimeGateway();
     peGateway = new InMemoryFranceTravailGateway();
-    useCase = new ResyncOldConventionsToPe(
+    useCase = new ResyncOldConventionsToFt(
       new InMemoryUowPerformer(uow),
       peGateway,
       timeGateway,
@@ -282,7 +282,7 @@ describe("ResyncOldConventionsToPe use case", () => {
       ]);
       expectToEqual(peGateway.notifications, []);
 
-      const report = await new ResyncOldConventionsToPe(
+      const report = await new ResyncOldConventionsToFt(
         new InMemoryUowPerformer(uow),
         peGateway,
         timeGateway,

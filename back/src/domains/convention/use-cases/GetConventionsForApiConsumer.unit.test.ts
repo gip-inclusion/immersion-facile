@@ -15,8 +15,8 @@ import {
 import { GetConventionsForApiConsumer } from "./GetConventionsForApiConsumer";
 
 describe("Get Conventions for ApiConsumer", () => {
-  const agencyPoleEmploi = new AgencyDtoBuilder()
-    .withId("agency-pole-emploi")
+  const agencyFranceTravail = new AgencyDtoBuilder()
+    .withId("agency-france-travail")
     .withKind("pole-emploi")
     .build();
 
@@ -25,9 +25,9 @@ describe("Get Conventions for ApiConsumer", () => {
     .withKind("mission-locale")
     .build();
 
-  const conventionPoleEmploi = new ConventionDtoBuilder()
-    .withId("convention-pole-emploi-id")
-    .withAgencyId(agencyPoleEmploi.id)
+  const conventionFranceTravail = new ConventionDtoBuilder()
+    .withId("convention-france-travail-id")
+    .withAgencyId(agencyFranceTravail.id)
     .withStatus("IN_REVIEW")
     .build();
 
@@ -42,11 +42,11 @@ describe("Get Conventions for ApiConsumer", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     uow.agencyRepository.agencies = [
-      toAgencyWithRights(agencyPoleEmploi),
+      toAgencyWithRights(agencyFranceTravail),
       toAgencyWithRights(agencyMissionLocale),
     ];
     uow.conventionRepository.setConventions([
-      conventionPoleEmploi,
+      conventionFranceTravail,
       conventionMissionLocale,
     ]);
     getConventionsForApiConsumer = new GetConventionsForApiConsumer(
@@ -102,13 +102,13 @@ describe("Get Conventions for ApiConsumer", () => {
 
         expectToEqual(retrievedConventions, [
           {
-            ...conventionPoleEmploi,
-            agencyName: agencyPoleEmploi.name,
-            agencyDepartment: agencyPoleEmploi.address.departmentCode,
-            agencyKind: agencyPoleEmploi.kind,
-            agencySiret: agencyPoleEmploi.agencySiret,
-            agencyCounsellorEmails: agencyPoleEmploi.counsellorEmails,
-            agencyValidatorEmails: agencyPoleEmploi.validatorEmails,
+            ...conventionFranceTravail,
+            agencyName: agencyFranceTravail.name,
+            agencyDepartment: agencyFranceTravail.address.departmentCode,
+            agencyKind: agencyFranceTravail.kind,
+            agencySiret: agencyFranceTravail.agencySiret,
+            agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
+            agencyValidatorEmails: agencyFranceTravail.validatorEmails,
           },
         ]);
       });
@@ -133,13 +133,13 @@ describe("Get Conventions for ApiConsumer", () => {
 
         expectToEqual(retrievedConventions, [
           {
-            ...conventionPoleEmploi,
-            agencyName: agencyPoleEmploi.name,
-            agencyDepartment: agencyPoleEmploi.address.departmentCode,
-            agencyKind: agencyPoleEmploi.kind,
-            agencySiret: agencyPoleEmploi.agencySiret,
-            agencyCounsellorEmails: agencyPoleEmploi.counsellorEmails,
-            agencyValidatorEmails: agencyPoleEmploi.validatorEmails,
+            ...conventionFranceTravail,
+            agencyName: agencyFranceTravail.name,
+            agencyDepartment: agencyFranceTravail.address.departmentCode,
+            agencyKind: agencyFranceTravail.kind,
+            agencySiret: agencyFranceTravail.agencySiret,
+            agencyCounsellorEmails: agencyFranceTravail.counsellorEmails,
+            agencyValidatorEmails: agencyFranceTravail.validatorEmails,
           },
         ]);
       });

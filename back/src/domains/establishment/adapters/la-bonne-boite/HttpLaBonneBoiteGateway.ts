@@ -31,8 +31,8 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
 
   constructor(
     private readonly httpClient: HttpClient<LaBonneBoiteRoutes>,
-    private readonly poleEmploiGateway: FranceTravailGateway,
-    private readonly poleEmploiClientId: string,
+    private readonly franceTravailGateway: FranceTravailGateway,
+    private readonly franceTravailClientId: string,
   ) {}
 
   public async searchCompanies({
@@ -44,8 +44,8 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
     return this.#limiter
       .schedule(async () => {
-        const { access_token } = await this.poleEmploiGateway.getAccessToken(
-          `application_${this.poleEmploiClientId} ${lbbV2App}`,
+        const { access_token } = await this.franceTravailGateway.getAccessToken(
+          `application_${this.franceTravailClientId} ${lbbV2App}`,
         );
         return this.httpClient.getCompanies({
           headers: {
@@ -100,8 +100,8 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   ): Promise<SearchResultDto | null> {
     return this.#limiter
       .schedule(async () => {
-        const { access_token } = await this.poleEmploiGateway.getAccessToken(
-          `application_${this.poleEmploiClientId} ${lbbV2App}`,
+        const { access_token } = await this.franceTravailGateway.getAccessToken(
+          `application_${this.franceTravailClientId} ${lbbV2App}`,
         );
         return this.httpClient.getCompany({
           headers: {

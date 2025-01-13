@@ -15,7 +15,7 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
-import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/FtConnect.dto";
+import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   WithNotificationIdAndKind,
@@ -481,7 +481,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         conventionId: validConvention.id,
       };
 
-      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 
@@ -567,7 +567,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         conventionId: validConvention.id,
       };
 
-      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 

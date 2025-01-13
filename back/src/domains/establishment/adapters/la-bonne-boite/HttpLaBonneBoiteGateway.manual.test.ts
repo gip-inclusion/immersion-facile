@@ -53,18 +53,18 @@ describe("HttpLaBonneBoiteGateway", () => {
     const config = AppConfig.createFromEnv();
     const peFetchSharedClient = createPeFetchSharedClient(config);
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
-      createFetchSharedClient(createLbbRoutes(config.peApiUrl), fetch),
+      createFetchSharedClient(createLbbRoutes(config.ftApiUrl), fetch),
       new HttpFranceTravailGateway(
         peFetchSharedClient,
         new InMemoryCachingGateway<AccessTokenResponse>(
           new RealTimeGateway(),
           "expires_in",
         ),
-        config.peApiUrl,
-        config.poleEmploiAccessTokenConfig,
+        config.ftApiUrl,
+        config.franceTravailAccessTokenConfig,
         noRetries,
       ),
-      config.poleEmploiClientId,
+      config.franceTravailClientId,
     );
   });
 

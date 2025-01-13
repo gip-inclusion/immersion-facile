@@ -12,15 +12,15 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
+import { InMemoryPeConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryPeConnectGateway";
+import { makePeConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
+import { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
 import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { makeInclusionConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/inclusionConnect.routes";
 import { makeProConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/proConnect.routes";
 import { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
-import { HttpPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/HttpPeConnectGateway";
-import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
-import { makePeConnectExternalRoutes } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
-import { FtConnectGateway } from "../../domains/core/authentication/pe-connect/port/FtConnectGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
@@ -168,19 +168,19 @@ export const createGateways = async (
       ? new CustomTimeGateway()
       : new RealTimeGateway();
 
-  const poleEmploiGateway =
-    config.poleEmploiGateway === "HTTPS"
+  const franceTravailGateway =
+    config.franceTravailGateway === "HTTPS"
       ? new HttpFranceTravailGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.franceTravailApi,
-            routes: createFranceTravailRoutes(config.peApiUrl),
+            routes: createFranceTravailRoutes(config.ftApiUrl),
           }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,
             "expires_in",
           ),
-          config.peApiUrl,
-          config.poleEmploiAccessTokenConfig,
+          config.ftApiUrl,
+          config.franceTravailAccessTokenConfig,
           noRetries,
           config.envType === "dev",
         )
@@ -189,19 +189,19 @@ export const createGateways = async (
   const { withCache, disconnectCache } = await getWithCache(config);
 
   const peConnectGateway: FtConnectGateway =
-    config.peConnectGateway === "HTTPS"
-      ? new HttpPeConnectGateway(
+    config.ftConnectGateway === "HTTPS"
+      ? new HttpFtConnectGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.franceTravailConnect,
             routes: makePeConnectExternalRoutes({
-              peApiUrl: config.peApiUrl,
-              peAuthCandidatUrl: config.peAuthCandidatUrl,
+              peApiUrl: config.ftApiUrl,
+              peAuthCandidatUrl: config.ftAuthCandidatUrl,
             }),
           }),
           {
             immersionFacileBaseUrl: config.immersionFacileBaseUrl,
-            poleEmploiClientId: config.poleEmploiClientId,
-            poleEmploiClientSecret: config.poleEmploiClientSecret,
+            franceTravailClientId: config.franceTravailClientId,
+            franceTravailClientSecret: config.franceTravailClientSecret,
           },
         )
       : new InMemoryPeConnectGateway();
@@ -393,10 +393,10 @@ export const createGateways = async (
         ? new HttpLaBonneBoiteGateway(
             createFetchHttpClientForExternalAPIs({
               partnerName: partnerNames.laBonneBoite,
-              routes: createLbbRoutes(config.peApiUrl),
+              routes: createLbbRoutes(config.ftApiUrl),
             }),
-            poleEmploiGateway,
-            config.poleEmploiClientId,
+            franceTravailGateway,
+            config.franceTravailClientId,
           )
         : new InMemoryLaBonneBoiteGateway(),
     subscribersGateway:
@@ -413,7 +413,7 @@ export const createGateways = async (
         : new InMemoryPassEmploiGateway(),
     pdfGeneratorGateway: createPdfGeneratorGateway(),
     peConnectGateway,
-    poleEmploiGateway,
+    franceTravailGateway,
     timeGateway,
     establishmentMarketingGateway:
       config.establishmentMarketingGateway === "BREVO"

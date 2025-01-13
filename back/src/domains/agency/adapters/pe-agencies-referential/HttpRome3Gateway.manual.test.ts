@@ -23,15 +23,15 @@ describe("HttpRome3Gateway", () => {
   const franceTravailGateway = new HttpFranceTravailGateway(
     createPeAxiosSharedClient(config),
     cachingGateway,
-    config.peApiUrl,
-    config.poleEmploiAccessTokenConfig,
+    config.ftApiUrl,
+    config.franceTravailAccessTokenConfig,
     noRetries,
   );
 
   const httpRome3Gateway = new HttpRome3Gateway(
-    createAxiosSharedClient(makeRome3Routes(config.peApiUrl), axios),
+    createAxiosSharedClient(makeRome3Routes(config.ftApiUrl), axios),
     franceTravailGateway,
-    config.poleEmploiClientId,
+    config.franceTravailClientId,
   );
 
   it("fetches the updated list of appellations, with their rome code (all in ROME v3)", async () => {

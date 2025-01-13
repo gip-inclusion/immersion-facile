@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ManagedRedirectError, loginPeConnect, peConnect } from "shared";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendRedirectResponseWithManagedErrors } from "../../../../config/helpers/sendRedirectResponseWithManagedErrors";
-import { makePeConnectLoginPageUrl } from "../../../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
+import { makePeConnectLoginPageUrl } from "../../../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 
 export const createPeConnectRouter = (deps: AppDependencies) => {
   const peConnectRouter = Router({ mergeParams: true });
@@ -26,7 +26,7 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
         if (!req?.query?.code)
           throw new ManagedRedirectError("peConnectNoAuthorisation");
 
-        return deps.useCases.linkPoleEmploiAdvisorAndRedirectToConvention.execute(
+        return deps.useCases.linkFranceTravailAdvisorAndRedirectToConvention.execute(
           req.query.code as string,
         );
       },

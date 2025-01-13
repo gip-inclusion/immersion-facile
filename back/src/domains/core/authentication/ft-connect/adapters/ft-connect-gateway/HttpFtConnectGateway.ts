@@ -17,23 +17,23 @@ import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import { externalAccessTokenSchema } from "../../port/AccessToken.schema";
 import { FtConnectGateway } from "../../port/FtConnectGateway";
 import {
-  ExternalPeConnectAdvisor,
-  ExternalPeConnectUser,
-  PeConnectHeaders,
-  PeConnectOauthConfig,
-} from "./peConnectApi.dto";
-import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./peConnectApi.error";
+  ExternalFtConnectAdvisor,
+  ExternalFtConnectUser,
+  FtConnectHeaders,
+  FtConnectOauthConfig,
+} from "./ftConnectApi.dto";
+import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./ftConnectApi.error";
 import {
   PeConnectExternalRoutes,
   toAccessToken,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "./peConnectApi.routes";
+} from "./ftConnectApi.routes";
 import {
   externalPeConnectAdvisorsSchema,
   externalPeConnectUserSchema,
   externalPeConnectUserStatutSchema,
-} from "./peConnectApi.schema";
+} from "./ftConnectApi.schema";
 
 const logger = createLogger(__filename);
 
@@ -82,23 +82,23 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
   "exchangeCodeForAccessToken",
 );
 
-const peConnectMaxRequestsPerInterval = 1;
+const ftConnectMaxRequestsPerInterval = 1;
 const rate_ms = 1250;
 
 // TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
-export class HttpPeConnectGateway implements FtConnectGateway {
+export class HttpFtConnectGateway implements FtConnectGateway {
   // PE Connect limit rate at 1 call per 1.2s
   #limiter = new Bottleneck({
-    reservoir: peConnectMaxRequestsPerInterval,
+    reservoir: ftConnectMaxRequestsPerInterval,
     reservoirRefreshInterval: rate_ms, // number of ms
-    reservoirRefreshAmount: peConnectMaxRequestsPerInterval,
+    reservoirRefreshAmount: ftConnectMaxRequestsPerInterval,
     maxConcurrent: 1,
-    minTime: Math.ceil(rate_ms / peConnectMaxRequestsPerInterval),
+    minTime: Math.ceil(rate_ms / ftConnectMaxRequestsPerInterval),
   });
 
   constructor(
     private httpClient: HttpClient<PeConnectExternalRoutes>,
-    private configs: PeConnectOauthConfig,
+    private configs: FtConnectOauthConfig,
   ) {}
 
   public async getAccessToken(
@@ -110,8 +110,8 @@ export class HttpPeConnectGateway implements FtConnectGateway {
       const response = await this.#limiter.schedule(() =>
         this.httpClient.exchangeCodeForAccessToken({
           body: queryParamsAsString({
-            client_id: this.configs.poleEmploiClientId,
-            client_secret: this.configs.poleEmploiClientSecret,
+            client_id: this.configs.franceTravailClientId,
+            client_secret: this.configs.franceTravailClientSecret,
             code: authorizationCode,
             grant_type: "authorization_code",
             redirect_uri: `${this.configs.immersionFacileBaseUrl}/api/pe-connect`,
@@ -156,7 +156,7 @@ export class HttpPeConnectGateway implements FtConnectGateway {
       }
     | undefined
   > {
-    const headers: PeConnectHeaders = {
+    const headers: FtConnectHeaders = {
       "Content-Type": "application/json",
       Accept: "application/json",
       Authorization: `Bearer ${accessToken.value}`,
@@ -180,7 +180,7 @@ export class HttpPeConnectGateway implements FtConnectGateway {
   }
 
   async #userIsJobseeker(
-    headers: PeConnectHeaders,
+    headers: FtConnectHeaders,
     peExternalId: string | undefined,
   ): Promise<boolean> {
     const log = getUserStatutInfoLogger;
@@ -226,8 +226,8 @@ export class HttpPeConnectGateway implements FtConnectGateway {
   }
 
   async #getUserInfo(
-    headers: PeConnectHeaders,
-  ): Promise<ExternalPeConnectUser | undefined> {
+    headers: FtConnectHeaders,
+  ): Promise<ExternalFtConnectUser | undefined> {
     const log = getUserInfoLogger;
     try {
       log.total({});
@@ -266,8 +266,8 @@ export class HttpPeConnectGateway implements FtConnectGateway {
   }
 
   async #getAdvisorsInfo(
-    headers: PeConnectHeaders,
-  ): Promise<ExternalPeConnectAdvisor[]> {
+    headers: FtConnectHeaders,
+  ): Promise<ExternalFtConnectAdvisor[]> {
     const log = getAdvisorsInfoLogger;
     try {
       log.total({});

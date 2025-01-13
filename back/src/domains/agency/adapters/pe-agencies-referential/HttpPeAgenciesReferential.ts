@@ -17,16 +17,16 @@ export class HttpPeAgenciesReferential implements PeAgenciesReferential {
 
   constructor(
     peApiUrl: AbsoluteUrl,
-    private readonly poleEmploiGateway: FranceTravailGateway,
-    private readonly poleEmploiClientId: string,
+    private readonly franceTravailGateway: FranceTravailGateway,
+    private readonly franceTravailClientId: string,
   ) {
     this.#axios = createAxiosInstance(logger);
     this.#referencielAgenceUrl = `${peApiUrl}/partenaire/referentielagences/v1/agences`;
   }
 
   public async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
-    const accessToken = await this.poleEmploiGateway.getAccessToken(
-      `application_${this.poleEmploiClientId} api_referentielagencesv1 organisationpe`,
+    const accessToken = await this.franceTravailGateway.getAccessToken(
+      `application_${this.franceTravailClientId} api_referentielagencesv1 organisationpe`,
     );
 
     if (!accessToken) throw new Error("No access token");

@@ -69,7 +69,7 @@ export class PgConventionFranceTravailAdvisorRepository
 
     return (
       conventionPeUserAdvisor &&
-      toConventionPoleEmploiUserAdvisorEntity(
+      toConventionFranceTravailUserAdvisorEntity(
         parseZodSchemaAndLogErrorOnParsingFailure(
           conventionFranceTravailUserAdvisorDtoSchema,
           conventionPeUserAdvisor,
@@ -129,7 +129,7 @@ const toConventionFranceTravailUserAdvisorDTO = ({
   conventionId: convention_id,
 });
 
-const toConventionPoleEmploiUserAdvisorEntity = (
+const toConventionFranceTravailUserAdvisorEntity = (
   dto: ConventionFtUserAdvisorDto,
 ): ConventionFtUserAdvisorEntity => ({
   ...dto,

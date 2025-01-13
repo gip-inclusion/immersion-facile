@@ -2,7 +2,7 @@ import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
-import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
+import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -18,11 +18,11 @@ const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
   const peAxiosHttpClient = createPeAxiosSharedClient(config);
 
-  const httpPoleEmploiGateway = new HttpFranceTravailGateway(
+  const httpFranceTravailGateway = new HttpFranceTravailGateway(
     peAxiosHttpClient,
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
-    config.peApiUrl,
-    config.poleEmploiAccessTokenConfig,
+    config.ftApiUrl,
+    config.franceTravailAccessTokenConfig,
     noRetries,
   );
 
@@ -31,18 +31,18 @@ const executeUsecase = async () => {
     createGetPgPoolFn(config),
   );
 
-  const resyncOldConventionsToPeUsecase = new ResyncOldConventionsToPe(
+  const resyncOldConventionsToFtUsecase = new ResyncOldConventionsToFt(
     uowPerformer,
-    httpPoleEmploiGateway,
+    httpFranceTravailGateway,
     timeGateway,
     config.maxConventionsToSyncWithPe,
   );
 
-  return resyncOldConventionsToPeUsecase.execute();
+  return resyncOldConventionsToFtUsecase.execute();
 };
 
 handleCRONScript(
-  "resyncOldConventionToPE",
+  "resyncOldConventionToFT",
   config,
   executeUsecase,
   (report) => {

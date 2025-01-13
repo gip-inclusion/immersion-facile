@@ -9,17 +9,17 @@ import {
   testRawRedirectError,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { HttpPeConnectGateway } from "./HttpPeConnectGateway";
+import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
 import {
   ExternalAccessToken,
-  ExternalPeConnectAdvisor,
-  ExternalPeConnectUser,
-} from "./peConnectApi.dto";
+  ExternalFtConnectAdvisor,
+  ExternalFtConnectUser,
+} from "./ftConnectApi.dto";
 import {
   makePeConnectExternalRoutes,
   toPeConnectAdvisorDto,
   toPeConnectUserDto,
-} from "./peConnectApi.routes";
+} from "./ftConnectApi.routes";
 
 const unhandledStatusCode = 201;
 
@@ -33,14 +33,14 @@ describe("HttpPeConnectGateway", () => {
     skipResponseValidation: true,
   });
 
-  const peConnectGateway = new HttpPeConnectGateway(httpClient, {
+  const peConnectGateway = new HttpFtConnectGateway(httpClient, {
     immersionFacileBaseUrl: "https://fake-immersion.fr",
-    poleEmploiClientId: "pe-client-id",
-    poleEmploiClientSecret: "pe-client-secret",
+    franceTravailClientId: "pe-client-id",
+    franceTravailClientSecret: "pe-client-secret",
   });
 
   const mock = new MockAdapter(axios);
-  const peExternalUser: ExternalPeConnectUser = {
+  const peExternalUser: ExternalFtConnectUser = {
     email: "maurice.chevalier@gmail.com",
     family_name: "chevalier",
     gender: "male",
@@ -48,14 +48,14 @@ describe("HttpPeConnectGateway", () => {
     idIdentiteExterne: "617cd5a3-2cbd-477c-96a0-85d34381f815",
     sub: "617cd5a3-2cbd-477c-96a0-85d34381f815",
   };
-  const peExternalAdvisorCapemploi: ExternalPeConnectAdvisor = {
+  const peExternalAdvisorCapemploi: ExternalFtConnectAdvisor = {
     type: "CAPEMPLOI",
     civilite: "1",
     mail: "capEmploiAdvisor@pe.fr",
     nom: "prost",
     prenom: "alain",
   };
-  const peExternalAdvisorPlacement: ExternalPeConnectAdvisor = {
+  const peExternalAdvisorPlacement: ExternalFtConnectAdvisor = {
     type: "PLACEMENT",
     civilite: "1",
     mail: "placementAdvisor@pe.fr",

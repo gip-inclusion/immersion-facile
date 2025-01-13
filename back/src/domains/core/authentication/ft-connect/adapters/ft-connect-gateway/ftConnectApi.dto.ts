@@ -9,7 +9,7 @@ export type ExternalAccessToken = {
 };
 
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect
-export type ExternalPeConnectUser = {
+export type ExternalFtConnectUser = {
   email?: string;
   family_name: string;
   gender: "male" | "female";
@@ -19,13 +19,13 @@ export type ExternalPeConnectUser = {
 };
 
 // External contract from https://pole-emploi.io/data/api/pole-emploi-connect/statut
-export type ExternalPeConnectStatut = {
+export type ExternalFtConnectStatut = {
   codeStatutIndividu: "0" | "1";
   libelleStatutIndividu: "Non demandeur d’emploi" | "Demandeur d’emploi";
 };
 
 // External contract from https://pole-emploi.io/data/api/conseillers
-export type ExternalPeConnectAdvisor = {
+export type ExternalFtConnectAdvisor = {
   nom: string;
   prenom: string;
   civilite: "1" | "2";
@@ -33,10 +33,8 @@ export type ExternalPeConnectAdvisor = {
   type: FtConnectAdvisorsKind;
 };
 
-export type ExternalPeConnectAdvisors = ExternalPeConnectAdvisor[];
-
 // External contract from https://pole-emploi.io/data/documentation/utilisation-api-pole-emploi/generer-access-token
-export type ExternalPeConnectOAuthGrantPayload = {
+export type ExternalFtConnectOAuthGrantPayload = {
   response_type: string;
   client_id: string;
   realm: string;
@@ -44,24 +42,24 @@ export type ExternalPeConnectOAuthGrantPayload = {
   scope: string;
 };
 
-export type PeConnectHeaders = {
+export type FtConnectHeaders = {
   "Content-Type": "application/json";
   Accept: "application/json";
   Authorization: BearerToken;
 };
 
-type PeConnectAccessTokenHeaders = {
+type FtConnectAccessTokenHeaders = {
   "Content-Type": "application/x-www-form-urlencoded";
 };
-export const peConnectAccessTokenHeadersSchema: z.Schema<PeConnectAccessTokenHeaders> =
+export const ftConnectAccessTokenHeadersSchema: z.Schema<FtConnectAccessTokenHeaders> =
   z
     .object({
       "Content-Type": z.literal("application/x-www-form-urlencoded"),
     })
     .passthrough();
 
-export type PeConnectOauthConfig = {
-  poleEmploiClientId: string;
-  poleEmploiClientSecret: string;
+export type FtConnectOauthConfig = {
+  franceTravailClientId: string;
+  franceTravailClientSecret: string;
   immersionFacileBaseUrl: AbsoluteUrl;
 };

@@ -46,24 +46,24 @@ const capemploiAdvisor: FtConnectImmersionAdvisorDto = {
   email: "jeanne.delamare@pole-emploi.fr",
   type: "CAPEMPLOI",
 };
-const poleEmploiFirstUserAdvisor: FtUserAndAdvisor = {
+const franceTravailFirstUserAdvisor: FtUserAndAdvisor = {
   advisor: placementAdvisor,
   user,
 };
 
-const poleEmploiFirstUserWithoutAdvisor: FtUserAndAdvisor = {
+const franceTravailFirstUserWithoutAdvisor: FtUserAndAdvisor = {
   advisor: undefined,
   user,
 };
 
-const poleEmploiUpdatedUserAdvisor: FtUserAndAdvisor = {
+const franceTravailUpdatedUserAdvisor: FtUserAndAdvisor = {
   advisor: capemploiAdvisor,
   user,
 };
 
-describe("PgConventionPoleEmploiAdvisorRepository", () => {
+describe("PgConventionFranceTravailAdvisorRepository", () => {
   let pool: Pool;
-  let conventionPoleEmploiAdvisorRepository: PgConventionFranceTravailAdvisorRepository;
+  let conventionFranceTravailAdvisorRepository: PgConventionFranceTravailAdvisorRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -94,21 +94,22 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
 
   beforeEach(async () => {
     await db.deleteFrom("partners_pe_connect").execute();
-    conventionPoleEmploiAdvisorRepository =
+    conventionFranceTravailAdvisorRepository =
       new PgConventionFranceTravailAdvisorRepository(db);
   });
 
   describe("openSlotForNextConvention", () => {
     it("should open a slot if no open slot is present", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserAdvisor,
       );
 
       expectToEqual(
         await db.selectFrom("partners_pe_connect").selectAll().execute(),
         [
           {
-            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            user_pe_external_id:
+              franceTravailFirstUserAdvisor.user.peExternalId,
             convention_id: "00000000-0000-0000-0000-000000000000",
             firstname: placementAdvisor.firstName,
             lastname: placementAdvisor.lastName,
@@ -120,15 +121,16 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     });
 
     it("should open a slot with no advisor", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserWithoutAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserWithoutAdvisor,
       );
 
       expectToEqual(
         await db.selectFrom("partners_pe_connect").selectAll().execute(),
         [
           {
-            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            user_pe_external_id:
+              franceTravailFirstUserAdvisor.user.peExternalId,
             convention_id: "00000000-0000-0000-0000-000000000000",
             firstname: null,
             lastname: null,
@@ -140,19 +142,20 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     });
 
     it("should update the open slot if it already exist", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserAdvisor,
       );
 
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiUpdatedUserAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailUpdatedUserAdvisor,
       );
 
       expectToEqual(
         await db.selectFrom("partners_pe_connect").selectAll().execute(),
         [
           {
-            user_pe_external_id: poleEmploiUpdatedUserAdvisor.user.peExternalId,
+            user_pe_external_id:
+              franceTravailUpdatedUserAdvisor.user.peExternalId,
             convention_id: "00000000-0000-0000-0000-000000000000",
             firstname: capemploiAdvisor.firstName,
             lastname: capemploiAdvisor.lastName,
@@ -165,9 +168,9 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   });
 
   describe("associateConventionAndUserAdvisor", () => {
-    it("should throw a not found error if no suitable opened conventionPoleEmploiUserAdvisor is present", async () => {
+    it("should throw a not found error if no suitable opened conventionFranceTravailUserAdvisor is present", async () => {
       await expect(
-        conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+        conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
           conventionId,
           userPeExternalId,
         ),
@@ -178,11 +181,11 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
       );
     });
 
-    it("should update the entity in db if a suitable conventionPoleEmploiUserAdvisor was found", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserAdvisor,
+    it("should update the entity in db if a suitable conventionFranceTravailUserAdvisor was found", async () => {
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserAdvisor,
       );
-      await conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
         userPeExternalId,
       );
@@ -191,7 +194,8 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         await db.selectFrom("partners_pe_connect").selectAll().execute(),
         [
           {
-            user_pe_external_id: poleEmploiFirstUserAdvisor.user.peExternalId,
+            user_pe_external_id:
+              franceTravailFirstUserAdvisor.user.peExternalId,
             convention_id: conventionId,
             email: placementAdvisor.email,
             firstname: placementAdvisor.firstName,
@@ -206,7 +210,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   describe("getByConventionId", () => {
     it("should return undefined if no convention Advisor", async () => {
       const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        await conventionFranceTravailAdvisorRepository.getByConventionId(
           conventionId,
         );
 
@@ -214,45 +218,45 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
     });
 
     it("should get the convention Advisor by the convention id", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserAdvisor,
       );
-      await conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
         userPeExternalId,
       );
 
       const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        await conventionFranceTravailAdvisorRepository.getByConventionId(
           conventionId,
         );
 
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
-        advisor: poleEmploiFirstUserAdvisor.advisor,
-        peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,
+        advisor: franceTravailFirstUserAdvisor.advisor,
+        peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
         conventionId,
       });
     });
 
     it("convention advisor without advisor", async () => {
-      await conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
-        poleEmploiFirstUserWithoutAdvisor,
+      await conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
+        franceTravailFirstUserWithoutAdvisor,
       );
-      await conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+      await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
         userPeExternalId,
       );
 
       const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
-        await conventionPoleEmploiAdvisorRepository.getByConventionId(
+        await conventionFranceTravailAdvisorRepository.getByConventionId(
           conventionId,
         );
 
       // biome-ignore lint/style/noNonNullAssertion: <explanation>
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,
-        peExternalId: poleEmploiFirstUserAdvisor.user.peExternalId,
+        peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
         conventionId,
       });
     });

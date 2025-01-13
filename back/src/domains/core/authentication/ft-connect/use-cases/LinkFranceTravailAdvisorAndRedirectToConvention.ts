@@ -17,13 +17,13 @@ import {
 import { chooseValidAdvisor } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { FtConnectGateway } from "../port/FtConnectGateway";
 
-export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalUseCase<
+export class LinkFranceTravailAdvisorAndRedirectToConvention extends TransactionalUseCase<
   string,
   AbsoluteUrl
 > {
   protected inputSchema = z.string();
 
-  readonly #peConnectGateway: FtConnectGateway;
+  readonly #ftConnectGateway: FtConnectGateway;
 
   readonly #baseUrlForRedirect: AbsoluteUrl;
 
@@ -35,7 +35,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     super(uowPerformer);
 
     this.#baseUrlForRedirect = baseUrlForRedirect;
-    this.#peConnectGateway = peConnectGateway;
+    this.#ftConnectGateway = peConnectGateway;
   }
 
   protected async _execute(
@@ -43,7 +43,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
     const accessToken =
-      await this.#peConnectGateway.getAccessToken(authorizationCode);
+      await this.#ftConnectGateway.getAccessToken(authorizationCode);
     return accessToken
       ? this.#onAccessToken(accessToken, uow)
       : this.#makeRedirectUrl({
@@ -60,7 +60,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
 
   async #onAccessToken(accessToken: AccessTokenDto, uow: UnitOfWork) {
     const userAndAdvisors =
-      await this.#peConnectGateway.getUserAndAdvisors(accessToken);
+      await this.#ftConnectGateway.getUserAndAdvisors(accessToken);
     if (!userAndAdvisors)
       return this.#makeRedirectUrl({
         fedIdProvider: "peConnect",
@@ -76,7 +76,7 @@ export class LinkPoleEmploiAdvisorAndRedirectToConvention extends TransactionalU
     };
 
     if (peUserAndAdvisor.user.isJobseeker)
-      await uow.conventionPoleEmploiAdvisorRepository.openSlotForNextConvention(
+      await uow.conventionFranceTravailAdvisorRepository.openSlotForNextConvention(
         peUserAndAdvisor,
       );
 

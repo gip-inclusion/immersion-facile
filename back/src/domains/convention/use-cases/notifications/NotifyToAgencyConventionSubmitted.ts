@@ -64,7 +64,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
     const conventionAdvisorEntity =
-      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
         convention.id,
       );
 

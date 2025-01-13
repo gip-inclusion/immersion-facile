@@ -24,12 +24,13 @@ import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedId
 describe("AssociatePeConnectFederatedIdentity", () => {
   let associatePeConnectFederatedIdentity: BindConventionToFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
-  let conventionPoleEmploiAdvisorRepo: InMemoryConventionFranceTravailAdvisorRepository;
+  let conventionFranceTravailAdvisorRepo: InMemoryConventionFranceTravailAdvisorRepository;
   let outboxRepo: InMemoryOutboxRepository;
   let createNewEvent: CreateNewEvent;
   beforeEach(() => {
     const uow = createInMemoryUow();
-    conventionPoleEmploiAdvisorRepo = uow.conventionPoleEmploiAdvisorRepository;
+    conventionFranceTravailAdvisorRepo =
+      uow.conventionFranceTravailAdvisorRepository;
     outboxRepo = uow.outboxRepository;
     uowPerformer = new InMemoryUowPerformer(uow);
 
@@ -59,7 +60,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expect(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
     ).toHaveLength(0);
     expectObjectsToMatch(outboxRepo.events, [expectedEvent]);
   });
@@ -75,7 +76,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expectObjectsToMatch(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
       [],
     );
 
@@ -87,7 +88,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("should associate convention and federated identity if the federated identity match format", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
       conventionFranceTravailUserAdvisorFromDto(
         userAdvisorDto,
         CONVENTION_ID_DEFAULT_UUID,
@@ -104,17 +105,17 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expect(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
     ).toHaveLength(1);
 
     expect(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors[0]
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors[0]
         .conventionId,
     ).toBe(conventionId);
   });
 
   it("should save event PeConnectFederatedIdentityAssociated", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
       conventionFranceTravailUserAdvisorFromDto(
         userAdvisorDto,
         CONVENTION_ID_DEFAULT_UUID,
@@ -131,7 +132,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expect(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
     ).toHaveLength(1);
 
     // outbox rep
@@ -143,7 +144,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("without advisor", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([
+    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
       conventionFranceTravailUserAdvisorFromDto(
         {
           ...userAdvisorDto,
@@ -163,7 +164,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expect(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
     ).toHaveLength(1);
 
     // outbox rep
@@ -175,7 +176,9 @@ describe("AssociatePeConnectFederatedIdentity", () => {
   });
 
   it("without open slot then no association and FederatedIdentityNotBoundToConvention event", async () => {
-    conventionPoleEmploiAdvisorRepo.setConventionPoleEmploiUsersAdvisor([]);
+    conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor(
+      [],
+    );
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
@@ -187,7 +190,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     });
 
     expectToEqual(
-      conventionPoleEmploiAdvisorRepo.conventionPoleEmploiUsersAdvisors,
+      conventionFranceTravailAdvisorRepo.conventionFranceTravailUsersAdvisors,
       [],
     );
 

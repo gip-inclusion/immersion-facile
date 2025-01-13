@@ -7,12 +7,12 @@ import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import {
   ExternalAccessToken,
-  ExternalPeConnectAdvisor,
-  ExternalPeConnectOAuthGrantPayload,
-  ExternalPeConnectUser,
-  peConnectAccessTokenHeadersSchema,
-} from "./peConnectApi.dto";
-import { peConnectHeadersSchema } from "./peConnectApi.schema";
+  ExternalFtConnectAdvisor,
+  ExternalFtConnectOAuthGrantPayload,
+  ExternalFtConnectUser,
+  ftConnectAccessTokenHeadersSchema,
+} from "./ftConnectApi.dto";
+import { peConnectHeadersSchema } from "./ftConnectApi.schema";
 
 const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
@@ -69,30 +69,30 @@ export const makePeConnectExternalRoutes = ({
       method: "post",
       url: `${peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
       requestBodySchema: z.string(),
-      headersSchema: peConnectAccessTokenHeadersSchema,
+      headersSchema: ftConnectAccessTokenHeadersSchema,
       responses: { 200: z.any() },
     }),
   });
 
 export const makePeConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
-  makeOauthGetAuthorizationCodeRedirectUrl(appConfig.peAuthCandidatUrl, {
+  makeOauthGetAuthorizationCodeRedirectUrl(appConfig.ftAuthCandidatUrl, {
     response_type: "code",
-    client_id: appConfig.poleEmploiClientId,
+    client_id: appConfig.franceTravailClientId,
     realm: "/individu",
     redirect_uri: `${appConfig.immersionFacileBaseUrl}/api/pe-connect`,
-    scope: peConnectNeededScopesForAllUsedApi(appConfig.poleEmploiClientId),
+    scope: peConnectNeededScopesForAllUsedApi(appConfig.franceTravailClientId),
   });
 
 const makeOauthGetAuthorizationCodeRedirectUrl = (
   peAuthCandidatUrl: AbsoluteUrl,
-  authorizationCodePayload: ExternalPeConnectOAuthGrantPayload,
+  authorizationCodePayload: ExternalFtConnectOAuthGrantPayload,
 ): AbsoluteUrl =>
-  `${peAuthCandidatUrl}/connexion/oauth2/authorize?${queryParamsAsString<ExternalPeConnectOAuthGrantPayload>(
+  `${peAuthCandidatUrl}/connexion/oauth2/authorize?${queryParamsAsString<ExternalFtConnectOAuthGrantPayload>(
     authorizationCodePayload,
   )}`;
 
 export const toPeConnectAdvisorDto = (
-  fromApi: ExternalPeConnectAdvisor,
+  fromApi: ExternalFtConnectAdvisor,
 ): FtConnectAdvisorDto => ({
   email: fromApi.mail,
   firstName: fromApi.prenom,
@@ -101,7 +101,7 @@ export const toPeConnectAdvisorDto = (
 });
 
 export const toPeConnectUserDto = (
-  externalPeConnectUser: ExternalPeConnectUser & { isUserJobseeker: boolean },
+  externalPeConnectUser: ExternalFtConnectUser & { isUserJobseeker: boolean },
 ): FtConnectUserDto => ({
   isJobseeker: externalPeConnectUser.isUserJobseeker,
   email: externalPeConnectUser.email,

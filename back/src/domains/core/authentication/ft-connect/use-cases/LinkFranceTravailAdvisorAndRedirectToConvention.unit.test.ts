@@ -5,7 +5,7 @@ import {
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
-import { InMemoryPeConnectGateway } from "../adapters/pe-connect-gateway/InMemoryPeConnectGateway";
+import { InMemoryPeConnectGateway } from "../adapters/ft-connect-gateway/InMemoryPeConnectGateway";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   FtConnectAdvisorDto,
@@ -13,12 +13,12 @@ import {
 } from "../dto/FtConnectAdvisor.dto";
 import { FtConnectUserDto } from "../dto/FtConnectUserDto";
 import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
-import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
+import { LinkFranceTravailAdvisorAndRedirectToConvention } from "./LinkFranceTravailAdvisorAndRedirectToConvention";
 
-describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
+describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
   let uow: InMemoryUnitOfWork;
-  let usecase: LinkPoleEmploiAdvisorAndRedirectToConvention;
-  let peConnectGateway: InMemoryPeConnectGateway;
+  let linkFtAdvisorAndRedirectToConvention: LinkFranceTravailAdvisorAndRedirectToConvention;
+  let ftConnectGateway: InMemoryPeConnectGateway;
 
   const baseurl = "https://plop";
   const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
@@ -26,33 +26,34 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    peConnectGateway = new InMemoryPeConnectGateway();
-    usecase = new LinkPoleEmploiAdvisorAndRedirectToConvention(
-      new InMemoryUowPerformer(uow),
-      peConnectGateway,
-      baseurl,
-    );
+    ftConnectGateway = new InMemoryPeConnectGateway();
+    linkFtAdvisorAndRedirectToConvention =
+      new LinkFranceTravailAdvisorAndRedirectToConvention(
+        new InMemoryUowPerformer(uow),
+        ftConnectGateway,
+        baseurl,
+      );
   });
 
   describe("Pe Connect correctly identify OAuth", () => {
     it("the returned conventionAdvisor gets stored", async () => {
-      peConnectGateway.setAccessToken(accessToken);
-      peConnectGateway.setUser(peJobseekerUser);
-      peConnectGateway.setAdvisors([
-        pePlacementAdvisor,
-        peIndemnisationAdvisor,
+      ftConnectGateway.setAccessToken(accessToken);
+      ftConnectGateway.setUser(ftJobseekerUser);
+      ftConnectGateway.setAdvisors([
+        ftPlacementAdvisor,
+        ftIndemnisationAdvisor,
       ]);
 
-      await usecase.execute(authorizationCode);
+      await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expectToEqual(
-        uow.conventionPoleEmploiAdvisorRepository
-          .conventionPoleEmploiUsersAdvisors,
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsersAdvisors,
         [
           conventionFranceTravailUserAdvisorFromDto(
             {
-              advisor: pePlacementAdvisor,
-              user: peJobseekerUser,
+              advisor: ftPlacementAdvisor,
+              user: ftJobseekerUser,
             },
             CONVENTION_ID_DEFAULT_UUID,
           ),
@@ -61,24 +62,24 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     });
 
     it("only PLACEMENT and CAPEMPLOI advisor types are valid for conventionAdvisor", async () => {
-      peConnectGateway.setAccessToken(accessToken);
-      peConnectGateway.setUser(peJobseekerUser);
-      peConnectGateway.setAdvisors([
-        peIndemnisationAdvisor,
-        pePlacementAdvisor,
-        peCapemploiAdvisor,
+      ftConnectGateway.setAccessToken(accessToken);
+      ftConnectGateway.setUser(ftJobseekerUser);
+      ftConnectGateway.setAdvisors([
+        ftIndemnisationAdvisor,
+        ftPlacementAdvisor,
+        ftCapEmploiAdvisor,
       ]);
 
-      await usecase.execute(authorizationCode);
+      await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expectToEqual(
-        uow.conventionPoleEmploiAdvisorRepository
-          .conventionPoleEmploiUsersAdvisors,
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsersAdvisors,
         [
           conventionFranceTravailUserAdvisorFromDto(
             {
-              advisor: peCapemploiAdvisor,
-              user: peJobseekerUser,
+              advisor: ftCapEmploiAdvisor,
+              user: ftJobseekerUser,
             },
             CONVENTION_ID_DEFAULT_UUID,
           ),
@@ -87,11 +88,12 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
     });
 
     it("the OAuth info and federated identity are present in the redirect url query parameters", async () => {
-      peConnectGateway.setAccessToken(accessToken);
-      peConnectGateway.setUser(peJobseekerUser);
-      peConnectGateway.setAdvisors([pePlacementAdvisor]);
+      ftConnectGateway.setAccessToken(accessToken);
+      ftConnectGateway.setUser(ftJobseekerUser);
+      ftConnectGateway.setAdvisors([ftPlacementAdvisor]);
 
-      const urlWithQueryParams = await usecase.execute(authorizationCode);
+      const urlWithQueryParams =
+        await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userPeExternalId}&fedIdProvider=peConnect`,
@@ -101,67 +103,71 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
 
   describe("Wrong path", () => {
     it("On PeConnect auth failure", async () => {
-      const urlWithQueryParams = await usecase.execute(authorizationCode);
+      const urlWithQueryParams =
+        await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
       expectToEqual(
-        uow.conventionPoleEmploiAdvisorRepository
-          .conventionPoleEmploiUsersAdvisors,
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsersAdvisors,
         [],
       );
     });
 
     it("On PeConnect not user info", async () => {
-      peConnectGateway.setAccessToken(accessToken);
-      peConnectGateway.setUser(undefined);
-      peConnectGateway.setAdvisors([pePlacementAdvisor]);
-      const urlWithQueryParams = await usecase.execute(authorizationCode);
+      ftConnectGateway.setAccessToken(accessToken);
+      ftConnectGateway.setUser(undefined);
+      ftConnectGateway.setAdvisors([ftPlacementAdvisor]);
+      const urlWithQueryParams =
+        await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?fedIdProvider=peConnect&fedId=${authFailed}`,
       );
       expectToEqual(
-        uow.conventionPoleEmploiAdvisorRepository
-          .conventionPoleEmploiUsersAdvisors,
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsersAdvisors,
         [],
       );
     });
 
     it("On PeConnected and is not jobseeker should not open slot and provide convention url with notJobSeeker peConnect mode", async () => {
-      peConnectGateway.setAccessToken(accessToken);
-      peConnectGateway.setUser(peNotJobseekerUser);
+      ftConnectGateway.setAccessToken(accessToken);
+      ftConnectGateway.setUser(ftNotJobseekerUser);
 
-      const urlWithQueryParams = await usecase.execute(authorizationCode);
+      const urlWithQueryParams =
+        await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
         `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${notJobSeeker}&fedIdProvider=peConnect`,
       );
       expectToEqual(
-        uow.conventionPoleEmploiAdvisorRepository
-          .conventionPoleEmploiUsersAdvisors,
+        uow.conventionFranceTravailAdvisorRepository
+          .conventionFranceTravailUsersAdvisors,
         [],
       );
     });
   });
 
   it("On PeConnected and is jobseeker but no advisors should open slot", async () => {
-    peConnectGateway.setAccessToken(accessToken);
-    peConnectGateway.setUser(peJobseekerUser);
+    ftConnectGateway.setAccessToken(accessToken);
+    ftConnectGateway.setUser(ftJobseekerUser);
 
-    const urlWithQueryParams = await usecase.execute(authorizationCode);
+    const urlWithQueryParams =
+      await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
     expect(urlWithQueryParams).toBe(
-      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${peJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
+      `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${ftJobseekerUser.peExternalId}&fedIdProvider=peConnect`,
     );
     expectToEqual(
-      uow.conventionPoleEmploiAdvisorRepository
-        .conventionPoleEmploiUsersAdvisors,
+      uow.conventionFranceTravailAdvisorRepository
+        .conventionFranceTravailUsersAdvisors,
       [
         conventionFranceTravailUserAdvisorFromDto(
           {
-            user: peJobseekerUser,
+            user: ftJobseekerUser,
             advisor: undefined,
           },
           CONVENTION_ID_DEFAULT_UUID,
@@ -171,14 +177,14 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   });
 });
 
-const peJobseekerUser: FtConnectUserDto = {
+const ftJobseekerUser: FtConnectUserDto = {
   isJobseeker: true,
   firstName: "John",
   lastName: "Doe",
   peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
   email: "john.doe@gmail.com",
 };
-const peNotJobseekerUser: FtConnectUserDto = {
+const ftNotJobseekerUser: FtConnectUserDto = {
   isJobseeker: false,
   firstName: "John",
   lastName: "Doe",
@@ -186,22 +192,22 @@ const peNotJobseekerUser: FtConnectUserDto = {
   email: "john.doe@gmail.com",
 };
 
-const pePlacementAdvisor: FtConnectImmersionAdvisorDto = {
-  email: "jane.smith@pole-emploi.net",
+const ftPlacementAdvisor: FtConnectImmersionAdvisorDto = {
+  email: "jane.smith@france-travail.net",
   lastName: "Smith",
   firstName: "Jane",
   type: "PLACEMENT",
 };
 
-const peIndemnisationAdvisor: FtConnectAdvisorDto = {
-  email: "017jean.dupont@pole-emploi.net",
+const ftIndemnisationAdvisor: FtConnectAdvisorDto = {
+  email: "017jean.dupont@france-travail.net",
   firstName: "Jean",
   lastName: "Dupont",
   type: "INDEMNISATION",
 };
 
-const peCapemploiAdvisor: FtConnectImmersionAdvisorDto = {
-  email: "elsa.oldenburg@pole-emploi.net",
+const ftCapEmploiAdvisor: FtConnectImmersionAdvisorDto = {
+  email: "elsa.oldenburg@france-travail.net",
   lastName: "Oldenburg",
   firstName: "Elsa",
   type: "CAPEMPLOI",
