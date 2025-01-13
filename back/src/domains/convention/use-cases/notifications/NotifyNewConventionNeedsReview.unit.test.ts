@@ -16,7 +16,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
+import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -284,8 +284,8 @@ describe("NotifyConventionNeedsReview", () => {
       ];
       shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
-      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
-        _entityName: "ConventionPoleEmploiAdvisor",
+      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
+        _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
           email: peAdvisorEmail,
           firstName: "Elsa",
@@ -351,8 +351,8 @@ describe("NotifyConventionNeedsReview", () => {
         .withFederatedIdentity(peIdentity)
         .build();
 
-      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
-        _entityName: "ConventionPoleEmploiAdvisor",
+      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
+        _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
           email: peAdvisorEmail,
           firstName: "Elsa",
@@ -620,8 +620,8 @@ describe("NotifyConventionNeedsReview", () => {
           .withFederatedIdentity(peIdentity)
           .build();
 
-      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
-        _entityName: "ConventionPoleEmploiAdvisor",
+      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
+        _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
           email: peAdvisorEmail,
           firstName: "Elsa",

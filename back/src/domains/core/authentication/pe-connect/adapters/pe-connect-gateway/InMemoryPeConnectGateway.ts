@@ -1,14 +1,14 @@
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../dto/PeConnectUser.dto";
-import { PeConnectGateway } from "../../port/PeConnectGateway";
+import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
+import { FtConnectGateway } from "../../port/FtConnectGateway";
 
-export class InMemoryPeConnectGateway implements PeConnectGateway {
+export class InMemoryPeConnectGateway implements FtConnectGateway {
   #accessToken: AccessTokenDto | undefined = undefined;
 
-  #advisors: PeConnectAdvisorDto[] = [];
+  #advisors: FtConnectAdvisorDto[] = [];
 
-  #user: PeConnectUserDto | undefined = undefined;
+  #user: FtConnectUserDto | undefined = undefined;
 
   public async getAccessToken(
     _authorizationCode: string,
@@ -18,15 +18,15 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
 
   public async getUserAndAdvisors(_accessToken: AccessTokenDto): Promise<
     | {
-        user: PeConnectUserDto;
-        advisors: PeConnectAdvisorDto[];
+        user: FtConnectUserDto;
+        advisors: FtConnectAdvisorDto[];
       }
     | undefined
   > {
     if (!this.#user) return undefined;
     const peUserAndAdvisor: {
-      user: PeConnectUserDto;
-      advisors: PeConnectAdvisorDto[];
+      user: FtConnectUserDto;
+      advisors: FtConnectAdvisorDto[];
     } = {
       advisors: this.#advisors,
       user: this.#user,
@@ -38,12 +38,12 @@ export class InMemoryPeConnectGateway implements PeConnectGateway {
     this.#accessToken = accessToken;
   }
 
-  public setAdvisors(advisors: PeConnectAdvisorDto[]) {
+  public setAdvisors(advisors: FtConnectAdvisorDto[]) {
     this.#advisors = advisors;
   }
 
   // test
-  public setUser(user: PeConnectUserDto | undefined) {
+  public setUser(user: FtConnectUserDto | undefined) {
     this.#user = user;
   }
 }

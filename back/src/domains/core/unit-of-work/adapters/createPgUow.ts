@@ -20,7 +20,7 @@ import { PgEstablishmentMarketingRepository } from "../../../marketing/adapters/
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
 import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
 import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
-import { PgConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/adapters/PgConventionPoleEmploiAdvisorRepository";
+import { PgConventionFranceTravailAdvisorRepository } from "../../authentication/pe-connect/adapters/PgConventionFranceTravailAdvisorRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
@@ -39,7 +39,7 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     apiConsumerRepository: new PgApiConsumerRepository(transaction),
     userRepository: new PgUserRepository(transaction),
     conventionPoleEmploiAdvisorRepository:
-      new PgConventionPoleEmploiAdvisorRepository(transaction),
+      new PgConventionFranceTravailAdvisorRepository(transaction),
     conventionExternalIdRepository: new PgConventionExternalIdRepository(
       transaction,
     ),

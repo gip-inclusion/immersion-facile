@@ -15,55 +15,55 @@ import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyReposito
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
 import {
-  ConventionPoleEmploiUserAdvisorEntity,
-  PeUserAndAdvisor,
-} from "../dto/PeConnect.dto";
-import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
-import { PgConventionPoleEmploiAdvisorRepository } from "./PgConventionPoleEmploiAdvisorRepository";
+  ConventionFtUserAdvisorEntity,
+  FtUserAndAdvisor,
+} from "../dto/FtConnect.dto";
+import { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
+import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import { PgConventionFranceTravailAdvisorRepository } from "./PgConventionFranceTravailAdvisorRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
 const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
-const user: PeConnectUserDto = {
+const user: FtConnectUserDto = {
   email: "",
   firstName: "",
   isJobseeker: true,
   lastName: "",
   peExternalId: userPeExternalId,
 };
-const placementAdvisor: PeConnectImmersionAdvisorDto = {
+const placementAdvisor: FtConnectImmersionAdvisorDto = {
   firstName: "Jean",
   lastName: "Dupont",
   email: "jean.dupont@pole-emploi.fr",
   type: "PLACEMENT",
 };
-const capemploiAdvisor: PeConnectImmersionAdvisorDto = {
+const capemploiAdvisor: FtConnectImmersionAdvisorDto = {
   firstName: "Jeanne",
   lastName: "Delamare",
   email: "jeanne.delamare@pole-emploi.fr",
   type: "CAPEMPLOI",
 };
-const poleEmploiFirstUserAdvisor: PeUserAndAdvisor = {
+const poleEmploiFirstUserAdvisor: FtUserAndAdvisor = {
   advisor: placementAdvisor,
   user,
 };
 
-const poleEmploiFirstUserWithoutAdvisor: PeUserAndAdvisor = {
+const poleEmploiFirstUserWithoutAdvisor: FtUserAndAdvisor = {
   advisor: undefined,
   user,
 };
 
-const poleEmploiUpdatedUserAdvisor: PeUserAndAdvisor = {
+const poleEmploiUpdatedUserAdvisor: FtUserAndAdvisor = {
   advisor: capemploiAdvisor,
   user,
 };
 
 describe("PgConventionPoleEmploiAdvisorRepository", () => {
   let pool: Pool;
-  let conventionPoleEmploiAdvisorRepository: PgConventionPoleEmploiAdvisorRepository;
+  let conventionPoleEmploiAdvisorRepository: PgConventionFranceTravailAdvisorRepository;
   let db: KyselyDb;
 
   beforeAll(async () => {
@@ -95,7 +95,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
   beforeEach(async () => {
     await db.deleteFrom("partners_pe_connect").execute();
     conventionPoleEmploiAdvisorRepository =
-      new PgConventionPoleEmploiAdvisorRepository(db);
+      new PgConventionFranceTravailAdvisorRepository(db);
   });
 
   describe("openSlotForNextConvention", () => {
@@ -205,9 +205,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
 
   describe("getByConventionId", () => {
     it("should return undefined if no convention Advisor", async () => {
-      const conventionAdvisor:
-        | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
+      const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
         await conventionPoleEmploiAdvisorRepository.getByConventionId(
           conventionId,
         );
@@ -224,9 +222,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         userPeExternalId,
       );
 
-      const conventionAdvisor:
-        | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
+      const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
         await conventionPoleEmploiAdvisorRepository.getByConventionId(
           conventionId,
         );
@@ -248,9 +244,7 @@ describe("PgConventionPoleEmploiAdvisorRepository", () => {
         userPeExternalId,
       );
 
-      const conventionAdvisor:
-        | ConventionPoleEmploiUserAdvisorEntity
-        | undefined =
+      const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
         await conventionPoleEmploiAdvisorRepository.getByConventionId(
           conventionId,
         );

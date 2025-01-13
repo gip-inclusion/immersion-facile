@@ -18,8 +18,8 @@ import {
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { PeUserAndAdvisor } from "../dto/PeConnect.dto";
-import { PeConnectImmersionAdvisorDto } from "../dto/PeConnectAdvisor.dto";
+import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
+import { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
 import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 
 describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
@@ -84,7 +84,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
         {
           peExternalId: userAdvisorDto.user.peExternalId,
           advisor: userAdvisorDto.advisor,
-          _entityName: "ConventionPoleEmploiAdvisor",
+          _entityName: "ConventionFranceTravailAdvisor",
           conventionId,
         },
       ],
@@ -149,7 +149,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
         {
           advisor: undefined,
           peExternalId: userAdvisorDto.user.peExternalId,
-          _entityName: "ConventionPoleEmploiAdvisor",
+          _entityName: "ConventionFranceTravailAdvisor",
           conventionId,
         },
       ],
@@ -165,13 +165,13 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
 
 const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const advisor: PeConnectImmersionAdvisorDto = {
+const advisor: FtConnectImmersionAdvisorDto = {
   email: "elsa.oldenburg@pole-emploi.net",
   firstName: "Elsa",
   lastName: "Oldenburg",
   type: "CAPEMPLOI",
 };
-const userAdvisorDto: PeUserAndAdvisor = {
+const userAdvisorDto: FtUserAndAdvisor = {
   advisor,
   user: {
     peExternalId: userPeExternalId,

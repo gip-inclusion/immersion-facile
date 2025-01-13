@@ -1,7 +1,7 @@
 import { AbsoluteUrl } from "shared";
 import { z } from "zod";
 import { BearerToken } from "../../dto/BearerToken";
-import { PeConnectAdvisorsKind } from "../../dto/PeConnectAdvisor.dto";
+import { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
 
 export type ExternalAccessToken = {
   access_token: string;
@@ -30,7 +30,7 @@ export type ExternalPeConnectAdvisor = {
   prenom: string;
   civilite: "1" | "2";
   mail: string;
-  type: PeConnectAdvisorsKind;
+  type: FtConnectAdvisorsKind;
 };
 
 export type ExternalPeConnectAdvisors = ExternalPeConnectAdvisor[];

@@ -1,4 +1,4 @@
-import { ConventionId, PeExternalId } from "shared";
+import { ConventionId, FtExternalId } from "shared";
 import {
   KyselyDb,
   executeKyselyRawSqlQuery,
@@ -6,30 +6,30 @@ import {
 import { createLogger } from "../../../../../utils/logger";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../utils/schema.utils";
 import {
-  ConventionPoleEmploiUserAdvisorDto,
-  ConventionPoleEmploiUserAdvisorEntity,
-  PeUserAndAdvisor,
-} from "../dto/PeConnect.dto";
-import { isPeAdvisorImmersionKind } from "../dto/PeConnectAdvisor.dto";
+  ConventionFtUserAdvisorDto,
+  ConventionFtUserAdvisorEntity,
+  FtUserAndAdvisor,
+} from "../dto/FtConnect.dto";
+import { isFtAdvisorImmersionKind } from "../dto/FtConnectAdvisor.dto";
 import {
-  ConventionAndPeExternalIds,
-  ConventionPoleEmploiAdvisorRepository,
-} from "../port/ConventionPoleEmploiAdvisorRepository";
-import { conventionPoleEmploiUserAdvisorDtoSchema } from "../port/PeConnect.schema";
+  ConventionAndFtExternalIds,
+  ConventionFranceTravailAdvisorRepository,
+} from "../port/ConventionFranceTravailAdvisorRepository";
+import { conventionFranceTravailUserAdvisorDtoSchema } from "../port/FtConnect.schema";
 
 const CONVENTION_ID_DEFAULT_UUID = "00000000-0000-0000-0000-000000000000";
 
 const logger = createLogger(__filename);
 
-export class PgConventionPoleEmploiAdvisorRepository
-  implements ConventionPoleEmploiAdvisorRepository
+export class PgConventionFranceTravailAdvisorRepository
+  implements ConventionFranceTravailAdvisorRepository
 {
   constructor(private transaction: KyselyDb) {}
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
-    peExternalId: PeExternalId,
-  ): Promise<ConventionAndPeExternalIds> {
+    peExternalId: FtExternalId,
+  ): Promise<ConventionAndFtExternalIds> {
     const pgResult = await executeKyselyRawSqlQuery(
       this.transaction,
       `
@@ -53,9 +53,9 @@ export class PgConventionPoleEmploiAdvisorRepository
 
   public async getByConventionId(
     conventionId: ConventionId,
-  ): Promise<ConventionPoleEmploiUserAdvisorEntity | undefined> {
+  ): Promise<ConventionFtUserAdvisorEntity | undefined> {
     const pgResult =
-      await executeKyselyRawSqlQuery<PgConventionPoleEmploiUserAdvisorDto>(
+      await executeKyselyRawSqlQuery<PgConventionFranceTravailUserAdvisorDto>(
         this.transaction,
         `SELECT *
        FROM partners_pe_connect
@@ -65,13 +65,13 @@ export class PgConventionPoleEmploiAdvisorRepository
 
     const result = pgResult.rows.at(0);
     const conventionPeUserAdvisor =
-      result && toConventionPoleEmploiUserAdvisorDTO(result);
+      result && toConventionFranceTravailUserAdvisorDTO(result);
 
     return (
       conventionPeUserAdvisor &&
       toConventionPoleEmploiUserAdvisorEntity(
         parseZodSchemaAndLogErrorOnParsingFailure(
-          conventionPoleEmploiUserAdvisorDtoSchema,
+          conventionFranceTravailUserAdvisorDtoSchema,
           conventionPeUserAdvisor,
           logger,
         ),
@@ -80,7 +80,7 @@ export class PgConventionPoleEmploiAdvisorRepository
   }
 
   public async openSlotForNextConvention(
-    peUserAndAdvisor: PeUserAndAdvisor,
+    peUserAndAdvisor: FtUserAndAdvisor,
   ): Promise<void> {
     const { user, advisor } = peUserAndAdvisor;
 
@@ -99,7 +99,7 @@ export class PgConventionPoleEmploiAdvisorRepository
   }
 }
 
-export type PgConventionPoleEmploiUserAdvisorDto = {
+export type PgConventionFranceTravailUserAdvisorDto = {
   user_pe_external_id: string;
   convention_id: string;
   firstname: string | null;
@@ -108,16 +108,16 @@ export type PgConventionPoleEmploiUserAdvisorDto = {
   type: string | null;
 };
 
-const toConventionPoleEmploiUserAdvisorDTO = ({
+const toConventionFranceTravailUserAdvisorDTO = ({
   user_pe_external_id,
   convention_id,
   firstname,
   lastname,
   email,
   type,
-}: PgConventionPoleEmploiUserAdvisorDto): ConventionPoleEmploiUserAdvisorDto => ({
+}: PgConventionFranceTravailUserAdvisorDto): ConventionFtUserAdvisorDto => ({
   advisor:
-    firstname && lastname && email && type && isPeAdvisorImmersionKind(type)
+    firstname && lastname && email && type && isFtAdvisorImmersionKind(type)
       ? {
           firstName: firstname,
           lastName: lastname,
@@ -130,10 +130,10 @@ const toConventionPoleEmploiUserAdvisorDTO = ({
 });
 
 const toConventionPoleEmploiUserAdvisorEntity = (
-  dto: ConventionPoleEmploiUserAdvisorDto,
-): ConventionPoleEmploiUserAdvisorEntity => ({
+  dto: ConventionFtUserAdvisorDto,
+): ConventionFtUserAdvisorEntity => ({
   ...dto,
-  _entityName: "ConventionPoleEmploiAdvisor",
+  _entityName: "ConventionFranceTravailAdvisor",
 });
 
 // On primary key conflict we update the data columns (firstname, lastname, email, type) with the new values.

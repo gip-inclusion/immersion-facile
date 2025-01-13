@@ -3,8 +3,8 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { PeConnectAdvisorDto } from "../../dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../../dto/PeConnectUser.dto";
+import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import {
   ExternalAccessToken,
   ExternalPeConnectAdvisor,
@@ -93,7 +93,7 @@ const makeOauthGetAuthorizationCodeRedirectUrl = (
 
 export const toPeConnectAdvisorDto = (
   fromApi: ExternalPeConnectAdvisor,
-): PeConnectAdvisorDto => ({
+): FtConnectAdvisorDto => ({
   email: fromApi.mail,
   firstName: fromApi.prenom,
   lastName: fromApi.nom,
@@ -102,7 +102,7 @@ export const toPeConnectAdvisorDto = (
 
 export const toPeConnectUserDto = (
   externalPeConnectUser: ExternalPeConnectUser & { isUserJobseeker: boolean },
-): PeConnectUserDto => ({
+): FtConnectUserDto => ({
   isJobseeker: externalPeConnectUser.isUserJobseeker,
   email: externalPeConnectUser.email,
   firstName: externalPeConnectUser.given_name,

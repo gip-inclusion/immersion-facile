@@ -4,15 +4,15 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
-import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionPoleEmploiAdvisorRepository";
+import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import { InMemoryPeConnectGateway } from "../adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
-  PeConnectAdvisorDto,
-  PeConnectImmersionAdvisorDto,
-} from "../dto/PeConnectAdvisor.dto";
-import { PeConnectUserDto } from "../dto/PeConnectUser.dto";
-import { conventionPoleEmploiUserAdvisorFromDto } from "../entities/ConventionPoleEmploiAdvisorEntity";
+  FtConnectAdvisorDto,
+  FtConnectImmersionAdvisorDto,
+} from "../dto/FtConnectAdvisor.dto";
+import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "./LinkPoleEmploiAdvisorAndRedirectToConvention";
 
 describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
@@ -49,7 +49,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [
-          conventionPoleEmploiUserAdvisorFromDto(
+          conventionFranceTravailUserAdvisorFromDto(
             {
               advisor: pePlacementAdvisor,
               user: peJobseekerUser,
@@ -75,7 +75,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
         uow.conventionPoleEmploiAdvisorRepository
           .conventionPoleEmploiUsersAdvisors,
         [
-          conventionPoleEmploiUserAdvisorFromDto(
+          conventionFranceTravailUserAdvisorFromDto(
             {
               advisor: peCapemploiAdvisor,
               user: peJobseekerUser,
@@ -159,7 +159,7 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
       uow.conventionPoleEmploiAdvisorRepository
         .conventionPoleEmploiUsersAdvisors,
       [
-        conventionPoleEmploiUserAdvisorFromDto(
+        conventionFranceTravailUserAdvisorFromDto(
           {
             user: peJobseekerUser,
             advisor: undefined,
@@ -171,14 +171,14 @@ describe("LinkPoleEmploiAdvisorAndRedirectToConvention", () => {
   });
 });
 
-const peJobseekerUser: PeConnectUserDto = {
+const peJobseekerUser: FtConnectUserDto = {
   isJobseeker: true,
   firstName: "John",
   lastName: "Doe",
   peExternalId: "749dd14f-c82a-48b1-b1bb-fffc5467e4d4",
   email: "john.doe@gmail.com",
 };
-const peNotJobseekerUser: PeConnectUserDto = {
+const peNotJobseekerUser: FtConnectUserDto = {
   isJobseeker: false,
   firstName: "John",
   lastName: "Doe",
@@ -186,21 +186,21 @@ const peNotJobseekerUser: PeConnectUserDto = {
   email: "john.doe@gmail.com",
 };
 
-const pePlacementAdvisor: PeConnectImmersionAdvisorDto = {
+const pePlacementAdvisor: FtConnectImmersionAdvisorDto = {
   email: "jane.smith@pole-emploi.net",
   lastName: "Smith",
   firstName: "Jane",
   type: "PLACEMENT",
 };
 
-const peIndemnisationAdvisor: PeConnectAdvisorDto = {
+const peIndemnisationAdvisor: FtConnectAdvisorDto = {
   email: "017jean.dupont@pole-emploi.net",
   firstName: "Jean",
   lastName: "Dupont",
   type: "INDEMNISATION",
 };
 
-const peCapemploiAdvisor: PeConnectImmersionAdvisorDto = {
+const peCapemploiAdvisor: FtConnectImmersionAdvisorDto = {
   email: "elsa.oldenburg@pole-emploi.net",
   lastName: "Oldenburg",
   firstName: "Elsa",

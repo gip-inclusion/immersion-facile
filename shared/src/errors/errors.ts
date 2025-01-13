@@ -12,7 +12,7 @@ import type {
 } from "../convention/convention.dto";
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
-import { PeExternalId } from "../federatedIdentities/federatedIdentity.dto";
+import { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GroupSlug } from "../group/group.dto";
 import {
@@ -93,7 +93,7 @@ export const errors = {
       ),
     updateForbidden: ({ id }: { id: ConventionId }) =>
       new ForbiddenError(`User is not allowed to update convention ${id}`),
-    missingFTAdvisor: ({ ftExternalId }: { ftExternalId: PeExternalId }) =>
+    missingFTAdvisor: ({ ftExternalId }: { ftExternalId: FtExternalId }) =>
       new NotFoundError(
         `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,
       ),

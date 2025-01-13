@@ -15,7 +15,7 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
-import { ConventionPoleEmploiUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/PeConnect.dto";
+import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/FtConnect.dto";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   WithNotificationIdAndKind,
@@ -469,8 +469,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
         ];
       const userPeExternalId = "i-am-an-external-id";
-      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
-        _entityName: "ConventionPoleEmploiAdvisor",
+      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
+        _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
           email: peAdvisorEmail,
           firstName: "Elsa",
@@ -560,8 +560,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           },
         ];
       const userPeExternalId = "i-am-an-external-id";
-      const userConventionAdvisor: ConventionPoleEmploiUserAdvisorEntity = {
-        _entityName: "ConventionPoleEmploiAdvisor",
+      const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
+        _entityName: "ConventionFranceTravailAdvisor",
         advisor: undefined,
         peExternalId: userPeExternalId,
         conventionId: validConvention.id,

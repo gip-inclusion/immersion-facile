@@ -1,7 +1,7 @@
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
-import { HttpFranceTravailGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
+import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";

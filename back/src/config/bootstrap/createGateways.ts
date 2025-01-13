@@ -4,9 +4,9 @@ import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import { createFranceTravailRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/FrancetTravailRoutes";
-import { HttpFranceTravailGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
-import { InMemoryFranceTravailGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
+import { createFranceTravailRoutes } from "../../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
+import { HttpFranceTravailGateway } from "../../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
+import { InMemoryFranceTravailGateway } from "../../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import { HttpAddressGateway } from "../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
@@ -20,7 +20,7 @@ import { OAuthGateway } from "../../domains/core/authentication/inclusion-connec
 import { HttpPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/HttpPeConnectGateway";
 import { InMemoryPeConnectGateway } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/InMemoryPeConnectGateway";
 import { makePeConnectExternalRoutes } from "../../domains/core/authentication/pe-connect/adapters/pe-connect-gateway/peConnectApi.routes";
-import { PeConnectGateway } from "../../domains/core/authentication/pe-connect/port/PeConnectGateway";
+import { FtConnectGateway } from "../../domains/core/authentication/pe-connect/port/FtConnectGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
@@ -188,7 +188,7 @@ export const createGateways = async (
 
   const { withCache, disconnectCache } = await getWithCache(config);
 
-  const peConnectGateway: PeConnectGateway =
+  const peConnectGateway: FtConnectGateway =
     config.peConnectGateway === "HTTPS"
       ? new HttpPeConnectGateway(
           createLegacyAxiosHttpClientForExternalAPIs({

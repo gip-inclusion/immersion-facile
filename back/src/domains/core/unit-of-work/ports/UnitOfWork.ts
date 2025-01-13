@@ -19,7 +19,7 @@ import { EstablishmentMarketingRepository } from "../../../marketing/ports/Estab
 import { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
 import { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
 import { UserRepository } from "../../authentication/inclusion-connect/port/UserRepository";
-import { ConventionPoleEmploiAdvisorRepository } from "../../authentication/pe-connect/port/ConventionPoleEmploiAdvisorRepository";
+import { ConventionFranceTravailAdvisorRepository } from "../../authentication/pe-connect/port/ConventionFranceTravailAdvisorRepository";
 import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
@@ -36,7 +36,7 @@ export type UnitOfWork = {
   apiConsumerRepository: ApiConsumerRepository;
   assessmentRepository: AssessmentRepository;
   conventionExternalIdRepository: ConventionExternalIdRepository;
-  conventionPoleEmploiAdvisorRepository: ConventionPoleEmploiAdvisorRepository;
+  conventionPoleEmploiAdvisorRepository: ConventionFranceTravailAdvisorRepository;
   conventionQueries: ConventionQueries;
   conventionRepository: ConventionRepository;
   conventionsToSyncRepository: ConventionsToSyncRepository;
