@@ -1265,18 +1265,17 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           .join("")}
  
 
-        Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs${
-          refersToOtherAgency ? ` et aux structures d'accompagnement` : ""
-        }</strong> pour être accompagné par notre équipe.
+        Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
 
         Au programme :
-          • Comment établir une convention d'immersion
-          • Découvrir le tableau de bord
+          • Le moteur de recherche pour trouver une entreprise accueillante
+          • Comment compléter une convention d'immersion
+          • Découvrir l'espace prescripteur - piloter les conventions
         `,
         buttons: [
           {
             label: "Je m'inscris au webinaire",
-            url: "https://app.livestorm.co/itou/decouvrir-immersion-facilitee?s=0aae9824-c7e1-4aba-996a-46bc5f1d4488",
+            url: "https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation",
           },
         ],
         agencyLogoUrl,

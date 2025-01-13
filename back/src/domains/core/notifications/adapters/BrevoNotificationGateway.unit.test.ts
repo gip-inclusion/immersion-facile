@@ -236,11 +236,12 @@ describe("BrevoNotificationGateway unit", () => {
       <br/>
       <br/>
       <br/>
-      <br/>Participez à l'un de nos <strong>webinaires dédiés aux prescripteurs</strong> pour être accompagné par notre équipe.
+      <br/>Participez à notre webinaire de 30 min pour découvrir Immersion Facilitée.
       <br/>
       <br/>Au programme :
-      <br/>• Comment établir une convention d'immersion
-      <br/>• Découvrir le tableau de bord</p>
+      <br/>• Le moteur de recherche pour trouver une entreprise accueillante
+      <br/>• Comment compléter une convention d'immersion
+      <br/>• Découvrir l'espace prescripteur - piloter les conventions</p>
       </td>
       </tr>
       </table>
@@ -257,7 +258,7 @@ describe("BrevoNotificationGateway unit", () => {
       >
       <a
       style=\"text-decoration: none; display: inline-block; padding: 10px 20px; text-align: center; background-color: #000091; color: #fff;\"
-      href=\"https://app.livestorm.co/itou/decouvrir-immersion-facilitee?s=0aae9824-c7e1-4aba-996a-46bc5f1d4488\"
+      href=\"https://app.livestorm.co/itou/prescripteur-utiliser-le-site-dimmersion-facilitee?utm_source=if&utm_medium=mail&utm_campaign=transac-activation\"
       >
       Je m'inscris au webinaire
       </a>
