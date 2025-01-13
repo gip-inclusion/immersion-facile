@@ -12,7 +12,7 @@ import {
   HttpRome4Gateway,
   makeRome4Routes,
 } from "../domains/agency/adapters/pe-agencies-referential/HttpRome4Gateway";
-import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
+import { HttpFranceTravailGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -37,7 +37,7 @@ const main = async () => {
     "expires_in",
   );
 
-  const franceTravailGateway = new HttpPoleEmploiGateway(
+  const franceTravailGateway = new HttpFranceTravailGateway(
     createPeAxiosSharedClient(config),
     cachingGateway,
     config.peApiUrl,

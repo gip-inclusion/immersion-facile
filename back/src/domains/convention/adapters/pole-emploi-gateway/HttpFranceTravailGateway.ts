@@ -26,41 +26,41 @@ import {
   RetryableError,
 } from "../../../core/retry-strategy/ports/RetryStrategy";
 import {
-  PoleEmploiBroadcastResponse,
-  PoleEmploiConvention,
-  PoleEmploiGateway,
-} from "../../ports/PoleEmploiGateway";
-import { PoleEmploiRoutes, getPeTestPrefix } from "./PoleEmploiRoutes";
+  FranceTravailBroadcastResponse,
+  FranceTravailConvention,
+  FranceTravailGateway,
+} from "../../ports/FranceTravailGateway";
+import { FrancetTravailRoutes, getFtTestPrefix } from "./FrancetTravailRoutes";
 
 const logger = createLogger(__filename);
 
-const poleEmploiCommonMaxRequestsPerInterval = 1;
-const poleEmploiBroadcastMaxRequestPerInterval = 3;
+const franceTravailCommonMaxRequestsPerInterval = 1;
+const franceTravailBroadcastMaxRequestPerInterval = 3;
 const rate_ms = 1250;
 
-export class HttpPoleEmploiGateway implements PoleEmploiGateway {
+export class HttpFranceTravailGateway implements FranceTravailGateway {
   // Common limiter with 1 call every 1.2s
   #commonlimiter = new Bottleneck({
-    reservoir: poleEmploiCommonMaxRequestsPerInterval,
+    reservoir: franceTravailCommonMaxRequestsPerInterval,
     reservoirRefreshInterval: rate_ms,
-    reservoirRefreshAmount: poleEmploiCommonMaxRequestsPerInterval,
+    reservoirRefreshAmount: franceTravailCommonMaxRequestsPerInterval,
     maxConcurrent: 1,
-    minTime: Math.ceil(rate_ms / poleEmploiCommonMaxRequestsPerInterval),
+    minTime: Math.ceil(rate_ms / franceTravailCommonMaxRequestsPerInterval),
   });
 
   // convention broacast limiter with 3 calls every 1.2s
   #broadcastlimiter = new Bottleneck({
-    reservoir: poleEmploiBroadcastMaxRequestPerInterval,
+    reservoir: franceTravailBroadcastMaxRequestPerInterval,
     reservoirRefreshInterval: rate_ms,
-    reservoirRefreshAmount: poleEmploiBroadcastMaxRequestPerInterval,
+    reservoirRefreshAmount: franceTravailBroadcastMaxRequestPerInterval,
     maxConcurrent: 1,
-    minTime: Math.ceil(rate_ms / poleEmploiBroadcastMaxRequestPerInterval),
+    minTime: Math.ceil(rate_ms / franceTravailBroadcastMaxRequestPerInterval),
   });
 
-  #peTestPrefix: "test" | "";
+  #ftTestPrefix: "test" | "";
   #isDev: boolean;
 
-  readonly #httpClient: HttpClient<PoleEmploiRoutes>;
+  readonly #httpClient: HttpClient<FrancetTravailRoutes>;
 
   readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
 
@@ -69,14 +69,14 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   readonly #retryStrategy: RetryStrategy;
 
   constructor(
-    httpClient: HttpClient<PoleEmploiRoutes>,
+    httpClient: HttpClient<FrancetTravailRoutes>,
     caching: InMemoryCachingGateway<AccessTokenResponse>,
-    peApiUrl: AbsoluteUrl,
+    ftApiUrl: AbsoluteUrl,
     accessTokenConfig: AccessTokenConfig,
     retryStrategy: RetryStrategy,
     isDev = false,
   ) {
-    this.#peTestPrefix = getPeTestPrefix(peApiUrl);
+    this.#ftTestPrefix = getFtTestPrefix(ftApiUrl);
     this.#accessTokenConfig = accessTokenConfig;
     this.#caching = caching;
     this.#httpClient = httpClient;
@@ -120,14 +120,14 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
   }
 
   public async notifyOnConventionUpdated(
-    poleEmploiConvention: PoleEmploiConvention,
-  ): Promise<PoleEmploiBroadcastResponse> {
+    ftConvention: FranceTravailConvention,
+  ): Promise<FranceTravailBroadcastResponse> {
     logger.info({
-      message: "PeBroadcast",
+      message: "FtBroadcast",
       franceTravailGatewayStatus: "total",
-      peConnect: {
-        peId: poleEmploiConvention.id,
-        originalId: poleEmploiConvention.originalId,
+      ftConnect: {
+        ftId: ftConvention.id,
+        originalId: ftConvention.originalId,
       },
     });
 
@@ -138,15 +138,15 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       };
     }
 
-    return this.#postPoleEmploiConvention(poleEmploiConvention)
-      .then((response): PoleEmploiBroadcastResponse => {
+    return this.#postFranceTravailConvention(ftConvention)
+      .then((response): FranceTravailBroadcastResponse => {
         logger.info({
-          message: "PeBroadcast",
+          message: "FtBroadcast",
           franceTravailGatewayStatus: "success",
           sharedRouteResponse: response,
-          peConnect: {
-            peId: poleEmploiConvention.id,
-            originalId: poleEmploiConvention.originalId,
+          ftConnect: {
+            ftId: ftConvention.id,
+            originalId: ftConvention.originalId,
           },
         });
 
@@ -162,22 +162,22 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
           } with body '${JSON.stringify(response.body)}'`,
         );
       })
-      .catch((err): PoleEmploiBroadcastResponse => {
+      .catch((err): FranceTravailBroadcastResponse => {
         const error = castError(err);
         if (!axios.isAxiosError(error)) {
           logger.error({
-            message: "PeBroadcast - notAxiosError",
+            message: "FtBroadcast - notAxiosError",
             franceTravailGatewayStatus: "error",
             error,
-            peConnect: {
-              peId: poleEmploiConvention.id,
-              originalId: poleEmploiConvention.originalId,
+            ftConnect: {
+              ftId: ftConvention.id,
+              originalId: ftConvention.originalId,
             },
           });
 
           notifyDiscord(
-            `HttpPoleEmploiGateway notAxiosError ${
-              poleEmploiConvention.originalId
+            `HttpFranceTravailGateway notAxiosError ${
+              ftConvention.originalId
             }: ${JSON.stringify(error)}`,
           );
 
@@ -193,18 +193,18 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         if (!error.response) {
           logger.error({
-            message: "PeBroadcast - noResponseInAxiosError",
+            message: "FtBroadcast - noResponseInAxiosError",
             franceTravailGatewayStatus: "error",
             error,
-            peConnect: {
-              peId: poleEmploiConvention.id,
-              originalId: poleEmploiConvention.originalId,
+            ftConnect: {
+              ftId: ftConvention.id,
+              originalId: ftConvention.originalId,
             },
           });
 
           notifyDiscord(
-            `HttpPoleEmploiGateway noResponseInAxiosError ${
-              poleEmploiConvention.originalId
+            `HttpFranceTravailGateway noResponseInAxiosError ${
+              ftConvention.originalId
             }: ${JSON.stringify(error)}`,
           );
 
@@ -226,12 +226,12 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
 
         if (error.response.status === 404) {
           logger.error({
-            message: `PeBroadcast - notFoundOrMismatch - ${message}`,
+            message: `FtBroadcast - notFoundOrMismatch - ${message}`,
             franceTravailGatewayStatus: "error",
             axiosResponse,
-            peConnect: {
-              peId: poleEmploiConvention.id,
-              originalId: poleEmploiConvention.originalId,
+            ftConnect: {
+              ftId: ftConvention.id,
+              originalId: ftConvention.originalId,
             },
           });
           return {
@@ -245,13 +245,13 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
         }
 
         const errorObject: LoggerParamsWithMessage = {
-          message: "PeBroadcast",
+          message: "FtBroadcast",
           franceTravailGatewayStatus: "error",
           error,
           axiosResponse,
-          peConnect: {
-            peId: poleEmploiConvention.id,
-            originalId: poleEmploiConvention.originalId,
+          ftConnect: {
+            ftId: ftConvention.id,
+            originalId: ftConvention.originalId,
           },
         };
         logger.error(errorObject);
@@ -268,14 +268,14 @@ export class HttpPoleEmploiGateway implements PoleEmploiGateway {
       });
   }
 
-  async #postPoleEmploiConvention(poleEmploiConvention: PoleEmploiConvention) {
+  async #postFranceTravailConvention(ftConvention: FranceTravailConvention) {
     const accessTokenResponse = await this.getAccessToken(
-      `echangespmsmp api_${this.#peTestPrefix}immersion-prov2`,
+      `echangespmsmp api_${this.#ftTestPrefix}immersion-prov2`,
     );
 
     return this.#broadcastlimiter.schedule(() =>
       this.#httpClient.broadcastConvention({
-        body: poleEmploiConvention,
+        body: ftConvention,
         headers: {
           authorization: `Bearer ${accessTokenResponse.access_token}`,
         },

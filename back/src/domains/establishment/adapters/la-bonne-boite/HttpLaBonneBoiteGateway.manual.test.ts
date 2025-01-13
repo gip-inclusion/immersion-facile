@@ -5,7 +5,7 @@ import {
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
-import { HttpPoleEmploiGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
+import { HttpFranceTravailGateway } from "../../../convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -54,7 +54,7 @@ describe("HttpLaBonneBoiteGateway", () => {
     const peFetchSharedClient = createPeFetchSharedClient(config);
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
       createFetchSharedClient(createLbbRoutes(config.peApiUrl), fetch),
-      new HttpPoleEmploiGateway(
+      new HttpFranceTravailGateway(
         peFetchSharedClient,
         new InMemoryCachingGateway<AccessTokenResponse>(
           new RealTimeGateway(),

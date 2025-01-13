@@ -4,9 +4,9 @@ import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
-import { HttpPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
-import { InMemoryPoleEmploiGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryPoleEmploiGateway";
-import { createPoleEmploiRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/PoleEmploiRoutes";
+import { createFranceTravailRoutes } from "../../domains/convention/adapters/pole-emploi-gateway/FrancetTravailRoutes";
+import { HttpFranceTravailGateway } from "../../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
+import { InMemoryFranceTravailGateway } from "../../domains/convention/adapters/pole-emploi-gateway/InMemoryFranceTravailGateway";
 import { HttpAddressGateway } from "../../domains/core/address/adapters/HttpAddressGateway";
 import { addressesExternalRoutes } from "../../domains/core/address/adapters/HttpAddressGateway.routes";
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
@@ -170,10 +170,10 @@ export const createGateways = async (
 
   const poleEmploiGateway =
     config.poleEmploiGateway === "HTTPS"
-      ? new HttpPoleEmploiGateway(
+      ? new HttpFranceTravailGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.franceTravailApi,
-            routes: createPoleEmploiRoutes(config.peApiUrl),
+            routes: createFranceTravailRoutes(config.peApiUrl),
           }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,
@@ -184,7 +184,7 @@ export const createGateways = async (
           noRetries,
           config.envType === "dev",
         )
-      : new InMemoryPoleEmploiGateway();
+      : new InMemoryFranceTravailGateway();
 
   const { withCache, disconnectCache } = await getWithCache(config);
 

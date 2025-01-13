@@ -2,7 +2,7 @@ import type { AxiosInstance } from "axios";
 import { AbsoluteUrl } from "shared";
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
-import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
+import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import {
   PeAgenciesReferential,
   PeAgencyFromReferenciel,
@@ -17,7 +17,7 @@ export class HttpPeAgenciesReferential implements PeAgenciesReferential {
 
   constructor(
     peApiUrl: AbsoluteUrl,
-    private readonly poleEmploiGateway: PoleEmploiGateway,
+    private readonly poleEmploiGateway: FranceTravailGateway,
     private readonly poleEmploiClientId: string,
   ) {
     this.#axios = createAxiosInstance(logger);

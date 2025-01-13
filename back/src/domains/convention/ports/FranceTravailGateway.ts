@@ -2,11 +2,11 @@ import { AgencyKind, ConventionStatus, DateString } from "shared";
 import { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
 import { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
-// This is an interface contract with Pole Emploi (conventions broadcast).
+// This is an interface contract with France Travail (conventions broadcast).
 // ! Beware of NOT breaking contract ! !
 // Doc is here : https://pad.incubateur.net/6p38o0mNRfmc8WuJ77Xr0w?view
 
-export const conventionStatusToPoleEmploiStatus: Record<
+export const conventionStatusToFranceTravailStatus: Record<
   ConventionStatus,
   string
 > = {
@@ -29,19 +29,19 @@ export const conventionStatusToPoleEmploiStatus: Record<
   // CONVENTION_SENT: "CONVENTION_ENVOYÉE",
 } as const;
 
-type ConventionStatusToPeStatus = typeof conventionStatusToPoleEmploiStatus;
-type PeConventionStatus =
-  ConventionStatusToPeStatus[keyof ConventionStatusToPeStatus];
+type ConventionStatusToFtStatus = typeof conventionStatusToFranceTravailStatus;
+type FtConventionStatus =
+  ConventionStatusToFtStatus[keyof ConventionStatusToFtStatus];
 
 export type AgencyKindForPe =
   | Exclude<AgencyKind, "pole-emploi">
   | "france-travail";
 
-export type PoleEmploiConvention = {
+export type FranceTravailConvention = {
   id: string; // id numérique sur 11 caractères
   originalId: string; // exemple: 31bd445d-54fa-4b53-8875-0ada1673fe3c
   peConnectId?: string; // nécessaire pour se connecter avec PE-UX
-  statut: PeConventionStatus;
+  statut: FtConventionStatus;
   email: string;
   telephone?: string;
   prenom: string;
@@ -77,26 +77,26 @@ export type PoleEmploiConvention = {
   fonctionTuteur: string;
 };
 
-type PeBroadcastSuccessResponse = { status: 200 | 201 | 204; body: unknown };
-type PeBroadcastErrorResponse = {
+type FtBroadcastSuccessResponse = { status: 200 | 201 | 204; body: unknown };
+type FtBroadcastErrorResponse = {
   status: Exclude<number, 200 | 201>;
   subscriberErrorFeedback: SubscriberErrorFeedback;
   body: unknown;
 };
 
-export type PoleEmploiBroadcastResponse =
-  | PeBroadcastSuccessResponse
-  | PeBroadcastErrorResponse;
+export type FranceTravailBroadcastResponse =
+  | FtBroadcastSuccessResponse
+  | FtBroadcastErrorResponse;
 
 export const isBroadcastResponseOk = (
-  response: PoleEmploiBroadcastResponse,
-): response is PeBroadcastSuccessResponse =>
+  response: FranceTravailBroadcastResponse,
+): response is FtBroadcastSuccessResponse =>
   [200, 201, 204].includes(response.status);
 
-export interface PoleEmploiGateway {
+export interface FranceTravailGateway {
   notifyOnConventionUpdated: (
-    poleEmploiConvention: PoleEmploiConvention,
-  ) => Promise<PoleEmploiBroadcastResponse>;
+    franceTravailConvention: FranceTravailConvention,
+  ) => Promise<FranceTravailBroadcastResponse>;
 
   getAccessToken: (scope: string) => Promise<AccessTokenResponse>;
 }

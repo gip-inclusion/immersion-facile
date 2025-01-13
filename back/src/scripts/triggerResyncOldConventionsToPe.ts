@@ -1,7 +1,7 @@
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
-import { HttpPoleEmploiGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpPoleEmploiGateway";
+import { HttpFranceTravailGateway } from "../domains/convention/adapters/pole-emploi-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToPe } from "../domains/convention/use-cases/ResyncOldConventionsToPe";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
@@ -18,7 +18,7 @@ const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
   const peAxiosHttpClient = createPeAxiosSharedClient(config);
 
-  const httpPoleEmploiGateway = new HttpPoleEmploiGateway(
+  const httpPoleEmploiGateway = new HttpFranceTravailGateway(
     peAxiosHttpClient,
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
     config.peApiUrl,

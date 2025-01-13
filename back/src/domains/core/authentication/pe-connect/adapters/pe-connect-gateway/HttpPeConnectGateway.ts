@@ -185,7 +185,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
   ): Promise<boolean> {
     const log = getUserStatutInfoLogger;
     try {
-      log.total({ peConnect: { peExternalId } });
+      log.total({ ftConnect: { peExternalId } });
       const response = await this.#limiter.schedule(() =>
         this.httpClient.getUserStatutInfo({
           headers,
@@ -194,7 +194,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       if (response.status !== 200) {
         log.error({
           sharedRouteResponse: response,
-          peConnect: { peExternalId },
+          ftConnect: { peExternalId },
           message: "getUserStatutInfo -Response status is not 200.",
         });
         return false;
@@ -207,7 +207,7 @@ export class HttpPeConnectGateway implements PeConnectGateway {
       const isJobSeeker = isJobSeekerFromStatus(
         externalPeConnectStatut.codeStatutIndividu,
       );
-      log.success({ peConnect: { peExternalId, isJobSeeker } });
+      log.success({ ftConnect: { peExternalId, isJobSeeker } });
       return isJobSeeker;
     } catch (error) {
       errorChecker(

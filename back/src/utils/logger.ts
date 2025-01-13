@@ -113,8 +113,8 @@ type LoggerParams = Partial<{
   events: DomainEvent[];
   nodeProcessReport: NodeProcessReport;
   notificationId: string;
-  peConnect: Partial<{
-    peId: ConventionId;
+  ftConnect: Partial<{
+    ftId: ConventionId;
     originalId: ConventionId;
     peExternalId: PeExternalId;
     isJobSeeker: boolean;
@@ -187,7 +187,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       message,
       nodeProcessReport,
       notificationId,
-      peConnect,
+      ftConnect,
       reportContent,
       request,
       requestId,
@@ -223,7 +223,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
-        peConnect,
+        ftConnect: ftConnect,
         reportContent,
         request,
         requestId,

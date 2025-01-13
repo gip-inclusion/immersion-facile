@@ -2,7 +2,7 @@ import Bottleneck from "bottleneck";
 import { RomeDto, SearchResultDto, SiretDto, castError } from "shared";
 import { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
-import { PoleEmploiGateway } from "../../../convention/ports/PoleEmploiGateway";
+import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import {
   LaBonneBoiteGateway,
   LaBonneBoiteRequestParams,
@@ -31,7 +31,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
 
   constructor(
     private readonly httpClient: HttpClient<LaBonneBoiteRoutes>,
-    private readonly poleEmploiGateway: PoleEmploiGateway,
+    private readonly poleEmploiGateway: FranceTravailGateway,
     private readonly poleEmploiClientId: string,
   ) {}
 
