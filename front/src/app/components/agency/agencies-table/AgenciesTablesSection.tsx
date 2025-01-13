@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
@@ -47,9 +48,15 @@ export const AgenciesTablesSection = ({
     <>
       <Feedback topic="user" />
       {toReviewAgencyRights.length > 0 && (
-        <OnGoingAgencyRightsTable
-          agenciesWithToReviewRights={toReviewAgencyRights}
-        />
+        <>
+          <h2 className={fr.cx("fr-h4")}>
+            Demandes d'accès en cours ({toReviewAgencyRights.length}{" "}
+            {toReviewAgencyRights.length === 1 ? "agence" : "agences"})
+          </h2>
+          <OnGoingAgencyRightsTable
+            agenciesWithToReviewRights={toReviewAgencyRights}
+          />
+        </>
       )}
       {activeAgencyRights.length > 0 && (
         <ActiveAgencyRightsTable

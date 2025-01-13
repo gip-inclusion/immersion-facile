@@ -1,10 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { subMinutes } from "date-fns";
-import { all } from "ramda";
 import React from "react";
 import { Loader } from "react-design-system";
-import { AgencyRight, distinguishAgencyRights } from "shared";
+import { distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -53,24 +52,6 @@ export const AgencyDashboardPage = ({
                   );
                 return <RegisterAgenciesForm />;
               },
-            )
-            .with(
-              {
-                currentUser: {
-                  agencyRights: P.when(
-                    all((agencyRight: AgencyRight) =>
-                      agencyRight.roles.includes("to-review"),
-                    ),
-                  ),
-                },
-              },
-              () => (
-                <Alert
-                  severity="info"
-                  title="En attente de validation"
-                  description="Votre demande d'accès à l'outil est en cours de validation par l'administration. Vous recevrez un email dès que votre accès sera validé."
-                />
-              ),
             )
             .with(
               {

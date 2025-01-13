@@ -7,7 +7,16 @@ export const AgencyLineAdminEmails = ({
 }: { agencyRight: AgencyRight }): ReactNode => (
   <ul className={fr.cx("fr-raw-list")}>
     {agencyRight.agency.admins.map((admin) => (
-      <li>{admin}</li>
+      <li>
+        <a
+          href={`mailto:${admin}`}
+          target="_blank"
+          rel="noreferrer"
+          className={fr.cx("fr-tag", "fr-tag--sm")}
+        >
+          {admin}
+        </a>
+      </li>
     ))}
   </ul>
 );

@@ -1,5 +1,6 @@
 import contact from "./contact.webp";
 import documentsAdministratifs from "./documents-administratifs.webp";
+import error from "./error-illustration.webp";
 import infosImportantes from "./infos-importantes.webp";
 import job from "./job-illustration.webp";
 import login from "./login-illustration.webp";
@@ -11,6 +12,7 @@ import search4 from "./search-illustration-3.webp";
 import success from "./success-illustration.webp";
 
 export const commonIllustrations = {
+  error,
   warning: infosImportantes,
   job,
   objective,
