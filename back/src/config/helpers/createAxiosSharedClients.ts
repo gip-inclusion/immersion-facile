@@ -7,6 +7,6 @@ export const createPeAxiosSharedClient = (
   config: AppConfig,
   axiosInstance = axios.create({ timeout: config.externalAxiosTimeout }),
 ) => {
-  const poleEmploiRoutes = createFranceTravailRoutes(config.peApiUrl);
-  return createAxiosSharedClient(poleEmploiRoutes, axiosInstance);
+  const franceTravailRoutes = createFranceTravailRoutes(config.ftApiUrl);
+  return createAxiosSharedClient(franceTravailRoutes, axiosInstance);
 };

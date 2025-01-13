@@ -17,9 +17,9 @@ import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGat
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
-  peApiUrl: AbsoluteUrl;
-  peAuthCandidatUrl: AbsoluteUrl;
-  peEnterpriseUrl: AbsoluteUrl;
+  ftApiUrl: AbsoluteUrl;
+  ftAuthCandidatUrl: AbsoluteUrl;
+  ftEnterpriseUrl: AbsoluteUrl;
   clientId: string;
   clientSecret: string;
 };
@@ -445,18 +445,18 @@ export class AppConfig {
     });
   }
 
-  public get peApiUrl(): AbsoluteUrl {
+  public get ftApiUrl(): AbsoluteUrl {
     return this.#throwIfNotAbsoluteUrl("POLE_EMPLOI_API_URL");
   }
 
-  public get peAuthCandidatUrl(): AbsoluteUrl {
+  public get ftAuthCandidatUrl(): AbsoluteUrl {
     return this.#throwIfNotAbsoluteUrl(
       "POLE_EMPLOI_AUTHENTIFICATION_CANDIDAT_URL",
     );
   }
 
-  // == PE Connect gateway ==
-  public get peConnectGateway() {
+  // == France Travail Connect gateway ==
+  public get ftConnectGateway() {
     return this.#throwIfNotInArray({
       variableName: "PE_CONNECT_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
@@ -464,7 +464,7 @@ export class AppConfig {
     });
   }
 
-  public get peEnterpriseUrl(): AbsoluteUrl {
+  public get ftEnterpriseUrl(): AbsoluteUrl {
     return this.#throwIfNotAbsoluteUrl("POLE_EMPLOI_ENTREPRISE_URL");
   }
 
@@ -472,26 +472,26 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
-  public get poleEmploiAccessTokenConfig(): AccessTokenConfig {
+  public get franceTravailAccessTokenConfig(): AccessTokenConfig {
     return {
       immersionFacileBaseUrl: this.immersionFacileBaseUrl,
-      peApiUrl: this.peApiUrl,
-      peAuthCandidatUrl: this.peAuthCandidatUrl,
-      peEnterpriseUrl: this.peEnterpriseUrl,
-      clientId: this.poleEmploiClientId,
-      clientSecret: this.poleEmploiClientSecret,
+      ftApiUrl: this.ftApiUrl,
+      ftAuthCandidatUrl: this.ftAuthCandidatUrl,
+      ftEnterpriseUrl: this.ftEnterpriseUrl,
+      clientId: this.franceTravailClientId,
+      clientSecret: this.franceTravailClientSecret,
     };
   }
 
-  public get poleEmploiClientId() {
+  public get franceTravailClientId() {
     return this.#throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_ID");
   }
 
-  public get poleEmploiClientSecret() {
+  public get franceTravailClientSecret() {
     return this.#throwIfNotDefinedOrDefault("POLE_EMPLOI_CLIENT_SECRET");
   }
 
-  public get poleEmploiGateway() {
+  public get franceTravailGateway() {
     return this.#throwIfNotInArray({
       variableName: "POLE_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],

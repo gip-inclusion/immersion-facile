@@ -13,18 +13,18 @@ const config = AppConfig.createFromEnv();
 const axiosHttpClient = createPeAxiosSharedClient(config);
 
 const referencielAgencesPE = new HttpPeAgenciesReferential(
-  config.peApiUrl,
+  config.ftApiUrl,
   new HttpFranceTravailGateway(
     axiosHttpClient,
     new InMemoryCachingGateway<AccessTokenResponse>(
       new RealTimeGateway(),
       "expires_in",
     ),
-    config.peApiUrl,
-    config.poleEmploiAccessTokenConfig,
+    config.ftApiUrl,
+    config.franceTravailAccessTokenConfig,
     noRetries,
   ),
-  config.poleEmploiClientId,
+  config.franceTravailClientId,
 );
 
 describe("HttpReferencielAgencesPe", () => {

@@ -8,21 +8,21 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 import { FranceTravailGateway } from "../ports/FranceTravailGateway";
 import { BroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
 
-type ResyncOldConventionToPeReport = {
+type ResyncOldConventionToFtReport = {
   success: number;
   skips: Record<ConventionId, string>;
   errors: Record<ConventionId, Error>;
 };
 
-export class ResyncOldConventionsToPe extends TransactionalUseCase<
+export class ResyncOldConventionsToFt extends TransactionalUseCase<
   void,
-  ResyncOldConventionToPeReport
+  ResyncOldConventionToFtReport
 > {
   protected override inputSchema = z.void();
 
   readonly #broadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
 
-  #report: ResyncOldConventionToPeReport = {
+  #report: ResyncOldConventionToFtReport = {
     errors: {},
     skips: {},
     success: 0,
@@ -34,7 +34,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
 
   constructor(
     uowPerform: UnitOfWorkPerformer,
-    poleEmploiGateway: FranceTravailGateway,
+    franceTravailGateway: FranceTravailGateway,
     timeGateway: TimeGateway,
     limit: number,
   ) {
@@ -42,7 +42,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
     this.#broadcastToFTUsecase =
       new BroadcastToFranceTravailOnConventionUpdates(
         uowPerform,
-        poleEmploiGateway,
+        franceTravailGateway,
         timeGateway,
         { resyncMode: true },
       );
@@ -54,7 +54,7 @@ export class ResyncOldConventionsToPe extends TransactionalUseCase<
   public async _execute(
     _: void,
     uow: UnitOfWork,
-  ): Promise<ResyncOldConventionToPeReport> {
+  ): Promise<ResyncOldConventionToFtReport> {
     const conventionsToSync =
       await uow.conventionsToSyncRepository.getToProcessOrError(this.#limit);
     await Promise.all(

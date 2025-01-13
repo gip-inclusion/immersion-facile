@@ -60,12 +60,12 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
+import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
+import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
+import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
-import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/pe-connect/use-cases/BindConventionToFederatedIdentity";
-import { LinkPoleEmploiAdvisorAndRedirectToConvention } from "../../domains/core/authentication/pe-connect/use-cases/LinkPoleEmploiAdvisorAndRedirectToConvention";
-import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/pe-connect/use-cases/NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
 import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
@@ -278,8 +278,8 @@ export const createUseCases = (
       getConventionsForApiConsumer: new GetConventionsForApiConsumer(
         uowPerformer,
       ),
-      linkPoleEmploiAdvisorAndRedirectToConvention:
-        new LinkPoleEmploiAdvisorAndRedirectToConvention(
+      linkFranceTravailAdvisorAndRedirectToConvention:
+        new LinkFranceTravailAdvisorAndRedirectToConvention(
           uowPerformer,
           gateways.peConnectGateway,
           config.immersionFacileBaseUrl,
@@ -535,8 +535,8 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
         config.immersionFacileDomain,
       ),
-      notifyPoleEmploiUserAdvisorOnConventionFullySigned:
-        new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
+      notifyFranceTravailUserAdvisorOnConventionFullySigned:
+        new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
           uowPerformer,
           saveNotificationAndRelatedEvent,
           generateConventionMagicLinkUrl,
@@ -551,10 +551,10 @@ export const createUseCases = (
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      broadcastToPoleEmploiOnConventionUpdates:
+      broadcastToFranceTravailOnConventionUpdates:
         new BroadcastToFranceTravailOnConventionUpdates(
           uowPerformer,
-          gateways.poleEmploiGateway,
+          gateways.franceTravailGateway,
           gateways.timeGateway,
           { resyncMode: false },
         ),

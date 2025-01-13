@@ -20,11 +20,30 @@ import {
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
 import { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
-import { NotifyPoleEmploiUserAdvisorOnConventionFullySigned } from "./NotifyPoleEmploiUserAdvisorOnConventionFullySigned";
+import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "./NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 
-describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
+describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
+  const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const advisor: FtConnectImmersionAdvisorDto = {
+    email: "elsa.oldenburg@pole-emploi.net",
+    firstName: "Elsa",
+    lastName: "Oldenburg",
+    type: "CAPEMPLOI",
+  };
+  const userAdvisorDto: FtUserAndAdvisor = {
+    advisor,
+    user: {
+      peExternalId: userPeExternalId,
+      email: "",
+      firstName: "",
+      isJobseeker: true,
+      lastName: "",
+    },
+  };
+
   let uow: InMemoryUnitOfWork;
-  let usecase: NotifyPoleEmploiUserAdvisorOnConventionFullySigned;
+  let notifyFranceTravailUserAdvisorOnConventionFullySigned: NotifyFranceTravailUserAdvisorOnConventionFullySigned;
   let agency: AgencyWithUsersRights;
   const timeGateway = new CustomTimeGateway();
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
@@ -42,12 +61,13 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       timeGateway,
     );
 
-    usecase = new NotifyPoleEmploiUserAdvisorOnConventionFullySigned(
-      new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
-      fakeGenerateMagicLinkUrlFn,
-      timeGateway,
-    );
+    notifyFranceTravailUserAdvisorOnConventionFullySigned =
+      new NotifyFranceTravailUserAdvisorOnConventionFullySigned(
+        new InMemoryUowPerformer(uow),
+        saveNotificationAndRelatedEvent,
+        fakeGenerateMagicLinkUrlFn,
+        timeGateway,
+      );
   });
 
   it("should resolve to undefined if the convention France Travail OAuth advisor is not found", async () => {
@@ -57,7 +77,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .build();
 
     expect(
-      await usecase.execute({ convention: conventionDtoFromEvent }),
+      await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({
+        convention: conventionDtoFromEvent,
+      }),
     ).toBeUndefined();
   });
 
@@ -79,7 +101,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .build();
 
     uow.conventionRepository.setConventions([conventionDtoFromEvent]);
-    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [
         {
           peExternalId: userAdvisorDto.user.peExternalId,
@@ -90,7 +112,9 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       ],
     );
 
-    await usecase.execute({ convention: conventionDtoFromEvent });
+    await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({
+      convention: conventionDtoFromEvent,
+    });
 
     expectSavedNotificationsAndEvents({
       emails: [
@@ -144,7 +168,7 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       .build();
 
     uow.conventionRepository.setConventions([conventionDtoFromEvent]);
-    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [
         {
           advisor: undefined,
@@ -155,29 +179,12 @@ describe("NotifyPoleEmploiUserAdvisorOnConventionFullySigned", () => {
       ],
     );
 
-    await usecase.execute({ convention: conventionDtoFromEvent });
+    await notifyFranceTravailUserAdvisorOnConventionFullySigned.execute({
+      convention: conventionDtoFromEvent,
+    });
 
     expectSavedNotificationsAndEvents({
       emails: [],
     });
   });
 });
-
-const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const advisor: FtConnectImmersionAdvisorDto = {
-  email: "elsa.oldenburg@pole-emploi.net",
-  firstName: "Elsa",
-  lastName: "Oldenburg",
-  type: "CAPEMPLOI",
-};
-const userAdvisorDto: FtUserAndAdvisor = {
-  advisor,
-  user: {
-    peExternalId: userPeExternalId,
-    email: "",
-    firstName: "",
-    isJobseeker: true,
-    lastName: "",
-  },
-};

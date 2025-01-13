@@ -13,7 +13,7 @@ import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/mag
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { FtConnectImmersionAdvisorDto } from "../../../core/authentication/pe-connect/dto/FtConnectAdvisor.dto";
+import { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -67,7 +67,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
       return;
     }
     const conventionAdvisorEntity =
-      await uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+      await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
         convention.id,
       );
     const peAdvisor = conventionAdvisorEntity?.advisor;

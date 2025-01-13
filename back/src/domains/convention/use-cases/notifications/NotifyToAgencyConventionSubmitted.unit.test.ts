@@ -16,7 +16,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/FtConnect.dto";
+import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -308,7 +308,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       .withFederatedIdentity(peIdentity)
       .build();
 
-    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [
         {
           conventionId: validConvention.id,
@@ -421,7 +421,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       conventionId: validConvention.id,
     };
 
-    uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+    uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [userConventionAdvisor],
     );
 

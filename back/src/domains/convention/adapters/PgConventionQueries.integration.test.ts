@@ -208,11 +208,11 @@ describe("Pg implementation of ConventionQueries", () => {
   });
 
   describe("PG implementation of method getConventionsByScope", () => {
-    let poleEmploiConvention: ConventionReadDto;
+    let franceTravailConvention: ConventionReadDto;
     let cciConvention: ConventionReadDto;
 
     beforeEach(async () => {
-      poleEmploiConvention = await insertAgencyAndConvention({
+      franceTravailConvention = await insertAgencyAndConvention({
         conventionId: conventionIdA,
         agencyId: agencyIdA,
         agencyName: "agency PE",
@@ -283,7 +283,7 @@ describe("Pg implementation of ConventionQueries", () => {
           filters: {},
         });
 
-        expectToEqual(result, [cciConvention, poleEmploiConvention]);
+        expectToEqual(result, [cciConvention, franceTravailConvention]);
       });
 
       it("return conventions matching agencyKinds and status", async () => {
@@ -297,7 +297,7 @@ describe("Pg implementation of ConventionQueries", () => {
           },
         });
 
-        expectToEqual(result, [poleEmploiConvention]);
+        expectToEqual(result, [franceTravailConvention]);
       });
     });
 
@@ -323,7 +323,7 @@ describe("Pg implementation of ConventionQueries", () => {
           filters: {},
         });
 
-        expectToEqual(result, [cciConvention, poleEmploiConvention]);
+        expectToEqual(result, [cciConvention, franceTravailConvention]);
       });
     });
 

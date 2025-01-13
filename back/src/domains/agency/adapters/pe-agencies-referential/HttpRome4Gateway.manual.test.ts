@@ -23,15 +23,15 @@ describe("HttpRome4Gateway", () => {
   const franceTravailGateway = new HttpFranceTravailGateway(
     createPeAxiosSharedClient(config),
     cachingGateway,
-    config.peApiUrl,
-    config.poleEmploiAccessTokenConfig,
+    config.ftApiUrl,
+    config.franceTravailAccessTokenConfig,
     noRetries,
   );
 
   const httpRome4Gateway = new HttpRome4Gateway(
-    createAxiosSharedClient(makeRome4Routes(config.peApiUrl), axios),
+    createAxiosSharedClient(makeRome4Routes(config.ftApiUrl), axios),
     franceTravailGateway,
-    config.poleEmploiClientId,
+    config.franceTravailClientId,
   );
 
   it("fetches the updated list of romes", async () => {

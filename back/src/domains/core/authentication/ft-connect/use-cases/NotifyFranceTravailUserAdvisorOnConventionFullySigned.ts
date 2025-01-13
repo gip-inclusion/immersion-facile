@@ -6,7 +6,7 @@ import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 
-export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends TransactionalUseCase<WithConventionDto> {
+export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -33,7 +33,7 @@ export class NotifyPoleEmploiUserAdvisorOnConventionFullySigned extends Transact
     uow: UnitOfWork,
   ): Promise<void> {
     const [conventionPeAdvisor, convention] = await Promise.all([
-      uow.conventionPoleEmploiAdvisorRepository.getByConventionId(
+      uow.conventionFranceTravailAdvisorRepository.getByConventionId(
         conventionFromEvent.id,
       ),
       uow.conventionRepository.getById(conventionFromEvent.id),

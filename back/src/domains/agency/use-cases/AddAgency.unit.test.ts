@@ -209,14 +209,14 @@ describe("AddAgency use case", () => {
     });
 
     it("uses default questionnaire url when none is provided", async () => {
-      const poleEmploiParis: CreateAgencyDto = {
+      const franceTravailParis: CreateAgencyDto = {
         ...createParisMissionLocaleParams,
       };
 
       uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
 
-      await addAgency.execute(poleEmploiParis);
+      await addAgency.execute(franceTravailParis);
 
       const newValidator: User = {
         id: uuids[0],
@@ -238,7 +238,7 @@ describe("AddAgency use case", () => {
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(
           {
-            ...poleEmploiParis,
+            ...franceTravailParis,
             counsellorEmails: [],
             validatorEmails: [],
             status: "needsReview",

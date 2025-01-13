@@ -41,40 +41,40 @@ const getUseCasesByTopics = (
   FederatedIdentityBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   FederatedIdentityNotBoundToConvention: [
     useCases.notifyToAgencyConventionSubmitted,
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignature,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionSubmittedAfterModification: [
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionPartiallySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionFullySigned: [
     useCases.notifyLastSigneeThatConventionHasBeenSigned,
     useCases.notifyNewConventionNeedsReview,
-    useCases.notifyPoleEmploiUserAdvisorOnConventionFullySigned,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.notifyFranceTravailUserAdvisorOnConventionFullySigned,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionAcceptedByCounsellor: [
     useCases.notifyNewConventionNeedsReview,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionAcceptedByValidator: [
     useCases.notifyAllActorsOfFinalConventionValidation,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
     useCases.addEstablishmentLead,
     {
@@ -88,21 +88,21 @@ const getUseCasesByTopics = (
   ConventionRequiresModification: [
     useCases.notifyActorThatConventionNeedsModifications,
     useCases.broadcastToPartnersOnConventionUpdates,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
   ],
   ConventionRejected: [
     useCases.notifyAllActorsThatConventionIsRejected,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionCancelled: [
     useCases.notifyAllActorsThatConventionIsCancelled,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionDeprecated: [
     useCases.notifyAllActorsThatConventionIsDeprecated,
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
@@ -174,7 +174,7 @@ const getUseCasesByTopics = (
   //partnersConvention related
   PartnerErroredConventionMarkedAsHandled: [],
   ConventionBroadcastRequested: [
-    useCases.broadcastToPoleEmploiOnConventionUpdates,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
 });

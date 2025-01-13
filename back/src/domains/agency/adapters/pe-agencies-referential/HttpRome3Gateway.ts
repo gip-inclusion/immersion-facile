@@ -35,25 +35,25 @@ export const makeRome3Routes = (peApiUrl: AbsoluteUrl) =>
 
 export class HttpRome3Gateway implements Rome3Gateway {
   #httpClient: HttpClient<Rome4Routes>;
-  #poleEmploiGateway: FranceTravailGateway;
-  #poleEmploiClientId: string;
+  #franceTravailGateway: FranceTravailGateway;
+  #franceTravailClientId: string;
 
   constructor(
     httpClient: HttpClient<Rome4Routes>,
-    poleEmploiGateway: FranceTravailGateway,
-    poleEmploiClientId: string,
+    franceTravailGateway: FranceTravailGateway,
+    franceTravailClientId: string,
   ) {
     this.#httpClient = httpClient;
-    this.#poleEmploiGateway = poleEmploiGateway;
-    this.#poleEmploiClientId = poleEmploiClientId;
+    this.#franceTravailGateway = franceTravailGateway;
+    this.#franceTravailClientId = franceTravailClientId;
   }
 
   #getScope() {
-    return `application_${this.#poleEmploiClientId} api_romev1 nomenclatureRome`;
+    return `application_${this.#franceTravailClientId} api_romev1 nomenclatureRome`;
   }
 
   public async getAllAppellations(): Promise<AppellationWithShortLabel[]> {
-    const { access_token } = await this.#poleEmploiGateway.getAccessToken(
+    const { access_token } = await this.#franceTravailGateway.getAccessToken(
       this.#getScope(),
     );
 

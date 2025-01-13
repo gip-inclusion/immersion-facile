@@ -3,6 +3,6 @@ import { createFranceTravailRoutes } from "../../domains/convention/adapters/fra
 import { AppConfig } from "../bootstrap/appConfig";
 
 export const createPeFetchSharedClient = (config: AppConfig) => {
-  const poleEmploiRoutes = createFranceTravailRoutes(config.peApiUrl);
-  return createFetchSharedClient(poleEmploiRoutes, fetch);
+  const franceTravailRoutes = createFranceTravailRoutes(config.ftApiUrl);
+  return createFetchSharedClient(franceTravailRoutes, fetch);
 };

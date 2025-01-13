@@ -221,7 +221,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
-    const peNotification = gateways.poleEmploiGateway.notifications[0];
+    const peNotification = gateways.franceTravailGateway.notifications[0];
     expect(peNotification.id).toBe(externalId);
     expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
     expect(peNotification.originalId).toBe(convention.id);

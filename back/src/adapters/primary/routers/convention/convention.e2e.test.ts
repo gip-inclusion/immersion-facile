@@ -544,7 +544,7 @@ describe("convention e2e", () => {
 
         await eventCrawler.processNewEvents();
 
-        expectToEqual(gateways.poleEmploiGateway.notifications, [
+        expectToEqual(gateways.franceTravailGateway.notifications, [
           {
             activitesObservees: convention.immersionActivities,
             adresseImmersion: convention.immersionAddress,

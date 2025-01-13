@@ -35,7 +35,7 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    private poleEmploiGateway: FranceTravailGateway,
+    private franceTravailGateway: FranceTravailGateway,
     private timeGateway: TimeGateway,
     private options: { resyncMode: boolean },
   ) {
@@ -70,7 +70,7 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
     const externalId =
       await uow.conventionExternalIdRepository.getByConventionId(convention.id);
 
-    const poleEmploiConvention: FranceTravailConvention = {
+    const franceTravailConvention: FranceTravailConvention = {
       id: externalId ?? "no-external-id",
       originalId: convention.id,
       peConnectId: beneficiary.federatedIdentity?.token,
@@ -118,10 +118,9 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
       fonctionTuteur: convention.establishmentTutor.job,
     };
 
-    const response =
-      await this.poleEmploiGateway.notifyOnConventionUpdated(
-        poleEmploiConvention,
-      );
+    const response = await this.franceTravailGateway.notifyOnConventionUpdated(
+      franceTravailConvention,
+    );
 
     if (this.options.resyncMode)
       await uow.conventionsToSyncRepository.save({

@@ -90,7 +90,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
         this.#commonlimiter.schedule(() =>
           createAxiosInstance(logger)
             .post(
-              `${this.#accessTokenConfig.peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+              `${this.#accessTokenConfig.ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
               querystring.stringify({
                 grant_type: "client_credentials",
                 client_id: this.#accessTokenConfig.clientId,

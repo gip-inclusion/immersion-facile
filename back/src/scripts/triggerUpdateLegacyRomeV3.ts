@@ -40,15 +40,15 @@ const main = async () => {
   const franceTravailGateway = new HttpFranceTravailGateway(
     createPeAxiosSharedClient(config),
     cachingGateway,
-    config.peApiUrl,
-    config.poleEmploiAccessTokenConfig,
+    config.ftApiUrl,
+    config.franceTravailAccessTokenConfig,
     noRetries,
   );
 
   const httpRome3Gateway = new HttpRome3Gateway(
-    createAxiosSharedClient(makeRome3Routes(config.peApiUrl), axios),
+    createAxiosSharedClient(makeRome3Routes(config.ftApiUrl), axios),
     franceTravailGateway,
-    config.poleEmploiClientId,
+    config.franceTravailClientId,
   );
 
   const numberOfAppellations = await db.transaction().execute(async (trx) => {

@@ -27,7 +27,7 @@ describe("Broadcasts events to France Travail", () => {
     .withKind("pole-emploi")
     .build();
 
-  let poleEmploiGateWay: InMemoryFranceTravailGateway;
+  let franceTravailGateWay: InMemoryFranceTravailGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
@@ -53,12 +53,12 @@ describe("Broadcasts events to France Travail", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    poleEmploiGateWay = new InMemoryFranceTravailGateway();
+    franceTravailGateWay = new InMemoryFranceTravailGateway();
     timeGateway = new CustomTimeGateway();
     broadcastToFranceTravailOnConventionUpdates =
       new BroadcastToFranceTravailOnConventionUpdates(
         new InMemoryUowPerformer(uow),
-        poleEmploiGateWay,
+        franceTravailGateWay,
         timeGateway,
         { resyncMode: false },
       );
@@ -74,7 +74,7 @@ describe("Broadcasts events to France Travail", () => {
       convention: conventionLinkedToSIAE,
     });
 
-    expect(poleEmploiGateWay.notifications).toHaveLength(0);
+    expect(franceTravailGateWay.notifications).toHaveLength(0);
   });
 
   it("Conventions without federated id are still sent, with their externalId", async () => {
@@ -88,15 +88,15 @@ describe("Broadcasts events to France Travail", () => {
     });
 
     // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+    expect(franceTravailGateWay.notifications).toHaveLength(1);
+    expectObjectsToMatch(franceTravailGateWay.notifications[0], {
       originalId: conventionLinkedToFTWithoutFederatedIdentity.id,
       id: externalId,
     });
   });
 
   it("If Pe returns a 404 error, we store the error in a repo", async () => {
-    poleEmploiGateWay.setNextResponse({
+    franceTravailGateWay.setNextResponse({
       status: 404,
       subscriberErrorFeedback: { message: "Ops, something is bad" },
       body: "not found",
@@ -110,7 +110,7 @@ describe("Broadcasts events to France Travail", () => {
     });
 
     // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
+    expect(franceTravailGateWay.notifications).toHaveLength(1);
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         consumerId: null,
@@ -131,7 +131,7 @@ describe("Broadcasts events to France Travail", () => {
   });
 
   it("store the broadcast feetback success in a repo", async () => {
-    poleEmploiGateWay.setNextResponse({
+    franceTravailGateWay.setNextResponse({
       status: 200,
       body: { success: true },
     });
@@ -197,8 +197,8 @@ describe("Broadcasts events to France Travail", () => {
     await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+    expect(franceTravailGateWay.notifications).toHaveLength(1);
+    expectObjectsToMatch(franceTravailGateWay.notifications[0], {
       id: externalId,
       peConnectId: "some-id",
       originalId: immersionConventionId,
@@ -270,8 +270,8 @@ describe("Broadcasts events to France Travail", () => {
     });
 
     // Assert
-    expect(poleEmploiGateWay.notifications).toHaveLength(1);
-    expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+    expect(franceTravailGateWay.notifications).toHaveLength(1);
+    expectObjectsToMatch(franceTravailGateWay.notifications[0], {
       id: externalId,
       originalId: conventionLinkedToAgencyReferingToOther.id,
       objectifDeImmersion: 3,
@@ -354,8 +354,8 @@ describe("Broadcasts events to France Travail", () => {
             convention,
           });
 
-          expect(poleEmploiGateWay.notifications).toHaveLength(1);
-          expectObjectsToMatch(poleEmploiGateWay.notifications[0], {
+          expect(franceTravailGateWay.notifications).toHaveLength(1);
+          expectObjectsToMatch(franceTravailGateWay.notifications[0], {
             siret: convention.siret,
             typeAgence: agencyKind,
           });
@@ -394,7 +394,7 @@ describe("Broadcasts events to France Travail", () => {
           });
 
           // Assert
-          expect(poleEmploiGateWay.notifications).toHaveLength(0);
+          expect(franceTravailGateWay.notifications).toHaveLength(0);
         });
       },
     );
@@ -436,7 +436,7 @@ describe("Broadcasts events to France Travail", () => {
             convention: convention,
           });
 
-          expect(poleEmploiGateWay.notifications).toHaveLength(0);
+          expect(franceTravailGateWay.notifications).toHaveLength(0);
         });
       },
     );

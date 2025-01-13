@@ -16,7 +16,7 @@ import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/pe-connect/dto/FtConnect.dto";
+import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
@@ -296,7 +296,7 @@ describe("NotifyConventionNeedsReview", () => {
         conventionId: conventionInReviewWithPeAdvisor.id,
       };
 
-      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 
@@ -363,7 +363,7 @@ describe("NotifyConventionNeedsReview", () => {
         conventionId: conventionInReviewWithPeAdvisor.id,
       };
 
-      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 
@@ -632,7 +632,7 @@ describe("NotifyConventionNeedsReview", () => {
         conventionId: conventionAcceptedByCounsellorWithPeAdvisor.id,
       };
 
-      uow.conventionPoleEmploiAdvisorRepository.setConventionPoleEmploiUsersAdvisor(
+      uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 

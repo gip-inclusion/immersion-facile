@@ -31,7 +31,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   }
 
   //test purposes only
-  public get conventionPoleEmploiUsersAdvisors() {
+  public get conventionFranceTravailUsersAdvisors() {
     return this.#conventionFranceTravailUsersAdvisors;
   }
 
@@ -55,11 +55,11 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   }
 
   //test purposes only
-  public setConventionPoleEmploiUsersAdvisor(
-    conventionPoleEmploiUserAdvisorEntities: ConventionFtUserAdvisorEntity[],
+  public setConventionFranceTravailUsersAdvisor(
+    conventionFranceTravailUserAdvisorEntities: ConventionFtUserAdvisorEntity[],
   ) {
     this.#conventionFranceTravailUsersAdvisors =
-      conventionPoleEmploiUserAdvisorEntities;
+      conventionFranceTravailUserAdvisorEntities;
   }
 
   async #getAlreadyOpenIfExist(
@@ -88,13 +88,13 @@ export const CONVENTION_ID_DEFAULT_UUID =
 
 const matchPeExternalId =
   (peExternalId: string) =>
-  (conventionPoleEmploiUserAdvisor: ConventionFtUserAdvisorEntity) =>
-    conventionPoleEmploiUserAdvisor.peExternalId === peExternalId;
+  (conventionFranceTravailUserAdvisor: ConventionFtUserAdvisorEntity) =>
+    conventionFranceTravailUserAdvisor.peExternalId === peExternalId;
 
 const matchConventionId =
   (conventionId: string) =>
-  (conventionPoleEmploiUserAdvisor: ConventionFtUserAdvisorEntity) =>
-    conventionPoleEmploiUserAdvisor.conventionId === conventionId;
+  (conventionFranceTravailUserAdvisor: ConventionFtUserAdvisorEntity) =>
+    conventionFranceTravailUserAdvisor.conventionId === conventionId;
 
 const isOpenEntity = (entity: ConventionFtUserAdvisorEntity) =>
   entity.conventionId === CONVENTION_ID_DEFAULT_UUID;

@@ -19,7 +19,7 @@ import {
 import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
-describe("HttpPoleEmploiGateway", () => {
+describe("HttpFranceTravailGateway", () => {
   it.each([
     {
       testMessage: "the email exists in PE but the dateNaissance is wrong",
@@ -57,18 +57,20 @@ describe("HttpPoleEmploiGateway", () => {
   ] satisfies TestCase[])(
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
-      const httpPoleEmploiGateway = new HttpFranceTravailGateway(
+      const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createPeAxiosSharedClient(config),
         cachingGateway,
-        config.peApiUrl,
-        config.poleEmploiAccessTokenConfig,
+        config.ftApiUrl,
+        config.franceTravailAccessTokenConfig,
         noRetries,
       );
 
-      const response = await httpPoleEmploiGateway.notifyOnConventionUpdated({
-        ...peConvention,
-        ...fields,
-      });
+      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
+        {
+          ...ftConvention,
+          ...fields,
+        },
+      );
 
       if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
         throw new Error("Should not occurs");
@@ -110,18 +112,20 @@ describe("HttpPoleEmploiGateway", () => {
   ] satisfies TestCase[])(
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
-      const httpPoleEmploiGateway = new HttpFranceTravailGateway(
+      const httpFranceTravailGateway = new HttpFranceTravailGateway(
         createPeAxiosSharedClient(config),
         cachingGateway,
-        config.peApiUrl,
-        config.poleEmploiAccessTokenConfig,
+        config.ftApiUrl,
+        config.franceTravailAccessTokenConfig,
         noRetries,
       );
 
-      const response = await httpPoleEmploiGateway.notifyOnConventionUpdated({
-        ...peConvention,
-        ...fields,
-      });
+      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
+        {
+          ...ftConvention,
+          ...fields,
+        },
+      );
 
       if (!isBroadcastResponseOk(expected))
         throw new Error("Should not occurs");
@@ -145,14 +149,14 @@ describe("HttpPoleEmploiGateway", () => {
 
     const accessTokenConfig: AccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      peApiUrl,
-      peAuthCandidatUrl: "https://",
-      peEnterpriseUrl,
+      ftApiUrl: peApiUrl,
+      ftAuthCandidatUrl: "https://",
+      ftEnterpriseUrl: peEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
 
-    const poleEmploiGateway = new HttpFranceTravailGateway(
+    const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
       peApiUrl,
@@ -171,7 +175,7 @@ describe("HttpPoleEmploiGateway", () => {
       .timeout();
 
     const response =
-      await poleEmploiGateway.notifyOnConventionUpdated(peConvention);
+      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw new Error("PE broadcast OK must not occurs");
@@ -198,14 +202,14 @@ describe("HttpPoleEmploiGateway", () => {
 
     const accessTokenConfig: AccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      peApiUrl,
-      peAuthCandidatUrl: "https://",
-      peEnterpriseUrl,
+      ftApiUrl: peApiUrl,
+      ftAuthCandidatUrl: "https://",
+      ftEnterpriseUrl: peEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
 
-    const poleEmploiGateway = new HttpFranceTravailGateway(
+    const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
       peApiUrl,
@@ -224,7 +228,7 @@ describe("HttpPoleEmploiGateway", () => {
       .reply(204, { message: "yolo" });
 
     const response =
-      await poleEmploiGateway.notifyOnConventionUpdated(peConvention);
+      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw new Error("PE broadcast OK must not occurs");
@@ -245,7 +249,7 @@ const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
   "expires_in",
 );
 
-const peConvention: FranceTravailConvention = {
+const ftConvention: FranceTravailConvention = {
   activitesObservees: "Tenir une conversation client",
   originalId: "31bd445d-54fa-4b53-8875-0ada1673fe3c",
   adresseImmersion: "5 avenue du Général",

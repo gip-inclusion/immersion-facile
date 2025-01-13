@@ -53,7 +53,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
     uow: UnitOfWork,
   ): Promise<void> {
     try {
-      await uow.conventionPoleEmploiAdvisorRepository.associateConventionAndUserAdvisor(
+      await uow.conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         convention.id,
         federatedIdentity.token,
       );

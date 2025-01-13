@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
-import { PeConnectExternalRoutes } from "./peConnectApi.routes";
+import { PeConnectExternalRoutes } from "./ftConnectApi.routes";
 
 type PeConnectTargetsKind = keyof PeConnectExternalRoutes;
 
