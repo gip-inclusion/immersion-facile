@@ -1,6 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
-import { Tooltip } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { prop, propEq } from "ramda";
 import React from "react";
@@ -41,7 +39,6 @@ type AgencyAdminAutocompleteProps = {
   initialValue?: AgencyOption | undefined;
   className?: string;
   placeholder: string;
-  tooltip?: string;
 };
 
 const isOneOfTheOptionsLabel = (options: AgencyOption[], searchTerm: string) =>
@@ -51,7 +48,6 @@ export const AgencyAdminAutocomplete = ({
   title,
   className,
   placeholder = "Ex : boulangère, infirmier",
-  tooltip,
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const {
@@ -135,15 +131,6 @@ export const AgencyAdminAutocomplete = ({
               htmlFor={"search"}
             >
               {title}
-              {tooltip && tooltip !== "" && (
-                <Tooltip
-                  title={tooltip}
-                  className={fr.cx("fr-ml-1w")}
-                  placement="top"
-                >
-                  <InfoRoundedIcon />
-                </Tooltip>
-              )}
             </label>
             <input
               {...params.inputProps}

@@ -1,4 +1,5 @@
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import checkCircleIconSvg from "src/assets/img/check-circle-icon.svg";
+
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import { DayStatus } from "./utils/getDayStatus";
@@ -30,7 +31,7 @@ export const DayCircle = ({
           <div>{name}</div>
         </button>
         <div className={cx("schedule-picker__day-circle-icon")}>
-          <CheckCircleIcon sx={{ color: "#1F8D49" }} fontSize="small" />
+          <img src={checkCircleIconSvg} alt="" />
         </div>
       </div>
     );

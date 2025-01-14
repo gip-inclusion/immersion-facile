@@ -19,7 +19,6 @@
     "@codegouvfr/react-dsfr": "^1.13.2",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
-    "@mui/icons-material": "^5.8.0",
     "@mui/material": "^5.11.8",
     "@storybook/addon-actions": "7.6.20",
     "@storybook/addon-essentials": "7.6.20",

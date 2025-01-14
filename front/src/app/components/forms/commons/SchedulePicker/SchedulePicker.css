@@ -64,6 +64,10 @@
   top: -7px;
   right: 0;
 }
+.schedule-picker__day-circle-icon img {
+  width: 16px;
+  height: 16px;
+}
 .schedule-picker__row {
   display: flex;
   width: 100%;
