@@ -20,6 +20,7 @@ const simulatedUserConnected: InclusionConnectedUser = {
   dashboards: { agencies: {}, establishments: {} },
   externalId: "fake-user-external-id",
   createdAt: new Date().toISOString(),
+  isBackofficeAdmin: true,
 };
 
 export const nonExisitingAgencyId: AgencyId = "not-found-agency-id";
