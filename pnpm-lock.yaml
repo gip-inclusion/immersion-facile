@@ -246,9 +246,6 @@ importers:
       '@hookform/resolvers':
         specifier: ^2.9.11
         version: 2.9.11(react-hook-form@7.42.1(react@18.2.0))
-      '@mui/icons-material':
-        specifier: ^5.8.0
-        version: 5.8.0(@mui/material@5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.0.28)(react@18.2.0)
       '@mui/material':
         specifier: ^5.11.8
         version: 5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -432,9 +429,6 @@ importers:
       '@emotion/styled':
         specifier: ^11.10.5
         version: 11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0)
-      '@mui/icons-material':
-        specifier: ^5.8.0
-        version: 5.8.0(@mui/material@5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.0.28)(react@18.2.0)
       '@mui/material':
         specifier: ^5.11.8
         version: 5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -2629,17 +2623,6 @@ packages:
 
   '@mui/core-downloads-tracker@5.11.8':
     resolution: {integrity: sha512-n/uJRIwZAaJaROaOA4VzycxDo27cusnrRzfycnAkAP5gBndwOJQ1CXjd1Y7hJe5eorj/ukixC7IZD+qCClMCMg==}
-
-  '@mui/icons-material@5.8.0':
-    resolution: {integrity: sha512-ScwLxa0q5VYV70Jfc60V/9VD0b9SvIeZ0Jddx2Dt2pBUFFO9vKdrbt9LYiT+4p21Au5NdYIb2XSHj46CLN1v3g==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      '@mui/material': ^5.0.0
-      '@types/react': ^17.0.0 || ^18.0.0
-      react: ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
 
   '@mui/material@5.11.8':
     resolution: {integrity: sha512-MpIVmtj9VJBhPHvPWoMkfCPpmVGXT4q43PtCJsdKIdc7W9/nG3Kpqw2oWyw+UxG5xG7eLhmfRFGPKvj4/WopEQ==}
@@ -11273,14 +11256,6 @@ snapshots:
       '@types/react': 18.0.28
 
   '@mui/core-downloads-tracker@5.11.8': {}
-
-  '@mui/icons-material@5.8.0(@mui/material@5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@types/react@18.0.28)(react@18.2.0)':
-    dependencies:
-      '@babel/runtime': 7.22.5
-      '@mui/material': 5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      react: 18.2.0
-    optionalDependencies:
-      '@types/react': 18.0.28
 
   '@mui/material@5.11.8(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@emotion/styled@11.10.5(@babel/core@7.20.12)(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react@18.2.0))(@types/react@18.0.28)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
