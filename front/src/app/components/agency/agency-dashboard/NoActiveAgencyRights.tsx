@@ -12,10 +12,19 @@ export function NoActiveAgencyRights({
     <>
       <h2>Suivi de mes demandes</h2>
       <div className={fr.cx("fr-grid-row")}>
-        <div className={fr.cx("fr-col-lg-2", "fr-pr-2w")}>
-          <img src={commonIllustrations.error} alt="attention" />
+        <div
+          className={fr.cx(
+            "fr-hidden",
+            "fr-unhidden-lg",
+            "fr-col-2",
+            "fr-pr-2w",
+          )}
+        >
+          <div>
+            <img src={commonIllustrations.error} alt="attention" />
+          </div>
         </div>
-        <div className={fr.cx("fr-col-lg-10")}>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-10")}>
           <h3>
             Votre demande d'accès à {toReviewAgencyRights.length}{" "}
             {toReviewAgencyRights.length === 1 ? "organisme" : "organismes"}{" "}
