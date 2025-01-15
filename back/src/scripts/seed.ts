@@ -427,7 +427,7 @@ const conventionSeed = async (uow: UnitOfWork) => {
     createdAt: new Date().toISOString(),
     kind: "email",
     templatedContent: {
-      kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       recipients: [
         conventionWithAssessmentReadyToFill.establishmentTutor.email,
       ],

@@ -66,11 +66,41 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     rejectionJustification: string;
   };
-  BENEFICIARY_ASSESSMENT_NOTIFICATION: {
+  ASSESSMENT_AGENCY_NOTIFICATION: {
+    agencyLogoUrl: AbsoluteUrl | undefined;
+    assessmentCreationLink: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    conventionId: ConventionId;
+    internshipKind: InternshipKind;
+  };
+  ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
+    internshipKind: InternshipKind;
+  };
+  ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {
+    agencyLogoUrl: AbsoluteUrl | undefined;
+    assessmentCreationLink: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    conventionId: ConventionId;
+    establishmentTutorName: string;
+    internshipKind: InternshipKind;
+  };
+  NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+    immersionObjective: ImmersionObjective | undefined;
+    conventionId: ConventionId;
+    dateEnd: string;
+    dateStart: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    establishmentFeedback: string;
+    assessmentStatus: AssessmentStatus;
     internshipKind: InternshipKind;
   };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
@@ -161,15 +191,7 @@ export type EmailParamsByEmailType = {
     signature: string;
     requesterName: string;
   };
-  ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    conventionId: ConventionId;
-    establishmentTutorName: string;
-    assessmentCreationLink: string;
-    internshipKind: InternshipKind;
-  };
+
   ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -177,18 +199,6 @@ export type EmailParamsByEmailType = {
     appellationLabel: AppellationLabel;
     domain: string;
     mode: "3days" | "7days";
-  };
-  NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
-    immersionObjective: ImmersionObjective | undefined;
-    conventionId: ConventionId;
-    dateEnd: string;
-    dateStart: string;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    establishmentFeedback: string;
-    assessmentStatus: AssessmentStatus;
-    internshipKind: InternshipKind;
   };
   DEPRECATED_CONVENTION_NOTIFICATION: {
     beneficiaryFirstName: string;

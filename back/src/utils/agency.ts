@@ -2,6 +2,7 @@ import { toPairs } from "ramda";
 import {
   AgencyDto,
   AgencyRight,
+  AgencyRole,
   AgencyUsersRights,
   AgencyWithUsersRights,
   Email,
@@ -99,14 +100,18 @@ export const getAgencyRightByUserId = async (
   return Promise.all(
     agenciesRightsForUser.map<Promise<AgencyRight>>(
       async ({ isNotifiedByEmail, roles, agencyId }) => {
-        const agencyWithRights = await uow.agencyRepository.getById(agencyId);
-        if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
+        const agency = await uow.agencyRepository.getById(agencyId);
+        if (!agency) throw errors.agency.notFound({ agencyId });
         return {
           isNotifiedByEmail,
           roles,
           agency: toAgencyDtoForAgencyUsersAndAdmins(
-            agencyWithRights,
-            await getAgencyAdminEmails(agencyWithRights, uow),
+            agency,
+            await getAgencyEmailsByRole({
+              agency,
+              role: "agency-admin",
+              uow,
+            }),
           ),
         };
       },
@@ -136,12 +141,17 @@ export const updateRightsOnMultipleAgenciesForUser = async (
   );
 };
 
-export const getAgencyAdminEmails = async (
-  agencyWithRights: AgencyWithUsersRights,
-  uow: UnitOfWork,
-): Promise<Email[]> => {
-  const adminUserIds = toPairs(agencyWithRights.usersRights)
-    .filter(([_, rights]) => rights?.roles.includes("agency-admin"))
+export const getAgencyEmailsByRole = async ({
+  agency,
+  role,
+  uow,
+}: {
+  agency: AgencyWithUsersRights;
+  role: AgencyRole;
+  uow: UnitOfWork;
+}): Promise<Email[]> => {
+  const adminUserIds = toPairs(agency.usersRights)
+    .filter(([_, rights]) => rights?.roles.includes(role))
     .map(([id]) => id);
 
   const users = await uow.userRepository.getByIds(

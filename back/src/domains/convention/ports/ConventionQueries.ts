@@ -22,8 +22,9 @@ export type GetConventionsFilters = {
 
 export type AssessmentEmailKind = ExtractFromExisting<
   TemplatedEmail["kind"],
-  | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
-  | "BENEFICIARY_ASSESSMENT_NOTIFICATION"
+  | "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
+  | "ASSESSMENT_BENEFICIARY_NOTIFICATION"
+  | "ASSESSMENT_AGENCY_NOTIFICATION"
 >;
 
 export type GetConventionsSortBy = keyof Pick<

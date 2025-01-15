@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import {
-  getAgencyAdminEmails,
+  getAgencyEmailsByRole,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -98,7 +98,11 @@ const updateAgenciesOfGroup = async (
           : {
               agency: toAgencyDtoForAgencyUsersAndAdmins(
                 agency,
-                await getAgencyAdminEmails(agency, uow),
+                await getAgencyEmailsByRole({
+                  agency,
+                  role: "agency-admin",
+                  uow,
+                }),
               ),
               roles: ["agency-viewer"],
               isNotifiedByEmail: false,

@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import {
   AdminTabRouteName,
+  EmailType,
   EstablishmentDashboardTab,
   adminTabRouteNames,
   adminTabs,
@@ -29,7 +30,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
 
 export const openEmailInAdmin = async (
   page: Page,
-  emailType: string,
+  emailType: EmailType,
   elementIndex = 0,
 ) => {
   await goToAdminTab(page, "adminNotifications");
