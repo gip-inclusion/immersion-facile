@@ -25,6 +25,7 @@ import {
   InternshipKind,
   assessmentSchema,
   assessmentStatuses,
+  computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   hoursValueToHoursDisplayed,
@@ -261,12 +262,14 @@ const AssessmentStatusSection = ({
     }
   }, [formValues]);
 
-  const totalHours = computeTotalHours(
-    convention,
-    (numberOfMissedHoursDisplayed ?? 0) +
+  const totalHours = computeTotalHours({
+    convention: convention,
+    missedHours:
+      (numberOfMissedHoursDisplayed ?? 0) +
       (numberOfMissedMinutesDisplayed ?? 0) / 60,
-    assessmentStatus,
-  );
+    assessmentStatus: assessmentStatus,
+  });
+
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
@@ -411,27 +414,6 @@ const AssessmentStatusSection = ({
     </>
   );
 };
-
-const computeTotalHours = (
-  convention: ConventionDto,
-  missedHours: number,
-  assessmentStatus: AssessmentStatus,
-) =>
-  match(assessmentStatus)
-    .with("COMPLETED", () =>
-      hoursValueToHoursDisplayed({
-        hoursValue: convention.schedule.totalHours,
-        padWithZero: false,
-      }),
-    )
-    .with("PARTIALLY_COMPLETED", () =>
-      hoursValueToHoursDisplayed({
-        hoursValue: convention.schedule.totalHours - missedHours,
-        padWithZero: false,
-      }),
-    )
-    .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
-    .exhaustive();
 
 const AssessmentContractSection = ({
   onStepChange,

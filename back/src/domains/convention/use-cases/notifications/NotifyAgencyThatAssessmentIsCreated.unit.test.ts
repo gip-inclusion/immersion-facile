@@ -1,7 +1,9 @@
 import {
   AgencyDtoBuilder,
   AssessmentDto,
+  AssessmentStatus,
   ConventionDtoBuilder,
+  ExtractFromExisting,
   InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -29,13 +31,22 @@ const validator = new InclusionConnectedUserBuilder()
   .buildUser();
 const convention = new ConventionDtoBuilder()
   .withAgencyId(agency.id)
+  .withDateStart(new Date("2025-01-01").toISOString())
+  .withDateStart(new Date("2025-01-15").toISOString())
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
 
-const assessment: AssessmentDto = {
+const assessment: Extract<
+  AssessmentDto,
+  {
+    status: ExtractFromExisting<AssessmentStatus, "PARTIALLY_COMPLETED">;
+  }
+> = {
   endedWithAJob: false,
   conventionId: convention.id,
-  status: "COMPLETED",
+  status: "PARTIALLY_COMPLETED",
+  lastDayOfPresence: new Date("2025-01-07").toISOString(),
+  numberOfMissedHours: 4,
   establishmentFeedback: "osef",
   establishmentAdvices: "osef",
 };
@@ -106,18 +117,16 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          kind: "NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION",
+          kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
           params: {
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
-            dateStart: convention.dateStart,
-            dateEnd: convention.dateEnd,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
-            establishmentFeedback: assessment.establishmentFeedback,
-            assessmentStatus: assessment.status,
             internshipKind: convention.internshipKind,
+            assessment,
+            numberOfHoursMade: "1000hours",
           },
           recipients: [validator.email, validator2.email],
         },

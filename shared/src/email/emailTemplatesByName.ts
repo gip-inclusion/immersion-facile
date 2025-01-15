@@ -156,53 +156,70 @@ export const emailTemplatesByName =
         subContent: defaultSignature(internshipKind),
       }),
     },
-    NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+    ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
       niceName:
-        "Bilan - Convention - Notification de création du bilan à l'agence",
-      tags: ["bilan_créé_prescripteur_confirmation"],
+        "Bilan - Prescripteurs - Notification de création du bilan à l'agence",
+      tags: ["bilan_complet_créé_prescripteur_confirmation"],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
         conventionId,
-        dateEnd,
-        dateStart,
-        establishmentFeedback,
         immersionObjective,
-        assessmentStatus,
         internshipKind,
-      }) => ({
-        subject: `Pour information : évaluation ${
-          internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
-        greetings: greetingsWithConventionId(conventionId),
-        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
-          internshipKind === "immersion" ? "immersion" : "mini-stage"
-        } au sein de l'entreprise ${businessName}.
-        <ul>
-          <li>Objectif ${
+        assessment,
+        numberOfHoursMade,
+      }) => {
+        const lastDayOfPresence = assessment.lastDayOfPresence ?? "";
+        return {
+          subject: `Pour information : évaluation ${
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-          } : ${immersionObjective}</li>
-          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
-            isStringDate(dateStart)
-              ? toDisplayedDate({
-                  date: new Date(dateStart),
+          } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+          greetings: greetingsWithConventionId(conventionId),
+          content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
+            internshipKind === "immersion" ? "immersion" : "mini-stage"
+          } au sein de l'entreprise ${businessName}.
+  
+          <strong>Objectif ${
+            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } : ${immersionObjective}
+          </strong>
+          Voici les informations saisies concernant cette immersion :<!--   
+       --><ul><!--   
+         --><li>L'immersion a-t-elle bien eu lieu ? Oui</li><!--   
+         --><li>Nombre d'heures totales de l'immersion : ${numberOfHoursMade}</li><!--   
+         --><li>Date réel de fin de l'immersion : ${
+           isStringDate(lastDayOfPresence)
+             ? toDisplayedDate({
+                  date: new Date(lastDayOfPresence),
                   withHours: true,
                 })
-              : "DATE INVALIDE"
-          } au ${
-            isStringDate(dateEnd)
-              ? toDisplayedDate({
-                  date: new Date(dateEnd),
-                  withHours: true,
-                })
-              : "DATE INVALIDE"
-          } : ${assessmentStatus === "COMPLETED" ? "oui" : "non"}</li>
-          <li>Retour de l'entreprise : ${establishmentFeedback}</li>
-        </ul>
-        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,
-        subContent: defaultSignature("immersion"),
-      }),
+             : "DATE INVALIDE"
+         }
+          </ul>
+          <strong>Résultats de l'immersion :</strong><!--   
+       --><ul><!--   
+           --><li>Embauche : ${assessment.endedWithAJob ? "Oui" : "Non"}</li><!--          
+           -->${
+             assessment.endedWithAJob
+               ? `<!--          
+             --><li>Date d'embauche : ${toDisplayedDate({
+               date: new Date(assessment.contractStartDate),
+             })}</li><!--   
+             --><li>Type de contrat : ${assessment.typeOfContract}</li>`
+               : ""
+           }
+          </ul>
+          <strong>Appréciation générale : </strong>
+          ${assessment.establishmentFeedback}
+          
+          <strong>Conseils pour la suite : </strong>
+          ${assessment.establishmentAdvices}
+          
+          La fiche bilan a également été communiquée au candidat.`,
+          subContent: defaultSignature(internshipKind),
+        };
+      },
     },
     TEST_EMAIL: {
       niceName: "Email de test Immersion Facilitée",
@@ -362,7 +379,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -431,7 +448,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -496,7 +513,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -596,7 +613,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -651,7 +668,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
