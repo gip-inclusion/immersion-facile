@@ -414,7 +414,7 @@ export const SearchPage = ({
                 defaultValue="France entière"
                 id={domElementIds.search.locationFilterTag}
                 iconId="fr-icon-map-pin-2-fill"
-                values={place ? [place] : []}
+                values={place ? [`${place} (${distanceKm}km)`] : []}
                 onReset={() => {
                   const updatedValues: SearchPageParams =
                     tempValue.sortedBy === "distance"
