@@ -6,7 +6,6 @@ export type AbsoluteUrl = `${Http}${string}`;
 
 export const absoluteUrlSchema: z.Schema<AbsoluteUrl> = z
   .string()
-  .toLowerCase()
   .trim()
   .regex(
     /^https?:\/\/.+?$/,

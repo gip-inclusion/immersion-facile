@@ -1,4 +1,9 @@
-import { callbackUrlSchema, toAbsoluteUrl } from "./AbsoluteUrl";
+import {
+  AbsoluteUrl,
+  absoluteUrlSchema,
+  callbackUrlSchema,
+  toAbsoluteUrl,
+} from "./AbsoluteUrl";
 
 describe("toAbsoluteUrl conversion", () => {
   const urlsToCheck = [
@@ -20,6 +25,14 @@ describe("toAbsoluteUrl conversion", () => {
 
   it.each(urlsToCheck)("url %s should equal to %s", (url, expectedUrl) => {
     expect(toAbsoluteUrl(url)).toBe(expectedUrl);
+  });
+});
+
+describe("absolutUrlSchema", () => {
+  it("", () => {
+    const urlWithJWT: AbsoluteUrl =
+      "http://url.com/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    expect(absoluteUrlSchema.parse(urlWithJWT)).toBe(urlWithJWT);
   });
 });
 
