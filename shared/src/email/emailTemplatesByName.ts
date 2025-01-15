@@ -35,6 +35,175 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    ASSESSMENT_AGENCY_NOTIFICATION: {
+      niceName: "Bilan - Prescripteurs - Lien de création du bilan",
+      tags: ["bilan_prescripteur_formulaireBilan"],
+      createEmailVariables: ({
+        agencyLogoUrl,
+        assessmentCreationLink,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        internshipKind,
+      }) => ({
+        subject: `Immersion Facilitée - Bilan disponible pour l'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `
+      ${
+        internshipKind === "immersion"
+          ? "L'immersion professionnelle"
+          : "Le mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de l’entreprise ${businessName} est en passe de s'achever.
+
+      Nous venons d’envoyer le bilan de l’immersion à l’entreprise. Vous pouvez, si vous le souhaitez, les contacter par téléphone pour les accompagner dans la saisie du bilan.
+      `,
+        buttons: [
+          {
+            label: "Formulaire de bilan",
+            url: assessmentCreationLink,
+          },
+        ],
+        subContent: `
+      Ces informations sont importantes pour la suite du parcours professionnel de BENEFICIARY_FIRST_NAME BENEFICIARY_LAST_NAME.    
+      ${defaultSignature(internshipKind)}
+      `,
+        agencyLogoUrl,
+      }),
+    },
+    ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {
+      niceName: "Bilan - Entreprise - Lien de creation du bilan",
+      tags: ["bilan_entreprise_formulaireBilan"],
+      createEmailVariables: ({
+        agencyLogoUrl,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        conventionId,
+        establishmentTutorName,
+        assessmentCreationLink,
+        internshipKind,
+      }) => ({
+        subject:
+          internshipKind === "immersion"
+            ? "Comment s'est déroulée l'immersion ?"
+            : "Mini Stage - Comment s'est déroulé le mini stage ?",
+        greetings: greetingsWithConventionId(
+          conventionId,
+          establishmentTutorName,
+        ),
+        content: `
+      ${
+        internshipKind === "immersion"
+          ? "L'immersion professionnelle"
+          : "Le mini stage"
+      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
+
+      Nous vous remercions de votre accueil. 
+
+      Pouvez-vous indiquer si ${
+        internshipKind ? "cette immersion" : "ce mini stage"
+      } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
+        buttons: [
+          {
+            label: `Evaluer ${
+              internshipKind === "immersion"
+                ? "cette immersion"
+                : "ce mini stage"
+            }`,
+            url: assessmentCreationLink,
+          },
+        ],
+        subContent: `
+      Ces informations sont importantes pour la suite de son parcours professionnel. 
+
+      En cas de difficulté, prévenez au plus vite la structure d’accompagnement pour que vous soyez conseillé au mieux.
+       
+      Merci  !      
+      ${defaultSignature(internshipKind)}
+      `,
+        agencyLogoUrl,
+      }),
+    },
+    ASSESSMENT_BENEFICIARY_NOTIFICATION: {
+      niceName: "Bilan - Bénéficiaire - Accompagnement au remplissage",
+      tags: ["bilan_bénéficiaire_accompagnementBilan"],
+      createEmailVariables: ({
+        conventionId,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        internshipKind,
+      }) => ({
+        subject: `Remplissez le bilan de fin ${
+          internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
+        } avec votre tuteur`,
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${beneficiaryFirstName} ${beneficiaryLastName}`,
+        ),
+        content: `
+        Votre ${
+          internshipKind === "immersion"
+            ? "immersion professionnelle"
+            : "mini-stage"
+        } au sein de l'entreprise ${businessName} se termine.
+        
+        Prenez quelques instants avec votre tuteur : il a reçu par mail l'accès au formulaire de bilan qu'il devra compléter en votre présence.
+        Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
+        
+        À la fin de votre immersion, contactez votre conseiller pour faire part de vos impressions et finaliser ainsi votre bilan.
+        `,
+        subContent: defaultSignature(internshipKind),
+      }),
+    },
+    NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
+      niceName:
+        "Bilan - Convention - Notification de création du bilan à l'agence",
+      tags: ["bilan_créé_prescripteur_confirmation"],
+      createEmailVariables: ({
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        dateEnd,
+        dateStart,
+        establishmentFeedback,
+        immersionObjective,
+        assessmentStatus,
+        internshipKind,
+      }) => ({
+        subject: `Pour information : évaluation ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
+          internshipKind === "immersion" ? "immersion" : "mini-stage"
+        } au sein de l'entreprise ${businessName}.
+        <ul>
+          <li>Objectif ${
+            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } : ${immersionObjective}</li>
+          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
+            isStringDate(dateStart)
+              ? toDisplayedDate({
+                  date: new Date(dateStart),
+                  withHours: true,
+                })
+              : "DATE INVALIDE"
+          } au ${
+            isStringDate(dateEnd)
+              ? toDisplayedDate({
+                  date: new Date(dateEnd),
+                  withHours: true,
+                })
+              : "DATE INVALIDE"
+          } : ${assessmentStatus === "COMPLETED" ? "oui" : "non"}</li>
+          <li>Retour de l'entreprise : ${establishmentFeedback}</li>
+        </ul>
+        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     TEST_EMAIL: {
       niceName: "Email de test Immersion Facilitée",
       createEmailVariables: ({ input1, input2, url }) => ({
@@ -1035,138 +1204,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       }),
     },
 
-    BENEFICIARY_ASSESSMENT_NOTIFICATION: {
-      niceName: "Convention - Notification de bilan au bénéficiaire",
-      tags: ["notification bénéficiaire bilan de l’immersion/mini-stage"],
-      createEmailVariables: ({
-        conventionId,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        internshipKind,
-      }) => ({
-        subject: `Remplissez le bilan de fin ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
-        } avec votre tuteur`,
-        greetings: greetingsWithConventionId(
-          conventionId,
-          `${beneficiaryFirstName} ${beneficiaryLastName}`,
-        ),
-        content: `
-        Votre ${
-          internshipKind === "immersion"
-            ? "immersion professionnelle"
-            : "mini-stage"
-        } au sein de l'entreprise ${businessName} se termine.
-        
-        Prenez quelques instants avec votre tuteur : il a reçu par mail l'accès au formulaire de bilan qu'il devra compléter en votre présence.
-        Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
-        
-        À la fin de votre immersion, contactez votre conseiller pour faire part de vos impressions et finaliser ainsi votre bilan.
-        `,
-        subContent: defaultSignature(internshipKind),
-      }),
-    },
-    ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
-      niceName: "Convention - Lien de creation du bilan",
-      tags: ["notification entreprise fin de l’immersion"],
-      createEmailVariables: ({
-        agencyLogoUrl,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        conventionId,
-        establishmentTutorName,
-        assessmentCreationLink,
-        internshipKind,
-      }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Comment s'est déroulée l'immersion ?"
-            : "Mini Stage - Comment s'est déroulé le mini stage ?",
-        greetings: greetingsWithConventionId(
-          conventionId,
-          establishmentTutorName,
-        ),
-        content: `
-      ${
-        internshipKind === "immersion"
-          ? "L'immersion professionnelle"
-          : "Le mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre entreprise est en passe de s'achever. 
-
-      Nous vous remercions de votre accueil. 
-
-      Pouvez-vous indiquer si ${
-        internshipKind ? "cette immersion" : "ce mini stage"
-      } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
-        buttons: [
-          {
-            label: `Evaluer ${
-              internshipKind === "immersion"
-                ? "cette immersion"
-                : "ce mini stage"
-            }`,
-            url: assessmentCreationLink,
-          },
-        ],
-        subContent: `
-      Ces informations sont importantes pour la suite de son parcours professionnel. 
-
-      En cas de difficulté, prévenez au plus vite la structure d’accompagnement pour que vous soyez conseillé au mieux.
-       
-      Merci  !      
-      ${defaultSignature(internshipKind)}
-      `,
-        agencyLogoUrl,
-      }),
-    },
-    NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION: {
-      niceName: "Convention - Notification de création du bilan à l'agence",
-      tags: ["notification agence bilan de l’immersion"],
-      createEmailVariables: ({
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        dateEnd,
-        dateStart,
-        establishmentFeedback,
-        immersionObjective,
-        assessmentStatus,
-        internshipKind,
-      }) => ({
-        subject: `Pour information : évaluation ${
-          internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
-        greetings: greetingsWithConventionId(conventionId),
-        content: `Le tuteur de ${beneficiaryFirstName} ${beneficiaryLastName} a évalué son ${
-          internshipKind === "immersion" ? "immersion" : "mini-stage"
-        } au sein de l'entreprise ${businessName}.
-        <ul>
-          <li>Objectif ${
-            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
-          } : ${immersionObjective}</li>
-          <li>Le bénéficiaire était bien présent aux dates prévues sur la convention, du ${
-            isStringDate(dateStart)
-              ? toDisplayedDate({
-                  date: new Date(dateStart),
-                  withHours: true,
-                })
-              : "DATE INVALIDE"
-          } au ${
-            isStringDate(dateEnd)
-              ? toDisplayedDate({
-                  date: new Date(dateEnd),
-                  withHours: true,
-                })
-              : "DATE INVALIDE"
-          } : ${assessmentStatus === "COMPLETED" ? "oui" : "non"}</li>
-          <li>Retour de l'entreprise : ${establishmentFeedback}</li>
-        </ul>
-        La fiche bilan a également été communiquée au candidat, avec pour instructions de la remplir et vous la renvoyer par email.`,
-        subContent: defaultSignature("immersion"),
-      }),
-    },
     AGENCY_OF_TYPE_OTHER_ADDED: {
       niceName: "Délégation - Agence de type autre ajoutée",
       tags: ["Agence de type autre ajoutée"],
@@ -1771,7 +1808,7 @@ const greetingsWithConventionId = (
 ): string =>
   `<strong>Identifiant de la convention : ${conventionId}</strong>
         
-Bonjour ${actor ?? ""},`;
+Bonjour${actor ? ` ${actor}` : ""},`;
 
 const descriptionByRole: Record<AgencyRole, string> = {
   validator:

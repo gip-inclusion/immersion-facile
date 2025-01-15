@@ -51,10 +51,10 @@ describe("Pg implementation of ConventionQueries", () => {
     createdAt: Date;
     convention: ConventionDto;
     emailKind:
-      | "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+      | "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
       | "VALIDATED_CONVENTION_FINAL_CONFIRMATION";
   }): EmailNotification => {
-    return emailKind === "ESTABLISHMENT_ASSESSMENT_NOTIFICATION"
+    return emailKind === "ASSESSMENT_ESTABLISHMENT_NOTIFICATION"
       ? {
           createdAt: createdAt.toISOString(),
           followedIds: {
@@ -65,7 +65,7 @@ describe("Pg implementation of ConventionQueries", () => {
           id,
           kind: "email",
           templatedContent: {
-            kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+            kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
             params: {
               internshipKind: "immersion",
               assessmentCreationLink: "fake-link",
@@ -742,7 +742,7 @@ describe("Pg implementation of ConventionQueries", () => {
       createdAt: subDays(new Date(dateEnd15), 1),
       convention:
         validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-      emailKind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      emailKind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
     });
     const conventionValidateEndingThe14thNotification: Notification =
       createNotification({
@@ -810,7 +810,7 @@ describe("Pg implementation of ConventionQueries", () => {
             from: date,
             to: addHours(date, 24),
           },
-          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         );
 
       // Assert
@@ -860,7 +860,7 @@ describe("Pg implementation of ConventionQueries", () => {
             from: subDays(validationDate, 5),
             to: addHours(validationDate, 24),
           },
-          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         );
 
       expectArraysToEqualIgnoringOrder(queryResults, [
@@ -896,7 +896,7 @@ describe("Pg implementation of ConventionQueries", () => {
             from: tomorrow,
             to: addHours(tomorrow, 24),
           },
-          "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         );
 
       expectArraysToEqualIgnoringOrder(queryResults, [pastConvention]);

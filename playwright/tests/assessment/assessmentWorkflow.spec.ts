@@ -13,7 +13,7 @@ test.describe("Assessment workflow", () => {
     await goToAdminTab(page, "adminNotifications");
     const emailWrapper = await openEmailInAdmin(
       page,
-      "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
     );
     await emailWrapper
       .locator("li")
@@ -61,7 +61,7 @@ test.describe("Assessment workflow", () => {
     await goToAdminTab(page, "adminNotifications");
     const emailWrapper = await openEmailInAdmin(
       page,
-      "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+      "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
     );
     await emailWrapper
       .locator("li")

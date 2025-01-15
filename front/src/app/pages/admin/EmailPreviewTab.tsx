@@ -266,11 +266,29 @@ export const defaultEmailValueByEmailKind: {
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
   },
-  BENEFICIARY_ASSESSMENT_NOTIFICATION: {
+  ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
+    internshipKind: "immersion",
+  },
+  ASSESSMENT_AGENCY_NOTIFICATION: {
+    agencyLogoUrl: defaultEmailPreviewUrl,
+    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    conventionId: "CONVENTION_ID",
+    internshipKind: "immersion",
+  },
+  ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {
+    agencyLogoUrl: defaultEmailPreviewUrl,
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    conventionId: "CONVENTION_ID",
+    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
+    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     internshipKind: "immersion",
   },
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
@@ -383,15 +401,6 @@ export const defaultEmailValueByEmailKind: {
     editFrontUrl: "EDIT_FRONT_URL",
     businessAddresses: ["BUSINESS_ADDRESS_1"],
     businessName: "BUSINESS_NAME",
-  },
-  ESTABLISHMENT_ASSESSMENT_NOTIFICATION: {
-    agencyLogoUrl: defaultEmailPreviewUrl,
-    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
-    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
-    conventionId: "CONVENTION_ID",
-    establishmentTutorName: "ESTABLISHMENT_TUTOR_NAME",
-    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
-    internshipKind: "immersion",
   },
   ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
     appellationLabel: "Conducteur Poids Lourd",

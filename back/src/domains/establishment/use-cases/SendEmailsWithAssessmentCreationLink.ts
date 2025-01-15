@@ -1,7 +1,10 @@
 import {
+  AgencyRole,
+  AgencyWithUsersRights,
   ConventionDto,
   ConventionId,
   DateRange,
+  Email,
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
@@ -9,10 +12,14 @@ import {
 } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { getAgencyEmailsByRole } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import {
+  NotificationContentAndFollowedIds,
+  SaveNotificationAndRelatedEvent,
+} from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -67,7 +74,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         params.conventionEndDate,
-        "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+        "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       );
 
     logger.info({
@@ -80,12 +87,11 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(
       conventions.map(async (convention) => {
-        await this.#sendOneEmailWithAssessmentCreationLink(
-          uow,
-          convention,
-        ).catch((error) => {
-          errors[convention.id] = castError(error);
-        });
+        await this.#sendEmailsWithAssessmentCreationLink(uow, convention).catch(
+          (error) => {
+            errors[convention.id] = castError(error);
+          },
+        );
       }),
     );
 
@@ -95,7 +101,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     };
   }
 
-  async #sendOneEmailWithAssessmentCreationLink(
+  async #sendEmailsWithAssessmentCreationLink(
     uow: UnitOfWork,
     convention: ConventionDto,
   ) {
@@ -103,10 +109,104 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    await this.#saveNotificationAndRelatedEvent(
+      uow,
+      this.#makeEstablishmentAssessmentEmail(convention, agency),
+    );
+
+    if (convention.internshipKind === "immersion")
+      await this.onImmersionConvention(uow, convention, agency);
+
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "EmailWithLinkToCreateAssessmentSent",
+        payload: { id: convention.id },
+      }),
+    );
+  }
+
+  private async onImmersionConvention(
+    uow: UnitOfWork,
+    convention: ConventionDto,
+    agency: AgencyWithUsersRights,
+  ) {
+    for (const validatorEmail of await getAgencyEmailsByRole({
+      agency,
+      role: "validator",
+      uow,
+    })) {
+      await this.#saveNotificationAndRelatedEvent(
+        uow,
+        await this.#makeAgencyAssessmentEmail(
+          convention,
+          agency,
+          validatorEmail,
+          "validator",
+        ),
+      );
+    }
+
+    for (const counsellorEmail of await getAgencyEmailsByRole({
+      agency,
+      role: "counsellor",
+      uow,
+    })) {
+      await this.#saveNotificationAndRelatedEvent(
+        uow,
+        await this.#makeAgencyAssessmentEmail(
+          convention,
+          agency,
+          counsellorEmail,
+          "counsellor",
+        ),
+      );
+    }
+  }
+
+  #makeAgencyAssessmentEmail(
+    convention: ConventionDto,
+    agency: AgencyWithUsersRights,
+    email: Email,
+    role: AgencyRole,
+  ): NotificationContentAndFollowedIds {
+    return {
+      followedIds: {
+        agencyId: convention.agencyId,
+        conventionId: convention.id,
+        establishmentSiret: convention.siret,
+      },
       kind: "email",
       templatedContent: {
-        kind: "ESTABLISHMENT_ASSESSMENT_NOTIFICATION",
+        kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+        params: {
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          conventionId: convention.id,
+          internshipKind: convention.internshipKind,
+          businessName: convention.businessName,
+          agencyLogoUrl: agency.logoUrl ?? undefined,
+          assessmentCreationLink: this.#generateConventionMagicLinkUrl({
+            id: convention.id,
+            email,
+            role,
+            targetRoute: frontRoutes.assessment,
+            now: this.#timeGateway.now(),
+          }),
+        },
+        recipients: [email],
+        sender: immersionFacileNoReplyEmailSender,
+      },
+    };
+  }
+
+  #makeEstablishmentAssessmentEmail(
+    convention: ConventionDto,
+    agency: AgencyWithUsersRights,
+  ): NotificationContentAndFollowedIds {
+    return {
+      kind: "email",
+      templatedContent: {
+        kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         recipients: [convention.establishmentTutor.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {
@@ -130,13 +230,6 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
         agencyId: convention.agencyId,
         establishmentSiret: convention.siret,
       },
-    });
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "EmailWithLinkToCreateAssessmentSent",
-        payload: { id: convention.id },
-      }),
-    );
+    };
   }
 }

@@ -98,7 +98,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     expectSavedNotificationsAndEvents({
       emails: [
         {
-          kind: "BENEFICIARY_ASSESSMENT_NOTIFICATION",
+          kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
           params: {
             conventionId: conventionEndingTomorrow.id,
             beneficiaryLastName:
@@ -138,7 +138,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     const signatories = conventionEndingTomorrow.signatories;
 
     const email: TemplatedEmail = {
-      kind: "BENEFICIARY_ASSESSMENT_NOTIFICATION",
+      kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
       params: {
         internshipKind: "immersion",
         beneficiaryFirstName: signatories.beneficiary.firstName,

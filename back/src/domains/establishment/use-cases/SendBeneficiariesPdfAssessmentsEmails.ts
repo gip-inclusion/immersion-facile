@@ -55,7 +55,7 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         params.conventionEndDate,
-        "BENEFICIARY_ASSESSMENT_NOTIFICATION",
+        "ASSESSMENT_BENEFICIARY_NOTIFICATION",
       );
     const errors: Record<ConventionId, Error> = {};
     await Promise.all(
@@ -97,7 +97,7 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
-        kind: "BENEFICIARY_ASSESSMENT_NOTIFICATION",
+        kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
         recipients: [convention.signatories.beneficiary.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {
