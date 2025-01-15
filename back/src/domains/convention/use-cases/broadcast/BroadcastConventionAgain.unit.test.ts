@@ -11,7 +11,7 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -124,7 +124,7 @@ describe("BroadcastConventionAgain", () => {
         "trigger ConventionBroadcastAgain event with the whole convention in payload",
         async (user) => {
           uow.broadcastFeedbacksRepository.save({
-            serviceName: broadcastToPeServiceName,
+            serviceName: broadcastToFtServiceName,
             consumerId: "my-consumer-id",
             consumerName: "My consumer name",
             requestParams: {
@@ -161,7 +161,7 @@ describe("BroadcastConventionAgain", () => {
         );
 
         uow.broadcastFeedbacksRepository.save({
-          serviceName: broadcastToPeServiceName,
+          serviceName: broadcastToFtServiceName,
           consumerId: "my-consumer-id",
           consumerName: "My consumer name",
           requestParams: {
