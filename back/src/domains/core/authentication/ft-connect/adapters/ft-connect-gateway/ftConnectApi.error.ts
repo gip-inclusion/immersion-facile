@@ -1,9 +1,9 @@
 import { AxiosError } from "axios";
 import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
-import { PeConnectExternalRoutes } from "./ftConnectApi.routes";
+import { FtConnectExternalRoutes } from "./ftConnectApi.routes";
 
-type PeConnectTargetsKind = keyof PeConnectExternalRoutes;
+type FtConnectTargetsKind = keyof FtConnectExternalRoutes;
 
 class ConnectionRefusedError extends Error {
   constructor(
@@ -18,9 +18,9 @@ class ConnectionRefusedError extends Error {
 }
 
 // ! In a map the highest priority is given to the lasted entry
-export const peConnectErrorStrategy = (
+export const ftConnectErrorStrategy = (
   error: AxiosError,
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
 ) =>
   new Map<boolean, UnhandledError | RawRedirectError | ManagedRedirectError>([
     // Generic catch all Http errors
@@ -102,7 +102,7 @@ export const peConnectErrorStrategy = (
   ]);
 
 const isInvalidGrantError = (
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "exchangeCodeForAccessToken" &&
@@ -116,21 +116,21 @@ const rawRedirectTitle = (error: AxiosError) =>
   `Une erreur est survenue - ${error.response?.status ?? error.code}`;
 
 const isGetUserInfoServerInternalError = (
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getUserInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
 const isGetUserStatusInfoServerInternalError = (
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getUserStatutInfo" &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
 
 const isAdvisorsServerInternalError = (
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
   error: AxiosError,
 ) =>
   context === "getAdvisorsInfo" &&
@@ -147,21 +147,21 @@ const makeRawRedirectError = (
 
 const isAdvisorForbiddenError = (
   error: AxiosError,
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getAdvisorsInfo";
 
 const isGetUserInfoForbiddenError = (
   error: AxiosError<any, any>,
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserInfo";
 
 const isGetUserStatusInfoForbiddenError = (
   error: AxiosError<any, any>,
-  context: PeConnectTargetsKind,
+  context: FtConnectTargetsKind,
 ): boolean =>
   error.response?.status === HTTP_STATUS.UNAUTHORIZED &&
   context === "getUserStatutInfo";

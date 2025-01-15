@@ -33,7 +33,7 @@ describe("PgConventionRepository", () => {
     phone: "+33112233445",
   };
 
-  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const userFtExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 
   const styliste: AppellationAndRomeDto = {
     romeCode: "B1805",
@@ -269,7 +269,7 @@ describe("PgConventionRepository", () => {
       })
       .withFederatedIdentity({
         provider: "peConnect",
-        token: userPeExternalId,
+        token: userFtExternalId,
         payload: {
           advisor: {
             email: "john@mail.com",
@@ -284,7 +284,7 @@ describe("PgConventionRepository", () => {
     await db
       .insertInto("partners_pe_connect")
       .values({
-        user_pe_external_id: userPeExternalId,
+        user_pe_external_id: userFtExternalId,
         convention_id: convention.id,
         email: "john@mail.com",
         firstname: "John",
@@ -303,7 +303,7 @@ describe("PgConventionRepository", () => {
       conventionRetreived?.signatories.beneficiary.federatedIdentity,
     ).toStrictEqual({
       provider: "peConnect",
-      token: userPeExternalId,
+      token: userFtExternalId,
       payload: {
         advisor: {
           email: "john@mail.com",
@@ -331,14 +331,14 @@ describe("PgConventionRepository", () => {
       })
       .withFederatedIdentity({
         provider: "peConnect",
-        token: userPeExternalId,
+        token: userFtExternalId,
       })
       .build();
 
     await db
       .insertInto("partners_pe_connect")
       .values({
-        user_pe_external_id: userPeExternalId,
+        user_pe_external_id: userFtExternalId,
         convention_id: convention.id,
         email: null,
         firstname: null,
@@ -357,7 +357,7 @@ describe("PgConventionRepository", () => {
       conventionRetreived?.signatories.beneficiary.federatedIdentity,
     ).toStrictEqual({
       provider: "peConnect",
-      token: userPeExternalId,
+      token: userFtExternalId,
     });
   });
 
@@ -428,11 +428,11 @@ describe("PgConventionRepository", () => {
   });
 
   it("Retrieves federated identity if exists", async () => {
-    const peConnectId: FtConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+    const ftConnectId: FtConnectToken = "bbbbac99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
     const convention = conventionStylisteBuilder
       .withFederatedIdentity({
         provider: "peConnect",
-        token: peConnectId,
+        token: ftConnectId,
         payload: {
           advisor: {
             email: "john@mail.com",
@@ -447,7 +447,7 @@ describe("PgConventionRepository", () => {
     await db
       .insertInto("partners_pe_connect")
       .values({
-        user_pe_external_id: peConnectId,
+        user_pe_external_id: ftConnectId,
         convention_id: convention.id,
         email: "john@mail.com",
         firstname: "John",

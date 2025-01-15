@@ -32,7 +32,7 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
     { convention: conventionFromEvent }: WithConventionDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const [conventionPeAdvisor, convention] = await Promise.all([
+    const [conventionFtAdvisor, convention] = await Promise.all([
       uow.conventionFranceTravailAdvisorRepository.getByConventionId(
         conventionFromEvent.id,
       ),
@@ -43,15 +43,15 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
 
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
 
-    if (conventionPeAdvisor?.advisor && agency)
+    if (conventionFtAdvisor?.advisor && agency)
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
-          recipients: [conventionPeAdvisor.advisor.email],
+          recipients: [conventionFtAdvisor.advisor.email],
           params: {
-            advisorFirstName: conventionPeAdvisor.advisor.firstName,
-            advisorLastName: conventionPeAdvisor.advisor.lastName,
+            advisorFirstName: conventionFtAdvisor.advisor.firstName,
+            advisorLastName: conventionFtAdvisor.advisor.lastName,
             agencyLogoUrl: agency.logoUrl ?? undefined,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -65,7 +65,7 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
               id: convention.id,
               role: "validator",
               targetRoute: frontRoutes.manageConvention,
-              email: conventionPeAdvisor.advisor.email,
+              email: conventionFtAdvisor.advisor.email,
               now: this.#timeGateway.now(),
             }),
           },

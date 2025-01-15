@@ -6,7 +6,7 @@ import { createApp } from "../config/bootstrap/server";
 import { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
 import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { InMemoryPeConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryPeConnectGateway";
+import { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
@@ -35,7 +35,7 @@ import { toAgencyWithRights } from "./agency";
 export type InMemoryGateways = {
   disconnectCache: () => Promise<void>;
   notification: InMemoryNotificationGateway;
-  peConnectGateway: InMemoryPeConnectGateway;
+  ftConnectGateway: InMemoryFtConnectGateway;
   siret: InMemorySiretGateway;
   pdfGeneratorGateway: InMemoryPdfGeneratorGateway;
   laBonneBoiteGateway: InMemoryLaBonneBoiteGateway;

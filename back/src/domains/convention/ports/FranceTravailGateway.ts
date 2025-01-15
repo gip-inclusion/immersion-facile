@@ -33,7 +33,7 @@ type ConventionStatusToFtStatus = typeof conventionStatusToFranceTravailStatus;
 type FtConventionStatus =
   ConventionStatusToFtStatus[keyof ConventionStatusToFtStatus];
 
-export type AgencyKindForPe =
+export type AgencyKindForFt =
   | Exclude<AgencyKind, "pole-emploi">
   | "france-travail";
 
@@ -67,7 +67,7 @@ export type FranceTravailConvention = {
   competencesObservees: string;
   signatureBeneficiaire: boolean;
   signatureEntreprise: boolean;
-  typeAgence: AgencyKindForPe;
+  typeAgence: AgencyKindForFt;
   nomAgence: string;
   prenomValidateurRenseigne?: string;
   nomValidateurRenseigne?: string;

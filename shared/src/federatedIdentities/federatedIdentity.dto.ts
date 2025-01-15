@@ -30,9 +30,9 @@ type GenericFederatedIdentity<
 export const authFailed = "AuthFailed";
 export const notJobSeeker = "NotJobSeeker";
 
-export type FtExternalId = Flavor<string, "PeExternalId">;
+export type FtExternalId = Flavor<string, "FtExternalId">;
 
-type PeConnectAdvisorForBeneficiary = {
+type FtConnectAdvisorForBeneficiary = {
   advisor: {
     email: string;
     firstName: string;
@@ -46,14 +46,14 @@ export type FtConnectToken =
   | typeof authFailed
   | typeof notJobSeeker;
 
-export type PeConnectIdentity = GenericFederatedIdentity<
+export type FtConnectIdentity = GenericFederatedIdentity<
   "peConnect",
   FtConnectToken,
-  PeConnectAdvisorForBeneficiary
+  FtConnectAdvisorForBeneficiary
 >;
-export const isPeConnectIdentity = (
+export const isFtConnectIdentity = (
   federatedIdentity: FederatedIdentity | undefined,
-): federatedIdentity is PeConnectIdentity =>
+): federatedIdentity is FtConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
 export type InclusionConnectIdentity = GenericFederatedIdentity<
@@ -61,4 +61,4 @@ export type InclusionConnectIdentity = GenericFederatedIdentity<
   InclusionConnectJwt
 >;
 
-export type FederatedIdentity = InclusionConnectIdentity | PeConnectIdentity;
+export type FederatedIdentity = InclusionConnectIdentity | FtConnectIdentity;

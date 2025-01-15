@@ -281,7 +281,7 @@ export const createUseCases = (
       linkFranceTravailAdvisorAndRedirectToConvention:
         new LinkFranceTravailAdvisorAndRedirectToConvention(
           uowPerformer,
-          gateways.peConnectGateway,
+          gateways.ftConnectGateway,
           config.immersionFacileBaseUrl,
         ),
 

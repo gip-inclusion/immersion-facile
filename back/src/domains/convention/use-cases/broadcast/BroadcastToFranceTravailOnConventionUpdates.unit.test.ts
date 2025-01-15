@@ -18,7 +18,7 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryFranceTravailGateway } from "../../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
-import { AgencyKindForPe } from "../../ports/FranceTravailGateway";
+import { AgencyKindForFt } from "../../ports/FranceTravailGateway";
 import { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 
 describe("Broadcasts events to France Travail", () => {
@@ -301,7 +301,7 @@ describe("Broadcasts events to France Travail", () => {
 
     describe.each([
       {
-        agencyKind: "mission-locale" as AgencyKindForPe,
+        agencyKind: "mission-locale" as AgencyKindForFt,
         featureFlag: {
           enableBroadcastOfMissionLocaleToFT: {
             kind: "boolean",
@@ -311,7 +311,7 @@ describe("Broadcasts events to France Travail", () => {
         ...createAgencyAndLinkedConvention("mission-locale"),
       },
       {
-        agencyKind: "conseil-departemental" as AgencyKindForPe,
+        agencyKind: "conseil-departemental" as AgencyKindForFt,
         featureFlag: {
           enableBroadcastOfConseilDepartementalToFT: {
             kind: "boolean",
@@ -321,7 +321,7 @@ describe("Broadcasts events to France Travail", () => {
         ...createAgencyAndLinkedConvention("conseil-departemental"),
       },
       {
-        agencyKind: "cap-emploi" as AgencyKindForPe,
+        agencyKind: "cap-emploi" as AgencyKindForFt,
         featureFlag: {
           enableBroadcastOfCapEmploiToFT: {
             kind: "boolean",
@@ -401,15 +401,15 @@ describe("Broadcasts events to France Travail", () => {
 
     describe.each([
       {
-        agencyKind: "mission-locale" as AgencyKindForPe,
+        agencyKind: "mission-locale" as AgencyKindForFt,
         ...createAgencyAndLinkedConvention("mission-locale"),
       },
       {
-        agencyKind: "conseil-departemental" as AgencyKindForPe,
+        agencyKind: "conseil-departemental" as AgencyKindForFt,
         ...createAgencyAndLinkedConvention("conseil-departemental"),
       },
       {
-        agencyKind: "cap-emploi" as AgencyKindForPe,
+        agencyKind: "cap-emploi" as AgencyKindForFt,
         ...createAgencyAndLinkedConvention("cap-emploi"),
       },
     ])(

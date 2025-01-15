@@ -43,16 +43,16 @@ describe("ResyncOldConventionsToPe use case", () => {
   let uow: InMemoryUnitOfWork;
   let useCase: ResyncOldConventionsToFt;
   let timeGateway: CustomTimeGateway;
-  let peGateway: InMemoryFranceTravailGateway;
+  let ftGateway: InMemoryFranceTravailGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
 
     timeGateway = new CustomTimeGateway();
-    peGateway = new InMemoryFranceTravailGateway();
+    ftGateway = new InMemoryFranceTravailGateway();
     useCase = new ResyncOldConventionsToFt(
       new InMemoryUowPerformer(uow),
-      peGateway,
+      ftGateway,
       timeGateway,
       100,
     );
@@ -75,7 +75,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -95,7 +95,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           processDate: timeGateway.now(),
         },
       ]);
-      expectToEqual(peGateway.notifications, [
+      expectToEqual(ftGateway.notifications, [
         conventionToConventionNotification(conventionToSync1, agencyPE),
         conventionToConventionNotification(conventionToSync2, agencyPE),
       ]);
@@ -115,7 +115,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -127,7 +127,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           processDate: timeGateway.now(),
         },
       ]);
-      expectToEqual(peGateway.notifications, [
+      expectToEqual(ftGateway.notifications, [
         conventionToConventionNotification(conventionToSync1, agencyPE),
       ]);
       expectToEqual(report, {
@@ -139,13 +139,13 @@ describe("ResyncOldConventionsToPe use case", () => {
 
     it("no convention to sync", async () => {
       uow.conventionsToSyncRepository.setForTesting([]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
       expectToEqual(uow.conventionRepository.conventions, []);
       expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, []);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
       expectToEqual(report, {
         success: 0,
         skips: {},
@@ -166,7 +166,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -179,7 +179,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           reason: "Agency is not of kind pole-emploi",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
       expectToEqual(report, {
         success: 0,
         skips: {
@@ -220,7 +220,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           processDate: subDays(timeGateway.now(), 1),
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -253,7 +253,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           processDate: subDays(timeGateway.now(), 1),
         },
       ]);
-      expectToEqual(peGateway.notifications, [
+      expectToEqual(ftGateway.notifications, [
         conventionToConventionNotification(conventionToSync1, agencyPE),
         conventionToConventionNotification(conventionToSync2, agencyPE),
       ]);
@@ -280,11 +280,11 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await new ResyncOldConventionsToFt(
         new InMemoryUowPerformer(uow),
-        peGateway,
+        ftGateway,
         timeGateway,
         1,
       ).execute();
@@ -304,7 +304,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, [
+      expectToEqual(ftGateway.notifications, [
         conventionToConventionNotification(conventionToSync1, agencyPE),
       ]);
       expectToEqual(report, {
@@ -324,7 +324,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -339,7 +339,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           }).message,
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
       expectToEqual(report, {
         success: 0,
         skips: {},
@@ -359,7 +359,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           status: "TO_PROCESS",
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
 
       const report = await useCase.execute();
 
@@ -372,7 +372,7 @@ describe("ResyncOldConventionsToPe use case", () => {
           reason: errors.agency.notFound({ agencyId: agencyPE.id }).message,
         },
       ]);
-      expectToEqual(peGateway.notifications, []);
+      expectToEqual(ftGateway.notifications, []);
       expectToEqual(report, {
         success: 0,
         skips: {},

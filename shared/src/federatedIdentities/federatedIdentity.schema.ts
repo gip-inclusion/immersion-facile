@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { PeConnectIdentity } from "./federatedIdentity.dto";
+import { FtConnectIdentity } from "./federatedIdentity.dto";
 
-export const peConnectIdentitySchema: z.Schema<PeConnectIdentity> = z.object({
+export const peConnectIdentitySchema: z.Schema<FtConnectIdentity> = z.object({
   provider: z.literal("peConnect"),
   token: z.string(),
   payload: z

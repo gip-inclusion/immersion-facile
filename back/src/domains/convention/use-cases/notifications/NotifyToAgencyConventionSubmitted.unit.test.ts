@@ -3,8 +3,8 @@ import {
   AgencyWithUsersRights,
   ConventionDto,
   ConventionDtoBuilder,
+  FtConnectIdentity,
   InclusionConnectedUserBuilder,
-  PeConnectIdentity,
   expectToEqual,
   frontRoutes,
 } from "shared";
@@ -89,7 +89,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       },
     },
   );
-  const agencyPeWithCouncellors = toAgencyWithRights(
+  const agencyFtWithCounsellors = toAgencyWithRights(
     AgencyDtoBuilder.create("agency-pe-with-councellors")
 
       .withKind("pole-emploi")
@@ -134,7 +134,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     uow.agencyRepository.agencies = [
       agencyWithOnlyValidator,
       agencyWithConsellorsAndValidator,
-      agencyPeWithCouncellors,
+      agencyFtWithCounsellors,
     ];
     uow.userRepository.users = [validator, councellor1, councellor2];
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
@@ -299,20 +299,20 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       "shortlink4",
     ];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-    const peIdentity: PeConnectIdentity = {
+    const ftIdentity: FtConnectIdentity = {
       provider: "peConnect",
       token: "123",
     };
     const validConvention = new ConventionDtoBuilder()
-      .withAgencyId(agencyPeWithCouncellors.id)
-      .withFederatedIdentity(peIdentity)
+      .withAgencyId(agencyFtWithCounsellors.id)
+      .withFederatedIdentity(ftIdentity)
       .build();
 
     uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
       [
         {
           conventionId: validConvention.id,
-          peExternalId: peIdentity.token,
+          peExternalId: ftIdentity.token,
           _entityName: "ConventionFranceTravailAdvisor",
           advisor: undefined,
         },
@@ -398,26 +398,26 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     const shortLinkIds = ["shortlink1", "shortlink2"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
-    const peAdvisorEmail = "pe-advisor@gmail.com";
-    const peIdentity: PeConnectIdentity = {
+    const ftAdvisorEmail = "ft-advisor@gmail.com";
+    const ftIdentity: FtConnectIdentity = {
       provider: "peConnect",
       token: "123",
     };
 
     const validConvention = new ConventionDtoBuilder()
-      .withAgencyId(agencyPeWithCouncellors.id)
-      .withFederatedIdentity(peIdentity)
+      .withAgencyId(agencyFtWithCounsellors.id)
+      .withFederatedIdentity(ftIdentity)
       .build();
 
     const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
       _entityName: "ConventionFranceTravailAdvisor",
       advisor: {
-        email: peAdvisorEmail,
+        email: ftAdvisorEmail,
         firstName: "Elsa",
         lastName: "Oldenburg",
         type: "CAPEMPLOI",
       },
-      peExternalId: peIdentity.token,
+      peExternalId: ftIdentity.token,
       conventionId: validConvention.id,
     };
 
@@ -434,14 +434,14 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         id: validConvention.id,
         role: "validator",
         targetRoute: frontRoutes.manageConvention,
-        email: peAdvisorEmail,
+        email: ftAdvisorEmail,
         now: timeGateway.now(),
       }),
       [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         role: "validator",
         targetRoute: frontRoutes.conventionStatusDashboard,
-        email: peAdvisorEmail,
+        email: ftAdvisorEmail,
         now: timeGateway.now(),
       }),
     });
@@ -450,7 +450,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
       emails: [
         {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          recipients: [peAdvisorEmail],
+          recipients: [ftAdvisorEmail],
           params: {
             internshipKind: validConvention.internshipKind,
             warning: undefined,

@@ -10,10 +10,10 @@ import { createConventionRouter } from "../../adapters/primary/routers/conventio
 import { createEstablishmentRouter } from "../../adapters/primary/routers/establishment/createEstablishmentRouter";
 import { createEstablishmentLeadRouter } from "../../adapters/primary/routers/establishmentLead/createEstablishmentLeadRouter";
 import { createFormCompletionRouter } from "../../adapters/primary/routers/formCompletion/createFormCompletionRouter";
+import { createFtConnectRouter } from "../../adapters/primary/routers/ftConnect/createFtConnectRouter";
 import { createInclusionConnectRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectRouter";
 import { createInclusionConnectedAllowedRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createMagicLinkRouter } from "../../adapters/primary/routers/magicLink/createMagicLinkRouter";
-import { createPeConnectRouter } from "../../adapters/primary/routers/peConnect/createPeConnectRouter";
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";
 import { createSearchRouter } from "../../adapters/primary/routers/search/createSearchRouter";
 import { createTechnicalRouter } from "../../adapters/primary/routers/technical/createTechnicalRouter";
@@ -90,7 +90,7 @@ export const createApp = async (
   app.use(createAddressRouter(deps));
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
-  app.use(createPeConnectRouter(deps));
+  app.use(createFtConnectRouter(deps));
   app.use(createInclusionConnectRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));

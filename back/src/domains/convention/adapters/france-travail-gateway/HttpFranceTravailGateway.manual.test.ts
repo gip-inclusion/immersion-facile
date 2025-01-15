@@ -7,7 +7,7 @@ import {
   AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -58,7 +58,7 @@ describe("HttpFranceTravailGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createPeAxiosSharedClient(config),
+        createFtAxiosSharedClient(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -113,7 +113,7 @@ describe("HttpFranceTravailGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createPeAxiosSharedClient(config),
+        createFtAxiosSharedClient(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -134,9 +134,9 @@ describe("HttpFranceTravailGateway", () => {
   );
 
   it("error feedback axios timeout", async () => {
-    const peApiUrl = "https://fake-pe.fr";
-    const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
-    const routes = createFranceTravailRoutes(peApiUrl);
+    const ftApiUrl = "https://fake-ft.fr";
+    const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
+    const routes = createFranceTravailRoutes(ftApiUrl);
 
     const httpClient = createAxiosSharedClient(routes, axios, {
       skipResponseValidation: true,
@@ -149,9 +149,9 @@ describe("HttpFranceTravailGateway", () => {
 
     const accessTokenConfig: AccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      ftApiUrl: peApiUrl,
+      ftApiUrl,
       ftAuthCandidatUrl: "https://",
-      ftEnterpriseUrl: peEnterpriseUrl,
+      ftEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
@@ -159,7 +159,7 @@ describe("HttpFranceTravailGateway", () => {
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
-      peApiUrl,
+      ftApiUrl,
       accessTokenConfig,
       noRetries,
     );
@@ -168,7 +168,7 @@ describe("HttpFranceTravailGateway", () => {
 
     mock
       .onPost(
-        `${peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+        `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
       .onPost(routes.broadcastConvention.url)
@@ -187,8 +187,8 @@ describe("HttpFranceTravailGateway", () => {
   });
 
   it("error feedback on bad response code", async () => {
-    const peApiUrl = "https://fake-pe.fr";
-    const peEnterpriseUrl = "https://fake-pe-enterprise.fr";
+    const peApiUrl = "https://fake-ft.fr";
+    const peEnterpriseUrl = "https://fake-ft-enterprise.fr";
     const routes = createFranceTravailRoutes(peApiUrl);
 
     const httpClient = createAxiosSharedClient(routes, axios, {

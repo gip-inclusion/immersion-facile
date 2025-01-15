@@ -3,7 +3,7 @@ import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import { FtConnectGateway } from "../../port/FtConnectGateway";
 
-export class InMemoryPeConnectGateway implements FtConnectGateway {
+export class InMemoryFtConnectGateway implements FtConnectGateway {
   #accessToken: AccessTokenDto | undefined = undefined;
 
   #advisors: FtConnectAdvisorDto[] = [];
@@ -24,14 +24,10 @@ export class InMemoryPeConnectGateway implements FtConnectGateway {
     | undefined
   > {
     if (!this.#user) return undefined;
-    const peUserAndAdvisor: {
-      user: FtConnectUserDto;
-      advisors: FtConnectAdvisorDto[];
-    } = {
+    return {
       advisors: this.#advisors,
       user: this.#user,
     };
-    return peUserAndAdvisor;
   }
 
   public setAccessToken(accessToken: AccessTokenDto) {

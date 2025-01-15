@@ -12,11 +12,11 @@ interface Rome3Gateway {
 }
 
 type Rome4Routes = ReturnType<typeof makeRome3Routes>;
-export const makeRome3Routes = (peApiUrl: AbsoluteUrl) =>
+export const makeRome3Routes = (ftApiUrl: AbsoluteUrl) =>
   defineRoutes({
     getAppellations: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/rome/v1/appellation?champs=code,libelle,libelleCourt,metier(code)`,
+      url: `${ftApiUrl}/partenaire/rome/v1/appellation?champs=code,libelle,libelleCourt,metier(code)`,
       ...withAuthorizationHeaders,
       responses: {
         200: z.array(

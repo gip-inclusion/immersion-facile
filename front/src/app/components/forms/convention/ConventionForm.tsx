@@ -33,7 +33,7 @@ import {
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
   isEstablishmentTutorIsEstablishmentRepresentative,
-  isPeConnectIdentity,
+  isFtConnectIdentity,
   keys,
   notJobSeeker,
 } from "shared";
@@ -291,7 +291,7 @@ export const ConventionForm = ({
   const shouldLockToPeAgencies = !!(
     route.name === "conventionImmersion" &&
     route.params.jwt &&
-    isPeConnectIdentity(
+    isFtConnectIdentity(
       conventionValues?.signatories.beneficiary.federatedIdentity,
     )
   );
@@ -612,7 +612,7 @@ const makeListAgencyOptionsKindFilter = ({
 }): AgencyKindFilter => {
   if (internshipKind === "mini-stage-cci") return "miniStageOnly";
   if (shouldListAll) return "miniStageExcluded";
-  return federatedIdentity && isPeConnectIdentity(federatedIdentity)
+  return federatedIdentity && isFtConnectIdentity(federatedIdentity)
     ? "immersionPeOnly"
     : "miniStageExcluded";
 };
@@ -623,7 +623,7 @@ const makeInitialBenefiaryForm = (
 ): Beneficiary<"immersion" | "mini-stage-cci"> => {
   const { federatedIdentity, ...beneficiaryOtherProperties } = beneficiary;
   const peConnectIdentity =
-    federatedIdentityWithUser && isPeConnectIdentity(federatedIdentityWithUser)
+    federatedIdentityWithUser && isFtConnectIdentity(federatedIdentityWithUser)
       ? federatedIdentityWithUser
       : undefined;
   const federatedIdentityValue = federatedIdentity ?? peConnectIdentity;

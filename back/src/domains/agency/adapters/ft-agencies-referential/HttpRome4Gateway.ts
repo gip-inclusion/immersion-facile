@@ -19,11 +19,11 @@ interface Rome4Gateway {
 }
 
 type Rome4Routes = ReturnType<typeof makeRome4Routes>;
-export const makeRome4Routes = (peApiUrl: AbsoluteUrl) =>
+export const makeRome4Routes = (ftApiUrl: AbsoluteUrl) =>
   defineRoutes({
     getRomes: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/rome-metiers/v1/metiers/metier?champs=code,libelle`,
+      url: `${ftApiUrl}/partenaire/rome-metiers/v1/metiers/metier?champs=code,libelle`,
       ...withAuthorizationHeaders,
       responses: {
         200: z.array(z.object({ code: z.string(), libelle: z.string() })),
@@ -31,7 +31,7 @@ export const makeRome4Routes = (peApiUrl: AbsoluteUrl) =>
     }),
     getAppellations: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/rome-metiers/v1/metiers/appellation?champs=code,libelle,libelleCourt,metier(code)`,
+      url: `${ftApiUrl}/partenaire/rome-metiers/v1/metiers/appellation?champs=code,libelle,libelleCourt,metier(code)`,
       ...withAuthorizationHeaders,
       responses: {
         200: z.array(

@@ -37,7 +37,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     "establishment-representativ@gmail.com";
   const beneficiaryCurrentEmployerEmail = "current@employer.com";
   const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
-  const peAdvisorEmail = "pe-advisor@pole-emploi.net";
+  const peAdvisorEmail = "ft-advisor@pole-emploi.net";
   const counsellor = new InclusionConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@email.fr")
@@ -468,7 +468,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             shortlinkId: "shortLinkId_2",
           },
         ];
-      const userPeExternalId = "i-am-an-external-id";
+      const userFtExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
         _entityName: "ConventionFranceTravailAdvisor",
         advisor: {
@@ -477,7 +477,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           lastName: "Oldenburg",
           type: "CAPEMPLOI",
         },
-        peExternalId: userPeExternalId,
+        peExternalId: userFtExternalId,
         conventionId: validConvention.id,
       };
 
@@ -559,11 +559,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             shortlinkId: "shortLinkId_6",
           },
         ];
-      const userPeExternalId = "i-am-an-external-id";
+      const userFtExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
         _entityName: "ConventionFranceTravailAdvisor",
         advisor: undefined,
-        peExternalId: userPeExternalId,
+        peExternalId: userFtExternalId,
         conventionId: validConvention.id,
       };
 

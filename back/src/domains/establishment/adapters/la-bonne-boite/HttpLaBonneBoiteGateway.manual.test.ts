@@ -4,7 +4,7 @@ import {
   AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createPeFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
+import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
@@ -51,7 +51,7 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
-    const peFetchSharedClient = createPeFetchSharedClient(config);
+    const peFetchSharedClient = createFtFetchSharedClient(config);
     laBonneBoiteGateway = new HttpLaBonneBoiteGateway(
       createFetchSharedClient(createLbbRoutes(config.ftApiUrl), fetch),
       new HttpFranceTravailGateway(

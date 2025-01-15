@@ -47,7 +47,7 @@ export interface Database {
   outbox_failures: OutboxFailures;
   outbox_publications: OutboxPublications;
   outbox: Outbox;
-  partners_pe_connect: PartnersPeConnect;
+  partners_pe_connect: PartnersFtConnect;
   public_appellations_data: PublicAppellationsData;
   public_department_region: PublicDepartmentRegion;
   public_naf_classes_2008: PublicNafClasses2008;
@@ -276,7 +276,7 @@ interface Actors {
   id: Generated<number>;
 }
 
-interface PartnersPeConnect {
+interface PartnersFtConnect {
   user_pe_external_id: string;
   convention_id: Generated<string>;
   firstname: string | null;
