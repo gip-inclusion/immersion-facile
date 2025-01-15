@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -132,7 +132,7 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
     await uow.broadcastFeedbacksRepository.save({
       consumerId: null,
       consumerName: "France Travail",
-      serviceName: broadcastToPeServiceName,
+      serviceName: broadcastToFtServiceName,
       requestParams: {
         conventionId: convention.id,
         conventionStatus: convention.status,

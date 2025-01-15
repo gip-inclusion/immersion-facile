@@ -19,7 +19,7 @@ import {
   BroadcastFeedback,
   BroadcastFeedbackResponse,
   ConventionBroadcastRequestParams,
-  broadcastToPeServiceName,
+  broadcastToFtServiceName,
 } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 
@@ -210,13 +210,13 @@ describe("PgBroadcastFeedbacksRepository", () => {
       const conventionId2 = "someId";
       const broadcastFeedback1 = await makeBroadcastFeedback({
         conventionId: conventionId1,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         errorMode: "response-error",
       });
       const broadcastFeedback2 = await makeBroadcastFeedback({
         conventionId: conventionId1,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         errorMode: "response-error",
       });
@@ -228,7 +228,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
       });
       const broadcastFeedback4 = await makeBroadcastFeedback({
         conventionId: conventionId2,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         errorMode: "response-error",
       });
@@ -315,7 +315,7 @@ describe("PgBroadcastFeedbacksRepository", () => {
     it("Throw when the saved error is already mark as handle", async () => {
       const broadcastFeedback1 = await makeBroadcastFeedback({
         conventionId: conventionId1,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         errorMode: "response-error",
         handledByAgency: true,
@@ -348,13 +348,13 @@ describe("PgBroadcastFeedbacksRepository", () => {
 
       const firstBroadcast = await makeBroadcastFeedback({
         conventionId,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         occurredAt: new Date("2024-07-01"),
       });
       const lastBroadcast = await makeBroadcastFeedback({
         conventionId,
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         kind: "error",
         occurredAt: new Date("2024-07-31"),
       });

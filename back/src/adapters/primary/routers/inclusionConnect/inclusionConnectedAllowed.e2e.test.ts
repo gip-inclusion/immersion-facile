@@ -23,7 +23,7 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { Gateways } from "../../../../config/bootstrap/createGateways";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
-import { broadcastToPeServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
@@ -353,7 +353,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         consumerName: "France Travail",
         consumerId: null,
         subscriberErrorFeedback: { message: "Some message" },
@@ -376,7 +376,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         inMemoryUow.broadcastFeedbacksRepository.broadcastFeedbacks,
         [
           {
-            serviceName: broadcastToPeServiceName,
+            serviceName: broadcastToFtServiceName,
             consumerName: "France Travail",
             consumerId: null,
             subscriberErrorFeedback: {

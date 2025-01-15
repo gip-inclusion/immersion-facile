@@ -10,7 +10,7 @@ import {
   reasonableSchedule,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { broadcastToPeServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -115,7 +115,7 @@ describe("Broadcasts events to France Travail", () => {
       {
         consumerId: null,
         consumerName: "France Travail",
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
           conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
@@ -148,7 +148,7 @@ describe("Broadcasts events to France Travail", () => {
       {
         consumerId: null,
         consumerName: "France Travail",
-        serviceName: broadcastToPeServiceName,
+        serviceName: broadcastToFtServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
           conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
