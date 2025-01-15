@@ -5,7 +5,7 @@ import {
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
-import { InMemoryPeConnectGateway } from "../adapters/ft-connect-gateway/InMemoryPeConnectGateway";
+import { InMemoryFtConnectGateway } from "../adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   FtConnectAdvisorDto,
@@ -18,15 +18,15 @@ import { LinkFranceTravailAdvisorAndRedirectToConvention } from "./LinkFranceTra
 describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
   let uow: InMemoryUnitOfWork;
   let linkFtAdvisorAndRedirectToConvention: LinkFranceTravailAdvisorAndRedirectToConvention;
-  let ftConnectGateway: InMemoryPeConnectGateway;
+  let ftConnectGateway: InMemoryFtConnectGateway;
 
   const baseurl = "https://plop";
-  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const userFtExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
   const authorizationCode = "123";
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    ftConnectGateway = new InMemoryPeConnectGateway();
+    ftConnectGateway = new InMemoryFtConnectGateway();
     linkFtAdvisorAndRedirectToConvention =
       new LinkFranceTravailAdvisorAndRedirectToConvention(
         new InMemoryUowPerformer(uow),
@@ -35,7 +35,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       );
   });
 
-  describe("Pe Connect correctly identify OAuth", () => {
+  describe("Ft Connect correctly identify OAuth", () => {
     it("the returned conventionAdvisor gets stored", async () => {
       ftConnectGateway.setAccessToken(accessToken);
       ftConnectGateway.setUser(ftJobseekerUser);
@@ -96,13 +96,13 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
       expect(urlWithQueryParams).toBe(
-        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userPeExternalId}&fedIdProvider=peConnect`,
+        `${baseurl}/demande-immersion?email=john.doe@gmail.com&firstName=John&lastName=Doe&fedId=${userFtExternalId}&fedIdProvider=peConnect`,
       );
     });
   });
 
   describe("Wrong path", () => {
-    it("On PeConnect auth failure", async () => {
+    it("On FtConnect auth failure", async () => {
       const urlWithQueryParams =
         await linkFtAdvisorAndRedirectToConvention.execute(authorizationCode);
 
@@ -116,7 +116,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("On PeConnect not user info", async () => {
+    it("On FtConnect not user info", async () => {
       ftConnectGateway.setAccessToken(accessToken);
       ftConnectGateway.setUser(undefined);
       ftConnectGateway.setAdvisors([ftPlacementAdvisor]);
@@ -133,7 +133,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
       );
     });
 
-    it("On PeConnected and is not jobseeker should not open slot and provide convention url with notJobSeeker peConnect mode", async () => {
+    it("On FtConnected and is not jobseeker should not open slot and provide convention url with notJobSeeker peConnect mode", async () => {
       ftConnectGateway.setAccessToken(accessToken);
       ftConnectGateway.setUser(ftNotJobseekerUser);
 
@@ -151,7 +151,7 @@ describe("LinkFranceTravailAdvisorAndRedirectToConvention", () => {
     });
   });
 
-  it("On PeConnected and is jobseeker but no advisors should open slot", async () => {
+  it("On FtConnected and is jobseeker but no advisors should open slot", async () => {
     ftConnectGateway.setAccessToken(accessToken);
     ftConnectGateway.setUser(ftJobseekerUser);
 

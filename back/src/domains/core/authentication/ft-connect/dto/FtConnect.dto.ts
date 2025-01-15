@@ -36,7 +36,7 @@ export type FtUserAndAdvisor = {
   user: FtConnectUserDto;
 };
 
-export const toPartialConventionDtoWithPeIdentity = (
+export const toPartialConventionDtoWithFtIdentity = (
   ftConnectUserInfo: FtConnectUserDto,
 ): ConventionFtConnectFields => ({
   email: ftConnectUserInfo.email || "",

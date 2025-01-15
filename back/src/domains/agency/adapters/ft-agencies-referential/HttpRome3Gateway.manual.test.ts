@@ -5,7 +5,7 @@ import {
   AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
@@ -21,7 +21,7 @@ describe("HttpRome3Gateway", () => {
   );
 
   const franceTravailGateway = new HttpFranceTravailGateway(
-    createPeAxiosSharedClient(config),
+    createFtAxiosSharedClient(config),
     cachingGateway,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,

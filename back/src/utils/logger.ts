@@ -223,7 +223,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         events: sanitizeEvents(events),
         nodeProcessReport,
         notificationId,
-        ftConnect: ftConnect,
+        ftConnect,
         reportContent,
         request,
         requestId,

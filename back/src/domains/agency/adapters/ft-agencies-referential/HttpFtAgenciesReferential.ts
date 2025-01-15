@@ -4,27 +4,27 @@ import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import {
-  PeAgenciesReferential,
-  PeAgencyFromReferenciel,
-} from "../../../establishment/ports/PeAgenciesReferential";
+  FtAgenciesReferential,
+  FtAgencyFromReferential,
+} from "../../../establishment/ports/FtAgenciesReferential";
 
 const logger = createLogger(__filename);
 
-export class HttpPeAgenciesReferential implements PeAgenciesReferential {
+export class HttpFtAgenciesReferential implements FtAgenciesReferential {
   #axios: AxiosInstance;
 
   readonly #referencielAgenceUrl: AbsoluteUrl;
 
   constructor(
-    peApiUrl: AbsoluteUrl,
+    ftApiUrl: AbsoluteUrl,
     private readonly franceTravailGateway: FranceTravailGateway,
     private readonly franceTravailClientId: string,
   ) {
     this.#axios = createAxiosInstance(logger);
-    this.#referencielAgenceUrl = `${peApiUrl}/partenaire/referentielagences/v1/agences`;
+    this.#referencielAgenceUrl = `${ftApiUrl}/partenaire/referentielagences/v1/agences`;
   }
 
-  public async getPeAgencies(): Promise<PeAgencyFromReferenciel[]> {
+  public async getFtAgencies(): Promise<FtAgencyFromReferential[]> {
     const accessToken = await this.franceTravailGateway.getAccessToken(
       `application_${this.franceTravailClientId} api_referentielagencesv1 organisationpe`,
     );

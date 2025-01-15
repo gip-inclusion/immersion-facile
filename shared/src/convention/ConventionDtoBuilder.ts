@@ -1,7 +1,7 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AgencyId } from "../agency/agency.dto";
-import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import {
   DateIntervalDto,
@@ -543,7 +543,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withFederatedIdentity(
-    federatedIdentity: PeConnectIdentity | undefined,
+    federatedIdentity: FtConnectIdentity | undefined,
   ): ConventionDtoBuilder {
     return this.withBeneficiary({
       ...this.#beneficiary,

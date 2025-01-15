@@ -1,24 +1,24 @@
 import { Router } from "express";
-import { ManagedRedirectError, loginPeConnect, peConnect } from "shared";
+import { ManagedRedirectError, ftConnect, loginFtConnect } from "shared";
 import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendRedirectResponseWithManagedErrors } from "../../../../config/helpers/sendRedirectResponseWithManagedErrors";
-import { makePeConnectLoginPageUrl } from "../../../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
+import { makeFtConnectLoginPageUrl } from "../../../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 
-export const createPeConnectRouter = (deps: AppDependencies) => {
-  const peConnectRouter = Router({ mergeParams: true });
+export const createFtConnectRouter = (deps: AppDependencies) => {
+  const ftConnectRouter = Router({ mergeParams: true });
 
-  peConnectRouter.route(`/${loginPeConnect}`).get(async (req, res) =>
+  ftConnectRouter.route(`/${loginFtConnect}`).get(async (req, res) =>
     sendRedirectResponseWithManagedErrors(
       req,
       res,
 
-      async () => makePeConnectLoginPageUrl(deps.config),
+      async () => makeFtConnectLoginPageUrl(deps.config),
       deps.errorHandlers.handleManagedRedirectResponseError,
       deps.errorHandlers.handleRawRedirectResponseError,
     ),
   );
 
-  peConnectRouter.route(`/${peConnect}`).get(async (req, res) =>
+  ftConnectRouter.route(`/${ftConnect}`).get(async (req, res) =>
     sendRedirectResponseWithManagedErrors(
       req,
       res,
@@ -35,5 +35,5 @@ export const createPeConnectRouter = (deps: AppDependencies) => {
     ),
   );
 
-  return peConnectRouter;
+  return ftConnectRouter;
 };

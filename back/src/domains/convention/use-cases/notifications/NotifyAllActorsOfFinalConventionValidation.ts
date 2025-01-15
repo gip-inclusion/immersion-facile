@@ -96,7 +96,7 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           email: validatorEmail,
         }),
       ),
-      ...getPeAdvisorEmailAndRoleIfExist(
+      ...getFtAdvisorEmailAndRoleIfExist(
         await uow.conventionFranceTravailAdvisorRepository.getByConventionId(
           convention.id,
         ),
@@ -186,9 +186,9 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
   }
 }
 
-const getPeAdvisorEmailAndRoleIfExist = (
-  conventionPeUserAdvisor: ConventionFtUserAdvisorEntity | undefined,
+const getFtAdvisorEmailAndRoleIfExist = (
+  conventionFtUserAdvisor: ConventionFtUserAdvisorEntity | undefined,
 ): [{ role: Role; email: Email }] | [] =>
-  conventionPeUserAdvisor?.advisor?.email
-    ? [{ role: "validator", email: conventionPeUserAdvisor.advisor.email }]
+  conventionFtUserAdvisor?.advisor?.email
+    ? [{ role: "validator", email: conventionFtUserAdvisor.advisor.email }]
     : [];

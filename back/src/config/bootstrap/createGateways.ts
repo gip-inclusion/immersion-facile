@@ -13,8 +13,8 @@ import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMe
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
 import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
-import { InMemoryPeConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryPeConnectGateway";
-import { makePeConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
+import { InMemoryFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
+import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 import { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
 import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
@@ -188,14 +188,14 @@ export const createGateways = async (
 
   const { withCache, disconnectCache } = await getWithCache(config);
 
-  const peConnectGateway: FtConnectGateway =
+  const ftConnectGateway: FtConnectGateway =
     config.ftConnectGateway === "HTTPS"
       ? new HttpFtConnectGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.franceTravailConnect,
-            routes: makePeConnectExternalRoutes({
-              peApiUrl: config.ftApiUrl,
-              peAuthCandidatUrl: config.ftAuthCandidatUrl,
+            routes: makeFtConnectExternalRoutes({
+              ftApiUrl: config.ftApiUrl,
+              ftAuthCandidatUrl: config.ftAuthCandidatUrl,
             }),
           }),
           {
@@ -204,7 +204,7 @@ export const createGateways = async (
             franceTravailClientSecret: config.franceTravailClientSecret,
           },
         )
-      : new InMemoryPeConnectGateway();
+      : new InMemoryFtConnectGateway();
 
   const oAuthGateway: OAuthGateway =
     config.inclusionConnectGateway === "HTTPS"
@@ -412,7 +412,7 @@ export const createGateways = async (
         ? new HttpPassEmploiGateway(config.passEmploiUrl, config.passEmploiKey)
         : new InMemoryPassEmploiGateway(),
     pdfGeneratorGateway: createPdfGeneratorGateway(),
-    peConnectGateway,
+    ftConnectGateway,
     franceTravailGateway,
     timeGateway,
     establishmentMarketingGateway:

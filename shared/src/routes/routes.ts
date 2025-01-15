@@ -41,7 +41,7 @@ export const frontRoutes = {
   unsubscribeEstablishmentLead: "desinscription-prospect",
 };
 
-export const loginPeConnect = "login-pe-connect";
-export const peConnect = "pe-connect";
+export const loginFtConnect = "login-pe-connect";
+export const ftConnect = "pe-connect";
 
 export const uploadFileRoute = "upload-file";

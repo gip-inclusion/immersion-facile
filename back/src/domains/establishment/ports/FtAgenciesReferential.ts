@@ -1,8 +1,8 @@
-export interface PeAgenciesReferential {
-  getPeAgencies: () => Promise<PeAgencyFromReferenciel[]>;
+export interface FtAgenciesReferential {
+  getFtAgencies: () => Promise<FtAgencyFromReferential[]>;
 }
 
-export type PeAgencyFromReferenciel = {
+export type FtAgencyFromReferential = {
   code: string;
   codeSafir: string;
   libelle: string;

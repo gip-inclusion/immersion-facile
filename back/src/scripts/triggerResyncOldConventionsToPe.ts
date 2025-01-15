@@ -1,6 +1,6 @@
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -16,7 +16,7 @@ const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
-  const peAxiosHttpClient = createPeAxiosSharedClient(config);
+  const peAxiosHttpClient = createFtAxiosSharedClient(config);
 
   const httpFranceTravailGateway = new HttpFranceTravailGateway(
     peAxiosHttpClient,

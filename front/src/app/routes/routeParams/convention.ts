@@ -6,10 +6,10 @@ import {
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
+  FtConnectIdentity,
   ImmersionObjective,
   InternshipKind,
   LevelOfEducation,
-  PeConnectIdentity,
   ScheduleDto,
   addressDtoToString,
   addressStringToDto,
@@ -440,7 +440,7 @@ const conventionPresentationFromParams = (
       ...(params.fedId && params.fedIdProvider
         ? {
             federatedIdentity: {
-              provider: params.fedIdProvider as PeConnectIdentity["provider"],
+              provider: params.fedIdProvider as FtConnectIdentity["provider"],
               token: params.fedId,
             },
           }

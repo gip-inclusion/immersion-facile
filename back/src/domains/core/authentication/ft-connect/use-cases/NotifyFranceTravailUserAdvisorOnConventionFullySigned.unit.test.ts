@@ -24,7 +24,7 @@ import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "./NotifyF
 
 describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-  const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+  const userFtExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
   const advisor: FtConnectImmersionAdvisorDto = {
     email: "elsa.oldenburg@pole-emploi.net",
     firstName: "Elsa",
@@ -34,7 +34,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
   const userAdvisorDto: FtUserAndAdvisor = {
     advisor,
     user: {
-      peExternalId: userPeExternalId,
+      peExternalId: userFtExternalId,
       email: "",
       firstName: "",
       isJobseeker: true,
@@ -87,7 +87,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")
@@ -154,7 +154,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
       .withAgencyId(agency.id)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBeneficiaryEmail("john.doe@plop.fr")

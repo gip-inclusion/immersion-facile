@@ -3,8 +3,8 @@ import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { FranceTravailConvention } from "../../ports/FranceTravailGateway";
 
-export const getFtTestPrefix = (peApiUrl: AbsoluteUrl) =>
-  ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(peApiUrl)
+export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
+  ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(ftApiUrl)
     ? "test"
     : "";
 
@@ -12,13 +12,13 @@ export type FrancetTravailRoutes = ReturnType<typeof createFranceTravailRoutes>;
 
 const franceTravailConventionSchema: z.Schema<FranceTravailConvention> =
   z.any();
-export const createFranceTravailRoutes = (peApiUrl: AbsoluteUrl) => {
-  const ftTestPrefix = getFtTestPrefix(peApiUrl);
+export const createFranceTravailRoutes = (ftApiUrl: AbsoluteUrl) => {
+  const ftTestPrefix = getFtTestPrefix(ftApiUrl);
 
   return defineRoutes({
     broadcastConvention: defineRoute({
       method: "post",
-      url: `${peApiUrl}/partenaire/${ftTestPrefix}immersion-pro/v2/demandes-immersion`,
+      url: `${ftApiUrl}/partenaire/${ftTestPrefix}immersion-pro/v2/demandes-immersion`,
       requestBodySchema: franceTravailConventionSchema,
       ...withAuthorizationHeaders,
       responses: {

@@ -221,11 +221,11 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
-    const peNotification = gateways.franceTravailGateway.notifications[0];
-    expect(peNotification.id).toBe(externalId);
-    expectToEqual(peNotification.statut, "DEMANDE_A_SIGNER");
-    expect(peNotification.originalId).toBe(convention.id);
-    expect(peNotification.email).toBe(convention.signatories.beneficiary.email);
+    const ftNotification = gateways.franceTravailGateway.notifications[0];
+    expect(ftNotification.id).toBe(externalId);
+    expectToEqual(ftNotification.statut, "DEMANDE_A_SIGNER");
+    expect(ftNotification.originalId).toBe(convention.id);
+    expect(ftNotification.email).toBe(convention.signatories.beneficiary.email);
     const sentEmails = gateways.notification.getSentEmails();
     expect(sentEmails).toHaveLength(numberOfEmailInitialySent - 1);
     expectArraysToEqualIgnoringOrder(

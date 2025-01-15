@@ -16,24 +16,24 @@ import {
   ExternalFtConnectUser,
 } from "./ftConnectApi.dto";
 import {
-  makePeConnectExternalRoutes,
-  toPeConnectAdvisorDto,
-  toPeConnectUserDto,
+  makeFtConnectExternalRoutes,
+  toFtConnectAdvisorDto,
+  toFtConnectUserDto,
 } from "./ftConnectApi.routes";
 
 const unhandledStatusCode = 201;
 
-describe("HttpPeConnectGateway", () => {
-  const routes = makePeConnectExternalRoutes({
-    peApiUrl: "https://fake-pe.fr",
-    peAuthCandidatUrl: "https://fake-pe.fr/auth/candidat",
+describe("HttpFtConnectGateway", () => {
+  const routes = makeFtConnectExternalRoutes({
+    ftApiUrl: "https://fake-ft.fr",
+    ftAuthCandidatUrl: "https://fake-ft.fr/auth/candidat",
   });
 
   const httpClient = createAxiosSharedClient(routes, axios, {
     skipResponseValidation: true,
   });
 
-  const peConnectGateway = new HttpFtConnectGateway(httpClient, {
+  const ftConnectGateway = new HttpFtConnectGateway(httpClient, {
     immersionFacileBaseUrl: "https://fake-immersion.fr",
     franceTravailClientId: "pe-client-id",
     franceTravailClientSecret: "pe-client-secret",
@@ -48,7 +48,7 @@ describe("HttpPeConnectGateway", () => {
     idIdentiteExterne: "617cd5a3-2cbd-477c-96a0-85d34381f815",
     sub: "617cd5a3-2cbd-477c-96a0-85d34381f815",
   };
-  const peExternalAdvisorCapemploi: ExternalFtConnectAdvisor = {
+  const ftExternalAdvisorCapemploi: ExternalFtConnectAdvisor = {
     type: "CAPEMPLOI",
     civilite: "1",
     mail: "capEmploiAdvisor@pe.fr",
@@ -62,13 +62,13 @@ describe("HttpPeConnectGateway", () => {
     nom: "prost",
     prenom: "alain",
   };
-  const peConnectUser = (isUserJobseeker: boolean) =>
-    toPeConnectUserDto({ ...peExternalUser, isUserJobseeker });
-  const peConnectAdvisorPlacement = toPeConnectAdvisorDto(
+  const ftConnectUser = (isUserJobseeker: boolean) =>
+    toFtConnectUserDto({ ...peExternalUser, isUserJobseeker });
+  const ftConnectAdvisorPlacement = toFtConnectAdvisorDto(
     peExternalAdvisorPlacement,
   );
-  const peConnectAdvisorCapEmploi = toPeConnectAdvisorDto(
-    peExternalAdvisorCapemploi,
+  const ftConnectAdvisorCapEmploi = toFtConnectAdvisorDto(
+    ftExternalAdvisorCapemploi,
   );
 
   const accessToken = {
@@ -86,7 +86,7 @@ describe("HttpPeConnectGateway", () => {
         mock
           .onPost(routes.exchangeCodeForAccessToken.url)
           .reply(200, expectedResponse);
-        expectObjectsToMatch(await peConnectGateway.getAccessToken(""), {
+        expectObjectsToMatch(await ftConnectGateway.getAccessToken(""), {
           expiresIn: expectedResponse.expires_in,
           value: expectedResponse.access_token,
         });
@@ -101,7 +101,7 @@ describe("HttpPeConnectGateway", () => {
           error: "invalid_grant",
         });
         await expectPromiseToFailWithError(
-          peConnectGateway.getAccessToken(""),
+          ftConnectGateway.getAccessToken(""),
           new ManagedRedirectError(
             "peConnectInvalidGrant",
             new Error("Request failed with status code 400"),
@@ -112,7 +112,7 @@ describe("HttpPeConnectGateway", () => {
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedRedirectError(
-          () => peConnectGateway.getAccessToken(""),
+          () => ftConnectGateway.getAccessToken(""),
           new ManagedRedirectError("peConnectConnectionAborted", new Error()),
         );
       });
@@ -134,18 +134,18 @@ describe("HttpPeConnectGateway", () => {
           });
 
         expectObjectsToMatch(
-          await peConnectGateway.getUserAndAdvisors(accessToken),
+          await ftConnectGateway.getUserAndAdvisors(accessToken),
           {
-            advisors: [peConnectAdvisorPlacement],
-            user: peConnectUser(true),
+            advisors: [ftConnectAdvisorPlacement],
+            user: ftConnectUser(true),
           },
         );
       });
 
-      it(`OK with ${peExternalUser.email} user and ${peExternalAdvisorCapemploi.mail} advisor`, async () => {
+      it(`OK with ${peExternalUser.email} user and ${ftExternalAdvisorCapemploi.mail} advisor`, async () => {
         mock
           .onGet(routes.getAdvisorsInfo.url)
-          .reply(200, [peExternalAdvisorCapemploi])
+          .reply(200, [ftExternalAdvisorCapemploi])
           .onGet(routes.getUserInfo.url)
           .reply(200, peExternalUser)
           .onGet(routes.getUserStatutInfo.url)
@@ -155,10 +155,10 @@ describe("HttpPeConnectGateway", () => {
           });
 
         expectObjectsToMatch(
-          await peConnectGateway.getUserAndAdvisors(accessToken),
+          await ftConnectGateway.getUserAndAdvisors(accessToken),
           {
-            advisors: [peConnectAdvisorCapEmploi],
-            user: peConnectUser(true),
+            advisors: [ftConnectAdvisorCapEmploi],
+            user: ftConnectUser(true),
           },
         );
       });
@@ -174,10 +174,10 @@ describe("HttpPeConnectGateway", () => {
           });
 
         expectObjectsToMatch(
-          await peConnectGateway.getUserAndAdvisors(accessToken),
+          await ftConnectGateway.getUserAndAdvisors(accessToken),
           {
             advisors: [],
-            user: peConnectUser(false),
+            user: ftConnectUser(false),
           },
         );
       });
@@ -188,7 +188,7 @@ describe("HttpPeConnectGateway", () => {
         // it(`Timeout on getUserInfo -> Retry`, async () => {
         //   mock
         //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-        //     .reply(200, [peExternalAdvisorCapemploi])
+        //     .reply(200, [ftExternalAdvisorCapemploi])
         //     .onGet(peConnectTargets(appConfig).getUserInfo.url)
         //     .timeout()
         //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
@@ -198,9 +198,9 @@ describe("HttpPeConnectGateway", () => {
         //       codeStatutIndividu: "1",
         //       libelleStatutIndividu: "Demandeur d’emploi",
         //     });
-        //   expectObjectsToMatch(await peConnectGateway.getUserAndAdvisors(accessToken), {
-        //     advisors: [peConnectAdvisorCapEmploi],
-        //     user: peConnectUser(true),
+        //   expectObjectsToMatch(await ftConnectGateway.getUserAndAdvisors(accessToken), {
+        //     advisors: [ftConnectAdvisorCapEmploi],
+        //     user: ftConnectUser(true),
         //   });
         // });
 
@@ -216,14 +216,14 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           expect(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
           ).toBeUndefined();
         });
 
         it("Bad status code -> OK with undefined", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
-            .reply(200, [peExternalAdvisorCapemploi])
+            .reply(200, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(unhandledStatusCode, peExternalUser)
             .onGet(routes.getUserStatutInfo.url)
@@ -232,7 +232,7 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           expect(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
           ).toBeUndefined();
         });
 
@@ -243,7 +243,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserInfo.url)
             .abortRequest();
           await expectPromiseToFailWithError(
-            peConnectGateway.getUserAndAdvisors(accessToken),
+            ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectConnectionAborted",
               new Error("Request aborted"),
@@ -258,7 +258,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserInfo.url)
             .networkError();
           await testRawRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -274,7 +274,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserInfo.url)
             .reply(401);
           await expectPromiseToFailWithError(
-            peConnectGateway.getUserAndAdvisors(accessToken),
+            ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
@@ -289,7 +289,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserInfo.url)
             .reply(500);
           await testRawRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
@@ -307,15 +307,15 @@ describe("HttpPeConnectGateway", () => {
         //     /*            .onGet(peConnectTargets(appConfig).getUserInfo.url)
         //     .reply(200, peExternalUser)*/
         //     .onGet(peConnectTargets(appConfig).getAdvisorsInfo.url)
-        //     .reply(200, [peExternalAdvisorCapemploi])
+        //     .reply(200, [ftExternalAdvisorCapemploi])
         //     .onGet(peConnectTargets(appConfig).getUserStatutInfo.url)
         //     .reply(200, {
         //       codeStatutIndividu: "1",
         //       libelleStatutIndividu: "Demandeur d’emploi",
         //     });
-        //   expectObjectsToMatch(await peConnectGateway.getUserAndAdvisors(accessToken), {
-        //     advisors: [peConnectAdvisorCapEmploi],
-        //     user: peConnectUser(true),
+        //   expectObjectsToMatch(await ftConnectGateway.getUserAndAdvisors(accessToken), {
+        //     advisors: [ftConnectAdvisorCapEmploi],
+        //     user: ftConnectUser(true),
         //   });
         // });
 
@@ -331,10 +331,10 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           expectObjectsToMatch(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
-              user: peConnectUser(true),
+              user: ftConnectUser(true),
             },
           );
         });
@@ -342,7 +342,7 @@ describe("HttpPeConnectGateway", () => {
         it("Bad status code -> OK with No advisors", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
-            .reply(unhandledStatusCode, [peExternalAdvisorCapemploi])
+            .reply(unhandledStatusCode, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
             .onGet(routes.getUserStatutInfo.url)
@@ -351,10 +351,10 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           expectObjectsToMatch(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
-              user: peConnectUser(true),
+              user: ftConnectUser(true),
             },
           );
         });
@@ -371,7 +371,7 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError("peConnectConnectionAborted", new Error()),
           );
         });
@@ -388,7 +388,7 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testRawRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -409,7 +409,7 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           await testManagedRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectAdvisorForbiddenAccess",
               new Error(),
@@ -429,10 +429,10 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getAdvisorsInfo.url)
             .reply(500);
           await expectObjectsToMatch(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
-              user: peConnectUser(true),
+              user: ftConnectUser(true),
             },
           );
         });
@@ -448,10 +448,10 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserStatutInfo.url)
             .reply(200, "UNSUPPORTED RESPONSE");
           expectObjectsToMatch(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
-              user: peConnectUser(false),
+              user: ftConnectUser(false),
             },
           );
         });
@@ -459,7 +459,7 @@ describe("HttpPeConnectGateway", () => {
         it("Bad status code -> OK with No advisors and not jobseeker", async () => {
           mock
             .onGet(routes.getAdvisorsInfo.url)
-            .reply(200, [peExternalAdvisorCapemploi])
+            .reply(200, [ftExternalAdvisorCapemploi])
             .onGet(routes.getUserInfo.url)
             .reply(200, peExternalUser)
             .onGet(routes.getUserStatutInfo.url)
@@ -468,10 +468,10 @@ describe("HttpPeConnectGateway", () => {
               libelleStatutIndividu: "Demandeur d’emploi",
             });
           expectObjectsToMatch(
-            await peConnectGateway.getUserAndAdvisors(accessToken),
+            await ftConnectGateway.getUserAndAdvisors(accessToken),
             {
               advisors: [],
-              user: peConnectUser(false),
+              user: ftConnectUser(false),
             },
           );
         });
@@ -485,7 +485,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserStatutInfo.url)
             .abortRequest();
           await expectPromiseToFailWithError(
-            peConnectGateway.getUserAndAdvisors(accessToken),
+            ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectConnectionAborted",
               new Error("Request aborted"),
@@ -502,7 +502,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserStatutInfo.url)
             .networkError();
           await testRawRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
@@ -520,7 +520,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserStatutInfo.url)
             .reply(401);
           await expectPromiseToFailWithError(
-            peConnectGateway.getUserAndAdvisors(accessToken),
+            ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedRedirectError(
               "peConnectGetUserStatusInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
@@ -537,7 +537,7 @@ describe("HttpPeConnectGateway", () => {
             .onGet(routes.getUserStatutInfo.url)
             .reply(500);
           await testRawRedirectError(
-            () => peConnectGateway.getUserAndAdvisors(accessToken),
+            () => ftConnectGateway.getUserAndAdvisors(accessToken),
             new RawRedirectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer votre status pôle emploi connect.",

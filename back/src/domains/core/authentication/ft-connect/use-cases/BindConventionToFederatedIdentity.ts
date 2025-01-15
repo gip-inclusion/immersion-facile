@@ -1,9 +1,9 @@
 import {
   ConventionDto,
-  PeConnectIdentity,
+  FtConnectIdentity,
   WithConventionDto,
   authFailed,
-  isPeConnectIdentity,
+  isFtConnectIdentity,
   withConventionSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../UseCase";
@@ -32,7 +32,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
     const federatedIdentity =
       convention.signatories.beneficiary.federatedIdentity;
 
-    return isPeConnectIdentity(federatedIdentity) &&
+    return isFtConnectIdentity(federatedIdentity) &&
       federatedIdentity.token !== authFailed
       ? this.#associateConventionToFederatedIdentity(
           convention,
@@ -49,7 +49,7 @@ export class BindConventionToFederatedIdentity extends TransactionalUseCase<With
 
   async #associateConventionToFederatedIdentity(
     convention: ConventionDto,
-    federatedIdentity: PeConnectIdentity,
+    federatedIdentity: FtConnectIdentity,
     uow: UnitOfWork,
   ): Promise<void> {
     try {

@@ -5,13 +5,13 @@ import { map, splitEvery } from "ramda";
 import { pipeWithValue, removeDiacritics, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
-import { createPeAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import {
   AppellationWithShortLabel,
   HttpRome4Gateway,
   makeRome4Routes,
-} from "../domains/agency/adapters/pe-agencies-referential/HttpRome4Gateway";
+} from "../domains/agency/adapters/ft-agencies-referential/HttpRome4Gateway";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
@@ -38,7 +38,7 @@ const main = async () => {
   );
 
   const franceTravailGateway = new HttpFranceTravailGateway(
-    createPeAxiosSharedClient(config),
+    createFtAxiosSharedClient(config),
     cachingGateway,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,

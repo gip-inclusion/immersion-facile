@@ -23,7 +23,7 @@ import { FtConnectUserDto } from "../dto/FtConnectUserDto";
 import { PgConventionFranceTravailAdvisorRepository } from "./PgConventionFranceTravailAdvisorRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";
-const userPeExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
+const userFtExternalId = "92f44bbf-103d-4312-bd74-217c7d79f618";
 
 const convention = new ConventionDtoBuilder().withId(conventionId).build();
 
@@ -32,7 +32,7 @@ const user: FtConnectUserDto = {
   firstName: "",
   isJobseeker: true,
   lastName: "",
-  peExternalId: userPeExternalId,
+  peExternalId: userFtExternalId,
 };
 const placementAdvisor: FtConnectImmersionAdvisorDto = {
   firstName: "Jean",
@@ -172,7 +172,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       await expect(
         conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
           conventionId,
-          userPeExternalId,
+          userFtExternalId,
         ),
       ).rejects.toThrow(
         new Error(
@@ -187,7 +187,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
-        userPeExternalId,
+        userFtExternalId,
       );
 
       expectToEqual(
@@ -223,7 +223,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
-        userPeExternalId,
+        userFtExternalId,
       );
 
       const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =
@@ -245,7 +245,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
       );
       await conventionFranceTravailAdvisorRepository.associateConventionAndUserAdvisor(
         conventionId,
-        userPeExternalId,
+        userFtExternalId,
       );
 
       const conventionAdvisor: ConventionFtUserAdvisorEntity | undefined =

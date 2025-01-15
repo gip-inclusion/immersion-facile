@@ -12,9 +12,9 @@ import {
   ExternalFtConnectUser,
   ftConnectAccessTokenHeadersSchema,
 } from "./ftConnectApi.dto";
-import { peConnectHeadersSchema } from "./ftConnectApi.schema";
+import { ftConnectHeadersSchema } from "./ftConnectApi.schema";
 
-const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
+const ftConnectNeededScopesForAllUsedApi = (clientId: string): string =>
   [
     `application_${clientId}`,
     "api_peconnect-individuv1",
@@ -27,13 +27,13 @@ const peConnectNeededScopesForAllUsedApi = (clientId: string): string =>
     "statut",
   ].join(" ");
 
-type PeConnectRoutesConfig = {
-  peApiUrl: AbsoluteUrl;
-  peAuthCandidatUrl: AbsoluteUrl;
+type FtConnectRoutesConfig = {
+  ftApiUrl: AbsoluteUrl;
+  ftAuthCandidatUrl: AbsoluteUrl;
 };
 
-export type PeConnectExternalRoutes = ReturnType<
-  typeof makePeConnectExternalRoutes
+export type FtConnectExternalRoutes = ReturnType<
+  typeof makeFtConnectExternalRoutes
 >;
 
 const _forceUnknownResponseBody = (responseBody: unknown): unknown =>
@@ -42,45 +42,45 @@ const _forceUnknownResponseBody = (responseBody: unknown): unknown =>
 // TODO : move the validation here, and adapt the gateways
 // explicitely : replace forceUnknownResponseBody by validation code made actually on adapter
 
-export const makePeConnectExternalRoutes = ({
-  peApiUrl,
-  peAuthCandidatUrl,
-}: PeConnectRoutesConfig) =>
+export const makeFtConnectExternalRoutes = ({
+  ftApiUrl,
+  ftAuthCandidatUrl,
+}: FtConnectRoutesConfig) =>
   defineRoutes({
     getAdvisorsInfo: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
-      headersSchema: peConnectHeadersSchema,
+      url: `${ftApiUrl}/partenaire/peconnect-conseillers/v1/contactspe/conseillers`,
+      headersSchema: ftConnectHeadersSchema,
       responses: { 200: z.any() },
     }),
     getUserInfo: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
-      headersSchema: peConnectHeadersSchema,
+      url: `${ftApiUrl}/partenaire/peconnect-individu/v1/userinfo`,
+      headersSchema: ftConnectHeadersSchema,
       responses: { 200: z.any() },
     }),
     getUserStatutInfo: defineRoute({
       method: "get",
-      url: `${peApiUrl}/partenaire/peconnect-statut/v1/statut`,
-      headersSchema: peConnectHeadersSchema,
+      url: `${ftApiUrl}/partenaire/peconnect-statut/v1/statut`,
+      headersSchema: ftConnectHeadersSchema,
       responses: { 200: z.any() },
     }),
     exchangeCodeForAccessToken: defineRoute({
       method: "post",
-      url: `${peAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
+      url: `${ftAuthCandidatUrl}/connexion/oauth2/access_token?realm=%2Findividu`,
       requestBodySchema: z.string(),
       headersSchema: ftConnectAccessTokenHeadersSchema,
       responses: { 200: z.any() },
     }),
   });
 
-export const makePeConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
+export const makeFtConnectLoginPageUrl = (appConfig: AppConfig): AbsoluteUrl =>
   makeOauthGetAuthorizationCodeRedirectUrl(appConfig.ftAuthCandidatUrl, {
     response_type: "code",
     client_id: appConfig.franceTravailClientId,
     realm: "/individu",
     redirect_uri: `${appConfig.immersionFacileBaseUrl}/api/pe-connect`,
-    scope: peConnectNeededScopesForAllUsedApi(appConfig.franceTravailClientId),
+    scope: ftConnectNeededScopesForAllUsedApi(appConfig.franceTravailClientId),
   });
 
 const makeOauthGetAuthorizationCodeRedirectUrl = (
@@ -91,7 +91,7 @@ const makeOauthGetAuthorizationCodeRedirectUrl = (
     authorizationCodePayload,
   )}`;
 
-export const toPeConnectAdvisorDto = (
+export const toFtConnectAdvisorDto = (
   fromApi: ExternalFtConnectAdvisor,
 ): FtConnectAdvisorDto => ({
   email: fromApi.mail,
@@ -100,14 +100,14 @@ export const toPeConnectAdvisorDto = (
   type: fromApi.type,
 });
 
-export const toPeConnectUserDto = (
-  externalPeConnectUser: ExternalFtConnectUser & { isUserJobseeker: boolean },
+export const toFtConnectUserDto = (
+  externalFtConnectUser: ExternalFtConnectUser & { isUserJobseeker: boolean },
 ): FtConnectUserDto => ({
-  isJobseeker: externalPeConnectUser.isUserJobseeker,
-  email: externalPeConnectUser.email,
-  firstName: externalPeConnectUser.given_name,
-  lastName: externalPeConnectUser.family_name,
-  peExternalId: externalPeConnectUser.idIdentiteExterne,
+  isJobseeker: externalFtConnectUser.isUserJobseeker,
+  email: externalFtConnectUser.email,
+  firstName: externalFtConnectUser.given_name,
+  lastName: externalFtConnectUser.family_name,
+  peExternalId: externalFtConnectUser.idIdentiteExterne,
 });
 
 export const toAccessToken = (

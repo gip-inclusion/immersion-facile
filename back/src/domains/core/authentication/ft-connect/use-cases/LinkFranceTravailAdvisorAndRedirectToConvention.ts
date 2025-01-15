@@ -12,7 +12,7 @@ import { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
   ConventionFtConnectFields,
   FtUserAndAdvisor,
-  toPartialConventionDtoWithPeIdentity,
+  toPartialConventionDtoWithFtIdentity,
 } from "../dto/FtConnect.dto";
 import { chooseValidAdvisor } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { FtConnectGateway } from "../port/FtConnectGateway";
@@ -29,13 +29,13 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
-    peConnectGateway: FtConnectGateway,
+    ftConnectGateway: FtConnectGateway,
     baseUrlForRedirect: AbsoluteUrl,
   ) {
     super(uowPerformer);
 
     this.#baseUrlForRedirect = baseUrlForRedirect;
-    this.#ftConnectGateway = peConnectGateway;
+    this.#ftConnectGateway = ftConnectGateway;
   }
 
   protected async _execute(
@@ -80,6 +80,6 @@ export class LinkFranceTravailAdvisorAndRedirectToConvention extends Transaction
         peUserAndAdvisor,
       );
 
-    return this.#makeRedirectUrl(toPartialConventionDtoWithPeIdentity(user));
+    return this.#makeRedirectUrl(toPartialConventionDtoWithFtIdentity(user));
   }
 }

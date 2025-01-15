@@ -3,7 +3,7 @@ import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, Postcode } from "../address/address.dto";
 import { AgencyId, AgencyKind } from "../agency/agency.dto";
 import { Email } from "../email/email.dto";
-import { PeConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import {
   AgencyRole,
   InclusionConnectedUser,
@@ -236,7 +236,7 @@ export type Beneficiary<T extends InternshipKind> =
     emergencyContact?: string;
     emergencyContactPhone?: string;
     emergencyContactEmail?: Email;
-    federatedIdentity?: PeConnectIdentity;
+    federatedIdentity?: FtConnectIdentity;
     financiaryHelp?: string;
     birthdate: string; // Date iso string
     isRqth?: boolean;

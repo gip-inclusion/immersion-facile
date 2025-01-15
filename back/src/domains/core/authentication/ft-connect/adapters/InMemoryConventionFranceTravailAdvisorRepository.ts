@@ -67,7 +67,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
   ): Promise<ConventionFtUserAdvisorEntity> {
     const entity: ConventionFtUserAdvisorEntity | undefined =
       this.#conventionFranceTravailUsersAdvisors
-        .filter(matchPeExternalId(peExternalId))
+        .filter(matchFtExternalId(peExternalId))
         .find(isOpenEntity);
     if (entity) return entity;
     throw errors.convention.missingFTAdvisor({ ftExternalId: peExternalId });
@@ -86,10 +86,10 @@ export class InMemoryConventionFranceTravailAdvisorRepository
 export const CONVENTION_ID_DEFAULT_UUID =
   "00000000-0000-0000-0000-000000000000";
 
-const matchPeExternalId =
-  (peExternalId: string) =>
+const matchFtExternalId =
+  (ftExternalId: string) =>
   (conventionFranceTravailUserAdvisor: ConventionFtUserAdvisorEntity) =>
-    conventionFranceTravailUserAdvisor.peExternalId === peExternalId;
+    conventionFranceTravailUserAdvisor.peExternalId === ftExternalId;
 
 const matchConventionId =
   (conventionId: string) =>

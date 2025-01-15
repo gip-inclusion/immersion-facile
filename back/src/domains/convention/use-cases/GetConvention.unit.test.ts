@@ -442,15 +442,15 @@ describe("Get Convention", () => {
         });
       });
 
-      it("user is a PeAdvisor", async () => {
-        const peAdvisorEmail = "pe-advisor@mail.fr";
-        const peConnectedConvention = new ConventionDtoBuilder(convention)
+      it("user is a FtAdvisor", async () => {
+        const ftAdvisorEmail = "ft-advisor@mail.fr";
+        const ftConnectedConvention = new ConventionDtoBuilder(convention)
           .withFederatedIdentity({
             provider: "peConnect",
             token: "some-id",
             payload: {
               advisor: {
-                email: peAdvisorEmail,
+                email: ftAdvisorEmail,
                 firstName: "john",
                 lastName: "doe",
                 type: "PLACEMENT",
@@ -458,10 +458,10 @@ describe("Get Convention", () => {
             },
           })
           .build();
-        uow.conventionRepository.setConventions([peConnectedConvention]);
+        uow.conventionRepository.setConventions([ftConnectedConvention]);
         const payload: ConventionJwtPayload = {
           role: "validator",
-          emailHash: makeEmailHash(peAdvisorEmail),
+          emailHash: makeEmailHash(ftAdvisorEmail),
           applicationId: convention.id,
           iat: 1,
           version: 1,
@@ -473,7 +473,7 @@ describe("Get Convention", () => {
         );
 
         expectToEqual(conventionResult, {
-          ...peConnectedConvention,
+          ...ftConnectedConvention,
           agencyName: agency.name,
           agencyDepartment: agency.address.departmentCode,
           agencyKind: agency.kind,

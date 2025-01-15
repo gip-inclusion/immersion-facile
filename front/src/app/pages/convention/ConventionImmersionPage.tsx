@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { FederatedIdentityProvider, loginPeConnect } from "shared";
+import { FederatedIdentityProvider, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   ConventionFormMode,
@@ -215,7 +215,7 @@ const SharedConventionMessage = ({
       <p className={fr.cx("fr-mt-4w", "fr-mb-0")}>
         {/* biome-ignore lint/a11y/useValidAnchor: This is a trusted source */}
         <a
-          href={`/api/${loginPeConnect}`}
+          href={`/api/${loginFtConnect}`}
           onClick={() => {
             storeConventionRouteParamsOnDevice(route.params);
           }}

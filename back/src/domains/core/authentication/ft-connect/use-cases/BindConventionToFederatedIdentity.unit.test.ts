@@ -21,8 +21,8 @@ import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
 import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 
-describe("AssociatePeConnectFederatedIdentity", () => {
-  let associatePeConnectFederatedIdentity: BindConventionToFederatedIdentity;
+describe("AssociateFtConnectFederatedIdentity", () => {
+  let associateFtConnectFederatedIdentity: BindConventionToFederatedIdentity;
   let uowPerformer: InMemoryUowPerformer;
   let conventionFranceTravailAdvisorRepo: InMemoryConventionFranceTravailAdvisorRepository;
   let outboxRepo: InMemoryOutboxRepository;
@@ -40,7 +40,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       uuidGenerator,
     });
 
-    associatePeConnectFederatedIdentity = new BindConventionToFederatedIdentity(
+    associateFtConnectFederatedIdentity = new BindConventionToFederatedIdentity(
       uowPerformer,
       createNewEvent,
     );
@@ -55,7 +55,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       topic: "FederatedIdentityNotBoundToConvention",
       payload: { convention: conventionDtoFromEvent, triggeredBy: null },
     });
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -71,7 +71,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
       .withFederatedIdentity({ provider: "peConnect", token: authFailed })
       .build();
 
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -97,10 +97,10 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .build();
 
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -114,7 +114,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
     ).toBe(conventionId);
   });
 
-  it("should save event PeConnectFederatedIdentityAssociated", async () => {
+  it("should save event FtConnectFederatedIdentityAssociated", async () => {
     conventionFranceTravailAdvisorRepo.setConventionFranceTravailUsersAdvisor([
       conventionFranceTravailUserAdvisorFromDto(
         userAdvisorDto,
@@ -124,10 +124,10 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .build();
 
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -156,10 +156,10 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .build();
 
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -182,10 +182,10 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 
     const conventionDtoFromEvent = new ConventionDtoBuilder()
       .withId(conventionId)
-      .withFederatedIdentity({ provider: "peConnect", token: userPeExternalId })
+      .withFederatedIdentity({ provider: "peConnect", token: userFtExternalId })
       .build();
 
-    await associatePeConnectFederatedIdentity.execute({
+    await associateFtConnectFederatedIdentity.execute({
       convention: conventionDtoFromEvent,
     });
 
@@ -204,7 +204,7 @@ describe("AssociatePeConnectFederatedIdentity", () => {
 });
 
 const conventionId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-const userPeExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
+const userFtExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
 const userAdvisorDto: FtUserAndAdvisor = {
   advisor: {
     email: "elsa.oldenburg@pole-emploi.net",
@@ -213,7 +213,7 @@ const userAdvisorDto: FtUserAndAdvisor = {
     type: "CAPEMPLOI",
   },
   user: {
-    peExternalId: userPeExternalId,
+    peExternalId: userFtExternalId,
     email: "",
     firstName: "",
     isJobseeker: true,

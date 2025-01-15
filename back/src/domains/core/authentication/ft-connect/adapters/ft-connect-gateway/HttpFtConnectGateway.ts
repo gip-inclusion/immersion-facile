@@ -22,17 +22,17 @@ import {
   FtConnectHeaders,
   FtConnectOauthConfig,
 } from "./ftConnectApi.dto";
-import { peConnectErrorStrategy as peConnectAxiosErrorStrategy } from "./ftConnectApi.error";
+import { ftConnectErrorStrategy } from "./ftConnectApi.error";
 import {
-  PeConnectExternalRoutes,
+  FtConnectExternalRoutes,
   toAccessToken,
-  toPeConnectAdvisorDto,
-  toPeConnectUserDto,
+  toFtConnectAdvisorDto,
+  toFtConnectUserDto,
 } from "./ftConnectApi.routes";
 import {
-  externalPeConnectAdvisorsSchema,
-  externalPeConnectUserSchema,
-  externalPeConnectUserStatutSchema,
+  externalFtConnectAdvisorsSchema,
+  externalFtConnectUserSchema,
+  externalFtConnectUserStatutSchema,
 } from "./ftConnectApi.schema";
 
 const logger = createLogger(__filename);
@@ -44,7 +44,7 @@ type CounterType =
   | "exchangeCodeForAccessToken";
 
 const counterApiKind = "peConnect";
-const makePeConnectLogger = (
+const makeFtConnectLogger = (
   logger: OpacifiedLogger,
   counterType: CounterType,
 ) => ({
@@ -68,16 +68,16 @@ const makePeConnectLogger = (
     }),
 });
 
-const getUserStatutInfoLogger = makePeConnectLogger(
+const getUserStatutInfoLogger = makeFtConnectLogger(
   logger,
   "getUserStatutInfo",
 );
 
-const getAdvisorsInfoLogger = makePeConnectLogger(logger, "getAdvisorsInfo");
+const getAdvisorsInfoLogger = makeFtConnectLogger(logger, "getAdvisorsInfo");
 
-const getUserInfoLogger = makePeConnectLogger(logger, "getUserInfo");
+const getUserInfoLogger = makeFtConnectLogger(logger, "getUserInfo");
 
-const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
+const exchangeCodeForAccessTokenLogger = makeFtConnectLogger(
   logger,
   "exchangeCodeForAccessToken",
 );
@@ -85,9 +85,9 @@ const exchangeCodeForAccessTokenLogger = makePeConnectLogger(
 const ftConnectMaxRequestsPerInterval = 1;
 const rate_ms = 1250;
 
-// TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS PE
+// TODO GERER LE RETRY POUR L'ENSEMBLE DES APPELS FT
 export class HttpFtConnectGateway implements FtConnectGateway {
-  // PE Connect limit rate at 1 call per 1.2s
+  // FT Connect limit rate at 1 call per 1.2s
   #limiter = new Bottleneck({
     reservoir: ftConnectMaxRequestsPerInterval,
     reservoirRefreshInterval: rate_ms, // number of ms
@@ -97,7 +97,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
   });
 
   constructor(
-    private httpClient: HttpClient<PeConnectExternalRoutes>,
+    private httpClient: HttpClient<FtConnectExternalRoutes>,
     private configs: FtConnectOauthConfig,
   ) {}
 
@@ -143,7 +143,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         },
         (payload) => notifyDiscordOnNotError(payload),
       );
-      return managePeConnectError(error, "exchangeCodeForAccessToken", {
+      return manageFtConnectError(error, "exchangeCodeForAccessToken", {
         authorization: authorizationCode,
       });
     }
@@ -162,19 +162,19 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       Authorization: `Bearer ${accessToken.value}`,
     };
 
-    const externalPeUser = await this.#getUserInfo(headers);
+    const externalFtUser = await this.#getUserInfo(headers);
     const isUserJobseeker = await this.#userIsJobseeker(
       headers,
-      externalPeUser?.idIdentiteExterne,
+      externalFtUser?.idIdentiteExterne,
     );
 
-    return externalPeUser
+    return externalFtUser
       ? {
-          user: toPeConnectUserDto({ ...externalPeUser, isUserJobseeker }),
+          user: toFtConnectUserDto({ ...externalFtUser, isUserJobseeker }),
           advisors: (isUserJobseeker
             ? await this.#getAdvisorsInfo(headers)
             : []
-          ).map(toPeConnectAdvisorDto),
+          ).map(toFtConnectAdvisorDto),
         }
       : undefined;
   }
@@ -199,13 +199,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return false;
       }
-      const externalPeConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalPeConnectUserStatutSchema,
+      const externalFtConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalFtConnectUserStatutSchema,
         response.body,
         logger,
       );
       const isJobSeeker = isJobSeekerFromStatus(
-        externalPeConnectStatut.codeStatutIndividu,
+        externalFtConnectStatut.codeStatutIndividu,
       );
       log.success({ ftConnect: { peExternalId, isJobSeeker } });
       return isJobSeeker;
@@ -219,7 +219,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       );
       return error instanceof ZodError
         ? false
-        : managePeConnectError(error, "getUserStatutInfo", {
+        : manageFtConnectError(error, "getUserStatutInfo", {
             authorization: headers.Authorization,
           });
     }
@@ -243,13 +243,13 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalPeConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalPeConnectUserSchema,
+      const externalFtConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
+        externalFtConnectUserSchema,
         response.body,
         logger,
       );
       log.success({});
-      return externalPeConnectUser;
+      return externalFtConnectUser;
     } catch (error) {
       errorChecker(
         error,
@@ -259,7 +259,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (payload) => notifyDiscordOnNotError(payload),
       );
       if (error instanceof ZodError) return undefined;
-      return managePeConnectError(error, "getUserInfo", {
+      return manageFtConnectError(error, "getUserInfo", {
         authorization: headers.Authorization,
       });
     }
@@ -283,14 +283,14 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return [];
       }
-      const externalPeConnectAdvisors =
+      const externalFtConnectAdvisors =
         parseZodSchemaAndLogErrorOnParsingFailure(
-          externalPeConnectAdvisorsSchema,
+          externalFtConnectAdvisorsSchema,
           response.body,
           logger,
         );
       log.success({});
-      return externalPeConnectAdvisors;
+      return externalFtConnectAdvisors;
     } catch (error) {
       errorChecker(
         error,
@@ -307,16 +307,16 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return [];
       }
-      return managePeConnectError(error, "getAdvisorsInfo", {
+      return manageFtConnectError(error, "getAdvisorsInfo", {
         authorization: headers.Authorization,
       });
     }
   }
 }
 
-const managePeConnectError = (
+const manageFtConnectError = (
   error: unknown,
-  routeName: keyof PeConnectExternalRoutes,
+  routeName: keyof FtConnectExternalRoutes,
   context: Record<string, string>,
 ): never => {
   if (!(error instanceof Error))
@@ -326,12 +326,10 @@ const managePeConnectError = (
     );
   if (axios.isAxiosError(error)) {
     logger.error({
-      message: `PE CONNECT ERROR - ${routeName}`,
+      message: `FT CONNECT ERROR - ${routeName}`,
       error,
     });
-    const handledError = peConnectAxiosErrorStrategy(error, routeName).get(
-      true,
-    );
+    const handledError = ftConnectErrorStrategy(error, routeName).get(true);
     if (handledError) throw handledError;
     throw new UnhandledError("Erreur axios non gérée", error);
   }
@@ -358,7 +356,7 @@ const notifyDiscordOnNotError = (payload: unknown): void =>
 const isJobSeekerFromStatus = (codeStatutIndividu: "0" | "1"): boolean =>
   codeStatutIndividu === "1";
 
-/** Should not occur if PE apis respect contract => a jobseeker OAuth should have advisors */
+/** Should not occur if FT apis respect contract => a jobseeker OAuth should have advisors */
 const isJobseekerButNoAdvisorsResponse = (error: unknown) =>
   axios.isAxiosError(error) &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;
