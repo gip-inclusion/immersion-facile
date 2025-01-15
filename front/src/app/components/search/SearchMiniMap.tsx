@@ -75,7 +75,7 @@ const getDefaultZoomLevel = (
   if (kind === "single") {
     return 17;
   }
-  return distanceKm ? distanceToZoomOptions[distanceKm] : 10;
+  return distanceKm ? distanceToZoomOptions[distanceKm] : 5;
 };
 
 export const SearchMiniMap = ({
@@ -101,10 +101,11 @@ export const SearchMiniMap = ({
   );
 
   useEffect(() => {
-    if (markerProps?.position) {
-      mapRef.current?.setView(markerProps.position, zoom);
-    }
-  }, [markerProps?.position, zoom]);
+    const latLon = markerProps
+      ? markerProps.position
+      : ([latitude, longitude] as L.LatLngExpression);
+    mapRef.current?.setView(latLon, zoom);
+  }, [markerProps, zoom, latitude, longitude]);
 
   return (
     <div ref={searchResultsWrapper} key={`map-${kind}`}>
@@ -117,7 +118,7 @@ export const SearchMiniMap = ({
           }
           zoom={zoom}
           touchZoom={true}
-          minZoom={6}
+          minZoom={5}
           ref={mapRef}
         >
           <TileLayer
