@@ -1,4 +1,12 @@
-import { WithAssessmentDto, errors, withAssessmentSchema } from "shared";
+import {
+  AssessmentDto,
+  AssessmentStatus,
+  ExtractFromExisting,
+  WithAssessmentDto,
+  computeTotalHours,
+  errors,
+  withAssessmentSchema,
+} from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -38,29 +46,50 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
 
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "NEW_ASSESSMENT_CREATED_AGENCY_NOTIFICATION",
-        recipients: agency.validatorEmails,
-        params: {
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          businessName: convention.businessName,
-          conventionId: convention.id,
-          dateEnd: convention.dateEnd,
-          dateStart: convention.dateStart,
-          establishmentFeedback: assessment.establishmentFeedback,
-          assessmentStatus: assessment.status,
-          immersionObjective: convention.immersionObjective,
-          internshipKind: convention.internshipKind,
+    if (didBeneficiaryCame(assessment)) {
+      const numberOfHoursMade = computeTotalHours({
+        convention,
+        assessmentStatus: assessment.status,
+        missedHours:
+          assessment.status === "PARTIALLY_COMPLETED"
+            ? assessment.numberOfMissedHours
+            : 0,
+      });
+
+      await this.#saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
+          recipients: agency.validatorEmails,
+          params: {
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            businessName: convention.businessName,
+            conventionId: convention.id,
+            immersionObjective: convention.immersionObjective,
+            internshipKind: convention.internshipKind,
+            assessment,
+            numberOfHoursMade,
+          },
         },
-      },
-      followedIds: {
-        conventionId: convention.id,
-        agencyId: convention.agencyId,
-        establishmentSiret: convention.siret,
-      },
-    });
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        },
+      });
+    }
   }
 }
+
+const didBeneficiaryCame = (
+  assessment: AssessmentDto,
+): assessment is Extract<
+  AssessmentDto,
+  {
+    status: ExtractFromExisting<
+      AssessmentStatus,
+      "COMPLETED" | "PARTIALLY_COMPLETED"
+    >;
+  }
+> => assessment.status !== "DID_NOT_SHOW";

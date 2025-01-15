@@ -28,7 +28,7 @@ export type WithAssessmentStatus =
     }
   | {
       status: ExtractFromExisting<AssessmentStatus, "PARTIALLY_COMPLETED">;
-      lastDayOfPresence: DateString | null;
+      lastDayOfPresence: DateString | undefined;
       numberOfMissedHours: number;
     };
 
