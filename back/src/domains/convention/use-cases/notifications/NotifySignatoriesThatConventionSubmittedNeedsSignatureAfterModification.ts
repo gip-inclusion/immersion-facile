@@ -59,7 +59,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
     _jwtPayload?: ConventionJwtPayload | undefined,
   ): Promise<void> {
     const { agency, convention: conventionReadDto } =
-      await retrieveConventionWithAgency(uow, convention);
+      await retrieveConventionWithAgency(uow, convention.id);
     await Promise.all(
       values(conventionReadDto.signatories)
         .filter(filterNotFalsy)

@@ -11,8 +11,8 @@ import {
   RenewMagicLinkRequestDto,
   Role,
   frontRoutes,
+  makeEmailHash,
   renewMagicLinkRequestSchema,
-  stringToMd5,
 } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
@@ -176,7 +176,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
   ) {
     let foundHit = false;
     for (const email of emails) {
-      if (!emailHash || stringToMd5(email) === emailHash) {
+      if (!emailHash || makeEmailHash(email) === emailHash) {
         foundHit = true;
 
         const makeMagicShortLink = prepareMagicShortLinkMaker({

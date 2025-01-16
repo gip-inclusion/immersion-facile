@@ -1,4 +1,3 @@
-import { toPairs } from "ramda";
 import {
   AgencyWithUsersRights,
   ConventionDomainPayload,
@@ -9,14 +8,16 @@ import {
   InclusionConnectJwtPayload,
   NotFoundError,
   WithConventionId,
+  errors,
   getIcUserRoleForAccessingConvention,
-  stringToMd5,
   withConventionIdSchema,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
-import { conventionEmailsByRole } from "../../../utils/convention";
+import {
+  isHashMatchConventionEmails,
+  isHashMatchNotNotifiedCounsellorOrValidator,
+  isHashMatchPeAdvisorEmail,
+} from "../../../utils/emailHash";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getIcUserByUserId } from "../../inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 
@@ -83,16 +84,16 @@ export class GetConvention extends TransactionalUseCase<
     agency: AgencyWithUsersRights;
     uow: UnitOfWork;
   }): Promise<ConventionReadDto> {
-    const matchingMd5Emails = await this.#isMatchingMd5Emails({
+    const matchingMd5Emails = await this.#isEmailHashMatch({
       authPayload,
       convention,
       agency,
       uow,
     });
     if (!matchingMd5Emails) {
-      throw new ForbiddenError(
-        `User has no right on convention '${convention.id}'`,
-      );
+      throw errors.convention.forbiddenMissingRights({
+        conventionId: convention.id,
+      });
     }
 
     return convention;
@@ -132,7 +133,7 @@ export class GetConvention extends TransactionalUseCase<
     );
   }
 
-  async #isMatchingMd5Emails({
+  async #isEmailHashMatch({
     authPayload,
     convention,
     agency,
@@ -143,53 +144,26 @@ export class GetConvention extends TransactionalUseCase<
     agency: AgencyWithUsersRights;
     uow: UnitOfWork;
   }): Promise<boolean> {
-    const emailsByRole = conventionEmailsByRole(
+    const isMatchingConventionEmails = await isHashMatchConventionEmails({
       convention,
-      await agencyWithRightToAgencyDto(uow, agency),
-    )[authPayload.role];
-    if (emailsByRole instanceof Error) throw emailsByRole;
-    const isEmailMatchingConventionEmails = !!emailsByRole.find(
-      (email) => authPayload.emailHash === stringToMd5(email),
-    );
+      uow,
+      agency,
+      authPayload,
+    });
     const isEmailMatchingIcUserEmails =
-      await this.#isInclusionConnectedCounsellorOrValidator({
+      await isHashMatchNotNotifiedCounsellorOrValidator({
         authPayload,
-        agencyWithRights: agency,
+        agency,
         uow,
       });
-    const peAdvisorEmail =
-      convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
-        .email;
-    const isEmailMatchingPeAdvisor = peAdvisorEmail
-      ? stringToMd5(peAdvisorEmail) === authPayload.emailHash
-      : false;
+    const isEmailMatchingPeAdvisor = isHashMatchPeAdvisorEmail({
+      convention,
+      authPayload,
+    });
     return (
-      isEmailMatchingConventionEmails ||
+      isMatchingConventionEmails ||
       isEmailMatchingIcUserEmails ||
       isEmailMatchingPeAdvisor
     );
-  }
-
-  async #isInclusionConnectedCounsellorOrValidator({
-    authPayload: { role, emailHash },
-    agencyWithRights,
-    uow,
-  }: {
-    authPayload: ConventionDomainPayload;
-    agencyWithRights: AgencyWithUsersRights;
-    uow: UnitOfWork;
-  }) {
-    if (role !== "counsellor" && role !== "validator") return false;
-
-    const userIdsWithRoleOnAgency = toPairs(agencyWithRights.usersRights)
-      .filter(([_, right]) => right?.roles.includes(role))
-      .map(([id]) => id);
-
-    const users = await uow.userRepository.getByIds(
-      userIdsWithRoleOnAgency,
-      await makeProvider(uow),
-    );
-
-    return users.some((user) => stringToMd5(user.email) === emailHash);
   }
 }

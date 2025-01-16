@@ -5,7 +5,6 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   DateString,
-  Email,
   InclusionConnectedUser,
   Role,
   Signatories,
@@ -16,11 +15,10 @@ import {
   errors,
   getRequesterRole,
   reviewedConventionStatuses,
-  stringToMd5,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import {
@@ -332,28 +330,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     payload: UpdateConventionStatusSupportedJwtPayload,
     originalConvention: ConventionDto,
   ): Promise<string> => {
-    const getEmailFromEmailHash = async (
-      agencyId: AgencyId,
-      emailHash: string,
-    ): Promise<Email> => {
-      const agencyWithRights = await uow.agencyRepository.getById(agencyId);
-      if (!agencyWithRights) throw errors.agency.notFound({ agencyId });
-      const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-      const agencyEmails = [
-        ...agency.validatorEmails,
-        ...agency.counsellorEmails,
-      ];
-
-      const email = agencyEmails.find(
-        (agencyEmail) => stringToMd5(agencyEmail) === emailHash,
-      );
-
-      if (!email) throw errors.agency.emailNotFound({ agencyId });
-
-      return email;
-    };
-
     if (!("role" in payload)) {
       const agencyIcUserEmail = await this.#agencyEmailFromUserIdAndAgencyId(
         uow,
@@ -364,7 +340,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     }
 
     return "emailHash" in payload
-      ? getEmailFromEmailHash(originalConvention.agencyId, payload.emailHash)
+      ? getAgencyEmailFromEmailHash(
+          uow,
+          originalConvention.agencyId,
+          payload.emailHash,
+        )
       : backOfficeEmail;
   };
 }

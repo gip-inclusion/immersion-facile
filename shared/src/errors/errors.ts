@@ -44,17 +44,25 @@ import {
 
 export const errors = {
   assessment: {
+    alreadyExist: (conventionId: ConventionId) =>
+      new ConflictError(
+        `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
+      ),
+    badStatus: (status: ConventionStatus) =>
+      new BadRequestError(
+        `Il n'est pas possible de créer un bilan d'immersion pour une convention qui n'est pas validée, le status actuel étant '${status}'.`,
+      ),
     notFound: (conventionId: ConventionId) =>
       new NotFoundError(
-        `Il n'y a pas de bilan pour la convention ${conventionId}`,
+        `Il n'y a pas de bilan pour la convention ${conventionId}.`,
       ),
     forbidden: () =>
       new ForbiddenError(
-        "Only an establishment tutor can create or get an assessment",
+        "Seul le tuteur de l'entreprise ou bien les conseillers ou les validateurs de l'agence prescriptrice peuvent récupérer ou créer le bilan.",
       ),
     conventionIdMismatch: () =>
       new ForbiddenError(
-        "Convention provided in DTO is not the same as application linked to it",
+        "Il y a un décalage d'identifiant de convention dans les données envoyées.",
       ),
   },
   inclusionConnect: {
@@ -105,6 +113,10 @@ export const errors = {
       new ForbiddenError(
         `Impossible de créer une convention avec le statut "${status}"`,
       ),
+    forbiddenMissingRights: ({
+      conventionId,
+    }: { conventionId: ConventionId }) =>
+      new ForbiddenError(`User has no right on convention '${conventionId}'`),
     badRoleStatusChange: ({
       roles,
       status,

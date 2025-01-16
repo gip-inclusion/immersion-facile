@@ -23,7 +23,7 @@ import {
   expectToEqual,
   expiredMagicLinkErrorMessage,
   frontRoutes,
-  stringToMd5,
+  makeEmailHash,
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -282,7 +282,9 @@ describe("convention e2e", () => {
             generateConventionJwt({
               applicationId: convention.id,
               role: "beneficiary",
-              emailHash: stringToMd5(convention.signatories.beneficiary.email),
+              emailHash: makeEmailHash(
+                convention.signatories.beneficiary.email,
+              ),
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
               exp:
                 Math.round(gateways.timeGateway.now().getTime() / 1000) +

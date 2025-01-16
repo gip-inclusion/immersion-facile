@@ -1,7 +1,6 @@
 import {
   WithAssessmentDto,
   computeTotalHours,
-  errors,
   withAssessmentSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
@@ -9,6 +8,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { retrieveConventionWithAgency } from "../../entities/Convention";
 
 export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<WithAssessmentDto> {
   protected inputSchema = withAssessmentSchema;
@@ -27,28 +27,21 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
     { assessment }: WithAssessmentDto,
     uow: UnitOfWork,
   ): Promise<void> {
-    const convention = await uow.conventionRepository.getById(
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
       assessment.conventionId,
     );
-    if (!convention)
-      throw errors.convention.notFound({
-        conventionId: assessment.conventionId,
-      });
 
-    const agencyWithRights = await uow.agencyRepository.getById(
-      convention.agencyId,
-    );
-    if (!agencyWithRights)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    const { validatorEmails, counsellorEmails } =
+      await agencyWithRightToAgencyDto(uow, agency);
+    const recipients = [...validatorEmails, ...counsellorEmails];
 
     if (assessment.status === "DID_NOT_SHOW") {
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
-          recipients: [...agency.counsellorEmails, ...agency.validatorEmails],
+          recipients,
           params: {
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -78,7 +71,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         kind: "email",
         templatedContent: {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-          recipients: [...agency.counsellorEmails, ...agency.validatorEmails],
+          recipients,
           params: {
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,

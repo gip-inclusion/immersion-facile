@@ -7,6 +7,7 @@ import {
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -16,9 +17,13 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
-const conventionId = "my-Convention-id";
-
 describe("Assessment routes", () => {
+  const agency = new AgencyDtoBuilder().build();
+  const convention = new ConventionDtoBuilder()
+    .withAgencyId(agency.id)
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .build();
+
   let httpClient: HttpClient<ConventionMagicLinkRoutes>;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
@@ -31,9 +36,9 @@ describe("Assessment routes", () => {
 
     jwt = testAppAndDeps.generateConventionJwt(
       createConventionMagicLinkPayload({
-        id: conventionId,
+        id: convention.id,
         role: "establishment-tutor",
-        email: "establishment@company.fr",
+        email: convention.establishmentTutor.email,
         now: new Date(),
       }),
     );
@@ -41,24 +46,15 @@ describe("Assessment routes", () => {
       conventionMagicLinkRoutes,
       testAppAndDeps.request,
     );
+    inMemoryUow.conventionRepository.setConventions([convention]);
   });
 
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.createAssessment,
   )} to add assessment`, () => {
     it("returns 201 if the jwt is valid", async () => {
-      const agency = new AgencyDtoBuilder().build();
-
-      const convention = new ConventionDtoBuilder()
-        .withId(conventionId)
-        .withAgencyId(agency.id)
-        .withStatus("ACCEPTED_BY_VALIDATOR")
-        .build();
-
-      inMemoryUow.conventionRepository.setConventions([convention]);
-
       const assessment: AssessmentDto = {
-        conventionId,
+        conventionId: convention.id,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -87,7 +83,7 @@ describe("Assessment routes", () => {
 
     it("fails with 401 if jwt is not valid", async () => {
       const assessment: AssessmentDto = {
-        conventionId,
+        conventionId: convention.id,
         status: "COMPLETED",
         establishmentFeedback: "The guy left after one day",
         endedWithAJob: false,
@@ -107,7 +103,7 @@ describe("Assessment routes", () => {
 
     it("fails with 400 if some data is not valid", async () => {
       const assessment: AssessmentDto = {
-        conventionId,
+        conventionId: convention.id,
         status: "COMPLETED",
         establishmentFeedback: "",
         endedWithAJob: false,
@@ -131,8 +127,14 @@ describe("Assessment routes", () => {
     });
 
     it("fails with 403 if convention id does not matches the one in token", async () => {
+      const anotherConvention = new ConventionDtoBuilder()
+        .withId("another-convention-id")
+        .build();
+
+      inMemoryUow.conventionRepository.setConventions([anotherConvention]);
+
       const assessment: AssessmentDto = {
-        conventionId: "another-convention-id",
+        conventionId: anotherConvention.id,
         status: "COMPLETED",
         establishmentFeedback: "mon feedback",
         endedWithAJob: false,
@@ -148,8 +150,7 @@ describe("Assessment routes", () => {
         status: 403,
         body: {
           status: 403,
-          message:
-            "Convention provided in DTO is not the same as application linked to it",
+          message: errors.assessment.conventionIdMismatch().message,
         },
       });
     });
