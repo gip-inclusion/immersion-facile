@@ -18,6 +18,12 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
     );
   }
 
+  public async getByConventionIds(
+    _conventionIds: ConventionId[],
+  ): Promise<AssessmentEntity[]> {
+    throw new Error("Method not implemented.");
+  }
+
   public async save(assessment: AssessmentEntity): Promise<void> {
     this.#assessments.push(assessment);
   }

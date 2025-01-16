@@ -6,4 +6,7 @@ export interface AssessmentRepository {
   getByConventionId(
     conventionId: ConventionId,
   ): Promise<AssessmentEntity | undefined>;
+  getByConventionIds(
+    conventionIds: ConventionId[],
+  ): Promise<AssessmentEntity[]>;
 }
