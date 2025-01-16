@@ -3,8 +3,11 @@ import {
   AgencyId,
   AgencyWithUsersRights,
   ConventionDomainPayload,
+  ConventionDto,
   ConventionReadDto,
   Email,
+  Role,
+  UserWithAdminRights,
   errors,
   isSomeEmailMatchingEmailHash,
   makeEmailHash,
@@ -94,3 +97,27 @@ export const isHashMatchPeAdvisorEmail = ({
     ? isSomeEmailMatchingEmailHash([peAdvisorEmail], authPayload.emailHash)
     : false;
 };
+
+export const makeHashByRolesForTest = (
+  convention: ConventionDto,
+  counsellor: UserWithAdminRights,
+  validator: UserWithAdminRights,
+): Record<Role, string> => ({
+  "agency-admin": "N/A",
+  "agency-viewer": "N/A",
+  "back-office": "N/A",
+  "beneficiary-current-employer": makeEmailHash(
+    convention.signatories.beneficiaryCurrentEmployer?.email ?? "N/A",
+  ),
+  "beneficiary-representative": makeEmailHash(
+    convention.signatories.beneficiaryRepresentative?.email ?? "N/A",
+  ),
+  "establishment-representative": makeEmailHash(
+    convention.signatories.establishmentRepresentative.email,
+  ),
+  "to-review": "N/A",
+  beneficiary: makeEmailHash(convention.signatories.beneficiary.email),
+  "establishment-tutor": makeEmailHash(convention.establishmentTutor.email),
+  counsellor: makeEmailHash(counsellor.email ?? "N/A"),
+  validator: makeEmailHash(validator.email),
+});
