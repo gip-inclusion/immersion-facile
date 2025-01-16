@@ -1,4 +1,4 @@
-import { Email, EmailType } from "shared";
+import { Email, EmailParamsByEmailType, EmailType } from "shared";
 import {
   EmailNotification,
   Notification,
@@ -22,6 +22,10 @@ export interface NotificationRepository {
     id: NotificationId,
     kind: NotificationKind,
   ) => Promise<Notification | undefined>;
+  getEmailsByKindAndAroundCreatedAt: (
+    kind: keyof EmailParamsByEmailType,
+    createdAt: Date,
+  ) => Promise<EmailNotification[]>;
   getLastNotifications: () => Promise<{
     emails: EmailNotification[];
     sms: SmsNotification[];

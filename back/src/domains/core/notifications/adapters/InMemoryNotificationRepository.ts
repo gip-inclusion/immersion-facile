@@ -1,9 +1,11 @@
-import { parseISO } from "date-fns";
+import { addDays, parseISO } from "date-fns";
+import subDays from "date-fns/subDays";
 import {
   AgencyDto,
   AgencyWithUsersRights,
   ConventionDto,
   EmailNotification,
+  EmailParamsByEmailType,
   Notification,
   NotificationId,
   NotificationKind,
@@ -45,6 +47,20 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     return getNotificationsMatchingKindAndIds(kind, this.notifications, [
       id,
     ])[0];
+  }
+
+  public getEmailsByKindAndAroundCreatedAt(
+    kind: keyof EmailParamsByEmailType,
+    createdAt: Date,
+  ): Promise<EmailNotification[]> {
+    const emailNotifications = this.notifications.filter(
+      (notification): notification is EmailNotification =>
+        notification.kind === "email" &&
+        notification.templatedContent.kind === kind &&
+        notification.createdAt >= subDays(createdAt, 1).toISOString() &&
+        notification.createdAt <= addDays(createdAt, 1).toISOString(),
+    );
+    return Promise.resolve(emailNotifications);
   }
 
   public async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
