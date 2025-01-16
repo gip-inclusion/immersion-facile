@@ -1,7 +1,10 @@
+import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import { map, uniq } from "ramda";
 import {
   EmailNotification,
+  EmailParamsByEmailType,
   Notification,
   NotificationId,
   NotificationKind,
@@ -52,6 +55,26 @@ export class PgNotificationRepository implements NotificationRepository {
           throwIfReached: true,
         });
     }
+  }
+
+  public async getEmailsByKindAndAroundCreatedAt(
+    emailKind: keyof EmailParamsByEmailType,
+    createdAt: Date,
+  ): Promise<EmailNotification[]> {
+    return getEmailsNotificationBuilder(this.transaction)
+      .where("e.email_kind", "=", emailKind)
+      .where(
+        sql`e.created_at`,
+        ">=",
+        subDays(createdAt, 1).toISOString().split("T")[0],
+      )
+      .where(
+        sql`e.created_at`,
+        "<=",
+        addDays(createdAt, 1).toISOString().split("T")[0],
+      )
+      .execute()
+      .then(map((row) => row.notif));
   }
 
   async getSmsByIds(ids: NotificationId[]): Promise<SmsNotification[]> {
