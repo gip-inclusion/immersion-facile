@@ -58,7 +58,7 @@ export const errors = {
       ),
     forbidden: () =>
       new ForbiddenError(
-        "Seul le tuteur de l'entreprise ou bien les conseillers ou les validateurs de l'agence prescriptrice peuvent récupérer ou créer le bilan.",
+        "Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs notifiés par email de l'agence prescriptrice peuvent récupérer ou créer le bilan.",
       ),
     conventionIdMismatch: () =>
       new ForbiddenError(
