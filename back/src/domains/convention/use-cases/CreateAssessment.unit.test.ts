@@ -1,184 +1,261 @@
 import {
+  AgencyDtoBuilder,
   AssessmentDto,
+  ConventionDomainPayload,
   ConventionDtoBuilder,
-  ConventionJwtPayload,
+  ForbiddenError,
+  InclusionConnectedUserBuilder,
+  Role,
+  allRoles,
   conventionStatuses,
-  currentJwtVersions,
+  errors,
   expectArraysToEqual,
-  expectObjectsToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
+  makeEmailHash,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import {
-  BadRequestError,
-  ConflictError,
-  ForbiddenError,
-  NotFoundError,
-} from "shared";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryAssessmentRepository } from "../adapters/InMemoryAssessmentRepository";
-import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
-import { AssessmentEntity } from "../entities/AssessmentEntity";
+import {
+  AssessmentEntity,
+  acceptedConventionStatusesForAssessment,
+} from "../entities/AssessmentEntity";
 import { CreateAssessment, makeCreateAssessment } from "./CreateAssessment";
 
-const conventionId = "conventionId";
-
-const assessment: AssessmentDto = {
-  conventionId,
-  status: "COMPLETED",
-  endedWithAJob: false,
-  establishmentFeedback: "Ca c'est bien passé",
-  establishmentAdvices: "mon conseil",
-};
-
-const ConventionDtoBuilderWithId = new ConventionDtoBuilder().withId(
-  conventionId,
-);
-
-const validPayload: ConventionJwtPayload = {
-  applicationId: conventionId,
-  role: "establishment-tutor",
-  emailHash: "",
-  version: currentJwtVersions.convention,
-};
-
 describe("CreateAssessment", () => {
-  let outboxRepository: InMemoryOutboxRepository;
-  let conventionRepository: InMemoryConventionRepository;
-  let createAssessment: CreateAssessment;
-  let uowPerformer: InMemoryUowPerformer;
-  let assessmentRepository: InMemoryAssessmentRepository;
+  const agency = new AgencyDtoBuilder().build();
+  const counsellor = new InclusionConnectedUserBuilder()
+    .withId("counsellor")
+    .withEmail("counsellor@mail.com")
+    .buildUser();
+  const validator = new InclusionConnectedUserBuilder()
+    .withId("validator")
+    .withEmail("validator@mail.com")
+    .buildUser();
 
-  beforeEach(() => {
-    const uow = createInMemoryUow();
-    assessmentRepository = uow.assessmentRepository;
-    conventionRepository = uow.conventionRepository;
-    outboxRepository = uow.outboxRepository;
-    uowPerformer = new InMemoryUowPerformer(uow);
-    const convention = ConventionDtoBuilderWithId.withStatus(
-      "ACCEPTED_BY_VALIDATOR",
-    )
-      .withId(conventionId)
-      .build();
-    conventionRepository.setConventions([convention]);
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway: new CustomTimeGateway(),
-      uuidGenerator: new TestUuidGenerator(),
-    });
-    createAssessment = makeCreateAssessment({
-      uowPerformer,
-      deps: { createNewEvent },
-    });
-  });
+  const validatedConvention = new ConventionDtoBuilder()
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withAgencyId(agency.id)
+    .build();
 
-  it("throws forbidden if no magicLink payload is provided", async () => {
-    await expectPromiseToFailWithError(
-      createAssessment.execute(assessment, undefined),
-      new ForbiddenError("No magic link provided"),
-    );
-  });
+  const assessment: AssessmentDto = {
+    conventionId: validatedConvention.id,
+    status: "COMPLETED",
+    endedWithAJob: false,
+    establishmentFeedback: "Ca c'est bien passé",
+    establishmentAdvices: "mon conseil",
+  };
 
-  it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
-    await expectPromiseToFailWithError(
-      createAssessment.execute(assessment, {
-        applicationId: "otherId",
-        role: "establishment-tutor",
-      } as ConventionJwtPayload),
-      new ForbiddenError(
-        "Convention provided in DTO is not the same as application linked to it",
-      ),
-    );
-  });
-
-  it("throws forbidden if magicLink role is not establishment", async () => {
-    await expectPromiseToFailWithError(
-      createAssessment.execute(assessment, {
-        applicationId: conventionId,
-        role: "beneficiary",
-      } as ConventionJwtPayload),
-      new ForbiddenError(
-        "Only an establishment tutor can create or get an assessment",
-      ),
-    );
-  });
-
-  it("throws not found if provided conventionId does not match any in DB", async () => {
-    const notFoundId = "not-found-id";
-    await expectPromiseToFailWithError(
-      createAssessment.execute(
-        { ...assessment, conventionId: notFoundId },
-        { ...validPayload, applicationId: notFoundId },
-      ),
-      new NotFoundError(`Did not found convention with id: ${notFoundId}`),
-    );
-  });
-
-  it("throws ConflictError if the assessment already exists for the Convention", async () => {
-    assessmentRepository.setAssessments([
-      { ...assessment, _entityName: "Assessment" },
-    ]);
-    await expectPromiseToFailWithError(
-      createAssessment.execute(assessment, validPayload),
-      new ConflictError(
-        `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
-      ),
-    );
-  });
+  const tutorPayload: ConventionDomainPayload = {
+    applicationId: validatedConvention.id,
+    role: "establishment-tutor",
+    emailHash: makeEmailHash(validatedConvention.establishmentTutor.email),
+  };
 
   const [passingStatuses, failingStatuses] = splitCasesBetweenPassingAndFailing(
     conventionStatuses,
-    ["ACCEPTED_BY_VALIDATOR"],
+    acceptedConventionStatusesForAssessment,
   );
 
-  it.each(failingStatuses.map((status) => ({ status })))(
-    "throws bad request if the Convention status is $status",
-    async ({ status }) => {
-      const convention = ConventionDtoBuilderWithId.withStatus(status).build();
-      conventionRepository.setConventions([convention]);
-
-      await expectPromiseToFailWithError(
-        createAssessment.execute(assessment, validPayload),
-        new BadRequestError(
-          `Cannot create an assessment for which the convention has not been validated, status was ${status}`,
-        ),
-      );
-    },
+  const [passingRoles, failingRoles] = splitCasesBetweenPassingAndFailing(
+    allRoles,
+    ["establishment-tutor", "validator", "counsellor"],
   );
 
-  it.each(passingStatuses.map((status) => ({ status })))(
-    "should save the Assessment if Convention has status $status",
-    async ({ status }) => {
-      const convention = ConventionDtoBuilderWithId.withStatus(status).build();
-      conventionRepository.setConventions([convention]);
-      await createAssessment.execute(assessment, validPayload);
-
-      const expectedImmersionEntity: AssessmentEntity = {
-        ...assessment,
-        _entityName: "Assessment",
-      };
-      expectArraysToEqual(assessmentRepository.assessments, [
-        expectedImmersionEntity,
-      ]);
-    },
+  const passingStatusAndRoles = passingStatuses.flatMap((status) =>
+    passingRoles.map((role) => ({ status, role })),
   );
 
-  it("should dispatch an AssessmentCreated event", async () => {
-    await createAssessment.execute(assessment, validPayload);
-    expect(outboxRepository.events).toHaveLength(1);
-    expectObjectsToMatch(outboxRepository.events[0], {
-      topic: "AssessmentCreated",
-      payload: {
-        assessment,
-        triggeredBy: {
-          kind: "convention-magic-link",
-          role: validPayload.role,
-        },
+  let createAssessment: CreateAssessment;
+  let uow: InMemoryUnitOfWork;
+
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    createAssessment = makeCreateAssessment({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway: new CustomTimeGateway(),
+          uuidGenerator: new TestUuidGenerator(),
+        }),
       },
+    });
+
+    uow.conventionRepository.setConventions([validatedConvention]);
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    ];
+    uow.userRepository.users = [counsellor, validator];
+  });
+
+  describe("wrong path", () => {
+    it("throws forbidden if no magicLink payload is provided", async () => {
+      await expectPromiseToFailWithError(
+        createAssessment.execute(assessment, undefined),
+        new ForbiddenError("No magic link provided"),
+      );
+    });
+
+    it("throws forbidden if magicLink payload has a different applicationId linked", async () => {
+      await expectPromiseToFailWithError(
+        createAssessment.execute(assessment, {
+          ...tutorPayload,
+          applicationId: "otherId",
+        }),
+        errors.assessment.conventionIdMismatch(),
+      );
+    });
+
+    it("throws not found if provided conventionId does not match any in DB", async () => {
+      const notFoundId = "not-found-id";
+      await expectPromiseToFailWithError(
+        createAssessment.execute(
+          { ...assessment, conventionId: notFoundId },
+          { ...tutorPayload, applicationId: notFoundId },
+        ),
+        errors.convention.notFound({ conventionId: notFoundId }),
+      );
+    });
+
+    it("throws ConflictError if the assessment already exists for the Convention", async () => {
+      uow.assessmentRepository.setAssessments([
+        { ...assessment, _entityName: "Assessment" },
+      ]);
+      await expectPromiseToFailWithError(
+        createAssessment.execute(assessment, tutorPayload),
+        errors.assessment.alreadyExist(assessment.conventionId),
+      );
+    });
+
+    it.each(failingStatuses.map((status) => ({ status })))(
+      "throws bad request if the Convention status is '$status'",
+      async ({ status }) => {
+        const convention = new ConventionDtoBuilder(validatedConvention)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        await expectPromiseToFailWithError(
+          createAssessment.execute(assessment, tutorPayload),
+          errors.assessment.badStatus(status),
+        );
+      },
+    );
+
+    it.each(failingRoles)(
+      "throws forbidden if the jwt role is '%s'",
+      async (role) => {
+        await expectPromiseToFailWithError(
+          createAssessment.execute(assessment, { ...tutorPayload, role }),
+          errors.assessment.forbidden(),
+        );
+      },
+    );
+
+    it.each(["counsellor", "validator"] satisfies Role[])(
+      "throw forbidden if the jwt role is '%s' the user is not notified on agency rights",
+      async (role) => {
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [counsellor.id]: {
+              isNotifiedByEmail: false,
+              roles: ["counsellor"],
+            },
+            [validator.id]: {
+              isNotifiedByEmail: false,
+              roles: ["validator"],
+            },
+          }),
+        ];
+        await expectPromiseToFailWithError(
+          createAssessment.execute(assessment, {
+            ...tutorPayload,
+            emailHash: makeHashByRolesForTest(
+              validatedConvention,
+              counsellor,
+              validator,
+            )[role],
+            role,
+          }),
+          errors.assessment.forbidden(),
+        );
+      },
+    );
+  });
+
+  describe("Right paths", () => {
+    it.each(passingStatusAndRoles)(
+      "should save the Assessment if Convention has status $status and role with email hash in payload is $role",
+      async ({ status, role }) => {
+        const convention = new ConventionDtoBuilder(validatedConvention)
+          .withStatus(status)
+          .build();
+        uow.conventionRepository.setConventions([convention]);
+
+        const hashByRole: Record<typeof role, string> = {
+          "agency-admin": "N/A",
+          "agency-viewer": "N/A",
+          "back-office": "N/A",
+          "beneficiary-current-employer": makeEmailHash(
+            convention.signatories.beneficiaryCurrentEmployer?.email ?? "N/A",
+          ),
+          "beneficiary-representative": makeEmailHash(
+            convention.signatories.beneficiaryRepresentative?.email ?? "N/A",
+          ),
+          "establishment-representative": makeEmailHash(
+            convention.signatories.establishmentRepresentative.email,
+          ),
+          "to-review": "N/A",
+          beneficiary: makeEmailHash(convention.signatories.beneficiary.email),
+          "establishment-tutor": makeEmailHash(
+            convention.establishmentTutor.email,
+          ),
+          counsellor: makeEmailHash(counsellor.email ?? "N/A"),
+          validator: makeEmailHash(validator.email),
+        };
+
+        await createAssessment.execute(assessment, {
+          ...tutorPayload,
+          role,
+          emailHash: hashByRole[role],
+        });
+
+        const expectedImmersionEntity: AssessmentEntity = {
+          ...assessment,
+          _entityName: "Assessment",
+        };
+        expectArraysToEqual(uow.assessmentRepository.assessments, [
+          expectedImmersionEntity,
+        ]);
+      },
+    );
+
+    it("should dispatch an AssessmentCreated event", async () => {
+      await createAssessment.execute(assessment, tutorPayload);
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AssessmentCreated",
+          payload: {
+            assessment,
+            triggeredBy: {
+              kind: "convention-magic-link",
+              role: tutorPayload.role,
+            },
+          },
+        },
+      ]);
     });
   });
 });
