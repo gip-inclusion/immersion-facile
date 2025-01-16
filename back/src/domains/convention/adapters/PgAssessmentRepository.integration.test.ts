@@ -165,4 +165,17 @@ describe("PgAssessmentRepository", () => {
       );
     });
   });
+
+  describe("getByConventionIds", () => {
+    it("returns assessment found", async () => {
+      await assessmentRepository.save(minimalAssessment);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionIds([
+          minimalAssessment.conventionId,
+        ]),
+        [minimalAssessment],
+      );
+    });
+  });
 });
