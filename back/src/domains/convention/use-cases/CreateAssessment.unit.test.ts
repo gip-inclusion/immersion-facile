@@ -16,6 +16,7 @@ import {
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeHashByRolesForTest } from "../../../utils/emailHash";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -24,10 +25,7 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
-  AssessmentEntity,
-  acceptedConventionStatusesForAssessment,
-} from "../entities/AssessmentEntity";
+import { acceptedConventionStatusesForAssessment } from "../entities/AssessmentEntity";
 import { CreateAssessment, makeCreateAssessment } from "./CreateAssessment";
 
 describe("CreateAssessment", () => {
@@ -203,40 +201,19 @@ describe("CreateAssessment", () => {
           .build();
         uow.conventionRepository.setConventions([convention]);
 
-        const hashByRole: Record<typeof role, string> = {
-          "agency-admin": "N/A",
-          "agency-viewer": "N/A",
-          "back-office": "N/A",
-          "beneficiary-current-employer": makeEmailHash(
-            convention.signatories.beneficiaryCurrentEmployer?.email ?? "N/A",
-          ),
-          "beneficiary-representative": makeEmailHash(
-            convention.signatories.beneficiaryRepresentative?.email ?? "N/A",
-          ),
-          "establishment-representative": makeEmailHash(
-            convention.signatories.establishmentRepresentative.email,
-          ),
-          "to-review": "N/A",
-          beneficiary: makeEmailHash(convention.signatories.beneficiary.email),
-          "establishment-tutor": makeEmailHash(
-            convention.establishmentTutor.email,
-          ),
-          counsellor: makeEmailHash(counsellor.email ?? "N/A"),
-          validator: makeEmailHash(validator.email),
-        };
-
         await createAssessment.execute(assessment, {
           ...tutorPayload,
           role,
-          emailHash: hashByRole[role],
+          emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
+            role
+          ],
         });
 
-        const expectedImmersionEntity: AssessmentEntity = {
-          ...assessment,
-          _entityName: "Assessment",
-        };
         expectArraysToEqual(uow.assessmentRepository.assessments, [
-          expectedImmersionEntity,
+          {
+            ...assessment,
+            _entityName: "Assessment",
+          },
         ]);
       },
     );

@@ -19,3 +19,8 @@ export const createAssessmentEntity = (
     ...dto,
   };
 };
+
+export const toAssessmentDto = ({
+  _entityName,
+  ...assessmentEntity
+}: AssessmentEntity): AssessmentDto => assessmentEntity;

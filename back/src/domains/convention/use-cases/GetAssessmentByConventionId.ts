@@ -1,13 +1,15 @@
 import {
   AssessmentDto,
-  ConventionJwtPayload,
+  ConventionDomainPayload,
   WithConventionId,
   errors,
   withConventionIdSchema,
 } from "shared";
-import { throwForbiddenIfNotAllow } from "../../../utils/assessment";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { throwForbiddenIfNotAllowedForAssessments } from "../../../utils/assessment";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { AssessmentEntity } from "../entities/AssessmentEntity";
+import { toAssessmentDto } from "../entities/AssessmentEntity";
+import { retrieveConventionWithAgency } from "../entities/Convention";
 
 export type GetAssessmentByConventionId = ReturnType<
   typeof makeGetAssessmentByConventionId
@@ -15,7 +17,7 @@ export type GetAssessmentByConventionId = ReturnType<
 export const makeGetAssessmentByConventionId = createTransactionalUseCase<
   WithConventionId,
   AssessmentDto,
-  ConventionJwtPayload | undefined
+  ConventionDomainPayload | undefined
 >(
   {
     name: "GetAssessment",
@@ -23,7 +25,16 @@ export const makeGetAssessmentByConventionId = createTransactionalUseCase<
   },
   async ({ uow, currentUser, inputParams }) => {
     if (!currentUser) throw errors.user.noJwtProvided();
-    throwForbiddenIfNotAllow(inputParams.conventionId, currentUser);
+    const { agency, convention } = await retrieveConventionWithAgency(
+      uow,
+      inputParams.conventionId,
+    );
+
+    throwForbiddenIfNotAllowedForAssessments(
+      convention,
+      await agencyWithRightToAgencyDto(uow, agency),
+      currentUser,
+    );
 
     const assessment = await uow.assessmentRepository.getByConventionId(
       inputParams.conventionId,
@@ -36,8 +47,3 @@ export const makeGetAssessmentByConventionId = createTransactionalUseCase<
     return toAssessmentDto(assessment);
   },
 );
-
-const toAssessmentDto = ({
-  _entityName,
-  ...assessmentEntity
-}: AssessmentEntity): AssessmentDto => assessmentEntity;
