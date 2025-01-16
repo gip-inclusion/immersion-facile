@@ -133,6 +133,27 @@ describe("PgAssessmentRepository", () => {
         minimalAssessment,
       );
     });
+
+    it("returns partially completed assessment with 0 missed hours", async () => {
+      const assessment: AssessmentEntity = {
+        conventionId: "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa",
+        status: "PARTIALLY_COMPLETED",
+        numberOfMissedHours: 0,
+        lastDayOfPresence: new Date("2024-10-17").toISOString(),
+        endedWithAJob: false,
+        establishmentFeedback: "Ca s'est bien passé",
+        establishmentAdvices: "mon conseil",
+        _entityName: "Assessment",
+      };
+
+      await assessmentRepository.save(assessment);
+
+      expectToEqual(
+        await assessmentRepository.getByConventionId(assessment.conventionId),
+        assessment,
+      );
+    });
+
     it("returns assessment found with all fields", async () => {
       await assessmentRepository.save(fullAssessment);
 
