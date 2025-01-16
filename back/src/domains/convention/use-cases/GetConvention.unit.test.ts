@@ -11,7 +11,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  stringToMd5,
+  makeEmailHash,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -161,7 +161,7 @@ describe("Get Convention", () => {
 
           const payload: ConventionJwtPayload = {
             role: "validator",
-            emailHash: stringToMd5(user.email),
+            emailHash: makeEmailHash(user.email),
             applicationId: convention.id,
             iat: 1,
             version: 1,
@@ -379,7 +379,7 @@ describe("Get Convention", () => {
         async ({ role, email }: { role: Role; email: string }) => {
           const payload: ConventionJwtPayload = {
             role,
-            emailHash: stringToMd5(email),
+            emailHash: makeEmailHash(email),
             applicationId: convention.id,
             iat: 1,
             version: 1,
@@ -426,7 +426,7 @@ describe("Get Convention", () => {
           { conventionId: convention.id },
           {
             role: "validator",
-            emailHash: stringToMd5(inclusionConnectedUser.email),
+            emailHash: makeEmailHash(inclusionConnectedUser.email),
             applicationId: convention.id,
           },
         );
@@ -461,7 +461,7 @@ describe("Get Convention", () => {
         uow.conventionRepository.setConventions([peConnectedConvention]);
         const payload: ConventionJwtPayload = {
           role: "validator",
-          emailHash: stringToMd5(peAdvisorEmail),
+          emailHash: makeEmailHash(peAdvisorEmail),
           applicationId: convention.id,
           iat: 1,
           version: 1,

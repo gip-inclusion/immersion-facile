@@ -1,9 +1,9 @@
-import { AgencyDto, ConventionDto, Role, errors } from "shared";
+import { AgencyDto, ConventionDto, Email, Role, errors } from "shared";
 
 export const conventionEmailsByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
-): Record<Role, string[] | Error> => ({
+): Record<Role, Email[] | Error> => ({
   "back-office": errors.convention.roleHasNoMagicLink({ role: "back-office" }),
   "to-review": errors.convention.roleHasNoMagicLink({ role: "to-review" }),
   "agency-viewer": errors.convention.roleHasNoMagicLink({

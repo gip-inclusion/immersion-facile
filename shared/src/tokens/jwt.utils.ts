@@ -1,13 +1,19 @@
 import * as crypto from "crypto";
 import { decode } from "js-base64";
-import { SiretDto, currentJwtVersions } from "..";
+import { Email, SiretDto, currentJwtVersions } from "..";
 import {
   ConventionJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   EstablishmentJwtPayload,
 } from "./jwtPayload.dto";
 
-export const stringToMd5 = (str: string) => {
+export const isSomeEmailMatchingEmailHash = (
+  emailsOrError: Email[],
+  emailHash: string,
+): boolean => emailsOrError.some((email) => makeEmailHash(email) === emailHash);
+export const makeEmailHash = (email: Email): string => stringToMd5(email);
+
+const stringToMd5 = (str: string) => {
   try {
     return crypto.createHash("md5").update(str).digest("hex");
   } catch (error) {

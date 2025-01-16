@@ -4,6 +4,7 @@ import {
   AgencyWithUsersRights,
   ApiConsumer,
   ConventionDto,
+  ConventionId,
   ConventionReadDto,
   ConventionStatus,
   ForbiddenError,
@@ -57,19 +58,18 @@ const oneOfTheRolesIsAllowed = ({
     allowedRoles.includes(roleToValidate),
   );
 
-export async function retrieveConventionWithAgency(
+export const retrieveConventionWithAgency = async (
   uow: UnitOfWork,
-  conventionInPayload: ConventionDto,
+  conventionId: ConventionId,
 ): Promise<{
   agency: AgencyWithUsersRights;
   convention: ConventionReadDto;
-}> {
-  const convention = await uow.conventionQueries.getConventionById(
-    conventionInPayload.id,
-  );
+}> => {
+  const convention =
+    await uow.conventionQueries.getConventionById(conventionId);
   if (!convention)
     throw errors.convention.notFound({
-      conventionId: conventionInPayload.id,
+      conventionId,
     });
   const agency = await uow.agencyRepository.getById(convention.agencyId);
   if (!agency) throw errors.agency.notFound({ agencyId: convention.agencyId });
@@ -78,7 +78,7 @@ export async function retrieveConventionWithAgency(
     agency,
     convention,
   };
-}
+};
 
 export const getAllConventionRecipientsEmail = (
   convention: ConventionDto,
