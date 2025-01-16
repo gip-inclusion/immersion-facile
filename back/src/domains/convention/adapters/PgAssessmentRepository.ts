@@ -55,7 +55,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
       ...(assessment.lastDayOfPresence
         ? { lastDayOfPresence: assessment.lastDayOfPresence }
         : {}),
-      ...(assessment.numberOfMissedHours
+      ...(assessment.numberOfMissedHours !== null
         ? { numberOfMissedHours: assessment.numberOfMissedHours }
         : {}),
     });
