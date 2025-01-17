@@ -36,7 +36,7 @@
     "trigger-delete-old-discussion-messages": "ts-node src/scripts/triggerDeleteOldDiscussionMessages",
     "trigger-refresh-materialized-views": "ts-node src/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-resync-old-conventions-to-pe": "ts-node src/scripts/triggerResyncOldConventionsToPe.ts",
-    "trigger-assessment-first-reminders": "ts-node src/scripts/triggerAssessmentReminder.ts",
+    "trigger-assessment-reminders": "ts-node src/scripts/triggerAssessmentReminder.ts",
     "trigger-sending-emails-with-assessment-creation-link": "ts-node src/scripts/triggerSendingEmailsWithAssessmentCreationLink.ts",
     "trigger-sending-beneficiary-assessment-emails": "ts-node src/scripts/triggerSendingBeneficiaryPdfAssessmentEmails.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",

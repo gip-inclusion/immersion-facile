@@ -22,28 +22,54 @@ const triggerAssessmentReminder = async () => {
     3600 * 24 * 30,
   );
 
-  return makeAssessmentReminder({
-    uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
-      .uowPerformer,
-    deps: {
-      timeGateway,
-      saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-        new UuidV4Generator(),
+  const { numberOfReminders: numberOfFirstReminders } =
+    await makeAssessmentReminder({
+      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+        .uowPerformer,
+      deps: {
         timeGateway,
-      ),
-      generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
-        config,
-        generateConventionJwt,
-      ),
-    },
-  }).execute({ mode: "3daysAfterConventionEnd" });
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
+          config,
+          generateConventionJwt,
+        ),
+      },
+    }).execute({ mode: "3daysAfterConventionEnd" });
+
+  const { numberOfReminders: numberOfSecondReminders } =
+    await makeAssessmentReminder({
+      uowPerformer: createUowPerformer(config, createGetPgPoolFn(config))
+        .uowPerformer,
+      deps: {
+        timeGateway,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          new UuidV4Generator(),
+          timeGateway,
+        ),
+        generateConventionMagicLinkUrl: makeGenerateConventionMagicLinkUrl(
+          config,
+          generateConventionJwt,
+        ),
+      },
+    }).execute({ mode: "10daysAfterConventionEnd" });
+
+  return {
+    numberOfFirstReminders,
+    numberOfSecondReminders,
+  };
 };
 
 handleCRONScript(
   "assessmentReminder",
   config,
   triggerAssessmentReminder,
-  ({ numberOfFirstReminders }) =>
-    [`Total of first reminders : ${numberOfFirstReminders}`].join("\n"),
+  ({ numberOfFirstReminders, numberOfSecondReminders }) =>
+    [
+      `Total of first reminders : ${numberOfFirstReminders}`,
+      `Total if second reminders: ${numberOfSecondReminders}`,
+    ].join("\n"),
   logger,
 );

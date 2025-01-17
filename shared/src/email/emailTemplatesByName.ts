@@ -38,7 +38,7 @@ export const emailTemplatesByName =
     ASSESSMENT_AGENCY_FIRST_REMINDER: {
       niceName:
         "Bilan - Prescripteurs - Relance à 3 jours après la fin de l’immersion",
-      tags: ["bilan_prescripteur_formulaireBilan_premierRappel"],
+      tags: ["bilan_prescripteur_formulaireBilan_J+3"],
       createEmailVariables: ({
         assessmentCreationLink,
         beneficiaryFirstName,
@@ -57,6 +57,38 @@ export const emailTemplatesByName =
         
         1. <a href= "mailto:${establishmentContactEmail}" target="_blank">Relancer directement l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan en ligne.
         2. Les contacter par téléphone pour les accompagner dans la saisie du bilan.
+        `,
+        buttons: [
+          {
+            label: "Formulaire de bilan",
+            url: assessmentCreationLink,
+          },
+        ],
+        subContent: `
+        ${defaultSignature(internshipKind)}
+        `,
+      }),
+    },
+    ASSESSMENT_AGENCY_SECOND_REMINDER: {
+      niceName:
+        "Bilan - Prescripteurs - Relance à 10 jours après la fin de l’immersion",
+      tags: ["bilan_prescripteur_formulaireBilan_J+10"],
+      createEmailVariables: ({
+        assessmentCreationLink,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        establishmentContactEmail,
+        internshipKind,
+      }) => ({
+        subject: `Immersion Facilitée - Urgent : Bilan toujours non complété pour l'immersion de ${beneficiaryFirstName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `
+        Malgré une première relance, le bilan de l’immersion de ${beneficiaryFirstName} ${beneficiaryLastName} chez ${businessName} reste incomplet.
+        
+        1. <a href= "mailto:${establishmentContactEmail}" target="_blank">Relancer l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan.
+        2. Les contacter par téléphone et les accompagner pour le compléter ensemble.
         `,
         buttons: [
           {

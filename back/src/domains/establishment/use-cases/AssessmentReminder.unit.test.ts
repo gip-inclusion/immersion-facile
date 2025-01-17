@@ -73,15 +73,77 @@ describe("AssessmentReminder", () => {
     ];
     await uow.conventionRepository.save(convention);
 
-    const { numberOfFirstReminders } = await assessmentReminder.execute({
+    const { numberOfReminders } = await assessmentReminder.execute({
       mode: "3daysAfterConventionEnd",
     });
 
-    expect(numberOfFirstReminders).toBe(1);
+    expect(numberOfReminders).toBe(1);
     expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
       {
         templatedContent: {
           kind: "ASSESSMENT_AGENCY_FIRST_REMINDER",
+          params: {
+            conventionId: convention.id,
+            internshipKind: convention.internshipKind,
+            businessName: convention.businessName,
+            establishmentContactEmail:
+              convention.signatories.establishmentRepresentative.email,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+              id: convention.id,
+              email: validator.email,
+              role: "validator",
+              targetRoute: frontRoutes.assessment,
+              now,
+            }),
+          },
+          recipients: [validator.email],
+          sender: {
+            email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+            name: "Immersion Facilitée",
+          },
+        },
+      },
+    ]);
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      { topic: "NotificationAdded" },
+    ]);
+  });
+
+  it("send second assessment reminder", async () => {
+    const now = timeGateway.now();
+    const conventionEndDate = subDays(now, 10);
+    const agency = new AgencyDtoBuilder().build();
+    const convention = new ConventionDtoBuilder()
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateEnd(conventionEndDate.toISOString())
+      .withAgencyId(agency.id)
+      .build();
+    const validator = new InclusionConnectedUserBuilder()
+      .withId("10000000-0000-0000-0000-000000000003")
+      .withEmail("validator@agency1.fr")
+      .buildUser();
+    await uow.userRepository.save(validator);
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator.id]: {
+          isNotifiedByEmail: true,
+          roles: ["validator"],
+        },
+      }),
+    ];
+    await uow.conventionRepository.save(convention);
+
+    const { numberOfReminders } = await assessmentReminder.execute({
+      mode: "10daysAfterConventionEnd",
+    });
+
+    expect(numberOfReminders).toBe(1);
+    expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+      {
+        templatedContent: {
+          kind: "ASSESSMENT_AGENCY_SECOND_REMINDER",
           params: {
             conventionId: convention.id,
             internshipKind: convention.internshipKind,
