@@ -35,6 +35,40 @@ const createConventionStatusButton = (link: string): EmailButtonProps => ({
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    ASSESSMENT_AGENCY_FIRST_REMINDER: {
+      niceName:
+        "Bilan - Prescripteurs - Relance à 3 jours après la fin de l’immersion",
+      tags: ["bilan_prescripteur_formulaireBilan_premierRappel"],
+      createEmailVariables: ({
+        assessmentCreationLink,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        establishmentContactEmail,
+        internshipKind,
+      }) => ({
+        subject: `Immersion Facilitée - Bilan non complété pour l'immersion de ${beneficiaryFirstName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `
+        Nous constatons que le bilan de l’immersion de ${beneficiaryFirstName} ${beneficiaryLastName} n’a pas encore été complété par l’entreprise ${businessName}.
+        
+        Afin de clôturer cette étape, vous pouvez :
+        
+        1. <a href= "mailto:${establishmentContactEmail}" target="_blank">Relancer directement l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan en ligne.
+        2. Les contacter par téléphone pour les accompagner dans la saisie du bilan.
+        `,
+        buttons: [
+          {
+            label: "Formulaire de bilan",
+            url: assessmentCreationLink,
+          },
+        ],
+        subContent: `
+        ${defaultSignature(internshipKind)}
+        `,
+      }),
+    },
     ASSESSMENT_AGENCY_NOTIFICATION: {
       niceName: "Bilan - Prescripteurs - Lien de création du bilan",
       tags: ["bilan_prescripteur_formulaireBilan"],
@@ -65,7 +99,7 @@ export const emailTemplatesByName =
           },
         ],
         subContent: `
-      Ces informations sont importantes pour la suite du parcours professionnel de BENEFICIARY_FIRST_NAME BENEFICIARY_LAST_NAME.    
+      Ces informations sont importantes pour la suite du parcours professionnel de ${beneficiaryFirstName} ${beneficiaryLastName}.    
       ${defaultSignature(internshipKind)}
       `,
         agencyLogoUrl,

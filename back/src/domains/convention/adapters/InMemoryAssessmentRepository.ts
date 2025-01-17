@@ -19,9 +19,11 @@ export class InMemoryAssessmentRepository implements AssessmentRepository {
   }
 
   public async getByConventionIds(
-    _conventionIds: ConventionId[],
+    conventionIds: ConventionId[],
   ): Promise<AssessmentEntity[]> {
-    throw new Error("Method not implemented.");
+    return this.#assessments.filter((assessment) =>
+      conventionIds.includes(assessment.conventionId),
+    );
   }
 
   public async save(assessment: AssessmentEntity): Promise<void> {
