@@ -1,5 +1,4 @@
 import { subHours } from "date-fns";
-import subDays from "date-fns/subDays";
 import { Pool } from "pg";
 import {
   EmailAttachment,
@@ -290,47 +289,6 @@ describe("PgNotificationRepository", () => {
         emailNotifications[1].id,
       ]);
       expectToEqual(response, [emailNotifications[0], emailNotifications[1]]);
-    });
-  });
-
-  describe("getEmailsByKindAndAroundCreatedAt", () => {
-    it("returns the emails notifications of given date", async () => {
-      await Promise.all(
-        emailNotifications.map((notif) => pgNotificationRepository.save(notif)),
-      );
-      const response =
-        await pgNotificationRepository.getEmailsByKindAndAroundCreatedAt(
-          "AGENCY_WAS_ACTIVATED",
-          now,
-        );
-      expectToEqual(response, [emailNotifications[0]]);
-    });
-
-    it("returns the emails notifications of one day before given date", async () => {
-      await Promise.all(
-        emailNotifications.map((notif) =>
-          pgNotificationRepository.save({
-            ...notif,
-            createdAt: subDays(new Date(notif.createdAt), 1).toISOString(),
-          }),
-        ),
-      );
-
-      const response =
-        await pgNotificationRepository.getEmailsByKindAndAroundCreatedAt(
-          "AGENCY_WAS_ACTIVATED",
-          now,
-        );
-
-      expectToEqual(response, [
-        {
-          ...emailNotifications[0],
-          createdAt: subDays(
-            new Date(emailNotifications[0].createdAt),
-            1,
-          ).toISOString(),
-        },
-      ]);
     });
   });
 

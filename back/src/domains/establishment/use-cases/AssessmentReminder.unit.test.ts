@@ -3,7 +3,6 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
-  Notification,
   expectObjectInArrayToMatch,
   frontRoutes,
 } from "shared";
@@ -55,6 +54,7 @@ describe("AssessmentReminder", () => {
     const conventionEndDate = subDays(now, 3);
     const agency = new AgencyDtoBuilder().build();
     const convention = new ConventionDtoBuilder()
+      .withStatus("ACCEPTED_BY_VALIDATOR")
       .withDateEnd(conventionEndDate.toISOString())
       .withAgencyId(agency.id)
       .build();
@@ -71,42 +71,7 @@ describe("AssessmentReminder", () => {
         },
       }),
     ];
-    const assessmentNotificationDate = subDays(conventionEndDate, 1);
-    const notification: Notification = {
-      createdAt: assessmentNotificationDate.toISOString(),
-      followedIds: {
-        conventionId: convention.id,
-        agencyId: convention.agencyId,
-        establishmentSiret: convention.siret,
-      },
-      id: "first--assessment-notification",
-      kind: "email",
-      templatedContent: {
-        kind: "ASSESSMENT_AGENCY_NOTIFICATION",
-        params: {
-          internshipKind: "immersion",
-          assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-            email: convention.establishmentTutor.email,
-            id: convention.id,
-            targetRoute: "bilan-immersion",
-            role: "establishment-tutor",
-            now: assessmentNotificationDate,
-          }),
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
-          conventionId: convention.id,
-          agencyLogoUrl: undefined,
-          businessName: "",
-        },
-        recipients: [convention.establishmentTutor.email],
-        sender: {
-          email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-          name: "Immersion Facilitée",
-        },
-      },
-    };
     await uow.conventionRepository.save(convention);
-    await uow.notificationRepository.save(notification);
 
     const { numberOfFirstReminders } = await assessmentReminder.execute({
       mode: "3daysAfterConventionEnd",
@@ -114,7 +79,6 @@ describe("AssessmentReminder", () => {
 
     expect(numberOfFirstReminders).toBe(1);
     expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-      notification,
       {
         templatedContent: {
           kind: "ASSESSMENT_AGENCY_FIRST_REMINDER",

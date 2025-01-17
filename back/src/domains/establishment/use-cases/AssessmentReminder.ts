@@ -6,7 +6,6 @@ import {
   ConventionId,
   ConventionReadDto,
   Email,
-  EmailNotification,
   errors,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
@@ -14,12 +13,12 @@ import {
 import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
+import { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -50,7 +49,7 @@ export const makeAssessmentReminder = createTransactionalUseCase<
       mode: params.mode,
       now,
       assessmentRepository: uow.assessmentRepository,
-      notificationRepository: uow.notificationRepository,
+      conventionRepository: uow.conventionRepository,
     });
 
     await Promise.all(
@@ -89,38 +88,26 @@ export const makeAssessmentReminder = createTransactionalUseCase<
 const getConventionIdsToRemind = async ({
   mode,
   now,
-  notificationRepository,
+  conventionRepository,
   assessmentRepository,
 }: {
   mode: AssessmentReminderMode;
   now: Date;
-  notificationRepository: NotificationRepository;
+  conventionRepository: ConventionRepository;
   assessmentRepository: AssessmentRepository;
 }): Promise<ConventionId[]> => {
   const daysAfterLastNotifications =
-    mode === "3daysAfterConventionEnd" ? 4 : 11; //assessment notification is sent one day before convention ends
-  const potentialAssessmentsToRemind =
-    await notificationRepository.getEmailsByKindAndAroundCreatedAt(
-      "ASSESSMENT_AGENCY_NOTIFICATION",
+    mode === "3daysAfterConventionEnd" ? 3 : 10;
+  const potentialConventionsToRemind =
+    await conventionRepository.getIdsValidatedByEndDateAround(
       subDays(now, daysAfterLastNotifications),
-    );
-  const conventionIds: ConventionId[] = potentialAssessmentsToRemind
-    .filter(
-      (
-        assessmentEmail,
-      ): assessmentEmail is EmailNotification & {
-        templatedContent: { params: { conventionId: ConventionId } };
-      } => "conventionId" in assessmentEmail.templatedContent.params,
-    )
-    .map(
-      (assessmentEmail) => assessmentEmail.templatedContent.params.conventionId,
     );
 
   const conventionsWithAssessments = (
-    await assessmentRepository.getByConventionIds(conventionIds)
+    await assessmentRepository.getByConventionIds(potentialConventionsToRemind)
   ).map((assessment) => assessment.conventionId);
 
-  return difference(conventionIds, conventionsWithAssessments);
+  return difference(potentialConventionsToRemind, conventionsWithAssessments);
 };
 
 const createNotification = ({

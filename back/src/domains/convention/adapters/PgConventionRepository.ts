@@ -1,3 +1,5 @@
+import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import {
   Beneficiary,
@@ -12,6 +14,7 @@ import {
   errors,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
+  validatedConventionStatuses,
 } from "shared";
 import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
 import { ConventionRepository } from "../ports/ConventionRepository";
@@ -83,6 +86,26 @@ export class PgConventionRepository implements ConventionRepository {
       .select("conventions.id")
       .leftJoin("actors", "conventions.establishment_tutor_id", "actors.id")
       .where("actors.email", "=", email)
+      .execute();
+
+    return result.map(({ id }) => id);
+  }
+
+  public async getIdsValidatedByEndDateAround(endDate: Date) {
+    const result = await this.transaction
+      .selectFrom("conventions")
+      .select("conventions.id")
+      .where("conventions.status", "in", validatedConventionStatuses)
+      .where(
+        sql`conventions.date_end`,
+        ">=",
+        subDays(endDate, 1).toISOString().split("T")[0],
+      )
+      .where(
+        sql`conventions.date_end`,
+        "<=",
+        addDays(endDate, 1).toISOString().split("T")[0],
+      )
       .execute();
 
     return result.map(({ id }) => id);
