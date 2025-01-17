@@ -79,6 +79,15 @@ export type EmailParamsByEmailType = {
     conventionId: ConventionId;
     internshipKind: InternshipKind;
   };
+  ASSESSMENT_AGENCY_FIRST_REMINDER: {
+    assessmentCreationLink: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    conventionId: ConventionId;
+    establishmentContactEmail: Email;
+    internshipKind: InternshipKind;
+  };
   ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: ConventionId;
     beneficiaryFirstName: string;

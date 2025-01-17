@@ -96,6 +96,7 @@ import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGener
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { AddFormEstablishment } from "../../domains/establishment/use-cases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
+import { makeAssessmentReminder } from "../../domains/establishment/use-cases/AssessmentReminder";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
@@ -633,6 +634,14 @@ export const createUseCases = (
         })),
     }),
 
+    assessmentReminder: makeAssessmentReminder({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+      },
+    }),
     getAgencyById: makeGetAgencyById({
       uowPerformer,
     }),

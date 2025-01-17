@@ -273,6 +273,15 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     internshipKind: "immersion",
   },
+  ASSESSMENT_AGENCY_FIRST_REMINDER: {
+    assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    conventionId: "CONVENTION_ID",
+    establishmentContactEmail: "ESTABLISHMENT_CONTACT_EMAIL",
+    internshipKind: "immersion",
+  },
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
