@@ -21,6 +21,7 @@ import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { PgConventionRepository } from "./PgConventionRepository";
 
 describe("PgConventionRepository", () => {
@@ -47,6 +48,7 @@ describe("PgConventionRepository", () => {
   let pool: Pool;
   let conventionRepository: PgConventionRepository;
   let db: KyselyDb;
+  let timeGateway: CustomTimeGateway;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -54,6 +56,7 @@ describe("PgConventionRepository", () => {
     await new PgAgencyRepository(db).insert(
       toAgencyWithRights(AgencyDtoBuilder.create().build()),
     );
+    timeGateway = new CustomTimeGateway();
   });
 
   afterAll(async () => {
@@ -947,6 +950,36 @@ describe("PgConventionRepository", () => {
         await conventionRepository.getIdsByEstablishmentRepresentativeEmail(
           email,
         );
+
+      expectToEqual(result, []);
+    });
+  });
+
+  describe("getIdsValidatedByEndDateAround", () => {
+    it("retrieve validated convention ids when endDate match", async () => {
+      const now = timeGateway.now();
+      const convention = new ConventionDtoBuilder()
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateEnd(now.toISOString())
+        .build();
+      await conventionRepository.save(convention);
+
+      const result =
+        await conventionRepository.getIdsValidatedByEndDateAround(now);
+
+      expectToEqual(result, [convention.id]);
+    });
+
+    it("retrieve nothing when endDate does not match", async () => {
+      const now = timeGateway.now();
+      const convention = new ConventionDtoBuilder()
+        .withDateEnd(now.toISOString())
+        .build();
+      await conventionRepository.save(convention);
+
+      const result = await conventionRepository.getIdsValidatedByEndDateAround(
+        addDays(now, 2),
+      );
 
       expectToEqual(result, []);
     });

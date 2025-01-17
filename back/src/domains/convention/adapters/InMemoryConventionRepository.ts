@@ -1,3 +1,5 @@
+import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { values } from "ramda";
 import {
   ConventionDto,
@@ -5,6 +7,7 @@ import {
   ConventionReadDto,
   Email,
   errors,
+  validatedConventionStatuses,
 } from "shared";
 import { ConventionRepository } from "../ports/ConventionRepository";
 
@@ -17,6 +20,19 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<number> {
     throw new Error("not implemented");
+  }
+
+  public async getIdsValidatedByEndDateAround(
+    dateEnd: Date,
+  ): Promise<ConventionId[]> {
+    return values(this.#conventions)
+      .filter(
+        (convention) =>
+          validatedConventionStatuses.includes(convention.status) &&
+          new Date(convention.dateEnd) >= subDays(dateEnd, 1) &&
+          new Date(convention.dateEnd) <= addDays(dateEnd, 1),
+      )
+      .map((convention) => convention.id);
   }
 
   public async getById(id: ConventionId) {

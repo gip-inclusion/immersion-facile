@@ -5,6 +5,7 @@ export interface ConventionRepository {
     email: Email,
   ): Promise<ConventionId[]>;
   getIdsByEstablishmentTutorEmail(email: Email): Promise<ConventionId[]>;
+  getIdsValidatedByEndDateAround: (endDate: Date) => Promise<ConventionId[]>;
   save: (conventionDto: ConventionDto) => Promise<void>;
   getById: (id: ConventionId) => Promise<ConventionDto | undefined>;
   update: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
