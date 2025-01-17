@@ -7,6 +7,7 @@ import {
   ConventionReadDto,
   Email,
   errors,
+  executeInSequence,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -23,10 +24,12 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 type AssessmentReminderOutput = {
-  numberOfFirstReminders: number;
+  numberOfReminders: number;
 };
 
-export type AssessmentReminderMode = "3daysAfterConventionEnd";
+export type AssessmentReminderMode =
+  | "3daysAfterConventionEnd"
+  | "10daysAfterConventionEnd";
 
 export type AssessmentReminder = ReturnType<typeof makeAssessmentReminder>;
 export const makeAssessmentReminder = createTransactionalUseCase<
@@ -41,7 +44,9 @@ export const makeAssessmentReminder = createTransactionalUseCase<
 >(
   {
     name: "AssessmentReminder",
-    inputSchema: z.object({ mode: z.enum(["3daysAfterConventionEnd"]) }),
+    inputSchema: z.object({
+      mode: z.enum(["3daysAfterConventionEnd", "10daysAfterConventionEnd"]),
+    }),
   },
   async ({ inputParams: params, uow, deps }) => {
     const now = deps.timeGateway.now();
@@ -52,36 +57,36 @@ export const makeAssessmentReminder = createTransactionalUseCase<
       conventionRepository: uow.conventionRepository,
     });
 
-    await Promise.all(
-      conventionIdsToRemind.map(async (conventionId) => {
-        const convention =
-          await uow.conventionQueries.getConventionById(conventionId);
-        if (!convention)
-          throw errors.convention.notFound({ conventionId: conventionId });
-        await sendAssessmentReminders({
-          uow,
-          recipientEmails: convention.agencyValidatorEmails,
-          convention,
-          now,
-          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
-          role: "validator",
-        });
-        await sendAssessmentReminders({
-          uow,
-          recipientEmails: convention.agencyCounsellorEmails,
-          convention,
-          now,
-          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
-          role: "counsellor",
-        });
-      }),
-    );
-
-    return Promise.resolve({
-      numberOfFirstReminders: conventionIdsToRemind.length,
+    await executeInSequence(conventionIdsToRemind, async (conventionId) => {
+      const convention =
+        await uow.conventionQueries.getConventionById(conventionId);
+      if (!convention)
+        throw errors.convention.notFound({ conventionId: conventionId });
+      await sendAssessmentReminders({
+        uow,
+        mode: params.mode,
+        recipientEmails: convention.agencyValidatorEmails,
+        convention,
+        now,
+        generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        role: "validator",
+      });
+      await sendAssessmentReminders({
+        uow,
+        mode: params.mode,
+        recipientEmails: convention.agencyCounsellorEmails,
+        convention,
+        now,
+        generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+        saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        role: "counsellor",
+      });
     });
+
+    return {
+      numberOfReminders: conventionIdsToRemind.length,
+    };
   },
 );
 
@@ -111,11 +116,13 @@ const getConventionIdsToRemind = async ({
 };
 
 const createNotification = ({
+  mode,
   convention,
   recipientEmail,
   establishmentContactEmail,
   assessmentCreationLink,
 }: {
+  mode: AssessmentReminderMode;
   convention: ConventionReadDto;
   recipientEmail: Email;
   establishmentContactEmail: Email;
@@ -129,7 +136,10 @@ const createNotification = ({
     },
     kind: "email",
     templatedContent: {
-      kind: "ASSESSMENT_AGENCY_FIRST_REMINDER",
+      kind:
+        mode === "3daysAfterConventionEnd"
+          ? "ASSESSMENT_AGENCY_FIRST_REMINDER"
+          : "ASSESSMENT_AGENCY_SECOND_REMINDER",
       params: {
         beneficiaryFirstName: convention.signatories.beneficiary.firstName,
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -147,6 +157,7 @@ const createNotification = ({
 
 const sendAssessmentReminders = async ({
   uow,
+  mode,
   saveNotificationAndRelatedEvent,
   convention,
   recipientEmails,
@@ -155,6 +166,7 @@ const sendAssessmentReminders = async ({
   role,
 }: {
   uow: UnitOfWork;
+  mode: AssessmentReminderMode;
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   convention: ConventionReadDto;
   recipientEmails: Email[];
@@ -171,6 +183,7 @@ const sendAssessmentReminders = async ({
       now,
     });
     const notification = createNotification({
+      mode,
       convention,
       recipientEmail: recipientEmail,
       establishmentContactEmail:
