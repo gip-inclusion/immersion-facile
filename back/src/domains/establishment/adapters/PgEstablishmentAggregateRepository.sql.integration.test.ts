@@ -9,9 +9,11 @@ import {
   UserBuilder,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
@@ -84,8 +86,15 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
 
   describe("updateAllEstablishmentScoresQuery", () => {
     it("updates all the establishments scores, depending on the number of conventions and discussion answered in the last year", async () => {
+      const validator = makeUniqueUserForTest(uuid());
+      await new PgUserRepository(db).save(validator, "proConnect");
+
       const agency = new AgencyDtoBuilder().build();
-      await pgAgencyRepository.insert(toAgencyWithRights(agency));
+      await pgAgencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       const convention = new ConventionDtoBuilder()
         .withSiret(establishment.establishment.siret)
@@ -174,8 +183,15 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
       `00000000-0000-4000-b000-00000000${index.toString().padStart(4, "0")}`;
 
     beforeEach(async () => {
+      const validator = makeUniqueUserForTest(uuid());
+      await new PgUserRepository(db).save(validator, "proConnect");
+
       agency = new AgencyDtoBuilder().build();
-      await pgAgencyRepository.insert(toAgencyWithRights(agency));
+      await pgAgencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       const discussions = Array.from({ length: 50 }, (_, i) =>
         new DiscussionBuilder()

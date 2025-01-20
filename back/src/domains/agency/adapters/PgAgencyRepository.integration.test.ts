@@ -166,7 +166,9 @@ describe("PgAgencyRepository", () => {
             acquisitionCampaign: "campaign",
           })
           .build(),
-        {},
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
       );
 
       await agencyRepository.insert(agency);
@@ -183,16 +185,24 @@ describe("PgAgencyRepository", () => {
 
       const agency1a = toAgencyWithRights(
         agency1builder.withName("agency1a").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
       );
       const agency1b = toAgencyWithRights(
         agency1builder.withName("agency1b").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
       );
 
       await agencyRepository.insert(agency1a);
       expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
 
-      const id1b = await agencyRepository.insert(agency1b);
-      expect(id1b).toBeUndefined();
+      await expectPromiseToFailWithError(
+        agencyRepository.insert(agency1b),
+        errors.agency.alreadyExist(agency1b.id),
+      );
 
       expectToEqual(await agencyRepository.getAgencies({}), [agency1a]);
     });
@@ -250,8 +260,6 @@ describe("PgAgencyRepository", () => {
         id: agency1.id,
         ...updatedFields,
       });
-
-      await agencyRepository.insert(agency1);
       expectToEqual(await agencyRepository.getAgencies({}), [
         { ...agency1, ...updatedFields },
       ]);
@@ -294,7 +302,9 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getById()", () => {
-    const agency1 = toAgencyWithRights(agency1builder.build());
+    const agency1 = toAgencyWithRights(agency1builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+    });
     const agency2WithRefersToAgency1 = toAgencyWithRights(
       agency2builder
         .withRefersToAgencyInfo({
@@ -302,6 +312,9 @@ describe("PgAgencyRepository", () => {
           refersToAgencyName: agency1.name,
         })
         .build(),
+      {
+        [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
     it("returns undefined when no agency found", async () => {
       expect(await agencyRepository.getById(agency1.id)).toBeUndefined();
@@ -328,6 +341,9 @@ describe("PgAgencyRepository", () => {
   describe("getBySafir()", () => {
     const agency1WithSafir = toAgencyWithRights(
       agency1builder.withCodeSafir(safirCode).build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     it("returns undefined when no agency found", async () => {
@@ -346,6 +362,9 @@ describe("PgAgencyRepository", () => {
       // TODO pourquoi on a pas une contrainte d'unicité sur le code SAFIR en base?
       const agency2WithSafir = toAgencyWithRights(
         agency2builder.withCodeSafir(safirCode).build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
       );
       await agencyRepository.insert(agency1WithSafir);
       await agencyRepository.insert(agency2WithSafir);
@@ -363,10 +382,17 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getByIds()", () => {
-    const agency1 = toAgencyWithRights(agency1builder.build());
-    const agency2 = toAgencyWithRights(agency2builder.build());
+    const agency1 = toAgencyWithRights(agency1builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+    });
+    const agency2 = toAgencyWithRights(agency2builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+    });
     const agency3 = toAgencyWithRights(
       agency1builder.withId("11111111-1111-1111-1111-111111111111").build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     beforeEach(async () => {
@@ -417,6 +443,9 @@ describe("PgAgencyRepository", () => {
         .withName("Agence Pôle emploi VITRY‐SUR‐SEINE")
         .withCoveredDepartments(["94"])
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
     const agency2PEVitryLeFrancois = toAgencyWithRights(
       agency1builder
@@ -426,6 +455,9 @@ describe("PgAgencyRepository", () => {
         .withName("Agence Pôle emploi VITRY-LE-FRANCOIS")
         .withCoveredDepartments(["51"])
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
     const agency3PEVitrolles = toAgencyWithRights(
       agency1builder
@@ -435,6 +467,9 @@ describe("PgAgencyRepository", () => {
         .withName("Agence Pôle emploi VITROLLES")
         .withCoveredDepartments(["13"])
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     const agencyMissionLocale = toAgencyWithRights(
@@ -443,6 +478,9 @@ describe("PgAgencyRepository", () => {
         .withAgencySiret("00000000000004")
         .withKind("mission-locale")
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     const agencyAddedFromPeReferenciel = toAgencyWithRights(
@@ -452,6 +490,9 @@ describe("PgAgencyRepository", () => {
         .withName("Agency from PE referenciel")
         .withStatus("from-api-PE")
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     const agencyInParisBuilder = new AgencyDtoBuilder().withAddress({
@@ -467,6 +508,9 @@ describe("PgAgencyRepository", () => {
         .withAgencySiret("00000000000006")
         .withKind("cci")
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     const agencyParisChambreAgriculture = toAgencyWithRights(
@@ -475,6 +519,9 @@ describe("PgAgencyRepository", () => {
         .withAgencySiret("00000000000007")
         .withKind("chambre-agriculture")
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     const agencyParisCma = toAgencyWithRights(
@@ -483,6 +530,9 @@ describe("PgAgencyRepository", () => {
         .withAgencySiret("00000000000008")
         .withKind("cma")
         .build(),
+      {
+        [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+      },
     );
 
     it("returns empty list for empty table", async () => {
@@ -495,7 +545,11 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agency1PEVitrySurSeine),
         agencyRepository.insert(agencyMissionLocale),
         agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(toAgencyWithRights(needsReviewAgency)),
+        agencyRepository.insert(
+          toAgencyWithRights(needsReviewAgency, {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
+        ),
       ]);
 
       const agencies = await agencyRepository.getAgencies({
@@ -514,7 +568,11 @@ describe("PgAgencyRepository", () => {
         agencyRepository.insert(agency2PEVitryLeFrancois),
         agencyRepository.insert(agencyMissionLocale),
         agencyRepository.insert(agencyAddedFromPeReferenciel),
-        agencyRepository.insert(toAgencyWithRights(needsReviewAgency)),
+        agencyRepository.insert(
+          toAgencyWithRights(needsReviewAgency, {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          }),
+        ),
       ]);
 
       expectToEqual(
@@ -626,6 +684,9 @@ describe("PgAgencyRepository", () => {
           })
           .withCoveredDepartments(["64", "75"])
           .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        },
       );
 
       beforeEach(async () => {
@@ -676,6 +737,12 @@ describe("PgAgencyRepository", () => {
                 streetNumberAndAddress: "",
               })
               .build(),
+            {
+              [validator1.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            },
           );
 
           const parisAgency = toAgencyWithRights(
@@ -689,6 +756,12 @@ describe("PgAgencyRepository", () => {
                 streetNumberAndAddress: "au fond à droite",
               })
               .build(),
+            {
+              [validator1.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            },
           );
 
           await Promise.all([
@@ -720,6 +793,9 @@ describe("PgAgencyRepository", () => {
             .withName("Nancy agency")
             .withPosition(48.697851, 6.20157)
             .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
         );
 
         const epinalAgency = toAgencyWithRights(
@@ -727,6 +803,9 @@ describe("PgAgencyRepository", () => {
             .withName("Epinal agency")
             .withPosition(48.179552, 6.441447)
             .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
         );
 
         const dijonAgency = toAgencyWithRights(
@@ -734,13 +813,23 @@ describe("PgAgencyRepository", () => {
             .withName("Dijon agency")
             .withPosition(47.365086, 5.051027)
             .build(),
+          {
+            [validator1.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+          },
         );
 
         await Promise.all([
           agencyRepository.insert(nancyAgency),
           agencyRepository.insert(epinalAgency),
           agencyRepository.insert(dijonAgency),
-          agencyRepository.insert(toAgencyWithRights(needsReviewAgency)),
+          agencyRepository.insert(
+            toAgencyWithRights(needsReviewAgency, {
+              [validator1.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+            }),
+          ),
         ]);
 
         const agencies = await agencyRepository.getAgencies({
@@ -758,7 +847,9 @@ describe("PgAgencyRepository", () => {
     });
 
     describe("doesNotReferToOtherAgency", () => {
-      const agency1 = toAgencyWithRights(agency1builder.build());
+      const agency1 = toAgencyWithRights(agency1builder.build(), {
+        [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      });
       const agency2WithRefersToAgency1 = toAgencyWithRights(
         agency2builder
           .withRefersToAgencyInfo({
@@ -766,6 +857,9 @@ describe("PgAgencyRepository", () => {
             refersToAgencyName: agency1.name,
           })
           .build(),
+        {
+          [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
       );
 
       beforeEach(async () => {
@@ -784,7 +878,9 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("getAgenciesRelatedToAgency()", () => {
-    const agency1 = toAgencyWithRights(agency1builder.build());
+    const agency1 = toAgencyWithRights(agency1builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+    });
     const agency2WithRefersToAgency1 = toAgencyWithRights(
       agency2builder
         .withRefersToAgencyInfo({
@@ -792,6 +888,9 @@ describe("PgAgencyRepository", () => {
           refersToAgencyName: agency1.name,
         })
         .build(),
+      {
+        [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      },
     );
 
     it("found related agencies", async () => {
@@ -824,7 +923,11 @@ describe("PgAgencyRepository", () => {
     it("returns agencyId if exist", async () => {
       const immersionFacileAgency = toAgencyWithRights(
         agency1builder.withKind("immersion-facile").build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
       );
+
       await agencyRepository.insert(immersionFacileAgency);
 
       expectToEqual(
@@ -857,13 +960,11 @@ describe("PgAgencyRepository", () => {
         },
       },
     );
-    const agencyWithoutRights = toAgencyWithRights(needsReviewAgency, {});
 
     beforeEach(async () => {
       await Promise.all([
         agencyRepository.insert(agency1WithValidatorAndCounsellorRights),
         agencyRepository.insert(agency2WithValidator2Rights),
-        agencyRepository.insert(agencyWithoutRights),
       ]);
     });
 
@@ -874,15 +975,6 @@ describe("PgAgencyRepository", () => {
             agencyId: agency1WithValidatorAndCounsellorRights.id,
           }),
           [counsellor1.id, validator1.id],
-        );
-      });
-
-      it("return nothing that when agency have no rights", async () => {
-        expectToEqual(
-          await agencyRepository.getUserIdWithAgencyRightsByFilters({
-            agencyId: agencyWithoutRights.id,
-          }),
-          [],
         );
       });
     });
@@ -998,7 +1090,9 @@ describe("PgAgencyRepository", () => {
   });
 
   describe("alreadyHasActiveAgencyWithSameAddressAndKind()", () => {
-    const agency1 = toAgencyWithRights(agency1builder.build());
+    const agency1 = toAgencyWithRights(agency1builder.build(), {
+      [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+    });
 
     it("return false if no agency exists with given address and kind", async () => {
       const hasAlreadySimilarAgency =
@@ -1018,6 +1112,9 @@ describe("PgAgencyRepository", () => {
           .withKind(agency1.kind)
           .withStatus("needsReview")
           .build(),
+        {
+          [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        },
       );
 
       await agencyRepository.insert(agency1);

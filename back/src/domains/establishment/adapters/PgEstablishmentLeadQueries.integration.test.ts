@@ -1,11 +1,14 @@
 import { subDays } from "date-fns";
 import { Pool } from "pg";
 import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
@@ -77,26 +80,28 @@ describe("PgEstablishmentLeadQueries", () => {
   let pool: Pool;
   let establishmentLeadQueries: PgEstablishmentLeadQueries;
   let establishmentLeadRepository: PgEstablishmentLeadRepository;
+  let pgUserRepository: PgUserRepository;
   let conventionRepository: PgConventionRepository;
   let agencyRepo: PgAgencyRepository;
-  let kyselyDb: KyselyDb;
+  let db: KyselyDb;
 
   beforeAll(async () => {
     pool = getTestPgPool();
-    kyselyDb = makeKyselyDb(pool);
+    db = makeKyselyDb(pool);
   });
 
   beforeEach(async () => {
-    await kyselyDb.deleteFrom("conventions").execute();
-    await kyselyDb.deleteFrom("agency_groups__agencies").execute();
-    await kyselyDb.deleteFrom("agency_groups").execute();
-    await kyselyDb.deleteFrom("agencies").execute();
-    await kyselyDb.deleteFrom("establishment_lead_events").execute();
+    await db.deleteFrom("conventions").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
+    await db.deleteFrom("establishment_lead_events").execute();
 
-    establishmentLeadQueries = new PgEstablishmentLeadQueries(kyselyDb);
-    establishmentLeadRepository = new PgEstablishmentLeadRepository(kyselyDb);
-    agencyRepo = new PgAgencyRepository(kyselyDb);
-    conventionRepository = new PgConventionRepository(kyselyDb);
+    establishmentLeadQueries = new PgEstablishmentLeadQueries(db);
+    establishmentLeadRepository = new PgEstablishmentLeadRepository(db);
+    agencyRepo = new PgAgencyRepository(db);
+    conventionRepository = new PgConventionRepository(db);
+    pgUserRepository = new PgUserRepository(db);
   });
 
   afterAll(async () => {
@@ -114,7 +119,14 @@ describe("PgEstablishmentLeadQueries", () => {
     });
 
     it("get the last convention by last event kind ", async () => {
-      await agencyRepo.insert(toAgencyWithRights(agency));
+      const validator = makeUniqueUserForTest(uuid());
+
+      await pgUserRepository.save(validator, "proConnect");
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
       await Promise.all([
         conventionRepository.save(convention1),
         conventionRepository.save(convention2),
@@ -143,7 +155,15 @@ describe("PgEstablishmentLeadQueries", () => {
           },
         ],
       };
-      await agencyRepo.insert(toAgencyWithRights(agency));
+
+      const validator = makeUniqueUserForTest(uuid());
+
+      await pgUserRepository.save(validator, "proConnect");
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
       await Promise.all([
         conventionRepository.save(convention1),
         conventionRepository.save(convention2),

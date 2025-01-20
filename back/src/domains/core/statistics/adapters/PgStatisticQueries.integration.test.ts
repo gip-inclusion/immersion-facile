@@ -8,12 +8,14 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../../utils/user";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
@@ -119,8 +121,15 @@ describe("PgStatisticQueries", () => {
         .build();
 
       beforeEach(async () => {
-        await new PgUserRepository(db).save(user, "proConnect");
-        await pgAgencyRepository.insert(toAgencyWithRights(agency));
+        const validator = makeUniqueUserForTest(uuid());
+        const userRepository = new PgUserRepository(db);
+        await userRepository.save(user, "proConnect");
+        await userRepository.save(validator, "proConnect");
+        await pgAgencyRepository.insert(
+          toAgencyWithRights(agency, {
+            [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          }),
+        );
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentAggregate,
         );
