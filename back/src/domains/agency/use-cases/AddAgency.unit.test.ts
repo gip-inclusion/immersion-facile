@@ -1,12 +1,12 @@
 import {
   AgencyDto,
   AgencyDtoBuilder,
+  BadRequestError,
   CreateAgencyDto,
   InclusionConnectedUserBuilder,
   User,
   errors,
   expectArraysToMatch,
-  expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -89,12 +89,11 @@ describe("AddAgency use case", () => {
   let addAgency: AddAgency;
   let createNewEvent: CreateNewEvent;
   let siretGateway: InMemorySiretGateway;
-  let uuidGenerator: TestUuidGenerator;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    uuidGenerator = new TestUuidGenerator();
+    const uuidGenerator = new TestUuidGenerator();
     timeGateway = new CustomTimeGateway();
     siretGateway = new InMemorySiretGateway();
     createNewEvent = makeCreateNewEvent({
@@ -112,7 +111,60 @@ describe("AddAgency use case", () => {
   });
 
   describe("right paths", () => {
-    it("save the agency in repo, with the default admin mail and the status to be reviewed", async () => {
+    it("add user with both validator and counsellor rights if the user is in validatorEmails and counsellorEmails", async () => {
+      uow.agencyRepository.agencies = [];
+      uow.userRepository.users = [];
+
+      const newValidator: User = {
+        id: uuids[0],
+        email: createParisMissionLocaleParams.validatorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: emptyName,
+        lastName: emptyName,
+        externalId: null,
+      };
+      const newCounsellor: User = {
+        id: uuids[1],
+        email: createParisMissionLocaleParams.counsellorEmails[0],
+        createdAt: timeGateway.now().toISOString(),
+        firstName: emptyName,
+        lastName: emptyName,
+        externalId: null,
+      };
+
+      await addAgency.execute({
+        ...createParisMissionLocaleParams,
+        validatorEmails: [newValidator.email],
+        counsellorEmails: [newValidator.email, newCounsellor.email],
+      });
+
+      expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(
+          {
+            ...createParisMissionLocaleParams,
+            status: "needsReview",
+            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
+            rejectionJustification: null,
+            codeSafir: null,
+            counsellorEmails: [],
+            validatorEmails: [],
+          },
+          {
+            [newValidator.id]: {
+              isNotifiedByEmail: true,
+              roles: ["validator", "counsellor"],
+            },
+            [newCounsellor.id]: {
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+          },
+        ),
+      ]);
+    });
+
+    it("the agency is saved in the agency in repo, with the status to be reviewed and missing users by email are created and have notified rights", async () => {
       uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
 
@@ -208,15 +260,16 @@ describe("AddAgency use case", () => {
       ]);
     });
 
-    it("uses default questionnaire url when none is provided", async () => {
-      const franceTravailParis: CreateAgencyDto = {
+    it("uses no questionnaire url when none is provided", async () => {
+      const agencyWithoutQuestionnaire: CreateAgencyDto = {
         ...createParisMissionLocaleParams,
+        questionnaireUrl: null,
       };
 
       uow.agencyRepository.agencies = [];
       uow.userRepository.users = [];
 
-      await addAgency.execute(franceTravailParis);
+      await addAgency.execute(agencyWithoutQuestionnaire);
 
       const newValidator: User = {
         id: uuids[0],
@@ -238,12 +291,13 @@ describe("AddAgency use case", () => {
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(
           {
-            ...franceTravailParis,
+            ...agencyWithoutQuestionnaire,
             counsellorEmails: [],
             validatorEmails: [],
             status: "needsReview",
             codeSafir: null,
             rejectionJustification: null,
+            questionnaireUrl: null,
           },
           {
             [newValidator.id]: {
@@ -345,7 +399,17 @@ describe("AddAgency use case", () => {
         },
       };
 
-      await expectPromiseToFail(addAgency.execute(agencyWithBadAddress));
+      await expectPromiseToFailWithError(
+        addAgency.execute(agencyWithBadAddress),
+        new BadRequestError(
+          "Schema validation failed. See issues for details.",
+          [
+            "address.postcode : Obligatoire",
+            "address.departmentCode : Obligatoire",
+            "address.city : Obligatoire",
+          ],
+        ),
+      );
     });
 
     it("Fails to add agency if geo components are 0,0", async () => {
@@ -357,7 +421,16 @@ describe("AddAgency use case", () => {
         },
       };
 
-      await expectPromiseToFail(addAgency.execute(agencyWithBadPosition));
+      await expectPromiseToFailWithError(
+        addAgency.execute(agencyWithBadPosition),
+        new BadRequestError(
+          "Schema validation failed. See issues for details.",
+          [
+            "position.lat : 0 est une latitude par défaut qui ne semble pas correcte",
+            "position.lon : 0 est une longitude par défaut qui ne semble pas correcte",
+          ],
+        ),
+      );
     });
 
     it("fails when referred agency is missing", async () => {
@@ -399,6 +472,26 @@ describe("AddAgency use case", () => {
       await expectPromiseToFailWithError(
         addAgency.execute({ ...newAgency, validatorEmails: ["mail@mail.com"] }),
         errors.agency.invalidSiret({ siret: newAgency.agencySiret }),
+      );
+    });
+
+    it("fails to create if at least one validator email is not provided", async () => {
+      const newAgency = new AgencyDtoBuilder()
+        .withId("agency-to-create-id")
+        .withStatus("needsReview")
+        .withAgencySiret("11110000111100")
+        .build();
+
+      await expectPromiseToFailWithError(
+        addAgency.execute({
+          ...newAgency,
+          validatorEmails: [],
+          counsellorEmails: [],
+        }),
+        new BadRequestError(
+          "Schema validation failed. See issues for details.",
+          ["validatorEmails : Vous devez renseigner au moins un email"],
+        ),
       );
     });
   });
