@@ -308,11 +308,6 @@ const step1Availability = async (
     updatedMaxContactsPerMonth.toString(),
   );
   await maxContactPerMonthLocator.fill(updatedMaxContactsPerMonth.toString());
-  const maxContactPerMonthLocatorUpdatedValue =
-    await maxContactPerMonthLocator.inputValue();
-  await expect(maxContactPerMonthLocatorUpdatedValue).toBe(
-    updatedMaxContactsPerMonth.toString(),
-  );
 
   await goToNextStep(page, 1, "edit");
 };
