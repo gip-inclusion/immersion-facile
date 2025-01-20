@@ -57,33 +57,33 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
             rest.refersToAgencyId,
           )
         : await Promise.all(
-            validatorEmails.map(async (email) => {
-              const userId = await createOrGetUserIdByEmail(
+            validatorEmails.map(async (email) => ({
+              userId: await createOrGetUserIdByEmail(
                 uow,
                 this.#timeGateway,
                 this.#uuidGenerator,
                 { email },
-              );
-              return { userId, isNotifiedByEmail: true };
-            }),
+              ),
+              isNotifiedByEmail: true,
+            })),
           );
 
-    const counsellorUserIdsForAgency = await Promise.all(
-      counsellorEmails.map(async (email) => {
-        const userId = await createOrGetUserIdByEmail(
-          uow,
-          this.#timeGateway,
-          this.#uuidGenerator,
-          { email },
-        );
-        return { userId, isNotifiedByEmail: true };
-      }),
-    );
+    const counsellorUserIdsForAgency: WithUserIdAndIsNotified[] =
+      await Promise.all(
+        counsellorEmails.map(async (email) => ({
+          userId: await createOrGetUserIdByEmail(
+            uow,
+            this.#timeGateway,
+            this.#uuidGenerator,
+            { email },
+          ),
+          isNotifiedByEmail: true,
+        })),
+      );
 
     const agency: AgencyWithUsersRights = {
       ...rest,
       status: "needsReview",
-      questionnaireUrl: rest.questionnaireUrl,
       codeSafir: null,
       rejectionJustification: null,
       usersRights: this.#makeUserRights(
@@ -116,15 +116,19 @@ export class AddAgency extends TransactionalUseCase<CreateAgencyDto, void> {
     validatorUsersForAgency: WithUserIdAndIsNotified[],
     counsellorUsersForAgency: WithUserIdAndIsNotified[],
   ): AgencyUsersRights {
-    const validatorsAndCounsellors = validatorUsersForAgency.filter((id) =>
-      counsellorUsersForAgency.includes(id),
+    const validatorsAndCounsellors = validatorUsersForAgency.filter(
+      ({ userId }) =>
+        counsellorUsersForAgency.map(({ userId }) => userId).includes(userId),
     );
     const validators = validatorUsersForAgency.filter(
-      (id) => !validatorsAndCounsellors.includes(id),
+      ({ userId }) =>
+        !validatorsAndCounsellors.map(({ userId }) => userId).includes(userId),
     );
     const counsellors = counsellorUsersForAgency.filter(
-      (id) => !validatorsAndCounsellors.includes(id),
+      ({ userId }) =>
+        !validatorsAndCounsellors.map(({ userId }) => userId).includes(userId),
     );
+
     return {
       ...buildAgencyUsersRights(validatorsAndCounsellors, [
         "validator",
