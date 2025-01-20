@@ -1,5 +1,8 @@
 import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AssessmentDto, AssessmentStatus } from "../assessment/assessment.dto";
+import {
+  AssessmentDtoCompleted,
+  AssessmentDtoPartiallyCompleted,
+} from "../assessment/assessment.dto";
 import {
   ConventionId,
   ImmersionObjective,
@@ -9,7 +12,7 @@ import {
 import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
-import { ExtractFromExisting } from "../utils";
+import { DateString } from "../utils/date";
 import { Email } from "./email.dto";
 
 export type UserParamsForMail = {
@@ -98,17 +101,18 @@ export type EmailParamsByEmailType = {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
+    conventionDateEnd: DateString;
     internshipKind: InternshipKind;
-    assessment: Extract<
-      AssessmentDto,
-      {
-        status: ExtractFromExisting<
-          AssessmentStatus,
-          "PARTIALLY_COMPLETED" | "COMPLETED"
-        >;
-      }
-    >;
+    assessment: AssessmentDtoCompleted | AssessmentDtoPartiallyCompleted;
     numberOfHoursMade: string;
+  };
+  ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
+    immersionObjective: ImmersionObjective | undefined;
+    conventionId: ConventionId;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    internshipKind: InternshipKind;
   };
   BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;

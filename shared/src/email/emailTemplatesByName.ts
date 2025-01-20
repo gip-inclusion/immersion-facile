@@ -158,19 +158,23 @@ export const emailTemplatesByName =
     },
     ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
       niceName:
-        "Bilan - Prescripteurs - Notification de création du bilan à l'agence",
-      tags: ["bilan_complet_créé_prescripteur_confirmation"],
+        "Bilan - Prescripteurs - Notification de création du bilan à l'agence (cas complet ou partiel)",
+      tags: ["bilan_complet_ou_partiel_créé_prescripteur_confirmation"],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
         conventionId,
+        conventionDateEnd,
         immersionObjective,
         internshipKind,
         assessment,
         numberOfHoursMade,
       }) => {
-        const lastDayOfPresence = assessment.lastDayOfPresence ?? "";
+        const lastDayOfPresence =
+          assessment.status === "COMPLETED"
+            ? conventionDateEnd
+            : assessment.lastDayOfPresence ?? "";
         return {
           subject: `Pour information : évaluation ${
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
@@ -217,6 +221,40 @@ export const emailTemplatesByName =
           ${assessment.establishmentAdvices}
           
           La fiche bilan a également été communiquée au candidat.`,
+          subContent: defaultSignature(internshipKind),
+        };
+      },
+    },
+    ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
+      niceName:
+        "Bilan - Prescripteurs - Notification de création du bilan à l'agence - (cas absent)",
+      tags: ["bilan_complet_créé_prescripteur_confirmation"],
+      createEmailVariables: ({
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+        conventionId,
+        immersionObjective,
+        internshipKind,
+      }) => {
+        return {
+          subject: `Pour information : évaluation ${
+            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
+          greetings: greetingsWithConventionId(conventionId),
+          content: `${
+            internshipKind === "immersion" ? "L'immersion" : "Le mini-stage"
+          } prévue pour ${beneficiaryFirstName} ${beneficiaryLastName}, au sein de l'entreprise ${businessName} n'a pas eu lieu.
+  
+          <strong>Objectif ${
+            internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
+          } : ${immersionObjective}
+          </strong>
+          
+          Nous vous invitons à contacter l'entreprise si vous souhaitez obtenir des précisions supplémentaires.
+          
+          La fiche bilan a également été communiquée au candidat.`,
+
           subContent: defaultSignature(internshipKind),
         };
       },

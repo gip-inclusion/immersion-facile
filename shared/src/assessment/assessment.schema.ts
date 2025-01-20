@@ -5,23 +5,21 @@ import {
   AssessmentDto,
   DateRange,
   WithAssessmentDto,
-  WithAssessmentStatus,
   WithEndedWithAJob,
   WithEstablishmentComments,
   typeOfContracts,
 } from "./assessment.dto";
 
-const withAssessmentStatusSchema: z.Schema<WithAssessmentStatus> =
-  z.discriminatedUnion("status", [
-    z.object({
-      status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
-    }),
-    z.object({
-      status: z.literal("PARTIALLY_COMPLETED"),
-      lastDayOfPresence: makeDateStringSchema(),
-      numberOfMissedHours: z.number(),
-    }),
-  ]);
+const withAssessmentStatusSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
+  }),
+  z.object({
+    status: z.literal("PARTIALLY_COMPLETED"),
+    lastDayOfPresence: makeDateStringSchema(),
+    numberOfMissedHours: z.number(),
+  }),
+]);
 
 const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
   z.object({

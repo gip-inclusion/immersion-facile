@@ -1,7 +1,4 @@
 import {
-  AssessmentDto,
-  AssessmentStatus,
-  ExtractFromExisting,
   WithAssessmentDto,
   computeTotalHours,
   errors,
@@ -46,7 +43,28 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
 
     const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-    if (didBeneficiaryCame(assessment)) {
+    if (assessment.status === "DID_NOT_SHOW") {
+      await this.#saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent: {
+          kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
+          recipients: [...agency.counsellorEmails, ...agency.validatorEmails],
+          params: {
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            businessName: convention.businessName,
+            conventionId: convention.id,
+            immersionObjective: convention.immersionObjective,
+            internshipKind: convention.internshipKind,
+          },
+        },
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+        },
+      });
+    } else {
       const numberOfHoursMade = computeTotalHours({
         convention,
         assessmentStatus: assessment.status,
@@ -60,7 +78,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         kind: "email",
         templatedContent: {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-          recipients: agency.validatorEmails,
+          recipients: [...agency.counsellorEmails, ...agency.validatorEmails],
           params: {
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -68,6 +86,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
             conventionId: convention.id,
             immersionObjective: convention.immersionObjective,
             internshipKind: convention.internshipKind,
+            conventionDateEnd: convention.dateEnd,
             assessment,
             numberOfHoursMade,
           },
@@ -81,15 +100,3 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
     }
   }
 }
-
-const didBeneficiaryCame = (
-  assessment: AssessmentDto,
-): assessment is Extract<
-  AssessmentDto,
-  {
-    status: ExtractFromExisting<
-      AssessmentStatus,
-      "COMPLETED" | "PARTIALLY_COMPLETED"
-    >;
-  }
-> => assessment.status !== "DID_NOT_SHOW";
