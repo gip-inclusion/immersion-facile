@@ -95,7 +95,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
     });
   });
 
-  it("Send an email to validators ", async () => {
+  it("Send an email to validators when beneficiary came", async () => {
     const validator2 = new InclusionConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
@@ -125,8 +125,54 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
             internshipKind: convention.internshipKind,
+            conventionDateEnd: convention.dateEnd,
             assessment,
-            numberOfHoursMade: "1000hours",
+            numberOfHoursMade: "66h",
+          },
+          recipients: [validator.email, validator2.email],
+        },
+      ],
+    });
+  });
+
+  it("Send an email to validators when beneficiary did NOT came", async () => {
+    const assessmentDidNotShow: AssessmentDto = {
+      conventionId: convention.id,
+      status: "DID_NOT_SHOW",
+      endedWithAJob: false,
+      establishmentFeedback: "osef feedback",
+      establishmentAdvices: "osef conseil",
+    };
+
+    const validator2 = new InclusionConnectedUserBuilder()
+      .withEmail("validator2@email.com")
+      .withId("validator2")
+      .buildUser();
+    uow.userRepository.users = [validator, validator2];
+    await uow.agencyRepository.insert(
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+    await uow.conventionRepository.save(convention);
+    await uow.assessmentRepository.save(
+      createAssessmentEntity(assessmentDidNotShow, convention),
+    );
+
+    await usecase.execute({ assessment: assessmentDidNotShow });
+
+    expectSavedNotificationsAndEvents({
+      emails: [
+        {
+          kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
+          params: {
+            immersionObjective: convention.immersionObjective,
+            conventionId: convention.id,
+            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            businessName: convention.businessName,
+            internshipKind: convention.internshipKind,
           },
           recipients: [validator.email, validator2.email],
         },

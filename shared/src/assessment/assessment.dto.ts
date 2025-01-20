@@ -1,9 +1,8 @@
 import { ConventionId } from "../convention/convention.dto";
-import { ExtractFromExisting } from "../utils";
 import { DateString } from "../utils/date";
 
-export type AssessmentStatus = (typeof assessmentStatuses)[number];
-export const assessmentStatuses = [
+export type AssessmentStatus = AssessmentDto["status"];
+export const assessmentStatuses: AssessmentStatus[] = [
   "COMPLETED",
   "PARTIALLY_COMPLETED",
   "DID_NOT_SHOW",
@@ -19,19 +18,6 @@ export const typeOfContracts = [
 ] as const;
 export type TypeOfContract = (typeof typeOfContracts)[number];
 
-export type WithAssessmentStatus =
-  | {
-      status: ExtractFromExisting<
-        AssessmentStatus,
-        "COMPLETED" | "DID_NOT_SHOW"
-      >;
-    }
-  | {
-      status: ExtractFromExisting<AssessmentStatus, "PARTIALLY_COMPLETED">;
-      lastDayOfPresence: DateString | undefined;
-      numberOfMissedHours: number;
-    };
-
 export type WithEndedWithAJob =
   | { endedWithAJob: false }
   | {
@@ -45,11 +31,29 @@ export type WithEstablishmentComments = {
   establishmentAdvices: string;
 };
 
-export type AssessmentDto = {
+type CommonAssesmentFields = {
   conventionId: ConventionId;
-} & WithAssessmentStatus &
-  WithEndedWithAJob &
+} & WithEndedWithAJob &
   WithEstablishmentComments;
+
+export type AssessmentDtoCompleted = CommonAssesmentFields & {
+  status: "COMPLETED";
+};
+
+export type AssessmentDtoDidNotShow = CommonAssesmentFields & {
+  status: "DID_NOT_SHOW";
+};
+
+export type AssessmentDtoPartiallyCompleted = CommonAssesmentFields & {
+  status: "PARTIALLY_COMPLETED";
+  lastDayOfPresence: DateString | undefined;
+  numberOfMissedHours: number;
+};
+
+export type AssessmentDto =
+  | AssessmentDtoCompleted
+  | AssessmentDtoDidNotShow
+  | AssessmentDtoPartiallyCompleted;
 
 export type WithAssessmentDto = {
   assessment: AssessmentDto;
