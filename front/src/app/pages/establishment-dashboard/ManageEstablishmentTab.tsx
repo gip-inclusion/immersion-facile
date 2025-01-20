@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import React from "react";
-import { WithEstablismentsSiretAndName, domElementIds } from "shared";
+import { WithEstablishmentData, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { Route } from "type-route";
 type ManageEstablishmentTabProps = {
-  establishments: WithEstablismentsSiretAndName[];
+  establishments: WithEstablishmentData[];
   route: Route<typeof routes.establishmentDashboard>;
 };
 export const ManageEstablishmentsTab = ({

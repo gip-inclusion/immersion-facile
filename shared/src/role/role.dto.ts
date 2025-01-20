@@ -4,8 +4,9 @@ export type Role = (typeof allRoles)[number];
 export type SignatoryRole = (typeof allSignatoryRoles)[number];
 export type AgencyModifierRole = (typeof agencyModifierRoles)[number];
 export type ModifierRole = (typeof allModifierRoles)[number];
-export type EstablishmentRole = (typeof establishmentsRoles)[number];
 export type AssessmentRole = (typeof assessmentRoles)[number];
+export type ConventionEstablishmentRole =
+  (typeof conventionEstablishmentsRoles)[number];
 export const allRoles = [
   "beneficiary",
   "beneficiary-representative",
@@ -29,7 +30,7 @@ export const allSignatoryRoles = [
   Required<Signatories>[keyof Required<Signatories>]["role"]
 >;
 
-export const establishmentsRoles = [
+export const conventionEstablishmentsRoles = [
   "establishment-representative",
   "establishment-tutor",
 ] as const;
@@ -53,3 +54,9 @@ export const getRequesterRole = (roles: Role[]): Role => {
   if (roles.includes("counsellor")) return "counsellor";
   return roles[0];
 };
+
+export const establishmentsRoles = [
+  "establishment-admin",
+  "establishment-contact",
+] as const;
+export type EstablishmentRole = (typeof establishmentsRoles)[number];

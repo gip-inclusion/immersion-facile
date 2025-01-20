@@ -6,7 +6,10 @@ import {
 import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
 import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
-import { EstablishmentRole } from "../role/role.dto";
+import {
+  ConventionEstablishmentRole,
+  EstablishmentRole,
+} from "../role/role.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";
 import { DateTimeIsoString } from "../utils/date";
@@ -48,18 +51,19 @@ type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
-export type WithEstablismentsSiretAndName = {
+export type WithEstablishmentData = {
   siret: SiretDto;
   businessName: string;
+  role: EstablishmentRole;
 };
 
 export type WithEstablishments = {
-  establishments?: WithEstablismentsSiretAndName[];
+  establishments?: WithEstablishmentData[];
 };
 
 export type ConventionsEstablishmentDashboard = {
   url: AbsoluteUrl;
-  role: EstablishmentRole;
+  role: ConventionEstablishmentRole;
 };
 export type WithDiscussionId = {
   discussionId: DiscussionId;

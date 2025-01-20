@@ -5,7 +5,7 @@ import {
   InclusionConnectedUser,
   User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { EstablishmentRole, Role } from "../role/role.dto";
+import { ConventionEstablishmentRole, Role } from "../role/role.dto";
 import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
 import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
@@ -32,7 +32,7 @@ export type AuthenticatedUserQueryParams = {
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =
-  | EstablishmentRole
+  | ConventionEstablishmentRole
   | ExtractFromExisting<Role, "back-office">
   | ExcludeFromExisting<AgencyRole, "to-review">;
 
