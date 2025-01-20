@@ -57,7 +57,7 @@ test.describe("Establishment creation and modification workflow", () => {
   const updatedInformations: Partial<FormEstablishmentDto> = {
     businessNameCustomized: faker.company.name(),
     additionalInformation: faker.lorem.sentence(),
-    maxContactsPerMonth: faker.number.int({ min: 1, max: 10 }),
+    maxContactsPerMonth: faker.number.int({ min: 5, max: 7 }),
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
