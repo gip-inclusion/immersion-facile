@@ -41,48 +41,46 @@ const MAX_AGENCIES_RETURNED = 200;
 export class PgAgencyRepository implements AgencyRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async insert(
-    agency: AgencyWithUsersRights,
-  ): Promise<AgencyId | undefined> {
-    try {
-      await this.transaction
-        .insertInto("agencies")
-        .values(({ fn }) => ({
-          id: agency.id,
-          name: agency.name,
-          status: agency.status,
-          kind: agency.kind,
-          questionnaire_url: agency.questionnaireUrl,
-          email_signature: agency.signature,
-          logo_url: agency.logoUrl,
-          position: fn("ST_MakePoint", [
-            sql`${agency.position.lon}, ${agency.position.lat}`,
-          ]),
-          agency_siret: agency.agencySiret,
-          code_safir: agency.codeSafir,
-          street_number_and_address: agency.address.streetNumberAndAddress,
-          post_code: agency.address.postcode,
-          city: agency.address.city,
-          department_code: agency.address.departmentCode,
-          covered_departments: JSON.stringify(agency.coveredDepartments),
-          refers_to_agency_id: agency.refersToAgencyId,
-          acquisition_campaign: agency.acquisitionCampaign,
-          acquisition_keyword: agency.acquisitionKeyword,
-        }))
-        .execute();
+  public async insert(agency: AgencyWithUsersRights): Promise<void> {
+    await this.insertAgency(agency);
+    await this.#saveAgencyRights(agency.id, agency.usersRights);
+  }
 
-      await this.#saveAgencyRights(agency.id, agency.usersRights);
-    } catch (error: any) {
-      // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
-      // See https://www.postgresql.org/docs/10/errcodes-appendix.html
-      if (error.code === "23505") {
-        logger.error({ error });
-        return undefined;
-      }
-      throw error;
-    }
-
-    return agency.id;
+  private insertAgency(agency: AgencyWithUsersRights) {
+    return this.transaction
+      .insertInto("agencies")
+      .values(({ fn }) => ({
+        id: agency.id,
+        name: agency.name,
+        status: agency.status,
+        kind: agency.kind,
+        questionnaire_url: agency.questionnaireUrl,
+        email_signature: agency.signature,
+        logo_url: agency.logoUrl,
+        position: fn("ST_MakePoint", [
+          sql`${agency.position.lon}, ${agency.position.lat}`,
+        ]),
+        agency_siret: agency.agencySiret,
+        code_safir: agency.codeSafir,
+        street_number_and_address: agency.address.streetNumberAndAddress,
+        post_code: agency.address.postcode,
+        city: agency.address.city,
+        department_code: agency.address.departmentCode,
+        covered_departments: JSON.stringify(agency.coveredDepartments),
+        refers_to_agency_id: agency.refersToAgencyId,
+        acquisition_campaign: agency.acquisitionCampaign,
+        acquisition_keyword: agency.acquisitionKeyword,
+      }))
+      .execute()
+      .catch((error) => {
+        // Detect attempts to re-insert an existing key (error code 23505: unique_violation)
+        // See https://www.postgresql.org/docs/10/errcodes-appendix.html
+        if (error.code === "23505") {
+          logger.error({ error });
+          throw errors.agency.alreadyExist(agency.id);
+        }
+        throw error;
+      });
   }
 
   public async update(agency: PartialAgencyWithUsersRights): Promise<void> {
@@ -449,11 +447,12 @@ export class PgAgencyRepository implements AgencyRepository {
       )
       .filter(isTruthy);
 
-    if (newRights.length)
-      await this.transaction
-        .insertInto("users__agencies")
-        .values(newRights)
-        .execute();
+    if (!newRights.length) throw errors.agency.noUsers(agencyId);
+
+    await this.transaction
+      .insertInto("users__agencies")
+      .values(newRights)
+      .execute();
   }
 }
 
