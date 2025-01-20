@@ -630,8 +630,12 @@ describe("InclusionConnectedAllowedRoutes", () => {
       const adminUser = new InclusionConnectedUserBuilder()
         .withIsAdmin(true)
         .buildUser();
+      const validator = new InclusionConnectedUserBuilder()
+        .withId("validator")
+        .withEmail("validator@mail.com")
+        .buildUser();
 
-      inMemoryUow.userRepository.users = [adminUser];
+      inMemoryUow.userRepository.users = [adminUser, validator];
 
       const token = generateInclusionConnectJwt({
         userId: adminUser.id,
@@ -640,6 +644,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       const convention = new ConventionDtoBuilder().build();
       inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       const response = await httpClient.broadcastConventionAgain({
         headers: { authorization: token },

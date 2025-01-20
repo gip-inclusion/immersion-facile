@@ -1,4 +1,3 @@
-import { AgencyDtoBuilder, ConventionDtoBuilder } from "shared";
 import supertest from "supertest";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { Gateways } from "../config/bootstrap/createGateways";
@@ -30,7 +29,6 @@ import { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/l
 import { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
 import { InMemoryEstablishmentMarketingGateway } from "../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { AppConfigBuilder } from "./AppConfigBuilder";
-import { toAgencyWithRights } from "./agency";
 
 export type InMemoryGateways = {
   disconnectCache: () => Promise<void>;
@@ -73,13 +71,6 @@ export type TestAppAndDeps = {
 export const buildTestApp = async (
   appConfigOverrides?: AppConfig,
 ): Promise<TestAppAndDeps> => {
-  const validConvention = new ConventionDtoBuilder().build();
-  const agency = AgencyDtoBuilder.create(validConvention.agencyId)
-    .withName("TEST-name")
-    .withQuestionnaireUrl("https://TEST-questionnaireUrl")
-    .withSignature("TEST-signature")
-    .build();
-
   const appConfig = new AppConfigBuilder({
     ADDRESS_API_GATEWAY: "IN_MEMORY",
     APPELLATIONS_GATEWAY: "IN_MEMORY",
@@ -129,8 +120,6 @@ export const buildTestApp = async (
 
   // biome-ignore lint/style/noNonNullAssertion: <explanation>
   const inMemoryUow = uow!;
-
-  await inMemoryUow.agencyRepository.insert(toAgencyWithRights(agency, {}));
 
   return {
     request,

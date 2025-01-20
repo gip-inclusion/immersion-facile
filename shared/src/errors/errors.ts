@@ -319,6 +319,8 @@ export const errors = {
       `Le refersToAgencyId de l'agence '${agencyWithRefersToId}' ne correspond pas avec l'agence '${referedAgencyId}' à laquelle elle est référencée.`,
   },
   agency: {
+    alreadyExist: (agencyId: AgencyId) =>
+      new ConflictError(`L'agence avec id '${agencyId}' existe déjà.`),
     notFound: ({ agencyId }: { agencyId: AgencyId }) =>
       new NotFoundError(
         `Aucune agence trouvée avec l'identifiant : ${agencyId}.`,
@@ -349,6 +351,10 @@ export const errors = {
     notEnoughCounsellors: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
         `L'agence ${agencyId} doit avoir au moins un conseiller recevant les emails.`,
+      ),
+    noUsers: (agencyId: AgencyId) =>
+      new BadRequestError(
+        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateurs`,
       ),
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(

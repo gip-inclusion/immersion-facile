@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   ConventionJwt,
   ConventionMagicLinkRoutes,
+  InclusionConnectedUserBuilder,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
@@ -14,10 +15,15 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Assessment routes", () => {
+  const validator = new InclusionConnectedUserBuilder()
+    .withEmail("validator@mail.com")
+    .withId("validator")
+    .buildUser();
   const agency = new AgencyDtoBuilder().build();
   const convention = new ConventionDtoBuilder()
     .withAgencyId(agency.id)
@@ -46,13 +52,22 @@ describe("Assessment routes", () => {
       conventionMagicLinkRoutes,
       testAppAndDeps.request,
     );
+
     inMemoryUow.conventionRepository.setConventions([convention]);
+    inMemoryUow.agencyRepository.insert(
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
+    inMemoryUow.userRepository.users = [validator];
   });
 
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.createAssessment,
   )} to add assessment`, () => {
     it("returns 201 if the jwt is valid", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
       const assessment: AssessmentDto = {
         conventionId: convention.id,
         status: "COMPLETED",
@@ -76,7 +91,7 @@ describe("Assessment routes", () => {
       expect(gateways.notification.getSentEmails()).toMatchObject([
         {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-          recipients: [agency.validatorEmails[0]],
+          recipients: [validator.email],
         },
       ]);
     });
@@ -129,6 +144,7 @@ describe("Assessment routes", () => {
     it("fails with 403 if convention id does not matches the one in token", async () => {
       const anotherConvention = new ConventionDtoBuilder()
         .withId("another-convention-id")
+        .withAgencyId(agency.id)
         .build();
 
       inMemoryUow.conventionRepository.setConventions([anotherConvention]);
