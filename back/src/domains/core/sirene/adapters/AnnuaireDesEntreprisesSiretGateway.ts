@@ -14,6 +14,7 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     reservoir: adeMaxQueryPerSeconds,
     reservoirRefreshInterval: 1000, // number of ms
     reservoirRefreshAmount: adeMaxQueryPerSeconds,
+    minTime: adeMaxQueryPerSeconds,
   });
 
   #httpClient: HttpClient<AnnuaireDesEntreprisesSiretRoutes>;
@@ -33,32 +34,37 @@ export class AnnuaireDesEntreprisesSiretGateway implements SiretGateway {
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
     // https://api.gouv.fr/les-api/api-recherche-entreprises
-    const response = await this.#limiter.schedule(async () =>
-      this.#httpClient.search({
-        queryParams: {
-          q: siret,
-          mtm_campaign: "immersion-facilitee",
-        },
-      }),
-    );
-    if (response.status !== 200) return;
+    return this.#limiter
+      .schedule(async () =>
+        this.#httpClient.search({
+          queryParams: {
+            q: siret,
+            mtm_campaign: "immersion-facilitee",
+          },
+        }),
+      )
+      .then((response) => {
+        if (response.status !== 200)
+          return this.#fallbackGateway.getEstablishmentBySiret(siret);
 
-    const result = response.body.results[0];
-    if (!result) return;
+        const result = response.body.results.at(0);
+        if (!result) return;
 
-    const formattedResult =
-      convertAdeEstablishmentToSirenEstablishmentDto(result);
+        const formattedResult =
+          convertAdeEstablishmentToSirenEstablishmentDto(result);
 
-    if (
-      formattedResult.businessName
-        .trim()
-        .toUpperCase()
-        .includes(nonDiffusibleEstablishmentName)
-    ) {
-      return this.#fallbackGateway.getEstablishmentBySiret(siret);
-    }
-    if (includeClosedEstablishments) return formattedResult;
-    if (formattedResult.isOpen) return formattedResult;
+        if (
+          formattedResult.businessName
+            .trim()
+            .toUpperCase()
+            .includes(nonDiffusibleEstablishmentName)
+        ) {
+          return this.#fallbackGateway.getEstablishmentBySiret(siret);
+        }
+        if (includeClosedEstablishments) return formattedResult;
+        if (formattedResult.isOpen) return formattedResult;
+      })
+      .catch((_) => this.#fallbackGateway.getEstablishmentBySiret(siret));
   }
 
   public getEstablishmentUpdatedBetween(): Promise<
