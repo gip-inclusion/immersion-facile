@@ -1,5 +1,6 @@
 export const partnerNames = {
   annuaireDesEntreprises: "Annuaire des entreprises",
+  inseeSiret: "INSEE siret",
   brevoEstablishmentMarketing: "Brevo Establishment Marketing",
   brevoNotifications: "Brevo Notifications",
   diagoriente: "Diagoriente",

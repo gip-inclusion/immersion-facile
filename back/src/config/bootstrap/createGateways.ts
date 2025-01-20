@@ -55,6 +55,7 @@ import { AnnuaireDesEntreprisesSiretGateway } from "../../domains/core/sirene/ad
 import { annuaireDesEntreprisesSiretRoutes } from "../../domains/core/sirene/adapters/AnnuaireDesEntreprisesSiretGateway.routes";
 import { InMemorySiretGateway } from "../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
+import { makeInseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
@@ -134,6 +135,7 @@ const configureCreateFetchHttpClientForExternalAPIs =
     createFetchSharedClient(routes, fetch, {
       skipResponseValidation: true,
       onResponseSideEffect: logPartnerResponses(partnerName),
+      signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
     });
 
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
@@ -315,6 +317,10 @@ export const createGateways = async (
     const createInseeSiretGateway = () =>
       new InseeSiretGateway(
         config.inseeHttpConfig,
+        createFetchHttpClientForExternalAPIs({
+          partnerName: partnerNames.inseeSiret,
+          routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+        }),
         timeGateway,
         noRetries,
         new InMemoryCachingGateway<AccessTokenResponse>(

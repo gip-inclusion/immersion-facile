@@ -1,35 +1,28 @@
 import querystring from "querystring";
-import axios from "axios";
 import Bottleneck from "bottleneck";
-import { format, formatISO, secondsToMilliseconds } from "date-fns";
-import { Logger } from "pino";
+import { format, formatISO } from "date-fns";
 import {
   NafDto,
   NumberEmployeesRange,
   OmitFromExistingKeys,
   SiretDto,
   SiretEstablishmentDto,
-  castError,
   errors,
   filterNotFalsy,
   queryParamsAsString,
 } from "shared";
+import { HttpClient } from "shared-routes";
 import {
   AccessTokenResponse,
   InseeAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
-import {
-  createAxiosInstance,
-  isRetryableError,
-} from "../../../../utils/axiosUtils";
+import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
-import {
-  RetryStrategy,
-  RetryableError,
-} from "../../retry-strategy/ports/RetryStrategy";
+import { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../ports/SirenGateway";
+import { InseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 const logger = createLogger(__filename);
 
@@ -60,73 +53,73 @@ export class InseeSiretGateway implements SiretGateway {
 
   readonly #retryStrategy: RetryStrategy;
 
-  readonly #axiosConfig: InseeAccessTokenConfig;
+  readonly #config: InseeAccessTokenConfig;
+  readonly #httpClient: HttpClient<InseeExternalRoutes>;
 
   readonly #timeGateway: TimeGateway;
 
   readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
 
   constructor(
-    axiosConfig: InseeAccessTokenConfig,
+    config: InseeAccessTokenConfig,
+    httpClient: HttpClient<InseeExternalRoutes>,
     timeGateway: TimeGateway,
     retryStrategy: RetryStrategy,
     caching: InMemoryCachingGateway<AccessTokenResponse>,
   ) {
-    this.#axiosConfig = axiosConfig;
+    this.#config = config;
     this.#retryStrategy = retryStrategy;
     this.#timeGateway = timeGateway;
     this.#caching = caching;
+    this.#httpClient = httpClient;
   }
 
   public async getEstablishmentBySiret(
     siret: SiretDto,
     includeClosedEstablishments = false,
   ): Promise<SiretEstablishmentDto | undefined> {
-    logger.debug({
-      message: `Fetching siret ${siret} with includeClosedEstablishments = ${includeClosedEstablishments}`,
-    });
+    return this.#retryStrategy.apply(async () => {
+      const response = await this.#limiter.schedule(async () =>
+        this.#httpClient.getEstablishmentBySiret({
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+            Authorization: `Bearer ${
+              (await this.#getAccessToken()).access_token
+            }`,
+          },
+          queryParams: this.#createSiretQueryParams(
+            siret,
+            includeClosedEstablishments,
+          ),
+        }),
+      );
+      if (response.status === 404) return;
+      if (response.status === 200) {
+        const establishment = response.body.etablissements.at(0);
+        if (!establishment) return;
+        return convertSirenRawEstablishmentToSirenEstablishmentDto(
+          establishment,
+        );
+      }
 
-    return this.#retryStrategy
-      .apply(async () => {
-        try {
-          const axios = await this.#createAxiosInstance();
-          const response = await this.#limiter.schedule(() =>
-            axios.get<SirenGatewayAnswer>("/siret", {
-              params: this.#createSiretQueryParams(
-                siret,
-                includeClosedEstablishments,
-              ),
-            }),
-          );
-          const establishment = response?.data?.etablissements.at(0);
-          return (
-            establishment &&
-            convertSirenRawEstablishmentToSirenEstablishmentDto(establishment)
-          );
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            if (error.response?.status === 404) {
-              return;
-            }
-            if (isRetryableError(logger as Logger, error))
-              throw new RetryableError(error);
-            logger.error({
-              error,
-            });
-          }
-          throw error;
-        }
-      })
-      .catch((error) => {
-        const serviceName = "Sirene API";
-        logger.error({
-          message: `Error fetching siret ${siret}`,
-          error: castError(error),
+      if ([429, 503].includes(response.status)) {
+        throw errors.siretApi.tooManyRequests({
+          serviceName: partnerNames.inseeSiret,
         });
-        if (error?.initialError?.status === 429)
-          throw errors.siretApi.tooManyRequests({ serviceName });
-        throw errors.siretApi.unavailable({ serviceName });
+      }
+
+      logger.error({
+        message: `INSEE API Failed with ${response.status} : ${JSON.stringify(
+          response.body,
+          null,
+          2,
+        )}`,
       });
+      throw errors.siretApi.unavailable({
+        serviceName: partnerNames.inseeSiret,
+      });
+    });
   }
 
   public async getEstablishmentUpdatedBetween(
@@ -134,108 +127,94 @@ export class InseeSiretGateway implements SiretGateway {
     toDate: Date,
     sirets: SiretDto[],
   ): Promise<Record<SiretDto, SiretEstablishmentDto>> {
-    try {
-      const formattedFromDate = format(fromDate, "yyyy-MM-dd");
-      const formattedToDate = format(toDate, "yyyy-MM-dd");
-      const axios = await this.#createAxiosInstance();
+    const formattedFromDate = format(fromDate, "yyyy-MM-dd");
+    const formattedToDate = format(toDate, "yyyy-MM-dd");
 
-      const requestBody = queryParamsAsString({
-        q: [
-          `dateDernierTraitementEtablissement:[${formattedFromDate} TO ${formattedToDate}]`,
-          `(${sirets.map((siret) => `siret:${siret}`).join(" OR ")})`,
-        ].join(" AND "),
-        champs: [
-          "siret",
-          "denominationUniteLegale",
-          "nomUniteLegale",
-          "prenomUsuelUniteLegale",
-          "activitePrincipaleUniteLegale",
-          "nomenclatureActivitePrincipaleUniteLegale",
-          "trancheEffectifsUniteLegale",
-          "etatAdministratifUniteLegale",
-          "numeroVoieEtablissement",
-          "typeVoieEtablissement",
-          "libelleVoieEtablissement",
-          "codePostalEtablissement",
-          "libelleCommuneEtablissement",
-          "dateDebut",
-          "dateFin",
-          "etatAdministratifEtablissement",
-        ].join(","),
-        nombre: 1000,
-      });
-
-      const response = await axios.post("/siret", requestBody, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
-
-      return (
-        response.data.etablissements as InseeApiRawEstablishment[]
-      ).reduce(
-        (acc, establishment) => ({
-          ...acc,
-          [establishment.siret]:
-            convertSirenRawEstablishmentToSirenEstablishmentDto(establishment),
-        }),
-        {} satisfies Record<SiretDto, SiretEstablishmentDto>,
-      );
-    } catch (err) {
-      const error = castError(err);
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 404) return {};
-        throw error.response?.data;
-      }
-      throw error;
-    }
-  }
-
-  async #createAxiosInstance() {
-    const accessToken = await this.#getAccessToken();
-    return createAxiosInstance(logger, {
-      baseURL: this.#axiosConfig.endpoint,
-      headers: {
-        Authorization: `Bearer ${accessToken.access_token}`,
-        Accept: "application/json",
-      },
-      timeout: secondsToMilliseconds(10),
+    const requestBody = queryParamsAsString({
+      q: [
+        `dateDernierTraitementEtablissement:[${formattedFromDate} TO ${formattedToDate}]`,
+        `(${sirets.map((siret) => `siret:${siret}`).join(" OR ")})`,
+      ].join(" AND "),
+      champs: [
+        "siret",
+        "denominationUniteLegale",
+        "nomUniteLegale",
+        "prenomUsuelUniteLegale",
+        "activitePrincipaleUniteLegale",
+        "nomenclatureActivitePrincipaleUniteLegale",
+        "trancheEffectifsUniteLegale",
+        "etatAdministratifUniteLegale",
+        "numeroVoieEtablissement",
+        "typeVoieEtablissement",
+        "libelleVoieEtablissement",
+        "codePostalEtablissement",
+        "libelleCommuneEtablissement",
+        "dateDebut",
+        "dateFin",
+        "etatAdministratifEtablissement",
+      ].join(","),
+      nombre: 1000,
     });
+
+    const response = await this.#httpClient.getEstablishmentUpdatedBetween({
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
+        Authorization: `Bearer ${(await this.#getAccessToken()).access_token}`,
+      },
+      body: requestBody,
+    });
+
+    if (response.status === 404) return {};
+
+    if ([429, 503].includes(response.status)) {
+      throw errors.siretApi.tooManyRequests({
+        serviceName: partnerNames.inseeSiret,
+      });
+    }
+
+    if (response.status !== 200) {
+      logger.error({
+        message: `INSEE API Failed with ${response.status} : ${JSON.stringify(
+          response.body,
+          null,
+          2,
+        )}`,
+      });
+
+      throw new Error(
+        `INSEE API Failed with ${response.status}. More logs in datadog.`,
+      );
+    }
+
+    return response.body.etablissements.reduce(
+      (acc, establishment) => ({
+        ...acc,
+        [establishment.siret]:
+          convertSirenRawEstablishmentToSirenEstablishmentDto(establishment),
+      }),
+      {} satisfies Record<SiretDto, SiretEstablishmentDto>,
+    );
   }
 
   async #getAccessToken() {
-    return this.#caching.caching(this.#axiosConfig.clientId, () =>
+    return this.#caching.caching(this.#config.clientId, () =>
       this.#retryStrategy.apply(() =>
         this.#tokenLimiter.schedule(() => {
-          return createAxiosInstance(logger)
-            .post(
-              "https://auth.insee.net/auth/realms/apim-gravitee/protocol/openid-connect/token?",
-              querystring.stringify({
-                grant_type: "password",
-                client_id: this.#axiosConfig.clientId,
-                client_secret: this.#axiosConfig.clientSecret,
-                username: this.#axiosConfig.username,
-                password: this.#axiosConfig.password,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                timeout: secondsToMilliseconds(10),
+          return this.#httpClient
+            .getAccessToken({
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
               },
-            )
-            .then((response) => {
-              return response.data;
+              body: querystring.stringify({
+                grant_type: "password",
+                client_id: this.#config.clientId,
+                client_secret: this.#config.clientSecret,
+                username: this.#config.username,
+                password: this.#config.password,
+              }),
             })
-            .catch((error) => {
-              logger.error({
-                error,
-                message: "Raw error getting access token",
-              });
-              if (isRetryableError(logger, error))
-                throw new RetryableError(error);
-              throw error;
-            });
+            .then((response) => response.body);
         }),
       ),
     );
@@ -298,7 +277,7 @@ export type InseeApiRawEstablishment = {
   periodesEtablissement: Array<InseePeriodeEtablissment>;
 };
 
-type SirenGatewayAnswer = {
+export type SirenGatewayAnswer = {
   header: {
     statut: number;
     message: string;

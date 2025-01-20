@@ -1,5 +1,6 @@
 import { subMonths } from "date-fns";
 import { expectObjectsToMatch, expectToEqual } from "shared";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import {
   AccessTokenResponse,
   AppConfig,
@@ -8,6 +9,7 @@ import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryC
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import { InseeSiretGateway } from "./InseeSiretGateway";
+import { makeInseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -19,13 +21,17 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 // - SIRENE_INSEE_CLIENT_SECRET
 // - SIRENE_INSEE_USERNAME
 // - SIRENE_INSEE_PASSWORD
-describe("HttpSirenGateway", () => {
+describe("InseeSiretGateway", () => {
   let siretGateway: InseeSiretGateway;
 
   beforeEach(() => {
     const config = AppConfig.createFromEnv();
+    const inseeExternalRoutes = makeInseeExternalRoutes(
+      config.inseeHttpConfig.endpoint,
+    );
     siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
+      createFetchSharedClient(inseeExternalRoutes, fetch),
       new RealTimeGateway(),
       noRetries,
       new InMemoryCachingGateway<AccessTokenResponse>(

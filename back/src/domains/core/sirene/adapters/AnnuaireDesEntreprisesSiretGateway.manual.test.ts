@@ -1,6 +1,7 @@
 import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import {
   AccessTokenResponse,
   AppConfig,
@@ -14,6 +15,7 @@ import {
 } from "./AnnuaireDesEntreprisesSiretGateway";
 import { annuaireDesEntreprisesSiretRoutes } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 import { InseeSiretGateway } from "./InseeSiretGateway";
+import { makeInseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 // These tests are not hermetic and not meant for automated testing. They will make requests to the
 // real SIRENE API, use up production quota, and fail for uncontrollable reasons such as quota
@@ -21,12 +23,21 @@ import { InseeSiretGateway } from "./InseeSiretGateway";
 describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
+  const inseeHttpClient = createFetchSharedClient(
+    makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+    fetch,
+    {
+      skipResponseValidation: true,
+      signal: AbortSignal.timeout(12_000),
+    },
+  );
 
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
       createAxiosSharedClient(annuaireDesEntreprisesSiretRoutes, axios),
       new InseeSiretGateway(
         config.inseeHttpConfig,
+        inseeHttpClient,
         new RealTimeGateway(),
         noRetries,
         new InMemoryCachingGateway<AccessTokenResponse>(
