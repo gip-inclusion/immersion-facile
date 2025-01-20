@@ -1,7 +1,10 @@
 import { Pool } from "pg";
 import { random, sleep } from "shared";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
+import { partnerNames } from "../config/bootstrap/partnerNames";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   ExponentialBackoffRetryStrategy,
@@ -9,6 +12,7 @@ import {
   defaultRetryDeadlineMs,
 } from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
 import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
+import { makeInseeExternalRoutes } from "../domains/core/sirene/adapters/InseeSiretGateway.routes";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UpdateEstablishmentsFromSirenApiScript } from "../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
@@ -34,8 +38,19 @@ const main = async () => {
     random,
   );
 
+  const httpClient = createFetchSharedClient(
+    makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+    fetch,
+    {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses(partnerNames.inseeSiret),
+      signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
+    },
+  );
+
   const siretGateway = new InseeSiretGateway(
     config.inseeHttpConfig,
+    httpClient,
     timeGateway,
     retryStrategy,
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),

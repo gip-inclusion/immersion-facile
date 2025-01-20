@@ -26,7 +26,7 @@ export type AccessTokenConfig = {
 };
 
 export type InseeAccessTokenConfig = {
-  endpoint: string;
+  endpoint: AbsoluteUrl;
   clientId: string;
   clientSecret: string;
   username: string;
@@ -347,7 +347,7 @@ export class AppConfig {
 
   public get inseeHttpConfig(): InseeAccessTokenConfig {
     return {
-      endpoint: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_ENDPOINT"),
+      endpoint: this.#throwIfNotAbsoluteUrl("SIRENE_INSEE_ENDPOINT"),
       clientId: this.#throwIfNotDefinedOrDefault("SIRENE_INSEE_CLIENT_ID"),
       clientSecret: this.#throwIfNotDefinedOrDefault(
         "SIRENE_INSEE_CLIENT_SECRET",
