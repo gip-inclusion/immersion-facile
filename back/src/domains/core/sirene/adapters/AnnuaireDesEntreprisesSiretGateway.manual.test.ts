@@ -103,23 +103,28 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     expectToEqual(response, undefined);
   });
 
-  it("Should support several of parallel calls, and queue the calls if over accepted rate", async () => {
-    const siretsPromises = Array(20).fill("34493368400021");
-    const results = await Promise.all(
-      siretsPromises.map((siret) =>
-        siretGateway.getEstablishmentBySiret(siret).catch((error) => {
-          const responseBodyAsString = error.response?.data
-            ? ` Body : ${JSON.stringify(error.response?.data)}`
-            : "";
+  const parallelCallQty = 20;
+  it(
+    "Should support several of parallel calls, and queue the calls if over accepted rate",
+    async () => {
+      const siretsPromises = Array(parallelCallQty).fill("34493368400021");
+      const results = await Promise.all(
+        siretsPromises.map((siret) =>
+          siretGateway.getEstablishmentBySiret(siret).catch((error) => {
+            const responseBodyAsString = error.response?.data
+              ? ` Body : ${JSON.stringify(error.response?.data)}`
+              : "";
 
-          throw new Error(
-            `Could not call api correctly, status: ${error.response.status}.${responseBodyAsString}`,
-          );
-        }),
-      ),
-    );
-    expect(results).toHaveLength(siretsPromises.length);
-  });
+            throw new Error(
+              `Could not call api correctly, status: ${error.response.status}.${responseBodyAsString}`,
+            );
+          }),
+        ),
+      );
+      expect(results).toHaveLength(siretsPromises.length);
+    },
+    1_000 * parallelCallQty * 1.2,
+  );
 
   it("Should return a non diffusible establishment using fallback API", async () => {
     const nonDiffusibleEstablishment =

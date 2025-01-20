@@ -37,14 +37,16 @@ const inseeMaxRequestsPerMinute = 500;
 const inseeMaxRequestPerInterval = 1;
 const rate_ms = 3_000;
 
+const ONE_MINUTE_MS = 60 * 1000;
 // The documentation can be found here:
 // https://portail-api.insee.fr/catalog/all > Api Sirene Privée > Documentation
 
 export class InseeSiretGateway implements SiretGateway {
   #limiter = new Bottleneck({
     reservoir: inseeMaxRequestsPerMinute,
-    reservoirRefreshInterval: 60 * 1000, // number of ms
+    reservoirRefreshInterval: ONE_MINUTE_MS,
     reservoirRefreshAmount: inseeMaxRequestsPerMinute,
+    minTime: Math.ceil(ONE_MINUTE_MS / inseeMaxRequestsPerMinute),
   });
 
   // 1 call every 3 seconds
