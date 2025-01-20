@@ -145,7 +145,13 @@ describe("UpdateConventionStatus", () => {
       });
 
       it("Accept from role establishment-representative when convention is requested to be modified for the second time", async () => {
-        const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {});
+        const validator = new InclusionConnectedUserBuilder()
+          .withId("validator")
+          .withEmail("validator@email.com")
+          .build();
+        const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        });
 
         const initialConvention = new ConventionDtoBuilder()
           .withId(conventionWithAgencyOneStepValidationId)
@@ -173,6 +179,7 @@ describe("UpdateConventionStatus", () => {
 
         await uow.agencyRepository.insert(agency);
         await uow.conventionRepository.save(initialConvention);
+        uow.userRepository.users = [validator];
 
         await updateConventionStatusUseCase.execute(
           {

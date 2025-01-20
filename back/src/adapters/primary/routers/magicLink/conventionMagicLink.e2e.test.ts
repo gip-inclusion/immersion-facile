@@ -14,6 +14,7 @@ import {
   currentJwtVersions,
   errors,
   expectHttpResponseToEqual,
+  expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -465,6 +466,11 @@ describe("Magic link router", () => {
 
   describe("POST /auth/sign-application/:conventionId", () => {
     it("200 - can sign with inclusion connected user (same email as establishement representative in convention)", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const validator = new InclusionConnectedUserBuilder()
+        .withId("validator")
+        .withEmail("validator@mail.com")
+        .buildUser();
       const convention = new ConventionDtoBuilder()
         .withStatus("READY_TO_SIGN")
         .notSigned()
@@ -478,7 +484,15 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.users = [establishmentRepresentative];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ];
+      inMemoryUow.userRepository.users = [
+        establishmentRepresentative,
+        validator,
+      ];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
       const response = await request
@@ -497,7 +511,13 @@ describe("Magic link router", () => {
     });
 
     it("403 - cannot sign with inclusion connected user (icUser email != convention establishment representative email)", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const validator = new InclusionConnectedUserBuilder()
+        .withId("validator")
+        .withEmail("validator@mail.com")
+        .buildUser();
       const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
         .withStatus("READY_TO_SIGN")
         .notSigned()
         .build();
@@ -510,8 +530,16 @@ describe("Magic link router", () => {
         createdAt: new Date().toISOString(),
       };
 
-      inMemoryUow.userRepository.users = [notEstablishmentRepresentative];
+      inMemoryUow.userRepository.users = [
+        notEstablishmentRepresentative,
+        validator,
+      ];
       inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.agencyRepository.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)
@@ -523,10 +551,12 @@ describe("Magic link router", () => {
         })
         .send();
 
-      expectToEqual(response.status, 403);
-      expectToEqual(response.body, {
+      expectObjectsToMatch(response, {
         status: 403,
-        message: `User '${notEstablishmentRepresentative.id}' is not the establishment representative for convention '${convention.id}'`,
+        body: {
+          status: 403,
+          message: `User '${notEstablishmentRepresentative.id}' is not the establishment representative for convention '${convention.id}'`,
+        },
       });
     });
   });
