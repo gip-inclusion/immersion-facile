@@ -51,12 +51,11 @@ export class InMemoryAgencyRepository implements AgencyRepository {
     });
   }
 
-  public async insert(
-    agency: AgencyWithUsersRights,
-  ): Promise<AgencyId | undefined> {
-    if (this.#agencies[agency.id]) return undefined;
+  public async insert(agency: AgencyWithUsersRights): Promise<void> {
+    if (this.#agencies[agency.id]) throw errors.agency.alreadyExist(agency.id);
+    if (!values(agency.usersRights).length)
+      throw errors.agency.noUsers(agency.id);
     this.#agencies[agency.id] = agency;
-    return agency.id;
   }
 
   public async update(agency: PartialAgencyDto) {

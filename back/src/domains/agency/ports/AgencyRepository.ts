@@ -41,7 +41,7 @@ export type AgencyRightOfUser = OmitFromExistingKeys<AgencyRight, "agency"> & {
 };
 
 export interface AgencyRepository {
-  insert(agency: AgencyWithUsersRights): Promise<AgencyId | undefined>;
+  insert(agency: AgencyWithUsersRights): Promise<void>;
   update(partialAgency: PartialAgencyWithUsersRights): Promise<void>;
 
   getById(id: AgencyId): Promise<AgencyWithUsersRights | undefined>;
