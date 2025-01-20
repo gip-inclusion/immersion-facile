@@ -84,13 +84,13 @@ export class GetConvention extends TransactionalUseCase<
     agency: AgencyWithUsersRights;
     uow: UnitOfWork;
   }): Promise<ConventionReadDto> {
-    const matchingMd5Emails = await this.#isEmailHashMatch({
+    const isMatchingEmailHash = await this.#isEmailHashMatch({
       authPayload,
       convention,
       agency,
       uow,
     });
-    if (!matchingMd5Emails) {
+    if (!isMatchingEmailHash) {
       throw errors.convention.forbiddenMissingRights({
         conventionId: convention.id,
       });

@@ -46,7 +46,7 @@ export const errors = {
   assessment: {
     alreadyExist: (conventionId: ConventionId) =>
       new ConflictError(
-        `Cannot create an assessment as one already exists for convention with id : ${conventionId}`,
+        `Il n'est pas possible de créer le bilan car un bilan existe déjà pour la convention '${conventionId}'.`,
       ),
     badStatus: (status: ConventionStatus) =>
       new BadRequestError(
@@ -116,7 +116,9 @@ export const errors = {
     forbiddenMissingRights: ({
       conventionId,
     }: { conventionId: ConventionId }) =>
-      new ForbiddenError(`User has no right on convention '${conventionId}'`),
+      new ForbiddenError(
+        `L'utilisateur n'a pas de droits sur la convention '${conventionId}'.`,
+      ),
     badRoleStatusChange: ({
       roles,
       status,

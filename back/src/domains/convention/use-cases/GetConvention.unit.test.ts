@@ -129,9 +129,9 @@ describe("Get Convention", () => {
 
             await expectPromiseToFailWithError(
               getConvention.execute({ conventionId: convention.id }, payload),
-              new ForbiddenError(
-                `User has no right on convention '${convention.id}'`,
-              ),
+              errors.convention.forbiddenMissingRights({
+                conventionId: convention.id,
+              }),
             );
           },
         );
@@ -169,9 +169,9 @@ describe("Get Convention", () => {
 
           await expectPromiseToFailWithError(
             getConvention.execute({ conventionId: convention.id }, payload),
-            new ForbiddenError(
-              `User has no right on convention '${convention.id}'`,
-            ),
+            errors.convention.forbiddenMissingRights({
+              conventionId: convention.id,
+            }),
           );
         });
       });

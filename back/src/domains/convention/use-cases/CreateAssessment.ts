@@ -47,7 +47,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
       conventionJwtPayload,
     );
 
-    const assessmentEntity = await validateConventionAndCreateAssessmentEntity(
+    const assessmentEntity = await createAssessmentEntityIfNotExist(
       uow,
       convention,
       assessment,
@@ -71,7 +71,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
   },
 );
 
-const validateConventionAndCreateAssessmentEntity = async (
+const createAssessmentEntityIfNotExist = async (
   uow: UnitOfWork,
   convention: ConventionDto,
   assessment: AssessmentDto,
