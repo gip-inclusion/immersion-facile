@@ -312,27 +312,20 @@ export const createGateways = async (
     config: AppConfig,
     timeGateway: TimeGateway,
   ) => {
+    const createInseeSiretGateway = () =>
+      new InseeSiretGateway(
+        config.inseeHttpConfig,
+        timeGateway,
+        noRetries,
+        new InMemoryCachingGateway<AccessTokenResponse>(
+          timeGateway,
+          "expires_in",
+        ),
+      );
+
     const gatewayByProvider = {
-      HTTPS: () =>
-        new InseeSiretGateway(
-          config.inseeHttpConfig,
-          timeGateway,
-          noRetries,
-          new InMemoryCachingGateway<AccessTokenResponse>(
-            timeGateway,
-            "expires_in",
-          ),
-        ),
-      INSEE: () =>
-        new InseeSiretGateway(
-          config.inseeHttpConfig,
-          timeGateway,
-          noRetries,
-          new InMemoryCachingGateway<AccessTokenResponse>(
-            timeGateway,
-            "expires_in",
-          ),
-        ),
+      HTTPS: () => createInseeSiretGateway(),
+      INSEE: () => createInseeSiretGateway(),
       IN_MEMORY: () => new InMemorySiretGateway(),
       ANNUAIRE_DES_ENTREPRISES: () =>
         new AnnuaireDesEntreprisesSiretGateway(
@@ -340,15 +333,7 @@ export const createGateways = async (
             partnerName: partnerNames.annuaireDesEntreprises,
             routes: annuaireDesEntreprisesSiretRoutes,
           }),
-          new InseeSiretGateway(
-            config.inseeHttpConfig,
-            timeGateway,
-            noRetries,
-            new InMemoryCachingGateway<AccessTokenResponse>(
-              timeGateway,
-              "expires_in",
-            ),
-          ),
+          createInseeSiretGateway(),
         ),
     };
     return gatewayByProvider[provider]();
