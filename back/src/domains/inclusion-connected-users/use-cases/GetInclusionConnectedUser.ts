@@ -5,7 +5,7 @@ import {
   EstablishmentDashboards,
   InclusionConnectedUser,
   WithDashboards,
-  WithEstablismentsSiretAndName,
+  WithEstablishmentData,
   WithOptionalUserId,
   agencyRoleIsNotToReview,
   errors,
@@ -85,20 +85,32 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
   async #withEstablishments(
     uow: UnitOfWork,
     user: InclusionConnectedUser,
-  ): Promise<{ establishments?: WithEstablismentsSiretAndName[] }> {
+  ): Promise<{ establishments?: WithEstablishmentData[] }> {
     const establishmentAggregates =
       await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
         {
           userId: user.id,
         },
       );
-
-    const establishments = establishmentAggregates.map(({ establishment }) => ({
-      siret: establishment.siret,
-      businessName: establishment.customizedName
-        ? establishment.customizedName
-        : establishment.name,
-    }));
+    const establishments = establishmentAggregates.map(
+      ({ establishment, userRights }) => {
+        const userRight = userRights.find(
+          (userRight) => userRight.userId === user.id,
+        );
+        if (!userRight) {
+          throw errors.establishment.noUserRights({
+            siret: establishment.siret,
+          });
+        }
+        return {
+          siret: establishment.siret,
+          businessName: establishment.customizedName
+            ? establishment.customizedName
+            : establishment.name,
+          role: userRight.role,
+        };
+      },
+    );
     return establishments.length ? { establishments } : {};
   }
 

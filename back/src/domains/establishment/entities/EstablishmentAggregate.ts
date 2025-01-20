@@ -1,4 +1,4 @@
-import { Phone, UserId } from "shared";
+import { EstablishmentRole, Phone, UserId } from "shared";
 import { EstablishmentEntity } from "./EstablishmentEntity";
 import { OfferEntity } from "./OfferEntity";
 
@@ -12,7 +12,6 @@ export type WithEstablishmentAggregate = {
   establishmentAggregate: EstablishmentAggregate;
 };
 
-type EstablishmentRole = "establishment-admin" | "establishment-contact";
 type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
   userId: UserId;
   role: Role;

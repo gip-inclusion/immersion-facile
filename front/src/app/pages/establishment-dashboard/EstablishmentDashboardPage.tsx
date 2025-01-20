@@ -5,7 +5,7 @@ import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 import React from "react";
 import { Loader } from "react-design-system";
-import { EstablishmentRole, InclusionConnectedUser } from "shared";
+import { ConventionEstablishmentRole, InclusionConnectedUser } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -20,7 +20,7 @@ import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 import { ManageDiscussionFormSection } from "./ManageDiscussionFormSection";
 
-const currentUserRoleToDisplay = (role: EstablishmentRole) =>
+const currentUserRoleToDisplay = (role: ConventionEstablishmentRole) =>
   role === "establishment-representative"
     ? "responsable d'entreprise"
     : "tuteur de l'entreprise";
@@ -96,7 +96,10 @@ export const EstablishmentDashboardPage = ({
             tabId: "fiche-entreprise",
             content: (
               <ManageEstablishmentsTab
-                establishments={establishments}
+                establishments={establishments.filter(
+                  (establishment) =>
+                    establishment.role === "establishment-admin",
+                )}
                 route={route}
               />
             ),

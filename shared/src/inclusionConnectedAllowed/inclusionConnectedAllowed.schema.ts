@@ -4,7 +4,10 @@ import { agencyDtoForAgencyUsersAndAdminsSchema } from "../agency/agency.schema"
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
 import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
-import { establishmentsRoles } from "../role/role.dto";
+import {
+  conventionEstablishmentsRoles,
+  establishmentsRoles,
+} from "../role/role.dto";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
@@ -17,7 +20,7 @@ import {
   WithAgencyDashboards,
   WithDiscussionId,
   WithEstablishmentDashboards,
-  WithEstablismentsSiretAndName,
+  WithEstablishmentData,
   WithOptionalUserId,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
@@ -40,11 +43,13 @@ export const withOptionalUserIdSchema: z.Schema<WithOptionalUserId> = z.object({
   userId: userIdSchema.optional(),
 });
 
-const withEstablishmentSiretAndName: z.Schema<WithEstablismentsSiretAndName> =
-  z.object({
+const withEstablishmentSiretAndName: z.Schema<WithEstablishmentData> = z.object(
+  {
     siret: siretSchema,
     businessName: zStringMinLength1,
-  });
+    role: z.enum(establishmentsRoles),
+  },
+);
 
 const dashboardsSchema: z.Schema<
   WithAgencyDashboards & WithEstablishmentDashboards
@@ -53,7 +58,7 @@ const dashboardsSchema: z.Schema<
     conventions: z
       .object({
         url: absoluteUrlSchema,
-        role: z.enum(establishmentsRoles),
+        role: z.enum(conventionEstablishmentsRoles),
       })
       .optional(),
     discussions: absoluteUrlSchema.optional(),

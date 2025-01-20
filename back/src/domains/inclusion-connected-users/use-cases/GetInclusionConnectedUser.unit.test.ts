@@ -28,8 +28,14 @@ describe("GetUserAgencyDashboardUrl", () => {
     .withFirstName("John")
     .withIsAdmin(false)
     .withEstablishments(undefined);
+  const anotherUserBuilder = new InclusionConnectedUserBuilder()
+    .withId("another-user-id")
+    .withFirstName("Jane")
+    .withIsAdmin(false)
+    .withEstablishments(undefined);
   const icNotAdmin = notAdminBuilder.build();
   const notAdmin = notAdminBuilder.buildUser();
+  const anotherUser = anotherUserBuilder.build();
 
   const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder();
 
@@ -438,23 +444,40 @@ describe("GetUserAgencyDashboardUrl", () => {
         it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
           uow.userRepository.users = [notAdmin];
 
-          const establishmentUserRights: EstablishmentUserRight[] = [
-            {
-              job: "Chef",
-              role: "establishment-admin",
-              userId: notAdmin.id,
-              phone: "+33600000000",
-            },
-          ];
+          const establishmentUserRightsForFirstEstablishment: EstablishmentUserRight[] =
+            [
+              {
+                job: "Chef",
+                role: "establishment-admin",
+                userId: notAdmin.id,
+                phone: "+33600000000",
+              },
+              {
+                job: "Dev",
+                role: "establishment-admin",
+                userId: anotherUser.id,
+                phone: "+33600000001",
+              },
+            ];
+
+          const establishmentUserRightsForSecondEstablishment: EstablishmentUserRight[] =
+            [
+              {
+                job: "Chef",
+                role: "establishment-contact",
+                userId: notAdmin.id,
+                phone: "+33600000000",
+              },
+            ];
 
           const establishmentAggregate1 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300012")
-            .withUserRights(establishmentUserRights)
+            .withUserRights(establishmentUserRightsForFirstEstablishment)
             .build();
 
           const establishmentAggregate2 = new EstablishmentAggregateBuilder()
             .withEstablishmentSiret("89114285300013")
-            .withUserRights(establishmentUserRights)
+            .withUserRights(establishmentUserRightsForSecondEstablishment)
             .build();
 
           uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -471,10 +494,12 @@ describe("GetUserAgencyDashboardUrl", () => {
             {
               siret: establishmentAggregate1.establishment.siret,
               businessName: establishmentAggregate1.establishment.name,
+              role: "establishment-admin",
             },
             {
               siret: establishmentAggregate2.establishment.siret,
               businessName: establishmentAggregate2.establishment.name,
+              role: "establishment-contact",
             },
           ]);
         });
