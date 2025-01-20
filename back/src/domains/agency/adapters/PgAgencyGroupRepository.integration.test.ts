@@ -1,8 +1,11 @@
 import { Pool } from "pg";
 import { AgencyDtoBuilder, AgencyGroup, expectToEqual } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../utils/user";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgAgencyGroupRepository } from "./PgAgencyGroupRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 
@@ -13,6 +16,7 @@ describe("PgAgencyGroupRepository", () => {
   let db: KyselyDb;
   let pgAgencyGroupRepository: PgAgencyGroupRepository;
   let pgAgencyRepository: PgAgencyRepository;
+  let pgUserRepository: PgUserRepository;
 
   beforeAll(async () => {
     pool = getTestPgPool();
@@ -27,6 +31,7 @@ describe("PgAgencyGroupRepository", () => {
 
     pgAgencyGroupRepository = new PgAgencyGroupRepository(db);
     pgAgencyRepository = new PgAgencyRepository(db);
+    pgUserRepository = new PgUserRepository(db);
   });
 
   afterAll(async () => {
@@ -54,7 +59,12 @@ describe("PgAgencyGroupRepository", () => {
         agencyIds: [agency.id],
       };
 
-      await insertAgencyGroup(agencyGroup);
+      await insertAgencyGroup({
+        db,
+        pgAgencyRepository,
+        pgUserRepository,
+        agencyGroup,
+      });
 
       const result = await pgAgencyGroupRepository.getByCodeSafir(
         agencyGroup.codeSafir,
@@ -63,41 +73,59 @@ describe("PgAgencyGroupRepository", () => {
       expectToEqual(result, agencyGroup);
     });
   });
-
-  const insertAgencyGroup = async (agencyGroup: AgencyGroup) => {
-    if (
-      agencyGroup.agencyIds.length > 1 &&
-      agencyGroup.agencyIds[0] !== agency.id
-    )
-      throw new Error("Agency not supported in tests. tests");
-
-    await pgAgencyRepository.insert(toAgencyWithRights(agency));
-
-    const [{ id: agencyGroupId }] = await db
-      .insertInto("agency_groups")
-      .values({
-        siret: agencyGroup.siret,
-        name: agencyGroup.name,
-        email: agencyGroup.email,
-        kind: agencyGroup.kind,
-        scope: agencyGroup.scope,
-        code_safir: agencyGroup.codeSafir,
-        departments: JSON.stringify(agencyGroup.departments),
-        cc_emails: agencyGroup.ccEmails
-          ? JSON.stringify(agencyGroup.ccEmails)
-          : null,
-      })
-      .returning("id")
-      .execute();
-
-    if (agencyGroup.agencyIds.length > 0) {
-      await db
-        .insertInto("agency_groups__agencies")
-        .values({
-          agency_group_id: agencyGroupId,
-          agency_id: agency.id,
-        })
-        .execute();
-    }
-  };
 });
+
+const insertAgencyGroup = async ({
+  db,
+  pgAgencyRepository,
+  pgUserRepository,
+  agencyGroup,
+}: {
+  db: KyselyDb;
+  pgAgencyRepository: PgAgencyRepository;
+  pgUserRepository: PgUserRepository;
+  agencyGroup: AgencyGroup;
+}) => {
+  if (
+    agencyGroup.agencyIds.length > 1 &&
+    agencyGroup.agencyIds[0] !== agency.id
+  )
+    throw new Error("Agency not supported in tests. tests");
+
+  const validator = makeUniqueUserForTest(uuid());
+
+  await pgUserRepository.save(validator, "proConnect");
+
+  await pgAgencyRepository.insert(
+    toAgencyWithRights(agency, {
+      [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+    }),
+  );
+
+  const [{ id: agencyGroupId }] = await db
+    .insertInto("agency_groups")
+    .values({
+      siret: agencyGroup.siret,
+      name: agencyGroup.name,
+      email: agencyGroup.email,
+      kind: agencyGroup.kind,
+      scope: agencyGroup.scope,
+      code_safir: agencyGroup.codeSafir,
+      departments: JSON.stringify(agencyGroup.departments),
+      cc_emails: agencyGroup.ccEmails
+        ? JSON.stringify(agencyGroup.ccEmails)
+        : null,
+    })
+    .returning("id")
+    .execute();
+
+  if (agencyGroup.agencyIds.length > 0) {
+    await db
+      .insertInto("agency_groups__agencies")
+      .values({
+        agency_group_id: agencyGroupId,
+        agency_id: agency.id,
+      })
+      .execute();
+  }
+};

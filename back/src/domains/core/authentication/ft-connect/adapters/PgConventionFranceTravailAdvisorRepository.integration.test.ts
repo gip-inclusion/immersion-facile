@@ -5,15 +5,18 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
+import { PgUserRepository } from "../../inclusion-connect/adapters/PgUserRepository";
 import {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
@@ -76,10 +79,17 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("agency_groups__agencies").execute();
     await db.deleteFrom("agencies").execute();
+
     const agencyRepository = new PgAgencyRepository(db);
+
+    const validator = makeUniqueUserForTest(uuid());
+    await new PgUserRepository(db).save(validator, "proConnect");
     await agencyRepository.insert(
-      toAgencyWithRights(AgencyDtoBuilder.create().build()),
+      toAgencyWithRights(AgencyDtoBuilder.create().build(), {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
     );
+
     const conventionRepository = new PgConventionRepository(db);
     const conventionExternalIdRepository = new PgConventionExternalIdRepository(
       db,

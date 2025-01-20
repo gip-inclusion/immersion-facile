@@ -23,9 +23,11 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
@@ -182,14 +184,11 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("Retrieves a convention by id exists with refersToAgency", async () => {
-      const refersToAgencyId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
       const referringAgency = new AgencyDtoBuilder()
         .withName("Agence référente")
-        .withId(refersToAgencyId)
+        .withId(uuid())
         .withAgencySiret("55552222000055")
         .build();
-
-      await agencyRepo.insert(toAgencyWithRights(referringAgency, {}));
 
       const expectedConventionRead = await insertAgencyAndConvention({
         conventionId: conventionIdA,
@@ -395,7 +394,11 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     beforeEach(async () => {
-      await agencyRepo.insert(toAgencyWithRights(agency));
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
       await Promise.all(
         [
@@ -778,8 +781,13 @@ describe("Pg implementation of ConventionQueries", () => {
     let notificationRepo: NotificationRepository;
 
     beforeEach(async () => {
-      const agencyRepository = new PgAgencyRepository(db);
-      await agencyRepository.insert(toAgencyWithRights(agency));
+      const validator = makeUniqueUserForTest(uuid());
+      await new PgUserRepository(db).save(validator, "proConnect");
+      await new PgAgencyRepository(db).insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+        }),
+      );
 
       conventionRepo = new PgConventionRepository(db);
       notificationRepo = new PgNotificationRepository(db);
@@ -999,7 +1007,11 @@ describe("Pg implementation of ConventionQueries", () => {
       .build();
 
     if (withRefersToAgency)
-      await agencyRepo.insert(toAgencyWithRights(withRefersToAgency));
+      await agencyRepo.insert(
+        toAgencyWithRights(withRefersToAgency, {
+          [validatorUser.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
 
     await agencyRepo.insert(
       toAgencyWithRights(agency, {

@@ -17,10 +17,13 @@ import {
   expectToEqual,
   reasonableSchedule,
 } from "shared";
+import { v4 as uuid } from "uuid";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
+import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { PgConventionRepository } from "./PgConventionRepository";
 
@@ -53,8 +56,13 @@ describe("PgConventionRepository", () => {
   beforeAll(async () => {
     pool = getTestPgPool();
     db = makeKyselyDb(pool);
+
+    const validator = makeUniqueUserForTest(uuid());
+    await new PgUserRepository(db).save(validator, "proConnect");
     await new PgAgencyRepository(db).insert(
-      toAgencyWithRights(AgencyDtoBuilder.create().build()),
+      toAgencyWithRights(new AgencyDtoBuilder().withId(uuid()).build(), {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
     );
     timeGateway = new CustomTimeGateway();
   });
