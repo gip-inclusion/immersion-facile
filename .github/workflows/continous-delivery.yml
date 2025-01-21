@@ -63,6 +63,19 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
+  deploy-pentest:
+    name: Deploy pentest
+    needs:
+      - deploy-staging
+    uses: ./.github/workflows/deploy-to-scalingo.yml
+    with:
+      environment: pentest
+      tag: "v${{ github.run_number }}"
+      isPreRelease: true
+    secrets:
+      SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
   deploy-prod:
     name: Deploy prod
     needs:
