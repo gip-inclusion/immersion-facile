@@ -16,10 +16,15 @@ on:
         required: false
         type: string
         default: "osc-fr1"
+      slackChannel:
+        type: string
+        required: true
     secrets:
       SCALINGO_API_TOKEN:
         required: true
       DISCORD_WEBHOOK_URL:
+        required: true
+      SLACK_BOT_TOKEN:
         required: true
 
 jobs:
@@ -49,6 +54,53 @@ jobs:
         run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
       - name: Deploy front
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
+      - name: Send Slack notification
+        run: |
+          releaseSuffix=$([[ "${{ inputs.isPreRelease }}" == "true" ]] && echo "-rc" || echo "")
+          curl --location "https://slack.com/api/chat.postMessage" -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.SLACK_BOT_TOKEN }}" -d @- <<EOF
+          {
+            "channel": "${{ inputs.slackChannel }}",
+            "blocks": [
+              {"type": "header", "text": {"type": "plain_text", "text": "${{ inputs.tag }}${releaseSuffix}"}},
+              {"type": "section", "text": {"type": "plain_text", "text": "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}${releaseSuffix}."}},
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "type": "button",
+                    "style": "primary",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Voir les changements"
+                    },
+                    "url": "https://github.com/gip-inclusion/immersion-facile/releases/tag/${{ inputs.tag }}${releaseSuffix}"
+                  }, {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Voir les releases"
+                    },
+                    "url": "https://github.com/gip-inclusion/immersion-facile/releases"
+                  }, {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Aller sur l'application"
+                    },
+                    "url": "https://${{ inputs.environment }}.immersion-facile.beta.gouv.fr"
+                  }, {
+                    "type": "button",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "Voir le workfow github"
+                    },
+                    "url": "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+                  }
+                ]
+              }
+            ]
+          }
+          EOF
       - name: Send Discord notification
         run: |
           releaseSuffix=$([[ "${{ inputs.isPreRelease }}" == "true" ]] && echo "-rc" || echo "")
