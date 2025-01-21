@@ -210,6 +210,7 @@ const conventionToConventionInUrl = (
       : {}),
     emergencyContact: beneficiary.emergencyContact,
     emergencyContactPhone: beneficiary.emergencyContactPhone,
+    emergencyContactEmail: beneficiary.emergencyContactEmail,
     fedId: beneficiary.federatedIdentity?.token,
     fedIdProvider: beneficiary.federatedIdentity?.provider,
   };
