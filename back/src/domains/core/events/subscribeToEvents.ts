@@ -25,10 +25,7 @@ const getUseCasesByTopics = (
   NotificationAdded: [useCases.sendNotification],
   ExchangeAddedToDiscussion: [
     useCases.sendExchangeToRecipient,
-    {
-      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
-      execute: useCases.updateMarketingEstablishmentContactList.execute,
-    },
+    useCases.updateMarketingEstablishmentContactList,
   ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
   // "Happy case" for immersion application.
@@ -116,10 +113,7 @@ const getUseCasesByTopics = (
   FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
   UpdatedEstablishmentAggregateInsertedFromForm: [
-    {
-      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
-      execute: useCases.updateMarketingEstablishmentContactList.execute,
-    },
+    useCases.updateMarketingEstablishmentContactList,
   ],
   NewEstablishmentAggregateInsertedFromForm: [
     useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
@@ -138,10 +132,7 @@ const getUseCasesByTopics = (
   // Search related
   ContactRequestedByBeneficiary: [
     useCases.notifyContactRequest,
-    {
-      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
-      execute: useCases.updateMarketingEstablishmentContactList.execute,
-    },
+    useCases.updateMarketingEstablishmentContactList,
   ],
 
   // Magic link renewal.
