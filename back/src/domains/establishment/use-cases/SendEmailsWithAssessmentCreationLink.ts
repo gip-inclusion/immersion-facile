@@ -12,7 +12,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { getAgencyEmailsByRole } from "../../../utils/agency";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -115,7 +115,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     );
 
     if (convention.internshipKind === "immersion")
-      await this.onImmersionConvention(uow, convention, agency);
+      await this.sendEmailToAgencyUsers(uow, convention, agency);
 
     await uow.outboxRepository.save(
       this.#createNewEvent({
@@ -125,40 +125,28 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     );
   }
 
-  private async onImmersionConvention(
+  private async sendEmailToAgencyUsers(
     uow: UnitOfWork,
     convention: ConventionDto,
     agency: AgencyWithUsersRights,
   ) {
-    for (const validatorEmail of await getAgencyEmailsByRole({
-      agency,
-      role: "validator",
-      uow,
-    })) {
-      await this.#saveNotificationAndRelatedEvent(
-        uow,
-        await this.#makeAgencyAssessmentEmail(
-          convention,
-          agency,
-          validatorEmail,
-          "validator",
-        ),
-      );
-    }
+    const agencyDto = await agencyWithRightToAgencyDto(uow, agency);
 
-    for (const counsellorEmail of await getAgencyEmailsByRole({
-      agency,
-      role: "counsellor",
-      uow,
-    })) {
+    const emailsToSendWithRole: { email: Email; role: AgencyRole }[] = [
+      ...agencyDto.validatorEmails.map((email) => ({
+        email,
+        role: "validator" as const,
+      })),
+      ...agencyDto.counsellorEmails.map((email) => ({
+        email,
+        role: "counsellor" as const,
+      })),
+    ];
+
+    for (const { email, role } of emailsToSendWithRole) {
       await this.#saveNotificationAndRelatedEvent(
         uow,
-        await this.#makeAgencyAssessmentEmail(
-          convention,
-          agency,
-          counsellorEmail,
-          "counsellor",
-        ),
+        this.#makeAgencyAssessmentEmail(convention, agency, email, role),
       );
     }
   }
