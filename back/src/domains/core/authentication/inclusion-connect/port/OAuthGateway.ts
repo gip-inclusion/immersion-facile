@@ -22,6 +22,7 @@ export type GetAccessTokenPayload = {
   lastName: string;
   email: Email;
   structure_pe?: string;
+  siret?: string; // remove optional when inclusion connect is removed
 };
 
 export type GetAccessTokenResult = {

@@ -1,4 +1,4 @@
-import { Email, ExternalId, emailSchema } from "shared";
+import { Email, ExternalId, SiretDto, emailSchema, siretSchema } from "shared";
 import { z } from "zod";
 
 type ProviderTokenPayloadBase = {
@@ -15,6 +15,7 @@ export type IcOAuthIdTokenPayload = ProviderTokenPayloadBase & {
 
 export type ProConnectOAuthIdTokenPayload = ProviderTokenPayloadBase & {
   usual_name: string;
+  siret: SiretDto;
   custom: {
     structureTravail?: string;
   };
@@ -39,4 +40,5 @@ export const proConnectAuthTokenPayloadSchema: z.Schema<ProConnectOAuthIdTokenPa
     custom: z.object({
       structureTravail: z.string().optional(),
     }),
+    siret: siretSchema,
   });

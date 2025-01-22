@@ -22,6 +22,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
@@ -133,6 +134,7 @@ export const InclusionConnectedPrivateRoute = ({
       firstName = "",
       lastName = "",
       idToken = "",
+      siret = "",
     } = route.params;
 
     if (token) {
@@ -148,6 +150,10 @@ export const InclusionConnectedPrivateRoute = ({
           },
           feedbackTopic: "auth-global",
         }),
+      );
+      outOfReduxDependencies.localDeviceRepository.set(
+        "connectedUserSiret",
+        siret,
       );
       const { token: _, ...routeParams } = route.params;
       routes[route.name](routeParams as any).replace();
