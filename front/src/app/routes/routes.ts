@@ -33,6 +33,7 @@ export type AcquisitionParams = Partial<{
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
 
 const inclusionConnectedParams = createInclusionConnectedParams({
+  siret: param.query.optional.string,
   page: param.query.optional.string,
   token: param.query.optional.string,
   firstName: param.query.optional.string,

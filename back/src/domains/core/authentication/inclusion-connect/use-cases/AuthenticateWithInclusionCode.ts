@@ -189,6 +189,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: newOrUpdatedAuthenticatedUser.firstName,
       lastName: newOrUpdatedAuthenticatedUser.lastName,
       email: newOrUpdatedAuthenticatedUser.email,
+      siret: payload.siret,
       idToken,
     })}`;
   }

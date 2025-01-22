@@ -324,7 +324,7 @@ export class AppConfig {
           ? "https://fake-pro-connect.url"
           : undefined,
       ),
-      scope: "openid given_name usual_name email custom",
+      scope: "openid given_name usual_name email custom siret",
     };
   }
 
