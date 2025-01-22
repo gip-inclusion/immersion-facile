@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { withNafCodesSchema } from "../naf";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -33,6 +34,7 @@ export const searchParamsSchema: z.Schema<SearchQueryParamsDto> = z
     establishmentSearchableBy: z.enum(["students", "jobSeekers"]).optional(),
     fitForDisabledWorkers: z.undefined().or(zToBoolean.optional()),
   })
+  .and(withNafCodesSchema)
   .and(geoParamsSchema)
   .and(withAcquisitionSchema)
   .and(

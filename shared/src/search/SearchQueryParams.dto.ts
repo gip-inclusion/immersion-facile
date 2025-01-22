@@ -1,5 +1,6 @@
 import { WithAcquisition } from "../acquisition.dto";
 import { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
+import { WithNafCodes } from "../naf";
 import {
   AppellationCode,
   RomeCode,
@@ -30,7 +31,8 @@ type SearchQueryCommonParamsDto = {
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
   fitForDisabledWorkers?: boolean | undefined;
-} & WithAcquisition;
+} & WithAcquisition &
+  WithNafCodes;
 
 type SearchQueryParamsAppellationsAndRome = {
   appellationCodes?: AppellationCode[];
