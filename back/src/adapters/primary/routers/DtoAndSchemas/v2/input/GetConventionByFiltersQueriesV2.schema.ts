@@ -10,7 +10,7 @@ export type GetConventionsByFiltersQueryParamsV2 = {
 
 export const getConventionsByFiltersQueryParamsV2Schema = z.object({
   startDateGreater: z.coerce.date().optional(),
-  startDateLessOrEqual: z.date().optional(),
+  startDateLessOrEqual: z.coerce.date().optional(),
   withStatuses: z.array(z.enum(conventionStatuses)).optional(),
 });
 
