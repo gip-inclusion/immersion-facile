@@ -1,4 +1,8 @@
-import { makeGetBooleanVariable, makeThrowIfNotInArray } from "shared";
+import {
+  environments,
+  makeGetBooleanVariable,
+  makeThrowIfNotInArray,
+} from "shared";
 
 const windowEnv: Record<string, string | undefined> = (window as any)._env_;
 if (!windowEnv)
@@ -10,7 +14,7 @@ const getBoolean = makeGetBooleanVariable(windowEnv);
 export const ENV = {
   envType: throwIfNotInArray({
     variableName: "VITE_ENV_TYPE",
-    authorizedValues: ["dev", "staging", "production", "local"],
+    authorizedValues: [...environments],
     defaultValue: "local",
   }),
   gateway: throwIfNotInArray({
