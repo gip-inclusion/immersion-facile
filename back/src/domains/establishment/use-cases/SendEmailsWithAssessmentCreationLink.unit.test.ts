@@ -117,14 +117,14 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       toAgencyWithRights(agency, {
         [counsellor.id]: { isNotifiedByEmail: true, roles: ["counsellor"] },
         [validator1.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        [validator2.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        [validator2.id]: { isNotifiedByEmail: false, roles: ["validator"] },
       }),
     ];
     uow.userRepository.users = [counsellor, validator1, validator2];
   });
 
   describe("Right paths", () => {
-    it("Sends an email to tutors and agency validators for immersions that end in time range and are kind immersion", async () => {
+    it("Sends an email to tutors and agency validators and counsellors with is_notied_by_email active for immersions that end in time range and are kind immersion", async () => {
       // Arrange
 
       uow.conventionRepository.setConventions([
@@ -207,32 +207,6 @@ describe("SendEmailWithAssessmentCreationLink", () => {
               conventionId: conventionEndingTomorrow.id,
               businessName: conventionEndingTomorrow.businessName,
               assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: validator2.email,
-                id: conventionEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "validator",
-                now,
-              }),
-              internshipKind: conventionEndingTomorrow.internshipKind,
-            },
-            recipients: [validator2.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
-          },
-          {
-            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
-            params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
-              conventionId: conventionEndingTomorrow.id,
-              businessName: conventionEndingTomorrow.businessName,
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
                 email: counsellor.email,
                 id: conventionEndingTomorrow.id,
                 targetRoute: "bilan-immersion",
@@ -251,9 +225,6 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       });
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
-        {
-          topic: "NotificationAdded",
-        },
         {
           topic: "NotificationAdded",
         },
@@ -410,7 +381,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       uow.userRepository.users = [];
 
       // Act
-      expectPromiseToFailWithError(
+      await expectPromiseToFailWithError(
         sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
             from: now,
