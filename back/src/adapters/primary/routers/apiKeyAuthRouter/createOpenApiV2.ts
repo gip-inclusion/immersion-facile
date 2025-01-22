@@ -469,6 +469,10 @@ export const createOpenApiSpecV2 = (envType: string) =>
         description: `Renvoie les conventions correspondantes.
         Les résultats sont limités à 100 et triés par date décroissante de début d'immersion`,
         extraDocs: {
+          queryParams: {
+            startDateGreater: { example: "2021-10-01" as any },
+            startDateLessOrEqual: { example: "2021-10-01" as any },
+          },
           responses: {
             "200": {
               description: "Retourne un tableau de conventions",
