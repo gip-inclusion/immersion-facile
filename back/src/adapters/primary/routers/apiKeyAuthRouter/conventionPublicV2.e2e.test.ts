@@ -201,7 +201,7 @@ describe("Convention routes", () => {
         headers: {
           authorization: conventionReadConsumerWithAgencyIdsScopeToken,
         },
-        queryParams: {},
+        queryParams: { startDateGreater: "2024-10-01" as any },
       });
 
       expectHttpResponseToEqual(response, {
