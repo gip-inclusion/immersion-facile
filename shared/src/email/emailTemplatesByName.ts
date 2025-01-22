@@ -258,11 +258,11 @@ export const emailTemplatesByName =
        --><ul><!--   
          --><li>L'immersion a-t-elle bien eu lieu ? Oui</li><!--   
          --><li>Nombre d'heures totales de l'immersion : ${numberOfHoursMade}</li><!--   
-         --><li>Date réel de fin de l'immersion : ${
+         --><li>Date réelle de fin de l'immersion : ${
            isStringDate(lastDayOfPresence)
              ? toDisplayedDate({
                   date: new Date(lastDayOfPresence),
-                  withHours: true,
+                  withHours: false,
                 })
              : "DATE INVALIDE"
          }
@@ -294,7 +294,7 @@ export const emailTemplatesByName =
     ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
       niceName:
         "Bilan - Prescripteurs - Notification de création du bilan à l'agence - (cas absent)",
-      tags: ["bilan_complet_créé_prescripteur_confirmation"],
+      tags: ["bilan_absent_créé_prescripteur_confirmation"],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
