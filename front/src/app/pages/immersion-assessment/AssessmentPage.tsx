@@ -3,7 +3,9 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
+  AssessmentRole,
   ConventionJwtPayload,
+  assessmentRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -31,7 +33,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   });
   const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
-  const hasRight = role === "establishment-tutor";
+  const hasRight = assessmentRoles.includes(role as AssessmentRole);
 
   if (fetchConventionError)
     return (

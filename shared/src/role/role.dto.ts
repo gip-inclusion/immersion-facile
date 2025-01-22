@@ -5,6 +5,7 @@ export type SignatoryRole = (typeof allSignatoryRoles)[number];
 export type AgencyModifierRole = (typeof agencyModifierRoles)[number];
 export type ModifierRole = (typeof allModifierRoles)[number];
 export type EstablishmentRole = (typeof establishmentsRoles)[number];
+export type AssessmentRole = (typeof assessmentRoles)[number];
 export const allRoles = [
   "beneficiary",
   "beneficiary-representative",
@@ -38,6 +39,12 @@ export const agencyModifierRoles = ["counsellor", "validator"] as const;
 export const allModifierRoles = [
   ...allSignatoryRoles,
   ...agencyModifierRoles,
+] as const;
+
+export const assessmentRoles = [
+  "establishment-tutor",
+  "validator",
+  "counsellor",
 ] as const;
 
 export const getRequesterRole = (roles: Role[]): Role => {
