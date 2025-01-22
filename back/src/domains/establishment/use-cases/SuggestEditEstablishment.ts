@@ -6,7 +6,7 @@ import {
   immersionFacileNoReplyEmailSender,
   siretSchema,
 } from "shared";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { notifyObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
@@ -82,6 +82,6 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
       followedIds: {
         establishmentSiret: siret,
       },
-    }).catch((error) => notifyObjectDiscord(error));
+    }).catch((error) => notifyObjectToTeam(error));
   }
 }

@@ -195,6 +195,10 @@ export class AppConfig {
     return this.env.DISCORD_WEBHOOK_URL;
   }
 
+  public get slackBotToken(): string | undefined {
+    return this.env.SLACK_BOT_TOKEN;
+  }
+
   public get documentGateway() {
     return this.#throwIfNotInArray({
       authorizedValues: ["NONE", "S3"],

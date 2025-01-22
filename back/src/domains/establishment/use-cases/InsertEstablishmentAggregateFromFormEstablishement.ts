@@ -5,7 +5,7 @@ import {
   withFormEstablishmentSchema,
 } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
-import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
+import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
@@ -110,7 +110,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     await uow.establishmentAggregateRepository
       .insertEstablishmentAggregate(establishmentAggregate)
       .catch((err) => {
-        notifyAndThrowErrorDiscord(
+        notifyToTeamAndThrowError(
           new Error(
             `Error when adding establishment aggregate with siret ${formEstablishment.siret} due to ${err}`,
           ),
