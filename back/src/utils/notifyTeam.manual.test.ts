@@ -1,20 +1,15 @@
 // This test need the env var DISCORD_WEBHOOK_URL to be set.
 
 import { DomainEvent } from "../domains/core/events/events";
-import {
-  notifyAndThrowErrorDiscord,
-  notifyObjectDiscord,
-} from "./notifyDiscord";
+import { notifyObjectToTeam, notifyToTeamAndThrowError } from "./notifyTeam";
 
-describe("Notify Discord", () => {
+describe("Notify Team", () => {
   it("Should serialize the thrown Error and notify channel dev-error channel", () => {
     try {
-      throw new SyntaxError(
-        "TESTING NOTIFY DISCORD - Invalid syntax for action !",
-      );
+      throw new SyntaxError("TEST NOTIFICATION - Invalid syntax for action !");
     } catch (e: unknown) {
       expect(e).toBeInstanceOf(SyntaxError);
-      notifyObjectDiscord(e as Error);
+      notifyObjectToTeam(e as Error);
     }
   });
 
@@ -45,22 +40,20 @@ describe("Notify Discord", () => {
       topic: "MagicLinkRenewalRequested",
       wasQuarantined: false,
     };
-    notifyObjectDiscord({
+    notifyObjectToTeam({
       event: domainEvent,
-      message: "TESTING NOTIFY DISCORD - test message with domain event",
+      message: "TEST NOTIFICATION - test message with domain event",
     });
     expect(true).toBe(true);
   });
 
   it("Should serialize the thrown Error, notify channel dev-error channel and throw Error", () => {
     try {
-      throw new SyntaxError(
-        "TESTING NOTIFY DISCORD - Invalid syntax for action !",
-      );
+      throw new SyntaxError("TEST NOTIFICATION - Invalid syntax for action !");
     } catch (e: unknown) {
       expect(e).toBeInstanceOf(SyntaxError);
 
-      expect(() => notifyAndThrowErrorDiscord(e as Error)).toThrow();
+      expect(() => notifyToTeamAndThrowError(e as Error)).toThrow();
     }
   });
 });

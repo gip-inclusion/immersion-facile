@@ -9,7 +9,7 @@ import {
   errors,
   normalizedMonthInDays,
 } from "shared";
-import { notifyAndThrowErrorDiscord } from "../../../utils/notifyDiscord";
+import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -106,7 +106,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     )?.appellationLabel;
 
     if (!appellationLabel) {
-      notifyAndThrowErrorDiscord(
+      notifyToTeamAndThrowError(
         errors.establishment.offerMissing({
           siret,
           appellationCode: contactRequest.appellationCode,

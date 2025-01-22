@@ -9,7 +9,7 @@ import {
   OpacifiedLogger,
   createLogger,
 } from "../../../../../../utils/logger";
-import { notifyObjectDiscord } from "../../../../../../utils/notifyDiscord";
+import { notifyObjectToTeam } from "../../../../../../utils/notifyTeam";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
@@ -141,7 +141,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (error) => {
           log.error({ error });
         },
-        (payload) => notifyDiscordOnNotError(payload),
+        (payload) => notifyTeamOnNotError(payload),
       );
       return manageFtConnectError(error, "exchangeCodeForAccessToken", {
         authorization: authorizationCode,
@@ -215,7 +215,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (error) => {
           log.error({ error });
         },
-        (payload) => notifyDiscordOnNotError(payload),
+        (payload) => notifyTeamOnNotError(payload),
       );
       return error instanceof ZodError
         ? false
@@ -256,7 +256,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (error) => {
           log.error({ error });
         },
-        (payload) => notifyDiscordOnNotError(payload),
+        (payload) => notifyTeamOnNotError(payload),
       );
       if (error instanceof ZodError) return undefined;
       return manageFtConnectError(error, "getUserInfo", {
@@ -297,11 +297,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         (error) => {
           log.error({ error });
         },
-        (payload) => notifyDiscordOnNotError(payload),
+        (payload) => notifyTeamOnNotError(payload),
       );
       if (error instanceof ZodError) return [];
       if (isJobseekerButNoAdvisorsResponse(error)) {
-        notifyObjectDiscord({
+        notifyObjectToTeam({
           message: `isJobseekerButNoAdvisorsResponse for token: ${headers.Authorization}`,
           error,
         });
@@ -347,8 +347,8 @@ const errorChecker = (
   cbOnNotError: (stuff: unknown) => void,
 ): void => (error instanceof Error ? cbOnError(error) : cbOnNotError(error));
 
-const notifyDiscordOnNotError = (payload: unknown): void =>
-  notifyObjectDiscord({
+const notifyTeamOnNotError = (payload: unknown): void =>
+  notifyObjectToTeam({
     message: "Should have been an error.",
     payload,
   });

@@ -11,7 +11,7 @@ import {
 import { Pool, QueryResultRow } from "pg";
 import { Falsy } from "ramda";
 import { createLogger } from "../../../utils/logger";
-import { notifyObjectDiscord } from "../../../utils/notifyDiscord";
+import { notifyObjectToTeam } from "../../../utils/notifyTeam";
 import { Database } from "./model/database";
 
 export const jsonBuildObject = <O extends Record<string, Expression<unknown>>>(
@@ -63,7 +63,7 @@ export const makeKyselyDb = (pool: Pool, options?: KyselyOptions): KyselyDb => {
             params: event.query.parameters,
           },
         };
-        notifyObjectDiscord(params);
+        notifyObjectToTeam(params);
         logger.error(params);
       } else if (event.queryDurationMillis > 1_000) {
         logger.warn({

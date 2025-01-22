@@ -1,6 +1,6 @@
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
-import { notifyAndThrowErrorDiscord } from "../../../../utils/notifyDiscord";
+import { notifyToTeamAndThrowError } from "../../../../utils/notifyTeam";
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,
@@ -26,7 +26,7 @@ export class HttpPassEmploiGateway implements PassEmploiGateway {
     });
 
     if (response.status !== 202) {
-      notifyAndThrowErrorDiscord(
+      notifyToTeamAndThrowError(
         new Error(
           `Could not notify Pass-Emploi : ${response.status} ${response.statusText}`,
         ),

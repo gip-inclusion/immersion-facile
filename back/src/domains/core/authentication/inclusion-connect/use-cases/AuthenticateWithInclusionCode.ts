@@ -13,7 +13,7 @@ import {
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { notifyDiscord } from "../../../../../utils/notifyDiscord";
+import { notifyTeam } from "../../../../../utils/notifyTeam";
 import {
   AgencyRightOfUser,
   removeAgencyRightsForUser,
@@ -148,7 +148,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     };
 
     if (!newOrUpdatedAuthenticatedUser.externalId) {
-      notifyDiscord(
+      notifyTeam(
         `Usecase AuthenticateWithInclusionCode. No ongoing_oauths found for externalId:
           ${newOrUpdatedAuthenticatedUser.id}`,
       );
