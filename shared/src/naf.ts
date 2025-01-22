@@ -1,8 +1,34 @@
 import { z } from "zod";
+import { Flavor } from "./typeFlavors";
 import { keys } from "./utils";
 
-export type NafSectorCode = keyof typeof nafSectorLabels;
-export const nafSectorLabels = {
+const nafSectorCodes = [
+  "0",
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+] as const;
+export type NafSectorCode = (typeof nafSectorCodes)[number];
+
+export const nafSectorLabels: Record<NafSectorCode, string> = {
   "0": "Unknown",
   A: "Agriculture, sylviculture et pêche",
   B: "Industries extractives",
@@ -30,14 +56,32 @@ export const nafSectorLabels = {
 export const validNafSectorCodes = keys(nafSectorLabels).filter(
   (val) => val !== "0",
 );
+export const nafSectorCodeSchema: z.Schema<NafSectorCode> =
+  z.enum(nafSectorCodes);
+
+export type NafCode = Flavor<string, "NafCode">;
+export type NafNomenclature = Flavor<string, "NafNomenclature">;
 
 export type NafDto = {
-  code: string;
-  nomenclature: string;
+  code: NafCode;
+  nomenclature: NafNomenclature;
+};
+export type WithNafCodes = {
+  nafCodes?: NafCode[];
 };
 
+const nafCodeSchema: z.Schema<NafCode> = z.string().length(5);
+
+export const nafCodesSchema: z.Schema<NafCode[]> = z
+  .array(nafCodeSchema)
+  .nonempty();
+
+export const withNafCodesSchema: z.Schema<WithNafCodes> = z.object({
+  nafCodes: nafCodesSchema.optional(),
+});
+
 export const nafSchema: z.Schema<NafDto> = z.object({
-  code: z.string(),
+  code: nafCodeSchema,
   nomenclature: z.string(),
 });
 
