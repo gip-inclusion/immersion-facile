@@ -3,6 +3,7 @@ import { trim } from "ramda";
 import {
   AbsoluteUrl,
   ProcessEnv,
+  environments,
   filterNotFalsy,
   inclusionConnectImmersionRoutes,
   makeGetBooleanVariable,
@@ -242,7 +243,7 @@ export class AppConfig {
   public get envType() {
     return this.#throwIfNotInArray({
       variableName: "ENV_TYPE",
-      authorizedValues: ["dev", "staging", "production", "local"],
+      authorizedValues: [...environments],
       defaultValue: "local",
     });
   }

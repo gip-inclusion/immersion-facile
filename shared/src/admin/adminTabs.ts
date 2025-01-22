@@ -1,8 +1,9 @@
 import { keys } from "ramda";
+import { Environment } from "../environment";
 
 type AdminTabProps = {
   slug: string;
-  isVisible: (env: "dev" | "staging" | "production" | "local") => boolean;
+  isVisible: (env: Environment) => boolean;
 };
 
 export const adminTabs = {
@@ -28,8 +29,7 @@ export const adminTabs = {
   },
   adminNotifications: {
     slug: "notifications",
-    isVisible: (env: "dev" | "staging" | "production" | "local") =>
-      env !== "production",
+    isVisible: (env: Environment) => env !== "production",
   },
   adminEmailPreview: {
     slug: "email-preview",
