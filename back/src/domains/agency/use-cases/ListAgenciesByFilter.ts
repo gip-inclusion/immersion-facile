@@ -80,6 +80,8 @@ export const toAgencyOption = (
   name: toAgencyOptionName(agency),
   kind: agency.kind,
   status: agency.status,
+  address: agency.address,
+  refersToAgencyName: agency.refersToAgencyName,
 });
 
 const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>

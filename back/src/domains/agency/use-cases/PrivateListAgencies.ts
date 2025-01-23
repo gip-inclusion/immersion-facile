@@ -23,11 +23,20 @@ export class PrivateListAgencies extends TransactionalUseCase<
       })
       .then(
         map(
-          ({ id, name, kind, status }): AgencyOption => ({
+          ({
             id,
             name,
             kind,
             status,
+            address,
+            refersToAgencyName,
+          }): AgencyOption => ({
+            id,
+            name,
+            kind,
+            status,
+            address,
+            refersToAgencyName,
           }),
         ),
       );

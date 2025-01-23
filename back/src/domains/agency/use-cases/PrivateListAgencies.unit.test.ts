@@ -39,6 +39,8 @@ describe("PrivateListAgencies use case", () => {
         kind: expectedAgency.kind,
         name: expectedAgency.name,
         status: expectedAgency.status,
+        address: expectedAgency.address,
+        refersToAgencyName: expectedAgency.refersToAgencyName,
       },
     ]);
   });

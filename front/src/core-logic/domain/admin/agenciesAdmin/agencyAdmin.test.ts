@@ -56,6 +56,13 @@ describe("agencyAdmin", () => {
             name: "My expected agency",
             kind: "mission-locale",
             status: "active",
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "75002",
+              departmentCode: "75",
+              city: "Paris",
+            },
+            refersToAgencyName: null,
           },
         ];
 
@@ -111,12 +118,16 @@ describe("agencyAdmin", () => {
               name: AGENCY_NEEDING_REVIEW_1.name,
               kind: AGENCY_NEEDING_REVIEW_1.kind,
               status: AGENCY_NEEDING_REVIEW_1.status,
+              address: AGENCY_NEEDING_REVIEW_1.address,
+              refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
             },
             {
               id: AGENCY_NEEDING_REVIEW_2.id,
               name: AGENCY_NEEDING_REVIEW_2.name,
               kind: AGENCY_NEEDING_REVIEW_2.kind,
               status: AGENCY_NEEDING_REVIEW_2.status,
+              address: AGENCY_NEEDING_REVIEW_2.address,
+              refersToAgencyName: AGENCY_NEEDING_REVIEW_2.refersToAgencyName,
             },
           ],
           agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
@@ -158,6 +169,8 @@ describe("agencyAdmin", () => {
                 name: AGENCY_NEEDING_REVIEW_1.name,
                 kind: AGENCY_NEEDING_REVIEW_1.kind,
                 status: AGENCY_NEEDING_REVIEW_1.status,
+                address: AGENCY_NEEDING_REVIEW_1.address,
+                refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
               },
             ],
             agencyNeedingReview: null,
@@ -177,12 +190,16 @@ describe("agencyAdmin", () => {
                 name: AGENCY_NEEDING_REVIEW_1.name,
                 kind: AGENCY_NEEDING_REVIEW_1.kind,
                 status: AGENCY_NEEDING_REVIEW_1.status,
+                address: AGENCY_NEEDING_REVIEW_1.address,
+                refersToAgencyName: AGENCY_NEEDING_REVIEW_1.refersToAgencyName,
               },
               {
                 id: AGENCY_NEEDING_REVIEW_2.id,
                 name: AGENCY_NEEDING_REVIEW_2.name,
                 kind: AGENCY_NEEDING_REVIEW_2.kind,
                 status: AGENCY_NEEDING_REVIEW_2.status,
+                address: AGENCY_NEEDING_REVIEW_2.address,
+                refersToAgencyName: AGENCY_NEEDING_REVIEW_2.refersToAgencyName,
               },
             ],
             agencyNeedingReview: AGENCY_NEEDING_REVIEW_2,
@@ -218,6 +235,13 @@ describe("agencyAdmin", () => {
             name: "My agency",
             kind: "cap-emploi",
             status: "active",
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "75002",
+              departmentCode: "75",
+              city: "Paris",
+            },
+            refersToAgencyName: null,
           },
         ];
         feedWithAgencyOptions(agencies);
@@ -238,8 +262,27 @@ describe("agencyAdmin", () => {
             name: agencyDto.name,
             kind: "pole-emploi",
             status: "active",
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "75002",
+              departmentCode: "75",
+              city: "Paris",
+            },
+            refersToAgencyName: null,
           },
-          { id: "456", name: "My other agency", kind: "cci", status: "active" },
+          {
+            id: "456",
+            name: "My other agency",
+            kind: "cci",
+            status: "active",
+            address: {
+              streetNumberAndAddress: "",
+              postcode: "75002",
+              departmentCode: "75",
+              city: "Paris",
+            },
+            refersToAgencyName: null,
+          },
         ];
 
         ({ store, dependencies } = createTestStore({
@@ -340,6 +383,13 @@ describe("agencyAdmin", () => {
           name: agencyDto1.name,
           kind: "autre",
           status: "active",
+          address: {
+            streetNumberAndAddress: "",
+            postcode: "75002",
+            departmentCode: "75",
+            city: "Paris",
+          },
+          refersToAgencyName: null,
         },
       ];
       ({ store, dependencies } = createTestStore({
