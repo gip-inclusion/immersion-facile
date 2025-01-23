@@ -79,38 +79,33 @@ export class LaBonneBoiteCompanyDto {
     searchedCoordinate?: GeoPositionDto,
   ): SearchResultDto {
     return {
-      siret: this.props.siret,
-      establishmentScore: 0,
-      name: this.props.company_name,
       address: {
         city: this.props.city,
         postcode: this.props.postcode,
         streetNumberAndAddress: "",
         departmentCode: this.props.department_number,
       },
-      additionalInformation: "",
       appellations: [],
-      customizedName: "",
-      distance_m: searchedCoordinate
-        ? distanceBetweenCoordinatesInMeters(
-            searchedCoordinate,
-            this.props.location,
-          )
-        : undefined,
-      fitForDisabledWorkers: false,
+      ...(searchedCoordinate
+        ? {
+            distance_m: distanceBetweenCoordinatesInMeters(
+              searchedCoordinate,
+              this.props.location,
+            ),
+          }
+        : {}),
+      establishmentScore: 0,
+      locationId: null,
       naf: this.props.naf,
       nafLabel: this.props.naf_label,
+      name: this.props.company_name,
       numberOfEmployeeRange: `${this.props.headcount_min}-${this.props.headcount_max}`,
-      position: {
-        lat: this.props.location.lat,
-        lon: this.props.location.lon,
-      },
+      position: { lat: this.props.location.lat, lon: this.props.location.lon },
       rome: romeDto.romeCode,
       romeLabel: romeDto.romeLabel,
-      voluntaryToImmersion: false,
-      website: "",
-      locationId: null,
+      siret: this.props.siret,
       urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${this.props.siret}`,
+      voluntaryToImmersion: false,
     };
   }
 }

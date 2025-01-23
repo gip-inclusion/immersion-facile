@@ -17,7 +17,7 @@ import { SubscriberResponse } from "../domains/core/api-consumer/ports/Subscribe
 import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
 import { DomainEvent, DomainTopic } from "../domains/core/events/events";
 import { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEntity";
-import { LaBonneBoiteRequestParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
+import { SearchCompaniesParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
 import { NodeProcessReport } from "./nodeProcessReport";
 
 type LogStatus = "debug" | "info" | "ok" | "warn" | "error" | "alert";
@@ -126,7 +126,7 @@ type LoggerParams = Partial<{
   axiosResponse: LoggedAxiosResponse;
   subscriberResponse: SubscriberResponse;
   schemaParsingInput: unknown;
-  searchLBB: LaBonneBoiteRequestParams;
+  searchLBB: SearchCompaniesParams;
   searchMade: SearchMadeEntity;
   searchParams: SearchQueryParamsDto | undefined;
   siret: SiretDto;

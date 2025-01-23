@@ -4,6 +4,7 @@ import {
   Flavor,
   SearchSortedBy,
   WithAcquisition,
+  WithNafCodes,
 } from "shared";
 import { hasSearchGeoParams } from "../use-cases/SearchImmersion";
 
@@ -16,7 +17,8 @@ export type SearchMadeWithoutGeoParams = {
   voluntaryToImmersion?: boolean;
   place?: string;
   establishmentSearchableBy?: EstablishmentSearchableByValue;
-} & WithAcquisition;
+} & WithAcquisition &
+  WithNafCodes;
 
 export type SearchMadeWithGeoParams = GeoParams & SearchMadeWithoutGeoParams;
 

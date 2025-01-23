@@ -177,6 +177,11 @@ export class InMemoryEstablishmentAggregateRepository
           ? agg.establishment.fitForDisabledWorkers === fitForDisabledWorkers
           : true,
       )
+      .filter((aggregate) =>
+        searchMade.nafCodes?.length
+          ? searchMade.nafCodes.includes(aggregate.establishment.nafDto.code)
+          : true,
+      )
       .flatMap((aggregate) =>
         uniqBy((offer) => offer.romeCode, aggregate.offers)
           .filter(
