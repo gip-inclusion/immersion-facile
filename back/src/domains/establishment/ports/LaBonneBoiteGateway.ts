@@ -1,15 +1,11 @@
-import { RomeDto, SearchResultDto, SiretDto } from "shared";
+import { RomeDto, SearchResultDto, SiretDto, WithNafCodes } from "shared";
+import { GeoParams } from "../entities/SearchMadeEntity";
 
-export type LaBonneBoiteRequestParams = {
-  rome: string;
-  romeLabel: string; // ugly fix for now
-  lat: number;
-  lon: number;
-  distanceKm: number;
-};
+export type SearchCompaniesParams = RomeDto & GeoParams & WithNafCodes;
+
 export interface LaBonneBoiteGateway {
   searchCompanies(
-    requestParams: LaBonneBoiteRequestParams,
+    requestParams: SearchCompaniesParams,
   ): Promise<SearchResultDto[]>;
   fetchCompanyBySiret(
     id: SiretDto,

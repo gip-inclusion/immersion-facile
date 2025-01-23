@@ -1,7 +1,7 @@
 import { RomeDto, SearchResultDto, SiretDto } from "shared";
 import {
   LaBonneBoiteGateway,
-  LaBonneBoiteRequestParams,
+  SearchCompaniesParams,
 } from "../../ports/LaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDto } from "./LaBonneBoiteCompanyDto";
 
@@ -13,24 +13,29 @@ export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   ) {}
 
   public async searchCompanies({
-    rome,
+    romeCode,
     romeLabel,
     lon,
     lat,
-  }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
+    nafCodes,
+  }: SearchCompaniesParams): Promise<SearchResultDto[]> {
     this.nbOfCalls = this.nbOfCalls + 1;
-    if (this._error) throw this._error;
-    return this._results
-      .filter((result) => result.isCompanyRelevant())
-      .map((result) =>
-        result.toSearchResult(
-          { romeCode: rome, romeLabel },
-          {
-            lat,
-            lon,
-          },
-        ),
-      );
+    return this._error
+      ? []
+      : this._results
+          .filter((result) => result.isCompanyRelevant())
+          .filter((result) =>
+            nafCodes?.length ? nafCodes.includes(result.props.naf) : true,
+          )
+          .map((result) =>
+            result.toSearchResult(
+              { romeCode, romeLabel },
+              {
+                lat,
+                lon,
+              },
+            ),
+          );
   }
 
   public async fetchCompanyBySiret(

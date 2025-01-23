@@ -2,10 +2,13 @@ import { addDays } from "date-fns";
 import {
   ApiConsumer,
   AppellationAndRomeDto,
+  NafCode,
   RomeDto,
   SearchQueryParamsDto,
   SearchQueryParamsWithGeoParams,
   SearchResultDto,
+  errors,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -20,6 +23,7 @@ import { InMemoryLaBonneBoiteGateway } from "../adapters/la-bonne-boite/InMemory
 import { LaBonneBoiteCompanyDto } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
 import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -106,6 +110,22 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
   .build();
 
 describe("SearchImmersionUseCase", () => {
+  const searchWithMinimalParams: SearchQueryParamsDto = {
+    sortedBy: "date",
+  };
+
+  const searchInMetzParams: SearchQueryParamsWithGeoParams = {
+    distanceKm: 30,
+    longitude: 6.17602,
+    latitude: 49.119146,
+    sortedBy: "distance",
+  };
+
+  const searchSecretariatInMetzRequestDto: SearchQueryParamsDto = {
+    ...searchInMetzParams,
+    appellationCodes: [secretariatOffer.appellationCode],
+  };
+
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
   let searchImmersionUseCase: SearchImmersion;
@@ -128,20 +148,39 @@ describe("SearchImmersionUseCase", () => {
     uuidGenerator.setNextUuid("searchMadeUuid");
   });
 
-  it("stores searches made", async () => {
-    await searchImmersionUseCase.execute(searchSecretariatInMetzRequestDto);
-    expectToEqual(uow.searchMadeRepository.searchesMade, [
-      {
-        id: "searchMadeUuid",
-        appellationCodes: [secretariatOffer.appellationCode],
-        lon: searchInMetzParams.longitude,
-        lat: searchInMetzParams.latitude,
-        distanceKm: searchInMetzParams.distanceKm,
-        needsToBeSearched: true,
-        sortedBy: "distance",
-        numberOfResults: 0,
-      },
-    ]);
+  describe("stores searches made", () => {
+    const searchMadeWithoutNafCode: SearchMadeEntity = {
+      id: "searchMadeUuid",
+      appellationCodes: [secretariatOffer.appellationCode],
+      lon: searchInMetzParams.longitude,
+      lat: searchInMetzParams.latitude,
+      distanceKm: searchInMetzParams.distanceKm,
+      needsToBeSearched: true,
+      sortedBy: "distance",
+      numberOfResults: 0,
+    };
+
+    it("without nafCode", async () => {
+      await searchImmersionUseCase.execute(searchSecretariatInMetzRequestDto);
+
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        searchMadeWithoutNafCode,
+      ]);
+    });
+
+    it("with nafCodes", async () => {
+      const nafCodes: NafCode[] = ["7510A", "8560C"];
+      await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        nafCodes,
+      });
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          ...searchMadeWithoutNafCode,
+          nafCodes,
+        },
+      ]);
+    });
   });
 
   describe("searches without geo params", () => {
@@ -636,169 +675,171 @@ describe("SearchImmersionUseCase", () => {
     ]);
   });
 
-  it("return only the establishment that only accept student if estbablishmentSearchableBy params is define to student", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
-      establishmentAcceptingOnlyStudent,
-      establishmentAcceptingOnlyJobSeeker,
-    ];
-    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
-
-    const searchParams: SearchQueryParamsDto = {
-      ...searchInMetzParams,
-      establishmentSearchableBy: "students",
-    };
-
-    const response = await searchImmersionUseCase.execute(searchParams);
-
-    expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
+  describe("estbablishmentSearchableBy param", () => {
+    it("define to student : return only the establishment that only accept student", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishmentAcceptingOnlyStudent,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-    ]);
-    expectToEqual(uow.searchMadeRepository.searchesMade, [
-      {
-        id: "searchMadeUuid",
-        appellationCodes: undefined,
-        lon: searchInMetzParams.longitude,
-        lat: searchInMetzParams.latitude,
-        distanceKm: searchInMetzParams.distanceKm,
-        needsToBeSearched: true,
-        sortedBy: "distance",
-        numberOfResults: 4,
+        establishmentAcceptingOnlyJobSeeker,
+      ];
+      laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+      const searchParams: SearchQueryParamsDto = {
+        ...searchInMetzParams,
         establishmentSearchableBy: "students",
-      },
-    ]);
-  });
+      };
 
-  it("return only the establishment that only accept student if estbablishmentSearchableBy params is define to jobSeekers", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
-      establishmentAcceptingOnlyStudent,
-      establishmentAcceptingOnlyJobSeeker,
-    ];
-    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+      const response = await searchImmersionUseCase.execute(searchParams);
 
-    const searchParams: SearchQueryParamsDto = {
-      ...searchInMetzParams,
-      establishmentSearchableBy: "jobSeekers",
-    };
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+      ]);
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCodes: undefined,
+          lon: searchInMetzParams.longitude,
+          lat: searchInMetzParams.latitude,
+          distanceKm: searchInMetzParams.distanceKm,
+          needsToBeSearched: true,
+          sortedBy: "distance",
+          numberOfResults: 4,
+          establishmentSearchableBy: "students",
+        },
+      ]);
+    });
 
-    const response = await searchImmersionUseCase.execute(searchParams);
-
-    expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
+    it("define to jobSeekers : return only the establishment that only accept job seekers", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
+        establishmentAcceptingOnlyStudent,
         establishmentAcceptingOnlyJobSeeker,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishmentAcceptingOnlyJobSeeker,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-    ]);
-    expectToEqual(uow.searchMadeRepository.searchesMade, [
-      {
-        id: "searchMadeUuid",
-        appellationCodes: undefined,
-        lon: searchInMetzParams.longitude,
-        lat: searchInMetzParams.latitude,
-        distanceKm: searchInMetzParams.distanceKm,
-        needsToBeSearched: true,
-        sortedBy: "distance",
-        numberOfResults: 4,
+      ];
+      laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+
+      const searchParams: SearchQueryParamsDto = {
+        ...searchInMetzParams,
         establishmentSearchableBy: "jobSeekers",
-      },
-    ]);
-  });
+      };
 
-  it("return all the establishments if estbablishmentSearchableBy params is not define", async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishment,
-      establishmentAcceptingOnlyStudent,
-      establishmentAcceptingOnlyJobSeeker,
-    ];
-    laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
+      const response = await searchImmersionUseCase.execute(searchParams);
 
-    const searchParams: SearchQueryParamsDto = {
-      ...searchInMetzParams,
-    };
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+      ]);
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCodes: undefined,
+          lon: searchInMetzParams.longitude,
+          lat: searchInMetzParams.latitude,
+          distanceKm: searchInMetzParams.distanceKm,
+          needsToBeSearched: true,
+          sortedBy: "distance",
+          numberOfResults: 4,
+          establishmentSearchableBy: "jobSeekers",
+        },
+      ]);
+    });
 
-    const response = await searchImmersionUseCase.execute(searchParams);
-
-    expectToEqual(response, [
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
+    it("not define : return all the establishments", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishment,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyStudent,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishmentAcceptingOnlyStudent,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
         establishmentAcceptingOnlyJobSeeker,
-        secretariatOffer.romeCode,
-        606885,
-      ),
-      establishmentAggregateToSearchResultByRomeForFirstLocation(
-        establishmentAcceptingOnlyJobSeeker,
-        boulangerOffer.romeCode,
-        606885,
-      ),
-    ]);
+      ];
+      laBonneBoiteGateway.setNextResults([lbbCompanyVO]);
 
-    expectToEqual(uow.searchMadeRepository.searchesMade, [
-      {
-        id: "searchMadeUuid",
-        appellationCodes: undefined,
-        lon: searchInMetzParams.longitude,
-        lat: searchInMetzParams.latitude,
-        distanceKm: searchInMetzParams.distanceKm,
-        needsToBeSearched: true,
-        sortedBy: "distance",
-        numberOfResults: 6,
-      },
-    ]);
+      const searchParams: SearchQueryParamsDto = {
+        ...searchInMetzParams,
+      };
+
+      const response = await searchImmersionUseCase.execute(searchParams);
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishment,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyStudent,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentAcceptingOnlyJobSeeker,
+          boulangerOffer.romeCode,
+          606885,
+        ),
+      ]);
+
+      expectToEqual(uow.searchMadeRepository.searchesMade, [
+        {
+          id: "searchMadeUuid",
+          appellationCodes: undefined,
+          lon: searchInMetzParams.longitude,
+          lat: searchInMetzParams.latitude,
+          distanceKm: searchInMetzParams.distanceKm,
+          needsToBeSearched: true,
+          sortedBy: "distance",
+          numberOfResults: 6,
+        },
+      ]);
+    });
   });
 
   describe("No result when a company is one internal & LBB results and the company is not searchable", () => {
@@ -1176,28 +1217,194 @@ describe("SearchImmersionUseCase", () => {
       ]);
     });
   });
+
+  describe("param nafCode", () => {
+    const naf7201A: NafCode = "7201A";
+    const naf6001B: NafCode = "6001B";
+    const naf5044C: NafCode = "5044C";
+
+    const establishmentWithNafA = new EstablishmentAggregateBuilder(
+      establishment,
+    )
+      .withEstablishmentNaf({ code: naf7201A, nomenclature: "" })
+      .withEstablishmentSiret("11111111111111")
+      .build();
+
+    const establishmentWithNafB = new EstablishmentAggregateBuilder(
+      establishment,
+    )
+      .withEstablishmentNaf({ code: naf6001B, nomenclature: "" })
+      .withEstablishmentSiret("11111111111112")
+      .build();
+
+    const establishmentWithNafC = new EstablishmentAggregateBuilder(
+      establishment,
+    )
+      .withEstablishmentNaf({ code: naf5044C, nomenclature: "" })
+      .withEstablishmentSiret("11111111111113")
+      .build();
+
+    const lbbWithNafA = new LaBonneBoiteCompanyDtoBuilder()
+      .withSiret("11114444222211")
+      .withRome(secretariatOffer.romeCode)
+      .withNaf({ code: naf7201A, nomenclature: "" })
+      .build();
+
+    const lbbWithNafB = new LaBonneBoiteCompanyDtoBuilder()
+      .withSiret("11114444222222")
+      .withRome(secretariatOffer.romeCode)
+      .withNaf({ code: naf6001B, nomenclature: "" })
+      .build();
+    const lbbWithNafC = new LaBonneBoiteCompanyDtoBuilder()
+      .withSiret("11114444222233")
+      .withRome(secretariatOffer.romeCode)
+      .withNaf({ code: naf5044C, nomenclature: "" })
+      .build();
+
+    beforeEach(() => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentWithNafA,
+        establishmentWithNafB,
+        establishmentWithNafC,
+      ];
+      laBonneBoiteGateway.setNextResults([
+        lbbWithNafA,
+        lbbWithNafB,
+        lbbWithNafC,
+      ]);
+    });
+
+    it("bad request error when nafCodes provided but empty", async () => {
+      await expectPromiseToFailWithError(
+        searchImmersionUseCase.execute({
+          ...searchSecretariatInMetzRequestDto,
+          nafCodes: [],
+        }),
+        errors.generic.schemaValidation([
+          "nafCodes : Array must contain at least 1 element(s)",
+        ]),
+      );
+    });
+
+    it("all establishment when filter is not provided", async () => {
+      const response = await searchImmersionUseCase.execute(
+        searchSecretariatInMetzRequestDto,
+      );
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafA,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafA.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafB,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafB.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafC,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafC.establishment.score,
+        ),
+        lbbToSearchResult(
+          lbbWithNafA,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+        lbbToSearchResult(
+          lbbWithNafB,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+        lbbToSearchResult(
+          lbbWithNafC,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+      ]);
+    });
+
+    it("only establishments with a naf code when provided", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        nafCodes: [naf7201A],
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafA,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafA.establishment.score,
+        ),
+        lbbToSearchResult(
+          lbbWithNafA,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+      ]);
+    });
+
+    it("only establishments with multiple naf codes when provided", async () => {
+      const response = await searchImmersionUseCase.execute({
+        ...searchSecretariatInMetzRequestDto,
+        nafCodes: [naf7201A, naf6001B],
+      });
+
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafA,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafA.establishment.score,
+        ),
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          establishmentWithNafB,
+          secretariatOffer.romeCode,
+          606885,
+          establishmentWithNafB.establishment.score,
+        ),
+        lbbToSearchResult(
+          lbbWithNafA,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+        lbbToSearchResult(
+          lbbWithNafB,
+          {
+            romeCode: secretariatOffer.romeCode,
+            romeLabel: secretariatOffer.romeLabel,
+          },
+          { distance_m: 23649 },
+        ),
+      ]);
+    });
+  });
 });
 
 const lbbCompanyVO = new LaBonneBoiteCompanyDtoBuilder()
   .withSiret("11114444222233")
   .withRome(secretariatOffer.romeCode)
   .build();
-
-const searchWithMinimalParams: SearchQueryParamsDto = {
-  sortedBy: "date",
-};
-
-const searchInMetzParams: SearchQueryParamsWithGeoParams = {
-  distanceKm: 30,
-  longitude: 6.17602,
-  latitude: 49.119146,
-  sortedBy: "distance",
-};
-
-const searchSecretariatInMetzRequestDto: SearchQueryParamsDto = {
-  ...searchInMetzParams,
-  appellationCodes: [secretariatOffer.appellationCode],
-};
 
 const authenticatedApiConsumerPayload: ApiConsumer = {
   id: "my-valid-apikey-id",
@@ -1237,8 +1444,6 @@ const lbbToSearchResult = (
   romeDto: RomeDto,
   { distance_m }: { distance_m: number | undefined },
 ): SearchResultDto => ({
-  additionalInformation: "",
-  establishmentScore: 0,
   address: {
     city: lbb.props.city,
     postcode: lbb.props.postcode,
@@ -1246,9 +1451,9 @@ const lbbToSearchResult = (
     departmentCode: lbb.props.department_number,
   },
   appellations: [],
-  customizedName: "",
   distance_m,
-  fitForDisabledWorkers: false,
+  establishmentScore: 0,
+  locationId: null,
   naf: lbb.props.naf,
   nafLabel: lbb.props.naf_label,
   name: lbb.props.company_name,
@@ -1257,8 +1462,6 @@ const lbbToSearchResult = (
   rome: romeDto.romeCode,
   romeLabel: romeDto.romeLabel,
   siret: lbb.siret,
-  voluntaryToImmersion: false,
-  locationId: null,
-  website: "",
   urlOfPartner: `https://labonneboite.francetravail.fr/entreprise/${lbb.siret}`,
+  voluntaryToImmersion: false,
 });

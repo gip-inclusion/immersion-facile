@@ -43,6 +43,13 @@ import {
 } from "./httpErrors";
 
 export const errors = {
+  generic: {
+    schemaValidation: (issues: string[]) =>
+      new BadRequestError(
+        "Schema validation failed. See issues for details.",
+        issues,
+      ),
+  },
   assessment: {
     alreadyExist: (conventionId: ConventionId) =>
       new ConflictError(
@@ -552,6 +559,12 @@ export const errors = {
       message,
     }: { serviceName: string; message?: string }) =>
       new UnavailableApiError(serviceName, message),
+  },
+  search: {
+    noRomeForAppelations: (appellationCodes: AppellationCode[]) =>
+      new BadRequestError(
+        `No Rome code matching appellation codes ${appellationCodes}`,
+      ),
   },
   shortLink: {
     notFound: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>

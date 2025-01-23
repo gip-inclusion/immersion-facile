@@ -5,10 +5,10 @@ import {
   SearchQueryParamsDto,
   SearchResultDto,
   SiretDto,
-  castError,
+  WithNafCodes,
+  errors,
   searchParamsSchema,
 } from "shared";
-import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -17,8 +17,6 @@ import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
 import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
 import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
-
-const logger = createLogger(__filename);
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchQueryParamsDto,
@@ -50,6 +48,7 @@ export class SearchImmersion extends TransactionalUseCase<
       acquisitionCampaign,
       acquisitionKeyword,
       fitForDisabledWorkers,
+      nafCodes,
     }: SearchQueryParamsDto,
     uow: UnitOfWork,
     apiConsumer: ApiConsumer,
@@ -66,6 +65,7 @@ export class SearchImmersion extends TransactionalUseCase<
       establishmentSearchableBy,
       acquisitionCampaign,
       acquisitionKeyword,
+      nafCodes,
     };
     const geoParams = { lat, lon, distanceKm };
     const [repositorySearchResults, lbbSearchResults] = await Promise.all([
@@ -76,11 +76,13 @@ export class SearchImmersion extends TransactionalUseCase<
       }),
       shouldFetchLBB(appellationCodes, voluntaryToImmersion) &&
       hasSearchGeoParams(geoParams)
-        ? this.#searchOnLbb(uow, {
+        ? this.#searchOnLbb({
+            uow,
             appellationCodes: appellationCodes as AppellationCode[],
             ...geoParams,
+            nafCodes,
           })
-        : Promise.resolve([]),
+        : [],
     ]);
 
     await uow.searchMadeRepository.insertSearchMade({
@@ -121,43 +123,30 @@ export class SearchImmersion extends TransactionalUseCase<
       );
   }
 
-  async #searchOnLbb(
-    uow: UnitOfWork,
-    params: {
-      appellationCodes: AppellationCode[];
-    } & GeoParams,
-  ): Promise<SearchResultDto[]> {
-    const { appellationCodes, ...geoParams } = params;
-    const matches =
+  async #searchOnLbb({
+    uow,
+    appellationCodes,
+    ...geoAndNaf
+  }: {
+    uow: UnitOfWork;
+    appellationCodes: AppellationCode[];
+  } & GeoParams &
+    WithNafCodes): Promise<SearchResultDto[]> {
+    const appelationsAndRomes =
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
         appellationCodes,
       );
 
-    const romeAndAppellationData = matches.at(0);
-    if (!romeAndAppellationData)
-      throw new Error(
-        `No Rome code matching appellation codes ${appellationCodes}`,
-      );
-    const { romeCode, romeLabel } = romeAndAppellationData;
-    if (hasSearchGeoParams(geoParams))
-      try {
-        const lbbResults = await this.laBonneBoiteAPI.searchCompanies({
-          rome: romeCode,
-          romeLabel,
-          ...geoParams,
-        });
-        return lbbResults.filter((result) => {
-          if (!result.distance_m) return true;
-          return result.distance_m <= params.distanceKm * 1000;
-        });
-      } catch (error) {
-        logger.error({
-          message: "Error while searching on LBB",
-          error: castError(error),
-        });
-        return [];
-      }
-    return [];
+    const firstRomeAndAppellationData = appelationsAndRomes.at(0);
+    if (!firstRomeAndAppellationData)
+      throw errors.search.noRomeForAppelations(appellationCodes);
+
+    const lbbResults = await this.laBonneBoiteAPI.searchCompanies({
+      ...firstRomeAndAppellationData,
+      ...geoAndNaf,
+    });
+
+    return lbbResults;
   }
 }
 
