@@ -286,7 +286,10 @@ const ConventionSummarySection = () => {
               },
               {
                 children: "Valider (au risque de créer un doublon)",
-                onClick: onConfirmSubmit,
+                onClick: () => {
+                  onConfirmSubmit();
+                  closeConfirmDuplicateConventionModal();
+                },
                 nativeButtonProps: {
                   disabled: isLoading,
                 },

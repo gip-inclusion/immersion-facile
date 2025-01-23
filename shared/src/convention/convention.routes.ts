@@ -122,6 +122,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
       200: withConventionIdLegacySchema,
       400: httpErrorSchema,
       409: httpErrorSchema,
+      503: httpErrorSchema,
     },
   }),
   shareConvention: defineRoute({
