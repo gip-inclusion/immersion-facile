@@ -1,7 +1,11 @@
+import { HtmlToPdfRequest } from "shared";
 import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 export class InMemoryPdfGeneratorGateway implements PdfGeneratorGateway {
-  public async make(htmlContent: string): Promise<string> {
-    return `PDF_OF >> "${htmlContent}"`;
+  public async make({
+    htmlContent,
+    conventionId,
+  }: HtmlToPdfRequest): Promise<string> {
+    return `PDF_OF convention ${conventionId} >> "${htmlContent}"`;
   }
 }

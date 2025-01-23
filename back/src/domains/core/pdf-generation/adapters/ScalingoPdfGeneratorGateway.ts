@@ -1,4 +1,8 @@
-import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import {
+  AbsoluteUrl,
+  HtmlToPdfRequest,
+  withAuthorizationHeaders,
+} from "shared";
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
@@ -46,7 +50,10 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
     this.#uuidGenerator = uuidGenerator;
   }
 
-  public async make(htmlContent: string): Promise<string> {
+  public async make({
+    htmlContent,
+    conventionId,
+  }: HtmlToPdfRequest): Promise<string> {
     const requestId = this.#uuidGenerator.new();
 
     const response = await this.#httpClient.generate({
@@ -59,7 +66,7 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
 
     if (response.status !== 200)
       throw new Error(
-        `[requestId : ${requestId}] Pdf generation failed with status ${response.status} - ${response.body}`,
+        `[requestId : ${requestId}, conventionId : ${conventionId}] Pdf generation failed with status ${response.status} - ${response.body}`,
       );
 
     return response.body;

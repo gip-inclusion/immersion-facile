@@ -1,3 +1,5 @@
+import { HtmlToPdfRequest } from "shared";
+
 export interface PdfGeneratorGateway {
-  make(htmlContent: string): Promise<string>;
+  make(params: HtmlToPdfRequest): Promise<string>;
 }

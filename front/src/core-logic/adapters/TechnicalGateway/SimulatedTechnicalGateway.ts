@@ -4,6 +4,7 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
+  HtmlToPdfRequest,
   ValidateEmailFeedback,
   sleep,
 } from "shared";
@@ -15,7 +16,7 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
     of(makeStubFeatureFlags());
 
   public htmlToPdf = (
-    _htmlContent: string,
+    _htmlContent: HtmlToPdfRequest,
     _jwt: ConventionSupportedJwt,
   ): Promise<string> => Promise.resolve("YWJjZA==");
 

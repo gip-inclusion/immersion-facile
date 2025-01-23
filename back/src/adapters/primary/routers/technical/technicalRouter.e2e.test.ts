@@ -134,12 +134,16 @@ describe("technical router", () => {
       const response = await httpClient.htmlToPdf({
         body: {
           htmlContent: "<p>some html content</p>",
+          conventionId: "convention-id",
         },
         headers: {
           authorization: validatorJwt,
         },
       });
-      expectToEqual(response.body, 'PDF_OF >> "<p>some html content</p>"');
+      expectToEqual(
+        response.body,
+        'PDF_OF convention convention-id >> "<p>some html content</p>"',
+      );
 
       expectToEqual(response.status, 200);
     });

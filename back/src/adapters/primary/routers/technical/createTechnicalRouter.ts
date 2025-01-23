@@ -93,7 +93,7 @@ export const createTechnicalRouter = (
     async (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.htmlToPdf.execute(
-          req.body.htmlContent,
+          req.body,
           req.payloads?.inclusion ?? req.payloads?.convention,
         ),
       ),

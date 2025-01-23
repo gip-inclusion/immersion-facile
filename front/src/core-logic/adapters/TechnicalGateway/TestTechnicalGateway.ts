@@ -4,6 +4,7 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
+  HtmlToPdfRequest,
   ValidateEmailFeedback,
 } from "shared";
 import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
@@ -15,7 +16,7 @@ export class TestTechnicalGateway implements TechnicalGateway {
   public getAllFeatureFlags$ = () => this.featureFlags$;
 
   public htmlToPdf = (
-    _htmlContent: string,
+    _htmlContent: HtmlToPdfRequest,
     _jwt: ConventionSupportedJwt,
   ): Promise<string> => Promise.resolve("YWJjZA==");
 
