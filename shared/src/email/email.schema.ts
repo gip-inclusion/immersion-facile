@@ -15,7 +15,7 @@ const emailTypeSchema = z.string() as z.Schema<EmailType>;
 
 // Waiting zod release for bad email regex
 const temporaryEmailRegex =
-  /^([A-Z0-9_+-]+\.?)*[A-Z0-9_+-]@([A-Z0-9][A-Z0-9-]*\.)+[A-Z]{2,}$/i;
+  /^[A-Z0-9._+-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)*\.[A-Z]{2,}$/i;
 export const emailSchema: z.Schema<Email> = z
   .string(requiredText)
   .transform((arg) => toLowerCaseWithoutDiacritics(arg.trim()))

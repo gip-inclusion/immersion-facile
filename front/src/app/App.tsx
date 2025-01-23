@@ -32,6 +32,8 @@ export const App = () => {
     local:
       "https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7_dev_d2e47aeaf37d823506115b8a.js",
     dev: "https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7_dev_d2e47aeaf37d823506115b8a.js",
+    pentest:
+      "https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7_pentest_a8b07fda200254c3602d860a.js",
     staging:
       "https://matomo.inclusion.beta.gouv.fr/js/container_gXlljpZ7_staging_60e68dc0e23bda19899cf43d.js",
     production:

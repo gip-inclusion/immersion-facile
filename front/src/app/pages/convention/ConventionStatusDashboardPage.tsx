@@ -1,10 +1,10 @@
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -53,10 +53,9 @@ const ConventionStatusDashboard = ({ jwt }: { jwt: string }) => {
 
   if (feedback.kind === "errored")
     return (
-      <Alert
-        title={"Impossible de récupérer l'état de la convention"}
-        severity="error"
-        description={feedback.errorMessage}
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={feedback.errorMessage}
+        jwt={jwt}
       />
     );
 

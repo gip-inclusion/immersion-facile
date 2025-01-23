@@ -141,3 +141,4 @@ export * from "./utils/string";
 export * from "./utils/toDotNotation";
 export * from "./zodUtils";
 export * from "./establishment/superEstablishment";
+export * from "./environment";
