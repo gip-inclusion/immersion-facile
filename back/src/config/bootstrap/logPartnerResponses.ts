@@ -3,11 +3,20 @@ import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);
 
-type LogPartnerResponses = (
-  partnerName: string,
-) => HttpClientOptions["onResponseSideEffect"];
+type Input = {
+  body?: unknown;
+  queryParams?: unknown;
+  urlParams?: unknown;
+};
+
+export type LogInputCbOnSuccess = (input: Input) => Input;
+
+type LogPartnerResponses = (params: {
+  partnerName: string;
+  logInputCbOnSuccess?: LogInputCbOnSuccess;
+}) => HttpClientOptions["onResponseSideEffect"];
 export const logPartnerResponses: LogPartnerResponses =
-  (partnerName) =>
+  ({ partnerName, logInputCbOnSuccess }) =>
   ({ response, route, durationInMs, input }) => {
     const common = {
       partnerName: partnerName,
@@ -25,6 +34,9 @@ export const logPartnerResponses: LogPartnerResponses =
           response: {
             kind: "success",
             status: response.status,
+            ...(logInputCbOnSuccess
+              ? { input: logInputCbOnSuccess(input) }
+              : {}),
           },
         },
       });

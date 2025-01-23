@@ -43,7 +43,9 @@ const main = async () => {
     fetch,
     {
       skipResponseValidation: true,
-      onResponseSideEffect: logPartnerResponses(partnerNames.inseeSiret),
+      onResponseSideEffect: logPartnerResponses({
+        partnerName: partnerNames.inseeSiret,
+      }),
       signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
     },
   );
