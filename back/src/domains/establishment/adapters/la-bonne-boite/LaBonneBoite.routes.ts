@@ -60,6 +60,9 @@ export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>
       ...withAuthorizationHeaders,
       responses: {
         200: lbbResponseSchema,
+        401: z.any(),
+        404: z.any(),
+        500: z.any(),
       },
     }),
     getCompany: defineRoute({
@@ -69,6 +72,7 @@ export const createLbbRoutes = (peApiUrl: AbsoluteUrl) =>
       ...withAuthorizationHeaders,
       responses: {
         200: lbbResponseSchema,
+        500: z.any(),
       },
     }),
   });
