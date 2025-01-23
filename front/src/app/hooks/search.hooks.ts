@@ -60,15 +60,17 @@ const filterUrlsParamsAndUpdateUrl = ({
 export const useSearch = ({ name }: SearchRoute) => {
   const dispatch = useDispatch();
   return {
-    triggerSearch: (values: SearchPageParams) => {
-      const appellationCodes = values.appellations?.map(
-        (appellation) => appellation.appellationCode,
-      );
+    triggerSearch: ({ appellations, ...rest }: SearchPageParams) => {
       dispatch(
-        searchSlice.actions.searchRequested({ ...values, appellationCodes }),
+        searchSlice.actions.searchRequested({
+          ...rest,
+          appellationCodes: appellations?.map(
+            (appellation) => appellation.appellationCode,
+          ),
+        }),
       );
       filterUrlsParamsAndUpdateUrl({
-        values,
+        values: { ...rest, appellations },
         urlParams: getUrlParameters(window.location),
         routeName: name,
       });
