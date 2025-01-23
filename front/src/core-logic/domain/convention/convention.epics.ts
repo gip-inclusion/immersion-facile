@@ -22,14 +22,17 @@ const saveConventionEpic: ConventionEpic = (
     switchMap(({ payload }) => {
       const conventionState = state$.value.convention;
       const { jwt } = conventionState;
-      return jwt
+      const conventionGatewayAction$ = jwt
         ? conventionGateway.updateConvention$(payload.convention, jwt)
         : conventionGateway.createConvention$(payload);
+
+      return conventionGatewayAction$.pipe(
+        map(conventionSlice.actions.saveConventionSucceeded),
+        catchEpicError((error: Error) =>
+          conventionSlice.actions.saveConventionFailed(error.message),
+        ),
+      );
     }),
-    map(conventionSlice.actions.saveConventionSucceeded),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.saveConventionFailed(error.message),
-    ),
   );
 
 const getSimilarConventionsEpic: ConventionEpic = (
