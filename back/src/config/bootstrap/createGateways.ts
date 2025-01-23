@@ -75,7 +75,10 @@ import {
   makeEmailAllowListPredicate,
 } from "./appConfig";
 import { getWithCache } from "./cache";
-import { logPartnerResponses } from "./logPartnerResponses";
+import {
+  LogInputCbOnSuccess,
+  logPartnerResponses,
+} from "./logPartnerResponses";
 import { partnerNames } from "./partnerNames";
 
 const logger = createLogger(__filename);
@@ -120,22 +123,7 @@ const configureCreateAxiosHttpClientForExternalAPIs =
   }) =>
     createAxiosSharedClient(routes, axiosInstance, {
       skipResponseValidation: true,
-      onResponseSideEffect: logPartnerResponses(partnerName),
-    });
-
-const configureCreateFetchHttpClientForExternalAPIs =
-  () =>
-  <R extends Record<string, UnknownSharedRoute>>({
-    routes,
-    partnerName,
-  }: {
-    routes: R;
-    partnerName: string;
-  }) =>
-    createFetchSharedClient(routes, fetch, {
-      skipResponseValidation: true,
-      onResponseSideEffect: logPartnerResponses(partnerName),
-      signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
+      onResponseSideEffect: logPartnerResponses({ partnerName: partnerName }),
     });
 
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
@@ -159,8 +147,25 @@ export const createGateways = async (
     },
   });
 
-  const createFetchHttpClientForExternalAPIs =
-    configureCreateFetchHttpClientForExternalAPIs();
+  const createFetchHttpClientForExternalAPIs = <
+    R extends Record<string, UnknownSharedRoute>,
+  >({
+    routes,
+    partnerName,
+    logInputCbOnSuccess,
+  }: {
+    routes: R;
+    partnerName: string;
+    logInputCbOnSuccess?: LogInputCbOnSuccess;
+  }) =>
+    createFetchSharedClient(routes, fetch, {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses({
+        partnerName: partnerName,
+        logInputCbOnSuccess,
+      }),
+      signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
+    });
 
   const createLegacyAxiosHttpClientForExternalAPIs =
     configureCreateAxiosHttpClientForExternalAPIs(config);
@@ -320,6 +325,17 @@ export const createGateways = async (
         createFetchHttpClientForExternalAPIs({
           partnerName: partnerNames.inseeSiret,
           routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
+          logInputCbOnSuccess: (input) => {
+            const queryParams =
+              (input?.queryParams as Record<string, unknown>) ?? {};
+
+            if ("q" in queryParams)
+              return {
+                queryParams: { q: queryParams.q },
+              };
+
+            return {};
+          },
         }),
         timeGateway,
         noRetries,
