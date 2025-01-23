@@ -163,7 +163,12 @@ export const ConventionDocumentPage = ({
       setIsPdfLoading(true);
       const pdfContent =
         await outOfReduxDependencies.technicalGateway.htmlToPdf(
-          prepareContentForPdfGenerator(document.documentElement.outerHTML),
+          {
+            htmlContent: prepareContentForPdfGenerator(
+              document.documentElement.outerHTML,
+            ),
+            conventionId: convention.id,
+          },
           jwt,
         );
       const downloadLink = document.createElement("a");

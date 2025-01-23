@@ -5,6 +5,7 @@ import {
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
+  HtmlToPdfRequest,
   TechnicalRoutes,
   ValidateEmailFeedback,
   uploadFileRoute,
@@ -42,12 +43,12 @@ export class HttpTechnicalGateway implements TechnicalGateway {
   }
 
   public htmlToPdf(
-    htmlContent: string,
+    params: HtmlToPdfRequest,
     jwt: ConventionSupportedJwt,
   ): Promise<string> {
     return this.httpClient
       .htmlToPdf({
-        body: { htmlContent },
+        body: params,
         headers: { authorization: jwt },
       })
       .then((response) =>

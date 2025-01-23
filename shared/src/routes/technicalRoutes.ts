@@ -1,5 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
+import { ConventionId } from "../convention/convention.dto";
 import {
   validateEmailInputSchema,
   validateEmailResponseSchema,
@@ -14,8 +15,14 @@ import {
   zStringMinLength1,
 } from "../zodUtils";
 
-const htmlToPdfRequestSchema = z.object({
+export type HtmlToPdfRequest = {
+  htmlContent: string;
+  conventionId: ConventionId;
+};
+
+export const htmlToPdfRequestSchema = z.object({
   htmlContent: zStringMinLength1,
+  conventionId: z.string(),
 });
 
 // @TODO: This should be a proper OpenAPI schema

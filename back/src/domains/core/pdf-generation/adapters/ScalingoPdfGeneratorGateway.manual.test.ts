@@ -27,7 +27,10 @@ describe("ScalingoPdfGeneratorGateway", () => {
           uuidGenerator,
         );
 
-        const pdfBase64 = await pdfGeneratorGateway.make("TEST");
+        const pdfBase64 = await pdfGeneratorGateway.make({
+          htmlContent: "TEST",
+          conventionId: "osef",
+        });
         expect(pdfBase64).toBeDefined();
         expect(pdfBase64.length).toBeGreaterThan(0);
         expect(Buffer.from(pdfBase64, "base64").toString("binary")).toContain(
