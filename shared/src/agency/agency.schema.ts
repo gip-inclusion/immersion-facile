@@ -61,6 +61,8 @@ export const agencyOptionSchema: z.ZodSchema<AgencyOption> = z.object({
   name: z.string(),
   kind: agencyKindSchema,
   status: agencyStatusSchema,
+  address: addressSchema,
+  refersToAgencyName: zStringMinLength1.or(z.null()),
 });
 
 export const agencyOptionsSchema: z.ZodSchema<AgencyOption[]> =

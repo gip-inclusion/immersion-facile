@@ -137,6 +137,8 @@ export type AgencyOption = {
   name: string;
   kind: AgencyKind;
   status: AgencyStatus;
+  address: AddressDto;
+  refersToAgencyName: string | null;
 };
 
 export const activeAgencyStatuses: AgencyStatus[] = ["active", "from-api-PE"];

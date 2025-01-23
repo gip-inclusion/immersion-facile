@@ -25,6 +25,13 @@ const placeholderOption: AgencyOption = {
   name: "",
   kind: "autre",
   status: "active",
+  address: {
+    streetNumberAndAddress: "",
+    postcode: "75002",
+    departmentCode: "75",
+    city: "Paris",
+  },
+  refersToAgencyName: null,
 };
 
 export const MultipleAgencyInput = ({

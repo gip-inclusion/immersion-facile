@@ -692,6 +692,7 @@ export const domElementIds = {
       form: "im-register-agencies-form",
       agencyAutocomplete: "im-register-agencies-form__agency-autocomplete",
       submitButton: "im-register-agencies-form__submit-button",
+      search: "im-register-agencies-form__searchbar",
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",

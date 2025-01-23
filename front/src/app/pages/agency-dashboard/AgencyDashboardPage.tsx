@@ -29,7 +29,7 @@ export const AgencyDashboardPage = ({
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
-        <h1>Bienvenue</h1>
+        <h1>Demander l'accès à des organismes</h1>
       </div>
       {isLoading && <Loader />}
       <WithFeedbackReplacer topic="dashboard-agency-register-user">
@@ -50,7 +50,7 @@ export const AgencyDashboardPage = ({
                       description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
                     />
                   );
-                return <RegisterAgenciesForm />;
+                return <RegisterAgenciesForm currentUser={currentUser} />;
               },
             )
             .with(

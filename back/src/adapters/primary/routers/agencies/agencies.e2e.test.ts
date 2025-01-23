@@ -119,12 +119,16 @@ describe("Agency routes", () => {
               name: `${agency1ActiveNearBy.name} (${agency1ActiveNearBy.address.city})`,
               kind: agency1ActiveNearBy.kind,
               status: agency1ActiveNearBy.status,
+              address: agency1ActiveNearBy.address,
+              refersToAgencyName: agency1ActiveNearBy.refersToAgencyName,
             },
             {
               id: agency2ActiveNearBy.id,
               name: `${agency2ActiveNearBy.name} (${agency2ActiveNearBy.address.city})`,
               kind: agency2ActiveNearBy.kind,
               status: agency2ActiveNearBy.status,
+              address: agency2ActiveNearBy.address,
+              refersToAgencyName: agency2ActiveNearBy.refersToAgencyName,
             },
           ],
         });
@@ -346,6 +350,8 @@ describe("Agency routes", () => {
               name: agency4NeedsReview.name,
               kind: agency4NeedsReview.kind,
               status: agency4NeedsReview.status,
+              address: agency4NeedsReview.address,
+              refersToAgencyName: agency4NeedsReview.refersToAgencyName,
             },
           ],
         });
