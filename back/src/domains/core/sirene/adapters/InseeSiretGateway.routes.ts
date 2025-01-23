@@ -6,6 +6,18 @@ import { SirenGatewayAnswer } from "./InseeSiretGateway";
 // The documentation can be found here:
 // https://portail-api.insee.fr/catalog/all > Api Sirene Privée > Documentation
 
+const inseeErrorSchema = z.object({
+  header: z.object({
+    statut: z.number(),
+    message: z.string(),
+  }),
+});
+
+const getAccessTokenError = z.object({
+  error: z.string(),
+  error_description: z.string(),
+});
+
 export type InseeExternalRoutes = ReturnType<typeof makeInseeExternalRoutes>;
 export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
   defineRoutes({
@@ -18,7 +30,8 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       requestBodySchema: z.string(),
       responses: {
         [200]: z.any(),
-        [401]: z.any(),
+        [400]: getAccessTokenError,
+        [401]: getAccessTokenError,
       },
     }),
     getEstablishmentUpdatedBetween: defineRoute({
@@ -32,8 +45,9 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       requestBodySchema: z.string(),
       responses: {
         [200]: siretGatewayAnswerSchema,
-        [404]: z.object({ yo: z.string() }),
-        [429]: z.string(),
+        [400]: inseeErrorSchema,
+        [404]: inseeErrorSchema,
+        [429]: inseeErrorSchema,
         [503]: z.string(),
       },
     }),
@@ -51,9 +65,10 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       }),
       responses: {
         [200]: siretGatewayAnswerSchema,
-        [404]: z.object({ yo: z.string() }),
-        [429]: z.string(),
-        [503]: z.string(),
+        [400]: inseeErrorSchema,
+        [404]: inseeErrorSchema,
+        [429]: inseeErrorSchema,
+        [503]: z.any(),
       },
     }),
   });

@@ -547,8 +547,11 @@ export const errors = {
       new TooManyRequestApiError(
         `Le service ${serviceName} a subit trop de sollicitation`,
       ),
-    unavailable: ({ serviceName }: { serviceName: string }) =>
-      new UnavailableApiError(serviceName),
+    unavailable: ({
+      serviceName,
+      message,
+    }: { serviceName: string; message?: string }) =>
+      new UnavailableApiError(serviceName, message),
   },
   shortLink: {
     notFound: ({ shortLinkId }: { shortLinkId: ShortLinkId }) =>

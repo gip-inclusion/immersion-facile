@@ -96,8 +96,15 @@ export class UpgradeRequired extends HttpError {
 export class UnavailableApiError extends HttpError {
   public httpCode = 503;
 
-  constructor(public serviceName: string) {
-    super(`Le service ${serviceName} n'est pas disponible`);
+  constructor(
+    public serviceName: string,
+    message?: string,
+  ) {
+    super(
+      `Le service ${serviceName} n'est pas disponible${
+        message ? `: ${message}` : ""
+      }`,
+    );
     Object.setPrototypeOf(this, UnavailableApiError.prototype);
   }
 }

@@ -110,22 +110,6 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   };
 };
 
-const configureCreateAxiosHttpClientForExternalAPIs =
-  (config: AppConfig) =>
-  <R extends Record<string, UnknownSharedRoute>>({
-    routes,
-    partnerName,
-    axiosInstance = axios.create({ timeout: config.externalAxiosTimeout }),
-  }: {
-    routes: R;
-    partnerName: string;
-    axiosInstance?: AxiosInstance;
-  }) =>
-    createAxiosSharedClient(routes, axiosInstance, {
-      skipResponseValidation: true,
-      onResponseSideEffect: logPartnerResponses({ partnerName: partnerName }),
-    });
-
 export type Gateways = ReturnType<typeof createGateways> extends Promise<
   infer T
 >
@@ -164,11 +148,28 @@ export const createGateways = async (
         partnerName: partnerName,
         logInputCbOnSuccess,
       }),
-      signal: AbortSignal.timeout(12_000), // timeout à 12s pour les partners
     });
 
-  const createLegacyAxiosHttpClientForExternalAPIs =
-    configureCreateAxiosHttpClientForExternalAPIs(config);
+  const createLegacyAxiosHttpClientForExternalAPIs = <
+    R extends Record<string, UnknownSharedRoute>,
+  >({
+    routes,
+    partnerName,
+    logInputCbOnSuccess,
+    axiosInstance = axios.create({ timeout: config.externalAxiosTimeout }),
+  }: {
+    routes: R;
+    partnerName: string;
+    axiosInstance?: AxiosInstance;
+    logInputCbOnSuccess?: LogInputCbOnSuccess;
+  }) =>
+    createAxiosSharedClient(routes, axiosInstance, {
+      skipResponseValidation: true,
+      onResponseSideEffect: logPartnerResponses({
+        partnerName: partnerName,
+        logInputCbOnSuccess,
+      }),
+    });
 
   const timeGateway =
     config.timeGateway === "CUSTOM"
@@ -319,23 +320,24 @@ export const createGateways = async (
     config: AppConfig,
     timeGateway: TimeGateway,
   ) => {
+    const logQwhenExists: LogInputCbOnSuccess = (input) => {
+      const queryParams = (input?.queryParams as Record<string, unknown>) ?? {};
+
+      if ("q" in queryParams)
+        return {
+          queryParams: { q: queryParams.q },
+        };
+
+      return {};
+    };
+
     const createInseeSiretGateway = () =>
       new InseeSiretGateway(
         config.inseeHttpConfig,
-        createFetchHttpClientForExternalAPIs({
+        createLegacyAxiosHttpClientForExternalAPIs({
           partnerName: partnerNames.inseeSiret,
           routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
-          logInputCbOnSuccess: (input) => {
-            const queryParams =
-              (input?.queryParams as Record<string, unknown>) ?? {};
-
-            if ("q" in queryParams)
-              return {
-                queryParams: { q: queryParams.q },
-              };
-
-            return {};
-          },
+          logInputCbOnSuccess: logQwhenExists,
         }),
         timeGateway,
         noRetries,
@@ -354,6 +356,7 @@ export const createGateways = async (
           createFetchHttpClientForExternalAPIs({
             partnerName: partnerNames.annuaireDesEntreprises,
             routes: annuaireDesEntreprisesSiretRoutes,
+            logInputCbOnSuccess: logQwhenExists,
           }),
           createInseeSiretGateway(),
         ),

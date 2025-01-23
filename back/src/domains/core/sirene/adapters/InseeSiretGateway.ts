@@ -1,4 +1,3 @@
-import querystring from "querystring";
 import Bottleneck from "bottleneck";
 import { format, formatISO } from "date-fns";
 import {
@@ -116,8 +115,12 @@ export class InseeSiretGateway implements SiretGateway {
           2,
         )}`,
       });
+
       throw errors.siretApi.unavailable({
         serviceName: partnerNames.inseeSiret,
+        message: `${response.status} - ${
+          response.body.header?.message ?? JSON.stringify(response.body)
+        }`,
       });
     });
   }
@@ -206,15 +209,22 @@ export class InseeSiretGateway implements SiretGateway {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
               },
-              body: querystring.stringify({
+              body: new URLSearchParams({
                 grant_type: "password",
                 client_id: this.#config.clientId,
                 client_secret: this.#config.clientSecret,
                 username: this.#config.username,
                 password: this.#config.password,
-              }),
+              }).toString(),
             })
-            .then((response) => response.body);
+            .then((response) => {
+              if (response?.status === 200) return response.body;
+              throw new Error(
+                `Could not access INSEE SIREN API. Status: ${
+                  response?.status
+                }. Body: ${JSON.stringify(response?.body)}`,
+              );
+            });
         }),
       ),
     );
