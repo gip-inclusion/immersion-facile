@@ -1,6 +1,11 @@
+import axios from "axios";
 import { subMonths } from "date-fns";
-import { expectObjectsToMatch, expectToEqual } from "shared";
-import { createFetchSharedClient } from "shared-routes/fetch";
+import {
+  expectObjectsToMatch,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   AccessTokenResponse,
   AppConfig,
@@ -31,7 +36,24 @@ describe("InseeSiretGateway", () => {
     );
     siretGateway = new InseeSiretGateway(
       config.inseeHttpConfig,
-      createFetchSharedClient(inseeExternalRoutes, fetch),
+      createAxiosSharedClient(
+        inseeExternalRoutes,
+        axios.create({ validateStatus: () => true }),
+        {
+          onResponseSideEffect: ({ response, input }) =>
+            console.info(
+              JSON.stringify(
+                {
+                  input: input,
+                  responseStatus: response.status,
+                  responseBody: response.body,
+                },
+                null,
+                2,
+              ),
+            ),
+        },
+      ),
       new RealTimeGateway(),
       noRetries,
       new InMemoryCachingGateway<AccessTokenResponse>(
@@ -46,6 +68,15 @@ describe("InseeSiretGateway", () => {
     const response =
       await siretGateway.getEstablishmentBySiret("18004623700012");
     expectObjectsToMatch(response, { siret: "18004623700012" });
+  });
+
+  it("errors when format is wrong", async () => {
+    await expectPromiseToFailWithError(
+      siretGateway.getEstablishmentBySiret({ wrong: "format" } as any),
+      new Error(
+        "Le service INSEE siret n'est pas disponible: 400 - Erreur de syntaxe dans le paramètre q=siret:[object Object] AND periode(etatAdministratifEtablissement:A)",
+      ),
+    );
   });
 
   it("filters out closed establishments", async () => {

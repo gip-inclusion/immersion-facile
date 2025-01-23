@@ -23,18 +23,23 @@ import { makeInseeExternalRoutes } from "./InseeSiretGateway.routes";
 describe("AnnuaireDesEntreprisesSiretGateway", () => {
   let siretGateway: AnnuaireDesEntreprisesSiretGateway;
   const config = AppConfig.createFromEnv();
-  const inseeHttpClient = createFetchSharedClient(
+  const inseeHttpClient = createAxiosSharedClient(
     makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
-    fetch,
+    axios.create({ validateStatus: () => true }),
     {
       skipResponseValidation: true,
-      signal: AbortSignal.timeout(12_000),
+      onResponseSideEffect: ({ input, route, response }) =>
+        console.info(
+          `SIREN API was called: ${route.method} ${route.url}
+          with : ${JSON.stringify(input, null, 2)}.
+          Response status was ${response.status}`,
+        ),
     },
   );
 
   beforeEach(() => {
     siretGateway = new AnnuaireDesEntreprisesSiretGateway(
-      createAxiosSharedClient(annuaireDesEntreprisesSiretRoutes, axios),
+      createFetchSharedClient(annuaireDesEntreprisesSiretRoutes, fetch),
       new InseeSiretGateway(
         config.inseeHttpConfig,
         inseeHttpClient,
@@ -121,15 +126,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
       const siretsPromises = Array(parallelCallQty).fill("34493368400021");
       const results = await Promise.all(
         siretsPromises.map((siret) =>
-          siretGateway.getEstablishmentBySiret(siret).catch((error) => {
-            const responseBodyAsString = error.response?.data
-              ? ` Body : ${JSON.stringify(error.response?.data)}`
-              : "";
-
-            throw new Error(
-              `Could not call api correctly, status: ${error.response.status}.${responseBodyAsString}`,
-            );
-          }),
+          siretGateway.getEstablishmentBySiret(siret),
         ),
       );
       expect(results).toHaveLength(siretsPromises.length);
