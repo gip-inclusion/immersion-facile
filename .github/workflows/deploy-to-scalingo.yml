@@ -62,7 +62,7 @@ jobs:
             "channel": "${{ inputs.slackChannel }}",
             "blocks": [
               {"type": "header", "text": {"type": "plain_text", "text": "${{ inputs.tag }}${releaseSuffix}"}},
-              {"type": "section", "text": {"type": "plain_text", "text": "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}${releaseSuffix}."}},
+              {"type": "section", "text": {"type": "plain_text", "text": "La version ${{ inputs.tag }}${releaseSuffix} est déployée en ${{ inputs.environment }}."}},
               {
                 "type": "actions",
                 "elements": [
