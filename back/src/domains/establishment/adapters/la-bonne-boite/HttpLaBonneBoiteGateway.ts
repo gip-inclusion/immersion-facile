@@ -5,7 +5,7 @@ import { createLogger } from "../../../../utils/logger";
 import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import {
   LaBonneBoiteGateway,
-  LaBonneBoiteRequestParams,
+  SearchCompaniesParams,
 } from "../../ports/LaBonneBoiteGateway";
 import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {
@@ -39,17 +39,15 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     distanceKm,
     lat,
     lon,
-    rome,
+    romeCode,
     romeLabel,
-  }: LaBonneBoiteRequestParams): Promise<SearchResultDto[]> {
+    nafCodes,
+  }: SearchCompaniesParams): Promise<SearchResultDto[]> {
     return this.#limiter
-      .schedule(async () => {
-        const { access_token } = await this.franceTravailGateway.getAccessToken(
-          `application_${this.franceTravailClientId} ${lbbV2App}`,
-        );
-        return this.httpClient.getCompanies({
+      .schedule(async () =>
+        this.httpClient.getCompanies({
           headers: {
-            authorization: createAuthorization(access_token),
+            authorization: await this.#makeAutorization(),
           },
           queryParams: {
             distance: MAX_DISTANCE_IN_KM,
@@ -57,26 +55,27 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             latitude: lat,
             page: 1,
             page_size: MAX_PAGE_SIZE,
-            rome: [rome],
+            rome: [romeCode],
+            ...(nafCodes ? { naf: nafCodes } : {}),
           },
-        });
-      })
-      .then(({ body }) => {
-        const items = body?.items;
-        return items
-          ? items
-              .map(
-                (props: LaBonneBoiteApiResultV2Props) =>
-                  new LaBonneBoiteCompanyDto(props),
-              )
-              .filter((result) => result.isCompanyRelevant())
-              .map((result) =>
-                result.toSearchResult(
-                  { romeCode: rome, romeLabel },
-                  { lat, lon },
-                ),
-              )
-          : [];
+        }),
+      )
+      .then((response) => {
+        if (response.status !== 200) throw new Error(JSON.stringify(response));
+        const items = response.body?.items
+          ?.map(
+            (props: LaBonneBoiteApiResultV2Props) =>
+              new LaBonneBoiteCompanyDto(props),
+          )
+          .filter((result) => result.isCompanyRelevant())
+          .map((result) =>
+            result.toSearchResult({ romeCode, romeLabel }, { lat, lon }),
+          )
+          .filter((result) =>
+            result.distance_m ? result.distance_m <= distanceKm * 1000 : true,
+          );
+
+        return items ?? [];
       })
       .catch((error) => {
         logger.error({
@@ -86,11 +85,12 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             distanceKm,
             lat,
             lon,
-            rome,
+            romeCode,
             romeLabel,
+            nafCodes,
           },
         });
-        throw error;
+        return [];
       });
   }
 
@@ -99,31 +99,28 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     romeDto: RomeDto,
   ): Promise<SearchResultDto | null> {
     return this.#limiter
-      .schedule(async () => {
-        const { access_token } = await this.franceTravailGateway.getAccessToken(
-          `application_${this.franceTravailClientId} ${lbbV2App}`,
-        );
-        return this.httpClient.getCompany({
+      .schedule(async () =>
+        this.httpClient.getCompany({
           headers: {
-            authorization: createAuthorization(access_token),
+            authorization: await this.#makeAutorization(),
           },
           queryParams: {
             siret,
           },
-        });
-      })
-      .then(({ body }) => {
-        const items = body?.items;
-        const item = items
-          ? items
-              .map(
-                (props: LaBonneBoiteApiResultV2Props) =>
-                  new LaBonneBoiteCompanyDto(props),
-              )
-              .filter((result) => result.isCompanyRelevant())
-              .map((result) => result.toSearchResult(romeDto))
-              .at(0)
-          : null;
+        }),
+      )
+      .then((response) => {
+        if (response.status !== 200) throw new Error(JSON.stringify(response));
+
+        const item = response.body?.items
+          ?.map(
+            (props: LaBonneBoiteApiResultV2Props) =>
+              new LaBonneBoiteCompanyDto(props),
+          )
+          .filter((result) => result.isCompanyRelevant())
+          .map((result) => result.toSearchResult(romeDto))
+          .at(0);
+
         return item ?? null;
       })
       .catch((error) => {
@@ -136,6 +133,12 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         throw error;
       });
   }
-}
 
-const createAuthorization = (accessToken: string) => `Bearer ${accessToken}`;
+  async #makeAutorization(): Promise<string> {
+    const result = await this.franceTravailGateway.getAccessToken(
+      `application_${this.franceTravailClientId} ${lbbV2App}`,
+    );
+
+    return `Bearer ${result.access_token}`;
+  }
+}
