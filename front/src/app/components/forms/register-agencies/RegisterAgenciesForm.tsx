@@ -33,6 +33,7 @@ import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConn
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { z } from "zod";
 import { MultipleAgencyInput } from "./MultipleAgencyInput";
+import { routes } from "src/app/routes/routes";
 
 type WithAgenciesOptions = {
   agencies: AgencyOption[];
@@ -104,21 +105,37 @@ export const RegisterAgenciesForm = ({
         Retrouver votre siret sur l'Annuaire des Entreprises
       </a>
 
-      <div className={fr.cx("fr-mt-6w")}>
-        <strong>Résultats pour votre recherche "{inputValue}"</strong>
-        <p className={fr.cx("fr-hint-text")}>
-          {checkedAgencies.length}{" "}
-          {checkedAgencies.length <= 1
-            ? "organisme sélectionné"
-            : "organismes sélectionnés"}
-        </p>
-      </div>
-      <AgencyTable
-        checkedAgencies={checkedAgencies}
-        setCheckedAgencies={setCheckedAgencies}
-        isAllChecked={isAllChecked}
-        setIsAllChecked={setIsAllChecked}
-      />
+      {inputValue.length > 0 && (
+        <>
+          <section className={fr.cx("fr-mt-6w")}>
+            <strong>Résultats pour votre recherche "{inputValue}"</strong>
+            <p className={fr.cx("fr-hint-text")}>
+              {checkedAgencies.length}{" "}
+              {checkedAgencies.length <= 1
+                ? "organisme sélectionné"
+                : "organismes sélectionnés"}
+            </p>
+            <AgencyTable
+              checkedAgencies={checkedAgencies}
+              setCheckedAgencies={setCheckedAgencies}
+              isAllChecked={isAllChecked}
+              setIsAllChecked={setIsAllChecked}
+            />
+          </section>
+          <section>
+            <h2 className={fr.cx("fr-text--lead")}>
+              Vous ne trouvez pas votre organisme ?
+            </h2>
+            <Button
+              linkProps={{
+                href: `${routes.addAgency().href}`,
+              }}
+            >
+              Créer un nouvel organisme sur Immersion Facilitée
+            </Button>
+          </section>
+        </>
+      )}
 
       {/* <form
         onSubmit={handleSubmit((values) =>
