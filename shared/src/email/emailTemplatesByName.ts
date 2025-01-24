@@ -483,7 +483,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -552,7 +552,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -617,7 +617,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -717,7 +717,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -772,7 +772,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
