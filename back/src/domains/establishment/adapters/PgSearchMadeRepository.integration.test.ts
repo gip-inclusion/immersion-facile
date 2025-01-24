@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { AppellationCode, expectToEqual } from "shared";
+import { AppellationCode, NafCode, expectToEqual } from "shared";
 import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
 import { GeoParams, SearchMadeEntity } from "../entities/SearchMadeEntity";
@@ -13,6 +13,7 @@ describe("PgSearchesMadeRepository", () => {
     place: "Nantes",
     voluntaryToImmersion: true,
     numberOfResults: 1,
+    nafCodes: [],
   };
 
   let pool: Pool;
@@ -26,6 +27,7 @@ describe("PgSearchesMadeRepository", () => {
 
   beforeEach(async () => {
     await db.deleteFrom("searches_made__appellation_code").execute();
+    await db.deleteFrom("searches_made__naf_code").execute();
     await db.deleteFrom("searches_made").execute();
     pgSearchesMadeRepository = new PgSearchMadeRepository(makeKyselyDb(pool));
   });
@@ -94,6 +96,20 @@ describe("PgSearchesMadeRepository", () => {
     );
   });
 
+  it("with nafCodes", async () => {
+    const searchMadeWithLocation: SearchMadeEntity = {
+      ...searchMadeWithoutLocation,
+      nafCodes: ["7211Z", "7219Z"],
+    };
+
+    await pgSearchesMadeRepository.insertSearchMade(searchMadeWithLocation);
+
+    expectToEqual(
+      await getSearchMadeById(db, searchMadeWithLocation.id),
+      searchMadeWithLocation,
+    );
+  });
+
   it("insert a search made without location and have departement code null", async () => {
     await pgSearchesMadeRepository.insertSearchMade(searchMadeWithoutLocation);
 
@@ -152,7 +168,7 @@ const getSearchMadeById = async (
 
   const appellationCodes: AppellationCode[] = await db
     .selectFrom("searches_made__appellation_code")
-    .selectAll()
+    .select("appellation_code")
     .where("search_made_id", "=", id)
     .execute()
     .then((rows) =>
@@ -162,6 +178,17 @@ const getSearchMadeById = async (
           (appellationCode): appellationCode is AppellationCode =>
             appellationCode !== null,
         ),
+    );
+
+  const nafCodes: NafCode[] = await db
+    .selectFrom("searches_made__naf_code")
+    .select("naf_code")
+    .where("search_made_id", "=", id)
+    .execute()
+    .then((rows) =>
+      rows
+        .map(({ naf_code }) => naf_code)
+        .filter((nafCode): nafCode is NafCode => nafCode !== null),
     );
 
   return (
@@ -180,6 +207,7 @@ const getSearchMadeById = async (
       acquisitionCampaign: optional(searchMadeResult.acquisition_campaign),
       acquisitionKeyword: optional(searchMadeResult.acquisition_keyword),
       establishmentSearchableBy: optional(searchMadeResult.searchable_by),
+      nafCodes,
     }
   );
 };

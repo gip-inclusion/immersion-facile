@@ -7,10 +7,12 @@ export const makeExpectedSearchResult = ({
   establishment: establishmentAggregate,
   withOffers,
   withLocationAndDistance,
+  nafLabel,
 }: {
   establishment: EstablishmentAggregate;
   withOffers: OfferEntity[];
   withLocationAndDistance: Location & { distance?: number };
+  nafLabel: string;
 }): SearchResultDto => {
   const firstOffer = withOffers.at(0);
   if (!firstOffer)
@@ -33,7 +35,7 @@ export const makeExpectedSearchResult = ({
       establishmentAggregate.establishment.fitForDisabledWorkers,
     locationId: withLocationAndDistance.id,
     naf: establishmentAggregate.establishment.nafDto.code,
-    nafLabel: "Activités des agences de travail temporaire",
+    nafLabel,
     name: establishmentAggregate.establishment.name,
     numberOfEmployeeRange:
       establishmentAggregate.establishment.numberEmployeesRange,

@@ -54,12 +54,10 @@ export class PgGroupRepository implements GroupRepository {
         "io.appellation_code",
       )
       .leftJoin("public_romes_data as r", "r.code_rome", "ap.code_rome")
-      .leftJoin("public_naf_classes_2008 as naf", (join) =>
-        join.onRef(
-          "naf.class_id",
-          "=",
-          sql`REGEXP_REPLACE(e.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2')`,
-        ),
+      .leftJoin(
+        "public_naf_rev2_sous_classes as naf",
+        "naf.naf_code",
+        "e.naf_code",
       )
       .leftJoin(
         "establishments_location_infos as loc",
@@ -73,7 +71,7 @@ export class PgGroupRepository implements GroupRepository {
         "e.siret",
         "r.code_rome",
         "r.libelle_rome",
-        "naf.class_label",
+        "naf.libelle",
         "e.contact_mode",
         "loc.id",
       ])
@@ -100,7 +98,7 @@ export class PgGroupRepository implements GroupRepository {
               'appellationLabel', ap.libelle_appellation_long
             ) ORDER BY ap.ogr_appellation)`,
             naf: ref("e.naf_code"),
-            nafLabel: ref("naf.class_label"),
+            nafLabel: ref("naf.libelle"),
             address: jsonBuildObject({
               streetNumberAndAddress: ref("loc.street_number_and_address"),
               postcode: ref("loc.post_code"),

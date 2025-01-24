@@ -8,6 +8,7 @@ import {
   DateTimeIsoString,
   EstablishmentSearchableByValue,
   LocationId,
+  NafCode,
   RomeCode,
   SearchResultDto,
   SearchSortedBy,
@@ -320,6 +321,7 @@ export class PgEstablishmentAggregateRepository
         geoParams: around,
         searchableBy: searchMade.establishmentSearchableBy,
         fitForDisabledWorkers,
+        nafCodes: searchMade.nafCodes,
         romeCodes: searchMade.romeCode
           ? [searchMade.romeCode]
           : await this.#getRomeCodeFromAppellationCodes(
@@ -550,7 +552,7 @@ export class PgEstablishmentAggregateRepository
           'romeLabel', io.rome_label,
           'appellations',  io.appellations,
           'naf', io.naf_code,
-          'nafLabel', public_naf_classes_2008.class_label,
+          'nafLabel', public_naf_rev2_sous_classes.libelle,
           'address', JSON_BUILD_OBJECT(
             'streetNumberAndAddress', io.street_number_and_address,
             'postcode', io.post_code,
@@ -563,7 +565,7 @@ export class PgEstablishmentAggregateRepository
           'numberOfEmployeeRange', io.number_employees
         )) AS search_immersion_result
       FROM match_immersion_offer AS io   
-      LEFT JOIN public_naf_classes_2008 ON (public_naf_classes_2008.class_id = REGEXP_REPLACE(io.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2'))
+      LEFT JOIN public_naf_rev2_sous_classes ON public_naf_rev2_sous_classes.naf_code = io.naf_code
       LEFT JOIN unique_establishments_contacts AS uec ON uec.siret = io.siret
       LEFT JOIN establishments__users AS ec ON ec.user_id = uec.user_id
       ORDER BY row_number ASC, io.location_id ASC;`,
@@ -854,6 +856,7 @@ const searchImmersionResultsQuery = (
       searchableBy?: EstablishmentSearchableByValue;
       romeCodes?: RomeCode[];
       geoParams?: GeoParams;
+      nafCodes?: NafCode[];
     };
     sortedBy: SearchSortedBy;
   },
@@ -861,6 +864,7 @@ const searchImmersionResultsQuery = (
   const geoParams = filters?.geoParams;
   const searchableBy = filters?.searchableBy;
   const fitForDisabledWorkers = filters?.fitForDisabledWorkers;
+  const nafCodes = filters?.nafCodes;
 
   const query = transaction
     .with("filtered_results", (qb) =>
@@ -872,6 +876,10 @@ const searchImmersionResultsQuery = (
                 .selectFrom("establishments")
                 .select(["siret", "score", "update_date"])
                 .where("is_open", "=", true),
+              (qb) =>
+                nafCodes?.length
+                  ? qb.where("establishments.naf_code", "in", nafCodes)
+                  : qb,
               (qb) =>
                 fitForDisabledWorkers === undefined
                   ? qb
@@ -1007,15 +1015,7 @@ const searchImmersionResultsQuery = (
       "loc.id",
       "loc_pos.id",
     )
-    .innerJoin(
-      (eb) => eb.selectFrom("public_naf_classes_2008").selectAll().as("n"),
-      (join) =>
-        join.onRef(
-          "n.class_id",
-          "=",
-          sql`REGEXP_REPLACE(e.naf_code,'(\\d\\d)(\\d\\d).', '\\1.\\2')`,
-        ),
-    )
+    .innerJoin("public_naf_rev2_sous_classes as n", "n.naf_code", "e.naf_code")
     .innerJoin("public_romes_data as ro", "ro.code_rome", "r.code_rome")
     .orderBy("r.rank")
     .select(({ ref, fn }) =>
@@ -1034,7 +1034,7 @@ const searchImmersionResultsQuery = (
           customizedName: ref("e.customized_name"),
           fitForDisabledWorkers: ref("e.fit_for_disabled_workers"),
           numberOfEmployeeRange: ref("e.number_employees"),
-          nafLabel: ref("n.class_label"),
+          nafLabel: ref("n.libelle"),
           contactMode: ref("e.contact_mode"),
           rome: ref("ro.code_rome"),
           romeLabel: ref("ro.libelle_rome"),

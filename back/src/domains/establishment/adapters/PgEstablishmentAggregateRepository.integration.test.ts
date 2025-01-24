@@ -120,6 +120,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   ...locationOfSearchPosition,
                   distance: 0,
                 },
+                nafLabel: "Activités des agences de travail temporaire",
               }),
             ],
           );
@@ -139,6 +140,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   ...locationOfSearchPosition,
                   distance: 0,
                 },
+                nafLabel: "Activités des agences de travail temporaire",
               }),
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_close,
@@ -147,6 +149,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   ...locationOfCloseSearchPosition,
                   distance: 133.12254555,
                 },
+                nafLabel: "Activités des agences de travail temporaire",
               }),
             ],
           );
@@ -166,6 +169,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   ...locationOfSearchPosition,
                   distance: 0,
                 },
+                nafLabel: "Activités des agences de travail temporaire",
               }),
               makeExpectedSearchResult({
                 establishment: establishmentWithOfferA1101_close,
@@ -174,6 +178,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   ...locationOfCloseSearchPosition,
                   distance: 133.12254555,
                 },
+                nafLabel: "Activités des agences de travail temporaire",
               }),
             ],
           );
@@ -216,6 +221,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                       distance: 0,
                     },
                     withOffers: establishment.offers,
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 )
                 .sort(
@@ -246,6 +252,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                       distance: 0,
                     },
                     withOffers: establishment.offers,
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 )
                 .sort(
@@ -277,6 +284,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                       distance: 0,
                     },
                     withOffers: establishment.offers,
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 )
                 .sort(
@@ -320,6 +328,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                     ...locationOfSearchPosition,
                     distance: 0,
                   },
+                  nafLabel: "Activités des agences de travail temporaire",
                 }),
               ],
             );
@@ -386,6 +395,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                       ...bassompierreSaintesLocation,
                       distance: 7704.55035665,
                     },
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 ),
                 ...[
@@ -401,6 +411,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                       ...portHubleChaniersLocation,
                       distance: 11093.36505388,
                     },
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 ),
                 ...[
@@ -416,9 +427,215 @@ describe("PgEstablishmentAggregateRepository", () => {
                       ...tourDeLaChaineLaRochelleLocation,
                       distance: 56222.51061222,
                     },
+                    nafLabel: "Activités des agences de travail temporaire",
                   }),
                 ),
               ].sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
+            );
+          });
+        });
+
+        describe("'nafCodes' SearchMade param", () => {
+          beforeEach(async () => {
+            await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+              establishment0145Z_A,
+            );
+            await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+              establishment0145Z_B,
+            );
+            await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+              establishment9900Z,
+            );
+            await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+              establishment4741Z,
+            );
+          });
+
+          it("establishments with all naf when naf filter is not provided", async () => {
+            const results =
+              await pgEstablishmentAggregateRepository.searchImmersionResults({
+                searchMade: {},
+              });
+
+            expectToEqual(
+              results.sort(
+                sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+              ),
+              [
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_A,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_A.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_A.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_B,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_B.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_B.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment4741Z,
+                  withLocationAndDistance: {
+                    ...establishment4741Z.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment4741Z.offers,
+                  nafLabel:
+                    "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment9900Z,
+                  withLocationAndDistance: {
+                    ...establishment9900Z.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment9900Z.offers,
+                  nafLabel:
+                    "Activités des organisations et organismes extraterritoriaux",
+                }),
+              ].sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
+            );
+          });
+
+          it("establishments with all naf when naf filter is empty", async () => {
+            const results =
+              await pgEstablishmentAggregateRepository.searchImmersionResults({
+                searchMade: { nafCodes: [] },
+              });
+
+            expectToEqual(
+              results.sort(
+                sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+              ),
+              [
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_A,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_A.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_A.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_B,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_B.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_B.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment4741Z,
+                  withLocationAndDistance: {
+                    ...establishment4741Z.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment4741Z.offers,
+                  nafLabel:
+                    "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment9900Z,
+                  withLocationAndDistance: {
+                    ...establishment9900Z.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment9900Z.offers,
+                  nafLabel:
+                    "Activités des organisations et organismes extraterritoriaux",
+                }),
+              ]
+
+              .sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
+            );
+          });
+
+          it("establishments with naf when naf filter is provided with one value", async () => {
+            const results =
+              await pgEstablishmentAggregateRepository.searchImmersionResults({
+                searchMade: {
+                  nafCodes: [establishment0145Z_A.establishment.nafDto.code],
+                },
+              });
+
+            expectToEqual(
+              results.sort(
+                sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+              ),
+              [establishment0145Z_A, establishment0145Z_B]
+                .map((establishment) =>
+                  makeExpectedSearchResult({
+                    establishment: establishment,
+                    withLocationAndDistance: {
+                      ...establishment.establishment.locations[0],
+                      distance: undefined,
+                    },
+                    withOffers: establishment.offers,
+                    nafLabel: "Élevage d'ovins et de caprins",
+                  }),
+                )
+                .sort(
+                  sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+                ),
+            );
+          });
+
+          it("establishments with different naf when naf filter is provided with multiple values", async () => {
+            const results =
+              await pgEstablishmentAggregateRepository.searchImmersionResults({
+                searchMade: {
+                  nafCodes: [
+                    establishment0145Z_A.establishment.nafDto.code,
+                    establishment4741Z.establishment.nafDto.code,
+                  ],
+                },
+              });
+
+            expectToEqual(
+              results.sort(
+                sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults,
+              ),
+              [
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_A,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_A.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_A.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment0145Z_B,
+                  withLocationAndDistance: {
+                    ...establishment0145Z_B.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment0145Z_B.offers,
+                  nafLabel: "Élevage d'ovins et de caprins",
+                }),
+                makeExpectedSearchResult({
+                  establishment: establishment4741Z,
+                  withLocationAndDistance: {
+                    ...establishment4741Z.establishment.locations[0],
+                    distance: undefined,
+                  },
+                  withOffers: establishment4741Z.offers,
+                  nafLabel:
+                    "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
+                }),
+              ]
+
+              .sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
             );
           });
         });
@@ -473,6 +690,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ...notFitForDisabledWorkers.establishment.locations[0],
                 distance: 0,
               },
+              nafLabel: "Activités des agences de travail temporaire",
             }),
             makeExpectedSearchResult({
               establishment: fitForDisabledWorkers,
@@ -481,6 +699,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ...fitForDisabledWorkers.establishment.locations[0],
                 distance: 0,
               },
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ]);
         });
@@ -505,6 +724,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ...notFitForDisabledWorkers.establishment.locations[0],
                 distance: 0,
               },
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ]);
         });
@@ -529,6 +749,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ...fitForDisabledWorkers.establishment.locations[0],
                 distance: 0,
               },
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ]);
         });
@@ -572,6 +793,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 ...locationOfSearchPosition,
                 distance: undefined,
               },
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ],
         );
@@ -612,6 +834,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distance: 0,
               },
               withOffers: [cartographeImmersionOffer],
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ],
         );
@@ -641,6 +864,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distance: 0,
               },
               withOffers: [cartographeImmersionOffer],
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ],
         );
@@ -698,6 +922,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 distance: 0,
               },
               withOffers: establishmentAtRangeWithRome.offers,
+              nafLabel: "Activités des agences de travail temporaire",
             }),
           ],
         );
@@ -739,6 +964,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   distance: 7704.55035665,
                 },
                 withOffers: [cuvisteOffer],
+                nafLabel: "Activités des agences de travail temporaire",
               }),
               makeExpectedSearchResult({
                 establishment: establishmentCuvisteAtChaniersAndLaRochelle,
@@ -747,6 +973,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   distance: 11093.36505388,
                 },
                 withOffers: [cuvisteOffer],
+                nafLabel: "Activités des agences de travail temporaire",
               }),
             ],
           );
@@ -1596,7 +1823,9 @@ describe("PgEstablishmentAggregateRepository", () => {
         },
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
-            .withEstablishmentCustomizedName("TOTO")
+            .withEstablishmentCustomizedName(
+              "Activités des agences de travail temporaire",
+            )
             .withUserRights([osefUserRight])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
@@ -2296,3 +2525,47 @@ const establishmentCuvisteAtChaniersAndLaRochelle =
     ])
     .withUserRights([osefUserRight])
     .build();
+
+const establishment0145Z_A = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000010")
+  .withLocations([bassompierreSaintesLocation])
+  .withEstablishmentNaf({
+    code: "0145Z",
+    nomenclature: "Élevage d'ovins et de caprins",
+  })
+  .build();
+const establishment0145Z_B = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000011")
+  .withLocations([portHubleChaniersLocation])
+  .withEstablishmentNaf({
+    code: "0145Z",
+    nomenclature: "Élevage d'ovins et de caprins",
+  })
+  .build();
+
+const establishment4741Z = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000020")
+  .withLocations([veauxLocation])
+  .withEstablishmentNaf({
+    code: "4741Z",
+    nomenclature:
+      "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
+  })
+  .build();
+
+const establishment9900Z = new EstablishmentAggregateBuilder()
+  .withUserRights([osefUserRight])
+  .withOffers([cuvisteOffer])
+  .withEstablishmentSiret("00000000000030")
+  .withLocations([tourDeLaChaineLaRochelleLocation])
+  .withEstablishmentNaf({
+    code: "9900Z",
+    nomenclature: "Activités des organisations et organismes extraterritoriaux",
+  })
+  .build();
