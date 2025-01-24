@@ -1,6 +1,6 @@
 import { sql } from "kysely";
 import { uniq } from "ramda";
-import { AppellationCode } from "shared";
+import { AppellationCode, NafCode } from "shared";
 import { KyselyDb, values } from "../../../config/pg/kysely/kyselyUtils";
 import {
   SearchMadeEntity,
@@ -21,9 +21,12 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         searchMade.appellationCodes,
       );
     }
+    if (searchMade.nafCodes && searchMade.nafCodes.length > 0) {
+      await this.#insertNafCodes(searchMade.id, searchMade.nafCodes);
+    }
   }
 
-  async #insertSearchMade(searchMade: SearchMadeEntity) {
+  async #insertSearchMade(searchMade: SearchMadeEntity): Promise<void> {
     await this.transaction
       .insertInto("searches_made")
       .columns([
@@ -155,7 +158,7 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
   async #insertAppellationCodes(
     id: SearchMadeId,
     appellationCodes: AppellationCode[],
-  ) {
+  ): Promise<void> {
     const uniqAppellationCodes = uniq(appellationCodes);
 
     await this.transaction
@@ -164,6 +167,23 @@ export class PgSearchMadeRepository implements SearchMadeRepository {
         ...uniqAppellationCodes.map((appellationCode) => ({
           search_made_id: id,
           appellation_code: appellationCode,
+        })),
+      ])
+      .execute();
+  }
+
+  async #insertNafCodes(
+    search_made_id: SearchMadeId,
+    nafCodes: NafCode[],
+  ): Promise<void> {
+    const uniqueNafCodes = uniq(nafCodes);
+
+    await this.transaction
+      .insertInto("searches_made__naf_code")
+      .values([
+        ...uniqueNafCodes.map((naf_code) => ({
+          search_made_id,
+          naf_code,
         })),
       ])
       .execute();

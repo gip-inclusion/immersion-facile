@@ -50,9 +50,16 @@ export interface Database {
   partners_pe_connect: PartnersFtConnect;
   public_appellations_data: PublicAppellationsData;
   public_department_region: PublicDepartmentRegion;
-  public_naf_classes_2008: PublicNafClasses2008;
+  public_naf_classes_2008_old: PublicNafClasses2008; // TO DELETE
+  public_naf_rev2_classes: PublicNafRev2Classes;
+  public_naf_rev2_divisions: PublicNafRev2Divisions;
+  public_naf_rev2_groupes: PublicNafRev2Groupes;
+  public_naf_rev2_niveaux: PublicNafRev2Niveaux;
+  public_naf_rev2_sections: PublicNafRev2Sections;
+  public_naf_rev2_sous_classes: PublicNafRev2SubClasses;
   public_romes_data: PublicRomesData;
   searches_made__appellation_code: SearchesMadeAppellationCode;
+  searches_made__naf_code: SearchesMadeNafCode;
   searches_made: SearchesMade;
   short_links: ShortLinks;
   users__agencies: UsersAgencies;
@@ -512,6 +519,11 @@ interface SearchesMadeAppellationCode {
   appellation_code: Generated<string | null>;
 }
 
+interface SearchesMadeNafCode {
+  search_made_id: string;
+  naf_code: string;
+}
+
 type SortedBy = "date" | "distance" | "score";
 type SearchableBy = "jobSeekers" | "students";
 
@@ -609,6 +621,7 @@ interface FeatureFlags {
   value: Json | null;
 }
 
+// TO DELETE
 interface PublicNafClasses2008 {
   class_id: string;
   class_label: string;
@@ -618,6 +631,40 @@ interface PublicNafClasses2008 {
   division_label: string;
   section_id: string;
   section_label: string;
+}
+
+interface PublicNafRev2Sections {
+  code: string;
+  libelle: string;
+}
+
+interface PublicNafRev2Divisions {
+  code: string;
+  libelle: string;
+}
+
+interface PublicNafRev2Groupes {
+  code: string;
+  libelle: string;
+}
+
+interface PublicNafRev2Classes {
+  code: string;
+  libelle: string;
+}
+
+interface PublicNafRev2SubClasses {
+  code: string;
+  libelle: string;
+  naf_code: string;
+}
+
+interface PublicNafRev2Niveaux {
+  code_sous_classe: string;
+  code_classe: string;
+  code_groupe: string;
+  code_division: string;
+  code_section: string;
 }
 
 interface PublicDepartmentRegion {
