@@ -4,7 +4,6 @@ import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import { fillAndSubmitBasicAgencyForm } from "../../utils/agency";
 import { goToDashboard } from "../../utils/dashboard";
-import { fillAutocomplete } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -56,15 +55,21 @@ test.describe("Agency dashboard workflow", () => {
       await page.goto("/");
       await goToDashboard(page, "agency");
       await expect(
-        await page.locator(
-          `#${domElementIds.agencyDashboard.registerAgencies.form}`,
+        page.locator(
+          `#${domElementIds.agencyDashboard.registerAgencies.search}`,
         ),
       ).toBeVisible();
-      await fillAutocomplete({
-        page,
-        locator: `#${domElementIds.agencyDashboard.registerAgencies.agencyAutocomplete}--0`,
-        value: "Cap emploi",
-      });
+      await page
+        .locator(`#${domElementIds.agencyDashboard.registerAgencies.search}`)
+        .fill("Cap emploi");
+
+      await page
+        .locator(
+          `#${domElementIds.agencyDashboard.registerAgencies.table} table tbody tr .fr-checkbox-group`,
+        )
+        .first()
+        .click();
+
       await page
         .locator(
           `#${domElementIds.agencyDashboard.registerAgencies.submitButton}`,

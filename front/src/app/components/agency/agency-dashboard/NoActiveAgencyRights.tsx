@@ -10,7 +10,7 @@ export function NoActiveAgencyRights({
 }): JSX.Element {
   return (
     <>
-      <h2>Suivi de mes demandes</h2>
+      <h2 className={fr.cx("fr-mt-2w")}>Suivi de mes demandes</h2>
       <div className={fr.cx("fr-grid-row")}>
         <div
           className={fr.cx(

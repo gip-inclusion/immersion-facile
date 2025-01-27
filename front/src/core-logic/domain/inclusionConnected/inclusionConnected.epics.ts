@@ -52,7 +52,13 @@ const getCurrentUserEpic: InclusionConnectedEpic = (
   { inclusionConnectedGateway },
 ) =>
   action$.pipe(
-    filter(inclusionConnectedSlice.actions.currentUserFetchRequested.match),
+    filter(
+      (action) =>
+        inclusionConnectedSlice.actions.currentUserFetchRequested.match(
+          action,
+        ) ||
+        inclusionConnectedSlice.actions.registerAgenciesSucceeded.match(action),
+    ),
     switchMap(({ payload }) =>
       inclusionConnectedGateway
         .getCurrentUser$(

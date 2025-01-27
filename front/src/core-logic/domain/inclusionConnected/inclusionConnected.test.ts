@@ -248,11 +248,30 @@ describe("InclusionConnected", () => {
         "dashboard-agency-register-user": {
           on: "create",
           level: "success",
-          title: "Demande de rattachement effectuée",
+          title: "Votre demande de rattachement a bien été prise en compte",
           message:
-            "Votre demande de première connexion a bien été reçue. Vous recevrez un email de confirmation dès qu'elle aura  été acceptée par nos équipes (2-7 jours ouvrés).",
+            "Elle sera étudiée prochainement par un administrateur et vous serez informé de sa décision.",
         },
       });
+    });
+
+    it("fetches the current IC user when registration succeed", () => {
+      expectIsLoadingToBe(false);
+      expectCurrentUserToBe(null);
+
+      store.dispatch(
+        inclusionConnectedSlice.actions.registerAgenciesSucceeded({
+          agencies: [agency1.id],
+          feedbackTopic: "dashboard-agency-register-user",
+        }),
+      );
+
+      dependencies.inclusionConnectedGateway.currentUser$.next(
+        inclusionConnectedUser,
+      );
+
+      expectIsLoadingToBe(false);
+      expectCurrentUserToBe(inclusionConnectedUser);
     });
 
     it("request agencies registration on the current user to throw on error", () => {

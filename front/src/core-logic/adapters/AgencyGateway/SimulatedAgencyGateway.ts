@@ -229,7 +229,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           kind: agency.kind,
           status: agency.status,
           address: agency.address,
-          refersToAgencyName: agency.refersToAgencyName
+          refersToAgencyName: agency.refersToAgencyName,
         })),
     );
   }

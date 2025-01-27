@@ -5,7 +5,7 @@ import React from "react";
 import { Loader } from "react-design-system";
 import { distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
-import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { FrontAgencyDashboardRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -32,52 +32,50 @@ export const AgencyDashboardPage = ({
         <h1>Demander l'accès à des organismes</h1>
       </div>
       {isLoading && <Loader />}
-      <WithFeedbackReplacer topic="dashboard-agency-register-user">
-        <>
-          {match({ currentUser })
-            .with(
-              {
-                currentUser: {
-                  agencyRights: [],
-                },
-              },
-              ({ currentUser }) => {
-                if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
-                  return (
-                    <Alert
-                      severity="warning"
-                      title="Rattachement à vos organismes en cours"
-                      description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
-                    />
-                  );
-                return <RegisterAgenciesForm currentUser={currentUser} />;
-              },
-            )
-            .with(
-              {
-                currentUser: P.not(null),
-              },
-              ({ currentUser }) => {
-                const { activeAgencyRights, toReviewAgencyRights } =
-                  distinguishAgencyRights(currentUser.agencyRights);
+      <Feedback topic="dashboard-agency-register-user" />
 
-                return activeAgencyRights.length ? (
-                  <AgencyDashboard
-                    route={route}
-                    activeAgencyRights={activeAgencyRights}
-                    dashboards={currentUser.dashboards}
-                    inclusionConnectedJwt={inclusionConnectedJwt}
-                  />
-                ) : (
-                  <NoActiveAgencyRights
-                    toReviewAgencyRights={toReviewAgencyRights}
-                  />
-                );
-              },
-            )
-            .otherwise(() => null)}
-        </>
-      </WithFeedbackReplacer>
+      {match({ currentUser })
+        .with(
+          {
+            currentUser: {
+              agencyRights: [],
+            },
+          },
+          ({ currentUser }) => {
+            if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
+              return (
+                <Alert
+                  severity="warning"
+                  title="Rattachement à vos organismes en cours"
+                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                />
+              );
+            return <RegisterAgenciesForm currentUser={currentUser} />;
+          },
+        )
+        .with(
+          {
+            currentUser: P.not(null),
+          },
+          ({ currentUser }) => {
+            const { activeAgencyRights, toReviewAgencyRights } =
+              distinguishAgencyRights(currentUser.agencyRights);
+
+            return activeAgencyRights.length ? (
+              <AgencyDashboard
+                route={route}
+                activeAgencyRights={activeAgencyRights}
+                dashboards={currentUser.dashboards}
+                inclusionConnectedJwt={inclusionConnectedJwt}
+              />
+            ) : (
+              <NoActiveAgencyRights
+                toReviewAgencyRights={toReviewAgencyRights}
+              />
+            );
+          },
+        )
+        .otherwise(() => null)}
     </>
   );
 };
