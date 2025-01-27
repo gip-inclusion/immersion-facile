@@ -30,7 +30,7 @@ describe("createRedisWithCache implementation", () => {
       redisClient,
     });
     calls.length = 0;
-    cachedCallToPartner = withCache<string>({
+    cachedCallToPartner = withCache({
       cb: someCallToAPartner,
       getCacheKey: (query) => query,
     });

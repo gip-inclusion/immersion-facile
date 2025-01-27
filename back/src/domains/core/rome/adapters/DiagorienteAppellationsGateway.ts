@@ -45,7 +45,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
 
   async searchAppellations(rawQuery: string): Promise<AppellationDto[]> {
     const tokenData = await this.getAccessToken();
-    const cachedSearchAppellations = this.#withCache<string>({
+    const cachedSearchAppellations = this.#withCache({
       overrideCacheDurationInHours: 24,
       logParams: {
         partner: "diagoriente",

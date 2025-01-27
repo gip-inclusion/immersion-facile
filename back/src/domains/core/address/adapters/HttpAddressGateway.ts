@@ -85,7 +85,7 @@ export class HttpAddressGateway implements AddressGateway {
         minLength: queryMinLength,
       });
 
-    return this.#withCache<string>({
+    return this.#withCache({
       overrideCacheDurationInHours: 24,
       getCacheKey: (query) => `geosearch_${query}`,
       logParams: {
