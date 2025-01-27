@@ -265,6 +265,7 @@ export const createGateways = async (
             clientId: config.diagorienteApiClientId,
             clientSecret: config.diagorienteApiClientSecret,
           },
+          withCache,
         ),
     })[config.appellationsGateway]();
 

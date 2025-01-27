@@ -2,11 +2,13 @@ import Bottleneck from "bottleneck";
 import { AppellationDto, appellationCodeSchema } from "shared";
 import { HttpClient } from "shared-routes";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
+import { WithCache } from "../../caching-gateway/port/WithCache";
 import { AppellationsGateway } from "../ports/AppellationsGateway";
 import {
   DiagorienteAccessTokenResponse,
   DiagorienteAppellationsRoutes,
   DiagorienteRawResponse,
+  diagorienteAppellationsRoutes,
   diagorienteTokenScope,
 } from "./DiagorienteAppellationsGateway.routes";
 
@@ -27,6 +29,8 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
     minTime: requestMinTime,
   });
 
+  #withCache: WithCache;
+
   constructor(
     private readonly httpClient: HttpClient<DiagorienteAppellationsRoutes>,
     private caching: InMemoryCachingGateway<DiagorienteAccessTokenResponse>,
@@ -34,22 +38,38 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
       clientId: string;
       clientSecret: string;
     },
-  ) {}
+    withCache: WithCache,
+  ) {
+    this.#withCache = withCache;
+  }
 
-  async searchAppellations(query: string): Promise<AppellationDto[]> {
+  async searchAppellations(rawQuery: string): Promise<AppellationDto[]> {
     const tokenData = await this.getAccessToken();
-    return this.#limiter.schedule(() =>
-      this.httpClient
-        .searchAppellations({
-          queryParams: { query, nb_results: maxResults * 10, tags: ["ROME4"] },
-          headers: {
-            Authorization: `Bearer ${tokenData.access_token}`,
-          },
-        })
-        .then(({ status, body }) =>
-          status === 200 ? diagorienteRawResponseToAppellationDto(body) : [],
-        ),
-    );
+    const cachedSearchAppellations = this.#withCache<string>({
+      overrideCacheDurationInHours: 24,
+      logParams: {
+        partner: "diagoriente",
+        route: diagorienteAppellationsRoutes.searchAppellations,
+      },
+      getCacheKey: (query) => `diagoriente_${query}`,
+      cb: (query): Promise<AppellationDto[]> =>
+        this.httpClient
+          .searchAppellations({
+            queryParams: {
+              query,
+              nb_results: maxResults * 10,
+              tags: ["ROME4"],
+            },
+            headers: {
+              Authorization: `Bearer ${tokenData.access_token}`,
+            },
+          })
+          .then(({ status, body }) =>
+            status === 200 ? diagorienteRawResponseToAppellationDto(body) : [],
+          ),
+    });
+
+    return this.#limiter.schedule(() => cachedSearchAppellations(rawQuery));
   }
 
   public getAccessToken(): Promise<DiagorienteAccessTokenResponse> {
