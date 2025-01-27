@@ -8,12 +8,12 @@ import { AppellationSearch } from "./AppellationSearch";
 describe("AppellationSearch", () => {
   let romeRepo: InMemoryRomeRepository;
   let appellationsGateway: InMemoryAppellationsGateway;
-  let useCase: AppellationSearch;
+  let appellationSearch: AppellationSearch;
 
   beforeEach(() => {
     romeRepo = new InMemoryRomeRepository();
     appellationsGateway = new InMemoryAppellationsGateway();
-    useCase = new AppellationSearch(
+    appellationSearch = new AppellationSearch(
       new InMemoryUowPerformer({
         ...createInMemoryUow(),
         romeRepository: romeRepo,
@@ -24,7 +24,7 @@ describe("AppellationSearch", () => {
 
   it("returns the list of found matches with ranges", async () => {
     expectToEqual(
-      await useCase.execute({
+      await appellationSearch.execute({
         searchText: "lapins",
         fetchAppellationsFromNaturalLanguage: false,
       }),
@@ -42,9 +42,9 @@ describe("AppellationSearch", () => {
     );
   });
 
-  it("returns the list of found matches with ranges from minimum search caracters", async () => {
+  it("returns the list of found matches with ranges from minimum search characters", async () => {
     expectToEqual(
-      await useCase.execute({
+      await appellationSearch.execute({
         searchText: "lap",
         fetchAppellationsFromNaturalLanguage: false,
       }),
@@ -64,7 +64,7 @@ describe("AppellationSearch", () => {
 
   it("issues no queries for short search texts", async () => {
     expectToEqual(
-      await useCase.execute({
+      await appellationSearch.execute({
         searchText: "l",
         fetchAppellationsFromNaturalLanguage: false,
       }),
@@ -74,7 +74,7 @@ describe("AppellationSearch", () => {
 
   it("returns empty list when no match is found", async () => {
     expectToEqual(
-      await useCase.execute({
+      await appellationSearch.execute({
         searchText: "unknown_search_term",
         fetchAppellationsFromNaturalLanguage: false,
       }),
@@ -107,7 +107,7 @@ describe("AppellationSearch", () => {
       ];
 
       expectToEqual(
-        await useCase.execute({
+        await appellationSearch.execute({
           searchText: "secret",
           fetchAppellationsFromNaturalLanguage: true,
         }),
@@ -154,7 +154,7 @@ describe("AppellationSearch", () => {
       ];
 
       expectToEqual(
-        await useCase.execute({
+        await appellationSearch.execute({
           searchText: "secret",
           fetchAppellationsFromNaturalLanguage: true,
         }),
@@ -174,7 +174,7 @@ describe("AppellationSearch", () => {
 
     it("returns empty array if no match", async () => {
       expectToEqual(
-        await useCase.execute({
+        await appellationSearch.execute({
           searchText: "unknown_search_term",
           fetchAppellationsFromNaturalLanguage: true,
         }),
@@ -182,9 +182,9 @@ describe("AppellationSearch", () => {
       );
     });
 
-    it("have a fallback when diagoriente appellations search returns empty array", async () => {
+    it("has a fallback when diagoriente appellations search returns empty array", async () => {
       expectToEqual(
-        await useCase.execute({
+        await appellationSearch.execute({
           searchText: "lapins",
           fetchAppellationsFromNaturalLanguage: true,
         }),
