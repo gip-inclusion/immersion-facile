@@ -1,7 +1,7 @@
 import { ZodError } from "zod";
 import { expectToEqual } from "../test.helpers";
 import { AssessmentDto, DateRange } from "./assessment.dto";
-import { assessmentSchema, withDateRangeSchema } from "./assessment.schema";
+import { assessmentDtoSchema, withDateRangeSchema } from "./assessment.schema";
 
 describe("Assessment schema date range", () => {
   it("accepts valid date range", () => {
@@ -46,7 +46,7 @@ describe("Assessment schema", () => {
       establishmentAdvices: "establishment advice",
       establishmentFeedback: "establishment feedback",
     };
-    const parsedAssessment = assessmentSchema.parse(assessment);
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
   });
 
@@ -62,7 +62,7 @@ describe("Assessment schema", () => {
       establishmentAdvices: "establishment advices",
       establishmentFeedback: "establishment feedback",
     };
-    const parsedAssessment = assessmentSchema.parse(assessment);
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
   });
 
@@ -74,7 +74,7 @@ describe("Assessment schema", () => {
       establishmentAdvices: "establishment advices",
       establishmentFeedback: "establishment feedback",
     };
-    const parsedAssessment = assessmentSchema.parse(assessment);
+    const parsedAssessment = assessmentDtoSchema.parse(assessment);
     expectToEqual(assessment, parsedAssessment);
   });
 
@@ -90,7 +90,7 @@ describe("Assessment schema", () => {
       establishmentAdvices: "my minimum establishment advices",
       establishmentFeedback: "my minimum establishment feedback",
     };
-    expect(() => assessmentSchema.parse(assessment)).toThrowError();
+    expect(() => assessmentDtoSchema.parse(assessment)).toThrowError();
   });
 });
 const expectDateRangeToFailWithError = (

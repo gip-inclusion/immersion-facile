@@ -3,7 +3,7 @@ import {
   ConventionDomainPayload,
   ConventionDto,
   ForbiddenError,
-  assessmentSchema,
+  assessmentDtoSchema,
   errors,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
@@ -26,7 +26,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
   ConventionDomainPayload | undefined,
   WithCreateNewEvent
 >(
-  { name: "CreateAssessment", inputSchema: assessmentSchema },
+  { name: "CreateAssessment", inputSchema: assessmentDtoSchema },
   async ({
     inputParams: assessment,
     uow,

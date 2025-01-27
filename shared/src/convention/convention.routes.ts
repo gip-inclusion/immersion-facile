@@ -1,7 +1,7 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
-import { assessmentSchema } from "../assessment/assessment.schema";
+import { assessmentDtoSchema } from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -25,7 +25,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/assessment",
     method: "post",
     ...withAuthorizationHeaders,
-    requestBodySchema: assessmentSchema,
+    requestBodySchema: assessmentDtoSchema,
     responses: {
       201: expressEmptyResponseBody,
       400: httpErrorSchema,
@@ -39,7 +39,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     method: "get",
     ...withAuthorizationHeaders,
     responses: {
-      200: assessmentSchema,
+      200: assessmentDtoSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

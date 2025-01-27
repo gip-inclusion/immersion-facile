@@ -1,15 +1,10 @@
 import { sql } from "kysely";
-import {
-  AssessmentStatus,
-  ConventionId,
-  DateString,
-  assessmentSchema,
-  errors,
-} from "shared";
+import { AssessmentStatus, ConventionId, DateString, errors } from "shared";
 import {
   KyselyDb,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
+import { assessmentEntitySchema } from "../../../utils/assessment";
 import { AssessmentEntity } from "../entities/AssessmentEntity";
 import { AssessmentRepository } from "../ports/AssessmentRepository";
 
@@ -25,17 +20,20 @@ const createAssessmentQueryBuilder = (transaction: KyselyDb) => {
       typeOfContract: eb.ref("type_of_contract"),
       lastDayOfPresence: sql<DateString>`date_to_iso(last_day_of_presence)`,
       numberOfMissedHours: eb.ref("number_of_missed_hours"),
+      numberOfHoursActuallyMade: eb.ref("number_of_hours_actually_made"),
     }).as("assessment"),
   ]);
 };
 
-const parseAssessmentSchema = (assessment: any) => {
-  return assessmentSchema.parse({
+const parseAssessmentEntitySchema = (assessment: any) =>
+  assessmentEntitySchema.parse({
+    _entityName: "Assessment",
     conventionId: assessment.conventionId,
     status: assessment.status,
     establishmentFeedback: assessment.establishmentFeedback,
     establishmentAdvices: assessment.establishmentAdvices,
     endedWithAJob: assessment.endedWithAJob,
+    numberOfHoursActuallyMade: assessment.numberOfHoursActuallyMade,
     ...(assessment.contractStartDate
       ? { contractStartDate: assessment.contractStartDate }
       : {}),
@@ -49,7 +47,6 @@ const parseAssessmentSchema = (assessment: any) => {
       ? { numberOfMissedHours: assessment.numberOfMissedHours }
       : {}),
   });
-};
 
 export class PgAssessmentRepository implements AssessmentRepository {
   constructor(private transaction: KyselyDb) {}
@@ -64,12 +61,7 @@ export class PgAssessmentRepository implements AssessmentRepository {
     const assessment = result?.assessment;
     if (!assessment) return;
 
-    const dto = parseAssessmentSchema(assessment);
-
-    return {
-      _entityName: "Assessment",
-      ...dto,
-    };
+    return parseAssessmentEntitySchema(assessment);
   }
 
   public async getByConventionIds(
@@ -81,12 +73,9 @@ export class PgAssessmentRepository implements AssessmentRepository {
       .where("convention_id", "in", conventionIds)
       .execute();
 
-    return result.map(({ assessment }) => {
-      return {
-        _entityName: "Assessment",
-        ...parseAssessmentSchema(assessment),
-      };
-    });
+    return result.map(({ assessment }) =>
+      parseAssessmentEntitySchema(assessment),
+    );
   }
 
   public async save(assessmentEntity: AssessmentEntity): Promise<void> {
@@ -112,6 +101,8 @@ export class PgAssessmentRepository implements AssessmentRepository {
           : null,
         establishment_feedback: assessmentEntity.establishmentFeedback,
         establishment_advices: assessmentEntity.establishmentAdvices,
+        number_of_hours_actually_made:
+          assessmentEntity.numberOfHoursActuallyMade,
       })
       .execute()
       .catch((error) => {

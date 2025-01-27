@@ -25,11 +25,13 @@ const convention = new ConventionDtoBuilder().withId(conventionId).build();
 const minimalAssessment: AssessmentEntity = {
   ...new AssessmentDtoBuilder().withMinimalInformations().build(),
   _entityName: "Assessment",
+  numberOfHoursActuallyMade: convention.schedule.totalHours,
 };
 
 const fullAssessment: AssessmentEntity = {
   ...new AssessmentDtoBuilder().withFullInformations().build(),
   _entityName: "Assessment",
+  numberOfHoursActuallyMade: convention.schedule.totalHours,
 };
 
 describe("PgAssessmentRepository", () => {
@@ -112,12 +114,10 @@ describe("PgAssessmentRepository", () => {
       expect(
         await db.selectFrom("immersion_assessments").selectAll().execute(),
       ).toHaveLength(1);
-      expectToEqual(
-        await assessmentRepository.getByConventionId(
-          fullAssessment.conventionId,
-        ),
-        fullAssessment,
+      const savedAssessment = await assessmentRepository.getByConventionId(
+        fullAssessment.conventionId,
       );
+      expectToEqual(savedAssessment, fullAssessment);
     });
   });
 
@@ -151,6 +151,7 @@ describe("PgAssessmentRepository", () => {
         endedWithAJob: false,
         establishmentFeedback: "Ca s'est bien passé",
         establishmentAdvices: "mon conseil",
+        numberOfHoursActuallyMade: 404,
         _entityName: "Assessment",
       };
 
