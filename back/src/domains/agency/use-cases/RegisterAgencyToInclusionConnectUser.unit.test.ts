@@ -73,7 +73,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
       );
     });
 
-    it("fails if user already has agency rights", async () => {
+    it("fails if user already has agency rights for agency", async () => {
       uow.userRepository.users = [user];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency1, {
@@ -117,6 +117,40 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
           payload: {
             userId: user.id,
             agencyIds: [agency1.id],
+            triggeredBy: { kind: "inclusion-connected", userId: user.id },
+          },
+        },
+      ]);
+    });
+
+    it("can register to another agency", async () => {
+      uow.userRepository.users = [user];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency1, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agency2, {}),
+      ];
+
+      await registerAgencyToInclusionConnectUser.execute([agency2.id], {
+        userId: user.id,
+      });
+
+      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.agencyRepository.agencies, [
+        toAgencyWithRights(agency1, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+        toAgencyWithRights(agency2, {
+          [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },
+        }),
+      ]);
+      expectArraysToMatch(uow.outboxRepository.events, [
+        {
+          topic: "AgencyRegisteredToInclusionConnectedUser",
+          payload: {
+            userId: user.id,
+            agencyIds: [agency2.id],
             triggeredBy: { kind: "inclusion-connected", userId: user.id },
           },
         },
