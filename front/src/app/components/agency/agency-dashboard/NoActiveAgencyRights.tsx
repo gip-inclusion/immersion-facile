@@ -1,13 +1,20 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { AgencyRight } from "shared";
+import Button from "@codegouvfr/react-dsfr/Button";
+import { useState } from "react";
+import { AgencyRight, InclusionConnectedUser } from "shared";
+import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { OnGoingAgencyRightsTable } from "../agencies-table/OnGoingAgencyRightsTable";
 
 export function NoActiveAgencyRights({
   toReviewAgencyRights,
+  currentUser,
 }: {
   toReviewAgencyRights: AgencyRight[];
+  currentUser: InclusionConnectedUser;
 }): JSX.Element {
+  const [showRegistrationForm, setShowRegistrationForm] =
+    useState<boolean>(false);
   return (
     <>
       <h2 className={fr.cx("fr-mt-2w")}>Suivi de mes demandes</h2>
@@ -41,6 +48,36 @@ export function NoActiveAgencyRights({
           <OnGoingAgencyRightsTable
             agenciesWithToReviewRights={toReviewAgencyRights}
           />
+        </div>
+      </div>
+
+      <div className={fr.cx("fr-grid-row")}>
+        <div
+          className={fr.cx(
+            "fr-hidden",
+            "fr-unhidden-lg",
+            "fr-col-2",
+            "fr-pr-2w",
+          )}
+        >
+          <div>
+            <img src={commonIllustrations.reachData} alt="attention" />
+          </div>
+        </div>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-10")}>
+          <h3>Vous travaillez ailleurs ?</h3>
+          {!showRegistrationForm && (
+            <Button
+              onClick={() => {
+                setShowRegistrationForm(() => true);
+              }}
+            >
+              Demander l'accès à d'autre organismes
+            </Button>
+          )}
+          {showRegistrationForm && (
+            <RegisterAgenciesForm currentUser={currentUser} />
+          )}
         </div>
       </div>
     </>

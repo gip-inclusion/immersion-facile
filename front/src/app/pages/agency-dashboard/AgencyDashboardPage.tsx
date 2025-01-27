@@ -50,7 +50,17 @@ export const AgencyDashboardPage = ({
                   description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
                 />
               );
-            return <RegisterAgenciesForm currentUser={currentUser} />;
+            return (
+              <>
+                <p className={fr.cx("fr-mt-4w")}>
+                  Bonjour {currentUser.firstName} {currentUser.lastName},
+                  recherchez un organisme afin d'accéder aux conventions et
+                  statistiques de ce dernier. Un administrateur vérifiera et
+                  validera votre demande.
+                </p>
+                <RegisterAgenciesForm currentUser={currentUser} />
+              </>
+            );
           },
         )
         .with(
@@ -71,6 +81,7 @@ export const AgencyDashboardPage = ({
             ) : (
               <NoActiveAgencyRights
                 toReviewAgencyRights={toReviewAgencyRights}
+                currentUser={currentUser}
               />
             );
           },

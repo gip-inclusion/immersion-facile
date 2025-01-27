@@ -20,7 +20,9 @@ import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnecte
 
 export const RegisterAgenciesForm = ({
   currentUser,
-}: { currentUser: InclusionConnectedUser }) => {
+}: {
+  currentUser: InclusionConnectedUser;
+}) => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<string>("");
   const inputElement = React.useRef<ElementRef<"input">>(null);
@@ -29,11 +31,6 @@ export const RegisterAgenciesForm = ({
   const [checkedAgencies, setCheckedAgencies] = useState<AgencyId[]>([]);
   return (
     <>
-      <p className={fr.cx("fr-mt-4w")}>
-        Bonjour {currentUser.firstName} {currentUser.lastName}, recherchez un
-        organisme afin d'accéder aux conventions et statistiques de ce dernier.
-        Un administrateur vérifiera et validera votre demande.
-      </p>
       <div className={fr.cx("fr-mt-4w", "fr-mb-2w")}>
         <Input
           label="Rechercher un organisme"
@@ -101,6 +98,7 @@ export const RegisterAgenciesForm = ({
               setCheckedAgencies={setCheckedAgencies}
               isAllChecked={isAllChecked}
               setIsAllChecked={setIsAllChecked}
+              currentUser={currentUser}
             />
           </section>
           <section>
@@ -126,14 +124,21 @@ const AgencyTable = ({
   setIsAllChecked,
   checkedAgencies,
   setCheckedAgencies,
+  currentUser,
 }: {
   isAllChecked: boolean;
   setIsAllChecked: (isAllChecked: boolean) => void;
   checkedAgencies: AgencyId[];
   setCheckedAgencies: (agencies: AgencyId[]) => void;
+  currentUser: InclusionConnectedUser;
 }) => {
   const isFetching = useAppSelector(agenciesSelectors.isLoading);
-  const agencies = useAppSelector(agenciesSelectors.options);
+  const userAgencyIds = currentUser.agencyRights.map(
+    (agencyRight) => agencyRight.agency.id,
+  );
+  const agencies = useAppSelector(agenciesSelectors.options).filter(
+    (agency) => !userAgencyIds.includes(agency.id),
+  );
 
   if (isFetching) return <p>Chargement en cours...</p>;
   if (agencies.length === 0)
