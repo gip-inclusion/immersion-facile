@@ -689,10 +689,9 @@ export const domElementIds = {
       inclusionConnectButton: "im-login-form__inclusion-connect-button--agency",
     },
     registerAgencies: {
-      form: "im-register-agencies-form",
-      agencyAutocomplete: "im-register-agencies-form__agency-autocomplete",
-      submitButton: "im-register-agencies-form__submit-button",
-      search: "im-register-agencies-form__searchbar",
+      table: "im-register-agencies-table",
+      search: "im-register-agencies__search",
+      submitButton: "im-register-agencies__submit-button",
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",

@@ -214,9 +214,9 @@ export const feedbackMapping: Record<
     },
     "create.success": {
       action: inclusionConnectedSlice.actions.registerAgenciesSucceeded,
-      title: "Demande de rattachement effectuée",
+      title: "Votre demande de rattachement a bien été prise en compte",
       message:
-        "Votre demande de première connexion a bien été reçue. Vous recevrez un email de confirmation dès qu'elle aura  été acceptée par nos équipes (2-7 jours ouvrés).",
+        "Elle sera étudiée prochainement par un administrateur et vous serez informé de sa décision.",
     },
     "create.error": {
       action: inclusionConnectedSlice.actions.registerAgenciesFailed,

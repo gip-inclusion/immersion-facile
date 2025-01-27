@@ -22,11 +22,11 @@ setup("authenticate as IC user establishment", async ({ page }) => {
 setup("authenticate as IC user agency", async ({ page }) => {
   await page.goto("/");
   await loginWithInclusionConnect(page, "agencyDashboard");
+
   await expect(
-    page.locator(
-      `#${domElementIds.agencyDashboard.registerAgencies.submitButton}`,
-    ),
+    page.locator(`#${domElementIds.agencyDashboard.registerAgencies.search}`),
   ).toBeVisible();
+
   await page.context().storageState({ path: agencyAuthFile });
 });
 
