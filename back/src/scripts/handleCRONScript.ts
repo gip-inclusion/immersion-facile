@@ -1,7 +1,7 @@
-import axios from "axios";
 import { calculateDurationInSecondsFrom } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { OpacifiedLogger, createLogger } from "../utils/logger";
+import { notifyTeam } from "../utils/notifyTeam";
 import { SentryInstance, configureSentry } from "./configureSentry";
 
 export const handleCRONScript = async <
@@ -80,7 +80,8 @@ const onScriptSuccess =
       monitorSlug: name,
       duration: durationInSeconds,
     });
-    return notifyDiscordPipelineReport(report).finally(() => process.exit(0));
+
+    return notifyTeam(report).finally(() => process.exit(0));
   };
 
 const onScriptError =
@@ -118,31 +119,5 @@ const onScriptError =
       duration: durationInSeconds,
     });
 
-    return notifyDiscordPipelineReport(report).finally(() => process.exit(1));
+    return notifyTeam(report).finally(() => process.exit(0));
   };
-
-const discordSizeLimit = 1950;
-const notifyDiscordPipelineReport = async (rawContent: string) => {
-  const config = AppConfig.createFromEnv();
-  const discordPipelineReportsWebhookUrl: string | undefined =
-    config.discordPipelineReportsWebhookUrl;
-
-  if (!discordPipelineReportsWebhookUrl) return;
-
-  const content = rawContent.slice(0, discordSizeLimit);
-
-  // This is intentionaly not awaited following a fire and forget logic.
-
-  await axios.post(
-    discordPipelineReportsWebhookUrl,
-    {
-      username: `${config.envType} - ${config.immersionFacileBaseUrl}`,
-      content,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8",
-      },
-    },
-  );
-};

@@ -7,22 +7,20 @@ const logger = createLogger(__filename);
 
 const discordSizeLimit = 1950;
 
-export const notifyTeam = (rawContent: string) => {
-  notifyDiscord(rawContent);
-  notifySlack(rawContent);
+export const notifyTeam = async (rawContent: string) => {
+  await notifyDiscord(rawContent);
+  await notifySlack(rawContent);
 };
 
-const notifyDiscord = (rawContent: string) => {
+const notifyDiscord = async (rawContent: string) => {
   const config = AppConfig.createFromEnv();
   const discordWebhookUrl = config.discordWebhookUrl;
 
-  if (!discordWebhookUrl) return;
+  if (!discordWebhookUrl) return Promise.resolve();
 
   const content = rawContent.slice(0, discordSizeLimit);
 
-  // This is intentionaly not awaited following a fire and forget logic.
-
-  axios
+  return axios
     .post(
       discordWebhookUrl,
       {
@@ -43,13 +41,13 @@ const notifyDiscord = (rawContent: string) => {
     });
 };
 
-const notifySlack = (rawContent: string) => {
+const notifySlack = async (rawContent: string) => {
   const config = AppConfig.createFromEnv();
   const slackBotToken = config.slackBotToken;
 
-  if (!slackBotToken) return;
+  if (!slackBotToken) return Promise.resolve();
 
-  axios
+  return axios
     .post(
       "https://slack.com/api/chat.postMessage",
       {
