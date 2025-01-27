@@ -302,7 +302,7 @@ const prettyPrintDaySchedule = (
     );
 };
 
-const calculateTotalImmersionHoursBetweenDateComplex = ({
+export const calculateTotalImmersionHoursBetweenDateComplex = ({
   dateStart,
   dateEnd,
   complexSchedule,

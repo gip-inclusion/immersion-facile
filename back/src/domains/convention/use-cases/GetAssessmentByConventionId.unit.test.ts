@@ -72,6 +72,7 @@ describe("GetAssessmentByConventionId", () => {
     uow.assessmentRepository.setAssessments([
       {
         _entityName: "Assessment",
+        numberOfHoursActuallyMade: convention.schedule.totalHours,
         ...assessment,
       },
     ]);

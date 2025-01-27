@@ -39,7 +39,7 @@ const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
     }),
   ]);
 
-export const assessmentSchema: z.Schema<AssessmentDto> = z
+export const assessmentDtoSchema: z.Schema<AssessmentDto> = z
   .object({
     conventionId: z.string(),
   })
@@ -48,7 +48,7 @@ export const assessmentSchema: z.Schema<AssessmentDto> = z
   .and(withEndedWithAJobSchema);
 
 export const withAssessmentSchema: z.Schema<WithAssessmentDto> = z.object({
-  assessment: assessmentSchema,
+  assessment: assessmentDtoSchema,
 });
 
 export const withDateRangeSchema: z.Schema<DateRange> = z

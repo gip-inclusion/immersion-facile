@@ -13,6 +13,7 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   makeEmailHash,
+  reasonableSchedule,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -128,7 +129,11 @@ describe("CreateAssessment", () => {
 
     it("throws ConflictError if the assessment already exists for the Convention", async () => {
       uow.assessmentRepository.setAssessments([
-        { ...assessment, _entityName: "Assessment" },
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
+        },
       ]);
       await expectPromiseToFailWithError(
         createAssessment.execute(assessment, tutorPayload),
@@ -213,10 +218,48 @@ describe("CreateAssessment", () => {
           {
             ...assessment,
             _entityName: "Assessment",
+            numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
           },
         ]);
       },
     );
+
+    it("should create an assessment with correct duration when partially completed", async () => {
+      const convention = new ConventionDtoBuilder(validatedConvention)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateStart(new Date("2025-01-20").toISOString())
+        .withDateEnd(new Date("2025-01-24").toISOString())
+        .withSchedule(reasonableSchedule)
+        .build();
+
+      const partiallyCompletedAssessment: AssessmentDto = {
+        conventionId: validatedConvention.id,
+        status: "PARTIALLY_COMPLETED",
+        lastDayOfPresence: new Date("2025-01-23").toISOString(),
+        numberOfMissedHours: 2.5,
+        endedWithAJob: false,
+        establishmentFeedback: "Ca c'est bien passé",
+        establishmentAdvices: "mon conseil",
+      };
+
+      uow.conventionRepository.setConventions([convention]);
+
+      await createAssessment.execute(partiallyCompletedAssessment, {
+        ...tutorPayload,
+        role: "establishment-tutor",
+        emailHash: makeHashByRolesForTest(convention, counsellor, validator)[
+          "establishment-tutor"
+        ],
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...partiallyCompletedAssessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: 25.5, // 4 days * 7 hours - 2.5 missed hours
+        },
+      ]);
+    });
 
     it("should dispatch an AssessmentCreated event", async () => {
       await createAssessment.execute(assessment, tutorPayload);

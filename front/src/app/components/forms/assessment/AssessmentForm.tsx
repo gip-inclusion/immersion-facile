@@ -23,7 +23,7 @@ import {
   ConventionReadDto,
   DotNestedKeys,
   InternshipKind,
-  assessmentSchema,
+  assessmentDtoSchema,
   assessmentStatuses,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
@@ -90,7 +90,7 @@ export const AssessmentForm = ({
     endedWithAJob: false,
   };
   const methods = useForm<AssessmentDto>({
-    resolver: zodResolver(assessmentSchema),
+    resolver: zodResolver(assessmentDtoSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });

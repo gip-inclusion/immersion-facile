@@ -3,9 +3,12 @@ import {
   ConventionDomainPayload,
   ConventionDto,
   Role,
+  assessmentDtoSchema,
   errors,
   isSomeEmailMatchingEmailHash,
 } from "shared";
+import { z } from "zod";
+import { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 
 export const throwForbiddenIfNotAllowedForAssessments = (
   convention: ConventionDto,
@@ -21,6 +24,14 @@ export const throwForbiddenIfNotAllowedForAssessments = (
   if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
     throw errors.assessment.forbidden();
 };
+
+export const assessmentEntitySchema: z.Schema<AssessmentEntity> =
+  assessmentDtoSchema.and(
+    z.object({
+      _entityName: z.literal("Assessment"),
+      numberOfHoursActuallyMade: z.number().or(z.null()),
+    }),
+  );
 
 const assessmentEmailsByRole = (
   convention: ConventionDto,
