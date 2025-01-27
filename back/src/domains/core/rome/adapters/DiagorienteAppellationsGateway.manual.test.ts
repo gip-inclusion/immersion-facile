@@ -2,6 +2,7 @@ import { expectObjectsToMatch } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
 import {
   DiagorienteAppellationsGateway,
@@ -31,6 +32,7 @@ describe("DiagorienteAppellationsGateway", () => {
         clientId: config.diagorienteApiClientId,
         clientSecret: config.diagorienteApiClientSecret,
       },
+      withNoCache,
     );
   });
 
