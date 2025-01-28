@@ -11,7 +11,7 @@ import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { SiretGateway } from "../../core/sirene/ports/SirenGateway";
+import { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";

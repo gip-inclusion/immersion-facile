@@ -20,7 +20,7 @@ import { createLogger } from "../../../../utils/logger";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { SiretGateway } from "../ports/SirenGateway";
+import { SiretGateway } from "../ports/SiretGateway";
 import { InseeExternalRoutes } from "./InseeSiretGateway.routes";
 
 const logger = createLogger(__filename);
