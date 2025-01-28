@@ -8,7 +8,7 @@ import {
   tooManySirenRequestsSiret,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { SiretGateway } from "../ports/SirenGateway";
+import { SiretGateway } from "../ports/SiretGateway";
 
 const logger = createLogger(__filename);
 

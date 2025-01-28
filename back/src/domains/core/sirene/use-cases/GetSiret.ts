@@ -5,7 +5,7 @@ import {
 } from "shared";
 import { UseCase } from "../../UseCase";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
-import { SiretGateway } from "../ports/SirenGateway";
+import { SiretGateway } from "../ports/SiretGateway";
 
 export class GetSiret extends UseCase<
   GetSiretRequestDto,
