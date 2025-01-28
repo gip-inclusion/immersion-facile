@@ -1,4 +1,4 @@
-import { expectObjectsToMatch } from "shared";
+import { expectObjectsToMatch, sleep } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
@@ -56,6 +56,33 @@ describe("DiagorienteAppellationsGateway", () => {
   });
 
   describe("searchAppellations", () => {
+    it("fetches search corretly", async () => {
+      const result = await appellationsGateway.searchAppellations("luthier");
+      await sleep(1000);
+      expect(result).toEqual([
+        {
+          appellationCode: "16229",
+          appellationLabel: "Luthier / Luthière",
+        },
+        {
+          appellationCode: "16231",
+          appellationLabel: "Luthier / Luthière guitare",
+        },
+        {
+          appellationCode: "16232",
+          appellationLabel: "Luthier / Luthière vents",
+        },
+        {
+          appellationCode: "16230",
+          appellationLabel: "Luthier / Luthière du quatuor",
+        },
+        {
+          appellationCode: "38279",
+          appellationLabel: "Flûtiste",
+        },
+      ]);
+    });
+
     const parallelCalls = 100;
     it.each([
       {
