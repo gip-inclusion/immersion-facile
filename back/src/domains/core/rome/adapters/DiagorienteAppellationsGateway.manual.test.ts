@@ -172,5 +172,28 @@ describe("DiagorienteAppellationsGateway", () => {
       },
       parallelCalls * requestMinTime * 10 + 500,
     );
+
+    it("fallsback to empty array when duration is over maximum", async () => {
+      const config = AppConfig.createFromEnv();
+      const maxDurationMs = 100;
+      const appellationsGatewayWithLowMaxDuration =
+        new DiagorienteAppellationsGateway(
+          createFetchSharedClient(diagorienteAppellationsRoutes, fetch),
+          cachingGateway,
+          {
+            clientId: config.diagorienteApiClientId,
+            clientSecret: config.diagorienteApiClientSecret,
+          },
+          withNoCache,
+          maxDurationMs,
+        );
+
+      const appellations =
+        await appellationsGatewayWithLowMaxDuration.searchAppellations(
+          "design",
+        );
+
+      expect(appellations).toEqual([]);
+    });
   });
 });

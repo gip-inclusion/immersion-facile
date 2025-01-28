@@ -1,6 +1,8 @@
 import Bottleneck from "bottleneck";
-import { AppellationDto, appellationCodeSchema } from "shared";
+import { AppellationDto, appellationCodeSchema, sleep } from "shared";
 import { HttpClient } from "shared-routes";
+import { partnerNames } from "../../../../config/bootstrap/partnerNames";
+import { createLogger } from "../../../../utils/logger";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { WithCache } from "../../caching-gateway/port/WithCache";
 import { AppellationsGateway } from "../ports/AppellationsGateway";
@@ -20,6 +22,8 @@ export const requestMinTime = Math.floor(
   ONE_SECOND_MS / diagorienteMaxCallRatePerSeconds,
 );
 
+const logger = createLogger(__filename);
+
 export class DiagorienteAppellationsGateway implements AppellationsGateway {
   #limiter = new Bottleneck({
     reservoir: diagorienteMaxCallRatePerSeconds,
@@ -30,6 +34,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   });
 
   #withCache: WithCache;
+  #maxQueryDurationMs: number;
 
   constructor(
     private readonly httpClient: HttpClient<DiagorienteAppellationsRoutes>,
@@ -39,8 +44,10 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
       clientSecret: string;
     },
     withCache: WithCache,
+    maxQueryDurationMs = 700,
   ) {
     this.#withCache = withCache;
+    this.#maxQueryDurationMs = maxQueryDurationMs;
   }
 
   async searchAppellations(rawQuery: string): Promise<AppellationDto[]> {
@@ -69,7 +76,31 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
           ),
     });
 
-    return this.#limiter.schedule(() => cachedSearchAppellations(rawQuery));
+    return this.#limiter.schedule(() => {
+      const apiCallPromise = cachedSearchAppellations(rawQuery);
+
+      return Promise.race([
+        apiCallPromise,
+        sleep(this.#maxQueryDurationMs).then(() => {
+          logger.warn({
+            partnerApiCall: {
+              partnerName: partnerNames.diagoriente,
+              durationInMs: this.#maxQueryDurationMs,
+              route: diagorienteAppellationsRoutes.searchAppellations,
+              response: {
+                kind: "failure",
+                status: 504,
+                body: {
+                  message: `Timeout on immersion facilitée side - more than ${this.#maxQueryDurationMs} ms to response`,
+                },
+              },
+            },
+          });
+
+          return [];
+        }),
+      ]);
+    });
   }
 
   public getAccessToken(): Promise<DiagorienteAccessTokenResponse> {

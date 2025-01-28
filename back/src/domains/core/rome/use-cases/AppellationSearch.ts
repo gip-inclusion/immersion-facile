@@ -2,17 +2,14 @@ import {
   AppellationAndRomeDto,
   AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
-  sleep,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
-import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
 import { findMatchRanges } from "../../../../utils/textSearch";
 import { TransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { diagorienteAppellationsRoutes } from "../adapters/DiagorienteAppellationsGateway.routes";
 import { AppellationsGateway } from "../ports/AppellationsGateway";
 
 const logger = createLogger(__filename);
@@ -80,32 +77,8 @@ export class AppellationSearch extends TransactionalUseCase<
     uow: UnitOfWork,
     searchText: string,
   ): Promise<AppellationAndRomeDto[]> {
-    const apiCallPromise =
-      this.#appellationsGateway.searchAppellations(searchText);
-
-    const maxDurationMs = 700;
-
-    const appellations = await Promise.race([
-      apiCallPromise,
-      sleep(maxDurationMs).then(() => {
-        logger.warn({
-          partnerApiCall: {
-            partnerName: partnerNames.diagoriente,
-            durationInMs: maxDurationMs,
-            route: diagorienteAppellationsRoutes.searchAppellations,
-            response: {
-              kind: "failure",
-              status: 504,
-              body: {
-                message: `Timeout on immersion facilitée side - more than ${maxDurationMs} ms to response`,
-              },
-            },
-          },
-        });
-
-        return [];
-      }),
-    ]);
+    const appellations =
+      await this.#appellationsGateway.searchAppellations(searchText);
 
     if (appellations.length === 0) return [];
 
