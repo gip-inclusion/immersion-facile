@@ -72,27 +72,32 @@ export const RegisterAgenciesForm = ({
       {inputValue.length > 0 && (
         <>
           <section className={fr.cx("fr-mt-6w")}>
-            <strong>Résultats pour votre recherche "{inputValue}"</strong>
-            <p className={fr.cx("fr-hint-text")}>
-              {checkedAgencies.length}{" "}
-              {checkedAgencies.length <= 1
-                ? "organisme sélectionné"
-                : "organismes sélectionnés"}
-            </p>
-            <Button
-              id={domElementIds.agencyDashboard.registerAgencies.submitButton}
-              onClick={() => {
-                dispatch(
-                  inclusionConnectedSlice.actions.registerAgenciesRequested({
-                    agencies: checkedAgencies,
-                    feedbackTopic: "dashboard-agency-register-user",
-                  }),
-                );
-              }}
-              disabled={checkedAgencies.length === 0}
-            >
-              Demander l'accès aux organismes sélectionnés
-            </Button>
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
+                <strong>Résultats pour votre recherche "{inputValue}"</strong>
+                <p className={fr.cx("fr-hint-text")}>
+                  {checkedAgencies.length}{" "}
+                  {checkedAgencies.length <= 1
+                    ? "organisme sélectionné"
+                    : "organismes sélectionnés"}
+                </p>
+              </div>
+              <Button
+                className={fr.cx("fr-col-12", "fr-col-md-4")}
+                id={domElementIds.agencyDashboard.registerAgencies.submitButton}
+                onClick={() => {
+                  dispatch(
+                    inclusionConnectedSlice.actions.registerAgenciesRequested({
+                      agencies: checkedAgencies,
+                      feedbackTopic: "dashboard-agency-register-user",
+                    }),
+                  );
+                }}
+                disabled={checkedAgencies.length === 0}
+              >
+                Demander l'accès aux organismes sélectionnés
+              </Button>
+            </div>
             <AgencyTable
               checkedAgencies={checkedAgencies}
               setCheckedAgencies={setCheckedAgencies}
