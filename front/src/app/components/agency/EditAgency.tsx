@@ -3,6 +3,7 @@ import React from "react";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
+import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -28,6 +29,7 @@ export const EditAgency = () => {
       {/* //Todo remove this from agency tab to redirect on agency detail admin page when select an agency in autocomplete */}
       {agency && (
         <>
+          <CopyAgencyId agencyId={agency.id} />
           <AgencyTag
             refersToAgencyName={agency.refersToAgencyName}
             className={fr.cx("fr-my-4w")}

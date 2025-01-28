@@ -1,18 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Badge } from "@codegouvfr/react-dsfr/Badge";
-import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { AgencyDto } from "shared";
-
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
 import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
+import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
+
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { routes } from "src/app/routes/routes";
 
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -40,23 +38,11 @@ export const AgencyOverview = ({
 }: AgencyOverviewProps) => {
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
 
-  const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
-    useCopyButton("Copier");
-
   return (
     <div>
       <h1 className={fr.cx("fr-h1")}>{agency.name}</h1>
-      <div>
-        Id de l'agence : <Badge severity="success">{agency.id}</Badge>{" "}
-        <Button
-          type="button"
-          disabled={copyButtonIsDisabled}
-          iconId={"fr-icon-clipboard-fill"}
-          onClick={() => onCopyButtonClick(agency.id)}
-        >
-          {copyButtonLabel}
-        </Button>
-      </div>
+      <CopyAgencyId agencyId={agency.id} />
+
       {/* //Todo remove after feedback refactor */}
       {routeName === "adminAgencies" || routeName === "adminAgencyDetail" ? (
         <SubmitFeedbackNotification
