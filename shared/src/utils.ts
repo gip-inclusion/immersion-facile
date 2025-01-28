@@ -11,6 +11,17 @@ export const sleep = (ms: number): Promise<void> =>
     setTimeout(resolve, ms);
   });
 
+export const cancellableSleep = (ms: number) => {
+  let timeout: NodeJS.Timeout;
+
+  return {
+    promise: new Promise((resolve: (args: void) => void) => {
+      timeout = setTimeout(resolve, ms);
+    }),
+    cancel: () => clearTimeout(timeout),
+  };
+};
+
 export type RandomFn = typeof random;
 export const random = (max: number): number => Math.floor(Math.random() * max);
 

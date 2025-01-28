@@ -1,5 +1,9 @@
 import Bottleneck from "bottleneck";
-import { AppellationDto, appellationCodeSchema, sleep } from "shared";
+import {
+  AppellationDto,
+  appellationCodeSchema,
+  cancellableSleep,
+} from "shared";
 import { HttpClient } from "shared-routes";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
@@ -79,9 +83,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
     return this.#limiter.schedule(() => {
       const apiCallPromise = cachedSearchAppellations(rawQuery);
 
+      const sleeping = cancellableSleep(this.#maxQueryDurationMs);
+
       return Promise.race([
-        apiCallPromise,
-        sleep(this.#maxQueryDurationMs).then(() => {
+        apiCallPromise.finally(() => sleeping.cancel()),
+        sleeping.promise.then(() => {
           logger.warn({
             partnerApiCall: {
               partnerName: partnerNames.diagoriente,
