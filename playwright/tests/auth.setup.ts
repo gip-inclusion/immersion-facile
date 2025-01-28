@@ -7,22 +7,22 @@ const { adminAuthFile, establishmentAuthFile, agencyAuthFile } = testConfig;
 setup("authenticate as admin", async ({ page }) => {
   await page.goto("/");
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
-  await loginWithInclusionConnect(page, "admin");
+  await loginWithIdentityProvider(page, "admin", "ProConnect");
   await expect(adminButton).toBeVisible();
   await page.context().storageState({ path: adminAuthFile });
 });
 
 setup("authenticate as IC user establishment", async ({ page }) => {
   await page.goto("/");
-  await loginWithInclusionConnect(page, "establishmentDashboard");
+  await loginWithIdentityProvider(page, "establishmentDashboard", "ProConnect");
   await expect(page.locator(".fr-tabs__list")).toBeVisible();
   await page.context().storageState({ path: establishmentAuthFile });
 });
 
 setup("authenticate as IC user agency", async ({ page }) => {
   await page.goto("/");
-  await loginWithInclusionConnect(page, "agencyDashboard");
 
+  await loginWithIdentityProvider(page, "agencyDashboard", "ProConnect");
   await expect(
     page.locator(`#${domElementIds.agencyDashboard.registerAgencies.search}`),
   ).toBeVisible();
@@ -30,12 +30,15 @@ setup("authenticate as IC user agency", async ({ page }) => {
   await page.context().storageState({ path: agencyAuthFile });
 });
 
-const loginWithInclusionConnect = async (
+type ProviderMode = "ProConnect" | "InclusionConnect";
+
+const loginWithIdentityProvider = async (
   page: Page,
   routeName: "agencyDashboard" | "establishmentDashboard" | "admin",
+  identityProviderMode: ProviderMode,
 ) => {
   const { loginButtonId, navLink, username, password, headerNavLink } =
-    buttonByRouteName[routeName];
+    buttonByRouteName(identityProviderMode)[routeName];
 
   if (routeName === "admin") {
     await page.goto("/admin");
@@ -47,21 +50,36 @@ const loginWithInclusionConnect = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }
 
-  const inclusionConnectButton = await page.locator(`#${loginButtonId}`);
-  await expect(inclusionConnectButton).toBeVisible();
+  const authButton = await page.locator(`#${loginButtonId}`);
+  await expect(authButton).toBeVisible();
 
-  await inclusionConnectButton.click();
-  await page.waitForURL(`${testConfig.inclusionConnect.baseUrl}/**`);
+  await authButton.click();
+  await page.waitForURL(
+    `${getAuthEnvVarByIdentityProviderMode(identityProviderMode).baseUrl}/**`,
+  );
   await page.waitForLoadState("domcontentloaded");
   await page.waitForSelector("input[name=email]");
   await page.fill("input[name=email]", username);
+
+  if (identityProviderMode === "ProConnect")
+    await page
+      .locator("button[type='submit']")
+      .getByText("Continuer", {
+        exact: false,
+      })
+      .click();
+
   await page.fill("input[name=password]", password);
-  await page
-    .locator("button[type='submit']")
-    .getByText("Connexion", {
-      exact: false,
-    })
-    .click();
+
+  identityProviderMode === "ProConnect"
+    ? await page.getByRole("button", { name: /identifier/ }).click()
+    : await page
+        .locator("button[type='submit']")
+        .getByText("Connexion", {
+          exact: false,
+        })
+        .click();
+
   await page.waitForURL(`${frontRoutes[routeName]}**`);
   expect(page.url()).toContain(frontRoutes[routeName]);
 };
@@ -71,7 +89,9 @@ type InclusionConnectRoute =
   | "establishmentDashboard"
   | "admin";
 
-const buttonByRouteName: Record<
+const buttonByRouteName = (
+  identityProviderMode: ProviderMode,
+): Record<
   InclusionConnectRoute,
   {
     loginButtonId: string;
@@ -80,26 +100,38 @@ const buttonByRouteName: Record<
     password: string;
     headerNavLink?: string;
   }
-> = {
-  agencyDashboard: {
-    loginButtonId: domElementIds.agencyDashboard.login.inclusionConnectButton,
-    navLink: domElementIds.header.navLinks.agency.dashboard,
-    username: testConfig.inclusionConnect.username,
-    password: testConfig.inclusionConnect.password,
-    headerNavLink: "fr-header-main-navigation-button-3",
-  },
-  establishmentDashboard: {
-    loginButtonId:
-      domElementIds.establishmentDashboard.login.inclusionConnectButton,
-    navLink: domElementIds.header.navLinks.establishment.dashboard,
-    username: testConfig.inclusionConnect.username,
-    password: testConfig.inclusionConnect.password,
-    headerNavLink: "fr-header-main-navigation-button-2",
-  },
-  admin: {
-    loginButtonId: domElementIds.admin.login.inclusionConnectButton,
-    navLink: domElementIds.header.navLinks.admin.backOffice,
-    username: testConfig.inclusionConnect.adminUsername,
-    password: testConfig.inclusionConnect.adminPassword,
-  },
+> => {
+  const { username, password, adminUsername, adminPassword } =
+    getAuthEnvVarByIdentityProviderMode(identityProviderMode);
+
+  return {
+    agencyDashboard: {
+      loginButtonId: domElementIds.agencyDashboard.login.inclusionConnectButton,
+      navLink: domElementIds.header.navLinks.agency.dashboard,
+      username,
+      password,
+      headerNavLink: "fr-header-main-navigation-button-3",
+    },
+    establishmentDashboard: {
+      loginButtonId:
+        domElementIds.establishmentDashboard.login.inclusionConnectButton,
+      navLink: domElementIds.header.navLinks.establishment.dashboard,
+      username,
+      password,
+      headerNavLink: "fr-header-main-navigation-button-2",
+    },
+    admin: {
+      loginButtonId: domElementIds.admin.login.inclusionConnectButton,
+      navLink: domElementIds.header.navLinks.admin.backOffice,
+      username: adminUsername,
+      password: adminPassword,
+    },
+  };
 };
+
+const getAuthEnvVarByIdentityProviderMode = (identityProviderMode: string) =>
+  testConfig[
+    identityProviderMode === "InclusionConnect"
+      ? "inclusionConnect"
+      : "proConnect"
+  ];
