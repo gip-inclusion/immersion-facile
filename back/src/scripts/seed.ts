@@ -176,7 +176,7 @@ const featureFlagsSeed = async (uow: UnitOfWork) => {
       severity: "warning",
     }),
     enableSearchByScore: makeBooleanFeatureFlag(true),
-    enableProConnect: makeBooleanFeatureFlag(false),
+    enableProConnect: makeBooleanFeatureFlag(true),
     enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
