@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect, useState } from "react";
 import {
@@ -194,6 +195,9 @@ export const ConventionDocumentPage = ({
   return (
     <MainWrapper layout="default" vSpacing={8}>
       {isPdfLoading && <Loader />}
+      {!canShowConvention && (
+        <Alert severity="error" title="La convention n'est pas accessible" />
+      )}
       {canShowConvention && (
         <ConventionDocument
           logos={logos}
