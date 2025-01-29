@@ -31,7 +31,7 @@ export const AgenciesTablesSection = ({
   onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
 }) => {
   if (!agencyRights.length)
-    return <p>Cet utilisateur n'est lié à aucune agence</p>;
+    return <p>Cet utilisateur n'est lié à aucun organisme.</p>;
 
   const [selectedAgencyRight, setSelectedAgencyRight] =
     useState<AgencyRight | null>(null);
@@ -53,6 +53,7 @@ export const AgenciesTablesSection = ({
             Demandes d'accès en cours ({toReviewAgencyRights.length}{" "}
             {toReviewAgencyRights.length === 1 ? "agence" : "agences"})
           </h2>
+
           <OnGoingAgencyRightsTable
             agenciesWithToReviewRights={toReviewAgencyRights}
           />

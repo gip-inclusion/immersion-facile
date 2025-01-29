@@ -29,6 +29,7 @@ import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/E
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
+import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
 import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
@@ -201,6 +202,7 @@ const getPageByRouteName: {
       <MyProfile route={route} />
     </InclusionConnectedPrivateRoute>
   ),
+  myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
   openApiDoc: () => <OpenApiDocPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,

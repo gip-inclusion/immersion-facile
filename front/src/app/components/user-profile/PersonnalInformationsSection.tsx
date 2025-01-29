@@ -10,18 +10,12 @@ export const PersonnalInformationsSection = ({
   editInformationsLink?: string;
 }) => (
   <>
-    <h2 className={fr.cx("fr-h4")}>Informations personnelles</h2>
+    <h2 className={fr.cx("fr-h4", "fr-mt-2w")}>Informations personnelles</h2>
 
-    <ul className={fr.cx("fr-text--sm", "fr-mb-2w")}>
-      <li>Id de l'utilisateur: {user.id}</li>
-      <li id={domElementIds.profile.email}>Email : {user.email}</li>
-      {user.firstName && (
-        <li id={domElementIds.profile.firstName}>Prénom : {user.firstName}</li>
-      )}
-      {user.lastName && (
-        <li id={domElementIds.profile.lastName}>Nom : {user.lastName}</li>
-      )}
-    </ul>
+    <p>
+      Pour modifier vos informations personnelles, vous devez passer par votre
+      compte ProConnect créé avec l'email : {user.email}
+    </p>
 
     {editInformationsLink && (
       <Button
@@ -33,7 +27,7 @@ export const PersonnalInformationsSection = ({
         }}
         id={domElementIds.profile.updateOwnInfosLink}
       >
-        Modifier mes informations
+        Changer mes informations sur ProConnect
       </Button>
     )}
   </>
