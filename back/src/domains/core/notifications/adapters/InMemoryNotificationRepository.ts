@@ -1,15 +1,19 @@
 import { parseISO } from "date-fns";
+import { difference } from "ramda";
 import {
   AgencyDto,
   AgencyWithUsersRights,
   ConventionDto,
+  ConventionId,
   EmailNotification,
+  EmailType,
   Notification,
   NotificationId,
   NotificationKind,
   ShortLinkId,
   Signatory,
   SmsNotification,
+  SmsTemplateByName,
   TemplatedEmail,
   concatValidatorNames,
   displayEmergencyContactInfos,
@@ -22,6 +26,36 @@ import { NotificationRepository } from "../ports/NotificationRepository";
 export class InMemoryNotificationRepository implements NotificationRepository {
   // for tests purposes
   public notifications: Notification[] = [];
+
+  public async getConventionIdsWithoutNotifications({
+    emailType,
+    smsType,
+    conventionIds,
+  }: {
+    emailType?: EmailType;
+    smsType?: keyof SmsTemplateByName;
+    conventionIds: ConventionId[];
+  }): Promise<ConventionId[]> {
+    const conventionsWithNotifications = this.notifications
+      .filter(
+        (notification) =>
+          notification.followedIds.conventionId &&
+          conventionIds.includes(notification.followedIds.conventionId),
+      )
+      .filter((notification) => {
+        if (emailType && notification.kind === "email") {
+          return notification.templatedContent.kind === emailType;
+        }
+        if (smsType && notification.kind === "sms") {
+          return notification.templatedContent.kind === smsType;
+        }
+        return false;
+      })
+      .map((notification) => notification.followedIds.conventionId)
+      .filter((id): id is ConventionId => id !== null);
+
+    return difference(conventionIds, conventionsWithNotifications);
+  }
 
   async getSmsByIds(ids: NotificationId[]): Promise<SmsNotification[]> {
     return getNotificationsMatchingKindAndIds("sms", this.notifications, ids);
