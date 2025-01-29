@@ -157,6 +157,46 @@ test.describe("User workflow", () => {
       ).toHaveCount(0);
     });
 
+    test("can request to register on agencies from MyProfile page", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await goToMyProfilePage(page);
+
+      await expect(
+        page.locator(`#${domElementIds.profile.registerAgenciesSearchLink}`),
+      ).toBeVisible();
+      await page
+        .locator(`#${domElementIds.profile.registerAgenciesSearchLink}`)
+        .click();
+
+      await expect(
+        page.locator(
+          `#${domElementIds.agencyDashboard.registerAgencies.search}`,
+        ),
+      ).toBeVisible();
+      await page
+        .locator(`#${domElementIds.agencyDashboard.registerAgencies.search}`)
+        .fill("Cap emploi");
+
+      await page
+        .locator(
+          `#${domElementIds.agencyDashboard.registerAgencies.table} table tbody tr .fr-checkbox-group`,
+        )
+        .first()
+        .click();
+
+      await page
+        .locator(
+          `#${domElementIds.agencyDashboard.registerAgencies.submitButton}`,
+        )
+        .click();
+
+      await expect(
+        await page.locator(".fr-alert--success").first(),
+      ).toBeVisible();
+    });
+
     test("has access to his notification preferences", async ({ page }) => {
       await page.goto("/");
       await goToMyProfilePage(page);
