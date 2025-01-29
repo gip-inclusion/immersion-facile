@@ -382,6 +382,98 @@ describe("PgNotificationRepository", () => {
       });
     });
   });
+
+  describe("getConventionIdWithoutNotifications", () => {
+    const conventionId = "cccccccc-1111-4111-1111-cccccccccccc";
+    beforeEach(async () => {
+      const emailNotification: EmailNotification = {
+        kind: "email",
+        id: "22222222-2222-4000-2222-222222222222",
+        createdAt: subHours(now, 3).toISOString(),
+        followedIds: { agencyId, conventionId },
+        templatedContent: {
+          kind: "SIGNATORY_FIRST_REMINDER",
+          recipients: ["lulu@mail.com"],
+          cc: ["bob@mail.com"],
+          params: {
+            actorFirstName: "firstname",
+            actorLastName: "lastname",
+            beneficiaryFirstName: "John",
+            beneficiaryLastName: "Doe",
+            businessName: "Lulu et cie",
+            conventionId,
+            magicLinkUrl: "http://magiclink",
+            signatoriesSummary: "",
+          },
+          attachments: [
+            {
+              url: "http://my-file.com",
+            },
+          ],
+        },
+      };
+      const smsNotification: SmsNotification = {
+        id: smsNotificationId,
+        kind: "sms",
+        createdAt: new Date("2023-01-01").toISOString(),
+        followedIds: { conventionId: conventionId },
+        templatedContent: sms,
+      };
+      await pgNotificationRepository.save(emailNotification);
+      await pgNotificationRepository.save(smsNotification);
+    });
+
+    it("should get 0 convention that has no email SIGNATORY_FIRST_REMINDER notification", async () => {
+      const conventionIds =
+        await pgNotificationRepository.getConventionIdsWithoutNotifications({
+          emailType: "SIGNATORY_FIRST_REMINDER",
+          conventionIds: [conventionId],
+        });
+
+      expect(conventionIds.length).toBe(0);
+    });
+
+    it("should get 0 convention that has no sms FirstReminderForSignatories notification", async () => {
+      const conventionIds =
+        await pgNotificationRepository.getConventionIdsWithoutNotifications({
+          smsType: "FirstReminderForSignatories",
+          conventionIds: [conventionId],
+        });
+
+      expect(conventionIds.length).toBe(0);
+    });
+
+    it("should get 1 convention that has no email NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION notification", async () => {
+      const conventionIds =
+        await pgNotificationRepository.getConventionIdsWithoutNotifications({
+          emailType: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          conventionIds: [conventionId],
+        });
+
+      expect(conventionIds).toEqual([conventionId]);
+    });
+
+    it("should get 1 convention that has no sms LastReminderForSignatories notification", async () => {
+      const conventionIds =
+        await pgNotificationRepository.getConventionIdsWithoutNotifications({
+          smsType: "LastReminderForSignatories",
+          conventionIds: [conventionId],
+        });
+
+      expect(conventionIds).toEqual([conventionId]);
+    });
+
+    it("should get 1 convention that has an no sms nor email notification", async () => {
+      const conventionIds =
+        await pgNotificationRepository.getConventionIdsWithoutNotifications({
+          smsType: "LastReminderForSignatories",
+          emailType: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          conventionIds: [conventionId],
+        });
+
+      expect(conventionIds).toEqual([conventionId]);
+    });
+  });
 });
 
 const createTemplatedEmailAndNotification = ({
