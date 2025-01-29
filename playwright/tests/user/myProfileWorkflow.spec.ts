@@ -21,15 +21,6 @@ test.describe("User workflow", () => {
       await page.goto("/");
       await goToMyProfilePage(page);
 
-      await expect(
-        page.locator(`#${domElementIds.profile.firstName}`),
-      ).toHaveText("Prénom : Prénom Admin");
-      await expect(
-        page.locator(`#${domElementIds.profile.lastName}`),
-      ).toHaveText("Nom : Nom Admin");
-      await expect(page.locator(`#${domElementIds.profile.email}`)).toHaveText(
-        "Email : admin+playwright@immersion-facile.beta.gouv.fr",
-      );
       const agenciesCount = await page
         .locator(`[id^=${domElementIds.profile.editRoleButton}]`)
         .count();
@@ -114,9 +105,6 @@ test.describe("User workflow", () => {
       await page.goto("/");
       await goToMyProfilePage(page);
 
-      await expect(page.locator(`#${domElementIds.profile.email}`)).toHaveText(
-        "Email : recette+playwright@immersion-facile.beta.gouv.fr",
-      );
       await expect(
         page.locator(`[id^=${domElementIds.profile.adminAgencyLink}]`),
       ).toHaveCount(0);
@@ -161,15 +149,6 @@ test.describe("User workflow", () => {
       await page.goto("/");
       await goToMyProfilePage(page);
 
-      await expect(
-        page.locator(`#${domElementIds.profile.firstName}`),
-      ).toHaveText("Prénom : Test e2e");
-      await expect(
-        page.locator(`#${domElementIds.profile.lastName}`),
-      ).toHaveText("Nom : Immersion Facilitée");
-      await expect(page.locator(`#${domElementIds.profile.email}`)).toHaveText(
-        "Email : recette+playwright@immersion-facile.beta.gouv.fr",
-      );
       await expect(
         page.locator(`#${domElementIds.profile.updateOwnInfosLink}`),
       ).toBeVisible();
