@@ -70,7 +70,7 @@ export const MyProfile = (_: MyProfileProps) => {
   return (
     <>
       <UserProfile
-        title={`${userDisplayed}`}
+        title={userDisplayed}
         currentUser={currentUser}
         userWithRights={currentUser}
         editInformationsLink={getLinkToUpdateAccountInfo(

@@ -136,7 +136,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
         userId: user.id,
       });
 
-      expectToEqual(await uow.userRepository.users, [user]);
+      expectToEqual(uow.userRepository.users, [user]);
       expectToEqual(uow.agencyRepository.agencies, [
         toAgencyWithRights(agency1, {
           [user.id]: { roles: ["to-review"], isNotifiedByEmail: false },

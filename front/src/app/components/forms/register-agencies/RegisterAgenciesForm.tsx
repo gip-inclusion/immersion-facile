@@ -25,10 +25,23 @@ export const RegisterAgenciesForm = ({
 }) => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<string>("");
-  const inputElement = React.useRef<ElementRef<"input">>(null);
+  const agencySearchBySiretOrNameInput =
+    React.useRef<ElementRef<"input">>(null);
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-  const [checkedAgencies, setCheckedAgencies] = useState<AgencyId[]>([]);
+  const [selectedAgencyIds, setSelectedAgencyIds] = useState<AgencyId[]>([]);
+
+  const onAgencySearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.currentTarget.value);
+    setSelectedAgencyIds([]);
+    setIsAllChecked(false);
+    dispatch(
+      agenciesSlice.actions.fetchAgencyOptionsRequested({
+        nameIncludes: event.currentTarget.value,
+        status: ["active", "from-api-PE"],
+      }),
+    );
+  };
   return (
     <>
       <div className={fr.cx("fr-mt-4w", "fr-mb-2w")}>
@@ -40,20 +53,10 @@ export const RegisterAgenciesForm = ({
             type: "search",
             placeholder: "",
             value: inputValue,
-            onChange: (event) => {
-              setInputValue(event.currentTarget.value);
-              setCheckedAgencies([]);
-              setIsAllChecked(false);
-              dispatch(
-                agenciesSlice.actions.fetchAgencyOptionsRequested({
-                  nameIncludes: event.currentTarget.value,
-                  status: ["active", "from-api-PE"],
-                }),
-              );
-            },
+            onChange: onAgencySearchChange,
             onKeyDown: (event) => {
               if (event.key === "Escape") {
-                inputElement.current?.blur();
+                agencySearchBySiretOrNameInput.current?.blur();
               }
             },
           }}
@@ -76,8 +79,8 @@ export const RegisterAgenciesForm = ({
               <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
                 <strong>Résultats pour votre recherche "{inputValue}"</strong>
                 <p className={fr.cx("fr-hint-text")}>
-                  {checkedAgencies.length}{" "}
-                  {checkedAgencies.length <= 1
+                  {selectedAgencyIds.length}{" "}
+                  {selectedAgencyIds.length <= 1
                     ? "organisme sélectionné"
                     : "organismes sélectionnés"}
                 </p>
@@ -88,19 +91,19 @@ export const RegisterAgenciesForm = ({
                 onClick={() => {
                   dispatch(
                     inclusionConnectedSlice.actions.registerAgenciesRequested({
-                      agencies: checkedAgencies,
+                      agencies: selectedAgencyIds,
                       feedbackTopic: "dashboard-agency-register-user",
                     }),
                   );
                 }}
-                disabled={checkedAgencies.length === 0}
+                disabled={selectedAgencyIds.length === 0}
               >
                 Demander l'accès aux organismes sélectionnés
               </Button>
             </div>
             <AgencyTable
-              checkedAgencies={checkedAgencies}
-              setCheckedAgencies={setCheckedAgencies}
+              checkedAgencies={selectedAgencyIds}
+              setCheckedAgencies={setSelectedAgencyIds}
               isAllChecked={isAllChecked}
               setIsAllChecked={setIsAllChecked}
               currentUser={currentUser}

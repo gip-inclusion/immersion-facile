@@ -66,17 +66,16 @@ export function NoActiveAgencyRights({
         </div>
         <div className={fr.cx("fr-col-12", "fr-col-lg-10")}>
           <h3>Vous travaillez ailleurs ?</h3>
-          {!showRegistrationForm && (
+          {showRegistrationForm ? (
+            <RegisterAgenciesForm currentUser={currentUser} />
+          ) : (
             <Button
               onClick={() => {
-                setShowRegistrationForm(() => true);
+                setShowRegistrationForm(true);
               }}
             >
               Demander l'accès à d'autre organismes
             </Button>
-          )}
-          {showRegistrationForm && (
-            <RegisterAgenciesForm currentUser={currentUser} />
           )}
         </div>
       </div>

@@ -47,10 +47,9 @@ export class RegisterAgencyToInclusionConnectUser extends TransactionalUseCase<
     const agencyRights = await uow.agencyRepository.getAgenciesRightsByUserId(
       user.id,
     );
-    const alreadyHasRequestedAgencyRight =
-      agencyRights.filter((agencyRight) =>
-        agencyIds.includes(agencyRight.agencyId),
-      ).length >= 1;
+    const alreadyHasRequestedAgencyRight = agencyRights.filter((agencyRight) =>
+      agencyIds.includes(agencyRight.agencyId),
+    ).length;
     if (alreadyHasRequestedAgencyRight) {
       throw errors.user.alreadyHaveAgencyRights({
         userId: user.id,
