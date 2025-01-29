@@ -70,7 +70,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .then(map((row) => row.notif));
   }
 
-  public async getEmailsByFilters(): Promise<EmailNotification[]> {
+  async #getLastEmails(): Promise<EmailNotification[]> {
     const subQuery = pipeWithValue(
       this.transaction
         .selectFrom("notifications_email as e")
@@ -94,7 +94,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .limit(this.maxRetrievedNotifications)
       .execute()
       .then(async (rows) => ({
-        emails: await this.getEmailsByFilters(),
+        emails: await this.#getLastEmails(),
         sms: rows.map((row) => row.notif),
       }));
   }

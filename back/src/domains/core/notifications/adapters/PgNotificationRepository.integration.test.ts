@@ -244,7 +244,8 @@ describe("PgNotificationRepository", () => {
         smsNotification,
       ]);
 
-      const response = await pgNotificationRepository.getEmailsByFilters();
+      const response = (await pgNotificationRepository.getLastNotifications())
+        .emails;
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
@@ -255,22 +256,6 @@ describe("PgNotificationRepository", () => {
         "sms",
       );
       expect(smsResponse).toEqual(smsNotification);
-    });
-  });
-
-  describe("getEmailsByFilters", () => {
-    beforeEach(async () => {
-      await Promise.all(
-        emailNotifications.map((notif) => pgNotificationRepository.save(notif)),
-      );
-    });
-
-    it("works", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters();
-      expectToEqual(
-        response,
-        emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
-      );
     });
   });
 
