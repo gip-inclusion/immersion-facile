@@ -561,7 +561,7 @@ export const errors = {
       new UnavailableApiError(serviceName, message),
   },
   search: {
-    noRomeForAppelations: (appellationCodes: AppellationCode[]) =>
+    noRomeForAppellations: (appellationCodes: AppellationCode[]) =>
       new BadRequestError(
         `No Rome code matching appellation codes ${appellationCodes}`,
       ),

@@ -139,7 +139,7 @@ export class SearchImmersion extends TransactionalUseCase<
 
     const firstRomeAndAppellationData = appelationsAndRomes.at(0);
     if (!firstRomeAndAppellationData)
-      throw errors.search.noRomeForAppelations(appellationCodes);
+      throw errors.search.noRomeForAppellations(appellationCodes);
 
     const lbbResults = await this.laBonneBoiteAPI.searchCompanies({
       ...firstRomeAndAppellationData,
