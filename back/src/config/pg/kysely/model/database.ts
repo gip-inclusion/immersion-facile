@@ -51,12 +51,9 @@ export interface Database {
   public_appellations_data: PublicAppellationsData;
   public_department_region: PublicDepartmentRegion;
   public_naf_classes_2008_old: PublicNafClasses2008; // TO DELETE
-  public_naf_rev2_classes: PublicNafRev2Classes;
-  public_naf_rev2_divisions: PublicNafRev2Divisions;
-  public_naf_rev2_groupes: PublicNafRev2Groupes;
   public_naf_rev2_niveaux: PublicNafRev2Niveaux;
   public_naf_rev2_sections: PublicNafRev2Sections;
-  public_naf_rev2_sous_classes: PublicNafRev2SubClasses;
+  public_naf_rev2_sous_classes: PublicNafRev2SousClasses;
   public_romes_data: PublicRomesData;
   searches_made__appellation_code: SearchesMadeAppellationCode;
   searches_made__naf_code: SearchesMadeNafCode;
@@ -638,22 +635,7 @@ interface PublicNafRev2Sections {
   libelle: string;
 }
 
-interface PublicNafRev2Divisions {
-  code: string;
-  libelle: string;
-}
-
-interface PublicNafRev2Groupes {
-  code: string;
-  libelle: string;
-}
-
-interface PublicNafRev2Classes {
-  code: string;
-  libelle: string;
-}
-
-interface PublicNafRev2SubClasses {
+interface PublicNafRev2SousClasses {
   code: string;
   libelle: string;
   naf_code: string;
