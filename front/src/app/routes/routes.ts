@@ -91,6 +91,11 @@ const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
   "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
 ]);
 
+const myProfile = defineRoute(
+  inclusionConnectedParams,
+  () => `/${frontRoutes.profile}`,
+);
+
 const agencyDashboardAgencies = agencyDashboard.extend("/agences");
 
 const { adminConventions, adminAgencies, adminUsers, ...restOfAdminRoutes } =
@@ -128,10 +133,8 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   agencyDashboardSynchronisedConventions: agencyDashboard.extend(
     "/conventions-synchronisees",
   ),
-  myProfile: defineRoute(
-    inclusionConnectedParams,
-    () => `/${frontRoutes.profile}`,
-  ),
+  myProfile,
+  myProfileAgencyRegistration: myProfile.extend("/agency-registration"),
   agencyDashboardAgencies: agencyDashboardAgencies,
   agencyDashboardAgencyDetails: agencyDashboardAgencies.extend(
     { agencyId: param.path.string },

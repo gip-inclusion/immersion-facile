@@ -9,6 +9,7 @@ export const OnGoingAgencyRightsTable = ({
   agenciesWithToReviewRights,
 }: { agenciesWithToReviewRights: AgencyRight[] }) => (
   <Table
+    fixed
     headers={["Organisme", "Caractéristiques de l'agence", "Administrateurs"]}
     data={agenciesWithToReviewRights
       .sort((a, b) => a.agency.name.localeCompare(b.agency.name))

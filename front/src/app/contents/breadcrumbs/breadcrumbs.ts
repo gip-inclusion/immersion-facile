@@ -85,6 +85,16 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
     label: "Bilan d'immersion",
     route: routes.assessment({ jwt: "" }),
   },
+  myProfile: {
+    label: "Mon profil",
+    route: routes.myProfile(),
+    children: {
+      myProfileAgencyRegistration: {
+        label: "Demander l'accès à des organismes",
+        route: routes.myProfileAgencyRegistration(),
+      },
+    },
+  },
 };
 
 export const getBreadcrumbs = makeBreadcrumbsSegments<typeof breadcrumbs>(
