@@ -1,7 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
-import { InclusionConnectedUser, UserParamsForAgency } from "shared";
+import {
+  InclusionConnectedUser,
+  UserParamsForAgency,
+  domElementIds,
+} from "shared";
 import { routes } from "src/app/routes/routes";
 import { AgenciesTablesSection } from "../agency/agencies-table/AgenciesTablesSection";
 import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
@@ -25,6 +29,7 @@ export const UserProfile = ({
     <div className={fr.cx("fr-grid-row")}>
       <h1 className={fr.cx("fr-col-12", "fr-col-sm-10")}>{title}</h1>
       <Button
+        id={domElementIds.profile.registerAgenciesSearchLink}
         className={fr.cx("fr-col-12", "fr-col-sm-2")}
         linkProps={{
           href: `${routes.myProfileAgencyRegistration().href}`,

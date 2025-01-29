@@ -662,6 +662,7 @@ export const domElementIds = {
       "im-profile-edit-agency-user__is-notified-by-email-toggle",
     editAgencyUserRoleSubmitButton:
       "im-profile-form-edit-agency__users-submit-button",
+    registerAgenciesSearchLink: "im-profile__register-agencies-search-link",
   },
   conventionStatusDashboard: {},
   group: {},
