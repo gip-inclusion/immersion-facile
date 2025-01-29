@@ -13,6 +13,12 @@ on:
         required: true
       IC_USERNAME:
         required: true
+      PC_ADMIN_PASSWORD:
+        required: true
+      PC_PASSWORD:
+        required: true
+      PC_USERNAME:
+        required: true
       SIRENE_INSEE_CLIENT_ID:
         required: true
       SIRENE_INSEE_CLIENT_SECRET:
@@ -22,6 +28,8 @@ on:
       SIRENE_INSEE_PASSWORD:
         required: true
       INCLUSION_CONNECT_CLIENT_SECRET:
+        required: true
+      PRO_CONNECT_CLIENT_SECRET:
         required: true
 
 jobs:
@@ -107,10 +115,17 @@ jobs:
       IC_USERNAME: ${{ secrets.IC_USERNAME }}
       IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
       IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
+      PC_USERNAME: ${{ secrets.PC_USERNAME }}
+      PC_PASSWORD: ${{ secrets.PC_PASSWORD }}
+      PC_ADMIN_PASSWORD: ${{ secrets.PC_ADMIN_PASSWORD }}
       INCLUSION_CONNECT_GATEWAY: "HTTPS"
       INCLUSION_CONNECT_CLIENT_ID: local_inclusion_connect
       INCLUSION_CONNECT_CLIENT_SECRET: ${{ secrets.INCLUSION_CONNECT_CLIENT_SECRET }}
       INCLUSION_CONNECT_BASE_URI: "https://recette.connect.inclusion.beta.gouv.fr/auth"
+      PRO_CONNECT_GATEWAY: "HTTPS"
+      PRO_CONNECT_CLIENT_ID: 449e24c6-b5aa-4435-bb8c-728d4a3c1c94
+      PRO_CONNECT_CLIENT_SECRET: ${{ secrets.PRO_CONNECT_CLIENT_SECRET }}
+      PRO_CONNECT_BASE_URI: "https://fca.integ01.dev-agentconnect.fr/api/v2"
       API_KEY_OPEN_CAGE_DATA_GEOCODING: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOCODING }}
       API_KEY_OPEN_CAGE_DATA_GEOSEARCH: ${{ secrets.API_KEY_OPEN_CAGE_DATA_GEOSEARCH }}
       POLE_EMPLOI_GATEWAY: IN_MEMORY
