@@ -2,7 +2,6 @@ import Bottleneck from "bottleneck";
 import { format, formatISO } from "date-fns";
 import {
   NafDto,
-  NumberEmployeesRange,
   OmitFromExistingKeys,
   SiretDto,
   SiretEstablishmentDto,
@@ -22,6 +21,7 @@ import { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { SiretGateway } from "../ports/SiretGateway";
 import { InseeExternalRoutes } from "./InseeSiretGateway.routes";
+import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const logger = createLogger(__filename);
 
@@ -305,7 +305,9 @@ export const convertSirenRawEstablishmentToSirenEstablishmentDto = (
   businessName: getBusinessName(siretEstablishment),
   businessAddress: getFormattedAddress(siretEstablishment),
   nafDto: getNafAndNomenclature(siretEstablishment),
-  numberEmployeesRange: getNumberEmployeesRange(siretEstablishment),
+  numberEmployeesRange: getNumberEmployeesRangeByTefenCode(
+    siretEstablishment.uniteLegale.trancheEffectifsUniteLegale,
+  ),
   isOpen: getIsActive(siretEstablishment),
 });
 
@@ -362,50 +364,4 @@ const getIsActive = ({
     uniteLegale.etatAdministratifUniteLegale === "A" &&
     lastPeriod.etatAdministratifEtablissement === "A"
   );
-};
-
-const getNumberEmployeesRange = ({
-  uniteLegale,
-}: InseeApiRawEstablishment): NumberEmployeesRange => {
-  const tefenCode = uniteLegale.trancheEffectifsUniteLegale;
-  if (!tefenCode || tefenCode === "NN") return "";
-  return employeeRangeByTefenCode[<TefenCode>+tefenCode];
-};
-
-// tefenCode is a French standard code for the number of employees in a company.
-type TefenCode =
-  | -1
-  | 0
-  | 1
-  | 2
-  | 3
-  | 11
-  | 12
-  | 21
-  | 22
-  | 31
-  | 32
-  | 41
-  | 42
-  | 51
-  | 52
-  | 53;
-
-const employeeRangeByTefenCode: Record<TefenCode, NumberEmployeesRange> = {
-  [-1]: "",
-  [0]: "0",
-  [1]: "1-2",
-  [2]: "3-5",
-  [3]: "6-9",
-  [11]: "10-19",
-  [12]: "20-49",
-  [21]: "50-99",
-  [22]: "100-199",
-  [31]: "200-249",
-  [32]: "250-499",
-  [41]: "500-999",
-  [42]: "1000-1999",
-  [51]: "2000-4999",
-  [52]: "5000-9999",
-  [53]: "+10000",
 };
