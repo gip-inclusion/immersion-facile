@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
 import { DateString, errorToString } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { notifyObjectToTeam } from "../../../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import {
@@ -118,7 +118,7 @@ export class InMemoryEventBus implements EventBus {
       const message = "Failed too many times, event will be Quarantined";
       logger.error({ events: [event], message });
       const { payload: _, publications: __, ...restEvent } = event;
-      notifyObjectToTeam({
+      notifyErrorObjectToTeam({
         event: {
           ...restEvent,
           lastPublication: getLastPublication(event),

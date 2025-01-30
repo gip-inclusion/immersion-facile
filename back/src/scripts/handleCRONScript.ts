@@ -81,7 +81,9 @@ const onScriptSuccess =
       duration: durationInSeconds,
     });
 
-    return notifyTeam(report).finally(() => process.exit(0));
+    return notifyTeam({ rawContent: report, isError: false }).finally(() =>
+      process.exit(0),
+    );
   };
 
 const onScriptError =
@@ -119,5 +121,7 @@ const onScriptError =
       duration: durationInSeconds,
     });
 
-    return notifyTeam(report).finally(() => process.exit(0));
+    return notifyTeam({ rawContent: report, isError: false }).finally(() =>
+      process.exit(0),
+    );
   };

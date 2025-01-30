@@ -148,10 +148,11 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     };
 
     if (!newOrUpdatedAuthenticatedUser.externalId) {
-      notifyTeam(
-        `Usecase AuthenticateWithInclusionCode. No ongoing_oauths found for externalId:
+      notifyTeam({
+        rawContent: `Usecase AuthenticateWithInclusionCode. No ongoing_oauths found for externalId:
           ${newOrUpdatedAuthenticatedUser.id}`,
-      );
+        isError: true,
+      });
     }
 
     await uow.userRepository.save(newOrUpdatedAuthenticatedUser, provider);

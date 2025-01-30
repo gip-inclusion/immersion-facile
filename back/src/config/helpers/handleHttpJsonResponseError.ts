@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { HttpError, HttpErrorResponseBody } from "shared";
 import { ZodError } from "zod";
 import { LoggerParamsWithMessage, createLogger } from "../../utils/logger";
-import { notifyObjectToTeam } from "../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../utils/notifyTeam";
 
 const logger = createLogger(__filename);
 
@@ -105,5 +105,5 @@ const logErrorAndNotifyDiscord = (
   };
 
   logger.error(params);
-  notifyObjectToTeam(params);
+  notifyErrorObjectToTeam(params);
 };

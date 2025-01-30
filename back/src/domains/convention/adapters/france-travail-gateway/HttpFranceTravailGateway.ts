@@ -16,7 +16,10 @@ import {
   LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
-import { notifyObjectToTeam, notifyTeam } from "../../../../utils/notifyTeam";
+import {
+  notifyErrorObjectToTeam,
+  notifyTeam,
+} from "../../../../utils/notifyTeam";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   RetryStrategy,
@@ -172,11 +175,12 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
             },
           });
 
-          notifyTeam(
-            `HttpFranceTravailGateway notAxiosError ${
+          notifyTeam({
+            rawContent: `HttpFranceTravailGateway notAxiosError ${
               ftConvention.originalId
             }: ${JSON.stringify(error)}`,
-          );
+            isError: true,
+          });
 
           return {
             status: 500,
@@ -199,11 +203,12 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
             },
           });
 
-          notifyTeam(
-            `HttpFranceTravailGateway noResponseInAxiosError ${
+          notifyTeam({
+            rawContent: `HttpFranceTravailGateway noResponseInAxiosError ${
               ftConvention.originalId
             }: ${JSON.stringify(error)}`,
-          );
+            isError: true,
+          });
 
           return {
             status: 500,
@@ -252,7 +257,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
           },
         };
         logger.error(errorObject);
-        notifyObjectToTeam(errorObject);
+        notifyErrorObjectToTeam(errorObject);
 
         return {
           status: error.response.status,
