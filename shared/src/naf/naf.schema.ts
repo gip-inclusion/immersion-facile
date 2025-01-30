@@ -6,8 +6,8 @@ import {
   NafCode,
   NafDto,
   NafSectionSuggestion,
+  NafSectionSuggestionsParams,
   NafSectorCode,
-  SectionSuggestionsParams,
   WithNafCodes,
   nafSectorCodes,
   nafSectorLabels,
@@ -39,15 +39,14 @@ export const nafDivisionSchema = z
   .string()
   .regex(nafDivisionRegex, "Division NAF incorrect");
 
-export const sectionSuggestionSchema: z.Schema<NafSectionSuggestion> = z.object(
-  {
+export const nafSectionSuggestionSchema: z.Schema<NafSectionSuggestion> =
+  z.object({
     label: zStringMinLength1,
     nafCodes: nafCodesSchema,
-  },
-);
-export const sectionSuggestionsSchema: z.Schema<NafSectionSuggestion[]> =
-  z.array(sectionSuggestionSchema);
-export const sectionSuggestionsParamsSchema: z.Schema<SectionSuggestionsParams> =
+  });
+export const nafSectionSuggestionsSchema: z.Schema<NafSectionSuggestion[]> =
+  z.array(nafSectionSuggestionSchema);
+export const nafSectionSuggestionsParamsSchema: z.Schema<NafSectionSuggestionsParams> =
   z.object({
     searchText: searchTextSchema,
   });

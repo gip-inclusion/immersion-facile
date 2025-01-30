@@ -1,20 +1,20 @@
 import {
   NafSectionSuggestion,
-  SectionSuggestionsParams,
-  sectionSuggestionsParamsSchema,
+  NafSectionSuggestionsParams,
+  nafSectionSuggestionsParamsSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../UseCase";
 
 export type GetNafSuggestions = ReturnType<typeof makeGetNafSuggestions>;
 
 export const makeGetNafSuggestions = createTransactionalUseCase<
-  SectionSuggestionsParams,
+  NafSectionSuggestionsParams,
   NafSectionSuggestion[],
   void,
   void
 >(
   {
-    inputSchema: sectionSuggestionsParamsSchema,
+    inputSchema: nafSectionSuggestionsParamsSchema,
     name: "NafSuggestions",
   },
   async ({ inputParams: { searchText }, uow }) => {

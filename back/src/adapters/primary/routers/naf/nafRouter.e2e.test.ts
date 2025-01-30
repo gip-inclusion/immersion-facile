@@ -1,7 +1,7 @@
 import {
   NafRoutes,
   NafSectionSuggestion,
-  SectionSuggestionsParams,
+  NafSectionSuggestionsParams,
   displayRouteName,
   expectHttpResponseToEqual,
   nafRoutes,
@@ -41,9 +41,9 @@ describe("naf Router", () => {
     ];
   });
 
-  describe(`${displayRouteName(nafRoutes.sectionSuggestions)}`, () => {
+  describe(`${displayRouteName(nafRoutes.nafSectionSuggestions)}`, () => {
     it("200 - One result with 'Agri'", async () => {
-      const response = await httpClient.sectionSuggestions({
+      const response = await httpClient.nafSectionSuggestions({
         queryParams: { searchText: "Agri" },
       });
       expectHttpResponseToEqual(response, {
@@ -53,7 +53,7 @@ describe("naf Router", () => {
     });
 
     it("200 - Multiple results with 'Indus'", async () => {
-      const response = await httpClient.sectionSuggestions({
+      const response = await httpClient.nafSectionSuggestions({
         queryParams: { searchText: "Indus" },
       });
       expectHttpResponseToEqual(response, {
@@ -63,7 +63,7 @@ describe("naf Router", () => {
     });
 
     it("200 - No results with 'dsklfsdmlf'", async () => {
-      const response = await httpClient.sectionSuggestions({
+      const response = await httpClient.nafSectionSuggestions({
         queryParams: { searchText: "dsklfsdmlf" },
       });
       expectHttpResponseToEqual(response, {
@@ -73,8 +73,8 @@ describe("naf Router", () => {
     });
 
     it("400 - Bad Schema", async () => {
-      const response = await httpClient.sectionSuggestions({
-        queryParams: {} as SectionSuggestionsParams,
+      const response = await httpClient.nafSectionSuggestions({
+        queryParams: {} as NafSectionSuggestionsParams,
       });
       expectHttpResponseToEqual(response, {
         body: {
