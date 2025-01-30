@@ -1,19 +1,19 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
-  sectionSuggestionsParamsSchema,
-  sectionSuggestionsSchema,
+  nafSectionSuggestionsParamsSchema,
+  nafSectionSuggestionsSchema,
 } from "./naf.schema";
 
 export type NafRoutes = typeof nafRoutes;
 
 export const nafRoutes = defineRoutes({
-  sectionSuggestions: defineRoute({
+  nafSectionSuggestions: defineRoute({
     method: "get",
     url: "/naf/section",
-    queryParamsSchema: sectionSuggestionsParamsSchema,
+    queryParamsSchema: nafSectionSuggestionsParamsSchema,
     responses: {
-      200: sectionSuggestionsSchema,
+      200: nafSectionSuggestionsSchema,
       400: httpErrorSchema,
     },
   }),

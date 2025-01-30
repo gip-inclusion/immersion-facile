@@ -75,6 +75,6 @@ export type NafSectionSuggestion = {
   nafCodes: NafCode[];
 };
 
-export type SectionSuggestionsParams = {
+export type NafSectionSuggestionsParams = {
   searchText: string;
 };

@@ -8,12 +8,12 @@ export class PgNafRepository implements NafRepository {
   async getNafSuggestions(searchText: string): Promise<NafSectionSuggestion[]> {
     const results = await this.transaction
       .selectFrom("public_naf_rev2_sections as sections")
-      .leftJoin(
+      .innerJoin(
         "public_naf_rev2_niveaux as niveaux",
         "niveaux.code_section",
         "sections.code",
       )
-      .leftJoin(
+      .innerJoin(
         "public_naf_rev2_sous_classes as sous_classes",
         "niveaux.code_sous_classe",
         "sous_classes.code",
