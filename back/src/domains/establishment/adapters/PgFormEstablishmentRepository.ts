@@ -13,7 +13,7 @@ import {
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
-import { notifyObjectToTeam } from "../../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { FormEstablishmentRepository } from "../ports/FormEstablishmentRepository";
 
 const logger = createLogger(__filename);
@@ -58,7 +58,7 @@ export class PgFormEstablishmentRepository
           message: "Cannot save form establishment ",
           error: castedError,
         });
-        notifyObjectToTeam({
+        notifyErrorObjectToTeam({
           _message: `Cannot create form establishment with siret ${formEstablishment.siret}`,
           ...castedError,
         });

@@ -4,7 +4,7 @@ import {
   LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
-import { notifyObjectToTeam } from "../../../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { DomainEvent, EventStatus } from "../events";
 import { EventBus } from "../ports/EventBus";
@@ -36,7 +36,7 @@ export class BasicEventCrawler implements EventCrawler {
       message: `${status} outbox ${count} exceeds ${limit}`,
     };
     logger.error(params);
-    notifyObjectToTeam(params);
+    notifyErrorObjectToTeam(params);
   }
 
   public async processNewEvents(): Promise<void> {
@@ -104,7 +104,7 @@ export class BasicEventCrawler implements EventCrawler {
           message: "Processing event group is taking long",
           events: eventGroup,
         };
-        notifyObjectToTeam(warning);
+        notifyErrorObjectToTeam(warning);
         logger.warn(warning);
       }, 30_000);
 
@@ -135,7 +135,7 @@ export class BasicEventCrawler implements EventCrawler {
         };
 
         logger.error(params);
-        notifyObjectToTeam({
+        notifyErrorObjectToTeam({
           params,
         });
 

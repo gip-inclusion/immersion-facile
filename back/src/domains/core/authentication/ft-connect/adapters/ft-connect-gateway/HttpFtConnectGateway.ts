@@ -9,7 +9,7 @@ import {
   OpacifiedLogger,
   createLogger,
 } from "../../../../../../utils/logger";
-import { notifyObjectToTeam } from "../../../../../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import { AccessTokenDto } from "../../dto/AccessToken.dto";
 import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
@@ -301,7 +301,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
       );
       if (error instanceof ZodError) return [];
       if (isJobseekerButNoAdvisorsResponse(error)) {
-        notifyObjectToTeam({
+        notifyErrorObjectToTeam({
           message: `isJobseekerButNoAdvisorsResponse for token: ${headers.Authorization}`,
           error,
         });
@@ -348,7 +348,7 @@ const errorChecker = (
 ): void => (error instanceof Error ? cbOnError(error) : cbOnNotError(error));
 
 const notifyTeamOnNotError = (payload: unknown): void =>
-  notifyObjectToTeam({
+  notifyErrorObjectToTeam({
     message: "Should have been an error.",
     payload,
   });

@@ -1,7 +1,10 @@
 // This test need the env var DISCORD_WEBHOOK_URL to be set.
 
 import { DomainEvent } from "../domains/core/events/events";
-import { notifyObjectToTeam, notifyToTeamAndThrowError } from "./notifyTeam";
+import {
+  notifyErrorObjectToTeam,
+  notifyToTeamAndThrowError,
+} from "./notifyTeam";
 
 describe("Notify Team", () => {
   it("Should serialize the thrown Error and notify channel dev-error channel", () => {
@@ -9,7 +12,7 @@ describe("Notify Team", () => {
       throw new SyntaxError("TEST NOTIFICATION - Invalid syntax for action !");
     } catch (e: unknown) {
       expect(e).toBeInstanceOf(SyntaxError);
-      notifyObjectToTeam(e as Error);
+      notifyErrorObjectToTeam(e as Error);
     }
   });
 
@@ -40,7 +43,7 @@ describe("Notify Team", () => {
       topic: "MagicLinkRenewalRequested",
       wasQuarantined: false,
     };
-    notifyObjectToTeam({
+    notifyErrorObjectToTeam({
       event: domainEvent,
       message: "TEST NOTIFICATION - test message with domain event",
     });

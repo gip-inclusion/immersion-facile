@@ -7,9 +7,12 @@ const logger = createLogger(__filename);
 
 const discordSizeLimit = 1950;
 
-export const notifyTeam = async (rawContent: string) => {
+export const notifyTeam = async ({
+  rawContent,
+  isError,
+}: { rawContent: string; isError: boolean }) => {
   await notifyDiscord(rawContent);
-  await notifySlack(rawContent);
+  await notifySlack(rawContent, isError);
 };
 
 const notifyDiscord = async (rawContent: string) => {
@@ -41,7 +44,7 @@ const notifyDiscord = async (rawContent: string) => {
     });
 };
 
-const notifySlack = async (rawContent: string) => {
+const notifySlack = async (rawContent: string, isError: boolean) => {
   const config = AppConfig.createFromEnv();
   const slackBotToken = config.slackBotToken;
 
@@ -51,7 +54,7 @@ const notifySlack = async (rawContent: string) => {
     .post(
       "https://slack.com/api/chat.postMessage",
       {
-        channel: getSlackChannelName(config.envType),
+        channel: getSlackChannelName(config.envType, isError),
         text: formatCode(rawContent),
       },
       {
@@ -69,14 +72,14 @@ const notifySlack = async (rawContent: string) => {
     });
 };
 
-const getSlackChannelName = (envType: Environment) => {
+const getSlackChannelName = (envType: Environment, isError: boolean) => {
   switch (envType) {
     case "production":
-      return "#if-prod-errors";
+      return isError ? "#if-prod-errors" : "#if-prod-notifications";
     case "staging":
-      return "#if-staging-errors";
+      return isError ? "#if-staging-errors" : "#if-staging-notifications";
     case "pentest":
-      return "#if-pentest-errors";
+      return isError ? "#if-pentest-errors" : "#if-pentest-notifications";
     default:
       throw Error(`Slack channel not defined for environment ${envType}`);
   }
@@ -84,12 +87,18 @@ const getSlackChannelName = (envType: Environment) => {
 
 const formatCode = (content: string) => `\`\`\`${content}\`\`\``;
 
-export const notifyObjectToTeam = <T>(obj: T) => {
-  notifyTeam(toPropertiesAsString(obj));
+export const notifyErrorObjectToTeam = <T>(obj: T) => {
+  notifyTeam({
+    rawContent: toPropertiesAsString(obj),
+    isError: true,
+  });
 };
 
 export const notifyToTeamAndThrowError = <T extends Error>(error: T) => {
-  notifyTeam(toPropertiesAsString(error));
+  notifyTeam({
+    rawContent: toPropertiesAsString(error),
+    isError: true,
+  });
   throw error;
 };
 
