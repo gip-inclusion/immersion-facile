@@ -2,7 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";
-import { nafSchema } from "../naf";
+import { nafSchema } from "../naf/naf.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { nafSchema } from "../naf";
+import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
 import { zStringMinLength1 } from "../zodUtils";
 import {

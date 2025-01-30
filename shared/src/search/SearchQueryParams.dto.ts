@@ -1,6 +1,6 @@
 import { WithAcquisition } from "../acquisition.dto";
 import { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
-import { WithNafCodes } from "../naf";
+import { WithNafCodes } from "../naf/naf.dto";
 import {
   AppellationCode,
   RomeCode,

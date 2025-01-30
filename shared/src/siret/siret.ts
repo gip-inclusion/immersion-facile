@@ -1,4 +1,4 @@
-import { NafDto } from "../naf";
+import { NafDto } from "../naf/naf.dto";
 import { Flavor } from "../typeFlavors";
 
 // Matches strings containing exactly 14 digits with any number of interspersed whitespaces.

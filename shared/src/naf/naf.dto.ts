@@ -1,8 +1,6 @@
-import { z } from "zod";
-import { Flavor } from "./typeFlavors";
-import { keys } from "./utils";
+import { Flavor } from "../typeFlavors";
 
-const nafSectorCodes = [
+export const nafSectorCodes = [
   "0",
   "A",
   "B",
@@ -28,7 +26,7 @@ const nafSectorCodes = [
 ] as const;
 export type NafSectorCode = (typeof nafSectorCodes)[number];
 
-export const nafSectorLabels: Record<NafSectorCode, string> = {
+export const nafSectorLabels: Record<NafSectorCode, NafSectionLabel> = {
   "0": "Unknown",
   A: "Agriculture, sylviculture et pêche",
   B: "Industries extractives",
@@ -53,14 +51,9 @@ export const nafSectorLabels: Record<NafSectorCode, string> = {
   U: "Activités extra-territoriales",
 };
 
-export const validNafSectorCodes = keys(nafSectorLabels).filter(
-  (val) => val !== "0",
-);
-export const nafSectorCodeSchema: z.Schema<NafSectorCode> =
-  z.enum(nafSectorCodes);
-
 export type NafCode = Flavor<string, "NafCode">;
 export type NafNomenclature = Flavor<string, "NafNomenclature">;
+export type NafSectionLabel = Flavor<string, "SectionLabel">;
 
 export type NafDto = {
   code: NafCode;
@@ -70,29 +63,18 @@ export type WithNafCodes = {
   nafCodes?: NafCode[];
 };
 
-const nafCodeSchema: z.Schema<NafCode> = z.string().length(5);
-
-export const nafCodesSchema: z.Schema<NafCode[]> = z
-  .array(nafCodeSchema)
-  .nonempty();
-
-export const withNafCodesSchema: z.Schema<WithNafCodes> = z.object({
-  nafCodes: nafCodesSchema.optional(),
-});
-
-export const nafSchema: z.Schema<NafDto> = z.object({
-  code: nafCodeSchema,
-  nomenclature: z.string(),
-});
-
-const nafDivisionRegex = /\d{2}/;
-export const nafDivisionSchema = z
-  .string()
-  .regex(nafDivisionRegex, "Division NAF incorrect");
-
 export const fromNafSubClassToNafClass = (nafSubClass: string): string => {
   const nafWithoutSectionId = nafSubClass.replace(/[A-Z]/gi, "");
   return [nafWithoutSectionId.slice(0, 2), nafWithoutSectionId.slice(2)].join(
     ".",
   );
+};
+
+export type NafSectionSuggestion = {
+  label: NafSectionLabel;
+  nafCodes: NafCode[];
+};
+
+export type SectionSuggestionsParams = {
+  searchText: string;
 };

@@ -4,7 +4,7 @@ import { LocationId } from "../address/address.dto";
 import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
-import { NafDto } from "../naf";
+import { NafDto } from "../naf/naf.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import { Flavor } from "../typeFlavors";

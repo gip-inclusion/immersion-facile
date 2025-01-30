@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
-import { withNafCodesSchema } from "../naf";
+import { withNafCodesSchema } from "../naf/naf.schema";
 import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
