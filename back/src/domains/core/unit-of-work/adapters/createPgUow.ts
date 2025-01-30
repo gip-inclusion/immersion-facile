@@ -24,6 +24,7 @@ import { PgUserRepository } from "../../authentication/inclusion-connect/adapter
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";
+import { PgNafRepository } from "../../naf/adapters/PgNafRepository";
 import { PgNotificationRepository } from "../../notifications/adapters/PgNotificationRepository";
 import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
 import { PgBroadcastFeedbacksRepository } from "../../saved-errors/adapters/PgBroadcastFeedbacksRepository";
@@ -76,5 +77,6 @@ export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
     shortLinkQuery: shortLinkRepository,
     shortLinkRepository,
     statisticQueries: new PgStatisticQueries(transaction),
+    nafRepository: new PgNafRepository(transaction),
   };
 };
