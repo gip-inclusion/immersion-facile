@@ -65,7 +65,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         code: "9103Z",
         nomenclature: "NAFRev2",
       },
-      numberEmployeesRange: "50-99",
+      numberEmployeesRange: "2000-4999",
       siret: "18004623700012",
     });
   });
@@ -156,7 +156,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     expect(establishment?.businessName).toBe(
       "MUTUELLE ASSURANCE INSTITUTEUR FRANCE (MAIF)",
     );
-    expect(establishment).toEqual({
+    expectToEqual(establishment, {
       businessAddress: "200 AVENUE SALVADOR ALLENDE 79000 NIORT",
       businessName: "MUTUELLE ASSURANCE INSTITUTEUR FRANCE (MAIF)",
       isOpen: true,
@@ -164,7 +164,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
         code: "6512Z",
         nomenclature: "NAFRev2",
       },
-      numberEmployeesRange: "50-99",
+      numberEmployeesRange: "5000-9999",
       siret: "77570970201646",
     });
   });

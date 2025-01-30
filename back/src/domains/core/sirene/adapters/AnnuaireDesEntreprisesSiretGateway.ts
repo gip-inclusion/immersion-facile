@@ -1,11 +1,12 @@
 import Bottleneck from "bottleneck";
 import { SiretDto, SiretEstablishmentDto } from "shared";
 import { HttpClient } from "shared-routes";
-import { SiretGateway } from "../ports/SirenGateway";
+import { SiretGateway } from "../ports/SiretGateway";
 import {
   AnnuaireDesEntreprisesSiretEstablishment,
   type AnnuaireDesEntreprisesSiretRoutes,
 } from "./AnnuaireDesEntreprisesSiretGateway.routes";
+import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const adeMaxQueryPerSeconds = 7;
 export const nonDiffusibleEstablishmentName = "NON-DIFFUSIBLE";
@@ -92,53 +93,9 @@ export const convertAdeEstablishmentToSirenEstablishmentDto = (
     ).replace(".", ""),
     nomenclature: "NAFRev2",
   },
-  numberEmployeesRange: getNumberEmployeesRange(
-    adeEstablishment.tranche_effectif_salarie
-      ? parseInt(adeEstablishment.tranche_effectif_salarie)
-      : null,
+  numberEmployeesRange: getNumberEmployeesRangeByTefenCode(
+    adeEstablishment.tranche_effectif_salarie ?? undefined,
   ),
   isOpen:
     adeEstablishment.matching_etablissements[0].etat_administratif === "A",
 });
-
-const numberEmployeesRanges = [
-  "",
-  "0",
-  "1-2",
-  "3-5",
-  "6-9",
-  "10-19",
-  "20-49",
-  "50-99",
-  "100-199",
-  "200-249",
-  "250-499",
-  "500-999",
-  "1000-1999",
-  "2000-4999",
-  "5000-9999",
-  "+10000",
-] as const;
-type NumberEmployeesRange = (typeof numberEmployeesRanges)[number];
-
-const getNumberEmployeesRange = (
-  numberEmployees: number | null,
-): NumberEmployeesRange => {
-  if (numberEmployees === null) return "";
-  if (numberEmployees === 0) return "0";
-  if (numberEmployees === 1 || numberEmployees === 2) return "1-2";
-  if (numberEmployees >= 3 && numberEmployees <= 5) return "3-5";
-  if (numberEmployees >= 6 && numberEmployees <= 9) return "6-9";
-  if (numberEmployees >= 10 && numberEmployees <= 19) return "10-19";
-  if (numberEmployees >= 20 && numberEmployees <= 49) return "20-49";
-  if (numberEmployees >= 50 && numberEmployees <= 99) return "50-99";
-  if (numberEmployees >= 100 && numberEmployees <= 199) return "100-199";
-  if (numberEmployees >= 200 && numberEmployees <= 249) return "200-249";
-  if (numberEmployees >= 250 && numberEmployees <= 499) return "250-499";
-  if (numberEmployees >= 500 && numberEmployees <= 999) return "500-999";
-  if (numberEmployees >= 1000 && numberEmployees <= 1999) return "1000-1999";
-  if (numberEmployees >= 2000 && numberEmployees <= 4999) return "2000-4999";
-  if (numberEmployees >= 5000 && numberEmployees <= 9999) return "5000-9999";
-  if (numberEmployees >= 10000) return "+10000";
-  return "";
-};

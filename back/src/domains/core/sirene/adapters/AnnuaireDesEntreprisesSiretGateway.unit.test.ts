@@ -13,7 +13,7 @@ const validEstablishment: AnnuaireDesEntreprisesSiretEstablishment = {
       etat_administratif: "A",
     },
   ],
-  tranche_effectif_salarie: "1",
+  tranche_effectif_salarie: "01",
   siege: {
     activite_principale: "78.3Z",
   },
