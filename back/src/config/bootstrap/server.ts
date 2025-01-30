@@ -14,6 +14,7 @@ import { createFtConnectRouter } from "../../adapters/primary/routers/ftConnect/
 import { createInclusionConnectRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectRouter";
 import { createInclusionConnectedAllowedRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectedAllowedRouter";
 import { createMagicLinkRouter } from "../../adapters/primary/routers/magicLink/createMagicLinkRouter";
+import { createNafRouter } from "../../adapters/primary/routers/naf/createNafRouter";
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";
 import { createSearchRouter } from "../../adapters/primary/routers/search/createSearchRouter";
 import { createTechnicalRouter } from "../../adapters/primary/routers/technical/createTechnicalRouter";
@@ -86,6 +87,7 @@ export const createApp = async (
   app.use(createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
+  app.use(createNafRouter(deps));
   app.use(createTechnicalRouter(deps, config.inboundEmailAllowedIps));
   app.use(createAddressRouter(deps));
   app.use(createConventionRouter(deps));
