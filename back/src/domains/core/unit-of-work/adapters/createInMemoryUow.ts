@@ -23,6 +23,7 @@ import { InMemoryUserRepository } from "../../authentication/inclusion-connect/a
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";
+import { InMemoryNafRepository } from "../../naf/adapters/InMemoryNafRepository";
 import { InMemoryNotificationRepository } from "../../notifications/adapters/InMemoryNotificationRepository";
 import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeRepository";
 import { InMemoryBroadcastFeedbacksRepository } from "../../saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
@@ -87,6 +88,7 @@ export const createInMemoryUow = () => {
     statisticQueries: new InMemoryStatisticQueries(),
     establishmentMarketingRepository:
       new InMemoryEstablishementMarketingRepository(),
+    nafRepository: new InMemoryNafRepository(),
   } satisfies UnitOfWork;
 };
 
