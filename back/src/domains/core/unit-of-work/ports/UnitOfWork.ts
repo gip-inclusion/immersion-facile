@@ -23,6 +23,7 @@ import { UserRepository } from "../../authentication/inclusion-connect/port/User
 import { OutboxQueries } from "../../events/ports/OutboxQueries";
 import { OutboxRepository } from "../../events/ports/OutboxRepository";
 import { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";
+import { NafRepository } from "../../naf/port/NafRepository";
 import { NotificationRepository } from "../../notifications/ports/NotificationRepository";
 import { RomeRepository } from "../../rome/ports/RomeRepository";
 import { BroadcastFeedbacksRepository } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
@@ -51,6 +52,7 @@ export type UnitOfWork = {
   featureFlagRepository: FeatureFlagRepository;
   formEstablishmentRepository: FormEstablishmentRepository;
   groupRepository: GroupRepository;
+  nafRepository: NafRepository;
   notificationRepository: NotificationRepository;
   npsRepository: NpsRepository;
   ongoingOAuthRepository: OngoingOAuthRepository;

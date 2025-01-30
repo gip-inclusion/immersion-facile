@@ -78,6 +78,7 @@ import {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
+import { makeGetNafSuggestions } from "../../domains/core/naf/use-cases/GetNafSuggestions";
 import {
   makeSaveNotificationAndRelatedEvent,
   makeSaveNotificationsBatchAndRelatedEvent,
@@ -717,6 +718,7 @@ export const createUseCases = (
       },
       uowPerformer,
     }),
+    nafSuggestions: makeGetNafSuggestions({ uowPerformer }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
