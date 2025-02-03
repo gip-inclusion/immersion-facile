@@ -1,4 +1,5 @@
 import * as AWS from "aws-sdk";
+import { AbsoluteUrl, StoredFileId } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { StoredFile } from "../entity/StoredFile";
 import { DocumentGateway } from "../port/DocumentGateway";
@@ -29,11 +30,28 @@ export class S3DocumentGateway implements DocumentGateway {
     this.#s3 = new AWS.S3({ endpoint: params.endPoint });
   }
 
-  public getFileUrl(file: StoredFile): string {
-    return `https://${this.#bucketName}.${this.#endpoint}/${file.id}`;
+  public async getUrl(fileId: StoredFileId): Promise<AbsoluteUrl | undefined> {
+    return new Promise((resolve) => {
+      this.#s3.getObject(
+        {
+          Bucket: this.#bucketName,
+          Key: fileId,
+        },
+        (err, data) => {
+          if (err) {
+            logger.error({ error: err });
+            resolve(undefined);
+          }
+          if (!data) {
+            resolve(undefined);
+          }
+          resolve(`https://${this.#bucketName}.${this.#endpoint}/${fileId}`);
+        },
+      );
+    });
   }
 
-  public async put(file: StoredFile): Promise<void> {
+  public async save(file: StoredFile): Promise<void> {
     return new Promise((resolve, reject) => {
       this.#s3.putObject(
         {
@@ -53,6 +71,15 @@ export class S3DocumentGateway implements DocumentGateway {
           });
           return resolve();
         },
+      );
+    });
+  }
+
+  //For reset testing
+  public async delete(id: StoredFileId): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.#s3.deleteObject({ Bucket: this.#bucketName, Key: id }, (err) =>
+        err ? reject(err) : resolve(),
       );
     });
   }
