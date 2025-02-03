@@ -11,6 +11,7 @@ import {
   InclusionConnectedUser,
   agencyKindToLabelIncludingIF,
   domElementIds,
+  looksLikeSiret,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -37,7 +38,8 @@ export const RegisterAgenciesForm = ({
     setIsAllChecked(false);
     dispatch(
       agenciesSlice.actions.fetchAgencyOptionsRequested({
-        nameIncludes: event.currentTarget.value,
+        [looksLikeSiret(event.currentTarget.value) ? "siret" : "nameIncludes"]:
+          event.currentTarget.value,
         status: ["active", "from-api-PE"],
       }),
     );
