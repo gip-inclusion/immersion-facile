@@ -1,6 +1,4 @@
-import { Flavor } from "shared";
-
-type StoredFileId = Flavor<string, "StoredFileId">;
+import { StoredFileId } from "shared";
 
 export interface StoredFile {
   id: StoredFileId;

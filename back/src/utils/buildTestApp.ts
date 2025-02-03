@@ -10,7 +10,7 @@ import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-c
 import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
 import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
-import { NotImplementedDocumentGateway } from "../domains/core/file-storage/adapters/NotImplementedDocumentGateway";
+import { InMemoryDocumentGateway } from "../domains/core/file-storage/adapters/InMemoryDocumentGateway";
 import {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
@@ -40,7 +40,7 @@ export type InMemoryGateways = {
   passEmploiGateway: InMemoryPassEmploiGateway;
   franceTravailGateway: InMemoryFranceTravailGateway;
   oAuthGateway: InMemoryOAuthGateway;
-  documentGateway: NotImplementedDocumentGateway;
+  documentGateway: InMemoryDocumentGateway;
   dashboardGateway: StubDashboardGateway;
   addressApi: InMemoryAddressGateway;
   timeGateway: CustomTimeGateway;
