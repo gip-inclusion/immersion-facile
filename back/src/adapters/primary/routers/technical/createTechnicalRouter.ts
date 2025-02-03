@@ -2,13 +2,17 @@ import { createHmac } from "crypto";
 import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
-import { TallyForm, technicalRoutes, uploadFileRoute } from "shared";
-import { BadRequestError, ForbiddenError } from "shared";
+import {
+  ForbiddenError,
+  TallyForm,
+  errors,
+  technicalRoutes,
+  uploadFileRoute,
+} from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
-import { UploadFileInput } from "../../../../domains/core/file-storage/useCases/UploadFile";
 import { createLogger } from "../../../../utils/logger";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
 
@@ -26,12 +30,17 @@ export const createTechnicalRouter = (
     .route(`/${uploadFileRoute}`)
     .post(upload.single(uploadFileRoute), (req, res) =>
       sendHttpResponse(req, res, async () => {
-        if (!req.file) throw new BadRequestError("No file provided");
-        const params: UploadFileInput = {
-          multerFile: req.file,
+        if (!req.file) throw errors.file.missingFileInParams();
+        return deps.useCases.uploadFile.execute({
+          file: {
+            name: req.file.originalname,
+            encoding: req.file.encoding,
+            size: req.file.size,
+            buffer: req.file.buffer,
+            mimetype: req.file.mimetype,
+          },
           renameFileToId: req.body?.renameFileToId.toLowerCase() === "true",
-        };
-        return deps.useCases.uploadFile.execute(params);
+        });
       }),
     );
 
