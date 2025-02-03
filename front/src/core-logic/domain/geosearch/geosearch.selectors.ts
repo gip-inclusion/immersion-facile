@@ -1,16 +1,28 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
-const suggestions = createRootSelector((state) => state.geosearch.suggestions);
+const geosearchState = createRootSelector((state) => state.geosearch);
 
-const isLoading = createRootSelector((state) => state.geosearch.isLoading);
+const isDebouncing = createSelector(
+  geosearchState,
+  (state) => state.isDebouncing,
+);
 
-const query = createRootSelector((state) => state.geosearch.query);
+const suggestions = createSelector(
+  geosearchState,
+  (state) => state.suggestions,
+);
 
-const value = createRootSelector((state) => state.geosearch.value);
+const isLoading = createSelector(geosearchState, (state) => state.isLoading);
+
+const query = createSelector(geosearchState, (state) => state.query);
+
+const value = createSelector(geosearchState, (state) => state.value);
 
 export const geosearchSelectors = {
   suggestions,
   isLoading,
   query,
   value,
+  isDebouncing,
 };

@@ -4,6 +4,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
+import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import {
   TestDependencies,
   createTestStore,
@@ -37,7 +38,9 @@ describe("Geosearch epic", () => {
   it("should update the searched query and reset the state", () => {
     const query = "foi";
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    expectDebouncingToBe(true);
     dependencies.scheduler.flush();
+    expectDebouncingToBe(false);
     expectLoadingToBe(true);
     expectQueryToBe(query);
   });
@@ -45,6 +48,7 @@ describe("Geosearch epic", () => {
   it("shouldn't update the searched query if threshold is not reached", () => {
     const query = "fo";
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    expectDebouncingToBe(true);
     dependencies.scheduler.flush();
     expectLoadingToBe(false);
     expectQueryToBe("");
@@ -62,7 +66,9 @@ describe("Geosearch epic", () => {
       },
     ];
     store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    expectDebouncingToBe(true);
     dependencies.scheduler.flush();
+    expectDebouncingToBe(false);
     expectLoadingToBe(true);
     dependencies.addressGateway.lookupLocationResults$.next(
       expectedSuggestions,
@@ -95,15 +101,21 @@ describe("Geosearch epic", () => {
   });
 
   const expectQueryToBe = (expected: string) => {
-    expectToEqual(store.getState().geosearch.query, expected);
+    expectToEqual(geosearchSelectors.query(store.getState()), expected);
   };
   const expectLoadingToBe = (expected: boolean) => {
-    expectToEqual(store.getState().geosearch.isLoading, expected);
+    expectToEqual(geosearchSelectors.isLoading(store.getState()), expected);
+  };
+  const expectDebouncingToBe = (expected: boolean) => {
+    expectToEqual(geosearchSelectors.isDebouncing(store.getState()), expected);
   };
   const expectSuggestionsToBe = (expected: LookupSearchResult[]) => {
-    expectArraysToEqual(store.getState().geosearch.suggestions, expected);
+    expectArraysToEqual(
+      geosearchSelectors.suggestions(store.getState()),
+      expected,
+    );
   };
   const expectSelectedSuggestionToBe = (expected: LookupSearchResult) => {
-    expectObjectsToMatch(store.getState().geosearch.value, expected);
+    expectObjectsToMatch(geosearchSelectors.value(store.getState()), expected);
   };
 });

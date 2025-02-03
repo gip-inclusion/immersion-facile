@@ -53,6 +53,7 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
+const nafLabelMaxLength = 40;
 
 const getSearchRouteParam = (
   currentKey: keyof SearchPageParams,
@@ -194,7 +195,21 @@ export const SearchPage = ({
 
   const placeInputLabel = <>...dans la ville</>;
   const shouldShowInitialScreen = searchStatus === "noSearchMade";
-
+  const displayAppellationsOrNaf = () => {
+    const appellationDisplayed = formValues.appellations?.length
+      ? formValues.appellations.map(
+          (appellation) => appellation.appellationLabel,
+        )
+      : [];
+    const nafDisplayed = formValues.nafLabel
+      ? [
+          formValues.nafLabel.length > nafLabelMaxLength
+            ? `${formValues.nafLabel.substring(0, nafLabelMaxLength)}...`
+            : formValues.nafLabel,
+        ]
+      : [];
+    return [...appellationDisplayed, ...nafDisplayed].join(" - ");
+  };
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -337,13 +352,7 @@ export const SearchPage = ({
                 defaultValue="Tous les métiers"
                 iconId="fr-icon-briefcase-fill"
                 id={domElementIds.search.appellationFilterTag}
-                values={
-                  formValues.appellations
-                    ? formValues.appellations.map(
-                        (appellation) => appellation.appellationLabel,
-                      )
-                    : []
-                }
+                values={[displayAppellationsOrNaf()]}
                 onReset={() => {
                   const updatedValues = {
                     ...tempValue,
@@ -400,6 +409,7 @@ export const SearchPage = ({
                           setTempValue({
                             ...tempValue,
                             nafCodes: nafSectionSuggestion.nafCodes,
+                            nafLabel: nafSectionSuggestion.label,
                           });
                         }}
                         onNafClear={() => {

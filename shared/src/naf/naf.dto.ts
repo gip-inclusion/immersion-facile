@@ -53,7 +53,7 @@ export const nafSectorLabels: Record<NafSectorCode, NafSectionLabel> = {
 
 export type NafCode = Flavor<string, "NafCode">;
 export type NafNomenclature = Flavor<string, "NafNomenclature">;
-export type NafSectionLabel = Flavor<string, "SectionLabel">;
+export type NafSectionLabel = Flavor<string, "NafSectionLabel">;
 
 export type NafDto = {
   code: NafCode;
@@ -61,6 +61,7 @@ export type NafDto = {
 };
 export type WithNafCodes = {
   nafCodes?: NafCode[];
+  nafLabel?: NafSectionLabel;
 };
 
 export const fromNafSubClassToNafClass = (nafSubClass: string): string => {
