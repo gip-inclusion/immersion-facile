@@ -501,7 +501,8 @@ export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
   const sunday = 0;
   return complexSchedule.some(
     (week) =>
-      getDay(parseISO(week.date)) === sunday && week.timePeriods.length > 0,
+      getDay(convertLocaleDateToUtcTimezoneDate(parseISO(week.date))) ===
+        sunday && week.timePeriods.length > 0,
   );
 };
 
