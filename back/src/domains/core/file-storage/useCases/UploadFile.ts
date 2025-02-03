@@ -1,16 +1,30 @@
+import { AbsoluteUrl, errors, zStringMinLength1 } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../UseCase";
 import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { StoredFile } from "../entity/StoredFile";
 import { DocumentGateway } from "../port/DocumentGateway";
 
+export type FileInput = Omit<StoredFile, "id">;
+
 export type UploadFileInput = {
-  multerFile: Express.Multer.File;
+  file: FileInput;
   renameFileToId?: boolean;
 };
 
-export class UploadFile extends UseCase<UploadFileInput, string> {
-  protected inputSchema = z.any();
+const uploadFileInput: z.Schema<UploadFileInput> = z.object({
+  file: z.object({
+    name: zStringMinLength1,
+    encoding: zStringMinLength1,
+    size: z.number(),
+    buffer: z.instanceof(Buffer),
+    mimetype: zStringMinLength1,
+  }),
+  renameFileToId: z.boolean().optional(),
+});
+
+export class UploadFile extends UseCase<UploadFileInput, AbsoluteUrl> {
+  protected inputSchema = uploadFileInput;
 
   readonly #documentGateway: DocumentGateway;
 
@@ -23,28 +37,26 @@ export class UploadFile extends UseCase<UploadFileInput, string> {
   }
 
   protected async _execute({
-    multerFile,
+    file,
     renameFileToId = true,
-  }: UploadFileInput): Promise<string> {
-    const fileId = renameFileToId
-      ? this.#replaceNameWithUuid(multerFile)
-      : multerFile.originalname;
-
-    const file: StoredFile = {
-      id: fileId,
-      name: multerFile.originalname,
-      encoding: multerFile.encoding,
-      size: multerFile.size,
-      buffer: multerFile.buffer,
-      mimetype: multerFile.mimetype,
+  }: UploadFileInput): Promise<AbsoluteUrl> {
+    const fileToSave: StoredFile = {
+      ...file,
+      id: renameFileToId ? this.#replaceNameWithUuid(file) : file.name,
     };
 
-    await this.#documentGateway.put(file);
-    return this.#documentGateway.getFileUrl(file);
+    const existingFileUrl = await this.#documentGateway.getUrl(fileToSave.id);
+    if (existingFileUrl) throw errors.file.fileAlreadyExist(fileToSave.id);
+
+    await this.#documentGateway.save(fileToSave);
+
+    const savedFile = await this.#documentGateway.getUrl(fileToSave.id);
+    if (!savedFile) throw errors.file.missingFile(fileToSave.id);
+    return savedFile;
   }
 
-  #replaceNameWithUuid(multerFile: Express.Multer.File) {
-    const extension = multerFile.originalname.split(".").at(-1);
+  #replaceNameWithUuid(file: FileInput) {
+    const extension = file.name.split(".").at(-1);
     return `${this.#uuidGenerator.new()}.${extension}`;
   }
 }

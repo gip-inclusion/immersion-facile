@@ -28,7 +28,7 @@ import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGat
 import { EmailableEmailValidationGateway } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
-import { NotImplementedDocumentGateway } from "../../domains/core/file-storage/adapters/NotImplementedDocumentGateway";
+import { InMemoryDocumentGateway } from "../../domains/core/file-storage/adapters/InMemoryDocumentGateway";
 import { S3DocumentGateway } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
 import { DocumentGateway } from "../../domains/core/file-storage/port/DocumentGateway";
 import { BrevoNotificationGateway } from "../../domains/core/notifications/adapters/BrevoNotificationGateway";
@@ -452,10 +452,9 @@ export const createGateways = async (
 const createDocumentGateway = (config: AppConfig): DocumentGateway => {
   switch (config.documentGateway) {
     case "S3":
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      return new S3DocumentGateway(config.cellarS3Params!);
-    case "NONE":
-      return new NotImplementedDocumentGateway();
+      return new S3DocumentGateway(config.cellarS3Params);
+    case "IN_MEMORY":
+      return new InMemoryDocumentGateway();
     default: {
       const exhaustiveCheck: never = config.documentGateway;
       logger.error({
