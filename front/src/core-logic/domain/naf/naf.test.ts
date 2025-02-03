@@ -29,16 +29,23 @@ describe("naf slice", () => {
   it("should fetch naf sections and update the state", () => {
     expectToMatchState(store.getState(), initialState);
     store.dispatch(nafSlice.actions.queryHasChanged("query"));
+    expectToMatchState(store.getState(), {
+      currentNafSections: [],
+      isLoading: false,
+      isDebouncing: true,
+    });
     dependencies.scheduler.flush();
     expectToMatchState(store.getState(), {
       currentNafSections: [],
       isLoading: true,
+      isDebouncing: false,
     });
     // feed gateway
     dependencies.nafGateway.nafSuggestions$.next(expectedResults);
     expectToMatchState(store.getState(), {
       currentNafSections: expectedResults,
       isLoading: false,
+      isDebouncing: false,
     });
   });
 
@@ -49,6 +56,7 @@ describe("naf slice", () => {
     expectToMatchState(store.getState(), {
       currentNafSections: [],
       isLoading: true,
+      isDebouncing: false,
     });
     dependencies.nafGateway.nafSuggestions$.error(new Error("test"));
     expectToMatchState(store.getState(), initialState);
@@ -62,6 +70,7 @@ describe("naf slice", () => {
     expectToMatchState(store.getState(), {
       currentNafSections: expectedResults,
       isLoading: false,
+      isDebouncing: false,
     });
     store.dispatch(nafSlice.actions.queryHasChanged("qu"));
     dependencies.scheduler.flush();
@@ -76,6 +85,7 @@ describe("naf slice", () => {
     expectToMatchState(store.getState(), {
       currentNafSections: expectedResults,
       isLoading: false,
+      isDebouncing: false,
     });
     store.dispatch(nafSlice.actions.queryWasEmptied());
     dependencies.scheduler.flush();

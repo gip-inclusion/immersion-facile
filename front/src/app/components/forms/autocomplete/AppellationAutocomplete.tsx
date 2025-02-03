@@ -88,7 +88,7 @@ export const AppellationAutocomplete = ({
   }) => {
     if (!searchTerm) return "Saisissez un métier";
     if (searchTerm.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
-      return "Saisissez au moins 3 caractères";
+      return "Saisissez au moins 2 caractères";
     if (isSearching || searchTerm !== debounceSearchTerm) return "...";
     return "Aucun métier trouvé";
   };

@@ -23,6 +23,7 @@ export const PlaceAutocomplete = ({
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const isSearching: boolean = useAppSelector(geosearchSelectors.isLoading);
+  const isDebouncing: boolean = useAppSelector(geosearchSelectors.isDebouncing);
   const searchSuggestions = useAppSelector(geosearchSelectors.suggestions);
   const options = searchSuggestions.map((suggestion) => ({
     value: suggestion,
@@ -32,11 +33,11 @@ export const PlaceAutocomplete = ({
     <RSAutocomplete
       {...props}
       selectProps={{
+        isDebouncing,
         inputId: props.id ?? "im-select__input--place",
         isLoading: isSearching,
         loadingMessage: () => <>Recherche de ville en cours... 🔎</>,
         inputValue: searchTerm,
-        noOptionsMessage: () => <>Saisissez au moins 3 caractères</>,
         placeholder: "Ex : Saint-Denis, La Réunion, France",
         onChange: (searchResult, actionMeta) => {
           if (actionMeta.action === "clear") {
@@ -50,6 +51,7 @@ export const PlaceAutocomplete = ({
                 searchResult.value,
               ),
             );
+            dispatch(geosearchSlice.actions.queryWasEmptied());
           }
         },
         options,

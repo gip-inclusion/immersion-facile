@@ -9,7 +9,13 @@ export type OptionType<T> = { value: T; label: string };
 
 export type RSAutocompleteProps<T> = InputProps.Common &
   InputProps.RegularInput & {
-    selectProps?: SelectProps<OptionType<T>, false, GroupBase<OptionType<T>>>;
+    selectProps?: SelectProps<
+      OptionType<T>,
+      false,
+      GroupBase<OptionType<T>>
+    > & {
+      isDebouncing?: boolean;
+    };
     initialInputValue?: string;
   };
 
@@ -54,26 +60,26 @@ export const RSAutocomplete = <T,>({
         classNames={{
           input: () => fr.cx("fr-input", { "fr-input--error": hasError }),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
+          menuList: () => cx(fr.cx("fr-menu__list"), Styles.menuList),
+          option: () => cx(fr.cx("fr-nav__link")),
         }}
         components={{
-          MenuList: ({ children, innerRef }) => (
-            <ul
-              ref={innerRef as any}
-              className={cx(fr.cx("fr-menu__list"), Styles.menuList)}
-            >
-              {children}
-            </ul>
-          ),
           DropdownIndicator: () => null,
-          Option: ({ children, innerProps, innerRef }) => (
-            <li className={cx(fr.cx("fr-nav__link"), Styles.option)}>
-              <div ref={innerRef} {...innerProps}>
-                {children}
-              </div>
-            </li>
-          ),
         }}
-        noOptionsMessage={selectProps?.noOptionsMessage}
+        noOptionsMessage={
+          selectProps?.noOptionsMessage ||
+          (({ inputValue }) => {
+            if (inputValue.length < 3)
+              return <>Saisissez au moins 3 caractères</>;
+            if (selectProps?.isLoading || selectProps?.isDebouncing)
+              return selectProps?.loadingMessage ? (
+                selectProps.loadingMessage({ inputValue })
+              ) : (
+                <>Recherche en cours...</>
+              );
+            return <>Aucune suggestion trouvée pour {inputValue}</>;
+          })
+        }
         hideSelectedOptions
         isClearable
         id={`${selectProps?.inputId}-wrapper`}

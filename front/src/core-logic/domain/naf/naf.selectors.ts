@@ -10,7 +10,10 @@ const currentNafSections = createSelector(
   (state) => state.currentNafSections,
 );
 
+const isDebouncing = createSelector(nafState, (state) => state.isDebouncing);
+
 export const nafSelectors = {
   isLoading,
   currentNafSections,
+  isDebouncing,
 };

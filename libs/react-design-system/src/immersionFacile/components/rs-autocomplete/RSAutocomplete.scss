@@ -22,9 +22,15 @@
   }
   &__option {
     &:hover {
-      background-color: var(--hover-tint);
+      background-color: var(--background-overlap-grey-hover);
       cursor: pointer;
     }
+    &--is-focused {
+      background-color: var(--background-overlap-grey-hover);
+    }
+  }
+  &__menu-list {
+    @extend .fr-menu__list !optional;
   }
   &__menu-notice {
     color: var(--grey-425-625);

@@ -22,18 +22,20 @@ export const NafAutocomplete = ({
   const dispatch = useDispatch();
   const [searchTerm, setSearchTerm] = useState("");
   const isLoading = useAppSelector(nafSelectors.isLoading);
+  const isDebouncing = useAppSelector(nafSelectors.isDebouncing);
   const options = useAppSelector(nafSelectors.currentNafSections);
   return (
     <RSAutocomplete
       {...props}
       selectProps={{
         isLoading,
+        isDebouncing,
         inputValue: searchTerm,
-        noOptionsMessage: () => <>Saisissez au moins 3 caractères</>,
         placeholder: "Ex : Administration publique",
         onChange: (nafSectionSuggestion, actionMeta) => {
           if (nafSectionSuggestion && actionMeta.action === "select-option") {
             onNafSelected(nafSectionSuggestion.value);
+            dispatch(nafSlice.actions.queryWasEmptied());
           }
           if (
             actionMeta.action === "clear" ||

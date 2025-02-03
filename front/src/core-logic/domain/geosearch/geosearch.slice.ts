@@ -6,6 +6,7 @@ type GeoSearchState = {
   value: LookupSearchResult | null;
   query: string;
   isLoading: boolean;
+  isDebouncing: boolean;
 };
 
 const initialState: GeoSearchState = {
@@ -13,18 +14,17 @@ const initialState: GeoSearchState = {
   query: "",
   value: null,
   isLoading: false,
+  isDebouncing: false,
 };
 
 export const geosearchSlice = createSlice({
   name: "geosearch",
   initialState,
   reducers: {
-    queryWasEmptied: (state) => {
-      state.suggestions = [];
-      state.value = null;
-    },
+    queryWasEmptied: (_state) => initialState,
     queryHasChanged: (state, _action: PayloadAction<LookupLocationInput>) => {
       state.suggestions = [];
+      state.isDebouncing = true;
     },
     suggestionsHaveBeenRequested: (
       state,
@@ -32,6 +32,7 @@ export const geosearchSlice = createSlice({
     ) => {
       state.query = action.payload;
       state.isLoading = true;
+      state.isDebouncing = false;
     },
     suggestionsSuccessfullyFetched: (
       state,
