@@ -12,19 +12,20 @@ export type UploadFileInput = {
   renameFileToId?: boolean;
 };
 
+// biome-ignore lint/correctness/noUnusedVariables: <explanation>
 const uploadFileInput: z.Schema<UploadFileInput> = z.object({
   file: z.object({
     name: zStringMinLength1,
     encoding: zStringMinLength1,
     size: z.number(),
-    buffer: z.instanceof(Buffer),
+    buffer: z.instanceof(Buffer), // class not supported by NarrowEvent<Topic>["payload"]
     mimetype: zStringMinLength1,
   }),
   renameFileToId: z.boolean().optional(),
 });
 
 export class UploadFile extends UseCase<UploadFileInput, AbsoluteUrl> {
-  protected inputSchema = uploadFileInput;
+  protected inputSchema = z.any();
 
   readonly #documentGateway: DocumentGateway;
 
