@@ -208,7 +208,9 @@ export const SearchPage = ({
             : formValues.nafLabel,
         ]
       : [];
-    return [...appellationDisplayed, ...nafDisplayed].join(" - ");
+    return appellationDisplayed.length || nafDisplayed.length
+      ? [...appellationDisplayed, ...nafDisplayed].join(" - ")
+      : "Tous les métiers";
   };
   return (
     <HeaderFooterLayout>
@@ -419,7 +421,7 @@ export const SearchPage = ({
                           });
                         }}
                         className={fr.cx("fr-mt-2w")}
-                        initialInputValue={"initial value"}
+                        initialInputValue={formValues.nafLabel}
                       />
                     </>
                   ),
