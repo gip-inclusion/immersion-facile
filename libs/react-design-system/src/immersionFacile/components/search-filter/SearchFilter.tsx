@@ -46,7 +46,12 @@ export const SearchFilter = ({
   const hasValue = values && values.length > 0;
   const wrapperElement = useRef<ElementRef<"div">>(null);
   useLayoutEffect(() => {
-    if (isOpened && wrapperElement.current) {
+    if (
+      isOpened &&
+      wrapperElement.current &&
+      wrapperElement.current.querySelectorAll(".im-select__control--is-focused")
+        .length === 0
+    ) {
       wrapperElement.current.querySelector("input")?.focus();
     }
     document.body.addEventListener("click", handleClickOutside);
