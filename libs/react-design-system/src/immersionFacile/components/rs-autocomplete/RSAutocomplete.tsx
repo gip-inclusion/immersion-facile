@@ -43,8 +43,11 @@ export const RSAutocomplete = <T,>({
   const hasError = state === "error";
   const { cx } = useStyles();
   return (
-    <div className={cx(fr.cx("fr-input-group"), className)}>
-      <label className="fr-label" htmlFor={selectProps?.id}>
+    <div
+      className={cx(fr.cx("fr-input-group"), className)}
+      id={selectProps?.id}
+    >
+      <label className="fr-label" htmlFor={selectProps?.inputId}>
         {label}
         {hintText && <span className="fr-hint-text">{hintText}</span>}
       </label>
