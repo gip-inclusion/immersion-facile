@@ -155,6 +155,7 @@ export const domElementIds = {
     placeAutocompleteInput: "im-search-page__address-autocomplete",
     resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
+    nafAutocomplete: "im-search-page__naf-autocomplete",
     distanceSelect: "im-search-page__distance-dropdown",
     sortFilter: "im-search-page__sort-filter-select",
     searchSubmitButton: "im-search__submit-search",

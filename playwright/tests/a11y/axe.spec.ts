@@ -12,7 +12,6 @@ test.describe("Axe detect accessibility issues on main pages", () => {
     });
     expect(accessibilityScanResults.violations).toEqual([]);
   });
-
   test("Search", async ({ page }) => {
     await page.goto(frontRoutes.search);
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
@@ -21,6 +20,11 @@ test.describe("Axe detect accessibility issues on main pages", () => {
 
   test("Convention form", async ({ page }) => {
     await page.goto(frontRoutes.conventionImmersionRoute);
+    await page
+      .locator(".fr-accordion")
+      .nth(4)
+      .locator(".fr-accordion__btn")
+      .click();
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });

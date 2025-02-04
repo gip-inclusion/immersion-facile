@@ -52,10 +52,11 @@ export const ConventionFormProfession = ({
         <AppellationAutocomplete
           label={label}
           initialValue={initialFieldValue}
-          id={
-            domElementIds.conventionImmersionRoute.conventionSection
-              .immersionAppellation
-          }
+          selectProps={{
+            inputId:
+              domElementIds.conventionImmersionRoute.conventionSection
+                .immersionAppellation,
+          }}
           onAppellationSelected={(appellation) => {
             setValue("immersionAppellation.romeCode", appellation.romeCode);
             setValue("immersionAppellation.romeLabel", appellation.romeLabel);

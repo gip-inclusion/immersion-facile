@@ -247,8 +247,8 @@ export const SearchPage = ({
                     onAppellationClear={() => {
                       setValue("appellations", undefined);
                     }}
-                    id={domElementIds.search.appellationAutocomplete}
                     selectProps={{
+                      inputId: domElementIds.search.appellationAutocomplete,
                       placeholder: useNaturalLanguageForAppellations
                         ? "Ex : Boulanger, faire du pain, etc"
                         : "Ex : Boulanger, styliste, etc",
@@ -269,7 +269,9 @@ export const SearchPage = ({
                         setValue("distanceKm", 10);
                       }
                     }}
-                    id={domElementIds.search.placeAutocompleteInput}
+                    selectProps={{
+                      inputId: domElementIds.search.placeAutocompleteInput,
+                    }}
                     onPlaceClear={() => {
                       setValue("latitude", initialValues.latitude);
                       setValue("longitude", initialValues.latitude);
@@ -386,8 +388,8 @@ export const SearchPage = ({
                             appellations: undefined,
                           });
                         }}
-                        id={domElementIds.search.appellationAutocomplete}
                         selectProps={{
+                          inputId: domElementIds.search.appellationAutocomplete,
                           placeholder: useNaturalLanguageForAppellations
                             ? "Ex : Boulanger, faire du pain, etc"
                             : "Ex : Boulanger, styliste, etc",
@@ -419,6 +421,9 @@ export const SearchPage = ({
                             ...tempValue,
                             nafCodes: undefined,
                           });
+                        }}
+                        selectProps={{
+                          inputId: domElementIds.search.nafAutocomplete,
                         }}
                         className={fr.cx("fr-mt-2w")}
                         initialInputValue={formValues.nafLabel}
@@ -497,7 +502,9 @@ export const SearchPage = ({
                         }}
                         className={fr.cx("fr-mt-2w")}
                         initialInputValue={place}
-                        id={domElementIds.search.placeAutocompleteInput}
+                        selectProps={{
+                          inputId: domElementIds.search.placeAutocompleteInput,
+                        }}
                       />
 
                       <Select
