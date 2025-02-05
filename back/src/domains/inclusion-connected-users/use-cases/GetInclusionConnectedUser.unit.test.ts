@@ -25,12 +25,16 @@ import { GetInclusionConnectedUser } from "./GetInclusionConnectedUser";
 describe("GetUserAgencyDashboardUrl", () => {
   const notAdminBuilder = new InclusionConnectedUserBuilder()
     .withId("not-an-admin-id")
-    .withFirstName("John")
+    .withFirstName("Francis")
+    .withLastName("Lemoine")
+    .withEmail("francis.lemoine@mail.com")
     .withIsAdmin(false)
     .withEstablishments(undefined);
   const anotherUserBuilder = new InclusionConnectedUserBuilder()
     .withId("another-user-id")
-    .withFirstName("Jane")
+    .withFirstName("Billy")
+    .withLastName("Idol")
+    .withEmail("billy.idol@mail.com")
     .withIsAdmin(false)
     .withEstablishments(undefined);
   const icNotAdmin = notAdminBuilder.build();
@@ -442,7 +446,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
       describe("establishments", () => {
         it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
-          uow.userRepository.users = [notAdmin];
+          uow.userRepository.users = [notAdmin, anotherUser];
 
           const establishmentUserRightsForFirstEstablishment: EstablishmentUserRight[] =
             [
@@ -495,11 +499,24 @@ describe("GetUserAgencyDashboardUrl", () => {
               siret: establishmentAggregate1.establishment.siret,
               businessName: establishmentAggregate1.establishment.name,
               role: "establishment-admin",
+              admins: [
+                {
+                  email: notAdmin.email,
+                  firstName: notAdmin.firstName,
+                  lastName: notAdmin.lastName,
+                },
+                {
+                  email: anotherUser.email,
+                  firstName: anotherUser.firstName,
+                  lastName: anotherUser.lastName,
+                },
+              ],
             },
             {
               siret: establishmentAggregate2.establishment.siret,
               businessName: establishmentAggregate2.establishment.name,
               role: "establishment-contact",
+              admins: [],
             },
           ]);
         });
