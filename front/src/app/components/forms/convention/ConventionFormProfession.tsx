@@ -45,7 +45,6 @@ export const ConventionFormProfession = ({
         disabled
       />
     );
-
   return (
     <>
       <div className={fr.cx("fr-input-group")}>

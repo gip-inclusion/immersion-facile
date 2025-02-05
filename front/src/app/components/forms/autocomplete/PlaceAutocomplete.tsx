@@ -34,13 +34,16 @@ export const PlaceAutocomplete = ({
       {...props}
       selectProps={{
         isDebouncing,
-        inputId: props.id ?? "im-select__input--place",
+        inputId: props.selectProps?.inputId ?? "im-select__input--place",
         isLoading: isSearching,
         loadingMessage: () => <>Recherche de ville en cours... 🔎</>,
         inputValue: searchTerm,
         placeholder: "Ex : Saint-Denis, La Réunion, France",
         onChange: (searchResult, actionMeta) => {
-          if (actionMeta.action === "clear") {
+          if (
+            actionMeta.action === "clear" ||
+            actionMeta.action === "remove-value"
+          ) {
             geosearchSlice.actions.queryWasEmptied();
             onPlaceClear();
           }
@@ -59,10 +62,6 @@ export const PlaceAutocomplete = ({
           setSearchTerm(value);
           if (actionMeta.action === "input-change") {
             dispatch(geosearchSlice.actions.queryHasChanged(value));
-            if (value === "") {
-              onPlaceClear();
-              dispatch(geosearchSlice.actions.queryWasEmptied());
-            }
           }
         },
       }}

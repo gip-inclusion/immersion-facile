@@ -1,5 +1,5 @@
 import test, { expect, Page } from "@playwright/test";
-import { domElementIds, frontRoutes } from "shared";
+import { addressRoutes, domElementIds, frontRoutes } from "shared";
 import {
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
@@ -47,6 +47,7 @@ test.describe("Search", () => {
       page,
       locator: `#${domElementIds.search.placeAutocompleteInput}`,
       value: "Paris",
+      endpoint: addressRoutes.lookupLocation.url,
     });
     await page.click(`#${domElementIds.search.searchSubmitButton}`);
     await expectSortFiltersToBe(page, [

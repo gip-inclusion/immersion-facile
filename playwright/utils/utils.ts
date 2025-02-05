@@ -42,7 +42,7 @@ export const fillAutocomplete = async ({
   await page.waitForSelector(`${locator}[aria-controls]`);
   const listboxId = await page.locator(locator).getAttribute("aria-controls");
   const firstOption = page
-    .locator(`#${listboxId} li, .im-select__menu-list li`)
+    .locator(`#${listboxId} li, .im-select__menu-list > div`)
     .nth(0); // TODO: clean when AdressAutocomplete use react-select
   await expect(firstOption).toBeVisible();
   await firstOption.click();

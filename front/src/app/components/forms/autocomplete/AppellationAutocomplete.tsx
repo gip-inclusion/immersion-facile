@@ -98,14 +98,17 @@ export const AppellationAutocomplete = ({
       selectProps={{
         defaultInputValue: initialValue?.appellationLabel,
         isLoading: isSearching,
-        inputId: props.id ?? "im-select__input--appellation",
+        inputId: props.selectProps?.inputId ?? "im-select__input--appellation",
         loadingMessage: () => <>Recherche de métier en cours... 🔎</>,
         inputValue: searchTerm,
         noOptionsMessage: () =>
           noOptionText({ isSearching, debounceSearchTerm, searchTerm }),
         placeholder: "Ex : Boulanger, styliste, etc.",
         onChange: (searchResult, actionMeta) => {
-          if (actionMeta.action === "clear") {
+          if (
+            actionMeta.action === "clear" ||
+            actionMeta.action === "remove-value"
+          ) {
             onAppellationClear();
           }
           if (searchResult && actionMeta.action === "select-option") {

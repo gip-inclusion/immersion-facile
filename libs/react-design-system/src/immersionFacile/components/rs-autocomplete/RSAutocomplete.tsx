@@ -30,7 +30,7 @@ export type RSAutocompleteComponentProps<
   Record<`on${Capitalize<K>}Selected`, (value: T) => void> &
   Record<`on${Capitalize<K>}Clear`, () => void>;
 
-const prefix = "im-select";
+export const prefix = "im-select";
 
 export const RSAutocomplete = <T,>({
   state,
@@ -47,13 +47,13 @@ export const RSAutocomplete = <T,>({
       className={cx(fr.cx("fr-input-group"), className)}
       id={selectProps?.id}
     >
-      <label className="fr-label" htmlFor={selectProps?.inputId}>
+      <label className={fr.cx("fr-label")} htmlFor={selectProps?.inputId}>
         {label}
         {hintText && <span className="fr-hint-text">{hintText}</span>}
       </label>
       <Select
         classNamePrefix={prefix}
-        className={`${prefix} ${hasError ? "im-select--has-error" : ""}`}
+        className={cx(`${prefix}`, hasError ? "im-select--has-error" : "")}
         unstyled
         defaultInputValue={selectProps?.defaultInputValue}
         value={selectProps?.value}

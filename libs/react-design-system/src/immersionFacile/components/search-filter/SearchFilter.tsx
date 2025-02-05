@@ -4,6 +4,7 @@ import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
+import { prefix } from "../rs-autocomplete";
 import Styles from "./SearchFilter.styles";
 
 export type SearchFilterProps = {
@@ -49,7 +50,7 @@ export const SearchFilter = ({
     if (
       isOpened &&
       wrapperElement.current &&
-      wrapperElement.current.querySelectorAll(".im-select__control--is-focused")
+      wrapperElement.current.querySelectorAll(`.${prefix}__control--is-focused`)
         .length === 0
     ) {
       wrapperElement.current.querySelector("input")?.focus();
