@@ -1,5 +1,8 @@
 import { AddressDto } from "shared";
 
+export const getRandomAddress = (): AddressDto =>
+  seedAddresses[Math.floor(Math.random() * seedAddresses.length)];
+
 export const seedAddresses: AddressDto[] = [
   {
     city: "Paris",
