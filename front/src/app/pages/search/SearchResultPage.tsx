@@ -250,10 +250,7 @@ export const SearchResultPage = ({
                     </>
                   </SearchResultSection>
                   <SearchResultSection title="Secteur d'activité :">
-                    <p>
-                      {currentSearchResult.romeLabel} (
-                      {currentSearchResult.rome})
-                    </p>
+                    <p>{currentSearchResult.nafLabel}</p>
                   </SearchResultSection>
 
                   {currentSearchResult.appellations.length > 0 && (
