@@ -1,12 +1,19 @@
-import { NafSectionSuggestion, expectArraysToEqual } from "shared";
+import {
+  NafSectionSuggestion,
+  expectArraysToEqual,
+  expectToEqual,
+} from "shared";
 import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
-import { NafState, nafSlice } from "src/core-logic/domain/naf/naf.slice";
-import { initialState } from "src/core-logic/domain/naf/naf.slice";
+import {
+  NafState,
+  initialState,
+  nafSlice,
+} from "src/core-logic/domain/naf/naf.slice";
 import {
   TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore, RootState } from "src/core-logic/storeConfig/store";
+import { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("naf slice", () => {
   const expectedResults: NafSectionSuggestion[] = [
@@ -27,22 +34,22 @@ describe("naf slice", () => {
   });
 
   it("should fetch naf sections and update the state", () => {
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
     store.dispatch(nafSlice.actions.queryHasChanged("query"));
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: [],
       isLoading: false,
       isDebouncing: true,
     });
     dependencies.scheduler.flush();
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: [],
       isLoading: true,
       isDebouncing: false,
     });
     // feed gateway
     dependencies.nafGateway.nafSuggestions$.next(expectedResults);
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: expectedResults,
       isLoading: false,
       isDebouncing: false,
@@ -50,53 +57,62 @@ describe("naf slice", () => {
   });
 
   it("should return to initial state when the request fails", () => {
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
     store.dispatch(nafSlice.actions.queryHasChanged("query"));
     dependencies.scheduler.flush();
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: [],
       isLoading: true,
       isDebouncing: false,
     });
     dependencies.nafGateway.nafSuggestions$.error(new Error("test"));
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
   });
 
   it("shouldn't trigger a new request to the gateway when query < threshold", () => {
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
     store.dispatch(nafSlice.actions.queryHasChanged("query"));
     dependencies.scheduler.flush();
     dependencies.nafGateway.nafSuggestions$.next(expectedResults);
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: expectedResults,
       isLoading: false,
       isDebouncing: false,
     });
     store.dispatch(nafSlice.actions.queryHasChanged("qu"));
     dependencies.scheduler.flush();
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors({
+      ...initialState,
+      isDebouncing: true,
+    });
   });
 
   it("should clear the current state when the query is emptied", () => {
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
     store.dispatch(nafSlice.actions.queryHasChanged("query"));
     dependencies.scheduler.flush();
     dependencies.nafGateway.nafSuggestions$.next(expectedResults);
-    expectToMatchState(store.getState(), {
+    expectToMatchSelectors({
       currentNafSections: expectedResults,
       isLoading: false,
       isDebouncing: false,
     });
     store.dispatch(nafSlice.actions.queryWasEmptied());
     dependencies.scheduler.flush();
-    expectToMatchState(store.getState(), initialState);
+    expectToMatchSelectors(initialState);
   });
-});
 
-const expectToMatchState = (
-  state: RootState,
-  { currentNafSections: expectedResults, isLoading: expectedLoading }: NafState,
-) => {
-  expect(nafSelectors.isLoading(state)).toBe(expectedLoading);
-  expectArraysToEqual(nafSelectors.currentNafSections(state), expectedResults);
-};
+  const expectToMatchSelectors = ({
+    currentNafSections: expectedResults,
+    isLoading: expectedLoading,
+    isDebouncing: expectedDebouncing,
+  }: NafState) => {
+    const state = store.getState();
+    expectToEqual(nafSelectors.isLoading(state), expectedLoading);
+    expectToEqual(nafSelectors.isDebouncing(state), expectedDebouncing);
+    expectArraysToEqual(
+      nafSelectors.currentNafSections(state),
+      expectedResults,
+    );
+  };
+});
