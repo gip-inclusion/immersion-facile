@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { useState } from "react";
+import React, { useState } from "react";
 import { AgencyRight, InclusionConnectedUser } from "shared";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -17,6 +17,7 @@ export function NoActiveAgencyRights({
     useState<boolean>(false);
   return (
     <>
+      <h1>Demander l'accès à des organismes</h1>
       <h2 className={fr.cx("fr-mt-2w")}>Suivi de mes demandes</h2>
       <div className={fr.cx("fr-grid-row")}>
         <div

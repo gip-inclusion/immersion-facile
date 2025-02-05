@@ -28,9 +28,6 @@ export const AgencyDashboardPage = ({
 
   return (
     <>
-      <div className={fr.cx("fr-grid-row")}>
-        <h1>Demander l'accès à des organismes</h1>
-      </div>
       {isLoading && <Loader />}
       <Feedback topic="dashboard-agency-register-user" />
 
@@ -44,14 +41,18 @@ export const AgencyDashboardPage = ({
           ({ currentUser }) => {
             if (new Date(currentUser.createdAt) > subMinutes(new Date(), 1))
               return (
-                <Alert
-                  severity="warning"
-                  title="Rattachement à vos organismes en cours"
-                  description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
-                />
+                <>
+                  <h1>Demander l'accès à des organismes</h1>
+                  <Alert
+                    severity="warning"
+                    title="Rattachement à vos organismes en cours"
+                    description="Vous êtes bien connecté. Nous sommes en train de vérifier si vous avez des organismes rattachées à votre compte. Merci de patienter. Ca ne devrait pas prendre plus de 1 minute. Veuillez recharger la page après ce delai."
+                  />
+                </>
               );
             return (
               <>
+                <h1>Demander l'accès à des organismes</h1>
                 <p className={fr.cx("fr-mt-4w")}>
                   Bonjour {currentUser.firstName} {currentUser.lastName},
                   recherchez un organisme afin d'accéder aux conventions et
@@ -72,12 +73,15 @@ export const AgencyDashboardPage = ({
               distinguishAgencyRights(currentUser.agencyRights);
 
             return activeAgencyRights.length ? (
-              <AgencyDashboard
-                route={route}
-                activeAgencyRights={activeAgencyRights}
-                dashboards={currentUser.dashboards}
-                inclusionConnectedJwt={inclusionConnectedJwt}
-              />
+              <>
+                <h1>Bienvenue</h1>
+                <AgencyDashboard
+                  route={route}
+                  activeAgencyRights={activeAgencyRights}
+                  dashboards={currentUser.dashboards}
+                  inclusionConnectedJwt={inclusionConnectedJwt}
+                />
+              </>
             ) : (
               <NoActiveAgencyRights
                 toReviewAgencyRights={toReviewAgencyRights}
