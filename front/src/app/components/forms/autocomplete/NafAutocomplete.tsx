@@ -53,10 +53,6 @@ export const NafAutocomplete = ({
           setSearchTerm(value);
           if (actionMeta.action === "input-change") {
             dispatch(nafSlice.actions.queryHasChanged(value));
-            if (value === "") {
-              onNafClear();
-              dispatch(nafSlice.actions.queryWasEmptied());
-            }
           }
         },
       }}
