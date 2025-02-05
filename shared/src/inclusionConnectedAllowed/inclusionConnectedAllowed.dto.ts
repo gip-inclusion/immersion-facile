@@ -55,6 +55,7 @@ export type WithEstablishmentData = {
   siret: SiretDto;
   businessName: string;
   role: EstablishmentRole;
+  admins: { firstName: string; lastName: string; email: Email }[];
 };
 
 export type WithEstablishments = {

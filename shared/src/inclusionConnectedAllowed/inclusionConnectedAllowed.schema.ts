@@ -48,6 +48,13 @@ const withEstablishmentSiretAndName: z.Schema<WithEstablishmentData> = z.object(
     siret: siretSchema,
     businessName: zStringMinLength1,
     role: z.enum(establishmentsRoles),
+    admins: z.array(
+      z.object({
+        firstName: zStringMinLength1,
+        lastName: zStringMinLength1,
+        email: emailSchema,
+      }),
+    ),
   },
 );
 
