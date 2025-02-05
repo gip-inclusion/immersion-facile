@@ -105,6 +105,8 @@ const adminUser = new InclusionConnectedUserBuilder()
 
 const franceMerguezUser = new UserBuilder()
   .withId("11111111-2222-4000-2222-111111111111")
+  .withFirstName("Daniella")
+  .withLastName("Velàzquez")
   .withEmail("recette+merguez@immersion-facile.beta.gouv.fr")
   .build();
 
@@ -272,6 +274,12 @@ const establishmentSeed = async (uow: UnitOfWork) => {
         role: "establishment-admin",
         phone: "+33600110011",
         job: "Le Boss des merguez",
+      },
+      {
+        userId: adminUser.id,
+        role: "establishment-contact",
+        job: "la compta",
+        phone: "+33672787844",
       },
     ])
     .build();

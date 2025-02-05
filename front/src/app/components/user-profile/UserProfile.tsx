@@ -8,6 +8,7 @@ import {
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { AgenciesTablesSection } from "../agency/agencies-table/AgenciesTablesSection";
+import { EstablishmentsTablesSection } from "../establishment/establishments-table/EstablishmentsTablesSection";
 import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
 
 type UserProfileProps = {
@@ -50,6 +51,9 @@ export const UserProfile = ({
       agencyRights={[...userWithRights.agencyRights]}
       isBackofficeAdmin={currentUser.isBackofficeAdmin}
       onUserUpdateRequested={onUserUpdateRequested}
+    />
+    <EstablishmentsTablesSection
+      withEstablishmentData={userWithRights.establishments}
     />
   </div>
 );

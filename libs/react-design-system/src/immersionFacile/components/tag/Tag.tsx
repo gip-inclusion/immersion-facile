@@ -14,7 +14,7 @@ type ThemeTag =
   | "voluntaryToImmersion"
   | "prescripteur"
   | "structureAccompagnement"
-  | "entreprise";
+  | "etablissement";
 
 type TagProps = {
   theme: ThemeTag;
@@ -55,9 +55,9 @@ const themes: Themes = {
     iconId: "fr-icon-parent-line",
     label: "Prescripteur",
   },
-  entreprise: {
+  etablissement: {
     iconId: "fr-icon-building-line",
-    label: "Entreprise",
+    label: "Établissement",
   },
 };
 

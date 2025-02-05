@@ -8,5 +8,5 @@ export default {
   voluntaryToImmersion: "im-tag--voluntaryToImmersion",
   prescripteur: "im-tag--prescripteur",
   structureAccompagnement: "im-tag--structureAccompagnement",
-  entreprise: "im-tag--entreprise",
+  etablissement: "im-tag--etablissement",
 };
