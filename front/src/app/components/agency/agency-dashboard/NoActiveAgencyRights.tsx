@@ -17,7 +17,6 @@ export function NoActiveAgencyRights({
     useState<boolean>(false);
   return (
     <>
-      <h1>Demander l'accès à des organismes</h1>
       <h2 className={fr.cx("fr-mt-2w")}>Suivi de mes demandes</h2>
       <div className={fr.cx("fr-grid-row")}>
         <div
