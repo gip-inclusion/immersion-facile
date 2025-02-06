@@ -27,3 +27,7 @@ location /aide {
 location = /etablissement {
     return 301 $scheme://$http_host/accueil-entreprises;
 }
+
+location = /recherche-diagoriente {
+    return 301 $scheme://$http_host/recherche;
+}
