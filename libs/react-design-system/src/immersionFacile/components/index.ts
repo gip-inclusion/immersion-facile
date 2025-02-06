@@ -1,5 +1,4 @@
 export * from "./button-with-submenu";
-export * from "./convention-document";
 export * from "./convention-form-layout";
 export * from "./convention-form-sidebar";
 export * from "./convention-summary";
@@ -10,6 +9,7 @@ export * from "./convention-total-hours";
 export * from "./copy-button";
 export * from "./crisp-chat";
 export * from "./discussion-meta";
+export * from "./document";
 export * from "./error-notifications";
 export * from "./field";
 export * from "./file";
