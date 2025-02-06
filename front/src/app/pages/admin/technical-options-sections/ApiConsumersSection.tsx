@@ -7,6 +7,7 @@ import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { addYears } from "date-fns";
 import React, { Fragment, useEffect, useState } from "react";
+import { useCopyButton } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
@@ -28,7 +29,6 @@ import {
 } from "src/app/contents/admin/apiConsumer";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";

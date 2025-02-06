@@ -3,6 +3,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useEffect, useState } from "react";
 import { FormOverlay } from "react-design-system";
 import {
+  ImmersionObjective,
   isStringImmersionObjective,
   keys,
   labelsForImmersionObjective,
@@ -146,7 +147,7 @@ const renderTranscientKeyValues = (data: ContactTranscientData) => {
 
 const renderValue = (
   key: keyof ContactTranscientData,
-  value: boolean | string | number,
+  value: string | boolean | number | ImmersionObjective,
 ): React.ReactNode => {
   if (typeof value === "boolean") {
     return value ? "Oui" : "Non";

@@ -4,13 +4,19 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
 import React from "react";
-import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
+import {
+  CopyButton,
+  DiscussionMeta,
+  ExchangeMessage,
+  Loader,
+} from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -231,6 +237,26 @@ const DiscussionDetails = ({
           buttonsSize="small"
           buttons={candidateContactButtons}
         />
+        <div className={fr.cx("fr-grid-row")}>
+          <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+            <Highlight className={fr.cx("fr-ml-0", "fr-pt-2w", "fr-pb-1w")}>
+              <p className={fr.cx("fr-text--sm", "fr-mb-2w")}>
+                Vous ne parvenez pas à répondre au candidat ? Copiez dans votre
+                presse papier l’adresse email sécurisée de cette discussion et
+                utilisez-la directement depuis votre boîte mail.
+              </p>
+              <CopyButton
+                textToCopy={createOpaqueEmail(
+                  discussion.id,
+                  "potentialBeneficiary",
+                  `reply.${window.location.hostname}`,
+                )}
+                withIcon
+                label="Copier l'adresse email"
+              />
+            </Highlight>
+          </div>
+        </div>
       </header>
       {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>

@@ -3,8 +3,8 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React, { useState } from "react";
 import { File } from "react-design-system";
+import { useCopyButton } from "react-design-system";
 import { domElementIds } from "shared";
-import { useCopyButton } from "src/app/hooks/useCopyButton";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 export const UploadFileSection = () => {
