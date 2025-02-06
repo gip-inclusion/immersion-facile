@@ -30,6 +30,7 @@ export const UserProfile = ({
       <h1 className={fr.cx("fr-col-12", "fr-col-sm-10")}>{title}</h1>
       <Button
         id={domElementIds.profile.registerAgenciesSearchLink}
+        priority="secondary"
         className={fr.cx("fr-col-12", "fr-col-sm-2")}
         linkProps={{
           href: `${routes.myProfileAgencyRegistration().href}`,
