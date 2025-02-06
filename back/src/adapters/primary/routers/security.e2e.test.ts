@@ -54,6 +54,7 @@ describe("security e2e", () => {
         status: 400,
       });
     });
+
     it("200 - should not throw an error if a request (POST) body parameter does not contain HTML", async () => {
       const response = await unauthenticatedRequest.createConvention({
         body: {
