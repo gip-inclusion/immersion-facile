@@ -1,8 +1,8 @@
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
+import { useCopyButton } from "react-design-system";
 import { AgencyId } from "shared";
-import { useCopyButton } from "src/app/hooks/useCopyButton";
 
 export const CopyAgencyId = ({ agencyId }: { agencyId: AgencyId }) => {
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =

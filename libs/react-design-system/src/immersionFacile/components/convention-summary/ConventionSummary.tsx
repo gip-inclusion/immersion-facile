@@ -93,7 +93,6 @@ export const ConventionSummary = ({
               label="Copier l'ID de convention"
               textToCopy={conventionId}
               withIcon={true}
-              withBorder={true}
               className={fr.cx("fr-my-2v")}
             />
           </div>

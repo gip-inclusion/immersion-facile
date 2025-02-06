@@ -1,5 +1,4 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import React from "react";
 import { CopyButton, CopyButtonProperties } from "./CopyButton";
 
 const Component = CopyButton;
@@ -39,13 +38,5 @@ export const WithIconButNoLabel: Story = {
   args: {
     textToCopy: "texte copié",
     withIcon: true,
-  },
-};
-
-export const WithBorder: Story = {
-  args: {
-    textToCopy: "texte copié",
-    withIcon: true,
-    withBorder: true,
   },
 };

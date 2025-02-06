@@ -86,7 +86,7 @@ const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
 };
 
 const getPageByRouteName: {
-  [K in keyof Routes]: (route: Route<Routes[K]>) => unknown;
+  [K in keyof Routes]: (route: Route<Routes[K]>) => React.ReactNode;
 } = {
   addAgency: () => <AddAgencyPage />,
   admin: (route) => (
