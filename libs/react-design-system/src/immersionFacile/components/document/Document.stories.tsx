@@ -1,11 +1,8 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import {
-  ConventionDocument,
-  ConventionDocumentProperties,
-} from "./ConventionDocument";
+import { ConventionDocumentProperties, Document } from "./Document";
 
-const Component = ConventionDocument;
+const Component = Document;
 type Story = StoryObj<typeof Component>;
 const argTypes: Partial<ArgTypes<ConventionDocumentProperties>> | undefined =
   {};
@@ -14,12 +11,12 @@ const componentDescription = `
 Affiche un document de convention imprimable.
 
 \`\`\`tsx  
-import { ConventionDocument } from "react-design-system";
+import { Document } from "react-design-system";
 \`\`\`
 `;
 
 export default {
-  title: "ConventionDocument",
+  title: "Document",
   component: Component,
   argTypes,
   parameters: {
@@ -33,7 +30,7 @@ export default {
 
 export const Default: Story = {
   args: {
-    children: <div>&lt; insérer ici le contenu html de la convention &gt;</div>,
-    title: "Insérer ici le titre de la convention",
+    children: <div>&lt; insérer ici le contenu html du document &gt;</div>,
+    title: "Insérer ici le titre du document",
   },
 };

@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect, useState } from "react";
 import {
-  ConventionDocument,
   ConventionRenewedInformations,
+  Document,
   Loader,
   MainWrapper,
   NPSForm,
@@ -195,7 +195,7 @@ export const ConventionDocumentPage = ({
     <MainWrapper layout="default" vSpacing={8}>
       {isPdfLoading && <Loader />}
       {canShowConvention && (
-        <ConventionDocument
+        <Document
           logos={logos}
           title={
             internshipKind === "immersion"
@@ -1009,7 +1009,7 @@ export const ConventionDocumentPage = ({
               status: convention.status,
             }}
           />
-        </ConventionDocument>
+        </Document>
       )}
     </MainWrapper>
   );

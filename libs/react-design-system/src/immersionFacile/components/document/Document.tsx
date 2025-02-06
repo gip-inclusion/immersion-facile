@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React, { ReactElement } from "react";
 import { useStyles } from "tss-react/dsfr";
-import "./ConventionDocument.scss";
+import "./Document.scss";
 
 const componentName = "im-convention-document";
 
@@ -13,7 +13,7 @@ export type ConventionDocumentProperties = {
   customActions?: React.ReactNode[];
 };
 
-export const ConventionDocument = ({
+export const Document = ({
   children,
   logos,
   title,
