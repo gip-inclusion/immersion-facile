@@ -32,18 +32,18 @@ export const AgencyDashboardPage = ({
 
   const agencyOptions = useAppSelector(agenciesSelectors.options);
 
-  const initialSiretFromProConnect =
+  const siretInDeviceStorage =
     outOfReduxDependencies.localDeviceRepository.get("connectedUserSiret");
 
   useEffect(() => {
-    if (initialSiretFromProConnect)
+    if (siretInDeviceStorage)
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
-          siret: initialSiretFromProConnect,
+          siret: siretInDeviceStorage,
           status: ["active", "from-api-PE"],
         }),
       );
-  }, [dispatch, initialSiretFromProConnect]);
+  }, [dispatch, siretInDeviceStorage]);
 
   return (
     <>
@@ -69,30 +69,25 @@ export const AgencyDashboardPage = ({
               );
             return (
               <>
-                {initialSiretFromProConnect ? (
-                  <>
-                    <strong className={fr.cx("fr-mt-4w", "fr-text--lead")}>
-                      Bonjour {currentUser.firstName} {currentUser.lastName},
-                      vous avez sélectionné le SIRET{" "}
-                      {initialSiretFromProConnect} lors de la création de votre
-                      compte sur ProConnect
-                    </strong>
-                  </>
+                {siretInDeviceStorage ? (
+                  <strong className={fr.cx("fr-mt-4w", "fr-text--lead")}>
+                    Bonjour {currentUser.firstName} {currentUser.lastName}, vous
+                    avez sélectionné le SIRET {siretInDeviceStorage} lors de la
+                    création de votre compte sur ProConnect
+                  </strong>
                 ) : (
-                  <>
-                    <p>
-                      Bonjour {currentUser.firstName} {currentUser.lastName},
-                      recherchez un organisme afin d'accéder aux conventions et
-                      statistiques de ce dernier. Un administrateur vérifiera et
-                      validera votre demande.
-                    </p>
-                  </>
+                  <p>
+                    Bonjour {currentUser.firstName} {currentUser.lastName},
+                    recherchez un organisme afin d'accéder aux conventions et
+                    statistiques de ce dernier. Un administrateur vérifiera et
+                    validera votre demande.
+                  </p>
                 )}
 
                 <RegisterAgenciesForm
                   currentUser={currentUser}
-                  {...(initialSiretFromProConnect && agencyOptions.length > 0
-                    ? { initialSiret: initialSiretFromProConnect }
+                  {...(siretInDeviceStorage && agencyOptions.length > 0
+                    ? { initialSiret: siretInDeviceStorage }
                     : {})}
                 />
               </>
