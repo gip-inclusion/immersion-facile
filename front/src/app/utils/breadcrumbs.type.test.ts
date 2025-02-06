@@ -12,5 +12,5 @@ getTestBreadcrumbs({
 
 getTestBreadcrumbs({
   // deep level
-  currentRouteKey: "searchDiagoriente",
+  currentRouteKey: "search",
 });

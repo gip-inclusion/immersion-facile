@@ -47,10 +47,6 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Recherche",
         route: routes.search(),
       },
-      searchDiagoriente: {
-        label: "Recherche (langage naturel)",
-        route: routes.searchDiagoriente(),
-      },
       beneficiaryDashboard: {
         label: "Tableau de bord",
         route: routes.beneficiaryDashboard(),

@@ -86,7 +86,10 @@ export const AppellationAutocomplete = ({
     debounceSearchTerm: string;
     searchTerm: string;
   }) => {
-    if (!searchTerm) return "Saisissez un métier";
+    if (!searchTerm)
+      return useNaturalLanguage
+        ? "Saisissez un métier ou une compétence"
+        : "Saisissez un métier";
     if (searchTerm.length < ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH)
       return "Saisissez au moins 2 caractères";
     if (isSearching || searchTerm !== debounceSearchTerm) return "...";
@@ -103,7 +106,8 @@ export const AppellationAutocomplete = ({
         inputValue: searchTerm,
         noOptionsMessage: () =>
           noOptionText({ isSearching, debounceSearchTerm, searchTerm }),
-        placeholder: "Ex : Boulanger, styliste, etc.",
+        placeholder:
+          props.selectProps?.placeholder ?? "Ex : Boulanger, styliste, etc.",
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||

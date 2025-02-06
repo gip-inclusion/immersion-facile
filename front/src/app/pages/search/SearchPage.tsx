@@ -72,7 +72,7 @@ export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
 }: {
-  route: Route<typeof routes.search | typeof routes.searchDiagoriente>;
+  route: Route<typeof routes.search>;
   useNaturalLanguageForAppellations?: boolean;
 }) => {
   const { cx } = useStyles();
