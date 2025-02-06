@@ -90,6 +90,7 @@ export const RegisterAgenciesForm = ({
               <Button
                 className={fr.cx("fr-col-12", "fr-col-md-4")}
                 id={domElementIds.agencyDashboard.registerAgencies.submitButton}
+                priority="secondary"
                 onClick={() => {
                   dispatch(
                     inclusionConnectedSlice.actions.registerAgenciesRequested({
