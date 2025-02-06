@@ -11,6 +11,7 @@ import {
   HTTPFrontErrorContents,
 } from "src/app/contents/error/types";
 import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
+import { escapeHtml } from "src/app/utils/sanitize";
 
 import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
 import technicalErrorSprite from "@codegouvfr/react-dsfr/dsfr/artwork/pictograms/system/technical-error.svg";
@@ -40,9 +41,16 @@ export const ErrorPageContent = ({
 }: ErrorPageContentProps): React.ReactElement => {
   const route = useRoute() as Route<typeof routes>;
   const redirectAction = useRedirectToConventionWithoutIdentityProvider();
-  const content: HTTPFrontErrorContents = type
+  const unsafeXSSContent: HTTPFrontErrorContents = type
     ? contentsMapper(redirectAction, message, title)[type]
     : unexpectedErrorContent(title ?? "", message ?? "");
+  const escapedContent = {
+    ...unsafeXSSContent,
+    overtitle: escapeHtml(unsafeXSSContent.overtitle),
+    title: escapeHtml(unsafeXSSContent.title),
+    subtitle: escapeHtml(unsafeXSSContent.subtitle),
+    description: escapeHtml(unsafeXSSContent.description),
+  };
   const siret = routeContainsJwt(route)
     ? getJwtPayload(route.params.jwt)?.siret
     : null;
@@ -59,12 +67,16 @@ export const ErrorPageContent = ({
       )}
     >
       <div className={fr.cx("fr-py-0", "fr-col-12", "fr-col-md-6")}>
-        <h1>{content.overtitle}</h1>
-        <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{content.title}</p>
-        <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{content.subtitle}</p>
+        <h1>{escapedContent.overtitle}</h1>
+        <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>
+          {escapedContent.title}
+        </p>
+        <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>
+          {escapedContent.subtitle}
+        </p>
         <p
           className={fr.cx("fr-text--sm", "fr-mb-3w")}
-          dangerouslySetInnerHTML={{ __html: content.description }}
+          dangerouslySetInnerHTML={{ __html: escapedContent.description }}
         />
         {shouldShowRefreshEditEstablishmentLink && siret && (
           <p className={fr.cx("fr-text--sm", "fr-mb-5w")}>
@@ -75,13 +87,13 @@ export const ErrorPageContent = ({
           </p>
         )}
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-          {content.buttons.map((button: ErrorButton, index) => {
+          {escapedContent.buttons.map((button: ErrorButton, index) => {
             const buttonProps: ErrorButtonProps =
               typeof button === "function"
                 ? button({
                     currentUrl: window.location.href,
                     currentDate: new Date().toISOString(),
-                    error: content.description,
+                    error: escapedContent.description,
                   })
                 : button;
             return (
