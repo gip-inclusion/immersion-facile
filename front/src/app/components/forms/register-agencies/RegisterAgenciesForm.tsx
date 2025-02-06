@@ -3,7 +3,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Table from "@codegouvfr/react-dsfr/Table";
-import React, { ElementRef, useEffect, useState } from "react";
+import React, { ElementRef, useState } from "react";
 import { Tag } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -49,45 +49,41 @@ export const RegisterAgenciesForm = ({
     );
   };
 
-  useEffect(() => {
-    if (inputValue === undefined && initialSiret) {
-      setInputValue(initialSiret);
-    }
-  }, [inputValue, initialSiret]);
+  if (inputValue === undefined && initialSiret) {
+    setInputValue(initialSiret);
+  }
 
   return (
     <>
-      <>
-        <div className={fr.cx("fr-mt-4w", "fr-mb-2w")}>
-          <Input
-            label="Se rattacher à un organisme"
-            hintText="Rechercher par n° SIRET ou nom sous lequel il est enregistré sur Immersion Facilitée"
-            nativeInputProps={{
-              id: domElementIds.agencyDashboard.registerAgencies.search,
-              type: "search",
-              placeholder: "",
-              value: inputValue,
-              onChange: onAgencySearchChange,
-              onKeyDown: (event) => {
-                if (event.key === "Escape") {
-                  agencySearchBySiretOrNameInput.current?.blur();
-                }
-              },
-            }}
-          />
-        </div>
-        <a
-          href="https://annuaire-entreprises.data.gouv.fr/"
-          target="_blank"
-          rel="noreferrer"
-          className={fr.cx("fr-link")}
-        >
-          <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
-          Retrouver votre siret sur l'Annuaire des Entreprises
-        </a>
-      </>
+      <div className={fr.cx("fr-mt-4w", "fr-mb-2w")}>
+        <Input
+          label="Se rattacher à un organisme"
+          hintText="Rechercher par n° SIRET ou nom sous lequel il est enregistré sur Immersion Facilitée"
+          nativeInputProps={{
+            id: domElementIds.agencyDashboard.registerAgencies.search,
+            type: "search",
+            placeholder: "",
+            value: inputValue,
+            onChange: onAgencySearchChange,
+            onKeyDown: (event) => {
+              if (event.key === "Escape") {
+                agencySearchBySiretOrNameInput.current?.blur();
+              }
+            },
+          }}
+        />
+      </div>
+      <a
+        href="https://annuaire-entreprises.data.gouv.fr/"
+        target="_blank"
+        rel="noreferrer"
+        className={fr.cx("fr-link")}
+      >
+        <i className={fr.cx("fr-icon-information-fill", "fr-icon--sm")} />
+        Retrouver votre siret sur l'Annuaire des Entreprises
+      </a>
 
-      {inputValue && inputValue.length > 0 && (
+      {inputValue && (
         <>
           <section className={fr.cx("fr-mt-6w")}>
             <div className={fr.cx("fr-grid-row")}>
@@ -126,20 +122,18 @@ export const RegisterAgenciesForm = ({
               currentUser={currentUser}
             />
           </section>
-          {
-            <section>
-              <h2 className={fr.cx("fr-text--lead")}>
-                Vous ne trouvez pas votre organisme ?
-              </h2>
-              <Button
-                linkProps={{
-                  href: `${routes.addAgency().href}`,
-                }}
-              >
-                Créer un nouvel organisme sur Immersion Facilitée
-              </Button>
-            </section>
-          }
+          <section>
+            <h2 className={fr.cx("fr-text--lead")}>
+              Vous ne trouvez pas votre organisme ?
+            </h2>
+            <Button
+              linkProps={{
+                href: `${routes.addAgency().href}`,
+              }}
+            >
+              Créer un nouvel organisme sur Immersion Facilitée
+            </Button>
+          </section>
         </>
       )}
     </>
