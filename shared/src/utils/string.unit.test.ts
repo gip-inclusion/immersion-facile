@@ -1,5 +1,6 @@
 import {
   cleanStringToHTMLAttribute,
+  doesStringContainsHTML,
   looksLikeSiret,
   removeDiacritics,
   slugify,
@@ -110,5 +111,19 @@ describe("string utils", () => {
         expect(looksLikeSiret(input)).toBe(false);
       },
     );
+  });
+
+  describe("doesStringContainsHTML", () => {
+    it.each([
+      ["<script>alert('XSS')</script>", true],
+      ["some content with a <a href='example.com'>link</a>", true],
+      ["some content with a <!-- beginning of html comment", true],
+      ["some content with a <!-- html comment -->", true],
+      ["some content with an --> ending of html comment", false],
+      ["some content with an < open tag", false],
+      ["> < emoji ?", false],
+    ])(`should return true for "%s"`, (input, expected) => {
+      expect(doesStringContainsHTML(input)).toBe(expected);
+    });
   });
 });
