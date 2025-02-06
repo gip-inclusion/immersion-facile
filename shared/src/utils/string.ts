@@ -50,7 +50,7 @@ export const isStringEmpty = (str: string) =>
 
 export const doesStringContainsHTML = (possiblyHtmlString: string): boolean => {
   const htmlRegex =
-    /(?:<[!]?(?:(?:[a-z][a-z0-9-]*)|(?:!--[\s\S]*?--))(?:\s+[^>]*)?>\s*)|(?:<!--)/i;
+    /(?:<[!]?(?:(?:[a-z][a-z0-9-]{0,1000})|(?:!--[\s\S]{0,1000}?--))(?:\s{0,1000}[^>]{0,1000})?>\s{0,1000})|(?:<!--)/i;
   return htmlRegex.test(possiblyHtmlString);
 };
 
