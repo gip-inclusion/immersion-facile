@@ -11,6 +11,7 @@ export const frontRoutes = {
   [allowedStartInclusionConnectLoginPages[0]]: "tableau-de-bord-agence",
   [allowedStartInclusionConnectLoginPages[1]]: "tableau-de-bord-etablissement",
   [allowedStartInclusionConnectLoginPages[2]]: "admin",
+  assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   initiateConvention: "initier-convention",
   conventionImmersionRoute: "demande-immersion",

@@ -15,6 +15,7 @@ import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
 import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
+import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
 import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
@@ -137,7 +138,7 @@ const getPageByRouteName: {
       <AgencyDetailForAgencyDashboard route={route} />
     </AgencyDashboardPrivateRoute>
   ),
-
+  assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
   initiateConvention: () => <InitiateConventionPage />,
   conventionImmersion: (route) => <ConventionImmersionPage route={route} />,

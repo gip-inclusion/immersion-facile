@@ -148,6 +148,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     ({ conventionId }) =>
       `/${frontRoutes.conventionImmersionRoute}/confirmation/${conventionId}`,
   ),
+  assessmentDocument: defineRoute(
+    { jwt: param.query.optional.string },
+    () => `/${frontRoutes.assessmentDocument}`,
+  ),
   conventionDocument: defineRoute(
     {
       jwt: param.query.optional.string,

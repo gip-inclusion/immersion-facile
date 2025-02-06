@@ -14,7 +14,11 @@ export const useAdminToken = () => {
   return rawToken;
 };
 
-export const useJwt = (route: Route<typeof routes.conventionDocument>) => {
+export const useJwt = (
+  route: Route<
+    typeof routes.conventionDocument | typeof routes.assessmentDocument
+  >,
+) => {
   const jwtQueryParam: ConventionSupportedJwt | undefined = route.params?.jwt;
   const inclusionConnectJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
