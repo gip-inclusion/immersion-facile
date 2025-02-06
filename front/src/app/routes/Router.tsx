@@ -207,8 +207,7 @@ const getPageByRouteName: {
   openApiDoc: () => <OpenApiDocPage />,
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
-  search: (route) => <SearchPage route={route} />,
-  searchDiagoriente: (route) => (
+  search: (route) => (
     <SearchPage route={route} useNaturalLanguageForAppellations />
   ),
   standard: (route) =>

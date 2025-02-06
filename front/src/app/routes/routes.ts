@@ -292,10 +292,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
   search: defineRoute(searchParams, () => `/${frontRoutes.search}`),
-  searchDiagoriente: defineRoute(
-    searchParams,
-    () => `/${frontRoutes.searchDiagoriente}`,
-  ),
   standard: defineRoute(
     { pagePath: param.path.ofType(standardPagesSerializer) },
     (params) => `/${frontRoutes.standard}/${params.pagePath}`,

@@ -39,7 +39,7 @@ describe("makeBreadcrumbsSegments", () => {
   });
   it("should returns segments for a route at a deep level", () => {
     const segments = getTestBreadcrumbs({
-      currentRouteKey: "searchDiagoriente",
+      currentRouteKey: "search",
     });
     expect(segments).toEqual([
       {
@@ -60,13 +60,6 @@ describe("makeBreadcrumbsSegments", () => {
         label: "Recherche",
         linkProps: {
           href: "/search",
-          onClick: expect.any(Function),
-        },
-      },
-      {
-        label: "Recherche (langage naturel)",
-        linkProps: {
-          href: "/searchDiagoriente",
           onClick: expect.any(Function),
         },
       },
@@ -111,12 +104,6 @@ const testBreadcrumbsSet = {
       search: {
         label: "Recherche",
         route: makeFakeRoute("search"),
-        children: {
-          searchDiagoriente: {
-            label: "Recherche (langage naturel)",
-            route: makeFakeRoute("searchDiagoriente"),
-          },
-        },
       },
 
       beneficiaryDashboard: {

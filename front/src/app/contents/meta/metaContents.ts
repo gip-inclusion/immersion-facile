@@ -173,12 +173,6 @@ export const defaultPageMetaContents: Partial<
     title: "Offre d'immersion (PMSMP)",
     description: "Fiche présentant une offre d'immersion (PMSMP)",
   },
-  searchDiagoriente: {
-    title:
-      "Rechercher une entreprise pour réaliser une immersion professionnelle",
-    description:
-      "Utilisez notre moteur de recherche pour trouver une entreprise accueillante d'Immersions Professionnelles ou PMSMP",
-  },
   conventionDocument: {
     title: "Document de convention d'immersion (PMSMP) finalisé",
     description: "Document de convention d'immersion (PMSMP) finalisé",

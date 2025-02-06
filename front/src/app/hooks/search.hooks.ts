@@ -20,9 +20,7 @@ export const encodedSearchUriParams = [
   "place",
 ] satisfies (keyof SearchPageParams)[];
 
-type SearchRoute = Route<
-  typeof routes.search | typeof routes.searchDiagoriente
->;
+type SearchRoute = Route<typeof routes.search>;
 
 const filterUrlsParamsAndUpdateUrl = ({
   values,
