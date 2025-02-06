@@ -1,3 +1,5 @@
+import { values } from "ramda";
+
 export const capitalize = (str: string): string =>
   str[0].toUpperCase() + str.slice(1);
 
@@ -45,3 +47,21 @@ export const removeSpaces = (str: string) => str.replace(/\s/g, "");
 
 export const isStringEmpty = (str: string) =>
   str !== "" && str.trim().length === 0;
+
+export const doesStringContainsHTML = (possiblyHtmlString: string): boolean => {
+  const htmlRegex =
+    /(?:<[!]?(?:(?:[a-z][a-z0-9-]*)|(?:!--[\s\S]*?--))(?:\s+[^>]*)?>\s*)|(?:<!--)/i;
+  return htmlRegex.test(possiblyHtmlString);
+};
+
+export const doesObjectContainsHTML = (obj: object): boolean => {
+  const browseObjectProps = (hasHtml: boolean, value: unknown): boolean => {
+    if (hasHtml) return true;
+    if (typeof value === "string") return doesStringContainsHTML(value);
+    if (typeof value === "object" && value !== null) {
+      return values(value).reduce(browseObjectProps, false);
+    }
+    return false;
+  };
+  return values(obj).reduce(browseObjectProps, false);
+};

@@ -143,6 +143,7 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     queryParamsSchema: findSimilarConventionsParamsSchema,
     responses: {
       200: findSimilarConventionsResponseSchema,
+      400: httpErrorSchema,
     },
   }),
 });

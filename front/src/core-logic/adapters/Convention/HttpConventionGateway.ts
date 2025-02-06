@@ -123,6 +123,7 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body.similarConventionIds)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );

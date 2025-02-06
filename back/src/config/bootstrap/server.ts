@@ -31,6 +31,7 @@ import { legacyCreateLogger } from "../../utils/logger";
 import { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./createAppDependencies";
 import { Gateways } from "./createGateways";
+import { detectHtmlInParamsMiddleware } from "./detectHtmlInParamsMiddleware";
 import { startCrawler } from "./startCrawler";
 
 const logger = legacyCreateLogger(__filename);
@@ -74,7 +75,7 @@ export const createApp = async (
       } else next();
     });
   });
-
+  app.use(detectHtmlInParamsMiddleware);
   const deps = await createAppDependencies(config);
 
   app.use(createSearchRouter(deps));
