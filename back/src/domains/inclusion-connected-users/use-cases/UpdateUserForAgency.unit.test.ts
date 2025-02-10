@@ -204,6 +204,41 @@ describe("UpdateUserForAgency", () => {
         errors.user.forbiddenNotificationsPreferencesUpdate(),
       );
     });
+
+    it("throws bad request if update of email to another email that already exist in agency", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const userToUpdate: UserWithAdminRights = {
+        ...notAdminUser,
+        email: "user-to-update@mail.fr",
+        id: "user-to-update",
+        isBackofficeAdmin: false,
+        externalId: null,
+      };
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [userToUpdate.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [icNotAdmin.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+      uow.userRepository.users = [userToUpdate, notAdminUser];
+
+      await expectPromiseToFailWithError(
+        updateIcUserRoleForAgency.execute(
+          {
+            roles: ["validator"],
+            agencyId: agency.id,
+            userId: userToUpdate.id,
+            isNotifiedByEmail: false,
+            email: icNotAdmin.email,
+          },
+          icAdmin,
+        ),
+        errors.agency.userAlreadyExist(),
+      );
+    });
   });
 
   describe("when updating email", () => {

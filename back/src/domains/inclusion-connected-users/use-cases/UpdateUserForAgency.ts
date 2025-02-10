@@ -1,5 +1,7 @@
+import { keys } from "ramda";
 import {
   AgencyUsersRights,
+  AgencyWithUsersRights,
   Email,
   InclusionConnectedUser,
   UserParamsForAgency,
@@ -7,6 +9,7 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -72,6 +75,11 @@ export class UpdateUserForAgency extends TransactionalUseCase<
     );
     rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, params.roles);
     rejectEmailModificationIfInclusionConnectedUser(userToUpdate, params.email);
+    await rejectIfEmailModificationToAnotherEmailAlreadyLinkedToAgency(
+      agency,
+      params,
+      uow,
+    );
 
     const updatedRights: AgencyUsersRights = {
       ...agency.usersRights,
@@ -144,4 +152,22 @@ const throwIfUserHasNoRightOnAgency = (
   return {
     isBackOfficeOrAgencyAdmin: currentUser.isBackofficeAdmin || isAgencyAdmin,
   };
+};
+
+const rejectIfEmailModificationToAnotherEmailAlreadyLinkedToAgency = async (
+  agency: AgencyWithUsersRights,
+  userToUpdate: UserParamsForAgency,
+  uow: UnitOfWork,
+) => {
+  const provider = await makeProvider(uow);
+  const user = await uow.userRepository.findByEmail(
+    userToUpdate.email,
+    provider,
+  );
+
+  if (user === undefined || (user && user.id === userToUpdate.userId)) return;
+
+  if (keys(agency.usersRights).includes(user.id)) {
+    throw errors.agency.userAlreadyExist();
+  }
 };
