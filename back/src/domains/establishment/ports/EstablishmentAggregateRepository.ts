@@ -42,7 +42,7 @@ export interface EstablishmentAggregateRepository {
     updatedAt: Date,
   ): Promise<void>;
   getEstablishmentAggregateBySiret(
-    siret: string,
+    siret: SiretDto,
   ): Promise<EstablishmentAggregate | undefined>;
   getEstablishmentAggregatesByFilters(
     params: EstablishmentAggregateFilters,
