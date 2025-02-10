@@ -9,6 +9,7 @@ import {
   Role,
   User,
   errors,
+  establishmentsRoles,
   expectPromiseToFailWithError,
   expectToEqual,
   makeEmailHash,
@@ -19,6 +20,7 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
@@ -30,6 +32,16 @@ describe("Get Convention", () => {
     .withId("validator")
     .withEmail("validator@mail.fr")
     .build();
+  const johnDoe: User = {
+    id: "my-user-id",
+    email: "my-user@email.com",
+    firstName: "John",
+    lastName: "Doe",
+    externalId: "john-external-id",
+    createdAt: new Date().toISOString(),
+  };
+  const billyIdol: User = new InclusionConnectedUserBuilder().buildUser();
+
   const agency = new AgencyDtoBuilder().build();
   const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
   const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
@@ -43,6 +55,18 @@ describe("Get Convention", () => {
       job: "Job",
     })
     .build();
+  const establishmentWithSiret = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret(convention.siret)
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "",
+        phone: "",
+        userId: billyIdol.id,
+      },
+    ])
+    .build();
+
   let getConvention: GetConvention;
   let uow: InMemoryUnitOfWork;
 
@@ -60,20 +84,14 @@ describe("Get Convention", () => {
         );
       });
 
-      it("When the user don't have correct role on inclusion connected users", async () => {
-        const user: User = {
-          id: "my-user-id",
-          email: "my-user@email.com",
-          firstName: "John",
-          lastName: "Doe",
-          externalId: "john-external-id",
-          createdAt: new Date().toISOString(),
-        };
-
-        uow.userRepository.users = [user];
+      it("When the user don't have correct role on inclusion connected users neither has right on existing establishment with same siret in convention", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          establishmentWithSiret,
+        ];
+        uow.userRepository.users = [johnDoe, billyIdol];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
-            [user.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
+            [johnDoe.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
           }),
         ];
         uow.conventionRepository.setConventions([convention]);
@@ -246,72 +264,121 @@ describe("Get Convention", () => {
         });
       });
 
-      it("that establishment rep is also the inclusion connected user", async () => {
-        const user: User = {
-          id: "my-user-id",
-          email: convention.signatories.establishmentRepresentative.email,
-          firstName: "John",
-          lastName: "Doe",
-          externalId: "john-external-id",
-          createdAt: new Date().toISOString(),
-        };
+      describe("establishment rights", () => {
+        it("that establishment rep email is also the inclusion connected user email", async () => {
+          const user: User = {
+            id: "my-user-id",
+            email: convention.signatories.establishmentRepresentative.email,
+            firstName: "John",
+            lastName: "Doe",
+            externalId: "john-external-id",
+            createdAt: new Date().toISOString(),
+          };
 
-        uow.userRepository.users = [user];
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+          uow.userRepository.users = [user];
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
-        const jwtPayload: InclusionConnectDomainJwtPayload = {
-          userId: user.id,
-        };
+          const jwtPayload: InclusionConnectDomainJwtPayload = {
+            userId: user.id,
+          };
 
-        const fetchedConvention = await getConvention.execute(
-          { conventionId: convention.id },
-          jwtPayload,
-        );
+          const fetchedConvention = await getConvention.execute(
+            { conventionId: convention.id },
+            jwtPayload,
+          );
 
-        expectToEqual(fetchedConvention, {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
+          expectToEqual(fetchedConvention, {
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencySiret: agency.agencySiret,
+            agencyCounsellorEmails: agency.counsellorEmails,
+            agencyValidatorEmails: agency.validatorEmails,
+          });
         });
-      });
 
-      it("that establishment tutor is also the inclusion connected user", async () => {
-        uow.conventionRepository.setConventions([
-          conventionWithEstablishmentTutor,
-        ]);
-        const user: User = {
-          id: "my-tutor-user-id",
-          email: conventionWithEstablishmentTutor.establishmentTutor.email,
-          firstName: "John",
-          lastName: "Doe",
-          externalId: "john-tutor-external-id",
-          createdAt: new Date().toISOString(),
-        };
-        uow.userRepository.users = [user];
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+        it("that establishment tutor email is also the inclusion connected user email", async () => {
+          uow.conventionRepository.setConventions([
+            conventionWithEstablishmentTutor,
+          ]);
+          const user: User = {
+            id: "my-tutor-user-id",
+            email: conventionWithEstablishmentTutor.establishmentTutor.email,
+            firstName: "John",
+            lastName: "Doe",
+            externalId: "john-tutor-external-id",
+            createdAt: new Date().toISOString(),
+          };
+          uow.userRepository.users = [user];
+          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
-        const jwtPayload: InclusionConnectDomainJwtPayload = {
-          userId: user.id,
-        };
+          const jwtPayload: InclusionConnectDomainJwtPayload = {
+            userId: user.id,
+          };
 
-        const fetchedConvention = await getConvention.execute(
-          { conventionId: conventionWithEstablishmentTutor.id },
-          jwtPayload,
-        );
+          const fetchedConvention = await getConvention.execute(
+            { conventionId: conventionWithEstablishmentTutor.id },
+            jwtPayload,
+          );
 
-        expectToEqual(fetchedConvention, {
-          ...conventionWithEstablishmentTutor,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
+          expectToEqual(fetchedConvention, {
+            ...conventionWithEstablishmentTutor,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencySiret: agency.agencySiret,
+            agencyCounsellorEmails: agency.counsellorEmails,
+            agencyValidatorEmails: agency.validatorEmails,
+          });
         });
+
+        it.each(establishmentsRoles)(
+          "that the inclusion connected user is also %s of the existing establishment with same siret in convention",
+          async (role) => {
+            const user = new InclusionConnectedUserBuilder().buildUser();
+
+            const establishmentWithRights = new EstablishmentAggregateBuilder(
+              establishmentWithSiret,
+            )
+              .withUserRights([
+                {
+                  userId: user.id,
+                  role,
+                  job: "",
+                  phone: "",
+                },
+              ])
+              .build();
+
+            uow.establishmentAggregateRepository.establishmentAggregates = [
+              establishmentWithRights,
+            ];
+
+            uow.conventionRepository.setConventions([convention]);
+
+            uow.userRepository.users = [user];
+            uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
+            expectToEqual(
+              await getConvention.execute(
+                { conventionId: conventionWithEstablishmentTutor.id },
+                {
+                  userId: user.id,
+                },
+              ),
+              {
+                ...convention,
+                agencyName: agency.name,
+                agencyDepartment: agency.address.departmentCode,
+                agencyKind: agency.kind,
+                agencySiret: agency.agencySiret,
+                agencyCounsellorEmails: agency.counsellorEmails,
+                agencyValidatorEmails: agency.validatorEmails,
+              },
+            );
+          },
+        );
       });
 
       it("the user is backofficeAdmin", async () => {
