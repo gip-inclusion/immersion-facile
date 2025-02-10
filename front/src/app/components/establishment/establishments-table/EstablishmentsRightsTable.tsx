@@ -14,9 +14,9 @@ export const EstablishmentsRightsTable = ({
 }) => (
   <>
     <h2 className={fr.cx("fr-h4")}>
-      Établissement rattachés au profil pour accueillir des candidats (
-      {withEstablishmentData.length}{" "}
-      {withEstablishmentData.length === 1 ? "établissement" : "établissements"})
+      {withEstablishmentData.length === 1
+        ? "Établissement rattaché au profil pour accueillir des candidats (1 établissement)"
+        : "Établissements rattachés au profil pour accueillir des candidats (${withEstablishmentData.length} établissements)"}
     </h2>
 
     <Table
