@@ -4,12 +4,13 @@ import { Email, SiretDto, currentJwtVersions } from "..";
 import {
   ConventionJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
+  EmailHash,
   EstablishmentJwtPayload,
 } from "./jwtPayload.dto";
 
 export const isSomeEmailMatchingEmailHash = (
   emailsOrError: Email[],
-  emailHash: string,
+  emailHash: EmailHash,
 ): boolean => emailsOrError.some((email) => makeEmailHash(email) === emailHash);
 export const makeEmailHash = (email: Email): string => stringToMd5(email);
 

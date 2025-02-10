@@ -5,6 +5,7 @@ import {
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { Role } from "../role/role.dto";
 import { SiretDto } from "../siret/siret";
+import { Flavor } from "../typeFlavors";
 import { ValueOf } from "../utils";
 
 export type CommonJwtPayload = {
@@ -18,10 +19,12 @@ export type StandardJwtPayload<R extends Role> = {
   role: R;
 };
 
+export type EmailHash = Flavor<string, "EmailHash">;
+
 export type ConventionDomainPayload = {
   applicationId: ConventionId;
   role: Role;
-  emailHash: string; //< md5 of email
+  emailHash: EmailHash; //< md5 of email
   sub?: string;
 };
 export type ConventionJwtPayload = CommonJwtPayload & ConventionDomainPayload;
