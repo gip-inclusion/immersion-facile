@@ -6,6 +6,7 @@ import {
   ConventionRelatedJwtPayload,
   ForbiddenError,
   InclusionConnectJwtPayload,
+  InclusionConnectedUser,
   NotFoundError,
   WithConventionId,
   errors,
@@ -64,7 +65,7 @@ export class GetConvention extends TransactionalUseCase<
 
     if (isInclusionConnectPayload) {
       return this.#onInclusionConnectPayload({
-        authPayload,
+        user: await getIcUserByUserId(uow, authPayload.userId),
         uow,
         convention,
       });
@@ -100,25 +101,30 @@ export class GetConvention extends TransactionalUseCase<
   }
 
   async #onInclusionConnectPayload({
-    authPayload,
+    user,
     convention,
     uow,
   }: {
-    authPayload: InclusionConnectJwtPayload;
+    user: InclusionConnectedUser;
     convention: ConventionReadDto;
     uow: UnitOfWork;
   }): Promise<ConventionReadDto> {
-    const roles = getIcUserRoleForAccessingConvention(
-      convention,
-      await getIcUserByUserId(uow, authPayload.userId),
-    );
+    const roles = getIcUserRoleForAccessingConvention(convention, user);
 
-    if (!roles.length)
-      throw new ForbiddenError(
-        `User with id '${authPayload.userId}' is not allowed to access convention with id '${convention.id}'`,
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        convention.siret,
       );
 
-    return convention;
+    const hasSomeEstablishmentRights = establishment?.userRights.some(
+      (userRight) => userRight.userId === user.id,
+    );
+
+    if (roles.length || hasSomeEstablishmentRights) return convention;
+
+    throw new ForbiddenError(
+      `User with id '${user.id}' is not allowed to access convention with id '${convention.id}'`,
+    );
   }
 
   #isInclusionConnectPayload(
