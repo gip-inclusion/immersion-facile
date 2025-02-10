@@ -1,11 +1,7 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  ConventionJwtPayload,
-  ForbiddenError,
-  InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
-  NotFoundError,
   Role,
   User,
   errors,
@@ -20,10 +16,12 @@ import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
+  const uuidGenerator = new UuidV4Generator();
   const counsellor = new InclusionConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.fr")
@@ -33,21 +31,71 @@ describe("Get Convention", () => {
     .withEmail("validator@mail.fr")
     .build();
   const johnDoe: User = {
-    id: "my-user-id",
+    id: "johndoe",
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
     externalId: "john-external-id",
     createdAt: new Date().toISOString(),
   };
-  const billyIdol: User = new InclusionConnectedUserBuilder().buildUser();
+  const establishmentRep: User = {
+    id: "estabrep",
+    email: "estabrep@mail.com",
+    firstName: "John",
+    lastName: "Doe",
+    externalId: "john-external-id",
+    createdAt: new Date().toISOString(),
+  };
+  const tutor: User = {
+    id: "my-tutor-user-id",
+    email: "tutor@email.com",
+    firstName: "John",
+    lastName: "Doe",
+    externalId: "john-tutor-external-id",
+    createdAt: new Date().toISOString(),
+  };
+
+  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    .withId(uuidGenerator.new())
+    .withIsAdmin(true)
+    .buildUser();
 
   const agency = new AgencyDtoBuilder().build();
-  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+  const convention = new ConventionDtoBuilder()
+    .withId(uuidGenerator.new())
+    .withAgencyId(agency.id)
+    .withEstablishmentRepresentative({
+      email: "estab-rep@email.com",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      role: "establishment-representative",
+    })
+    .withBeneficiaryRepresentative({
+      email: "benef-rep@email.com",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      role: "beneficiary-representative",
+    })
+    .withBeneficiaryCurrentEmployer({
+      email: "benef-rep@email.com",
+      firstName: "",
+      lastName: "",
+      phone: "",
+      businessAddress: "",
+      businessName: "",
+      businessSiret: "",
+      job: "",
+      role: "beneficiary-current-employer",
+    })
+    .withEstablishmentRepresentativeEmail(establishmentRep.email)
+    .build();
   const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
+    .withId(uuidGenerator.new())
     .withAgencyId(agency.id)
     .withEstablishmentTutor({
-      email: "establishment-tutor@mail.fr",
+      email: tutor.email,
       firstName: "John",
       lastName: "Doe",
       role: "establishment-tutor",
@@ -62,9 +110,26 @@ describe("Get Convention", () => {
         role: "establishment-admin",
         job: "",
         phone: "",
-        userId: billyIdol.id,
+        userId: tutor.id,
       },
     ])
+    .build();
+
+  const ftAdvisorEmail = "ft-advisor@mail.fr";
+  const ftConnectedConvention = new ConventionDtoBuilder(convention)
+    .withId(uuidGenerator.new())
+    .withFederatedIdentity({
+      provider: "peConnect",
+      token: "some-id",
+      payload: {
+        advisor: {
+          email: ftAdvisorEmail,
+          firstName: "john",
+          lastName: "doe",
+          type: "PLACEMENT",
+        },
+      },
+    })
     .build();
 
   let getConvention: GetConvention;
@@ -73,6 +138,21 @@ describe("Get Convention", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     getConvention = new GetConvention(new InMemoryUowPerformer(uow));
+
+    uow.conventionRepository.setConventions([
+      convention,
+      conventionWithEstablishmentTutor,
+      ftConnectedConvention,
+    ]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+    uow.userRepository.users = [
+      counsellor,
+      validator,
+      johnDoe,
+      establishmentRep,
+      tutor,
+      backofficeAdminUser,
+    ];
   });
 
   describe("Wrong paths", () => {
@@ -80,7 +160,7 @@ describe("Get Convention", () => {
       it("When no auth payload provided", async () => {
         await expectPromiseToFailWithError(
           getConvention.execute({ conventionId: convention.id }),
-          new ForbiddenError("No auth payload provided"),
+          errors.user.noJwtProvided(),
         );
       });
 
@@ -88,30 +168,26 @@ describe("Get Convention", () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
           establishmentWithSiret,
         ];
-        uow.userRepository.users = [johnDoe, billyIdol];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [johnDoe.id]: { isNotifiedByEmail: false, roles: ["to-review"] },
           }),
         ];
-        uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
           getConvention.execute(
             { conventionId: convention.id },
-            { userId: "my-user-id" },
+            { userId: johnDoe.id },
           ),
-          new ForbiddenError(
-            `User with id 'my-user-id' is not allowed to access convention with id '${convention.id}'`,
-          ),
+          errors.convention.forbiddenMissingRights({
+            conventionId: convention.id,
+            userId: johnDoe.id,
+          }),
         );
       });
 
       describe("with ConventionJwtPayload", () => {
         it("When convention id in jwt token does not match provided one", async () => {
-          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-          uow.conventionRepository.setConventions([convention]);
-
           await expectPromiseToFailWithError(
             getConvention.execute(
               { conventionId: convention.id },
@@ -121,9 +197,9 @@ describe("Get Convention", () => {
                 emailHash: "",
               },
             ),
-            new ForbiddenError(
-              `This token is not allowed to access convention with id ${convention.id}. Role was 'establishment-representative'`,
-            ),
+            errors.convention.forbiddenMissingRights({
+              conventionId: convention.id,
+            }),
           );
         });
 
@@ -131,22 +207,36 @@ describe("Get Convention", () => {
           "validator",
           "beneficiary",
           "counsellor",
+          "validator",
           "establishment-representative",
-        ] as const)(
-          "When the user email for role %s is not used in the convention anymore",
-          async (role: Role) => {
-            uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-            uow.conventionRepository.setConventions([convention]);
-            const payload: ConventionJwtPayload = {
-              role,
-              emailHash: "oldHash",
-              applicationId: convention.id,
-              iat: 1,
-              version: 1,
-            };
+          "establishment-tutor",
+          "beneficiary-current-employer",
+          "beneficiary-representative",
+        ] satisfies Role[])(
+          "When there is not email hash match from '%role' emails in convention or in agency",
+          async (role) => {
+            uow.agencyRepository.agencies = [
+              toAgencyWithRights(agency, {
+                [validator.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["validator"],
+                },
+                [counsellor.id]: {
+                  isNotifiedByEmail: false,
+                  roles: ["counsellor"],
+                },
+              }),
+            ];
 
             await expectPromiseToFailWithError(
-              getConvention.execute({ conventionId: convention.id }, payload),
+              getConvention.execute(
+                { conventionId: convention.id },
+                {
+                  role,
+                  emailHash: "thisHashDontMatch",
+                  applicationId: convention.id,
+                },
+              ),
               errors.convention.forbiddenMissingRights({
                 conventionId: convention.id,
               }),
@@ -155,15 +245,6 @@ describe("Get Convention", () => {
         );
 
         it("when the user has inclusion connect but not for the agency of this convention", async () => {
-          const user: User = {
-            id: "my-user-id",
-            email: "john@mail.com",
-            firstName: "John",
-            lastName: "Doe",
-
-            externalId: "john-external-id",
-            createdAt: new Date().toISOString(),
-          };
           const anotherAgency = new AgencyDtoBuilder(agency)
             .withId("another")
             .build();
@@ -171,22 +252,19 @@ describe("Get Convention", () => {
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency),
             toAgencyWithRights(anotherAgency, {
-              [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+              [johnDoe.id]: { isNotifiedByEmail: false, roles: ["validator"] },
             }),
           ];
-          uow.conventionRepository.setConventions([convention]);
-          uow.userRepository.users = [user];
-
-          const payload: ConventionJwtPayload = {
-            role: "validator",
-            emailHash: makeEmailHash(user.email),
-            applicationId: convention.id,
-            iat: 1,
-            version: 1,
-          };
 
           await expectPromiseToFailWithError(
-            getConvention.execute({ conventionId: convention.id }, payload),
+            getConvention.execute(
+              { conventionId: convention.id },
+              {
+                role: "validator",
+                emailHash: makeEmailHash(johnDoe.email),
+                applicationId: convention.id,
+              },
+            ),
             errors.convention.forbiddenMissingRights({
               conventionId: convention.id,
             }),
@@ -197,6 +275,8 @@ describe("Get Convention", () => {
 
     describe("Not found error", () => {
       it("When the Convention does not exist", async () => {
+        uow.conventionRepository.setConventions([]);
+
         await expectPromiseToFailWithError(
           getConvention.execute(
             { conventionId: convention.id },
@@ -206,144 +286,102 @@ describe("Get Convention", () => {
               emailHash: "",
             },
           ),
-          new NotFoundError(`No convention found with id ${convention.id}`),
+          errors.convention.notFound({ conventionId: convention.id }),
         );
       });
 
-      it("When if user is not on inclusion connected users", async () => {
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-        uow.conventionRepository.setConventions([convention]);
-        const userId = "my-user-id";
+      it("When if user is missing", async () => {
+        uow.userRepository.users = [];
 
         await expectPromiseToFailWithError(
-          getConvention.execute({ conventionId: convention.id }, { userId }),
-          errors.user.notFound({ userId }),
+          getConvention.execute(
+            { conventionId: convention.id },
+            { userId: johnDoe.id },
+          ),
+          errors.user.notFound({ userId: johnDoe.id }),
         );
       });
     });
   });
 
   describe("Right paths", () => {
-    beforeEach(() => {
-      uow.conventionRepository.setConventions([convention]);
-      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-    });
-
     describe("Inclusion connected user", () => {
       it("that have agency rights", async () => {
-        const user: User = {
-          id: "my-user-id",
-          email: "my-user@email.com",
-          firstName: "John",
-          lastName: "Doe",
-          externalId: "john-external-id",
-          createdAt: new Date().toISOString(),
-        };
-
-        uow.userRepository.users = [user];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
-            [user.id]: { isNotifiedByEmail: false, roles: ["validator"] },
+            [johnDoe.id]: { isNotifiedByEmail: false, roles: ["validator"] },
           }),
         ];
 
-        const fetchedConvention = await getConvention.execute(
-          { conventionId: convention.id },
-          {
-            userId: user.id,
-          },
-        );
-        expectToEqual(fetchedConvention, {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: [user.email],
-        });
-      });
-
-      describe("establishment rights", () => {
-        it("that establishment rep email is also the inclusion connected user email", async () => {
-          const user: User = {
-            id: "my-user-id",
-            email: convention.signatories.establishmentRepresentative.email,
-            firstName: "John",
-            lastName: "Doe",
-            externalId: "john-external-id",
-            createdAt: new Date().toISOString(),
-          };
-
-          uow.userRepository.users = [user];
-          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-          const jwtPayload: InclusionConnectDomainJwtPayload = {
-            userId: user.id,
-          };
-
-          const fetchedConvention = await getConvention.execute(
+        expectToEqual(
+          await getConvention.execute(
             { conventionId: convention.id },
-            jwtPayload,
-          );
-
-          expectToEqual(fetchedConvention, {
+            {
+              userId: johnDoe.id,
+            },
+          ),
+          {
             ...convention,
             agencyName: agency.name,
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
-            agencyCounsellorEmails: agency.counsellorEmails,
-            agencyValidatorEmails: agency.validatorEmails,
-          });
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: [johnDoe.email],
+          },
+        );
+      });
+
+      describe("establishment rights", () => {
+        it("that establishment rep email is also the inclusion connected user email", async () => {
+          expectToEqual(
+            await getConvention.execute(
+              { conventionId: convention.id },
+              {
+                userId: establishmentRep.id,
+              },
+            ),
+            {
+              ...convention,
+              agencyName: agency.name,
+              agencyDepartment: agency.address.departmentCode,
+              agencyKind: agency.kind,
+              agencySiret: agency.agencySiret,
+              agencyCounsellorEmails: agency.counsellorEmails,
+              agencyValidatorEmails: agency.validatorEmails,
+            },
+          );
         });
 
         it("that establishment tutor email is also the inclusion connected user email", async () => {
-          uow.conventionRepository.setConventions([
-            conventionWithEstablishmentTutor,
-          ]);
-          const user: User = {
-            id: "my-tutor-user-id",
-            email: conventionWithEstablishmentTutor.establishmentTutor.email,
-            firstName: "John",
-            lastName: "Doe",
-            externalId: "john-tutor-external-id",
-            createdAt: new Date().toISOString(),
-          };
-          uow.userRepository.users = [user];
-          uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-          const jwtPayload: InclusionConnectDomainJwtPayload = {
-            userId: user.id,
-          };
-
-          const fetchedConvention = await getConvention.execute(
-            { conventionId: conventionWithEstablishmentTutor.id },
-            jwtPayload,
+          expectToEqual(
+            await getConvention.execute(
+              { conventionId: conventionWithEstablishmentTutor.id },
+              {
+                userId: tutor.id,
+              },
+            ),
+            {
+              ...conventionWithEstablishmentTutor,
+              agencyName: agency.name,
+              agencyDepartment: agency.address.departmentCode,
+              agencyKind: agency.kind,
+              agencySiret: agency.agencySiret,
+              agencyCounsellorEmails: agency.counsellorEmails,
+              agencyValidatorEmails: agency.validatorEmails,
+            },
           );
-
-          expectToEqual(fetchedConvention, {
-            ...conventionWithEstablishmentTutor,
-            agencyName: agency.name,
-            agencyDepartment: agency.address.departmentCode,
-            agencyKind: agency.kind,
-            agencySiret: agency.agencySiret,
-            agencyCounsellorEmails: agency.counsellorEmails,
-            agencyValidatorEmails: agency.validatorEmails,
-          });
         });
 
         it.each(establishmentsRoles)(
           "that the inclusion connected user is also %s of the existing establishment with same siret in convention",
           async (role) => {
-            const user = new InclusionConnectedUserBuilder().buildUser();
-
             const establishmentWithRights = new EstablishmentAggregateBuilder(
               establishmentWithSiret,
             )
               .withUserRights([
                 {
-                  userId: user.id,
+                  userId: johnDoe.id,
                   role,
                   job: "",
                   phone: "",
@@ -355,16 +393,11 @@ describe("Get Convention", () => {
               establishmentWithRights,
             ];
 
-            uow.conventionRepository.setConventions([convention]);
-
-            uow.userRepository.users = [user];
-            uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
             expectToEqual(
               await getConvention.execute(
-                { conventionId: conventionWithEstablishmentTutor.id },
+                { conventionId: convention.id },
                 {
-                  userId: user.id,
+                  userId: johnDoe.id,
                 },
               ),
               {
@@ -382,34 +415,28 @@ describe("Get Convention", () => {
       });
 
       it("the user is backofficeAdmin", async () => {
-        const backofficeAdminUser = new InclusionConnectedUserBuilder()
-          .withIsAdmin(true)
-          .buildUser();
-
-        uow.userRepository.users = [backofficeAdminUser];
-
-        const conventionResult = await getConvention.execute(
-          { conventionId: convention.id },
+        expectToEqual(
+          await getConvention.execute(
+            { conventionId: convention.id },
+            {
+              userId: backofficeAdminUser.id,
+            },
+          ),
           {
-            userId: backofficeAdminUser.id,
+            ...convention,
+            agencyName: agency.name,
+            agencyDepartment: agency.address.departmentCode,
+            agencyKind: agency.kind,
+            agencySiret: agency.agencySiret,
+            agencyCounsellorEmails: agency.counsellorEmails,
+            agencyValidatorEmails: agency.validatorEmails,
           },
         );
-
-        expectToEqual(conventionResult, {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
-        });
       });
     });
 
     describe("with ConventionJwtPayload", () => {
       beforeEach(() => {
-        uow.userRepository.users = [counsellor, validator];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [counsellor.id]: {
@@ -433,6 +460,32 @@ describe("Get Convention", () => {
           role: "beneficiary",
           email: convention.signatories.beneficiary.email,
         },
+      ] satisfies { role: Role; email: string }[])(
+        "email hash match email hash for role '$role' in convention",
+        async ({ role, email }: { role: Role; email: string }) => {
+          expectToEqual(
+            await getConvention.execute(
+              { conventionId: convention.id },
+              {
+                role,
+                emailHash: makeEmailHash(email),
+                applicationId: convention.id,
+              },
+            ),
+            {
+              ...convention,
+              agencyName: agency.name,
+              agencyDepartment: agency.address.departmentCode,
+              agencyKind: agency.kind,
+              agencySiret: agency.agencySiret,
+              agencyCounsellorEmails: [counsellor.email],
+              agencyValidatorEmails: [validator.email],
+            },
+          );
+        },
+      );
+
+      it.each([
         {
           role: "counsellor",
           email: counsellor.email,
@@ -441,113 +494,65 @@ describe("Get Convention", () => {
           role: "validator",
           email: validator.email,
         },
-      ] as const)(
-        "user '$role' has no inclusion connect",
+      ] satisfies { role: Role; email: string }[])(
+        "email hash match user email hash and has '$role' agency right",
         async ({ role, email }: { role: Role; email: string }) => {
-          const payload: ConventionJwtPayload = {
-            role,
-            emailHash: makeEmailHash(email),
-            applicationId: convention.id,
-            iat: 1,
-            version: 1,
-          };
+          uow.userRepository.users = [counsellor, validator];
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [validator.id]: {
+                isNotifiedByEmail: false,
+                roles: ["validator"],
+              },
+              [counsellor.id]: {
+                isNotifiedByEmail: false,
+                roles: ["counsellor"],
+              },
+            }),
+          ];
 
-          const conventionResult = await getConvention.execute(
-            { conventionId: convention.id },
-            payload,
+          expectToEqual(
+            await getConvention.execute(
+              { conventionId: convention.id },
+              {
+                role,
+                emailHash: makeEmailHash(email),
+                applicationId: convention.id,
+              },
+            ),
+            {
+              ...convention,
+              agencyName: agency.name,
+              agencyDepartment: agency.address.departmentCode,
+              agencyKind: agency.kind,
+              agencySiret: agency.agencySiret,
+              agencyCounsellorEmails: [counsellor.email],
+              agencyValidatorEmails: [validator.email],
+            },
           );
+        },
+      );
 
-          expectToEqual(conventionResult, {
-            ...convention,
+      it("user is a FtAdvisor", async () => {
+        expectToEqual(
+          await getConvention.execute(
+            { conventionId: ftConnectedConvention.id },
+            {
+              role: "validator",
+              emailHash: makeEmailHash(ftAdvisorEmail),
+              applicationId: ftConnectedConvention.id,
+            },
+          ),
+          {
+            ...ftConnectedConvention,
             agencyName: agency.name,
             agencyDepartment: agency.address.departmentCode,
             agencyKind: agency.kind,
             agencySiret: agency.agencySiret,
             agencyCounsellorEmails: [counsellor.email],
             agencyValidatorEmails: [validator.email],
-          });
-        },
-      );
-
-      it("user has inclusion connect", async () => {
-        const inclusionConnectedUser: User = {
-          id: "my-user-id",
-          email: "john@mail.com",
-          firstName: "John",
-          lastName: "Doe",
-          externalId: "john-external-id",
-          createdAt: new Date().toISOString(),
-        };
-
-        uow.userRepository.users = [inclusionConnectedUser];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(agency, {
-            [inclusionConnectedUser.id]: {
-              isNotifiedByEmail: false,
-              roles: ["validator"],
-            },
-          }),
-        ];
-
-        const conventionResult = await getConvention.execute(
-          { conventionId: convention.id },
-          {
-            role: "validator",
-            emailHash: makeEmailHash(inclusionConnectedUser.email),
-            applicationId: convention.id,
           },
         );
-
-        expectToEqual(conventionResult, {
-          ...convention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: [],
-          agencyValidatorEmails: [inclusionConnectedUser.email],
-        });
-      });
-
-      it("user is a FtAdvisor", async () => {
-        const ftAdvisorEmail = "ft-advisor@mail.fr";
-        const ftConnectedConvention = new ConventionDtoBuilder(convention)
-          .withFederatedIdentity({
-            provider: "peConnect",
-            token: "some-id",
-            payload: {
-              advisor: {
-                email: ftAdvisorEmail,
-                firstName: "john",
-                lastName: "doe",
-                type: "PLACEMENT",
-              },
-            },
-          })
-          .build();
-        uow.conventionRepository.setConventions([ftConnectedConvention]);
-        const payload: ConventionJwtPayload = {
-          role: "validator",
-          emailHash: makeEmailHash(ftAdvisorEmail),
-          applicationId: convention.id,
-          iat: 1,
-          version: 1,
-        };
-
-        const conventionResult = await getConvention.execute(
-          { conventionId: convention.id },
-          payload,
-        );
-
-        expectToEqual(conventionResult, {
-          ...ftConnectedConvention,
-          agencyName: agency.name,
-          agencyDepartment: agency.address.departmentCode,
-          agencyKind: agency.kind,
-          agencySiret: agency.agencySiret,
-          agencyCounsellorEmails: [counsellor.email],
-          agencyValidatorEmails: [validator.email],
-        });
       });
     });
   });

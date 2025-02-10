@@ -129,9 +129,12 @@ export const errors = {
       ),
     forbiddenMissingRights: ({
       conventionId,
-    }: { conventionId: ConventionId }) =>
+      userId,
+    }: { conventionId: ConventionId; userId?: UserId }) =>
       new ForbiddenError(
-        `L'utilisateur n'a pas de droits sur la convention '${conventionId}'.`,
+        `L'utilisateur ${
+          userId ? `'${userId}' ` : ""
+        }n'a pas de droits sur la convention '${conventionId}'.`,
       ),
     badRoleStatusChange: ({
       roles,

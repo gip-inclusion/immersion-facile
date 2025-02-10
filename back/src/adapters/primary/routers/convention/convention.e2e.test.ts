@@ -394,8 +394,8 @@ describe("convention e2e", () => {
         status: 404,
         body: {
           status: 404,
-          message:
-            "No convention found with id add5c20e-6dd2-45af-affe-927358005251",
+          message: errors.convention.notFound({ conventionId: unknownId })
+            .message,
         },
       });
     });

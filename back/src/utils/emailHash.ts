@@ -2,10 +2,10 @@ import { toPairs } from "ramda";
 import {
   AgencyId,
   AgencyWithUsersRights,
-  ConventionDomainPayload,
   ConventionDto,
   ConventionReadDto,
   Email,
+  EmailHash,
   Role,
   UserWithAdminRights,
   errors,
@@ -18,11 +18,13 @@ import { agencyWithRightToAgencyDto } from "./agency";
 import { conventionEmailsByRole } from "./convention";
 
 export const isHashMatchNotNotifiedCounsellorOrValidator = async ({
-  authPayload: { role, emailHash },
+  role,
+  emailHash,
   agency,
   uow,
 }: {
-  authPayload: ConventionDomainPayload;
+  role: Role;
+  emailHash: EmailHash;
   agency: AgencyWithUsersRights;
   uow: UnitOfWork;
 }): Promise<boolean> => {
@@ -69,32 +71,34 @@ export const isHashMatchConventionEmails = async ({
   convention,
   uow,
   agency,
-  authPayload,
+  emailHash,
+  role,
 }: {
   convention: ConventionReadDto;
   uow: UnitOfWork;
   agency: AgencyWithUsersRights;
-  authPayload: ConventionDomainPayload;
+  emailHash: EmailHash;
+  role: Role;
 }) => {
   const emailsByRole = conventionEmailsByRole(
     convention,
     await agencyWithRightToAgencyDto(uow, agency),
-  )[authPayload.role];
+  )[role];
 
   if (emailsByRole instanceof Error) throw emailsByRole;
-  return isSomeEmailMatchingEmailHash(emailsByRole, authPayload.emailHash);
+  return isSomeEmailMatchingEmailHash(emailsByRole, emailHash);
 };
 
 export const isHashMatchPeAdvisorEmail = ({
   convention,
-  authPayload,
-}: { convention: ConventionReadDto; authPayload: ConventionDomainPayload }) => {
+  emailHash,
+}: { convention: ConventionReadDto; emailHash: EmailHash }) => {
   const peAdvisorEmail =
     convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
       .email;
 
   return peAdvisorEmail
-    ? isSomeEmailMatchingEmailHash([peAdvisorEmail], authPayload.emailHash)
+    ? isSomeEmailMatchingEmailHash([peAdvisorEmail], emailHash)
     : false;
 };
 
