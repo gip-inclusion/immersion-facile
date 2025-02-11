@@ -51,9 +51,13 @@ export const SearchFilter = ({
       isOpened &&
       wrapperElement.current &&
       wrapperElement.current.querySelectorAll(`.${prefix}__control--is-focused`)
-        .length === 0
+        .length === 0 &&
+      wrapperElement.current.querySelector("input")
     ) {
-      wrapperElement.current.querySelector("input")?.focus();
+      const input = wrapperElement.current.querySelector("input");
+      if (input && input.value === "") {
+        input.focus();
+      }
     }
     document.body.addEventListener("click", handleClickOutside);
   });

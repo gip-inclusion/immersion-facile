@@ -45,11 +45,9 @@ export const AppellationAutocomplete = ({
   const [options, setOptions] = useState<AppellationMatchDto[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
-  useEffect(() => {
-    if (initialOption && selectedOption === null) {
-      setSelectedOption(initialOption);
-    }
-  }, [initialOption, selectedOption]);
+  if (initialOption && selectedOption === null) {
+    setSelectedOption(initialOption);
+  }
   useEffect(() => {
     (async () => {
       const sanitizedTerm = debounceSearchTerm.trim();
@@ -104,6 +102,12 @@ export const AppellationAutocomplete = ({
         inputId: props.selectProps?.inputId ?? "im-select__input--appellation",
         loadingMessage: () => <>Recherche de métier en cours... 🔎</>,
         inputValue: searchTerm,
+        defaultValue: initialValue
+          ? {
+              label: initialValue.appellationLabel,
+              value: initialValue,
+            }
+          : undefined,
         noOptionsMessage: () =>
           noOptionText({ isSearching, debounceSearchTerm, searchTerm }),
         placeholder:

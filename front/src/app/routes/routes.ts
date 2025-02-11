@@ -12,6 +12,7 @@ import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,
   conventionValuesFromUrl,
+  nafCodeSerializer,
 } from "./routeParams/convention";
 import { formEstablishmentParamsInUrl } from "./routeParams/formEstablishment";
 import { standardPagesSerializer } from "./routeParams/standardPage";
@@ -75,6 +76,8 @@ export const searchParams = {
   place: param.query.optional.string,
   fitForDisabledWorkers: param.query.optional.boolean,
   currentPage: param.query.optional.number,
+  nafCodes: param.query.optional.ofType(nafCodeSerializer),
+  nafLabel: param.query.optional.string,
   ...acquisitionParams,
 };
 

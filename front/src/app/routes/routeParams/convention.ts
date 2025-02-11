@@ -10,6 +10,7 @@ import {
   ImmersionObjective,
   InternshipKind,
   LevelOfEducation,
+  NafCode,
   ScheduleDto,
   addressDtoToString,
   addressStringToDto,
@@ -263,6 +264,11 @@ export const appellationAndRomeDtoArraySerializer: ValueSerializer<
 export const appellationStringSerializer: ValueSerializer<AppellationCode> = {
   parse: (raw) => appellationCodeSchema.parse(raw),
   stringify: (appellation) => appellation,
+};
+
+export const nafCodeSerializer: ValueSerializer<NafCode[]> = {
+  parse: (raw) => parseStringToJsonOrThrow(raw, "nafCodes"),
+  stringify: (nafCode) => JSON.stringify(nafCode),
 };
 
 export type ConventionFormKeysInUrl = keyof ConventionQueryParams;
