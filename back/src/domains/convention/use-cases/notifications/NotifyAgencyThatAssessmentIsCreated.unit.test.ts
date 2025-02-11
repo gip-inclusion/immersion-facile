@@ -7,6 +7,7 @@ import {
   InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  reasonableSchedule,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
@@ -32,7 +33,8 @@ const validator = new InclusionConnectedUserBuilder()
 const convention = new ConventionDtoBuilder()
   .withAgencyId(agency.id)
   .withDateStart(new Date("2025-01-01").toISOString())
-  .withDateStart(new Date("2025-01-15").toISOString())
+  .withDateEnd(new Date("2025-01-15").toISOString())
+  .withSchedule(reasonableSchedule)
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
 
@@ -129,7 +131,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             immersionAppellationLabel:
               convention.immersionAppellation.appellationLabel,
             assessment,
-            numberOfHoursMade: "66h",
+            numberOfHoursMade: "45h",
           },
           recipients: [validator.email, validator2.email],
           cc: [convention.signatories.beneficiary.email],

@@ -63,11 +63,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
     } else {
       const numberOfHoursMade = computeTotalHours({
         convention,
-        assessmentStatus: assessment.status,
-        missedHours:
-          assessment.status === "PARTIALLY_COMPLETED"
-            ? assessment.numberOfMissedHours
-            : 0,
+        assessment,
       });
 
       await this.#saveNotificationAndRelatedEvent(uow, {

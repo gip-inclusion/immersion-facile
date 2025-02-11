@@ -10,16 +10,29 @@ import {
   typeOfContracts,
 } from "./assessment.dto";
 
-const withAssessmentStatusSchema = z.discriminatedUnion("status", [
-  z.object({
-    status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
-  }),
-  z.object({
-    status: z.literal("PARTIALLY_COMPLETED"),
-    lastDayOfPresence: makeDateStringSchema(),
-    numberOfMissedHours: z.number(),
-  }),
-]);
+const withAssessmentStatusSchema = z.discriminatedUnion(
+  "status",
+  [
+    z.object({
+      status: z.enum(["COMPLETED", "DID_NOT_SHOW"]),
+    }),
+    z.object({
+      status: z.literal("PARTIALLY_COMPLETED"),
+      lastDayOfPresence: makeDateStringSchema(),
+      numberOfMissedHours: z.number(),
+    }),
+  ],
+  {
+    errorMap: (error) => {
+      if (error.code === "invalid_union_discriminator")
+        return {
+          message: "Veuillez selectionner une option",
+        };
+
+      return { message: error.message ?? "no message provided" };
+    },
+  },
+);
 
 const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
   z.object({
@@ -28,16 +41,20 @@ const withEstablishmentCommentsSchema: z.Schema<WithEstablishmentComments> =
   });
 
 const withEndedWithAJobSchema: z.Schema<WithEndedWithAJob> =
-  z.discriminatedUnion("endedWithAJob", [
-    z.object({
-      endedWithAJob: z.literal(true),
-      typeOfContract: zEnumValidation(typeOfContracts, localization.required),
-      contractStartDate: makeDateStringSchema(),
-    }),
-    z.object({
-      endedWithAJob: z.literal(false),
-    }),
-  ]);
+  z.discriminatedUnion(
+    "endedWithAJob",
+    [
+      z.object({
+        endedWithAJob: z.literal(true),
+        typeOfContract: zEnumValidation(typeOfContracts, localization.required),
+        contractStartDate: makeDateStringSchema(),
+      }),
+      z.object({
+        endedWithAJob: z.literal(false),
+      }),
+    ],
+    { errorMap: () => ({ message: "Veuillez sélectionnez une option" }) },
+  );
 
 export const assessmentDtoSchema: z.Schema<AssessmentDto> = z
   .object({
