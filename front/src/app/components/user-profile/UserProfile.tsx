@@ -48,7 +48,7 @@ export const UserProfile = ({
     />
     <AgenciesTablesSection
       user={userWithRights}
-      agencyRights={[...userWithRights.agencyRights]}
+      agencyRights={userWithRights.agencyRights}
       isBackofficeAdmin={currentUser.isBackofficeAdmin}
       onUserUpdateRequested={onUserUpdateRequested}
     />

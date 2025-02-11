@@ -32,7 +32,7 @@ export const ActiveAgencyRightsTable = ({
         "Reçoit les notifications",
         "Actions",
       ]}
-      data={agenciesWithoutToReviewRights
+      data={[...agenciesWithoutToReviewRights]
         .sort((a, b) => a.agency.name.localeCompare(b.agency.name))
         .map(makeAgencyRightLine(onUpdateClicked, isBackofficeAdmin))}
     />
