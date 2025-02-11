@@ -7,6 +7,7 @@ import {
 import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
+import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import { SearchCompaniesParams } from "../../ports/LaBonneBoiteGateway";
@@ -38,6 +39,8 @@ describe("HttpLaBonneBoiteGateway", () => {
         noRetries,
       ),
       config.franceTravailClientId,
+      withNoCache,
+      createLbbRoutes(config.ftApiUrl),
     );
   });
 

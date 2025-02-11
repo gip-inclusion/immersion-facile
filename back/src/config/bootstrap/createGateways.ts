@@ -408,6 +408,8 @@ export const createGateways = async (
             }),
             franceTravailGateway,
             config.franceTravailClientId,
+            withCache,
+            createLbbRoutes(config.ftApiUrl),
           )
         : new InMemoryLaBonneBoiteGateway(),
     subscribersGateway:
