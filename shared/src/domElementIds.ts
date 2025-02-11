@@ -756,6 +756,7 @@ export const domElementIds = {
       rejectApplicationCancelButton:
         "im-manage-establishment__reject-application-cancel-button",
       statusBadge: "im-manage-establishment__discussion-status-badge",
+      copyEmailButton: "im-manage-establishment__discussion-copy-email-button",
     },
     manageConventionForm: {
       submitButton: "im-manage-establishment__manage-convention-submit-button",
