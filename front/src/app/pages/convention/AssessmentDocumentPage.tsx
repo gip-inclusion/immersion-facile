@@ -135,8 +135,7 @@ export const AssessmentDocumentPage = ({
                 Nombre d'heures totales de l'immersion :{" "}
                 {computeTotalHours({
                   convention,
-                  assessmentStatus: assessment.status,
-                  missedHours: 0,
+                  assessment: assessment,
                 })}
               </li>
               <li>
@@ -154,11 +153,7 @@ export const AssessmentDocumentPage = ({
                 Nombre d'heures totales de l'immersion :{" "}
                 {computeTotalHours({
                   convention,
-                  assessmentStatus: assessment.status,
-                  missedHours:
-                    assessment.status === "PARTIALLY_COMPLETED"
-                      ? assessment.numberOfMissedHours
-                      : 0,
+                  assessment: assessment,
                 })}
               </li>
               <li>
