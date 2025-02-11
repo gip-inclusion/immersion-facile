@@ -251,6 +251,10 @@ const DiscussionDetails = ({
                   "potentialBeneficiary",
                   `reply.${window.location.hostname}`,
                 )}
+                id={
+                  domElementIds.establishmentDashboard.discussion
+                    .copyEmailButton
+                }
                 withIcon
                 label="Copier l'adresse email"
               />

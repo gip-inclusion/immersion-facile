@@ -18,6 +18,7 @@ export const CopyButton = (props: CopyButtonProperties) => {
 
   return (
     <Button
+      id={props.id}
       type="button"
       disabled={copyButtonIsDisabled}
       onClick={() => onCopyButtonClick(props.textToCopy)}
