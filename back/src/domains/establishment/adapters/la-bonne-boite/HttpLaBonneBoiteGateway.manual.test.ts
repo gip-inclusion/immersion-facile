@@ -20,26 +20,6 @@ describe("HttpLaBonneBoiteGateway", () => {
     romeCode: "D1102",
     romeLabel: "Boulangerie - viennoiserie",
   };
-  const searchResult = new LaBonneBoiteCompanyDtoBuilder()
-    .withName("L'ENTREMETS GOURMAND")
-    .withSiret("83906399700028")
-    .withEmployeeRange(0, 0)
-    .withNaf({
-      code: "1071C",
-      nomenclature: "Boulangerie et boulangerie-pâtisserie",
-    })
-    .withPosition({
-      lat: 47.8734,
-      lon: -4.12565,
-    })
-    .withRome(boulangerRomeData.romeCode)
-    .withAddress({
-      city: "Combrit",
-      postcode: "29120",
-      departmentCode: "29",
-    })
-    .build()
-    .toSearchResult(boulangerRomeData, benodetLonLat);
 
   let laBonneBoiteGateway: HttpLaBonneBoiteGateway;
 
@@ -252,12 +232,36 @@ describe("HttpLaBonneBoiteGateway", () => {
 
   describe("fetchCompanyBySiret", () => {
     it("should retrieve only one company based on siret", async () => {
-      const siret = "83906399700028";
+      const siret = "38774939300048";
       const result = await laBonneBoiteGateway.fetchCompanyBySiret(
         siret,
         boulangerRomeData,
       );
-      expectToEqual(result, searchResult);
+
+      expectToEqual(
+        result,
+        new LaBonneBoiteCompanyDtoBuilder()
+          .withName("UAB")
+          .withSiret("38774939300048")
+          .withEmployeeRange(0, 0)
+          .withNaf({
+            code: "4781Z",
+            nomenclature:
+              "Commerce de détail alimentaire sur éventaires et marchés",
+          })
+          .withPosition({
+            lat: 48.8133,
+            lon: 2.45697,
+          })
+          .withRome(boulangerRomeData.romeCode)
+          .withAddress({
+            city: "Saint-Maurice",
+            postcode: "94410",
+            departmentCode: "94",
+          })
+          .build()
+          .toSearchResult(boulangerRomeData),
+      );
     });
   });
 });
