@@ -205,7 +205,7 @@ export const AssessmentDocumentPage = ({
             Ce document a été rédigé dans le cadre{" "}
             {convention.internshipKind === "immersion"
               ? "de l'immersion professionelle réalisée"
-              : "du mini-stage réalisé"}
+              : "du mini-stage réalisé"}{" "}
             par {convention.signatories.beneficiary.firstName}{" "}
             {convention.signatories.beneficiary.lastName} chez{" "}
             {convention.businessName}. Il peut être utilisé comme référence lors
