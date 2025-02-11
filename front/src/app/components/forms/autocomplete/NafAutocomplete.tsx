@@ -12,11 +12,14 @@ import { nafSlice } from "src/core-logic/domain/naf/naf.slice";
 export type NafAutocompleteProps = RSAutocompleteComponentProps<
   "naf",
   NafSectionSuggestion
->;
+> & {
+  initialValue?: NafSectionSuggestion;
+};
 
 export const NafAutocomplete = ({
   onNafSelected,
   onNafClear,
+  initialValue,
   ...props
 }: NafAutocompleteProps) => {
   const dispatch = useDispatch();
@@ -45,6 +48,12 @@ export const NafAutocomplete = ({
             dispatch(nafSlice.actions.queryWasEmptied());
           }
         },
+        defaultValue: initialValue
+          ? {
+              label: initialValue.label,
+              value: initialValue,
+            }
+          : undefined,
         options: options.map((option) => ({
           label: option.label,
           value: option,

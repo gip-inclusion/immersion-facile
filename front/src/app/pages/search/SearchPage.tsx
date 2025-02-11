@@ -99,6 +99,8 @@ export const SearchPage = ({
     longitude: undefined,
     fitForDisabledWorkers: undefined,
     currentPage: 1,
+    nafCodes: undefined,
+    nafLabel: undefined,
     ...acquisitionParams,
   };
   const [tempValue, setTempValue] = useState<SearchPageParams>(initialValues);
@@ -419,14 +421,22 @@ export const SearchPage = ({
                         onNafClear={() => {
                           setTempValue({
                             ...tempValue,
-                            nafCodes: undefined,
+                            nafCodes: initialValues.nafCodes,
+                            nafLabel: initialValues.nafLabel,
                           });
                         }}
                         selectProps={{
                           inputId: domElementIds.search.nafAutocomplete,
                         }}
                         className={fr.cx("fr-mt-2w")}
-                        initialInputValue={formValues.nafLabel}
+                        initialValue={
+                          formValues.nafLabel && formValues.nafCodes
+                            ? {
+                                label: formValues.nafLabel,
+                                nafCodes: formValues.nafCodes,
+                              }
+                            : undefined
+                        }
                       />
                     </>
                   ),
