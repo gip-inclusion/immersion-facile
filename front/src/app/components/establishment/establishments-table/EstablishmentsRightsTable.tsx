@@ -22,7 +22,7 @@ export const EstablishmentsRightsTable = ({
     <Table
       fixed={true}
       headers={["Établissement", "Administrateurs", "Rôle"]}
-      data={withEstablishmentData
+      data={[...withEstablishmentData]
         .sort((a, b) => a.businessName.localeCompare(b.businessName))
         .map(makeEstablishmentRightLine)}
     />

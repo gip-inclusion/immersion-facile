@@ -11,7 +11,7 @@ export const OnGoingAgencyRightsTable = ({
   <Table
     fixed
     headers={["Organisme", "Caractéristiques de l'agence", "Administrateurs"]}
-    data={agenciesWithToReviewRights
+    data={[...agenciesWithToReviewRights]
       .sort((a, b) => a.agency.name.localeCompare(b.agency.name))
       .map(makeAgencyWithToReviewRightLine())}
   />
