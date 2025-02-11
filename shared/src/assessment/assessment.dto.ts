@@ -31,7 +31,14 @@ export type WithEstablishmentComments = {
   establishmentAdvices: string;
 };
 
-type CommonAssesmentFields = {
+export type FormAssessmentDto =
+  | AssessmentDto
+  | ({
+      conventionId: ConventionId;
+    } & (WithEndedWithAJob | { endedWithAJob: null }) &
+      WithEstablishmentComments & { status: null });
+
+export type CommonAssesmentFields = {
   conventionId: ConventionId;
 } & WithEndedWithAJob &
   WithEstablishmentComments;

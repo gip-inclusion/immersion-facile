@@ -22,6 +22,7 @@ import {
   ConventionDto,
   ConventionReadDto,
   DotNestedKeys,
+  FormAssessmentDto,
   InternshipKind,
   assessmentDtoSchema,
   assessmentStatuses,
@@ -82,14 +83,14 @@ export const AssessmentForm = ({
   const currentAssessment = useAppSelector(
     assessmentSelectors.currentAssessment,
   );
-  const initialValues: AssessmentDto = {
+  const initialValues: FormAssessmentDto = {
     conventionId: convention.id,
-    status: "COMPLETED",
     establishmentFeedback: "",
     establishmentAdvices: "",
-    endedWithAJob: false,
+    endedWithAJob: null,
+    status: null,
   };
-  const methods = useForm<AssessmentDto>({
+  const methods = useForm<FormAssessmentDto>({
     resolver: zodResolver(assessmentDtoSchema),
     mode: "onTouched",
     defaultValues: initialValues,
@@ -167,7 +168,9 @@ export const AssessmentForm = ({
               </div>
 
               <form
-                onSubmit={handleSubmit(onSubmit)}
+                onSubmit={handleSubmit((values) => {
+                  return onSubmit(values as AssessmentDto);
+                })}
                 id={domElementIds.assessment.form}
                 data-matomo-name={domElementIds.assessment.form}
               >
@@ -207,13 +210,13 @@ const wordingByInternshipKind: Record<
   immersion: {
     COMPLETED: "Oui, l'immersion a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
+      "Oui, mais les horaires ont changés (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
   "mini-stage-cci": {
     COMPLETED: "Oui, le mini-stage a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
+      "Oui, mais les horaires ont changés (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
 };
@@ -235,15 +238,13 @@ const AssessmentStatusSection = ({
   onStepChange: OnStepChange;
 }) => {
   const { register, formState, watch, setValue } =
-    useFormContext<AssessmentDto>();
+    useFormContext<FormAssessmentDto>();
   const getFieldError = makeFieldError(formState);
   const formValues = watch();
   const [numberOfMissedHoursDisplayed, setNumberOfMissedHoursDisplayed] =
     useState<number | null>(null);
   const [numberOfMissedMinutesDisplayed, setNumberOfMissedMinutesDisplayed] =
     useState<number | null>(null);
-  const assessmentStatus = watch("status");
-
   useEffect(() => {
     if (
       formValues.status === "PARTIALLY_COMPLETED" &&
@@ -264,10 +265,8 @@ const AssessmentStatusSection = ({
 
   const totalHours = computeTotalHours({
     convention: convention,
-    missedHours:
-      (numberOfMissedHoursDisplayed ?? 0) +
-      (numberOfMissedMinutesDisplayed ?? 0) / 60,
-    assessmentStatus: assessmentStatus,
+
+    assessment: formValues,
   });
 
   return (
@@ -314,13 +313,18 @@ const AssessmentStatusSection = ({
                 }}
                 {...getFieldError("lastDayOfPresence")}
               />
-              <p className={fr.cx("fr-mb-2w")}>
-                L'immersion représente actuellement{" "}
+
+              <p className={fr.cx("fr-mb-0")}>
+                Pouvez-vous indiquer le nombre total d’heures manquées en raison
+                d’absences ou de retards ?
+              </p>
+              <p className={fr.cx("fr-hint-text")}>
+                Nombre total d’heures initialement indiquées dans la convention
+                :{" "}
                 {hoursValueToHoursDisplayed({
                   hoursValue: convention.schedule.totalHours,
                   padWithZero: false,
                 })}
-                , pouvez-vous indiquer le nombre d'heures manquées ?
               </p>
               <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                 <Input
@@ -437,7 +441,7 @@ const AssessmentContractSection = ({
               onChange: () => {
                 setValue("endedWithAJob", true);
               },
-              checked: endedWithAJobValue,
+              checked: endedWithAJobValue === true,
             },
           },
           {
@@ -447,10 +451,11 @@ const AssessmentContractSection = ({
               onChange: () => {
                 setValue("endedWithAJob", false);
               },
-              checked: !endedWithAJobValue,
+              checked: endedWithAJobValue === false,
             },
           },
         ]}
+        {...getFieldError("endedWithAJob")}
       />
       {endedWithAJobValue && (
         <div className={fr.cx("fr-grid-row", "fr-mb-4w")}>
@@ -499,8 +504,8 @@ const AssessmentContractSection = ({
               onStepChange(
                 3,
                 endedWithAJobValue
-                  ? ["typeOfContract", "contractStartDate"]
-                  : [],
+                  ? ["typeOfContract", "contractStartDate", "endedWithAJob"]
+                  : ["endedWithAJob"],
               ),
             type: "button",
             priority: "primary",
