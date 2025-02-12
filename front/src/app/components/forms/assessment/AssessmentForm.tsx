@@ -20,10 +20,12 @@ import {
   AssessmentDto,
   AssessmentStatus,
   ConventionDto,
+  ConventionId,
   ConventionReadDto,
   DotNestedKeys,
-  FormAssessmentDto,
   InternshipKind,
+  WithEndedWithAJob,
+  WithEstablishmentComments,
   assessmentDtoSchema,
   assessmentStatuses,
   computeTotalHours,
@@ -49,6 +51,13 @@ type AssessmentFormProperties = {
   convention: ConventionReadDto;
   jwt: string;
 };
+
+type FormAssessmentDto =
+  | AssessmentDto
+  | ({
+      conventionId: ConventionId;
+    } & (WithEndedWithAJob | { endedWithAJob: null }) &
+      WithEstablishmentComments & { status: null });
 
 export type OnStepChange = (
   // @TODO: make it generic to handle FormEstablishment and AssessmentForm
@@ -97,11 +106,11 @@ export const AssessmentForm = ({
   });
   const { handleSubmit, trigger } = methods;
 
-  const onSubmit = (values: AssessmentDto) => {
+  const onSubmit = (values: FormAssessmentDto) => {
     dispatch(
       assessmentSlice.actions.creationRequested({
         assessmentAndJwt: {
-          assessment: values,
+          assessment: formAssessmentDtoToAssessmentDto(values),
           jwt,
         },
         feedbackTopic: "assessment",
@@ -168,9 +177,7 @@ export const AssessmentForm = ({
               </div>
 
               <form
-                onSubmit={handleSubmit((values) => {
-                  return onSubmit(values as AssessmentDto);
-                })}
+                onSubmit={handleSubmit(onSubmit)}
                 id={domElementIds.assessment.form}
                 data-matomo-name={domElementIds.assessment.form}
               >
@@ -262,11 +269,18 @@ const AssessmentStatusSection = ({
       );
     }
   }, [formValues]);
-
+  const assessmentDto = formAssessmentDtoToAssessmentDto(formValues);
   const totalHours = computeTotalHours({
     convention: convention,
-
-    assessment: formValues,
+    lastDayOfPresence:
+      assessmentDto.status === "PARTIALLY_COMPLETED"
+        ? assessmentDto.lastDayOfPresence
+        : "",
+    numberOfMissedHours:
+      assessmentDto.status === "PARTIALLY_COMPLETED"
+        ? assessmentDto.numberOfMissedHours
+        : 0,
+    status: formValues.status,
   });
 
   return (
@@ -629,3 +643,46 @@ const AssessmentSuccessMessage = ({
     </div>
   </div>
 );
+
+export const formAssessmentDtoToAssessmentDto = (
+  formAssessmentDto: FormAssessmentDto,
+): AssessmentDto => {
+  const commonFields = {
+    conventionId: formAssessmentDto.conventionId,
+    establishmentFeedback: formAssessmentDto.establishmentFeedback,
+    establishmentAdvices: formAssessmentDto.establishmentAdvices,
+  };
+
+  let assessmentDto: AssessmentDto = {
+    ...commonFields,
+    status: "COMPLETED",
+    endedWithAJob: false,
+  };
+
+  if (formAssessmentDto.status === "DID_NOT_SHOW") {
+    assessmentDto = {
+      ...assessmentDto,
+      status: "DID_NOT_SHOW",
+    };
+  }
+
+  if (formAssessmentDto.endedWithAJob) {
+    assessmentDto = {
+      ...assessmentDto,
+      endedWithAJob: true,
+      typeOfContract: formAssessmentDto.typeOfContract,
+      contractStartDate: formAssessmentDto.contractStartDate,
+    };
+  }
+
+  if (formAssessmentDto.status === "PARTIALLY_COMPLETED") {
+    assessmentDto = {
+      ...assessmentDto,
+      status: "PARTIALLY_COMPLETED",
+      lastDayOfPresence: formAssessmentDto.lastDayOfPresence,
+      numberOfMissedHours: formAssessmentDto.numberOfMissedHours,
+    };
+  }
+
+  return assessmentDto;
+};
