@@ -31,27 +31,20 @@ export type WithEstablishmentComments = {
   establishmentAdvices: string;
 };
 
-export type FormAssessmentDto =
-  | AssessmentDto
-  | ({
-      conventionId: ConventionId;
-    } & (WithEndedWithAJob | { endedWithAJob: null }) &
-      WithEstablishmentComments & { status: null });
-
-export type CommonAssesmentFields = {
+type CommonAssessmentFields = {
   conventionId: ConventionId;
 } & WithEndedWithAJob &
   WithEstablishmentComments;
 
-export type AssessmentDtoCompleted = CommonAssesmentFields & {
+export type AssessmentDtoCompleted = CommonAssessmentFields & {
   status: "COMPLETED";
 };
 
-export type AssessmentDtoDidNotShow = CommonAssesmentFields & {
+export type AssessmentDtoDidNotShow = CommonAssessmentFields & {
   status: "DID_NOT_SHOW";
 };
 
-export type AssessmentDtoPartiallyCompleted = CommonAssesmentFields & {
+export type AssessmentDtoPartiallyCompleted = CommonAssessmentFields & {
   status: "PARTIALLY_COMPLETED";
   lastDayOfPresence: DateString | undefined;
   numberOfMissedHours: number;

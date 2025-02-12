@@ -1,37 +1,39 @@
 import { match } from "ts-pattern";
 import { ConventionDto } from "../convention/convention.dto";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
-import { hoursValueToHoursDisplayed } from "../utils/date";
-import { FormAssessmentDto } from "./assessment.dto";
+import { DateString, hoursValueToHoursDisplayed } from "../utils/date";
+import { AssessmentStatus } from "./assessment.dto";
 
 export const computeTotalHours = ({
   convention,
-  assessment,
+  status,
+  lastDayOfPresence,
+  numberOfMissedHours,
 }: {
   convention: ConventionDto;
-  assessment: FormAssessmentDto;
+  status: AssessmentStatus | null;
+  lastDayOfPresence: DateString | undefined;
+  numberOfMissedHours: number;
 }): string =>
-  match(assessment)
+  match(status)
 
-    .with({ status: "COMPLETED" }, () =>
+    .with("COMPLETED", () =>
       hoursValueToHoursDisplayed({
         hoursValue: convention.schedule.totalHours,
         padWithZero: false,
       }),
     )
-    .with({ status: "PARTIALLY_COMPLETED" }, (formAssessment) =>
+    .with("PARTIALLY_COMPLETED", () =>
       hoursValueToHoursDisplayed({
         hoursValue:
           calculateTotalImmersionHoursBetweenDateComplex({
             complexSchedule: convention.schedule.complexSchedule,
             dateStart: convention.dateStart,
-            dateEnd: formAssessment.lastDayOfPresence ?? convention.dateEnd,
-          }) - formAssessment.numberOfMissedHours,
+            dateEnd: lastDayOfPresence ?? convention.dateEnd,
+          }) - numberOfMissedHours,
         padWithZero: false,
       }),
     )
-    .with({ status: "DID_NOT_SHOW" }, () =>
-      hoursValueToHoursDisplayed({ hoursValue: 0 }),
-    )
-    .with({ status: null }, () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
+    .with("DID_NOT_SHOW", () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
+    .with(null, () => hoursValueToHoursDisplayed({ hoursValue: 0 }))
     .exhaustive();

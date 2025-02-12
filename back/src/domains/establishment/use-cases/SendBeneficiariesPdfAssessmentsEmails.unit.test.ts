@@ -31,7 +31,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
   const id: ConventionId = "immersion-ending-tomorrow-id";
 
   let uow: InMemoryUnitOfWork;
-  let sendBeneficiaryAssesmentEmail: SendBeneficiariesPdfAssessmentsEmails;
+  let sendBeneficiaryAssessmentEmail: SendBeneficiariesPdfAssessmentsEmails;
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
@@ -48,7 +48,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
       timeGateway,
     );
 
-    sendBeneficiaryAssesmentEmail = new SendBeneficiariesPdfAssessmentsEmails(
+    sendBeneficiaryAssessmentEmail = new SendBeneficiariesPdfAssessmentsEmails(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       makeCreateNewEvent({
@@ -88,7 +88,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     const now = new Date("2023-11-21T08:00:00.000Z");
     timeGateway.setNextDates([now, now]);
 
-    await sendBeneficiaryAssesmentEmail.execute({
+    await sendBeneficiaryAssessmentEmail.execute({
       conventionEndDate: {
         from: addDays(now, 1),
         to: addDays(now, 2),
@@ -172,7 +172,7 @@ describe("SendBeneficiariesPdfAssessmentsEmails", () => {
     expectToEqual(uow.outboxRepository.events, []);
 
     const now = timeGateway.now();
-    await sendBeneficiaryAssesmentEmail.execute({
+    await sendBeneficiaryAssessmentEmail.execute({
       conventionEndDate: {
         from: addDays(now, 1),
         to: addDays(now, 2),
