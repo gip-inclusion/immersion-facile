@@ -107,7 +107,6 @@ describe("Pg implementation of ConventionQueries", () => {
                 convention.immersionAppellation.appellationLabel,
               emergencyContactInfos: "",
               agencyLogoUrl: "https://super link",
-              agencyAssessmentDocumentLink: "https://super link",
               magicLink: "",
               validatorName: convention.validators?.agencyValidator
                 ? concatValidatorNames(convention.validators?.agencyValidator)

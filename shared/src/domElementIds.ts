@@ -197,7 +197,6 @@ export const domElementIds = {
     kindSelect: "im-form-add-agency__kind",
     counsellorEmailsInput: "im-form-add-agency__counsellor-emails",
     codeSafirInput: "im-form-add-agency__code-safir",
-    questionnaireUrlInput: "im-form-add-agency__questionnaire-url",
     agencySiretInput: "im-form-add-agency__agency-siret",
     agencyRefersToInput:
       "im-form-add-agency__im-form-add-agency__refers-to-agency-input",

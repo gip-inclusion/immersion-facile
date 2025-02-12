@@ -55,7 +55,6 @@ describe("PgAgencyRepository", () => {
       departmentCode: "75",
     })
     .withCoveredDepartments(["75"])
-    .withQuestionnaireUrl("http://questionnaire.agency1.fr")
     .withSignature("The team of agency1")
     .withLogoUrl("http://logo.agency1.fr");
 
@@ -70,7 +69,6 @@ describe("PgAgencyRepository", () => {
       postcode: "75001",
       departmentCode: "75",
     })
-    .withQuestionnaireUrl("http://questionnaire.agency2.fr")
     .withSignature("The team of agency2");
 
   const needsReviewAgency = AgencyDtoBuilder.create(

@@ -154,17 +154,6 @@ export const AgencyFormCommonFields = ({
         />
       )}
       <Input
-        label={formContents.questionnaireUrl.label}
-        hintText={formContents.questionnaireUrl.hintText}
-        nativeInputProps={{
-          ...formContents.questionnaireUrl,
-          ...register("questionnaireUrl", {
-            setValueAs: (value: string | null) => (value === "" ? null : value),
-          }),
-        }}
-        {...getFieldError("questionnaireUrl")}
-      />
-      <Input
         label={formContents.signature.label}
         hintText={formContents.signature.hintText}
         nativeInputProps={{
