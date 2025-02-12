@@ -1,7 +1,6 @@
 import { addDays, subDays } from "date-fns";
 import {
   EstablishmentRoutes,
-  FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   UserBuilder,
@@ -24,7 +23,7 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
-describe("Delete form establishment", () => {
+describe("Delete establishment", () => {
   const backofficeAdminUser = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true)
@@ -49,9 +48,6 @@ describe("Delete form establishment", () => {
       },
     ])
     .build();
-  const formEstablishment = FormEstablishmentDtoBuilder.valid()
-    .withSiret(establishmentAggregate.establishment.siret)
-    .build();
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let uow: InMemoryUnitOfWork;
@@ -74,11 +70,10 @@ describe("Delete form establishment", () => {
 
   it(`${displayRouteName(
     establishmentRoutes.deleteEstablishment,
-  )} 204 - Establishment Aggregate & Form deleted with back office JWT`, async () => {
+  )} 204 - Establishment Aggregate deleted with back office JWT`, async () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
-    uow.formEstablishmentRepository.setFormEstablishments([formEstablishment]);
 
     const response = await httpClient.deleteEstablishment({
       urlParams: {
@@ -97,7 +92,6 @@ describe("Delete form establishment", () => {
       uow.establishmentAggregateRepository.establishmentAggregates,
       [],
     );
-    expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
   });
 
   it(`${displayRouteName(
@@ -172,33 +166,6 @@ describe("Delete form establishment", () => {
   it(`${displayRouteName(
     establishmentRoutes.deleteEstablishment,
   )} 404 - Establishment Aggregate not found`, async () => {
-    const response = await httpClient.deleteEstablishment({
-      urlParams: {
-        siret: establishmentAggregate.establishment.siret,
-      },
-      headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
-      },
-    });
-
-    expectHttpResponseToEqual(response, {
-      body: {
-        status: 404,
-        message: errors.establishment.notFound({
-          siret: establishmentAggregate.establishment.siret,
-        }).message,
-      },
-      status: 404,
-    });
-  });
-
-  it(`${displayRouteName(
-    establishmentRoutes.deleteEstablishment,
-  )} 404 - Establishment Form not found`, async () => {
-    uow.establishmentAggregateRepository.establishmentAggregates = [
-      establishmentAggregate,
-    ];
-
     const response = await httpClient.deleteEstablishment({
       urlParams: {
         siret: establishmentAggregate.establishment.siret,

@@ -1,5 +1,4 @@
 import {
-  FormEstablishmentDtoBuilder,
   GroupOptions,
   InclusionConnectedUserBuilder,
   UserBuilder,
@@ -120,35 +119,14 @@ describe("Delete Establishment", () => {
         }),
       );
     });
-
-    it("Throws not found error on missing form establishment", async () => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        establishmentAggregate,
-      ];
-      await expectPromiseToFailWithError(
-        deleteEstablishment.execute(
-          {
-            siret: establishmentAggregate.establishment.siret,
-          },
-          icBackofficeAdminUser,
-        ),
-        errors.establishment.notFound({
-          siret: establishmentAggregate.establishment.siret,
-        }),
-      );
-    });
   });
 
   describe("Right paths", () => {
-    it("Establishment aggregate and form establishment are deleted, establishment group with siret have siret removed", async () => {
+    it("Establishment aggregate are deleted, establishment group with siret have siret removed", async () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
       ];
-      uow.formEstablishmentRepository.setFormEstablishments([
-        FormEstablishmentDtoBuilder.valid()
-          .withSiret(establishmentAggregate.establishment.siret)
-          .build(),
-      ]);
+
       uow.groupRepository.groupEntities = [
         {
           name: "group",
@@ -169,7 +147,7 @@ describe("Delete Establishment", () => {
         uow.establishmentAggregateRepository.establishmentAggregates,
         [],
       );
-      expectToEqual(await uow.formEstablishmentRepository.getAll(), []);
+
       expectToEqual(uow.groupRepository.groupEntities, [
         {
           name: "group",
