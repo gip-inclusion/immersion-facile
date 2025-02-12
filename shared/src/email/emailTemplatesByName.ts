@@ -190,6 +190,41 @@ export const emailTemplatesByName =
         agencyLogoUrl,
       }),
     },
+    ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION: {
+      niceName: "Bilan - Établissement - Bilan complété",
+      tags: ["bilan_etablissement_bilanComplete"],
+      createEmailVariables: ({
+        recipientFullName,
+        beneficiaryFullName,
+        linkToAssessment,
+        businessName,
+        internshipKind,
+      }) => ({
+        subject: `Le bilan de l’immersion de ${beneficiaryFullName} est complété`,
+        greetings: `Bonjour ${recipientFullName},`,
+        content: `Le bilan ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+        } de ${beneficiaryFullName} au sein de votre entreprise ${businessName} est désormais finalisé.
+        
+        Consultez-le dès maintenant :
+        `,
+        buttons: [
+          {
+            label: "Consulter le bilan",
+            url: linkToAssessment,
+            target: "_blank",
+          },
+        ],
+        subContent: `Ce document récapitule les éléments clés ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+        }.
+        
+        Merci pour votre engagement dans l'accueil des candidats en ${
+          internshipKind === "immersion" ? "immersion" : "stage"
+        }.
+        ${defaultSignature(internshipKind)}`,
+      }),
+    },
     ASSESSMENT_BENEFICIARY_NOTIFICATION: {
       niceName: "Bilan - Bénéficiaire - Accompagnement au remplissage",
       tags: ["bilan_bénéficiaire_accompagnementBilan"],
