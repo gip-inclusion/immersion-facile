@@ -286,7 +286,6 @@ const agency3: AgencyWithUsersRights = {
   usersRights: {
     validatorUserA3: { isNotifiedByEmail: true, roles: ["validator"] },
   },
-  questionnaireUrl: "http://questionnaire.agency3.fr",
   signature: "Signature of Test Agency 3",
   coveredDepartments: ["64"],
   address: {
@@ -315,7 +314,6 @@ const agency1: AgencyWithUsersRights = {
     counsellorUserA1: { isNotifiedByEmail: true, roles: ["counsellor"] },
     validatorUserA1: { isNotifiedByEmail: true, roles: ["validator"] },
   },
-  questionnaireUrl: "http://questionnaire.agency1.fr",
   signature: "Signature of Test Agency 1",
   agencySiret: "00000000000000",
   coveredDepartments: ["75"],
@@ -361,7 +359,6 @@ const testAgencies: AgencyWithUsersRights[] = [
     logoUrl: "http://LOGO AGENCY IF URL",
     refersToAgencyId: null,
     refersToAgencyName: null,
-    questionnaireUrl: null,
     codeSafir: null,
     rejectionJustification: null,
   },
@@ -378,7 +375,6 @@ const testAgencies: AgencyWithUsersRights[] = [
       validatorUser1A2: { isNotifiedByEmail: true, roles: ["validator"] },
       validatorUser2A2: { isNotifiedByEmail: true, roles: ["validator"] },
     },
-    questionnaireUrl: "http://questionnaire.agency2.fr",
     signature: "Signature of Test Agency 2",
     coveredDepartments: ["68"],
     address: {
@@ -408,7 +404,6 @@ const testAgencies: AgencyWithUsersRights[] = [
       counsellorUserA4: { isNotifiedByEmail: true, roles: ["counsellor"] },
       validatorUserA4: { isNotifiedByEmail: true, roles: ["validator"] },
     },
-    questionnaireUrl: "http://questionnaire.agency4.fr",
     signature: "Signature of Test Agency 4 accompagnante",
     coveredDepartments: ["64"],
     address: {
@@ -437,7 +432,6 @@ const testAgencies: AgencyWithUsersRights[] = [
       counsellorUserA5: { isNotifiedByEmail: true, roles: ["counsellor"] },
       validatorUserA1: { isNotifiedByEmail: true, roles: ["validator"] },
     },
-    questionnaireUrl: "http://questionnaire.agency5.fr",
     signature: "Signature of Test Agency 5 accompagnante",
     coveredDepartments: ["64"],
     address: {

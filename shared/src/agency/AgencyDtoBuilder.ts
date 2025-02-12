@@ -21,7 +21,6 @@ const emptyAgency: AgencyDto = {
   counsellorEmails: [],
   validatorEmails: [],
   agencySiret: "12345678904444",
-  questionnaireUrl: "https://empty-questionnaire-url",
   signature: "empty-signature",
   coveredDepartments: [defaultAddress.departmentCode],
   address: defaultAddress,
@@ -127,13 +126,6 @@ export class AgencyDtoBuilder implements Builder<AgencyDto> {
         lat,
         lon,
       },
-    });
-  }
-
-  public withQuestionnaireUrl(questionnaireUrl: AbsoluteUrl) {
-    return new AgencyDtoBuilder({
-      ...this.#agency,
-      questionnaireUrl,
     });
   }
 

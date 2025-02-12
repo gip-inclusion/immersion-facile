@@ -31,7 +31,6 @@ export type CreateAgencyDto = {
   position: GeoPositionDto;
   counsellorEmails: Email[];
   validatorEmails: Email[];
-  questionnaireUrl: AbsoluteUrl | null;
   agencySiret: SiretDto;
   logoUrl: AbsoluteUrl | null;
   signature: string;

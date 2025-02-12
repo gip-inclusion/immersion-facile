@@ -12,7 +12,6 @@ import {
   displayEmergencyContactInfos,
   errors,
   frontRoutes,
-  isUrlValid,
   withConventionSchema,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -172,11 +171,6 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           beneficiary,
         }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
-        agencyAssessmentDocumentLink:
-          agency.questionnaireUrl !== null &&
-          isUrlValid(agency.questionnaireUrl)
-            ? agency.questionnaireUrl
-            : undefined,
         magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
         validatorName: convention.validators?.agencyValidator
           ? concatValidatorNames(convention.validators?.agencyValidator)

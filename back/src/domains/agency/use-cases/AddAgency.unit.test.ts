@@ -54,7 +54,6 @@ describe("AddAgency use case", () => {
     kind: "mission-locale",
     name: "Mission locale de Paris",
     position: { lat: 10, lon: 20 },
-    questionnaireUrl: "https://www.my-test-url.com",
     signature: "Super signature of the agency",
     logoUrl: "https://www.my-url.com",
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
@@ -80,7 +79,6 @@ describe("AddAgency use case", () => {
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: createParisMissionLocaleParams.id,
     refersToAgencyName: createParisMissionLocaleParams.name,
-    questionnaireUrl: null,
     logoUrl: null,
   };
   const uuids = ["uuid1", "uuid2", "uuid3", "uuid4"];
@@ -144,7 +142,6 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
             rejectionJustification: null,
             codeSafir: null,
             counsellorEmails: [],
@@ -193,7 +190,6 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
             rejectionJustification: null,
             codeSafir: null,
             counsellorEmails: [],
@@ -225,7 +221,6 @@ describe("AddAgency use case", () => {
           {
             ...createParisMissionLocaleParams,
             status: "needsReview",
-            questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
             rejectionJustification: null,
             codeSafir: null,
             counsellorEmails: [],
@@ -263,7 +258,6 @@ describe("AddAgency use case", () => {
     it("uses no questionnaire url when none is provided", async () => {
       const agencyWithoutQuestionnaire: CreateAgencyDto = {
         ...createParisMissionLocaleParams,
-        questionnaireUrl: null,
       };
 
       uow.agencyRepository.agencies = [];
@@ -297,7 +291,6 @@ describe("AddAgency use case", () => {
             status: "needsReview",
             codeSafir: null,
             rejectionJustification: null,
-            questionnaireUrl: null,
           },
           {
             [newValidator.id]: {
@@ -323,7 +316,6 @@ describe("AddAgency use case", () => {
         counsellorEmails: [],
         validatorEmails: [],
         status: "needsReview",
-        questionnaireUrl: createParisMissionLocaleParams.questionnaireUrl,
         codeSafir: null,
         rejectionJustification: null,
       };

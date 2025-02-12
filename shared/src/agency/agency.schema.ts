@@ -91,7 +91,6 @@ const commonAgencyShape = {
   coveredDepartments: z.array(zStringMinLength1).min(1),
   address: addressSchema,
   position: geoPositionSchema,
-  questionnaireUrl: absoluteUrlSchema.or(z.null()),
   signature: stringWithMaxLength255,
   logoUrl: absoluteUrlSchema.or(z.null()),
   agencySiret: siretSchema,
@@ -124,7 +123,6 @@ export const editAgencySchema: z.ZodSchema<AgencyDto> = z
   .object({ ...commonAgencyShape, ...withEmails })
   .and(
     z.object({
-      questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
@@ -144,7 +142,6 @@ export const agencyDtoForAgencyUsersAndAdminsSchema: z.Schema<AgencyDtoForAgency
     .merge(
       z.object({
         agencySiret: siretSchema,
-        questionnaireUrl: absoluteUrlSchema.or(z.null()),
         status: agencyStatusSchema,
         codeSafir: zStringMinLength1.or(z.null()),
         refersToAgencyId: refersToAgencyIdSchema.or(z.null()),
@@ -160,7 +157,6 @@ export const agencySchema: z.ZodSchema<AgencyDto> = z
   .merge(
     z.object({
       agencySiret: siretSchema,
-      questionnaireUrl: absoluteUrlSchema.or(z.null()),
       status: agencyStatusSchema,
       codeSafir: zStringMinLength1.or(z.null()),
       refersToAgencyId: refersToAgencyIdSchema.or(z.null()),

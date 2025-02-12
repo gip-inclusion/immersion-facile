@@ -76,8 +76,6 @@ export const AddAgencyForm = () => {
       agenciesSlice.actions.addAgencyRequested({
         ...values,
         kind: values.kind,
-        questionnaireUrl:
-          values.kind === "pole-emploi" ? null : values.questionnaireUrl,
       }),
     );
   };
@@ -395,7 +393,6 @@ const initialValues: (id: AgencyDto["id"]) => CreateAgencyInitialValues = (
   },
   counsellorEmails: [],
   validatorEmails: [],
-  questionnaireUrl: null,
   logoUrl: null,
   signature: "",
   agencySiret: "",

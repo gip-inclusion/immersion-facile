@@ -54,7 +54,6 @@ export class PgAgencyRepository implements AgencyRepository {
         name: agency.name,
         status: agency.status,
         kind: agency.kind,
-        questionnaire_url: agency.questionnaireUrl,
         email_signature: agency.signature,
         logo_url: agency.logoUrl,
         position: fn("ST_MakePoint", [
@@ -90,7 +89,6 @@ export class PgAgencyRepository implements AgencyRepository {
         name: agency.name,
         status: agency.status,
         kind: agency.kind,
-        questionnaire_url: agency.questionnaireUrl,
         email_signature: agency.signature,
         logo_url: agency.logoUrl,
         position: agency.position
@@ -331,9 +329,6 @@ export class PgAgencyRepository implements AgencyRepository {
           name: ref("agencies.name"),
           status: cast<AgencyStatus>(ref("agencies.status")),
           kind: cast<AgencyKind>(ref("agencies.kind")),
-          questionnaireUrl: sql<AbsoluteUrl>`${ref(
-            "agencies.questionnaire_url",
-          )}`,
           logoUrl: sql<AbsoluteUrl>`${ref("agencies.logo_url")}`,
           position: jsonBuildObject({
             lat: sql<number>`(ST_AsGeoJSON(${ref(

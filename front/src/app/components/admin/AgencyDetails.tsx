@@ -15,7 +15,6 @@ const agencyFieldToLabel: FieldsToLabel = {
   address: "Adresse",
   counsellorEmails: "Emails des conseillers",
   validatorEmails: "Emails des validateurs",
-  questionnaireUrl: "URL du questionnaire",
   signature: "Signature",
   agencySiret: "Siret",
   codeSafir: "Code Safir",
