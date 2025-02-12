@@ -132,40 +132,54 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     siret: SiretDto,
     romeDto: RomeDto,
   ): Promise<SearchResultDto | null> {
-    return this.#limiter
-      .schedule(async () =>
-        this.httpClient.getCompany({
-          headers: {
-            authorization: await this.#makeAutorization(),
-          },
-          queryParams: {
+    const cachedGetLbbResult = this.withCache({
+      overrideCacheDurationInHours: 24 * 3,
+      logParams: {
+        partner: "laBonneBoite",
+        route: this.lbbRoute.getCompany,
+      },
+      getCacheKey: (siret) => `lbb_${siret}`,
+      cb: async (siret): Promise<LaBonneBoiteApiResultV2Props[]> => {
+        return this.httpClient
+          .getCompany({
+            headers: {
+              authorization: await this.#makeAutorization(),
+            },
+            queryParams: {
+              siret,
+            },
+          })
+          .then((response) => {
+            if (response.status !== 200)
+              throw new Error(JSON.stringify(response));
+            return response.body?.items ?? [];
+          });
+      },
+    });
+    return this.#limiter.schedule(async () =>
+      cachedGetLbbResult(siret)
+        .then((result) => {
+          const item = result
+            .map(
+              (props: LaBonneBoiteApiResultV2Props) =>
+                new LaBonneBoiteCompanyDto(props),
+            )
+            .filter((result) => result.isCompanyRelevant())
+            .map((result) => result.toSearchResult(romeDto))
+            .at(0);
+
+          return item ?? null;
+        })
+        .catch((error) => {
+          logger.error({
+            error: castError(error),
+            message: "fetchCompanyBySiret_error",
             siret,
-          },
+            romeLabel: romeDto.romeLabel,
+          });
+          throw error;
         }),
-      )
-      .then((response) => {
-        if (response.status !== 200) throw new Error(JSON.stringify(response));
-
-        const item = response.body?.items
-          ?.map(
-            (props: LaBonneBoiteApiResultV2Props) =>
-              new LaBonneBoiteCompanyDto(props),
-          )
-          .filter((result) => result.isCompanyRelevant())
-          .map((result) => result.toSearchResult(romeDto))
-          .at(0);
-
-        return item ?? null;
-      })
-      .catch((error) => {
-        logger.error({
-          error: castError(error),
-          message: "fetchCompanyBySiret_error",
-          siret,
-          romeLabel: romeDto.romeLabel,
-        });
-        throw error;
-      });
+    );
   }
 
   async #makeAutorization(): Promise<string> {
