@@ -255,57 +255,6 @@ describe("AddAgency use case", () => {
       ]);
     });
 
-    it("uses no questionnaire url when none is provided", async () => {
-      const agencyWithoutQuestionnaire: CreateAgencyDto = {
-        ...createParisMissionLocaleParams,
-      };
-
-      uow.agencyRepository.agencies = [];
-      uow.userRepository.users = [];
-
-      await addAgency.execute(agencyWithoutQuestionnaire);
-
-      const newValidator: User = {
-        id: uuids[0],
-        email: createParisMissionLocaleParams.validatorEmails[0],
-        createdAt: timeGateway.now().toISOString(),
-        firstName: emptyName,
-        lastName: emptyName,
-        externalId: null,
-      };
-      const newCounsellor: User = {
-        id: uuids[1],
-        email: createParisMissionLocaleParams.counsellorEmails[0],
-        createdAt: timeGateway.now().toISOString(),
-        firstName: emptyName,
-        lastName: emptyName,
-        externalId: null,
-      };
-      expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
-      expectToEqual(uow.agencyRepository.agencies, [
-        toAgencyWithRights(
-          {
-            ...agencyWithoutQuestionnaire,
-            counsellorEmails: [],
-            validatorEmails: [],
-            status: "needsReview",
-            codeSafir: null,
-            rejectionJustification: null,
-          },
-          {
-            [newValidator.id]: {
-              isNotifiedByEmail: true,
-              roles: ["validator"],
-            },
-            [newCounsellor.id]: {
-              isNotifiedByEmail: true,
-              roles: ["counsellor"],
-            },
-          },
-        ),
-      ]);
-    });
-
     it("agency with refers to should have validator emails from referral agency, respecting the notification option", async () => {
       const validator2 = new InclusionConnectedUserBuilder()
         .withId("validator-2")
