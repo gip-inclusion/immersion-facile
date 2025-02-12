@@ -993,7 +993,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         internshipKind,
         magicLink,
         validatorName,
-        agencyAssessmentDocumentLink,
       }) => ({
         subject:
           internshipKind === "immersion"
@@ -1021,25 +1020,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
                 : "Voir la convention du mini-stage",
             url: magicLink,
           },
-          {
-            label: "Télécharger la fiche bilan",
-            url:
-              agencyAssessmentDocumentLink ||
-              `${
-                internshipKind === "immersion"
-                  ? "https://immersion.cellar-c2.services.clever-cloud.com/bilan-immersion-professionnelle-inscriptible.pdf"
-                  : "https://immersion.cellar-c2.services.clever-cloud.com/CCI_MiniStage_Bilan.pdf"
-              }`,
-          },
         ],
-        highlight: {
-          kind: "info",
-          content: `${
-            internshipKind === "immersion"
-              ? "À la fin de l'immersion, nous vous remercions de compléter la fiche bilan de l'immersion, et de l'envoyer au conseiller qui a signé la convention (France Travail, Mission Locale…). Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire de l'immersion."
-              : "À la fin du mini stage, nous vous remercions de compléter la fiche bilan du mini stage, et de l'envoyer au conseiller de la Chambre de Commerce et d'Instrustrie - CCI qui a signé la convention. Cette évaluation doit être complétée par le tuteur, si possible en présence du bénéficiaire du mini stage."
-          }`,
-        },
         subContent: `
       ${defaultSignature(internshipKind)}
 

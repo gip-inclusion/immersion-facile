@@ -425,7 +425,6 @@ export type EmailParamsByEmailType = {
     businessAddresses: string[];
   };
   VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
-    agencyAssessmentDocumentLink: string | undefined;
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryBirthdate: string;
     beneficiaryFirstName: string;
