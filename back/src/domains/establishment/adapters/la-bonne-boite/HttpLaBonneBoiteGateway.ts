@@ -1,7 +1,6 @@
 import Bottleneck from "bottleneck";
-import { RomeDto, SearchResultDto, SiretDto, castError } from "shared";
+import { RomeDto, SearchResultDto, SiretDto } from "shared";
 import { HttpClient } from "shared-routes";
-import { createLogger } from "../../../../utils/logger";
 import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import { WithCache } from "../../../core/caching-gateway/port/WithCache";
 import {
@@ -20,8 +19,6 @@ const MAX_DISTANCE_IN_KM = 100;
 const lbbMaxQueryPerSeconds = 1;
 
 const lbbV2App = "api_labonneboitev2";
-
-const logger = createLogger(__filename);
 
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   #limiter = new Bottleneck({
@@ -110,19 +107,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
                 : true,
             );
         })
-        .catch((error) => {
-          logger.error({
-            error: castError(error),
-            message: "searchCompanies_error",
-            searchLBB: {
-              distanceKm: searchCompaniesParams.distanceKm,
-              lat: searchCompaniesParams.lat,
-              lon: searchCompaniesParams.lon,
-              romeCode: searchCompaniesParams.romeCode,
-              romeLabel: searchCompaniesParams.romeLabel,
-              nafCodes: searchCompaniesParams.nafCodes,
-            },
-          });
+        .catch(() => {
           return [];
         }),
     );
@@ -157,28 +142,18 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       },
     });
     return this.#limiter.schedule(async () =>
-      cachedGetLbbResult(siret)
-        .then((result) => {
-          const item = result
-            .map(
-              (props: LaBonneBoiteApiResultV2Props) =>
-                new LaBonneBoiteCompanyDto(props),
-            )
-            .filter((result) => result.isCompanyRelevant())
-            .map((result) => result.toSearchResult(romeDto))
-            .at(0);
+      cachedGetLbbResult(siret).then((result) => {
+        const item = result
+          .map(
+            (props: LaBonneBoiteApiResultV2Props) =>
+              new LaBonneBoiteCompanyDto(props),
+          )
+          .filter((result) => result.isCompanyRelevant())
+          .map((result) => result.toSearchResult(romeDto))
+          .at(0);
 
-          return item ?? null;
-        })
-        .catch((error) => {
-          logger.error({
-            error: castError(error),
-            message: "fetchCompanyBySiret_error",
-            siret,
-            romeLabel: romeDto.romeLabel,
-          });
-          throw error;
-        }),
+        return item ?? null;
+      }),
     );
   }
 
