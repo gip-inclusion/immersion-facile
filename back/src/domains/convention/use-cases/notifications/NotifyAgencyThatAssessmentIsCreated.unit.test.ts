@@ -134,7 +134,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             numberOfHoursMade: "45h",
           },
           recipients: [validator.email, validator2.email],
-          cc: [convention.signatories.beneficiary.email],
         },
       ],
     });
@@ -182,7 +181,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
           },
           recipients: [validator.email, validator2.email],
-          cc: [convention.signatories.beneficiary.email],
         },
       ],
     });
