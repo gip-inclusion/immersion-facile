@@ -63,8 +63,8 @@ test.describe("Establishment creation and modification workflow", () => {
       phone: faker.helpers.fromRegExp(phoneRegexp),
       email: "admin+playwright@immersion-facile.beta.gouv.fr", //admin email required due to connexion to Establishment Dashboard
       contactMethod: "PHONE",
-      firstName: "Prénom Admin",
-      lastName: "Nom Admin",
+      firstName: "Jean",
+      lastName: "Immersion",
       copyEmails: [
         "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
       ],
