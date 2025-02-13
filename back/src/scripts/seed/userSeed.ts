@@ -7,8 +7,8 @@ export const seedUsers = {
     .withIsAdmin(false)
     .withCreatedAt(new Date("2024-04-29"))
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
-    .withFirstName("Prénom IcUser")
-    .withLastName("Nom IcUser")
+    .withFirstName("Jean")
+    .withLastName("Immersion")
     .withId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .withExternalId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .build(),
@@ -16,8 +16,8 @@ export const seedUsers = {
     .withIsAdmin(true)
     .withCreatedAt(new Date("2024-04-30"))
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
-    .withFirstName("Prénom Admin")
-    .withLastName("Nom Admin")
+    .withFirstName("Jean")
+    .withLastName("Immersion")
     .withId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .withExternalId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .build(),
