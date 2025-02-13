@@ -10,7 +10,6 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { FrontAgencyDashboardRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -29,8 +28,6 @@ export const AgencyDashboardPage = ({
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
-
-  const agencyOptions = useAppSelector(agenciesSelectors.options);
 
   const siretInDeviceStorage =
     outOfReduxDependencies.localDeviceRepository.get("connectedUserSiret");
@@ -86,7 +83,7 @@ export const AgencyDashboardPage = ({
 
                 <RegisterAgenciesForm
                   currentUser={currentUser}
-                  {...(siretInDeviceStorage && agencyOptions.length > 0
+                  {...(siretInDeviceStorage
                     ? { initialSiret: siretInDeviceStorage }
                     : {})}
                 />
