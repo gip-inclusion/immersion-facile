@@ -44,7 +44,10 @@ export const getIcUserRoleForAccessingConvention = (
   if (user.isBackofficeAdmin) roles.push("back-office");
   if (convention.signatories.establishmentRepresentative.email === user.email)
     roles.push("establishment-representative");
-  if (convention.establishmentTutor.email === user.email)
+  if (
+    convention.establishmentTutor.email === user.email ||
+    user.establishments?.some((e) => e.siret === convention.siret)
+  )
     roles.push("establishment-tutor");
   const agencyRight = user.agencyRights.find(
     (agencyRight) => agencyRight.agency.id === convention.agencyId,
