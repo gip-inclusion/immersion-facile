@@ -166,8 +166,10 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.appellations} input`)
-      .inputValue(),
+      .locator(
+        `#${domElementIds.establishment.admin.appellations}-0-wrapper .im-select__single-value`,
+      )
+      .innerText(),
   ).toContain("Bûcheron");
 
   await expect(
