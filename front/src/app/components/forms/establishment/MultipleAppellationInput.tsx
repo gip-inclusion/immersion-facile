@@ -65,7 +65,9 @@ export const MultipleAppellationInput = ({
                   onAppellationClear={() => {
                     onAppellationDelete(index);
                   }}
-                  id={`${id}-${index}`}
+                  selectProps={{
+                    inputId: `${id}-${index}`,
+                  }}
                 />
               </div>
               <Button

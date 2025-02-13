@@ -39,9 +39,7 @@ export const AppellationAutocomplete = ({
 
   const [selectedOption, setSelectedOption] =
     useState<AppellationMatchDto | null>(initialOption);
-  const [searchTerm, setSearchTerm] = useState<string>(
-    initialValue?.appellationLabel ?? "",
-  );
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [options, setOptions] = useState<AppellationMatchDto[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
