@@ -1,4 +1,5 @@
-import { FormEstablishmentDtoBuilder } from "shared";
+import { InclusionConnectedUserBuilder } from "shared";
+import { locationToRawAddress } from "../../../../utils/address";
 import {
   ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
@@ -6,17 +7,21 @@ import {
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import { NotifyConfirmationEstablishmentCreated } from "./NotifyConfirmationEstablishmentCreated";
 
 describe("NotifyConfirmationEstablishmentCreated", () => {
-  const validEstablishment = FormEstablishmentDtoBuilder.valid().build();
   let notifyConfirmationEstablishmentCreated: NotifyConfirmationEstablishmentCreated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let uow: InMemoryUnitOfWork;
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
+    uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
     const uuidGenerator = new UuidV4Generator();
     const timeGateway = new CustomTimeGateway();
@@ -37,24 +42,61 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
+      const establishmentAdmin = new InclusionConnectedUserBuilder()
+        .withId("admin")
+        .withEmail("admin@estab.com")
+        .buildUser();
+      const establishmentContact1 = new InclusionConnectedUserBuilder()
+        .withId("contact1")
+        .withEmail("contact1@estab.com")
+        .buildUser();
+      const establishmentContact2 = new InclusionConnectedUserBuilder()
+        .withId("contact2")
+        .withEmail("contact2@estab.com")
+        .buildUser();
+
+      const establishmentAggregate = new EstablishmentAggregateBuilder()
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "Boss",
+            phone: "+3366887744",
+            userId: establishmentAdmin.id,
+          },
+          { role: "establishment-contact", userId: establishmentContact1.id },
+          { role: "establishment-contact", userId: establishmentContact2.id },
+        ])
+        .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishmentAggregate,
+      ];
+      uow.userRepository.users = [
+        establishmentAdmin,
+        establishmentContact1,
+        establishmentContact2,
+      ];
+
       await notifyConfirmationEstablishmentCreated.execute({
-        formEstablishment: validEstablishment,
+        siret: establishmentAggregate.establishment.siret,
       });
 
       expectSavedNotificationsAndEvents({
         emails: [
           {
             kind: "NEW_ESTABLISHMENT_CREATED_CONTACT_CONFIRMATION",
-            recipients: [validEstablishment.businessContact.email],
+            recipients: [establishmentAdmin.email],
+            cc: [establishmentContact1.email, establishmentContact2.email],
             params: {
-              businessName: validEstablishment.businessName,
-              contactFirstName: validEstablishment.businessContact.firstName,
-              contactLastName: validEstablishment.businessContact.lastName,
-              businessAddresses: validEstablishment.businessAddresses.map(
-                ({ rawAddress }) => rawAddress,
-              ),
+              businessName: establishmentAggregate.establishment.name,
+              contactFirstName: establishmentAdmin.firstName,
+              contactLastName: establishmentAdmin.lastName,
+              businessAddresses:
+                establishmentAggregate.establishment.locations.map(
+                  ({ id, address }) =>
+                    locationToRawAddress(id, address).rawAddress,
+                ),
             },
-            cc: validEstablishment.businessContact.copyEmails,
           },
         ],
       });
