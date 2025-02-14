@@ -23,7 +23,7 @@ export const CopyButton = (props: CopyButtonProperties) => {
       disabled={copyButtonIsDisabled}
       onClick={() => onCopyButtonClick(props.textToCopy)}
       size="small"
-      priority="tertiary"
+      priority={props.priority ?? "tertiary no outline"}
       className={cx(
         fr.cx(
           "fr-py-0",

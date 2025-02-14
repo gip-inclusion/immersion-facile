@@ -94,6 +94,7 @@ export const ConventionSummary = ({
               textToCopy={conventionId}
               withIcon={true}
               className={fr.cx("fr-my-2v")}
+              priority="tertiary"
             />
           </div>
         </section>

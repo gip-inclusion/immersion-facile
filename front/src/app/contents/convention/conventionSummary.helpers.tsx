@@ -99,6 +99,7 @@ const makeSignatoriesSubsections = (
             <CopyButton
               withIcon={true}
               textToCopy={convention.signatories.beneficiary.email}
+              priority="tertiary no outline"
             />
           ),
         },
