@@ -25,6 +25,11 @@ test.describe("Assessment workflow", () => {
     await expect(
       await page.locator(`#${domElementIds.assessment.statusInput}`),
     ).toBeVisible();
+
+    await page
+      .locator(`[for="${domElementIds.assessment.statusInput}-0"]`)
+      .click();
+
     await page
       .locator(
         `#${domElementIds.assessment.nextButtonFromStepAndMode({
@@ -35,6 +40,11 @@ test.describe("Assessment workflow", () => {
     await expect(
       await page.locator(`#${domElementIds.assessment.endedWithAJobInput}`),
     ).toBeVisible();
+
+    await page
+      .locator(`[for="${domElementIds.assessment.endedWithAJobInput}-1"]`)
+      .click();
+
     await page
       .locator(
         `#${domElementIds.assessment.nextButtonFromStepAndMode({
