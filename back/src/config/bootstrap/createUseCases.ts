@@ -265,7 +265,7 @@ export const createUseCases = (
       lookupLocation: new LookupLocation(gateways.addressApi),
 
       addFormEstablishmentBatch: new AddFormEstablishmentBatch(
-        addFormEstablishment,
+        insertEstablishmentAggregateFromForm,
         uowPerformer,
       ),
 

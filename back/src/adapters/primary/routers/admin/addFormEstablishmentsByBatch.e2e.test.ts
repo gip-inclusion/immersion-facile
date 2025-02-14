@@ -10,6 +10,7 @@ import {
   adminRoutes,
   currentJwtVersions,
   expectHttpResponseToEqual,
+  updatedAddress1,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -17,20 +18,20 @@ import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapt
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
-const adminBuilder = new InclusionConnectedUserBuilder()
-  .withId("backoffice-admin-user")
-  .withIsAdmin(true);
-const icAdmin = adminBuilder.build();
-const admin = adminBuilder.buildUser();
-
-const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-  version: currentJwtVersions.inclusion,
-  iat: new Date().getTime(),
-  exp: addDays(new Date(), 30).getTime(),
-  userId: icAdmin.id,
-};
-
 describe("POST /add-form-establishment-batch", () => {
+  const adminBuilder = new InclusionConnectedUserBuilder()
+    .withId("backoffice-admin-user")
+    .withIsAdmin(true);
+  const icAdmin = adminBuilder.build();
+  const admin = adminBuilder.buildUser();
+
+  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: icAdmin.id,
+  };
+
   const formEstablishment1: FormEstablishmentDto =
     FormEstablishmentDtoBuilder.valid().build();
   const payload: FormEstablishmentBatchDto = {
@@ -56,7 +57,30 @@ describe("POST /add-form-establishment-batch", () => {
     ({ gateways } = testApp);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
     testApp.inMemoryUow.userRepository.users = [admin];
+    testApp.inMemoryUow.romeRepository.appellations = [
+      {
+        appellationCode: "11111",
+        appellationLabel: "Test",
+        romeCode: "",
+        romeLabel: "",
+      },
+      {
+        appellationCode: "22222",
+        appellationLabel: "Test",
+        romeCode: "",
+        romeLabel: "",
+      },
+      {
+        appellationCode: "33333",
+        appellationLabel: "Test",
+        romeCode: "",
+        romeLabel: "",
+      },
+    ];
 
+    gateways.addressApi.setNextLookupStreetAndAddresses([
+      [updatedAddress1.addressAndPosition],
+    ]);
     gateways.timeGateway.defaultDate = new Date();
 
     token = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);

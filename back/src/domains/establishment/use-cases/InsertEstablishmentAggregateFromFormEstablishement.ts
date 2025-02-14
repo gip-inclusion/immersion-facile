@@ -129,7 +129,6 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     ]);
 
     const establishmentAggregate = await makeEstablishmentAggregate({
-      uuidGenerator: this.uuidGenerator,
       timeGateway: this.timeGateway,
       nafAndNumberOfEmployee: await getNafAndNumberOfEmployee(
         this.siretGateway,
