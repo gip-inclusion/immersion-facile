@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useCopyButton = (defaultLabel = "Copier cet ID") => {
+export const useCopyButton = (label = "") => {
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopyButtonClick = (stringToCopy: string) => {
@@ -18,7 +18,7 @@ export const useCopyButton = (defaultLabel = "Copier cet ID") => {
 
   const copyButtonIsDisabled = isCopied;
 
-  const copyButtonLabel = isCopied ? "Copié !" : defaultLabel;
+  const copyButtonLabel = isCopied ? "Copié !" : label;
 
   return { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled, isCopied };
 };
