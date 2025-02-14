@@ -401,6 +401,7 @@ export const createUseCases = (
 
       notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
         new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
+          uowPerformer,
           gateways.passEmploiGateway,
         ),
 

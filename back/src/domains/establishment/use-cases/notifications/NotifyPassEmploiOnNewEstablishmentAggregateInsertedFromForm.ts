@@ -1,25 +1,31 @@
-import { z } from "zod";
-import { UseCase } from "../../../core/UseCase";
-import { WithEstablishmentAggregate } from "../../entities/EstablishmentAggregate";
+import { WithSiretDto, errors, withSiretSchema } from "shared";
+import { TransactionalUseCase } from "../../../core/UseCase";
+import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
   PassEmploiGateway,
   PassEmploiNotificationParams,
 } from "../../ports/PassEmploiGateway";
 
-// No need of a validation schema here since this use-case is only called from the our domain
-const establishmentAggregateSchema: z.Schema<WithEstablishmentAggregate> =
-  z.any();
+export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends TransactionalUseCase<WithSiretDto> {
+  protected inputSchema = withSiretSchema;
 
-export class NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm extends UseCase<WithEstablishmentAggregate> {
-  protected inputSchema = establishmentAggregateSchema;
-
-  constructor(private passEmploiGateway: PassEmploiGateway) {
-    super();
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    private passEmploiGateway: PassEmploiGateway,
+  ) {
+    super(uowPerformer);
   }
 
-  public async _execute({
-    establishmentAggregate,
-  }: WithEstablishmentAggregate): Promise<void> {
+  public async _execute(
+    { siret }: WithSiretDto,
+    uow: UnitOfWork,
+  ): Promise<void> {
+    const establishmentAggregate =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
+    if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
     const notificationParams: PassEmploiNotificationParams = {
       immersions: establishmentAggregate.offers.map(({ romeCode }) => ({
         rome: romeCode,
