@@ -35,7 +35,7 @@ describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
   it("do nothing when no establishment were found", async () => {
     const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
 
-    await updateEstablishmentLead.execute({ formEstablishment });
+    await updateEstablishmentLead.execute({ siret: formEstablishment.siret });
 
     expectToEqual(
       await establishmentLeadRepository.getBySiret(formEstablishment.siret),
@@ -68,7 +68,7 @@ describe("UpdateEstablishmentLeadOnEstablishmentRegistered", () => {
       .withSiret(convention.siret)
       .build();
 
-    await updateEstablishmentLead.execute({ formEstablishment });
+    await updateEstablishmentLead.execute({ siret: formEstablishment.siret });
 
     expectToEqual(
       await establishmentLeadRepository.getBySiret(formEstablishment.siret),
