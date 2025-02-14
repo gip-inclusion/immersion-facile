@@ -1,5 +1,9 @@
 import { expectArraysToEqual } from "shared";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryPassEmploiGateway } from "../../adapters/pass-emploi/InMemoryPassEmploiGateway";
 import {
   EstablishmentAggregateBuilder,
@@ -9,27 +13,20 @@ import {
 import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
-const prepareUseCase = () => {
-  const uow = createInMemoryUow();
-  const establishmentAggregateRepository = uow.establishmentAggregateRepository;
-  const passEmploiGateway = new InMemoryPassEmploiGateway();
-  const useCase =
-    new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
+describe("Notify pass-emploi", () => {
+  let uow: InMemoryUnitOfWork;
+  let passEmploiGateway: InMemoryPassEmploiGateway;
+  let useCase: NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm;
+
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    passEmploiGateway = new InMemoryPassEmploiGateway();
+    useCase = new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
+      new InMemoryUowPerformer(uow),
       passEmploiGateway,
     );
-
-  return {
-    useCase,
-    passEmploiGateway,
-    establishmentAggregateRepository,
-  };
-};
-
-describe("Notify pass-emploi", () => {
+  });
   it("Calls pass-emploi API with formatted immersion offers from just inserted aggregate", async () => {
-    // Prepare
-    const { useCase, passEmploiGateway } = prepareUseCase();
-
     // Act
     const siret = "12345678901234";
     const position = { lon: 1, lat: 1 };
@@ -65,7 +62,11 @@ describe("Notify pass-emploi", () => {
       ])
       .build();
 
-    await useCase.execute({ establishmentAggregate: newAggregate });
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      newAggregate,
+    ];
+
+    await useCase.execute({ siret: newAggregate.establishment.siret });
 
     // Assert
     const expectedNotifications: PassEmploiNotificationParams[] = [
