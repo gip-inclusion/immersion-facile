@@ -44,19 +44,21 @@ describe("Add form establishment", () => {
     establishmentRoutes.addFormEstablishment,
   )} Route to post form establishments from front (hence, without API key)`, () => {
     beforeEach(() => {
-      gateways.addressApi.setAddressAndPosition([
-        {
-          position: {
-            lat: 48.8715,
-            lon: 2.3019,
+      gateways.addressApi.setNextLookupStreetAndAddresses([
+        [
+          {
+            position: {
+              lat: 48.8715,
+              lon: 2.3019,
+            },
+            address: {
+              city: "Paris",
+              streetNumberAndAddress: "10 avenue des Champs Elysées",
+              postcode: "75008",
+              departmentCode: "75",
+            },
           },
-          address: {
-            city: "Paris",
-            streetNumberAndAddress: "10 avenue des Champs Elysées",
-            postcode: "75008",
-            departmentCode: "75",
-          },
-        },
+        ],
       ]);
 
       inMemoryUow.romeRepository.appellations =

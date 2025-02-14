@@ -3,15 +3,15 @@ import {
   FormEstablishmentBatchDto,
   InclusionConnectedUser,
   castError,
+  executeInSequence,
   formEstablishmentBatchSchema,
   slugify,
-  splitInChunks,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { GroupEntity } from "../entities/GroupEntity";
-import { AddFormEstablishment } from "./AddFormEstablishment";
+import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
@@ -21,7 +21,7 @@ export class AddFormEstablishmentBatch extends UseCase<
   protected inputSchema = formEstablishmentBatchSchema;
 
   constructor(
-    private addFormEstablishmentUseCase: AddFormEstablishment,
+    private insertEstablishmentAggregateFromForm: InsertEstablishmentAggregateFromForm,
     private uowPerformer: UnitOfWorkPerformer,
   ) {
     super();
@@ -50,39 +50,33 @@ export class AddFormEstablishmentBatch extends UseCase<
     };
     await this.uowPerformer.perform((uow) => uow.groupRepository.save(group));
 
-    const sizeOfChunk = 15;
-    const chunksOfFormEstablishments = splitInChunks(
-      formEstablishments,
-      sizeOfChunk,
-    );
-
     const report: EstablishmentBatchReport = {
       numberOfEstablishmentsProcessed: 0,
       numberOfSuccess: 0,
       failures: [],
     };
 
-    for (let i = 0; i < chunksOfFormEstablishments.length; i++) {
-      const chunkOfFormEstablishments = chunksOfFormEstablishments[i];
-      await Promise.all(
-        chunkOfFormEstablishments.map(async (formEstablishment) => {
-          try {
-            await this.addFormEstablishmentUseCase.execute(
-              formEstablishment,
-              currentUser,
-            );
-            report.numberOfSuccess += 1;
-          } catch (error) {
-            report.failures.push({
-              siret: formEstablishment.siret,
-              errorMessage: castError(error).message,
-            });
-          } finally {
-            report.numberOfEstablishmentsProcessed += 1;
-          }
+    await executeInSequence(formEstablishments, async (formEstablishment) =>
+      this.insertEstablishmentAggregateFromForm
+        .execute(
+          {
+            formEstablishment,
+          },
+          currentUser,
+        )
+        .then(() => {
+          report.numberOfSuccess += 1;
+        })
+        .catch((error) => {
+          report.failures.push({
+            siret: formEstablishment.siret,
+            errorMessage: castError(error).message,
+          });
+        })
+        .finally(() => {
+          report.numberOfEstablishmentsProcessed += 1;
         }),
-      );
-    }
+    );
 
     return report;
   }

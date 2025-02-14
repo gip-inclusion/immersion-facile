@@ -4,13 +4,14 @@ import {
   FormEstablishmentDtoBuilder,
   GroupOptions,
   InclusionConnectedUserBuilder,
+  defaultAddress,
   defaultValidFormEstablishment,
   errors,
-  expectObjectsToMatch,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   InMemorySiretGateway,
@@ -24,85 +25,87 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryFormEstablishmentRepository } from "../adapters/InMemoryFormEstablishmentRepository";
-import { InMemoryGroupRepository } from "../adapters/InMemoryGroupRepository";
-import { AddFormEstablishment } from "./AddFormEstablishment";
+import {
+  EstablishmentAggregateBuilder,
+  EstablishmentEntityBuilder,
+} from "../helpers/EstablishmentBuilders";
 import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
-
-const icUserNotAdmin = new InclusionConnectedUserBuilder()
-  .withIsAdmin(false)
-  .build();
-
-const icUserAdmin = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
-
-const groupOptions: GroupOptions = {
-  heroHeader: {
-    title: "My title",
-    description: "My description",
-  },
-};
-
-const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
-  const formEstablishment1: FormEstablishmentDto =
-    FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-      .build();
-
-  const formEstablishment2: FormEstablishmentDto =
-    FormEstablishmentDtoBuilder.valid()
-      .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
-      .withBusinessName("michelin")
-      .build();
-
-  return {
-    groupName: "L'amie caliné",
-    title: groupOptions.heroHeader.title,
-    description: groupOptions.heroHeader.description,
-    formEstablishments: [formEstablishment1, formEstablishment2],
-  };
-};
+import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 describe("AddFormEstablishmentsBatch Use Case", () => {
+  const icUserNotAdmin = new InclusionConnectedUserBuilder()
+    .withIsAdmin(false)
+    .build();
+
+  const icUserAdmin = new InclusionConnectedUserBuilder()
+    .withIsAdmin(true)
+    .build();
+
+  const groupOptions: GroupOptions = {
+    heroHeader: {
+      title: "My title",
+      description: "My description",
+    },
+  };
+
+  const createFormEstablishmentBatchDto = (): FormEstablishmentBatchDto => {
+    const formEstablishment1: FormEstablishmentDto =
+      FormEstablishmentDtoBuilder.valid()
+        .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
+        .build();
+
+    const formEstablishment2: FormEstablishmentDto =
+      FormEstablishmentDtoBuilder.valid()
+        .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
+        .withBusinessName("michelin")
+        .build();
+
+    return {
+      groupName: "L'amie caliné",
+      title: groupOptions.heroHeader.title,
+      description: groupOptions.heroHeader.description,
+      formEstablishments: [formEstablishment1, formEstablishment2],
+    };
+  };
+
   let uow: InMemoryUnitOfWork;
   let addFormEstablishmentBatch: AddFormEstablishmentBatch;
-  let formEstablishmentRepo: InMemoryFormEstablishmentRepository;
-  let outboxRepo: InMemoryOutboxRepository;
-  let groupRepository: InMemoryGroupRepository;
   let siretGateway: InMemorySiretGateway;
-  let uowPerformer: InMemoryUowPerformer;
   let uuidGenerator: TestUuidGenerator;
+  let timeGateway: CustomTimeGateway;
 
   const formEstablishmentBatch = createFormEstablishmentBatchDto();
 
   beforeEach(() => {
     uow = createInMemoryUow();
     siretGateway = new InMemorySiretGateway();
-    formEstablishmentRepo = uow.formEstablishmentRepository;
-    groupRepository = uow.groupRepository;
-    outboxRepo = uow.outboxRepository;
-    uow.romeRepository.appellations =
-      defaultValidFormEstablishment.appellations;
-
-    uowPerformer = new InMemoryUowPerformer(uow);
-
     uuidGenerator = new TestUuidGenerator();
-    const createNewEvent = makeCreateNewEvent({
-      timeGateway: new CustomTimeGateway(),
-      uuidGenerator,
-    });
-
-    const addFormEstablishment = new AddFormEstablishment(
-      uowPerformer,
-      createNewEvent,
-      siretGateway,
-    );
+    timeGateway = new CustomTimeGateway();
+    const addressGateway = new InMemoryAddressGateway();
+    const uowPerformer = new InMemoryUowPerformer(uow);
 
     addFormEstablishmentBatch = new AddFormEstablishmentBatch(
-      addFormEstablishment,
+      new InsertEstablishmentAggregateFromForm(
+        uowPerformer,
+        siretGateway,
+        addressGateway,
+        uuidGenerator,
+        timeGateway,
+        makeCreateNewEvent({
+          timeGateway,
+          uuidGenerator,
+        }),
+      ),
       uowPerformer,
     );
+
+    addressGateway.setNextLookupStreetAndAddresses([
+      [defaultAddress.addressAndPosition],
+      [defaultAddress.addressAndPosition],
+    ]);
+
+    uow.romeRepository.appellations =
+      defaultValidFormEstablishment.appellations;
   });
 
   it("throws Unauthorized if no currentUser is provided", async () => {
@@ -125,16 +128,61 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       icUserAdmin,
     );
 
-    const formEstablishmentsInRepo = await formEstablishmentRepo.getAll();
-    expect(formEstablishmentsInRepo).toHaveLength(2);
     expectToEqual(
-      formEstablishmentsInRepo[0],
-      formEstablishmentBatch.formEstablishments[0],
+      uow.establishmentAggregateRepository.establishmentAggregates,
+      await Promise.all(
+        formEstablishmentBatch.formEstablishments.map(async (form) =>
+          new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(form.siret)
+                .withCustomizedName(form.businessNameCustomized)
+                .withNafDto(
+                  (await siretGateway.getEstablishmentBySiret(form.siret))
+                    ?.nafDto || { code: "", nomenclature: "" },
+                )
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(form.businessName)
+                .withNumberOfEmployeeRange("3-5")
+                .withWebsite(form.website)
+                .withNextAvailabilityDate(
+                  form.nextAvailabilityDate &&
+                    new Date(form.nextAvailabilityDate),
+                )
+                .withAcquisition({
+                  acquisitionCampaign: form.acquisitionCampaign,
+                  acquisitionKeyword: form.acquisitionKeyword,
+                })
+                .withScore(0)
+                .build(),
+            )
+            .withLocations([
+              {
+                ...defaultAddress.addressAndPosition,
+                id: defaultAddress.formAddress.id,
+              },
+            ])
+            .withOffers(
+              form.appellations.map((appellation) => ({
+                ...appellation,
+                createdAt: timeGateway.now(),
+              })),
+            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "a job",
+                phone: "+33612345678",
+                userId: "no-uuid-provided",
+              },
+            ])
+            .build(),
+        ),
+      ),
     );
-    expectToEqual(
-      formEstablishmentsInRepo[1],
-      formEstablishmentBatch.formEstablishments[1],
-    );
+
     expectToEqual(report, {
       numberOfEstablishmentsProcessed: 2,
       numberOfSuccess: 2,
@@ -145,7 +193,44 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("reports the errors when something goes wrong with an addition", async () => {
     const existingFormEstablishment =
       formEstablishmentBatch.formEstablishments[0];
-    formEstablishmentRepo.setFormEstablishments([existingFormEstablishment]);
+    uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(existingFormEstablishment.siret)
+            .withCustomizedName(
+              existingFormEstablishment.businessNameCustomized,
+            )
+            .withNafDto({ code: "", nomenclature: "" })
+            .withCreatedAt(timeGateway.now())
+            .withUpdatedAt(timeGateway.now())
+            .withIsCommited(false)
+            .withName(existingFormEstablishment.businessName)
+            .withNumberOfEmployeeRange("0")
+            .withLocations([])
+            .withWebsite(existingFormEstablishment.website)
+            .withNextAvailabilityDate(
+              existingFormEstablishment.nextAvailabilityDate &&
+                new Date(existingFormEstablishment.nextAvailabilityDate),
+            )
+            .withAcquisition({
+              acquisitionCampaign:
+                existingFormEstablishment.acquisitionCampaign,
+              acquisitionKeyword: existingFormEstablishment.acquisitionKeyword,
+            })
+            .withScore(0)
+            .build(),
+        )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "",
+          },
+        ])
+        .build(),
+    );
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
@@ -166,37 +251,180 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     });
   });
 
-  it("Saves an event with topic : 'FormEstablishmentAdded'", async () => {
-    uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
+  it("Saves an event with topic : 'NewEstablishmentAggregateInsertedFromForm'", async () => {
+    uuidGenerator.setNextUuids(["1", "2", "3", "4", "5", "6"]);
 
-    await addFormEstablishmentBatch.execute(
+    const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
       icUserAdmin,
     );
 
-    expect(outboxRepo.events).toHaveLength(2);
-    expectObjectsToMatch(outboxRepo.events[0], {
-      id: "event1-id",
-      topic: "FormEstablishmentAdded",
-      payload: {
-        formEstablishment: formEstablishmentBatch.formEstablishments[0],
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: icUserAdmin.id,
+    expectToEqual(report, {
+      failures: [],
+      numberOfEstablishmentsProcessed: 2,
+      numberOfSuccess: 2,
+    });
+
+    expectObjectInArrayToMatch(uow.outboxRepository.events, [
+      {
+        id: "4",
+        topic: "NewEstablishmentAggregateInsertedFromForm",
+        payload: {
+          establishmentAggregate: new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishmentBatch.formEstablishments[0].siret)
+                .withCustomizedName(
+                  formEstablishmentBatch.formEstablishments[0]
+                    .businessNameCustomized,
+                )
+                .withNafDto({ code: "7112B", nomenclature: "Ref2" })
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(
+                  formEstablishmentBatch.formEstablishments[0].businessName,
+                )
+                .withNumberOfEmployeeRange("3-5")
+                .withLocations([
+                  {
+                    ...defaultAddress.addressAndPosition,
+                    id: defaultAddress.formAddress.id,
+                  },
+                ])
+                .withWebsite(
+                  formEstablishmentBatch.formEstablishments[0].website,
+                )
+                .withNextAvailabilityDate(
+                  formEstablishmentBatch.formEstablishments[0]
+                    .nextAvailabilityDate &&
+                    new Date(
+                      formEstablishmentBatch.formEstablishments[0]
+                        .nextAvailabilityDate,
+                    ),
+                )
+                .withAcquisition({
+                  acquisitionCampaign:
+                    formEstablishmentBatch.formEstablishments[0]
+                      .acquisitionCampaign,
+                  acquisitionKeyword:
+                    formEstablishmentBatch.formEstablishments[0]
+                      .acquisitionKeyword,
+                })
+                .withScore(0)
+                .build(),
+            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "a job",
+                phone: "+33612345678",
+                userId: "1",
+              },
+              {
+                role: "establishment-contact",
+                userId: "2",
+              },
+              {
+                role: "establishment-contact",
+                userId: "3",
+              },
+            ])
+            .withOffers(
+              formEstablishmentBatch.formEstablishments[0].appellations.map(
+                (appellation) => ({
+                  ...appellation,
+                  createdAt: timeGateway.now(),
+                }),
+              ),
+            )
+            .build(),
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icUserAdmin.id,
+          },
         },
       },
-    });
-    expectObjectsToMatch(outboxRepo.events[1], {
-      id: "event2-id",
-      topic: "FormEstablishmentAdded",
-      payload: {
-        formEstablishment: formEstablishmentBatch.formEstablishments[1],
-        triggeredBy: {
-          kind: "inclusion-connected",
-          userId: icUserAdmin.id,
+      {
+        id: "5",
+        topic: "NewEstablishmentAggregateInsertedFromForm",
+        payload: {
+          establishmentAggregate: new EstablishmentAggregateBuilder()
+            .withEstablishment(
+              new EstablishmentEntityBuilder()
+                .withSiret(formEstablishmentBatch.formEstablishments[1].siret)
+                .withCustomizedName(
+                  formEstablishmentBatch.formEstablishments[1]
+                    .businessNameCustomized,
+                )
+                .withNafDto({ code: "8559A", nomenclature: "Ref2" })
+                .withCreatedAt(timeGateway.now())
+                .withUpdatedAt(timeGateway.now())
+                .withIsCommited(false)
+                .withName(
+                  formEstablishmentBatch.formEstablishments[1].businessName,
+                )
+                .withNumberOfEmployeeRange("3-5")
+                .withLocations([
+                  {
+                    ...defaultAddress.addressAndPosition,
+                    id: defaultAddress.formAddress.id,
+                  },
+                ])
+                .withWebsite(
+                  formEstablishmentBatch.formEstablishments[1].website,
+                )
+                .withNextAvailabilityDate(
+                  formEstablishmentBatch.formEstablishments[1]
+                    .nextAvailabilityDate &&
+                    new Date(
+                      formEstablishmentBatch.formEstablishments[1]
+                        .nextAvailabilityDate,
+                    ),
+                )
+                .withAcquisition({
+                  acquisitionCampaign:
+                    formEstablishmentBatch.formEstablishments[1]
+                      .acquisitionCampaign,
+                  acquisitionKeyword:
+                    formEstablishmentBatch.formEstablishments[1]
+                      .acquisitionKeyword,
+                })
+                .withScore(0)
+                .build(),
+            )
+            .withOffers(
+              formEstablishmentBatch.formEstablishments[1].appellations.map(
+                (appellation) => ({
+                  ...appellation,
+                  createdAt: timeGateway.now(),
+                }),
+              ),
+            )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "a job",
+                phone: "+33612345678",
+                userId: "1",
+              },
+              {
+                role: "establishment-contact",
+                userId: "2",
+              },
+              {
+                role: "establishment-contact",
+                userId: "3",
+              },
+            ])
+            .build(),
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: icUserAdmin.id,
+          },
         },
       },
-    });
+    ]);
   });
 
   it("creates the establishmentGroup with the sirets of the establishments", async () => {
@@ -207,8 +435,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       icUserAdmin,
     );
 
-    expect(groupRepository.groupEntities).toHaveLength(1);
-    expectToEqual(groupRepository.groupEntities[0], {
+    expect(uow.groupRepository.groupEntities).toHaveLength(1);
+    expectToEqual(uow.groupRepository.groupEntities[0], {
       slug: "l-amie-caline",
       name: formEstablishmentBatch.groupName,
       sirets: [
@@ -221,15 +449,57 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
   it("updates Group if it already exists", async () => {
     const slug = "l-amie-caline";
-    await groupRepository.save({
+    await uow.groupRepository.save({
       slug,
       name: formEstablishmentBatch.groupName,
       sirets: [formEstablishmentBatch.formEstablishments[0].siret],
       options: groupOptions,
     });
-    await formEstablishmentRepo.setFormEstablishments([
-      formEstablishmentBatch.formEstablishments[0],
-    ]);
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(formEstablishmentBatch.formEstablishments[0].siret)
+            .withCustomizedName(
+              formEstablishmentBatch.formEstablishments[0]
+                .businessNameCustomized,
+            )
+            .withNafDto({ code: "", nomenclature: "" })
+            .withCreatedAt(timeGateway.now())
+            .withUpdatedAt(timeGateway.now())
+            .withIsCommited(false)
+            .withName(formEstablishmentBatch.formEstablishments[0].businessName)
+            .withNumberOfEmployeeRange("0")
+            .withLocations([])
+            .withWebsite(formEstablishmentBatch.formEstablishments[0].website)
+            .withNextAvailabilityDate(
+              formEstablishmentBatch.formEstablishments[0]
+                .nextAvailabilityDate &&
+                new Date(
+                  formEstablishmentBatch.formEstablishments[0]
+                    .nextAvailabilityDate,
+                ),
+            )
+            .withAcquisition({
+              acquisitionCampaign:
+                formEstablishmentBatch.formEstablishments[0]
+                  .acquisitionCampaign,
+              acquisitionKeyword:
+                formEstablishmentBatch.formEstablishments[0].acquisitionKeyword,
+            })
+            .withScore(0)
+            .build(),
+        )
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "",
+          },
+        ])
+        .build(),
+    );
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
     const report = await addFormEstablishmentBatch.execute(
@@ -250,7 +520,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       ],
     });
 
-    expectToEqual(groupRepository.groupEntities, [
+    expectToEqual(uow.groupRepository.groupEntities, [
       {
         slug,
         name: formEstablishmentBatch.groupName,
