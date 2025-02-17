@@ -12,23 +12,16 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   email,
   id,
   now,
-  exp,
-  durationDays,
   iat,
   version,
   role,
   targetRoute,
-}: CreateConventionMagicLinkPayloadProperties & { targetRoute: string }) => {
-  const fakeJwt = [
-    id,
-    role,
-    now.toISOString(),
-    email,
-    exp,
-    durationDays,
-    iat,
-    version,
-  ]
+  lifetime = "short",
+}: CreateConventionMagicLinkPayloadProperties & {
+  targetRoute: string;
+  lifetime?: "short" | "long";
+}) => {
+  const fakeJwt = [id, role, now.toISOString(), email, iat, version, lifetime]
     .filter(filterNotFalsy)
     .join("/");
   return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;

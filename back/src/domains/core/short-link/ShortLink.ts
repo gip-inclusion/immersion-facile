@@ -36,7 +36,13 @@ export const prepareMagicShortLinkMaker =
     shortLinkIdGeneratorGateway,
     config,
   }: MakeMagicLinkAndProvidesShortLinkProperties) =>
-  async (targetRoute: string): Promise<AbsoluteUrl> =>
+  async ({
+    targetRoute,
+    lifetime,
+  }: {
+    targetRoute: string;
+    lifetime: "short" | "long";
+  }): Promise<AbsoluteUrl> =>
     makeShortLink({
       uow,
       shortLinkIdGeneratorGateway,
@@ -44,6 +50,7 @@ export const prepareMagicShortLinkMaker =
       longLink: generateConventionMagicLinkUrl({
         ...conventionMagicLinkPayload,
         targetRoute,
+        lifetime,
       }),
     });
 

@@ -117,12 +117,14 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
         businessName: convention.businessName,
         justification,
         signature: agency.signature,
-        magicLink: await makeShortMagicLink(
-          frontRoutes.conventionImmersionRoute,
-        ),
-        conventionStatusLink: await makeShortMagicLink(
-          frontRoutes.conventionStatusDashboard,
-        ),
+        magicLink: await makeShortMagicLink({
+          targetRoute: frontRoutes.conventionImmersionRoute,
+          lifetime: "short",
+        }),
+        conventionStatusLink: await makeShortMagicLink({
+          targetRoute: frontRoutes.conventionStatusDashboard,
+          lifetime: "long",
+        }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
         requesterName,
       },

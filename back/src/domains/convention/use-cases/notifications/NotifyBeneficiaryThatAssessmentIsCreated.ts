@@ -54,6 +54,7 @@ export const makeNotifyBeneficiaryThatAssessmentIsCreated =
               role: "beneficiary",
               targetRoute: frontRoutes.assessmentDocument,
               now: today,
+              lifetime: "long",
             }),
           },
         },

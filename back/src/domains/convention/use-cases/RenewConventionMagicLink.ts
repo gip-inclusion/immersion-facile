@@ -199,10 +199,14 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
             payload: {
               internshipKind,
               emails,
-              magicLink: await makeMagicShortLink(route),
-              conventionStatusLink: await makeMagicShortLink(
-                frontRoutes.conventionStatusDashboard,
-              ),
+              magicLink: await makeMagicShortLink({
+                targetRoute: route,
+                lifetime: "short",
+              }),
+              conventionStatusLink: await makeMagicShortLink({
+                targetRoute: frontRoutes.conventionStatusDashboard,
+                lifetime: "long",
+              }),
               conventionId,
               triggeredBy: { kind: "convention-magic-link", role },
             },

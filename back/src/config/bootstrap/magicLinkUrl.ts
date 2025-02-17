@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   CreateConventionMagicLinkPayloadProperties,
   EstablishmentJwtPayload,
+  OmitFromExistingKeys,
   createConventionMagicLinkPayload,
   frontRoutes,
 } from "shared";
@@ -29,10 +30,24 @@ export const makeGenerateConventionMagicLinkUrl =
   (config: AppConfig, generateJwt: GenerateConventionJwt) =>
   ({
     targetRoute,
+    lifetime = "short",
     ...jwtPayload
-  }: CreateConventionMagicLinkPayloadProperties & {
+  }: OmitFromExistingKeys<
+    CreateConventionMagicLinkPayloadProperties,
+    "durationDays"
+  > & {
     targetRoute: string;
+    lifetime?: "short" | "long";
   }): AbsoluteUrl => {
-    const jwt = generateJwt(createConventionMagicLinkPayload(jwtPayload));
+    const jwt = generateJwt(
+      createConventionMagicLinkPayload({
+        ...jwtPayload,
+        durationDays:
+          lifetime === "short"
+            ? config.magicLinkShortDurationInDays
+            : config.magicLinkLongDurationInDays,
+      }),
+    );
+
     return `${config.immersionFacileBaseUrl}/${targetRoute}?jwt=${jwt}`;
   };

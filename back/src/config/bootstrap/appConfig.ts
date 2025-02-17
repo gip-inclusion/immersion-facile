@@ -274,6 +274,14 @@ export class AppConfig {
       : `https://${this.immersionFacileDomain}`;
   }
 
+  public get magicLinkShortDurationInDays(): number {
+    return 31; // 1 month
+  }
+
+  public get magicLinkLongDurationInDays(): number {
+    return 31 * 6; // 6 months
+  }
+
   public get immersionFacileDomain(): string {
     return this.#throwIfNotDefinedOrDefault("DOMAIN");
   }

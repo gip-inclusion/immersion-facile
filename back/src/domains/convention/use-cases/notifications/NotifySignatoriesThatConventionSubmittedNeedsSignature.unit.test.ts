@@ -103,6 +103,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.beneficiary.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
+        lifetime: "long",
       }),
       [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
@@ -121,6 +122,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
+        lifetime: "long",
       }),
       [deterministicShortLinks[4]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
@@ -139,6 +141,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionStatusDashboard,
+        lifetime: "long",
       }),
     });
 

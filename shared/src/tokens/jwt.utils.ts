@@ -49,20 +49,23 @@ export const createConventionMagicLinkPayload = ({
   email,
   now,
   sub,
-  // biome-ignore lint/correctness/noUnusedVariables: it is used in other param
   durationDays = 31,
-  iat = Math.round(now.getTime() / 1000),
-  exp = iat + durationDays * 24 * 3600,
   version = currentJwtVersions.convention,
-}: CreateConventionMagicLinkPayloadProperties): ConventionJwtPayload => ({
-  version,
-  applicationId: id, //TODO : replace applicationId by conventionId on convention magic link payload (applicationId was legacy name)
-  role,
-  iat,
-  exp,
-  emailHash: stringToMd5(email),
-  ...(sub ? { sub } : {}),
-});
+  exp: expOverride,
+}: CreateConventionMagicLinkPayloadProperties): ConventionJwtPayload => {
+  const iat = Math.round(now.getTime() / 1000);
+  const exp = expOverride ?? iat + durationDays * 24 * 3600;
+
+  return {
+    version,
+    applicationId: id, //TODO : replace applicationId by conventionId on convention magic link payload (applicationId was legacy name)
+    role,
+    iat,
+    exp,
+    emailHash: stringToMd5(email),
+    ...(sub ? { sub } : {}),
+  };
+};
 
 type CreateEstablishmentJwtPayloadProperties = {
   siret: SiretDto;

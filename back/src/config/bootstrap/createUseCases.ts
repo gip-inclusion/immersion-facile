@@ -143,7 +143,6 @@ export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
   generateConventionJwt: GenerateConventionJwt,
-  generateConventionLongDurationJwt: GenerateConventionJwt,
   generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
   generateApiConsumerJwt: GenerateApiConsumerJwt,
@@ -178,12 +177,6 @@ export const createUseCases = (
     config,
     generateConventionJwt,
   );
-
-  const generateConventionLongDurationLinkUrl =
-    makeGenerateConventionMagicLinkUrl(
-      config,
-      generateConventionLongDurationJwt,
-    );
 
   const addConvention = new AddConvention(
     uowPerformer,
@@ -472,7 +465,7 @@ export const createUseCases = (
         new NotifyLastSigneeThatConventionHasBeenSigned(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-          generateConventionLongDurationLinkUrl,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyAllActorsOfFinalConventionValidation:
@@ -550,7 +543,7 @@ export const createUseCases = (
         new NotifyAgencyThatAssessmentIsCreated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-          generateConventionLongDurationLinkUrl,
+          generateConventionMagicLinkUrl,
           gateways.timeGateway,
         ),
       notifyAgencyDelegationContact: new NotifyAgencyDelegationContact(
@@ -653,7 +646,7 @@ export const createUseCases = (
         uowPerformer,
         deps: {
           saveNotificationAndRelatedEvent,
-          generateLink: generateConventionLongDurationLinkUrl,
+          generateLink: generateConventionMagicLinkUrl,
           timeGateway: gateways.timeGateway,
         },
       }),
@@ -676,7 +669,7 @@ export const createUseCases = (
         uowPerformer,
         deps: {
           saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl: generateConventionLongDurationLinkUrl,
+          generateConventionMagicLinkUrl,
           timeGateway: gateways.timeGateway,
         },
       }),
