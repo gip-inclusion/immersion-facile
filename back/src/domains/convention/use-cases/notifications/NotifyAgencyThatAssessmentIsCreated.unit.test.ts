@@ -7,12 +7,9 @@ import {
   InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
-  expectToEqual,
   frontRoutes,
   reasonableSchedule,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -20,8 +17,6 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
-import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -65,22 +60,16 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   let usecase: NotifyAgencyThatAssessmentIsCreated;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let timeGateway: CustomTimeGateway;
-  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
-  let config: AppConfig;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    config = new AppConfigBuilder().build();
-    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+
     timeGateway = new CustomTimeGateway();
-    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     usecase = new NotifyAgencyThatAssessmentIsCreated(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       fakeGenerateMagicLinkUrlFn,
       timeGateway,
-      config,
-      shortLinkIdGeneratorGateway,
     );
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
@@ -113,9 +102,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   it("Send an email to validators when beneficiary came", async () => {
-    const shortLinkIds = ["shortlink1", "shortlink2"];
-    shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
-
     const validator2 = new InclusionConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
@@ -134,23 +120,6 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
 
     await usecase.execute({ assessment });
 
-    expectToEqual(uow.shortLinkQuery.getShortLinks(), {
-      [shortLinkIds[0]]: fakeGenerateMagicLinkUrlFn({
-        id: convention.id,
-        email: validator.email,
-        now: timeGateway.now(),
-        role: "validator",
-        targetRoute: frontRoutes.assessmentDocument,
-      }),
-      [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-        id: convention.id,
-        email: validator2.email,
-        now: timeGateway.now(),
-        role: "validator",
-        targetRoute: frontRoutes.assessmentDocument,
-      }),
-    });
-
     expectSavedNotificationsAndEvents({
       emails: [
         {
@@ -167,7 +136,13 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
+            magicLink: fakeGenerateMagicLinkUrlFn({
+              targetRoute: frontRoutes.assessmentDocument,
+              id: convention.id,
+              role: "validator",
+              email: validator.email,
+              now: timeGateway.now(),
+            }),
           },
           recipients: [validator.email],
         },
@@ -185,10 +160,15 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
               convention.immersionAppellation.appellationLabel,
             assessment,
             numberOfHoursMade: "45h",
-            magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
+            magicLink: fakeGenerateMagicLinkUrlFn({
+              targetRoute: frontRoutes.assessmentDocument,
+              id: convention.id,
+              role: "validator",
+              email: validator2.email,
+              now: timeGateway.now(),
+            }),
           },
           recipients: [validator2.email],
-          cc: [convention.signatories.beneficiary.email],
         },
       ],
     });
