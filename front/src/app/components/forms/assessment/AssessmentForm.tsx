@@ -358,7 +358,7 @@ const AssessmentStatusSection = ({
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedHoursInput,
-                    value: numberOfMissedHoursDisplayed ?? "",
+                    value: numberOfMissedHoursDisplayed || "",
                   }}
                   {...getFieldError("numberOfMissedHours")}
                 />
@@ -379,7 +379,7 @@ const AssessmentStatusSection = ({
                     pattern: "\\d*",
                     type: "number",
                     id: domElementIds.assessment.numberOfMissedMinutesInput,
-                    value: numberOfMissedMinutesDisplayed ?? "",
+                    value: numberOfMissedMinutesDisplayed || "",
                   }}
                   {...getFieldError("numberOfMissedHours")}
                 />
