@@ -5,22 +5,24 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { ErrorNotifications } from "react-design-system";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   AgencyDto,
+  CreateAgencyDto,
   agencyKindToLabel,
   agencyStatusToLabel,
   allAgencyStatuses,
   domElementIds,
   editAgencySchema,
 } from "shared";
-import {
-  AgencyFormCommonFields,
-  AgencyLogoUpload,
-} from "src/app/components/forms/agency/AgencyFormCommonFields";
+import { UploadFile } from "src/app/components/UploadFile";
+import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
 import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
-import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
+import {
+  FormAgencyFieldsLabels,
+  formAgencyFieldsLabels,
+} from "src/app/contents/forms/agency/formAgency";
 import {
   displayReadableError,
   getFormContents,
@@ -165,5 +167,27 @@ export const EditAgencyForm = ({
         </div>
       </form>
     </FormProvider>
+  );
+};
+
+const AgencyLogoUpload = () => {
+  const { getValues, setValue } = useFormContext<CreateAgencyDto>();
+  const { getFormFields } = getFormContents(formAgencyFieldsLabels);
+  const fieldsContent: FormAgencyFieldsLabels = getFormFields();
+  const formValues = getValues();
+
+  return (
+    <>
+      <UploadFile
+        setFileUrl={(value) => setValue("logoUrl", value)}
+        maxSize_Mo={2}
+        {...formAgencyFieldsLabels.logoUrl}
+        hint={fieldsContent.logoUrl.hintText}
+        renameFileToId={true}
+      />
+      {formValues.logoUrl && (
+        <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />
+      )}
+    </>
   );
 };
