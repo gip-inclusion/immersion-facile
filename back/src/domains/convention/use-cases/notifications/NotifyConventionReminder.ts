@@ -146,7 +146,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
         conventionId: convention.id,
         signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
         magicLinkUrl: isSignatoryRole(role)
-          ? await makeShortMagicLink(frontRoutes.conventionToSign)
+          ? await makeShortMagicLink({
+              targetRoute: frontRoutes.conventionToSign,
+              lifetime: "short",
+            })
           : undefined,
       },
     };
@@ -277,7 +280,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       uow,
     });
 
-    const shortLink = await makeShortMagicLink(frontRoutes.conventionToSign);
+    const shortLink = await makeShortMagicLink({
+      targetRoute: frontRoutes.conventionToSign,
+      lifetime: "short",
+    });
 
     return {
       kind,
@@ -320,9 +326,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               businessName: convention.businessName,
               dateStart: convention.dateStart,
               dateEnd: convention.dateEnd,
-              agencyMagicLinkUrl: await makeShortMagicLink(
-                frontRoutes.manageConvention,
-              ),
+              agencyMagicLinkUrl: await makeShortMagicLink({
+                targetRoute: frontRoutes.manageConvention,
+                lifetime: "short",
+              }),
             },
           }
         : {
@@ -334,9 +341,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
               businessName: convention.businessName,
-              agencyMagicLinkUrl: await makeShortMagicLink(
-                frontRoutes.manageConvention,
-              ),
+              agencyMagicLinkUrl: await makeShortMagicLink({
+                targetRoute: frontRoutes.manageConvention,
+                lifetime: "short",
+              }),
             },
           };
 

@@ -68,6 +68,7 @@ export const makeNotifyEstablishmentThatAssessmentWasCreated =
                 role,
                 targetRoute: `${frontRoutes.assessmentDocument}`,
                 now: timeGateway.now(),
+                lifetime: "long",
               }),
             },
           },

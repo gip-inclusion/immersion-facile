@@ -171,7 +171,10 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           beneficiary,
         }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
-        magicLink: await makeShortMagicLink(frontRoutes.conventionDocument),
+        magicLink: await makeShortMagicLink({
+          targetRoute: frontRoutes.conventionDocument,
+          lifetime: "long",
+        }),
         validatorName: convention.validators?.agencyValidator
           ? concatValidatorNames(convention.validators?.agencyValidator)
           : "",

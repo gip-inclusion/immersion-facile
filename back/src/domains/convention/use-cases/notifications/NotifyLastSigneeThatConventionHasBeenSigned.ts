@@ -71,6 +71,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
       role: lastSignee.role,
       email: lastSignee.email,
       now: this.#timeGateway.now(),
+      lifetime: "long",
     });
 
     return {

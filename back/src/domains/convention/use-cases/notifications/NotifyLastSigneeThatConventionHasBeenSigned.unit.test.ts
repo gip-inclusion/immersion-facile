@@ -75,6 +75,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
       role: "beneficiary",
       email: signedConvention.signatories.beneficiary.email,
       now,
+      lifetime: "long",
     });
 
     expectSavedNotificationsAndEvents({
@@ -124,6 +125,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
               email:
                 signedConvention.signatories.establishmentRepresentative.email,
               now,
+              lifetime: "long",
             }),
             agencyLogoUrl: agency.logoUrl ?? undefined,
             agencyName: agency.name,

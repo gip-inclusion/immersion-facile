@@ -110,6 +110,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
             role,
             email,
             now: this.#timeGateway.now(),
+            lifetime: "long",
           });
           await this.#saveNotificationAndRelatedEvent(uow, {
             kind: "email",

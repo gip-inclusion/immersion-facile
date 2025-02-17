@@ -149,10 +149,14 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               conventionId: convention.id,
               firstName: convention.signatories.beneficiary.firstName,
               lastName: convention.signatories.beneficiary.lastName,
-              magicLink: await makeMagicShortLink(frontRoutes.manageConvention),
-              conventionStatusLink: await makeMagicShortLink(
-                frontRoutes.conventionStatusDashboard,
-              ),
+              magicLink: await makeMagicShortLink({
+                targetRoute: frontRoutes.manageConvention,
+                lifetime: "short",
+              }),
+              conventionStatusLink: await makeMagicShortLink({
+                targetRoute: frontRoutes.conventionStatusDashboard,
+                lifetime: "long",
+              }),
               agencyLogoUrl: agency.logoUrl ?? undefined,
               warning,
             },

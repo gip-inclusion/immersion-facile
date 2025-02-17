@@ -232,6 +232,7 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
               fakeGenerateMagicLinkUrlFn({
                 ...magicLinkCommonFields,
                 targetRoute: frontRoutes.conventionStatusDashboard,
+                lifetime: "long",
               }),
           };
         }, {});
