@@ -68,6 +68,7 @@ describe("Assessment routes", () => {
   )} to add assessment`, () => {
     it("returns 201 if the jwt is valid", async () => {
       inMemoryUow.conventionRepository.setConventions([convention]);
+      gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLink1"]);
 
       const assessment: AssessmentDto = {
         conventionId: convention.id,
