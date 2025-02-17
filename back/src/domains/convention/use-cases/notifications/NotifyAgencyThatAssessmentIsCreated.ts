@@ -101,42 +101,46 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         status: assessment.status,
       });
 
-      executeInSequence(recipientsRoleAndEmail, async ({ email, role }) => {
-        const magicLink = this.#generateConventionMagicLinkUrl({
-          targetRoute: frontRoutes.assessmentDocument,
-          id: convention.id,
-          role,
-          email,
-          now: this.#timeGateway.now(),
-        });
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
-            recipients: [email],
-            params: {
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              businessName: convention.businessName,
-              conventionId: convention.id,
-              immersionObjective: convention.immersionObjective,
-              internshipKind: convention.internshipKind,
-              conventionDateEnd: convention.dateEnd,
-              immersionAppellationLabel:
-                convention.immersionAppellation.appellationLabel,
-              assessment,
-              numberOfHoursMade,
-              magicLink,
+      await executeInSequence(
+        recipientsRoleAndEmail,
+        async ({ email, role }) => {
+          const magicLink = this.#generateConventionMagicLinkUrl({
+            targetRoute: frontRoutes.assessmentDocument,
+            id: convention.id,
+            role,
+            email,
+            now: this.#timeGateway.now(),
+          });
+          await this.#saveNotificationAndRelatedEvent(uow, {
+            kind: "email",
+            templatedContent: {
+              kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
+              recipients: [email],
+              params: {
+                beneficiaryFirstName:
+                  convention.signatories.beneficiary.firstName,
+                beneficiaryLastName:
+                  convention.signatories.beneficiary.lastName,
+                businessName: convention.businessName,
+                conventionId: convention.id,
+                immersionObjective: convention.immersionObjective,
+                internshipKind: convention.internshipKind,
+                conventionDateEnd: convention.dateEnd,
+                immersionAppellationLabel:
+                  convention.immersionAppellation.appellationLabel,
+                assessment,
+                numberOfHoursMade,
+                magicLink,
+              },
             },
-          },
-          followedIds: {
-            conventionId: convention.id,
-            agencyId: convention.agencyId,
-            establishmentSiret: convention.siret,
-          },
-        });
-      });
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+            },
+          });
+        },
+      );
     }
   }
 }
