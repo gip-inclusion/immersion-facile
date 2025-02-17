@@ -1,4 +1,9 @@
-import { AbsoluteUrl, errors, zStringMinLength1 } from "shared";
+import {
+  AbsoluteUrl,
+  InclusionConnectedUser,
+  errors,
+  zStringMinLength1,
+} from "shared";
 import { z } from "zod";
 import { UseCase } from "../../UseCase";
 import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
@@ -24,7 +29,11 @@ const uploadFileInput: z.Schema<UploadFileInput> = z.object({
   renameFileToId: z.boolean().optional(),
 });
 
-export class UploadFile extends UseCase<UploadFileInput, AbsoluteUrl> {
+export class UploadFile extends UseCase<
+  UploadFileInput,
+  AbsoluteUrl,
+  InclusionConnectedUser
+> {
   protected inputSchema = z.any();
 
   readonly #documentGateway: DocumentGateway;
@@ -37,10 +46,18 @@ export class UploadFile extends UseCase<UploadFileInput, AbsoluteUrl> {
     this.#uuidGenerator = uuidGenerator;
   }
 
-  protected async _execute({
-    file,
-    renameFileToId = true,
-  }: UploadFileInput): Promise<AbsoluteUrl> {
+  protected async _execute(
+    { file, renameFileToId = true }: UploadFileInput,
+    connectedUser: InclusionConnectedUser,
+  ): Promise<AbsoluteUrl> {
+    if (!connectedUser) throw errors.user.unauthorized();
+
+    const isAdminOrAgencyAdmin =
+      throwIfUserIsNotAdminNorAgencyAdmin(connectedUser);
+
+    if (!isAdminOrAgencyAdmin)
+      throw errors.user.forbidden({ userId: connectedUser.id });
+
     const fileToSave: StoredFile = {
       ...file,
       id: renameFileToId ? this.#replaceNameWithUuid(file) : file.name,
@@ -61,3 +78,16 @@ export class UploadFile extends UseCase<UploadFileInput, AbsoluteUrl> {
     return `${this.#uuidGenerator.new()}.${extension}`;
   }
 }
+
+const throwIfUserIsNotAdminNorAgencyAdmin = (
+  currentUser: InclusionConnectedUser,
+): boolean => {
+  if (!currentUser) throw errors.user.unauthorized();
+  if (currentUser.isBackofficeAdmin) return true;
+
+  const isAgencyAdmin = currentUser.agencyRights.some((agencyRight) =>
+    agencyRight.roles.includes("agency-admin"),
+  );
+
+  return isAgencyAdmin;
+};
