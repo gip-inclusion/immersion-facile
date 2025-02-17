@@ -200,7 +200,9 @@ export const emailTemplatesByName =
         businessName,
         internshipKind,
       }) => ({
-        subject: `Le bilan de l’immersion de ${beneficiaryFullName} est complété`,
+        subject: `Le bilan ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+        } de ${beneficiaryFullName} est complété`,
         greetings: `Bonjour ${recipientFullName},`,
         content: `Le bilan ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
@@ -221,7 +223,7 @@ export const emailTemplatesByName =
         
         Merci pour votre engagement dans l'accueil des candidats en ${
           internshipKind === "immersion" ? "immersion" : "stage"
-        }.
+        } !
         ${defaultSignature(internshipKind)}`,
       }),
     },
