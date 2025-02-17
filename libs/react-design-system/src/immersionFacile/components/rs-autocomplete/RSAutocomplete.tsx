@@ -60,6 +60,7 @@ export const RSAutocomplete = <T,>({
         placeholder={selectProps?.placeholder}
         loadingMessage={selectProps?.loadingMessage || (() => <>...</>)}
         inputId={selectProps?.inputId}
+        filterOption={() => true}
         classNames={{
           input: () => fr.cx("fr-input", { "fr-input--error": hasError }),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
