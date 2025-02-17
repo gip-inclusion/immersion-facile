@@ -87,6 +87,26 @@ const formatSchedule = (convention: ConventionReadDto) => {
   );
 };
 
+const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
+  htmlContent
+    .replaceAll(
+      new RegExp(
+        /(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])\/([^'"]*["'][^>]*>)/gm,
+      ),
+      `<link rel="stylesheet" href="${window.location.origin}/$2`, // $2 contains the path and the closing tag
+    )
+    .replaceAll(
+      new RegExp(/<img src="\//gm),
+      `<img src="${window.location.origin}/`,
+    );
+export const prepareContentForPdfGenerator = (content: string) => {
+  const contentWithoutScripts = content.replace(
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi,
+    "",
+  );
+  return replaceContentsUrlWithAbsoluteUrl(contentWithoutScripts);
+};
+
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
@@ -137,26 +157,6 @@ export const ConventionDocumentPage = ({
       alt=""
     />,
   ];
-
-  const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
-    htmlContent
-      .replaceAll(
-        new RegExp(
-          /(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])\/([^'"]*["'][^>]*>)/gm,
-        ),
-        `<link rel="stylesheet" href="${window.location.origin}/$2`, // $2 contains the path and the closing tag
-      )
-      .replaceAll(
-        new RegExp(/<img src="\//gm),
-        `<img src="${window.location.origin}/`,
-      );
-  const prepareContentForPdfGenerator = (content: string) => {
-    const contentWithoutScripts = content.replace(
-      /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi,
-      "",
-    );
-    return replaceContentsUrlWithAbsoluteUrl(contentWithoutScripts);
-  };
 
   const onDownloadPdfClick = async () => {
     try {
