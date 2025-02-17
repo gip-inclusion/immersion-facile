@@ -550,6 +550,10 @@ export const createUseCases = (
         new NotifyAgencyThatAssessmentIsCreated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
+          gateways.timeGateway,
+          config,
+          gateways.shortLinkGenerator,
         ),
       notifyAgencyDelegationContact: new NotifyAgencyDelegationContact(
         uowPerformer,

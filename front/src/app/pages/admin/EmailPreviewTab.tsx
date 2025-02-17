@@ -498,6 +498,7 @@ export const defaultEmailValueByEmailKind: {
     numberOfHoursMade: "30h",
     immersionObjective: "Confirmer un projet professionnel",
     internshipKind: "immersion",
+    magicLink: "http://MAGIC_LINK",
   },
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
