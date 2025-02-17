@@ -100,6 +100,9 @@ const makeSignatoriesSubsections = (
               withIcon={true}
               textToCopy={convention.signatories.beneficiary.email}
               priority="tertiary no outline"
+              label="Copier l'email du bénéficiaire"
+              iconOnly
+              className="fr-ml-1v"
             />
           ),
         },
@@ -156,6 +159,9 @@ const makeSignatoriesSubsections = (
                   textToCopy={
                     convention.signatories.beneficiaryRepresentative.email
                   }
+                  label="Copier l'email du représentant légal du bénéficiaire"
+                  iconOnly
+                  className="fr-ml-1v"
                 />
               ),
             },
@@ -211,6 +217,9 @@ const makeSignatoriesSubsections = (
               textToCopy={
                 convention.signatories.establishmentRepresentative.email
               }
+              label="Copier l'email du représentant de l'entreprise"
+              iconOnly
+              className="fr-ml-1v"
             />
           ),
         },
@@ -278,6 +287,9 @@ const makeSignatoriesSubsections = (
                   textToCopy={
                     convention.signatories.beneficiaryCurrentEmployer.email
                   }
+                  label="Copier l'email de l'employeur actuel du bénéficiaire"
+                  iconOnly
+                  className="fr-ml-1v"
                 />
               ),
             },
@@ -331,6 +343,9 @@ const makeSignatoriesSubsections = (
                 <CopyButton
                   withIcon={true}
                   textToCopy={convention.agencyName}
+                  label="Copier la structure d'accompagnement"
+                  iconOnly
+                  className="fr-ml-1v"
                 />
               ),
             }
@@ -364,6 +379,9 @@ const makeSignatoriesSubsections = (
                   ? convention.agencyRefersTo.name
                   : convention.agencyName
               }
+              label="Copier le prescripteur"
+              iconOnly
+              className="fr-ml-1v"
             />
           ),
         },
@@ -518,6 +536,9 @@ const makeEstablishmentSubSections = (
             <CopyButton
               withIcon={true}
               textToCopy={convention.establishmentTutor.email}
+              label="Copier l'email du tuteur"
+              iconOnly
+              className="fr-ml-1v"
             />
           ),
         },

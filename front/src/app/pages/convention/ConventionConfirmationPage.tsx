@@ -63,7 +63,7 @@ export const ConventionConfirmationPage = ({
 }: ConventionConfirmationPageProps) => {
   const { conventionId } = route.params;
   const { copyButtonIsDisabled, copyButtonLabel, onCopyButtonClick } =
-    useCopyButton();
+    useCopyButton("Copier cet ID");
   const isValidConventionId = useMemo(
     () => !!conventionId && zUuidLike.safeParse(conventionId).success,
     [conventionId],

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export const useCopyButton = (label = "") => {
+export const useCopyButton = (label: string) => {
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopyButtonClick = (stringToCopy: string) => {

@@ -17,8 +17,9 @@ const { Component: ShareLinkModal, open: openShareLinkModal } = createModal({
 
 export const ShareConventionLink = () => {
   const { getValues } = useFormContext<ConventionReadDto>();
-  const { onCopyButtonClick, isCopied, copyButtonIsDisabled } = useCopyButton();
   const t = useConventionTexts(getValues().internshipKind);
+  const { onCopyButtonClick, isCopied, copyButtonIsDisabled, copyButtonLabel } =
+    useCopyButton(t.copyLinkTooltip);
   const [emailSent, setEmailSent] = useState<boolean | null>(null);
   const shareLinkByEmail = t.shareLinkByMail.share;
   const getConventionFormData = () => ({
@@ -74,7 +75,7 @@ export const ShareConventionLink = () => {
                     }}
                     id={domElementIds.conventionImmersionRoute.copyLinkButton}
                   >
-                    {isCopied ? t.linkCopied : t.copyLinkTooltip}
+                    {isCopied ? t.linkCopied : copyButtonLabel}
                   </Button>
                 </div>
               </>
