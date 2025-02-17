@@ -3,16 +3,14 @@ import {
   Role,
   WithAssessmentDto,
   computeTotalHours,
+  executeInSequence,
   frontRoutes,
   withAssessmentSchema,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
-import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -24,23 +22,17 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
   readonly #timeGateway: TimeGateway;
-  readonly #config: AppConfig;
-  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     timeGateway: TimeGateway,
-    config: AppConfig,
-    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
   ) {
     super(uowPerformer);
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
     this.#timeGateway = timeGateway;
-    this.#config = config;
-    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
   }
 
   public async _execute(
@@ -109,25 +101,19 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
         status: assessment.status,
       });
 
-      for (const { email, role } of recipientsRoleAndEmail) {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
-          config: this.#config,
-          conventionMagicLinkPayload: {
-            id: convention.id,
-            role,
-            email,
-            now: this.#timeGateway.now(),
-          },
-          generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
-          shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-          uow,
+      executeInSequence(recipientsRoleAndEmail, async ({ email, role }) => {
+        const magicLink = this.#generateConventionMagicLinkUrl({
+          targetRoute: frontRoutes.assessmentDocument,
+          id: convention.id,
+          role,
+          email,
+          now: this.#timeGateway.now(),
         });
         await this.#saveNotificationAndRelatedEvent(uow, {
           kind: "email",
           templatedContent: {
             kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
             recipients: [email],
-            cc: [convention.signatories.beneficiary.email],
             params: {
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
@@ -141,9 +127,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
                 convention.immersionAppellation.appellationLabel,
               assessment,
               numberOfHoursMade,
-              magicLink: await makeShortMagicLink(
-                frontRoutes.assessmentDocument,
-              ),
+              magicLink,
             },
           },
           followedIds: {
@@ -152,7 +136,7 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
             establishmentSiret: convention.siret,
           },
         });
-      }
+      });
     }
   }
 }
