@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -13,10 +13,9 @@ import {
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
+import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { prepareContentForPdfGenerator } from "src/app/pages/convention/ConventionDocumentPage";
 import { routes } from "src/app/routes/routes";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { Route } from "type-route";
@@ -39,7 +38,7 @@ export const AssessmentDocumentPage = ({
     jwt,
     conventionId: jwtPayload.applicationId,
   });
-  const [isPdfLoading, setIsPdfLoading] = useState<boolean>(false);
+  const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
 
   const logos = [
     <img key="logo-rf" src={logoRf} alt="Logo RF" />,
@@ -55,32 +54,6 @@ export const AssessmentDocumentPage = ({
       }),
     );
   }, [dispatch, conventionId, jwt]);
-
-  const onDownloadPdfClick = async () => {
-    try {
-      setIsPdfLoading(true);
-      const pdfContent =
-        await outOfReduxDependencies.technicalGateway.htmlToPdf(
-          {
-            htmlContent: prepareContentForPdfGenerator(
-              document.documentElement.outerHTML,
-            ),
-            conventionId,
-          },
-          jwt,
-        );
-      const downloadLink = document.createElement("a");
-      downloadLink.href = `data:application/pdf;base64,${pdfContent}`;
-      downloadLink.download = `bilan-immersion-${conventionId}.pdf`;
-      downloadLink.click();
-    } catch (e) {
-      alert("Erreur lors de la génération du PDF >> voir la console.");
-
-      console.error(JSON.stringify(e));
-    } finally {
-      setIsPdfLoading(false);
-    }
-  };
 
   if (isConventionLoading || isAssessmentLoading || isPdfLoading)
     return <Loader />;
@@ -100,7 +73,7 @@ export const AssessmentDocumentPage = ({
           <Button
             key={"htmlToPdfButton"}
             priority="secondary"
-            onClick={onDownloadPdfClick}
+            onClick={() => generateAndDownloadPdf(conventionId, jwt)}
             className={fr.cx("fr-mr-1w")}
             id={domElementIds.assessmentDocument.downloadPdfButton}
           >

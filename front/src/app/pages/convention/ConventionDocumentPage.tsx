@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   ConventionRenewedInformations,
   Document,
@@ -24,10 +24,10 @@ import {
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
+import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes } from "src/app/routes/routes";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { Route } from "type-route";
@@ -87,26 +87,6 @@ const formatSchedule = (convention: ConventionReadDto) => {
   );
 };
 
-const replaceContentsUrlWithAbsoluteUrl = (htmlContent: string): string =>
-  htmlContent
-    .replaceAll(
-      new RegExp(
-        /(<link\b[^>]*\brel=["']stylesheet["'][^>]*\bhref=["'])\/([^'"]*["'][^>]*>)/gm,
-      ),
-      `<link rel="stylesheet" href="${window.location.origin}/$2`, // $2 contains the path and the closing tag
-    )
-    .replaceAll(
-      new RegExp(/<img src="\//gm),
-      `<img src="${window.location.origin}/`,
-    );
-export const prepareContentForPdfGenerator = (content: string) => {
-  const contentWithoutScripts = content.replace(
-    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script\s*>/gi,
-    "",
-  );
-  return replaceContentsUrlWithAbsoluteUrl(contentWithoutScripts);
-};
-
 export const ConventionDocumentPage = ({
   route,
 }: ConventionDocumentPageProps) => {
@@ -120,7 +100,7 @@ export const ConventionDocumentPage = ({
   const agencyFeedback = useAppSelector(agenciesSelectors.feedback);
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
 
   useEffect(() => {
     if (convention?.agencyId) {
@@ -158,32 +138,6 @@ export const ConventionDocumentPage = ({
     />,
   ];
 
-  const onDownloadPdfClick = async () => {
-    try {
-      setIsPdfLoading(true);
-      const pdfContent =
-        await outOfReduxDependencies.technicalGateway.htmlToPdf(
-          {
-            htmlContent: prepareContentForPdfGenerator(
-              document.documentElement.outerHTML,
-            ),
-            conventionId: convention.id,
-          },
-          jwt,
-        );
-      const downloadLink = document.createElement("a");
-      downloadLink.href = `data:application/pdf;base64,${pdfContent}`;
-      downloadLink.download = `convention-immersion-${convention.id}.pdf`;
-      downloadLink.click();
-    } catch (e) {
-      alert("Erreur lors de la génération du PDF >> voir la console.");
-
-      console.error(JSON.stringify(e));
-    } finally {
-      setIsPdfLoading(false);
-    }
-  };
-
   const title = isConventionRenewed(convention)
     ? "Renouvellement de convention"
     : "Convention";
@@ -206,7 +160,7 @@ export const ConventionDocumentPage = ({
             <Button
               key={"htmlToPdfButton"}
               priority="secondary"
-              onClick={onDownloadPdfClick}
+              onClick={() => generateAndDownloadPdf(convention.id, jwt)}
               className={fr.cx("fr-mr-1w")}
               id={domElementIds.conventionDocument.downloadPdfButton}
             >
