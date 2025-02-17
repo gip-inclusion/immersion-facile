@@ -28,20 +28,24 @@ export const createTechnicalRouter = (
 
   technicalRouter
     .route(`/${uploadFileRoute}`)
-    .post(upload.single(uploadFileRoute), (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (!req.file) throw errors.file.missingFileInParams();
-        return deps.useCases.uploadFile.execute({
-          file: {
-            name: req.file.originalname,
-            encoding: req.file.encoding,
-            size: req.file.size,
-            buffer: req.file.buffer,
-            mimetype: req.file.mimetype,
-          },
-          renameFileToId: req.body?.renameFileToId.toLowerCase() === "true",
-        });
-      }),
+    .post(
+      deps.inclusionConnectAuthMiddleware,
+      upload.single(uploadFileRoute),
+      (req, res) =>
+        sendHttpResponse(req, res, async () => {
+          if (!req.file) throw errors.file.missingFileInParams();
+          return deps.useCases.uploadFile.execute({
+            file: {
+              name: req.file.originalname,
+              encoding: req.file.encoding,
+              size: req.file.size,
+              buffer: req.file.buffer,
+              mimetype: req.file.mimetype,
+            },
+            renameFileToId: req.body?.renameFileToId.toLowerCase() === "true",
+            connectedUser: req.payloads?.currentUser,
+          });
+        }),
     );
 
   const technicalSharedRouter = createExpressSharedRouter(

@@ -1,14 +1,42 @@
-import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  InclusionConnectedUserBuilder,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
 import { v4 as uuid } from "uuid";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryDocumentGateway } from "../adapters/InMemoryDocumentGateway";
 import { StoredFile } from "../entity/StoredFile";
 import { FileInput, UploadFile } from "./UploadFile";
 
-describe("SetFeatureFlag use case", () => {
+describe("UploadFile use case", () => {
   let documentGateway: InMemoryDocumentGateway;
   let uuidGenerator: TestUuidGenerator;
   let uploadFile: UploadFile;
+
+  const backofficeAdminUserBuilder =
+    new InclusionConnectedUserBuilder().withIsAdmin(true);
+  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+
+  const agency = new AgencyDtoBuilder().withId("agency-id").build();
+  const agencyAdminUserBuilder =
+    new InclusionConnectedUserBuilder().withAgencyRights([
+      {
+        agency: {
+          ...agency,
+          coveredDepartments: [],
+          admins: ["admin@example.com"],
+        },
+        roles: ["agency-admin"],
+        isNotifiedByEmail: false,
+      },
+    ]);
+  const icAgencyAdminUser = agencyAdminUserBuilder.build();
+  const regularUserBuilder =
+    new InclusionConnectedUserBuilder().withAgencyRights([]);
+  const icRegularUser = regularUserBuilder.build();
 
   beforeEach(() => {
     documentGateway = new InMemoryDocumentGateway();
@@ -25,12 +53,15 @@ describe("SetFeatureFlag use case", () => {
   };
 
   describe("right paths", () => {
-    it("File url have filename.ext when renameFileToId is disabled", async () => {
+    it("File url have filename.ext when renameFileToId is disabled and user is admin", async () => {
       expectToEqual(
-        await uploadFile.execute({
-          file: file,
-          renameFileToId: false,
-        }),
+        await uploadFile.execute(
+          {
+            file: file,
+            renameFileToId: false,
+          },
+          icBackofficeAdminUser,
+        ),
         `https://fakeS3/${file.name}`,
       );
 
@@ -39,7 +70,24 @@ describe("SetFeatureFlag use case", () => {
       });
     });
 
-    it("File url have uuid.ext when renameFileToId is enabled", async () => {
+    it("File url have filename.ext when renameFileToId is disabled and user is agency-admin", async () => {
+      expectToEqual(
+        await uploadFile.execute(
+          {
+            file: file,
+            renameFileToId: false,
+          },
+          icAgencyAdminUser,
+        ),
+        `https://fakeS3/${file.name}`,
+      );
+
+      expectToEqual(documentGateway.storedFiles, {
+        [file.name]: { id: file.name, ...file },
+      });
+    });
+
+    it("File url have uuid.ext when renameFileToId is enabled and user is agency-admin", async () => {
       const id = uuid();
 
       uuidGenerator.setNextUuid(id);
@@ -47,9 +95,12 @@ describe("SetFeatureFlag use case", () => {
       const expectedFileId = `${id}.tmp`;
 
       expectToEqual(
-        await uploadFile.execute({
-          file: file,
-        }),
+        await uploadFile.execute(
+          {
+            file,
+          },
+          icAgencyAdminUser,
+        ),
         `https://fakeS3/${expectedFileId}`,
       );
 
@@ -60,6 +111,20 @@ describe("SetFeatureFlag use case", () => {
   });
 
   describe("Wrong path", () => {
+    it("throws UnauthorizedError if no connected user provided", async () => {
+      await expectPromiseToFailWithError(
+        uploadFile.execute({ file }, undefined),
+        errors.user.unauthorized(),
+      );
+    });
+
+    it("throws ForbiddenError if connected user is not admin nor agency-admin", async () => {
+      await expectPromiseToFailWithError(
+        uploadFile.execute({ file }, icRegularUser),
+        errors.user.forbidden({ userId: icRegularUser.id }),
+      );
+    });
+
     it("throws ConflictError file created with renameFileToId enabled exist with same id, already stored file not replaced", async () => {
       const id = uuid();
 
@@ -81,9 +146,7 @@ describe("SetFeatureFlag use case", () => {
       };
 
       await expectPromiseToFailWithError(
-        uploadFile.execute({
-          file,
-        }),
+        uploadFile.execute({ file }, icAgencyAdminUser),
         errors.file.fileAlreadyExist(expectedFileId),
       );
 
@@ -107,10 +170,7 @@ describe("SetFeatureFlag use case", () => {
       };
 
       await expectPromiseToFailWithError(
-        uploadFile.execute({
-          file,
-          renameFileToId: false,
-        }),
+        uploadFile.execute({ file, renameFileToId: false }, icAgencyAdminUser),
         errors.file.fileAlreadyExist(alreadyStoredFile.id),
       );
 
