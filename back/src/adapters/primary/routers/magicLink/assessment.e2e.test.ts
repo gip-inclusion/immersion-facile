@@ -91,14 +91,14 @@ describe("Assessment routes", () => {
 
       expectArraysToMatch(gateways.notification.getSentEmails(), [
         {
-          kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
-          recipients: [convention.signatories.beneficiary.email],
-        },
-        {
           kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
           recipients: [
             convention.signatories.establishmentRepresentative.email,
           ],
+        },
+        {
+          kind: "ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION",
+          recipients: [convention.signatories.beneficiary.email],
         },
         {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
