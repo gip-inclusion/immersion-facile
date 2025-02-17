@@ -550,7 +550,7 @@ export const createUseCases = (
         new NotifyAgencyThatAssessmentIsCreated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-          generateConventionStatusLinkUrl,
+          generateConventionLongDurationLinkUrl,
           gateways.timeGateway,
         ),
       notifyAgencyDelegationContact: new NotifyAgencyDelegationContact(
