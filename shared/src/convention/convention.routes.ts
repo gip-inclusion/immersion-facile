@@ -54,6 +54,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: conventionReadSchema,
       400: httpErrorSchema,
+      401: httpErrorSchema,
       403: renewMagicLinkResponseSchema.or(httpErrorSchema),
       404: httpErrorSchema,
     },

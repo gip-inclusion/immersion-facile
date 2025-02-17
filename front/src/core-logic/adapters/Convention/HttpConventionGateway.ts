@@ -174,7 +174,7 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 404 }, () => undefined)
-            .with({ status: 403 }, ({ body }) => {
+            .with({ status: P.union(403, 401) }, ({ body }) => {
               throw new Error(body.message);
             })
 
