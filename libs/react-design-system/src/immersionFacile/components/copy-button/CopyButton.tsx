@@ -7,8 +7,9 @@ import { useCopyButton } from "./useCopyButton";
 export type CopyButtonProperties = ButtonProps.Common &
   ButtonProps.AsButton & {
     textToCopy: string;
-    label?: string;
+    label: string;
     withIcon?: boolean;
+    iconOnly?: boolean;
   };
 
 export const CopyButton = (props: CopyButtonProperties) => {
@@ -27,13 +28,14 @@ export const CopyButton = (props: CopyButtonProperties) => {
       className={cx(
         fr.cx(
           "fr-py-0",
-          "fr-px-2v",
+          !props.iconOnly && "fr-px-2v",
           props.withIcon && "fr-icon-clipboard-fill",
-          props.withIcon && "fr-btn--icon-left",
+          props.withIcon && !props.iconOnly && "fr-btn--icon-left",
         ),
+        props.className,
       )}
-    >
-      {copyButtonLabel}
-    </Button>
+      title={props.iconOnly ? copyButtonLabel : undefined}
+      children={props.iconOnly ? undefined : copyButtonLabel}
+    />
   );
 };
