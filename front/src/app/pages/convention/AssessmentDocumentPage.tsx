@@ -1,10 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, { useEffect } from "react";
+import Button from "@codegouvfr/react-dsfr/Button";
+import React, { useEffect, useState } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
+  domElementIds,
   isStringDate,
   makeSiretDescriptionLink,
   toDisplayedDate,
@@ -12,7 +14,9 @@ import {
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { prepareContentForPdfGenerator } from "src/app/pages/convention/ConventionDocumentPage";
 import { routes } from "src/app/routes/routes";
+import { outOfReduxDependencies } from "src/config/dependencies";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { Route } from "type-route";
@@ -35,6 +39,7 @@ export const AssessmentDocumentPage = ({
     jwt,
     conventionId: jwtPayload.applicationId,
   });
+  const [isPdfLoading, setIsPdfLoading] = useState<boolean>(false);
 
   const logos = [
     <img key="logo-rf" src={logoRf} alt="Logo RF" />,
@@ -51,7 +56,34 @@ export const AssessmentDocumentPage = ({
     );
   }, [dispatch, conventionId, jwt]);
 
-  if (isConventionLoading || isAssessmentLoading) return <Loader />;
+  const onDownloadPdfClick = async () => {
+    try {
+      setIsPdfLoading(true);
+      const pdfContent =
+        await outOfReduxDependencies.technicalGateway.htmlToPdf(
+          {
+            htmlContent: prepareContentForPdfGenerator(
+              document.documentElement.outerHTML,
+            ),
+            conventionId,
+          },
+          jwt,
+        );
+      const downloadLink = document.createElement("a");
+      downloadLink.href = `data:application/pdf;base64,${pdfContent}`;
+      downloadLink.download = `bilan-immersion-${conventionId}.pdf`;
+      downloadLink.click();
+    } catch (e) {
+      alert("Erreur lors de la génération du PDF >> voir la console.");
+
+      console.error(JSON.stringify(e));
+    } finally {
+      setIsPdfLoading(false);
+    }
+  };
+
+  if (isConventionLoading || isAssessmentLoading || isPdfLoading)
+    return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
 
@@ -64,7 +96,17 @@ export const AssessmentDocumentPage = ({
             ? "de l'Immersion Professionelle"
             : "du mini-stage"
         } au sein de ${convention.businessName}`}
-        customActions={[]}
+        customActions={[
+          <Button
+            key={"htmlToPdfButton"}
+            priority="secondary"
+            onClick={onDownloadPdfClick}
+            className={fr.cx("fr-mr-1w")}
+            id={domElementIds.assessmentDocument.downloadPdfButton}
+          >
+            Télécharger en PDF
+          </Button>,
+        ]}
       >
         <h2 className={fr.cx("fr-h4")}>
           Identifiant de la convention: {convention.id}

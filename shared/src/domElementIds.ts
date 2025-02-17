@@ -670,7 +670,9 @@ export const domElementIds = {
   conventionDocument: {
     downloadPdfButton: "im-convention-document__download-pdf-button",
   },
-  assessmentDocument: {},
+  assessmentDocument: {
+    downloadPdfButton: "im-assessment-document__download-pdf-button",
+  },
   landingEstablishment: {},
   conventionToSign: {
     form: "im-convention-to-sign-form",
