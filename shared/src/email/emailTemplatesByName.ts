@@ -272,6 +272,7 @@ export const emailTemplatesByName =
         immersionAppellationLabel,
         assessment,
         numberOfHoursMade,
+        magicLink,
       }) => {
         const lastDayOfPresence =
           assessment.status === "COMPLETED"
@@ -323,8 +324,17 @@ export const emailTemplatesByName =
           <strong>Conseils pour la suite : </strong>
           ${assessment.establishmentAdvices}
           
-          La fiche bilan a également été communiquée au candidat.`,
-          subContent: defaultSignature(internshipKind),
+          `,
+          buttons: [
+            {
+              label: "Consulter le bilan",
+              url: magicLink,
+            },
+          ],
+          subContent: `
+          La fiche bilan a également été communiquée au candidat.
+
+          ${defaultSignature(internshipKind)}`,
         };
       },
     },

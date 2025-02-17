@@ -131,6 +131,7 @@ export type EmailParamsByEmailType = {
     assessment: AssessmentDtoCompleted | AssessmentDtoPartiallyCompleted;
     immersionAppellationLabel: string;
     numberOfHoursMade: string;
+    magicLink: string;
   };
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
     immersionObjective: ImmersionObjective | undefined;
