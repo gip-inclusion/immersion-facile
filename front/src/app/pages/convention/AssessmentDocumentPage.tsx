@@ -199,6 +199,7 @@ export const AssessmentDocumentPage = ({
           {assessment.endedWithAJob && (
             <>
               <li>
+                Date d'embauche:{" "}
                 {toDisplayedDate({
                   date: convertLocaleDateToUtcTimezoneDate(
                     new Date(assessment.contractStartDate),
