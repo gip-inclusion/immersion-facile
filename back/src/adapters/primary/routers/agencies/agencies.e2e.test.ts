@@ -116,7 +116,7 @@ describe("Agency routes", () => {
           body: [
             {
               id: agency1ActiveNearBy.id,
-              name: `${agency1ActiveNearBy.name}`,
+              name: agency1ActiveNearBy.name,
               kind: agency1ActiveNearBy.kind,
               status: agency1ActiveNearBy.status,
               address: agency1ActiveNearBy.address,
@@ -124,7 +124,7 @@ describe("Agency routes", () => {
             },
             {
               id: agency2ActiveNearBy.id,
-              name: `${agency2ActiveNearBy.name}`,
+              name: agency2ActiveNearBy.name,
               kind: agency2ActiveNearBy.kind,
               status: agency2ActiveNearBy.status,
               address: agency2ActiveNearBy.address,
