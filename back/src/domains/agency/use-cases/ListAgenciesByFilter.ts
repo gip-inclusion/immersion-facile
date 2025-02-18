@@ -85,4 +85,4 @@ export const toAgencyOption = (
 });
 
 const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>
-  `${agency.name} (${agency.address.city})`;
+  `${agency.name}`;
