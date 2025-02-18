@@ -750,71 +750,37 @@ describe("UpdateConventionStatus", () => {
   });
 
   describe("* -> CANCELLED transition", () => {
-    describe("with convention with one step validation agency", () => {
-      acceptStatusTransitionTests({
-        updateStatusParams: {
-          status: "CANCELLED",
-          statusJustification: "Cancelled justification",
-          conventionId: conventionWithAgencyOneStepValidationId,
-        },
-        expectedDomainTopic: "ConventionCancelled",
-        updatedFields: { statusJustification: "Cancelled justification" },
-        allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-        allowedInclusionConnectedUsers: [
-          "icUserWithRoleValidator",
-          "icUserWithRoleBackofficeAdmin",
-          "icUserWithRoleBackofficeAdminAndValidator",
-        ],
-        allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
-      });
-      rejectStatusTransitionTests({
-        updateStatusParams: {
-          status: "CANCELLED",
-          statusJustification: "Cancelled justification",
-          conventionId: conventionWithAgencyOneStepValidationId,
-        },
-        allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-        allowedInclusionConnectedUsers: [
-          "icUserWithRoleValidator",
-          "icUserWithRoleBackofficeAdmin",
-          "icUserWithRoleBackofficeAdminAndValidator",
-        ],
-        allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
-      });
+    acceptStatusTransitionTests({
+      updateStatusParams: {
+        status: "CANCELLED",
+        statusJustification: "Cancelled justification",
+        conventionId: conventionWithAgencyTwoStepsValidationId,
+      },
+      expectedDomainTopic: "ConventionCancelled",
+      updatedFields: { statusJustification: "Cancelled justification" },
+      allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
+        "icUserWithRoleCounsellor",
+      ],
+      allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
-    describe("with convention with two step validation agency", () => {
-      acceptStatusTransitionTests({
-        updateStatusParams: {
-          status: "CANCELLED",
-          statusJustification: "Cancelled justification",
-          conventionId: conventionWithAgencyTwoStepsValidationId,
-        },
-        expectedDomainTopic: "ConventionCancelled",
-        updatedFields: { statusJustification: "Cancelled justification" },
-        allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-        allowedInclusionConnectedUsers: [
-          "icUserWithRoleValidator",
-          "icUserWithRoleBackofficeAdmin",
-          "icUserWithRoleBackofficeAdminAndValidator",
-          "icUserWithRoleCounsellor",
-        ],
-        allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
-      });
-      rejectStatusTransitionTests({
-        updateStatusParams: {
-          status: "CANCELLED",
-          statusJustification: "Cancelled justification",
-          conventionId: conventionWithAgencyTwoStepsValidationId,
-        },
-        allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-        allowedInclusionConnectedUsers: [
-          "icUserWithRoleValidator",
-          "icUserWithRoleBackofficeAdmin",
-          "icUserWithRoleBackofficeAdminAndValidator",
-          "icUserWithRoleCounsellor",
-        ],
-        allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
-      });
+    rejectStatusTransitionTests({
+      updateStatusParams: {
+        status: "CANCELLED",
+        statusJustification: "Cancelled justification",
+        conventionId: conventionWithAgencyTwoStepsValidationId,
+      },
+      allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
+      allowedInclusionConnectedUsers: [
+        "icUserWithRoleValidator",
+        "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
+        "icUserWithRoleCounsellor",
+      ],
+      allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
   });
 
