@@ -16,6 +16,7 @@ import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
+import { escapeHtml } from "src/app/utils/sanitize";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { Route } from "type-route";
@@ -217,9 +218,23 @@ export const AssessmentDocumentPage = ({
           )}
         </ul>
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale :</h2>
-        <p>{assessment.establishmentFeedback}</p>
+        <p
+          dangerouslySetInnerHTML={{
+            __html: escapeHtml(assessment.establishmentFeedback).replace(
+              /\n/g,
+              "<br />",
+            ),
+          }}
+        />
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Conseils pour la suite :</h2>
-        <p>{assessment.establishmentAdvices}</p>
+        <p
+          dangerouslySetInnerHTML={{
+            __html: escapeHtml(assessment.establishmentAdvices).replace(
+              /\n/g,
+              "<br />",
+            ),
+          }}
+        />
         <hr className={fr.cx("fr-hr", "fr-mb-6w", "fr-mt-10w")} />
         <footer className={fr.cx("fr-text--xs")}>
           <p>
