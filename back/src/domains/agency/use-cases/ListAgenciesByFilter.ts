@@ -77,12 +77,9 @@ export const toAgencyOption = (
   agency: AgencyWithUsersRights,
 ): AgencyOption => ({
   id: agency.id,
-  name: toAgencyOptionName(agency),
+  name: agency.name,
   kind: agency.kind,
   status: agency.status,
   address: agency.address,
   refersToAgencyName: agency.refersToAgencyName,
 });
-
-const toAgencyOptionName = (agency: AgencyWithUsersRights): string =>
-  `${agency.name}`;
