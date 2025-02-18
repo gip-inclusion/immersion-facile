@@ -748,6 +748,12 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           internshipKind === "immersion" ? "l'immersion" : "le mini stage"
         }, veuillez vous assurer que la convention a bien été validée par un conseiller de la structure d'accompagnement du bénéficiaire (${agencyName}).
         Vous recevrez une notification lorsque ce sera fait.
+
+        Dans le cas contraire, il y a des risques :
+
+        Risque juridique pour l’entreprise : elle s’expose à des sanctions en cas de contrôle par l’inspection du travail. Sans convention, l'immersion pourrait être considérée comme du travail dissimulé.
+
+        Absence de protection pour le candidat : il ne bénéficiera pas de couverture sociale pour les accidents de travail ou les maladies professionnelles liées à l’activité de l’entreprise. En cas d’accident, il pourrait se retrouver sans indemnisation de la sécurité sociale.
         `,
         },
         subContent: defaultSignature(internshipKind),
