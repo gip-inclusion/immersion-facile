@@ -196,7 +196,12 @@ export const AssessmentDocumentPage = ({
           :
         </h2>
         <ul>
-          <li>Embauche ? {assessment.endedWithAJob ? "Oui" : "Non"}</li>
+          <li>
+            {convention.internshipKind === "immersion"
+              ? "L'immersion a-t-elle débouchée"
+              : "Le mini-stage a-t-il débouché"}{" "}
+            sur une embauche ? {assessment.endedWithAJob ? "Oui" : "Non"}
+          </li>
           {assessment.endedWithAJob && (
             <>
               <li>
