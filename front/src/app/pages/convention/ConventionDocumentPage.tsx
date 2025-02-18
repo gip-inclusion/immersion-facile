@@ -151,6 +151,7 @@ export const ConventionDocumentPage = ({
       {canShowConvention && (
         <Document
           logos={logos}
+          printButtonLabel={"Imprimer la convention"}
           title={
             internshipKind === "immersion"
               ? `${title} relative à la mise en œuvre d’une période de mise en situation en milieu professionnel`

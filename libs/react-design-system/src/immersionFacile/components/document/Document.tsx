@@ -7,6 +7,7 @@ import "./Document.scss";
 const componentName = "im-convention-document";
 
 export type ConventionDocumentProperties = {
+  printButtonLabel: string;
   children: React.ReactNode;
   logos: React.ReactNode[];
   title: string;
@@ -15,6 +16,7 @@ export type ConventionDocumentProperties = {
 
 export const Document = ({
   children,
+  printButtonLabel,
   logos,
   title,
   customActions,
@@ -39,7 +41,7 @@ export const Document = ({
           type="button"
           id={"im-convention-document__print-button"}
         >
-          Imprimer la convention
+          {printButtonLabel}
         </Button>
       </div>
       <article className={cx(`${componentName}__content`)}>
