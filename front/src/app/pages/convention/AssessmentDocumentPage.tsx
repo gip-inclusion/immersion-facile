@@ -64,6 +64,7 @@ export const AssessmentDocumentPage = ({
     <MainWrapper layout="default" vSpacing={8}>
       <Document
         logos={logos}
+        printButtonLabel={"Imprimer le bilan"}
         title={`Bilan ${
           convention.internshipKind === "immersion"
             ? "de l'Immersion Professionelle"
