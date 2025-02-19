@@ -132,12 +132,12 @@ export class SearchImmersion extends TransactionalUseCase<
     appellationCodes: AppellationCode[];
   } & GeoParams &
     WithNafCodes): Promise<SearchResultDto[]> {
-    const appelationsAndRomes =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+    const appellationsAndRomes =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
         appellationCodes,
       );
 
-    const firstRomeAndAppellationData = appelationsAndRomes.at(0);
+    const firstRomeAndAppellationData = appellationsAndRomes.at(0);
     if (!firstRomeAndAppellationData)
       throw errors.search.noRomeForAppellations(appellationCodes);
 

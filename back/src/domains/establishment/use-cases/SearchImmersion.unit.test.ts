@@ -137,7 +137,15 @@ describe("SearchImmersionUseCase", () => {
     uow = createInMemoryUow();
     laBonneBoiteGateway = new InMemoryLaBonneBoiteGateway();
     uuidGenerator = new TestUuidGenerator();
-    uow.romeRepository.appellations = [secretariatAppellationAndRome];
+    uow.romeRepository.appellations = [
+      secretariatAppellationAndRome,
+      {
+        appellationCode: boulangerOffer.appellationCode,
+        appellationLabel: boulangerOffer.appellationLabel,
+        romeCode: boulangerOffer.romeCode,
+        romeLabel: boulangerOffer.romeLabel,
+      },
+    ];
     timeGateway = new CustomTimeGateway(now);
     searchImmersionUseCase = new SearchImmersion(
       new InMemoryUowPerformer(uow),
