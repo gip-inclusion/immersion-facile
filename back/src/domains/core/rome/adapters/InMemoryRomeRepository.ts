@@ -100,7 +100,7 @@ export class InMemoryRomeRepository implements RomeRepository {
     )?.romeCode;
   }
 
-  public async getAppellationAndRomeDtosFromAppellationCodes(
+  public async getAppellationAndRomeDtosFromAppellationCodesIfExist(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
     return this.appellations.filter((appellationDto) =>

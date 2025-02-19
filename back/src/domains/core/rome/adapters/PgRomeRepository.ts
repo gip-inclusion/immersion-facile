@@ -37,7 +37,7 @@ export class PgRomeRepository implements RomeRepository {
       });
   }
 
-  public async getAppellationAndRomeDtosFromAppellationCodes(
+  public async getAppellationAndRomeDtosFromAppellationCodesIfExist(
     codes: AppellationCode[],
   ): Promise<AppellationAndRomeDto[]> {
     return this.transaction

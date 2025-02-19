@@ -32,13 +32,12 @@ describe("Postgres implementation of Rome Gateway", () => {
     });
   });
 
-  describe("getFullAppellationsFromCodes", () => {
+  describe("getAppellationAndRomeDtosFromAppellationCodes", () => {
     it("gets Appellations DTOs when providing the codes", async () => {
       expectToEqual(
-        await pgRomeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-          "10868",
-          "12694",
-        ]),
+        await pgRomeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+          ["10868", "12694"],
+        ),
         [
           {
             appellationCode: "10868",
@@ -53,6 +52,16 @@ describe("Postgres implementation of Rome Gateway", () => {
             romeLabel: "Coiffure",
           },
         ],
+      );
+    });
+
+    it("no result on missing appellation in repo", async () => {
+      const missingAppellationCode = "666";
+      expectToEqual(
+        await pgRomeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+          [missingAppellationCode],
+        ),
+        [],
       );
     });
   });
