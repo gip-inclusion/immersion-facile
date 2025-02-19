@@ -625,4 +625,10 @@ export const errors = {
         `Le fil d'arianne n'est pas défini pour cette page ('${currentRouteName}').`,
       ),
   },
+  rome: {
+    missingAppellation: ({
+      appellationCode,
+    }: { appellationCode: AppellationCode }) =>
+      new NotFoundError(`Code appellation ${appellationCode} non trouvé.`),
+  },
 };
