@@ -10,21 +10,20 @@ export const contentsMapper = (
 ): Record<ManagedErrorKind, FrontErrorProps> => ({
   peConnectConnectionAborted: {
     title: peConnectErrorKind,
-    description:
-      "La connexion à France Travail (anciennement Pôle emploi) Connect a été interrompue.",
+    description: "La connexion à France Travail Connect a été interrompue.",
     subtitle: "Veuillez réessayer.",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   peConnectNoAuthorisation: {
     subtitle: peConnectErrorKind,
     title:
-      "Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi Connect.",
+      "Vous n'avez pas accordé les autorisations nécessaires à France Travail Connect.",
     description: "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   peConnectInvalidGrant: {
     subtitle: peConnectErrorKind,
-    title: "Pôle Emploi Connect - Identifiants invalides",
+    title: "France Travail Connect - Identifiants invalides",
     description:
       "Le code d'autorisation retourné par France Travail ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
     buttons: [
@@ -61,7 +60,7 @@ export const contentsMapper = (
     subtitle: peConnectErrorKind,
     title:
       "Récupération du statut demandeur d'emploi du bénéficiare - accès interdit",
-    description: `Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
+    description: `Vous êtes bien authentifiés mais le service France Travail Connect refuse
     la récupération de votre état de demandeur d'emploi.`,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
@@ -126,4 +125,4 @@ export const contactUsButtonContent = ({
 
 const peConnectErrorKind = "Erreur France Travail Connect";
 const peTechnicalTeamForwardDescription =
-  "Nous travaillons activement à la résolution de ce problème avec le service technique France Travail (anciennement Pôle emploi).";
+  "Nous travaillons activement à la résolution de ce problème avec le service technique France Travail.";
