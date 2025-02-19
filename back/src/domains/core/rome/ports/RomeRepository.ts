@@ -12,7 +12,7 @@ export interface RomeRepository {
 
   searchRome: (query: string) => Promise<RomeDto[]>;
   searchAppellation: (query: string) => Promise<AppellationAndRomeDto[]>;
-  getAppellationAndRomeDtosFromAppellationCodes: (
+  getAppellationAndRomeDtosFromAppellationCodesIfExist: (
     codes: AppellationCode[],
   ) => Promise<AppellationAndRomeDto[]>;
   getAppellationAndRomeLegacyV3: (
