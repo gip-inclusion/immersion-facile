@@ -51,9 +51,9 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
       throw new Error(`No exchanges on discussion '${discussion.id}'.`);
 
     const appellation = (
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        discussion.appellationCode,
-      ])
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [discussion.appellationCode],
+      )
     ).at(0);
 
     if (!appellation)
