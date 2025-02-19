@@ -223,6 +223,14 @@ export class EstablishmentAggregateBuilder
     },
   ) {}
 
+  withEstablishmentWebsite(website?: AbsoluteUrl | "") {
+    return new EstablishmentAggregateBuilder().withEstablishment(
+      new EstablishmentEntityBuilder(this.aggregate.establishment)
+        .withWebsite(website ?? "")
+        .build(),
+    );
+  }
+
   public build() {
     if (!this.aggregate.userRights.length)
       throw errors.establishment.noUserRights({
