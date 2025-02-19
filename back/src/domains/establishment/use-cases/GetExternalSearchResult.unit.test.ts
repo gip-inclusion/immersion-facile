@@ -62,8 +62,8 @@ describe("GetExternalSearchResult", () => {
           appellationCode: searchedAppellation.appellationCode,
         }),
         errors.establishment.offerMissing({
-          siret: lbbResult.siret,
           appellationCode: searchedAppellation.appellationCode,
+          siret: lbbResult.siret,
           mode: "not found",
         }),
       );

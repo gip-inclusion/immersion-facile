@@ -28,9 +28,10 @@ export const makeGetExternalSearchResult = createTransactionalUseCase<
     if (isEstablishmentDeleted) throw errors.establishment.notFound({ siret });
 
     const [appellationAndRome] =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        appellationCode,
-      ]);
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [appellationCode],
+      );
+
     if (!appellationAndRome)
       throw errors.establishment.offerMissing({
         siret,
