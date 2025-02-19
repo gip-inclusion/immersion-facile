@@ -1,5 +1,6 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
+import { AddressAndPosition } from "../address/address.dto";
 import { Email } from "../email/email.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
@@ -16,9 +17,66 @@ import {
   noContactPerMonth,
 } from "./FormEstablishment.schema";
 
-export const defaultFormEstablishmentAddress = {
-  id: "364efc5a-db4f-452c-8d20-95c6a23f21fe",
-  rawAddress: "1 Rue du Moulin, 12345 Quelque Part",
+type TestAddress = {
+  formAddress: FormEstablishmentAddress;
+  addressAndPosition: AddressAndPosition;
+};
+
+export const defaultAddress: TestAddress = {
+  formAddress: {
+    id: "364efc5a-db4f-452c-8d20-95c6a23f21fe",
+    rawAddress: "1 Rue du Moulin, 27110 Épreville-près-le-Neubourg, France",
+  },
+  addressAndPosition: {
+    address: {
+      city: "Épreville-près-le-Neubourg",
+      departmentCode: "27",
+      postcode: "27110",
+      streetNumberAndAddress: "1 Rue du Moulin",
+    },
+    position: {
+      lat: 49.137593,
+      lon: 0.8746325,
+    },
+  },
+};
+
+export const updatedAddress1: TestAddress = {
+  formAddress: {
+    id: "fbd6096d-b514-4d54-a16e-46c89f75d83c",
+    rawAddress: "1 rue de la paix, 75001 Paris",
+  },
+  addressAndPosition: {
+    address: {
+      city: "Paris",
+      departmentCode: "75",
+      postcode: "75001",
+      streetNumberAndAddress: "1 rue de la paix",
+    },
+    position: {
+      lat: 48.8685535,
+      lon: 2.3303318,
+    },
+  },
+};
+
+export const updatedAddress2: TestAddress = {
+  formAddress: {
+    id: "fbd6096d-b514-4d54-a16e-46c89f75d83d",
+    rawAddress: "2 Rue de la Paix, 93100 Montreuil, France",
+  },
+  addressAndPosition: {
+    address: {
+      city: "Montreuil",
+      departmentCode: "93",
+      postcode: "93100",
+      streetNumberAndAddress: "2 rue de la paix",
+    },
+    position: {
+      lat: 48.860428,
+      lon: 2.473908,
+    },
+  },
 };
 
 const defaultBusinessContactDto: BusinessContactDto = {
@@ -33,7 +91,7 @@ const defaultBusinessContactDto: BusinessContactDto = {
 
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddresses: [defaultFormEstablishmentAddress],
+  businessAddresses: [defaultAddress.formAddress],
   businessContact: defaultBusinessContactDto,
   naf: { code: "7201A", nomenclature: "nomenclature code 7201A" },
   businessName: "Ma super entreprise",
@@ -74,16 +132,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
 
 export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
-  businessAddresses: [
-    {
-      id: "fbd6096d-b514-4d54-a16e-46c89f75d83c",
-      rawAddress: "1 rue de la paix, 75001 Paris",
-    },
-    {
-      id: "fbd6096d-b514-4d54-a16e-46c89f75d83d",
-      rawAddress: "2 rue de la paix, 93000 Bobigny",
-    },
-  ],
+  businessAddresses: [updatedAddress1.formAddress, updatedAddress2.formAddress],
   businessContact: {
     email: "my-updated-email@test.com",
     contactMethod: "PHONE",
