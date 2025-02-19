@@ -54,7 +54,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     switch (establishmentContact.contactMethod) {
       case "EMAIL": {
         const appellationAndRomeDtos =
-          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
             [discussion.appellationCode],
           );
         const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
