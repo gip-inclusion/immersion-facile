@@ -24,6 +24,7 @@ import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage"
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { ErrorRedirectPage } from "src/app/pages/error/ErrorRedirectPage";
+import { frontErrors } from "src/app/pages/error/front-errors";
 import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
@@ -172,7 +173,11 @@ const getPageByRouteName: {
         <EstablishmentDashboardPage route={route} />
       </InclusionConnectedPrivateRoute>
     ) : (
-      <ErrorPage type="httpClientNotFoundError" />
+      <ErrorPage
+        error={frontErrors.establishment.notFound({
+          siret: route.params.siret,
+        })}
+      />
     ),
 
   errorRedirect: (route) => <ErrorRedirectPage route={route} />,
@@ -214,7 +219,7 @@ const getPageByRouteName: {
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
       <StandardLayout route={route} />
     ) : (
-      <ErrorPage type="httpClientNotFoundError" />
+      <ErrorPage error={frontErrors.generic.pageNotFound()} />
     ),
   stats: () => <StatsPage />,
   unregisterEstablishmentLead: (route) => (
@@ -226,7 +231,7 @@ export const Router = (): React.ReactNode => {
   const route = useRoute();
   const routeName = route.name;
   return routeName === false ? (
-    <ErrorPage type="httpClientNotFoundError" />
+    <ErrorPage error={frontErrors.generic.pageNotFound()} />
   ) : (
     (getPageByRouteName[routeName](route as Route<unknown>) as React.ReactNode)
   );

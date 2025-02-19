@@ -42,7 +42,7 @@ export const App = () => {
   useSetAcquisitionParams();
   return (
     <ErrorBoundary
-      fallbackRender={({ error }) => <ErrorPage message={error.message} />}
+      fallbackRender={({ error }) => <ErrorPage error={error} />}
       resetKeys={[currentRoute]}
       onReset={() => {
         dispatch(rootAppSlice.actions.appResetRequested());
