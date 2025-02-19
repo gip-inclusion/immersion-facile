@@ -1,5 +1,7 @@
 import React from "react";
 import { isManagedError } from "shared";
+import { contentsMapper } from "src/app/contents/error/textSetup";
+import { FrontSpecificError } from "src/app/pages/error/front-errors";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
 import { ErrorPage } from "./ErrorPage";
@@ -12,12 +14,23 @@ interface ErrorRedirectProps {
 
 export const ErrorRedirectPage = ({
   route,
-}: ErrorRedirectProps): JSX.Element => (
-  <ErrorPage
-    type={isManagedError(route.params.kind) ? route.params.kind : undefined}
-    {...propertiesFromUrl(route)}
-  />
-);
+}: ErrorRedirectProps): JSX.Element => {
+  const type = isManagedError(route.params.kind)
+    ? route.params.kind
+    : undefined;
+  const { title, message } = propertiesFromUrl(route);
+  const frontError = type
+    ? new FrontSpecificError(
+        contentsMapper(
+          () => {},
+          title ?? "Une erreur est survenue",
+          message ?? "Une erreur inattendue est survenue",
+        )[type],
+      )
+    : null;
+
+  return <ErrorPage error={frontError ?? new Error("Aucun truc bidule")} />;
+};
 
 type RedirectErrorProps = {
   message: string;

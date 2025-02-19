@@ -1,59 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { ManagedErrorKind, domElementIds } from "shared";
-import {
-  contentsMapper,
-  unexpectedErrorContent,
-} from "src/app/contents/error/textSetup";
-import {
-  ErrorButton,
-  ErrorButtonProps,
-  HTTPFrontErrorContents,
-} from "src/app/contents/error/types";
-import { useRedirectToConventionWithoutIdentityProvider } from "src/app/hooks/redirections.hooks";
-import { escapeHtml } from "src/app/utils/sanitize";
+import { FrontErrorProps } from "src/app/contents/error/types";
 
 import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
 import technicalErrorSprite from "@codegouvfr/react-dsfr/dsfr/artwork/pictograms/system/technical-error.svg";
-import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
-import { routes, useRoute } from "src/app/routes/routes";
-import { getJwtPayload } from "src/app/utils/jwt";
-import { Route } from "type-route";
 
-type ErrorPageContentProps = {
-  type?: ManagedErrorKind;
-  title?: string;
-  message?: string;
-  shouldShowRefreshEditEstablishmentLink: boolean;
-};
-
-const routeContainsJwt = (
-  route: Route<typeof routes>,
-): route is Route<typeof routes.editFormEstablishment> => {
-  return "jwt" in route.params;
-};
+type ErrorPageContentProps = FrontErrorProps;
 
 export const ErrorPageContent = ({
-  type,
   title,
-  message,
-  shouldShowRefreshEditEstablishmentLink,
+  subtitle,
+  description,
+  buttons,
 }: ErrorPageContentProps): React.ReactElement => {
-  const route = useRoute() as Route<typeof routes>;
-  const redirectAction = useRedirectToConventionWithoutIdentityProvider();
-  const unsafeXSSContent: HTTPFrontErrorContents = type
-    ? contentsMapper(redirectAction, message, title)[type]
-    : unexpectedErrorContent(title ?? "", message ?? "");
-  const escapedContent = {
-    ...unsafeXSSContent,
-    overtitle: escapeHtml(unsafeXSSContent.overtitle),
-    title: escapeHtml(unsafeXSSContent.title),
-    subtitle: escapeHtml(unsafeXSSContent.subtitle),
-    description: escapeHtml(unsafeXSSContent.description),
-  };
-  const siret = routeContainsJwt(route)
-    ? getJwtPayload(route.params.jwt)?.siret
-    : null;
   return (
     <div
       className={fr.cx(
@@ -67,65 +26,26 @@ export const ErrorPageContent = ({
       )}
     >
       <div className={fr.cx("fr-py-0", "fr-col-12", "fr-col-md-6")}>
-        <h1>{escapedContent.overtitle}</h1>
-        <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>
-          {escapedContent.title}
-        </p>
-        <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>
-          {escapedContent.subtitle}
-        </p>
+        <h1>{title}</h1>
+        <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>
         <p
           className={fr.cx("fr-text--sm", "fr-mb-3w")}
-          dangerouslySetInnerHTML={{ __html: escapedContent.description }}
+          dangerouslySetInnerHTML={{ __html: description }}
         />
-        {shouldShowRefreshEditEstablishmentLink && siret && (
-          <p className={fr.cx("fr-text--sm", "fr-mb-5w")}>
-            <RenewEstablishmentMagicLinkButton
-              id={domElementIds.establishment.edit.refreshEditLink}
-              siret={siret}
-            />
-          </p>
-        )}
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
-          {escapedContent.buttons.map((button: ErrorButton, index) => {
-            const buttonProps: ErrorButtonProps =
-              typeof button === "function"
-                ? button({
-                    currentUrl: window.location.href,
-                    currentDate: new Date().toISOString(),
-                    error: escapedContent.description,
-                  })
-                : button;
-            return (
-              <li key={`${buttonProps.kind}-${index}`}>
-                {buttonProps.onClick ? (
-                  <button
-                    className={fr.cx(
-                      "fr-btn",
-                      buttonProps.kind !== "primary" &&
-                        `fr-btn--${buttonProps.kind}`,
-                    )}
-                    onClick={buttonProps.onClick}
-                    type="button"
-                  >
-                    {buttonProps.label}
-                  </button>
-                ) : (
-                  <a
-                    className={fr.cx(
-                      "fr-btn",
-                      buttonProps.kind !== "primary" &&
-                        `fr-btn--${buttonProps.kind}`,
-                    )}
-                    href={buttonProps.href}
-                    target={buttonProps.target}
-                  >
-                    {buttonProps.label}
-                  </a>
-                )}
-              </li>
-            );
-          })}
+          {buttons.length
+            ? buttons.map((button) => (
+                <li>
+                  {typeof button === "function"
+                    ? button({
+                        currentUrl: window.location.href,
+                        currentDate: new Date().toISOString(),
+                        error: description,
+                      })
+                    : button}
+                </li>
+              ))
+            : null}
         </ul>
       </div>
       <div

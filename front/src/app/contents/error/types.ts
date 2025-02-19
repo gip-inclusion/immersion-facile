@@ -1,25 +1,16 @@
-export type HTTPFrontErrorContents = {
-  overtitle: string;
-  title: string;
-  subtitle: string;
-  description: string;
+export type FrontErrorProps = {
   buttons: ErrorButton[];
+  subtitle?: string;
+  title: string;
+  description: string;
 };
 
 export type ErrorButton =
-  | ErrorButtonProps
-  | ((params: ContactErrorInformations) => ErrorButtonProps);
+  | React.ReactElement
+  | ((params: ContactErrorInformation) => React.ReactElement);
 
-export type ContactErrorInformations = {
+export type ContactErrorInformation = {
   currentUrl: string;
   currentDate: string;
   error: string;
-};
-
-export type ErrorButtonProps = {
-  label: string;
-  kind: "primary" | "secondary";
-  href?: string;
-  onClick?: () => void;
-  target?: React.HTMLAttributeAnchorTarget;
 };

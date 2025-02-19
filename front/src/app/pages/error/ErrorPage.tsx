@@ -1,34 +1,33 @@
 import React from "react";
 import { MainWrapper } from "react-design-system";
-import { ManagedErrorKind, expiredMagicLinkErrorMessage } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { FrontErrorProps } from "src/app/contents/error/types";
+import { FrontSpecificError } from "src/app/pages/error/front-errors";
 import { ErrorPageContent } from "./ErrorPageContent";
 
 type ErrorPageProperties = {
-  type?: ManagedErrorKind;
-  message?: string;
-  title?: string;
+  error: FrontSpecificError | Error;
+};
+
+const getPageContentProps = (
+  error: FrontSpecificError | Error,
+): FrontErrorProps => {
+  if (error instanceof FrontSpecificError) return error.props;
+
+  return {
+    title: "Erreur inattendue",
+    description: error.message,
+    buttons: [],
+  };
 };
 
 export const ErrorPage = ({
-  type,
-  message,
-  title,
+  error,
 }: ErrorPageProperties): React.ReactElement => {
-  const shouldShowRefreshEditEstablishmentLink = !!message?.includes(
-    expiredMagicLinkErrorMessage,
-  );
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={0}>
-        <ErrorPageContent
-          type={type}
-          message={message}
-          title={title}
-          shouldShowRefreshEditEstablishmentLink={
-            shouldShowRefreshEditEstablishmentLink
-          }
-        />
+        <ErrorPageContent {...getPageContentProps(error)} />
       </MainWrapper>
     </HeaderFooterLayout>
   );

@@ -1,79 +1,32 @@
+import Button from "@codegouvfr/react-dsfr/Button";
 import { ManagedErrorKind, immersionFacileContactEmail } from "shared";
 import { routes } from "src/app/routes/routes";
-import {
-  ContactErrorInformations,
-  ErrorButtonProps,
-  HTTPFrontErrorContents,
-} from "./types";
-
-export const unexpectedErrorContent = (
-  title: string,
-  message: string,
-): HTTPFrontErrorContents => ({
-  overtitle: "Erreur inattendue",
-  title:
-    "Une erreur inattendue est survenue dans le cadre de votre parcours immersion facilitée.",
-  subtitle: title ?? "",
-  description: message ?? "",
-  buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
-});
+import { ContactErrorInformation, ErrorButton, FrontErrorProps } from "./types";
 
 export const contentsMapper = (
   redirectToConventionWithoutIdentityProviderOnClick: () => void,
   message?: string,
   title?: string,
-): Record<ManagedErrorKind, HTTPFrontErrorContents> => ({
+): Record<ManagedErrorKind, FrontErrorProps> => ({
   peConnectConnectionAborted: {
-    overtitle: peConnectErrorKind,
-    title:
+    title: peConnectErrorKind,
+    description:
       "La connexion à France Travail (anciennement Pôle emploi) Connect a été interrompue.",
     subtitle: "Veuillez réessayer.",
-    description: "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
   peConnectNoAuthorisation: {
-    overtitle: peConnectErrorKind,
+    subtitle: peConnectErrorKind,
     title:
       "Vous n'avez pas accordé les autorisations nécessaires à Pôle Emploi Connect.",
-    subtitle:
-      "Vous avez refusé d'accorder les autorisations nécessaires sur l'interface Pôle Emploi Connect.",
-    description:
-      "Vous pouvez nous accorder les autorisation nécessaires depuis le portail Pôle Emploi Connect.",
+    description: "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
-  peConnectNoValidAdvisor: {
-    overtitle: peConnectErrorKind,
-    title: "Impossible d'identifier votre conseiller référent",
-    subtitle:
-      "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas d'identifier le conseiller référent qui vous est dédié.",
-    description: "",
-    buttons: [
-      redirectToConventionWithoutIdentityProvider(
-        redirectToConventionWithoutIdentityProviderOnClick,
-      ),
-      contactUsButtonContent,
-    ],
-  },
-  peConnectNoValidUser: {
-    overtitle: peConnectErrorKind,
-    title:
-      "Les données retournées par Pôle Emploi Connect ne permettent pas de vous identifier.",
-    subtitle:
-      "Les données retournées par France Travail (anciennement Pôle emploi) ne permettent pas de vous identifier.",
-    description: "",
-    buttons: [
-      redirectToConventionWithoutIdentityProvider(
-        redirectToConventionWithoutIdentityProviderOnClick,
-      ),
-      contactUsButtonContent,
-    ],
-  },
   peConnectInvalidGrant: {
-    overtitle: peConnectErrorKind,
+    subtitle: peConnectErrorKind,
     title: "Pôle Emploi Connect - Identifiants invalides",
-    subtitle:
-      "Le code d'autorisation retourné par France Travail (anciennement Pôle emploi) ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
-    description: "",
+    description:
+      "Le code d'autorisation retourné par France Travail ne permet pas d'avoir accès aux droits nécessaires pour lier votre compte.",
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -82,11 +35,10 @@ export const contentsMapper = (
     ],
   },
   peConnectAdvisorForbiddenAccess: {
-    overtitle: peConnectErrorKind,
+    subtitle: peConnectErrorKind,
     title: "Récupération du conseiller - accès interdit",
-    subtitle: `Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
+    description: `Vous êtes bien authentifiés mais le service France Travail Connect refuse
         la récupération de vos conseillers référents.`,
-    description: peTechnicalTeamForwardDescription,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -95,10 +47,8 @@ export const contentsMapper = (
     ],
   },
   peConnectGetUserInfoForbiddenAccess: {
-    overtitle: peConnectErrorKind,
+    subtitle: peConnectErrorKind,
     title: "Récupération des information du bénéficiaire - accès interdit",
-    subtitle: `Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
-    la récupération de vos conseillers référents.`,
     description: peTechnicalTeamForwardDescription,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
@@ -108,12 +58,11 @@ export const contentsMapper = (
     ],
   },
   peConnectGetUserStatusInfoForbiddenAccess: {
-    overtitle: peConnectErrorKind,
+    subtitle: peConnectErrorKind,
     title:
       "Récupération du statut demandeur d'emploi du bénéficiare - accès interdit",
-    subtitle: `Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
+    description: `Vous êtes bien authentifiés mais le service Pôle Emploi Connect refuse
     la récupération de votre état de demandeur d'emploi.`,
-    description: peTechnicalTeamForwardDescription,
     buttons: [
       redirectToConventionWithoutIdentityProvider(
         redirectToConventionWithoutIdentityProviderOnClick,
@@ -121,59 +70,39 @@ export const contentsMapper = (
       contactUsButtonContent,
     ],
   },
-  httpUnknownClientError: {
-    overtitle: httpClientErrorKind,
-    title: "Erreur client inconnue",
-    subtitle: title ?? "",
-    description: message ?? "",
-    buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
-  },
-  httpClientNotFoundError: {
-    overtitle: httpClientErrorKind,
-    title: "Page non trouvée - 404",
-    subtitle:
-      "La page que vous cherchez est introuvable. Excusez-nous pour la gène occasionnée.",
-    description: `Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible.
-      <br>Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou effectuer une recherche avec notre moteur de recherche en haut de page.
-      <br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.`,
-    buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
-  },
-  httpClientInvalidToken: {
-    overtitle: httpClientErrorKind,
-    title: "Votre token n'est pas valide.",
-    subtitle: title ?? "",
-    description: message ?? "",
-    buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
-  },
   unknownError: {
-    overtitle: "Erreur inconnue",
+    subtitle: "Erreur inconnue",
     title:
+      title ??
       "Une erreur inconnue est survenue. Excusez-nous pour la gène occasionnée.",
-    subtitle: title ?? "",
     description: message ?? "",
     buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
   },
 });
 
-const redirectToHomePageButtonContent: ErrorButtonProps = {
-  kind: "primary",
-  label: "Page d'accueil",
-  ...routes.home().link,
-};
+export const redirectToHomePageButtonContent: ErrorButton = (
+  <Button
+    priority="primary"
+    children="Page d'accueil"
+    linkProps={{
+      ...routes.home().link,
+    }}
+  />
+);
+
 const redirectToConventionWithoutIdentityProvider = (
   onClick: () => void,
-): ErrorButtonProps => ({
-  kind: "primary",
-  label:
-    "Vous pouvez quand même remplir votre demande de convention en indiquant l'agence France Travail à laquelle vous êtes rattaché ici.",
-  onClick,
-});
-
+): ErrorButton => (
+  <Button priority="primary" onClick={onClick}>
+    "Vous pouvez quand même remplir votre demande de convention en indiquant
+    l'agence France Travail à laquelle vous êtes rattaché ici."
+  </Button>
+);
 export const contactUsButtonContent = ({
   currentUrl,
   currentDate,
   error,
-}: ContactErrorInformations): ErrorButtonProps => {
+}: ContactErrorInformation) => {
   const emailBody = `%0D%0A________________________%0D%0A
   %0D%0A
   Veuillez répondre au dessus de cette ligne.%0D%0A%0D%0A
@@ -183,14 +112,18 @@ export const contactUsButtonContent = ({
   - Résumé de l'erreur :%0D%0A%0D%0A
   ${error}
   `;
-  return {
-    kind: "secondary",
-    label: "Contactez-nous",
-    href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
-    target: "_blank",
-  };
+  return (
+    <Button
+      priority="secondary"
+      children="Contactez-nous"
+      linkProps={{
+        href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
+        target: "_blank",
+      }}
+    />
+  );
 };
-const httpClientErrorKind = "Erreur Http Client";
-const peConnectErrorKind = "Erreur Pôle Emploi Connect";
+
+const peConnectErrorKind = "Erreur France Travail Connect";
 const peTechnicalTeamForwardDescription =
   "Nous travaillons activement à la résolution de ce problème avec le service technique France Travail (anciennement Pôle emploi).";

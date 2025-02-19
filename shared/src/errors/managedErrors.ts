@@ -2,15 +2,10 @@ export type ManagedErrorKind = (typeof managedErrorKinds)[number];
 const managedErrorKinds = [
   "peConnectInvalidGrant",
   "peConnectNoAuthorisation",
-  "peConnectNoValidAdvisor",
-  "peConnectNoValidUser",
   "peConnectAdvisorForbiddenAccess",
   "peConnectGetUserInfoForbiddenAccess",
   "peConnectGetUserStatusInfoForbiddenAccess",
   "peConnectConnectionAborted",
-  "httpUnknownClientError",
-  "httpClientNotFoundError",
-  "httpClientInvalidToken",
   "unknownError",
 ] as const;
 

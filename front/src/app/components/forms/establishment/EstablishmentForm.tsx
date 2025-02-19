@@ -30,6 +30,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
+import { frontErrors } from "src/app/pages/error/front-errors";
 import {
   formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams,
   formEstablishmentQueryParamsToFormEstablishmentDto,
@@ -147,7 +148,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     (feedback: Feedback, jwt: string) => {
       if (feedback.level === "error") {
         if (!feedback.message.includes(expiredMagicLinkErrorMessage)) {
-          throw new Error(feedback.message);
+          throw frontErrors.establishment.expiredLink({
+            jwt,
+            siret:
+              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
+                jwt,
+              ).siret,
+          });
         }
         routes
           .renewConventionMagicLink({
