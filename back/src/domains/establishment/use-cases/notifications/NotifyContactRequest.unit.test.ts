@@ -12,12 +12,13 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { InMemoryRomeRepository } from "../../../core/rome/adapters/InMemoryRomeRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { createInMemoryUow } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  InMemoryUnitOfWork,
+  createInMemoryUow,
+} from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryDiscussionRepository } from "../../adapters/InMemoryDiscussionRepository";
 import {
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
@@ -30,38 +31,29 @@ const allowedContactEmail = "toto@gmail.com";
 const allowedCopyEmail = "copy@gmail.com";
 
 describe("NotifyContactRequest", () => {
-  let discussionRepository: InMemoryDiscussionRepository;
-  let romeRepository: InMemoryRomeRepository;
+  let uow: InMemoryUnitOfWork;
   let notifyContactRequest: NotifyContactRequest;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   const domain = "reply.domain.com";
 
   beforeEach(() => {
-    const uow = createInMemoryUow();
-    discussionRepository = uow.discussionRepository;
-    romeRepository = uow.romeRepository;
+    uow = createInMemoryUow();
 
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
 
-    const uuidGenerator = new UuidV4Generator();
-    const timeGateway = new CustomTimeGateway();
-    const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-
     notifyContactRequest = new NotifyContactRequest(
       new InMemoryUowPerformer(uow),
-      saveNotificationAndRelatedEvent,
+      makeSaveNotificationAndRelatedEvent(
+        new UuidV4Generator(),
+        new CustomTimeGateway(),
+      ),
       domain,
     );
-  });
 
-  const prepareDiscussionInRepository = (contactMethod: ContactMethod) => {
-    romeRepository.appellations = [
+    uow.romeRepository.appellations = [
       {
         appellationCode: TEST_APPELLATION_CODE,
         appellationLabel: TEST_APPELLATION_LABEL,
@@ -69,7 +61,9 @@ describe("NotifyContactRequest", () => {
         romeLabel: "Rome de test",
       },
     ];
+  });
 
+  const prepareDiscussionInRepository = (contactMethod: ContactMethod) => {
     const discussion = new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(siret)
@@ -81,7 +75,7 @@ describe("NotifyContactRequest", () => {
       .withAppellationCode(TEST_APPELLATION_CODE)
       .build();
 
-    discussionRepository.discussions = [discussion];
+    uow.discussionRepository.discussions = [discussion];
     return discussion;
   };
 
@@ -224,7 +218,7 @@ describe("NotifyContactRequest", () => {
         siret: discussion.siret,
       };
 
-      romeRepository.appellations = [];
+      uow.romeRepository.appellations = [];
 
       await expectPromiseToFailWithError(
         notifyContactRequest.execute(validContactRequestByMail),
