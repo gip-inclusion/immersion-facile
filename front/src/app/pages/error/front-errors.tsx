@@ -1,5 +1,6 @@
+import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
-import { SiretDto, domElementIds } from "shared";
+import { ConventionId, SiretDto, domElementIds } from "shared";
 import {
   contactUsButtonContent,
   redirectToHomePageButtonContent,
@@ -22,12 +23,40 @@ export const frontErrors = {
       new FrontSpecificError({
         title: "Page non trouvé",
         description:
-          "La page que vous cherchez est introuvable. Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible.      <br>Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou effectuer une recherche avec notre moteur de recherche en haut de page.<br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.",
+          "La page que vous cherchez est introuvable. Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible. <br>Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou effectuer une recherche avec notre moteur de recherche en haut de page.<br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.",
         subtitle: "La page que vous cherchez est introuvable.",
         buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
       }),
   },
   convention: {
+    cancelled: ({
+      conventionId,
+      justificationStatus,
+      agencyName,
+    }: {
+      conventionId: ConventionId;
+      justificationStatus?: string;
+      agencyName: string;
+    }) =>
+      new FrontSpecificError({
+        title: "Demande annulée",
+        subtitle: `La demande de convention ${conventionId} n'est plus accessible.`,
+        description: `${
+          justificationStatus
+            ? `Elle a été annulée pour le motif suivant : ${justificationStatus}<br><br>`
+            : ""
+        } Merci de vous rapprocher de votre conseiller. Pour rappel, l'agence indiquée sur votre convention était : ${agencyName}.`,
+        buttons: [
+          <Button
+            linkProps={{
+              href: "https://immersion-facile.beta.gouv.fr/aide/",
+              target: "_blank",
+            }}
+          >
+            Accéder à la FAQ
+          </Button>,
+        ],
+      }),
     externalConsumerNotFound: ({ consumerName }: { consumerName: string }) =>
       new FrontSpecificError({
         title: "Partenaire inconnu",
