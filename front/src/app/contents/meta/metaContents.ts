@@ -64,10 +64,6 @@ export const defaultPageMetaContents: Partial<
     description:
       "Modifier une entreprise accueillante de PMSMP et immersions professionnelles.",
   },
-  errorRedirect: {
-    title: "Erreur",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
   formEstablishment: {
     title: "Formulaire de référencement entreprise",
     description:

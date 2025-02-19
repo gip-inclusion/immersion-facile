@@ -213,14 +213,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),
-  errorRedirect: defineRoute(
-    {
-      title: param.query.optional.string,
-      message: param.query.optional.string,
-      kind: param.query.optional.string,
-    },
-    () => `/${frontRoutes.error}`,
-  ),
   formEstablishment: defineRoute(
     establishmentParams,
     () => `/${frontRoutes.establishment}`,

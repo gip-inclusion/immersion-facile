@@ -1,33 +1,32 @@
-export type ManagedErrorKind = (typeof managedErrorKinds)[number];
-const managedErrorKinds = [
+export type FTConnectErrorKind = (typeof ftConnectErrorKinds)[number];
+const ftConnectErrorKinds = [
   "peConnectInvalidGrant",
   "peConnectNoAuthorisation",
   "peConnectAdvisorForbiddenAccess",
   "peConnectGetUserInfoForbiddenAccess",
   "peConnectGetUserStatusInfoForbiddenAccess",
   "peConnectConnectionAborted",
-  "unknownError",
 ] as const;
 
-export abstract class RedirectError extends Error {
+abstract class RedirectError extends Error {
   constructor(message: string, cause?: Error) {
     super(message, { cause });
   }
 }
 
-export class ManagedRedirectError extends RedirectError {
+export class ManagedFTConnectError extends RedirectError {
   constructor(
-    public readonly kind: ManagedErrorKind,
+    public readonly kind: FTConnectErrorKind,
     cause?: Error,
   ) {
     super(
-      `A managed redirect error of type ${kind} has been thrown`,
+      `A France Travail error of type ${kind} has been thrown.`,
       cause && new Error(cause?.message),
     );
   }
 }
 
-export class RawRedirectError extends RedirectError {
+export class FTConnectError extends RedirectError {
   constructor(
     public readonly title: string,
     public override readonly message: string,
@@ -37,11 +36,6 @@ export class RawRedirectError extends RedirectError {
     this.name = "RawRedirectError";
   }
 }
-
-export const isManagedError = (
-  kind: string | undefined,
-): kind is ManagedErrorKind =>
-  kind ? managedErrorKinds.includes(kind as ManagedErrorKind) : false;
 
 // Use to circumvent the jest/no-conditionnal-expect pattern
 export const getTypedError = async <TError>(
@@ -55,25 +49,22 @@ export const getTypedError = async <TError>(
   }
 };
 
-export async function testRawRedirectError(
+export async function testRawFTConnectError(
   cb: () => unknown,
-  expectedError: RawRedirectError,
+  expectedError: FTConnectError,
 ) {
-  const error: RawRedirectError = await getTypedError<RawRedirectError>(() =>
-    cb(),
-  );
+  const error: FTConnectError = await getTypedError<FTConnectError>(() => cb());
   expect(error.constructor.name).toEqual(expectedError.constructor.name);
   expect(error).toStrictEqual(expectedError);
   expect(error.title).toStrictEqual(expectedError.title);
 }
 
-export async function testManagedRedirectError(
+export async function testManagedFTConnectError(
   cb: () => unknown,
-  expectedError: ManagedRedirectError,
+  expectedError: ManagedFTConnectError,
 ) {
-  const error: ManagedRedirectError = await getTypedError<ManagedRedirectError>(
-    () => cb(),
-  );
+  const error: ManagedFTConnectError =
+    await getTypedError<ManagedFTConnectError>(() => cb());
   expect(error.constructor.name).toEqual(expectedError.constructor.name);
   expect(error).toStrictEqual(expectedError);
   expect(error.kind).toStrictEqual(expectedError.kind);

@@ -1,8 +1,8 @@
 import { Response } from "express";
 import {
   AbsoluteUrl,
-  ManagedRedirectError,
-  RawRedirectError,
+  FTConnectError,
+  ManagedFTConnectError,
   queryParamsAsString,
 } from "shared";
 
@@ -12,7 +12,7 @@ type RawRedirectErrorParams = {
 };
 
 const toRawRedirectErrorParams = (
-  error: RawRedirectError,
+  error: FTConnectError,
 ): RawRedirectErrorParams => ({
   title: error.title,
   message: error.message,
@@ -20,13 +20,12 @@ const toRawRedirectErrorParams = (
 
 export const makeHandleManagedRedirectResponseError =
   (redirectErrorUrl: AbsoluteUrl) =>
-  (error: ManagedRedirectError, res: Response): void => {
+  (error: ManagedFTConnectError, res: Response): void => {
     res.redirect(`${redirectErrorUrl}?kind=${error.kind}`);
   };
 
 export const makeHandleRawRedirectResponseError =
-  (redirectErrorUrl: AbsoluteUrl) =>
-  (error: RawRedirectError, res: Response) => {
+  (redirectErrorUrl: AbsoluteUrl) => (error: FTConnectError, res: Response) => {
     res.redirect(
       `${redirectErrorUrl}?${queryParamsAsString<RawRedirectErrorParams>(
         toRawRedirectErrorParams(error),
