@@ -11,7 +11,7 @@ export class InMemoryAddressGateway implements AddressGateway {
 
   #lookupSearchResults: LookupSearchResult[] = [];
 
-  #streetAndAddresses: AddressAndPosition[] = [];
+  #nextLookupStreetAndAddresses: AddressAndPosition[][] = [];
 
   public async getAddressFromPosition(
     position: GeoPositionDto,
@@ -29,11 +29,17 @@ export class InMemoryAddressGateway implements AddressGateway {
   public async lookupStreetAddress(
     _query: string,
   ): Promise<AddressAndPosition[]> {
-    return this.#streetAndAddresses;
+    const nextLookupStreetAndAddresses =
+      this.#nextLookupStreetAndAddresses.shift();
+    if (!nextLookupStreetAndAddresses)
+      throw new Error("No nextLookupStreetAndAddresses provided.");
+    return nextLookupStreetAndAddresses;
   }
 
-  public setAddressAndPosition(streetAndAddresses: AddressAndPosition[]) {
-    this.#streetAndAddresses = streetAndAddresses;
+  public setNextLookupStreetAndAddresses(
+    nextLookupStreetAndAddresses: AddressAndPosition[][],
+  ) {
+    this.#nextLookupStreetAndAddresses = nextLookupStreetAndAddresses;
   }
 
   public setLookupSearchResults(lookupSearchResults: LookupSearchResult[]) {

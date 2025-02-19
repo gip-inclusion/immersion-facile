@@ -27,7 +27,9 @@ describe("Lookup Street Address", () => {
         },
       },
     ];
-    addressApiGateway.setAddressAndPosition(expectedStreeAndAddresses);
+    addressApiGateway.setNextLookupStreetAndAddresses([
+      expectedStreeAndAddresses,
+    ]);
 
     const lookupStreetAddressQuery: WithLookupAddressQueryParams = {
       lookup: "1 rue",

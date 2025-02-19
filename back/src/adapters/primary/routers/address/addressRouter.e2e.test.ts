@@ -28,9 +28,9 @@ describe("address router", () => {
     it(`${displayRouteName(
       addressRoutes.lookupStreetAddress,
     )} 200 with lookup="${query8bdduportLookup}"`, async () => {
-      addressGateway.setAddressAndPosition(
+      addressGateway.setNextLookupStreetAndAddresses([
         expected8bdduportAddressAndPositions,
-      );
+      ]);
       const response = await httpClient.lookupStreetAddress({
         queryParams: {
           lookup: query8bdduportLookup,
