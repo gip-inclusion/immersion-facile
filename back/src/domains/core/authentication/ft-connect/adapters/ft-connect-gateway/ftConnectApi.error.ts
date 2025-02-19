@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import { HTTP_STATUS, ManagedRedirectError, RawRedirectError } from "shared";
+import { FTConnectError, HTTP_STATUS, ManagedFTConnectError } from "shared";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import { FtConnectExternalRoutes } from "./ftConnectApi.routes";
 
@@ -22,7 +22,7 @@ export const ftConnectErrorStrategy = (
   error: AxiosError,
   context: FtConnectTargetsKind,
 ) =>
-  new Map<boolean, UnhandledError | RawRedirectError | ManagedRedirectError>([
+  new Map<boolean, UnhandledError | FTConnectError | ManagedFTConnectError>([
     // Generic catch all Http errors
     [
       isHttpClientError4XX(error),
@@ -70,26 +70,26 @@ export const ftConnectErrorStrategy = (
     ],
     [
       isAdvisorForbiddenError(error, context),
-      new ManagedRedirectError("peConnectAdvisorForbiddenAccess", error),
+      new ManagedFTConnectError("peConnectAdvisorForbiddenAccess", error),
     ],
     [
       isGetUserInfoForbiddenError(error, context),
-      new ManagedRedirectError("peConnectGetUserInfoForbiddenAccess", error),
+      new ManagedFTConnectError("peConnectGetUserInfoForbiddenAccess", error),
     ],
     [
       isGetUserStatusInfoForbiddenError(error, context),
-      new ManagedRedirectError(
+      new ManagedFTConnectError(
         "peConnectGetUserStatusInfoForbiddenAccess",
         error,
       ),
     ],
     [
       error.code === "ECONNABORTED",
-      new ManagedRedirectError("peConnectConnectionAborted", error),
+      new ManagedFTConnectError("peConnectConnectionAborted", error),
     ],
     [
       error.message === "Network Error",
-      new RawRedirectError(
+      new FTConnectError(
         "Une erreur est survenue - Erreur réseau",
         "Nous n’avons pas réussi à joindre pôle emploi connect.",
         error,
@@ -97,7 +97,7 @@ export const ftConnectErrorStrategy = (
     ],
     [
       isInvalidGrantError(context, error),
-      new ManagedRedirectError("peConnectInvalidGrant", error),
+      new ManagedFTConnectError("peConnectInvalidGrant", error),
     ],
   ]);
 
@@ -142,8 +142,8 @@ const makeUnknownError = (error: AxiosError) =>
 const makeRawRedirectError = (
   message: string,
   error: AxiosError<any, any>,
-): RawRedirectError =>
-  new RawRedirectError(rawRedirectTitle(error), message, error);
+): FTConnectError =>
+  new FTConnectError(rawRedirectTitle(error), message, error);
 
 const isAdvisorForbiddenError = (
   error: AxiosError,

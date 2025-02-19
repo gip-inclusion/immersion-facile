@@ -1,12 +1,18 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
-import { ConventionId, SiretDto, domElementIds } from "shared";
 import {
-  contactUsButtonContent,
-  redirectToHomePageButtonContent,
-} from "src/app/contents/error/textSetup";
-import { FrontErrorProps } from "src/app/contents/error/types";
+  ConventionId,
+  SiretDto,
+  domElementIds,
+  immersionFacileContactEmail,
+} from "shared";
+import {
+  ContactErrorInformation,
+  ErrorButton,
+  FrontErrorProps,
+} from "src/app/contents/error/types";
 import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
+import { routes } from "src/app/routes/routes";
 
 export class FrontSpecificError extends Error {
   public props: FrontErrorProps;
@@ -94,4 +100,40 @@ export const frontErrors = {
       });
     },
   },
+};
+
+export const redirectToHomePageButtonContent: ErrorButton = (
+  <Button
+    priority="primary"
+    children="Page d'accueil"
+    linkProps={{
+      ...routes.home().link,
+    }}
+  />
+);
+
+export const contactUsButtonContent = ({
+  currentUrl,
+  currentDate,
+  error,
+}: ContactErrorInformation) => {
+  const emailBody = `%0D%0A________________________%0D%0A
+  %0D%0A
+  Veuillez répondre au dessus de cette ligne.%0D%0A%0D%0A
+  Les infos suivantes peuvent être utiles pour résoudre votre problème :%0D%0A%0D%0A
+  - URL de la page concernée : ${currentUrl}%0D%0A%0D%0A
+  - Date et heure de l'erreur : ${currentDate}%0D%0A%0D%0A
+  - Résumé de l'erreur :%0D%0A%0D%0A
+  ${error}
+  `;
+  return (
+    <Button
+      priority="secondary"
+      children="Contactez-nous"
+      linkProps={{
+        href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
+        target: "_blank",
+      }}
+    />
+  );
 };

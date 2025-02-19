@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AbsoluteUrl, ManagedRedirectError, RawRedirectError } from "shared";
+import { AbsoluteUrl, FTConnectError, ManagedFTConnectError } from "shared";
 import { createLogger } from "../../utils/logger";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
@@ -9,11 +9,11 @@ export const sendRedirectResponseWithManagedErrors = async (
   res: Response,
   callback: () => Promise<AbsoluteUrl>,
   handleManagedRedirectResponseError: (
-    error: ManagedRedirectError,
+    error: ManagedFTConnectError,
     res: Response,
   ) => void,
   handleRawRedirectResponseError: (
-    error: RawRedirectError,
+    error: FTConnectError,
     res: Response,
   ) => void,
 ) => {
@@ -29,10 +29,10 @@ export const sendRedirectResponseWithManagedErrors = async (
       message: "Redirect error",
     });
 
-    if (error instanceof ManagedRedirectError)
+    if (error instanceof ManagedFTConnectError)
       return handleManagedRedirectResponseError(error, res);
 
-    if (error instanceof RawRedirectError)
+    if (error instanceof FTConnectError)
       return handleRawRedirectResponseError(error, res);
 
     return handleHttpJsonResponseError(req, res, error);

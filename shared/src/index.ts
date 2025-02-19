@@ -51,7 +51,7 @@ export * from "./envHelpers";
 export * from "./environment";
 export * from "./errors/errors";
 export * from "./errors/httpErrors";
-export * from "./errors/managedErrors";
+export * from "./errors/ftConnectErrors";
 export * from "./establishment/superEstablishment";
 export * from "./featureFlag/featureFlags.dto";
 export * from "./featureFlag/featureFlags.schema";

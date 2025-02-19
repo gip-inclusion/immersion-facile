@@ -1,12 +1,12 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {
-  ManagedRedirectError,
-  RawRedirectError,
+  FTConnectError,
+  ManagedFTConnectError,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
-  testManagedRedirectError,
-  testRawRedirectError,
+  testManagedFTConnectError,
+  testRawFTConnectError,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
@@ -102,7 +102,7 @@ describe("HttpFtConnectGateway", () => {
         });
         await expectPromiseToFailWithError(
           ftConnectGateway.getAccessToken(""),
-          new ManagedRedirectError(
+          new ManagedFTConnectError(
             "peConnectInvalidGrant",
             new Error("Request failed with status code 400"),
           ),
@@ -111,9 +111,9 @@ describe("HttpFtConnectGateway", () => {
 
       it("request aborted -> ManagedRedirectError kind peConnectConnectionAborted", async () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).abortRequest();
-        await testManagedRedirectError(
+        await testManagedFTConnectError(
           () => ftConnectGateway.getAccessToken(""),
-          new ManagedRedirectError("peConnectConnectionAborted", new Error()),
+          new ManagedFTConnectError("peConnectConnectionAborted", new Error()),
         );
       });
     });
@@ -244,7 +244,7 @@ describe("HttpFtConnectGateway", () => {
             .abortRequest();
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError(
+            new ManagedFTConnectError(
               "peConnectConnectionAborted",
               new Error("Request aborted"),
             ),
@@ -257,9 +257,9 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .networkError();
-          await testRawRedirectError(
+          await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
+            new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
               new Error(),
@@ -275,7 +275,7 @@ describe("HttpFtConnectGateway", () => {
             .reply(401);
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError(
+            new ManagedFTConnectError(
               "peConnectGetUserInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
@@ -288,9 +288,9 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, [peExternalAdvisorPlacement])
             .onGet(routes.getUserInfo.url)
             .reply(500);
-          await testRawRedirectError(
+          await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
+            new FTConnectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer vos informations personnelles pôle emploi connect.",
               new Error(),
@@ -370,9 +370,12 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          await testManagedRedirectError(
+          await testManagedFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError("peConnectConnectionAborted", new Error()),
+            new ManagedFTConnectError(
+              "peConnectConnectionAborted",
+              new Error(),
+            ),
           );
         });
 
@@ -387,9 +390,9 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          await testRawRedirectError(
+          await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
+            new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
               new Error(),
@@ -408,9 +411,9 @@ describe("HttpFtConnectGateway", () => {
               codeStatutIndividu: "1",
               libelleStatutIndividu: "Demandeur d’emploi",
             });
-          await testManagedRedirectError(
+          await testManagedFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError(
+            new ManagedFTConnectError(
               "peConnectAdvisorForbiddenAccess",
               new Error(),
             ),
@@ -486,7 +489,7 @@ describe("HttpFtConnectGateway", () => {
             .abortRequest();
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError(
+            new ManagedFTConnectError(
               "peConnectConnectionAborted",
               new Error("Request aborted"),
             ),
@@ -501,9 +504,9 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, peExternalUser)
             .onGet(routes.getUserStatutInfo.url)
             .networkError();
-          await testRawRedirectError(
+          await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
+            new FTConnectError(
               "Une erreur est survenue - Erreur réseau",
               "Nous n’avons pas réussi à joindre pôle emploi connect.",
               new Error(),
@@ -521,7 +524,7 @@ describe("HttpFtConnectGateway", () => {
             .reply(401);
           await expectPromiseToFailWithError(
             ftConnectGateway.getUserAndAdvisors(accessToken),
-            new ManagedRedirectError(
+            new ManagedFTConnectError(
               "peConnectGetUserStatusInfoForbiddenAccess",
               new Error("Request failed with status code 401"),
             ),
@@ -536,9 +539,9 @@ describe("HttpFtConnectGateway", () => {
             .reply(200, peExternalUser)
             .onGet(routes.getUserStatutInfo.url)
             .reply(500);
-          await testRawRedirectError(
+          await testRawFTConnectError(
             () => ftConnectGateway.getUserAndAdvisors(accessToken),
-            new RawRedirectError(
+            new FTConnectError(
               "Une erreur est survenue - 500",
               "Nous n’avons pas réussi à récupérer votre status pôle emploi connect.",
               new Error(),

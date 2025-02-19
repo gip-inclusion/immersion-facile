@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import React from "react";
 import { MainWrapper } from "react-design-system";
-import { contactUsButtonContent } from "src/app/contents/error/textSetup";
+import { contactUsButtonContent } from "src/app/pages/error/front-errors";
 
 export const MinimalErrorPage = ({ error }: { error: Error }) => {
   return (
