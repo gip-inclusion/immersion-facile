@@ -42,7 +42,6 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
       LaBonneBoiteApiResultV2Props[],
       SearchCompaniesParams
     >({
-      overrideCacheDurationInHours: 24 * 3,
       logParams: {
         partner: "laBonneBoite",
         route: this.lbbRoute.getCompanies,
@@ -118,7 +117,6 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     romeDto: RomeDto,
   ): Promise<SearchResultDto | null> {
     const cachedGetLbbResult = this.withCache({
-      overrideCacheDurationInHours: 24 * 3,
       logParams: {
         partner: "laBonneBoite",
         route: this.lbbRoute.getCompany,
