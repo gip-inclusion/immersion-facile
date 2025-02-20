@@ -82,7 +82,7 @@ export class AppellationSearch extends TransactionalUseCase<
 
     if (appellations.length === 0) return [];
 
-    return uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes(
+    return uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
       appellations.map(({ appellationCode }) => appellationCode),
     );
   }
