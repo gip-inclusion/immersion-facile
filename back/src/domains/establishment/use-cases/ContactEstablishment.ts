@@ -181,9 +181,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       });
 
     const appellationAndRomeDtos =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        contactRequest.appellationCode,
-      ]);
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [contactRequest.appellationCode],
+      );
     const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
 
     if (!appellationLabel)
