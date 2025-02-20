@@ -16,15 +16,12 @@ export const UploadFileSection = () => {
   const [fileBase64, setFileBase64] = React.useState<
     string | ArrayBuffer | null
   >(null);
-  const renameFileToId = false;
   const label = "Télécharger un document sur clever";
   const maxSize_Mo = 10;
   const onUploadClick = async () => {
     if (!file) return;
-    const fileUrl = await outOfReduxDependencies.technicalGateway.uploadFile(
-      file,
-      renameFileToId,
-    );
+    const fileUrl =
+      await outOfReduxDependencies.technicalGateway.uploadFile(file);
     setUploadedFileUrl(fileUrl);
   };
   const toBase64 = (file: File) => {

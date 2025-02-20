@@ -37,12 +37,9 @@ export class TestTechnicalGateway implements TechnicalGateway {
     };
   }
 
-  public async uploadFile(
-    file: File,
-    renameFileToId: boolean,
-  ): Promise<AbsoluteUrl> {
+  public async uploadFile(file: File): Promise<AbsoluteUrl> {
     // biome-ignore lint/suspicious/noConsoleLog: <explanation>
     console.log("logo uploaded : ", file);
-    return `http://${file.name}-${renameFileToId}-url`;
+    return `http://${file.name}-url`;
   }
 }

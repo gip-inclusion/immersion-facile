@@ -42,7 +42,6 @@ export const createTechnicalRouter = (
               buffer: req.file.buffer,
               mimetype: req.file.mimetype,
             },
-            renameFileToId: req.body?.renameFileToId.toLowerCase() === "true",
             connectedUser: req.payloads?.currentUser,
           });
         }),

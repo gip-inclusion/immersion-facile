@@ -183,7 +183,6 @@ const AgencyLogoUpload = () => {
         maxSize_Mo={2}
         {...formAgencyFieldsLabels.logoUrl}
         hint={fieldsContent.logoUrl.hintText}
-        renameFileToId={true}
       />
       {formValues.logoUrl && (
         <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />
