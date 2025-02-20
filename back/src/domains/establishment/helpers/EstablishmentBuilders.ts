@@ -75,7 +75,7 @@ export class EstablishmentEntityBuilder
     return this.entity;
   }
 
-  public withAdditionalInformation(additionalInformation: string) {
+  public withAdditionalInformation(additionalInformation?: string) {
     return new EstablishmentEntityBuilder({
       ...this.entity,
       additionalInformation,

@@ -108,6 +108,8 @@ describe("search route", () => {
           .build();
         const user = new UserBuilder().build();
 
+        inMemoryUow.romeRepository.appellations = [offer1, offer2];
+
         // Prepare
         await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
           new EstablishmentAggregateBuilder()

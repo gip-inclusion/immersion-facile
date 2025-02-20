@@ -39,6 +39,7 @@ describe("Update Establishment aggregate from form data", () => {
   let uow: InMemoryUnitOfWork;
   let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
   const now = new Date();
+  const locationId: LocationId = "364efc5a-db4f-452c-8d20-95c6a23f21fe";
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
@@ -71,7 +72,7 @@ describe("Update Establishment aggregate from form data", () => {
 
   describe("Replaces establishment and offers with same siret, and apply users rights", () => {
     const siret: SiretDto = "12345678911234";
-    const locationId: LocationId = "364efc5a-db4f-452c-8d20-95c6a23f21fe";
+
     const previousEstablishmentAdmin = new UserBuilder()
       .withEmail("previous.admin@mail.com")
       .build();
