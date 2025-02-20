@@ -97,7 +97,6 @@ import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
-import { AddFormEstablishment } from "../../domains/establishment/use-cases/AddFormEstablishment";
 import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { makeAssessmentReminder } from "../../domains/establishment/use-cases/AssessmentReminder";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
@@ -167,11 +166,15 @@ export const createUseCases = (
       createNewEvent,
     );
 
-  const addFormEstablishment = new AddFormEstablishment(
-    uowPerformer,
-    createNewEvent,
-    gateways.siret,
-  );
+  const insertEstablishmentAggregateFromForm =
+    new InsertEstablishmentAggregateFromForm(
+      uowPerformer,
+      gateways.siret,
+      gateways.addressApi,
+      uuidGenerator,
+      gateways.timeGateway,
+      createNewEvent,
+    );
 
   const generateConventionMagicLinkUrl = makeGenerateConventionMagicLinkUrl(
     config,
@@ -330,8 +333,6 @@ export const createUseCases = (
         uowPerformer,
       ),
 
-      addFormEstablishment,
-
       editFormEstablishment: new EditFormEstablishment(
         uowPerformer,
         createNewEvent,
@@ -346,15 +347,7 @@ export const createUseCases = (
           gateways.timeGateway,
           createNewEvent,
         ),
-      insertEstablishmentAggregateFromForm:
-        new InsertEstablishmentAggregateFromForm(
-          uowPerformer,
-          gateways.siret,
-          gateways.addressApi,
-          uuidGenerator,
-          gateways.timeGateway,
-          createNewEvent,
-        ),
+      insertEstablishmentAggregateFromForm,
       addEstablishmentLead: new AddEstablishmentLead(
         uowPerformer,
         gateways.timeGateway,

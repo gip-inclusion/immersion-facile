@@ -1,4 +1,10 @@
-import { FormEstablishmentAddress, Location, SiretDto } from "shared";
+import {
+  AddressDto,
+  FormEstablishmentAddress,
+  Location,
+  LocationId,
+  SiretDto,
+} from "shared";
 import { AddressGateway } from "../domains/core/address/ports/AddressGateway";
 
 export const rawAddressToLocation = async (
@@ -22,3 +28,11 @@ export const rawAddressToLocation = async (
     id: formEstablishementAddress.id,
   };
 };
+
+export const locationToRawAddress = (
+  id: LocationId,
+  address: AddressDto,
+): FormEstablishmentAddress => ({
+  id,
+  rawAddress: `${address.streetNumberAndAddress}, ${address.postcode} ${address.city}`,
+});
