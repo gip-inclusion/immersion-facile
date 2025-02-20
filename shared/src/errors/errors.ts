@@ -14,6 +14,7 @@ import { DiscussionId } from "../discussion/discussion.dto";
 import { Email } from "../email/email.dto";
 import { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import { StoredFileId } from "../file/file.dto";
+import { FileValidationError } from "../file/file.validators";
 import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import { GroupSlug } from "../group/group.dto";
 import {
@@ -56,6 +57,8 @@ export const errors = {
     fileAlreadyExist: (id: StoredFileId) =>
       new ConflictError(`File ${id} already exist.`),
     missingFile: (id: StoredFileId) => new NotFoundError(`File ${id} missing.`),
+    invalidFile: (validationResult: FileValidationError) =>
+      new BadRequestError(validationResult.message),
   },
   assessment: {
     alreadyExist: (conventionId: ConventionId) =>
