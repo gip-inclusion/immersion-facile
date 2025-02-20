@@ -126,7 +126,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
               /* void */
             })
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .with({ status: P.union(401, 403, 409) }, logBodyAndThrow)
+            .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

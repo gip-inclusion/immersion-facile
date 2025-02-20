@@ -39,7 +39,7 @@ export interface EstablishmentAggregateRepository {
   ): Promise<void>;
   updateEstablishmentAggregate(
     establishmentAggregate: EstablishmentAggregate,
-    updatedAt: Date,
+    updatedAt: Date, // Pas utilisé dans l'InMemory > Side effects PG pas testés dans la business logic
   ): Promise<void>;
   getEstablishmentAggregateBySiret(
     siret: SiretDto,

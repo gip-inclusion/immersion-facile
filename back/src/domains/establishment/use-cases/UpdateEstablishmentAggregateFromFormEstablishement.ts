@@ -1,4 +1,7 @@
 import {
+  EstablishmentDomainPayload,
+  FormEstablishmentDto,
+  InclusionConnectDomainJwtPayload,
   WithFormEstablishmentDto,
   errors,
   withFormEstablishmentSchema,
@@ -7,25 +10,25 @@ import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import {
-  WithTriggeredBy,
-  withTriggeredBySchema,
-} from "../../core/events/events";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../entities/EstablishmentAggregate";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
-  WithFormEstablishmentDto & WithTriggeredBy,
-  void
+  WithFormEstablishmentDto,
+  void,
+  InclusionConnectDomainJwtPayload | EstablishmentDomainPayload
 > {
-  protected inputSchema = withFormEstablishmentSchema.and(
-    withTriggeredBySchema,
-  );
+  protected inputSchema = withFormEstablishmentSchema;
 
   readonly #addressGateway: AddressGateway;
 
@@ -51,12 +54,12 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   }
 
   public async _execute(
-    {
-      formEstablishment,
-      triggeredBy,
-    }: WithFormEstablishmentDto & WithTriggeredBy,
+    { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
+    jwtPayload: InclusionConnectDomainJwtPayload | EstablishmentDomainPayload,
   ): Promise<void> {
+    if (!jwtPayload) throw errors.user.noJwtProvided();
+
     const initialEstablishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
@@ -67,6 +70,64 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
         siret: formEstablishment.siret,
       });
 
+    const triggeredBy = await this.#getTriggeredBy(
+      uow,
+      jwtPayload,
+      initialEstablishmentAggregate,
+      formEstablishment,
+    );
+
+    return this.withAllowedRights(
+      uow,
+      formEstablishment,
+      initialEstablishmentAggregate,
+      triggeredBy,
+    );
+  }
+
+  async #getTriggeredBy(
+    uow: UnitOfWork,
+    jwtPayload: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
+    establishmentAggregate: EstablishmentAggregate,
+    formEstablishment: FormEstablishmentDto,
+  ): Promise<TriggeredBy> {
+    if ("siret" in jwtPayload) {
+      if (jwtPayload.siret === formEstablishment.siret)
+        return {
+          kind: "establishment-magic-link",
+          siret: formEstablishment.siret,
+        };
+      throw errors.establishment.siretMismatch();
+    }
+
+    const user = await uow.userRepository.getById(
+      jwtPayload.userId,
+      await makeProvider(uow),
+    );
+    if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
+
+    if (
+      establishmentAggregate.userRights.some(
+        ({ userId }) => userId === user.id,
+      ) ||
+      user.isBackofficeAdmin
+    )
+      return {
+        kind: "inclusion-connected",
+        userId: user.id,
+      };
+
+    throw errors.user.forbidden({
+      userId: user.id,
+    });
+  }
+
+  private async withAllowedRights(
+    uow: UnitOfWork,
+    formEstablishment: FormEstablishmentDto,
+    originalAggregate: EstablishmentAggregate,
+    triggeredBy: TriggeredBy,
+  ): Promise<void> {
     const adminUserId = await createOrGetUserIdByEmail(
       uow,
       this.#timeGateway,
@@ -102,13 +163,14 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     ];
 
     const establishmentAggregate = makeEstablishmentAggregate({
-      uuidGenerator: this.#uuidGenerator,
+      existingEntity: originalAggregate.establishment,
       timeGateway: this.#timeGateway,
       formEstablishment,
+      // Rien touché mais étonnant qu'on maj pas le naf ni le nombre d'employés
       nafAndNumberOfEmployee: {
-        nafDto: initialEstablishmentAggregate.establishment.nafDto,
+        nafDto: originalAggregate.establishment.nafDto,
         numberEmployeesRange:
-          initialEstablishmentAggregate.establishment.numberEmployeesRange,
+          originalAggregate.establishment.numberEmployeesRange,
       },
       addressesAndPosition: await Promise.all(
         formEstablishment.businessAddresses.map(async (address) =>
@@ -119,7 +181,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
           ),
         ),
       ),
-      score: initialEstablishmentAggregate.establishment.score,
+      score: originalAggregate.establishment.score,
       userRights: updatedUserRights,
     });
 

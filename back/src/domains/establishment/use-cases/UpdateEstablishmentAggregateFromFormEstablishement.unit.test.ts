@@ -1,14 +1,20 @@
 import {
   AppellationAndRomeDto,
+  EstablishmentDomainPayload,
+  EstablishmentJwtPayload,
   FormEstablishmentDtoBuilder,
-  LocationId,
+  InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
   SiretDto,
   UserBuilder,
   addressDtoToString,
+  defaultAddress,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  updatedAddress1,
+  updatedAddress2,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -38,8 +44,9 @@ describe("Update Establishment aggregate from form data", () => {
   let timeGateway: CustomTimeGateway;
   let uow: InMemoryUnitOfWork;
   let updateEstablishmentAggregateFromFormUseCase: UpdateEstablishmentAggregateFromForm;
+
+  const creationDate = new Date("2022-01-01");
   const now = new Date();
-  const locationId: LocationId = "364efc5a-db4f-452c-8d20-95c6a23f21fe";
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
@@ -57,15 +64,23 @@ describe("Update Establishment aggregate from form data", () => {
       );
   });
 
-  it("Fails if establishment does not exists amongst establishments from form", async () => {
-    const establishment = FormEstablishmentDtoBuilder.valid().build();
+  it("Fails if establishment does not exists amongst aggregates", async () => {
+    uow.establishmentAggregateRepository.establishmentAggregates = [];
+    const user = new InclusionConnectedUserBuilder().buildUser();
+    uow.userRepository.users = [user];
+
+    const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
     await expectPromiseToFailWithError(
-      updateEstablishmentAggregateFromFormUseCase.execute({
-        formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
-        triggeredBy: null,
-      }),
+      updateEstablishmentAggregateFromFormUseCase.execute(
+        {
+          formEstablishment,
+        },
+        {
+          userId: user.id,
+        },
+      ),
       errors.establishment.notFound({
-        siret: establishment.siret,
+        siret: formEstablishment.siret,
       }),
     );
   });
@@ -82,6 +97,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withSiret(siret)
           .withMaxContactsPerMonth(6)
           .withScore(25)
+          .withCreatedAt(creationDate)
           .build(),
       )
       .withOffers([
@@ -116,11 +132,13 @@ describe("Update Establishment aggregate from form data", () => {
         numberEmployeesRange: "10-19",
       });
 
-      addressGateway.setAddressAndPosition([
-        {
-          address: rueGuillaumeTellDto,
-          position: { lon: 1, lat: 2 },
-        },
+      addressGateway.setNextLookupStreetAndAddresses([
+        [
+          {
+            address: rueGuillaumeTellDto,
+            position: { lon: 1, lat: 2 },
+          },
+        ],
       ]);
     });
 
@@ -147,7 +165,7 @@ describe("Update Establishment aggregate from form data", () => {
       .withAppellations([updatedAppellation])
       .withBusinessAddresses([
         {
-          id: locationId,
+          id: defaultAddress.formAddress.id,
           rawAddress: addressDtoToString(rueGuillaumeTellDto),
         },
       ])
@@ -164,10 +182,12 @@ describe("Update Establishment aggregate from form data", () => {
     it("When users already existed", async () => {
       uow.userRepository.users = [updatedAdmin, updatedContact];
 
-      await updateEstablishmentAggregateFromFormUseCase.execute({
-        formEstablishment: updatedFormEstablishment,
-        triggeredBy: null,
-      });
+      await updateEstablishmentAggregateFromFormUseCase.execute(
+        {
+          formEstablishment: updatedFormEstablishment,
+        },
+        { siret: updatedFormEstablishment.siret },
+      );
 
       expectToEqual(uow.userRepository.users, [updatedAdmin, updatedContact]);
 
@@ -177,8 +197,7 @@ describe("Update Establishment aggregate from form data", () => {
           new EstablishmentAggregateBuilder(previousAggregate)
             .withEstablishment(
               new EstablishmentEntityBuilder(previousAggregate.establishment)
-
-                .withCreatedAt(timeGateway.now())
+                .withCreatedAt(creationDate)
                 .withCustomizedName(
                   updatedFormEstablishment.businessNameCustomized,
                 )
@@ -195,7 +214,7 @@ describe("Update Establishment aggregate from form data", () => {
                   {
                     address: rueGuillaumeTellDto,
                     position: { lon: 1, lat: 2 },
-                    id: locationId,
+                    id: defaultAddress.formAddress.id,
                   },
                 ])
                 .withUpdatedAt(timeGateway.now())
@@ -232,7 +251,13 @@ describe("Update Establishment aggregate from form data", () => {
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         {
           topic: "UpdatedEstablishmentAggregateInsertedFromForm",
-          payload: { siret, triggeredBy: null },
+          payload: {
+            siret,
+            triggeredBy: {
+              kind: "establishment-magic-link",
+              siret: updatedFormEstablishment.siret,
+            },
+          },
         },
       ]);
     });
@@ -241,10 +266,14 @@ describe("Update Establishment aggregate from form data", () => {
       uuidGenerator.setNextUuids([updatedAdmin.id, updatedContact.id]);
       uow.userRepository.users = [];
 
-      await updateEstablishmentAggregateFromFormUseCase.execute({
-        formEstablishment: updatedFormEstablishment,
-        triggeredBy: null,
-      });
+      await updateEstablishmentAggregateFromFormUseCase.execute(
+        {
+          formEstablishment: updatedFormEstablishment,
+        },
+        {
+          siret: updatedFormEstablishment.siret,
+        },
+      );
 
       expectToEqual(uow.userRepository.users, [
         new UserBuilder(updatedAdmin)
@@ -263,7 +292,7 @@ describe("Update Establishment aggregate from form data", () => {
           new EstablishmentAggregateBuilder(previousAggregate)
             .withEstablishment(
               new EstablishmentEntityBuilder(previousAggregate.establishment)
-                .withCreatedAt(timeGateway.now())
+                .withCreatedAt(creationDate)
                 .withCustomizedName(
                   updatedFormEstablishment.businessNameCustomized,
                 )
@@ -280,7 +309,7 @@ describe("Update Establishment aggregate from form data", () => {
                   {
                     address: rueGuillaumeTellDto,
                     position: { lon: 1, lat: 2 },
-                    id: locationId,
+                    id: defaultAddress.formAddress.id,
                   },
                 ])
                 .withUpdatedAt(timeGateway.now())
@@ -317,9 +346,291 @@ describe("Update Establishment aggregate from form data", () => {
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         {
           topic: "UpdatedEstablishmentAggregateInsertedFromForm",
-          payload: { siret, triggeredBy: null },
+          payload: {
+            siret,
+            triggeredBy: {
+              kind: "establishment-magic-link",
+              siret: updatedFormEstablishment.siret,
+            },
+          },
         },
       ]);
+    });
+  });
+
+  describe("Behavior of EditFormEstablishment", () => {
+    const existingFormEstablishment =
+      FormEstablishmentDtoBuilder.valid().build();
+    const updatedFormEstablishment = FormEstablishmentDtoBuilder.fullyUpdated()
+      .withSiret(existingFormEstablishment.siret)
+      .build();
+
+    const backofficeAdminUserBuilder =
+      new InclusionConnectedUserBuilder().withIsAdmin(true);
+    const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+    const backofficeAdminUser = backofficeAdminUserBuilder.buildUser();
+
+    const inclusionConnectedUserBuilder = new InclusionConnectedUserBuilder()
+      .withId("inclusion-connected-user")
+      .withIsAdmin(false);
+    const icInclusionConnectedUser = inclusionConnectedUserBuilder.build();
+    const inclusionConnectedUser = inclusionConnectedUserBuilder.buildUser();
+
+    const inclusionConnectJwtPayload: InclusionConnectDomainJwtPayload = {
+      userId: icInclusionConnectedUser.id,
+    };
+
+    const establishmentPayload: EstablishmentDomainPayload = {
+      siret: updatedFormEstablishment.siret,
+    };
+
+    const existingEstablishmentAggregate = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(existingFormEstablishment.siret)
+          .withName(existingFormEstablishment.businessName)
+          .withSearchableBy(existingFormEstablishment.searchableBy)
+          .withContactMethod(
+            existingFormEstablishment.businessContact.contactMethod,
+          )
+          .withCustomizedName(existingFormEstablishment.businessNameCustomized)
+          .withFitForDisabledWorkers(
+            existingFormEstablishment.fitForDisabledWorkers,
+          )
+          .withMaxContactsPerMonth(
+            existingFormEstablishment.maxContactsPerMonth,
+          )
+          .withNumberOfEmployeeRange("1-2")
+          .withSourceProvider(existingFormEstablishment.source)
+          .withWebsite(existingFormEstablishment.website)
+          .withNafDto({
+            code: "F2245",
+            nomenclature: "nafRev2",
+          })
+          .withAcquisition({
+            acquisitionCampaign: existingFormEstablishment.acquisitionCampaign,
+            acquisitionKeyword: existingFormEstablishment.acquisitionKeyword,
+          })
+          .withNextAvailabilityDate(
+            existingFormEstablishment.nextAvailabilityDate &&
+              new Date(existingFormEstablishment.nextAvailabilityDate),
+          )
+          .withCreatedAt(creationDate)
+          .withUpdatedAt(creationDate)
+          .withIsCommited(existingFormEstablishment.isEngagedEnterprise)
+          .withAdditionalInformation(
+            existingFormEstablishment.additionalInformation,
+          )
+          .withScore(0)
+          .build(),
+      )
+      .withLocations([
+        {
+          ...defaultAddress.addressAndPosition,
+          id: defaultAddress.formAddress.id,
+        },
+      ])
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "",
+          phone: "",
+          userId: "",
+        },
+      ])
+      .build();
+
+    const updatedEstablishmentAggregate = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(updatedFormEstablishment.siret)
+          .withName(updatedFormEstablishment.businessName)
+          .withSearchableBy(updatedFormEstablishment.searchableBy)
+          .withContactMethod(
+            updatedFormEstablishment.businessContact.contactMethod,
+          )
+          .withCustomizedName(updatedFormEstablishment.businessNameCustomized)
+          .withFitForDisabledWorkers(
+            updatedFormEstablishment.fitForDisabledWorkers,
+          )
+          .withMaxContactsPerMonth(updatedFormEstablishment.maxContactsPerMonth)
+          .withNumberOfEmployeeRange("1-2")
+          .withSourceProvider(updatedFormEstablishment.source)
+          .withWebsite(updatedFormEstablishment.website)
+          .withNafDto({
+            code: "F2245",
+            nomenclature: "nafRev2",
+          })
+          .withAcquisition({
+            acquisitionCampaign: updatedFormEstablishment.acquisitionCampaign,
+            acquisitionKeyword: updatedFormEstablishment.acquisitionKeyword,
+          })
+          .withNextAvailabilityDate(
+            updatedFormEstablishment.nextAvailabilityDate &&
+              new Date(updatedFormEstablishment.nextAvailabilityDate),
+          )
+          .withCreatedAt(creationDate)
+          .withUpdatedAt(now)
+          .withIsCommited(updatedFormEstablishment.isEngagedEnterprise)
+          .withAdditionalInformation(
+            updatedFormEstablishment.additionalInformation,
+          )
+          .withScore(0)
+          .build(),
+      )
+      .withOffers(
+        updatedFormEstablishment.appellations.map((appellation) => ({
+          ...appellation,
+          createdAt: now,
+        })),
+      )
+      .withLocations([
+        {
+          ...updatedAddress1.addressAndPosition,
+          id: updatedAddress1.formAddress.id,
+        },
+        {
+          ...updatedAddress2.addressAndPosition,
+          id: updatedAddress2.formAddress.id,
+        },
+      ])
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "new job",
+          phone: "+33612345679",
+          userId: "no-uuid-provided",
+        },
+        {
+          role: "establishment-contact",
+          userId: "no-uuid-provided",
+        },
+      ])
+      .build();
+
+    beforeEach(() => {
+      addressGateway.setNextLookupStreetAndAddresses([
+        [updatedAddress1.addressAndPosition],
+        [updatedAddress2.addressAndPosition],
+      ]);
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        existingEstablishmentAggregate,
+      ];
+    });
+
+    describe("Wrong paths", () => {
+      it("Forbidden error on EstablishmentJwtPayload with bad siret", async () => {
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            {
+              siret: "bad-siret",
+            } as EstablishmentJwtPayload,
+          ),
+          errors.establishment.siretMismatch(),
+        );
+      });
+
+      it("Not found error if user is not found", async () => {
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            inclusionConnectJwtPayload,
+          ),
+          errors.user.notFound({ userId: inclusionConnectJwtPayload.userId }),
+        );
+      });
+
+      it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
+        uow.userRepository.users = [inclusionConnectedUser];
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            inclusionConnectJwtPayload,
+          ),
+          errors.user.forbidden({ userId: icInclusionConnectedUser.id }),
+        );
+      });
+
+      it("Forbidden error without jwt payload", async () => {
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute({
+            formEstablishment: updatedFormEstablishment,
+          }),
+          errors.user.noJwtProvided(),
+        );
+      });
+
+      it("conflict error when form does not exist", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [];
+
+        await expectPromiseToFailWithError(
+          updateEstablishmentAggregateFromFormUseCase.execute(
+            { formEstablishment: updatedFormEstablishment },
+            establishmentPayload,
+          ),
+          errors.establishment.notFound({
+            siret: establishmentPayload.siret,
+          }),
+        );
+      });
+    });
+
+    describe("Right paths", () => {
+      it("publish a FormEstablishmentEdited event & update formEstablishment on repository with an establishment payload", async () => {
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          { formEstablishment: updatedFormEstablishment },
+          establishmentPayload,
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+            payload: {
+              siret: updatedFormEstablishment.siret,
+              triggeredBy: {
+                kind: "establishment-magic-link",
+                siret: establishmentPayload.siret,
+              },
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [updatedEstablishmentAggregate],
+        );
+      });
+
+      it("publish a FormEstablishmentEdited event & update formEstablishment on repository with a IC payload with user with backoffice rights", async () => {
+        uow.userRepository.users = [backofficeAdminUser];
+
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          { formEstablishment: updatedFormEstablishment },
+          {
+            userId: icBackofficeAdminUser.id,
+          },
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          {
+            topic: "UpdatedEstablishmentAggregateInsertedFromForm",
+            payload: {
+              siret: updatedFormEstablishment.siret,
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: icBackofficeAdminUser.id,
+              },
+            },
+          },
+        ]);
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [updatedEstablishmentAggregate],
+        );
+      });
     });
   });
 });
