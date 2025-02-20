@@ -24,6 +24,7 @@ export const establishmentRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
+      404: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
       409: httpErrorSchema,
     },

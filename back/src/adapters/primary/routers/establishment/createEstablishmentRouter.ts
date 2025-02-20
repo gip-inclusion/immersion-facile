@@ -55,8 +55,8 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     deps.establishmentMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.editFormEstablishment.execute(
-          req.body,
+        deps.useCases.updateEstablishmentAggregateFromForm.execute(
+          { formEstablishment: req.body },
           req.payloads?.establishment ?? req.payloads?.inclusion,
         ),
       ),

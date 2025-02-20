@@ -1,11 +1,11 @@
 import { FormEstablishmentDto, Location, noContactPerMonth } from "shared";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
+import { EstablishmentEntity } from "../entities/EstablishmentEntity";
 
 export const makeEstablishmentAggregate = ({
   timeGateway,
@@ -14,21 +14,22 @@ export const makeEstablishmentAggregate = ({
   addressesAndPosition,
   score = 0,
   userRights,
+  existingEntity,
 }: {
-  uuidGenerator: UuidGenerator;
   timeGateway: TimeGateway;
   formEstablishment: FormEstablishmentDto;
   addressesAndPosition: Location[];
   nafAndNumberOfEmployee: NafAndNumberOfEmpolyee;
   score?: number;
   userRights: EstablishmentUserRight[];
+  existingEntity?: EstablishmentEntity;
 }): EstablishmentAggregate => ({
   establishment: {
     acquisitionCampaign: formEstablishment.acquisitionCampaign,
     acquisitionKeyword: formEstablishment.acquisitionKeyword,
     locations: addressesAndPosition,
     additionalInformation: formEstablishment.additionalInformation,
-    createdAt: timeGateway.now(),
+    createdAt: existingEntity ? existingEntity.createdAt : timeGateway.now(),
     customizedName: formEstablishment.businessNameCustomized,
     fitForDisabledWorkers: formEstablishment.fitForDisabledWorkers,
     isCommited: formEstablishment.isEngagedEnterprise,

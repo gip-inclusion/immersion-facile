@@ -9,9 +9,11 @@ import {
   currentJwtVersions,
   errors,
   establishmentRoutes,
+  expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
   expiredMagicLinkErrorMessage,
+  updatedAddress1,
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -26,7 +28,13 @@ import {
   TEST_OPEN_ESTABLISHMENT_1,
   TEST_OPEN_ESTABLISHMENT_2,
 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
+import { TimeGateway } from "../../../../domains/core/time-gateway/ports/TimeGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import {
+  EstablishmentAggregate,
+  EstablishmentUserRight,
+} from "../../../../domains/establishment/entities/EstablishmentAggregate";
+import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
@@ -42,6 +50,18 @@ describe("Edit form establishments", () => {
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
     .build();
 
+  const existingEstablishment = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret(formEstablishment.siret)
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "",
+        phone: "",
+        userId: "",
+      },
+    ])
+    .build();
+
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
     ({
@@ -51,13 +71,15 @@ describe("Edit form establishments", () => {
       inMemoryUow,
       generateEditEstablishmentJwt,
       generateInclusionConnectJwt,
-    } = await buildTestApp(
-      new AppConfigBuilder().withTestPresetPreviousKeys().build(),
-    ));
+    } = await buildTestApp(new AppConfigBuilder().build()));
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
 
-    inMemoryUow.formEstablishmentRepository.setFormEstablishments([
-      formEstablishment,
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+      existingEstablishment,
+    ];
+
+    gateways.addressApi.setNextLookupStreetAndAddresses([
+      [updatedAddress1.addressAndPosition],
     ]);
   });
 
@@ -79,10 +101,13 @@ describe("Edit form establishments", () => {
       body: "",
       status: 200,
     });
-    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
-    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+
+    expectEstablishmentInRepoUpdated(
+      inMemoryUow,
+      gateways.timeGateway,
+      existingEstablishment,
       formEstablishment,
-    ]);
+    );
   });
 
   it("200 - Updates establishment with new data", async () => {
@@ -102,27 +127,33 @@ describe("Edit form establishments", () => {
         },
       ],
     };
-    const response = await httpClient.updateFormEstablishment({
-      body: updatedFormEstablishment,
-      headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
-      },
-    });
 
-    expectHttpResponseToEqual(response, {
-      body: "",
-      status: 200,
-    });
+    expectHttpResponseToEqual(
+      await httpClient.updateFormEstablishment({
+        body: updatedFormEstablishment,
+        headers: {
+          authorization: generateEditEstablishmentJwt(
+            createEstablishmentJwtPayload({
+              siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+              durationDays: 1,
+              now: new Date(),
+            }),
+          ),
+        },
+      }),
+      {
+        body: "",
+        status: 200,
+      },
+    );
     expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
-    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+
+    expectEstablishmentInRepoUpdated(
+      inMemoryUow,
+      gateways.timeGateway,
+      existingEstablishment,
       updatedFormEstablishment,
-    ]);
+    );
   });
 
   it("200 - Supports posting already existing form establisment when authenticated with backoffice JWT", async () => {
@@ -138,23 +169,46 @@ describe("Edit form establishments", () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.userRepository.users = [backofficeAdminUser];
+    const adminUser = new InclusionConnectedUserBuilder()
+      .withId("admin")
+      .withEmail(formEstablishment.businessContact.email)
+      .buildUser();
 
-    const response = await httpClient.updateFormEstablishment({
-      body: formEstablishment,
-      headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminICJwtPayload),
+    const contactUsers = formEstablishment.businessContact.copyEmails.map(
+      (email, index) =>
+        new InclusionConnectedUserBuilder()
+          .withId(`contact-${index}`)
+          .withEmail(email)
+          .buildUser(),
+    );
+
+    inMemoryUow.userRepository.users = [
+      adminUser,
+      ...contactUsers,
+      backofficeAdminUser,
+    ];
+
+    expectHttpResponseToEqual(
+      await httpClient.updateFormEstablishment({
+        body: formEstablishment,
+        headers: {
+          authorization: generateInclusionConnectJwt(
+            backofficeAdminICJwtPayload,
+          ),
+        },
+      }),
+      {
+        body: "",
+        status: 200,
       },
-    });
-
-    expectHttpResponseToEqual(response, {
-      body: "",
-      status: 200,
-    });
+    );
     expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
-    expectToEqual(await inMemoryUow.formEstablishmentRepository.getAll(), [
+    expectEstablishmentInRepoUpdated(
+      inMemoryUow,
+      gateways.timeGateway,
+      existingEstablishment,
       formEstablishment,
-    ]);
+    );
   });
 
   it("400 - not authenticated", async () => {
@@ -236,7 +290,9 @@ describe("Edit form establishments", () => {
     });
   });
 
-  it("409 - Missing establishment form", async () => {
+  it("404 - Missing establishment aggregate", async () => {
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [];
+
     const establishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(TEST_OPEN_ESTABLISHMENT_2.siret)
       .build();
@@ -255,13 +311,63 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        status: 409,
-        message: errors.establishment.conflictError({
+        status: 404,
+        message: errors.establishment.notFound({
           siret: establishment.siret,
         }).message,
       },
-      status: 409,
+      status: 404,
     });
-    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
   });
 });
+
+function expectEstablishmentInRepoUpdated(
+  inMemoryUow: InMemoryUnitOfWork,
+  timeGateway: TimeGateway,
+  existingEstablishment: EstablishmentAggregate,
+  formEstablishment: FormEstablishmentDto,
+) {
+  expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+
+  expect(
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates,
+  ).toHaveLength(1);
+  const updatedAggregateInRepo =
+    inMemoryUow.establishmentAggregateRepository.establishmentAggregates[0];
+  const { locations, ...restOfEstablishmentInRepo } =
+    updatedAggregateInRepo.establishment;
+
+  expectArraysToMatch(locations, [updatedAddress1.addressAndPosition]);
+  const { locations: _, ...restOfExistingEstablishment } =
+    existingEstablishment.establishment;
+  expectToEqual(restOfEstablishmentInRepo, {
+    ...restOfExistingEstablishment,
+    updatedAt: timeGateway.now(),
+    website: formEstablishment.website,
+    name: formEstablishment.businessName,
+    isCommited: formEstablishment.isEngagedEnterprise,
+    customizedName: formEstablishment.businessNameCustomized,
+    maxContactsPerMonth: formEstablishment.maxContactsPerMonth,
+    searchableBy: formEstablishment.searchableBy,
+  });
+  expectToEqual(
+    updatedAggregateInRepo.offers,
+    formEstablishment.appellations.map((appellation) => ({
+      ...appellation,
+      createdAt: timeGateway.now(),
+    })),
+  );
+  expectArraysToMatch(updatedAggregateInRepo.userRights, [
+    {
+      role: "establishment-admin",
+      job: formEstablishment.businessContact.job,
+      phone: formEstablishment.businessContact.phone,
+    },
+    ...formEstablishment.businessContact.copyEmails.map(
+      (_) =>
+        ({
+          role: "establishment-contact",
+        }) satisfies Partial<EstablishmentUserRight>,
+    ),
+  ]);
+}
