@@ -47,6 +47,8 @@ export const assessmentRoles = [
   "validator",
   "counsellor",
 ] as const;
+export type AllowedManageConventionAgencyRoles = (typeof allowedManageConventionAgencyRoles)[number];
+export const allowedManageConventionAgencyRoles = ["counsellor", "validator"] as const;
 
 export const getRequesterRole = (roles: Role[]): Role => {
   if (roles.includes("back-office")) return "back-office";
