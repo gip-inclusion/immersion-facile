@@ -75,7 +75,13 @@ export const AssessmentDocumentPage = ({
           <Button
             key={"htmlToPdfButton"}
             priority="secondary"
-            onClick={() => generateAndDownloadPdf(conventionId, jwt)}
+            onClick={() =>
+              generateAndDownloadPdf({
+                conventionId,
+                prefix: "bilan",
+                jwt,
+              })
+            }
             className={fr.cx("fr-mr-1w")}
             id={domElementIds.assessmentDocument.downloadPdfButton}
           >

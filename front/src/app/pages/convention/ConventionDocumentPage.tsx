@@ -161,7 +161,13 @@ export const ConventionDocumentPage = ({
             <Button
               key={"htmlToPdfButton"}
               priority="secondary"
-              onClick={() => generateAndDownloadPdf(convention.id, jwt)}
+              onClick={() =>
+                generateAndDownloadPdf({
+                  conventionId: convention.id,
+                  prefix: "convention",
+                  jwt,
+                })
+              }
               className={fr.cx("fr-mr-1w")}
               id={domElementIds.conventionDocument.downloadPdfButton}
             >

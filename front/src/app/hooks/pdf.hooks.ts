@@ -22,7 +22,15 @@ export const usePdfGenerator = () => {
   const { technicalGateway } = outOfReduxDependencies; // Récupération directe des dépendances externes
 
   const generateAndDownloadPdf = useCallback(
-    async (conventionId: string, jwt: string) => {
+    async ({
+      conventionId,
+      prefix,
+      jwt,
+    }: {
+      conventionId: string;
+      prefix: string;
+      jwt: string;
+    }) => {
       try {
         setIsPdfLoading(true);
 
@@ -37,7 +45,7 @@ export const usePdfGenerator = () => {
 
         const downloadLink = document.createElement("a");
         downloadLink.href = `data:application/pdf;base64,${pdfContent}`;
-        downloadLink.download = `bilan-immersion-${conventionId}.pdf`;
+        downloadLink.download = `${prefix}-${conventionId}.pdf`;
         downloadLink.click();
       } catch (e) {
         alert("Erreur lors de la génération du PDF >> voir la console.");
