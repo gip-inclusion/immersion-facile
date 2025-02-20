@@ -47,8 +47,8 @@ describe("UploadFile use case", () => {
   const file: FileInput = {
     buffer: Buffer.from("toto"),
     encoding: "a",
-    mimetype: "a",
-    name: "file.tmp",
+    mimetype: "image/jpeg",
+    name: "file.jpg",
     size: 1,
   };
 
@@ -58,7 +58,7 @@ describe("UploadFile use case", () => {
 
       uuidGenerator.setNextUuid(id);
 
-      const expectedFileId = `${id}.tmp`;
+      const expectedFileId = `${id}.jpg`;
 
       expectToEqual(
         await uploadFile.execute(
@@ -79,7 +79,7 @@ describe("UploadFile use case", () => {
 
       uuidGenerator.setNextUuid(id);
 
-      const expectedFileId = `${id}.tmp`;
+      const expectedFileId = `${id}.jpg`;
 
       expectToEqual(
         await uploadFile.execute(
@@ -117,7 +117,7 @@ describe("UploadFile use case", () => {
 
       uuidGenerator.setNextUuid(id);
 
-      const expectedFileId = `${id}.tmp`;
+      const expectedFileId = `${id}.jpg`;
 
       const alreadyStoredFile: StoredFile = {
         id: expectedFileId,
@@ -140,6 +140,34 @@ describe("UploadFile use case", () => {
       expectToEqual(documentGateway.storedFiles, {
         [alreadyStoredFile.id]: alreadyStoredFile,
       });
+    });
+
+    it("throws BadRequestError if user is agency-admin and file extension is invalid", async () => {
+      await expectPromiseToFailWithError(
+        uploadFile.execute(
+          { file: { ...file, name: "file.txt" } },
+          icAgencyAdminUser,
+        ),
+        errors.file.invalidFile({
+          code: "INVALID_EXTENSION",
+          message:
+            "Invalid file extension. Allowed extensions: .pdf, .jpeg, .jpg, .png, .webp, .svg",
+        }),
+      );
+    });
+
+    it("throws BadRequestError if user is agency-admin and file mime type is invalid", async () => {
+      await expectPromiseToFailWithError(
+        uploadFile.execute(
+          { file: { ...file, name: "file.pdf", mimetype: "image/gif" } },
+          icAgencyAdminUser,
+        ),
+        errors.file.invalidFile({
+          code: "INVALID_MIME_TYPE",
+          message:
+            "Invalid mime type. Allowed types: application/pdf, image/jpeg, image/png, image/jpg, image/webp, image/svg+xml",
+        }),
+      );
     });
   });
 });

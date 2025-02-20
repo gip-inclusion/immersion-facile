@@ -2,6 +2,7 @@ import {
   AbsoluteUrl,
   InclusionConnectedUser,
   errors,
+  validateFile,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
@@ -55,6 +56,13 @@ export class UploadFile extends UseCase<
 
     if (!isAdminOrAgencyAdmin)
       throw errors.user.forbidden({ userId: connectedUser.id });
+
+    const validationResult = validateFile({
+      ...file,
+      type: file.mimetype,
+    });
+    if (validationResult !== true)
+      throw errors.file.invalidFile(validationResult);
 
     const fileToSave: StoredFile = {
       ...file,
