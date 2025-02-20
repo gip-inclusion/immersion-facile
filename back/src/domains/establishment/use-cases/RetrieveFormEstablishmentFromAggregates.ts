@@ -1,7 +1,9 @@
 import {
   AppellationAndRomeDto,
+  EstablishmentDomainPayload,
   EstablishmentJwtPayload,
   FormEstablishmentDto,
+  InclusionConnectDomainJwtPayload,
   InclusionConnectJwtPayload,
   SiretDto,
   addressDtoToString,
@@ -19,7 +21,7 @@ import {
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentJwtPayload | InclusionConnectJwtPayload
+  EstablishmentDomainPayload | InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = siretSchema;
 
