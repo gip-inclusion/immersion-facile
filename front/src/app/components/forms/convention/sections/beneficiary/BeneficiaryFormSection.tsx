@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import {
   BeneficiaryRepresentative,
   ConventionReadDto,
+  DateString,
   InternshipKind,
   addressDtoToString,
   domElementIds,
@@ -118,10 +119,10 @@ export const BeneficiaryFormSection = ({
   );
 
   const onBirthdateChange = useCallback(
-    (value: string) => {
+    (beneficiaryBirthdate: DateString) => {
       const newIsMinor = isBeneficiaryMinorAccordingToAge(
         values.dateStart,
-        value,
+        beneficiaryBirthdate,
       );
       if (newIsMinor) {
         setValue(
@@ -129,13 +130,14 @@ export const BeneficiaryFormSection = ({
           "beneficiary-representative",
         );
       }
-      if (!newIsMinor && !isMinorOrProtected) {
+
+      if (!newIsMinor) {
         setValue("signatories.beneficiaryRepresentative", undefined);
       }
       setIsMinorAccordingToAge(newIsMinor);
       dispatch(conventionSlice.actions.isMinorChanged(newIsMinor));
     },
-    [dispatch, values.dateStart, setValue, isMinorOrProtected],
+    [dispatch, values.dateStart, setValue],
   );
 
   useEffect(() => {
@@ -316,7 +318,6 @@ export const BeneficiaryFormSection = ({
         }}
         {...getFieldError("signatories.beneficiary.financiaryHelp")}
       />
-
       {!isMinorAccordingToAge && (
         <RadioButtons
           legend={formContents.isMinor.label}
