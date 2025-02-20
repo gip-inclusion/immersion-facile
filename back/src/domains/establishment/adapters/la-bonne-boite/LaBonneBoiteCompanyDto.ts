@@ -7,7 +7,6 @@ export type LaBonneBoiteApiResultV2Props = {
   siret: SiretDto;
   email: string;
   company_name: string;
-  office_name: string;
   headcount_min: number;
   headcount_max: number;
   naf: string;
@@ -17,13 +16,8 @@ export type LaBonneBoiteApiResultV2Props = {
     lon: number;
   };
   city: string;
-  citycode: string;
   postcode: string;
-  department: string;
-  region: string;
   department_number: string;
-  hiring_potential: number;
-  is_high_potential: boolean;
 };
 
 // Careful, value objects should be immutable

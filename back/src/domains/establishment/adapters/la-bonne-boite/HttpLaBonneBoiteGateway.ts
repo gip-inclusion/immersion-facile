@@ -39,7 +39,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
     searchCompaniesParams: SearchCompaniesParams,
   ): Promise<SearchResultDto[]> {
     const cachedGetLbbResults = this.withCache<
-      LaBonneBoiteApiResultV2Props[],
+      SearchResultDto[],
       SearchCompaniesParams
     >({
       logParams: {
@@ -55,7 +55,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         lat,
         romeCode,
         nafCodes,
-      }): Promise<LaBonneBoiteApiResultV2Props[]> => {
+      }): Promise<SearchResultDto[]> => {
         return this.httpClient
           .getCompanies({
             headers: {
@@ -75,37 +75,39 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
             if (response.status !== 200)
               throw new Error(JSON.stringify(response));
             return response.body?.items ?? [];
-          });
+          })
+          .then((results) =>
+            results
+              .map(
+                (props: LaBonneBoiteApiResultV2Props) =>
+                  new LaBonneBoiteCompanyDto(props),
+              )
+              .filter((result) => result.isCompanyRelevant())
+              .map((result) =>
+                result.toSearchResult(
+                  {
+                    romeCode: searchCompaniesParams.romeCode,
+                    romeLabel: searchCompaniesParams.romeLabel,
+                  },
+                  {
+                    lat: searchCompaniesParams.lat,
+                    lon: searchCompaniesParams.lon,
+                  },
+                ),
+              ),
+          );
       },
     });
 
     return this.#limiter.schedule(() =>
       cachedGetLbbResults(searchCompaniesParams)
-        .then((results) => {
-          return results
-            .map(
-              (props: LaBonneBoiteApiResultV2Props) =>
-                new LaBonneBoiteCompanyDto(props),
-            )
-            .filter((result) => result.isCompanyRelevant())
-            .map((result) =>
-              result.toSearchResult(
-                {
-                  romeCode: searchCompaniesParams.romeCode,
-                  romeLabel: searchCompaniesParams.romeLabel,
-                },
-                {
-                  lat: searchCompaniesParams.lat,
-                  lon: searchCompaniesParams.lon,
-                },
-              ),
-            )
-            .filter((result) =>
-              result.distance_m
-                ? result.distance_m <= searchCompaniesParams.distanceKm * 1000
-                : true,
-            );
-        })
+        .then((results) =>
+          results.filter((result) =>
+            result.distance_m
+              ? result.distance_m <= searchCompaniesParams.distanceKm * 1000
+              : true,
+          ),
+        )
         .catch(() => {
           return [];
         }),
@@ -122,7 +124,7 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
         route: this.lbbRoute.getCompany,
       },
       getCacheKey: (siret) => `lbb_${siret}`,
-      cb: async (siret): Promise<LaBonneBoiteApiResultV2Props[]> => {
+      cb: async (siret): Promise<SearchResultDto | null> => {
         return this.httpClient
           .getCompany({
             headers: {
@@ -135,24 +137,23 @@ export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
           .then((response) => {
             if (response.status !== 200)
               throw new Error(JSON.stringify(response));
-            return response.body?.items ?? [];
+            const results = response.body?.items ?? [];
+
+            return (
+              results
+                .map(
+                  (props: LaBonneBoiteApiResultV2Props) =>
+                    new LaBonneBoiteCompanyDto(props),
+                )
+                .filter((result) => result.isCompanyRelevant())
+                .map((result) => result.toSearchResult(romeDto))
+                .at(0) ?? null
+            );
           });
       },
     });
-    return this.#limiter.schedule(async () =>
-      cachedGetLbbResult(siret).then((result) => {
-        const item = result
-          .map(
-            (props: LaBonneBoiteApiResultV2Props) =>
-              new LaBonneBoiteCompanyDto(props),
-          )
-          .filter((result) => result.isCompanyRelevant())
-          .map((result) => result.toSearchResult(romeDto))
-          .at(0);
 
-        return item ?? null;
-      }),
-    );
+    return this.#limiter.schedule(async () => cachedGetLbbResult(siret));
   }
 
   async #makeAutorization(): Promise<string> {

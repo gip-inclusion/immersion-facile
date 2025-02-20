@@ -20,17 +20,11 @@ const validEstablishmentFromLaBonneBoite: LaBonneBoiteApiResultV2Props = {
   naf: "8810C",
   company_name: "BLANCHISSERIE LA FENSCH",
   siret: "77561959600155",
-  hiring_potential: 4.5,
-  citycode: "57647",
-  is_high_potential: false,
   postcode: "57290",
-  department: "Moselle",
-  region: "Grand Est",
   department_number: "57",
   headcount_min: 5,
   headcount_max: 10,
   naf_label: "Activités de services administratifs et de soutien",
-  office_name: "BLANCHISSERIE LA FENSCH",
   id: 1000,
   email: "contact@blanchissele.fr",
 };
@@ -53,7 +47,6 @@ export class LaBonneBoiteCompanyDtoBuilder
       ...this.props,
       city: address.city,
       postcode: address.postcode,
-      department: address.departmentCode,
       department_number: address.departmentCode,
     });
   }
