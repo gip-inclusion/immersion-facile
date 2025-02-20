@@ -53,41 +53,7 @@ describe("UploadFile use case", () => {
   };
 
   describe("right paths", () => {
-    it("File url have filename.ext when renameFileToId is disabled and user is admin", async () => {
-      expectToEqual(
-        await uploadFile.execute(
-          {
-            file: file,
-            renameFileToId: false,
-          },
-          icBackofficeAdminUser,
-        ),
-        `https://fakeS3/${file.name}`,
-      );
-
-      expectToEqual(documentGateway.storedFiles, {
-        [file.name]: { id: file.name, ...file },
-      });
-    });
-
-    it("File url have filename.ext when renameFileToId is disabled and user is agency-admin", async () => {
-      expectToEqual(
-        await uploadFile.execute(
-          {
-            file: file,
-            renameFileToId: false,
-          },
-          icAgencyAdminUser,
-        ),
-        `https://fakeS3/${file.name}`,
-      );
-
-      expectToEqual(documentGateway.storedFiles, {
-        [file.name]: { id: file.name, ...file },
-      });
-    });
-
-    it("File url have uuid.ext when renameFileToId is enabled and user is agency-admin", async () => {
+    it("File url have uuid.ext when user is agency-admin", async () => {
       const id = uuid();
 
       uuidGenerator.setNextUuid(id);
@@ -100,6 +66,27 @@ describe("UploadFile use case", () => {
             file,
           },
           icAgencyAdminUser,
+        ),
+        `https://fakeS3/${expectedFileId}`,
+      );
+
+      expectToEqual(documentGateway.storedFiles, {
+        [expectedFileId]: { id: expectedFileId, ...file },
+      });
+    });
+    it("File url have uuid.ext when user is backoffice admin", async () => {
+      const id = uuid();
+
+      uuidGenerator.setNextUuid(id);
+
+      const expectedFileId = `${id}.tmp`;
+
+      expectToEqual(
+        await uploadFile.execute(
+          {
+            file,
+          },
+          icBackofficeAdminUser,
         ),
         `https://fakeS3/${expectedFileId}`,
       );
@@ -125,8 +112,8 @@ describe("UploadFile use case", () => {
       );
     });
 
-    it("throws ConflictError file created with renameFileToId enabled exist with same id, already stored file not replaced", async () => {
-      const id = uuid();
+    it("throws ConflictError file created exist with same id, already stored file not replaced", async () => {
+      const id = uuidGenerator.new();
 
       uuidGenerator.setNextUuid(id);
 
@@ -148,30 +135,6 @@ describe("UploadFile use case", () => {
       await expectPromiseToFailWithError(
         uploadFile.execute({ file }, icAgencyAdminUser),
         errors.file.fileAlreadyExist(expectedFileId),
-      );
-
-      expectToEqual(documentGateway.storedFiles, {
-        [alreadyStoredFile.id]: alreadyStoredFile,
-      });
-    });
-
-    it("throws ConflictError file created with renameFileToId disabled exist with same id, already stored file not replaced", async () => {
-      const alreadyStoredFile: StoredFile = {
-        id: file.name,
-        buffer: Buffer.from("already stored file"),
-        encoding: "",
-        mimetype: "",
-        name: "other.tmp",
-        size: 2,
-      };
-
-      documentGateway.storedFiles = {
-        [alreadyStoredFile.id]: alreadyStoredFile,
-      };
-
-      await expectPromiseToFailWithError(
-        uploadFile.execute({ file, renameFileToId: false }, icAgencyAdminUser),
-        errors.file.fileAlreadyExist(alreadyStoredFile.id),
       );
 
       expectToEqual(documentGateway.storedFiles, {

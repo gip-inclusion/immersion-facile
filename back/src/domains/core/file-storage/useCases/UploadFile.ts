@@ -14,7 +14,6 @@ export type FileInput = Omit<StoredFile, "id">;
 
 export type UploadFileInput = {
   file: FileInput;
-  renameFileToId?: boolean;
 };
 
 // biome-ignore lint/correctness/noUnusedVariables: <explanation>
@@ -26,7 +25,6 @@ const uploadFileInput: z.Schema<UploadFileInput> = z.object({
     buffer: z.instanceof(Buffer), // class not supported by NarrowEvent<Topic>["payload"]
     mimetype: zStringMinLength1,
   }),
-  renameFileToId: z.boolean().optional(),
 });
 
 export class UploadFile extends UseCase<
@@ -47,7 +45,7 @@ export class UploadFile extends UseCase<
   }
 
   protected async _execute(
-    { file, renameFileToId = true }: UploadFileInput,
+    { file }: UploadFileInput,
     connectedUser: InclusionConnectedUser,
   ): Promise<AbsoluteUrl> {
     if (!connectedUser) throw errors.user.unauthorized();
@@ -60,7 +58,7 @@ export class UploadFile extends UseCase<
 
     const fileToSave: StoredFile = {
       ...file,
-      id: renameFileToId ? this.#replaceNameWithUuid(file) : file.name,
+      id: this.#replaceNameWithUuid(file),
     };
 
     const existingFileUrl = await this.#documentGateway.getUrl(fileToSave.id);

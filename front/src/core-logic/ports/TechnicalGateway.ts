@@ -10,7 +10,7 @@ import {
 
 export interface TechnicalGateway {
   getAllFeatureFlags$(): Observable<FeatureFlags>;
-  uploadFile(file: File, renameFileToId: boolean): Promise<AbsoluteUrl>;
+  uploadFile(file: File): Promise<AbsoluteUrl>;
   htmlToPdf(
     params: HtmlToPdfRequest,
     jwt: ConventionSupportedJwt,

@@ -9,7 +9,6 @@ interface UploadLogoProps {
   hint?: React.ReactNode;
   maxSize_Mo: number;
   setFileUrl: (fileUrl: AbsoluteUrl) => void;
-  renameFileToId: boolean;
 }
 
 export const UploadFile = ({
@@ -17,7 +16,6 @@ export const UploadFile = ({
   setFileUrl,
   label,
   hint,
-  renameFileToId,
 }: UploadLogoProps) => {
   const [error, setError] = React.useState<string>();
   return (
@@ -35,10 +33,7 @@ export const UploadFile = ({
         if (!file) return;
 
         const fileUrl =
-          await outOfReduxDependencies.technicalGateway.uploadFile(
-            file,
-            renameFileToId,
-          );
+          await outOfReduxDependencies.technicalGateway.uploadFile(file);
         setFileUrl(fileUrl);
       }}
       label={label}

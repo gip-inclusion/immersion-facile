@@ -58,13 +58,9 @@ export class HttpTechnicalGateway implements TechnicalGateway {
       );
   }
 
-  public async uploadFile(
-    file: File,
-    renameFileToId: boolean,
-  ): Promise<AbsoluteUrl> {
+  public async uploadFile(file: File): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
-    formData.append("renameFileToId", renameFileToId.toString());
     const { data } = await this.axiosInstance.post(
       `/${uploadFileRoute}`,
       formData,
