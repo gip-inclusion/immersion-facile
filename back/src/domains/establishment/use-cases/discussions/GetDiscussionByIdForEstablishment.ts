@@ -41,9 +41,9 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     const { appellationCode, ...rest } = discussion;
 
     const appellation = (
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-        appellationCode,
-      ])
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [appellationCode],
+      )
     ).at(0);
 
     if (!appellation)
