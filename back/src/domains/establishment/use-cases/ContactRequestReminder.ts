@@ -82,9 +82,9 @@ const makeNotification = async ({
   discussion: DiscussionDto;
 }): Promise<NotificationContentAndFollowedIds | null> => {
   const appellations =
-    await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodes([
-      discussion.appellationCode,
-    ]);
+    await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+      [discussion.appellationCode],
+    );
   const appellation = appellations.at(0);
   const replyTo = createOpaqueEmail(
     discussion.id,
