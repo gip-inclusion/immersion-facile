@@ -51,16 +51,15 @@ export class UploadFile extends UseCase<
   ): Promise<AbsoluteUrl> {
     if (!connectedUser) throw errors.user.unauthorized();
 
-    const isAdminOrAgencyAdmin =
-      throwIfUserIsNotAdminNorAgencyAdmin(connectedUser);
+    throwIfUserIsNotAdminNorAgencyAdmin(connectedUser);
 
-    if (!isAdminOrAgencyAdmin)
-      throw errors.user.forbidden({ userId: connectedUser.id });
-
-    const validationResult = validateFile({
-      ...file,
-      type: file.mimetype,
-    });
+    const validationResult = validateFile(
+      {
+        ...file,
+        type: file.mimetype,
+      },
+      file.buffer,
+    );
     if (validationResult !== true)
       throw errors.file.invalidFile(validationResult);
 
@@ -87,13 +86,13 @@ export class UploadFile extends UseCase<
 
 const throwIfUserIsNotAdminNorAgencyAdmin = (
   currentUser: InclusionConnectedUser,
-): boolean => {
+): void | never => {
   if (!currentUser) throw errors.user.unauthorized();
-  if (currentUser.isBackofficeAdmin) return true;
+  if (currentUser.isBackofficeAdmin) return;
 
   const isAgencyAdmin = currentUser.agencyRights.some((agencyRight) =>
     agencyRight.roles.includes("agency-admin"),
   );
-
-  return isAgencyAdmin;
+  if (!isAgencyAdmin) throw errors.user.forbidden({ userId: currentUser.id });
+  return;
 };

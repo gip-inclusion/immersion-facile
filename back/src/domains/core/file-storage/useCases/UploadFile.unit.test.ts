@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
+  allowedFileSignatures,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -45,7 +46,7 @@ describe("UploadFile use case", () => {
   });
 
   const file: FileInput = {
-    buffer: Buffer.from("toto"),
+    buffer: Buffer.from(new Uint8Array(allowedFileSignatures.jpeg.bytes)),
     encoding: "a",
     mimetype: "image/jpeg",
     name: "file.jpg",
@@ -63,7 +64,9 @@ describe("UploadFile use case", () => {
       expectToEqual(
         await uploadFile.execute(
           {
-            file,
+            file: {
+              ...file,
+            },
           },
           icAgencyAdminUser,
         ),
@@ -151,7 +154,7 @@ describe("UploadFile use case", () => {
         errors.file.invalidFile({
           code: "INVALID_EXTENSION",
           message:
-            "Invalid file extension. Allowed extensions: .pdf, .jpeg, .jpg, .png, .webp, .svg",
+            "Invalid file extension. Allowed extensions: pdf, jpeg, jpg, png, webp, svg",
         }),
       );
     });
