@@ -7,6 +7,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  formEstablishmentSchema,
 } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -149,6 +150,98 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       website: establishment.website,
       additionalInformation: establishment.additionalInformation,
       maxContactsPerMonth: establishment.maxContactsPerMonth,
+      fitForDisabledWorkers: false,
+      searchableBy: {
+        jobSeekers: true,
+        students: false,
+      },
+    });
+  });
+
+  it("returns a reconstructed schema validated form if establishment with siret exists & establishment jwt payload even if admin don't have firstname or lastname", async () => {
+    const adminWithoutFirstNameAndLastName = new InclusionConnectedUserBuilder()
+      .withId("admin-id")
+      .withEmail("admin@mail.com")
+      .withLastName("")
+      .withFirstName("")
+      .buildUser();
+
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
+      .withEstablishment(
+        new EstablishmentEntityBuilder()
+          .withSiret(siret)
+          .withSearchableBy({
+            jobSeekers: true,
+            students: false,
+          })
+          .build(),
+      )
+      .withUserRights([
+        {
+          ...establishmentAdminRight,
+          userId: adminWithoutFirstNameAndLastName.id,
+        },
+        {
+          userId: establishmentContact.id,
+          role: "establishment-contact",
+        },
+      ])
+      .withOffers([
+        new OfferEntityBuilder()
+          .withRomeCode("A1101")
+          .withAppellationCode("11987")
+          .build(),
+      ])
+      .build();
+
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      establishmentAggregate,
+    );
+    uow.userRepository.users = [
+      adminWithoutFirstNameAndLastName,
+      establishmentContact,
+    ];
+    // Act
+    const retrievedForm = await useCase.execute(
+      establishmentJwtPayload.siret,
+      establishmentJwtPayload,
+    );
+
+    // Assert
+    expectToEqual(formEstablishmentSchema.parse(retrievedForm), {
+      siret,
+      source: "immersion-facile",
+      businessName: establishmentAggregate.establishment.name,
+      businessNameCustomized:
+        establishmentAggregate.establishment.customizedName,
+      businessAddresses: establishmentAggregate.establishment.locations.map(
+        (location) => ({
+          rawAddress: addressDtoToString(location.address),
+          id: location.id,
+        }),
+      ),
+      isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
+      naf: establishmentAggregate.establishment.nafDto,
+      appellations: establishmentAggregate.offers.map((offer) => ({
+        appellationCode: offer.appellationCode,
+        appellationLabel: offer.appellationLabel,
+        romeCode: offer.romeCode,
+        romeLabel: offer.romeLabel,
+      })),
+      businessContact: {
+        contactMethod: establishmentAggregate.establishment.contactMethod,
+        copyEmails: [establishmentContact.email],
+        email: establishmentAdmin.email,
+        firstName: "NON FOURNI",
+        lastName: "NON FOURNI",
+        job: establishmentAdminRight.job,
+        phone: establishmentAdminRight.phone,
+      },
+      website: establishmentAggregate.establishment.website,
+      additionalInformation:
+        establishmentAggregate.establishment.additionalInformation,
+      maxContactsPerMonth:
+        establishmentAggregate.establishment.maxContactsPerMonth,
       fitForDisabledWorkers: false,
       searchableBy: {
         jobSeekers: true,
