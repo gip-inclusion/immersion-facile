@@ -5,16 +5,22 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
+  AgencyDtoBuilder,
   ConventionDtoBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   createConventionMagicLinkPayload,
   errors,
-  expectPromiseToFailWithError,
+  expectPromiseToFailWithError, InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
 } from "shared";
+import {toAgencyWithRights} from "../../../utils/agency";
 
 const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
+const convention = new ConventionDtoBuilder()
+  .withId(conventionId)
+  .withStatus("READY_TO_SIGN")
+  .build();
 
 const viewerJwtPayload = createConventionMagicLinkPayload({
   id: conventionId,
@@ -30,9 +36,13 @@ const validatorJwtPayload = createConventionMagicLinkPayload({
   now: new Date(),
 });
 
-const connectedUserPayload = {
+const connectedUserPayload: InclusionConnectDomainJwtPayload = {
   userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
 };
+
+const connectedUserBuilder = new InclusionConnectedUserBuilder()
+  .withId(connectedUserPayload.userId);
+const connectedUser = connectedUserBuilder.build();
 
 describe("RemindSignatories", () => {
   let uow: InMemoryUnitOfWork;
@@ -46,7 +56,22 @@ describe("RemindSignatories", () => {
   });
 
   describe("Wrong paths", () => {
-    it("throws bad request if requested convention does not match the one in jwt", async () => {});
+    it("throws bad request if requested convention does not match the one in jwt", async () => {
+      const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: requestedConventionId,
+            role: "beneficiary-representative",
+          },
+          validatorJwtPayload
+        ),
+        errors.convention.forbiddenMissingRights({
+          conventionId: requestedConventionId,
+        })
+      );
+    });
 
     it("throws not found if convention does not exist", async () => {
       await expectPromiseToFailWithError(
@@ -91,12 +116,25 @@ describe("RemindSignatories", () => {
     );
 
     describe("from connected user", () => {
-      it("throws unauthorized if user has no rights on agency", async () => {
-        const convention = new ConventionDtoBuilder()
-          .withId(conventionId)
-          .withStatus("READY_TO_SIGN")
-          .build();
+      it("throws not found if connected user id does not exist", async () => {
+        const unexistingUserPayload: InclusionConnectDomainJwtPayload = { userId: "bcc5c20e-6dd2-45cf-affe-927358005267" }
         uow.conventionRepository.setConventions([convention]);
+
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId,
+              role: "beneficiary-representative",
+            },
+            unexistingUserPayload
+          ),
+          errors.user.notFound(unexistingUserPayload)
+        );
+      });
+
+      it("throws unauthorized if user has no rights on agency", async () => {
+        uow.conventionRepository.setConventions([convention]);
+        uow.userRepository.users = [connectedUser];
 
         await expectPromiseToFailWithError(
           usecase.execute(
@@ -106,19 +144,35 @@ describe("RemindSignatories", () => {
             },
             connectedUserPayload
           ),
-          errors.convention.notFound({ conventionId })
+          errors.user.noRightsOnAgency({ userId: connectedUserPayload.userId, agencyId: convention.agencyId })
         );
       });
 
-      it("throws unauthorized if user has not enough rights on agency", () => {});
+      it("throws unauthorized if user has not enough rights on agency", async () => {
+        const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [connectedUserPayload.userId]: { roles: ["agency-viewer"], isNotifiedByEmail: false },
+          }),
+        ];
+        uow.userRepository.users = [connectedUser];
+
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId,
+              role: "beneficiary-representative",
+            },
+            connectedUserPayload
+          ),
+          errors.user.noRightsOnAgency({ userId: connectedUserPayload.userId, agencyId: convention.agencyId })
+        );
+      });
     });
 
     describe("from magiclink", () => {
       it("throws unauthorized if user has no rights on agency", async () => {
-        const convention = new ConventionDtoBuilder()
-          .withId(conventionId)
-          .withStatus("READY_TO_SIGN")
-          .build();
         uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
@@ -129,7 +183,9 @@ describe("RemindSignatories", () => {
             },
             viewerJwtPayload
           ),
-          errors.convention.notFound({ conventionId })
+          errors.convention.unsupportedRoleSignReminder({
+            role: "agency-viewer",
+          })
         );
       });
 
@@ -144,6 +200,8 @@ describe("RemindSignatories", () => {
   });
 
   describe("Right paths", () => {
+    // for magic link and connected user
+    // for validator and counsellor
     it("send sms reminder", () => {});
   });
 });

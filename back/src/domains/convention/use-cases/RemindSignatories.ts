@@ -1,20 +1,21 @@
 import {
   AgencyId,
-  AgencyRole,
-  AllowedManageConventionAgencyRoles,
   ConventionId,
   ConventionRelatedJwtPayload,
   Role,
   SignatoryRole,
-  allowedManageConventionAgencyRoles,
   conventionIdSchema,
   errors,
   signatorySchema,
+  agencyModifierRoles,
+  AgencyModifierRole,
+  ConventionStatus,
 } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
+import {intersection} from "ramda";
 
 type RemindSignatoriesParams = {
   conventionId: ConventionId;
@@ -39,11 +40,13 @@ export const makeRemindSignatories = createTransactionalUseCase<
     inputSchema: remindSignatoriesParamsSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
-    if ("role" in jwtPayload) {
-    }
+    throwErrorOnConventionIdMismatch({
+      requestedConventionId: inputParams.conventionId,
+      jwtPayload,
+    });
 
     const convention = await uow.conventionRepository.getById(
-      inputParams.conventionId,
+      inputParams.conventionId
     );
 
     if (!convention)
@@ -51,37 +54,64 @@ export const makeRemindSignatories = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status)) {
-      throw errors.convention.signReminderNotAllowedForStatus({
-        status: convention.status,
-      });
-    }
-  },
+    throwErrorIfConventionStatusNotAllowed(convention.status);
+    await throwErrorIfUserRightsNotEnough({
+      uow,
+      jwtPayload,
+      agencyId: convention.agencyId,
+    });
+
+    console.log("end");
+  }
 );
+
+const throwErrorOnConventionIdMismatch = ({
+  requestedConventionId,
+  jwtPayload,
+}: {
+  requestedConventionId: ConventionId;
+  jwtPayload: ConventionRelatedJwtPayload;
+}) => {
+  if ("applicationId" in jwtPayload && requestedConventionId !== jwtPayload.applicationId)
+    throw errors.convention.forbiddenMissingRights({
+      conventionId: requestedConventionId,
+    });
+};
+
+const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
+  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
+    throw errors.convention.signReminderNotAllowedForStatus({
+      status: status,
+    });
+  }
+};
+
+const throwErrorIfUserRightsNotEnough = async ({
+  uow,
+  jwtPayload,
+  agencyId,
+}: {
+  jwtPayload: ConventionRelatedJwtPayload;
+  uow: UnitOfWork;
+  agencyId: AgencyId;
+}) => {
+  const role = await getUserRoleForAgency({ uow, jwtPayload, agencyId });
+};
 
 const getUserRoleForAgency = async ({
   uow,
   jwtPayload,
   agencyId,
-  conventionId,
 }: {
   jwtPayload: ConventionRelatedJwtPayload;
   uow: UnitOfWork;
   agencyId: AgencyId;
-  conventionId: ConventionId;
-}) => {
-  const isAllowedToManageConventionAgencyRole = (
-    role: Role,
-  ): role is AllowedManageConventionAgencyRoles | Role => {
-    return allowedManageConventionAgencyRoles.includes(role as any);
-  };
-
+}): Promise<Role[]> => {
   if ("role" in jwtPayload) {
-    if (jwtPayload.applicationId !== conventionId)
-      throw errors.convention.forbiddenMissingRights({ conventionId });
-
-    if (!isAllowedToManageConventionAgencyRole(jwtPayload.role))
-      throw errors.convention.unsupportedRoleSignReminder(jwtPayload.role);
+    if (!agencyModifierRoles.includes(jwtPayload.role as any))
+      throw errors.convention.unsupportedRoleSignReminder({
+        role: jwtPayload.role as any,
+      });
 
     return [jwtPayload.role];
   }
@@ -93,7 +123,7 @@ const getUserRoleForAgency = async ({
     });
 
   const agencyRightOnAgency = userWithRights.agencyRights.find(
-    (agencyRight) => agencyRight.agency.id === agencyId,
+    (agencyRight) => agencyRight.agency.id === agencyId && intersection(agencyModifierRoles,agencyRight.roles).length > 0
   );
 
   if (!agencyRightOnAgency)
@@ -104,5 +134,3 @@ const getUserRoleForAgency = async ({
 
   return agencyRightOnAgency.roles;
 };
-
-
