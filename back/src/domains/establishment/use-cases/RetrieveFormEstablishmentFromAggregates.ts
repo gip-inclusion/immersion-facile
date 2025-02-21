@@ -134,10 +134,10 @@ export const establishmentAggregateToFormEstablishement = async (
       contactMethod: establishmentAggregate.establishment.contactMethod,
       firstName: firstEstablishmentAdmin.firstName.length
         ? firstEstablishmentAdmin.firstName
-        : "NON FOURNI",
+        : "NON CONNU",
       lastName: firstEstablishmentAdmin.lastName.length
         ? firstEstablishmentAdmin.lastName
-        : "NON FOURNI",
+        : "NON CONNU",
       email: firstEstablishmentAdmin.email,
       job: firstAdminRight.job,
       phone: firstAdminRight.phone,
