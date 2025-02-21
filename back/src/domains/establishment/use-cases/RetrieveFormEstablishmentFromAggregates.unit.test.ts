@@ -255,10 +255,10 @@ const makeExpectedFormEstablishment = ({
     email: establishmentAdmin.email,
     firstName: establishmentAdmin.firstName.length
       ? establishmentAdmin.firstName
-      : "NON FOURNI",
+      : "NON CONNU",
     lastName: establishmentAdmin.lastName.length
       ? establishmentAdmin.lastName
-      : "NON FOURNI",
+      : "NON CONNU",
     job,
     phone,
   },
