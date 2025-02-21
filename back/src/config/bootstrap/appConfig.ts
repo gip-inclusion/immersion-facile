@@ -15,6 +15,7 @@ import {
 import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../domains/core/events/events";
 import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
+import type { CrispConfig } from "../../domains/core/support/ports/CrispApi";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -577,6 +578,14 @@ export class AppConfig {
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
     });
+  }
+
+  public get crispConfig(): CrispConfig {
+    return {
+      id: this.#throwIfNotDefinedOrDefault("CRISP_ID"),
+      key: this.#throwIfNotDefinedOrDefault("CRISP_KEY"),
+      websiteId: this.#throwIfNotDefinedOrDefault("CRISP_WEBSITE_ID"),
+    };
   }
 
   public get tallySignatureSecret() {
