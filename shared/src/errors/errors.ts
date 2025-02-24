@@ -28,7 +28,8 @@ import {
   NotificationId,
   NotificationKind,
 } from "../notifications/notifications.dto";
-import { Role } from "../role/role.dto";
+import { Role, SignatoryRole } from "../role/role.dto";
+import { signatoryTitleByRole } from "../role/role.utils";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ShortLinkId } from "../shortLink/shortLink.dto";
 import { SiretDto } from "../siret/siret";
@@ -190,6 +191,13 @@ export const errors = {
       new BadRequestError(
         `Aucun des signataires n'a signé la convention avec l'identifiant ${conventionId}.`,
       ),
+    signatoryAlreadySigned: ({
+      conventionId,
+      signatoryRole,
+    }: { conventionId: ConventionId; signatoryRole: SignatoryRole }) =>
+      new BadRequestError(
+        `Le  ${signatoryTitleByRole[signatoryRole]} a déjà signé la convention ${conventionId}.`,
+      ),
     missingActor: ({
       conventionId,
       role,
@@ -215,6 +223,13 @@ export const errors = {
     }) =>
       new ForbiddenError(
         `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.`,
+      ),
+    invalidMobilePhoneNumber: ({
+      conventionId,
+      signatoryRole,
+    }: { conventionId: ConventionId; signatoryRole: SignatoryRole }) =>
+      new BadRequestError(
+        `Le numéro de téléphone du ${signatoryTitleByRole[signatoryRole]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
   },
   establishment: {
@@ -521,6 +536,18 @@ export const errors = {
     forbiddenRolesUpdate: () =>
       new ForbiddenError(
         "Vous n'avez pas les droits nécessaires pour modifier ces rôles.",
+      ),
+    notEnoughRightOnAgency: ({
+      userId,
+      agencyId,
+    }: {
+      agencyId: AgencyId;
+      userId?: UserId;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur ${
+          userId ? `qui a l'identifiant '${userId}' ` : ""
+        }n'a pas les droits suffisant sur l'agence qui a l'identifiant '${agencyId}'.`,
       ),
   },
   broadcastFeedback: {

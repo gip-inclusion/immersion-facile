@@ -1,21 +1,28 @@
+import { NumberType, getNumberType } from "libphonenumber-js";
+import { parsePhoneNumber } from "libphonenumber-js/mobile";
+import { intersection, toPairs } from "ramda";
 import {
   AgencyId,
   ConventionId,
+  ConventionReadDto,
   ConventionRelatedJwtPayload,
+  ConventionStatus,
   Role,
   SignatoryRole,
-  conventionIdSchema,
-  errors,
-  signatorySchema,
   agencyModifierRoles,
-  AgencyModifierRole,
-  ConventionStatus,
+  conventionIdSchema,
+  conventionSignatoryRoleBySignatoryKey,
+  errors,
+  isSomeEmailMatchingEmailHash,
+  signatorySchema,
+  signatoryTitleByRole,
 } from "shared";
 import { z } from "zod";
+import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
-import {intersection} from "ramda";
 
 type RemindSignatoriesParams = {
   conventionId: ConventionId;
@@ -45,8 +52,8 @@ export const makeRemindSignatories = createTransactionalUseCase<
       jwtPayload,
     });
 
-    const convention = await uow.conventionRepository.getById(
-      inputParams.conventionId
+    const convention = await uow.conventionQueries.getConventionById(
+      inputParams.conventionId,
     );
 
     if (!convention)
@@ -55,14 +62,25 @@ export const makeRemindSignatories = createTransactionalUseCase<
       });
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
-    await throwErrorIfUserRightsNotEnough({
+    await throwIfNotAllowedForUser({
       uow,
       jwtPayload,
       agencyId: convention.agencyId,
+      convention,
+    });
+
+    throwErrorIfPhoneNumerNotValid({
+      convention,
+      signatoryRole: inputParams.role,
+    });
+
+    throwErrorIfSignatoryAlreadySigned({
+      convention,
+      signatoryRole: inputParams.role,
     });
 
     console.log("end");
-  }
+  },
 );
 
 const throwErrorOnConventionIdMismatch = ({
@@ -72,7 +90,10 @@ const throwErrorOnConventionIdMismatch = ({
   requestedConventionId: ConventionId;
   jwtPayload: ConventionRelatedJwtPayload;
 }) => {
-  if ("applicationId" in jwtPayload && requestedConventionId !== jwtPayload.applicationId)
+  if (
+    "applicationId" in jwtPayload &&
+    requestedConventionId !== jwtPayload.applicationId
+  )
     throw errors.convention.forbiddenMissingRights({
       conventionId: requestedConventionId,
     });
@@ -86,34 +107,55 @@ const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
   }
 };
 
-const throwErrorIfUserRightsNotEnough = async ({
+const throwIfNotAllowedForUser = async ({
   uow,
   jwtPayload,
   agencyId,
+  convention,
 }: {
   jwtPayload: ConventionRelatedJwtPayload;
   uow: UnitOfWork;
   agencyId: AgencyId;
-}) => {
-  const role = await getUserRoleForAgency({ uow, jwtPayload, agencyId });
-};
-
-const getUserRoleForAgency = async ({
-  uow,
-  jwtPayload,
-  agencyId,
-}: {
-  jwtPayload: ConventionRelatedJwtPayload;
-  uow: UnitOfWork;
-  agencyId: AgencyId;
-}): Promise<Role[]> => {
+  convention: ConventionReadDto;
+}): Promise<void> => {
   if ("role" in jwtPayload) {
     if (!agencyModifierRoles.includes(jwtPayload.role as any))
       throw errors.convention.unsupportedRoleSignReminder({
         role: jwtPayload.role as any,
       });
 
-    return [jwtPayload.role];
+    const agency = await uow.agencyRepository.getById(agencyId);
+
+    if (!agency) throw errors.agency.notFound({ agencyId });
+
+    const userIdsWithRoleOnAgency = toPairs(agency.usersRights)
+      .filter(
+        ([_, right]) =>
+          right?.roles.includes("counsellor") ||
+          right?.roles.includes("validator"),
+      )
+      .map(([id]) => id);
+
+    const users = await uow.userRepository.getByIds(
+      userIdsWithRoleOnAgency,
+      await makeProvider(uow),
+    );
+
+    if (
+      !isHashMatchPeAdvisorEmail({
+        convention,
+        emailHash: jwtPayload.emailHash,
+      }) &&
+      !isSomeEmailMatchingEmailHash(
+        users.map(({ email }) => email),
+        jwtPayload.emailHash,
+      )
+    )
+      throw errors.user.notEnoughRightOnAgency({
+        agencyId,
+      });
+
+    return;
   }
 
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
@@ -123,7 +165,7 @@ const getUserRoleForAgency = async ({
     });
 
   const agencyRightOnAgency = userWithRights.agencyRights.find(
-    (agencyRight) => agencyRight.agency.id === agencyId && intersection(agencyModifierRoles,agencyRight.roles).length > 0
+    (agencyRight) => agencyRight.agency.id === agencyId,
   );
 
   if (!agencyRightOnAgency)
@@ -132,5 +174,44 @@ const getUserRoleForAgency = async ({
       agencyId: agencyId,
     });
 
-  return agencyRightOnAgency.roles;
+  if (intersection(agencyModifierRoles, agencyRightOnAgency.roles).length === 0)
+    throw errors.user.notEnoughRightOnAgency({
+      agencyId,
+      userId: userWithRights.id,
+    });
+};
+
+const throwErrorIfPhoneNumerNotValid = ({
+  convention,
+  signatoryRole,
+}: { convention: ConventionReadDto; signatoryRole: SignatoryRole }) => {
+  const signatory = conventionSignatoryRoleBySignatoryKey[signatoryRole];
+
+  if (!convention.signatories[signatory]) {
+    throw new Error();
+  }
+
+  const isValidMobilePhone =
+    parsePhoneNumber(convention.signatories[signatory].phone).getType() ===
+    "MOBILE";
+
+  if (!isValidMobilePhone)
+    throw errors.convention.invalidMobilePhoneNumber({
+      conventionId: convention.id,
+      signatoryRole,
+    });
+};
+
+const throwErrorIfSignatoryAlreadySigned = ({
+  convention,
+  signatoryRole,
+}: { convention: ConventionReadDto; signatoryRole: SignatoryRole }) => {
+  const signatory = conventionSignatoryRoleBySignatoryKey[signatoryRole];
+
+  if (convention.signatories[signatory]?.signedAt) {
+    throw errors.convention.signatoryAlreadySigned({
+      conventionId: convention.id,
+      signatoryRole,
+    });
+  }
 };
