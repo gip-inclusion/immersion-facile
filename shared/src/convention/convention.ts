@@ -1,4 +1,4 @@
-import { differenceInCalendarISOWeekYears } from "date-fns";
+import { differenceInISOWeekYears } from "date-fns";
 import { keys, mapObjIndexed, values } from "ramda";
 import { Role, SignatoryRole, allSignatoryRoles } from "../role/role.dto";
 import { DotNestedKeys } from "../utils";
@@ -115,7 +115,7 @@ export const isBeneficiaryMinorAccordingToAge = (
   conventionDateStart: DateString,
   beneficiaryBirthdate: string,
 ): boolean => {
-  const age = differenceInCalendarISOWeekYears(
+  const age = differenceInISOWeekYears(
     new Date(conventionDateStart),
     new Date(beneficiaryBirthdate),
   );
