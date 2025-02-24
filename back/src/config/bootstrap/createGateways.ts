@@ -56,11 +56,9 @@ import { annuaireDesEntreprisesSiretRoutes } from "../../domains/core/sirene/ada
 import { InMemorySiretGateway } from "../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
 import { makeInseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
-import {
-  HttpCrispGateway,
-  crispRoutes,
-} from "../../domains/core/support/adapters/HttpCrispGateway";
+import { HttpCrispGateway } from "../../domains/core/support/adapters/HttpCrispGateway";
 import { InMemoryCrispApi } from "../../domains/core/support/adapters/InMemoryCrispApi";
+import { crispRoutes } from "../../domains/core/support/adapters/crispRoutes";
 import { CrispGateway } from "../../domains/core/support/ports/CrispGateway";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
