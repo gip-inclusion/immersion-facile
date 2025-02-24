@@ -93,6 +93,7 @@ import { RomeSearch } from "../../domains/core/rome/use-cases/RomeSearch";
 import { GetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
+import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -726,6 +727,10 @@ export const createUseCases = (
       uowPerformer,
     }),
     nafSuggestions: makeGetNafSuggestions({ uowPerformer }),
+    sendTicketToCrisp: makeSendSupportTicketToCrisp({
+      uowPerformer,
+      deps: { crispApi: gateways.crispGateway },
+    }),
     notifyBeneficiaryThatContactRequestHasBeenSent:
       makeNotifyCandidateThatContactRequestHasBeenSent({
         uowPerformer,

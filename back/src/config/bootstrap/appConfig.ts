@@ -15,7 +15,7 @@ import {
 import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../domains/core/events/events";
 import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
-import type { CrispConfig } from "../../domains/core/support/ports/CrispApi";
+import type { CrispConfig } from "../../domains/core/support/ports/CrispGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -577,6 +577,14 @@ export class AppConfig {
       variableName: "SUBSCRIBERS_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
       defaultValue: "IN_MEMORY",
+    });
+  }
+
+  public get crispGatewayKind() {
+    return this.#throwIfNotInArray({
+      variableName: "CRISP_GATEWAY",
+      authorizedValues: ["HTTP", "IN_MEMORY", "LOG_ONLY"],
+      defaultValue: "LOG_ONLY",
     });
   }
 

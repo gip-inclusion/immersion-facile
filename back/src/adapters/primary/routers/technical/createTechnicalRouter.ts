@@ -141,6 +141,23 @@ export const createTechnicalRouter = (
     }),
   );
 
+  technicalSharedRouter.sendTicketToCrisp(async (req, res) =>
+    sendHttpResponse(req, res.status(201), async () => {
+      throwErrorIfWrongTallySignature(
+        req.headers["tally-signature"],
+        req.body,
+        deps.config.tallySignatureSecret,
+      );
+
+      if (deps.config.crispGatewayKind === "LOG_ONLY") {
+        logger.info({ message: JSON.stringify(req.body, null, 2) });
+        return;
+      }
+
+      return deps.useCases.sendTicketToCrisp.execute(req.body);
+    }),
+  );
+
   return technicalRouter;
 };
 
