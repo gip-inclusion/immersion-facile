@@ -377,6 +377,10 @@ export const defaultEmailValueByEmailKind: {
     domain: "immersion-facile.beta.gouv.fr",
     discussionId: "fake-discussion-id",
   },
+  CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
+    businessName: "BUSINESS_NAME",
+    beneficiaryFullName: "BENEFICIARY_FULL_NAME",
+  },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",
     contactFirstName: "CONTACT_FIRST_NAME",

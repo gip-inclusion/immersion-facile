@@ -118,6 +118,7 @@ import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/u
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { makeRejectDiscussionAndSendNotification } from "../../domains/establishment/use-cases/discussions/RejectDiscussionAndSendNotification";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
+import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../../domains/establishment/use-cases/notifications/NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
@@ -725,6 +726,11 @@ export const createUseCases = (
       uowPerformer,
     }),
     nafSuggestions: makeGetNafSuggestions({ uowPerformer }),
+    notifyBeneficiaryThatContactRequestHasBeenSent:
+      makeNotifyCandidateThatContactRequestHasBeenSent({
+        uowPerformer,
+        deps: { saveNotificationAndRelatedEvent },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

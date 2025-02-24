@@ -3,6 +3,7 @@ import {
   SearchRoutes,
   UserBuilder,
   errors,
+  expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
@@ -115,9 +116,12 @@ describe("Contact establishment public v2 e2e", () => {
       ]);
 
       await processEventsForEmailToBeSent(eventCrawler);
-      expect(gateways.notification.getSentEmails()).toHaveLength(1);
-      expect(gateways.notification.getSentEmails()[0].kind).toBe(
-        "CONTACT_BY_EMAIL_REQUEST",
+      const sentEmails = gateways.notification.getSentEmails();
+
+      expect(sentEmails).toHaveLength(2);
+      expectArraysToEqualIgnoringOrder(
+        sentEmails.map((email) => email.kind),
+        ["CONTACT_BY_EMAIL_REQUEST", "CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION"],
       );
 
       expect(inMemoryUow.discussionRepository.discussions).toHaveLength(1);

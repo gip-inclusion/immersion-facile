@@ -1796,6 +1796,28 @@ Profil du candidat :
         ${defaultSignature("immersion")}`,
       }),
     },
+    CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
+      niceName: "Candidat - Confirmation de la demande de contact",
+      tags: [""],
+      createEmailVariables: ({ beneficiaryFullName, businessName }) => ({
+        subject: ` Immersion Facilitée - Confirmation de l’envoi de votre candidature auprès de ${businessName}`,
+        greetings: `Bonjour ${beneficiaryFullName},`,
+        content: `<strong>Nous vous confirmons que votre candidature pour une immersion professionnelle a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
+
+          Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre immersion.
+          
+          <strong>Comment maximiser vos chances ?</strong>
+          • Si l'entreprise ne répond pas sous <strong>15 jours</strong>, appelez-la directement.
+          • Postulez à au moins <strong>3 entreprises</strong> pour multiplier vos opportunités.
+          
+          Les entreprises ne répondent pas toujours, mais cela ne remet pas en cause votre valeur. Gardez confiance !
+          
+          Si vous avez besoin d'aide pour préparer votre relance, n'hésitez pas à contacter votre conseiller.
+          
+          Bonne chance pour la suite de vos démarches ! Nous restons à votre disposition.
+        `,
+      }),
+    },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
       niceName: "Établissement - Mise en relation par mail",
       tags: ["mise en relation mail"],

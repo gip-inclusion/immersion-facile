@@ -194,6 +194,10 @@ export type EmailParamsByEmailType = {
     domain: string;
     discussionId: string;
   };
+  CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
+    beneficiaryFullName: string;
+    businessName: string;
+  };
   CONTACT_BY_EMAIL_REQUEST_LEGACY: {
     businessName: string;
     businessAddress: string;
