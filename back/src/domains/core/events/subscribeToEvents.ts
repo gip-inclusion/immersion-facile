@@ -124,6 +124,7 @@ const getUseCasesByTopics = (
   // Search related
   ContactRequestedByBeneficiary: [
     useCases.notifyContactRequest,
+    useCases.notifyBeneficiaryThatContactRequestHasBeenSent,
     useCases.updateMarketingEstablishmentContactList,
   ],
 
