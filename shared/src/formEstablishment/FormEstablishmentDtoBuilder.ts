@@ -80,9 +80,6 @@ export const updatedAddress2: TestAddress = {
 };
 
 const defaultBusinessContactDto: BusinessContactDto = {
-  email: "amil@mail.com",
-  firstName: "Esteban",
-  lastName: "Ocon",
   phone: "+33612345678",
   job: "a job",
   contactMethod: "EMAIL",
@@ -134,10 +131,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [updatedAddress1.formAddress, updatedAddress2.formAddress],
   businessContact: {
-    email: "my-updated-email@test.com",
     contactMethod: "PHONE",
-    firstName: "Jean-Luc",
-    lastName: "Deloin",
     copyEmails: ["updated-copy-email@test.com"],
     job: "new job",
     phone: "+33612345679",
@@ -183,10 +177,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   naf: { code: "", nomenclature: "" },
   businessContact: {
     contactMethod: "EMAIL",
-    lastName: "",
-    firstName: "",
     phone: "",
-    email: "",
     job: "",
     copyEmails: [],
   },
@@ -249,13 +240,6 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessContact });
   }
 
-  public withBusinessContactEmail(email: Email) {
-    return new FormEstablishmentDtoBuilder({
-      ...this.#dto,
-      businessContact: { ...this.#dto.businessContact, email },
-    });
-  }
-
   public withBusinessContactCopyEmails(copyEmails: Email[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
@@ -312,9 +296,6 @@ const formEstablishmentToEstablishmentCsvRow = (
   establishment: FormEstablishmentDto,
 ): EstablishmentCSVRow => ({
   businessAddress: establishment.businessAddresses[0].rawAddress,
-  businessContact_email: establishment.businessContact.email,
-  businessContact_firstName: establishment.businessContact.firstName,
-  businessContact_lastName: establishment.businessContact.lastName,
   businessContact_phone: establishment.businessContact.phone,
   businessContact_job: establishment.businessContact.job,
   businessContact_contactMethod: establishment.businessContact.contactMethod,
@@ -342,18 +323,6 @@ export class BusinessContactDtoBuilder implements Builder<BusinessContactDto> {
 
   constructor(dto: BusinessContactDto = defaultBusinessContactDto) {
     this.#dto = dto;
-  }
-
-  public withFirstName(firstName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, firstName });
-  }
-
-  public withLastName(lastName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, lastName });
-  }
-
-  public withEmail(email: Email) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, email });
   }
 
   public withCopyEmails(copyEmails: Email[]) {

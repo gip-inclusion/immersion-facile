@@ -68,12 +68,9 @@ describe("Add form establishment", () => {
     it(`${displayRouteName(
       establishmentRoutes.addFormEstablishment,
     )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
-      const email = "tiredofthismess@seriously.com";
-
       const response = await httpClient.addFormEstablishment({
         body: FormEstablishmentDtoBuilder.valid()
           .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-          .withBusinessContactEmail(email)
           .build(),
       });
 
@@ -93,10 +90,8 @@ describe("Add form establishment", () => {
     it(`${displayRouteName(
       establishmentRoutes.addFormEstablishment,
     )} 200 update EstablishmentLead kind`, async () => {
-      const email = "tiredofthismess@seriously.com";
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-        .withBusinessContactEmail(email)
         .build();
       const establishmentLead: EstablishmentLead = {
         lastEventKind: "to-be-reminded",

@@ -5,7 +5,6 @@ import {
   InclusionConnectedUserBuilder,
   UserBuilder,
   addressDtoToString,
-  createEstablishmentJwtPayload,
   currentJwtVersions,
   displayRouteName,
   errors,
@@ -17,10 +16,7 @@ import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
-import {
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
-} from "../../../../domains/core/jwt";
+import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
@@ -87,19 +83,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
-    ({
-      request,
-      inMemoryUow,
-      gateways,
-      generateInclusionConnectJwt,
-      generateEditEstablishmentJwt,
-    } = await buildTestApp());
+    ({ request, inMemoryUow, gateways, generateInclusionConnectJwt } =
+      await buildTestApp());
     inMemoryUow.userRepository.users = [
       backofficeAdminUser,
       establishmentAdmin,

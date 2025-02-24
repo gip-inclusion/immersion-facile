@@ -1,26 +1,11 @@
 import {
   AbsoluteUrl,
   CreateConventionMagicLinkPayloadProperties,
-  EstablishmentJwtPayload,
   OmitFromExistingKeys,
   createConventionMagicLinkPayload,
-  frontRoutes,
 } from "shared";
-import {
-  GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
-} from "../../domains/core/jwt";
+import { GenerateConventionJwt } from "../../domains/core/jwt";
 import { AppConfig } from "./appConfig";
-
-export const makeGenerateEditFormEstablishmentUrl =
-  (
-    config: AppConfig,
-    generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
-  ): GenerateEditFormEstablishmentJwt =>
-  (payload: EstablishmentJwtPayload): AbsoluteUrl => {
-    const jwt = generateEditEstablishmentJwt(payload);
-    return `${config.immersionFacileBaseUrl}/${frontRoutes.editFormEstablishmentRoute}?jwt=${jwt}`;
-  };
 
 export type GenerateConventionMagicLinkUrl = ReturnType<
   typeof makeGenerateConventionMagicLinkUrl

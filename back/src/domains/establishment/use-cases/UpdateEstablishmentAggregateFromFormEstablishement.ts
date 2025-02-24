@@ -1,5 +1,4 @@
 import {
-  EstablishmentDomainPayload,
   FormEstablishmentDto,
   InclusionConnectDomainJwtPayload,
   WithFormEstablishmentDto,
@@ -26,7 +25,7 @@ import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregat
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
   void,
-  InclusionConnectDomainJwtPayload | EstablishmentDomainPayload
+  InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = withFormEstablishmentSchema;
 
@@ -56,7 +55,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   public async _execute(
     { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
-    jwtPayload: InclusionConnectDomainJwtPayload | EstablishmentDomainPayload,
+    jwtPayload: InclusionConnectDomainJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw errors.user.noJwtProvided();
 
@@ -87,19 +86,9 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
   async #getTriggeredBy(
     uow: UnitOfWork,
-    jwtPayload: EstablishmentDomainPayload | InclusionConnectDomainJwtPayload,
+    jwtPayload: InclusionConnectDomainJwtPayload,
     establishmentAggregate: EstablishmentAggregate,
-    formEstablishment: FormEstablishmentDto,
   ): Promise<TriggeredBy> {
-    if ("siret" in jwtPayload) {
-      if (jwtPayload.siret === formEstablishment.siret)
-        return {
-          kind: "establishment-magic-link",
-          siret: formEstablishment.siret,
-        };
-      throw errors.establishment.siretMismatch();
-    }
-
     const user = await uow.userRepository.getById(
       jwtPayload.userId,
       await makeProvider(uow),
@@ -132,11 +121,6 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       uow,
       this.#timeGateway,
       this.#uuidGenerator,
-      {
-        email: formEstablishment.businessContact.email,
-        firstName: formEstablishment.businessContact.firstName,
-        lastName: formEstablishment.businessContact.lastName,
-      },
     );
 
     const contactUserIds = await Promise.all(

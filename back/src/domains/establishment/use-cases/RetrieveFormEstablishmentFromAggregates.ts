@@ -1,7 +1,5 @@
 import {
   AppellationAndRomeDto,
-  EstablishmentDomainPayload,
-  EstablishmentJwtPayload,
   FormEstablishmentDto,
   InclusionConnectDomainJwtPayload,
   InclusionConnectJwtPayload,
@@ -21,14 +19,14 @@ import {
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentDomainPayload | InclusionConnectDomainJwtPayload
+  InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = siretSchema;
 
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    jwtPayload?: EstablishmentJwtPayload | InclusionConnectJwtPayload,
+    jwtPayload?: InclusionConnectJwtPayload,
   ) {
     if (!jwtPayload) throw errors.user.noJwtProvided();
     const isValidEstablishmentJwtPayload =
@@ -132,13 +130,6 @@ export const establishmentAggregateToFormEstablishement = async (
     appellations,
     businessContact: {
       contactMethod: establishmentAggregate.establishment.contactMethod,
-      firstName: firstEstablishmentAdmin.firstName.length
-        ? firstEstablishmentAdmin.firstName
-        : "NON CONNU",
-      lastName: firstEstablishmentAdmin.lastName.length
-        ? firstEstablishmentAdmin.lastName
-        : "NON CONNU",
-      email: firstEstablishmentAdmin.email,
       job: firstAdminRight.job,
       phone: firstAdminRight.phone,
       copyEmails: establishmentContacts.map(({ email }) => email),

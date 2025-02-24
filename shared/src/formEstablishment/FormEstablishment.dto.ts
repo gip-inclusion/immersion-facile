@@ -21,11 +21,8 @@ export type ContactMethod = (typeof contactMethods)[number];
 export const isContactMethod = includesTypeGuard(contactMethods);
 
 export type BusinessContactDto = {
-  lastName: string;
-  firstName: string;
   job: string;
   phone: string; // we have a very permissive regex /^\+?[0-9]+$/
-  email: Email; // a valid email
   contactMethod: ContactMethod;
   copyEmails: Email[];
 };
@@ -87,10 +84,7 @@ export type EstablishmentCSVRow = {
   appellations_code: string;
   isEngagedEnterprise: CSVBoolean;
   businessContact_job: string;
-  businessContact_email: string;
   businessContact_phone: string;
-  businessContact_lastName: string;
-  businessContact_firstName: string;
   businessContact_contactMethod: ContactMethod;
   businessContact_copyEmails: string;
   isSearchable?: CSVBoolean;

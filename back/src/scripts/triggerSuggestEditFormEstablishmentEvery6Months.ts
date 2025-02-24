@@ -26,14 +26,6 @@ const startScript = async (): Promise<Report> => {
     createGetPgPoolFn(config),
   );
 
-  const numberOfDaysBeforeExpiration = 7;
-  const expiresInSeconds = numberOfDaysBeforeExpiration * 24 * 60 * 60;
-
-  const generateEditEstablishmentJwt = makeGenerateJwtES256<"establishment">(
-    config.jwtPrivateKey,
-    expiresInSeconds,
-  );
-
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
     uuidGenerator,
     timeGateway,

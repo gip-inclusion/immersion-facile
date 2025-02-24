@@ -1,7 +1,6 @@
 import {
   SiretDto,
   addressDtoToString,
-  createEstablishmentJwtPayload,
   errors,
   immersionFacileNoReplyEmailSender,
   siretSchema,
@@ -9,7 +8,6 @@ import {
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
-import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -22,17 +20,13 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
 
   readonly #timeGateway: TimeGateway;
 
-  readonly #generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt;
-
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
-    generateEditFormEstablishmentUrl: GenerateEditFormEstablishmentJwt,
   ) {
     super(uowPerformer);
 
-    this.#generateEditFormEstablishmentUrl = generateEditFormEstablishmentUrl;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
   }

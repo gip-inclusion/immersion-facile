@@ -44,10 +44,7 @@ test.describe("Establishment creation and modification workflow", () => {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "recette+initial-establishment@immersion-facile.beta.gouv.fr",
       contactMethod: "PHONE",
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
       copyEmails: [
         "recette+copy-updated-establishment1@immersion-facile.beta.gouv.fr",
       ],
@@ -61,10 +58,7 @@ test.describe("Establishment creation and modification workflow", () => {
     businessContact: {
       job: faker.person.jobType(),
       phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "admin+playwright@immersion-facile.beta.gouv.fr", //admin email required due to connexion to Establishment Dashboard
       contactMethod: "PHONE",
-      firstName: "Jean",
-      lastName: "Immersion",
       copyEmails: [
         "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
       ],

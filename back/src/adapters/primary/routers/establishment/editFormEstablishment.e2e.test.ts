@@ -5,7 +5,6 @@ import {
   FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  createEstablishmentJwtPayload,
   currentJwtVersions,
   errors,
   establishmentRoutes,
@@ -20,7 +19,6 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
-  GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
@@ -43,7 +41,6 @@ describe("Edit form establishments", () => {
   let appConfig: AppConfig;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
@@ -69,7 +66,6 @@ describe("Edit form establishments", () => {
       appConfig,
       gateways,
       inMemoryUow,
-      generateEditEstablishmentJwt,
       generateInclusionConnectJwt,
     } = await buildTestApp(new AppConfigBuilder().build()));
     httpClient = createSupertestSharedClient(establishmentRoutes, request);

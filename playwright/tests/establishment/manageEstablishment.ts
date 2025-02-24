@@ -120,20 +120,6 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(
-        `#${domElementIds.establishment.admin.businessContact.firstName}`,
-      )
-      .inputValue(),
-  ).toBe(businessContact.firstName);
-
-  await expect(
-    await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.lastName}`)
-      .inputValue(),
-  ).toBe(businessContact.lastName);
-
-  await expect(
-    await page
       .locator(`#${domElementIds.establishment.admin.businessContact.job}`)
       .inputValue(),
   ).toBe(businessContact.job);
@@ -143,12 +129,6 @@ const checkEstablishment = async (
       .locator(`#${domElementIds.establishment.admin.businessContact.phone}`)
       .inputValue(),
   ).toContain(businessContact.phone.substring(1));
-
-  await expect(
-    await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.email}`)
-      .inputValue(),
-  ).toBe(businessContact.email);
 
   await expect(
     await page.locator(

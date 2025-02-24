@@ -14,7 +14,6 @@ import { InMemoryDocumentGateway } from "../domains/core/file-storage/adapters/I
 import {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
@@ -61,7 +60,6 @@ export type TestAppAndDeps = {
   eventCrawler: BasicEventCrawler;
   appConfig: AppConfig;
   generateApiConsumerJwt: GenerateApiConsumerJwt;
-  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateConventionJwt: GenerateConventionJwt;
   generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   uuidGenerator: UuidGenerator;
@@ -109,7 +107,6 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiConsumerJwt,
     generateConventionJwt,
-    generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
     uuidGenerator,
     inMemoryUow: uow,
@@ -128,7 +125,6 @@ export const buildTestApp = async (
     appConfig,
     generateApiConsumerJwt,
     generateConventionJwt,
-    generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
     uuidGenerator,
     inMemoryUow,

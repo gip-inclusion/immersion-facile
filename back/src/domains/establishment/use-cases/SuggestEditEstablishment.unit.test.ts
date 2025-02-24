@@ -1,5 +1,4 @@
 import {
-  EstablishmentJwtPayload,
   SiretDto,
   UserBuilder,
   immersionFacileNoReplyEmailSender,
@@ -34,10 +33,6 @@ describe("SuggestEditEstablishment", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
 
-    const generateEditFormEstablishmentUrl = (
-      payload: EstablishmentJwtPayload,
-    ) => makeFakeEditUrl(payload.siret);
-
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
@@ -48,7 +43,6 @@ describe("SuggestEditEstablishment", () => {
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       timeGateway,
-      generateEditFormEstablishmentUrl,
     );
   });
 
