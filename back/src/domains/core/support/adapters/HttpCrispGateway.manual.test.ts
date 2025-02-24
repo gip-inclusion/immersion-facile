@@ -1,6 +1,7 @@
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { HttpCrispGateway, crispRoutes } from "./HttpCrispGateway";
+import { HttpCrispGateway } from "./HttpCrispGateway";
+import { crispRoutes } from "./crispRoutes";
 
 describe("HttpCrispGateway", () => {
   const config = AppConfig.createFromEnv();

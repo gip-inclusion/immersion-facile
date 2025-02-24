@@ -16,9 +16,3 @@ export interface CrispGateway {
     params: InitiateCrispConversationParams,
   ) => Promise<void>;
 }
-
-export type CrispConfig = {
-  id: string;
-  key: string;
-  websiteId: string;
-};

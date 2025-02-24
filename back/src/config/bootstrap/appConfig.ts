@@ -15,7 +15,7 @@ import {
 import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import { DomainTopic } from "../../domains/core/events/events";
 import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
-import type { CrispConfig } from "../../domains/core/support/ports/CrispGateway";
+import { CrispConfig } from "../../domains/core/support/adapters/HttpCrispGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;

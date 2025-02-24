@@ -11,7 +11,7 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
   void,
   { crispApi: CrispGateway }
 >(
-  { name: "SendSupportTicketToCrips", inputSchema: tallyFormSchema },
+  { name: "SendSupportTicketToCrisp", inputSchema: tallyFormSchema },
   async () => {
     // TODO: we need to have some sample from prod data to implement this.
   },
