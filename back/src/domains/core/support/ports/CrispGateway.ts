@@ -11,7 +11,7 @@ export type InitiateCrispConversationParams = {
   helperNote: string;
 };
 
-export interface CrispApi {
+export interface CrispGateway {
   initiateConversation: (
     params: InitiateCrispConversationParams,
   ) => Promise<void>;

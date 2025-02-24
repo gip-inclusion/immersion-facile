@@ -22,6 +22,7 @@ import { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adap
 import { InMemoryAppellationsGateway } from "../domains/core/rome/adapters/InMemoryAppellationsGateway";
 import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { InMemorySiretGateway } from "../domains/core/sirene/adapters/InMemorySiretGateway";
+import { InMemoryCrispApi } from "../domains/core/support/adapters/InMemoryCrispApi";
 import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
@@ -49,6 +50,7 @@ export type InMemoryGateways = {
   subscribersGateway: InMemorySubscribersGateway;
   appellationsGateway: InMemoryAppellationsGateway;
   establishmentMarketingGateway: InMemoryEstablishmentMarketingGateway;
+  crispGateway: InMemoryCrispApi;
 };
 
 // following function only to type check that InMemoryRepositories is assignable to Repositories :

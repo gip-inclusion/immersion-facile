@@ -1,14 +1,14 @@
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { HttpCrispApi, crispApiRoutes } from "./HttpCrispApi";
+import { HttpCrispGateway, crispRoutes } from "./HttpCrispGateway";
 
-describe("HttpCrispApi", () => {
+describe("HttpCrispGateway", () => {
   const config = AppConfig.createFromEnv();
-  let crispApi: HttpCrispApi;
+  let crispApi: HttpCrispGateway;
 
   beforeEach(() => {
-    const httpClient = createFetchSharedClient(crispApiRoutes, fetch);
-    crispApi = new HttpCrispApi(httpClient, config.crispConfig);
+    const httpClient = createFetchSharedClient(crispRoutes, fetch);
+    crispApi = new HttpCrispGateway(httpClient, config.crispConfig);
   });
 
   describe("initiate conversation", () => {

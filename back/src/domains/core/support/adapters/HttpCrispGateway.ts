@@ -1,10 +1,10 @@
 import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import {
-  CrispApi,
   CrispConfig,
+  CrispGateway,
   InitiateCrispConversationParams,
-} from "../ports/CrispApi";
+} from "../ports/CrispGateway";
 
 type CrispHeaders = z.infer<typeof crispHeadersSchema>;
 const crispHeadersSchema = z.object({
@@ -18,8 +18,8 @@ const withErrorAndReason = {
   reason: z.string(),
 };
 
-export type CrispApiRoutes = typeof crispApiRoutes;
-export const crispApiRoutes = defineRoutes({
+export type CrispRoutes = typeof crispRoutes;
+export const crispRoutes = defineRoutes({
   createConversation: defineRoute({
     method: "post",
     url: "https://api.crisp.chat/v1/website/:websiteId/conversation",
@@ -88,15 +88,12 @@ export const crispError = (params: {
     )}`,
   );
 
-export class HttpCrispApi implements CrispApi {
-  #httpClient: HttpClient<CrispApiRoutes>;
+export class HttpCrispGateway implements CrispGateway {
+  #httpClient: HttpClient<CrispRoutes>;
   #headers: CrispHeaders;
   #websiteId: string;
 
-  constructor(
-    httpClient: HttpClient<CrispApiRoutes>,
-    crispConfig: CrispConfig,
-  ) {
+  constructor(httpClient: HttpClient<CrispRoutes>, crispConfig: CrispConfig) {
     const Authorization = `Basic ${Buffer.from(
       `${crispConfig.id}:${crispConfig.key}`,
     ).toString("base64")}`;
