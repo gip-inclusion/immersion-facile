@@ -1,9 +1,10 @@
-import { keys } from "shared";
+import { WithSiretDto, keys } from "shared";
 import type { AppDependencies } from "../../../config/bootstrap/createAppDependencies";
 import {
   InstantiatedUseCase,
   UseCases,
 } from "../../../config/bootstrap/createUseCases";
+import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import { DomainTopic } from "./events";
 import { NarrowEvent } from "./ports/EventBus";
 
@@ -105,26 +106,17 @@ const getUseCasesByTopics = (
   ConventionReminderRequired: [useCases.notifyConventionReminder],
 
   // Establishment form related
-  FormEstablishmentAdded: [
-    useCases.insertEstablishmentAggregateFromForm,
-    useCases.notifyConfirmationEstablishmentCreated,
-    useCases.markEstablishmentLeadAsRegistrationAccepted,
-  ],
-  FormEstablishmentEdited: [useCases.updateEstablishmentAggregateFromForm],
   FormEstablishmentEditLinkSent: [],
   UpdatedEstablishmentAggregateInsertedFromForm: [
     useCases.updateMarketingEstablishmentContactList,
   ],
   NewEstablishmentAggregateInsertedFromForm: [
-    useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
-    {
-      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
-      execute: ({
-        establishmentAggregate: {
-          establishment: { siret },
-        },
-      }) => useCases.updateMarketingEstablishmentContactList.execute({ siret }),
-    },
+    extractSiretFromArg(useCases.notifyConfirmationEstablishmentCreated),
+    extractSiretFromArg(
+      useCases.notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm,
+    ),
+    extractSiretFromArg(useCases.updateMarketingEstablishmentContactList),
+    extractSiretFromArg(useCases.markEstablishmentLeadAsRegistrationAccepted),
   ],
   // Establishment lead related
   EstablishmentLeadReminderSent: [],
@@ -188,3 +180,15 @@ export const subscribeToEvents = (deps: AppDependencies) => {
     });
   });
 };
+
+const extractSiretFromArg = <
+  UC extends InstantiatedUseCase<WithSiretDto, void, any>,
+>(
+  useCase: UC,
+): InstantiatedUseCase<WithEstablishmentAggregate, void, any> => ({
+  useCaseName: useCase.useCaseName,
+  execute: (params) =>
+    useCase.execute({
+      siret: params.establishmentAggregate.establishment.siret,
+    }),
+});
