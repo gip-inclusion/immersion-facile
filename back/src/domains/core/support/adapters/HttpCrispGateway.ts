@@ -68,7 +68,7 @@ export class HttpCrispGateway implements CrispGateway {
 
     const addMetaResponse = await this.#httpClient.addMetadataToConversation({
       headers: this.#headers,
-      body: params.metadata,
+      body: { ...params.metadata, nickname: params.metadata.email },
       urlParams: { sessionId, websiteId: this.#websiteId },
     });
     if (addMetaResponse.status !== 200) throw crispError(addMetaResponse);
