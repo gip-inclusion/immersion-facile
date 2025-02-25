@@ -50,7 +50,13 @@ describe("GetAssessmentByConventionId", () => {
   };
   const [passingRoles, failingRoles] = splitCasesBetweenPassingAndFailing(
     allRoles,
-    ["establishment-tutor", "validator", "counsellor", "beneficiary"],
+    [
+      "establishment-tutor",
+      "establishment-representative",
+      "validator",
+      "counsellor",
+      "beneficiary",
+    ],
   );
 
   let getAssessment: GetAssessmentByConventionId;
