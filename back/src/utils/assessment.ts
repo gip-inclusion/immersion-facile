@@ -50,7 +50,10 @@ const assessmentEmailsByRole = (
   "beneficiary-current-employer": errors.assessment.forbidden(),
   "beneficiary-representative": errors.assessment.forbidden(),
   "agency-admin": errors.assessment.forbidden(),
-  "establishment-representative": errors.assessment.forbidden(),
+  "establishment-representative":
+    mode === "GetAssessment"
+      ? [convention.signatories.establishmentRepresentative.email]
+      : errors.assessment.forbidden(),
   "establishment-tutor": [convention.establishmentTutor.email],
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
