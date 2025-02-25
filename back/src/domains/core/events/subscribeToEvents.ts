@@ -1,4 +1,4 @@
-import { WithSiretDto, keys } from "shared";
+import { WithConventionDto, WithSiretDto, keys } from "shared";
 import type { AppDependencies } from "../../../config/bootstrap/createAppDependencies";
 import {
   InstantiatedUseCase,
@@ -75,11 +75,9 @@ const getUseCasesByTopics = (
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
     useCases.addEstablishmentLead,
-    {
-      useCaseName: useCases.updateMarketingEstablishmentContactList.useCaseName,
-      execute: ({ convention: { siret } }) =>
-        useCases.updateMarketingEstablishmentContactList.execute({ siret }),
-    },
+    extractSiretFromConvention(
+      useCases.updateMarketingEstablishmentContactList,
+    ),
   ],
 
   // Edge cases for immersion application.
@@ -191,5 +189,17 @@ const extractSiretFromArg = <
   execute: (params) =>
     useCase.execute({
       siret: params.establishmentAggregate.establishment.siret,
+    }),
+});
+
+const extractSiretFromConvention = <
+  UC extends InstantiatedUseCase<WithSiretDto, void, any>,
+>(
+  useCase: UC,
+): InstantiatedUseCase<WithConventionDto, void, any> => ({
+  useCaseName: useCase.useCaseName,
+  execute: (params) =>
+    useCase.execute({
+      siret: params.convention.siret,
     }),
 });
