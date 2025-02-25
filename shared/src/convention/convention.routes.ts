@@ -110,6 +110,17 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
     },
   }),
+  remindSignatories: defineRoute({
+    url: "/auth/convention/:conventionId/signatories/:role/remind",
+    method: "post",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+    },
+  }),
 });
 
 export type UnauthenticatedConventionRoutes =
