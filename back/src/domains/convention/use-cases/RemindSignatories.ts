@@ -1,4 +1,3 @@
-import { NumberType, getNumberType } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { intersection, toPairs } from "ramda";
 import {
@@ -7,20 +6,26 @@ import {
   ConventionReadDto,
   ConventionRelatedJwtPayload,
   ConventionStatus,
-  Role,
+  Signatories,
   SignatoryRole,
   agencyModifierRoles,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
+  frontRoutes,
   isSomeEmailMatchingEmailHash,
   signatorySchema,
-  signatoryTitleByRole,
 } from "shared";
 import { z } from "zod";
+import { AppConfig } from "../../../config/bootstrap/appConfig";
+import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
+import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
@@ -40,7 +45,14 @@ export type RemindSignatories = ReturnType<typeof makeRemindSignatories>;
 export const makeRemindSignatories = createTransactionalUseCase<
   RemindSignatoriesParams,
   void,
-  ConventionRelatedJwtPayload
+  ConventionRelatedJwtPayload,
+  {
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    timeGateway: TimeGateway;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    config: AppConfig;
+  }
 >(
   {
     name: "RemindSignatories",
@@ -69,17 +81,60 @@ export const makeRemindSignatories = createTransactionalUseCase<
       convention,
     });
 
+    const signatoryKey =
+      conventionSignatoryRoleBySignatoryKey[inputParams.role];
+    const signatory = convention.signatories[signatoryKey];
+    if (!signatory) {
+      throw errors.convention.missingActor({
+        conventionId: convention.id,
+        role: inputParams.role,
+      });
+    }
+
     throwErrorIfPhoneNumerNotValid({
       convention,
+      signatoryKey,
       signatoryRole: inputParams.role,
     });
 
     throwErrorIfSignatoryAlreadySigned({
       convention,
+      signatoryKey,
       signatoryRole: inputParams.role,
     });
 
-    console.log("end");
+    const makeShortMagicLink = prepareMagicShortLinkMaker({
+      config: deps.config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        role: inputParams.role,
+        email: signatory.email,
+        now: deps.timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+      uow,
+    });
+
+    const shortLink = await makeShortMagicLink({
+      targetRoute: frontRoutes.conventionToSign,
+      lifetime: "short",
+    });
+
+    await deps.saveNotificationAndRelatedEvent(uow, {
+      kind: "sms",
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+        userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
+      },
+      templatedContent: {
+        recipientPhone: signatory.phone,
+        kind: "LastReminderForSignatories",
+        params: { shortLink: shortLink },
+      },
+    });
   },
 );
 
@@ -184,17 +239,19 @@ const throwIfNotAllowedForUser = async ({
 const throwErrorIfPhoneNumerNotValid = ({
   convention,
   signatoryRole,
-}: { convention: ConventionReadDto; signatoryRole: SignatoryRole }) => {
-  const signatory = conventionSignatoryRoleBySignatoryKey[signatoryRole];
-
-  if (!convention.signatories[signatory]) {
+  signatoryKey,
+}: {
+  convention: ConventionReadDto;
+  signatoryKey: keyof Signatories;
+  signatoryRole: SignatoryRole;
+}) => {
+  if (!convention.signatories[signatoryKey]) {
     throw new Error();
   }
 
   const isValidMobilePhone =
-    parsePhoneNumber(convention.signatories[signatory].phone).getType() ===
+    parsePhoneNumber(convention.signatories[signatoryKey].phone).getType() ===
     "MOBILE";
-
   if (!isValidMobilePhone)
     throw errors.convention.invalidMobilePhoneNumber({
       conventionId: convention.id,
@@ -205,10 +262,13 @@ const throwErrorIfPhoneNumerNotValid = ({
 const throwErrorIfSignatoryAlreadySigned = ({
   convention,
   signatoryRole,
-}: { convention: ConventionReadDto; signatoryRole: SignatoryRole }) => {
-  const signatory = conventionSignatoryRoleBySignatoryKey[signatoryRole];
-
-  if (convention.signatories[signatory]?.signedAt) {
+  signatoryKey,
+}: {
+  convention: ConventionReadDto;
+  signatoryRole: SignatoryRole;
+  signatoryKey: keyof Signatories;
+}) => {
+  if (convention.signatories[signatoryKey]?.signedAt) {
     throw errors.convention.signatoryAlreadySigned({
       conventionId: convention.id,
       signatoryRole,

@@ -1,3 +1,4 @@
+import { afterEach } from "node:test";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -8,14 +9,25 @@ import {
   conventionStatusesWithValidator,
   createConventionMagicLinkPayload,
   errors,
+  expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
 } from "shared";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import {
+  SaveNotificationAndRelatedEvent,
+  makeSaveNotificationAndRelatedEvent,
+} from "../../core/notifications/helpers/Notification";
+import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
+import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { RemindSignatories, makeRemindSignatories } from "./RemindSignatories";
 
 const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
@@ -23,6 +35,9 @@ const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 const convention = new ConventionDtoBuilder()
   .withId(conventionId)
   .withStatus("READY_TO_SIGN")
+  .signedByEstablishmentRepresentative(undefined)
+  .signedByBeneficiary(undefined)
+  .withBeneficiarySignedAt(undefined)
   .build();
 
 const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
@@ -44,6 +59,13 @@ const validatorJwtPayload = createConventionMagicLinkPayload({
   now: new Date(),
 });
 
+const counsellorJwtPayload = createConventionMagicLinkPayload({
+  id: conventionId,
+  role: "counsellor",
+  email: notConnectedUser.email,
+  now: new Date(),
+});
+
 const connectedUserPayload: InclusionConnectDomainJwtPayload = {
   userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
 };
@@ -54,17 +76,39 @@ const connectedUserBuilder = new InclusionConnectedUserBuilder().withId(
 const connectedUser = connectedUserBuilder.build();
 
 describe("RemindSignatories", () => {
+  const config = new AppConfigBuilder().build();
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
   let usecase: RemindSignatories;
+  let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   beforeEach(() => {
+    const timeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+    saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      new UuidV4Generator(),
+      timeGateway,
+    );
+
     usecase = makeRemindSignatories({
       uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        timeGateway,
+        shortLinkIdGeneratorGateway,
+        config,
+      },
     });
   });
 
   describe("Wrong paths", () => {
+    afterEach(() => {
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, []);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+    });
+
     it("throws bad request if requested convention does not match the one in jwt", async () => {
       const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
 
@@ -123,6 +167,33 @@ describe("RemindSignatories", () => {
         );
       },
     );
+
+    it("throws bad request if role to remind does not exist", async () => {
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+      uow.conventionRepository.setConventions([convention]);
+      uow.userRepository.users = [notConnectedUser];
+
+      await expectPromiseToFailWithError(
+        usecase.execute(
+          {
+            conventionId: convention.id,
+            role: "beneficiary-current-employer",
+          },
+          validatorJwtPayload,
+        ),
+        errors.convention.missingActor({
+          conventionId: convention.id,
+          role: "beneficiary-current-employer",
+        }),
+      );
+    });
 
     describe("from connected user", () => {
       it("throws not found if connected user id does not exist", async () => {
@@ -259,42 +330,58 @@ describe("RemindSignatories", () => {
       });
     });
 
-    it("throws too many requests if there was already a reminder less than 24h before", () => {});
-
-    it("throws bad request if phone number format %s is incorrect", async () => {
-      const conventionWithIncorrectPhoneFormat = new ConventionDtoBuilder(
-        convention,
-      )
-        .withBeneficiaryPhone("+3300000000")
-        .withBeneficiarySignedAt(undefined)
-        .build();
-      uow.conventionRepository.setConventions([
-        conventionWithIncorrectPhoneFormat,
-      ]);
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(agency, {
-          [notConnectedUser.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-      ];
-      uow.userRepository.users = [notConnectedUser];
-
-      await expectPromiseToFailWithError(
-        usecase.execute(
-          {
-            conventionId,
-            role: "beneficiary",
-          },
-          validatorJwtPayload,
-        ),
-        errors.convention.invalidMobilePhoneNumber({
-          conventionId: conventionWithIncorrectPhoneFormat.id,
-          signatoryRole: "beneficiary",
-        }),
-      );
+    it("throws too many requests if there was already a reminder less than 24h before", () => {
+      
     });
+
+    it.each([
+      "+33555689727", // Métropole
+      "+262269567890", // Mayotte
+      "+590590123456", // Guadeloupe
+      "+594594234567", // Guyane
+      "+596596345678", // Martinique
+      "+262262456789", // Réunion
+      "+68940301010", //  Polynésie française
+      "+687261234", // Nouvelle-Calédonie
+      "+508412345", //Saint-Pierre-et-Miquelon
+    ])(
+      "throws bad request if phone number format %s is incorrect",
+      async (phoneNumber) => {
+        const shortLinkId = "link1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+        const conventionWithIncorrectPhoneFormat = new ConventionDtoBuilder(
+          convention,
+        )
+          .withBeneficiaryPhone(phoneNumber)
+          .build();
+        uow.conventionRepository.setConventions([
+          conventionWithIncorrectPhoneFormat,
+        ]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
+        uow.userRepository.users = [notConnectedUser];
+
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId,
+              role: "beneficiary",
+            },
+            validatorJwtPayload,
+          ),
+          errors.convention.invalidMobilePhoneNumber({
+            conventionId: conventionWithIncorrectPhoneFormat.id,
+            signatoryRole: "beneficiary",
+          }),
+        );
+      },
+    );
 
     it("throws bad request if reminded signatory has already signed", async () => {
       const conventionAlreadySigned = new ConventionDtoBuilder(convention)
@@ -331,10 +418,169 @@ describe("RemindSignatories", () => {
   describe("Right paths: send sms reminder", () => {
     // for magic link and connected user
     // for validator and counsellor
-    //phone number valid
-    it.each(["+33600000000", "+33700000000", "+262692000000"])(
-      "for phone number %s",
-      (phoneNumber) => {},
+    it.each(["validator", "counsellor"] as const)(
+      "When pro connected %s triggers it",
+      async (role) => {
+        const shortLinkId = "link1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [connectedUser.id]: {
+              roles: [role],
+              isNotifiedByEmail: false,
+            },
+          }),
+        ];
+        uow.userRepository.users = [connectedUser];
+
+        await usecase.execute(
+          {
+            conventionId,
+            role: "establishment-representative",
+          },
+          connectedUserPayload,
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          { topic: "NotificationAdded" },
+        ]);
+        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+          {
+            kind: "sms",
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+              userId: connectedUser.id,
+            },
+            templatedContent: {
+              recipientPhone:
+                convention.signatories.establishmentRepresentative.phone,
+              kind: "LastReminderForSignatories",
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkId),
+              },
+            },
+          },
+        ]);
+      },
     );
+    it.each(["validator", "counsellor"] as const)(
+      "When not connected %s triggers it",
+      async (role) => {
+        const shortLinkId = "link1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: [role],
+              isNotifiedByEmail: false,
+            },
+          }),
+        ];
+        uow.userRepository.users = [notConnectedUser];
+
+        await usecase.execute(
+          {
+            conventionId,
+            role: "establishment-representative",
+          },
+          role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          { topic: "NotificationAdded" },
+        ]);
+        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+          {
+            kind: "sms",
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+              userId: undefined,
+            },
+            templatedContent: {
+              recipientPhone:
+                convention.signatories.establishmentRepresentative.phone,
+              kind: "LastReminderForSignatories",
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkId),
+              },
+            },
+          },
+        ]);
+      },
+    );
+    // phone number valid
+    it.each([
+      "+33600000000", // metropole
+      "+33785689727", // metropole
+      "+262639000001", // Mayotte
+      "+590690000001", // Guadeloupe
+      "+590691282545", // Guadeloupe
+      "+594694000001", // Guyane
+      "+596696000001", // Martinique
+      "+262692000001", // Réunion
+      "+262693000001", // Réunion
+      "+68987770076", // polynesie française
+      "+687751234", // nouvelle calédonie
+      "+681821234", // wallis et futuna
+      "+508551234", // saint pierre et miquelon
+    ])("for phone number %s", async (phoneNumber) => {
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+      const conventionWithCustomPhoneNumer = new ConventionDtoBuilder(
+        convention,
+      )
+        .withBeneficiaryPhone(phoneNumber)
+        .build();
+
+      uow.conventionRepository.setConventions([conventionWithCustomPhoneNumer]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [notConnectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+      uow.userRepository.users = [notConnectedUser];
+
+      await usecase.execute(
+        {
+          conventionId,
+          role: "beneficiary",
+        },
+        validatorJwtPayload,
+      );
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: conventionWithCustomPhoneNumer.id,
+            agencyId: conventionWithCustomPhoneNumer.agencyId,
+            establishmentSiret: conventionWithCustomPhoneNumer.siret,
+            userId: undefined,
+          },
+          templatedContent: {
+            recipientPhone:
+              conventionWithCustomPhoneNumer.signatories.beneficiary.phone,
+            kind: "LastReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
+            },
+          },
+        },
+      ]);
+    });
   });
 });

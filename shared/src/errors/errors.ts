@@ -205,7 +205,7 @@ export const errors = {
       conventionId: ConventionId;
       role: Role;
     }) =>
-      new BadRequestError(`There is no ${role} on convention ${conventionId}.`),
+      new BadRequestError(`Il n'y a pas de role ${role} pour la convention ${conventionId}.`),
     unsupportedRoleRenewMagicLink: ({ role }: { role: Role }) =>
       new BadRequestError(
         `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
