@@ -1,8 +1,6 @@
 type CrispMetadata = {
   email: string;
   segments: string[];
-  nickname?: string;
-  subject?: string;
 };
 
 export type InitiateCrispConversationParams = {

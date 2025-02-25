@@ -10,6 +10,13 @@ import {
   SendSupportTicketToCrisp,
   makeSendSupportTicketToCrisp,
 } from "./SendSupportTicketToCrisp";
+import {
+  conventionFromTally,
+  johnDoeEmail,
+  tallyFormCase1,
+  tallyFormCase2WithConventionId,
+  tallyFormCase3,
+} from "./SendSupportTicketToCrisp.testData";
 
 describe("SendSupportTicketToCrisp", () => {
   let sendSupportTicketToCrisp: SendSupportTicketToCrisp;
@@ -27,21 +34,82 @@ describe("SendSupportTicketToCrisp", () => {
     });
   });
 
-  it.skip("creates a ticket on crisp", async () => {
-    const subject = "Yo";
-    const nickname = "Nickname";
-    const email = "yo@yo.com";
-    const segments = ["segment1"];
-
-    await sendSupportTicketToCrisp.execute(tallyForm);
-
-    expectCrispInitiatedConversationParams([
+  describe("It creates a ticket on crisp from different usecases", () => {
+    it.each([
       {
-        helperNote: "Yo",
-        message: "Lala",
-        metadata: { subject, nickname, email, segments },
+        name: "case 1",
+        tallyForm: tallyFormCase1,
+        expectedParams: {
+          message: "J'ai eu un problème, que voici...",
+          helperNote: `Choisissez le cas qui vous correspond le mieux:
+Autre chose
+
+Vous avez sélectionné "Autre chose", pouvez-vous préciser la situation qui vous correspond le mieux ?:
+Autre chose
+
+Vous êtes:
+Le bénéficiaire
+
+Vous nous écrivez pour...:
+Vous-même
+`,
+          metadata: {
+            email: johnDoeEmail,
+            segments: ["email", "beneficiaire"],
+          },
+        },
       },
-    ]);
+      {
+        name: "case 2, with convention ID",
+        tallyForm: tallyFormCase2WithConventionId,
+        expectedParams: {
+          message: "J'ai eu un problème, que voici...",
+          helperNote: `Choisissez le cas qui vous correspond le mieux:
+Autre chose
+
+Vous avez sélectionné "Autre chose", pouvez-vous préciser la situation qui vous correspond le mieux ?:
+J'ai besoin d'aide concernant une Immersion passée ou en cours
+
+Vous êtes:
+Le bénéficiaire
+
+Vous nous écrivez pour...:
+Vous-même
+
+Convention ID: ${conventionFromTally}`,
+          metadata: {
+            email: johnDoeEmail,
+            segments: ["email", "beneficiaire"],
+          },
+        },
+      },
+      {
+        name: "case 3, whatever",
+        tallyForm: tallyFormCase3,
+        expectedParams: {
+          message: "J'ai eu un problème, que voici...",
+          helperNote: `Choisissez le cas qui vous correspond le mieux:
+Autre chose
+
+Vous avez sélectionné "Autre chose", pouvez-vous préciser la situation qui vous correspond le mieux ?:
+Je suis prescripteur de PMSMP (Mission locale, France Travail, Conseil départemental, CEP...)
+
+Vous nous écrivez pour...:
+Vous-même
+
+Sur quoi porte votre demande ?:
+Je veux référencer ma structure sur le site Immersion Facilitée
+`,
+          metadata: {
+            email: johnDoeEmail,
+            segments: ["email", "prescripteur"],
+          },
+        },
+      },
+    ])("Ticket on crisp: $name", async ({ tallyForm, expectedParams }) => {
+      await sendSupportTicketToCrisp.execute(tallyForm);
+      expectCrispInitiatedConversationParams([expectedParams]);
+    });
   });
 
   const expectCrispInitiatedConversationParams = (
@@ -50,20 +118,3 @@ describe("SendSupportTicketToCrisp", () => {
     expect(crispApi.initiatedConversationParams).toEqual(params);
   };
 });
-
-// TODO create sample data realistic from prod data
-const tallyForm: TallyForm = {
-  eventId: "444e93a8-68db-4cc2-ac17-0bbcbd4460f8",
-  eventType: "FORM_SUBMISSION",
-  createdAt: "2024-04-17T08:56:10.922Z",
-  data: {
-    responseId: "2O0vAe",
-    submissionId: "2O0vAe",
-    respondentId: "v2eE1D",
-    formId: "w7WM49",
-    formName:
-      "Recevoir le contact du prescripteur de droit qui peut me délivrer une convention de délégation",
-    createdAt: "2024-04-17T08:56:10.000Z",
-    fields: [],
-  },
-};
