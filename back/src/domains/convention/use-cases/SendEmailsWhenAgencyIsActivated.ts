@@ -9,7 +9,6 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { oAuthProviderByFeatureFlags } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -31,10 +30,6 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
     { agencyId }: WithAgencyId,
     uow: UnitOfWork,
   ): Promise<void> {
-    const provider = oAuthProviderByFeatureFlags(
-      await uow.featureFlagRepository.getAll(),
-    );
-
     const agency = await uow.agencyRepository.getById(agencyId);
     if (!agency) throw errors.agency.notFound({ agencyId });
 
@@ -44,7 +39,7 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
       (userIdAndRights) => userIdAndRights[0],
     );
 
-    const users = await uow.userRepository.getByIds(userIds, provider);
+    const users = await uow.userRepository.getByIds(userIds);
 
     if (users.length === 0)
       throw errors.agency.usersNotFound({ agencyId: agency.id });
@@ -105,7 +100,7 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
         agencyReferredTo,
       );
 
-      this.#saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent: {
           kind: "AGENCY_WITH_REFERS_TO_ACTIVATED",

@@ -5,7 +5,6 @@ import {
   withOptionalUserIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -41,17 +40,13 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
     currentIcUser?: InclusionConnectedUser,
   ): Promise<InclusionConnectedUser> {
     if (!currentIcUser) throw errors.user.noJwtProvided();
-    const provider = await makeProvider(uow);
 
-    const currentUser = await uow.userRepository.getById(
-      currentIcUser.id,
-      provider,
-    );
+    const currentUser = await uow.userRepository.getById(currentIcUser.id);
     if (params.userId) throwIfNotAdmin(currentUser);
 
     const userIdToFetch = params.userId ?? currentIcUser.id;
 
-    const user = await uow.userRepository.getById(userIdToFetch, provider);
+    const user = await uow.userRepository.getById(userIdToFetch);
     if (!user) throw errors.user.notFound({ userId: userIdToFetch });
 
     return getIcUserByUserId(

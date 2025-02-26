@@ -17,7 +17,6 @@ import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUser
 import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   NormalizedIcUserById,
   NormalizedInclusionConnectedUser,
@@ -26,7 +25,6 @@ import {
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
-import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { v4 as uuidV4 } from "uuid";
 import { Feedback } from "../feedback/Feedback";
@@ -84,9 +82,6 @@ export const AgencyUsers = ({
 }: AgencyUsersProperties) => {
   const isLocationAdmin =
     routeName === "adminAgencies" || routeName === "adminAgencyDetail";
-  const { enableProConnect } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
 
   const manageUserModal = React.useMemo(
     () =>
@@ -118,8 +113,6 @@ export const AgencyUsers = ({
   >(null);
 
   const [mode, setMode] = useState<"add" | "update" | null>(null);
-
-  const provider = enableProConnect ? "ProConnect" : "Inclusion Connect";
 
   const onModifyClicked = (agencyUser: NormalizedInclusionConnectedUser) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
@@ -301,9 +294,9 @@ export const AgencyUsers = ({
               </h5>
               <p className={fr.cx("fr-text--sm")}>
                 {selectedUserData.isIcUser
-                  ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ${provider} créé avec l'email ${selectedUserData.email}`
+                  ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ProConnect créé avec l'email ${selectedUserData.email}`
                   : `Pour ajouter un nom, prénom et mot de passe, l'utilisateur doit se créer un compte 
-                  via ${provider}, avec l'email ${selectedUserData.email}.
+                  via ProConnect, avec l'email ${selectedUserData.email}.
                   Nous vous déconseillons de créer un compte pour les boites génériques pour conserver la traçabilité des actions sur les demandes de conventions d'immersion.`}
               </p>
               <AgencyUserModificationForm

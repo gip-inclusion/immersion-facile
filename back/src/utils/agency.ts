@@ -10,7 +10,6 @@ import {
   errors,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const toAgencyWithRights = (
@@ -47,8 +46,6 @@ export const agencyWithRightToAgencyDto = async (
   uow: UnitOfWork,
   { usersRights, ...rest }: AgencyWithUsersRights,
 ): Promise<AgencyDto> => {
-  const provider = await makeProvider(uow);
-
   const { counsellorIds, validatorIds } = toPairs(usersRights).reduce<{
     counsellorIds: UserId[];
     validatorIds: UserId[];
@@ -76,12 +73,9 @@ export const agencyWithRightToAgencyDto = async (
     { counsellorIds: [], validatorIds: [] },
   );
 
-  const counsellors = await uow.userRepository.getByIds(
-    counsellorIds,
-    provider,
-  );
+  const counsellors = await uow.userRepository.getByIds(counsellorIds);
 
-  const validators = await uow.userRepository.getByIds(validatorIds, provider);
+  const validators = await uow.userRepository.getByIds(validatorIds);
 
   return {
     ...rest,
@@ -154,9 +148,6 @@ export const getAgencyEmailsByRole = async ({
     .filter(([_, rights]) => rights?.roles.includes(role))
     .map(([id]) => id);
 
-  const users = await uow.userRepository.getByIds(
-    adminUserIds,
-    await makeProvider(uow),
-  );
+  const users = await uow.userRepository.getByIds(adminUserIds);
   return users.map((user) => user.email);
 };

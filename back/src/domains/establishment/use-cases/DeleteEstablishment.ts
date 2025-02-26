@@ -7,7 +7,6 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -77,16 +76,14 @@ export class DeleteEstablishment extends TransactionalUseCase<
       .filter(({ role }) => role === "establishment-contact")
       .map(({ userId }) => userId);
 
-    const provider = await makeProvider(uow);
-
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "ESTABLISHMENT_DELETED",
-        recipients: (await uow.userRepository.getByIds(adminIds, provider)).map(
+        recipients: (await uow.userRepository.getByIds(adminIds)).map(
           ({ email }) => email,
         ),
-        cc: (await uow.userRepository.getByIds(contactIds, provider)).map(
+        cc: (await uow.userRepository.getByIds(contactIds)).map(
           ({ email }) => email,
         ),
         params: {
