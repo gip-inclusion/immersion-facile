@@ -63,11 +63,10 @@ const responseError = (
 
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
-  payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
+  payloadKey: ExtractFromExisting<PayloadKey, "convention">,
 ): RequestHandler => {
-  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "establishment" | "inclusionConnect"
-  >(config);
+  const { verifyJwt, verifyDeprecatedJwt } =
+    verifyJwtConfig<"convention">(config);
   return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
