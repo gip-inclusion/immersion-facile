@@ -1,7 +1,8 @@
 import {
-  type EstablishmentJwtPayload,
-  type SiretDto,
+  AbsoluteUrl,
   UserBuilder,
+  createInclusionConnectJwtPayload,
+  frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -9,6 +10,7 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { GenerateInclusionConnectJwt } from "../../core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -27,35 +29,43 @@ describe("SuggestEditEstablishment", () => {
   let suggestEditEstablishment: SuggestEditEstablishment;
   let uow: InMemoryUnitOfWork;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let timeGateway: CustomTimeGateway;
 
-  const makeFakeEditUrl = (siret: SiretDto) =>
-    `www.immersion-facile.fr/edit?jwt=jwtOfSiret[${siret}]`;
+  const fakeBaseUrl: AbsoluteUrl = "https://if-base-url";
+
+  const generateFakeInclusionConnectJwt: GenerateInclusionConnectJwt = ({
+    userId,
+    version,
+    exp,
+    iat,
+  }) => `${userId}-${version}-${exp}-${iat}`;
 
   beforeEach(() => {
     uow = createInMemoryUow();
-
-    const generateEditFormEstablishmentUrl = (
-      payload: EstablishmentJwtPayload,
-    ) => makeFakeEditUrl(payload.siret);
+    timeGateway = new CustomTimeGateway();
 
     expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
       uow.notificationRepository,
       uow.outboxRepository,
     );
 
-    const timeGateway = new CustomTimeGateway();
     suggestEditEstablishment = new SuggestEditEstablishment(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
       timeGateway,
-      generateEditFormEstablishmentUrl,
+      generateFakeInclusionConnectJwt,
+      fakeBaseUrl,
     );
   });
 
-  it("Sends an email to contact and people in copy", async () => {
-    const admin = new UserBuilder()
+  it("Sends an email to each establishment admin with specific jwt", async () => {
+    const admin1 = new UserBuilder()
       .withId(uuid())
       .withEmail("jerome@gmail.com")
+      .build();
+    const admin2 = new UserBuilder()
+      .withId(uuid())
+      .withEmail("billy@gmail.com")
       .build();
     const contact = new UserBuilder()
       .withId(uuid())
@@ -86,10 +96,16 @@ describe("SuggestEditEstablishment", () => {
       )
       .withUserRights([
         {
-          userId: admin.id,
+          userId: admin1.id,
           role: "establishment-admin",
-          job: "Boss",
+          job: "Boss1",
           phone: "+33688779955",
+        },
+        {
+          userId: admin2.id,
+          role: "establishment-admin",
+          job: "Boss2",
+          phone: "+33688779666",
         },
         {
           userId: contact.id,
@@ -101,7 +117,7 @@ describe("SuggestEditEstablishment", () => {
     uow.establishmentAggregateRepository.establishmentAggregates = [
       establishmentAggregate,
     ];
-    uow.userRepository.users = [admin, contact];
+    uow.userRepository.users = [admin1, admin2, contact];
 
     await suggestEditEstablishment.execute(
       establishmentAggregate.establishment.siret,
@@ -111,13 +127,36 @@ describe("SuggestEditEstablishment", () => {
       emails: [
         {
           kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
-          recipients: [admin.email],
+          recipients: [admin1.email],
           sender: immersionFacileNoReplyEmailSender,
-          cc: [contact.email],
           params: {
-            editFrontUrl: makeFakeEditUrl(
-              establishmentAggregate.establishment.siret,
-            ),
+            editFrontUrl: `${fakeBaseUrl}/${
+              frontRoutes.editFormEstablishmentRoute
+            }?jwt=${generateFakeInclusionConnectJwt(
+              createInclusionConnectJwtPayload({
+                userId: admin1.id,
+                now: timeGateway.now(),
+                durationDays: 2,
+              }),
+            )}`,
+            businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
+            businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+          },
+        },
+        {
+          kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
+          recipients: [admin2.email],
+          sender: immersionFacileNoReplyEmailSender,
+          params: {
+            editFrontUrl: `${fakeBaseUrl}/${
+              frontRoutes.editFormEstablishmentRoute
+            }?jwt=${generateFakeInclusionConnectJwt(
+              createInclusionConnectJwtPayload({
+                userId: admin2.id,
+                now: timeGateway.now(),
+                durationDays: 2,
+              }),
+            )}`,
             businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },

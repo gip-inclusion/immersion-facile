@@ -1,8 +1,10 @@
 import type { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { makeGenerateEditFormEstablishmentUrl } from "../config/bootstrap/magicLinkUrl";
-import { makeGenerateJwtES256 } from "../domains/core/jwt";
+import {
+  GenerateInclusionConnectJwt,
+  makeGenerateJwtES256,
+} from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
@@ -26,29 +28,18 @@ const startScript = async (): Promise<Report> => {
     createGetPgPoolFn(config),
   );
 
-  const numberOfDaysBeforeExpiration = 7;
-  const expiresInSeconds = numberOfDaysBeforeExpiration * 24 * 60 * 60;
-
-  const generateEditEstablishmentJwt = makeGenerateJwtES256<"establishment">(
-    config.jwtPrivateKey,
-    expiresInSeconds,
-  );
-
-  const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-    uuidGenerator,
-    timeGateway,
-  );
-
-  const suggestEditEstablishment = new SuggestEditEstablishment(
-    uowPerformer,
-    saveNotificationAndRelatedEvent,
-    timeGateway,
-    makeGenerateEditFormEstablishmentUrl(config, generateEditEstablishmentJwt),
-  );
+  const generateInclusionConnectJwt: GenerateInclusionConnectJwt =
+    makeGenerateJwtES256<"inclusionConnect">(config.jwtPrivateKey, 3600);
 
   const suggestEditEstablishmentsScript = new SuggestEditEstablishmentsScript(
     uowPerformer,
-    suggestEditEstablishment,
+    new SuggestEditEstablishment(
+      uowPerformer,
+      makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
+      timeGateway,
+      generateInclusionConnectJwt,
+      config.immersionFacileBaseUrl,
+    ),
     timeGateway,
   );
   return suggestEditEstablishmentsScript.execute();
