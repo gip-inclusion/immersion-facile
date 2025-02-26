@@ -11,7 +11,6 @@ import {
 } from "shared";
 import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -125,7 +124,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       contactRequest,
       contact: await businessContactFromEstablishmentAggregateAndUsers(
         uow,
-        await makeProvider(uow),
         establishmentAggregate,
       ),
       establishment: establishmentAggregate.establishment,

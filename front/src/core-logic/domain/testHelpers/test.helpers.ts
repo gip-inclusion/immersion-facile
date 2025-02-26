@@ -19,7 +19,6 @@ const defaultFlagsInFront: FeatureFlags = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
-  enableProConnect: makeBooleanFeatureFlag(false), // si tu veux check le rendu proconnect en in-memory
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),

@@ -2,7 +2,6 @@ import { keys, values } from "ramda";
 import {
   Email,
   GetUsersFilters,
-  OAuthGatewayProvider,
   UserId,
   UserWithAdminRights,
   errors,
@@ -24,10 +23,7 @@ export class InMemoryUserRepository implements UserRepository {
     return this.users.find((user) => user.email === email);
   }
 
-  public async getByIds(
-    userIds: UserId[],
-    _: OAuthGatewayProvider,
-  ): Promise<UserOnRepository[]> {
+  public async getByIds(userIds: UserId[]): Promise<UserOnRepository[]> {
     const users = this.users.filter((user) => userIds.includes(user.id));
 
     const missingUserIds = userIds.filter(

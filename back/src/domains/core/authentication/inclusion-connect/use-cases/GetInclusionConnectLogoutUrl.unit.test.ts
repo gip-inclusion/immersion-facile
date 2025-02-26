@@ -46,11 +46,6 @@ describe("GetInclusionConnectLogoutUrl", () => {
             oAuthGateway: new InMemoryOAuthGateway(fakeProviderConfig),
           },
         });
-
-        uow.featureFlagRepository.update({
-          flagName: "enableProConnect",
-          featureFlag: { isActive: provider === "proConnect", kind: "boolean" },
-        });
       });
 
       it("throws when it does not find the ongoingOAuth", async () => {
@@ -61,7 +56,8 @@ describe("GetInclusionConnectLogoutUrl", () => {
         );
       });
 
-      it("returns the inclusion connect logout url from %s", async () => {
+      it("returns the oAuth logout url from %s", async () => {
+        expect(provider).toBe("proConnect");
         const ongoingOAuth: OngoingOAuth = {
           state: "some-state",
           nonce: "some-nonce",

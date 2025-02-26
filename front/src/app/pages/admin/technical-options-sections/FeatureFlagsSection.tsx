@@ -125,10 +125,6 @@ const labelsByFeatureFlag: Record<
     title: "Recherche par pertinence",
     enableLabel: "Activer la recherche par pertinence (scoring)",
   },
-  enableProConnect: {
-    title: "Passer de Inclusion Connect à Pro Connect",
-    enableLabel: "Activer le mode Pro Connect",
-  },
   enableBroadcastOfMissionLocaleToFT: {
     title: "Diffusion des conventions à France Travail",
     enableLabel: "Activer les Missions Locales",

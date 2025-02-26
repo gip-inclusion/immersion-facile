@@ -21,7 +21,6 @@ export const defaultFlags: FeatureFlags = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
-  enableProConnect: makeBooleanFeatureFlag(false),
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),

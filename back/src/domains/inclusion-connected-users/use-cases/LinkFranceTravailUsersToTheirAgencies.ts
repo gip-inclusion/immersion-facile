@@ -20,7 +20,7 @@ import { getUserWithRights } from "../helpers/userRights.helper";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),
-  provider: z.enum(["inclusionConnect", "proConnect"]),
+  provider: z.enum(["proConnect"]),
   codeSafir: z.string().or(z.null()),
 });
 

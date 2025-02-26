@@ -2,13 +2,12 @@ import {
   AllowedStartInclusionConnectLoginSourcesKind,
   InclusionConnectImmersionRoutes,
   WithSourcePage,
-  allowedStartInclusionConnectLoginPages,
+  allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
   expectHttpResponseToEqual,
   frontRoutes,
   inclusionConnectImmersionRoutes,
-  makeBooleanFeatureFlag,
   queryParamsAsString,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -16,7 +15,6 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import { SuperTest, Test } from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { fakeProviderConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
@@ -29,31 +27,25 @@ describe("proConnect flow", () => {
   let httpClient: HttpClient<InclusionConnectImmersionRoutes>;
   let uuidGenerator: UuidGenerator;
   let gateways: InMemoryGateways;
-  let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
 
   describe("Right path", () => {
     beforeAll(async () => {
       let request: SuperTest<Test>;
 
-      ({ uuidGenerator, gateways, request, inMemoryUow, appConfig } =
-        await buildTestApp(
-          new AppConfigBuilder({
-            PRO_CONNECT_GATEWAY: "IN_MEMORY",
-            PRO_CONNECT_CLIENT_SECRET: fakeProviderConfig.clientSecret,
-            PRO_CONNECT_CLIENT_ID: fakeProviderConfig.clientId,
-            PRO_CONNECT_BASE_URI: fakeProviderConfig.providerBaseUri,
-            DOMAIN: immersionDomain,
-          }).build(),
-        ));
+      ({ uuidGenerator, gateways, request, appConfig } = await buildTestApp(
+        new AppConfigBuilder({
+          PRO_CONNECT_GATEWAY: "IN_MEMORY",
+          PRO_CONNECT_CLIENT_SECRET: fakeProviderConfig.clientSecret,
+          PRO_CONNECT_CLIENT_ID: fakeProviderConfig.clientId,
+          PRO_CONNECT_BASE_URI: fakeProviderConfig.providerBaseUri,
+          DOMAIN: immersionDomain,
+        }).build(),
+      ));
       httpClient = createSupertestSharedClient(
         inclusionConnectImmersionRoutes,
         request,
       );
-      inMemoryUow.featureFlagRepository.update({
-        flagName: "enableProConnect",
-        featureFlag: makeBooleanFeatureFlag(true),
-      });
     });
 
     it(`${displayRouteName(
@@ -78,7 +70,7 @@ describe("proConnect flow", () => {
           headers: {
             location: encodeURI(
               `${
-                appConfig.inclusionConnectConfig.providerBaseUri
+                appConfig.proConnectConfig.providerBaseUri
               }/login-pro-connect?${queryParamsAsString({
                 page,
                 nonce,
@@ -90,7 +82,7 @@ describe("proConnect flow", () => {
       );
     });
 
-    it.each(allowedStartInclusionConnectLoginPages)(
+    it.each(allowedStartOAuthLoginPages)(
       `${displayRouteName(
         inclusionConnectImmersionRoutes.afterLoginRedirection,
       )} 302 redirect to %s with pro connect token`,

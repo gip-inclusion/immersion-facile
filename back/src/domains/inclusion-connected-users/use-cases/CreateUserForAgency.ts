@@ -8,7 +8,6 @@ import {
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -92,11 +91,7 @@ const getUserIdAndCreateIfMissing = async (
   inputParams: UserParamsForAgency,
   deps: { timeGateway: TimeGateway; createNewEvent: CreateNewEvent },
 ): Promise<User> => {
-  const provider = await makeProvider(uow);
-  const existingUser = await uow.userRepository.findByEmail(
-    inputParams.email,
-    provider,
-  );
+  const existingUser = await uow.userRepository.findByEmail(inputParams.email);
   if (existingUser) return existingUser;
 
   const newUser: User = {
@@ -107,6 +102,6 @@ const getUserIdAndCreateIfMissing = async (
     lastName: emptyName,
     externalId: null,
   };
-  await uow.userRepository.save(newUser, provider);
+  await uow.userRepository.save(newUser);
   return newUser;
 };

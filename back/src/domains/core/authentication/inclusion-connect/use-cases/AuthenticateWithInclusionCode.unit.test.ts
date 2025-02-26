@@ -5,7 +5,7 @@ import {
   IdToken,
   OAuthGatewayProvider,
   User,
-  allowedStartInclusionConnectLoginPages,
+  allowedStartOAuthLoginPages,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -68,11 +68,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           immersionBaseUrl,
           timeGateway,
         );
-
-        uow.featureFlagRepository.update({
-          flagName: "enableProConnect",
-          featureFlag: { kind: "boolean", isActive: provider === "proConnect" },
-        });
       });
 
       describe("right paths", () => {
@@ -311,7 +306,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
         });
 
         describe("handle dynamic login pages", () => {
-          it.each(allowedStartInclusionConnectLoginPages)(
+          it.each(allowedStartOAuthLoginPages)(
             "generates an app token and returns a redirection url which includes token and user data for %s",
             async (page) => {
               const { initialOngoingOAuth } =
@@ -390,8 +385,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       ...params,
     };
     const initialOngoingOAuth: OngoingOAuth = {
-      provider:
-        provider === "inclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider,
       state: "my-state",
       nonce: "nounce", // matches the one in the payload of the token
     };

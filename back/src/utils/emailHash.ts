@@ -12,7 +12,6 @@ import {
   isSomeEmailMatchingEmailHash,
   makeEmailHash,
 } from "shared";
-import { makeProvider } from "../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 import { conventionEmailsByRole } from "./convention";
@@ -36,10 +35,7 @@ export const isHashMatchNotNotifiedCounsellorOrValidator = async ({
     )
     .map(([id]) => id);
 
-  const users = await uow.userRepository.getByIds(
-    userIdsWithRoleOnAgency,
-    await makeProvider(uow),
-  );
+  const users = await uow.userRepository.getByIds(userIdsWithRoleOnAgency);
 
   return isSomeEmailMatchingEmailHash(
     users.map(({ email }) => email),

@@ -7,7 +7,6 @@ export const partnerNames = {
   emailable: "Emailable",
   franceTravailApi: "France Travail - API",
   franceTravailConnect: "France Travail - FT Connect",
-  inclusionConnect: "Inclusion Connect",
   laBonneBoite: "La Bonne Boite",
   openCageData: "OpenCageData",
   pdfGenerator: "Pdf Generator App",
