@@ -416,7 +416,7 @@ export type EmailParamsByEmailType = {
     agencyName: string;
   };
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    editFrontUrl: string;
+    editFrontUrl: AbsoluteUrl;
     businessName: string;
     businessAddresses: string[];
   };
