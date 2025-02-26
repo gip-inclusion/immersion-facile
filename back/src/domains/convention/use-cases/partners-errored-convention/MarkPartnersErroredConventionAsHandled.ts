@@ -5,7 +5,6 @@ import {
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -36,7 +35,6 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
       throw errors.user.unauthorized();
     }
     const { userId } = payload;
-    const provider = await makeProvider(uow);
     const conventionToMarkAsHandled = await uow.conventionRepository.getById(
       params.conventionId,
     );
@@ -45,7 +43,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
         conventionId: params.conventionId,
       });
 
-    const currentUser = await uow.userRepository.getById(userId, provider);
+    const currentUser = await uow.userRepository.getById(userId);
     if (!currentUser) throw errors.user.notFound({ userId });
 
     const userWithRights = await getUserWithRights(uow, currentUser.id);

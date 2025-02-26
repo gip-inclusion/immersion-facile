@@ -94,7 +94,7 @@ const insertAgencyGroup = async ({
 
   const validator = makeUniqueUserForTest(uuid());
 
-  await pgUserRepository.save(validator, "proConnect");
+  await pgUserRepository.save(validator);
 
   await pgAgencyRepository.insert(
     toAgencyWithRights(agency, {

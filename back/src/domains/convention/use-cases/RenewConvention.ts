@@ -1,17 +1,18 @@
 import {
   AgencyRole,
+  BadRequestError,
   ConventionDto,
   ConventionId,
   ConventionRelatedJwtPayload,
+  ForbiddenError,
+  NotFoundError,
   RenewConventionParams,
   Role,
   clearSignaturesAndValidationDate,
   errors,
   renewConventionParamsSchema,
 } from "shared";
-import { BadRequestError, ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { AddConvention } from "./AddConvention";
@@ -95,7 +96,6 @@ export class RenewConvention extends TransactionalUseCase<
 
     const inclusionConnectedUser = await uow.userRepository.getById(
       jwtPayload.userId,
-      await makeProvider(uow),
     );
     if (!inclusionConnectedUser)
       throw new NotFoundError(

@@ -11,7 +11,6 @@ import {
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   EstablishmentAdminRight,
@@ -46,11 +45,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
     const isValidIcJwtPayload = "userId" in jwtPayload;
     if (isValidIcJwtPayload) {
-      const provider = await makeProvider(uow);
-      const currentUser = await uow.userRepository.getById(
-        jwtPayload.userId,
-        provider,
-      );
+      const currentUser = await uow.userRepository.getById(jwtPayload.userId);
       if (!currentUser)
         throw errors.user.notFound({ userId: jwtPayload.userId });
 
@@ -85,7 +80,6 @@ export const establishmentAggregateToFormEstablishement = async (
   appellations: AppellationAndRomeDto[],
   uow: UnitOfWork,
 ): Promise<FormEstablishmentDto> => {
-  const provider = await makeProvider(uow);
   const firstAdminRight = establishmentAggregate.userRights.find(
     (right): right is EstablishmentAdminRight =>
       right.role === "establishment-admin",
@@ -98,7 +92,6 @@ export const establishmentAggregateToFormEstablishement = async (
 
   const firstEstablishmentAdmin = await uow.userRepository.getById(
     firstAdminRight.userId,
-    provider,
   );
 
   if (!firstEstablishmentAdmin)
@@ -108,7 +101,6 @@ export const establishmentAggregateToFormEstablishement = async (
     establishmentAggregate.userRights
       .filter(({ role }) => role === "establishment-contact")
       .map(({ userId }) => userId),
-    provider,
   );
 
   return {

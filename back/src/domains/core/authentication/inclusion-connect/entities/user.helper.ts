@@ -1,8 +1,7 @@
-import { Email, OAuthGatewayProvider, UserId } from "shared";
+import { Email, UserId } from "shared";
 import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import { makeProvider } from "../port/OAuthGateway";
 
 type CreateUserInfo = {
   email: Email;
@@ -16,38 +15,27 @@ export const createOrGetUserIdByEmail = async (
   uuidGenerator: UuidGenerator,
   userInfo: CreateUserInfo,
 ): Promise<UserId> => {
-  const provider = await makeProvider(uow);
-  const user = await uow.userRepository.findByEmail(userInfo.email, provider);
+  const user = await uow.userRepository.findByEmail(userInfo.email);
   return user
     ? user.id
-    : createUser(
-        uow,
-        provider,
-        uuidGenerator.new(),
-        userInfo,
-        timeGateway.now(),
-      );
+    : createUser(uow, uuidGenerator.new(), userInfo, timeGateway.now());
 };
 
 export const emptyName = "";
 
 const createUser = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   userId: UserId,
   userInfo: CreateUserInfo,
   createdAt: Date,
 ): Promise<UserId> => {
-  await uow.userRepository.save(
-    {
-      id: userId,
-      email: userInfo.email,
-      createdAt: createdAt.toISOString(),
-      externalId: null,
-      firstName: userInfo.firstName ?? emptyName,
-      lastName: userInfo.lastName ?? emptyName,
-    },
-    provider,
-  );
+  await uow.userRepository.save({
+    id: userId,
+    email: userInfo.email,
+    createdAt: createdAt.toISOString(),
+    externalId: null,
+    firstName: userInfo.firstName ?? emptyName,
+    lastName: userInfo.lastName ?? emptyName,
+  });
   return userId;
 };

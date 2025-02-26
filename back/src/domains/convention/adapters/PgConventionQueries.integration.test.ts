@@ -149,7 +149,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyRepo = new PgAgencyRepository(db);
     conventionRepository = new PgConventionRepository(db);
 
-    await new PgUserRepository(db).save(validator, "inclusionConnect");
+    await new PgUserRepository(db).save(validator);
   });
 
   afterAll(async () => {
@@ -781,7 +781,7 @@ describe("Pg implementation of ConventionQueries", () => {
 
     beforeEach(async () => {
       const validator = makeUniqueUserForTest(uuid());
-      await new PgUserRepository(db).save(validator, "proConnect");
+      await new PgUserRepository(db).save(validator);
       await new PgAgencyRepository(db).insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: false, roles: ["validator"] },

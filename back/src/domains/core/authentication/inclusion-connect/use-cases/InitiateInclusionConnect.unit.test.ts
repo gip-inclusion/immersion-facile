@@ -1,6 +1,6 @@
 import {
   WithSourcePage,
-  allowedStartInclusionConnectLoginPages,
+  allowedStartOAuthLoginPages,
   expectToEqual,
   oAuthGatewayProviders,
   queryParamsAsString,
@@ -18,7 +18,7 @@ describe("InitiateInclusionConnect usecase", () => {
   describe.each(oAuthGatewayProviders)(
     "With OAuthGateway mode '%s'",
     (provider) => {
-      it.each(allowedStartInclusionConnectLoginPages)(
+      it.each(allowedStartOAuthLoginPages)(
         "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
         async (page) => {
           const state = "my-state";
@@ -30,13 +30,7 @@ describe("InitiateInclusionConnect usecase", () => {
             uuidGenerator,
             new InMemoryOAuthGateway(fakeProviderConfig),
           );
-          await uow.featureFlagRepository.update({
-            flagName: "enableProConnect",
-            featureFlag: {
-              isActive: provider === "proConnect",
-              kind: "boolean",
-            },
-          });
+          expect(provider).toBe("proConnect");
 
           uuidGenerator.setNextUuids([nonce, state]);
 
@@ -44,10 +38,7 @@ describe("InitiateInclusionConnect usecase", () => {
             page,
           };
           const redirectUrl = await useCase.execute(sourcePage);
-          const loginEndpoint =
-            provider === "inclusionConnect"
-              ? "login-inclusion-connect"
-              : "login-pro-connect";
+          const loginEndpoint = "login-pro-connect";
 
           expectToEqual(
             redirectUrl,
@@ -66,10 +57,7 @@ describe("InitiateInclusionConnect usecase", () => {
             {
               nonce,
               state,
-              provider:
-                provider === "inclusionConnect"
-                  ? "inclusionConnect"
-                  : "proConnect",
+              provider: "proConnect",
               externalId: undefined,
               accessToken: undefined,
             },

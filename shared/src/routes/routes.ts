@@ -1,6 +1,6 @@
-export type AllowedStartInclusionConnectLoginPage =
-  (typeof allowedStartInclusionConnectLoginPages)[number];
-export const allowedStartInclusionConnectLoginPages = [
+export type AllowedStartOAuthLoginPage =
+  (typeof allowedStartOAuthLoginPages)[number];
+export const allowedStartOAuthLoginPages = [
   "agencyDashboard",
   "establishmentDashboard",
   "admin",
@@ -8,9 +8,9 @@ export const allowedStartInclusionConnectLoginPages = [
 
 export const frontRoutes = {
   addAgency: "ajouter-prescripteur",
-  [allowedStartInclusionConnectLoginPages[0]]: "tableau-de-bord-agence",
-  [allowedStartInclusionConnectLoginPages[1]]: "tableau-de-bord-etablissement",
-  [allowedStartInclusionConnectLoginPages[2]]: "admin",
+  [allowedStartOAuthLoginPages[0]]: "tableau-de-bord-agence",
+  [allowedStartOAuthLoginPages[1]]: "tableau-de-bord-etablissement",
+  [allowedStartOAuthLoginPages[2]]: "admin",
   assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   initiateConvention: "initier-convention",

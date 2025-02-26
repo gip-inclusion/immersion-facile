@@ -27,7 +27,6 @@ export class InMemoryOAuthGateway implements OAuthGateway {
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const loginUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      inclusionConnect: `${this.providerConfig.providerBaseUri}/login-inclusion-connect`,
       proConnect: `${this.providerConfig.providerBaseUri}/login-pro-connect`,
     };
     return `${loginUri[provider]}?${queryParamsAsString(params)}`;
@@ -46,7 +45,6 @@ export class InMemoryOAuthGateway implements OAuthGateway {
     provider: OAuthGatewayProvider,
   ): Promise<AbsoluteUrl> {
     const logoutUri: Record<OAuthGatewayProvider, AbsoluteUrl> = {
-      inclusionConnect: `${this.providerConfig.providerBaseUri}/logout-inclusion-connect`,
       proConnect: `${this.providerConfig.providerBaseUri}/logout-pro-connect`,
     };
 

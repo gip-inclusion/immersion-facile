@@ -293,30 +293,6 @@ export class AppConfig {
     );
   }
 
-  public get inclusionConnectConfig(): OAuthConfig {
-    return {
-      clientId: this.#throwIfNotDefinedOrDefault(
-        "INCLUSION_CONNECT_CLIENT_ID",
-        this.inclusionConnectGateway !== "HTTPS" ? "fake id" : undefined,
-      ),
-      clientSecret: this.#throwIfNotDefinedOrDefault(
-        "INCLUSION_CONNECT_CLIENT_SECRET",
-        this.inclusionConnectGateway !== "HTTPS" ? "fake secret" : undefined,
-      ),
-      immersionRedirectUri: {
-        afterLogin: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
-        afterLogout: this.immersionFacileBaseUrl,
-      },
-      providerBaseUri: this.#throwIfNotAbsoluteUrl(
-        "INCLUSION_CONNECT_BASE_URI",
-        this.inclusionConnectGateway !== "HTTPS"
-          ? "https://fake-inclusion-connect.url"
-          : undefined,
-      ),
-      scope: "openid profile email",
-    };
-  }
-
   public get proConnectConfig(): OAuthConfig {
     return {
       clientId: this.#throwIfNotDefinedOrDefault(
@@ -339,15 +315,6 @@ export class AppConfig {
       ),
       scope: "openid given_name usual_name email custom siret",
     };
-  }
-
-  // == Inclusion Connect gateway ==
-  public get inclusionConnectGateway() {
-    return this.#throwIfNotInArray({
-      variableName: "INCLUSION_CONNECT_GATEWAY",
-      authorizedValues: ["IN_MEMORY", "HTTPS"],
-      defaultValue: "IN_MEMORY",
-    });
   }
 
   public get proConnectGateway() {

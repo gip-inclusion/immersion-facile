@@ -47,7 +47,7 @@ describe("PgOngoingOAuthRepository", () => {
         externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
-      await pgUserRepository.save(user, provider);
+      await pgUserRepository.save(user);
       await pgOngoingOAuthRepository.save(ongoingOAuth);
 
       const fetchedFromState =
@@ -60,7 +60,7 @@ describe("PgOngoingOAuthRepository", () => {
         .execute();
       expect(results).toHaveLength(1);
 
-      await pgUserRepository.save(user, provider);
+      await pgUserRepository.save(user);
       const updatedOngoingOAuth: OngoingOAuth = {
         ...ongoingOAuth,
         userId: user.id,

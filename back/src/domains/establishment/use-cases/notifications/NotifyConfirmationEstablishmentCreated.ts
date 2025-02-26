@@ -1,7 +1,6 @@
 import { WithSiretDto, errors, withSiretSchema } from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -73,10 +72,7 @@ const getFirstAdminUser = async (
       siret: establishment.establishment.siret,
     });
 
-  const firstAdminUser = await uow.userRepository.getById(
-    firstAdmin.userId,
-    await makeProvider(uow),
-  );
+  const firstAdminUser = await uow.userRepository.getById(firstAdmin.userId);
 
   if (!firstAdminUser)
     throw errors.user.notFound({ userId: firstAdmin.userId });
@@ -93,6 +89,5 @@ const getEstablishmentContactUsers = async (
 
   return uow.userRepository.getByIds(
     contactUserRights.map((userRight) => userRight.userId),
-    await makeProvider(uow),
   );
 };

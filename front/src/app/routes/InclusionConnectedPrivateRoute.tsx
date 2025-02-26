@@ -10,7 +10,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  AllowedStartInclusionConnectLoginPage,
+  AllowedStartOAuthLoginPage,
   OAuthGatewayProvider,
   absoluteUrlSchema,
   domElementIds,
@@ -25,7 +25,6 @@ import { loginIllustration } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
@@ -81,12 +80,6 @@ const providers: Record<
     buttonProvider: OAuthButtonProps["provider"];
   }
 > = {
-  inclusionConnect: {
-    name: "Inclusion Connect",
-    buttonProvider: "inclusion-connect",
-    baseline:
-      "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
-  },
   proConnect: {
     name: "ProConnect",
     buttonProvider: "pro-connect",
@@ -97,7 +90,7 @@ const providers: Record<
 
 const getPage = (
   route: InclusionConnectPrivateRoute,
-): AllowedStartInclusionConnectLoginPage => {
+): AllowedStartOAuthLoginPage => {
   if (route.name === "establishmentDashboard") return "establishmentDashboard";
   if (route.name === "agencyDashboardMain") return "agencyDashboard";
   return "admin";
@@ -116,13 +109,8 @@ export const InclusionConnectedPrivateRoute = ({
   const authIsLoading = useAppSelector(authSelectors.isLoading);
   const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
-  const { enableProConnect } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
 
-  const provider = enableProConnect.isActive
-    ? providers.proConnect
-    : providers.inclusionConnect;
+  const provider = providers.proConnect;
   const afterLoginRedirectionUrl = useAppSelector(
     authSelectors.afterLoginRedirectionUrl,
   );

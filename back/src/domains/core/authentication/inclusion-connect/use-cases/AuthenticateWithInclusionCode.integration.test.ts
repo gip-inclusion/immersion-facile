@@ -11,7 +11,6 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
-import { defaultFlags } from "../../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
@@ -74,14 +73,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
         await db.deleteFrom("feature_flags").execute();
         await db.deleteFrom("users_ongoing_oauths").execute();
         await db.deleteFrom("users").execute();
-
-        uow.featureFlagRepository.insertAll({
-          ...defaultFlags,
-          enableProConnect: {
-            kind: "boolean",
-            isActive: provider === "proConnect",
-          },
-        });
       });
 
       it("saves the user as Authenticated user", async () => {
@@ -128,8 +119,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {
-      provider:
-        provider === "inclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider,
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
     };

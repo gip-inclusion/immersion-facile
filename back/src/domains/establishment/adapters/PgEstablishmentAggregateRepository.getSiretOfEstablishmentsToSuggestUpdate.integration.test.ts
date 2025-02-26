@@ -46,7 +46,7 @@ describe("PgScriptsQueries", () => {
     await db.deleteFrom("notifications_email").execute();
     await db.deleteFrom("users").execute();
 
-    await new PgUserRepository(db).save(user, "proConnect");
+    await new PgUserRepository(db).save(user);
   });
 
   afterAll(async () => {

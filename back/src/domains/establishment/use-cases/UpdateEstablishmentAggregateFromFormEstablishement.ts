@@ -10,7 +10,6 @@ import { rawAddressToLocation } from "../../../utils/address";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -100,10 +99,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       throw errors.establishment.siretMismatch();
     }
 
-    const user = await uow.userRepository.getById(
-      jwtPayload.userId,
-      await makeProvider(uow),
-    );
+    const user = await uow.userRepository.getById(jwtPayload.userId);
     if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
     if (

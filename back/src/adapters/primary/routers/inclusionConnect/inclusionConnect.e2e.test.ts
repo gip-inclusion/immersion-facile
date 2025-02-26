@@ -4,7 +4,7 @@ import {
   IdToken,
   InclusionConnectImmersionRoutes,
   WithSourcePage,
-  allowedStartInclusionConnectLoginPages,
+  allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
   expectHttpResponseToEqual,
@@ -85,8 +85,8 @@ describe("inclusion connection flow", () => {
           headers: {
             location: encodeURI(
               `${
-                appConfig.inclusionConnectConfig.providerBaseUri
-              }/login-inclusion-connect?${queryParamsAsString({
+                appConfig.proConnectConfig.providerBaseUri
+              }/login-pro-connect?${queryParamsAsString({
                 page,
                 nonce,
                 state,
@@ -97,7 +97,7 @@ describe("inclusion connection flow", () => {
       );
     });
 
-    it.each(allowedStartInclusionConnectLoginPages)(
+    it.each(allowedStartOAuthLoginPages)(
       `${displayRouteName(
         inclusionConnectImmersionRoutes.afterLoginRedirection,
       )} 302 redirect to %s with inclusion connect token`,

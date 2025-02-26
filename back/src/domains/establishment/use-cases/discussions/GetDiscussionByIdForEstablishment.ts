@@ -7,7 +7,6 @@ import {
   errors,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
@@ -23,8 +22,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     jwtPayload?: InclusionConnectDomainJwtPayload,
   ): Promise<DiscussionReadDto> {
     if (!jwtPayload) throw errors.user.unauthorized();
-    const provider = await makeProvider(uow);
-    const user = await uow.userRepository.getById(jwtPayload.userId, provider);
+    const user = await uow.userRepository.getById(jwtPayload.userId);
 
     if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 

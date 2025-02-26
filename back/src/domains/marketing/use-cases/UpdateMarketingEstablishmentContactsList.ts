@@ -8,7 +8,6 @@ import {
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
@@ -143,7 +142,6 @@ const onEstablishment = async (
 
   const userMarketingContact = await uow.userRepository.getById(
     establishmentAdmin.userId,
-    await makeProvider(uow),
   );
 
   if (!userMarketingContact)
@@ -160,11 +158,7 @@ const onEstablishment = async (
     establishmentAggregate.establishment.siret,
     marketingContact,
   );
-  const provider = await makeProvider(uow);
-  const user = await uow.userRepository.findByEmail(
-    marketingContact.email,
-    provider,
-  );
+  const user = await uow.userRepository.findByEmail(marketingContact.email);
 
   const hasIcAccount = !!user?.externalId;
 
