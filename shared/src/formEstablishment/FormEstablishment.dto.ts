@@ -5,8 +5,10 @@ import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
 import { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
 import { NafDto } from "../naf/naf.dto";
+import { EstablishmentRole } from "../role/role.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
+import { Phone } from "../sms/smsTemplateByName";
 import { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
 import { DateTimeIsoString } from "../utils/date";
@@ -20,15 +22,26 @@ const contactMethods = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMethod = (typeof contactMethods)[number];
 export const isContactMethod = includesTypeGuard(contactMethods);
 
-export type BusinessContactDto = {
-  lastName: string;
-  firstName: string;
-  job: string;
-  phone: string; // we have a very permissive regex /^\+?[0-9]+$/
-  email: Email; // a valid email
-  contactMethod: ContactMethod;
-  copyEmails: Email[];
+type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
+  email: Email;
+  role: Role;
 };
+
+export type WithJobAndPhone = {
+  job: string;
+  phone: Phone;
+};
+
+export type AdminFormEstablishmentUserRight =
+  GenericFormEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
+
+export type ContactFormEstablishmentUserRight =
+  GenericFormEstablishmentUserRight<"establishment-contact"> &
+    Partial<WithJobAndPhone>;
+
+export type FormUserRights = Array<
+  AdminFormEstablishmentUserRight | ContactFormEstablishmentUserRight
+>;
 
 export type FormEstablishmentSourceInUrl =
   | "immersion-facile"
@@ -57,9 +70,10 @@ export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
   businessAddresses: FormEstablishmentAddress[];
-  businessContact: BusinessContactDto;
+  userRights: FormUserRights;
   businessName: string;
   businessNameCustomized?: string;
+  contactMethod: ContactMethod;
   fitForDisabledWorkers: boolean;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
@@ -85,20 +99,53 @@ export type EstablishmentCSVRow = {
   businessAddress: string;
   naf_code: string;
   appellations_code: string;
+  contactMethod: ContactMethod;
   isEngagedEnterprise: CSVBoolean;
-  businessContact_job: string;
-  businessContact_email: string;
-  businessContact_phone: string;
-  businessContact_lastName: string;
-  businessContact_firstName: string;
-  businessContact_contactMethod: ContactMethod;
-  businessContact_copyEmails: string;
   isSearchable?: CSVBoolean;
   website: CSVOptionalString;
   additionalInformation: CSVOptionalString;
   fitForDisabledWorkers?: CSVBoolean;
   searchableByStudents: CSVBoolean;
   searchableByJobSeekers: CSVBoolean;
+  right1_email: Email;
+  right1_phone: Phone;
+  right1_job: string;
+  right2_role?: EstablishmentRole;
+  right2_email?: Email;
+  right2_phone?: Phone;
+  right2_job?: string;
+  right3_role?: EstablishmentRole;
+  right3_email?: Email;
+  right3_phone?: Phone;
+  right3_job?: string;
+  right4_role?: EstablishmentRole;
+  right4_email?: Email;
+  right4_phone?: Phone;
+  right4_job?: string;
+  right5_role?: EstablishmentRole;
+  right5_email?: Email;
+  right5_phone?: Phone;
+  right5_job?: string;
+  right6_role?: EstablishmentRole;
+  right6_email?: Email;
+  right6_phone?: Phone;
+  right6_job?: string;
+  right7_role?: EstablishmentRole;
+  right7_email?: Email;
+  right7_phone?: Phone;
+  right7_job?: string;
+  right8_role?: EstablishmentRole;
+  right8_email?: Email;
+  right8_phone?: Phone;
+  right8_job?: string;
+  right9_role?: EstablishmentRole;
+  right9_email?: Email;
+  right9_phone?: Phone;
+  right9_job?: string;
+  right10_role?: EstablishmentRole;
+  right10_email?: Email;
+  right10_phone?: Phone;
+  right10_job?: string;
 };
 
 export type SiretAdditionFailure = { siret: SiretDto; errorMessage: string };
