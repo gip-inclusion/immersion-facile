@@ -20,11 +20,33 @@ import { makeShortLinkUrl } from "../../short-link/ShortLink";
 import {
   EmailNotificationFilters,
   NotificationRepository,
+  SmsNotificationFilters,
 } from "../ports/NotificationRepository";
 
 export class InMemoryNotificationRepository implements NotificationRepository {
   // for tests purposes
   public notifications: Notification[] = [];
+
+  async getLastSmsNotificationByFilter(
+    filters: SmsNotificationFilters,
+  ): Promise<SmsNotification | undefined> {
+    return this.notifications.find(
+      (notification): notification is SmsNotification => {
+        if (notification.kind !== "sms") return false;
+
+        if (
+          filters.recipientPhoneNumber !==
+          notification.templatedContent.recipientPhone
+        )
+          return false;
+
+        if (filters.smsKind !== notification.templatedContent.kind)
+          return false;
+
+        return filters.conventionId === notification.followedIds.conventionId;
+      },
+    );
+  }
 
   async getSmsByIds(ids: NotificationId[]): Promise<SmsNotification[]> {
     return getNotificationsMatchingKindAndIds("sms", this.notifications, ids);
