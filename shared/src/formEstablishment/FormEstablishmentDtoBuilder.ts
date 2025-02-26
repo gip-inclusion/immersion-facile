@@ -1,21 +1,16 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressAndPosition } from "../address/address.dto";
-import { Email } from "../email/email.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
-  BusinessContactDto,
-  EstablishmentCSVRow,
+  EstablishmentFormUserRights,
   EstablishmentSearchableBy,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
 } from "./FormEstablishment.dto";
-import {
-  defaultMaxContactsPerMonth,
-  noContactPerMonth,
-} from "./FormEstablishment.schema";
+import { defaultMaxContactsPerMonth } from "./FormEstablishment.schema";
 
 type TestAddress = {
   formAddress: FormEstablishmentAddress;
@@ -79,20 +74,26 @@ export const updatedAddress2: TestAddress = {
   },
 };
 
-const defaultBusinessContactDto: BusinessContactDto = {
-  email: "amil@mail.com",
-  firstName: "Esteban",
-  lastName: "Ocon",
-  phone: "+33612345678",
-  job: "a job",
-  contactMethod: "EMAIL",
-  copyEmails: ["copy1@mail.com", "copy2@mail.com"],
-};
-
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [defaultAddress.formAddress],
-  businessContact: defaultBusinessContactDto,
+  userRights: [
+    {
+      role: "establishment-admin",
+      email: "amil@mail.com",
+      job: "a job",
+      phone: "+33612345678",
+    },
+    {
+      role: "establishment-contact",
+      email: "copy1@mail.com",
+    },
+    {
+      role: "establishment-contact",
+      email: "copy2@mail.com",
+    },
+  ],
+  contactMethod: "EMAIL",
   naf: { code: "7201A", nomenclature: "nomenclature code 7201A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
@@ -133,15 +134,19 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
 export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [updatedAddress1.formAddress, updatedAddress2.formAddress],
-  businessContact: {
-    email: "my-updated-email@test.com",
-    contactMethod: "PHONE",
-    firstName: "Jean-Luc",
-    lastName: "Deloin",
-    copyEmails: ["updated-copy-email@test.com"],
-    job: "new job",
-    phone: "+33612345679",
-  },
+  userRights: [
+    {
+      role: "establishment-admin",
+      email: "my-updated-email@test.com",
+      job: "new job",
+      phone: "+33612345679",
+    },
+    {
+      role: "establishment-contact",
+      email: "updated-copy-email@test.com",
+    },
+  ],
+  contactMethod: "PHONE",
   naf: { code: "8054B", nomenclature: "nomenclature code B" },
   businessName: "Edited Business Name",
   siret: "01234567890123",
@@ -181,15 +186,9 @@ const emptyFormEstablishment: FormEstablishmentDto = {
     },
   ],
   naf: { code: "", nomenclature: "" },
-  businessContact: {
-    contactMethod: "EMAIL",
-    lastName: "",
-    firstName: "",
-    phone: "",
-    email: "",
-    job: "",
-    copyEmails: [],
-  },
+
+  contactMethod: "EMAIL",
+  userRights: [],
   businessName: "",
   siret: "",
   appellations: [],
@@ -230,10 +229,6 @@ export class FormEstablishmentDtoBuilder
     return this.#dto;
   }
 
-  public buildCsvRow(): EstablishmentCSVRow {
-    return formEstablishmentToEstablishmentCsvRow(this.#dto);
-  }
-
   public withAppellations(appellations: AppellationAndRomeDto[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
@@ -245,21 +240,12 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddresses });
   }
 
-  public withBusinessContact(businessContact: BusinessContactDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessContact });
-  }
-
-  public withBusinessContactEmail(email: Email) {
+  public withEstablishmentFormUserRights(
+    establishmentFormUserRights: EstablishmentFormUserRights,
+  ) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      businessContact: { ...this.#dto.businessContact, email },
-    });
-  }
-
-  public withBusinessContactCopyEmails(copyEmails: Email[]) {
-    return new FormEstablishmentDtoBuilder({
-      ...this.#dto,
-      businessContact: { ...this.#dto.businessContact, copyEmails },
+      userRights: establishmentFormUserRights,
     });
   }
 
@@ -308,59 +294,28 @@ export class FormEstablishmentDtoBuilder
   }
 }
 
-const formEstablishmentToEstablishmentCsvRow = (
-  establishment: FormEstablishmentDto,
-): EstablishmentCSVRow => ({
-  businessAddress: establishment.businessAddresses[0].rawAddress,
-  businessContact_email: establishment.businessContact.email,
-  businessContact_firstName: establishment.businessContact.firstName,
-  businessContact_lastName: establishment.businessContact.lastName,
-  businessContact_phone: establishment.businessContact.phone,
-  businessContact_job: establishment.businessContact.job,
-  businessContact_contactMethod: establishment.businessContact.contactMethod,
-  businessContact_copyEmails:
-    establishment.businessContact.copyEmails.join(","),
-  naf_code: establishment.naf?.code ?? "",
-  businessName: establishment.businessName,
-  businessNameCustomized: establishment.businessNameCustomized ?? "",
-  siret: establishment.siret,
-  website: establishment.website ?? "",
-  additionalInformation: establishment.additionalInformation ?? "",
-  appellations_code: establishment.appellations
-    .map((appellation) => appellation.appellationCode)
-    .join(","),
-  isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-  isSearchable:
-    establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
-  fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
-  searchableByStudents: establishment.searchableBy.students ? "1" : "0",
-  searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
-});
-
-export class BusinessContactDtoBuilder implements Builder<BusinessContactDto> {
-  #dto: BusinessContactDto;
-
-  constructor(dto: BusinessContactDto = defaultBusinessContactDto) {
-    this.#dto = dto;
-  }
-
-  public withFirstName(firstName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, firstName });
-  }
-
-  public withLastName(lastName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, lastName });
-  }
-
-  public withEmail(email: Email) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, email });
-  }
-
-  public withCopyEmails(copyEmails: Email[]) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, copyEmails });
-  }
-
-  public build() {
-    return this.#dto;
-  }
-}
+// const formEstablishmentToEstablishmentCsvRow = (
+//   establishment: FormEstablishmentDto,
+// ): EstablishmentCSVRow => ({
+//   businessAddress: establishment.businessAddresses[0].rawAddress,
+//   businessContact_phone: establishment.businessContact.phone,
+//   businessContact_job: establishment.businessContact.job,
+//   businessContact_contactMethod: establishment.businessContact.contactMethod,
+//   businessContact_copyEmails:
+//     establishment.businessContact.copyEmails.join(","),
+//   naf_code: establishment.naf?.code ?? "",
+//   businessName: establishment.businessName,
+//   businessNameCustomized: establishment.businessNameCustomized ?? "",
+//   siret: establishment.siret,
+//   website: establishment.website ?? "",
+//   additionalInformation: establishment.additionalInformation ?? "",
+//   appellations_code: establishment.appellations
+//     .map((appellation) => appellation.appellationCode)
+//     .join(","),
+//   isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
+//   isSearchable:
+//     establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
+//   fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
+//   searchableByStudents: establishment.searchableBy.students ? "1" : "0",
+//   searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
+// });

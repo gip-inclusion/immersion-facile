@@ -65,3 +65,9 @@ export type GetSiretRequestDto = {
 
 export const makeSiretDescriptionLink = (siret: SiretDto) =>
   `https://annuaire-entreprises.data.gouv.fr/etablissement/${siret}`;
+
+export const toFormatedTextSiret = (siret: SiretDto): string =>
+  `${siret.substring(0, 3)} ${siret.substring(3, 6)} ${siret.substring(
+    6,
+    9,
+  )} ${siret.substring(9, siret.length)}`;
