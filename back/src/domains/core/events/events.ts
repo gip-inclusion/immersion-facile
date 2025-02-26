@@ -120,7 +120,6 @@ export type DomainEvent =
 
   // FORM ESTABLISHMENT RELATED
   | GenericEvent<"ContactRequestedByBeneficiary", ContactEstablishmentEventPayload & WithTriggeredBy>
-  | GenericEvent<"FormEstablishmentEditLinkSent", EstablishmentJwtPayload & WithTriggeredBy>
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
