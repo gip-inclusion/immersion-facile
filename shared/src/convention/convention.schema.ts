@@ -10,6 +10,7 @@ import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { phoneSchema } from "../phone.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
+import { signatoryRoleSchema } from "../role/role.schema";
 import {
   appellationCodeSchema,
   appellationDtoSchema,
@@ -69,6 +70,7 @@ import {
   InternshipKind,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   MarkPartnersErroredConventionAsHandledRequest,
+  RemindSignatoriesRequestDto,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   RenewMagicLinkResponse,
@@ -499,6 +501,13 @@ export const renewMagicLinkResponseSchema: z.Schema<RenewMagicLinkResponse> =
     message: z.literal(expiredMagicLinkErrorMessage),
     needsNewMagicLink: z.boolean(),
   });
+
+export const remindSignatoriesRequestSchema: z.Schema<RemindSignatoriesRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    signatoryRole: signatoryRoleSchema,
+  });
+
 export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkPartnersErroredConventionAsHandledRequest> =
   z.object({
     conventionId: conventionIdSchema,

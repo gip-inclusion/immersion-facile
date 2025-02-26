@@ -17,7 +17,7 @@ import {
   errors,
   frontRoutes,
   isSomeEmailMatchingEmailHash,
-  signatorySchema,
+  signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -41,7 +41,7 @@ type RemindSignatoriesParams = {
 const remindSignatoriesParamsSchema: z.Schema<RemindSignatoriesParams> =
   z.object({
     conventionId: conventionIdSchema,
-    role: signatorySchema,
+    role: signatoryRoleSchema,
   });
 
 export type RemindSignatories = ReturnType<typeof makeRemindSignatories>;

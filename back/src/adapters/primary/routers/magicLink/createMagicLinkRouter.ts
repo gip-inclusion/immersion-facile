@@ -111,5 +111,31 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       }),
   );
 
+  sharedRouter.remindSignatories(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const conventionId = req.body.conventionId;
+        const role = req.body.signatoryRole;
+
+        return match(req.payloads)
+          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
+            deps.useCases.remindSignatories.execute(
+              { conventionId, role },
+              convention,
+            ),
+          )
+          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
+            deps.useCases.remindSignatories.execute(
+              { conventionId, role },
+              inclusion,
+            ),
+          )
+          .otherwise(() => {
+            throw errors.user.unauthorized();
+          });
+      }),
+  );
+
   return expressRouter;
 };

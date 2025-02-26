@@ -24,6 +24,7 @@ import { makeGetAssessmentByConventionId } from "../../domains/convention/use-ca
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
+import { makeRemindSignatories } from "../../domains/convention/use-cases/RemindSignatories";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
@@ -736,6 +737,16 @@ export const createUseCases = (
         uowPerformer,
         deps: { saveNotificationAndRelatedEvent },
       }),
+    remindSignatories: makeRemindSignatories({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        config,
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
