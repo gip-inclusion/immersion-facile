@@ -3,7 +3,6 @@ import { rawAddressToLocation } from "../../../utils/address";
 import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
@@ -42,7 +41,6 @@ export const makeEstablishmentAggregate = async ({
 
   const establishmentUsers = await uow.userRepository.getByIds(
     establishmentUsersIds,
-    await makeProvider(uow),
   );
 
   const updatedUserRights: EstablishmentUserRight[] =

@@ -1,7 +1,7 @@
 import {
+  AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
-  type EstablishmentDomainPayload,
-  type EstablishmentJwtPayload,
+  ContactFormEstablishmentUserRight,
   FormEstablishmentDtoBuilder,
   type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
@@ -16,7 +16,6 @@ import {
   updatedAddress1,
   updatedAddress2,
 } from "shared";
-import { v4 as uuid } from "uuid";
 import {
   InMemoryAddressGateway,
   rueGuillaumeTellDto,
@@ -30,6 +29,10 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import {
+  EstablishmentAdminRight,
+  EstablishmentContactRight,
+} from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -142,13 +145,13 @@ describe("Update Establishment aggregate from form data", () => {
       ]);
     });
 
-    const updatedAdmin = new UserBuilder()
-      .withId(uuid())
+    const newEstablishmentAdmin = new UserBuilder()
+      .withId("establishmentAdmin")
       .withEmail("new.admin@gmail.com")
       .withCreatedAt(now)
       .build();
-    const updatedContact = new UserBuilder()
-      .withId(uuid())
+    const newEstablishmentContact = new UserBuilder()
+      .withId("updatedContact")
       .withEmail("new.contact@gmail.com")
       .withCreatedAt(now)
       .build();
@@ -160,6 +163,16 @@ describe("Update Establishment aggregate from form data", () => {
       appellationCode: "22222",
     };
     const nextAvailabilityDate = new Date();
+    const updatedFormAdmin: AdminFormEstablishmentUserRight = {
+      role: "establishment-admin",
+      email: newEstablishmentAdmin.email,
+      job: "new job",
+      phone: "+33677445511",
+    };
+    const updatedFormContact: ContactFormEstablishmentUserRight = {
+      role: "establishment-contact",
+      email: newEstablishmentContact.email,
+    };
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
       .withAppellations([updatedAppellation])
@@ -169,8 +182,7 @@ describe("Update Establishment aggregate from form data", () => {
           rawAddress: addressDtoToString(rueGuillaumeTellDto),
         },
       ])
-      .withBusinessContactEmail(updatedAdmin.email)
-      .withBusinessContactCopyEmails([updatedContact.email])
+      .withFormUserRights([updatedFormAdmin, updatedFormContact])
       .withNextAvailabilityDate(nextAvailabilityDate)
       .withMaxContactsPerMonth(10)
       .withSearchableBy({
@@ -180,16 +192,26 @@ describe("Update Establishment aggregate from form data", () => {
       .build();
 
     it("When users already existed", async () => {
-      uow.userRepository.users = [updatedAdmin, updatedContact];
+      uow.userRepository.users = [
+        previousEstablishmentAdmin,
+        newEstablishmentAdmin,
+        newEstablishmentContact,
+      ];
 
       await updateEstablishmentAggregateFromFormUseCase.execute(
         {
           formEstablishment: updatedFormEstablishment,
         },
-        { siret: updatedFormEstablishment.siret },
+        {
+          userId: previousEstablishmentAdmin.id,
+        },
       );
 
-      expectToEqual(uow.userRepository.users, [updatedAdmin, updatedContact]);
+      expectToEqual(uow.userRepository.users, [
+        previousEstablishmentAdmin,
+        newEstablishmentAdmin,
+        newEstablishmentContact,
+      ]);
 
       expectToEqual(
         uow.establishmentAggregateRepository.establishmentAggregates,
@@ -235,13 +257,13 @@ describe("Update Establishment aggregate from form data", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
-                job: updatedFormEstablishment.businessContact.job,
-                phone: updatedFormEstablishment.businessContact.phone,
-                userId: updatedAdmin.id,
+                userId: newEstablishmentAdmin.id,
+                job: updatedFormAdmin.job,
+                phone: updatedFormAdmin.phone,
               },
               {
                 role: "establishment-contact",
-                userId: updatedContact.id,
+                userId: newEstablishmentContact.id,
               },
             ])
             .build(),
@@ -254,8 +276,8 @@ describe("Update Establishment aggregate from form data", () => {
           payload: {
             siret,
             triggeredBy: {
-              kind: "establishment-magic-link",
-              siret: updatedFormEstablishment.siret,
+              kind: "inclusion-connected",
+              userId: previousEstablishmentAdmin.id,
             },
           },
         },
@@ -263,24 +285,29 @@ describe("Update Establishment aggregate from form data", () => {
     });
 
     it("When users not exist, create user additionnaly", async () => {
-      uuidGenerator.setNextUuids([updatedAdmin.id, updatedContact.id]);
-      uow.userRepository.users = [];
+      uuidGenerator.setNextUuids([
+        newEstablishmentAdmin.id,
+        newEstablishmentContact.id,
+      ]);
+
+      uow.userRepository.users = [previousEstablishmentAdmin];
 
       await updateEstablishmentAggregateFromFormUseCase.execute(
         {
           formEstablishment: updatedFormEstablishment,
         },
         {
-          siret: updatedFormEstablishment.siret,
+          userId: previousEstablishmentAdmin.id,
         },
       );
 
       expectToEqual(uow.userRepository.users, [
-        new UserBuilder(updatedAdmin)
-          .withFirstName(updatedFormEstablishment.businessContact.firstName)
-          .withLastName(updatedFormEstablishment.businessContact.lastName)
+        previousEstablishmentAdmin,
+        new UserBuilder(newEstablishmentAdmin)
+          .withFirstName("")
+          .withLastName("")
           .build(),
-        new UserBuilder(updatedContact)
+        new UserBuilder(newEstablishmentContact)
           .withFirstName("")
           .withLastName("")
           .build(),
@@ -330,13 +357,13 @@ describe("Update Establishment aggregate from form data", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
-                job: updatedFormEstablishment.businessContact.job,
-                phone: updatedFormEstablishment.businessContact.phone,
-                userId: updatedAdmin.id,
+                userId: newEstablishmentAdmin.id,
+                job: updatedFormAdmin.job,
+                phone: updatedFormAdmin.phone,
               },
               {
                 role: "establishment-contact",
-                userId: updatedContact.id,
+                userId: newEstablishmentContact.id,
               },
             ])
             .build(),
@@ -349,8 +376,8 @@ describe("Update Establishment aggregate from form data", () => {
           payload: {
             siret,
             triggeredBy: {
-              kind: "establishment-magic-link",
-              siret: updatedFormEstablishment.siret,
+              kind: "inclusion-connected",
+              userId: previousEstablishmentAdmin.id,
             },
           },
         },
@@ -380,19 +407,13 @@ describe("Update Establishment aggregate from form data", () => {
       userId: icInclusionConnectedUser.id,
     };
 
-    const establishmentPayload: EstablishmentDomainPayload = {
-      siret: updatedFormEstablishment.siret,
-    };
-
     const existingEstablishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(existingFormEstablishment.siret)
           .withName(existingFormEstablishment.businessName)
           .withSearchableBy(existingFormEstablishment.searchableBy)
-          .withContactMethod(
-            existingFormEstablishment.businessContact.contactMethod,
-          )
+          .withContactMethod(existingFormEstablishment.contactMethod)
           .withCustomizedName(existingFormEstablishment.businessNameCustomized)
           .withFitForDisabledWorkers(
             existingFormEstablishment.fitForDisabledWorkers,
@@ -435,20 +456,28 @@ describe("Update Establishment aggregate from form data", () => {
           role: "establishment-admin",
           job: "",
           phone: "",
-          userId: "",
+          userId: inclusionConnectedUser.id,
         },
       ])
       .build();
 
+    const newAdminRight: EstablishmentAdminRight = {
+      role: "establishment-admin",
+      job: "new job",
+      phone: "+33612345679",
+      userId: "nextuser1",
+    };
+    const newContactRight: EstablishmentContactRight = {
+      role: "establishment-contact",
+      userId: "nextuser2",
+    };
     const updatedEstablishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(updatedFormEstablishment.siret)
           .withName(updatedFormEstablishment.businessName)
           .withSearchableBy(updatedFormEstablishment.searchableBy)
-          .withContactMethod(
-            updatedFormEstablishment.businessContact.contactMethod,
-          )
+          .withContactMethod(updatedFormEstablishment.contactMethod)
           .withCustomizedName(updatedFormEstablishment.businessNameCustomized)
           .withFitForDisabledWorkers(
             updatedFormEstablishment.fitForDisabledWorkers,
@@ -494,18 +523,7 @@ describe("Update Establishment aggregate from form data", () => {
           id: updatedAddress2.formAddress.id,
         },
       ])
-      .withUserRights([
-        {
-          role: "establishment-admin",
-          job: "new job",
-          phone: "+33612345679",
-          userId: "no-uuid-provided",
-        },
-        {
-          role: "establishment-contact",
-          userId: "no-uuid-provided",
-        },
-      ])
+      .withUserRights([newAdminRight, newContactRight])
       .build();
 
     beforeEach(() => {
@@ -517,21 +535,14 @@ describe("Update Establishment aggregate from form data", () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         existingEstablishmentAggregate,
       ];
+
+      uuidGenerator.setNextUuids([
+        newAdminRight.userId,
+        newContactRight.userId,
+      ]);
     });
 
     describe("Wrong paths", () => {
-      it("Forbidden error on EstablishmentJwtPayload with bad siret", async () => {
-        await expectPromiseToFailWithError(
-          updateEstablishmentAggregateFromFormUseCase.execute(
-            { formEstablishment: updatedFormEstablishment },
-            {
-              siret: "bad-siret",
-            } as EstablishmentJwtPayload,
-          ),
-          errors.establishment.siretMismatch(),
-        );
-      });
-
       it("Not found error if user is not found", async () => {
         await expectPromiseToFailWithError(
           updateEstablishmentAggregateFromFormUseCase.execute(
@@ -544,6 +555,10 @@ describe("Update Establishment aggregate from form data", () => {
 
       it("Forbidden error on InclusionConnectJwtPayload with ic user that doesn't have rights on establishment", async () => {
         uow.userRepository.users = [inclusionConnectedUser];
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          { ...existingEstablishmentAggregate, userRights: [] },
+        ];
+
         await expectPromiseToFailWithError(
           updateEstablishmentAggregateFromFormUseCase.execute(
             { formEstablishment: updatedFormEstablishment },
@@ -568,20 +583,22 @@ describe("Update Establishment aggregate from form data", () => {
         await expectPromiseToFailWithError(
           updateEstablishmentAggregateFromFormUseCase.execute(
             { formEstablishment: updatedFormEstablishment },
-            establishmentPayload,
+            inclusionConnectJwtPayload,
           ),
           errors.establishment.notFound({
-            siret: establishmentPayload.siret,
+            siret: updatedFormEstablishment.siret,
           }),
         );
       });
     });
 
     describe("Right paths", () => {
-      it("publish a FormEstablishmentEdited event & update formEstablishment on repository with an establishment payload", async () => {
+      it("publish a FormEstablishmentEdited event & update formEstablishment on repository with an inclusion connected payload", async () => {
+        uow.userRepository.users = [inclusionConnectedUser];
+
         await updateEstablishmentAggregateFromFormUseCase.execute(
           { formEstablishment: updatedFormEstablishment },
-          establishmentPayload,
+          inclusionConnectJwtPayload,
         );
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -590,8 +607,8 @@ describe("Update Establishment aggregate from form data", () => {
             payload: {
               siret: updatedFormEstablishment.siret,
               triggeredBy: {
-                kind: "establishment-magic-link",
-                siret: establishmentPayload.siret,
+                kind: "inclusion-connected",
+                userId: inclusionConnectJwtPayload.userId,
               },
             },
           },
