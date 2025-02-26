@@ -13,6 +13,7 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { remindSignatoriesSlice } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -40,6 +41,7 @@ const topics = [
   "siret-input",
   "agency-for-dashboard",
   "assessment",
+  "remind-signatories",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -122,6 +124,19 @@ export const feedbackMapping: Record<
       title: "Problème rencontré lors de la rediffusion au partenaire",
       message:
         "Une erreur est survenue. Veuillez consulter le tableau de bord.",
+    },
+  },
+  "remind-signatories": {
+    "create.success": {
+      action: remindSignatoriesSlice.actions.remindSignatoriesSucceeded,
+      title: "Le SMS a bien été envoyé",
+      message:
+        "Le destinataire devrait le recevoir dans les prochaines minutes.",
+    },
+    "create.error": {
+      action: remindSignatoriesSlice.actions.remindSignatoriesFailed,
+      title: "Problème lors de l'envoi SMS",
+      message: "Une erreur est survenue lors de l'envoi du SMS.",
     },
   },
   "dashboard-discussion-rejection": {
