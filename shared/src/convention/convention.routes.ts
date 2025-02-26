@@ -11,6 +11,7 @@ import {
   conventionReadSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
+  remindSignatoriesRequestSchema,
   renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
   renewMagicLinkResponseSchema,
@@ -108,6 +109,19 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
+    },
+  }),
+  remindSignatories: defineRoute({
+    url: "/auth/convention/signatories/remind",
+    method: "post",
+    requestBodySchema: remindSignatoriesRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      409: httpErrorSchema,
     },
   }),
 });
