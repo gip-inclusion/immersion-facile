@@ -5,22 +5,22 @@ import {
   FormEstablishmentDtoBuilder,
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  createEstablishmentJwtPayload,
+  createInclusionConnectJwtPayload,
   currentJwtVersions,
   errors,
   establishmentRoutes,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
-  expiredMagicLinkErrorMessage,
+  inclusionConnectTokenExpiredMessage,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import {
-  type GenerateEditFormEstablishmentJwt,
   type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
@@ -30,10 +30,7 @@ import {
 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { TimeGateway } from "../../../../domains/core/time-gateway/ports/TimeGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import type {
-  EstablishmentAggregate,
-  EstablishmentUserRight,
-} from "../../../../domains/establishment/entities/EstablishmentAggregate";
+import type { EstablishmentAggregate } from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
@@ -46,21 +43,25 @@ describe("Edit form establishments", () => {
   let appConfig: AppConfig;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
     .build();
 
+  const establishmentAdminUser = new InclusionConnectedUserBuilder()
+    .withId("admin")
+    .withEmail("admin@establishment.mail")
+    .buildUser();
+
   const existingEstablishment = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(formEstablishment.siret)
     .withUserRights([
       {
         role: "establishment-admin",
-        job: "",
-        phone: "",
-        userId: "",
+        job: "Boss",
+        phone: "+33688774455",
+        userId: establishmentAdminUser.id,
       },
     ])
     .build();
@@ -72,7 +73,6 @@ describe("Edit form establishments", () => {
       appConfig,
       gateways,
       inMemoryUow,
-      generateEditEstablishmentJwt,
       generateInclusionConnectJwt,
     } = await buildTestApp(new AppConfigBuilder().build()));
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
@@ -84,17 +84,20 @@ describe("Edit form establishments", () => {
     gateways.addressApi.setNextLookupStreetAndAddresses([
       [updatedAddress1.addressAndPosition],
     ]);
+    gateways.timeGateway.defaultDate = new Date();
+
+    inMemoryUow.userRepository.users = [establishmentAdminUser];
   });
 
   it("200 - Supports posting already existing form establisment when authenticated with establishment JWT", async () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-            durationDays: 1,
-            now: new Date(),
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            now: gateways.timeGateway.now(),
+            durationDays: 30,
+            userId: establishmentAdminUser.id,
           }),
         ),
       },
@@ -135,11 +138,11 @@ describe("Edit form establishments", () => {
       await httpClient.updateFormEstablishment({
         body: updatedFormEstablishment,
         headers: {
-          authorization: generateEditEstablishmentJwt(
-            createEstablishmentJwtPayload({
-              siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-              durationDays: 1,
-              now: new Date(),
+          authorization: generateInclusionConnectJwt(
+            createInclusionConnectJwtPayload({
+              now: gateways.timeGateway.now(),
+              durationDays: 30,
+              userId: establishmentAdminUser.id,
             }),
           ),
         },
@@ -172,21 +175,15 @@ describe("Edit form establishments", () => {
       userId: backofficeAdminUser.id,
     };
 
-    const adminUser = new InclusionConnectedUserBuilder()
-      .withId("admin")
-      .withEmail(formEstablishment.businessContact.email)
-      .buildUser();
-
-    const contactUsers = formEstablishment.businessContact.copyEmails.map(
-      (email, index) =>
-        new InclusionConnectedUserBuilder()
-          .withId(`contact-${index}`)
-          .withEmail(email)
-          .buildUser(),
+    const contactUsers = formEstablishment.userRights.map((right, index) =>
+      new InclusionConnectedUserBuilder()
+        .withId(`contact-${index}`)
+        .withEmail(right.email)
+        .buildUser(),
     );
 
     inMemoryUow.userRepository.users = [
-      adminUser,
+      establishmentAdminUser,
       ...contactUsers,
       backofficeAdminUser,
     ];
@@ -232,7 +229,7 @@ describe("Edit form establishments", () => {
   });
 
   it("401 - Jwt is generated from wrong private key", async () => {
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"inclusionConnect">(
       appConfig.apiJwtPrivateKey, // Private Key is the wrong one !
       undefined,
     );
@@ -241,10 +238,10 @@ describe("Edit form establishments", () => {
       body: formEstablishment,
       headers: {
         authorization: generateJwtWithWrongKey(
-          createEstablishmentJwtPayload({
-            siret: "12345678901234",
-            durationDays: 1,
-            now: new Date(),
+          createInclusionConnectJwtPayload({
+            now: gateways.timeGateway.now(),
+            durationDays: 30,
+            userId: establishmentAdminUser.id,
           }),
         ),
       },
@@ -252,7 +249,7 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       status: 401,
-      body: { status: 401, message: "Provided token is invalid" },
+      body: { status: 401, message: invalidTokenMessage },
     });
   });
 
@@ -265,7 +262,7 @@ describe("Edit form establishments", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { status: 401, message: "Provided token is invalid" },
+      body: { status: 401, message: invalidTokenMessage },
       status: 401,
     });
   });
@@ -274,11 +271,11 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: "12345678901234",
-            durationDays: 1,
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            userId: establishmentAdminUser.id,
             now: subYears(gateways.timeGateway.now(), 1),
+            durationDays: 30,
           }),
         ),
       },
@@ -286,10 +283,10 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: expiredMagicLinkErrorMessage,
-        needsNewMagicLink: true,
+        message: inclusionConnectTokenExpiredMessage,
+        status: 401,
       },
-      status: 403,
+      status: 401,
     });
   });
 
@@ -302,11 +299,11 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: establishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_2.siret,
-            durationDays: 1,
-            now: new Date(),
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            now: gateways.timeGateway.now(),
+            durationDays: 30,
+            userId: establishmentAdminUser.id,
           }),
         ),
       },
@@ -360,17 +357,20 @@ function expectEstablishmentInRepoUpdated(
       createdAt: timeGateway.now(),
     })),
   );
-  expectArraysToMatch(updatedAggregateInRepo.userRights, [
-    {
-      role: "establishment-admin",
-      job: formEstablishment.businessContact.job,
-      phone: formEstablishment.businessContact.phone,
-    },
-    ...formEstablishment.businessContact.copyEmails.map(
-      (_) =>
-        ({
-          role: "establishment-contact",
-        }) satisfies Partial<EstablishmentUserRight>,
-    ),
-  ]);
+
+  expectArraysToMatch(
+    updatedAggregateInRepo.userRights,
+    formEstablishment.userRights.map((right) => {
+      const user = inMemoryUow.userRepository.users.find(
+        (user) => user.email === right.email,
+      );
+      if (!user) throw errors.user.notFoundByEmail({ email: right.email });
+      return {
+        role: right.role,
+        userId: user.id,
+        job: right.job,
+        phone: right.phone,
+      };
+    }),
+  );
 }
