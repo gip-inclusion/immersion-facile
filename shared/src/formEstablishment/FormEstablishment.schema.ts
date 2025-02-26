@@ -1,9 +1,11 @@
+import { uniq } from "ramda";
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneSchema } from "../phone.schema";
+import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -19,11 +21,11 @@ import {
   zUuidLike,
 } from "../zodUtils";
 import type {
-  BusinessContactDto,
   CSVBoolean,
   ContactMethod,
   EstablishmentBatchReport,
   EstablishmentCSVRow,
+  EstablishmentFormUserRights,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
@@ -41,18 +43,40 @@ const validContactMethods: NotEmptyArray<ContactMethod> = [
 ];
 export const contactMethodSchema = zEnumValidation(
   validContactMethods,
-  "Choisissez parmis les options proposées",
+  "Choisissez parmi les options proposées",
 );
 
-export const businessContactSchema: z.Schema<BusinessContactDto> = z.object({
-  lastName: zStringMinLength1,
-  firstName: zStringMinLength1,
-  job: zStringMinLength1,
-  phone: phoneSchema,
-  email: emailSchema,
-  contactMethod: contactMethodSchema,
-  copyEmails: z.array(emailSchema),
-});
+export const establishmentFormUserRightsSchema: z.Schema<EstablishmentFormUserRights> =
+  z
+    .array(
+      z
+        .object({
+          role: z.literal("establishment-admin"),
+          email: emailSchema,
+          phone: phoneSchema,
+          job: zStringMinLength1,
+        })
+        .or(
+          z.object({
+            role: z.literal("establishment-contact"),
+            email: emailSchema,
+            phone: phoneSchema.optional(),
+            job: zStringMinLength1.optional(),
+          }),
+        ),
+    )
+    .refine(
+      (userRights) =>
+        userRights.filter((right) => right.role === "establishment-admin")
+          .length > 0,
+      "La structure accueillante nécéssite au moins un administrateur pour être valide.",
+    )
+    .refine(
+      (userRights) =>
+        uniq(userRights.map((right) => right.email)).length ===
+        userRights.length,
+      "La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+    );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "immersion-facile",
@@ -63,6 +87,7 @@ const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "passeEmploi",
 ];
 export const formEstablishmentSourceSchema = z.enum(formEstablishmentSources);
+
 export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
   .object({
     source: formEstablishmentSourceSchema,
@@ -90,7 +115,8 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     appellations: z
       .array(appellationDtoSchema)
       .min(1, localization.atLeastOneJob),
-    businessContact: businessContactSchema,
+    contactMethod: contactMethodSchema,
+    userRights: establishmentFormUserRightsSchema,
     maxContactsPerMonth: z
       .number({
         invalid_type_error:
@@ -145,19 +171,52 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     naf_code: zStringMinLength1,
     appellations_code: zStringMinLength1,
     isEngagedEnterprise: csvBooleanSchema,
-    businessContact_job: zStringMinLength1,
-    businessContact_email: zStringMinLength1,
-    businessContact_phone: phoneSchema,
-    businessContact_lastName: zStringMinLength1,
-    businessContact_firstName: zStringMinLength1,
-    businessContact_contactMethod: contactMethodSchema,
-    businessContact_copyEmails: zStringCanBeEmpty,
+    contactMethod: contactMethodSchema,
     isSearchable: csvBooleanSchema,
     website: zStringCanBeEmpty,
     additionalInformation: zStringCanBeEmpty,
     fitForDisabledWorkers: csvBooleanSchema,
     searchableByJobSeekers: csvBooleanSchema,
     searchableByStudents: csvBooleanSchema,
+    right1_email: emailSchema,
+    right1_phone: phoneSchema,
+    right1_job: zStringMinLength1,
+    right2_role: establishmentRoleSchema.optional(),
+    right2_email: emailSchema.optional(),
+    right2_phone: phoneSchema.optional(),
+    right2_job: zStringMinLength1.optional(),
+    right3_role: establishmentRoleSchema.optional(),
+    right3_email: emailSchema.optional(),
+    right3_phone: phoneSchema.optional(),
+    right3_job: zStringMinLength1.optional(),
+    right4_role: establishmentRoleSchema.optional(),
+    right4_email: emailSchema.optional(),
+    right4_phone: phoneSchema.optional(),
+    right4_job: zStringMinLength1.optional(),
+    right5_role: establishmentRoleSchema.optional(),
+    right5_email: emailSchema.optional(),
+    right5_phone: phoneSchema.optional(),
+    right5_job: zStringMinLength1.optional(),
+    right6_role: establishmentRoleSchema.optional(),
+    right6_email: emailSchema.optional(),
+    right6_phone: phoneSchema.optional(),
+    right6_job: zStringMinLength1.optional(),
+    right7_role: establishmentRoleSchema.optional(),
+    right7_email: emailSchema.optional(),
+    right7_phone: phoneSchema.optional(),
+    right7_job: zStringMinLength1.optional(),
+    right8_role: establishmentRoleSchema.optional(),
+    right8_email: emailSchema.optional(),
+    right8_phone: phoneSchema.optional(),
+    right8_job: zStringMinLength1.optional(),
+    right9_role: establishmentRoleSchema.optional(),
+    right9_email: emailSchema.optional(),
+    right9_phone: phoneSchema.optional(),
+    right9_job: zStringMinLength1.optional(),
+    right10_role: establishmentRoleSchema.optional(),
+    right10_email: emailSchema.optional(),
+    right10_phone: phoneSchema.optional(),
+    right10_job: zStringMinLength1.optional(),
   });
 
 export const establishmentCSVRowsSchema: z.Schema<EstablishmentCSVRow[]> =
