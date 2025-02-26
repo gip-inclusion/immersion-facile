@@ -255,6 +255,16 @@ export const errors = {
       new BadRequestError(
         `Le numéro de téléphone du ${signatoryTitleByRole[signatoryRole]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
+    smsReminderAlreadySent: ({
+      signatoryRole,
+      minHoursBetweenReminder,
+    }: {
+      signatoryRole: SignatoryRole;
+      minHoursBetweenReminder: number;
+    }) =>
+      new TooManyRequestApiError(
+        `Une relance de signature au ${signatoryRole} a été envoyée il y a moins de ${minHoursBetweenReminder}h`,
+      ),
   },
   establishment: {
     badPagination: ({
