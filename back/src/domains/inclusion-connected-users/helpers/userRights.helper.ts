@@ -1,5 +1,4 @@
 import {
-  OAuthGatewayProvider,
   UserId,
   UserWithRights,
   WithEstablishmentData,
@@ -7,7 +6,6 @@ import {
   errors,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
@@ -16,22 +14,20 @@ export const getUserWithRights = async (
   uow: UnitOfWork,
   userId: UserId,
 ): Promise<UserWithRights> => {
-  const provider = await makeProvider(uow);
-  const user = await uow.userRepository.getById(userId, provider);
+  const user = await uow.userRepository.getById(userId);
   if (!user) throw errors.user.notFound({ userId });
   const agencyRights = await getAgencyRightByUserId(uow, user.id);
 
   return {
     ...user,
     agencyRights,
-    ...(await withEstablishments(uow, user, provider)),
+    ...(await withEstablishments(uow, user)),
   };
 };
 
 const withEstablishments = async (
   uow: UnitOfWork,
   user: UserOnRepository,
-  provider: OAuthGatewayProvider,
 ): Promise<WithEstablishments> => {
   const establishmentAggregates =
     await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
@@ -41,7 +37,7 @@ const withEstablishments = async (
     );
   const establishments: WithEstablishmentData[] = await Promise.all(
     establishmentAggregates.map((establishment) =>
-      makeEstablishmentRights(uow, provider, establishment, user.id),
+      makeEstablishmentRights(uow, establishment, user.id),
     ),
   );
   return establishments.length ? { establishments } : {};
@@ -49,7 +45,6 @@ const withEstablishments = async (
 
 const makeEstablishmentRights = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   { establishment, userRights }: EstablishmentAggregate,
   userId: UserId,
 ) => {
@@ -64,7 +59,6 @@ const makeEstablishmentRights = async (
     userRights
       .filter((user) => user.role === "establishment-admin")
       .map(({ userId }) => userId),
-    provider,
   );
 
   return {

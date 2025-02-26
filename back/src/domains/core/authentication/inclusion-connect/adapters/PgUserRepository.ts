@@ -1,13 +1,5 @@
 import { SqlBool, sql } from "kysely";
-import {
-  Email,
-  GetUsersFilters,
-  OAuthGatewayProvider,
-  User,
-  UserId,
-  errors,
-  isTruthy,
-} from "shared";
+import { Email, GetUsersFilters, User, UserId, errors, isTruthy } from "shared";
 import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { UserOnRepository, UserRepository } from "../port/UserRepository";
 
@@ -25,10 +17,8 @@ export class PgUserRepository implements UserRepository {
   constructor(private transaction: KyselyDb) {}
 
   //For testing purpose
-  public async getAllUsers(
-    provider: OAuthGatewayProvider,
-  ): Promise<UserOnRepository[]> {
-    const allUsers = await this.#getUserQueryBuilder(provider).execute();
+  public async getAllUsers(): Promise<UserOnRepository[]> {
+    const allUsers = await this.#getUserQueryBuilder().execute();
     return allUsers
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))
       .filter(isTruthy);
@@ -46,16 +36,10 @@ export class PgUserRepository implements UserRepository {
       });
   }
 
-  public async save(
-    user: UserOnRepository,
-    provider: OAuthGatewayProvider,
-  ): Promise<void> {
+  public async save(user: UserOnRepository): Promise<void> {
     const { id, email, firstName, lastName, externalId, createdAt } = user;
-    const providerColumn =
-      provider === "inclusionConnect"
-        ? "inclusion_connect_sub"
-        : "pro_connect_sub";
-    const existingUser = await this.#findById(id, provider);
+
+    const existingUser = await this.#findById(id);
 
     if (!existingUser) {
       await this.transaction
@@ -65,7 +49,7 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          [providerColumn]: externalId,
+          pro_connect_sub: externalId,
           created_at: createdAt,
         })
         .execute();
@@ -86,7 +70,7 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        [providerColumn]: externalId,
+        pro_connect_sub: externalId,
         updated_at: sql`now()`,
       })
       .where("id", "=", id)
@@ -105,23 +89,17 @@ export class PgUserRepository implements UserRepository {
       .execute();
   }
 
-  public async getById(
-    userId: string,
-    provider: OAuthGatewayProvider,
-  ): Promise<UserOnRepository | undefined> {
-    const user = await this.#getUserQueryBuilder(provider)
+  public async getById(userId: string): Promise<UserOnRepository | undefined> {
+    const user = await this.#getUserQueryBuilder()
       .where("id", "=", userId)
       .executeTakeFirst();
 
     return this.#toAuthenticatedUser(user);
   }
 
-  async getByIds(
-    userIds: UserId[],
-    provider: OAuthGatewayProvider,
-  ): Promise<UserOnRepository[]> {
+  async getByIds(userIds: UserId[]): Promise<UserOnRepository[]> {
     if (!userIds.length) return [];
-    const usersInDb = await this.#getUserQueryBuilder(provider)
+    const usersInDb = await this.#getUserQueryBuilder()
       .where("id", "in", userIds)
       .execute();
     const users = usersInDb
@@ -135,57 +113,40 @@ export class PgUserRepository implements UserRepository {
     return users;
   }
 
-  public async getUsers(
-    filters: GetUsersFilters,
-    provider: OAuthGatewayProvider,
-  ): Promise<UserOnRepository[]> {
+  public async getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]> {
     if (filters.emailContains === "") return [];
-    const usersInDb = await this.#getUserQueryBuilder(provider)
+    const usersInDb = await this.#getUserQueryBuilder()
       .where("users.email", "ilike", `%${filters.emailContains}%`)
       .execute();
-    const users = usersInDb
+    return usersInDb
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))
       .filter(isTruthy);
-    return users;
   }
 
   public async findByExternalId(
     externalId: string,
-    provider: OAuthGatewayProvider,
   ): Promise<UserOnRepository | undefined> {
-    const response = await this.#getUserQueryBuilder(provider)
-      .where(
-        provider === "inclusionConnect"
-          ? "inclusion_connect_sub"
-          : "pro_connect_sub",
-        "=",
-        externalId,
-      )
+    const response = await this.#getUserQueryBuilder()
+      .where("pro_connect_sub", "=", externalId)
       .executeTakeFirst();
     return this.#toAuthenticatedUser(response);
   }
 
-  public async findByEmail(
-    email: Email,
-    provider: OAuthGatewayProvider,
-  ): Promise<User | undefined> {
-    const response = await this.#getUserQueryBuilder(provider)
+  public async findByEmail(email: Email): Promise<User | undefined> {
+    const response = await this.#getUserQueryBuilder()
       .where("users.email", "ilike", email)
       .executeTakeFirst();
     return this.#toAuthenticatedUser(response);
   }
 
-  async #findById(
-    userId: UserId,
-    provider: OAuthGatewayProvider,
-  ): Promise<UserOnRepository | undefined> {
-    const response = await this.#getUserQueryBuilder(provider)
+  async #findById(userId: UserId): Promise<UserOnRepository | undefined> {
+    const response = await this.#getUserQueryBuilder()
       .where("id", "=", userId)
       .executeTakeFirst();
     return this.#toAuthenticatedUser(response);
   }
 
-  #getUserQueryBuilder(provider: OAuthGatewayProvider) {
+  #getUserQueryBuilder() {
     return this.transaction
       .selectFrom("users")
       .leftJoin("users_admins", "users.id", "users_admins.user_id")
@@ -198,14 +159,7 @@ export class PgUserRepository implements UserRepository {
           sql<string>`date_to_iso(${qb.ref("users.created_at")})`.as(
             "created_at",
           ),
-        (qb) =>
-          qb
-            .ref(
-              provider === "proConnect"
-                ? "pro_connect_sub"
-                : "inclusion_connect_sub",
-            )
-            .as("external_id"),
+        "pro_connect_sub as external_id",
         sql<SqlBool>`BOOL_OR(users_admins.user_id IS NOT NULL)`.as(
           "isBackofficeAdmin",
         ),

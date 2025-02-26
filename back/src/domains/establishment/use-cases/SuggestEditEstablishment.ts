@@ -8,7 +8,6 @@ import {
 } from "shared";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -52,17 +51,15 @@ export class SuggestEditEstablishment extends TransactionalUseCase<SiretDto> {
       .filter((userRight) => userRight.role === "establishment-contact")
       .map((right) => right.userId);
 
-    const provider = await makeProvider(uow);
-
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "SUGGEST_EDIT_FORM_ESTABLISHMENT",
         sender: immersionFacileNoReplyEmailSender,
-        recipients: (await uow.userRepository.getByIds(adminIds, provider)).map(
+        recipients: (await uow.userRepository.getByIds(adminIds)).map(
           ({ email }) => email,
         ),
-        cc: (await uow.userRepository.getByIds(contactIds, provider)).map(
+        cc: (await uow.userRepository.getByIds(contactIds)).map(
           ({ email }) => email,
         ),
         params: {

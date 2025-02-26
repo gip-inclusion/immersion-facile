@@ -84,7 +84,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     pgDiscussionRepository = new PgDiscussionRepository(kyselyDb);
     pgUserRepository = new PgUserRepository(kyselyDb);
 
-    await pgUserRepository.save(osefUser, "proConnect");
+    await pgUserRepository.save(osefUser);
   });
 
   afterAll(async () => {
@@ -1743,7 +1743,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       };
 
       beforeEach(async () => {
-        await pgUserRepository.save(user, "proConnect");
+        await pgUserRepository.save(user);
       });
 
       it.each([
@@ -2146,8 +2146,8 @@ describe("PgEstablishmentAggregateRepository", () => {
       .build();
 
     beforeEach(async () => {
-      await pgUserRepository.save(user1, "proConnect");
-      await pgUserRepository.save(user2, "proConnect");
+      await pgUserRepository.save(user1);
+      await pgUserRepository.save(user2);
       await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
         establishmentWithoutEmail,
       );

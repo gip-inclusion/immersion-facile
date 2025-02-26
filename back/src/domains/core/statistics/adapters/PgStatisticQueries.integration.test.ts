@@ -123,8 +123,8 @@ describe("PgStatisticQueries", () => {
       beforeEach(async () => {
         const validator = makeUniqueUserForTest(uuid());
         const userRepository = new PgUserRepository(db);
-        await userRepository.save(user, "proConnect");
-        await userRepository.save(validator, "proConnect");
+        await userRepository.save(user);
+        await userRepository.save(validator);
         await pgAgencyRepository.insert(
           toAgencyWithRights(agency, {
             [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },

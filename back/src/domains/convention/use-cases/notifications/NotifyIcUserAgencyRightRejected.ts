@@ -4,7 +4,6 @@ import {
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { makeProvider } from "../../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -33,10 +32,7 @@ export class NotifyIcUserAgencyRightRejected extends TransactionalUseCase<
 
     if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
 
-    const user = await uow.userRepository.getById(
-      params.userId,
-      await makeProvider(uow),
-    );
+    const user = await uow.userRepository.getById(params.userId);
 
     if (!user) throw errors.user.notFound({ userId: params.userId });
 

@@ -25,7 +25,6 @@ const initialState: FeatureFlagsState = {
     severity: "warning",
   }),
   enableSearchByScore: makeBooleanFeatureFlag(false),
-  enableProConnect: makeBooleanFeatureFlag(false),
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),

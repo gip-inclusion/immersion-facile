@@ -50,7 +50,7 @@ describe("PgAssessmentRepository", () => {
 
     const validator = makeUniqueUserForTest(uuid());
 
-    await new PgUserRepository(db).save(validator, "proConnect");
+    await new PgUserRepository(db).save(validator);
     await new PgAgencyRepository(db).insert(
       toAgencyWithRights(AgencyDtoBuilder.create().build(), {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },

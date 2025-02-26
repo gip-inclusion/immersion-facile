@@ -1,6 +1,5 @@
 import { Pool } from "pg";
 import {
-  OAuthGatewayProvider,
   User,
   UserId,
   errors,
@@ -66,252 +65,215 @@ describe("PgAuthenticatedUserRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayProviders)(
-    `With oAuthProvider '%s'`,
-    (provider) => {
-      describe("save()", () => {
-        it("saves a user, than finds it from external_id, then updates it", async () => {
-          await userRepository.save(user, provider);
+  describe.each(oAuthGatewayProviders)(`With oAuthProvider '%s'`, () => {
+    describe("save()", () => {
+      it("saves a user, than finds it from external_id, then updates it", async () => {
+        await userRepository.save(user);
 
-          const fetchedUser = await userRepository.findByExternalId(
-            userExternalId,
-            provider,
-          );
-          expectToEqual(fetchedUser, user);
+        const fetchedUser =
+          await userRepository.findByExternalId(userExternalId);
+        expectToEqual(fetchedUser, user);
 
-          const updatedUser: User = {
-            id: user.id,
-            email: "updated-mail@mail.com",
-            lastName: "Dodo",
-            firstName: "Johnny",
-            externalId: userExternalId,
-            createdAt,
-          };
-          await userRepository.save(updatedUser, provider);
+        const updatedUser: User = {
+          id: user.id,
+          email: "updated-mail@mail.com",
+          lastName: "Dodo",
+          firstName: "Johnny",
+          externalId: userExternalId,
+          createdAt,
+        };
+        await userRepository.save(updatedUser);
 
-          const fetchedUpdatedUser = await userRepository.findByExternalId(
-            userExternalId,
-            provider,
-          );
-          expectToEqual(fetchedUpdatedUser, updatedUser);
-        });
-
-        it("adds the missing data to the entry when user already exists but not connected", async () => {
-          const userNotIcConnected: User = {
-            ...user,
-            firstName: "",
-            lastName: "",
-            externalId: null,
-          };
-          await userRepository.save(userNotIcConnected, provider);
-          expectToEqual(await userRepository.getAllUsers(provider), [
-            userNotIcConnected,
-          ]);
-
-          await userRepository.save(user, provider);
-
-          expectToEqual(await userRepository.getAllUsers(provider), [user]);
-        });
+        const fetchedUpdatedUser =
+          await userRepository.findByExternalId(userExternalId);
+        expectToEqual(fetchedUpdatedUser, updatedUser);
       });
 
-      describe("updateEmail()", () => {
-        it("updates users email in users table", async () => {
-          await insertUser(db, user1, provider);
-          const updatedEmail = "new-email@email.fr";
+      it("adds the missing data to the entry when user already exists but not connected", async () => {
+        const userNotIcConnected: User = {
+          ...user,
+          firstName: "",
+          lastName: "",
+          externalId: null,
+        };
+        await userRepository.save(userNotIcConnected);
+        expectToEqual(await userRepository.getAllUsers(), [userNotIcConnected]);
 
-          await userRepository.updateEmail(user1.id, updatedEmail);
+        await userRepository.save(user);
 
-          expectToEqual(await userRepository.getById(user1.id, provider), {
-            ...user1,
-            email: updatedEmail,
-          });
+        expectToEqual(await userRepository.getAllUsers(), [user]);
+      });
+    });
+
+    describe("updateEmail()", () => {
+      it("updates users email in users table", async () => {
+        await insertUser(db, user1, true);
+        const updatedEmail = "new-email@email.fr";
+
+        await userRepository.updateEmail(user1.id, updatedEmail);
+
+        expectToEqual(await userRepository.getById(user1.id), {
+          ...user1,
+          email: updatedEmail,
         });
       });
+    });
 
-      describe("delete()", () => {
-        it("deletes an existing user", async () => {
-          await insertUser(db, user1, provider);
-          await userRepository.delete(user1.id);
-          const response = await userRepository.getById(user1.id, provider);
-          expectToEqual(response, undefined);
-          expectToEqual(
-            await db
-              .selectFrom("users__agencies")
-              .selectAll()
-              .where("user_id", "=", user1.id)
-              .execute(),
-            [],
-          );
-        });
-
-        it("does not throw when user does not exist", async () => {
-          await expectPromiseToFailWithError(
-            userRepository.delete(user1.id),
-            errors.user.notFound({ userId: user1.id }),
-          );
-        });
-      });
-
-      describe("getById()", () => {
-        it("gets the connected user from its Id", async () => {
-          await insertUser(db, user1, provider);
-          const inclusionConnectedUser = await userRepository.getById(
-            user1.id,
-            provider,
-          );
-          expectToEqual(inclusionConnectedUser, user1);
-        });
-
-        it("gets the connected user with admin right for admins", async () => {
-          await insertUser(db, user1, provider);
+    describe("delete()", () => {
+      it("deletes an existing user", async () => {
+        await insertUser(db, user1, true);
+        await userRepository.delete(user1.id);
+        const response = await userRepository.getById(user1.id);
+        expectToEqual(response, undefined);
+        expectToEqual(
           await db
-            .insertInto("users_admins")
-            .values({ user_id: user1.id })
-            .execute();
-          const adminUser = await userRepository.getById(user1.id, provider);
-          expectToEqual(adminUser, {
-            ...user1,
-            isBackofficeAdmin: true,
-          });
-        });
+            .selectFrom("users__agencies")
+            .selectAll()
+            .where("user_id", "=", user1.id)
+            .execute(),
+          [],
+        );
       });
 
-      describe("getByIds()", () => {
-        it("success nothing", async () => {
-          expectToEqual(await userRepository.getByIds([], provider), []);
-        });
+      it("does not throw when user does not exist", async () => {
+        await expectPromiseToFailWithError(
+          userRepository.delete(user1.id),
+          errors.user.notFound({ userId: user1.id }),
+        );
+      });
+    });
 
-        it("success one user", async () => {
-          await insertUser(db, user1, provider);
-
-          expectToEqual(await userRepository.getByIds([user1.id], provider), [
-            user1,
-          ]);
-        });
-
-        it("success multiple users", async () => {
-          await insertUser(db, user1, provider);
-          await insertUser(db, user2, provider);
-          await insertUser(db, user, provider);
-
-          expectToEqual(
-            await userRepository.getByIds(
-              [user1.id, user2.id, user.id],
-              provider,
-            ),
-            [user2, user, user1],
-          );
-        });
-
-        it("error if at least one missing user", async () => {
-          await insertUser(db, user1, provider);
-
-          const missingUserId: UserId = uuid();
-
-          expectPromiseToFailWithError(
-            userRepository.getByIds([user1.id, missingUserId], provider),
-            errors.users.notFound({ userIds: [missingUserId] }),
-          );
-        });
-
-        it("error if multiple missing users", async () => {
-          const missingUserId1: UserId = uuid();
-          const missingUserId2: UserId = uuid();
-
-          expectPromiseToFailWithError(
-            userRepository.getByIds([missingUserId1, missingUserId2], provider),
-            errors.users.notFound({
-              userIds: [missingUserId1, missingUserId2],
-            }),
-          );
-        });
+    describe("getById()", () => {
+      it("gets the connected user from its Id", async () => {
+        await insertUser(db, user1, true);
+        const inclusionConnectedUser = await userRepository.getById(user1.id);
+        expectToEqual(inclusionConnectedUser, user1);
       });
 
-      describe("getUsers()", () => {
-        it("returns no users when emailContains is empty string", async () => {
-          const users = await userRepository.getUsers(
-            { emailContains: "" },
-            "inclusionConnect",
-          );
-          expectToEqual(users, []);
-        });
-
-        it("returns all the users with email matching filter", async () => {
-          const userNotIcConnected: User = {
-            ...user,
-            firstName: "",
-            lastName: "",
-            externalId: null,
-          };
-
-          await insertUser(db, user1, "inclusionConnect");
-          await insertUser(db, user2, "proConnect");
-          await insertUser(db, userNotIcConnected, null);
-
-          const users = await userRepository.getUsers(
-            { emailContains: "j" },
-            "inclusionConnect",
-          );
-          expectToEqual(users, [
-            { ...user2, externalId: null },
-            userNotIcConnected,
-            user1,
-          ]);
+      it("gets the connected user with admin right for admins", async () => {
+        await insertUser(db, user1, true);
+        await db
+          .insertInto("users_admins")
+          .values({ user_id: user1.id })
+          .execute();
+        const adminUser = await userRepository.getById(user1.id);
+        expectToEqual(adminUser, {
+          ...user1,
+          isBackofficeAdmin: true,
         });
       });
+    });
 
-      describe("findByExternalId()", () => {
-        it("returns an user", async () => {
-          await userRepository.save(user, provider);
-          const response = await userRepository.findByExternalId(
-            userExternalId,
-            provider,
-          );
-          expectToEqual(response, user);
-        });
-
-        it("returns undefined when user not found", async () => {
-          const response = await userRepository.findByExternalId(
-            "an-external-id",
-            provider,
-          );
-          expect(response).toBeUndefined();
-        });
+    describe("getByIds()", () => {
+      it("success nothing", async () => {
+        expectToEqual(await userRepository.getByIds([]), []);
       });
 
-      describe("findByEmail()", () => {
-        it("returns a user", async () => {
-          await userRepository.save(user, provider);
-          const response = await userRepository.findByEmail(
-            user.email,
-            provider,
-          );
-          expectToEqual(response, user);
-        });
+      it("success one user", async () => {
+        await insertUser(db, user1, true);
 
-        it("returns undefined when user not found", async () => {
-          const response = await userRepository.findByEmail(
-            "some@email.com",
-            provider,
-          );
-          expect(response).toBeUndefined();
-        });
+        expectToEqual(await userRepository.getByIds([user1.id]), [user1]);
       });
-    },
-  );
+
+      it("success multiple users", async () => {
+        await insertUser(db, user1, true);
+        await insertUser(db, user2, true);
+        await insertUser(db, user, true);
+
+        expectToEqual(
+          await userRepository.getByIds([user1.id, user2.id, user.id]),
+          [user2, user, user1],
+        );
+      });
+
+      it("error if at least one missing user", async () => {
+        await insertUser(db, user1, true);
+
+        const missingUserId: UserId = uuid();
+
+        expectPromiseToFailWithError(
+          userRepository.getByIds([user1.id, missingUserId]),
+          errors.users.notFound({ userIds: [missingUserId] }),
+        );
+      });
+
+      it("error if multiple missing users", async () => {
+        const missingUserId1: UserId = uuid();
+        const missingUserId2: UserId = uuid();
+
+        expectPromiseToFailWithError(
+          userRepository.getByIds([missingUserId1, missingUserId2]),
+          errors.users.notFound({
+            userIds: [missingUserId1, missingUserId2],
+          }),
+        );
+      });
+    });
+
+    describe("getUsers()", () => {
+      it("returns no users when emailContains is empty string", async () => {
+        const users = await userRepository.getUsers({ emailContains: "" });
+        expectToEqual(users, []);
+      });
+
+      it("returns all the users with email matching filter", async () => {
+        const userNotIcConnected: User = {
+          ...user,
+          firstName: "",
+          lastName: "",
+          externalId: null,
+        };
+
+        await insertUser(db, user1, true);
+        await insertUser(db, user2, false);
+        await insertUser(db, userNotIcConnected, false);
+
+        const users = await userRepository.getUsers({ emailContains: "j" });
+        expectToEqual(users, [
+          { ...user2, externalId: null },
+          userNotIcConnected,
+          user1,
+        ]);
+      });
+    });
+
+    describe("findByExternalId()", () => {
+      it("returns an user", async () => {
+        await userRepository.save(user);
+        const response = await userRepository.findByExternalId(userExternalId);
+        expectToEqual(response, user);
+      });
+
+      it("returns undefined when user not found", async () => {
+        const response =
+          await userRepository.findByExternalId("an-external-id");
+        expect(response).toBeUndefined();
+      });
+    });
+
+    describe("findByEmail()", () => {
+      it("returns a user", async () => {
+        await userRepository.save(user);
+        const response = await userRepository.findByEmail(user.email);
+        expectToEqual(response, user);
+      });
+
+      it("returns undefined when user not found", async () => {
+        const response = await userRepository.findByEmail("some@email.com");
+        expect(response).toBeUndefined();
+      });
+    });
+  });
 });
 
 const insertUser = async (
   db: KyselyDb,
   { id, email, firstName, lastName, externalId, createdAt }: User,
-  provider: OAuthGatewayProvider | null,
+  isProConnected: boolean,
 ) => {
-  const icProvider =
-    provider === "inclusionConnect"
-      ? { inclusion_connect_sub: externalId }
-      : {};
-  const proConnectProvider =
-    provider === "proConnect" ? { pro_connect_sub: externalId } : {};
+  const proConnectProvider = isProConnected
+    ? { pro_connect_sub: externalId }
+    : {};
 
   await db
     .insertInto("users")
@@ -321,7 +283,6 @@ const insertUser = async (
       first_name: firstName,
       last_name: lastName,
       created_at: createdAt,
-      ...icProvider,
       ...proConnectProvider,
     })
     .execute();

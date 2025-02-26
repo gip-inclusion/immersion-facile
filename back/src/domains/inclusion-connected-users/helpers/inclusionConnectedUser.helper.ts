@@ -7,14 +7,12 @@ import {
   ConventionsEstablishmentDashboard,
   EstablishmentDashboards,
   InclusionConnectedUser,
-  OAuthGatewayProvider,
   UserId,
   UserWithAgencyRights,
   WithDashboards,
   agencyRoleIsNotToReview,
 } from "shared";
 import { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -44,8 +42,7 @@ export const getIcUsersByUserIds = async (
   uow: UnitOfWork,
   userIds: UserId[],
 ): Promise<InclusionConnectedUser[]> => {
-  const provider = await makeProvider(uow);
-  const users = await uow.userRepository.getByIds(userIds, provider);
+  const users = await uow.userRepository.getByIds(userIds);
 
   const userRightsByUser = (
     await Promise.all(
@@ -79,7 +76,6 @@ export const getIcUsersByUserIds = async (
         userRightsByUser[user.id],
         agenciesRelatedToUsersByAgencyId,
         uow,
-        provider,
       ),
       dashboards: { agencies: {}, establishments: {} },
     })),
@@ -90,7 +86,6 @@ const makeAgencyRights = (
   userRights: AgencyRightOfUser[],
   agenciesRelatedToUsersByAgencyId: Record<AgencyId, AgencyWithUsersRights>,
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
 ): Promise<AgencyRight[]> =>
   Promise.all(
     userRights.map<Promise<AgencyRight>>(async ({ agencyId, ...rights }) => {
@@ -101,7 +96,6 @@ const makeAgencyRights = (
         toPairs(usersRights)
           .filter(([_, userRight]) => userRight?.roles.includes("agency-admin"))
           .map(([id]) => id),
-        provider,
       );
 
       return {
