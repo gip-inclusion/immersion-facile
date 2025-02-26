@@ -3,12 +3,10 @@ import {
   type ContactEstablishmentEventPayload,
   type ConventionId,
   type DateString,
-  type EstablishmentJwtPayload,
   type Flavor,
   type IdentityProvider,
   type RejectIcUserRoleForAgencyParams,
   type Role,
-  type SiretDto,
   type UserId,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
@@ -18,7 +16,6 @@ import {
   type WithDiscussionId,
   type WithSiretDto,
   roleSchema,
-  siretSchema,
   userIdSchema,
 } from "shared";
 import { z } from "zod";
@@ -78,7 +75,6 @@ export type UserAuthenticatedPayload = {
 export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }
   | { kind: "convention-magic-link"; role: Role }
-  | { kind: "establishment-magic-link"; siret: SiretDto }
   | { kind: "crawler" };
 
 export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
@@ -86,10 +82,7 @@ export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
   [
     z.object({ kind: z.literal("inclusion-connected"), userId: userIdSchema }),
     z.object({ kind: z.literal("convention-magic-link"), role: roleSchema }),
-    z.object({
-      kind: z.literal("establishment-magic-link"),
-      siret: siretSchema,
-    }),
+    z.object({ kind: z.literal("crawler") }),
   ],
 );
 
