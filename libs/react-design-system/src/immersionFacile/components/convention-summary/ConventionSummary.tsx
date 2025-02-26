@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Badge } from "@codegouvfr/react-dsfr/Badge";
+import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import React, { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { CopyButton } from "../copy-button/CopyButton";
@@ -18,7 +18,10 @@ export type ConventionSummarySection = {
 
 export type ConventionSummarySubSection = {
   key: string;
-  title?: string;
+  header?: {
+    title: string;
+    badge?: BadgeProps;
+  };
   fields: ConventionSummaryField[];
   isFullWidthDisplay?: boolean;
   hasBackgroundColor?: boolean;
@@ -32,10 +35,7 @@ export type ConventionSummaryField = { key: string } & (
       copyButton?: string | ReactNode;
       hasBackgroundColor?: boolean;
     }
-  | {
-      value: string | NonNullable<ReactNode>;
-      badgeSeverity: "success" | "warning";
-    }
+  | BadgeProps
   | { value: NonNullable<ReactNode> }
 );
 
@@ -157,12 +157,12 @@ const SubSection = ({
         />
       )}
       <section
-        key={subSection.title}
+        key={subSection.header?.title}
         className={cx(
           fr.cx(
             "fr-col-12",
             "fr-pr-3w",
-            !!subSection.title && "fr-py-2w",
+            !!subSection.header?.title && "fr-py-2w",
             !subSection.isFullWidthDisplay && "fr-col-md-6",
             subSection.hasBackgroundColor && "fr-p-2w",
           ),
@@ -177,28 +177,22 @@ const SubSection = ({
         )}
       >
         <div className={fr.cx("fr-col-12")}>
-          {subSection.title && (
-            <h6 className={fr.cx("fr-mb-2v")}>{subSection.title}</h6>
+          {subSection.header?.title && (
+            <h6 className={fr.cx("fr-mb-2v")}>{subSection.header.title}</h6>
+          )}
+          {subSection.header?.badge && (
+            <div className={cx(fr.cx("fr-col-12"), "fr-mb-2w")}>
+              <Badge small {...subSection.header.badge} />
+            </div>
           )}
           {subSection.isSchedule && <Schedule fields={subSection.fields} />}
           {!subSection.isSchedule && (
             <div className={fr.cx("fr-grid-row")}>
               {subSection.fields.map((field) => {
-                if ("badgeSeverity" in field) {
+                if ("severity" in field) {
                   return (
-                    <div
-                      key={field.key}
-                      className={cx(
-                        fr.cx("fr-col-12"),
-                        field.key !== "dateApproval" &&
-                          field.key !== "dateValidation"
-                          ? "fr-mb-2w"
-                          : "",
-                      )}
-                    >
-                      <Badge small severity={field.badgeSeverity}>
-                        {field.value}
-                      </Badge>
+                    <div key={field.key} className={cx(fr.cx("fr-col-12"))}>
+                      <Badge small {...field} />
                     </div>
                   );
                 }
@@ -236,7 +230,7 @@ const SubSection = ({
 
 const Schedule = ({ fields }: { fields: ConventionSummaryField[] }) => {
   const schedule = fields[0];
-  if (!schedule) return null;
+  if (!schedule || !("value" in schedule)) return null;
   return <>{schedule.value}</>;
 };
 
