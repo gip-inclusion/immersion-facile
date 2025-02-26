@@ -13,6 +13,7 @@ import {
   DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectedAllowedRoutes,
+  RemindSignatoriesRequestDto,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -124,6 +125,23 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body.similarConventionIds)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public remindSignatories$(
+    params: RemindSignatoriesRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .remindSignatories({ body: params, headers: { authorization: jwt } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404, 409) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

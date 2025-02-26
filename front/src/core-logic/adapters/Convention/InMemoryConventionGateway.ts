@@ -12,6 +12,7 @@ import {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   FindSimilarConventionsParams,
+  RemindSignatoriesRequestDto,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -55,6 +56,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public broadcastConventionAgainResult$ = new Subject<void>();
 
+  public remindSignatoriesResult$ = new Subject<void>();
+
   #agencies: { [id: string]: AgencyOption } = {};
 
   #conventions: { [id: string]: ConventionDto } = {
@@ -91,6 +94,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _findSimilarConventionsParams: FindSimilarConventionsParams,
   ): Observable<ConventionId[]> {
     return this.getSimilarConventionsResult$;
+  }
+
+  public remindSignatories$(
+    _params: RemindSignatoriesRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return this.remindSignatoriesResult$;
   }
 
   public renewConvention$(
