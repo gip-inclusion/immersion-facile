@@ -10,6 +10,7 @@ import {
   DiscussionId,
   FindSimilarConventionsParams,
   InclusionConnectJwt,
+  RemindSignatoriesRequestDto,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -53,6 +54,10 @@ export interface ConventionGateway {
   shareConventionLinkByEmail(
     shareLinkByEmailDto: ShareLinkByEmailDto,
   ): Promise<boolean>;
+  remindSignatories$(
+    params: RemindSignatoriesRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
   renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
   renewConvention$(
     params: RenewConventionParams,
