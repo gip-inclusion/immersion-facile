@@ -1,12 +1,14 @@
-import { subHours } from "date-fns";
+import { subDays, subHours } from "date-fns";
 import { Pool } from "pg";
 import {
+  ConventionId,
   EmailAttachment,
   EmailNotification,
   Notification,
   SmsNotification,
   TemplatedEmail,
   TemplatedSms,
+  expectArraysToEqual,
   expectToEqual,
 } from "shared";
 import {
@@ -238,7 +240,7 @@ describe("PgNotificationRepository", () => {
   });
 
   describe("saveBatch", () => {
-    it("saves a batch of notifications", async () => {
+    it("saves a batch of notifications email and sms", async () => {
       await pgNotificationRepository.saveBatch([
         ...emailNotifications,
         smsNotification,
@@ -249,6 +251,19 @@ describe("PgNotificationRepository", () => {
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
       );
+
+      const smsResponse = await pgNotificationRepository.getByIdAndKind(
+        smsNotificationId,
+        "sms",
+      );
+      expect(smsResponse).toEqual(smsNotification);
+    });
+
+    it("saves a batch of notifications sms only", async () => {
+      await pgNotificationRepository.saveBatch([smsNotification]);
+
+      const response = await pgNotificationRepository.getEmailsByFilters();
+      expectArraysToEqual(response, []);
 
       const smsResponse = await pgNotificationRepository.getByIdAndKind(
         smsNotificationId,
@@ -454,6 +469,66 @@ describe("PgNotificationRepository", () => {
           },
         ],
       });
+    });
+  });
+
+  describe("getLastSmsNotificationByFilter", () => {
+    const smsKind = "LastReminderForSignatories";
+    const recipientPhone = "+33610101010";
+    const conventionId: ConventionId = "88888888-4444-4000-4444-111111111111";
+
+    it("get the latest sms for a phoneNumber, given conventionId and smsKind", async () => {
+      const lastSmsNotification: SmsNotification = {
+        kind: "sms",
+        id: "77777777-7777-4000-7777-777777777777",
+        createdAt: subHours(new Date(), 4).toISOString(),
+        templatedContent: {
+          kind: smsKind,
+          recipientPhone,
+          params: { shortLink: "https://short.com" },
+        },
+        followedIds: {
+          conventionId: conventionId,
+        },
+      };
+      const olderSmsNotification: SmsNotification = {
+        kind: "sms",
+        id: "77777777-7777-4000-7777-777777778888",
+        createdAt: subDays(new Date(), 5).toISOString(),
+        templatedContent: {
+          kind: smsKind,
+          recipientPhone,
+          params: { shortLink: "https://short.com" },
+        },
+        followedIds: {
+          conventionId: conventionId,
+        },
+      };
+
+      await pgNotificationRepository.saveBatch([
+        lastSmsNotification,
+        olderSmsNotification,
+      ]);
+
+      expectToEqual(
+        await pgNotificationRepository.getLastSmsNotificationByFilter({
+          conventionId,
+          smsKind,
+          recipientPhoneNumber: recipientPhone,
+        }),
+        lastSmsNotification,
+      );
+    });
+
+    it("Return undefined if no sms notification found", async () => {
+      const lastNotification =
+        await pgNotificationRepository.getLastSmsNotificationByFilter({
+          conventionId,
+          smsKind,
+          recipientPhoneNumber: recipientPhone,
+        });
+
+      expect(lastNotification).toBeUndefined();
     });
   });
 });
