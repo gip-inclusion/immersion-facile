@@ -78,7 +78,6 @@ import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile"
 import type {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
 import { makeGetNafSuggestions } from "../../domains/core/naf/use-cases/GetNafSuggestions";
@@ -111,7 +110,6 @@ import { InsertEstablishmentAggregateFromForm } from "../../domains/establishmen
 import { LegacyContactEstablishment } from "../../domains/establishment/use-cases/LegacyContactEstablishment";
 import { MarkEstablishmentLeadAsRegistrationAccepted } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationAccepted";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "../../domains/establishment/use-cases/MarkEstablishmentLeadAsRegistrationRejected";
-import { RequestEditFormEstablishment } from "../../domains/establishment/use-cases/RequestEditFormEstablishment";
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
@@ -135,16 +133,12 @@ import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
-import {
-  makeGenerateConventionMagicLinkUrl,
-  makeGenerateEditFormEstablishmentUrl,
-} from "./magicLinkUrl";
+import { makeGenerateConventionMagicLinkUrl } from "./magicLinkUrl";
 
 export const createUseCases = (
   config: AppConfig,
   gateways: Gateways,
   generateConventionJwt: GenerateConventionJwt,
-  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt,
   generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
   generateApiConsumerJwt: GenerateApiConsumerJwt,
   uowPerformer: UnitOfWorkPerformer,
@@ -380,16 +374,6 @@ export const createUseCases = (
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
       ),
-      requestEditFormEstablishment: new RequestEditFormEstablishment(
-        uowPerformer,
-        saveNotificationAndRelatedEvent,
-        gateways.timeGateway,
-        makeGenerateEditFormEstablishmentUrl(
-          config,
-          generateEditEstablishmentJwt,
-        ),
-      ),
-
       notifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm:
         new NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm(
           uowPerformer,

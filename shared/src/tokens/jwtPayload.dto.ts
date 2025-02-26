@@ -4,7 +4,6 @@ import type {
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { Role } from "../role/role.dto";
-import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { ValueOf } from "../utils";
 
@@ -37,12 +36,6 @@ export type ConventionRelatedJwtPayload =
   | ConventionDomainPayload
   | InclusionConnectDomainJwtPayload;
 
-export type EstablishmentDomainPayload = {
-  siret: SiretDto;
-};
-export type EstablishmentJwtPayload = CommonJwtPayload &
-  EstablishmentDomainPayload;
-
 export type CreateConventionMagicLinkPayloadProperties = {
   id: ConventionId;
   role: Role;
@@ -57,7 +50,6 @@ export type CreateConventionMagicLinkPayloadProperties = {
 
 export type JwtPayloads = {
   convention?: ConventionJwtPayload;
-  establishment?: EstablishmentJwtPayload;
   inclusion?: InclusionConnectJwtPayload;
   currentUser?: InclusionConnectedUser;
 };

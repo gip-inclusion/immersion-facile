@@ -1,11 +1,11 @@
 import * as crypto from "node:crypto";
 import { decode } from "js-base64";
-import { type Email, type SiretDto, currentJwtVersions } from "..";
-import type {
+import { type Email, UserId, currentJwtVersions } from "..";
+import {
   ConventionJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   EmailHash,
-  EstablishmentJwtPayload,
+  InclusionConnectJwtPayload,
 } from "./jwtPayload.dto";
 
 export const isSomeEmailMatchingEmailHash = (
@@ -38,7 +38,7 @@ export const decodeJwtWithoutSignatureCheck = <T>(jwtToken: string): T => {
 };
 
 export const decodeMagicLinkJwtWithoutSignatureCheck = <
-  T extends ConventionJwtPayload | EstablishmentJwtPayload,
+  T extends ConventionJwtPayload,
 >(
   jwtToken: string,
 ): T => decodeJwtWithoutSignatureCheck<T>(jwtToken);
@@ -67,26 +67,22 @@ export const createConventionMagicLinkPayload = ({
   };
 };
 
-type CreateEstablishmentJwtPayloadProperties = {
-  siret: SiretDto;
-  durationDays: number;
-  now: Date;
-  iat?: number;
-  exp?: number;
-  version?: number;
-};
-
-export const createEstablishmentJwtPayload = ({
-  siret,
+export const createInclusionConnectJwtPayload = ({
+  userId,
   // biome-ignore lint/correctness/noUnusedVariables: it is used in other param
   durationDays,
   now,
   iat = Math.round(now.getTime() / 1000),
   exp = iat + durationDays * 24 * 3600,
-  version = currentJwtVersions.establishment,
-}: CreateEstablishmentJwtPayloadProperties): EstablishmentJwtPayload => ({
-  siret,
+}: {
+  userId: UserId;
+  durationDays: number;
+  now: Date;
+  iat?: number;
+  exp?: number;
+}): InclusionConnectJwtPayload => ({
+  userId,
   iat,
   exp,
-  version,
+  version: currentJwtVersions.inclusion,
 });
