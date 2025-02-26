@@ -90,7 +90,10 @@ export const errors = {
     missingOAuth: ({
       state,
       identityProvider,
-    }: { state?: OAuthState; identityProvider?: IdentityProvider }) =>
+    }: {
+      state?: OAuthState;
+      identityProvider?: IdentityProvider;
+    }) =>
       state && identityProvider
         ? new ForbiddenError(
             `Il n'y a pas d'OAuth en cours avec l'état '${state}' et le provider '${identityProvider}'.`,
@@ -137,7 +140,10 @@ export const errors = {
     forbiddenMissingRights: ({
       conventionId,
       userId,
-    }: { conventionId: ConventionId; userId?: UserId }) =>
+    }: {
+      conventionId: ConventionId;
+      userId?: UserId;
+    }) =>
       new ForbiddenError(
         `L'utilisateur ${
           userId ? `'${userId}' ` : ""
@@ -162,14 +168,28 @@ export const errors = {
     badStatusTransition: ({
       currentStatus,
       targetStatus,
-    }: { currentStatus: ConventionStatus; targetStatus: ConventionStatus }) =>
+    }: {
+      currentStatus: ConventionStatus;
+      targetStatus: ConventionStatus;
+    }) =>
       new BadRequestError(
         `Impossible de passer du statut de convention "${currentStatus}" à "${targetStatus}".`,
+      ),
+    signReminderNotAllowedForStatus: ({
+      status,
+    }: {
+      status: ConventionStatus;
+    }) =>
+      new BadRequestError(
+        `Impossible de relancer la demande de signature pour les conventions ayant le statut "${status}".`,
       ),
     twoStepsValidationBadStatus: ({
       targetStatus,
       conventionId,
-    }: { targetStatus: ConventionStatus; conventionId: ConventionId }) =>
+    }: {
+      targetStatus: ConventionStatus;
+      conventionId: ConventionId;
+    }) =>
       new ForbiddenError(
         `Impossible de passer du statut "${targetStatus}" pour la convention "${conventionId}". La convention doit être d'abord approuvée par un conseiller.`,
       ),
@@ -177,11 +197,26 @@ export const errors = {
       new BadRequestError(
         `Aucun des signataires n'a signé la convention avec l'identifiant ${conventionId}.`,
       ),
+    signatoryAlreadySigned: ({
+      conventionId,
+      signatoryRole,
+    }: {
+      conventionId: ConventionId;
+      signatoryRole: SignatoryRole;
+    }) =>
+      new BadRequestError(
+        `Le  ${signatoryTitleByRole[signatoryRole]} a déjà signé la convention ${conventionId}.`,
+      ),
     missingActor: ({
       conventionId,
       role,
-    }: { conventionId: ConventionId; role: Role }) =>
-      new BadRequestError(`There is no ${role} on convention ${conventionId}.`),
+    }: {
+      conventionId: ConventionId;
+      role: Role;
+    }) =>
+      new BadRequestError(
+        `Il n'y a pas de role ${role} pour la convention ${conventionId}.`,
+      ),
     missingSignatorySignature: ({ role }: { role: SignatoryRole }) =>
       new BadRequestError(
         `Signature manquante pour ${signatoryTitleByRole[role]}.`,
@@ -196,12 +231,29 @@ export const errors = {
       new BadRequestError(
         `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
       ),
+    unsupportedRoleSignReminder: ({ role }: { role: Role }) =>
+      new ForbiddenError(
+        `Le rôle ${role} n'est pas supporté pour la relance des signataires`,
+      ),
     forbiddenReminder: ({
       convention,
       kind,
-    }: { convention: ConventionDto; kind: ReminderKind }) =>
+    }: {
+      convention: ConventionDto;
+      kind: ReminderKind;
+    }) =>
       new ForbiddenError(
         `Convention with id: '${convention.id}' and status: '${convention.status}' is not supported for reminder ${kind}.`,
+      ),
+    invalidMobilePhoneNumber: ({
+      conventionId,
+      signatoryRole,
+    }: {
+      conventionId: ConventionId;
+      signatoryRole: SignatoryRole;
+    }) =>
+      new BadRequestError(
+        `Le numéro de téléphone du ${signatoryTitleByRole[signatoryRole]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
   },
   establishment: {
@@ -209,7 +261,11 @@ export const errors = {
       page,
       perPage,
       totalPages,
-    }: { page: number; totalPages: number; perPage: number }) =>
+    }: {
+      page: number;
+      totalPages: number;
+      perPage: number;
+    }) =>
       new BadRequestError(
         `Le numéro de la page est plus grand que le nombre total de pages (page demandée: ${page} > pages totales: ${totalPages}, avec ${perPage} résultats / page).`,
       ),
@@ -304,11 +360,7 @@ export const errors = {
       ),
     noLocation: ({ siret }: { siret: SiretDto }) =>
       new NotFoundError(`L'établissement '${siret}' n'a pas de localisations.`),
-    forbiddenUnavailable: ({
-      siret,
-    }: {
-      siret: SiretDto;
-    }) =>
+    forbiddenUnavailable: ({ siret }: { siret: SiretDto }) =>
       new ForbiddenError(
         `L'entreprise ${siret} n'est pas disponible pour des immersions.`,
       ),
@@ -335,7 +387,10 @@ export const errors = {
     notFound: ({
       missingAgencyIds,
       presentAgencyIds = [],
-    }: { missingAgencyIds: AgencyId[]; presentAgencyIds?: AgencyId[] }) =>
+    }: {
+      missingAgencyIds: AgencyId[];
+      presentAgencyIds?: AgencyId[];
+    }) =>
       new NotFoundError(
         [
           `Nous n'avons pas trouvé les agences avec les identifiants suivants : ${missingAgencyIds.join(
@@ -349,7 +404,10 @@ export const errors = {
     refersToMismatch: ({
       agencyWithRefersToId,
       referedAgencyId,
-    }: { agencyWithRefersToId: AgencyId; referedAgencyId: AgencyId }) =>
+    }: {
+      agencyWithRefersToId: AgencyId;
+      referedAgencyId: AgencyId;
+    }) =>
       `Le refersToAgencyId de l'agence '${agencyWithRefersToId}' ne correspond pas avec l'agence '${referedAgencyId}' à laquelle elle est référencée.`,
   },
   agency: {
@@ -368,7 +426,11 @@ export const errors = {
       id,
       actual,
       expected,
-    }: { id: AgencyId; actual: AgencyStatus; expected: AgencyStatus }) =>
+    }: {
+      id: AgencyId;
+      actual: AgencyStatus;
+      expected: AgencyStatus;
+    }) =>
       new BadRequestError(
         `L'agence '${id}' n'a pas le bon status. Le status actuel est '${actual}' alors que le status attendu est '${expected}'.`,
       ),
@@ -398,7 +460,9 @@ export const errors = {
       new BadRequestError(`L'agence ${agencyId} n'est pas rejetée.`),
     invalidRoleUpdateForOneStepValidationAgency: ({
       agencyId,
-    }: { agencyId: AgencyId }) =>
+    }: {
+      agencyId: AgencyId;
+    }) =>
       new BadRequestError(
         `L'agence "${agencyId}" à une seule étape de validation ne peut pas avoir aucun validateur recevant des notifications.`,
       ),
@@ -406,7 +470,10 @@ export const errors = {
     invalidRoleUpdateForAgencyWithRefersTo: ({
       agencyId,
       role,
-    }: { agencyId: AgencyId; role: AgencyRole }) =>
+    }: {
+      agencyId: AgencyId;
+      role: AgencyRole;
+    }) =>
       new BadRequestError(
         `Le role "${role}" n'est pas autorisé pour l'agence "${agencyId}" car cette agence est une structure d'accompagnement.`,
       ),
@@ -445,14 +512,20 @@ export const errors = {
     expectedRightsOnAgency: ({
       agencyId,
       userId,
-    }: { userId: UserId; agencyId: AgencyId }) =>
+    }: {
+      userId: UserId;
+      agencyId: AgencyId;
+    }) =>
       new BadRequestError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
       ),
     noRightsOnAgency: ({
       agencyId,
       userId,
-    }: { userId: UserId; agencyId: AgencyId }) =>
+    }: {
+      userId: UserId;
+      agencyId: AgencyId;
+    }) =>
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas de droits sur l'agence "${agencyId}".`,
       ),
@@ -488,13 +561,21 @@ export const errors = {
       new ForbiddenError(
         "Vous n'avez pas les droits nécessaires pour modifier ces rôles.",
       ),
+    notEnoughRightOnAgency: ({
+      userId,
+      agencyId,
+    }: {
+      agencyId: AgencyId;
+      userId?: UserId;
+    }) =>
+      new ForbiddenError(
+        `L'utilisateur ${
+          userId ? `qui a l'identifiant '${userId}' ` : ""
+        }n'a pas les droits suffisant sur l'agence qui a l'identifiant '${agencyId}'.`,
+      ),
   },
   broadcastFeedback: {
-    notFound: ({
-      conventionId,
-    }: {
-      conventionId: ConventionId;
-    }) =>
+    notFound: ({ conventionId }: { conventionId: ConventionId }) =>
       new NotFoundError(
         `Il n'y a pas d'erreur non géré de transfert de convention pour la convention '${conventionId}'.`,
       ),
@@ -519,14 +600,19 @@ export const errors = {
       new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
     missingAppellationLabel: ({
       appellationCode,
-    }: { appellationCode: AppellationCode }) =>
+    }: {
+      appellationCode: AppellationCode;
+    }) =>
       new BadRequestError(
         `Pas de label trouvé pour le code appélation métier '${appellationCode}'.`,
       ),
     rejectForbidden: ({
       discussionId,
       userId,
-    }: { discussionId: DiscussionId; userId: UserId }) =>
+    }: {
+      discussionId: DiscussionId;
+      userId: UserId;
+    }) =>
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas le droit de rejeter la discussion '${discussionId}'.`,
       ),
@@ -535,7 +621,10 @@ export const errors = {
     accessForbidden: ({
       discussionId,
       userId,
-    }: { discussionId: DiscussionId; userId: UserId }) =>
+    }: {
+      discussionId: DiscussionId;
+      userId: UserId;
+    }) =>
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas accès à la discussion '${discussionId}'.`,
       ),
@@ -584,8 +673,10 @@ export const errors = {
     unavailable: ({
       serviceName,
       message,
-    }: { serviceName: string; message?: string }) =>
-      new UnavailableApiError(serviceName, message),
+    }: {
+      serviceName: string;
+      message?: string;
+    }) => new UnavailableApiError(serviceName, message),
   },
   search: {
     noRomeForAppellations: (appellationCodes: AppellationCode[]) =>
@@ -642,7 +733,8 @@ export const errors = {
   rome: {
     missingAppellation: ({
       appellationCode,
-    }: { appellationCode: AppellationCode }) =>
-      new NotFoundError(`Code appellation ${appellationCode} non trouvé.`),
+    }: {
+      appellationCode: AppellationCode;
+    }) => new NotFoundError(`Code appellation ${appellationCode} non trouvé.`),
   },
 };

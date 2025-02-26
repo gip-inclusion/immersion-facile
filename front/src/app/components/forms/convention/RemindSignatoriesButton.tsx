@@ -109,7 +109,7 @@ const ReminderModalContent = ({
             <ul>
               {signatoriesWithMissingSignature.map((signatory) => (
                 <li key={signatory.email}>
-                  <strong>{signatoryTitleByRole[signatory.role]} :</strong>{" "}
+                  <strong>Le {signatoryTitleByRole[signatory.role]} :</strong>{" "}
                   {signatory.firstName} {signatory.lastName} - {signatory.email}{" "}
                   - {signatory.phone}
                 </li>
