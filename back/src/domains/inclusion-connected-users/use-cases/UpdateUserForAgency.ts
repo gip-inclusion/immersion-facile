@@ -9,7 +9,6 @@ import {
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import {
   UserOnRepository,
   UserRepository,
@@ -52,10 +51,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
       params,
     );
 
-    const userToUpdate = await uow.userRepository.getById(
-      params.userId,
-      await makeProvider(uow),
-    );
+    const userToUpdate = await uow.userRepository.getById(params.userId);
     if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
 
     const agency = await uow.agencyRepository.getById(params.agencyId);
@@ -164,11 +160,7 @@ const rejectIfEmailModificationToAnotherEmailAlreadyLinkedToAgency = async (
   userToUpdate: UserParamsForAgency,
   uow: UnitOfWork,
 ) => {
-  const provider = await makeProvider(uow);
-  const user = await uow.userRepository.findByEmail(
-    userToUpdate.email,
-    provider,
-  );
+  const user = await uow.userRepository.findByEmail(userToUpdate.email);
 
   if (user === undefined || (user && user.id === userToUpdate.userId)) return;
 

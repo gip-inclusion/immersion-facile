@@ -2,7 +2,6 @@ import {
   AbsoluteUrl,
   AuthenticateWithOAuthCodeParams,
   AuthenticatedUserQueryParams,
-  IdentityProvider,
   OAuthCode,
   OAuthGatewayProvider,
   User,
@@ -27,11 +26,7 @@ import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 import { OngoingOAuth } from "../entities/OngoingOAuth";
-import {
-  GetAccessTokenPayload,
-  OAuthGateway,
-  makeProvider,
-} from "../port/OAuthGateway";
+import { GetAccessTokenPayload, OAuthGateway } from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
@@ -75,22 +70,22 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
-    const provider = await makeProvider(uow);
-    const identityProvider: IdentityProvider =
-      provider === "inclusionConnect" ? "inclusionConnect" : "proConnect";
     const existingOngoingOAuth =
       await uow.ongoingOAuthRepository.findByStateAndProvider(
         state,
-        identityProvider,
+        "proConnect",
       );
     if (existingOngoingOAuth)
       return this.#onOngoingOAuth(
         uow,
-        provider,
+        "proConnect",
         { code, page },
         existingOngoingOAuth,
       );
-    throw errors.inclusionConnect.missingOAuth({ state, identityProvider });
+    throw errors.inclusionConnect.missingOAuth({
+      state,
+      identityProvider: "proConnect",
+    });
   }
 
   async #onOngoingOAuth(
@@ -116,12 +111,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
     const userWithSameEmail = await uow.userRepository.findByEmail(
       payload.email,
-      provider,
     );
 
     const existingUser = await this.#makeExistingUser(
       uow,
-      provider,
       existingInclusionConnectedUser,
       userWithSameEmail,
     );
@@ -155,7 +148,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       });
     }
 
-    await uow.userRepository.save(newOrUpdatedAuthenticatedUser, provider);
+    await uow.userRepository.save(newOrUpdatedAuthenticatedUser);
     await uow.ongoingOAuthRepository.save(ongoingOAuth);
 
     await uow.outboxRepository.save(
@@ -197,7 +190,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #makeExistingUser(
     uow: UnitOfWork,
-    provider: OAuthGatewayProvider,
     existingInclusionConnectedUser: User | undefined,
     userWithSameEmail: User | undefined,
   ): Promise<User | undefined> {
@@ -211,7 +203,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       const conflictingUser = userWithSameEmail;
       await this.#updateUserAgencyRights(
         uow,
-        provider,
         conflictingUser,
         existingInclusionConnectedUser,
       );
@@ -246,18 +237,13 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #updateUserAgencyRights(
     uow: UnitOfWork,
-    provider: OAuthGatewayProvider,
     conflictingUser: User,
     userToKeep: User,
   ): Promise<void> {
     const conflictingIcUser = await uow.userRepository.getById(
       conflictingUser.id,
-      provider,
     );
-    const userToKeepIcUser = await uow.userRepository.getById(
-      userToKeep.id,
-      provider,
-    );
+    const userToKeepIcUser = await uow.userRepository.getById(userToKeep.id);
     if (!conflictingIcUser || !userToKeepIcUser) return;
 
     const conflictingUserAgencyRights =

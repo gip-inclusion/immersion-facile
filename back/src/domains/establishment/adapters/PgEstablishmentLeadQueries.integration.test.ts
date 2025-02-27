@@ -121,7 +121,7 @@ describe("PgEstablishmentLeadQueries", () => {
     it("get the last convention by last event kind ", async () => {
       const validator = makeUniqueUserForTest(uuid());
 
-      await pgUserRepository.save(validator, "proConnect");
+      await pgUserRepository.save(validator);
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
@@ -158,7 +158,7 @@ describe("PgEstablishmentLeadQueries", () => {
 
       const validator = makeUniqueUserForTest(uuid());
 
-      await pgUserRepository.save(validator, "proConnect");
+      await pgUserRepository.save(validator);
       await agencyRepo.insert(
         toAgencyWithRights(agency, {
           [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },

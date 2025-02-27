@@ -61,7 +61,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
     testUser = new UserBuilder()
       .withId("11111111-1111-4444-1111-111111111111")
       .build();
-    await pgUserRepository.save(testUser, "proConnect");
+    await pgUserRepository.save(testUser);
 
     establishment = new EstablishmentAggregateBuilder()
       .withEstablishmentSiret("12345678901234")
@@ -87,7 +87,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
   describe("updateAllEstablishmentScoresQuery", () => {
     it("updates all the establishments scores, depending on the number of conventions and discussion answered in the last year", async () => {
       const validator = makeUniqueUserForTest(uuid());
-      await new PgUserRepository(db).save(validator, "proConnect");
+      await new PgUserRepository(db).save(validator);
 
       const agency = new AgencyDtoBuilder().build();
       await pgAgencyRepository.insert(
@@ -184,7 +184,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
 
     beforeEach(async () => {
       const validator = makeUniqueUserForTest(uuid());
-      await new PgUserRepository(db).save(validator, "proConnect");
+      await new PgUserRepository(db).save(validator);
 
       agency = new AgencyDtoBuilder().build();
       await pgAgencyRepository.insert(

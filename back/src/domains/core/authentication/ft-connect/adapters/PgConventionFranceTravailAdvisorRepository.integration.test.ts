@@ -83,7 +83,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
     const agencyRepository = new PgAgencyRepository(db);
 
     const validator = makeUniqueUserForTest(uuid());
-    await new PgUserRepository(db).save(validator, "proConnect");
+    await new PgUserRepository(db).save(validator);
     await agencyRepository.insert(
       toAgencyWithRights(AgencyDtoBuilder.create().build(), {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },

@@ -87,7 +87,7 @@ describe("PgEstablishmentGroupRepository", () => {
     await db.deleteFrom("discussions").execute();
     await db.deleteFrom("users").execute();
 
-    await new PgUserRepository(db).save(user, "proConnect");
+    await new PgUserRepository(db).save(user);
   });
 
   afterAll(async () => {

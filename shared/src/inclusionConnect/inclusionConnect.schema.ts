@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { allowedStartInclusionConnectLoginPages } from "../routes/routes";
+import { allowedStartOAuthLoginPages } from "../routes/routes";
 import { AuthenticateWithOAuthCodeParams } from "./inclusionConnect.dto";
 
 export const withSourcePageSchema = z.object({
-  page: z.enum(allowedStartInclusionConnectLoginPages),
+  page: z.enum(allowedStartOAuthLoginPages),
 });
 
 export const authenticateWithOAuthCodeSchema: z.Schema<AuthenticateWithOAuthCodeParams> =

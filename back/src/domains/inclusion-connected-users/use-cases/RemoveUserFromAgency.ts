@@ -5,7 +5,6 @@ import {
   withAgencyIdAndUserIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
@@ -27,10 +26,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
     if (!isUserHimself)
       throwIfNotAgencyAdminOrBackofficeAdmin(agencyId, currentUser);
 
-    const user = await uow.userRepository.getById(
-      userId,
-      await makeProvider(uow),
-    );
+    const user = await uow.userRepository.getById(userId);
     if (!user) throw errors.user.notFound({ userId });
 
     const agency = await uow.agencyRepository.getById(agencyId);

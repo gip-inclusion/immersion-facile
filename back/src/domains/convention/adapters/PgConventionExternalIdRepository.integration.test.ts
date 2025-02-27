@@ -43,7 +43,7 @@ describe("PgConventionExternalIdRepository", () => {
       const convention = new ConventionDtoBuilder().withId(uuid()).build();
       const validator = makeUniqueUserForTest(uuid());
 
-      await pgUserRepository.save(validator, "proConnect");
+      await pgUserRepository.save(validator);
       await pgAgencyRepository.insert(
         toAgencyWithRights(
           new AgencyDtoBuilder().withId(convention.agencyId).build(),
