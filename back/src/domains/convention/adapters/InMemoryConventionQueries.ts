@@ -6,14 +6,15 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  type DataWithPagination,
   type DateRange,
   type FindSimilarConventionsParams,
+  NotFoundError,
   type SiretDto,
   type UserId,
   errors,
   validatedConventionStatuses,
 } from "shared";
-import { NotFoundError } from "shared";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -22,6 +23,7 @@ import type {
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
+  GetPaginatedConventionsForAgencyUserParams,
 } from "../ports/ConventionQueries";
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
@@ -118,6 +120,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
       return new Date(previousDate).getTime() - new Date(currentDate).getTime();
     });
+  }
+
+  public async getPaginatedConventionsForAgencyUser(
+    _params: GetPaginatedConventionsForAgencyUserParams,
+  ): Promise<DataWithPagination<ConventionDto>> {
+    throw new Error("Method not implemented.");
   }
 
   public async getConventionsByScope(params: {
