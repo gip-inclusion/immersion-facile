@@ -22,6 +22,18 @@ export const throwBadRequestWithExplicitMessage = <
   throw new Error(errorMessage);
 };
 
+export const throwTooManyRequestWithExplicitMessage = <
+  R extends HttpResponse<429, HttpErrorBody>,
+>({
+  body,
+}: R): never => {
+  const errorMessage = messageAndIssuesToString({
+    message: body.message,
+    issues: body.issues,
+  });
+  throw new Error(errorMessage);
+};
+
 export const throwServiceUnavailableWithExplicitMessage = <
   R extends HttpResponse<503, HttpErrorBody>,
 >({

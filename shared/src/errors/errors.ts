@@ -263,7 +263,7 @@ export const errors = {
       minHoursBetweenReminder: number;
     }) =>
       new TooManyRequestApiError(
-        `Une relance de signature au ${signatoryRole} a été envoyée il y a moins de ${minHoursBetweenReminder}h`,
+        `Une relance de signature au ${signatoryTitleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h`,
       ),
   },
   establishment: {

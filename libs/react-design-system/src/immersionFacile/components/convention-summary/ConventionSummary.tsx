@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import React, { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { CopyButton } from "../copy-button/CopyButton";
@@ -21,6 +22,7 @@ export type ConventionSummarySubSection = {
   header?: {
     title: string;
     badge?: BadgeProps;
+    action?: ButtonProps;
   };
   fields: ConventionSummaryField[];
   isFullWidthDisplay?: boolean;
@@ -161,10 +163,14 @@ const SubSection = ({
         className={cx(
           fr.cx(
             "fr-col-12",
-            "fr-pr-3w",
             !!subSection.header?.title && "fr-py-2w",
             !subSection.isFullWidthDisplay && "fr-col-md-6",
             subSection.hasBackgroundColor && "fr-p-2w",
+            shouldDisplayVerticalSeparator(
+              index,
+              !!subSection.isFullWidthDisplay,
+              isNextSubsectionFullwidth,
+            ) && "fr-pr-3w",
           ),
           conventionSummaryStyles.subsection,
           subSection.hasBackgroundColor &&
@@ -177,14 +183,33 @@ const SubSection = ({
         )}
       >
         <div className={fr.cx("fr-col-12")}>
-          {subSection.header?.title && (
-            <h6 className={fr.cx("fr-mb-2v")}>{subSection.header.title}</h6>
-          )}
-          {subSection.header?.badge && (
-            <div className={cx(fr.cx("fr-col-12"), "fr-mb-2w")}>
-              <Badge small {...subSection.header.badge} />
+          <div className={fr.cx("fr-grid-row")}>
+            <div
+              className={cx(
+                fr.cx("fr-col-12"),
+                subSection.header?.action ? "fr-col-lg-6" : "",
+              )}
+            >
+              {subSection.header?.title && (
+                <h6 className={fr.cx("fr-mb-2v")}>{subSection.header.title}</h6>
+              )}
+              {subSection.header?.badge && (
+                <div className={fr.cx("fr-col-12", "fr-mb-2w")}>
+                  <Badge small {...subSection.header.badge} />
+                </div>
+              )}
             </div>
-          )}
+            {subSection.header?.action && (
+              <div
+                className={cx(
+                  fr.cx("fr-col-12", "fr-col-lg-6", "fr-pr-2w"),
+                  conventionSummaryStyles.subsectionHeaderButton,
+                )}
+              >
+                <Button size="small" {...subSection.header.action} />
+              </div>
+            )}
+          </div>
           {subSection.isSchedule && <Schedule fields={subSection.fields} />}
           {!subSection.isSchedule && (
             <div className={fr.cx("fr-grid-row")}>

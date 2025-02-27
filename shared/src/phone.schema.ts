@@ -1,9 +1,7 @@
-import {
-  CountryCode,
-  isValidPhoneNumber,
-  parsePhoneNumber,
-} from "libphonenumber-js";
+import { CountryCode, isValidPhoneNumber } from "libphonenumber-js";
+import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { z } from "zod";
+import { Phone } from "./sms/smsTemplateByName";
 import { zStringMinLength1 } from "./zodUtils";
 
 const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];
@@ -22,3 +20,11 @@ export const phoneSchema = zStringMinLength1.transform((phone, ctx) => {
   }
   return parsePhoneNumber(phone, countryCode).format("E.164");
 });
+
+export const isValidMobilePhone = (phoneNumber: Phone) => {
+  // console.log(
+  //   "parsePhoneNumber(phoneNumber).getType() ====>",
+  //   parsePhoneNumber(phoneNumber).getType(),
+  // );
+  return parsePhoneNumber(phoneNumber).getType() === "MOBILE";
+};

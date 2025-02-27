@@ -1,4 +1,5 @@
 import { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import {
   ConventionSummaryField,
@@ -12,7 +13,9 @@ import {
 import {
   ConventionReadDto,
   DateString,
+  Phone,
   ScheduleDto,
+  SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   makeSiretDescriptionLink,
@@ -23,6 +26,11 @@ import {
 
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
+  signatoriesSubsectionButtonProps?: (
+    signatoryRole: SignatoryRole,
+    signatoryPhone: Phone,
+    signatoryAlreadySign: boolean,
+  ) => ButtonProps,
 ): ConventionSummarySubSection[] => {
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
@@ -74,6 +82,15 @@ const makeSignatoriesSubsections = (
               severity: "success",
             } satisfies BadgeProps)
           : defaultSignatoryBadgeValue(),
+        action:
+          ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
+          signatoriesSubsectionButtonProps
+            ? signatoriesSubsectionButtonProps(
+                "beneficiary",
+                convention.signatories.beneficiary.phone,
+                !!convention.signatories.beneficiary.signedAt,
+              )
+            : undefined,
       },
       fields: removeEmptyValue([
         {
@@ -133,6 +150,17 @@ const makeSignatoriesSubsections = (
                   severity: "success",
                 } satisfies BadgeProps)
               : defaultSignatoryBadgeValue(),
+            action:
+              ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
+                convention.status,
+              ) && signatoriesSubsectionButtonProps
+                ? signatoriesSubsectionButtonProps(
+                    "beneficiary-representative",
+                    convention.signatories.establishmentRepresentative.phone,
+                    !!convention.signatories.establishmentRepresentative
+                      .signedAt,
+                  )
+                : undefined,
           },
           fields: removeEmptyValue([
             {
@@ -192,6 +220,15 @@ const makeSignatoriesSubsections = (
               severity: "success",
             } satisfies BadgeProps)
           : defaultSignatoryBadgeValue(),
+        action:
+          ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
+          signatoriesSubsectionButtonProps
+            ? signatoriesSubsectionButtonProps(
+                "establishment-representative",
+                convention.signatories.establishmentRepresentative.phone,
+                !!convention.signatories.establishmentRepresentative.signedAt,
+              )
+            : undefined,
       },
       fields: removeEmptyValue([
         {
@@ -258,6 +295,17 @@ const makeSignatoriesSubsections = (
                   severity: "success",
                 } satisfies BadgeProps)
               : defaultSignatoryBadgeValue(),
+            action:
+              ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
+                convention.status,
+              ) && signatoriesSubsectionButtonProps
+                ? signatoriesSubsectionButtonProps(
+                    "beneficiary-current-employer",
+                    convention.signatories.beneficiaryCurrentEmployer.phone,
+                    !!convention.signatories.beneficiaryCurrentEmployer
+                      .signedAt,
+                  )
+                : undefined,
           },
           fields: removeEmptyValue([
             {
@@ -690,11 +738,19 @@ const makeAdditionalInformationSubSections = (
 
 export const makeConventionSections = (
   convention: ConventionReadDto,
+  signatoriesSubsectionButtonProps?: (
+    signatoryRole: SignatoryRole,
+    signatoryPhone: Phone,
+    signatoryAlreadySign: boolean,
+  ) => ButtonProps,
 ): ConventionSummarySection[] => {
   return [
     {
       title: "Signataires de la convention",
-      subSections: makeSignatoriesSubsections(convention),
+      subSections: makeSignatoriesSubsections(
+        convention,
+        signatoriesSubsectionButtonProps,
+      ),
     },
     {
       title: "Informations sur le bénéficiaire",
