@@ -5,7 +5,6 @@ import {
   FormEstablishmentDtoBuilder,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  createEstablishmentJwtPayload,
   currentJwtVersions,
   errors,
   establishmentRoutes,
@@ -20,7 +19,6 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import supertest from "supertest";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
-  GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
@@ -43,21 +41,32 @@ describe("Edit form establishments", () => {
   let appConfig: AppConfig;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
     .build();
 
+  const establishmentAdminUser = new InclusionConnectedUserBuilder()
+    .withId("admin")
+    .withEmail("admin@establishment.mail")
+    .buildUser();
+
+  const establishmentAdminJwtPayload: InclusionConnectJwtPayload = {
+    version: currentJwtVersions.inclusion,
+    iat: new Date().getTime(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: establishmentAdminUser.id,
+  };
+
   const existingEstablishment = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(formEstablishment.siret)
     .withUserRights([
       {
         role: "establishment-admin",
-        job: "",
-        phone: "",
-        userId: "",
+        job: "Boss",
+        phone: "+33688774455",
+        userId: establishmentAdminUser.id,
       },
     ])
     .build();
@@ -69,7 +78,6 @@ describe("Edit form establishments", () => {
       appConfig,
       gateways,
       inMemoryUow,
-      generateEditEstablishmentJwt,
       generateInclusionConnectJwt,
     } = await buildTestApp(new AppConfigBuilder().build()));
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
@@ -87,12 +95,8 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-            durationDays: 1,
-            now: new Date(),
-          }),
+        authorization: generateInclusionConnectJwt(
+          establishmentAdminJwtPayload,
         ),
       },
     });
@@ -132,12 +136,8 @@ describe("Edit form establishments", () => {
       await httpClient.updateFormEstablishment({
         body: updatedFormEstablishment,
         headers: {
-          authorization: generateEditEstablishmentJwt(
-            createEstablishmentJwtPayload({
-              siret: TEST_OPEN_ESTABLISHMENT_1.siret,
-              durationDays: 1,
-              now: new Date(),
-            }),
+          authorization: generateInclusionConnectJwt(
+            establishmentAdminJwtPayload,
           ),
         },
       }),
@@ -169,21 +169,15 @@ describe("Edit form establishments", () => {
       userId: backofficeAdminUser.id,
     };
 
-    const adminUser = new InclusionConnectedUserBuilder()
-      .withId("admin")
-      .withEmail(formEstablishment.businessContact.email)
-      .buildUser();
-
-    const contactUsers = formEstablishment.businessContact.copyEmails.map(
-      (email, index) =>
-        new InclusionConnectedUserBuilder()
-          .withId(`contact-${index}`)
-          .withEmail(email)
-          .buildUser(),
+    const contactUsers = formEstablishment.userRights.map((right, index) =>
+      new InclusionConnectedUserBuilder()
+        .withId(`contact-${index}`)
+        .withEmail(right.email)
+        .buildUser(),
     );
 
     inMemoryUow.userRepository.users = [
-      adminUser,
+      establishmentAdminUser,
       ...contactUsers,
       backofficeAdminUser,
     ];
@@ -229,7 +223,7 @@ describe("Edit form establishments", () => {
   });
 
   it("401 - Jwt is generated from wrong private key", async () => {
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"establishment">(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"inclusionConnect">(
       appConfig.apiJwtPrivateKey, // Private Key is the wrong one !
       undefined,
     );
@@ -237,13 +231,7 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateJwtWithWrongKey(
-          createEstablishmentJwtPayload({
-            siret: "12345678901234",
-            durationDays: 1,
-            now: new Date(),
-          }),
-        ),
+        authorization: generateJwtWithWrongKey(establishmentAdminJwtPayload),
       },
     });
 
@@ -271,13 +259,11 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: "12345678901234",
-            durationDays: 1,
-            now: subYears(gateways.timeGateway.now(), 1),
-          }),
-        ),
+        authorization: generateInclusionConnectJwt({
+          userId: establishmentAdminUser.id,
+          version: currentJwtVersions.inclusion,
+          exp: subYears(gateways.timeGateway.now(), 1).getTime(),
+        }),
       },
     });
 
@@ -299,12 +285,8 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: establishment,
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_2.siret,
-            durationDays: 1,
-            now: new Date(),
-          }),
+        authorization: generateInclusionConnectJwt(
+          establishmentAdminJwtPayload,
         ),
       },
     });
@@ -360,10 +342,10 @@ function expectEstablishmentInRepoUpdated(
   expectArraysToMatch(updatedAggregateInRepo.userRights, [
     {
       role: "establishment-admin",
-      job: formEstablishment.businessContact.job,
-      phone: formEstablishment.businessContact.phone,
+      job: "kiki",
+      phone: "+33600000000",
     },
-    ...formEstablishment.businessContact.copyEmails.map(
+    ...formEstablishment.userRights.map(
       (_) =>
         ({
           role: "establishment-contact",
