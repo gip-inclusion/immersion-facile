@@ -393,7 +393,7 @@ export type FindSimilarConventionsParams = {
   codeAppellation: AppellationCode;
   dateStart: DateString;
   beneficiaryBirthdate: DateString;
-  beneficiaryLastName: DateString;
+  beneficiaryLastName: string;
 };
 
 export type FindSimilarConventionsResponseDto = {
