@@ -41,7 +41,7 @@ jobs:
                   psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
                 echo '> Start pg_restore' &&\
                   pg_restore\
-                    --jobs=4\
+                    --jobs=8\
                     --disable-triggers\
                     --use-list=list.txt\
                     --verbose\
