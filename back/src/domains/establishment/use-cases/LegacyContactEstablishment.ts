@@ -1,6 +1,5 @@
 import subDays from "date-fns/subDays";
 import {
-  type BusinessContactDto,
   type DiscussionDto,
   type LegacyContactEstablishmentRequestDto,
   errors,
@@ -15,8 +14,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { businessContactFromEstablishmentAggregateAndUsers } from "../helpers/businessContact.helpers";
+import { getDiscussionContactsFromAggregate } from "../helpers/businessContact.helpers";
 
 export class LegacyContactEstablishment extends TransactionalUseCase<LegacyContactEstablishmentRequestDto> {
   protected inputSchema = legacyContactEstablishmentRequestSchema;
@@ -114,13 +112,10 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       // );
     }
 
-    const discussion = this.#createDiscussion({
+    const discussion = await this.#createDiscussion({
       contactRequest,
-      contact: await businessContactFromEstablishmentAggregateAndUsers(
-        uow,
-        establishmentAggregate,
-      ),
-      establishment: establishmentAggregate.establishment,
+      establishment: establishmentAggregate,
+      uow,
       now,
     });
 
@@ -145,18 +140,21 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     );
   }
 
-  #createDiscussion({
+  async #createDiscussion({
+    uow,
     contactRequest,
-    contact,
     establishment,
     now,
   }: {
+    uow: UnitOfWork;
     contactRequest: LegacyContactEstablishmentRequestDto;
-    contact: BusinessContactDto;
-    establishment: EstablishmentEntity;
+    establishment: EstablishmentAggregate;
     now: Date;
-  }): DiscussionDto {
-    const matchingAddress = establishment.locations.find(
+  }): Promise<DiscussionDto> {
+    const { otherUsers, firstAdminRight, firstAdminUser } =
+      await getDiscussionContactsFromAggregate(uow, establishment);
+
+    const matchingAddress = establishment.establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
     if (!matchingAddress) {
@@ -165,11 +163,14 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
         siret: contactRequest.siret,
       });
     }
+
     return {
       id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
-      businessName: establishment.customizedName ?? establishment.name,
+      businessName:
+        establishment.establishment.customizedName ??
+        establishment.establishment.name,
       createdAt: now.toISOString(),
       immersionObjective:
         contactRequest.contactMode === "EMAIL"
@@ -189,7 +190,15 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
             ? contactRequest.potentialBeneficiaryResumeLink
             : undefined,
       },
-      establishmentContact: contact,
+      establishmentContact: {
+        contactMethod: establishment.establishment.contactMethod,
+        copyEmails: otherUsers.map((user) => user.email),
+        job: firstAdminRight.job,
+        phone: firstAdminRight.phone,
+        email: firstAdminUser.email,
+        firstName: firstAdminUser.firstName,
+        lastName: firstAdminUser.lastName,
+      },
       exchanges:
         contactRequest.contactMode === "EMAIL"
           ? [
