@@ -9,6 +9,7 @@ export async function down(pgm: MigrationBuilder): Promise<void> {
     inclusion_connect_sub: {
       type: "text",
       notNull: false,
+      unique: true,
     },
   });
 }

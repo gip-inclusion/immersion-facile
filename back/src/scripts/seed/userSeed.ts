@@ -35,7 +35,7 @@ export const seedUsers = {
 
 export const userSeed = async (db: KyselyDb) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-  console.log("inclusionConnectUserSeed start ...");
+  console.log("proConnectUserSeed start ...");
 
   await db
     .insertInto("users")
@@ -45,8 +45,7 @@ export const userSeed = async (db: KyselyDb) => {
         email: user.email,
         first_name: user.firstName,
         last_name: user.lastName,
-        inclusion_connect_sub: user.externalId,
-        pro_connect_sub: null,
+        pro_connect_sub: user.externalId,
         created_at: user.createdAt,
       })),
     )
