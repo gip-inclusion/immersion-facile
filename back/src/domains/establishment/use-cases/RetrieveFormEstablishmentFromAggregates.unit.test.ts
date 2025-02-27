@@ -106,7 +106,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
       await expectPromiseToFailWithError(
         useCase.execute(siret, {
-          siret,
+          userId: icAdmin.id,
         }),
         errors.establishment.notFound({ siret }),
       );
@@ -114,24 +114,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
   });
 
   describe("Right paths", () => {
-    it("returns a reconstructed form if establishment with siret exists with dataSource=form & establishment jwt payload", async () => {
-      const establishmentForm = await useCase.execute(siret, {
-        siret,
-      });
-
-      expectToEqual(
-        establishmentForm,
-        makeExpectedFormEstablishment({
-          establishmentAdmin,
-          establishmentAggregate,
-          establishmentContact,
-          job,
-          phone,
-        }),
-      );
-    });
-
-    it("returns a reconstructed schema validated form if establishment with siret exists & establishment jwt payload even if admin don't have firstname or lastname", async () => {
+    it("returns a reconstructed schema validated form if establishment with siret exists & IC jwt payload with backoffice rights even if admin don't have firstname or lastname", async () => {
       const adminWithoutFirstNameAndLastName =
         new InclusionConnectedUserBuilder()
           .withId("admin-no-name-id")
@@ -161,12 +144,13 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       ];
 
       uow.userRepository.users = [
+        icAdmin,
         adminWithoutFirstNameAndLastName,
         establishmentContact,
       ];
 
       const establishmentForm = await useCase.execute(siret, {
-        siret,
+        userId: adminWithoutFirstNameAndLastName.id,
       });
 
       expectToEqual(
@@ -249,19 +233,19 @@ const makeExpectedFormEstablishment = ({
     romeCode: offer.romeCode,
     romeLabel: offer.romeLabel,
   })),
-  businessContact: {
-    contactMethod: establishmentAggregate.establishment.contactMethod,
-    copyEmails: [establishmentContact.email],
-    email: establishmentAdmin.email,
-    firstName: establishmentAdmin.firstName.length
-      ? establishmentAdmin.firstName
-      : "NON CONNU",
-    lastName: establishmentAdmin.lastName.length
-      ? establishmentAdmin.lastName
-      : "NON CONNU",
-    job,
-    phone,
-  },
+  userRights: [
+    {
+      role: "establishment-admin",
+      email: establishmentAdmin.email,
+      job,
+      phone,
+    },
+    {
+      role: "establishment-contact",
+      email: establishmentContact.email,
+    },
+  ],
+  contactMethod: establishmentAggregate.establishment.contactMethod,
   website: establishmentAggregate.establishment.website,
   additionalInformation:
     establishmentAggregate.establishment.additionalInformation,
