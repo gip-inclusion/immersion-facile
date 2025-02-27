@@ -1,7 +1,6 @@
 import subDays from "date-fns/subDays";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
-  BusinessContactDto,
   ContactEstablishmentRequestDto,
   DiscussionDto,
   contactEstablishmentRequestSchema,
@@ -17,8 +16,7 @@ import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { businessContactFromEstablishmentAggregateAndUsers } from "../helpers/businessContact.helpers";
+import { getDiscussionContactsFromAggregate } from "../helpers/businessContact.helpers";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   protected inputSchema = contactEstablishmentRequestSchema;
@@ -122,14 +120,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
     const discussion = await this.#createDiscussion({
       contactRequest,
-      contact: await businessContactFromEstablishmentAggregateAndUsers(
-        uow,
-        establishmentAggregate,
-      ),
-      establishment: establishmentAggregate.establishment,
+      establishment: establishmentAggregate,
       now,
       uow,
-      domain: this.#domain,
     });
 
     await uow.discussionRepository.insert(discussion);
@@ -156,20 +149,18 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
   async #createDiscussion({
     contactRequest,
-    contact,
     establishment,
     now,
     uow,
-    domain,
   }: {
     contactRequest: ContactEstablishmentRequestDto;
-    contact: BusinessContactDto;
-    establishment: EstablishmentEntity;
+    establishment: EstablishmentAggregate;
     now: Date;
     uow: UnitOfWork;
-    domain: string;
   }): Promise<DiscussionDto> {
-    const matchingAddress = establishment.locations.find(
+    const { otherUsers, firstAdminRight, firstAdminUser } =
+      await getDiscussionContactsFromAggregate(uow, establishment);
+    const matchingAddress = establishment.establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
     if (!matchingAddress)
@@ -200,9 +191,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
             "CONTACT_BY_EMAIL_REQUEST",
             {
               appellationLabel,
-              businessName: establishment.customizedName ?? establishment.name,
-              contactFirstName: contact.firstName,
-              contactLastName: contact.lastName,
+              businessName:
+                establishment.establishment.customizedName ??
+                establishment.establishment.name,
+              contactFirstName: firstAdminUser.firstName,
+              contactLastName: firstAdminUser.lastName,
               potentialBeneficiaryFirstName:
                 contactRequest.potentialBeneficiaryFirstName,
               potentialBeneficiaryLastName:
@@ -221,7 +214,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
                 contactRequest.experienceAdditionalInformation,
               potentialBeneficiaryHasWorkingExperience:
                 contactRequest.hasWorkingExperience,
-              domain,
+              domain: this.#domain,
               discussionId: discussionId,
             },
             { showContentParts: true },
@@ -231,7 +224,9 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       id: discussionId,
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
-      businessName: establishment.customizedName ?? establishment.name,
+      businessName:
+        establishment.establishment.customizedName ??
+        establishment.establishment.name,
       createdAt: now.toISOString(),
       immersionObjective:
         contactRequest.contactMode === "EMAIL"
@@ -267,12 +262,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       },
       establishmentContact: {
         contactMethod: contactRequest.contactMode,
-        email: contact.email,
-        firstName: contact.firstName,
-        lastName: contact.lastName,
-        phone: contact.phone,
-        job: contact.job,
-        copyEmails: contact.copyEmails,
+        email: firstAdminUser.email,
+        firstName: firstAdminUser.firstName,
+        lastName: firstAdminUser.lastName,
+        phone: firstAdminRight.phone,
+        job: firstAdminRight.job,
+        copyEmails: otherUsers.map((user) => user.email),
       },
       exchanges:
         contactRequest.contactMode === "EMAIL" &&
