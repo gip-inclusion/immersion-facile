@@ -1,6 +1,7 @@
+import axios from "axios";
 import { Pool } from "pg";
 import { random, sleep } from "shared";
-import { createFetchSharedClient } from "shared-routes/fetch";
+import { createAxiosSharedClient } from "shared-routes/axios";
 import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
@@ -38,9 +39,12 @@ const main = async () => {
     random,
   );
 
-  const httpClient = createFetchSharedClient(
+  const httpClient = createAxiosSharedClient(
     makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
-    fetch,
+    axios.create({
+      timeout: config.externalAxiosTimeout,
+      validateStatus: () => true,
+    }),
     {
       skipResponseValidation: true,
       onResponseSideEffect: logPartnerResponses({
