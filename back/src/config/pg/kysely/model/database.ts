@@ -343,7 +343,6 @@ interface Users {
   last_name: string;
   created_at: Generated<string>;
   updated_at: Generated<Timestamp>;
-  inclusion_connect_sub: string | null;
   pro_connect_sub: string | null;
 }
 
