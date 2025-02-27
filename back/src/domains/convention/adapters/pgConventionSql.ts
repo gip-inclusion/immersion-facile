@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import { SelectQueryBuilder } from "kysely";
 import {
   AgencyId,
   AgencyKind,
@@ -7,6 +8,7 @@ import {
   AppellationLabel,
   Beneficiary,
   ConventionAgencyFields,
+  ConventionDto,
   ConventionId,
   ConventionReadDto,
   DateString,
@@ -26,22 +28,23 @@ import {
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
+import { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../utils/schema.utils";
 
-export const createConventionQueryBuilder = (transaction: KyselyDb) => {
-  // biome-ignore format: reads better without formatting
-  const builder = transaction
-    .selectFrom("conventions")
-    .innerJoin("actors as b", "b.id", "conventions.beneficiary_id")
-    .innerJoin("actors as er", "er.id", "conventions.establishment_representative_id")
-    .innerJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
-    .leftJoin("actors as br", "br.id", "conventions.beneficiary_representative_id")
-    .leftJoin("actors as bce", "bce.id", "conventions.beneficiary_current_employer_id")
-    .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
-    .leftJoin("view_appellations_dto as vad", "vad.appellation_code", "conventions.immersion_appellation")
-    .leftJoin("agencies", "agencies.id", "conventions.agency_id")
+// Common type for the query builder with proper return type
+type ConventionQueryBuilder = SelectQueryBuilder<
+  any,
+  any,
+  { dto: ConventionDto }
+>;
 
+// Function to create the common selection part with proper return type
+const createConventionSelection = <
+  QB extends SelectQueryBuilder<any, any, any>,
+>(
+  builder: QB,
+): SelectQueryBuilder<Database, any, { dto: ConventionDto }> => {
   return builder.select(({ ref, ...eb }) =>
     jsonStripNulls(
       jsonBuildObject({
@@ -238,6 +241,65 @@ export const createConventionQueryBuilder = (transaction: KyselyDb) => {
       }),
     ).as("dto"),
   );
+};
+
+// Function to create the common joins for both query builders
+const createCommonJoins = <QB extends SelectQueryBuilder<Database, any, any>>(
+  builder: QB,
+): QB => {
+  return builder
+    .innerJoin("actors as b", "b.id", "conventions.beneficiary_id")
+    .innerJoin(
+      "actors as er",
+      "er.id",
+      "conventions.establishment_representative_id",
+    )
+    .innerJoin("actors as et", "et.id", "conventions.establishment_tutor_id")
+    .leftJoin(
+      "actors as br",
+      "br.id",
+      "conventions.beneficiary_representative_id",
+    )
+    .leftJoin(
+      "actors as bce",
+      "bce.id",
+      "conventions.beneficiary_current_employer_id",
+    )
+    .leftJoin("partners_pe_connect as p", "p.convention_id", "conventions.id")
+    .leftJoin(
+      "view_appellations_dto as vad",
+      "vad.appellation_code",
+      "conventions.immersion_appellation",
+    )
+    .leftJoin("agencies", "agencies.id", "conventions.agency_id") as QB;
+};
+
+export const createConventionQueryBuilder = (
+  transaction: KyselyDb,
+): ConventionQueryBuilder => {
+  // biome-ignore format: reads better without formatting
+  const builder = transaction
+    .selectFrom("conventions");
+
+  const builderWithJoins = createCommonJoins(builder);
+  return createConventionSelection(builderWithJoins);
+};
+
+export const createConventionQueryBuilderForAgencyUser = ({
+  transaction,
+  agencyUserId,
+}: {
+  transaction: KyselyDb;
+  agencyUserId: UserId;
+}): ConventionQueryBuilder => {
+  // biome-ignore format: reads better without formatting
+  const builder = transaction
+    .selectFrom("users__agencies")
+    .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
+    .where("users__agencies.user_id", "=", agencyUserId);
+
+  const builderWithJoins = createCommonJoins(builder);
+  return createConventionSelection(builderWithJoins);
 };
 
 export const getConventionAgencyFieldsForAgencies = async (

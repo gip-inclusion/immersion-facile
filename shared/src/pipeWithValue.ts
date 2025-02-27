@@ -67,6 +67,51 @@ export function pipeWithValue<A, B, C, D, E, F, G, H, I>(
 ): I;
 
 // biome-ignore format: better readability without formatting
+export function pipeWithValue<A, B, C, D, E, F, G, H, I, J>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+): J;
+
+// biome-ignore format: better readability without formatting
+export function pipeWithValue<A, B, C, D, E, F, G, H, I, J, K>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+): K;
+
+// biome-ignore format: better readability without formatting
+export function pipeWithValue<A, B, C, D, E, F, G, H, I, J, K, L>(
+  a: A,
+  ab: (a: A) => B,
+  bc: (b: B) => C,
+  cd: (c: C) => D,
+  de: (d: D) => E,
+  ef: (e: E) => F,
+  fg: (f: F) => G,
+  gh: (g: G) => H,
+  hi: (h: H) => I,
+  ij: (i: I) => J,
+  jk: (j: J) => K,
+  kl?: (k: K) => L,
+): L;
+
+// biome-ignore format: better readability without formatting
 export function pipeWithValue(
   a: unknown,
   ab?: AnyFunction,
@@ -77,6 +122,9 @@ export function pipeWithValue(
   fg?: AnyFunction,
   gh?: AnyFunction,
   hi?: AnyFunction,
+  ij?: AnyFunction,
+  jk?: AnyFunction,
+  kl?: AnyFunction,
 ): unknown {
   // biome-ignore lint/style/noArguments: <explanation>
   switch (arguments.length) {
@@ -98,6 +146,12 @@ export function pipeWithValue(
       return gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a)))))));
     case 9:
       return hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a))))))));
+    case 10:
+      return ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a)))))))));
+    case 11:
+      return jk?.(ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a))))))))));
+    case 12:
+      return kl?.(jk?.(ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a)))))))))));
     default:
       throw Error(
         "Cannot handle so many arguments, check : https://github.com/gcanti/fp-ts/blob/master/src/function.ts",
