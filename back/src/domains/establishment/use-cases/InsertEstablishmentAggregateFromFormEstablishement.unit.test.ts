@@ -1,7 +1,9 @@
 import {
+  AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
-  BusinessContactDtoBuilder,
+  ContactFormEstablishmentUserRight,
   FormEstablishmentDtoBuilder,
+  InclusionConnectedUserBuilder,
   type NafDto,
   type NumberEmployeesRange,
   UserBuilder,
@@ -43,6 +45,9 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
   const numberEmployeesRanges: NumberEmployeesRange = "6-9";
+  const userBuilder = new InclusionConnectedUserBuilder().withId("ic-user");
+  const icUser = userBuilder.build();
+  const user = userBuilder.buildUser();
 
   const establishmentAdmin = new UserBuilder()
     .withFirstName("El patron")
@@ -71,6 +76,24 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       appellationLabel: "métier B.1",
     },
   ];
+  //
+  //
+  //
+  //
+  //
+  //
+
+  const formAdminRight: AdminFormEstablishmentUserRight = {
+    role: "establishment-admin",
+    email: establishmentAdmin.email,
+    job: "osef",
+    phone: "+33655445544",
+  };
+
+  const formContactRight: ContactFormEstablishmentUserRight = {
+    role: "establishment-contact",
+    email: establishmentContact.email,
+  };
 
   let siretGateway: InMemorySiretGateway;
   let addressAPI: InMemoryAddressGateway;
@@ -108,6 +131,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     });
 
     uow.romeRepository.appellations = appellations;
+    uow.userRepository.users = [user];
 
     uuidGenerator.setNextUuids([
       establishmentAdmin.id,
@@ -117,7 +141,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   describe("Converts Form Establishment in Aggregate", () => {
     it("And create user that doesn't exist by email", async () => {
-      // Prepare
       const withAcquisition: WithAcquisition = {
         acquisitionKeyword: "yolo",
         acquisitionCampaign: "my campaign",
@@ -132,29 +155,28 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
-        .withBusinessContact(
-          new BusinessContactDtoBuilder()
-            .withEmail(establishmentAdmin.email)
-            .withCopyEmails([establishmentContact.email])
-            .build(),
-        )
+        .withFormUserRights([formAdminRight, formContactRight])
         .build();
 
-      // Act
-      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+      await insertEstablishmentAggregateFromForm.execute(
+        { formEstablishment },
+        icUser,
+      );
 
-      // Assert
       expectToEqual(uow.userRepository.users, [
-        new UserBuilder(establishmentAdmin)
-          .withFirstName(formEstablishment.businessContact.firstName)
-          .withLastName(formEstablishment.businessContact.lastName)
-          .withCreatedAt(timeGateway.now())
-          .build(),
-        new UserBuilder(establishmentContact)
-          .withFirstName("")
-          .withLastName("")
-          .withCreatedAt(timeGateway.now())
-          .build(),
+        user,
+        {
+          ...establishmentAdmin,
+          firstName: "",
+          lastName: "",
+          createdAt: timeGateway.now().toISOString(),
+        },
+        {
+          ...establishmentContact,
+          firstName: "",
+          lastName: "",
+          createdAt: timeGateway.now().toISOString(),
+        },
       ]);
 
       expectToEqual(
@@ -187,8 +209,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
-                job: formEstablishment.businessContact.job,
-                phone: formEstablishment.businessContact.phone,
+                job: formAdminRight.job,
+                phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
               },
               {
@@ -210,7 +232,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     });
 
     it("And doesn't modify user that aldready exist by email", async () => {
-      // Prepare
       const withAcquisition: WithAcquisition = {
         acquisitionKeyword: "yolo",
         acquisitionCampaign: "my campaign",
@@ -230,12 +251,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         },
       ];
       const nextAvailabilityDate = new Date();
-      const businessContact = new BusinessContactDtoBuilder()
-        .withEmail(establishmentAdmin.email)
-        .withCopyEmails([establishmentContact.email])
-        .withFirstName("TOTO")
-        .withLastName("KIKI")
-        .build();
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withFitForDisabledWorkers(true)
         .withSiret("90040893100013")
@@ -243,7 +258,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
-        .withBusinessContact(businessContact)
+        .withFormUserRights([formAdminRight, formContactRight])
         .build();
 
       siretGateway.setSirenEstablishment({
@@ -256,14 +271,16 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       uow.userRepository.users = [establishmentAdmin, establishmentContact];
       uow.romeRepository.appellations = professions;
 
-      // Act
-      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+      await insertEstablishmentAggregateFromForm.execute(
+        { formEstablishment },
+        icUser,
+      );
 
-      // Assert
       expectToEqual(uow.userRepository.users, [
         establishmentAdmin,
         establishmentContact,
       ]);
+
       expectToEqual(
         uow.establishmentAggregateRepository.establishmentAggregates,
         [
@@ -294,8 +311,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withUserRights([
               {
                 role: "establishment-admin",
-                job: businessContact.job,
-                phone: businessContact.phone,
+                job: formAdminRight.job,
+                phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
               },
               {
@@ -316,218 +333,73 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       );
     });
 
-    it("Avoid making same establishment right mapping when same email is used in admin and copy contacts", async () => {
-      // Prepare
-      const withAcquisition: WithAcquisition = {
-        acquisitionKeyword: "yolo",
-        acquisitionCampaign: "my campaign",
-      };
-      const professions: AppellationAndRomeDto[] = [
-        {
-          romeCode: "A1101",
-          appellationCode: "11717",
-          romeLabel: "métier A",
-          appellationLabel: "métier A.1",
-        },
-        {
-          romeCode: "A1102",
-          appellationCode: "11715",
-          romeLabel: "métier B",
-          appellationLabel: "métier B.1",
-        },
-      ];
-      const nextAvailabilityDate = new Date();
-      const businessContact = new BusinessContactDtoBuilder()
-        .withEmail(establishmentAdmin.email)
-        .withCopyEmails([establishmentAdmin.email, establishmentAdmin.email])
-        .build();
+    it("Can't create establishment when same email is used in admin and copy contacts", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
-        .withSiret("90040893100013")
-        .withAppellations(professions)
-        .withNextAvailabilityDate(nextAvailabilityDate)
-        .withAcquisition(withAcquisition)
-        .withBusinessAddresses([defaultAddress.formAddress])
-        .withBusinessContact(businessContact)
-        .build();
-
-      siretGateway.setSirenEstablishment({
-        ...TEST_OPEN_ESTABLISHMENT_1,
-        siret: formEstablishment.siret,
-        nafDto: expectedNafDto,
-        numberEmployeesRange: numberEmployeesRanges,
-      });
-
-      uuidGenerator.setNextUuids([establishmentAdmin.id]);
-
-      uow.romeRepository.appellations = professions;
-
-      // Act
-      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
-
-      // Assert
-      expectToEqual(uow.userRepository.users, [
-        new UserBuilder(establishmentAdmin)
-          .withFirstName(businessContact.firstName)
-          .withLastName(businessContact.lastName)
-          .withCreatedAt(timeGateway.now())
-          .build(),
-      ]);
-      expectToEqual(
-        uow.establishmentAggregateRepository.establishmentAggregates,
-        [
-          new EstablishmentAggregateBuilder()
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withSiret(formEstablishment.siret)
-                .withCustomizedName(formEstablishment.businessNameCustomized)
-                .withNafDto(expectedNafDto)
-                .withCreatedAt(timeGateway.now())
-                .withUpdatedAt(timeGateway.now())
-                .withIsCommited(false)
-                .withName(formEstablishment.businessName)
-                .withNumberOfEmployeeRange(numberEmployeesRanges)
-                .withLocations([
-                  {
-                    ...defaultAddress.addressAndPosition,
-                    id: defaultAddress.formAddress.id,
-                  },
-                ])
-                .withWebsite(formEstablishment.website)
-                .withNextAvailabilityDate(nextAvailabilityDate)
-                .withAcquisition(withAcquisition)
-                .withScore(0)
-                .build(),
-            )
-            .withFitForDisabledWorkers(true)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: businessContact.job,
-                phone: businessContact.phone,
-                userId: establishmentAdmin.id,
-              },
-            ])
-            .withOffers(
-              professions.map((prof) =>
-                new OfferEntityBuilder({
-                  ...prof,
-                  createdAt: timeGateway.now(),
-                }).build(),
-              ),
-            )
-            .build(),
-        ],
-      );
-    });
-
-    it("Avoid making same establishment right mapping when same email is used in copy contacts", async () => {
-      // Prepare
-      const withAcquisition: WithAcquisition = {
-        acquisitionKeyword: "yolo",
-        acquisitionCampaign: "my campaign",
-      };
-      const appellations: AppellationAndRomeDto[] = [
-        {
-          romeCode: "A1101",
-          appellationCode: "11717",
-          romeLabel: "métier A",
-          appellationLabel: "métier A.1",
-        },
-        {
-          appellationCode: "11718",
-          romeCode: "A1102",
-          romeLabel: "métier B",
-          appellationLabel: "métier B.1",
-        },
-      ];
-      const nextAvailabilityDate = new Date();
-      const businessContact = new BusinessContactDtoBuilder()
-        .withEmail(establishmentAdmin.email)
-        .withCopyEmails([
-          establishmentContact.email,
-          establishmentContact.email,
+        .withFormUserRights([
+          formAdminRight,
+          { role: "establishment-contact", email: formAdminRight.email },
         ])
-        .withFirstName("TOTO")
-        .withLastName("KIKI")
         .build();
+
+      await expectPromiseToFailWithError(
+        insertEstablishmentAggregateFromForm.execute(
+          { formEstablishment },
+          icUser,
+        ),
+        errors.inputs.badSchema({
+          flattenErrors: [
+            "formEstablishment.userRights : La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+          ],
+        }),
+      );
+    });
+
+    it("Can't create establishment when same email is used in copy contacts", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFitForDisabledWorkers(true)
-        .withSiret("90040893100013")
-        .withAppellations(appellations)
-        .withNextAvailabilityDate(nextAvailabilityDate)
-        .withAcquisition(withAcquisition)
-        .withBusinessAddresses([defaultAddress.formAddress])
-        .withBusinessContact(businessContact)
+        .withFormUserRights([
+          formAdminRight,
+          formContactRight,
+          formContactRight,
+        ])
         .build();
 
-      siretGateway.setSirenEstablishment({
-        ...TEST_OPEN_ESTABLISHMENT_1,
-        siret: formEstablishment.siret,
-        nafDto: expectedNafDto,
-        numberEmployeesRange: numberEmployeesRanges,
-      });
+      await expectPromiseToFailWithError(
+        insertEstablishmentAggregateFromForm.execute(
+          { formEstablishment },
+          icUser,
+        ),
+        errors.inputs.badSchema({
+          flattenErrors: [
+            "formEstablishment.userRights : La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+          ],
+        }),
+      );
+    });
 
-      uow.userRepository.users = [establishmentAdmin, establishmentContact];
-      uow.romeRepository.appellations = appellations;
+    it("Can't create establishment when no admin right provided", async () => {
+      const formEstablishment = FormEstablishmentDtoBuilder.valid()
+        .withFormUserRights([formContactRight])
+        .build();
 
-      // Act
-      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+      await expectPromiseToFailWithError(
+        insertEstablishmentAggregateFromForm.execute(
+          { formEstablishment },
+          icUser,
+        ),
+        errors.inputs.badSchema({
+          flattenErrors: [
+            "formEstablishment.userRights : La structure accueillante nécéssite au moins un administrateur pour être valide.",
+          ],
+        }),
+      );
+    });
 
-      // Assert
-      expectToEqual(uow.userRepository.users, [
-        establishmentAdmin,
-        establishmentContact,
-      ]);
-      expectToEqual(
-        uow.establishmentAggregateRepository.establishmentAggregates,
-        [
-          new EstablishmentAggregateBuilder()
-            .withEstablishment(
-              new EstablishmentEntityBuilder()
-                .withSiret(formEstablishment.siret)
-                .withCustomizedName(formEstablishment.businessNameCustomized)
-                .withNafDto(expectedNafDto)
-                .withCreatedAt(timeGateway.now())
-                .withUpdatedAt(timeGateway.now())
-                .withIsCommited(false)
-                .withName(formEstablishment.businessName)
-                .withNumberOfEmployeeRange(numberEmployeesRanges)
-                .withLocations([
-                  {
-                    ...defaultAddress.addressAndPosition,
-                    id: defaultAddress.formAddress.id,
-                  },
-                ])
-                .withWebsite(formEstablishment.website)
-                .withNextAvailabilityDate(nextAvailabilityDate)
-                .withAcquisition(withAcquisition)
-                .withScore(0)
-                .build(),
-            )
-            .withFitForDisabledWorkers(true)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: businessContact.job,
-                phone: businessContact.phone,
-                userId: establishmentAdmin.id,
-              },
-              {
-                role: "establishment-contact",
-                userId: establishmentContact.id,
-              },
-            ])
-            .withOffers(
-              appellations.map((prof) =>
-                new OfferEntityBuilder({
-                  ...prof,
-                  createdAt: timeGateway.now(),
-                }).build(),
-              ),
-            )
-            .build(),
-        ],
+    it("Throws forbidden when no user provided", async () => {
+      await expectPromiseToFailWithError(
+        insertEstablishmentAggregateFromForm.execute({
+          formEstablishment: FormEstablishmentDtoBuilder.valid().build(),
+        }),
+        errors.user.noJwtProvided(),
       );
     });
   });
@@ -545,7 +417,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     });
     uow.romeRepository.appellations = formEstablishment.appellations;
 
-    await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+    await insertEstablishmentAggregateFromForm.execute(
+      { formEstablishment },
+      icUser,
+    );
 
     const establishmentAggregate =
       uow.establishmentAggregateRepository.establishmentAggregates[0];
@@ -557,7 +432,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
   });
 
   it("Throws if establishment and offers with same siret already exists", async () => {
-    // Prepare : insert an establishment aggregate from LBB with siret
     const previousEstablishment = new EstablishmentEntityBuilder()
       .withSiret("12345678911234")
       .withName("Previous name")
@@ -595,11 +469,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           appellationCode: "22222",
         },
       ])
-      .withBusinessContact(
-        new BusinessContactDtoBuilder()
-          .withEmail("new.contact@gmail.com")
-          .build(),
-      )
+      .withFormUserRights([formAdminRight])
       .build();
 
     siretGateway.setSirenEstablishment({
@@ -619,15 +489,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     ]);
 
     await expectPromiseToFailWithError(
-      insertEstablishmentAggregateFromForm.execute({ formEstablishment }),
+      insertEstablishmentAggregateFromForm.execute(
+        { formEstablishment },
+        icUser,
+      ),
       errors.establishment.conflictError({
         siret: previousEstablishment.siret,
       }),
-    );
-
-    expectToEqual(
-      uow.establishmentAggregateRepository.establishmentAggregates,
-      [aggregateInRepo],
     );
   });
 
@@ -642,9 +510,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     uow.romeRepository.appellations =
       validFormEstablishmentWithSiret.appellations;
 
-    await insertEstablishmentAggregateFromForm.execute({
-      formEstablishment: validFormEstablishmentWithSiret,
-    });
+    await insertEstablishmentAggregateFromForm.execute(
+      {
+        formEstablishment: validFormEstablishmentWithSiret,
+      },
+      icUser,
+    );
 
     const createdAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
@@ -652,9 +523,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           .withSiret(validFormEstablishmentWithSiret.siret)
           .withName(validFormEstablishmentWithSiret.businessName)
           .withSearchableBy(validFormEstablishmentWithSiret.searchableBy)
-          .withContactMethod(
-            validFormEstablishmentWithSiret.businessContact.contactMethod,
-          )
+          .withContactMethod(validFormEstablishmentWithSiret.contactMethod)
           .withCustomizedName(
             validFormEstablishmentWithSiret.businessNameCustomized,
           )
@@ -726,7 +595,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         topic: "NewEstablishmentAggregateInsertedFromForm",
         payload: {
           establishmentAggregate: createdAggregate,
-          triggeredBy: null,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: user.id,
+          },
         },
       },
     ]);
@@ -750,7 +622,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
       uow.romeRepository.appellations = formEstablishment.appellations;
 
-      await insertEstablishmentAggregateFromForm.execute({ formEstablishment });
+      await insertEstablishmentAggregateFromForm.execute(
+        { formEstablishment },
+        icUser,
+      );
 
       const createdAggregate = new EstablishmentAggregateBuilder()
         .withEstablishment(
@@ -758,7 +633,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withSiret(formEstablishment.siret)
             .withName(formEstablishment.businessName)
             .withSearchableBy(formEstablishment.searchableBy)
-            .withContactMethod(formEstablishment.businessContact.contactMethod)
+            .withContactMethod(formEstablishment.contactMethod)
             .withCustomizedName(formEstablishment.businessNameCustomized)
             .withFitForDisabledWorkers(formEstablishment.fitForDisabledWorkers)
             .withMaxContactsPerMonth(formEstablishment.maxContactsPerMonth)
@@ -821,7 +696,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           topic: "NewEstablishmentAggregateInsertedFromForm",
           payload: {
             establishmentAggregate: createdAggregate,
-            triggeredBy: null,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: user.id,
+            },
           },
         },
       ]);
@@ -858,9 +736,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         numberEmployeesRange: numberEmployees,
       });
 
-      await insertEstablishmentAggregateFromForm.execute({
-        formEstablishment: formEstablishmentWithWeirdAppellationDto,
-      });
+      await insertEstablishmentAggregateFromForm.execute(
+        {
+          formEstablishment: formEstablishmentWithWeirdAppellationDto,
+        },
+        icUser,
+      );
 
       const form = FormEstablishmentDtoBuilder.valid()
         .withAppellations([correctAppellationDto])
@@ -876,7 +757,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 .withSiret(form.siret)
                 .withName(form.businessName)
                 .withSearchableBy(form.searchableBy)
-                .withContactMethod(form.businessContact.contactMethod)
+                .withContactMethod(form.contactMethod)
                 .withCustomizedName(form.businessNameCustomized)
                 .withFitForDisabledWorkers(form.fitForDisabledWorkers)
                 .withMaxContactsPerMonth(form.maxContactsPerMonth)
@@ -952,9 +833,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       ];
 
       await expectPromiseToFailWithError(
-        insertEstablishmentAggregateFromForm.execute({
-          formEstablishment,
-        }),
+        insertEstablishmentAggregateFromForm.execute(
+          {
+            formEstablishment,
+          },
+          icUser,
+        ),
         errors.establishment.conflictError({ siret: formEstablishment.siret }),
       );
     });
@@ -976,7 +860,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         siretGateway.setSirenEstablishment(siretRawInactiveEstablishment);
 
         await expectPromiseToFailWithError(
-          insertEstablishmentAggregateFromForm.execute({ formEstablishment }),
+          insertEstablishmentAggregateFromForm.execute(
+            { formEstablishment },
+            icUser,
+          ),
           errors.establishment.missingOrClosed({
             siret: formEstablishment.siret,
           }),
@@ -990,9 +877,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
         uow.romeRepository.appellations = formEstablishment.appellations;
 
-        await insertEstablishmentAggregateFromForm.execute({
-          formEstablishment,
-        });
+        await insertEstablishmentAggregateFromForm.execute(
+          {
+            formEstablishment,
+          },
+          icUser,
+        );
 
         expect(uow.outboxRepository.events).toHaveLength(1);
         expect(
@@ -1005,7 +895,10 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         siretGateway.setError(error);
 
         await expectPromiseToFailWithError(
-          insertEstablishmentAggregateFromForm.execute({ formEstablishment }),
+          insertEstablishmentAggregateFromForm.execute(
+            { formEstablishment },
+            icUser,
+          ),
           errors.siretApi.unavailable({ serviceName: "Sirene API" }),
         );
       });

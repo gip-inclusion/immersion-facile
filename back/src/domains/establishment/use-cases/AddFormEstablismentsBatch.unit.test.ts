@@ -123,10 +123,44 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   });
 
   it("Adds two formEstablishments successfully and returns report", async () => {
+    uuidGenerator.setNextUuids(["1", "2", "3", "4", "5", "6"]);
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
       icUserAdmin,
     );
+
+    expectToEqual(report, {
+      numberOfEstablishmentsProcessed: 2,
+      numberOfSuccess: 2,
+      failures: [],
+    });
+
+    expectToEqual(uow.userRepository.users, [
+      {
+        createdAt: "2021-09-01T10:10:00.000Z",
+        email: "amil@mail.com",
+        externalId: null,
+        firstName: "",
+        id: "1",
+        lastName: "",
+      },
+      {
+        createdAt: "2021-09-01T10:10:00.000Z",
+        email: "copy1@mail.com",
+        externalId: null,
+        firstName: "",
+        id: "2",
+        lastName: "",
+      },
+      {
+        createdAt: "2021-09-01T10:10:00.000Z",
+        email: "copy2@mail.com",
+        externalId: null,
+        firstName: "",
+        id: "3",
+        lastName: "",
+      },
+    ]);
 
     expectToEqual(
       uow.establishmentAggregateRepository.establishmentAggregates,
@@ -175,22 +209,25 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 role: "establishment-admin",
                 job: "a job",
                 phone: "+33612345678",
-                userId: "no-uuid-provided",
+                userId: "1",
+              },
+              {
+                role: "establishment-contact",
+                userId: "2",
+              },
+              {
+                role: "establishment-contact",
+                userId: "3",
               },
             ])
             .build(),
         ),
       ),
     );
-
-    expectToEqual(report, {
-      numberOfEstablishmentsProcessed: 2,
-      numberOfSuccess: 2,
-      failures: [],
-    });
   });
 
   it("reports the errors when something goes wrong with an addition", async () => {
+    uuidGenerator.setNextUuids(["1", "2", "3", "4", "5", "6"]);
     const existingFormEstablishment =
       formEstablishmentBatch.formEstablishments[0];
     uow.establishmentAggregateRepository.insertEstablishmentAggregate(
