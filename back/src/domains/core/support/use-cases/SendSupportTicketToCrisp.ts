@@ -37,8 +37,7 @@ const makeGetInputValue =
   (fields: TallyForm["data"]["fields"]) =>
   (key: string): string | undefined => {
     const field = fields.find((field) => field.key === key);
-    if (!field?.value) return;
-    return field.value;
+    return field?.value;
   };
 
 export type SendSupportTicketToCrisp = ReturnType<
