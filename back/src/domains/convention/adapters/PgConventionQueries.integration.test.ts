@@ -1038,4 +1038,253 @@ describe("Pg implementation of ConventionQueries", () => {
       agencyCounsellorEmails: [],
     } satisfies ConventionReadDto;
   };
+
+  describe("PG implementation of method getPaginatedConventionsForAgencyUser", () => {
+    const agencyId = "cccccc99-9c0b-1bbb-bb6d-6bb9bd38cccc";
+    const agency = new AgencyDtoBuilder()
+      .withId(agencyId)
+      .withName("Test Agency")
+      .withAddress({
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75017",
+        streetNumberAndAddress: "Avenue des champs Elysées",
+      })
+      .build();
+
+    const differentAgencyId = "dddddddd-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+    const differentAgency = new AgencyDtoBuilder()
+      .withId(differentAgencyId)
+      .withName("Different Agency")
+      .withAddress({
+        city: "Lyon",
+        departmentCode: "69",
+        postcode: "69001",
+        streetNumberAndAddress: "Rue de la République",
+      })
+      .build();
+
+    const singleAgencyUser = new InclusionConnectedUserBuilder()
+      .withEmail("single-agency-user@mail.com")
+      .withId("11111111-2222-3333-4444-555555555555")
+      .buildUser();
+
+    const conventionA = new ConventionDtoBuilder()
+      .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+      .withAgencyId(agencyId)
+      .withStatus("DRAFT")
+      .withDateStart(new Date("2023-01-15").toISOString())
+      .withDateEnd(new Date("2023-01-20").toISOString())
+      .withDateSubmission(new Date("2023-01-10").toISOString())
+      .withBeneficiaryFirstName("John")
+      .withBeneficiaryLastName("Doe")
+      .withBusinessName("Business A")
+      .build();
+
+    const conventionB = new ConventionDtoBuilder()
+      .withId("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")
+      .withAgencyId(agencyId)
+      .withStatus("IN_REVIEW")
+      .withDateStart(new Date("2023-02-15").toISOString())
+      .withDateEnd(new Date("2023-02-20").toISOString())
+      .withDateSubmission(new Date("2023-02-10").toISOString())
+      .withBeneficiaryFirstName("Jane")
+      .withBeneficiaryLastName("Smith")
+      .withBusinessName("Business B")
+      .build();
+
+    const conventionC = new ConventionDtoBuilder()
+      .withId("cccccccc-cccc-cccc-cccc-cccccccccccc")
+      .withAgencyId(agencyId)
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .withDateStart(new Date("2023-03-15").toISOString())
+      .withDateEnd(new Date("2023-03-20").toISOString())
+      .withDateSubmission(new Date("2023-03-10").toISOString())
+      .withBeneficiaryFirstName("Alice")
+      .withBeneficiaryLastName("Johnson")
+      .withBusinessName("Business C")
+      .build();
+
+    const conventionD = new ConventionDtoBuilder()
+      .withId("dddddddd-dddd-dddd-dddd-dddddddddddd")
+      .withAgencyId(differentAgencyId)
+      .withStatus("DRAFT")
+      .withDateStart(new Date("2023-04-15").toISOString())
+      .withDateEnd(new Date("2023-04-20").toISOString())
+      .withDateSubmission(new Date("2023-04-10").toISOString())
+      .withBeneficiaryFirstName("Bob")
+      .withBeneficiaryLastName("Brown")
+      .withBusinessName("Business D")
+      .build();
+
+    beforeEach(async () => {
+      await new PgUserRepository(db).save(singleAgencyUser);
+
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+          [singleAgencyUser.id]: {
+            isNotifiedByEmail: true,
+            roles: ["validator"],
+          },
+        }),
+      );
+
+      await agencyRepo.insert(
+        toAgencyWithRights(differentAgency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+
+      await Promise.all([
+        conventionRepository.save(conventionA),
+        conventionRepository.save(conventionB),
+        conventionRepository.save(conventionC),
+        conventionRepository.save(conventionD),
+      ]);
+    });
+
+    it("should return conventions for the agency user with pagination", async () => {
+      const resultPage1 =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 2 },
+          sortBy: "dateSubmission",
+        });
+
+      expect(resultPage1.data.length).toBe(2);
+      expect(resultPage1.pagination.totalRecords).toBe(1);
+      expectToEqual(resultPage1.data, [conventionD, conventionC]);
+
+      const resultPage2 =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 2, perPage: 2 },
+          sortBy: "dateSubmission",
+        });
+
+      expect(resultPage2.data.length).toBe(2);
+      expectToEqual(resultPage2.data, [conventionB, conventionA]);
+    });
+
+    it("should filter conventions by status", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { statuses: ["DRAFT"] },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(2);
+      expectToEqual(result.data, [conventionD, conventionA]);
+    });
+
+    it("should filter conventions by beneficiary name", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { beneficiaryNameContains: "John" },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(2);
+    });
+
+    it("should filter conventions by establishment name", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: { establishmentNameContains: "Business B" },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(1);
+      expectToEqual(result.data, [conventionB]);
+    });
+
+    it("should filter conventions by date range", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            dateStart: {
+              from: new Date("2023-02-01"),
+              to: new Date("2023-03-31"),
+            },
+          },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(2);
+      expectToEqual(result.data, [conventionC, conventionB]);
+    });
+
+    it("should sort conventions by dateStart", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          sortBy: "dateStart",
+        });
+
+      expect(result.data.length).toBe(4);
+      expectToEqual(result.data, [
+        conventionD,
+        conventionC,
+        conventionB,
+        conventionA,
+      ]);
+    });
+
+    it("should respect pagination limits", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 2 },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(2);
+      expectToEqual(result.data, [conventionD, conventionC]);
+    });
+
+    it("should filter by multiple criteria", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: validator.id,
+          pagination: { page: 1, perPage: 10 },
+          filters: {
+            statuses: ["DRAFT", "IN_REVIEW"],
+            dateSubmission: {
+              from: new Date("2023-01-01"),
+              to: new Date("2023-02-15"),
+            },
+          },
+          sortBy: "dateStart",
+        });
+
+      expect(result.data.length).toBe(2);
+      expectToEqual(result.data, [conventionB, conventionA]);
+    });
+
+    it("should only return conventions from agencies the user belongs to", async () => {
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: singleAgencyUser.id,
+          pagination: { page: 1, perPage: 10 },
+          sortBy: "dateSubmission",
+        });
+
+      expectToEqual(result.data, [conventionC, conventionB, conventionA]);
+
+      const allConventionsBelongToUsersAgency = result.data.every(
+        (convention) => convention.agencyId === agencyId,
+      );
+      expect(allConventionsBelongToUsersAgency).toBe(true);
+    });
+  });
 });

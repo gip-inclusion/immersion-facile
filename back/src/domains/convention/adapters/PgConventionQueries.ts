@@ -7,9 +7,14 @@ import {
   type ConventionReadDto,
   type ConventionScope,
   type ConventionStatus,
+  type DataWithPagination,
+  type DateFilter,
   type DateRange,
   type FindSimilarConventionsParams,
+  type NotEmptyArray,
+  type PaginationQueryParams,
   type SiretDto,
+  type UserId,
   conventionReadSchema,
   conventionSchema,
   errors,
@@ -26,9 +31,12 @@ import type {
   GetConventionsFilters,
   GetConventionsParams,
   GetConventionsSortBy,
+  GetPaginatedConventionsFilters,
+  GetPaginatedConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
   createConventionQueryBuilder,
+  createConventionQueryBuilderForAgencyUser,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
 } from "./pgConventionSql";
@@ -57,7 +65,12 @@ export class PgConventionQueries implements ConventionQueries {
         "=",
         params.beneficiaryBirthdate,
       )
-      .where("b.last_name", "=", params.beneficiaryLastName)
+      .where(
+        (eb) =>
+          sql<any>`${eb.ref("b.last_name")} = ${sql.lit(
+            params.beneficiaryLastName,
+          )}`,
+      )
       .where(
         "conventions.date_start",
         "<=",
@@ -237,11 +250,173 @@ export class PgConventionQueries implements ConventionQueries {
       );
     });
   }
+
+  public async getPaginatedConventionsForAgencyUser({
+    filters = {},
+    pagination,
+    sortBy,
+    agencyUserId,
+  }: {
+    agencyUserId: UserId;
+    pagination: Required<PaginationQueryParams>;
+    filters?: GetPaginatedConventionsFilters;
+    sortBy: GetPaginatedConventionsSortBy;
+  }): Promise<DataWithPagination<ConventionDto>> {
+    const {
+      actorEmailContains,
+      beneficiaryNameContains,
+      establishmentNameContains,
+      statuses,
+      agencyIds,
+      agencyDepartmentCodes,
+      dateStart,
+      dateEnd,
+      dateSubmission,
+      ...rest
+    } = filters;
+
+    rest satisfies Record<string, never>;
+
+    const data = await pipeWithValue(
+      createConventionQueryBuilderForAgencyUser({
+        transaction: this.transaction,
+        agencyUserId,
+      }),
+      filterEmail(actorEmailContains?.trim()),
+      filterByBeneficiaryName(beneficiaryNameContains?.trim()),
+      filterEstablishmentName(establishmentNameContains?.trim()),
+      filterDate("date_start", dateStart),
+      filterDate("date_end", dateEnd),
+      filterDate("date_submission", dateSubmission),
+      filterInList("status", statuses),
+      filterInList("agency_id", agencyIds),
+      filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+      sortConventions(sortBy),
+      applyPagination(pagination),
+    ).execute();
+
+    return {
+      data: data.map(({ dto }) => dto),
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 1,
+        totalRecords: 1,
+      },
+    };
+  }
 }
 
-type ConventionReadQueryBuilder = ReturnType<
-  typeof createConventionQueryBuilder
->;
+const applyPagination =
+  (pagination: Required<PaginationQueryParams>) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    const { page, perPage } = pagination;
+    const offset = (page - 1) * perPage;
+    return builder.limit(perPage).offset(offset);
+  };
+
+type ConventionQueryBuilder = ReturnType<typeof createConventionQueryBuilder>;
+
+const sortConventions =
+  (sortBy?: GetPaginatedConventionsSortBy) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    const sortByByKey: Record<
+      GetPaginatedConventionsSortBy,
+      keyof Database["conventions"]
+    > = {
+      dateSubmission: "date_submission",
+      dateStart: "date_start",
+      dateValidation: "date_validation",
+    };
+
+    if (!sortBy) return builder.orderBy(sortByByKey.dateStart, "desc");
+    return builder.orderBy(sortByByKey[sortBy], "desc");
+  };
+
+const filterByAgencyDepartmentCodes =
+  (agencyDepartmentCodes: NotEmptyArray<string> | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!agencyDepartmentCodes) return builder;
+    return builder.where(
+      "agencies.department_code",
+      "in",
+      agencyDepartmentCodes,
+    );
+  };
+
+const filterDate =
+  (
+    fieldName: keyof Database["conventions"],
+    dateFilter: DateFilter | undefined,
+  ) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!dateFilter) return builder;
+    if (dateFilter.from && dateFilter.to)
+      return builder
+        .where(fieldName, ">=", dateFilter.from)
+        .where(fieldName, "<=", dateFilter.to);
+
+    if (dateFilter.from) return builder.where(fieldName, ">=", dateFilter.from);
+    if (dateFilter.to) return builder.where(fieldName, "<=", dateFilter.to);
+    return builder;
+  };
+
+const filterEmail =
+  (emailContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!emailContains) return builder;
+    const pattern = `%${emailContains}%`;
+
+    return builder.where((eb) => {
+      return eb.or([
+        sql<any>`${eb.ref("b.email")} ILIKE ${sql.lit(pattern)}`,
+        sql<any>`${eb.ref("er.email")} ILIKE ${sql.lit(pattern)}`,
+        sql<any>`${eb.ref("et.email")} ILIKE ${sql.lit(pattern)}`,
+        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${sql.lit(pattern)}`,
+        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${sql.lit(pattern)}`,
+      ]);
+    });
+  };
+
+const filterInList =
+  <T extends string>(
+    fieldName: keyof Database["conventions"],
+    list: T[] | undefined,
+  ) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!list) return builder;
+    return builder.where(`conventions.${fieldName}`, "in", list);
+  };
+
+const filterEstablishmentName =
+  (establishmentNameContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!establishmentNameContains) return builder;
+    return builder.where(
+      "business_name",
+      "ilike",
+      `%${establishmentNameContains}%`,
+    );
+  };
+
+const filterByBeneficiaryName =
+  (beneficiaryNameContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!beneficiaryNameContains) return builder;
+    const nameWords = beneficiaryNameContains.split(" ");
+
+    return builder.where((eb) =>
+      eb.or(
+        nameWords.flatMap((nameWord) => {
+          const pattern = `%${nameWord}%`;
+          return [
+            sql<any>`${eb.ref("b.first_name")} ILIKE ${sql.lit(pattern)}`,
+            sql<any>`${eb.ref("b.last_name")} ILIKE ${sql.lit(pattern)}`,
+          ];
+        }),
+      ),
+    );
+  };
 
 const addFiltersToBuilder =
   ({
@@ -252,7 +427,7 @@ const addFiltersToBuilder =
     dateSubmissionSince,
     withSirets,
   }: GetConventionsFilters) =>
-  (builder: ConventionReadQueryBuilder) => {
+  (builder: ConventionQueryBuilder) => {
     const addWithStatusFilterIfNeeded: AddToBuilder = (b) =>
       withStatuses && withStatuses.length > 0
         ? b.where("conventions.status", "in", withStatuses)
@@ -301,6 +476,4 @@ export const validateConventionResults = (
     validateAndParseZodSchemaV2(conventionSchema, pgResult.dto, logger),
   );
 
-type AddToBuilder = (
-  b: ConventionReadQueryBuilder,
-) => ConventionReadQueryBuilder;
+type AddToBuilder = (b: ConventionQueryBuilder) => ConventionQueryBuilder;
