@@ -1,6 +1,9 @@
 import {
+  AdminFormEstablishmentUserRight,
   type EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
+  InclusionConnectedUserBuilder,
+  createInclusionConnectJwtPayload,
   defaultValidFormEstablishment,
   displayRouteName,
   establishmentRoutes,
@@ -10,12 +13,14 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
+import { v4 as uuid } from "uuid";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
@@ -32,15 +37,25 @@ describe("Add form establishment", () => {
 
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
+  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+
+  const user = new InclusionConnectedUserBuilder().withId(uuid()).buildUser();
 
   beforeEach(async () => {
-    ({ request, inMemoryUow, gateways, eventCrawler } = await buildTestApp());
+    ({
+      request,
+      inMemoryUow,
+      gateways,
+      eventCrawler,
+      generateInclusionConnectJwt,
+    } = await buildTestApp());
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
     inMemoryUow.apiConsumerRepository.consumers = [
       authorizedUnJeuneUneSolutionApiConsumer,
       unauthorizedApiConsumer,
       outdatedApiConsumer,
     ];
+    inMemoryUow.userRepository.users = [user];
   });
 
   describe(`${displayRouteName(
@@ -71,13 +86,27 @@ describe("Add form establishment", () => {
     it(`${displayRouteName(
       establishmentRoutes.addFormEstablishment,
     )} 200 Check if email notification has been sent and published after FormEstablishment added`, async () => {
-      const email = "tiredofthismess@seriously.com";
+      const adminFormRight: AdminFormEstablishmentUserRight = {
+        role: "establishment-admin",
+        email: "mail@mail.com",
+        job: "osef",
+        phone: "+33600000000",
+      };
 
       const response = await httpClient.addFormEstablishment({
         body: FormEstablishmentDtoBuilder.valid()
           .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-          .withBusinessContactEmail(email)
+          .withFormUserRights([adminFormRight])
           .build(),
+        headers: {
+          authorization: generateInclusionConnectJwt(
+            createInclusionConnectJwtPayload({
+              userId: user.id,
+              durationDays: 1,
+              now: new Date(),
+            }),
+          ),
+        },
       });
 
       expectHttpResponseToEqual(response, {
@@ -89,17 +118,15 @@ describe("Add form establishment", () => {
 
       expectToEqual(
         gateways.notification.getSentEmails().map((e) => e.recipients),
-        [[email]],
+        [[adminFormRight.email]],
       );
     });
 
     it(`${displayRouteName(
       establishmentRoutes.addFormEstablishment,
     )} 200 update EstablishmentLead kind`, async () => {
-      const email = "tiredofthismess@seriously.com";
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-        .withBusinessContactEmail(email)
         .build();
       const establishmentLead: EstablishmentLead = {
         lastEventKind: "to-be-reminded",
@@ -126,6 +153,15 @@ describe("Add form establishment", () => {
 
       const response = await httpClient.addFormEstablishment({
         body: formEstablishment,
+        headers: {
+          authorization: generateInclusionConnectJwt(
+            createInclusionConnectJwtPayload({
+              userId: user.id,
+              durationDays: 1,
+              now: new Date(),
+            }),
+          ),
+        },
       });
 
       expectHttpResponseToEqual(response, {
