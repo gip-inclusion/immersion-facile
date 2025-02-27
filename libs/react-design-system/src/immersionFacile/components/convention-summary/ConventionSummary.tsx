@@ -1,9 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React, { ReactNode } from "react";
-import { createPortal } from "react-dom";
 import { useStyles } from "tss-react/dsfr";
 import { CopyButton } from "../copy-button/CopyButton";
 import { conventionSummaryStyles } from "./ConventionSummary.styles";
@@ -12,7 +10,6 @@ export type ConventionSummaryProperties = {
   conventionId?: string;
   submittedAt: string;
   summary: ConventionSummarySection[];
-  modal: ReturnType<typeof createModal>;
 };
 
 export type ConventionSummarySection = {
@@ -48,7 +45,6 @@ export const ConventionSummary = ({
   conventionId,
   submittedAt,
   summary,
-  modal,
 }: ConventionSummaryProperties) => {
   const { cx } = useStyles();
 
@@ -133,12 +129,6 @@ export const ConventionSummary = ({
           </div>
         </section>
       ))}
-      {createPortal(
-        <modal.Component title="Envoyer le lien de signature par SMS">
-          Le signataire recevra un lien de signature
-        </modal.Component>,
-        document.body,
-      )}
     </>
   );
 };

@@ -26,6 +26,7 @@ import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
   throwServiceUnavailableWithExplicitMessage,
+  throwTooManyRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
@@ -141,7 +142,8 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .with({ status: P.union(403, 404, 409) }, logBodyAndThrow)
+            .with({ status: 429 }, throwTooManyRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

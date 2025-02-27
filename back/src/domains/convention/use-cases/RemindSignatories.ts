@@ -1,5 +1,4 @@
 import { subHours } from "date-fns";
-import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { intersection, toPairs } from "ramda";
 import {
   AgencyId,
@@ -17,6 +16,7 @@ import {
   errors,
   frontRoutes,
   isSomeEmailMatchingEmailHash,
+  isValidMobilePhone,
   signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
@@ -244,9 +244,6 @@ const throwErrorIfPhoneNumerNotValid = ({
     throw new Error();
   }
 
-  const isValidMobilePhone =
-    parsePhoneNumber(convention.signatories[signatoryKey].phone).getType() ===
-    "MOBILE";
   if (!isValidMobilePhone)
     throw errors.convention.invalidMobilePhoneNumber({
       conventionId: convention.id,
