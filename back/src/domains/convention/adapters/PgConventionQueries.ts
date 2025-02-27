@@ -7,9 +7,14 @@ import {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  DataWithPagination,
+  DateFilter,
   DateRange,
   FindSimilarConventionsParams,
+  NotEmptyArray,
+  PaginationQueryParams,
   SiretDto,
+  UserId,
   conventionReadSchema,
   conventionSchema,
   pipeWithValue,
@@ -25,9 +30,12 @@ import {
   GetConventionsFilters,
   GetConventionsParams,
   GetConventionsSortBy,
+  GetPaginatedConventionsFilters,
+  GetPaginatedConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
   createConventionQueryBuilder,
+  createConventionQueryBuilderForAgencyUser,
   getConventionAgencyFieldsForAgencies,
   getReadConventionById,
 } from "./pgConventionSql";
@@ -236,11 +244,157 @@ export class PgConventionQueries implements ConventionQueries {
       );
     });
   }
+
+  public async getPaginatedConventionsForAgencyUser({
+    filters = {},
+    pagination,
+    sortBy,
+    agencyUserId,
+  }: {
+    agencyUserId: UserId;
+    pagination: Required<PaginationQueryParams>;
+    filters?: GetPaginatedConventionsFilters;
+    sortBy: GetPaginatedConventionsSortBy;
+  }): Promise<DataWithPagination<ConventionDto>> {
+    const {
+      actorEmailContains,
+      beneficiaryNameContains,
+      establishmentNameContains,
+      statuses,
+      agencyIds,
+      agencyDepartmentCodes,
+      dateStart,
+      dateEnd,
+      dateSubmission,
+      ...rest
+    } = filters;
+
+    rest satisfies Record<string, never>;
+
+    const data = await pipeWithValue(
+      createConventionQueryBuilderForAgencyUser({
+        transaction: this.transaction,
+        agencyUserId,
+      }),
+      filterEmail(actorEmailContains?.trim()),
+      filterByBeneficiaryName(beneficiaryNameContains?.trim()),
+      filterEstablishmentName(establishmentNameContains?.trim()),
+      filterDate("date_start", dateStart),
+      filterDate("date_end", dateEnd),
+      filterDate("date_submission", dateSubmission),
+      filterInList("status", statuses),
+      filterInList("agency_id", agencyIds),
+      filterByAgencyDepartmentCodes(agencyDepartmentCodes),
+      sortConventions(sortBy),
+      (b) => b.limit(pagination.perPage),
+    ).execute();
+
+    return {
+      data: data.map(({ dto }) => dto),
+      pagination: {
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 1,
+        totalRecords: 1,
+      },
+    };
+  }
 }
 
-type ConventionReadQueryBuilder = ReturnType<
-  typeof createConventionQueryBuilder
->;
+type ConventionQueryBuilder = ReturnType<typeof createConventionQueryBuilder>;
+
+const sortConventions =
+  (sortBy?: GetPaginatedConventionsSortBy) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    const sortByByKey: Record<GetPaginatedConventionsSortBy, keyof Database["conventions"]> = {
+      dateSubmission: "date_submission",
+      dateStart: "date_start",
+      dateValidation: "date_validation",
+    };
+
+    if (!sortBy) return builder.orderBy(sortByByKey.dateStart, "desc");
+    return builder.orderBy(sortByByKey[sortBy], "desc");
+  };
+
+const filterByAgencyDepartmentCodes =
+  (agencyDepartmentCodes: NotEmptyArray<string> | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!agencyDepartmentCodes) return builder;
+    return builder.where(
+      "agencies.department_code",
+      "in",
+      agencyDepartmentCodes,
+    );
+  };
+
+const filterDate =
+  (
+    fieldName: keyof Database["conventions"],
+    dateFilter: DateFilter | undefined,
+  ) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!dateFilter) return builder;
+    if (dateFilter.from && dateFilter.to)
+      return builder
+        .where(fieldName, ">=", dateFilter.from)
+        .where(fieldName, "<=", dateFilter.to);
+
+    if (dateFilter.from) return builder.where(fieldName, ">=", dateFilter.from);
+    if (dateFilter.to) return builder.where(fieldName, "<=", dateFilter.to);
+    return builder;
+  };
+
+const filterEmail =
+  (emailContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!emailContains) return builder;
+    return builder.where((eb) =>
+      eb.or([
+        eb("b.email", "ilike", sql`%${emailContains}%`),
+        eb("br.email", "ilike", sql`%${emailContains}%`),
+        eb("bce.email", "ilike", sql`%${emailContains}%`),
+        eb("er.email", "ilike", sql`%${emailContains}%`),
+        eb("et.email", "ilike", sql`%${emailContains}%`),
+      ]),
+    );
+  };
+
+const filterEstablishmentName =
+  (establishmentNameContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!establishmentNameContains) return builder;
+    return builder.where(
+      "business_name",
+      "ilike",
+      `%${establishmentNameContains}%`,
+    );
+  };
+
+const filterByBeneficiaryName =
+  (beneficiaryNameContains: string | undefined) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!beneficiaryNameContains) return builder;
+    const nameWords = beneficiaryNameContains.split(" ");
+    return builder.where((eb) =>
+      eb.or(
+        nameWords.flatMap((nameWord) => [
+          eb(eb.ref("b.first_name"), "ilike", `%${nameWord}%`),
+          eb(eb.ref("b.last_name"), "ilike", `%${nameWord}%`),
+        ]),
+      ),
+
+    );
+  };
+
+const filterInList =
+  <T extends string>(
+    fieldName: keyof Database["conventions"],
+    list: T[] | undefined,
+  ) =>
+  (builder: ConventionQueryBuilder): ConventionQueryBuilder => {
+    if (!list) return builder;
+    return builder.where(fieldName, "in", list);
+  };
 
 const addFiltersToBuilder =
   ({
@@ -251,7 +405,7 @@ const addFiltersToBuilder =
     dateSubmissionSince,
     withSirets,
   }: GetConventionsFilters) =>
-  (builder: ConventionReadQueryBuilder) => {
+  (builder: ConventionQueryBuilder) => {
     const addWithStatusFilterIfNeeded: AddToBuilder = (b) =>
       withStatuses && withStatuses.length > 0
         ? b.where("conventions.status", "in", withStatuses)
@@ -300,6 +454,4 @@ export const validateConventionResults = (
     validateAndParseZodSchemaV2(conventionSchema, pgResult.dto, logger),
   );
 
-type AddToBuilder = (
-  b: ConventionReadQueryBuilder,
-) => ConventionReadQueryBuilder;
+type AddToBuilder = (b: ConventionQueryBuilder) => ConventionQueryBuilder;
