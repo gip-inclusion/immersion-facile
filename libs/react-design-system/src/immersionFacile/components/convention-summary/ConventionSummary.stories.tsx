@@ -34,5 +34,6 @@ export const Default: Story = {
     conventionId: "Titre de la section",
     submittedAt: "",
     summary: [],
+    modal: {},
   },
 };

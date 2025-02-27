@@ -1,6 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React, { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useStyles } from "tss-react/dsfr";
 import { CopyButton } from "../copy-button/CopyButton";
 import { conventionSummaryStyles } from "./ConventionSummary.styles";
@@ -9,6 +12,7 @@ export type ConventionSummaryProperties = {
   conventionId?: string;
   submittedAt: string;
   summary: ConventionSummarySection[];
+  modal: ReturnType<typeof createModal>;
 };
 
 export type ConventionSummarySection = {
@@ -21,6 +25,7 @@ export type ConventionSummarySubSection = {
   header?: {
     title: string;
     badge?: BadgeProps;
+    action?: ButtonProps;
   };
   fields: ConventionSummaryField[];
   isFullWidthDisplay?: boolean;
@@ -43,6 +48,7 @@ export const ConventionSummary = ({
   conventionId,
   submittedAt,
   summary,
+  modal,
 }: ConventionSummaryProperties) => {
   const { cx } = useStyles();
 
@@ -127,6 +133,12 @@ export const ConventionSummary = ({
           </div>
         </section>
       ))}
+      {createPortal(
+        <modal.Component title="Envoyer le lien de signature par SMS">
+          Le signataire recevra un lien de signature
+        </modal.Component>,
+        document.body,
+      )}
     </>
   );
 };
@@ -184,6 +196,9 @@ const SubSection = ({
             <div className={cx(fr.cx("fr-col-12"), "fr-mb-2w")}>
               <Badge small {...subSection.header.badge} />
             </div>
+          )}
+          {subSection.header?.action && (
+            <Button size="small" {...subSection.header.action} />
           )}
           {subSection.isSchedule && <Schedule fields={subSection.fields} />}
           {!subSection.isSchedule && (

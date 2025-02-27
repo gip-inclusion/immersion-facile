@@ -17,7 +17,10 @@ import {
   toDisplayedDate,
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import {
+  makeConventionSections,
+  remindBySmsModal,
+} from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -110,8 +113,9 @@ export const ConventionSignForm = ({
           submittedAt={toDisplayedDate({
             date: new Date(convention.dateSubmission),
           })}
-          summary={makeConventionSections(convention)}
+          summary={makeConventionSections(convention, remindBySmsModal)}
           conventionId={convention.id}
+          modal={remindBySmsModal}
         />
       </>
     );
@@ -133,8 +137,9 @@ export const ConventionSignForm = ({
             submittedAt={toDisplayedDate({
               date: new Date(convention.dateSubmission),
             })}
-            summary={makeConventionSections(convention)}
+            summary={makeConventionSections(convention, remindBySmsModal)}
             conventionId={convention.id}
+            modal={remindBySmsModal}
           />
         )}
 

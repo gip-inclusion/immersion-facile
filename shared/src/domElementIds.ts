@@ -341,6 +341,10 @@ export const domElementIds = {
       "im-convention-validation__open-remind-signatories-modal-button",
     remindSignatoriesModal:
       "im-convention-validation__remind-signatories-modal",
+    openRemindSignatoriesBySmsModal:
+      "im-convention-validation__open-remind-signatories-by-sms-modal",
+    remindSignatoriesBySmsModal:
+      "im-convention-validation__remind-signatories-by-sms-modal",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:

@@ -16,7 +16,10 @@ import {
 } from "shared";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import {
+  makeConventionSections,
+  remindBySmsModal,
+} from "src/app/contents/convention/conventionSummary.helpers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -217,7 +220,8 @@ const ConventionSummarySection = () => {
             submittedAt={toDisplayedDate({
               date: new Date(convention.dateSubmission),
             })}
-            summary={makeConventionSections(convention)}
+            summary={makeConventionSections(convention, remindBySmsModal)}
+            modal={remindBySmsModal}
           />
           <ConventionFeedbackNotification
             submitFeedback={submitFeedback}

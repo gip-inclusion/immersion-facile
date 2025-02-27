@@ -14,7 +14,10 @@ import {
 } from "shared";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useStyles } from "tss-react/dsfr";
-import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
+import {
+  makeConventionSections,
+  remindBySmsModal,
+} from "../../../contents/convention/conventionSummary.helpers";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -68,8 +71,9 @@ export const ConventionValidation = ({
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}
-        summary={makeConventionSections(convention)}
+        summary={makeConventionSections(convention, remindBySmsModal)}
         conventionId={convention.id}
+        modal={remindBySmsModal}
       />
     </>
   );

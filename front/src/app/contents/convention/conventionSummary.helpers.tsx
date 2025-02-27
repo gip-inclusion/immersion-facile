@@ -1,4 +1,6 @@
 import { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React from "react";
 import {
   ConventionSummaryField,
@@ -15,14 +17,21 @@ import {
   ScheduleDto,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
+  domElementIds,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
   toDisplayedDate,
 } from "shared";
 
+export const remindBySmsModal = createModal({
+  id: domElementIds.manageConvention.remindSignatoriesBySmsModal,
+  isOpenedByDefault: false,
+});
+
 const makeSignatoriesSubsections = (
   convention: ConventionReadDto,
+  modal: ReturnType<typeof createModal>,
 ): ConventionSummarySubSection[] => {
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
@@ -74,6 +83,17 @@ const makeSignatoriesSubsections = (
               severity: "success",
             } satisfies BadgeProps)
           : defaultSignatoryBadgeValue(),
+        action: ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
+          convention.status,
+        )
+          ? ({
+              priority: "tertiary",
+              children: "Faire signer par SMS",
+              onClick: () => modal.open(),
+              id: domElementIds.manageConvention
+                .openRemindSignatoriesBySmsModal,
+            } satisfies ButtonProps)
+          : undefined,
       },
       fields: removeEmptyValue([
         {
@@ -690,11 +710,12 @@ const makeAdditionalInformationSubSections = (
 
 export const makeConventionSections = (
   convention: ConventionReadDto,
+  modal: ReturnType<typeof createModal>,
 ): ConventionSummarySection[] => {
   return [
     {
       title: "Signataires de la convention",
-      subSections: makeSignatoriesSubsections(convention),
+      subSections: makeSignatoriesSubsections(convention, modal),
     },
     {
       title: "Informations sur le bénéficiaire",
