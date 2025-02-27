@@ -6,6 +6,7 @@ import {
   ConventionId,
   ConventionReadDto,
   ConventionScope,
+  DataWithPagination,
   DateRange,
   FindSimilarConventionsParams,
   SiretDto,
@@ -22,6 +23,7 @@ import {
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
+  GetPaginatedConventionsForAgencyUserParams,
 } from "../ports/ConventionQueries";
 import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
@@ -117,6 +119,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
       return new Date(previousDate).getTime() - new Date(currentDate).getTime();
     });
+  }
+
+  public async getPaginatedConventionsForAgencyUser(
+    params: GetPaginatedConventionsForAgencyUserParams,
+  ): Promise<DataWithPagination<ConventionDto>> {
+    throw new Error("Method not implemented.");
   }
 
   public async getConventionsByScope(params: {
