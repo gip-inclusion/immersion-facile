@@ -57,26 +57,8 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
     const getInputValue = makeGetInputValue(fields);
     const segments = getInputValue(segmentKey)?.split(",") ?? [];
 
-    const email: string = fields.find(
-      (question) =>
-        [emailKey, establishmentEmailKey].includes(question.key) &&
-        !!question.value,
-    )?.value;
-    if (!email || !email.includes("@"))
-      throw new Error(
-        `Invalid email : ${email} in support. Check in tally for eventId: ${inputParams.eventId}.`,
-      );
-
-    const deleteReason = getInputValue(deleteReasonKey);
-    const message =
-      getInputValue(messageKey) ??
-      `Demande de suppression d'entreprise${
-        deleteReason ? ` pour la raison suivante: ${deleteReason}` : ""
-      }`;
-    if (!message)
-      throw new Error(
-        `Invalid message : ${message} in support. Check in tally for eventId: ${inputParams.eventId}.`,
-      );
+    const email = getEmail(fields, inputParams.eventId);
+    const message = getMessage(getInputValue, inputParams.eventId);
 
     const conventionId = getInputValue(conventionIdKey)?.trim();
 
@@ -107,7 +89,7 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
     const siret = getInputValue(siretKey);
 
     await crispApi.initiateConversation({
-      message: message ?? deleteReason,
+      message,
       metadata: {
         segments: [
           ...new Set([
@@ -144,6 +126,36 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_repr%25C3%25A9s
     });
   },
 );
+
+const getEmail = (fields: TallyForm["data"]["fields"], eventId: string) => {
+  const email: string = fields.find(
+    (question) =>
+      [emailKey, establishmentEmailKey].includes(question.key) &&
+      !!question.value,
+  )?.value;
+  if (!email || !email.includes("@"))
+    throw new Error(
+      `Invalid email : ${email} in support. Check in tally for eventId: ${eventId}.`,
+    );
+  return email;
+};
+
+const getMessage = (
+  getInputValue: (key: string) => string | undefined,
+  eventId: string,
+) => {
+  const deleteReason = getInputValue(deleteReasonKey);
+  const message =
+    getInputValue(messageKey) ??
+    `Demande de suppression d'entreprise${
+      deleteReason ? ` pour la raison suivante: ${deleteReason}` : ""
+    }`;
+  if (!message)
+    throw new Error(
+      `Invalid message : ${message} in support. Check in tally for eventId: ${eventId}.`,
+    );
+  return message;
+};
 
 const getConventionRelatedData = async ({
   uow,
