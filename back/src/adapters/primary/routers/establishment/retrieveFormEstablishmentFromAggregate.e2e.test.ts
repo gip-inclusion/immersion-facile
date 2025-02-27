@@ -5,23 +5,20 @@ import {
   InclusionConnectedUserBuilder,
   UserBuilder,
   addressDtoToString,
-  createEstablishmentJwtPayload,
+  createInclusionConnectJwtPayload,
   currentJwtVersions,
   displayRouteName,
   errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
-  expiredMagicLinkErrorMessage,
+  inclusionConnectTokenExpiredMessage,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
-import type {
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
-} from "../../../../domains/core/jwt";
+import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
@@ -91,19 +88,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
-    ({
-      request,
-      inMemoryUow,
-      gateways,
-      generateInclusionConnectJwt,
-      generateEditEstablishmentJwt,
-    } = await buildTestApp());
+    ({ request, inMemoryUow, gateways, generateInclusionConnectJwt } =
+      await buildTestApp());
     inMemoryUow.userRepository.users = [
       backofficeAdminUser,
       establishmentAdmin,
@@ -114,7 +105,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
-  )} 200 Retrieves form establishment from aggregates when exists and authenticated with establishment jwt`, async () => {
+  )} 200 Retrieves form establishment from aggregates when exists and authenticated with inclusion connect jwt`, async () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
     );
@@ -122,9 +113,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: TEST_OPEN_ESTABLISHMENT_1.siret,
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            userId: establishmentAdmin.id,
             durationDays: 1,
             now: new Date(),
           }),
@@ -162,15 +153,19 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
         ],
         maxContactsPerMonth:
           establishmentAggregate.establishment.maxContactsPerMonth,
-        businessContact: {
-          contactMethod: establishmentAggregate.establishment.contactMethod,
-          firstName: establishmentAdmin.firstName,
-          lastName: establishmentAdmin.lastName,
-          job: establishmentAdminRight.job,
-          phone: establishmentAdminRight.phone,
-          email: establishmentAdmin.email,
-          copyEmails: [establishmentContact.email],
-        },
+        userRights: [
+          {
+            role: "establishment-admin",
+            email: establishmentAdmin.email,
+            job: establishmentAdminRight.job,
+            phone: establishmentAdminRight.phone,
+          },
+          {
+            role: "establishment-contact",
+            email: establishmentContact.email,
+          },
+        ],
+        contactMethod: establishmentAggregate.establishment.contactMethod,
         searchableBy: {
           jobSeekers: true,
           students: false,
@@ -224,15 +219,19 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
           establishmentAggregate.establishment.fitForDisabledWorkers,
         maxContactsPerMonth:
           establishmentAggregate.establishment.maxContactsPerMonth,
-        businessContact: {
-          contactMethod: establishmentAggregate.establishment.contactMethod,
-          firstName: establishmentAdmin.firstName,
-          lastName: establishmentAdmin.lastName,
-          job: establishmentAdminRight.job,
-          phone: establishmentAdminRight.phone,
-          email: establishmentAdmin.email,
-          copyEmails: [establishmentContact.email],
-        },
+        userRights: [
+          {
+            role: "establishment-admin",
+            email: establishmentAdmin.email,
+            job: establishmentAdminRight.job,
+            phone: establishmentAdminRight.phone,
+          },
+          {
+            role: "establishment-contact",
+            email: establishmentContact.email,
+          },
+        ],
+        contactMethod: establishmentAggregate.establishment.contactMethod,
         searchableBy: establishmentAggregate.establishment.searchableBy,
       },
       status: 200,
@@ -291,9 +290,9 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateEditEstablishmentJwt(
-          createEstablishmentJwtPayload({
-            siret: establishmentAggregate.establishment.siret,
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            userId: establishmentAdmin.id,
             now: gateways.timeGateway.now(),
             durationDays: 1,
             exp:
@@ -309,10 +308,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: expiredMagicLinkErrorMessage,
-        needsNewMagicLink: true,
+        message: inclusionConnectTokenExpiredMessage,
+        status: 401,
       },
-      status: 403,
+      status: 401,
     });
   });
 
