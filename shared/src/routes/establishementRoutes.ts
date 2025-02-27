@@ -11,6 +11,7 @@ export const establishmentRoutes = defineRoutes({
     method: "post",
     url: "/form-establishments",
     requestBodySchema: formEstablishmentSchema,
+    ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
     },
