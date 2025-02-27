@@ -121,7 +121,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
-      409: httpErrorSchema,
+      429: httpErrorSchema,
     },
   }),
 });
