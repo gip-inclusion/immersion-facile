@@ -17,13 +17,29 @@ import {
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { NotificationRepository } from "../ports/NotificationRepository";
+import {
+  NotificationRepository,
+  SmsNotificationFilters,
+} from "../ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
     private maxRetrievedNotifications = 30,
   ) {}
+
+  public async getLastSmsNotificationByFilter(
+    filters: SmsNotificationFilters,
+  ): Promise<SmsNotification | undefined> {
+    const result = await getSmsNotificationBuilder(this.transaction)
+      .where("recipient_phone", "=", filters.recipientPhoneNumber)
+      .where("convention_id", "=", filters.conventionId)
+      .where("sms_kind", "=", filters.smsKind)
+      .orderBy("created_at", "desc")
+      .executeTakeFirst();
+
+    return result?.notif;
+  }
 
   public async deleteAllEmailAttachements(): Promise<number> {
     const response = await this.transaction
@@ -145,8 +161,12 @@ export class PgNotificationRepository implements NotificationRepository {
     );
 
     await Promise.all([
-      this.#saveSmsNotifications(smsNotifications),
-      this.#saveEmailNotifications(emailNotifications),
+      smsNotifications.length > 0
+        ? this.#saveSmsNotifications(smsNotifications)
+        : null,
+      emailNotifications.length > 0
+        ? this.#saveEmailNotifications(emailNotifications)
+        : null,
     ]);
   }
 

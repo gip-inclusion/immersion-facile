@@ -309,6 +309,10 @@ export type WithConventionDto = {
   convention: ConventionDto;
 };
 
+export type RemindSignatoriesRequestDto = WithConventionId & {
+  signatoryRole: SignatoryRole;
+};
+
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
 };

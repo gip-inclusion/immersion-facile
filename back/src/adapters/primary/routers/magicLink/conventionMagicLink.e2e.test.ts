@@ -26,7 +26,7 @@ import {
 } from "../../../../domains/core/jwt";
 import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { buildTestApp } from "../../../../utils/buildTestApp";
+import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("Magic link router", () => {
   const payloadMeta = {
@@ -55,6 +55,7 @@ describe("Magic link router", () => {
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<ConventionMagicLinkRoutes>;
+  let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     ({
@@ -62,6 +63,7 @@ describe("Magic link router", () => {
       generateConventionJwt,
       generateInclusionConnectJwt,
       inMemoryUow,
+      gateways,
     } = await buildTestApp());
     httpClient = createSupertestSharedClient(
       conventionMagicLinkRoutes,
@@ -558,6 +560,55 @@ describe("Magic link router", () => {
           message: `User '${notEstablishmentRepresentative.id}' is not the establishment representative for convention '${convention.id}'`,
         },
       });
+    });
+  });
+
+  describe("POST /auth/convention/signatories/remind", () => {
+    it("200 - connected validator can send reminder to signatory", async () => {
+      const agency = new AgencyDtoBuilder().build();
+      const validator = new InclusionConnectedUserBuilder()
+        .withId("validator")
+        .withEmail("validator@mail.com")
+        .buildUser();
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .notSigned()
+        .build();
+      const establishmentRepresentative: User = {
+        email: convention.signatories.establishmentRepresentative.email,
+        firstName: "",
+        lastName: "",
+        id: "1",
+        externalId: "john-external-id",
+        createdAt: new Date().toISOString(),
+      };
+      gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLink1"]);
+
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      ];
+      inMemoryUow.userRepository.users = [
+        establishmentRepresentative,
+        validator,
+      ];
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
+      const response = await httpClient.remindSignatories({
+        body: {
+          conventionId: convention.id,
+          signatoryRole: "establishment-representative",
+        },
+        headers: {
+          authorization: generateInclusionConnectJwt({
+            userId: validator.id,
+            version: 1,
+          }),
+        },
+      });
+      expectToEqual(response.status, 200);
+      expectToEqual(response.body, "");
     });
   });
 });
