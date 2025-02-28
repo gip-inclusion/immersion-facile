@@ -62,206 +62,224 @@ describe("HttpOpenCageDataAddressGateway", () => {
 
   describe("lookupStreetAddress, postcode is now mandatory", () => {
     describe("Right paths", () => {
-      it.each<{ candidateQuery: string; expectedResult: Location }>([
-        {
-          candidateQuery: "111 Meinglazou 29260 Lesneven",
-          expectedResult: {
-            address: {
-              city: "Lesneven",
-              departmentCode: "29",
-              postcode: "29260",
-              streetNumberAndAddress: "",
+      describe("Problematic addresses", () => {
+        it.each<{ candidateQuery: string; expectedResult: Location }>([
+          {
+            candidateQuery: "47 Rue Dupont des Loges 57000 Metz",
+            expectedResult: {
+              address: {
+                city: "Metz",
+                departmentCode: "57",
+                postcode: "57000",
+                streetNumberAndAddress: "47 Rue Dupont des Loges",
+              },
+              id: "123",
+              position: {
+                lat: 49.11436415,
+                lon: 6.17377662619927,
+              },
             },
-            position: {
-              lat: 48.5787522,
-              lon: -4.2966868,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery:
-            "2 rue des Anciens Combattants d'Afrique du Nord, 54200 Toul",
-          expectedResult: {
-            address: {
-              city: "Toul",
-              departmentCode: "54",
-              postcode: "54200",
-              streetNumberAndAddress:
-                "2 Rue des Anciens Combattants d'Afrique du Nord",
+          {
+            candidateQuery: "111 Meinglazou 29260 Lesneven",
+            expectedResult: {
+              address: {
+                city: "Lesneven",
+                departmentCode: "29",
+                postcode: "29260",
+                streetNumberAndAddress: "",
+              },
+              position: {
+                lat: 48.5787522,
+                lon: -4.2966868,
+              },
+              id: "123",
             },
-            position: {
-              lat: 48.671259,
-              lon: 5.891857,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "17 place Sainte Luce 06800 Cagnes sur Mer",
-          expectedResult: {
-            address: {
-              city: "Cagnes-sur-Mer",
-              departmentCode: "06",
-              postcode: "06800",
-              streetNumberAndAddress: "Place Sainte-Luce",
+          {
+            candidateQuery:
+              "2 rue des Anciens Combattants d'Afrique du Nord, 54200 Toul",
+            expectedResult: {
+              address: {
+                city: "Toul",
+                departmentCode: "54",
+                postcode: "54200",
+                streetNumberAndAddress:
+                  "2 Rue des Anciens Combattants d'Afrique du Nord",
+              },
+              position: {
+                lat: 48.671259,
+                lon: 5.891857,
+              },
+              id: "123",
             },
-            position: {
-              lat: 43.664522,
-              lon: 7.1494273,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "21 Rue Monthyon Saint-Denis 97400",
-          expectedResult: {
-            address: {
-              city: "Saint-Denis",
-              departmentCode: "974",
-              postcode: "97400",
-              streetNumberAndAddress: "21 Rue Monthyon",
+          {
+            candidateQuery: "17 place Sainte Luce 06800 Cagnes sur Mer",
+            expectedResult: {
+              address: {
+                city: "Cagnes-sur-Mer",
+                departmentCode: "06",
+                postcode: "06800",
+                streetNumberAndAddress: "Place Sainte-Luce",
+              },
+              position: {
+                lat: 43.664522,
+                lon: 7.1494273,
+              },
+              id: "123",
             },
-            position: {
-              lat: -20.887292,
-              lon: 55.455501,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "69120",
-          expectedResult: {
-            address: {
-              city: "Vaulx-en-Velin",
-              departmentCode: "69",
-              postcode: "69120",
-              streetNumberAndAddress: "",
+          {
+            candidateQuery: "21 Rue Monthyon Saint-Denis 97400",
+            expectedResult: {
+              address: {
+                city: "Saint-Denis",
+                departmentCode: "974",
+                postcode: "97400",
+                streetNumberAndAddress: "21 Rue Monthyon",
+              },
+              position: {
+                lat: -20.887292,
+                lon: 55.455501,
+              },
+              id: "123",
             },
-            position: {
-              lat: 45.771767625,
-              lon: 4.92455044791667,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "75016",
-          expectedResult: {
-            address: {
-              city: "Paris",
-              departmentCode: "75",
-              postcode: "75016",
-              streetNumberAndAddress: "",
+          {
+            candidateQuery: "69120",
+            expectedResult: {
+              address: {
+                city: "Vaulx-en-Velin",
+                departmentCode: "69",
+                postcode: "69120",
+                streetNumberAndAddress: "",
+              },
+              position: {
+                lat: 45.771767625,
+                lon: 4.92455044791667,
+              },
+              id: "123",
             },
-            position: {
-              lat: 48.8523073360927,
-              lon: 2.27125068377483,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "Avenue des Champs élyssés Paris",
-          expectedResult: {
-            address: {
-              city: "Paris 8e Arrondissement",
-              departmentCode: "75",
-              postcode: "75008",
-              streetNumberAndAddress: "Avenue des Champs-Élysées",
+          {
+            candidateQuery: "75016",
+            expectedResult: {
+              address: {
+                city: "Paris",
+                departmentCode: "75",
+                postcode: "75016",
+                streetNumberAndAddress: "",
+              },
+              position: {
+                lat: 48.8523073360927,
+                lon: 2.27125068377483,
+              },
+              id: "123",
             },
-            position: {
-              lat: 48.8695,
-              lon: 2.308483,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "Carcassonne",
-          expectedResult: {
-            address: {
-              city: "Carcassonne",
-              departmentCode: "11",
-              postcode: "11000",
-              streetNumberAndAddress: "",
+          {
+            candidateQuery: "Avenue des Champs élyssés Paris",
+            expectedResult: {
+              address: {
+                city: "Paris 8e Arrondissement",
+                departmentCode: "75",
+                postcode: "75008",
+                streetNumberAndAddress: "Avenue des Champs-Élysées",
+              },
+              position: {
+                lat: 48.8695,
+                lon: 2.308483,
+              },
+              id: "123",
             },
-            position: {
-              lat: 43.2130358,
-              lon: 2.3491069,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "rue Chanzy Lunévile 54300",
-          expectedResult: {
-            address: {
-              city: "Lunéville",
-              departmentCode: "54",
-              postcode: "54300",
-              streetNumberAndAddress: "Rue du Général Chanzy",
+          {
+            candidateQuery: "Carcassonne",
+            expectedResult: {
+              address: {
+                city: "Carcassonne",
+                departmentCode: "11",
+                postcode: "11000",
+                streetNumberAndAddress: "",
+              },
+              position: {
+                lat: 43.2130358,
+                lon: 2.3491069,
+              },
+              id: "123",
             },
-            position: {
-              lat: 48.596289,
-              lon: 6.489476,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "LIEU DIT LE GROS CHATELET GARE 88200 Remiremont",
-          expectedResult: {
-            address: {
-              city: "Remiremont",
-              departmentCode: "88",
-              postcode: "88200",
-              streetNumberAndAddress: "Gros Chatelet",
+          {
+            candidateQuery: "rue Chanzy Lunévile 54300",
+            expectedResult: {
+              address: {
+                city: "Lunéville",
+                departmentCode: "54",
+                postcode: "54300",
+                streetNumberAndAddress: "Rue du Général Chanzy",
+              },
+              position: {
+                lat: 48.596289,
+                lon: 6.489476,
+              },
+              id: "123",
             },
-            position: {
-              lat: 48.01562,
-              lon: 6.600757,
-            },
-            id: "123",
           },
-        },
-        {
-          candidateQuery: "97150 Saint-Martin",
-          expectedResult: {
-            address: {
-              city: "Saint-Martin",
-              departmentCode: "971",
-              postcode: "97150",
-              streetNumberAndAddress: "",
+          {
+            candidateQuery: "LIEU DIT LE GROS CHATELET GARE 88200 Remiremont",
+            expectedResult: {
+              address: {
+                city: "Remiremont",
+                departmentCode: "88",
+                postcode: "88200",
+                streetNumberAndAddress: "Gros Chatelet",
+              },
+              position: {
+                lat: 48.01562,
+                lon: 6.600757,
+              },
+              id: "123",
             },
-            position: {
-              lat: 18.06481835,
-              lon: -63.049171129033,
-            },
-            id: "123",
           },
-        },
-      ])(
-        `Should work if searching for '$candidateQuery' query expect:
-            - address: '$expectedResult.address'
-            - position: '$expectedResult.position'`,
-        async ({ candidateQuery, expectedResult }) => {
-          const resultMetropolitanFrance =
-            await httpAddressGateway.lookupStreetAddress(candidateQuery);
+          {
+            candidateQuery: "97150 Saint-Martin",
+            expectedResult: {
+              address: {
+                city: "Saint-Martin",
+                departmentCode: "971",
+                postcode: "97150",
+                streetNumberAndAddress: "",
+              },
+              position: {
+                lat: 18.06481835,
+                lon: -63.049171129033,
+              },
+              id: "123",
+            },
+          },
+        ])(
+          `Should work if searching for '$candidateQuery' query expect:
+              - address: '$expectedResult.address'
+              - position: '$expectedResult.position'`,
+          async ({ candidateQuery, expectedResult }) => {
+            const resultMetropolitanFrance =
+              await httpAddressGateway.lookupStreetAddress(candidateQuery);
 
-          const firstResult: AddressAndPosition | undefined =
-            resultMetropolitanFrance.at(0);
-          expectToEqual(firstResult?.address, expectedResult.address);
-          expect(expectedResult.position.lon).toBeCloseTo(
-            expectedResult.position.lon,
-          );
-          expect(expectedResult.position.lat).toBeCloseTo(
-            expectedResult.position.lat,
-            3,
-          );
-        },
-        10000,
-      );
+            const firstResult: AddressAndPosition | undefined =
+              resultMetropolitanFrance.at(0);
+            expectToEqual(firstResult?.address, expectedResult.address);
+            expect(expectedResult.position.lon).toBeCloseTo(
+              expectedResult.position.lon,
+            );
+            expect(expectedResult.position.lat).toBeCloseTo(
+              expectedResult.position.lat,
+              3,
+            );
+          },
+          10000,
+        );
+      });
     });
 
     it("Should return expected address DTO when providing address with special characters.", async () => {
