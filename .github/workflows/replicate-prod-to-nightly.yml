@@ -21,7 +21,7 @@ jobs:
 
       - name: Dump the remote database data and restore it to the local database.
         run: >-
-          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run bash -c "
+          scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL bash -c "
                 echo '> activate Scalingo CLI, PG then login' &&
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
