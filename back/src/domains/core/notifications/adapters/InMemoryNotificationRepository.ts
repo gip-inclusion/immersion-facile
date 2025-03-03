@@ -47,7 +47,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     ])[0];
   }
 
-  public async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
+  public async getLastEmailsByFilters(filters: EmailNotificationFilters = {}) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
@@ -59,21 +59,19 @@ export class InMemoryNotificationRepository implements NotificationRepository {
           return false;
 
         if (
-          filters.emailKind &&
-          notification.templatedContent.kind !== filters.emailKind
+          filters.emailType &&
+          notification.templatedContent.kind !== filters.emailType
         )
           return false;
 
-        return filters.since
-          ? new Date(notification.createdAt) > filters.since
-          : true;
+        return true;
       },
     );
   }
 
   public async getLastNotifications() {
     return {
-      emails: await this.getEmailsByFilters(),
+      emails: await this.getLastEmailsByFilters(),
       sms: this.notifications.filter(
         (notification): notification is SmsNotification =>
           notification.kind === "sms",
