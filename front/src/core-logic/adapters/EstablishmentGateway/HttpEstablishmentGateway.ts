@@ -1,6 +1,5 @@
 import { Observable, from } from "rxjs";
 import {
-  EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
   InclusionConnectJwt,
@@ -20,10 +19,14 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public addFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
+    jwt: InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
-        .addFormEstablishment({ body: formEstablishment })
+        .addFormEstablishment({
+          body: formEstablishment,
+          headers: { authorization: jwt },
+        })
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => {
@@ -69,7 +72,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: InclusionConnectJwt,
   ): Observable<FormEstablishmentDto> {
     return from(
       this.httpClient
@@ -91,26 +94,9 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
     );
   }
 
-  public requestEstablishmentModification$(siret: SiretDto): Observable<void> {
-    return from(
-      this.httpClient
-        .requestEmailToUpdateFormRoute({
-          urlParams: { siret },
-        })
-        .then((response) =>
-          match(response)
-            .with({ status: 201 }, () => {
-              /* void */
-            })
-            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
-            .otherwise(otherwiseThrow),
-        ),
-    );
-  }
-
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: InclusionConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient

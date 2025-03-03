@@ -1,24 +1,21 @@
 import { Observable } from "rxjs";
-import {
-  EstablishmentJwt,
-  FormEstablishmentDto,
-  InclusionConnectJwt,
-  SiretDto,
-} from "shared";
+import { FormEstablishmentDto, InclusionConnectJwt, SiretDto } from "shared";
 
 export interface EstablishmentGateway {
   deleteEstablishment$(
     siret: SiretDto,
     jwt: InclusionConnectJwt,
   ): Observable<void>;
-  addFormEstablishment$(establishment: FormEstablishmentDto): Observable<void>;
-  requestEstablishmentModification$(siret: SiretDto): Observable<void>;
+  addFormEstablishment$(
+    establishment: FormEstablishmentDto,
+    jwt: InclusionConnectJwt,
+  ): Observable<void>;
   getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: InclusionConnectJwt,
   ): Observable<FormEstablishmentDto>;
   updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: InclusionConnectJwt,
   ): Observable<void>;
 }
