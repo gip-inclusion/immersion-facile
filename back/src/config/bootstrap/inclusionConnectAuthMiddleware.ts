@@ -41,8 +41,10 @@ export const makeInclusionConnectAuthMiddleware = (
         message:
           "name" in error && error.name === "TokenExpiredError"
             ? inclusionConnectTokenExpiredMessage
-            : "Provided token is invalid",
+            : invalidTokenMessage,
       });
     }
   };
 };
+
+export const invalidTokenMessage = "Provided token is invalid";
