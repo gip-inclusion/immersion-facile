@@ -7,6 +7,34 @@ export const crispDeleteReason =
 export const conventionFromTally = "conv-id-from-tally";
 export const crispTicketSiret = "11112222333344";
 
+export const tallyFormCase0TicketToSkip: TallyForm = {
+  eventId: "6a49da03-cc7a-4544-bdd4-fc8ef70eb295",
+  eventType: "FORM_RESPONSE",
+  createdAt: "2025-03-03T13:36:54.748Z",
+  data: {
+    responseId: "5yveaN",
+    submissionId: "5yveaN",
+    respondentId: "25DPxV",
+    formId: "mBdQQe",
+    formName: "[Support] Faire une demande de contact (réponse en 48h ouvrées)",
+    createdAt: "2025-03-03T13:36:54.000Z",
+    fields: [
+      {
+        key: "question_818ZDA_5439773a-d891-4197-871f-bd50a6bb7c86",
+        label: "segment",
+        type: "CALCULATED_FIELDS",
+        value: "email,prescripteur,close-ticket",
+      },
+      {
+        key: "question_818ZDA_ebb6daf8-6141-4b37-a9c2-58af14389a59",
+        label: "close_ticket",
+        type: "CALCULATED_FIELDS",
+        value: "true",
+      },
+    ],
+  },
+};
+
 export const tallyFormCase1: TallyForm = {
   eventId: "74e8fd8e-87b1-43cb-be8c-408ca0171064",
   eventType: "FORM_RESPONSE",

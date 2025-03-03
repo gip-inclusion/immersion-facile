@@ -14,6 +14,8 @@ const whyStopToWelcomeImmersionKey = "question_eq2Jxo";
 const youAreKey = "question_PpRzBx";
 const youAre2Key = "question_VGQYoJ";
 const youAre3Key = "question_vGEzzv";
+const isTicketToSkipKey =
+  "question_818ZDA_ebb6daf8-6141-4b37-a9c2-58af14389a59";
 
 const makeGetValueFromMultipleChoiceField =
   (fields: TallyForm["data"]["fields"]) =>
@@ -55,6 +57,10 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
     const getValueFromMultipleChoice =
       makeGetValueFromMultipleChoiceField(fields);
     const getInputValue = makeGetInputValue(fields);
+
+    const isTicketToSkip = getInputValue(isTicketToSkipKey);
+    if (isTicketToSkip?.toLowerCase() === "true") return;
+
     const segments = getInputValue(segmentKey)?.split(",") ?? [];
 
     const email = getEmail(fields, inputParams.eventId);
