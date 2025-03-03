@@ -1,10 +1,5 @@
 import { type Observable, delay, of } from "rxjs";
-import type {
-  ConnectedUserJwt,
-  EstablishmentJwt,
-  FormEstablishmentDto,
-  SiretDto,
-} from "shared";
+import type { ConnectedUserJwt, FormEstablishmentDto, SiretDto } from "shared";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
@@ -32,7 +27,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    _jwt: ConnectedUserJwt | EstablishmentJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<FormEstablishmentDto> {
     const establishment = this.establishments.find(
       (establishment) => establishment.siret === siret,
@@ -41,13 +36,9 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     throw new Error(`Establishment with siret ${siret} not found.`);
   }
 
-  public requestEstablishmentModification$(_siret: SiretDto): Observable<void> {
-    throw new Error("Method not implemented.");
-  }
-
   public updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt | ConnectedUserJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<void> {
     this.establishments.map((currentEstablishment) =>
       establishment.siret === currentEstablishment.siret
