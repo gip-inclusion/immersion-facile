@@ -1,9 +1,9 @@
 import { Observable, from } from "rxjs";
 import {
+  ConnectedUserJwt,
   EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
-  InclusionConnectJwt,
   SiretDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -36,7 +36,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public deleteEstablishment$(
     siret: SiretDto,
-    jwt: InclusionConnectJwt,
+    jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -69,7 +69,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: EstablishmentJwt | ConnectedUserJwt,
   ): Observable<FormEstablishmentDto> {
     return from(
       this.httpClient
@@ -110,7 +110,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: EstablishmentJwt | ConnectedUserJwt,
   ): Observable<void> {
     return from(
       this.httpClient

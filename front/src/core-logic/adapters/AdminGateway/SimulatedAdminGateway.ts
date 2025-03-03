@@ -4,12 +4,12 @@ import {
   AgencyRight,
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUserJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   GetUsersFilters,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
@@ -62,7 +62,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
-    _token: InclusionConnectJwt,
+    _token: ConnectedUserJwt,
   ): Observable<EstablishmentBatchReport> {
     return of({
       numberOfEstablishmentsProcessed: 12,
@@ -103,14 +103,14 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public getAllApiConsumers$(
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ConnectedUserJwt,
   ): Observable<ApiConsumer[]> {
     return of(apiConsumers);
   }
 
   public getDashboardUrl$(
     { name }: GetDashboardParams,
-    _token: InclusionConnectJwt,
+    _token: ConnectedUserJwt,
   ): Observable<DashboardUrlAndName> {
     return of({ name, url: `http://${name}.com` });
   }
@@ -165,7 +165,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public getLastNotifications$(
-    _token: InclusionConnectJwt,
+    _token: ConnectedUserJwt,
   ): Observable<NotificationsByKind> {
     const notificationsByKind: NotificationsByKind = {
       emails: [],
@@ -185,7 +185,7 @@ export class SimulatedAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ConnectedUserJwt,
   ): Observable<ApiConsumerJwt> {
     return of(
       "fakeTokenJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk4ZDE3NTE3LWJlNDItNDY2OS04OTVkLTQ3ODE0MjBhNjhiOCIsImlhdCI6MTY5MTM5MTk4Mn0.WuGBIyvVa7rNaIxjZTgVTSIcU0LkN8GRDmFxXMYTRYFh0vK0c6ImupszTJF4VXHGpkkpE1AXasOwBWhOg",
@@ -221,7 +221,7 @@ export class SimulatedAdminGateway implements AdminGateway {
     params: {
       userId: UserId;
     },
-    _token: InclusionConnectJwt,
+    _token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser> {
     const icUser = simulatedUsers.find((user) => user.id === params.userId);
     if (!icUser) throw new Error(`User ${params.userId} not found`);

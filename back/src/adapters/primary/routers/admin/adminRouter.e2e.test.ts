@@ -5,8 +5,8 @@ import {
   AgencyRole,
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUserJwt,
   FeatureFlags,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
@@ -59,7 +59,7 @@ describe("Admin router", () => {
 
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
-  let token: InclusionConnectJwt;
+  let token: ConnectedUserJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;

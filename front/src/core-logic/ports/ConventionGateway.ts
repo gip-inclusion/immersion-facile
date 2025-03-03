@@ -1,6 +1,7 @@
 import { Observable } from "rxjs";
 import {
   ApiConsumerName,
+  ConnectedUserJwt,
   ConventionDto,
   ConventionId,
   ConventionJwt,
@@ -9,7 +10,6 @@ import {
   DashboardUrlAndName,
   DiscussionId,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -48,7 +48,7 @@ export interface ConventionGateway {
   ): Observable<void>;
   signConvention$(
     conventionId: ConventionId,
-    jwt: ConventionJwt | InclusionConnectJwt,
+    jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void>;
   shareConventionLinkByEmail(
     shareLinkByEmailDto: ShareLinkByEmailDto,
@@ -60,6 +60,6 @@ export interface ConventionGateway {
   ): Observable<void>;
   broadcastConventionAgain$(
     params: WithConventionId,
-    jwt: InclusionConnectJwt,
+    jwt: ConnectedUserJwt,
   ): Observable<void>;
 }

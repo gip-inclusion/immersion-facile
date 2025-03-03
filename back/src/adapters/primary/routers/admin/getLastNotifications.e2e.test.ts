@@ -1,8 +1,8 @@
 import { addDays } from "date-fns";
 import {
   AdminRoutes,
+  ConnectedUserJwt,
   EmailNotification,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   SmsNotification,
@@ -17,7 +17,7 @@ import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapte
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("Get last notification route", () => {
-  let adminToken: InclusionConnectJwt;
+  let adminToken: ConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<AdminRoutes>;
 

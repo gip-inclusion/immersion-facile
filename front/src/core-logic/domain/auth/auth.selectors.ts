@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { InclusionConnectJwt, authFailed } from "shared";
+import { ConnectedUserJwt, authFailed } from "shared";
 import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
@@ -27,7 +27,7 @@ const isPeConnected = createSelector(
 
 const isInclusionConnected = createSelector(
   currentFederatedIdentity,
-  (federatedIdentity) => federatedIdentity?.provider === "inclusionConnect",
+  (federatedIdentity) => federatedIdentity?.provider === "connectedUser",
 );
 
 const inclusionConnectToken = createSelector(
@@ -35,7 +35,7 @@ const inclusionConnectToken = createSelector(
   currentFederatedIdentity,
   (isInclusionConnected, federatedIdentity) =>
     isInclusionConnected
-      ? (federatedIdentity?.token as InclusionConnectJwt)
+      ? (federatedIdentity?.token as ConnectedUserJwt)
       : undefined,
 );
 

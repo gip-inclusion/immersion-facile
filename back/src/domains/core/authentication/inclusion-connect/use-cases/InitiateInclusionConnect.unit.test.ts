@@ -2,7 +2,6 @@ import {
   WithSourcePage,
   allowedStartOAuthLoginPages,
   expectToEqual,
-  oAuthGatewayProviders,
   queryParamsAsString,
 } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -15,55 +14,51 @@ import {
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 
 describe("InitiateInclusionConnect usecase", () => {
-  describe.each(oAuthGatewayProviders)(
-    "With OAuthGateway mode '%s'",
-    (provider) => {
-      it.each(allowedStartOAuthLoginPages)(
-        "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
-        async (page) => {
-          const state = "my-state";
-          const nonce = "my-nonce";
-          const uow = createInMemoryUow();
-          const uuidGenerator = new TestUuidGenerator();
-          const useCase = new InitiateInclusionConnect(
-            new InMemoryUowPerformer(uow),
-            uuidGenerator,
-            new InMemoryOAuthGateway(fakeProviderConfig),
-          );
-          expect(provider).toBe("proConnect");
+  describe("With OAuthGateway mode 'proConnect'", () => {
+    it.each(allowedStartOAuthLoginPages)(
+      "construct redirect url for %s with expected query params, and stores nounce and state in ongoingOAuth",
+      async (page) => {
+        const state = "my-state";
+        const nonce = "my-nonce";
+        const uow = createInMemoryUow();
+        const uuidGenerator = new TestUuidGenerator();
+        const useCase = new InitiateInclusionConnect(
+          new InMemoryUowPerformer(uow),
+          uuidGenerator,
+          new InMemoryOAuthGateway(fakeProviderConfig),
+        );
 
-          uuidGenerator.setNextUuids([nonce, state]);
+        uuidGenerator.setNextUuids([nonce, state]);
 
-          const sourcePage: WithSourcePage = {
-            page,
-          };
-          const redirectUrl = await useCase.execute(sourcePage);
-          const loginEndpoint = "login-pro-connect";
+        const sourcePage: WithSourcePage = {
+          page,
+        };
+        const redirectUrl = await useCase.execute(sourcePage);
+        const loginEndpoint = "login-pro-connect";
 
-          expectToEqual(
-            redirectUrl,
-            encodeURI(
-              `${
-                fakeProviderConfig.providerBaseUri
-              }/${loginEndpoint}?${queryParamsAsString({
-                page,
-                nonce,
-                state,
-              })}`,
-            ),
-          );
-
-          expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
-            {
+        expectToEqual(
+          redirectUrl,
+          encodeURI(
+            `${
+              fakeProviderConfig.providerBaseUri
+            }/${loginEndpoint}?${queryParamsAsString({
+              page,
               nonce,
               state,
-              provider: "proConnect",
-              externalId: undefined,
-              accessToken: undefined,
-            },
-          ]);
-        },
-      );
-    },
-  );
+            })}`,
+          ),
+        );
+
+        expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+          {
+            nonce,
+            state,
+            provider: "proConnect",
+            externalId: undefined,
+            accessToken: undefined,
+          },
+        ]);
+      },
+    );
+  });
 });

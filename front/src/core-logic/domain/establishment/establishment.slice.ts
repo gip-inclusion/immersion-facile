@@ -1,8 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
+  ConnectedUserJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
-  InclusionConnectJwt,
   SiretDto,
   defaultMaxContactsPerMonth,
 } from "shared";
@@ -14,17 +14,17 @@ import {
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: EstablishmentJwt | InclusionConnectJwt;
+  jwt: EstablishmentJwt | ConnectedUserJwt;
 };
 
 export type EstablishmentDeletePayload = {
   siret: SiretDto;
-  jwt: InclusionConnectJwt;
+  jwt: ConnectedUserJwt;
 };
 
 export type SiretAndJwtPayload = {
   siret: SiretDto;
-  jwt: EstablishmentJwt | InclusionConnectJwt;
+  jwt: EstablishmentJwt | ConnectedUserJwt;
 };
 
 export type EstablishmentRequestedPayload =

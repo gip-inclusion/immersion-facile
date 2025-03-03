@@ -4,8 +4,8 @@ import {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
@@ -18,15 +18,15 @@ export interface AgencyGateway {
   addAgency$(agency: CreateAgencyDto): Observable<void>;
   createUserForAgency$(
     params: UserParamsForAgency,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser>;
   getAgencyById$(
     agencyId: AgencyId,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<AgencyDto>;
   getAgencyUsers$(
     agencyId: AgencyId,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser[]>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
@@ -35,22 +35,22 @@ export interface AgencyGateway {
     filter: ListAgencyOptionsRequestDto,
   ): Observable<AgencyOption[]>;
   listAgencyOptionsNeedingReview$(
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ): Observable<AgencyOption[]>;
   updateAgency$(
     agencyDto: AgencyDto,
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ): Observable<void>;
   updateUserAgencyRight$(
     params: UserParamsForAgency,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void>;
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void>;
   validateOrRejectAgency$(
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void>;
 }

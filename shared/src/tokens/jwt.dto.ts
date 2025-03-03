@@ -4,15 +4,15 @@ import { PayloadKey } from "./jwtPayload.dto";
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
 export type ConventionJwt = Flavor<string, "ConventionJwt">;
 export type EstablishmentJwt = Flavor<string, "EstablishmentJwt">;
-export type InclusionConnectJwt = Flavor<string, "InclusionConnectJwt">;
+export type ConnectedUserJwt = Flavor<string, "ConnectedUserJwt">;
 
 export type AppSupportedJwt =
   | ApiConsumerJwt
   | ConventionJwt
   | EstablishmentJwt
-  | InclusionConnectJwt;
+  | ConnectedUserJwt;
 
-export type ConventionSupportedJwt = ConventionJwt | InclusionConnectJwt;
+export type ConventionSupportedJwt = ConventionJwt | ConnectedUserJwt;
 
 export const currentJwtVersions: Record<PayloadKey, number> = {
   convention: 1,

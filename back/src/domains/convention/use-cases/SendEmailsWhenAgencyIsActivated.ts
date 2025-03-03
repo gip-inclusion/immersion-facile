@@ -68,7 +68,7 @@ export class SendEmailsWhenAgencyIsActivated extends TransactionalUseCase<WithAg
         };
       });
 
-    await this.#saveNotificationAndRelatedEvent(uow, {
+    this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
         kind: "AGENCY_WAS_ACTIVATED",

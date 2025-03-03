@@ -1,7 +1,7 @@
 import {
+  ConnectedUserJwt,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectJwt,
   SiretEstablishmentDto,
   expectObjectsToMatch,
   expectToEqual,
@@ -448,7 +448,7 @@ describe("Establishment", () => {
   });
 
   describe("establishment deletion", () => {
-    const backOfficeJwt: InclusionConnectJwt = "backoffice-jwt";
+    const backOfficeJwt: ConnectedUserJwt = "backoffice-jwt";
 
     it("should delete requested establishment", () => {
       expectStoreToMatchInitialState();

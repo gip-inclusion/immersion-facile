@@ -26,7 +26,7 @@ const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
 };
 
 const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
-  provider: "inclusionConnect",
+  provider: "connectedUser",
   token: "123",
   email: "john.doe@mail.com",
   firstName: "John",
