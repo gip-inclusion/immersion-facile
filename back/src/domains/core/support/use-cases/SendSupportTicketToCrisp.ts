@@ -1,7 +1,10 @@
 import { ConventionId, TallyForm, tallyFormSchema } from "shared";
+import { createLogger } from "../../../../utils/logger";
 import { createTransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import { CrispGateway } from "../ports/CrispGateway";
+
+const logger = createLogger(__filename);
 
 const segmentKey = "question_818ZDA_5439773a-d891-4197-871f-bd50a6bb7c86";
 const emailKey = "question_MeYNZk";
@@ -59,9 +62,17 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
     const getInputValue = makeGetInputValue(fields);
 
     const isTicketToSkip = getInputValue(isTicketToSkipKey);
-    if (isTicketToSkip?.toLowerCase() === "true") return;
+    const rawSegments = getInputValue(segmentKey)?.split(",") ?? [];
 
-    const segments = getInputValue(segmentKey)?.split(",") ?? [];
+    if (isTicketToSkip?.toLowerCase() === "true") {
+      logger.info({
+        crispTicket: {
+          kind: "Ticket self solved",
+          segments: [...new Set(rawSegments)],
+        },
+      });
+      return;
+    }
 
     const email = getEmail(fields, inputParams.eventId);
     const message = getMessage(getInputValue, inputParams.eventId);
@@ -94,15 +105,19 @@ export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
 
     const siret = getInputValue(siretKey);
 
+    const segments = [
+      ...new Set([
+        ...rawSegments,
+        ...(conventionRelatedData?.extraSegment ?? []),
+      ]),
+    ];
+
+    logger.warn({ crispTicket: { kind: "Ticket sent to Crisp", segments } });
+
     await crispApi.initiateConversation({
       message,
       metadata: {
-        segments: [
-          ...new Set([
-            ...segments,
-            ...(conventionRelatedData?.extraSegment ?? []),
-          ]),
-        ],
+        segments,
         email,
       },
       helperNote: [

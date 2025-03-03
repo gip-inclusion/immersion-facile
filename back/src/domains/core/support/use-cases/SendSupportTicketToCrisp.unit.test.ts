@@ -1,4 +1,4 @@
-import { ConventionDtoBuilder } from "shared";
+import { ConventionDtoBuilder, TallyForm } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   InMemoryUnitOfWork,
@@ -204,7 +204,12 @@ https://app-smtp.brevo.com/log
           },
         },
       },
-    ])(
+    ] satisfies Array<
+      { name: string; tallyForm: TallyForm } & (
+        | { expectNotCalled: true }
+        | { expectedParams: InitiateCrispConversationParams }
+      )
+    >)(
       "Ticket on crisp: $name",
       async ({ tallyForm, expectedParams, expectNotCalled }) => {
         await sendSupportTicketToCrisp.execute(tallyForm);
@@ -216,10 +221,8 @@ https://app-smtp.brevo.com/log
   });
 
   const expectCrispInitiatedConversationParams = (
-    params: (InitiateCrispConversationParams | undefined)[],
+    params: InitiateCrispConversationParams[],
   ) => {
-    if (params.some((p) => p === undefined))
-      throw new Error("some param was : undefined");
     expect(crispApi.initiatedConversationParams).toEqual(params);
   };
 });

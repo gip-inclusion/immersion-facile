@@ -90,6 +90,10 @@ type ApiConsumerCall = {
 };
 
 type LoggerParams = Partial<{
+  crispTicket: {
+    kind: "Ticket self solved" | "Ticket sent to Crisp";
+    segments?: string[];
+  };
   partnerApiCall: PartnerApiCall;
   cacheKey: string;
   apiConsumerCall: ApiConsumerCall;
@@ -207,6 +211,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       siret,
       romeLabel,
       apiConsumerCall,
+      crispTicket,
       ...rest
     }) => {
       const _noValuesForgotten: Record<string, never> = rest;
@@ -244,6 +249,7 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         siret,
         romeLabel,
         cacheKey,
+        crispTicket,
       };
 
       const opacifiedWithoutNullOrUndefined = pickBy(
