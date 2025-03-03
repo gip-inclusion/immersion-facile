@@ -1,4 +1,4 @@
-import { SignatoryRole } from "./role.dto";
+import { AgencyModifierRole, SignatoryRole } from "./role.dto";
 
 export const signatoryTitleByRole: Record<SignatoryRole, string> = {
   beneficiary: "Le bénéficiaire",
@@ -6,4 +6,9 @@ export const signatoryTitleByRole: Record<SignatoryRole, string> = {
   "establishment-representative": "Le représentant de l'entreprise",
   "beneficiary-current-employer":
     "Le représentant de l'entreprise actuelle du candidat",
+};
+
+export const agencyModifierTitleByRole: Record<AgencyModifierRole, string> = {
+  counsellor: "conseiller",
+  validator: "valideur",
 };
