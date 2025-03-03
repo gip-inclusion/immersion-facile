@@ -26,16 +26,16 @@ import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPer
 
 const logger = createLogger(__filename);
 
-type SendEmailsWithAssessmentCreationLinkOutput = {
+type SendAssessmentFormNotificationsOutput = {
   errors?: Record<ConventionId, Error>;
   numberOfImmersionEndingTomorrow: number;
 };
 
-export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
+export class SendAssessmentFormNotifications extends TransactionalUseCase<
   {
     conventionEndDate?: DateRange;
   },
-  SendEmailsWithAssessmentCreationLinkOutput
+  SendAssessmentFormNotificationsOutput
 > {
   protected inputSchema = z.object({
     conventionEndDate: withDateRangeSchema.optional(),
@@ -69,7 +69,7 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
       conventionEndDate: DateRange;
     },
     uow: UnitOfWork,
-  ): Promise<SendEmailsWithAssessmentCreationLinkOutput> {
+  ): Promise<SendAssessmentFormNotificationsOutput> {
     const now = this.#timeGateway.now();
     const conventions =
       await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
@@ -85,13 +85,15 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     if (conventions.length === 0) return { numberOfImmersionEndingTomorrow: 0 };
 
     const errors: Record<ConventionId, Error> = {};
+
     await Promise.all(
       conventions.map(async (convention) => {
-        await this.#sendEmailsWithAssessmentCreationLink(uow, convention).catch(
-          (error) => {
-            errors[convention.id] = castError(error);
-          },
-        );
+        try {
+          await this.#sendEmailsWithAssessmentCreationLink({ uow, convention });
+          await this.#sendEmailToBeneficiary({ uow, convention });
+        } catch (error) {
+          errors[convention.id] = castError(error);
+        }
       }),
     );
 
@@ -101,10 +103,49 @@ export class SendEmailsWithAssessmentCreationLink extends TransactionalUseCase<
     };
   }
 
-  async #sendEmailsWithAssessmentCreationLink(
-    uow: UnitOfWork,
-    convention: ConventionDto,
-  ) {
+  async #sendEmailToBeneficiary({
+    uow,
+    convention,
+  }: {
+    uow: UnitOfWork;
+    convention: ConventionDto;
+  }) {
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: {
+        kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+        recipients: [convention.signatories.beneficiary.email],
+        sender: immersionFacileNoReplyEmailSender,
+        params: {
+          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          businessName: convention.businessName,
+          conventionId: convention.id,
+          internshipKind: convention.internshipKind,
+        },
+      },
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+      },
+    });
+
+    await uow.outboxRepository.save(
+      this.#createNewEvent({
+        topic: "BeneficiaryAssessmentEmailSent",
+        payload: { id: convention.id },
+      }),
+    );
+  }
+
+  async #sendEmailsWithAssessmentCreationLink({
+    uow,
+    convention,
+  }: {
+    uow: UnitOfWork;
+    convention: ConventionDto;
+  }) {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
     if (!agency)
       throw new Error(`Missing agency ${convention.agencyId} on repository.`);

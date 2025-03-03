@@ -11,7 +11,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notificatio
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailsWithAssessmentCreationLink } from "../domains/establishment/use-cases/SendEmailsWithAssessmentCreationLink";
+import { SendAssessmentFormNotifications } from "../domains/establishment/use-cases/SendAssessmentFormNotifications";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 import { getDateRangeFromScriptParams } from "./utils";
@@ -23,8 +23,8 @@ import { getDateRangeFromScriptParams } from "./utils";
 const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
-const sendEmailsWithAssessmentCreationLinkScript = async () => {
-  logger.info({ message: "Starting to send Emails with assessment link" });
+const sendAssessmentFormNotificationsScript = async () => {
+  logger.info({ message: "Starting to send emails with assessment link" });
 
   const timeGateway = new RealTimeGateway();
   const now = timeGateway.now();
@@ -62,27 +62,26 @@ const sendEmailsWithAssessmentCreationLinkScript = async () => {
     timeGateway,
   );
 
-  const sendEmailsWithAssessmentCreationLink =
-    new SendEmailsWithAssessmentCreationLink(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
+  const sendAssessmentFormNotifications = new SendAssessmentFormNotifications(
+    uowPerformer,
+    saveNotificationAndRelatedEvent,
+    timeGateway,
+    makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
+    makeCreateNewEvent({
       timeGateway,
-      makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
-      makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-    );
+      uuidGenerator: new UuidV4Generator(),
+    }),
+  );
 
-  return sendEmailsWithAssessmentCreationLink.execute({
+  return sendAssessmentFormNotifications.execute({
     conventionEndDate: conventionFinishingRange,
   });
 };
 
 handleCRONScript(
-  "sendEmailsWithAssessmentCreationLinkScript",
+  "sendAssessmentFormNotificationsScript",
   config,
-  sendEmailsWithAssessmentCreationLinkScript,
+  sendAssessmentFormNotificationsScript,
   ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
     const failures = keys(errors);
     const numberOfFailures = failures.length;
