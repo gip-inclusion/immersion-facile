@@ -3,7 +3,6 @@ import {
   Email,
   ExternalId,
   IdToken,
-  OAuthGatewayProvider,
   WithIdToken,
   WithSourcePage,
 } from "shared";
@@ -40,16 +39,9 @@ export type GetLogoutUrlParams = WithIdToken & {
 };
 
 export interface OAuthGateway {
-  getLoginUrl(
-    params: GetLoginUrlParams,
-    provider: OAuthGatewayProvider,
-  ): Promise<AbsoluteUrl>;
+  getLoginUrl(params: GetLoginUrlParams): Promise<AbsoluteUrl>;
   getAccessToken: (
     params: GetAccessTokenParams,
-    provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
-  getLogoutUrl(
-    params: GetLogoutUrlParams,
-    provider: OAuthGatewayProvider,
-  ): Promise<AbsoluteUrl>;
+  getLogoutUrl(params: GetLogoutUrlParams): Promise<AbsoluteUrl>;
 }

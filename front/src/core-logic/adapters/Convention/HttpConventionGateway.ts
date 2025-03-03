@@ -11,8 +11,8 @@ import {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
   InclusionConnectedAllowedRoutes,
+  ProConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -40,7 +40,7 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public broadcastConventionAgain$(
     params: WithConventionId,
-    jwt: InclusionConnectJwt,
+    jwt: ProConnectJwt,
   ): Observable<void> {
     return from(
       this.allowedInclusionConnectClient
@@ -77,7 +77,7 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public getApiConsumersByConvention$(
     params: WithConventionId,
-    jwt: InclusionConnectJwt,
+    jwt: ProConnectJwt,
   ): Observable<ApiConsumerName[]> {
     return from(
       this.authenticatedHttpClient
@@ -200,7 +200,7 @@ export class HttpConventionGateway implements ConventionGateway {
 
   public signConvention$(
     conventionId: ConventionId,
-    jwt: ConventionJwt | InclusionConnectJwt,
+    jwt: ConventionJwt | ProConnectJwt,
   ): Observable<void> {
     return from(
       this.magicLinkHttpClient

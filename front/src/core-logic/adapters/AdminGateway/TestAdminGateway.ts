@@ -6,9 +6,9 @@ import {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetUsersFilters,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
+  ProConnectJwt,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserInList,
@@ -28,7 +28,7 @@ export class TestAdminGateway implements AdminGateway {
     InclusionConnectedUser[]
   >();
 
-  public getAllApiConsumers$ = (_adminToken: InclusionConnectJwt) =>
+  public getAllApiConsumers$ = (_adminToken: ProConnectJwt) =>
     this.apiConsumers$;
 
   public lastNotifications$ = new Subject<NotificationsByKind>();
@@ -56,7 +56,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ProConnectJwt,
   ) => {
     this.setFeatureFlagLastCalledWith = params;
     return this.setFeatureFlagResponse$;
@@ -64,7 +64,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     _establishmentBatch: FormEstablishmentBatchDto,
-    _token: InclusionConnectJwt,
+    _token: ProConnectJwt,
   ): Observable<EstablishmentBatchReport> {
     return this.establishmentBatchResponse$;
   }
@@ -87,7 +87,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public getLastNotifications$(
-    _token: InclusionConnectJwt,
+    _token: ProConnectJwt,
   ): Observable<NotificationsByKind> {
     return this.lastNotifications$;
   }
@@ -101,7 +101,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     _apiConsumer: ApiConsumer,
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ProConnectJwt,
   ): Observable<ApiConsumerJwt> {
     return this.saveApiConsumersResponse$;
   }

@@ -2,7 +2,7 @@ import { Observable, Subject } from "rxjs";
 import {
   EstablishmentJwt,
   FormEstablishmentDto,
-  InclusionConnectJwt,
+  ProConnectJwt,
   SiretDto,
 } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
@@ -26,7 +26,7 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public deleteEstablishment$(
     _siret: SiretDto,
-    _jwt: InclusionConnectJwt,
+    _jwt: ProConnectJwt,
   ): Observable<void> {
     return this.deleteEstablishmentResult$;
   }
@@ -44,7 +44,7 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt | InclusionConnectJwt,
+    _jwt: EstablishmentJwt | ProConnectJwt,
   ): Observable<void> {
     return this.editFormEstablishmentResult$;
   }

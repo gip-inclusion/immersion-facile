@@ -9,7 +9,7 @@ import {
   DashboardUrlAndName,
   DiscussionId,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
+  ProConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -48,7 +48,7 @@ export interface ConventionGateway {
   ): Observable<void>;
   signConvention$(
     conventionId: ConventionId,
-    jwt: ConventionJwt | InclusionConnectJwt,
+    jwt: ConventionJwt | ProConnectJwt,
   ): Observable<void>;
   shareConventionLinkByEmail(
     shareLinkByEmailDto: ShareLinkByEmailDto,
@@ -60,6 +60,6 @@ export interface ConventionGateway {
   ): Observable<void>;
   broadcastConventionAgain$(
     params: WithConventionId,
-    jwt: InclusionConnectJwt,
+    jwt: ProConnectJwt,
   ): Observable<void>;
 }

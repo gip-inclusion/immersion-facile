@@ -3,7 +3,6 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  oAuthGatewayProviders,
   queryParamsAsString,
 } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
@@ -31,59 +30,55 @@ const user: User = {
 };
 
 describe("GetInclusionConnectLogoutUrl", () => {
-  describe.each(oAuthGatewayProviders)(
-    "With OAuthGateway provider '%s'",
-    (provider) => {
-      let uow: InMemoryUnitOfWork;
-      let getInclusionConnectLogoutUrl: GetInclusionConnectLogoutUrl;
+  describe("With OAuthGateway provider 'proConnect'", () => {
+    let uow: InMemoryUnitOfWork;
+    let getInclusionConnectLogoutUrl: GetInclusionConnectLogoutUrl;
 
-      beforeEach(() => {
-        uow = createInMemoryUow();
-        uow.userRepository.users = [user];
-        getInclusionConnectLogoutUrl = makeGetInclusionConnectLogoutUrl({
-          uowPerformer: new InMemoryUowPerformer(uow),
-          deps: {
-            oAuthGateway: new InMemoryOAuthGateway(fakeProviderConfig),
-          },
-        });
+    beforeEach(() => {
+      uow = createInMemoryUow();
+      uow.userRepository.users = [user];
+      getInclusionConnectLogoutUrl = makeGetInclusionConnectLogoutUrl({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          oAuthGateway: new InMemoryOAuthGateway(fakeProviderConfig),
+        },
       });
+    });
 
-      it("throws when it does not find the ongoingOAuth", async () => {
-        uow.ongoingOAuthRepository.ongoingOAuths = [];
-        await expectPromiseToFailWithError(
-          getInclusionConnectLogoutUrl.execute({ idToken: "whatever" }, user),
-          errors.inclusionConnect.missingOAuth({}),
-        );
-      });
+    it("throws when it does not find the ongoingOAuth", async () => {
+      uow.ongoingOAuthRepository.ongoingOAuths = [];
+      await expectPromiseToFailWithError(
+        getInclusionConnectLogoutUrl.execute({ idToken: "whatever" }, user),
+        errors.inclusionConnect.missingOAuth({}),
+      );
+    });
 
-      it("returns the oAuth logout url from %s", async () => {
-        expect(provider).toBe("proConnect");
-        const ongoingOAuth: OngoingOAuth = {
-          state: "some-state",
-          nonce: "some-nonce",
-          provider: "proConnect",
-          userId: user.id,
-          externalId: user.externalId ?? undefined,
-          accessToken: "fake-access-token",
-        };
-        uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
-        const logoutSuffixe =
-          ongoingOAuth.provider === "proConnect"
-            ? "pro-connect"
-            : "inclusion-connect";
-        const idToken = "fake-id-token";
-        expectToEqual(
-          await getInclusionConnectLogoutUrl.execute({ idToken }, user),
-          `${
-            fakeProviderConfig.providerBaseUri
-          }/logout-${logoutSuffixe}?${queryParamsAsString({
-            postLogoutRedirectUrl:
-              fakeProviderConfig.immersionRedirectUri.afterLogout,
-            idToken,
-            state: ongoingOAuth.state,
-          })}`,
-        );
-      });
-    },
-  );
+    it("returns the oAuth logout url from %s", async () => {
+      const ongoingOAuth: OngoingOAuth = {
+        state: "some-state",
+        nonce: "some-nonce",
+        provider: "proConnect",
+        userId: user.id,
+        externalId: user.externalId ?? undefined,
+        accessToken: "fake-access-token",
+      };
+      uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
+      const logoutSuffixe =
+        ongoingOAuth.provider === "proConnect"
+          ? "pro-connect"
+          : "inclusion-connect";
+      const idToken = "fake-id-token";
+      expectToEqual(
+        await getInclusionConnectLogoutUrl.execute({ idToken }, user),
+        `${
+          fakeProviderConfig.providerBaseUri
+        }/logout-${logoutSuffixe}?${queryParamsAsString({
+          postLogoutRedirectUrl:
+            fakeProviderConfig.immersionRedirectUri.afterLogout,
+          idToken,
+          state: ongoingOAuth.state,
+        })}`,
+      );
+    });
+  });
 });

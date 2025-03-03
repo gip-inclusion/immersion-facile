@@ -5,7 +5,6 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  oAuthGatewayProviders,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -65,7 +64,7 @@ describe("PgAuthenticatedUserRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayProviders)(`With oAuthProvider '%s'`, () => {
+  describe(`With oAuthProvider 'proConnect'`, () => {
     describe("save()", () => {
       it("saves a user, than finds it from external_id, then updates it", async () => {
         await userRepository.save(user);

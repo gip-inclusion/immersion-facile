@@ -11,7 +11,7 @@ import {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
+  ProConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -66,7 +66,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   broadcastConventionAgain$(
     _params: WithConventionId,
-    _jwt: InclusionConnectJwt,
+    _jwt: ProConnectJwt,
   ): Observable<void> {
     return this.broadcastConventionAgainResult$;
   }
@@ -78,7 +78,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public getApiConsumersByConvention$(
     _params: WithConventionId,
-    _jwt: InclusionConnectJwt,
+    _jwt: ProConnectJwt,
   ): Observable<ApiConsumerName[]> {
     return this.getApiConsumersByconventionResult$;
   }
@@ -131,7 +131,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public signConvention$(
     _conventionId: ConventionId,
-    _jwt: ConventionJwt | InclusionConnectJwt,
+    _jwt: ConventionJwt | ProConnectJwt,
   ): Observable<void> {
     return this.conventionSignedResult$;
   }

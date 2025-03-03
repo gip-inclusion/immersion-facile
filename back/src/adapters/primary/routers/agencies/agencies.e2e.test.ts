@@ -4,8 +4,8 @@ import {
   AgencyDtoBuilder,
   AgencyRoutes,
   CreateAgencyDto,
-  InclusionConnectJwt,
   InclusionConnectedUserBuilder,
+  ProConnectJwt,
   agencyRoutes,
   currentJwtVersions,
   displayRouteName,
@@ -39,7 +39,7 @@ describe("Agency routes", () => {
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
-  let backofficeAdminToken: InclusionConnectJwt;
+  let backofficeAdminToken: ProConnectJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   beforeEach(async () => {

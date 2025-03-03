@@ -1,5 +1,5 @@
 import { Pool } from "pg";
-import { User, expectToEqual, oAuthGatewayProviders } from "shared";
+import { User, expectToEqual } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
@@ -31,13 +31,13 @@ describe("PgOngoingOAuthRepository", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayProviders)("with provider '%s'", (provider) => {
+  describe("with provider 'proConnect'", () => {
     it("saves an ongoing OAuth, then gets it from its states, then updates it, than gets ongoingOauth from userId", async () => {
       const state = "11111111-1111-1111-1111-111111111111";
       const ongoingOAuth: OngoingOAuth = {
         state,
         nonce: "123",
-        provider,
+        provider: "proConnect",
       };
       const user: User = {
         id: "22222222-2222-2222-2222-222222222222",
@@ -51,7 +51,10 @@ describe("PgOngoingOAuthRepository", () => {
       await pgOngoingOAuthRepository.save(ongoingOAuth);
 
       const fetchedFromState =
-        await pgOngoingOAuthRepository.findByStateAndProvider(state, provider);
+        await pgOngoingOAuthRepository.findByStateAndProvider(
+          state,
+          "proConnect",
+        );
       expectToEqual(fetchedFromState, ongoingOAuth);
 
       const results = await db

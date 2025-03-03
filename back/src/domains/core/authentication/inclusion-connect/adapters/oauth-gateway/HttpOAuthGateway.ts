@@ -1,6 +1,5 @@
 import {
   AbsoluteUrl,
-  OAuthGatewayProvider,
   WithSourcePage,
   decodeJwtWithoutSignatureCheck,
   errors,
@@ -138,22 +137,10 @@ export class HttpOAuthGateway implements OAuthGateway {
     };
   }
 
-  public async getLogoutUrl(
-    params: GetLogoutUrlParams,
-    provider: OAuthGatewayProvider,
-  ): Promise<AbsoluteUrl> {
-    const uriByProvider: Record<
-      OAuthGatewayProvider,
-      { uri: AbsoluteUrl; postLogoutRedirectUri: AbsoluteUrl }
-    > = {
-      proConnect: {
-        uri: `${this.#proConnectConfig.providerBaseUri}/session/end`,
-        postLogoutRedirectUri:
-          this.#proConnectConfig.immersionRedirectUri.afterLogout,
-      },
-    };
-
-    const { uri, postLogoutRedirectUri } = uriByProvider[provider];
+  public async getLogoutUrl(params: GetLogoutUrlParams): Promise<AbsoluteUrl> {
+    const uri: AbsoluteUrl = `${this.#proConnectConfig.providerBaseUri}/session/end`;
+    const postLogoutRedirectUri =
+      this.#proConnectConfig.immersionRedirectUri.afterLogout;
 
     return `${uri}?${queryParamsAsString<OAuthLogoutQueryParams>({
       state: params.state,

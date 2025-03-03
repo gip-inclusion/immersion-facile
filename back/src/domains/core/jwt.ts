@@ -8,8 +8,8 @@ import {
   ConventionJwtPayload,
   EstablishmentJwt,
   EstablishmentJwtPayload,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
+  ProConnectJwt,
 } from "shared";
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
@@ -32,7 +32,7 @@ type JwtMap =
   | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>
   | JwtTokenMapping<
       "inclusionConnect",
-      InclusionConnectJwt,
+      ProConnectJwt,
       InclusionConnectJwtPayload
     >
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;

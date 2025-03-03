@@ -6,9 +6,9 @@ import {
   AgencyPublicDisplayDto,
   AgencyRoutes,
   CreateAgencyDto,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
+  ProConnectJwt,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
@@ -60,7 +60,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public getAgencyAdminById$(
     agencyId: AgencyId,
-    adminToken: InclusionConnectJwt,
+    adminToken: ProConnectJwt,
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
@@ -78,7 +78,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   getAgencyById$(
     agencyId: AgencyId,
-    token: InclusionConnectJwt,
+    token: ProConnectJwt,
   ): Observable<AgencyDto> {
     return from(
       this.httpClient
@@ -95,7 +95,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
   getAgencyUsers$(
     agencyId: AgencyId,
-    token: InclusionConnectJwt,
+    token: ProConnectJwt,
   ): Observable<InclusionConnectedUser[]> {
     return from(
       this.httpClient
@@ -152,7 +152,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   // TODO Mieux identifier l'admin
 
   public listAgencyOptionsNeedingReview$(
-    adminToken: InclusionConnectJwt,
+    adminToken: ProConnectJwt,
   ): Observable<AgencyOption[]> {
     return from(
       this.httpClient
@@ -171,7 +171,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public updateAgency$(
     agencyDto: AgencyDto,
-    adminToken: InclusionConnectJwt,
+    adminToken: ProConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -192,7 +192,7 @@ export class HttpAgencyGateway implements AgencyGateway {
 
   public updateUserAgencyRight$(
     params: UserParamsForAgency,
-    token: InclusionConnectJwt,
+    token: ProConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -234,7 +234,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public async validateOrRejectAgency(
-    adminToken: InclusionConnectJwt,
+    adminToken: ProConnectJwt,
     { id, ...rest }: UpdateAgencyStatusParams,
   ): Promise<void> {
     await this.httpClient.updateAgencyStatus({
@@ -245,7 +245,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   }
 
   public validateOrRejectAgency$(
-    adminToken: InclusionConnectJwt,
+    adminToken: ProConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
     return from(

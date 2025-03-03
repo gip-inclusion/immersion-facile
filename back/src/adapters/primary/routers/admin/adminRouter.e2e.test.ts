@@ -6,10 +6,10 @@ import {
   ApiConsumer,
   ApiConsumerJwt,
   FeatureFlags,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
   InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  ProConnectJwt,
   SetFeatureFlagParam,
   User,
   adminRoutes,
@@ -59,7 +59,7 @@ describe("Admin router", () => {
 
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
-  let token: InclusionConnectJwt;
+  let token: ProConnectJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;

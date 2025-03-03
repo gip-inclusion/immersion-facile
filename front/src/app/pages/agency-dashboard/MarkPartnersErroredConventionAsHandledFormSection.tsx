@@ -9,8 +9,8 @@ import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  InclusionConnectJwt,
   MarkPartnersErroredConventionAsHandledRequest,
+  ProConnectJwt,
   domElementIds,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
@@ -30,7 +30,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
   jwt,
   isPeUser,
 }: {
-  jwt: InclusionConnectJwt;
+  jwt: ProConnectJwt;
   isPeUser: boolean;
 }) => {
   const methods = useForm<MarkPartnersErroredConventionAsHandledRequest>({
