@@ -16,6 +16,7 @@ import {
   crispMessageContent,
   crispTicketSiret,
   johnDoeEmail,
+  tallyFormCase0TicketToSkip,
   tallyFormCase1,
   tallyFormCase2WithConventionId,
   tallyFormCase3,
@@ -46,6 +47,11 @@ describe("SendSupportTicketToCrisp", () => {
 
   describe("It creates a ticket on crisp from different usecases", () => {
     it.each([
+      {
+        name: "case 0",
+        tallyForm: tallyFormCase0TicketToSkip,
+        expectNotCalled: true,
+      },
       {
         name: "case 1",
         tallyForm: tallyFormCase1,
@@ -198,15 +204,22 @@ https://app-smtp.brevo.com/log
           },
         },
       },
-    ])("Ticket on crisp: $name", async ({ tallyForm, expectedParams }) => {
-      await sendSupportTicketToCrisp.execute(tallyForm);
-      expectCrispInitiatedConversationParams([expectedParams]);
-    });
+    ])(
+      "Ticket on crisp: $name",
+      async ({ tallyForm, expectedParams, expectNotCalled }) => {
+        await sendSupportTicketToCrisp.execute(tallyForm);
+        expectNotCalled
+          ? expectCrispInitiatedConversationParams([])
+          : expectCrispInitiatedConversationParams([expectedParams]);
+      },
+    );
   });
 
   const expectCrispInitiatedConversationParams = (
-    params: InitiateCrispConversationParams[],
+    params: (InitiateCrispConversationParams | undefined)[],
   ) => {
+    if (params.some((p) => p === undefined))
+      throw new Error("some param was : undefined");
     expect(crispApi.initiatedConversationParams).toEqual(params);
   };
 });
