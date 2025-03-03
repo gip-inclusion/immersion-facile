@@ -241,22 +241,6 @@ const step3BusinessContact = async (
   );
   await expectLocatorToBeReadOnly(lastNameLocator);
 
-  // Update email first in order to unlock firstname & lastname fields
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.email}`,
-    businessContact.email,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-    businessContact.firstName,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-    businessContact.lastName,
-  );
-
   await page.fill(
     `#${domElementIds.establishment.edit.businessContact.job}`,
     businessContact.job,

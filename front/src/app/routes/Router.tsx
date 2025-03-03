@@ -179,7 +179,7 @@ const getPageByRouteName: {
       />
     ),
 
-  formEstablishment: () => <EstablishmentCreationFormPage />,
+  formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),

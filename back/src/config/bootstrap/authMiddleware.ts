@@ -14,6 +14,7 @@ import { JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 import { AppConfig } from "./appConfig";
+import { invalidTokenMessage } from "./inclusionConnectAuthMiddleware";
 
 const logger = createLogger(__filename);
 
@@ -62,11 +63,10 @@ const responseError = (
 
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
-  payloadKey: ExtractFromExisting<PayloadKey, "convention" | "establishment">,
+  payloadKey: ExtractFromExisting<PayloadKey, "convention">,
 ): RequestHandler => {
-  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig<
-    "convention" | "establishment" | "inclusionConnect"
-  >(config);
+  const { verifyJwt, verifyDeprecatedJwt } =
+    verifyJwtConfig<"convention">(config);
   return (req, res, next) => {
     const maybeJwt = req.headers.authorization;
     if (!maybeJwt) {
@@ -115,7 +115,7 @@ const sendAuthenticationError = (res: Response, error: Error) => {
   res.status(401);
   return res.json({
     status: 401,
-    message: "Provided token is invalid",
+    message: invalidTokenMessage,
   });
 };
 

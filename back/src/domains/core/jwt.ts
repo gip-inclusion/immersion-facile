@@ -6,15 +6,12 @@ import {
   CommonJwtPayload,
   ConventionJwt,
   ConventionJwtPayload,
-  EstablishmentJwt,
-  EstablishmentJwtPayload,
   InclusionConnectJwt,
   InclusionConnectJwtPayload,
 } from "shared";
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
 export type GenerateInclusionConnectJwt = GenerateJwtFn<"inclusionConnect">;
-export type GenerateEditFormEstablishmentJwt = GenerateJwtFn<"establishment">;
 export type GenerateApiConsumerJwt = GenerateJwtFn<"apiConsumer">;
 
 type JwtTokenMapping<
@@ -29,7 +26,6 @@ type JwtTokenMapping<
 
 type JwtMap =
   | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
-  | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>
   | JwtTokenMapping<
       "inclusionConnect",
       InclusionConnectJwt,

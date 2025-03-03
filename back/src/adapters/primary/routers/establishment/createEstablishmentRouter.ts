@@ -26,38 +26,37 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
     establishmentRouter,
   );
 
-  establishmentSharedRouter.addFormEstablishment((req, res) =>
-    sendHttpResponse(req, res, () =>
-      deps.useCases.insertEstablishmentAggregateFromForm.execute({
-        formEstablishment: req.body,
-      }),
-    ),
-  );
-
-  establishmentSharedRouter.requestEmailToUpdateFormRoute((req, res) =>
-    sendHttpResponse(req, res.status(201), () =>
-      deps.useCases.requestEditFormEstablishment.execute(req.params.siret),
-    ),
+  establishmentSharedRouter.addFormEstablishment(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.insertEstablishmentAggregateFromForm.execute(
+          {
+            formEstablishment: req.body,
+          },
+          req.payloads?.currentUser,
+        ),
+      ),
   );
 
   establishmentSharedRouter.getFormEstablishment(
-    deps.establishmentMagicLinkAuthMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
-          req.payloads?.establishment ?? req.payloads?.inclusion,
+          req.payloads?.inclusion,
         ),
       ),
   );
 
   establishmentSharedRouter.updateFormEstablishment(
-    deps.establishmentMagicLinkAuthMiddleware,
+    deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateEstablishmentAggregateFromForm.execute(
           { formEstablishment: req.body },
-          req.payloads?.establishment ?? req.payloads?.inclusion,
+          req.payloads?.inclusion,
         ),
       ),
   );

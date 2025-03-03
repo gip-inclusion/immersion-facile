@@ -36,14 +36,7 @@ export const createNewEstablishment =
       .click();
 
     await goToNextStep(page, 2, "create");
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.firstName}`,
-      businessContact.firstName,
-    );
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.lastName}`,
-      businessContact.lastName,
-    );
+
     await page.fill(
       `#${domElementIds.establishment.create.businessContact.job}`,
       businessContact.job,

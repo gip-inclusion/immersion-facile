@@ -15,6 +15,7 @@ import {
 } from "shared";
 import { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
@@ -408,7 +409,7 @@ describe("Agency routes", () => {
 
         expectHttpResponseToEqual(response, {
           status: 401,
-          body: { status: 401, message: "Provided token is invalid" },
+          body: { status: 401, message: invalidTokenMessage },
         });
       });
 
