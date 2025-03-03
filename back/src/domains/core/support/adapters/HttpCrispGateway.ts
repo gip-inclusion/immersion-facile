@@ -59,7 +59,7 @@ export class HttpCrispGateway implements CrispGateway {
       body: {
         type: "text",
         from: "user",
-        origin: "urn:tally",
+        origin: "email",
         content: `Message : ${params.message}`,
       },
       urlParams: { sessionId, websiteId: this.#websiteId },
@@ -78,7 +78,7 @@ export class HttpCrispGateway implements CrispGateway {
       body: {
         type: "note",
         from: "user",
-        origin: "urn:tally",
+        origin: "email",
         content: params.helperNote,
       },
       urlParams: { sessionId, websiteId: this.#websiteId },
