@@ -47,7 +47,7 @@ export const makeRemoveUserFromAgency = createTransactionalUseCase<
 
     const { [user.id]: _, ...usersRights } = agency.usersRights;
 
-    validateAgencyRights(agency.id, usersRights);
+    validateAgencyRights(agency.id, usersRights, agency.refersToAgencyId);
 
     await uow.agencyRepository.update({
       id: agency.id,
