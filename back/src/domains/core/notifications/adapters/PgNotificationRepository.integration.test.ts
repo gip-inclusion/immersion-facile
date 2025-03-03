@@ -244,7 +244,7 @@ describe("PgNotificationRepository", () => {
         smsNotification,
       ]);
 
-      const response = await pgNotificationRepository.getEmailsByFilters();
+      const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
@@ -265,12 +265,30 @@ describe("PgNotificationRepository", () => {
       );
     });
 
-    it("works", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters();
+    it("without filters", async () => {
+      const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
       );
+    });
+
+    describe("filters by email and kind", () => {
+      it("returns no result", async () => {
+        const response = await pgNotificationRepository.getLastEmailsByFilters({
+          email: "fake-email@email.com",
+          emailType: emailNotifications[0].templatedContent.kind,
+        });
+        expectToEqual(response, []);
+      });
+
+      it("returns 1 result", async () => {
+        const response = await pgNotificationRepository.getLastEmailsByFilters({
+          email: emailNotifications[0].templatedContent.recipients[0],
+          emailType: emailNotifications[0].templatedContent.kind,
+        });
+        expectToEqual(response, [emailNotifications[0]]);
+      });
     });
   });
 

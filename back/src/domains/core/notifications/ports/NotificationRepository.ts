@@ -9,8 +9,7 @@ import {
 
 export type EmailNotificationFilters = {
   email?: Email;
-  since?: Date;
-  emailKind?: EmailType;
+  emailType?: EmailType;
 };
 
 export interface NotificationRepository {
@@ -26,6 +25,8 @@ export interface NotificationRepository {
     emails: EmailNotification[];
     sms: SmsNotification[];
   }>;
-  getEmailsByFilters: () => Promise<EmailNotification[]>;
+  getLastEmailsByFilters: (
+    filters?: EmailNotificationFilters,
+  ) => Promise<EmailNotification[]>;
   deleteAllEmailAttachements: () => Promise<number>;
 }

@@ -28,11 +28,11 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendEmailsWithAssessmentCreationLink } from "./SendEmailsWithAssessmentCreationLink";
+import { SendAssessmentFormNotifications } from "./SendAssessmentFormNotifications";
 
 describe("SendEmailWithAssessmentCreationLink", () => {
   let uow: InMemoryUnitOfWork;
-  let sendEmailWithAssessmentCreationLink: SendEmailsWithAssessmentCreationLink;
+  let sendEmailWithAssessmentCreationLink: SendAssessmentFormNotifications;
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -101,17 +101,16 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       uuidGenerator,
       timeGateway,
     );
-    sendEmailWithAssessmentCreationLink =
-      new SendEmailsWithAssessmentCreationLink(
-        new InMemoryUowPerformer(uow),
-        saveNotificationAndRelatedEvent,
+    sendEmailWithAssessmentCreationLink = new SendAssessmentFormNotifications(
+      new InMemoryUowPerformer(uow),
+      saveNotificationAndRelatedEvent,
+      timeGateway,
+      fakeGenerateMagicLinkUrlFn,
+      makeCreateNewEvent({
         timeGateway,
-        fakeGenerateMagicLinkUrlFn,
-        makeCreateNewEvent({
-          timeGateway,
-          uuidGenerator,
-        }),
-      );
+        uuidGenerator,
+      }),
+    );
 
     uow.agencyRepository.agencies = [
       toAgencyWithRights(agency, {
@@ -124,7 +123,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
   });
 
   describe("Right paths", () => {
-    it("Sends an email to tutors and agency validators and counsellors with is_notied_by_email active for immersions that end in time range and are kind immersion", async () => {
+    it("Sends an email to tutors and agency validators and counsellors with is_notified_by_email active for immersions that end in time range and are kind immersion", async () => {
       // Arrange
 
       uow.conventionRepository.setConventions([
@@ -221,6 +220,25 @@ describe("SendEmailWithAssessmentCreationLink", () => {
               name: "Immersion Facilitée",
             },
           },
+          {
+            kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+            params: {
+              conventionId: conventionEndingTomorrow.id,
+              beneficiaryLastName:
+                conventionEndingTomorrow.signatories.beneficiary.lastName,
+              beneficiaryFirstName:
+                conventionEndingTomorrow.signatories.beneficiary.firstName,
+              businessName: conventionEndingTomorrow.businessName,
+              internshipKind: conventionEndingTomorrow.internshipKind,
+            },
+            recipients: [
+              conventionEndingTomorrow.signatories.beneficiary.email,
+            ],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
         ],
       });
 
@@ -237,6 +255,15 @@ describe("SendEmailWithAssessmentCreationLink", () => {
         {
           topic: "EmailWithLinkToCreateAssessmentSent",
           payload: { id: conventionEndingTomorrow.id },
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "BeneficiaryAssessmentEmailSent",
+          payload: {
+            id: conventionEndingTomorrow.id,
+          },
         },
       ]);
     });
@@ -298,6 +325,25 @@ describe("SendEmailWithAssessmentCreationLink", () => {
               name: "Immersion Facilitée",
             },
           },
+          {
+            kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+            params: {
+              conventionId: conventionCCIEndingTomorrow.id,
+              beneficiaryLastName:
+                conventionCCIEndingTomorrow.signatories.beneficiary.lastName,
+              beneficiaryFirstName:
+                conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
+              businessName: conventionCCIEndingTomorrow.businessName,
+              internshipKind: conventionCCIEndingTomorrow.internshipKind,
+            },
+            recipients: [
+              conventionCCIEndingTomorrow.signatories.beneficiary.email,
+            ],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
         ],
       });
 
@@ -308,6 +354,15 @@ describe("SendEmailWithAssessmentCreationLink", () => {
         {
           topic: "EmailWithLinkToCreateAssessmentSent",
           payload: { id: conventionEndingTomorrow.id },
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "BeneficiaryAssessmentEmailSent",
+          payload: {
+            id: conventionEndingTomorrow.id,
+          },
         },
       ]);
     });

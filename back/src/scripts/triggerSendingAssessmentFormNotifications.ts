@@ -1,34 +1,60 @@
 import { addDays } from "date-fns";
+import subDays from "date-fns/subDays";
 import { keys } from "ramda";
+import { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
+import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendBeneficiariesPdfAssessmentsEmails } from "../domains/establishment/use-cases/SendBeneficiariesPdfAssessmentsEmails";
+import { SendAssessmentFormNotifications } from "../domains/establishment/use-cases/SendAssessmentFormNotifications";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 import { getDateRangeFromScriptParams } from "./utils";
 
 /**
- *  we can pass date params to this script like this: pnpm back trigger-sending-beneficiary-assessment-emails 2024-07-01 2024-01-24
+ *  we can pass date params to this script like this: pnpm back trigger-sending-emails-with-assessment-creation-link 2024-07-01 2024-01-24
  */
 
 const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
-const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
-  logger.info({ message: "Starting to send Beneficiary assessment Emails" });
+const sendAssessmentFormNotificationsScript = async () => {
+  logger.info({ message: "Starting to send emails with assessment link" });
 
   const timeGateway = new RealTimeGateway();
+  const now = timeGateway.now();
+  const todayAndAround = {
+    from: subDays(now, 1),
+    to: addDays(now, 1),
+  };
+  const conventionFinishingRange: DateRange =
+    getDateRangeFromScriptParams({
+      scriptParams: process.argv,
+    }) ?? todayAndAround;
+
+  if (conventionFinishingRange.to > addDays(now, 1)) {
+    const message =
+      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne seront pas terminées demain.";
+    logger.error({
+      message,
+    });
+    throw new Error(message);
+  }
 
   const { uowPerformer } = createUowPerformer(
     config,
     createGetPgPoolFn(config),
   );
 
+  const generateConventionJwt = makeGenerateJwtES256<"convention">(
+    config.jwtPrivateKey,
+    3600 * 24 * 30,
+  );
   const uuidGenerator = new UuidV4Generator();
 
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
@@ -36,43 +62,26 @@ const sendBeneficiaryPdfAssessmentEmailsScript = async () => {
     timeGateway,
   );
 
-  const sendBeneficiariesPdfAssesmentsEmails =
-    new SendBeneficiariesPdfAssessmentsEmails(
-      uowPerformer,
-      saveNotificationAndRelatedEvent,
-      makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new UuidV4Generator(),
-      }),
-    );
+  const sendAssessmentFormNotifications = new SendAssessmentFormNotifications(
+    uowPerformer,
+    saveNotificationAndRelatedEvent,
+    timeGateway,
+    makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
+    makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator: new UuidV4Generator(),
+    }),
+  );
 
-  const now = timeGateway.now();
-  const tomorrow = {
-    from: addDays(now, 1),
-    to: addDays(now, 2),
-  };
-  const conventionEndDate =
-    getDateRangeFromScriptParams({
-      scriptParams: process.argv,
-    }) ?? tomorrow;
-
-  if (conventionEndDate.to > addDays(now, 2)) {
-    const message =
-      "Attention, vous êtes sur le point d'envoyer des bilans concernant des immersions qui ne sont pas encore terminées.";
-    logger.error({
-      message,
-    });
-    throw new Error(message);
-  }
-  return sendBeneficiariesPdfAssesmentsEmails.execute({
-    conventionEndDate,
+  return sendAssessmentFormNotifications.execute({
+    conventionEndDate: conventionFinishingRange,
   });
 };
 
 handleCRONScript(
-  "sendBeneficiaryPdfAssessmentEmailsScript",
+  "sendAssessmentFormNotificationsScript",
   config,
-  sendBeneficiaryPdfAssessmentEmailsScript,
+  sendAssessmentFormNotificationsScript,
   ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
     const failures = keys(errors);
     const numberOfFailures = failures.length;
