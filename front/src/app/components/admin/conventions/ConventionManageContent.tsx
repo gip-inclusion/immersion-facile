@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -9,7 +8,6 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredMagicLinkErrorMessage,
 } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
@@ -84,7 +82,6 @@ export const ConventionManageContent = ({
 
   return (
     <>
-      <Feedback topic="remind-signatories" className={fr.cx("fr-my-2w")} />
       <ConventionValidation convention={convention} jwtParams={jwtParams} />
       <ConventionManageActions
         jwtParams={jwtParams}
