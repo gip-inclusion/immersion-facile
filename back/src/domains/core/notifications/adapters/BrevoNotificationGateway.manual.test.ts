@@ -102,12 +102,12 @@ describe("BrevoNotificationGateway manual", () => {
 
   it("should send email with attachment correctly", async () => {
     const response = await notificationGateway.sendEmail({
-      kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+      kind: "TEST_EMAIL",
       recipients: ["recette@immersion-facile.beta.gouv.fr"],
       params: {
-        businessAddresses: ["1 rue de la paix"],
-        businessName: "Super Corp",
-        editFrontUrl: "www.google.com",
+        input1: "test input 1",
+        input2: "test input 2",
+        url: "https://www.google.fr",
       },
       attachments: [
         {
