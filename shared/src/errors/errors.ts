@@ -29,7 +29,11 @@ import {
   NotificationId,
   NotificationKind,
 } from "../notifications/notifications.dto";
-import { Role } from "../role/role.dto";
+import { AgencyModifierRole, Role, SignatoryRole } from "../role/role.dto";
+import {
+  agencyModifierTitleByRole,
+  signatoryTitleByRole,
+} from "../role/role.utils";
 import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ShortLinkId } from "../shortLink/shortLink.dto";
 import { SiretDto } from "../siret/siret";
@@ -178,6 +182,16 @@ export const errors = {
       role,
     }: { conventionId: ConventionId; role: Role }) =>
       new BadRequestError(`There is no ${role} on convention ${conventionId}.`),
+    missingSignatorySignature: ({ role }: { role: SignatoryRole }) =>
+      new BadRequestError(
+        `Signature manquante pour ${signatoryTitleByRole[role]}.`,
+      ),
+    missingAgencyApprovalOrValidation: ({
+      role,
+    }: { role: AgencyModifierRole }) =>
+      new BadRequestError(
+        `Validation manquante par le ${agencyModifierTitleByRole[role]}.`,
+      ),
     unsupportedRoleRenewMagicLink: ({ role }: { role: Role }) =>
       new BadRequestError(
         `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,

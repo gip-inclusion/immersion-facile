@@ -10,11 +10,14 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  AgencyModifierRole,
   ConventionId,
   ConventionReadDto,
+  SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
+  errors,
   isConventionRenewed,
   isStringDate,
   makeSiretDescriptionLink,
@@ -35,8 +38,21 @@ import { Route } from "type-route";
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
 
-const throwOnMissingSignDate = (signedAt: string | undefined): string => {
-  if (!signedAt) throw new Error("Signature date is missing.");
+const throwOnMissingSignDate = (
+  actor: SignatoryRole,
+  signedAt: string | undefined,
+): string => {
+  if (!signedAt)
+    throw errors.convention.missingSignatorySignature({ role: actor });
+  return signedAt;
+};
+
+const throwOnMissingApprovalOrValidationDate = (
+  actor: AgencyModifierRole,
+  signedAt: string | undefined,
+): string => {
+  if (!signedAt)
+    throw errors.convention.missingAgencyApprovalOrValidation({ role: actor });
   return signedAt;
 };
 
@@ -530,7 +546,9 @@ export const ConventionDocumentPage = ({
               (signé le{" "}
               {toDisplayedDate({
                 date: convertLocaleDateToUtcTimezoneDate(
-                  new Date(throwOnMissingSignDate(beneficiary.signedAt)),
+                  new Date(
+                    throwOnMissingSignDate("beneficiary", beneficiary.signedAt),
+                  ),
                 ),
                 withHours: true,
                 showGMT: true,
@@ -549,6 +567,7 @@ export const ConventionDocumentPage = ({
                   date: convertLocaleDateToUtcTimezoneDate(
                     new Date(
                       throwOnMissingSignDate(
+                        "beneficiary-representative",
                         beneficiaryRepresentative.signedAt,
                       ),
                     ),
@@ -572,6 +591,7 @@ export const ConventionDocumentPage = ({
                   date: convertLocaleDateToUtcTimezoneDate(
                     new Date(
                       throwOnMissingSignDate(
+                        "beneficiary-current-employer",
                         beneficiaryCurrentEmployer.signedAt,
                       ),
                     ),
@@ -591,6 +611,7 @@ export const ConventionDocumentPage = ({
                 date: convertLocaleDateToUtcTimezoneDate(
                   new Date(
                     throwOnMissingSignDate(
+                      "establishment-representative",
                       establishmentRepresentative.signedAt,
                     ),
                   ),
@@ -607,7 +628,12 @@ export const ConventionDocumentPage = ({
                 , <strong>{convention.agencyName}</strong> (validé le{" "}
                 {toDisplayedDate({
                   date: convertLocaleDateToUtcTimezoneDate(
-                    new Date(throwOnMissingSignDate(convention.dateValidation)),
+                    new Date(
+                      throwOnMissingApprovalOrValidationDate(
+                        "validator",
+                        convention.dateValidation,
+                      ),
+                    ),
                   ),
                 })}
                 )
@@ -624,7 +650,10 @@ export const ConventionDocumentPage = ({
                   {toDisplayedDate({
                     date: convertLocaleDateToUtcTimezoneDate(
                       new Date(
-                        throwOnMissingSignDate(convention.dateValidation),
+                        throwOnMissingApprovalOrValidationDate(
+                          "validator",
+                          convention.dateValidation,
+                        ),
                       ),
                     ),
                   })}
@@ -635,7 +664,12 @@ export const ConventionDocumentPage = ({
                   <strong>{convention.agencyName}</strong> (validé le{" "}
                   {toDisplayedDate({
                     date: convertLocaleDateToUtcTimezoneDate(
-                      new Date(throwOnMissingSignDate(convention.dateApproval)),
+                      new Date(
+                        throwOnMissingApprovalOrValidationDate(
+                          "counsellor",
+                          convention.dateApproval,
+                        ),
+                      ),
                     ),
                   })}
                   ).
