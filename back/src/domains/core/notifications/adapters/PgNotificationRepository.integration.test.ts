@@ -244,7 +244,7 @@ describe("PgNotificationRepository", () => {
         smsNotification,
       ]);
 
-      const response = await pgNotificationRepository.getEmailsByFilters();
+      const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
@@ -265,12 +265,71 @@ describe("PgNotificationRepository", () => {
       );
     });
 
-    it("works", async () => {
-      const response = await pgNotificationRepository.getEmailsByFilters();
+    it("without filters returns all emails", async () => {
+      const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
       );
+    });
+
+    describe("with filters", () => {
+      it("returns matching email when required filters match", async () => {
+        const emailNotification = emailNotifications[0];
+        const response = await pgNotificationRepository.getLastEmailsByFilters({
+          email: emailNotification.templatedContent.recipients[0],
+          emailType: emailNotification.templatedContent.kind,
+        });
+        expectToEqual(response, [emailNotification]);
+      });
+
+      it("returns matching email when all filters match", async () => {
+        const emailNotification: EmailNotification = {
+          createdAt: new Date().toISOString(),
+          followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+          id: "11111111-1111-4444-1111-111111111111",
+          kind: "email",
+          templatedContent: {
+            kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+            recipients: ["bob@mail.com"],
+            sender: {
+              email: "fake-email@email.com",
+              name: "Fake name",
+            },
+            cc: [],
+            params: {
+              agencyLogoUrl: "https://my-logo.com",
+              beneficiaryFirstName: "Bob",
+              beneficiaryLastName: "L'éponge",
+              businessName: "Essuie-tout",
+              conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
+              requesterName: "Yolo",
+              conventionStatusLink: "https://status.com",
+              internshipKind: "immersion",
+              justification: "Justification",
+              magicLink: "https://magic-link.com",
+              signature: "Signature",
+            },
+          },
+        };
+        await pgNotificationRepository.save(emailNotification);
+
+        const response = await pgNotificationRepository.getLastEmailsByFilters({
+          email: emailNotification.templatedContent.recipients[0],
+          emailType: emailNotification.templatedContent.kind,
+          conventionId: emailNotification.followedIds.conventionId,
+        });
+
+        expectToEqual(response, [emailNotification]);
+      });
+
+      it("returns empty array when no match found", async () => {
+        const response = await pgNotificationRepository.getLastEmailsByFilters({
+          email: "fake-email@email.com",
+          emailType: emailNotifications[0].templatedContent.kind,
+        });
+        expectToEqual(response, []);
+      });
     });
   });
 

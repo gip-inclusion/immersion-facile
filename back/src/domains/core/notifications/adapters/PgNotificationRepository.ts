@@ -1,7 +1,9 @@
 import { sql } from "kysely";
 import { map, uniq } from "ramda";
 import {
+  ConventionId,
   EmailNotification,
+  EmailType,
   Notification,
   NotificationId,
   NotificationKind,
@@ -10,14 +12,16 @@ import {
   TemplatedEmail,
   TemplatedSms,
   exhaustiveCheck,
-  pipeWithValue,
 } from "shared";
 import {
   KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { NotificationRepository } from "../ports/NotificationRepository";
+import {
+  EmailNotificationFilters,
+  NotificationRepository,
+} from "../ports/NotificationRepository";
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
@@ -70,20 +74,25 @@ export class PgNotificationRepository implements NotificationRepository {
       .then(map((row) => row.notif));
   }
 
-  public async getEmailsByFilters(): Promise<EmailNotification[]> {
-    const subQuery = pipeWithValue(
-      this.transaction
-        .selectFrom("notifications_email as e")
-        .select("id")
-        .groupBy("e.id")
-        .orderBy("e.created_at", "desc"),
-      (b) => b.limit(this.maxRetrievedNotifications),
-    );
-
+  public async getLastEmailsByFilters(
+    filters?: EmailNotificationFilters,
+  ): Promise<EmailNotification[]> {
     return getEmailsNotificationBuilder(this.transaction)
       .where("e.created_at", ">", sql<Date>`NOW() - INTERVAL '2 day'`)
-      .where("e.id", "in", subQuery)
+      .$if(filters !== undefined, (qb) =>
+        qb
+          .where("e.email_kind", "=", filters?.emailType as EmailType)
+          .where("r.email", "=", filters?.email as string)
+          .$if(filters?.conventionId !== undefined, (qb) =>
+            qb.where(
+              "e.convention_id",
+              "=",
+              filters?.conventionId as ConventionId,
+            ),
+          ),
+      )
       .orderBy("e.created_at", "desc")
+      .limit(this.maxRetrievedNotifications)
       .execute()
       .then(map((row) => row.notif));
   }
@@ -94,7 +103,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .limit(this.maxRetrievedNotifications)
       .execute()
       .then(async (rows) => ({
-        emails: await this.getEmailsByFilters(),
+        emails: await this.getLastEmailsByFilters(),
         sms: rows.map((row) => row.notif),
       }));
   }

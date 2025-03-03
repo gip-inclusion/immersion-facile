@@ -60,11 +60,12 @@ export class InMemoryConventionQueries implements ConventionQueries {
     finishingRange: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
-    const notifications = this.notificationRepository
-      ? await this.notificationRepository.getEmailsByFilters({
-          emailKind: assessmentEmailKind,
-        })
-      : [];
+    const notifications = (
+      await this.notificationRepository.getLastEmailsByFilters()
+    ).filter(
+      (notification) =>
+        notification.templatedContent.kind === assessmentEmailKind,
+    );
     const immersionIdsThatAlreadyGotAnEmail = notifications
       ? notifications.map(
           (notification) => notification.followedIds.conventionId,
