@@ -96,7 +96,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
       },
     };
 
-    validateAgencyRights(agency.id, updatedRights);
+    validateAgencyRights(agency.id, updatedRights, agency.refersToAgencyId);
 
     await Promise.all([
       uow.agencyRepository.update({

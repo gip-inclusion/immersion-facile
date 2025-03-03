@@ -29,6 +29,13 @@ import {
 
 describe("RemoveUserFromAgency", () => {
   const agency = new AgencyDtoBuilder().build();
+  const agencyWithRefersTo = new AgencyDtoBuilder()
+    .withId("agencyWithRefersTo-ID")
+    .withRefersToAgencyInfo({
+      refersToAgencyId: agency.id,
+      refersToAgencyName: agency.name,
+    })
+    .build();
 
   const adminBuilder = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-id")
@@ -193,6 +200,34 @@ describe("RemoveUserFromAgency", () => {
 
       const inputParams: WithAgencyIdAndUserId = {
         agencyId: agency.id,
+        userId: counsellorReceivingNotif.id,
+      };
+
+      await expectPromiseToFailWithError(
+        removeUserFromAgency.execute(inputParams, icAdmin),
+        errors.agency.notEnoughCounsellors(inputParams),
+      );
+    });
+
+    it("throws forbidden if user to delete is the last pre-validator receiving notifications of an agency with refers to", async () => {
+      const counsellorReceivingNotif: User = {
+        ...notAdminUser,
+        id: "counsellor-receiving-notif-id",
+        email: "counsellorReceivingNotif@email.com",
+      };
+      uow.userRepository.users = [counsellorReceivingNotif, notAdminUser];
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithRefersTo, {
+          [notAdminUser.id]: { roles: ["validator"], isNotifiedByEmail: true },
+          [counsellorReceivingNotif.id]: {
+            roles: ["counsellor"],
+            isNotifiedByEmail: true,
+          },
+        }),
+      ];
+
+      const inputParams: WithAgencyIdAndUserId = {
+        agencyId: agencyWithRefersTo.id,
         userId: counsellorReceivingNotif.id,
       };
 
