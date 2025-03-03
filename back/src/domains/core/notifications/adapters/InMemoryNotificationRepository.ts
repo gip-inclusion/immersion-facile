@@ -47,33 +47,31 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     ])[0];
   }
 
-  public async getEmailsByFilters(filters: EmailNotificationFilters = {}) {
+  public async getLastEmailsByFilters(filters?: EmailNotificationFilters) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
 
-        if (
-          filters.email &&
-          !notification.templatedContent.recipients.includes(filters.email)
-        )
-          return false;
+        if (!filters) return true;
 
-        if (
-          filters.emailKind &&
-          notification.templatedContent.kind !== filters.emailKind
-        )
-          return false;
+        const matchesRequiredFilters =
+          notification.templatedContent.recipients.includes(filters.email) &&
+          notification.templatedContent.kind === filters.emailType;
 
-        return filters.since
-          ? new Date(notification.createdAt) > filters.since
-          : true;
+        if (!matchesRequiredFilters) return false;
+
+        if (filters.conventionId !== undefined) {
+          return notification.followedIds.conventionId === filters.conventionId;
+        }
+
+        return true;
       },
     );
   }
 
   public async getLastNotifications() {
     return {
-      emails: await this.getEmailsByFilters(),
+      emails: await this.getLastEmailsByFilters(),
       sms: this.notifications.filter(
         (notification): notification is SmsNotification =>
           notification.kind === "sms",
