@@ -120,6 +120,10 @@ Retrouver la convention par Email de l'entreprise:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_repr%25C3%25A9sentant_de_l%27entreprise=${email}
 `,
         multipleChoiceProcessedQuestions,
+        `-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
+`,
       ]
         .filter(Boolean)
         .join("\n"),

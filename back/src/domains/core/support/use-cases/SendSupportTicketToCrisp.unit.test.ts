@@ -57,6 +57,10 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=$
 -----------
 Retrouver la convention par Email de bénéficiaire:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25C3%25A9ficiaire=${johnDoeEmail}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
@@ -88,6 +92,10 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_numero_
 -----------
 Retrouver la convention par Email de bénéficiaire:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25C3%25A9ficiaire=${johnDoeEmail}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
@@ -102,6 +110,10 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25
           message: crispMessageContent,
           helperNote: `Liens magiques (de la personne écrivant au support):
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=${johnDoeEmail}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
@@ -120,6 +132,10 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=$
 -----------
 Siret fourni : ${crispTicketSiret}
 Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${crispTicketSiret}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
@@ -141,6 +157,10 @@ Convention ID: 76f8f40b-1b43-4623-8592-47209b1e7dfb - Non trouvée dans la base 
 -----------
 Retrouver la convention par Email de l'entreprise:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_repr%25C3%25A9sentant_de_l%27entreprise=john.doe@gmail.com
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
@@ -167,6 +187,10 @@ Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/p
 
 Pour quelle raison principale souhaitez-vous arrêter d'accueillir d'immersions professionnelles:
 Je reçois trop de demandes
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
 `,
           metadata: {
             email: johnDoeEmail,
