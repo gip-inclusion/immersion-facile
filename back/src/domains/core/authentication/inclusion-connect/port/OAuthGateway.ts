@@ -2,13 +2,10 @@ import {
   AbsoluteUrl,
   Email,
   ExternalId,
-  FeatureFlags,
   IdToken,
-  OAuthGatewayProvider,
   WithIdToken,
   WithSourcePage,
 } from "shared";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { OAuthJwt } from "../entities/OngoingOAuth";
 
 export type GetAccessTokenParams = WithSourcePage & {
@@ -41,27 +38,10 @@ export type GetLogoutUrlParams = WithIdToken & {
   state: string;
 };
 
-export const oAuthProviderByFeatureFlags = (
-  flags: FeatureFlags,
-): OAuthGatewayProvider =>
-  flags.enableProConnect.isActive ? "proConnect" : "inclusionConnect";
-
-export const makeProvider = async (
-  uow: UnitOfWork,
-): Promise<OAuthGatewayProvider> =>
-  oAuthProviderByFeatureFlags(await uow.featureFlagRepository.getAll());
-
 export interface OAuthGateway {
-  getLoginUrl(
-    params: GetLoginUrlParams,
-    provider: OAuthGatewayProvider,
-  ): Promise<AbsoluteUrl>;
+  getLoginUrl(params: GetLoginUrlParams): Promise<AbsoluteUrl>;
   getAccessToken: (
     params: GetAccessTokenParams,
-    provider: OAuthGatewayProvider,
   ) => Promise<GetAccessTokenResult>;
-  getLogoutUrl(
-    params: GetLogoutUrlParams,
-    provider: OAuthGatewayProvider,
-  ): Promise<AbsoluteUrl>;
+  getLogoutUrl(params: GetLogoutUrlParams): Promise<AbsoluteUrl>;
 }

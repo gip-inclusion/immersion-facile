@@ -10,7 +10,6 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -88,10 +87,8 @@ export class SendBeneficiariesPdfAssessmentsEmails extends TransactionalUseCase<
     if (!firstValidatorRight)
       throw errors.agency.notEnoughValidators({ agencyId: agency.id });
     const firstValidatorUserId = firstValidatorRight[0];
-    const firstValidatorUser = await uow.userRepository.getById(
-      firstValidatorUserId,
-      await makeProvider(uow),
-    );
+    const firstValidatorUser =
+      await uow.userRepository.getById(firstValidatorUserId);
     if (!firstValidatorUser)
       throw errors.user.notFound({ userId: firstValidatorUserId });
     await this.#saveNotificationAndRelatedEvent(uow, {

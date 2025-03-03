@@ -18,7 +18,6 @@ import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/f
 import { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
 import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { makeInclusionConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/inclusionConnect.routes";
 import { makeProConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/proConnect.routes";
 import { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -219,24 +218,17 @@ export const createGateways = async (
       : new InMemoryFtConnectGateway();
 
   const oAuthGateway: OAuthGateway =
-    config.inclusionConnectGateway === "HTTPS"
+    config.proConnectGateway === "HTTPS"
       ? new HttpOAuthGateway(
-          createLegacyAxiosHttpClientForExternalAPIs({
-            partnerName: partnerNames.inclusionConnect,
-            routes: makeInclusionConnectRoutes(
-              config.inclusionConnectConfig.providerBaseUri,
-            ),
-          }),
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.proConnect,
             routes: makeProConnectRoutes(
               config.proConnectConfig.providerBaseUri,
             ),
           }),
-          config.inclusionConnectConfig,
           config.proConnectConfig,
         )
-      : new InMemoryOAuthGateway(config.inclusionConnectConfig);
+      : new InMemoryOAuthGateway(config.proConnectConfig);
 
   const createEmailValidationGateway = (config: AppConfig) =>
     ({

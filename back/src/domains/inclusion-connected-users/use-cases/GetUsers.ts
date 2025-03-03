@@ -6,7 +6,6 @@ import {
   getUsersFiltersSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
@@ -22,10 +21,7 @@ export const makeGetUsers = createTransactionalUseCase<
   },
   async ({ uow, currentUser, inputParams }) => {
     throwIfNotAdmin(currentUser);
-    const users = await uow.userRepository.getUsers(
-      inputParams,
-      await makeProvider(uow),
-    );
+    const users = await uow.userRepository.getUsers(inputParams);
     return Promise.all(users.map((user) => userToUserInList(uow, user)));
   },
 );

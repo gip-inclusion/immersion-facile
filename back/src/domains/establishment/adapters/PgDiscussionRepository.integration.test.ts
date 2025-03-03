@@ -61,7 +61,7 @@ describe("PgDiscussionRepository", () => {
     pgDiscussionRepository = new PgDiscussionRepository(db);
     establishmentAggregateRepo = new PgEstablishmentAggregateRepository(db);
 
-    await new PgUserRepository(db).save(user, "proConnect");
+    await new PgUserRepository(db).save(user);
   });
 
   afterAll(async () => {

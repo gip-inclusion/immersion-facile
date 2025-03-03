@@ -3,17 +3,17 @@ import {
   DiscussionId,
   DiscussionReadDto,
   DiscussionRejected,
-  InclusionConnectJwt,
+  ProConnectJwt,
 } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FetchDiscussionRequestedPayload = {
-  jwt: InclusionConnectJwt;
+  jwt: ProConnectJwt;
   discussionId: DiscussionId;
 };
 
 export type RejectDiscussionRequestedPayload = {
-  jwt: InclusionConnectJwt;
+  jwt: ProConnectJwt;
   discussionId: DiscussionId;
 } & DiscussionRejected;
 

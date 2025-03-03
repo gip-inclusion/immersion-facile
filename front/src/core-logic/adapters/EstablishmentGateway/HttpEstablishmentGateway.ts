@@ -3,7 +3,7 @@ import {
   EstablishmentJwt,
   EstablishmentRoutes,
   FormEstablishmentDto,
-  InclusionConnectJwt,
+  ProConnectJwt,
   SiretDto,
 } from "shared";
 import { HttpClient } from "shared-routes";
@@ -36,7 +36,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public deleteEstablishment$(
     siret: SiretDto,
-    jwt: InclusionConnectJwt,
+    jwt: ProConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -69,7 +69,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: EstablishmentJwt | ProConnectJwt,
   ): Observable<FormEstablishmentDto> {
     return from(
       this.httpClient
@@ -110,7 +110,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     formEstablishment: FormEstablishmentDto,
-    jwt: EstablishmentJwt | InclusionConnectJwt,
+    jwt: EstablishmentJwt | ProConnectJwt,
   ): Observable<void> {
     return from(
       this.httpClient

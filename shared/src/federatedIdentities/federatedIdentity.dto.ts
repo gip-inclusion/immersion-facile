@@ -1,18 +1,15 @@
 import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
-import { InclusionConnectJwt } from "../tokens/jwt.dto";
+import { ProConnectJwt } from "../tokens/jwt.dto";
 import { Flavor } from "../typeFlavors";
 
 export type FederatedIdentityProvider =
   (typeof federatedIdentityProviders)[number];
 
-export const federatedIdentityProviders = [
-  "inclusionConnect",
-  "peConnect",
-] as const;
+export const federatedIdentityProviders = ["proConnect", "peConnect"] as const;
 
 type GenericFederatedIdentity<
   Provider extends FederatedIdentityProvider,
-  T extends FtConnectToken | InclusionConnectJwt,
+  T extends FtConnectToken | ProConnectJwt,
   P = void,
 > = Provider extends "peConnect"
   ? {
@@ -56,9 +53,9 @@ export const isFtConnectIdentity = (
 ): federatedIdentity is FtConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
-export type InclusionConnectIdentity = GenericFederatedIdentity<
-  "inclusionConnect",
-  InclusionConnectJwt
+export type ProConnectIdentity = GenericFederatedIdentity<
+  "proConnect",
+  ProConnectJwt
 >;
 
-export type FederatedIdentity = InclusionConnectIdentity | FtConnectIdentity;
+export type FederatedIdentity = ProConnectIdentity | FtConnectIdentity;

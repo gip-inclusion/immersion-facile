@@ -10,7 +10,6 @@ export const featureFlagNames = [
   "enableTemporaryOperation",
   "enableMaintenance",
   "enableSearchByScore",
-  "enableProConnect",
   "enableBroadcastOfMissionLocaleToFT",
   "enableBroadcastOfConseilDepartementalToFT",
   "enableBroadcastOfCapEmploiToFT",
@@ -66,7 +65,6 @@ export type FeatureFlags = {
   enableMaintenance: FeatureFlagTextWithSeverity;
   enableTemporaryOperation: FeatureFlagTextImageAndRedirect;
   enableSearchByScore: FeatureFlagBoolean;
-  enableProConnect: FeatureFlagBoolean;
   enableBroadcastOfMissionLocaleToFT: FeatureFlagBoolean;
   enableBroadcastOfConseilDepartementalToFT: FeatureFlagBoolean;
   enableBroadcastOfCapEmploiToFT: FeatureFlagBoolean;

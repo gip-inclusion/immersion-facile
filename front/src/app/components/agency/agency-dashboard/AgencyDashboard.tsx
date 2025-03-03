@@ -1,7 +1,7 @@
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import {
   AgencyRight,
-  InclusionConnectJwt,
+  ProConnectJwt,
   WithDashboards,
   domElementIds,
 } from "shared";
@@ -24,7 +24,7 @@ export const AgencyDashboard = ({
   dashboards,
 }: {
   route: FrontAgencyDashboardRoute;
-  inclusionConnectedJwt: InclusionConnectJwt | undefined;
+  inclusionConnectedJwt: ProConnectJwt | undefined;
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): JSX.Element => {
   const currentTab = route.name;
@@ -55,7 +55,7 @@ const rawAgencyDashboardTabs = ({
   activeAgencyRights,
   inclusionConnectedJwt,
 }: {
-  inclusionConnectedJwt?: InclusionConnectJwt;
+  inclusionConnectedJwt?: ProConnectJwt;
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): DashboardTab[] => {
   const agenciesUserIsAdminOn = activeAgencyRights

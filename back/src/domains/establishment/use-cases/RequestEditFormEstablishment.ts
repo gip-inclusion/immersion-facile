@@ -6,7 +6,6 @@ import {
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { GenerateEditFormEstablishmentJwt } from "../../core/jwt";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -45,20 +44,16 @@ export class RequestEditFormEstablishment extends TransactionalUseCase<SiretDto>
 
     const { userRights, establishment } = establishmentAggregate;
 
-    const provider = await makeProvider(uow);
-
     const establishmentAdmins = await uow.userRepository.getByIds(
       userRights
         .filter((right) => right.role === "establishment-admin")
         .map((right) => right.userId),
-      provider,
     );
 
     const establishmentContacts = await uow.userRepository.getByIds(
       userRights
         .filter((right) => right.role === "establishment-contact")
         .map((right) => right.userId),
-      provider,
     );
 
     await this.#saveNotificationAndRelatedEvent(uow, {

@@ -5,9 +5,9 @@ import {
   AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
+  ProConnectJwt,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
   WithAgencyId,
@@ -51,14 +51,14 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public getAgencyById$(
     _agencyId: AgencyId,
-    _token: InclusionConnectJwt,
+    _token: ProConnectJwt,
   ): Observable<AgencyDto> {
     return this.fetchedAgency$;
   }
 
   public getAgencyUsers$(
     _agencyId: AgencyId,
-    _token: InclusionConnectJwt,
+    _token: ProConnectJwt,
   ): Observable<InclusionConnectedUser[]> {
     return this.fetchedAgencyUsers$;
   }
@@ -76,14 +76,14 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   public listAgencyOptionsNeedingReview$(
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ProConnectJwt,
   ): Observable<AgencyOption[]> {
     return this.agencyOptions$;
   }
 
   public updateAgency$(
     _agencyDto: AgencyDto,
-    _adminToken: InclusionConnectJwt,
+    _adminToken: ProConnectJwt,
   ): Observable<void> {
     return this.updateAgencyResponse$;
   }
@@ -100,14 +100,14 @@ export class TestAgencyGateway implements AgencyGateway {
   }
 
   public validateOrRejectAgency$(
-    _: InclusionConnectJwt,
+    _: ProConnectJwt,
     updateAgencyStatusParams: UpdateAgencyStatusParams,
   ): Observable<void> {
     return from(this.#validateOrRejectAgency(_, updateAgencyStatusParams.id));
   }
 
   async #validateOrRejectAgency(
-    _: InclusionConnectJwt,
+    _: ProConnectJwt,
     agencyId: AgencyId,
   ): Promise<void> {
     this.#agencies[agencyId].status = "active";

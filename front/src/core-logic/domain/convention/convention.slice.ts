@@ -8,7 +8,7 @@ import {
   ConventionSupportedJwt,
   DiscussionId,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
+  ProConnectJwt,
   RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
@@ -169,7 +169,7 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadAction<{
         conventionId: ConventionId;
-        jwt: ConventionJwt | InclusionConnectJwt;
+        jwt: ConventionJwt | ProConnectJwt;
       }>,
     ) => {
       state.isLoading = true;
@@ -178,7 +178,7 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadAction<{
         conventionId: ConventionId;
-        jwt: ConventionJwt | InclusionConnectJwt;
+        jwt: ConventionJwt | ProConnectJwt;
       }>,
     ) => {
       state.isLoading = false;

@@ -97,7 +97,7 @@ const logoutFromInclusionConnect: AuthEpic = (
         throw errors.inclusionConnect.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
-        provider === "inclusionConnect" &&
+        provider === "proConnect" &&
         action.payload.mode === "device-and-inclusion"
       ) {
         const { idToken } = federatedIdentityWithUser;

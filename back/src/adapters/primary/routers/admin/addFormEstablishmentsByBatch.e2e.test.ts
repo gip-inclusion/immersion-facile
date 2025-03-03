@@ -4,9 +4,9 @@ import {
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
+  ProConnectJwt,
   adminRoutes,
   currentJwtVersions,
   expectHttpResponseToEqual,
@@ -41,7 +41,7 @@ describe("POST /add-form-establishment-batch", () => {
     formEstablishments: [formEstablishment1],
   };
   let httpClient: HttpClient<AdminRoutes>;
-  let token: InclusionConnectJwt;
+  let token: ProConnectJwt;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
@@ -87,7 +87,7 @@ describe("POST /add-form-establishment-batch", () => {
   });
 
   it("throws 401 if invalid token", async () => {
-    const badBackOfficeJwt: InclusionConnectJwt = "Invalid";
+    const badBackOfficeJwt: ProConnectJwt = "Invalid";
     const response = await httpClient.addFormEstablishmentBatch({
       body: payload,
       headers: { authorization: badBackOfficeJwt },

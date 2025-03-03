@@ -1,17 +1,11 @@
 import { Pool } from "pg";
-import {
-  AbsoluteUrl,
-  OAuthGatewayProvider,
-  expectObjectsToMatch,
-  oAuthGatewayProviders,
-} from "shared";
+import { AbsoluteUrl, expectObjectsToMatch } from "shared";
 import {
   KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
-import { defaultFlags } from "../../../feature-flags/adapters/InMemoryFeatureFlagRepository";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
@@ -67,69 +61,55 @@ describe("AuthenticateWithInclusionCode use case", () => {
     await pool.end();
   });
 
-  describe.each(oAuthGatewayProviders)(
-    "when user had never connected before with mode '%s'",
-    (provider) => {
-      beforeEach(async () => {
-        await db.deleteFrom("feature_flags").execute();
-        await db.deleteFrom("users_ongoing_oauths").execute();
-        await db.deleteFrom("users").execute();
+  describe("when user had never connected before", () => {
+    beforeEach(async () => {
+      await db.deleteFrom("feature_flags").execute();
+      await db.deleteFrom("users_ongoing_oauths").execute();
+      await db.deleteFrom("users").execute();
+    });
 
-        uow.featureFlagRepository.insertAll({
-          ...defaultFlags,
-          enableProConnect: {
-            kind: "boolean",
-            isActive: provider === "proConnect",
-          },
-        });
+    it("saves the user as Authenticated user", async () => {
+      const { accessToken, initialOngoingOAuth } =
+        await makeSuccessfulAuthenticationConditions();
+
+      await authenticateWithInclusionCode.execute({
+        code: "my-inclusion-code",
+        state: initialOngoingOAuth.state,
+        page: "agencyDashboard",
       });
 
-      it("saves the user as Authenticated user", async () => {
-        const { accessToken, initialOngoingOAuth } =
-          await makeSuccessfulAuthenticationConditions(provider);
-
-        await authenticateWithInclusionCode.execute({
-          code: "my-inclusion-code",
-          state: initialOngoingOAuth.state,
-          page: "agencyDashboard",
-        });
-
-        const expectedOngoingOauth =
-          await uow.ongoingOAuthRepository.findByStateAndProvider(
-            initialOngoingOAuth.state,
-            initialOngoingOAuth.provider,
-          );
-
-        expectObjectsToMatch(expectedOngoingOauth, {
-          ...initialOngoingOAuth,
-          accessToken,
-          externalId: defaultExpectedIcIdTokenPayload.sub,
-        });
-
-        expectObjectsToMatch(
-          await uow.userRepository.findByExternalId(
-            defaultExpectedIcIdTokenPayload.sub,
-            provider,
-          ),
-          {
-            id: expectedOngoingOauth?.userId,
-            firstName: defaultExpectedIcIdTokenPayload.firstName,
-            lastName: defaultExpectedIcIdTokenPayload.lastName,
-            email: defaultExpectedIcIdTokenPayload.email,
-            externalId: defaultExpectedIcIdTokenPayload.sub,
-          },
+      const expectedOngoingOauth =
+        await uow.ongoingOAuthRepository.findByStateAndProvider(
+          initialOngoingOAuth.state,
+          initialOngoingOAuth.provider,
         );
+
+      expectObjectsToMatch(expectedOngoingOauth, {
+        ...initialOngoingOAuth,
+        accessToken,
+        externalId: defaultExpectedIcIdTokenPayload.sub,
       });
-    },
-  );
+
+      expectObjectsToMatch(
+        await uow.userRepository.findByExternalId(
+          defaultExpectedIcIdTokenPayload.sub,
+        ),
+        {
+          id: expectedOngoingOauth?.userId,
+          firstName: defaultExpectedIcIdTokenPayload.firstName,
+          lastName: defaultExpectedIcIdTokenPayload.lastName,
+          email: defaultExpectedIcIdTokenPayload.email,
+          externalId: defaultExpectedIcIdTokenPayload.sub,
+        },
+      );
+    });
+  });
 
   const makeSuccessfulAuthenticationConditions = async (
-    provider: OAuthGatewayProvider,
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {
-      provider:
-        provider === "inclusionConnect" ? "inclusionConnect" : "proConnect",
+      provider: "proConnect",
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
     };

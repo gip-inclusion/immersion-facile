@@ -416,7 +416,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           {
             userId: agencyUser.id,
             accessToken: "yolo",
-            provider: "inclusionConnect",
+            provider: "proConnect",
             state,
             nonce: "fake-nonce",
             externalId: agencyUser.externalId ?? undefined,
@@ -436,8 +436,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
         expectHttpResponseToEqual(response, {
           body: `${
-            appConfig.inclusionConnectConfig.providerBaseUri
-          }/logout-inclusion-connect?${queryParamsAsString({
+            appConfig.proConnectConfig.providerBaseUri
+          }/logout-pro-connect?${queryParamsAsString({
             postLogoutRedirectUrl: appConfig.immersionFacileBaseUrl,
             idToken: "fake-id-token",
             state,

@@ -6,12 +6,10 @@ import {
   LoginForm,
   MainWrapper,
   OAuthButton,
-  OAuthButtonProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  AllowedStartInclusionConnectLoginPage,
-  OAuthGatewayProvider,
+  AllowedStartOAuthLoginPage,
   absoluteUrlSchema,
   domElementIds,
   inclusionConnectImmersionRoutes,
@@ -25,7 +23,6 @@ import { loginIllustration } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { Route } from "type-route";
 
@@ -73,31 +70,16 @@ type InclusionConnectedPrivateRouteProps = {
   allowAdminOnly?: boolean;
 };
 
-const providers: Record<
-  OAuthGatewayProvider,
-  {
-    name: string;
-    baseline: string;
-    buttonProvider: OAuthButtonProps["provider"];
-  }
-> = {
-  inclusionConnect: {
-    name: "Inclusion Connect",
-    buttonProvider: "inclusion-connect",
-    baseline:
-      "Inclusion Connect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne de l'inclusion.",
-  },
-  proConnect: {
-    name: "ProConnect",
-    buttonProvider: "pro-connect",
-    baseline:
-      "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-  },
+const proConnectProvider = {
+  name: "ProConnect",
+  buttonProvider: "pro-connect" as const,
+  baseline:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
 };
 
 const getPage = (
   route: InclusionConnectPrivateRoute,
-): AllowedStartInclusionConnectLoginPage => {
+): AllowedStartOAuthLoginPage => {
   if (route.name === "establishmentDashboard") return "establishmentDashboard";
   if (route.name === "agencyDashboardMain") return "agencyDashboard";
   return "admin";
@@ -116,13 +98,7 @@ export const InclusionConnectedPrivateRoute = ({
   const authIsLoading = useAppSelector(authSelectors.isLoading);
   const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
-  const { enableProConnect } = useAppSelector(
-    featureFlagSelectors.featureFlagState,
-  );
 
-  const provider = enableProConnect.isActive
-    ? providers.proConnect
-    : providers.inclusionConnect;
   const afterLoginRedirectionUrl = useAppSelector(
     authSelectors.afterLoginRedirectionUrl,
   );
@@ -141,7 +117,7 @@ export const InclusionConnectedPrivateRoute = ({
       dispatch(
         authSlice.actions.federatedIdentityProvided({
           federatedIdentityWithUser: {
-            provider: "inclusionConnect",
+            provider: "proConnect",
             token,
             email,
             lastName,
@@ -188,8 +164,8 @@ export const InclusionConnectedPrivateRoute = ({
               <LoginForm
                 sections={[
                   {
-                    title: `Se connecter avec ${provider.name}`,
-                    description: provider.baseline,
+                    title: `Se connecter avec ${proConnectProvider.name}`,
+                    description: proConnectProvider.baseline,
                     authComponent: (
                       <OAuthButton
                         id={domElementIds[page].login.inclusionConnectButton}
@@ -201,7 +177,7 @@ export const InclusionConnectedPrivateRoute = ({
                             { page },
                           ),
                         )}`}
-                        provider={provider.buttonProvider}
+                        provider={proConnectProvider.buttonProvider}
                       />
                     ),
                   },

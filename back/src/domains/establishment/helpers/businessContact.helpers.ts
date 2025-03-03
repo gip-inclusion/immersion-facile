@@ -1,4 +1,4 @@
-import { BusinessContactDto, OAuthGatewayProvider, errors } from "shared";
+import { BusinessContactDto, errors } from "shared";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   EstablishmentAdminRight,
@@ -7,7 +7,6 @@ import {
 
 export const businessContactFromEstablishmentAggregateAndUsers = async (
   uow: UnitOfWork,
-  provider: OAuthGatewayProvider,
   establishmentAggregate: EstablishmentAggregate,
 ): Promise<BusinessContactDto> => {
   const firstAdminRight = establishmentAggregate.userRights.find(
@@ -18,10 +17,7 @@ export const businessContactFromEstablishmentAggregateAndUsers = async (
     throw errors.establishment.adminNotFound({
       siret: establishmentAggregate.establishment.siret,
     });
-  const firstAdmin = await uow.userRepository.getById(
-    firstAdminRight.userId,
-    provider,
-  );
+  const firstAdmin = await uow.userRepository.getById(firstAdminRight.userId);
   if (!firstAdmin)
     throw errors.establishment.adminNotFound({
       siret: establishmentAggregate.establishment.siret,
@@ -31,7 +27,6 @@ export const businessContactFromEstablishmentAggregateAndUsers = async (
     establishmentAggregate.userRights
       .filter((right) => right.role === "establishment-contact")
       .map(({ userId }) => userId),
-    provider,
   );
 
   return {

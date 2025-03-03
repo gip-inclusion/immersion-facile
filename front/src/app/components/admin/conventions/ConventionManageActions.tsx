@@ -17,7 +17,7 @@ import {
   ConventionSupportedJwt,
   DateIntervalDto,
   ExcludeFromExisting,
-  InclusionConnectJwt,
+  ProConnectJwt,
   RenewConventionParams,
   Role,
   UpdateConventionStatusRequestDto,
@@ -61,7 +61,7 @@ import { ScheduleSection } from "../../forms/convention/sections/schedule/Schedu
 
 export type JwtKindProps =
   | {
-      jwt: InclusionConnectJwt;
+      jwt: ProConnectJwt;
       kind: "backoffice";
     }
   | {
@@ -69,7 +69,7 @@ export type JwtKindProps =
       kind: "convention";
     }
   | {
-      jwt: InclusionConnectJwt;
+      jwt: ProConnectJwt;
       kind: "inclusionConnect";
     };
 
