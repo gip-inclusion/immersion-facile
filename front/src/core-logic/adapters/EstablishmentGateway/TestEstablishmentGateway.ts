@@ -1,10 +1,5 @@
 import { type Observable, Subject } from "rxjs";
-import type {
-  ConnectedUserJwt,
-  EstablishmentJwt,
-  FormEstablishmentDto,
-  SiretDto,
-} from "shared";
+import type { ConnectedUserJwt, FormEstablishmentDto, SiretDto } from "shared";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class TestEstablishmentGateway implements EstablishmentGateway {
@@ -13,8 +8,6 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public deleteEstablishmentResult$ = new Subject<void>();
 
   public editFormEstablishmentResult$ = new Subject<void>();
-
-  public establishmentModificationResponse$ = new Subject<void>();
 
   public formEstablishment$ = new Subject<FormEstablishmentDto>();
 
@@ -33,18 +26,14 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     _siret: SiretDto,
-    _jwt: EstablishmentJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<FormEstablishmentDto> {
     return this.formEstablishment$;
   }
 
-  public requestEstablishmentModification$(_siret: SiretDto): Observable<void> {
-    return this.establishmentModificationResponse$;
-  }
-
   public updateFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt | ConnectedUserJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<void> {
     return this.editFormEstablishmentResult$;
   }

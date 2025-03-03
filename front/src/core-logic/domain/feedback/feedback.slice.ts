@@ -35,7 +35,6 @@ const topics = [
   "user",
   "agency-user-for-dashboard",
   "search-result",
-  "establishment-modification-link",
   "form-establishment",
   "siret-input",
   "agency-for-dashboard",
@@ -357,20 +356,6 @@ export const feedbackMapping: Record<
       title: "Oups !",
       message:
         "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre.",
-    },
-  },
-  "establishment-modification-link": {
-    "create.error": {
-      action: establishmentSlice.actions.sendModificationLinkFailed,
-      title: "Lien non envoyé",
-      message:
-        "Il y a eu un problème lors de l'envoi du lien de modification de l'entreprise.",
-    },
-    "create.success": {
-      action: establishmentSlice.actions.sendModificationLinkSucceeded,
-      title: "Lien envoyé",
-      message:
-        "Le lien de modification de l'entreprise a bien été envoyé par email.",
     },
   },
   "form-establishment": {
