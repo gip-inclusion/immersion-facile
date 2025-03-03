@@ -6,6 +6,7 @@ export const conventionSummaryStyles = {
   sectionHeaderMain: "im-convention-summary__section__header__main",
   sectionId: "im-convention-summary__section__id",
   subsection: "im-convention-summary__subsection",
+  subsectionHeaderButton: "im-convention-summary__subsection-header-button",
   subsectionHighlighted: "im-convention-summary__subsection--highlighted",
   subsectionHorizontalSeparator:
     "im-convention-summary__subsection__horizontal-separator",

@@ -1,4 +1,4 @@
-import { Email, EmailType } from "shared";
+import { ConventionId, Email, EmailType, Phone, TemplatedSms } from "shared";
 import {
   EmailNotification,
   Notification,
@@ -11,6 +11,12 @@ export type EmailNotificationFilters = {
   email?: Email;
   since?: Date;
   emailKind?: EmailType;
+};
+
+export type SmsNotificationFilters = {
+  recipientPhoneNumber: Phone;
+  conventionId: ConventionId;
+  smsKind: TemplatedSms["kind"];
 };
 
 export interface NotificationRepository {
@@ -28,4 +34,7 @@ export interface NotificationRepository {
   }>;
   getEmailsByFilters: () => Promise<EmailNotification[]>;
   deleteAllEmailAttachements: () => Promise<number>;
+  getLastSmsNotificationByFilter: (
+    filters: SmsNotificationFilters,
+  ) => Promise<SmsNotification | undefined>;
 }

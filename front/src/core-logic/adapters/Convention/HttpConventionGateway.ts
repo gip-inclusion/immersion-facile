@@ -13,6 +13,7 @@ import {
   FindSimilarConventionsParams,
   InclusionConnectJwt,
   InclusionConnectedAllowedRoutes,
+  RemindSignatoriesRequestDto,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -25,6 +26,7 @@ import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
   throwServiceUnavailableWithExplicitMessage,
+  throwTooManyRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
@@ -124,6 +126,24 @@ export class HttpConventionGateway implements ConventionGateway {
           match(response)
             .with({ status: 200 }, ({ body }) => body.similarConventionIds)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public remindSignatories$(
+    params: RemindSignatoriesRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .remindSignatories({ body: params, headers: { authorization: jwt } })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 429 }, throwTooManyRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

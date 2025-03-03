@@ -16,9 +16,15 @@ type FeedbackProps = {
   }) => JSX.Element;
   closable?: boolean;
   children?: React.ReactNode;
+  className?: string;
 };
 
-export const Feedback = ({ topic, render, closable }: FeedbackProps) => {
+export const Feedback = ({
+  topic,
+  render,
+  closable,
+  className,
+}: FeedbackProps) => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const feedback = feedbacks[topic];
   if (!feedback) return null;
@@ -37,6 +43,7 @@ export const Feedback = ({ topic, render, closable }: FeedbackProps) => {
       description={feedback.message}
       small
       closable={closable}
+      className={className}
     />
   ) : (
     <Alert
@@ -44,6 +51,7 @@ export const Feedback = ({ topic, render, closable }: FeedbackProps) => {
       title={feedback.title}
       description={feedback.message}
       small
+      className={className}
     />
   );
 };
