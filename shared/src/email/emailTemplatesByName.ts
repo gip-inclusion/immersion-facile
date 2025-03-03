@@ -608,15 +608,15 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       <strong>Etape 1</strong> : Si le demandeur d’emploi n’est pas reconnu par CVM, procédez à son identification afin de pouvoir traiter le mail. Vous avez les informations à la fin de cet email. 
       Consultez la procédure à suivre pour clôturer cet email : <a href="https://drive.google.com/file/d/1tWL68ua1f-NgYnPkXs979_CkukPtlGRU/view?usp=sharing">Comment traiter un mail Immersion Facilitée dans CVM ?</a>
 
-      <strong>Etape 2</strong> : <a href="${magicLink}" target="_blank">Vous pouvez y accéder en cliquant ici</a>      
+      <strong>Etape 2</strong> : <a href="${magicLink}" target="_blank">Vous pouvez y accéder en cliquant ici</a>  
+      
+      <strong>ATTENTION !</strong> Vous pouvez renvoyer un lien de signature par SMS en un clic aux signataires qui ont renseigné un numéro de mobile. Il vous suffit de cliquer sur le bouton 'Faire signer par SMS' dans l'encadré correspondant au signataire auquel vous souhaitez adresser le SMS.
 
       Tant que cette demande n'est pas encore confirmée par <strong>l'entreprise et par la/le bénéficiaire</strong>, vous pouvez demander des modifications ou la refuser, si nécessaire.
 
       <strong>La demande de modification et le refus sont à réaliser depuis l’écran Immersion Facilitée.</strong>
 
       Quand leur accord respectif sera enregistré, vous pourrez alors la valider. 
-
-      Pensez à relancer celui qui n'a pas confirmé si son accord tarde à venir !  
 
       <strong>Ne répondez pas à ce mail, il ne sera ni adressé au bénéficiaire, ni à l’entreprise.</strong>
 
@@ -679,9 +679,9 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
       Vous pouvez également suivre <a href="${conventionStatusLink}" target="_blank">l'état de la convention en cliquant ici</a>.
       <ul>
-        <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>
+        <li><strong>ATTENTION !</strong> Vous pouvez renvoyer un lien de signature par SMS en un clic aux signataires qui ont renseigné un numéro de mobile. Il vous suffit de cliquer sur le bouton 'Faire signer par SMS' dans l'encadré correspondant au signataire auquel vous souhaitez adresser le SMS.</li>
+        <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>   
         <li>Vous ne pouvez pas la valider tant que le bénéficiaire et l'entreprise n'ont pas confirmé chacun leur accord pour cette demande.</li>
-        <li>Vous avez connaissance du mail et du téléphone de chacun. Vous pouvez les relancer en cas de besoin.</li>
       </ul> 
       <strong>Dates ${
         internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
