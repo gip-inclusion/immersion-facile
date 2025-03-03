@@ -3,7 +3,7 @@ import {
   ApiConsumer,
   ApiConsumerJwt,
   ApiConsumerName,
-  InclusionConnectJwt,
+  ConnectedUserJwt,
   WithConventionId,
 } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
@@ -29,7 +29,7 @@ export const apiConsumerSlice = createSlice({
     fetchApiConsumerNamesRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        WithConventionId & { jwt: InclusionConnectJwt }
+        WithConventionId & { jwt: ConnectedUserJwt }
       >,
     ) => {
       state.isLoading = true;
@@ -58,7 +58,7 @@ export const apiConsumerSlice = createSlice({
     },
     retrieveApiConsumersRequested: (
       state,
-      _action: PayloadAction<InclusionConnectJwt>,
+      _action: PayloadAction<ConnectedUserJwt>,
     ) => {
       state.isLoading = true;
     },
@@ -76,7 +76,7 @@ export const apiConsumerSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{
         apiConsumer: ApiConsumer;
-        adminToken: InclusionConnectJwt;
+        adminToken: ConnectedUserJwt;
       }>,
     ) => {
       state.isLoading = true;

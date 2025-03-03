@@ -2,13 +2,13 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   AbsoluteUrl,
   AgencyId,
+  ConnectedUserJwt,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
   DiscussionId,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
   RenewConventionParams,
   SignatoryRole,
   UpdateConventionStatusRequestDto,
@@ -169,7 +169,7 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadAction<{
         conventionId: ConventionId;
-        jwt: ConventionJwt | InclusionConnectJwt;
+        jwt: ConventionJwt | ConnectedUserJwt;
       }>,
     ) => {
       state.isLoading = true;
@@ -178,7 +178,7 @@ export const conventionSlice = createSlice({
       state,
       _action: PayloadAction<{
         conventionId: ConventionId;
-        jwt: ConventionJwt | InclusionConnectJwt;
+        jwt: ConventionJwt | ConnectedUserJwt;
       }>,
     ) => {
       state.isLoading = false;

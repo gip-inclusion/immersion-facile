@@ -3,7 +3,6 @@ import {
   AuthenticateWithOAuthCodeParams,
   AuthenticatedUserQueryParams,
   OAuthCode,
-  OAuthGatewayProvider,
   User,
   WithSourcePage,
   authenticateWithOAuthCodeSchema,
@@ -38,7 +37,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   readonly #createNewEvent: CreateNewEvent;
 
-  readonly #inclusionConnectGateway: OAuthGateway;
+  readonly #oAuthGateway: OAuthGateway;
 
   readonly #uuidGenerator: UuidGenerator;
 
@@ -51,7 +50,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
-    inclusionConnectGateway: OAuthGateway,
+    oAuthGateway: OAuthGateway,
     uuidGenerator: UuidGenerator,
     generateAuthenticatedUserJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
@@ -59,7 +58,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   ) {
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
-    this.#inclusionConnectGateway = inclusionConnectGateway;
+    this.#oAuthGateway = oAuthGateway;
     this.#uuidGenerator = uuidGenerator;
     this.#generateAuthenticatedUserJwt = generateAuthenticatedUserJwt;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
@@ -76,12 +75,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         "proConnect",
       );
     if (existingOngoingOAuth)
-      return this.#onOngoingOAuth(
-        uow,
-        "proConnect",
-        { code, page },
-        existingOngoingOAuth,
-      );
+      return this.#onOngoingOAuth(uow, { code, page }, existingOngoingOAuth);
     throw errors.inclusionConnect.missingOAuth({
       state,
       identityProvider: "proConnect",
@@ -90,24 +84,20 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
 
   async #onOngoingOAuth(
     uow: UnitOfWork,
-    provider: OAuthGatewayProvider,
     { code, page }: WithSourcePage & { code: OAuthCode },
     existingOngoingOAuth: OngoingOAuth,
   ): Promise<ConnectedRedirectUrl> {
     const { accessToken, payload, idToken } =
-      await this.#inclusionConnectGateway.getAccessToken(
-        {
-          code,
-          page,
-        },
-        provider,
-      );
+      await this.#oAuthGateway.getAccessToken({
+        code,
+        page,
+      });
 
     if (payload.nonce !== existingOngoingOAuth.nonce)
       throw errors.inclusionConnect.nonceMismatch();
 
     const existingInclusionConnectedUser =
-      await uow.userRepository.findByExternalId(payload.sub, provider);
+      await uow.userRepository.findByExternalId(payload.sub);
 
     const userWithSameEmail = await uow.userRepository.findByEmail(
       payload.email,

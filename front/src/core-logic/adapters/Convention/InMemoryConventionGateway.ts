@@ -3,6 +3,7 @@ import {
   AddConventionInput,
   AgencyOption,
   ApiConsumerName,
+  ConnectedUserJwt,
   ConventionDto,
   ConventionDtoBuilder,
   ConventionId,
@@ -11,7 +12,6 @@ import {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   FindSimilarConventionsParams,
-  InclusionConnectJwt,
   RenewConventionParams,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -66,7 +66,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   broadcastConventionAgain$(
     _params: WithConventionId,
-    _jwt: InclusionConnectJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<void> {
     return this.broadcastConventionAgainResult$;
   }
@@ -78,7 +78,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public getApiConsumersByConvention$(
     _params: WithConventionId,
-    _jwt: InclusionConnectJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<ApiConsumerName[]> {
     return this.getApiConsumersByconventionResult$;
   }
@@ -131,7 +131,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public signConvention$(
     _conventionId: ConventionId,
-    _jwt: ConventionJwt | InclusionConnectJwt,
+    _jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void> {
     return this.conventionSignedResult$;
   }

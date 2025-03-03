@@ -4,11 +4,11 @@ import {
   ApiConsumerJwtPayload,
   AppSupportedJwt,
   CommonJwtPayload,
+  ConnectedUserJwt,
   ConventionJwt,
   ConventionJwtPayload,
   EstablishmentJwt,
   EstablishmentJwtPayload,
-  InclusionConnectJwt,
   InclusionConnectJwtPayload,
 } from "shared";
 
@@ -32,7 +32,7 @@ type JwtMap =
   | JwtTokenMapping<"establishment", EstablishmentJwt, EstablishmentJwtPayload>
   | JwtTokenMapping<
       "inclusionConnect",
-      InclusionConnectJwt,
+      ConnectedUserJwt,
       InclusionConnectJwtPayload
     >
   | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;

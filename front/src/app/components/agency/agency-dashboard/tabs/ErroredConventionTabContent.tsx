@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import {
   AgencyRight,
-  InclusionConnectJwt,
+  ConnectedUserJwt,
   WithAgencyDashboards,
   WithEstablishmentDashboards,
 } from "shared";
@@ -12,7 +12,7 @@ import { MetabaseView } from "../../../MetabaseView";
 
 export const ErroredConventionTabContent = (
   activeAgencyRights: AgencyRight[],
-  inclusionConnectedJwt: InclusionConnectJwt | undefined,
+  inclusionConnectedJwt: ConnectedUserJwt | undefined,
   dashboards: WithAgencyDashboards & WithEstablishmentDashboards,
 ) => {
   const isUserHaveFtAgencyRight = activeAgencyRights.some(

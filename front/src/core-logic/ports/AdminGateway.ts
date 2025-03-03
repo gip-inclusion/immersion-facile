@@ -2,12 +2,12 @@ import { Observable } from "rxjs";
 import {
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUserJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   GetUsersFilters,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
@@ -22,61 +22,61 @@ import {
 export interface AdminGateway {
   addEstablishmentBatch$: (
     establishmentBatch: FormEstablishmentBatchDto,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ) => Observable<EstablishmentBatchReport>;
 
   createUserForAgency$(
     params: UserParamsForAgency,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser>;
 
   getDashboardUrl$: (
     params: GetDashboardParams,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ) => Observable<DashboardUrlAndName>;
   getInclusionConnectedUsersToReview$: (
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
     filters: WithUserFilters,
   ) => Observable<InclusionConnectedUser[]>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ) => Observable<void>;
   getAllApiConsumers$: (
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ) => Observable<ApiConsumer[]>;
 
   getLastNotifications$(
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<NotificationsByKind>;
 
   updateUserRoleForAgency$(
     params: UserParamsForAgency,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void>;
 
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void>;
 
   rejectUserForAgency$(
     params: RejectIcUserRoleForAgencyParams,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void>;
 
   saveApiConsumer$(
     apiConsumer: ApiConsumer,
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ): Observable<ApiConsumerJwt | undefined>;
 
   listUsers$(
     params: GetUsersFilters,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<UserInList[]>;
 
   getIcUser$(
     params: { userId: UserId },
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser>;
 }

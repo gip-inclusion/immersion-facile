@@ -3,12 +3,12 @@ import {
   AdminRoutes,
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUserJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   GetUsersFilters,
-  InclusionConnectJwt,
   InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
@@ -33,7 +33,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public addEstablishmentBatch$(
     establishmentBatch: FormEstablishmentBatchDto,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<EstablishmentBatchReport> {
     return from(
       this.httpClient
@@ -74,7 +74,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public getAllApiConsumers$(
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ): Observable<ApiConsumer[]> {
     return from(
       this.httpClient
@@ -92,7 +92,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public getDashboardUrl$(
     params: GetDashboardParams,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<DashboardUrlAndName> {
     return from(
       this.httpClient
@@ -118,7 +118,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public getInclusionConnectedUsersToReview$(
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
     filters: WithUserFilters,
   ): Observable<InclusionConnectedUser[]> {
     return from(
@@ -136,7 +136,7 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public getLastNotifications$(token: InclusionConnectJwt) {
+  public getLastNotifications$(token: ConnectedUserJwt) {
     return from(
       this.httpClient
         .getLastNotifications({ headers: { authorization: token } })
@@ -170,7 +170,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public saveApiConsumer$(
     apiConsumer: ApiConsumer,
-    adminToken: InclusionConnectJwt,
+    adminToken: ConnectedUserJwt,
   ): Observable<ApiConsumerJwt | undefined> {
     return from(
       this.httpClient
@@ -189,7 +189,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public updateFeatureFlags$(
     params: SetFeatureFlagParam,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<void> {
     return from(
       this.httpClient
@@ -248,7 +248,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public listUsers$(
     filters: GetUsersFilters,
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<UserInList[]> {
     return from(
       this.httpClient
@@ -264,7 +264,7 @@ export class HttpAdminGateway implements AdminGateway {
 
   public getIcUser$(
     params: { userId: UserId },
-    token: InclusionConnectJwt,
+    token: ConnectedUserJwt,
   ): Observable<InclusionConnectedUser> {
     return from(
       this.httpClient

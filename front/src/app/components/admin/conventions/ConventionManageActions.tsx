@@ -11,13 +11,13 @@ import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  ConnectedUserJwt,
   ConventionJwt,
   ConventionReadDto,
   ConventionStatus,
   ConventionSupportedJwt,
   DateIntervalDto,
   ExcludeFromExisting,
-  InclusionConnectJwt,
   RenewConventionParams,
   Role,
   UpdateConventionStatusRequestDto,
@@ -61,7 +61,7 @@ import { ScheduleSection } from "../../forms/convention/sections/schedule/Schedu
 
 export type JwtKindProps =
   | {
-      jwt: InclusionConnectJwt;
+      jwt: ConnectedUserJwt;
       kind: "backoffice";
     }
   | {
@@ -69,7 +69,7 @@ export type JwtKindProps =
       kind: "convention";
     }
   | {
-      jwt: InclusionConnectJwt;
+      jwt: ConnectedUserJwt;
       kind: "inclusionConnect";
     };
 

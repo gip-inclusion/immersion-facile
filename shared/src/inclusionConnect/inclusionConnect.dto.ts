@@ -1,4 +1,4 @@
-import { Flavor, InclusionConnectJwt, UserWithRights } from "..";
+import { ConnectedUserJwt, Flavor, UserWithRights } from "..";
 import { ConventionDto } from "../convention/convention.dto";
 import {
   AgencyRole,
@@ -25,7 +25,7 @@ export type WithSourcePage = {
 };
 
 export type AuthenticatedUserQueryParams = {
-  token: InclusionConnectJwt;
+  token: ConnectedUserJwt;
   idToken: string;
   siret?: string; // remove optional when inclusion connect is removed
 } & Pick<User, "email" | "firstName" | "lastName">;

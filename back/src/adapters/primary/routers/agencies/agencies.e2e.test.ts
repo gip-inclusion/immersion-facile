@@ -3,8 +3,8 @@ import {
   AddressDto,
   AgencyDtoBuilder,
   AgencyRoutes,
+  ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectJwt,
   InclusionConnectedUserBuilder,
   agencyRoutes,
   currentJwtVersions,
@@ -39,7 +39,7 @@ describe("Agency routes", () => {
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
-  let backofficeAdminToken: InclusionConnectJwt;
+  let backofficeAdminToken: ConnectedUserJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
 
   beforeEach(async () => {

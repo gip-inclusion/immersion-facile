@@ -1,19 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  ConnectedUserJwt,
   DiscussionId,
   DiscussionReadDto,
   DiscussionRejected,
-  InclusionConnectJwt,
 } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FetchDiscussionRequestedPayload = {
-  jwt: InclusionConnectJwt;
+  jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
 };
 
 export type RejectDiscussionRequestedPayload = {
-  jwt: InclusionConnectJwt;
+  jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
 } & DiscussionRejected;
 

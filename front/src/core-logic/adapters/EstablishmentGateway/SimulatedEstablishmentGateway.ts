@@ -1,8 +1,8 @@
 import { Observable, delay, of } from "rxjs";
 import {
+  ConnectedUserJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
-  InclusionConnectJwt,
   SiretDto,
 } from "shared";
 import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
@@ -22,7 +22,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
 
   public deleteEstablishment$(
     siret: SiretDto,
-    _jwt: InclusionConnectJwt,
+    _jwt: ConnectedUserJwt,
   ): Observable<void> {
     this.establishments = this.establishments.filter(
       (establishment) => establishment.siret !== siret,
@@ -32,7 +32,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
 
   public getFormEstablishmentFromJwt$(
     siret: SiretDto,
-    _jwt: InclusionConnectJwt | EstablishmentJwt,
+    _jwt: ConnectedUserJwt | EstablishmentJwt,
   ): Observable<FormEstablishmentDto> {
     const establishment = this.establishments.find(
       (establishment) => establishment.siret === siret,
@@ -47,7 +47,7 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
 
   public updateFormEstablishment$(
     establishment: FormEstablishmentDto,
-    _jwt: EstablishmentJwt | InclusionConnectJwt,
+    _jwt: EstablishmentJwt | ConnectedUserJwt,
   ): Observable<void> {
     this.establishments.map((currentEstablishment) =>
       establishment.siret === currentEstablishment.siret

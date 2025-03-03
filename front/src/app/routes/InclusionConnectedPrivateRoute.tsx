@@ -6,12 +6,10 @@ import {
   LoginForm,
   MainWrapper,
   OAuthButton,
-  OAuthButtonProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   AllowedStartOAuthLoginPage,
-  OAuthGatewayProvider,
   absoluteUrlSchema,
   domElementIds,
   inclusionConnectImmersionRoutes,
@@ -72,20 +70,11 @@ type InclusionConnectedPrivateRouteProps = {
   allowAdminOnly?: boolean;
 };
 
-const providers: Record<
-  OAuthGatewayProvider,
-  {
-    name: string;
-    baseline: string;
-    buttonProvider: OAuthButtonProps["provider"];
-  }
-> = {
-  proConnect: {
-    name: "ProConnect",
-    buttonProvider: "pro-connect",
-    baseline:
-      "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-  },
+const proConnectProvider = {
+  name: "ProConnect",
+  buttonProvider: "pro-connect" as const,
+  baseline:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
 };
 
 const getPage = (
@@ -110,7 +99,6 @@ export const InclusionConnectedPrivateRoute = ({
   const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
 
-  const provider = providers.proConnect;
   const afterLoginRedirectionUrl = useAppSelector(
     authSelectors.afterLoginRedirectionUrl,
   );
@@ -129,7 +117,7 @@ export const InclusionConnectedPrivateRoute = ({
       dispatch(
         authSlice.actions.federatedIdentityProvided({
           federatedIdentityWithUser: {
-            provider: "inclusionConnect",
+            provider: "connectedUser",
             token,
             email,
             lastName,
@@ -176,8 +164,8 @@ export const InclusionConnectedPrivateRoute = ({
               <LoginForm
                 sections={[
                   {
-                    title: `Se connecter avec ${provider.name}`,
-                    description: provider.baseline,
+                    title: `Se connecter avec ${proConnectProvider.name}`,
+                    description: proConnectProvider.baseline,
                     authComponent: (
                       <OAuthButton
                         id={domElementIds[page].login.inclusionConnectButton}
@@ -189,7 +177,7 @@ export const InclusionConnectedPrivateRoute = ({
                             { page },
                           ),
                         )}`}
-                        provider={provider.buttonProvider}
+                        provider={proConnectProvider.buttonProvider}
                       />
                     ),
                   },
