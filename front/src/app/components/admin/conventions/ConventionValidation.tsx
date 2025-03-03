@@ -24,8 +24,12 @@ import {
   toDisplayedDate,
 } from "shared";
 import { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { remindSignatoriesSlice } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.slice";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
 import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
 
@@ -55,13 +59,22 @@ export const ConventionValidation = ({
 }: ConventionValidationProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
+  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const hasErrorFeedback = feedbacks["remind-signatories"]?.level === "error";
 
   const [signatoryToRemind, setSignatoryToRemind] = useState<{
     signatoryRole: SignatoryRole;
     signatoryPhone: Phone;
   } | null>(null);
 
-  const isModalOpen = useIsModalOpen(remindBySmsModal);
+  const closeRemindBySmsModalModal = () => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    remindBySmsModal.close();
+  };
+
+  const isModalOpen = useIsModalOpen(remindBySmsModal, {
+    onConceal: () => closeRemindBySmsModalModal(),
+  });
 
   useEffect(() => {
     if (!isModalOpen) setSignatoryToRemind(null);
@@ -89,7 +102,6 @@ export const ConventionValidation = ({
           feedbackTopic: "remind-signatories",
         }),
       );
-    remindBySmsModal.close();
   };
 
   const openRemindBySmsButtonProps: (
@@ -146,6 +158,7 @@ export const ConventionValidation = ({
 
           <ButtonsGroup
             inlineLayoutWhen="always"
+            alignment="right"
             buttons={[
               {
                 priority: "secondary",
@@ -159,10 +172,12 @@ export const ConventionValidation = ({
                   .submitRemindSignatoriesBySmsModalButton,
                 priority: "primary",
                 children: "Envoyer",
+                disabled: hasErrorFeedback,
                 onClick: () => onSubmitRemindSignatoryBySms(),
               },
             ]}
           />
+          <Feedback topic="remind-signatories" className={fr.cx("fr-my-2w")} />
         </remindBySmsModal.Component>,
         document.body,
       )}
