@@ -16,6 +16,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import type {
   GenerateEditFormEstablishmentJwt,
@@ -279,7 +280,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       status: 401,
       body: {
         status: 401,
-        message: "Provided token is invalid",
+        message: invalidTokenMessage,
       },
     });
   });

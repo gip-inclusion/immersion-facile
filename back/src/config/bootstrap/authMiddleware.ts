@@ -14,6 +14,7 @@ import { type JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 import type { AppConfig } from "./appConfig";
+import { invalidTokenMessage } from "./inclusionConnectAuthMiddleware";
 
 const logger = createLogger(__filename);
 
@@ -115,7 +116,7 @@ const sendAuthenticationError = (res: Response, error: Error) => {
   res.status(401);
   return res.json({
     status: 401,
-    message: "Provided token is invalid",
+    message: invalidTokenMessage,
   });
 };
 
