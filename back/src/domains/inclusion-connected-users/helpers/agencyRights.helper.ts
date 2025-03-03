@@ -47,21 +47,28 @@ export const rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferenc
 export function validateAgencyRights(
   agencyId: AgencyId,
   agencyRights: AgencyUsersRights,
+  agencyRefersTo: AgencyId | null,
 ) {
-  rejectIfAgencyHaveCounsellorsButNoOneNotified(agencyId, agencyRights);
+  rejectIfAgencyHaveCounsellorsButNoOneNotified(
+    agencyId,
+    agencyRights,
+    agencyRefersTo,
+  );
   rejectIfAgencyWontHaveSomeNotifiedValidator(agencyId, agencyRights);
 }
 
 const rejectIfAgencyHaveCounsellorsButNoOneNotified = (
   agencyId: AgencyId,
   agencyRights: AgencyUsersRights,
+  agencyRefersTo: AgencyId | null,
 ): void => {
   const counsellorRights = values(agencyRights).filter((right) =>
     right?.roles.includes("counsellor"),
   );
   if (
-    counsellorRights.length > 0 &&
-    !counsellorRights.some((right) => right?.isNotifiedByEmail === true)
+    (counsellorRights.length > 0 &&
+      !counsellorRights.some((right) => right?.isNotifiedByEmail === true)) ||
+    (agencyRefersTo && counsellorRights.length === 0)
   )
     throw errors.agency.notEnoughCounsellors({ agencyId });
 };
