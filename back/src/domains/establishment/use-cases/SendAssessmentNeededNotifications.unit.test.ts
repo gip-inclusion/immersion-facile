@@ -29,11 +29,11 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendAssessmentFormNotifications } from "./SendAssessmentFormNotifications";
+import { SendAssessmentNeededNotifications } from "./SendAssessmentNeededNotifications";
 
-describe("SendEmailWithAssessmentCreationLink", () => {
+describe("SendAssessmentNeededNotifications", () => {
   let uow: InMemoryUnitOfWork;
-  let sendEmailWithAssessmentCreationLink: SendAssessmentFormNotifications;
+  let sendEmailWithAssessmentCreationLink: SendAssessmentNeededNotifications;
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -157,7 +157,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       uuidGenerator,
       timeGateway,
     );
-    sendEmailWithAssessmentCreationLink = new SendAssessmentFormNotifications(
+    sendEmailWithAssessmentCreationLink = new SendAssessmentNeededNotifications(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
       timeGateway,

@@ -37,7 +37,7 @@
     "trigger-refresh-materialized-views": "ts-node src/scripts/triggerRefreshMaterializedViews.ts",
     "trigger-resync-old-conventions-to-pe": "ts-node src/scripts/triggerResyncOldConventionsToPe.ts",
     "trigger-assessment-reminders": "ts-node src/scripts/triggerAssessmentReminder.ts",
-    "trigger-sending-assessment-form-notifications": "ts-node src/scripts/triggerSendingAssessmentFormNotifications.ts",
+    "trigger-sending-assessment-needed-notifications": "ts-node src/scripts/triggerSendAssessmentNeededNotifications.ts",
     "trigger-suggest-edit-form-establishment-every-6-months": "ts-node src/scripts/triggerSuggestEditFormEstablishmentEvery6Months.ts",
     "trigger-update-establishments-from-sirene": "ts-node src/scripts/triggerUpdateEstablishmentsFromSireneApiScript.ts",
     "trigger-update-all-establishments-scores": "ts-node src/scripts/triggerUpdateAllEstablishmentsScores.ts",

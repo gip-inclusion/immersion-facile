@@ -31,7 +31,7 @@ type SendAssessmentFormNotificationsOutput = {
   numberOfImmersionEndingTomorrow: number;
 };
 
-export class SendAssessmentFormNotifications extends TransactionalUseCase<
+export class SendAssessmentNeededNotifications extends TransactionalUseCase<
   {
     conventionEndDate?: DateRange;
   },
