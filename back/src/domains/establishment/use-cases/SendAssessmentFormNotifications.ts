@@ -110,6 +110,15 @@ export class SendAssessmentFormNotifications extends TransactionalUseCase<
     uow: UnitOfWork;
     convention: ConventionDto;
   }) {
+    const emails = await uow.notificationRepository.getLastEmailsByFilters({
+      email: convention.signatories.beneficiary.email,
+      emailType: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+      conventionId: convention.id,
+    });
+    const emailAlreadySent = emails.length > 0;
+
+    if (emailAlreadySent) return;
+
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {

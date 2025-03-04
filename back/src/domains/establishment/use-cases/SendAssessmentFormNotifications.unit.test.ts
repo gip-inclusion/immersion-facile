@@ -5,6 +5,7 @@ import {
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
   Notification,
+  TemplatedEmail,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -87,6 +88,61 @@ describe("SendEmailWithAssessmentCreationLink", () => {
     .withDateEnd(inTwoDays.toISOString())
     .build();
 
+  const agencyNotifications: TemplatedEmail[] = [
+    {
+      kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+      params: {
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        agencyLogoUrl: agency.logoUrl!,
+        beneficiaryFirstName:
+          conventionEndingTomorrow.signatories.beneficiary.firstName,
+        beneficiaryLastName:
+          conventionEndingTomorrow.signatories.beneficiary.lastName,
+        conventionId: conventionEndingTomorrow.id,
+        businessName: conventionEndingTomorrow.businessName,
+        assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+          email: validator1.email,
+          id: conventionEndingTomorrow.id,
+          targetRoute: "bilan-immersion",
+          role: "validator",
+          now,
+        }),
+        internshipKind: conventionEndingTomorrow.internshipKind,
+      },
+      recipients: [validator1.email],
+      sender: {
+        email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+        name: "Immersion Facilitée",
+      },
+    },
+    {
+      kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+      params: {
+        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        agencyLogoUrl: agency.logoUrl!,
+        beneficiaryFirstName:
+          conventionEndingTomorrow.signatories.beneficiary.firstName,
+        beneficiaryLastName:
+          conventionEndingTomorrow.signatories.beneficiary.lastName,
+        conventionId: conventionEndingTomorrow.id,
+        businessName: conventionEndingTomorrow.businessName,
+        assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+          email: counsellor.email,
+          id: conventionEndingTomorrow.id,
+          targetRoute: "bilan-immersion",
+          role: "counsellor",
+          now,
+        }),
+        internshipKind: conventionEndingTomorrow.internshipKind,
+      },
+      recipients: [counsellor.email],
+      sender: {
+        email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+        name: "Immersion Facilitée",
+      },
+    },
+  ];
+
   beforeEach(() => {
     const uuidGenerator = new UuidV4Generator();
 
@@ -168,58 +224,7 @@ describe("SendEmailWithAssessmentCreationLink", () => {
               name: "Immersion Facilitée",
             },
           },
-          {
-            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
-            params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
-              conventionId: conventionEndingTomorrow.id,
-              businessName: conventionEndingTomorrow.businessName,
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: validator1.email,
-                id: conventionEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "validator",
-                now,
-              }),
-              internshipKind: conventionEndingTomorrow.internshipKind,
-            },
-            recipients: [validator1.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
-          },
-          {
-            kind: "ASSESSMENT_AGENCY_NOTIFICATION",
-            params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
-              conventionId: conventionEndingTomorrow.id,
-              businessName: conventionEndingTomorrow.businessName,
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: counsellor.email,
-                id: conventionEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "counsellor",
-                now,
-              }),
-              internshipKind: conventionEndingTomorrow.internshipKind,
-            },
-            recipients: [counsellor.email],
-            sender: {
-              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-              name: "Immersion Facilitée",
-            },
-          },
+          ...agencyNotifications,
           {
             kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
             params: {
@@ -367,9 +372,132 @@ describe("SendEmailWithAssessmentCreationLink", () => {
       ]);
     });
 
+    it("Sends only establishment notification when beneficiary already received assessment notification", async () => {
+      const beneficiaryEmailContent: TemplatedEmail = {
+        kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+        params: {
+          conventionId: conventionEndingTomorrow.id,
+          beneficiaryLastName:
+            conventionEndingTomorrow.signatories.beneficiary.lastName,
+          beneficiaryFirstName:
+            conventionEndingTomorrow.signatories.beneficiary.firstName,
+          businessName: conventionEndingTomorrow.businessName,
+          internshipKind: conventionEndingTomorrow.internshipKind,
+        },
+        recipients: [conventionEndingTomorrow.signatories.beneficiary.email],
+        sender: {
+          email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+          name: "Immersion Facilitée",
+        },
+      };
+      const existingBeneficiaryNotification: Notification = {
+        createdAt: new Date().toISOString(),
+        followedIds: {
+          conventionId: conventionEndingTomorrow.id,
+          agencyId: conventionEndingTomorrow.agencyId,
+          establishmentSiret: conventionEndingTomorrow.siret,
+        },
+        id: "existing-beneficiary-notification",
+        kind: "email",
+        templatedContent: beneficiaryEmailContent,
+      };
+
+      uow.conventionRepository.setConventions([conventionEndingTomorrow]);
+      uow.notificationRepository.notifications = [
+        existingBeneficiaryNotification,
+      ];
+      await uow.outboxRepository.save({
+        id: "existing-notification-added",
+        topic: "NotificationAdded",
+        payload: {
+          id: existingBeneficiaryNotification.id,
+          kind: existingBeneficiaryNotification.kind,
+        },
+        occurredAt: new Date().toISOString(),
+        publications: [],
+        wasQuarantined: false,
+        status: "published",
+      });
+      await uow.outboxRepository.save({
+        id: "existing-beneficiary-assessment-email",
+        topic: "BeneficiaryAssessmentEmailSent",
+        payload: {
+          id: conventionEndingTomorrow.id,
+        },
+        occurredAt: new Date().toISOString(),
+        publications: [],
+        wasQuarantined: false,
+        status: "published",
+      });
+
+      await sendEmailWithAssessmentCreationLink.execute({
+        conventionEndDate: {
+          from: now,
+          to: inOneDay,
+        },
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          beneficiaryEmailContent,
+          {
+            kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+            params: {
+              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              agencyLogoUrl: agency.logoUrl!,
+              beneficiaryFirstName:
+                conventionEndingTomorrow.signatories.beneficiary.firstName,
+              beneficiaryLastName:
+                conventionEndingTomorrow.signatories.beneficiary.lastName,
+              conventionId: conventionEndingTomorrow.id,
+              establishmentTutorName: `${conventionEndingTomorrow.establishmentTutor.firstName} ${conventionEndingTomorrow.establishmentTutor.lastName}`,
+              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+                email: conventionEndingTomorrow.establishmentTutor.email,
+                id: conventionEndingTomorrow.id,
+                targetRoute: "bilan-immersion",
+                role: "establishment-tutor",
+                now,
+              }),
+              internshipKind: conventionEndingTomorrow.internshipKind,
+            },
+            recipients: [conventionEndingTomorrow.establishmentTutor.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+          ...agencyNotifications,
+        ],
+      });
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "BeneficiaryAssessmentEmailSent",
+          payload: {
+            id: conventionEndingTomorrow.id,
+          },
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "NotificationAdded",
+        },
+        {
+          topic: "EmailWithLinkToCreateAssessmentSent",
+          payload: { id: conventionEndingTomorrow.id },
+        },
+      ]);
+    });
+
     it("Does not send an email to immersions having already received one", async () => {
       // Arrange
-
       const notification: Notification = {
         createdAt: new Date().toISOString(),
         followedIds: {
