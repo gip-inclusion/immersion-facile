@@ -58,6 +58,7 @@ export * from "./featureFlag/featureFlags.schema";
 export * from "./federatedIdentities/federatedIdentity.dto";
 export * from "./file/file.dto";
 export * from "./file/file.validators";
+export * from "./filters";
 export * from "./formEstablishment/FormEstablishment.dto";
 export * from "./formEstablishment/FormEstablishment.schema";
 export * from "./formEstablishment/FormEstablishmentDtoBuilder";
