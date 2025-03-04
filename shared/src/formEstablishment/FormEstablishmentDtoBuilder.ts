@@ -1,16 +1,15 @@
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressAndPosition } from "../address/address.dto";
-import { Email } from "../email/email.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
-  BusinessContactDto,
   EstablishmentCSVRow,
   EstablishmentSearchableBy,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  FormUserRights,
 } from "./FormEstablishment.dto";
 import {
   defaultMaxContactsPerMonth,
@@ -79,20 +78,26 @@ export const updatedAddress2: TestAddress = {
   },
 };
 
-const defaultBusinessContactDto: BusinessContactDto = {
-  email: "amil@mail.com",
-  firstName: "Esteban",
-  lastName: "Ocon",
-  phone: "+33612345678",
-  job: "a job",
-  contactMethod: "EMAIL",
-  copyEmails: ["copy1@mail.com", "copy2@mail.com"],
-};
-
 export const defaultValidFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [defaultAddress.formAddress],
-  businessContact: defaultBusinessContactDto,
+  userRights: [
+    {
+      role: "establishment-admin",
+      email: "amil@mail.com",
+      job: "a job",
+      phone: "+33612345678",
+    },
+    {
+      role: "establishment-contact",
+      email: "copy1@mail.com",
+    },
+    {
+      role: "establishment-contact",
+      email: "copy2@mail.com",
+    },
+  ],
+  contactMethod: "EMAIL",
   naf: { code: "7201A", nomenclature: "nomenclature code 7201A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
@@ -133,15 +138,19 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
 export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
   source: "immersion-facile",
   businessAddresses: [updatedAddress1.formAddress, updatedAddress2.formAddress],
-  businessContact: {
-    email: "my-updated-email@test.com",
-    contactMethod: "PHONE",
-    firstName: "Jean-Luc",
-    lastName: "Deloin",
-    copyEmails: ["updated-copy-email@test.com"],
-    job: "new job",
-    phone: "+33612345679",
-  },
+  userRights: [
+    {
+      role: "establishment-admin",
+      email: "my-updated-email@test.com",
+      job: "new job",
+      phone: "+33612345679",
+    },
+    {
+      role: "establishment-contact",
+      email: "updated-copy-email@test.com",
+    },
+  ],
+  contactMethod: "PHONE",
   naf: { code: "8054B", nomenclature: "nomenclature code B" },
   businessName: "Edited Business Name",
   siret: "01234567890123",
@@ -181,15 +190,9 @@ const emptyFormEstablishment: FormEstablishmentDto = {
     },
   ],
   naf: { code: "", nomenclature: "" },
-  businessContact: {
-    contactMethod: "EMAIL",
-    lastName: "",
-    firstName: "",
-    phone: "",
-    email: "",
-    job: "",
-    copyEmails: [],
-  },
+
+  contactMethod: "EMAIL",
+  userRights: [],
   businessName: "",
   siret: "",
   appellations: [],
@@ -230,10 +233,6 @@ export class FormEstablishmentDtoBuilder
     return this.#dto;
   }
 
-  public buildCsvRow(): EstablishmentCSVRow {
-    return formEstablishmentToEstablishmentCsvRow(this.#dto);
-  }
-
   public withAppellations(appellations: AppellationAndRomeDto[]) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
@@ -241,25 +240,18 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
+  public buildCsvRow(): EstablishmentCSVRow {
+    return formEstablishmentToEstablishmentCsvRow(this.#dto);
+  }
+
   public withBusinessAddresses(businessAddresses: FormEstablishmentAddress[]) {
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddresses });
   }
 
-  public withBusinessContact(businessContact: BusinessContactDto) {
-    return new FormEstablishmentDtoBuilder({ ...this.#dto, businessContact });
-  }
-
-  public withBusinessContactEmail(email: Email) {
+  public withFormUserRights(formUserRights: FormUserRights) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      businessContact: { ...this.#dto.businessContact, email },
-    });
-  }
-
-  public withBusinessContactCopyEmails(copyEmails: Email[]) {
-    return new FormEstablishmentDtoBuilder({
-      ...this.#dto,
-      businessContact: { ...this.#dto.businessContact, copyEmails },
+      userRights: formUserRights,
     });
   }
 
@@ -310,57 +302,123 @@ export class FormEstablishmentDtoBuilder
 
 const formEstablishmentToEstablishmentCsvRow = (
   establishment: FormEstablishmentDto,
-): EstablishmentCSVRow => ({
-  businessAddress: establishment.businessAddresses[0].rawAddress,
-  businessContact_email: establishment.businessContact.email,
-  businessContact_firstName: establishment.businessContact.firstName,
-  businessContact_lastName: establishment.businessContact.lastName,
-  businessContact_phone: establishment.businessContact.phone,
-  businessContact_job: establishment.businessContact.job,
-  businessContact_contactMethod: establishment.businessContact.contactMethod,
-  businessContact_copyEmails:
-    establishment.businessContact.copyEmails.join(","),
-  naf_code: establishment.naf?.code ?? "",
-  businessName: establishment.businessName,
-  businessNameCustomized: establishment.businessNameCustomized ?? "",
-  siret: establishment.siret,
-  website: establishment.website ?? "",
-  additionalInformation: establishment.additionalInformation ?? "",
-  appellations_code: establishment.appellations
-    .map((appellation) => appellation.appellationCode)
-    .join(","),
-  isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
-  isSearchable:
-    establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
-  fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
-  searchableByStudents: establishment.searchableBy.students ? "1" : "0",
-  searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
-});
+): EstablishmentCSVRow => {
+  const [
+    userRight1,
+    userRight2,
+    userRight3,
+    userRight4,
+    userRight5,
+    userRight6,
+    userRight7,
+    userRight8,
+    userRight9,
+    userRight10,
+  ] = establishment.userRights;
+  if (userRight1.role !== "establishment-admin")
+    throw new Error("first user right must be admin");
+  return {
+    businessAddress: establishment.businessAddresses[0].rawAddress,
+    // businessContact_phone: establishment.businessContact.phone,
+    // businessContact_job: establishment.businessContact.job,
+    contactMethod: establishment.contactMethod,
+    // businessContact_copyEmails:establishment.businessContact.copyEmails.join(","),
+    naf_code: establishment.naf?.code ?? "",
+    businessName: establishment.businessName,
+    businessNameCustomized: establishment.businessNameCustomized ?? "",
+    siret: establishment.siret,
+    website: establishment.website ?? "",
+    additionalInformation: establishment.additionalInformation ?? "",
+    appellations_code: establishment.appellations
+      .map((appellation) => appellation.appellationCode)
+      .join(","),
+    isEngagedEnterprise: establishment.isEngagedEnterprise ? "1" : "0",
+    isSearchable:
+      establishment.maxContactsPerMonth > noContactPerMonth ? "1" : "0",
+    fitForDisabledWorkers: establishment.fitForDisabledWorkers ? "1" : "0",
+    searchableByStudents: establishment.searchableBy.students ? "1" : "0",
+    searchableByJobSeekers: establishment.searchableBy.jobSeekers ? "1" : "0",
+    right1_email: userRight1.email,
+    right1_job: userRight1.job,
+    right1_phone: userRight1.phone,
+    ...(userRight2
+      ? {
+          right2_role: userRight2.role,
+          right2_job: userRight2.job,
+          right2_phone: userRight2.phone,
+          right2_email: userRight2.email,
+        }
+      : {}),
+    ...(userRight3
+      ? {
+          right3_role: userRight3.role,
+          right3_job: userRight3.job,
+          right3_phone: userRight3.phone,
+          right3_email: userRight3.email,
+        }
+      : {}),
 
-export class BusinessContactDtoBuilder implements Builder<BusinessContactDto> {
-  #dto: BusinessContactDto;
+    ...(userRight4
+      ? {
+          right4_role: userRight4.role,
+          right4_job: userRight4.job,
+          right4_phone: userRight4.phone,
+          right4_email: userRight4.email,
+        }
+      : {}),
 
-  constructor(dto: BusinessContactDto = defaultBusinessContactDto) {
-    this.#dto = dto;
-  }
+    ...(userRight5
+      ? {
+          right5_role: userRight5.role,
+          right5_job: userRight5.job,
+          right5_phone: userRight5.phone,
+          right5_email: userRight5.email,
+        }
+      : {}),
 
-  public withFirstName(firstName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, firstName });
-  }
+    ...(userRight6
+      ? {
+          right6_role: userRight6.role,
+          right6_job: userRight6.job,
+          right6_phone: userRight6.phone,
+          right6_email: userRight6.email,
+        }
+      : {}),
 
-  public withLastName(lastName: string) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, lastName });
-  }
+    ...(userRight7
+      ? {
+          right7_role: userRight7.role,
+          right7_job: userRight7.job,
+          right7_phone: userRight7.phone,
+          right7_email: userRight7.email,
+        }
+      : {}),
 
-  public withEmail(email: Email) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, email });
-  }
+    ...(userRight8
+      ? {
+          right8_role: userRight8.role,
+          right8_job: userRight8.job,
+          right8_phone: userRight8.phone,
+          right8_email: userRight8.email,
+        }
+      : {}),
 
-  public withCopyEmails(copyEmails: Email[]) {
-    return new BusinessContactDtoBuilder({ ...this.#dto, copyEmails });
-  }
+    ...(userRight9
+      ? {
+          right9_role: userRight9.role,
+          right9_job: userRight9.job,
+          right9_phone: userRight9.phone,
+          right9_email: userRight9.email,
+        }
+      : {}),
 
-  public build() {
-    return this.#dto;
-  }
-}
+    ...(userRight10
+      ? {
+          right10_role: userRight10.role,
+          right10_job: userRight10.job,
+          right10_phone: userRight10.phone,
+          right10_email: userRight10.email,
+        }
+      : {}),
+  };
+};

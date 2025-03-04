@@ -1,4 +1,3 @@
-import { prop, uniqBy } from "ramda";
 import {
   FormEstablishmentDto,
   InclusionConnectedUser,
@@ -6,12 +5,9 @@ import {
   errors,
   withFormEstablishmentSchema,
 } from "shared";
-import { rawAddressToLocation } from "../../../utils/address";
-import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { AddressGateway } from "../../core/address/ports/AddressGateway";
-import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { TriggeredBy } from "../../core/events/events";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
@@ -20,7 +16,6 @@ import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
@@ -33,7 +28,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly siretGateway: SiretGateway,
-    private readonly addressAPI: AddressGateway,
+    private readonly addressGateway: AddressGateway,
     private readonly uuidGenerator: UuidGenerator,
     private readonly timeGateway: TimeGateway,
     private readonly createNewEvent: CreateNewEvent,
@@ -46,6 +41,8 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     uow: UnitOfWork,
     currentUser?: InclusionConnectedUser,
   ): Promise<void> {
+    if (!currentUser) throw errors.user.noJwtProvided();
+
     const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         formEstablishment.siret,
@@ -77,14 +74,10 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
           : formEstablishment.businessNameCustomized,
     };
 
-    const triggeredBy: TriggeredBy | null = currentUser
-      ? {
-          kind: "inclusion-connected",
-          userId: currentUser.id,
-        }
-      : null;
-
-    await this.next(uow, correctFormEstablishment, triggeredBy);
+    await this.next(uow, correctFormEstablishment, {
+      kind: "inclusion-connected",
+      userId: currentUser.id,
+    });
   }
 
   private async next(
@@ -92,80 +85,31 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
     formEstablishment: FormEstablishmentDto,
     triggeredBy: TriggeredBy | null,
   ) {
-    const { businessContact } = formEstablishment;
-
-    const establishmentAdminId = await createOrGetUserIdByEmail(
-      uow,
-      this.timeGateway,
-      this.uuidGenerator,
-      {
-        email: businessContact.email,
-        firstName: businessContact.firstName,
-        lastName: businessContact.lastName,
-      },
-    );
-
-    const establishmentContactIds = await Promise.all(
-      businessContact.copyEmails.map((email) =>
-        createOrGetUserIdByEmail(uow, this.timeGateway, this.uuidGenerator, {
-          email,
-        }),
-      ),
-    );
-
-    const userRights: EstablishmentUserRight[] = uniqBy(prop("userId"), [
-      {
-        role: "establishment-admin",
-        userId: establishmentAdminId,
-        job: businessContact.job,
-        phone: businessContact.phone,
-      },
-      ...establishmentContactIds.map(
-        (userId): EstablishmentUserRight => ({
-          role: "establishment-contact",
-          userId,
-        }),
-      ),
-    ]);
-
     const establishmentAggregate = await makeEstablishmentAggregate({
+      uow,
       timeGateway: this.timeGateway,
+      addressGateway: this.addressGateway,
+      uuidGenerator: this.uuidGenerator,
+      score: 0,
       nafAndNumberOfEmployee: await getNafAndNumberOfEmployee(
         this.siretGateway,
         formEstablishment.siret,
       ),
-      addressesAndPosition: await Promise.all(
-        formEstablishment.businessAddresses.map(
-          async (formEstablishmentAddress) =>
-            rawAddressToLocation(
-              this.addressAPI,
-              formEstablishment.siret,
-              formEstablishmentAddress,
-            ),
-        ),
-      ),
       formEstablishment,
-      userRights,
     });
 
-    await uow.establishmentAggregateRepository
-      .insertEstablishmentAggregate(establishmentAggregate)
-      .catch((err) => {
-        notifyToTeamAndThrowError(
-          new Error(
-            `Error when adding establishment aggregate with siret ${formEstablishment.siret} due to ${err}`,
-          ),
-        );
-      });
+    await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      establishmentAggregate,
+    );
 
-    const event = this.createNewEvent({
-      topic: "NewEstablishmentAggregateInsertedFromForm",
-      payload: {
-        establishmentAggregate,
-        triggeredBy,
-      },
-    });
-
-    await uow.outboxRepository.save(event);
+    await uow.outboxRepository.save(
+      this.createNewEvent({
+        topic: "NewEstablishmentAggregateInsertedFromForm",
+        payload: {
+          establishmentAggregate,
+          triggeredBy,
+        },
+      }),
+    );
   }
 }

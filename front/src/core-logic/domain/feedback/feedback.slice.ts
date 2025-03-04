@@ -10,9 +10,8 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -35,7 +34,6 @@ const topics = [
   "user",
   "agency-user-for-dashboard",
   "search-result",
-  "establishment-modification-link",
   "form-establishment",
   "siret-input",
   "agency-for-dashboard",
@@ -337,20 +335,6 @@ export const feedbackMapping: Record<
       title: "Oups !",
       message:
         "L'offre ne peut plus être affichée, veuillez relancer une recherche d'offre d'immersion pour retrouver une offre.",
-    },
-  },
-  "establishment-modification-link": {
-    "create.error": {
-      action: establishmentSlice.actions.sendModificationLinkFailed,
-      title: "Lien non envoyé",
-      message:
-        "Il y a eu un problème lors de l'envoi du lien de modification de l'entreprise.",
-    },
-    "create.success": {
-      action: establishmentSlice.actions.sendModificationLinkSucceeded,
-      title: "Lien envoyé",
-      message:
-        "Le lien de modification de l'entreprise a bien été envoyé par email.",
     },
   },
   "form-establishment": {

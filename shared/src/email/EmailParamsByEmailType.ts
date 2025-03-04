@@ -265,11 +265,6 @@ export type EmailParamsByEmailType = {
     subject: string;
     htmlContent: string;
   };
-  EDIT_FORM_ESTABLISHMENT_LINK: {
-    editFrontUrl: string;
-    businessName: string;
-    businessAddresses: string[];
-  };
   ESTABLISHMENT_DELETED: {
     businessName: string;
     siret: SiretDto;
@@ -439,7 +434,7 @@ export type EmailParamsByEmailType = {
     agencyName: string;
   };
   SUGGEST_EDIT_FORM_ESTABLISHMENT: {
-    editFrontUrl: string;
+    editFrontUrl: AbsoluteUrl;
     businessName: string;
     businessAddresses: string[];
   };

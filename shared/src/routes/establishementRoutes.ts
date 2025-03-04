@@ -11,6 +11,7 @@ export const establishmentRoutes = defineRoutes({
     method: "post",
     url: "/form-establishments",
     requestBodySchema: formEstablishmentSchema,
+    ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
     },
@@ -38,14 +39,6 @@ export const establishmentRoutes = defineRoutes({
       401: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
       404: httpErrorSchema,
-    },
-  }),
-  requestEmailToUpdateFormRoute: defineRoute({
-    method: "post",
-    url: "/request-email-to-update-form/:siret",
-    responses: {
-      201: expressEmptyResponseBody,
-      400: httpErrorSchema,
     },
   }),
   deleteEstablishment: defineRoute({
