@@ -154,7 +154,17 @@ export const createTechnicalRouter = (
         return;
       }
 
-      return deps.useCases.sendTicketToCrisp.execute(req.body);
+      return deps.useCases.sendTicketToCrisp
+        .execute(req.body)
+        .catch((error) => {
+          logger.error({
+            crispTicket: {
+              kind: "Ticket errored",
+              errorMessage: error?.message,
+            },
+          });
+          throw error;
+        });
     }),
   );
 
