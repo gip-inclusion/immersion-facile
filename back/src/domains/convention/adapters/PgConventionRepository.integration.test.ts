@@ -729,6 +729,45 @@ describe("PgConventionRepository", () => {
       );
     });
 
+    it("Update the tutor", async () => {
+      const tutor: EstablishmentTutor = {
+        firstName: "Joe",
+        lastName: "Doe",
+        job: "Tutor",
+        email: "tutor123w@mail.com",
+        phone: "0111223344",
+        role: "establishment-tutor",
+      };
+
+      const conventionId = "40400404-0000-0000-0000-6bb9bd38bbbb";
+
+      const convention = new ConventionDtoBuilder()
+        .withId(conventionId)
+        .withEstablishmentTutor(tutor)
+        .build();
+
+      const updatedConvention = new ConventionDtoBuilder(convention)
+        .withEstablishmentTutor({
+          firstName: "updated-Joe",
+          lastName: "updated-Doe",
+          job: "updated-Job",
+          email: "updated-tutor123w@mail.com",
+          phone: "+33555600765",
+          role: "establishment-tutor",
+        })
+        .build();
+      await conventionRepository.save(convention);
+
+      await conventionRepository.update(updatedConvention);
+      const updatedConventionStored = await conventionRepository.getById(
+        updatedConvention.id,
+      );
+      expectToEqual(
+        updatedConventionStored?.establishmentTutor,
+        updatedConvention.establishmentTutor,
+      );
+    });
+
     it("Updates an already saved immersion with a beneficiary representative", async () => {
       const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
       const convention = conventionStylisteBuilder
