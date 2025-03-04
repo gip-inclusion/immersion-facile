@@ -91,8 +91,9 @@ type ApiConsumerCall = {
 
 type LoggerParams = Partial<{
   crispTicket: {
-    kind: "Ticket self solved" | "Ticket sent to Crisp";
+    kind: "Ticket self solved" | "Ticket sent to Crisp" | "Ticket errored";
     segments?: string[];
+    errorMessage?: string;
   };
   partnerApiCall: PartnerApiCall;
   cacheKey: string;
