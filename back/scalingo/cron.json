@@ -29,7 +29,7 @@
       "size": "M"
     },
     {
-      "command": "49 20 * * * pnpm back run trigger-sending-assessment-notifications",
+      "command": "49 20 * * * pnpm back run trigger-sending-assessment-needed-notifications",
       "size": "M"
     },
     {

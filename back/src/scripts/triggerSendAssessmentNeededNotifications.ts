@@ -11,7 +11,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notificatio
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { SendAssessmentFormNotifications } from "../domains/establishment/use-cases/SendAssessmentFormNotifications";
+import { SendAssessmentNeededNotifications } from "../domains/establishment/use-cases/SendAssessmentNeededNotifications";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 import { getDateRangeFromScriptParams } from "./utils";
@@ -62,7 +62,7 @@ const sendAssessmentFormNotificationsScript = async () => {
     timeGateway,
   );
 
-  const sendAssessmentFormNotifications = new SendAssessmentFormNotifications(
+  const sendAssessmentFormNotifications = new SendAssessmentNeededNotifications(
     uowPerformer,
     saveNotificationAndRelatedEvent,
     timeGateway,
