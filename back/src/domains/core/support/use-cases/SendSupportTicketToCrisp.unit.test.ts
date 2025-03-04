@@ -16,9 +16,9 @@ import {
   crispMessageContent,
   crispTicketSiret,
   johnDoeEmail,
+  makeTallyFormCase2WithConventionId,
   tallyFormCase0TicketToSkip,
   tallyFormCase1,
-  tallyFormCase2WithConventionId,
   tallyFormCase3,
   tallyFormCase4Establishment,
   tallyFormCase5,
@@ -76,7 +76,7 @@ https://app-smtp.brevo.com/log
       },
       {
         name: "case 2, with convention ID",
-        tallyForm: tallyFormCase2WithConventionId,
+        tallyForm: makeTallyFormCase2WithConventionId(conventionFromTally),
         expectedParams: {
           message: crispMessageContent,
           helperNote: `Liens magiques (de la personne écrivant au support):
@@ -106,6 +106,33 @@ https://app-smtp.brevo.com/log
           metadata: {
             email: johnDoeEmail,
             segments: ["email", "beneficiaire", "immersion"],
+          },
+        },
+      },
+      {
+        name: "case 2bis, with convention ID, but invalid",
+        tallyForm: makeTallyFormCase2WithConventionId(
+          "wrong-format-convention-id",
+        ),
+        expectedParams: {
+          message: crispMessageContent,
+          helperNote: `Liens magiques (de la personne écrivant au support):
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=${johnDoeEmail}
+
+-----------
+Convention ID: wrong-format-convention-id - Format invalide
+
+-----------
+Retrouver la convention par Email de bénéficiaire:
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25C3%25A9ficiaire=${johnDoeEmail}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
+`,
+          metadata: {
+            email: johnDoeEmail,
+            segments: ["email", "beneficiaire"],
           },
         },
       },

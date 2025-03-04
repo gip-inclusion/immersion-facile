@@ -4,7 +4,7 @@ export const johnDoeEmail = "john.doe@gmail.com";
 export const crispMessageContent = "J'ai eu un problème, que voici...";
 export const crispDeleteReason =
   "Cela ne correspond pas à notre processus de vérification, d'enregistrement et de signature interne.";
-export const conventionFromTally = "conv-id-from-tally";
+export const conventionFromTally = "11112222-3333-4444-5555-666677778888";
 export const crispTicketSiret = "11112222333344";
 
 export const tallyFormCase0TicketToSkip: TallyForm = {
@@ -170,7 +170,9 @@ export const tallyFormCase1: TallyForm = {
   },
 };
 
-export const tallyFormCase2WithConventionId: TallyForm = {
+export const makeTallyFormCase2WithConventionId = (
+  conventionId: string,
+): TallyForm => ({
   eventId: "c23ba90d-e546-4664-b2c2-1196f11e120c",
   eventType: "FORM_RESPONSE",
   createdAt: "2025-02-25T12:57:44.237Z",
@@ -316,7 +318,7 @@ export const tallyFormCase2WithConventionId: TallyForm = {
         label:
           "ID de convention (pour accélérer le traitement de votre demande)",
         type: "INPUT_TEXT",
-        value: conventionFromTally,
+        value: conventionId,
       },
       {
         key: "question_MeYNZk",
@@ -332,7 +334,7 @@ export const tallyFormCase2WithConventionId: TallyForm = {
       },
     ],
   },
-};
+});
 
 export const tallyFormCase3 = {
   eventId: "8063f6b3-ec89-458b-a5f7-bfb5fd293858",

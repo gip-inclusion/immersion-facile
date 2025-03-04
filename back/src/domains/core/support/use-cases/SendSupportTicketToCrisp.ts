@@ -1,4 +1,5 @@
 import { ConventionId, TallyForm, tallyFormSchema } from "shared";
+import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { createTransactionalUseCase } from "../../UseCase";
 import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
@@ -189,6 +190,16 @@ const getConventionRelatedData = async ({
   note: string;
   extraSegment: string[];
 }> => {
+  const conventionIdResult = z.string().uuid().safeParse(conventionId);
+  if (!conventionIdResult.success) {
+    return {
+      note: `-----------
+Convention ID: ${conventionId} - Format invalide
+`,
+      extraSegment: [],
+    };
+  }
+
   const convention = await uow.conventionRepository.getById(conventionId);
   if (!convention)
     return {
