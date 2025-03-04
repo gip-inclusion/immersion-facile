@@ -642,6 +642,7 @@ export class PgConventionRepository implements ConventionRepository {
         last_name: establishmentTutor.lastName,
         email: establishmentTutor.email,
         phone: establishmentTutor.phone,
+        extra_fields: sql`JSON_STRIP_NULLS(JSON_BUILD_OBJECT('job', ${establishmentTutor.job}::text))`,
         signed_at: falsyToNull(signedAt),
       })
       .from("conventions")
