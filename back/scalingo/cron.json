@@ -29,11 +29,7 @@
       "size": "M"
     },
     {
-      "command": "49 20 * * * pnpm back run trigger-sending-emails-with-assessment-creation-link",
-      "size": "M"
-    },
-    {
-      "command": "55 20 * * * pnpm back run trigger-sending-beneficiary-assessment-emails",
+      "command": "49 20 * * * pnpm back run trigger-sending-assessment-notifications",
       "size": "M"
     },
     {
