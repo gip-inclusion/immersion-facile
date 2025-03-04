@@ -37,7 +37,7 @@ describe("PgConventionRepository", () => {
   };
 
   const userFtExternalId = "749dd14f-c82a-48b1-b1bb-fffc5467e4d4";
-
+  const agency = new AgencyDtoBuilder().withId(uuid()).build();
   const styliste: AppellationAndRomeDto = {
     romeCode: "B1805",
     romeLabel: "Stylisme",
@@ -45,8 +45,9 @@ describe("PgConventionRepository", () => {
     appellationLabel: "Styliste",
   };
 
-  const conventionStylisteBuilder =
-    new ConventionDtoBuilder().withImmersionAppellation(styliste);
+  const conventionStylisteBuilder = new ConventionDtoBuilder()
+    .withImmersionAppellation(styliste)
+    .withAgencyId(agency.id);
 
   let pool: Pool;
   let conventionRepository: PgConventionRepository;
@@ -72,11 +73,24 @@ describe("PgConventionRepository", () => {
   });
 
   beforeEach(async () => {
+    timeGateway = new CustomTimeGateway();
     await db.deleteFrom("partners_pe_connect").execute();
     await db.deleteFrom("conventions").execute();
     await db.deleteFrom("actors").execute();
     await db.deleteFrom("partners_pe_connect").execute();
     await db.deleteFrom("convention_external_ids").execute();
+    await db.deleteFrom("agency_groups__agencies").execute();
+    await db.deleteFrom("agency_groups").execute();
+    await db.deleteFrom("agencies").execute();
+
+    const validator = makeUniqueUserForTest(uuid());
+
+    await new PgUserRepository(db).save(validator);
+    await new PgAgencyRepository(db).insert(
+      toAgencyWithRights(agency, {
+        [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+      }),
+    );
 
     conventionRepository = new PgConventionRepository(db);
   });
@@ -85,6 +99,7 @@ describe("PgConventionRepository", () => {
     const convention = conventionStylisteBuilder
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
       .withEstablishmentNumberOfEmployeesRange("20-49")
+      .withAgencyId(agency.id)
       .build();
 
     expect(await conventionRepository.getById(convention.id)).toBeUndefined();
@@ -101,6 +116,7 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withInternshipKind("immersion")
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
+      .withAgencyId(agency.id)
       .withDateStart(new Date("2023-01-02").toISOString())
       .withDateEnd(new Date("2023-01-06").toISOString())
       .withSchedule(reasonableSchedule)
@@ -162,6 +178,7 @@ describe("PgConventionRepository", () => {
     const convention = new ConventionDtoBuilder()
       .withImmersionAppellation(styliste)
       .withoutWorkCondition()
+      .withAgencyId(agency.id)
       .withAcquisition(withAcquisition)
       .notSigned()
       .build();
@@ -222,6 +239,7 @@ describe("PgConventionRepository", () => {
         phone: "+33836656565",
         ...extraFields,
       })
+      .withAgencyId(agency.id)
       .build();
 
     await conventionRepository.save(convention);
@@ -250,6 +268,7 @@ describe("PgConventionRepository", () => {
         phone: "+33836656565",
         ...extraFields,
       })
+      .withAgencyId(agency.id)
       .build();
 
     await conventionRepository.save(convention);
@@ -287,6 +306,7 @@ describe("PgConventionRepository", () => {
           },
         },
       })
+      .withAgencyId(agency.id)
       .build();
 
     await db
@@ -341,6 +361,7 @@ describe("PgConventionRepository", () => {
         provider: "peConnect",
         token: userFtExternalId,
       })
+      .withAgencyId(agency.id)
       .build();
 
     await db
@@ -386,6 +407,7 @@ describe("PgConventionRepository", () => {
         ...tutor,
         role: "establishment-representative",
       })
+      .withAgencyId(agency.id)
       .build();
 
     const getEmailBuilder = db
@@ -529,6 +551,7 @@ describe("PgConventionRepository", () => {
           ...tutor,
           role: "establishment-representative",
         })
+        .withAgencyId(agency.id)
         .build();
 
       const conventionWithDiffTutorAndRep = new ConventionDtoBuilder(
@@ -572,7 +595,10 @@ describe("PgConventionRepository", () => {
       const conventionId = "40400404-0000-0000-0000-6bb9bd38aaaa";
 
       const conventionWithoutBeneficiaryCurrentEmployer =
-        new ConventionDtoBuilder().withId(conventionId).build();
+        new ConventionDtoBuilder()
+          .withId(conventionId)
+          .withAgencyId(agency.id)
+          .build();
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
         conventionWithoutBeneficiaryCurrentEmployer,
@@ -689,6 +715,7 @@ describe("PgConventionRepository", () => {
       const convention = new ConventionDtoBuilder()
         .withEstablishmentTutor(tutor)
         .withEstablishmentRepresentative(establishmentRepresentative)
+        .withAgencyId(agency.id)
         .notSigned()
         .build();
 
@@ -744,6 +771,7 @@ describe("PgConventionRepository", () => {
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
         .withEstablishmentTutor(tutor)
+        .withAgencyId(agency.id)
         .build();
 
       const updatedConvention = new ConventionDtoBuilder(convention)
@@ -975,6 +1003,7 @@ describe("PgConventionRepository", () => {
       const email = "mail@mail.com";
       const convention = new ConventionDtoBuilder()
         .withEstablishmentRepresentativeEmail(email)
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(convention);
 
@@ -990,6 +1019,7 @@ describe("PgConventionRepository", () => {
       const email = "mail@mail.com";
       const conventionWithoutEmail = new ConventionDtoBuilder()
         .withEstablishmentRepresentativeEmail("notEmail@emauil.ciom")
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(conventionWithoutEmail);
 
@@ -1008,6 +1038,7 @@ describe("PgConventionRepository", () => {
       const convention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
         .withDateEnd(now.toISOString())
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(convention);
 
@@ -1021,6 +1052,7 @@ describe("PgConventionRepository", () => {
       const now = timeGateway.now();
       const convention = new ConventionDtoBuilder()
         .withDateEnd(now.toISOString())
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(convention);
 
@@ -1037,6 +1069,7 @@ describe("PgConventionRepository", () => {
       const email = "mail@mail.com";
       const convention = new ConventionDtoBuilder()
         .withEstablishmentTutorEmail(email)
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(convention);
 
@@ -1050,6 +1083,7 @@ describe("PgConventionRepository", () => {
       const email = "mail@mail.com";
       const conventionWithoutEmail = new ConventionDtoBuilder()
         .withEstablishmentTutorEmail("notEmail@emauil.ciom")
+        .withAgencyId(agency.id)
         .build();
       await conventionRepository.save(conventionWithoutEmail);
 
