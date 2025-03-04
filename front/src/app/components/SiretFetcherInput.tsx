@@ -3,7 +3,6 @@ import React from "react";
 import { ImmersionTextField } from "react-design-system";
 import { domElementIds } from "shared";
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";
-import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
 
 type SiretFetcherInputProps = {
   placeholder: string;
@@ -34,21 +33,11 @@ export const SiretFetcherInput = ({
         onChange={(e) => updateSiret(e.target.value)}
       />
       {isSiretAlreadySaved && (
-        <>
-          <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
-            Nous avons bien trouvé votre établissement dans notre base de
-            données.
-          </p>
-          <div className={fr.cx("fr-grid-row", "fr-grid-row--center")}>
-            <RenewEstablishmentMagicLinkButton
-              id={
-                domElementIds.homeEstablishments.siretModal
-                  .editEstablishmentButton
-              }
-              siret={currentSiret}
-            />
-          </div>
-        </>
+        <p className={fr.cx("fr-valid-text", "fr-mb-2w")}>
+          Nous avons bien trouvé votre établissement dans notre base de données.
+          Pour modifier votre établissement, connectez-vous à votre tableau de
+          bord entreprise.
+        </p>
       )}
     </>
   );

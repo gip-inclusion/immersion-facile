@@ -686,7 +686,12 @@ export const domElementIds = {
       "im-convention-to-sign__open-remind-signatories-modal-button",
   },
   editFormEstablishmentRoute: {},
-  error: {},
+  error: {
+    establishmentDashboardButton:
+      "im-error-page__establishment-dashboard-button",
+    homeButton: "im-error-page__home-button",
+    contactUsButton: "im-error-contact-us-button",
+  },
   conventionMiniStageRoute: {},
 
   agencyDashboard: {

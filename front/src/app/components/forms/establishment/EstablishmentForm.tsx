@@ -3,18 +3,15 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   DotNestedKeys,
-  EstablishmentJwtPayload,
   FormEstablishmentDto,
-  decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
-  expiredMagicLinkErrorMessage,
   formEstablishmentSchema,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -43,7 +40,6 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { Feedback } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
 import { Route } from "type-route";
 
@@ -51,9 +47,7 @@ type RouteByMode = {
   create:
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;
-  edit:
-    | Route<typeof routes.editFormEstablishment>
-    | Route<typeof routes.establishmentDashboard>;
+  edit: Route<typeof routes.establishmentDashboard>;
   admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
 
@@ -144,29 +138,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 
-  const redirectToErrorOnFeedback = useCallback(
-    (feedback: Feedback, jwt: string) => {
-      if (feedback.level === "error") {
-        if (!feedback.message.includes(expiredMagicLinkErrorMessage)) {
-          throw frontErrors.establishment.expiredLink({
-            jwt,
-            siret:
-              decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                jwt,
-              ).siret,
-          });
-        }
-        routes
-          .renewConventionMagicLink({
-            expiredJwt: jwt,
-            originalURL: window.location.href,
-          })
-          .replace();
-      }
-    },
-    [],
-  );
-
   useEffect(() => {
     match({ route: currentRoute, adminJwt, inclusionConnectedJwt })
       .with(
@@ -185,20 +156,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           ),
-      )
-      .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
-        dispatch(
-          establishmentSlice.actions.fetchEstablishmentRequested({
-            establishmentRequested: {
-              siret:
-                decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
-                  route.params.jwt,
-                ).siret,
-              jwt: route.params.jwt,
-            },
-            feedbackTopic: "form-establishment",
-          }),
-        ),
       )
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
@@ -284,38 +241,43 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [debouncedFormValues, isEstablishmentCreation]);
 
-  useEffect(() => {
-    if (route.name === "editFormEstablishment" && establishmentFeedback) {
-      redirectToErrorOnFeedback(establishmentFeedback, route.params.jwt);
-    }
-  }, [establishmentFeedback, redirectToErrorOnFeedback, route]);
-
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt, inclusionConnectedJwt })
       .with(
         {
           route: {
-            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+            name: P.union("formEstablishment", "formEstablishmentForExternals"), // TODO : formEstablishmentForExternals ???
           },
+          inclusionConnectedJwt: P.not(P.nullish),
         },
-        () =>
+        ({ inclusionConnectedJwt }) =>
           dispatch(
             establishmentSlice.actions.createEstablishmentRequested({
               formEstablishment,
               feedbackTopic: "form-establishment",
+              jwt: inclusionConnectedJwt,
             }),
           ),
       )
-      .with({ route: { name: "editFormEstablishment" } }, ({ route }) =>
-        dispatch(
-          establishmentSlice.actions.updateEstablishmentRequested({
-            establishmentUpdate: {
-              formEstablishment,
-              jwt: route.params.jwt,
-            },
-            feedbackTopic: "form-establishment",
-          }),
-        ),
+      .with(
+        {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+          inclusionConnectedJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized(); // should not happen
+        },
+      )
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
       )
       .with(
         {
@@ -332,15 +294,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           ),
-      )
-      .with(
-        {
-          route: { name: "manageEstablishmentAdmin" },
-          adminJwt: P.nullish,
-        },
-        () => {
-          throw new Error("Accès interdit sans être connecté en admin.");
-        },
       )
       .with(
         {

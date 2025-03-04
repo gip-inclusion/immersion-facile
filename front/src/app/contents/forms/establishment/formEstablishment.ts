@@ -1,5 +1,4 @@
 import {
-  BusinessContactDto,
   FormEstablishmentDto,
   SiretDto,
   domElementIds,
@@ -12,9 +11,8 @@ import { FormFieldAttributesForContent } from "../types";
 type FormEstablishmentFieldKeys =
   | Exclude<
       keyof FormEstablishmentDto,
-      "id" | "naf" | "businessContact" | "source" | "isSearchable"
+      "id" | "naf" | "source" | "isSearchable" | "userRights"
     >
-  | `businessContact.${keyof BusinessContactDto}`
   | "maxContactsPerMonthWhenAvailable";
 
 type FormEstablishmentField = Partial<FormEstablishmentFieldKeys>;
@@ -52,39 +50,39 @@ export const formEstablishmentFieldsLabels = (
     id: domElementIds.establishment[mode].businessAddresses,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
-  "businessContact.lastName": {
-    label: "Nom du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.lastName,
-  },
-  "businessContact.firstName": {
-    label: "Prénom du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.firstName,
-  },
-  "businessContact.job": {
-    label: "Fonction du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.job,
-  },
-  "businessContact.phone": {
-    label: "Numéro de téléphone (ne sera pas communiqué directement)",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.phone,
-  },
-  "businessContact.email": {
-    label: "E-mail du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.email,
-  },
-  "businessContact.copyEmails": {
-    label: "Autres destinataires",
-    hintText:
-      "Adresses mail à mettre en copie, les utilisateurs liés à ces adresses auront accès aux discussions",
-    placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
-    id: domElementIds.establishment[mode].businessContact.copyEmails,
-  },
-  "businessContact.contactMethod": {
+  // "businessContact.lastName": {
+  //   label: "Nom du référent",
+  //   required: true,
+  //   id: domElementIds.establishment[mode].businessContact.lastName,
+  // },
+  // "businessContact.firstName": {
+  //   label: "Prénom du référent",
+  //   required: true,
+  //   id: domElementIds.establishment[mode].businessContact.firstName,
+  // },
+  // "businessContact.job": {
+  //   label: "Fonction du référent",
+  //   required: true,
+  //   id: domElementIds.establishment[mode].businessContact.job,
+  // },
+  // "businessContact.phone": {
+  //   label: "Numéro de téléphone (ne sera pas communiqué directement)",
+  //   required: true,
+  //   id: domElementIds.establishment[mode].businessContact.phone,
+  // },
+  // "businessContact.email": {
+  //   label: "E-mail du référent",
+  //   required: true,
+  //   id: domElementIds.establishment[mode].businessContact.email,
+  // },
+  // "businessContact.copyEmails": {
+  //   label: "Autres destinataires",
+  //   hintText:
+  //     "Adresses mail à mettre en copie, les utilisateurs liés à ces adresses auront accès aux discussions",
+  //   placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
+  //   id: domElementIds.establishment[mode].businessContact.copyEmails,
+  // },
+  contactMethod: {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
     required: true,
     id: domElementIds.establishment[mode].businessContact.contactMethod,
