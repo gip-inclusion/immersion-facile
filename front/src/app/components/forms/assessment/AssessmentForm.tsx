@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -31,7 +31,6 @@ import {
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
-  hoursValueToHoursDisplayed,
   toDisplayedDate,
   typeOfContracts,
 } from "shared";
@@ -289,6 +288,7 @@ const AssessmentStatusSection = ({
         <div className={fr.cx("fr-col-lg-7")}>
           <RadioButtons
             id={domElementIds.assessment.statusInput}
+            legend="L'immersion a-t-elle été effectuée ?"
             options={assessmentStatuses.map((value) => ({
               label: getLabels(convention.internshipKind)[value],
               nativeInputProps: {
@@ -311,7 +311,7 @@ const AssessmentStatusSection = ({
           {formValues.status === "PARTIALLY_COMPLETED" && (
             <>
               <Input
-                label="Quelle a été la date du dernier jour de présence en entreprise ?"
+                label="S’il y a eu une fin d’immersion anticipée, quelle a été la date du dernier jour de présence en entreprise ?"
                 hintText={`Date indiquée dans la convention : ${toDisplayedDate(
                   {
                     date: convertLocaleDateToUtcTimezoneDate(
@@ -328,18 +328,22 @@ const AssessmentStatusSection = ({
                 {...getFieldError("lastDayOfPresence")}
               />
 
-              <p className={fr.cx("fr-mb-0")}>
-                Pouvez-vous indiquer le nombre total d’heures manquées en raison
-                d’absences ou de retards ?
+              {assessmentDto.status === "PARTIALLY_COMPLETED" &&
+                assessmentDto.lastDayOfPresence && (
+                  <Alert
+                    className={fr.cx("fr-mb-2w")}
+                    description="Vous avez indiqué que l’immersion s’est terminée plus tôt que
+                prévu. Le total d’heures réalisées a été ajusté automatiquement."
+                    severity="info"
+                    small
+                  />
+                )}
+
+              <p className={fr.cx("fr-mb-2v")}>
+                Pendant les jours réels de présence, combien d'heures ont été
+                manquées en raison d’absences ou de retards ?
               </p>
-              <p className={fr.cx("fr-hint-text")}>
-                Nombre total d’heures initialement indiquées dans la convention
-                :{" "}
-                {hoursValueToHoursDisplayed({
-                  hoursValue: convention.schedule.totalHours,
-                  padWithZero: false,
-                })}
-              </p>
+
               <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
                 <Input
                   className={fr.cx("fr-col-12", "fr-col-sm-6")}
