@@ -216,13 +216,13 @@ const wordingByInternshipKind: Record<
   immersion: {
     COMPLETED: "Oui, l'immersion a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changés (abandon en cours, absences, retards, etc.)",
+      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
   "mini-stage-cci": {
     COMPLETED: "Oui, le mini-stage a eu lieu aux horaires prévus",
     PARTIALLY_COMPLETED:
-      "Oui, mais les horaires ont changés (abandon en cours, absences, retards, etc.)",
+      "Oui, mais les horaires ont changé (abandon en cours, absences, retards, etc.)",
     DID_NOT_SHOW: "Non, le candidat n'est jamais venu",
   },
 };
