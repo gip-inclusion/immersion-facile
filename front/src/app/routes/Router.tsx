@@ -25,7 +25,6 @@ import { ConventionStatusDashboardPage } from "src/app/pages/convention/Conventi
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
-import { EstablishmentEditionFormPage } from "src/app/pages/establishment/EstablishmentEditionFormPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
@@ -155,7 +154,6 @@ const getPageByRouteName: {
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
-  editFormEstablishment: () => <EstablishmentEditionFormPage />,
   establishmentDashboard: (route) =>
     establishmentDashboardTabsList.includes(
       route.params.tab as EstablishmentDashboardTab,
@@ -179,7 +177,7 @@ const getPageByRouteName: {
       />
     ),
 
-  formEstablishment: () => <EstablishmentCreationFormPage />,
+  formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
   ),
