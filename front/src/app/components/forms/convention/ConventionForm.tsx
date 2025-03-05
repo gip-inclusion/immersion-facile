@@ -386,9 +386,13 @@ export const ConventionForm = ({
             </p>
 
             <form
-              id={domElementIds.conventionImmersionRoute.form({ mode })}
+              id={domElementIds.conventionImmersionRoute.form({
+                mode,
+                internshipKind,
+              })}
               data-matomo-name={domElementIds.conventionImmersionRoute.form({
                 mode,
+                internshipKind,
               })}
             >
               <>
