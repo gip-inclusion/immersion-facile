@@ -60,6 +60,9 @@ export const domElementIds = {
         addAgencyForm: buildHeaderNavLinkId("agency-form"),
         formConvention: buildHeaderNavLinkId("agency-form-convention"),
         dashboard: buildHeaderNavLinkId("agency-my-dashboard"),
+        resourcesAndWebinars: buildHeaderNavLinkId(
+          "agency-resources-and-webinars",
+        ),
       },
       admin: {
         backOffice: buildHeaderNavLinkId("admin-home"),
@@ -113,7 +116,7 @@ export const domElementIds = {
       sitemap: buildFooterNavLinkId("sitemap"),
       budget: buildFooterNavLinkId("budget"),
       apiDocumentation: buildFooterNavLinkId("api-documentation"),
-      communicationKit: buildFooterNavLinkId("communication-kit"),
+      resourcesAndWebinars: buildFooterNavLinkId("resources-and-webinars"),
     },
   },
 
@@ -122,6 +125,7 @@ export const domElementIds = {
       candidate: buildHeroHeaderId("home-candidate"),
       establishment: buildHeroHeaderId("home-establishment"),
       agency: buildHeroHeaderId("home-agency"),
+      resourcesAndWebinars: buildHeroHeaderId("home-resources-and-webinars"),
     },
   },
 
