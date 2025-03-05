@@ -1,9 +1,7 @@
 import { sql } from "kysely";
 import { map, uniq } from "ramda";
 import {
-  ConventionId,
   EmailNotification,
-  EmailType,
   Notification,
   NotificationId,
   NotificationKind,
@@ -12,6 +10,7 @@ import {
   TemplatedEmail,
   TemplatedSms,
   exhaustiveCheck,
+  pipeWithValue,
 } from "shared";
 import {
   KyselyDb,
@@ -77,20 +76,22 @@ export class PgNotificationRepository implements NotificationRepository {
   public async getLastEmailsByFilters(
     filters?: EmailNotificationFilters,
   ): Promise<EmailNotification[]> {
-    return getEmailsNotificationBuilder(this.transaction)
-      .where("e.created_at", ">", sql<Date>`NOW() - INTERVAL '2 day'`)
-      .$if(filters !== undefined, (qb) =>
-        qb
-          .where("e.email_kind", "=", filters?.emailType as EmailType)
-          .where("r.email", "=", filters?.email as string)
-          .$if(filters?.conventionId !== undefined, (qb) =>
-            qb.where(
-              "e.convention_id",
-              "=",
-              filters?.conventionId as ConventionId,
-            ),
-          ),
-      )
+    return pipeWithValue(
+      getEmailsNotificationBuilder(this.transaction).where(
+        "e.created_at",
+        ">",
+        sql<Date>`NOW() - INTERVAL '2 day'`,
+      ),
+      (qb) =>
+        filters?.emailType
+          ? qb.where("e.email_kind", "=", filters.emailType)
+          : qb,
+      (qb) => (filters?.email ? qb.where("r.email", "=", filters?.email) : qb),
+      (qb) =>
+        filters?.conventionId
+          ? qb.where("e.convention_id", "=", filters?.conventionId)
+          : qb,
+    )
       .orderBy("e.created_at", "desc")
       .limit(this.maxRetrievedNotifications)
       .execute()
