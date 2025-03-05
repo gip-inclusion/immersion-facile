@@ -32,6 +32,7 @@ const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
   firstName: "John",
   lastName: "Doe",
   idToken: "inclusion-connect-id-token",
+  siret: "12345678901234",
 };
 
 describe("Auth slice", () => {

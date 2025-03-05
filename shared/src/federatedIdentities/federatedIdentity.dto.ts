@@ -1,4 +1,5 @@
 import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
+import { WithSiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 
@@ -56,9 +57,10 @@ export const isFtConnectIdentity = (
 ): federatedIdentity is FtConnectIdentity =>
   federatedIdentity?.provider === "peConnect";
 
-export type ConnectedUserIdentity = GenericFederatedIdentity<
+type ConnectedUserIdentity = GenericFederatedIdentity<
   "connectedUser",
   ConnectedUserJwt
->;
+> &
+  WithSiretDto;
 
 export type FederatedIdentity = ConnectedUserIdentity | FtConnectIdentity;
