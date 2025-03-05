@@ -5,14 +5,12 @@ import {
   ConventionRelatedJwtPayload,
   ConventionStatus,
   CreateConventionMagicLinkPayloadProperties,
-  Signatories,
   SignatoryRole,
   UserId,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
-  isValidMobilePhone,
   signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
@@ -25,7 +23,14 @@ import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { throwIfNotAllowedForUser } from "../entities/Convention";
+import {
+  throwErrorIfPhoneNumberNotValid,
+  throwErrorIfSignatoryAlreadySigned,
+  throwErrorOnConventionIdMismatch,
+  throwIfNotAllowedForUser,
+} from "../entities/Convention";
+
+export const MIN_HOURS_BETWEEN_REMINDER = 24;
 
 type SendSignatureLinkParams = {
   conventionId: ConventionId;
@@ -39,8 +44,6 @@ const sendSignatureLinkParamsSchema: z.Schema<SendSignatureLinkParams> =
   });
 
 export type SendSignatureLink = ReturnType<typeof makeSendSignatureLink>;
-
-export const MIN_HOURS_BETWEEN_REMINDER = 24;
 
 export const makeSendSignatureLink = createTransactionalUseCase<
   SendSignatureLinkParams,
@@ -127,63 +130,10 @@ export const makeSendSignatureLink = createTransactionalUseCase<
   },
 );
 
-const throwErrorOnConventionIdMismatch = ({
-  requestedConventionId,
-  jwtPayload,
-}: {
-  requestedConventionId: ConventionId;
-  jwtPayload: ConventionRelatedJwtPayload;
-}) => {
-  if (
-    "applicationId" in jwtPayload &&
-    requestedConventionId !== jwtPayload.applicationId
-  )
-    throw errors.convention.forbiddenMissingRights({
-      conventionId: requestedConventionId,
-    });
-};
-
 const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
   if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
     throw errors.convention.sendSignatureLinkNotAllowedForStatus({
       status: status,
-    });
-  }
-};
-
-const throwErrorIfPhoneNumberNotValid = ({
-  convention,
-  signatoryRole,
-  signatoryKey,
-}: {
-  convention: ConventionReadDto;
-  signatoryKey: keyof Signatories;
-  signatoryRole: SignatoryRole;
-}) => {
-  if (!convention.signatories[signatoryKey]) {
-    throw new Error();
-  }
-
-  if (!isValidMobilePhone(convention.signatories[signatoryKey]?.phone))
-    throw errors.convention.invalidMobilePhoneNumber({
-      conventionId: convention.id,
-      signatoryRole,
-    });
-};
-
-const throwErrorIfSignatoryAlreadySigned = ({
-  convention,
-  signatoryRole,
-  signatoryKey,
-}: {
-  convention: ConventionReadDto;
-  signatoryRole: SignatoryRole;
-  signatoryKey: keyof Signatories;
-}) => {
-  if (convention.signatories[signatoryKey]?.signedAt) {
-    throw errors.convention.signatoryAlreadySigned({
-      conventionId: convention.id,
-      signatoryRole,
     });
   }
 };

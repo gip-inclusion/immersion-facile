@@ -11,9 +11,12 @@ import {
   ConventionStatus,
   ForbiddenError,
   Role,
+  Signatories,
+  SignatoryRole,
   agencyModifierRoles,
   errors,
   isSomeEmailMatchingEmailHash,
+  isValidMobilePhone,
   statusTransitionConfigs,
 } from "shared";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
@@ -214,5 +217,58 @@ export const throwIfNotAllowedForUser = async ({
     throw errors.user.notEnoughRightOnAgency({
       agencyId,
       userId: userWithRights.id,
+    });
+};
+
+export const throwErrorOnConventionIdMismatch = ({
+  requestedConventionId,
+  jwtPayload,
+}: {
+  requestedConventionId: ConventionId;
+  jwtPayload: ConventionRelatedJwtPayload;
+}) => {
+  if (
+    "applicationId" in jwtPayload &&
+    requestedConventionId !== jwtPayload.applicationId
+  )
+    throw errors.convention.forbiddenMissingRights({
+      conventionId: requestedConventionId,
+    });
+};
+
+export const throwErrorIfSignatoryAlreadySigned = ({
+  convention,
+  signatoryRole,
+  signatoryKey,
+}: {
+  convention: ConventionReadDto;
+  signatoryRole: SignatoryRole;
+  signatoryKey: keyof Signatories;
+}) => {
+  if (convention.signatories[signatoryKey]?.signedAt) {
+    throw errors.convention.signatoryAlreadySigned({
+      conventionId: convention.id,
+      signatoryRole,
+    });
+  }
+};
+
+export const throwErrorIfPhoneNumberNotValid = ({
+  convention,
+  signatoryRole,
+  signatoryKey,
+}: {
+  convention: ConventionReadDto;
+  signatoryKey: keyof Signatories;
+  signatoryRole: SignatoryRole;
+}) => {
+  if (!convention.signatories[signatoryKey]) {
+    throw new Error();
+  }
+
+  if (!isValidMobilePhone(convention.signatories[signatoryKey]?.phone))
+    throw errors.convention.invalidMobilePhoneNumber({
+      conventionId: convention.id,
+      signatoryRole,
     });
 };
