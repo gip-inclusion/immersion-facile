@@ -1,19 +1,24 @@
-import { uniq } from "ramda";
+import { intersection, toPairs, uniq } from "ramda";
 import {
   AgencyDto,
+  AgencyId,
   AgencyWithUsersRights,
   ApiConsumer,
   ConventionDto,
   ConventionId,
   ConventionReadDto,
+  ConventionRelatedJwtPayload,
   ConventionStatus,
   ForbiddenError,
   Role,
+  agencyModifierRoles,
   errors,
+  isSomeEmailMatchingEmailHash,
   statusTransitionConfigs,
 } from "shared";
-
+import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export const throwIfTransitionNotAllowed = ({
   targetStatus,
@@ -140,3 +145,74 @@ export const isConventionInScope = (
 ): boolean =>
   isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
   isAgencyKindInConsumerScope(conventionRead, apiConsumer);
+
+export const throwIfNotAllowedForUser = async ({
+  uow,
+  jwtPayload,
+  agencyId,
+  convention,
+}: {
+  jwtPayload: ConventionRelatedJwtPayload;
+  uow: UnitOfWork;
+  agencyId: AgencyId;
+  convention: ConventionReadDto;
+}): Promise<void> => {
+  if ("role" in jwtPayload) {
+    if (!agencyModifierRoles.includes(jwtPayload.role as any))
+      throw errors.convention.unsupportedRoleSendSignatureLink({
+        role: jwtPayload.role as any,
+      });
+
+    const agency = await uow.agencyRepository.getById(agencyId);
+
+    if (!agency) throw errors.agency.notFound({ agencyId });
+
+    const userIdsWithRoleOnAgency = toPairs(agency.usersRights)
+      .filter(
+        ([_, right]) =>
+          right?.roles.includes("counsellor") ||
+          right?.roles.includes("validator"),
+      )
+      .map(([id]) => id);
+
+    const users = await uow.userRepository.getByIds(userIdsWithRoleOnAgency);
+
+    if (
+      !isHashMatchPeAdvisorEmail({
+        convention,
+        emailHash: jwtPayload.emailHash,
+      }) &&
+      !isSomeEmailMatchingEmailHash(
+        users.map(({ email }) => email),
+        jwtPayload.emailHash,
+      )
+    )
+      throw errors.user.notEnoughRightOnAgency({
+        agencyId,
+      });
+
+    return;
+  }
+
+  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+  if (!userWithRights)
+    throw errors.user.notFound({
+      userId: jwtPayload.userId,
+    });
+
+  const agencyRightOnAgency = userWithRights.agencyRights.find(
+    (agencyRight) => agencyRight.agency.id === agencyId,
+  );
+
+  if (!agencyRightOnAgency)
+    throw errors.user.noRightsOnAgency({
+      userId: userWithRights.id,
+      agencyId: agencyId,
+    });
+
+  if (intersection(agencyModifierRoles, agencyRightOnAgency.roles).length === 0)
+    throw errors.user.notEnoughRightOnAgency({
+      agencyId,
+      userId: userWithRights.id,
+    });
+};

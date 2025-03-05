@@ -345,12 +345,12 @@ export const domElementIds = {
       "im-convention-validation__open-remind-signatories-modal-button",
     remindSignatoriesModal:
       "im-convention-validation__remind-signatories-modal",
-    openRemindSignatoriesBySmsModal:
-      "im-convention-validation__open-remind-signatories-by-sms-modal",
-    remindSignatoriesBySmsModal:
-      "im-convention-validation__remind-signatories-by-sms-modal",
-    submitRemindSignatoriesBySmsModalButton:
-      "im-convention-validation__remind-signatories-by-sms-modal-button",
+    openSendSignatureLinkModal:
+      "im-convention-validation__open-send-signature-link-modal",
+    sendSignatureLinkModal:
+      "im-convention-validation__send-signature-link-modal",
+    submitSendSignatureLinkModalButton:
+      "im-convention-validation__send-signature-link-modal-button",
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:

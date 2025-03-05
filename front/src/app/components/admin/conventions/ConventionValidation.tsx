@@ -27,7 +27,7 @@ import { JwtKindProps } from "src/app/components/admin/conventions/ConventionMan
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { remindSignatoriesSlice } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.slice";
+import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -43,8 +43,8 @@ const beforeAfterString = (date: string) => {
   });
 };
 
-const remindBySmsModal = createModal({
-  id: domElementIds.manageConvention.remindSignatoriesBySmsModal,
+const sendSignatureLinkModal = createModal({
+  id: domElementIds.manageConvention.sendSignatureLinkModal,
   isOpenedByDefault: false,
 });
 
@@ -60,24 +60,25 @@ export const ConventionValidation = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  const hasErrorFeedback = feedbacks["remind-signatories"]?.level === "error";
+  const hasErrorFeedback = feedbacks["send-signature-link"]?.level === "error";
 
-  const [signatoryToRemind, setSignatoryToRemind] = useState<{
-    signatoryRole: SignatoryRole;
-    signatoryPhone: Phone;
-  } | null>(null);
+  const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
+    useState<{
+      signatoryRole: SignatoryRole;
+      signatoryPhone: Phone;
+    } | null>(null);
 
-  const closeRemindBySmsModalModal = () => {
+  const closeSendSignatureLinkModal = () => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    remindBySmsModal.close();
+    sendSignatureLinkModal.close();
   };
 
-  const isModalOpen = useIsModalOpen(remindBySmsModal, {
-    onConceal: () => closeRemindBySmsModalModal(),
+  const isModalOpen = useIsModalOpen(sendSignatureLinkModal, {
+    onConceal: () => closeSendSignatureLinkModal(),
   });
 
   useEffect(() => {
-    if (!isModalOpen) setSignatoryToRemind(null);
+    if (!isModalOpen) setSignatoryToSendSignatureLink(null);
   }, [isModalOpen]);
 
   const {
@@ -92,19 +93,19 @@ export const ConventionValidation = ({
     beneficiary.firstName
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
 
-  const onSubmitRemindSignatoryBySms = () => {
-    if (signatoryToRemind)
+  const onSubmitSendSignatureLink = () => {
+    if (signatoryToSendSignatureLink)
       dispatch(
-        remindSignatoriesSlice.actions.remindSignatoriesRequested({
+        sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
           conventionId: convention.id,
-          signatoryRole: signatoryToRemind.signatoryRole,
+          signatoryRole: signatoryToSendSignatureLink.signatoryRole,
           jwt: jwtParams.jwt,
-          feedbackTopic: "remind-signatories",
+          feedbackTopic: "send-signature-link",
         }),
       );
   };
 
-  const openRemindBySmsButtonProps: (
+  const openSendSignatureLinkButtonProps: (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
@@ -114,11 +115,11 @@ export const ConventionValidation = ({
       children: "Faire signer par SMS",
       disabled: !isValidMobilePhone(signatoryPhone) || signatoryAlreadySign,
       onClick: () => {
-        remindBySmsModal.open();
-        setSignatoryToRemind({ signatoryRole, signatoryPhone });
+        sendSignatureLinkModal.open();
+        setSignatoryToSendSignatureLink({ signatoryRole, signatoryPhone });
       },
 
-      id: domElementIds.manageConvention.openRemindSignatoriesBySmsModal,
+      id: domElementIds.manageConvention.openSendSignatureLinkModal,
     };
   };
 
@@ -143,17 +144,23 @@ export const ConventionValidation = ({
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}
-        summary={makeConventionSections(convention, openRemindBySmsButtonProps)}
+        summary={makeConventionSections(
+          convention,
+          openSendSignatureLinkButtonProps,
+        )}
         conventionId={convention.id}
       />
 
       {createPortal(
-        <remindBySmsModal.Component title="Envoyer le lien de signature par SMS">
+        <sendSignatureLinkModal.Component title="Envoyer le lien de signature par SMS">
           <p>
             Le{" "}
-            {signatoryToRemind &&
-              signatoryTitleByRole[signatoryToRemind.signatoryRole]}{" "}
-            recevra un lien de signature au {signatoryToRemind?.signatoryPhone}
+            {signatoryToSendSignatureLink &&
+              signatoryTitleByRole[
+                signatoryToSendSignatureLink.signatoryRole
+              ]}{" "}
+            recevra un lien de signature au{" "}
+            {signatoryToSendSignatureLink?.signatoryPhone}
           </p>
 
           <ButtonsGroup
@@ -164,21 +171,22 @@ export const ConventionValidation = ({
                 priority: "secondary",
                 children: "Annuler",
                 onClick: () => {
-                  remindBySmsModal.close();
+                  sendSignatureLinkModal.close();
                 },
               },
               {
                 id: domElementIds.manageConvention
-                  .submitRemindSignatoriesBySmsModalButton,
+                  .submitSendSignatureLinkModalButton,
                 priority: "primary",
                 children: "Envoyer",
                 disabled: hasErrorFeedback,
-                onClick: () => onSubmitRemindSignatoryBySms(),
+                onClick: () => onSubmitSendSignatureLink(),
               },
             ]}
           />
-          <Feedback topic="remind-signatories" className={fr.cx("fr-my-2w")} />
-        </remindBySmsModal.Component>,
+
+          <Feedback topic="send-signature-link" className={fr.cx("fr-my-2w")} />
+        </sendSignatureLinkModal.Component>,
         document.body,
       )}
     </>

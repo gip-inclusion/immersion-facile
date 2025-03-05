@@ -175,7 +175,7 @@ export const errors = {
       new BadRequestError(
         `Impossible de passer du statut de convention "${currentStatus}" à "${targetStatus}".`,
       ),
-    signReminderNotAllowedForStatus: ({
+    sendSignatureLinkNotAllowedForStatus: ({
       status,
     }: {
       status: ConventionStatus;
@@ -231,9 +231,9 @@ export const errors = {
       new BadRequestError(
         `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
       ),
-    unsupportedRoleSignReminder: ({ role }: { role: Role }) =>
+    unsupportedRoleSendSignatureLink: ({ role }: { role: Role }) =>
       new ForbiddenError(
-        `Le rôle ${role} n'est pas supporté pour la relance des signataires`,
+        `Le rôle ${role} n'est pas supporté pour l'envoi du lien de signature aux signataires`,
       ),
     forbiddenReminder: ({
       convention,
@@ -255,7 +255,7 @@ export const errors = {
       new BadRequestError(
         `Le numéro de téléphone du ${signatoryTitleByRole[signatoryRole]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
-    smsReminderAlreadySent: ({
+    smsSignatureLinkAlreadySent: ({
       signatoryRole,
       minHoursBetweenReminder,
     }: {

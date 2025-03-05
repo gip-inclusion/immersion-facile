@@ -30,8 +30,8 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentEpics } from "src/core-logic/domain/assessment/assessment.epics";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { remindSignatoriesEpics } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.epic";
-import { remindSignatoriesSlice } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.slice";
+import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
+import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishment/establishment.epics";
 import { establishmentLeadEpics } from "src/core-logic/domain/establishmentLead/establishmentLead.epics";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
@@ -93,7 +93,7 @@ const allEpics: AppEpic<any>[] = [
   ...createUserOnAgencyEpics,
   ...removeUserFromAgencyEpics,
   ...nafEpics,
-  ...remindSignatoriesEpics,
+  ...sendSignatureLinkEpics,
 ];
 
 const appReducer = combineReducers({
@@ -127,7 +127,7 @@ const appReducer = combineReducers({
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
-  [remindSignatoriesSlice.name]: remindSignatoriesSlice.reducer,
+  [sendSignatureLinkSlice.name]: sendSignatureLinkSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
   [nafSlice.name]: nafSlice.reducer,

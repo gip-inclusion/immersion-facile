@@ -11,10 +11,10 @@ import {
   conventionReadSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
-  remindSignatoriesRequestSchema,
   renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
   renewMagicLinkResponseSchema,
+  sendSignatureLinkRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
   withConventionIdLegacySchema,
@@ -111,10 +111,10 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
     },
   }),
-  remindSignatories: defineRoute({
-    url: "/auth/convention/signatories/remind",
+  sendSignatureLink: defineRoute({
+    url: "/auth/convention/signatories/send-signature-link",
     method: "post",
-    requestBodySchema: remindSignatoriesRequestSchema,
+    requestBodySchema: sendSignatureLinkRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

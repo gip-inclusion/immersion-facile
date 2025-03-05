@@ -10,10 +10,9 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
-import { remindSignatoriesSlice } from "src/core-logic/domain/convention/remind-signatories/remindSignatories.slice";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -41,7 +40,7 @@ const topics = [
   "siret-input",
   "agency-for-dashboard",
   "assessment",
-  "remind-signatories",
+  "send-signature-link",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -126,15 +125,15 @@ export const feedbackMapping: Record<
         "Une erreur est survenue. Veuillez consulter le tableau de bord.",
     },
   },
-  "remind-signatories": {
+  "send-signature-link": {
     "create.success": {
-      action: remindSignatoriesSlice.actions.remindSignatoriesSucceeded,
+      action: sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded,
       title: "Le SMS a bien été envoyé",
       message:
         "Le destinataire devrait le recevoir dans les prochaines minutes.",
     },
     "create.error": {
-      action: remindSignatoriesSlice.actions.remindSignatoriesFailed,
+      action: sendSignatureLinkSlice.actions.sendSignatureLinkFailed,
       title: "Problème lors de l'envoi SMS",
       message: "Une erreur est survenue lors de l'envoi du SMS.",
     },

@@ -13,8 +13,8 @@ import {
   DashboardUrlAndName,
   FindSimilarConventionsParams,
   InclusionConnectedAllowedRoutes,
-  RemindSignatoriesRequestDto,
   RenewConventionParams,
+  SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
@@ -131,13 +131,13 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public remindSignatories$(
-    params: RemindSignatoriesRequestDto,
+  public sendSignatureLink$(
+    params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(
       this.magicLinkHttpClient
-        .remindSignatories({ body: params, headers: { authorization: jwt } })
+        .sendSignatureLink({ body: params, headers: { authorization: jwt } })
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
