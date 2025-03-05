@@ -1,39 +1,39 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ConventionSupportedJwt, RemindSignatoriesRequestDto } from "shared";
+import { ConventionSupportedJwt, SendSignatureLinkRequestDto } from "shared";
 
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
-export interface RemindSignatoriesState {
+export interface SendSignatureLinkState {
   isLoading: boolean;
 }
 
-export const remindSignatoriesInitialState: RemindSignatoriesState = {
+export const sendSignatureLinkInitialState: SendSignatureLinkState = {
   isLoading: false,
 };
 
-export const remindSignatoriesSlice = createSlice({
-  name: "remindSignatories",
-  initialState: remindSignatoriesInitialState,
+export const sendSignatureLinkSlice = createSlice({
+  name: "sendSignatureLink",
+  initialState: sendSignatureLinkInitialState,
   reducers: {
-    remindSignatoriesRequested: (
+    sendSignatureLinkRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        RemindSignatoriesRequestDto & { jwt: ConventionSupportedJwt }
+        SendSignatureLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
       state.isLoading = true;
     },
 
-    remindSignatoriesSucceeded: (
+    sendSignatureLinkSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<
-        RemindSignatoriesRequestDto & { jwt: ConventionSupportedJwt }
+        SendSignatureLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
       state.isLoading = false;
     },
 
-    remindSignatoriesFailed: (
+    sendSignatureLinkFailed: (
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {

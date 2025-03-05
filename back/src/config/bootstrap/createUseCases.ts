@@ -24,12 +24,12 @@ import { makeGetAssessmentByConventionId } from "../../domains/convention/use-ca
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
-import { makeRemindSignatories } from "../../domains/convention/use-cases/RemindSignatories";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
+import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
@@ -737,7 +737,7 @@ export const createUseCases = (
         uowPerformer,
         deps: { saveNotificationAndRelatedEvent },
       }),
-    remindSignatories: makeRemindSignatories({
+    sendSignatureLink: makeSendSignatureLink({
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,

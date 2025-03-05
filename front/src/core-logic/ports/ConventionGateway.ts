@@ -10,8 +10,8 @@ import {
   DashboardUrlAndName,
   DiscussionId,
   FindSimilarConventionsParams,
-  RemindSignatoriesRequestDto,
   RenewConventionParams,
+  SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -54,8 +54,8 @@ export interface ConventionGateway {
   shareConventionLinkByEmail(
     shareLinkByEmailDto: ShareLinkByEmailDto,
   ): Promise<boolean>;
-  remindSignatories$(
-    params: RemindSignatoriesRequestDto,
+  sendSignatureLink$(
+    params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
   renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;

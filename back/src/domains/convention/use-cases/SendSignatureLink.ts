@@ -1,7 +1,5 @@
 import { subHours } from "date-fns";
-import { intersection, toPairs } from "ramda";
 import {
-  AgencyId,
   ConventionId,
   ConventionReadDto,
   ConventionRelatedJwtPayload,
@@ -10,46 +8,42 @@ import {
   Signatories,
   SignatoryRole,
   UserId,
-  agencyModifierRoles,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
-  isSomeEmailMatchingEmailHash,
   isValidMobilePhone,
   signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { makeProvider } from "../../core/authentication/inclusion-connect/port/OAuthGateway";
 import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
+import { throwIfNotAllowedForUser } from "../entities/Convention";
 
-type RemindSignatoriesParams = {
+type SendSignatureLinkParams = {
   conventionId: ConventionId;
   role: SignatoryRole;
 };
 
-const remindSignatoriesParamsSchema: z.Schema<RemindSignatoriesParams> =
+const sendSignatureLinkParamsSchema: z.Schema<SendSignatureLinkParams> =
   z.object({
     conventionId: conventionIdSchema,
     role: signatoryRoleSchema,
   });
 
-export type RemindSignatories = ReturnType<typeof makeRemindSignatories>;
+export type SendSignatureLink = ReturnType<typeof makeSendSignatureLink>;
 
 export const MIN_HOURS_BETWEEN_REMINDER = 24;
 
-export const makeRemindSignatories = createTransactionalUseCase<
-  RemindSignatoriesParams,
+export const makeSendSignatureLink = createTransactionalUseCase<
+  SendSignatureLinkParams,
   void,
   ConventionRelatedJwtPayload,
   {
@@ -62,7 +56,7 @@ export const makeRemindSignatories = createTransactionalUseCase<
 >(
   {
     name: "RemindSignatories",
-    inputSchema: remindSignatoriesParamsSchema,
+    inputSchema: sendSignatureLinkParamsSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -97,7 +91,7 @@ export const makeRemindSignatories = createTransactionalUseCase<
       });
     }
 
-    throwErrorIfPhoneNumerNotValid({
+    throwErrorIfPhoneNumberNotValid({
       convention,
       signatoryKey,
       signatoryRole: inputParams.role,
@@ -109,7 +103,7 @@ export const makeRemindSignatories = createTransactionalUseCase<
       signatoryRole: inputParams.role,
     });
 
-    await throwErrorIfReminderAlreadySent({
+    await throwErrorIfSignatureLinkAlreadySent({
       timeGateway: deps.timeGateway,
       signatoryPhoneNumber: signatory.phone,
       signatoryRole: signatory.role,
@@ -151,87 +145,13 @@ const throwErrorOnConventionIdMismatch = ({
 
 const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
   if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
-    throw errors.convention.signReminderNotAllowedForStatus({
+    throw errors.convention.sendSignatureLinkNotAllowedForStatus({
       status: status,
     });
   }
 };
 
-const throwIfNotAllowedForUser = async ({
-  uow,
-  jwtPayload,
-  agencyId,
-  convention,
-}: {
-  jwtPayload: ConventionRelatedJwtPayload;
-  uow: UnitOfWork;
-  agencyId: AgencyId;
-  convention: ConventionReadDto;
-}): Promise<void> => {
-  if ("role" in jwtPayload) {
-    if (!agencyModifierRoles.includes(jwtPayload.role as any))
-      throw errors.convention.unsupportedRoleSignReminder({
-        role: jwtPayload.role as any,
-      });
-
-    const agency = await uow.agencyRepository.getById(agencyId);
-
-    if (!agency) throw errors.agency.notFound({ agencyId });
-
-    const userIdsWithRoleOnAgency = toPairs(agency.usersRights)
-      .filter(
-        ([_, right]) =>
-          right?.roles.includes("counsellor") ||
-          right?.roles.includes("validator"),
-      )
-      .map(([id]) => id);
-
-    const users = await uow.userRepository.getByIds(
-      userIdsWithRoleOnAgency,
-      await makeProvider(uow),
-    );
-
-    if (
-      !isHashMatchPeAdvisorEmail({
-        convention,
-        emailHash: jwtPayload.emailHash,
-      }) &&
-      !isSomeEmailMatchingEmailHash(
-        users.map(({ email }) => email),
-        jwtPayload.emailHash,
-      )
-    )
-      throw errors.user.notEnoughRightOnAgency({
-        agencyId,
-      });
-
-    return;
-  }
-
-  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-  if (!userWithRights)
-    throw errors.user.notFound({
-      userId: jwtPayload.userId,
-    });
-
-  const agencyRightOnAgency = userWithRights.agencyRights.find(
-    (agencyRight) => agencyRight.agency.id === agencyId,
-  );
-
-  if (!agencyRightOnAgency)
-    throw errors.user.noRightsOnAgency({
-      userId: userWithRights.id,
-      agencyId: agencyId,
-    });
-
-  if (intersection(agencyModifierRoles, agencyRightOnAgency.roles).length === 0)
-    throw errors.user.notEnoughRightOnAgency({
-      agencyId,
-      userId: userWithRights.id,
-    });
-};
-
-const throwErrorIfPhoneNumerNotValid = ({
+const throwErrorIfPhoneNumberNotValid = ({
   convention,
   signatoryRole,
   signatoryKey,
@@ -318,7 +238,7 @@ const sendSms = async ({
   });
 };
 
-const throwErrorIfReminderAlreadySent = async ({
+const throwErrorIfSignatureLinkAlreadySent = async ({
   notificationRepository,
   timeGateway,
   conventionId,
@@ -342,7 +262,7 @@ const throwErrorIfReminderAlreadySent = async ({
     new Date(lastSms.createdAt) >
       subHours(timeGateway.now(), MIN_HOURS_BETWEEN_REMINDER)
   ) {
-    throw errors.convention.smsReminderAlreadySent({
+    throw errors.convention.smsSignatureLinkAlreadySent({
       signatoryRole,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
     });

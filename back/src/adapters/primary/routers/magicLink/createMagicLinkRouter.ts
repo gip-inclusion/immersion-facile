@@ -111,7 +111,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       }),
   );
 
-  sharedRouter.remindSignatories(
+  sharedRouter.sendSignatureLink(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
@@ -120,13 +120,13 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
 
         return match(req.payloads)
           .with({ convention: P.not(P.nullish) }, ({ convention }) =>
-            deps.useCases.remindSignatories.execute(
+            deps.useCases.sendSignatureLink.execute(
               { conventionId, role },
               convention,
             ),
           )
           .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.remindSignatories.execute(
+            deps.useCases.sendSignatureLink.execute(
               { conventionId, role },
               inclusion,
             ),

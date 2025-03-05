@@ -6,7 +6,6 @@ import {
   NotificationKind,
   SmsNotification,
 } from "shared";
-import { ConventionId } from "shared";
 
 export type EmailNotificationFilters = {
   email: Email;

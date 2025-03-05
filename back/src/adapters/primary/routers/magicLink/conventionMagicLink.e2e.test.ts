@@ -564,7 +564,7 @@ describe("Magic link router", () => {
   });
 
   describe("POST /auth/convention/signatories/remind", () => {
-    it("200 - connected validator can send reminder to signatory", async () => {
+    it("200 - connected validator can send signature link to signatory", async () => {
       const agency = new AgencyDtoBuilder().build();
       const validator = new InclusionConnectedUserBuilder()
         .withId("validator")
@@ -595,7 +595,7 @@ describe("Magic link router", () => {
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);
 
-      const response = await httpClient.remindSignatories({
+      const response = await httpClient.sendSignatureLink({
         body: {
           conventionId: convention.id,
           signatoryRole: "establishment-representative",

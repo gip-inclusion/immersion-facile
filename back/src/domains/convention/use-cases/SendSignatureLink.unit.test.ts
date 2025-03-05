@@ -33,9 +33,9 @@ import {
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   MIN_HOURS_BETWEEN_REMINDER,
-  RemindSignatories,
-  makeRemindSignatories,
-} from "./RemindSignatories";
+  SendSignatureLink,
+  makeSendSignatureLink,
+} from "./SendSignatureLink";
 
 const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
@@ -82,11 +82,11 @@ const connectedUserBuilder = new InclusionConnectedUserBuilder().withId(
 );
 const connectedUser = connectedUserBuilder.build();
 
-describe("RemindSignatories", () => {
+describe("Send signature link", () => {
   const config = new AppConfigBuilder().build();
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
-  let usecase: RemindSignatories;
+  let usecase: SendSignatureLink;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let timeGateway: TimeGateway;
 
@@ -99,7 +99,7 @@ describe("RemindSignatories", () => {
       timeGateway,
     );
 
-    usecase = makeRemindSignatories({
+    usecase = makeSendSignatureLink({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
         saveNotificationAndRelatedEvent,
@@ -152,7 +152,7 @@ describe("RemindSignatories", () => {
       ...conventionStatusesWithJustification,
       ...conventionStatusesWithValidator,
     ] as const)(
-      "throws bad request if convention status %s does not allow reminder",
+      "throws bad request if convention status %s does not allow send signature link",
       async (conventionStatus) => {
         const draftConvention = new ConventionDtoBuilder()
           .withId(conventionId)
@@ -169,14 +169,14 @@ describe("RemindSignatories", () => {
             },
             validatorJwtPayload,
           ),
-          errors.convention.signReminderNotAllowedForStatus({
+          errors.convention.sendSignatureLinkNotAllowedForStatus({
             status: draftConvention.status,
           }),
         );
       },
     );
 
-    it("throws bad request if role to remind does not exist", async () => {
+    it("throws bad request if role to send signature link does not exist", async () => {
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
@@ -272,7 +272,7 @@ describe("RemindSignatories", () => {
     });
 
     describe("from magiclink", () => {
-      it("throws unauthorized if role in payload is not allowed to send sign reminder", async () => {
+      it("throws unauthorized if role in payload is not allowed to send signature link", async () => {
         uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
 
@@ -284,7 +284,7 @@ describe("RemindSignatories", () => {
             },
             viewerJwtPayload,
           ),
-          errors.convention.unsupportedRoleSignReminder({
+          errors.convention.unsupportedRoleSendSignatureLink({
             role: "agency-viewer",
           }),
         );
@@ -338,7 +338,7 @@ describe("RemindSignatories", () => {
       });
     });
 
-    it(`throws too many requests if there was already a reminder less than ${MIN_HOURS_BETWEEN_REMINDER} hours before`, async () => {
+    it(`throws too many requests if there was already a signature link sent less than ${MIN_HOURS_BETWEEN_REMINDER} hours before`, async () => {
       const shortLinkId = "link2";
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
       uow.conventionRepository.setConventions([convention]);
@@ -381,7 +381,7 @@ describe("RemindSignatories", () => {
           },
           validatorJwtPayload,
         ),
-        errors.convention.smsReminderAlreadySent({
+        errors.convention.smsSignatureLinkAlreadySent({
           signatoryRole: "establishment-representative",
           minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
         }),
@@ -437,7 +437,7 @@ describe("RemindSignatories", () => {
       },
     );
 
-    it("throws bad request if reminded signatory has already signed", async () => {
+    it("throws bad request if signatory has already signed", async () => {
       const conventionAlreadySigned = new ConventionDtoBuilder(convention)
         .withBeneficiaryPhone("+33600000000")
         .withBeneficiarySignedAt(new Date())
@@ -469,7 +469,7 @@ describe("RemindSignatories", () => {
     });
   });
 
-  describe("Right paths: send sms reminder", () => {
+  describe("Right paths: send signature link sms", () => {
     it.each(["validator", "counsellor"] as const)(
       "When pro connected %s triggers it",
       async (role) => {
@@ -636,7 +636,7 @@ describe("RemindSignatories", () => {
       ]);
     });
 
-    it(`send reminder if last reminder was sent more than ${MIN_HOURS_BETWEEN_REMINDER} hours ago`, async () => {
+    it(`send signature link if last signature link was sent more than ${MIN_HOURS_BETWEEN_REMINDER} hours ago`, async () => {
       const shortLinkId = "link2";
       const pastSmsNotification: Notification = {
         id: "past-notification-id",

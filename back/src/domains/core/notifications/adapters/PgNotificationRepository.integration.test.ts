@@ -262,7 +262,7 @@ describe("PgNotificationRepository", () => {
     it("saves a batch of notifications sms only", async () => {
       await pgNotificationRepository.saveBatch([smsNotification]);
 
-      const response = await pgNotificationRepository.getEmailsByFilters();
+      const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectArraysToEqual(response, []);
 
       const smsResponse = await pgNotificationRepository.getByIdAndKind(

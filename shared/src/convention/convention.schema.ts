@@ -70,10 +70,10 @@ import {
   InternshipKind,
   MINI_STAGE_CCI_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   MarkPartnersErroredConventionAsHandledRequest,
-  RemindSignatoriesRequestDto,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   RenewMagicLinkResponse,
+  SendSignatureLinkRequestDto,
   Signatories,
   UpdateConventionRequestDto,
   UpdateConventionStatusRequestDto,
@@ -502,7 +502,7 @@ export const renewMagicLinkResponseSchema: z.Schema<RenewMagicLinkResponse> =
     needsNewMagicLink: z.boolean(),
   });
 
-export const remindSignatoriesRequestSchema: z.Schema<RemindSignatoriesRequestDto> =
+export const sendSignatureLinkRequestSchema: z.Schema<SendSignatureLinkRequestDto> =
   z.object({
     conventionId: conventionIdSchema,
     signatoryRole: signatoryRoleSchema,
