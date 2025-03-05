@@ -125,7 +125,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     mtm_kwd: ____,
     ...routeParamsWithoutJwtAndTrackers
   } = route.params;
-  const isSharedConvention = useMemo(
+  const isNewOrSharedConvention = useMemo(
     () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
     [routeParamsWithoutJwtAndTrackers],
   );
@@ -140,7 +140,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
     .with({ isLoading: false }, () => (
       <ConventionFormWrapper
         internshipKind="immersion"
-        mode={isSharedConvention ? "edit" : mode}
+        mode={isNewOrSharedConvention ? "create" : mode}
       />
     ))
     .exhaustive();
