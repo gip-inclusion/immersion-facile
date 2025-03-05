@@ -4,7 +4,7 @@ import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { type FederatedIdentityProvider, loginFtConnect } from "shared";
+import { loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   type ConventionFormMode,
@@ -171,20 +171,19 @@ const useFederatedIdentityFromUrl = (route: ConventionImmersionPageRoute) => {
         fedIdProvider: __,
         ...paramsWithoutFederatedIdentity
       } = initialRouteParams;
-      dispatch(
-        authSlice.actions.federatedIdentityProvided({
-          federatedIdentityWithUser: {
-            provider:
-              initialRouteParams.fedIdProvider as FederatedIdentityProvider,
-            token: initialRouteParams.fedId,
-            email: initialRouteParams.email,
-            firstName: initialRouteParams.firstName,
-            lastName: initialRouteParams.lastName,
-            idToken: "should-not-need-for-pe-connect",
-          },
-          feedbackTopic: "auth-global",
-        }),
-      );
+      if (initialRouteParams.fedIdProvider === "peConnect")
+        dispatch(
+          authSlice.actions.federatedIdentityProvided({
+            federatedIdentityWithUser: {
+              provider: initialRouteParams.fedIdProvider,
+              token: initialRouteParams.fedId,
+              email: initialRouteParams.email,
+              firstName: initialRouteParams.firstName,
+              lastName: initialRouteParams.lastName,
+            },
+            feedbackTopic: "auth-global",
+          }),
+        );
       routes
         .conventionImmersion({
           ...paramsWithoutFederatedIdentity,

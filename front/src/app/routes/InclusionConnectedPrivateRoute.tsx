@@ -21,7 +21,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -124,14 +123,12 @@ export const InclusionConnectedPrivateRoute = ({
             lastName,
             firstName,
             idToken,
+            siret,
           },
           feedbackTopic: "auth-global",
         }),
       );
-      outOfReduxDependencies.localDeviceRepository.set(
-        "connectedUserSiret",
-        siret,
-      );
+
       const { token: _, ...routeParams } = route.params;
       routes[route.name](routeParams as any).replace();
     }
