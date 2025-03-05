@@ -216,7 +216,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),
   formEstablishment: defineRoute(
-    establishmentParams,
+    {
+      ...inclusionConnectedParams,
+      ...establishmentParams,
+    },
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(

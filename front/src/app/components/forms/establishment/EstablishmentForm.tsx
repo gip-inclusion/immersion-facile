@@ -266,6 +266,17 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+          inclusionConnectedJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
+      )
+      .with(
+        {
           route: { name: "manageEstablishmentAdmin" },
           adminJwt: P.not(P.nullish),
         },

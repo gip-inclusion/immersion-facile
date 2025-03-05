@@ -60,6 +60,7 @@ export type FrontAgencyDashboardRoute =
 type InclusionConnectPrivateRoute =
   | FrontAdminRoute
   | FrontAgencyDashboardRoute
+  | Route<typeof routes.formEstablishment>
   | Route<typeof routes.establishmentDashboard>
   | Route<typeof routes.myProfile>;
 
@@ -68,21 +69,6 @@ type InclusionConnectedPrivateRouteProps = {
   children: ReactElement;
   inclusionConnectConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
-};
-
-const proConnectProvider = {
-  name: "ProConnect",
-  buttonProvider: "pro-connect" as const,
-  baseline:
-    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-};
-
-const getPage = (
-  route: InclusionConnectPrivateRoute,
-): AllowedStartOAuthLoginPage => {
-  if (route.name === "establishmentDashboard") return "establishmentDashboard";
-  if (route.name === "agencyDashboardMain") return "agencyDashboard";
-  return "admin";
 };
 
 export const InclusionConnectedPrivateRoute = ({
@@ -221,4 +207,19 @@ export const InclusionConnectedPrivateRoute = ({
       <MainWrapper layout="default">{children}</MainWrapper>
     </HeaderFooterLayout>
   );
+};
+
+const proConnectProvider = {
+  name: "ProConnect",
+  buttonProvider: "pro-connect" as const,
+  baseline:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+};
+
+const getPage = (
+  route: InclusionConnectPrivateRoute,
+): AllowedStartOAuthLoginPage => {
+  if (route.name === "establishmentDashboard") return "establishmentDashboard";
+  if (route.name === "agencyDashboardMain") return "agencyDashboard";
+  return "admin";
 };
