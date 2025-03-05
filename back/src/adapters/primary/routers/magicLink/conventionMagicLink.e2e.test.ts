@@ -563,7 +563,7 @@ describe("Magic link router", () => {
     });
   });
 
-  describe("POST /auth/convention/signatories/remind", () => {
+  describe("POST /auth/convention/signatories/send-signature-link", () => {
     it("200 - connected validator can send signature link to signatory", async () => {
       const agency = new AgencyDtoBuilder().build();
       const validator = new InclusionConnectedUserBuilder()
