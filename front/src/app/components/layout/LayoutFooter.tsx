@@ -206,10 +206,9 @@ const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
     },
   },
   {
-    label: "Kit de communication",
-    href: "https://inclusion.beta.gouv.fr/kits-de-communication/immersion-facilitée/",
-    id: bottomsLinksIds.communicationKit,
-    target: "_blank",
+    label: "Ressources et webinaires",
+    href: "https://pages.immersion-facile.beta.gouv.fr/",
+    id: bottomsLinksIds.resourcesAndWebinars,
   },
   headerFooterDisplayItem,
 ];

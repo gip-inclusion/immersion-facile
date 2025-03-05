@@ -276,6 +276,14 @@ export const LayoutHeader = () => {
             id: agencyIds.dashboard,
           },
         },
+        {
+          text: "Ressources et webinaires",
+          isActive: false,
+          linkProps: {
+            href: "https://pages.immersion-facile.beta.gouv.fr/",
+            id: agencyIds.resourcesAndWebinars,
+          },
+        },
       ],
     },
   ];

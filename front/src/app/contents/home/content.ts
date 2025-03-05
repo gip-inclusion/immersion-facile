@@ -202,6 +202,15 @@ export const heroHeaderNavCards: (
         alternateTitle:
           "Mon espace : espace personnel nominatif où retrouver mes conventions et statistiques.",
       },
+      {
+        title: "Ressources et webinaires",
+        icon: "fr-icon-book-2-line",
+        type: "agency",
+        id: domElementIds.home.heroHeader.resourcesAndWebinars,
+        link: { href: "https://pages.immersion-facile.beta.gouv.fr" },
+        alternateTitle:
+          "Ressources et webinaires : découvrez nos ressources dédiées pour guider et être guidé.",
+      },
     ],
   };
 };
