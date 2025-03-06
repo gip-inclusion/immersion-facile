@@ -398,6 +398,8 @@ export const domElementIds = {
       availabilityButton: "im-form-create-establishment__availability-button",
       nextAvailabilityDateInput:
         "im-form-create-establishment__next-availability-date",
+      navigateToEstablishmentDashboard:
+        "im-form-create-establishment__navigate-establishment-dahsboard-button",
       previousButtonFromStepAndMode: ({ currentStep }) =>
         `im-form-create-establishment__previous-button--step-${currentStep}`,
       nextButtonFromStepAndMode: ({ currentStep }) =>
@@ -690,7 +692,12 @@ export const domElementIds = {
       "im-convention-to-sign__submit-modification-request-button",
   },
   editFormEstablishmentRoute: {},
-  error: {},
+  error: {
+    establishmentDashboardButton:
+      "im-error-page__establishment-dashboard-button",
+    homeButton: "im-error-page__home-button",
+    contactUsButton: "im-error-contact-us-button",
+  },
   conventionMiniStageRoute: {},
 
   agencyDashboard: {

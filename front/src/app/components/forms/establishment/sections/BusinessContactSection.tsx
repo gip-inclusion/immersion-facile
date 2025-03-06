@@ -43,16 +43,7 @@ export const BusinessContactSection = ({
             },
             {
               children: "Étape suivante",
-              onClick: () =>
-                onStepChange(4, [
-                  "businessContact.firstName",
-                  "businessContact.lastName",
-                  "businessContact.job",
-                  "businessContact.phone",
-                  "businessContact.email",
-                  "businessContact.copyEmails",
-                  "businessContact.contactMethod",
-                ]),
+              onClick: () => onStepChange(4, ["userRights", "contactMethod"]),
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
               id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
