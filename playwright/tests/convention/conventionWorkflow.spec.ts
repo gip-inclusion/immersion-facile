@@ -131,34 +131,6 @@ test.describe("Convention creation and modification workflow", () => {
       test("signs convention for signatory 2", async ({ page }) => {
         await signConvention(page, signatoriesMagicLinks, 1);
       });
-      test("validator can remind missing signatories", async ({ page }) => {
-        await page.goto("/");
-        await goToAdminTab(page, "adminNotifications");
-        const emailWrapper = await openEmailInAdmin(
-          page,
-          "NEW_CONVENTION_AGENCY_NOTIFICATION",
-          0,
-        );
-        const href = await getMagicLinkInEmailWrapper(emailWrapper);
-        expect(href).not.toBe(null);
-        if (!href) return;
-        await page.goto(href);
-        const remindSignatories = page.locator(
-          `#${domElementIds.manageConvention.remindSignatoriesButton}`,
-        );
-        await expect(remindSignatories).toBeVisible();
-        await remindSignatories.click();
-        await expect(
-          page.locator(
-            `#${domElementIds.manageConvention.remindSignatoriesModal}`,
-          ),
-        ).toBeVisible();
-        await page
-          .locator(
-            `#${domElementIds.manageConvention.remindSignatoriesModal} .fr-btn--close`,
-          )
-          .click();
-      });
 
       test("signs convention for signatory 3", async ({ page }) => {
         await signConvention(page, signatoriesMagicLinks, 2);

@@ -32,10 +32,6 @@ import {
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import {
-  RemindSignatoriesButton,
-  isRemindingAllowed,
-} from "src/app/components/forms/convention/RemindSignatoriesButton";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
@@ -185,15 +181,6 @@ export const ConventionManageActions = ({
           >
             {t.verification.markAsDeprecated}
           </VerificationActionButton>
-        )}
-
-        {isRemindingAllowed(convention, roles) && (
-          <RemindSignatoriesButton
-            convention={convention}
-            priority="primary"
-            id={domElementIds.manageConvention.remindSignatoriesButton}
-            className={fr.cx("fr-m-1w")}
-          />
         )}
 
         {isAllowedConventionTransition(convention, "DRAFT", roles) && (
