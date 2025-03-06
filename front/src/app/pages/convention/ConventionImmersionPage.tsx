@@ -119,18 +119,25 @@ export const ConventionImmersionPage = ({
 
 const PageContent = ({ route }: ConventionImmersionPageProps) => {
   const { isLoading } = useFeatureFlags();
+  const initialRouteParams = useRef(route.params).current;
   const {
     jwt: _,
     mtm_campaign: __,
     mtm_kwd: ____,
     ...routeParamsWithoutJwtAndTrackers
-  } = route.params;
-  const isNewOrSharedConvention = useMemo(
+  } = initialRouteParams;
+  const isSharedConvention = useMemo(
     () => keys(routeParamsWithoutJwtAndTrackers).length > 0,
     [routeParamsWithoutJwtAndTrackers],
   );
 
-  const mode: ConventionFormMode = "jwt" in route.params ? "edit" : "create";
+  const getMode = (): ConventionFormMode => {
+    if ("jwt" in initialRouteParams) return "edit";
+    if (isSharedConvention) return "create-from-shared";
+    return "create-from-scratch";
+  };
+
+  const mode = getMode();
 
   return match({
     isLoading,
@@ -138,10 +145,7 @@ const PageContent = ({ route }: ConventionImmersionPageProps) => {
   })
     .with({ isLoading: true }, () => <Loader />)
     .with({ isLoading: false }, () => (
-      <ConventionFormWrapper
-        internshipKind="immersion"
-        mode={isNewOrSharedConvention ? "create" : mode}
-      />
+      <ConventionFormWrapper internshipKind="immersion" mode={mode} />
     ))
     .exhaustive();
 };
