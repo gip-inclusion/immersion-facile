@@ -9,7 +9,6 @@ import {
   errors,
   normalizedMonthInDays,
 } from "shared";
-import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -105,19 +104,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     )?.appellationLabel;
 
     if (!appellationLabel) {
-      notifyToTeamAndThrowError(
-        errors.establishment.offerMissing({
-          siret,
-          appellationCode: contactRequest.appellationCode,
-          mode: "bad request",
-        }),
-      );
-
-      // we keep discord notification for now, but we will remove it when the bug is confirmed and fixed
-      // Than it will just be :
-      // throw new BadRequestError(
-      //   `Establishment with siret '${contactRequest.siret}' doesn't have an immersion offer with appellation code '${contactRequest.appellationCode}'.`,
-      // );
+      throw errors.establishment.offerMissing({
+        siret,
+        appellationCode: contactRequest.appellationCode,
+        mode: "bad request",
+      });
     }
 
     const discussion = await this.#createDiscussion({

@@ -389,7 +389,7 @@ export const emailTemplatesByName =
         return {
           subject: `Immersion Facilitée - Le bilan de votre ${
             internshipKind === "immersion" ? "immersion" : "mini-stage"
-          } est disponible ! `,
+          } est disponible !`,
           greetings: greetingsWithConventionId(
             conventionId,
             `${beneficiaryFirstName} ${beneficiaryLastName}`,
