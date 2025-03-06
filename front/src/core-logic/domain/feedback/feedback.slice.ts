@@ -132,6 +132,12 @@ export const feedbackMapping: Record<
       message:
         "Le destinataire devrait le recevoir dans les prochaines minutes.",
     },
+    "create.info": {
+      action: sendSignatureLinkSlice.actions.sendSignatureLinkRequested,
+      title: "Le sms est en cours d'envoi",
+      message:
+        "Le sms est en cours d'envoi au signataire. Cela peut prendre une quinzaine de secondes.",
+    },
     "create.error": {
       action: sendSignatureLinkSlice.actions.sendSignatureLinkFailed,
       title: "Problème lors de l'envoi SMS",

@@ -5,8 +5,8 @@ const sendSignatureLinkState = ({ sendSignatureLink }: RootState) =>
   sendSignatureLink;
 
 export const sendSignatureLinkSelectors = {
-  isLoading: createSelector(
+  isSending: createSelector(
     sendSignatureLinkState,
-    ({ isLoading }) => isLoading,
+    ({ isSending }) => isSending,
   ),
 };

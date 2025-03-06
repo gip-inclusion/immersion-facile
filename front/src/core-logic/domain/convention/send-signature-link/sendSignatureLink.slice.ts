@@ -4,11 +4,11 @@ import { ConventionSupportedJwt, SendSignatureLinkRequestDto } from "shared";
 import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface SendSignatureLinkState {
-  isLoading: boolean;
+  isSending: boolean;
 }
 
 export const sendSignatureLinkInitialState: SendSignatureLinkState = {
-  isLoading: false,
+  isSending: false,
 };
 
 export const sendSignatureLinkSlice = createSlice({
@@ -21,7 +21,7 @@ export const sendSignatureLinkSlice = createSlice({
         SendSignatureLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
-      state.isLoading = true;
+      state.isSending = true;
     },
 
     sendSignatureLinkSucceeded: (
@@ -30,14 +30,14 @@ export const sendSignatureLinkSlice = createSlice({
         SendSignatureLinkRequestDto & { jwt: ConventionSupportedJwt }
       >,
     ) => {
-      state.isLoading = false;
+      state.isSending = false;
     },
 
     sendSignatureLinkFailed: (
       state,
       _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
     ) => {
-      state.isLoading = false;
+      state.isSending = false;
     },
   },
 });

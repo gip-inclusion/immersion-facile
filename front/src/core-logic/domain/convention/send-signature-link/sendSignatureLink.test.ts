@@ -33,12 +33,18 @@ describe("sendSignatureLink slice", () => {
       }),
     );
     expectSendSignatureLinkState({
-      isLoading: true,
+      isSending: true,
     });
     feedGatewaySendSignatureLinkSuccess();
 
     expectSendSignatureLinkState({
-      isLoading: false,
+      isSending: true,
+    });
+
+    fastForwardObservables();
+
+    expectSendSignatureLinkState({
+      isSending: false,
     });
 
     expectToEqual(
@@ -63,12 +69,12 @@ describe("sendSignatureLink slice", () => {
       }),
     );
     expectSendSignatureLinkState({
-      isLoading: true,
+      isSending: true,
     });
     const errorMessage = "Une erreur est survenue lors de l'envoi du SMS.";
     feedGatewayWithSendSignatureLinkFailure(new Error(errorMessage));
     expectSendSignatureLinkState({
-      isLoading: false,
+      isSending: false,
     });
 
     expectToEqual(
@@ -98,4 +104,6 @@ describe("sendSignatureLink slice", () => {
   const feedGatewayWithSendSignatureLinkFailure = (error: Error) => {
     dependencies.conventionGateway.sendSignatureLinkResult$.error(error);
   };
+
+  const fastForwardObservables = () => dependencies.scheduler.flush();
 });
