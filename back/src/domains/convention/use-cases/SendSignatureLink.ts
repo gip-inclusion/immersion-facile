@@ -77,6 +77,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       });
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
+
     await throwIfNotAllowedForUser({
       uow,
       jwtPayload,
