@@ -288,7 +288,6 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     businessName: string;
     conventionId: ConventionId;
-    conventionStatusLink: string;
     dateEnd: string;
     dateStart: string;
     internshipKind: InternshipKind;

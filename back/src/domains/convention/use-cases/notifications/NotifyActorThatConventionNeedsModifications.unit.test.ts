@@ -197,7 +197,6 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
         shortLinkIdGateway.addMoreShortLinkIds(
           expectedRecipients.flatMap((expectedRecipient) => [
             `shortLinkId_${expectedRecipient}_1_${modifierRole}`,
-            `shortLinkId_${expectedRecipient}_2_${modifierRole}`,
           ]),
         );
         const justification = "Change required.";
@@ -228,12 +227,6 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
                 ...magicLinkCommonFields,
                 targetRoute: frontRoutes.conventionImmersionRoute,
               }),
-            [`shortLinkId_${expectedRecipient}_2_${modifierRole}`]:
-              fakeGenerateMagicLinkUrlFn({
-                ...magicLinkCommonFields,
-                targetRoute: frontRoutes.conventionStatusDashboard,
-                lifetime: "long",
-              }),
           };
         }, {});
 
@@ -254,10 +247,6 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
               magicLink: makeShortLinkUrl(
                 config,
                 `shortLinkId_${expectedRecipient}_1_${modifierRole}`,
-              ),
-              conventionStatusLink: makeShortLinkUrl(
-                config,
-                `shortLinkId_${expectedRecipient}_2_${modifierRole}`,
               ),
               signature: agency.signature,
               agencyLogoUrl: agency.logoUrl ?? undefined,
