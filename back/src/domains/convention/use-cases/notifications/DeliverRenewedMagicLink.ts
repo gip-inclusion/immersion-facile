@@ -40,13 +40,7 @@ export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLink
   }
 
   protected async _execute(
-    {
-      emails,
-      magicLink,
-      conventionStatusLink,
-      internshipKind,
-      conventionId,
-    }: RenewMagicLinkPayload,
+    { emails, magicLink, internshipKind, conventionId }: RenewMagicLinkPayload,
     uow: UnitOfWork,
   ): Promise<void> {
     await this.#saveNotificationAndRelatedEvent(uow, {
@@ -57,7 +51,6 @@ export class DeliverRenewedMagicLink extends TransactionalUseCase<RenewMagicLink
         params: {
           internshipKind,
           magicLink,
-          conventionStatusLink,
           conventionId,
         },
       },

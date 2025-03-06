@@ -127,7 +127,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     signatory,
     recipient,
     agency,
-    conventionStatusLinkId,
     conventionToSignLinkId,
     config,
   }: {
@@ -169,7 +168,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
           config,
           conventionToSignLinkId,
         ),
-        conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
         agencyLogoUrl: agency.logoUrl ?? undefined,
       },

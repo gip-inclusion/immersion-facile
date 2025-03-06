@@ -146,10 +146,6 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
           targetRoute: frontRoutes.conventionToSign,
           lifetime: "short",
         }),
-        conventionStatusLink: await makeMagicShortLink({
-          targetRoute: frontRoutes.conventionStatusDashboard,
-          lifetime: "long",
-        }),
         businessName,
         agencyLogoUrl: agency.logoUrl ?? undefined,
       },

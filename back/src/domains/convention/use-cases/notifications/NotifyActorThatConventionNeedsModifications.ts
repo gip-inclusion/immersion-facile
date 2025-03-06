@@ -121,10 +121,6 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
           targetRoute: frontRoutes.conventionImmersionRoute,
           lifetime: "short",
         }),
-        conventionStatusLink: await makeShortMagicLink({
-          targetRoute: frontRoutes.conventionStatusDashboard,
-          lifetime: "long",
-        }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
         requesterName,
       },

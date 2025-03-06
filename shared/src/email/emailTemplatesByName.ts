@@ -503,7 +503,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         beneficiaryRepresentativeName,
         businessName,
         conventionId,
-        conventionStatusLink,
         establishmentRepresentativeName,
         establishmentTutorName,
         internshipKind,
@@ -551,10 +550,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
           - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
           - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".`,
-        buttons: [
-          { url: conventionSignShortlink, label: "Ouvrir ma demande" },
-          createConventionStatusButton(conventionStatusLink),
-        ],
+        buttons: [{ url: conventionSignShortlink, label: "Ouvrir ma demande" }],
         highlight: {
           content: `Attention, ne démarrez pas votre ${
             internshipKind === "immersion" ? "immersion" : "mini stage"
@@ -826,7 +822,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         beneficiaryLastName,
         businessName,
         conventionId,
-        conventionStatusLink,
         internshipKind,
         magicLink,
         possibleRoleAction,
@@ -860,7 +855,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             url: magicLink,
             target: "_blank",
           },
-          createConventionStatusButton(conventionStatusLink),
         ],
         subContent: defaultSignature(internshipKind),
         attachmentUrls:
@@ -869,52 +863,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
                 "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
-        agencyLogoUrl,
-      }),
-    },
-    BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
-      niceName: "Convention - Signature de l'autre signataire",
-      tags: ["confirmation nécessaire après confirmation de l’autre partie"],
-      createEmailVariables: ({
-        agencyLogoUrl,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        conventionStatusLink,
-        establishmentRepresentativeName,
-        existingSignatureName,
-        immersionProfession,
-        internshipKind,
-        magicLink,
-      }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Pour action : à vous de signer votre demande de convention"
-            : "Pour action : à vous de confirmer votre demande de mini stage",
-        greetings: greetingsWithConventionId(conventionId),
-        content: `
-      La demande de convention pour ${
-        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-      } de ${beneficiaryFirstName} ${beneficiaryLastName} pour le métier de ${immersionProfession} dans l'entreprise ${businessName} encadré par ${establishmentRepresentativeName} vient d'être signée par ${existingSignatureName}.
-
-      <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
-      - Si les informations sont correctes, cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant.
-      - Si les informations ne sont pas correctes, cliquez sur le bouton "Annuler les signatures et demander une modification".
-      `,
-        buttons: [
-          { url: magicLink, label: "Ouvrir ma demande" },
-          createConventionStatusButton(conventionStatusLink),
-        ],
-        subContent: `
-      Ensuite, il vous suffira d'attendre le mail de validation de l'organisme d'accompagnement.
-
-      <strong>Attention, ne démarrez pas ${
-        internshipKind === "immersion" ? "l'immersion" : "le mini stage"
-      } sans ce mail de validation. Sinon, le risque “accident du travail” ne sera pas couvert.</strong>
-      
-      ${defaultSignature(internshipKind)}
-      `,
         agencyLogoUrl,
       }),
     },
@@ -1138,7 +1086,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         beneficiaryLastName,
         businessName,
         conventionId,
-        conventionStatusLink,
         internshipKind,
         justification,
         magicLink,
@@ -1161,7 +1108,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             url: magicLink,
             label: "Modifier votre demande",
           },
-          createConventionStatusButton(conventionStatusLink),
         ],
         subContent: `
       Après avoir corrigé votre demande, il faudra de nouveau que tous les acteurs de la convention confirment leur accord. 
@@ -1367,12 +1313,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
     MAGIC_LINK_RENEWAL: {
       niceName: "Convention - Renouvellement de lien magique",
       tags: ["renouvellement de lien"],
-      createEmailVariables: ({
-        conventionId,
-        conventionStatusLink,
-        internshipKind,
-        magicLink,
-      }) => ({
+      createEmailVariables: ({ conventionId, internshipKind, magicLink }) => ({
         subject:
           internshipKind === "immersion"
             ? "Voici votre nouveau lien magique pour accéder à la demande d'immersion"
@@ -1390,7 +1331,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             url: magicLink,
             label: "Mon lien renouvelé",
           },
-          createConventionStatusButton(conventionStatusLink),
         ],
         subContent: defaultSignature(internshipKind),
         highlight: {
@@ -1952,7 +1892,6 @@ Profil du candidat :
         agencyLogoUrl,
         beneficiaryName,
         conventionId,
-        conventionStatusLink,
         internshipKind,
       }) => ({
         subject: "Test contenant toutes les blocs email",
@@ -1969,10 +1908,7 @@ Profil du candidat :
         internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
       }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.`,
         legals: defaultConventionFinalLegals(internshipKind),
-        buttons: [
-          { label: "Label de bouton", url: "http://www.example.com" },
-          createConventionStatusButton(conventionStatusLink),
-        ],
+        buttons: [{ label: "Label de bouton", url: "http://www.example.com" }],
         subContent: `Il vous informera par mail de la validation ou non ${
           internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
         }. Le tuteur qui vous encadrera pendant cette période recevra aussi la réponse.
