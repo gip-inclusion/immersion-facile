@@ -1,7 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { keys } from "shared";
-import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
+import {
+  ConventionFormMode,
+  ConventionFormWrapper,
+} from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { routes } from "src/app/routes/routes";
 import { Route } from "type-route";
@@ -18,11 +21,20 @@ export const ConventionMiniStagePage = ({
   route,
 }: ConventionMiniStagePageProps) => {
   const t = useConventionTexts("mini-stage-cci");
-  const { jwt: _, ...routeParamsWithoutJwt } = route.params;
+  const initialRouteParams = useRef(route.params).current;
+  const { jwt: _, ...routeParamsWithoutJwt } = initialRouteParams;
   const isSharedConvention = useMemo(
     () => keys(routeParamsWithoutJwt).length > 0,
     [routeParamsWithoutJwt],
   );
+
+  const getMode = (): ConventionFormMode => {
+    if ("jwt" in initialRouteParams) return "edit";
+    if (isSharedConvention) return "create-from-shared";
+    return "create-from-scratch";
+  };
+  const mode = getMode();
+
   return (
     <MainWrapper
       layout={"default"}
@@ -33,10 +45,7 @@ export const ConventionMiniStagePage = ({
         </PageHeader>
       }
     >
-      <ConventionFormWrapper
-        internshipKind="mini-stage-cci"
-        mode={isSharedConvention ? "edit" : "create"}
-      />
+      <ConventionFormWrapper internshipKind="mini-stage-cci" mode={mode} />
     </MainWrapper>
   );
 };

@@ -25,6 +25,7 @@ import {
   Beneficiary,
   ConventionReadDto,
   DepartmentCode,
+  ExcludeFromExisting,
   FederatedIdentity,
   InternshipKind,
   addressDtoToString,
@@ -71,6 +72,7 @@ import { errors as errorMessage } from "shared";
 import {
   ConventionFormMode,
   SupportedConventionRoutes,
+  creationFormModes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
@@ -160,8 +162,11 @@ export const ConventionForm = ({
 
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
-  const defaultValues =
-    mode === "create" ? initialValues : fetchedConvention || initialValues;
+  const defaultValues = creationFormModes.includes(
+    mode as ExcludeFromExisting<ConventionFormMode, "edit">,
+  )
+    ? initialValues
+    : fetchedConvention || initialValues;
 
   const methods = useForm<Required<ConventionPresentation>>({
     defaultValues,
@@ -350,7 +355,7 @@ export const ConventionForm = ({
   }, [dispatch]);
 
   useEffect(() => {
-    if (mode !== "create") {
+    if (mode === "edit") {
       validateSteps("clearAllErrors");
     }
   }, [conventionValues.id]);
