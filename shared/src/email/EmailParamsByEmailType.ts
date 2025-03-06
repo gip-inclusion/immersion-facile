@@ -12,6 +12,7 @@ import {
 import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
+import { ExtractFromExisting } from "../utils";
 import { DateString } from "../utils/date";
 import { Email } from "./email.dto";
 
@@ -22,6 +23,27 @@ export type UserParamsForMail = {
   firstName: string;
   lastName: string;
   email: Email;
+};
+
+type WithInternshipKind =
+  | {
+      internshipKind: ExtractFromExisting<InternshipKind, "immersion">;
+    }
+  | {
+      internshipKind: ExtractFromExisting<InternshipKind, "mini-stage-cci">;
+      agencyKind: "cci" | "cma" | "chambre-agriculture";
+    };
+
+export const ensureAgencyKind = <T extends { internshipKind: InternshipKind }>(
+  params: T,
+): T => {
+  if (params.internshipKind === "mini-stage-cci" && !("agencyKind" in params)) {
+    return {
+      ...params,
+      agencyKind: "cci" as const,
+    };
+  }
+  return params;
 };
 
 export type EmailParamsByEmailType = {
@@ -70,86 +92,77 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     rejectionJustification: string;
   };
-  ASSESSMENT_AGENCY_NOTIFICATION: {
+  ASSESSMENT_AGENCY_NOTIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_AGENCY_FIRST_REMINDER: {
+  ASSESSMENT_AGENCY_FIRST_REMINDER: WithInternshipKind & {
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
     establishmentContactEmail: Email;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_AGENCY_SECOND_REMINDER: {
+  ASSESSMENT_AGENCY_SECOND_REMINDER: WithInternshipKind & {
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
     establishmentContactEmail: Email;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_BENEFICIARY_NOTIFICATION: {
+  ASSESSMENT_BENEFICIARY_NOTIFICATION: WithInternshipKind & {
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {
+  ASSESSMENT_ESTABLISHMENT_NOTIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     conventionId: ConventionId;
     establishmentTutorName: string;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION: {
+  ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION: WithInternshipKind & {
     recipientFullName: string;
     beneficiaryFullName: string;
     businessName: string;
     linkToAssessment: AbsoluteUrl;
-    internshipKind: InternshipKind;
   };
-  ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
+  ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: WithInternshipKind & {
     immersionObjective: ImmersionObjective | undefined;
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionDateEnd: DateString;
-    internshipKind: InternshipKind;
     assessment: AssessmentDtoCompleted | AssessmentDtoPartiallyCompleted;
     immersionAppellationLabel: string;
     numberOfHoursMade: string;
     magicLink: string;
   };
-  ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
+  ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: WithInternshipKind & {
     immersionObjective: ImmersionObjective | undefined;
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
-    internshipKind: InternshipKind;
     immersionAppellationLabel: string;
   };
-  ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: {
-    internshipKind: InternshipKind;
+  ASSESSMENT_CREATED_BENEFICIARY_NOTIFICATION: WithInternshipKind & {
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     magicLink: string;
   };
-  BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
+  BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -159,10 +172,9 @@ export type EmailParamsByEmailType = {
     establishmentRepresentativeName: string;
     existingSignatureName: string;
     immersionProfession: string;
-    internshipKind: InternshipKind;
     magicLink: string;
   };
-  CANCELLED_CONVENTION_NOTIFICATION: {
+  CANCELLED_CONVENTION_NOTIFICATION: WithInternshipKind & {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
@@ -170,7 +182,6 @@ export type EmailParamsByEmailType = {
     businessName: string;
     conventionId: ConventionId;
     immersionProfession: string;
-    internshipKind: InternshipKind;
     signature: string;
     dateEnd: string;
     dateStart: string;
@@ -228,14 +239,13 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
   };
-  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
+  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
     conventionStatusLink: string;
-    internshipKind: InternshipKind;
     justification: string;
     magicLink: string;
     signature: string;
@@ -250,7 +260,7 @@ export type EmailParamsByEmailType = {
     domain: string;
     mode: "3days" | "7days";
   };
-  DEPRECATED_CONVENTION_NOTIFICATION: {
+  DEPRECATED_CONVENTION_NOTIFICATION: WithInternshipKind & {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
@@ -259,7 +269,6 @@ export type EmailParamsByEmailType = {
     dateEnd: string;
     dateStart: string;
     immersionProfession: string;
-    internshipKind: InternshipKind;
   };
   DISCUSSION_EXCHANGE: {
     subject: string;
@@ -280,25 +289,23 @@ export type EmailParamsByEmailType = {
     registerEstablishmentShortLink: string;
     unsubscribeToEmailShortLink: string;
   };
-  FULL_PREVIEW_EMAIL: {
+  FULL_PREVIEW_EMAIL: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryName: string;
     conventionId: ConventionId;
     conventionStatusLink: string;
-    internshipKind: InternshipKind;
   };
   IC_USER_RIGHTS_HAS_CHANGED: UserParamsForMail;
   IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
     agencyName: string;
     justification: string;
   };
-  MAGIC_LINK_RENEWAL: {
+  MAGIC_LINK_RENEWAL: WithInternshipKind & {
     conventionId: ConventionId | undefined;
     conventionStatusLink: string;
-    internshipKind: InternshipKind;
     magicLink: string;
   };
-  NEW_CONVENTION_AGENCY_NOTIFICATION: {
+  NEW_CONVENTION_AGENCY_NOTIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyName: string;
     businessName: string;
@@ -306,13 +313,12 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
     dateEnd: string;
     dateStart: string;
-    internshipKind: InternshipKind;
     firstName: string;
     lastName: string;
     magicLink: AbsoluteUrl;
     warning?: string;
   };
-  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: {
+  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryName: string;
     beneficiaryRepresentativeName?: string;
@@ -322,31 +328,28 @@ export type EmailParamsByEmailType = {
     conventionStatusLink: string;
     establishmentRepresentativeName: string;
     establishmentTutorName: string;
-    internshipKind: InternshipKind;
     conventionSignShortlink: string;
     signatoryName: string;
     renewed?: Renewed;
   };
-  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
+  NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
     conventionSignShortlink: AbsoluteUrl;
-    internshipKind: InternshipKind;
     justification: string;
     signatoryFirstName: string;
     signatoryLastName: string;
   };
-  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
+  NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
     conventionStatusLink: string;
-    internshipKind: InternshipKind;
     magicLink: string;
     possibleRoleAction: string;
     validatorName: string;
@@ -393,7 +396,7 @@ export type EmailParamsByEmailType = {
     immersionAddress: string;
     magicLink: string;
   };
-  REJECTED_CONVENTION_NOTIFICATION: {
+  REJECTED_CONVENTION_NOTIFICATION: WithInternshipKind & {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryFirstName: string;
@@ -401,12 +404,10 @@ export type EmailParamsByEmailType = {
     businessName: string;
     conventionId: ConventionId;
     immersionProfession: string;
-    internshipKind: InternshipKind;
     rejectionReason: string;
     signature: string;
   };
-  SHARE_DRAFT_CONVENTION_BY_LINK: {
-    internshipKind: InternshipKind;
+  SHARE_DRAFT_CONVENTION_BY_LINK: WithInternshipKind & {
     additionalDetails: string;
     conventionFormUrl: string;
   };
@@ -430,11 +431,10 @@ export type EmailParamsByEmailType = {
     magicLinkUrl: AbsoluteUrl | undefined;
     signatoriesSummary: string;
   };
-  SIGNEE_HAS_SIGNED_CONVENTION: {
+  SIGNEE_HAS_SIGNED_CONVENTION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     conventionId: ConventionId;
     conventionStatusLink: AbsoluteUrl;
-    internshipKind: InternshipKind;
     signedAt: string;
     agencyName: string;
   };
@@ -443,7 +443,7 @@ export type EmailParamsByEmailType = {
     businessName: string;
     businessAddresses: string[];
   };
-  VALIDATED_CONVENTION_FINAL_CONFIRMATION: {
+  VALIDATED_CONVENTION_FINAL_CONFIRMATION: WithInternshipKind & {
     agencyLogoUrl: AbsoluteUrl | undefined;
     beneficiaryBirthdate: string;
     beneficiaryFirstName: string;
@@ -455,7 +455,6 @@ export type EmailParamsByEmailType = {
     emergencyContactInfos: string;
     establishmentTutorName: string;
     immersionAppellationLabel: string;
-    internshipKind: InternshipKind;
     magicLink: string;
     validatorName: string;
   };
