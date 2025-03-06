@@ -4,6 +4,7 @@ type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
 
 type FrontRouteParametrizedKeys =
   | "mode"
+  | "internshipKind"
   | "currentStep"
   | "rightName"
   | "apiConsumerId";
@@ -211,7 +212,8 @@ export const domElementIds = {
   },
 
   conventionImmersionRoute: {
-    form: (params) => `im-convention-immersion-form--${params.mode}`,
+    form: (params) =>
+      `im-convention-${params.internshipKind}-form--${params.mode}`,
     shareForm: "im-convention-form__share-form",
     shareFormSubmitButton: "im-convention-form__share-form-submit-button",
     copyLinkButton: "im-convention-form__copy-link-button",
