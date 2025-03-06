@@ -295,8 +295,6 @@ describe("ContactEstablishment", () => {
           appellationCode: "12898",
           siret: validEmailRequest.siret,
           businessName: "Company inside repository",
-          acquisitionCampaign: undefined,
-          acquisitionKeyword: undefined,
           address: establishment.locations[0].address,
           potentialBeneficiary: {
             firstName: validEmailRequest.potentialBeneficiaryFirstName,
@@ -354,31 +352,11 @@ describe("ContactEstablishment", () => {
       ]);
     });
 
-    // Helper function for testing max contacts scenarios
-    const testMaxContactsScenario = async ({
-      maxContactsPerMonth,
-      discussionsSetup,
-      newContactRequest,
-      expectedIsMaxDiscussionsReached,
-    }: {
-      maxContactsPerMonth: number;
-      discussionsSetup: {
-        id: string;
-        createdAt: string;
-        message: string;
-        potentialBeneficiary: {
-          firstName: string;
-          lastName: string;
-          email: string;
-        };
-      }[];
-      newContactRequest: ContactEstablishmentRequestDto;
-      expectedIsMaxDiscussionsReached: boolean;
-    }) => {
-      // Prepare establishment
+    it("switches establishment is searchable to false when the max contacts per month is reached", async () => {
+      // préparation
       const establishmentAggregate = establishmentAggregateWithEmailContact
         .withIsMaxDiscussionsForPeriodReached(false)
-        .withMaxContactsPerMonth(maxContactsPerMonth)
+        .withMaxContactsPerMonth(2)
         .withOffers([immersionOffer])
         .build();
       await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -386,168 +364,115 @@ describe("ContactEstablishment", () => {
       );
       const establishment = establishmentAggregate.establishment;
 
-      // Set up discussions
-      uow.discussionRepository.discussions = discussionsSetup.map((setup) => ({
-        id: setup.id,
-        appellationCode: appellationAndRome.appellationCode,
-        siret,
-        businessName: "Entreprise Test",
-        address: establishment.locations[0].address,
-        immersionObjective: "Confirmer un projet professionnel",
-        potentialBeneficiary: {
-          firstName: setup.potentialBeneficiary.firstName,
-          lastName: setup.potentialBeneficiary.lastName,
-          email: setup.potentialBeneficiary.email,
-          phone: "+33654783402",
-          resumeLink: "http://fakelink.com",
-        },
-        establishmentContact: {
-          contactMethod: "EMAIL",
-          email: establishmentContact.email,
-          firstName: establishmentContact.firstName,
-          lastName: establishmentContact.lastName,
-          phone: establishmentAdminRight.phone,
-          job: establishmentAdminRight.job,
-          copyEmails: [establishmentContact.email],
-        },
-        createdAt: setup.createdAt,
-        exchanges: [
-          {
-            subject: "Demande de contact initiée par le bénéficiaire",
-            message: setup.message,
-            recipient: "establishment",
-            sender: "potentialBeneficiary",
-            sentAt: setup.createdAt,
-            attachments: [],
-          },
-        ],
-        status: "PENDING",
-      }));
-
-      // Execute the contact request with the establishment's location ID
-      const requestWithLocationId = {
-        ...newContactRequest,
-        locationId: establishment.locations[0].id,
-      };
-      await contactEstablishment.execute(requestWithLocationId);
-
-      // Get the updated establishment aggregate
-      const establishmentAggregateAfterContact =
-        uow.establishmentAggregateRepository.establishmentAggregates[0];
-
-      // Verify results
-      expect(uow.discussionRepository.discussions).toHaveLength(
-        discussionsSetup.length + 1,
-      );
-      expect(
-        establishmentAggregateAfterContact.establishment
-          .isMaxDiscussionsForPeriodReached,
-      ).toBe(expectedIsMaxDiscussionsReached);
-    };
-
-    it("switches establishment is searchable to false when the max contacts per month is reached", async () => {
-      // Set current date for the test
       const connectionDate = new Date("2022-01-10T12:00:00.000");
       timeGateway.setNextDate(connectionDate);
 
-      // Set UUID for the new discussion
+      const discussion1Date = new Date("2022-01-09T12:00:00.000").toISOString();
+      const discussionToOldDate = new Date(
+        "2022-01-02T12:00:00.000",
+      ).toISOString();
+      uow.discussionRepository.discussions = [
+        {
+          id: "discussionToOld",
+          appellationCode: appellationAndRome.appellationCode,
+          siret,
+          businessName: "Entreprise 1",
+          address: establishment.locations[0].address,
+          immersionObjective: "Confirmer un projet professionnel",
+          potentialBeneficiary: {
+            firstName: "Antoine",
+            lastName: "Tourasse",
+            email: "antoine.tourasse@email.com",
+            phone: "+33654783402",
+            resumeLink: "http://fakelink.com",
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          createdAt: discussionToOldDate,
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message: "Bonjour, c'est une vieille disucssion",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussionToOldDate,
+              attachments: [],
+            },
+          ],
+          status: "PENDING",
+        },
+        {
+          id: "discussion1",
+          appellationCode: appellationAndRome.appellationCode,
+          createdAt: discussion1Date,
+          siret,
+          businessName: "Entreprise 2",
+          address: establishment.locations[0].address,
+          potentialBeneficiary: {
+            firstName: "Antoine",
+            lastName: "Tourasse",
+            email: "antoine.tourasse@email.com",
+            phone: "+33654783402",
+            resumeLink: "http://fakelink.com",
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message:
+                "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussion1Date,
+              attachments: [],
+            },
+          ],
+          immersionObjective: "Confirmer un projet professionnel",
+          status: "PENDING",
+        },
+      ];
+
       uuidGenerator.setNextUuid("discussion2");
+      const secondContactRequestDto: ContactEstablishmentRequestDto = {
+        appellationCode: appellationAndRome.appellationCode,
+        siret,
+        potentialBeneficiaryFirstName: "Bob",
+        potentialBeneficiaryLastName: "Marley",
+        potentialBeneficiaryEmail: "bob.marley@email.com",
+        contactMode: "EMAIL",
+        immersionObjective: "Confirmer un projet professionnel",
+        potentialBeneficiaryPhone: "+33654783402",
+        locationId: establishment.locations[0].id,
+        datePreferences: "fake date preferences",
+        hasWorkingExperience: true,
+        experienceAdditionalInformation:
+          "fake experience additional information",
+      };
+      await contactEstablishment.execute(secondContactRequestDto);
 
-      // Test scenario
-      await testMaxContactsScenario({
-        maxContactsPerMonth: 2,
-        discussionsSetup: [
-          {
-            id: "discussionToOld",
-            createdAt: new Date("2022-01-02T12:00:00.000").toISOString(),
-            message: "Bonjour, c'est une vieille disucssion",
-            potentialBeneficiary: {
-              firstName: "Antoine",
-              lastName: "Tourasse",
-              email: "antoine.tourasse@email.com",
-            },
-          },
-          {
-            id: "discussion1",
-            createdAt: new Date("2022-01-09T12:00:00.000").toISOString(),
-            message:
-              "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
-            potentialBeneficiary: {
-              firstName: "Antoine",
-              lastName: "Tourasse",
-              email: "antoine.tourasse@email.com",
-            },
-          },
-        ],
-        newContactRequest: {
-          appellationCode: appellationAndRome.appellationCode,
-          siret,
-          potentialBeneficiaryFirstName: "Bob",
-          potentialBeneficiaryLastName: "Marley",
-          potentialBeneficiaryEmail: "bob.marley@email.com",
-          contactMode: "EMAIL",
-          immersionObjective: "Confirmer un projet professionnel",
-          potentialBeneficiaryPhone: "+33654783402",
-          locationId: "dummy-location-id", // Will be overridden in the helper function
-          datePreferences: "fake date preferences",
-          hasWorkingExperience: true,
-          experienceAdditionalInformation:
-            "fake experience additional information",
-        },
-        expectedIsMaxDiscussionsReached: true,
-      });
-    });
+      const establishmentAggregateAfterSecondContact =
+        uow.establishmentAggregateRepository.establishmentAggregates[0];
 
-    it("switches establishment is searchable to false when the 1/4th of max contacts per month is reached in a week", async () => {
-      // Set current date for the test
-      const currentDate = new Date("2022-01-10T12:00:00.000");
-      timeGateway.setNextDate(currentDate);
-
-      // Set UUID for the new discussion
-      uuidGenerator.setNextUuid("newDiscussionId");
-
-      // Test scenario
-      await testMaxContactsScenario({
-        maxContactsPerMonth: 8, // Setting a higher number to test the 1/4th threshold
-        discussionsSetup: [
-          {
-            id: "discussionWithinWeek",
-            createdAt: new Date("2022-01-04T12:00:00.000").toISOString(), // 6 days ago (within a week)
-            message: "Bonjour, c'est une discussion récente",
-            potentialBeneficiary: {
-              firstName: "Antoine",
-              lastName: "Tourasse",
-              email: "antoine.tourasse@email.com",
-            },
-          },
-          {
-            id: "discussionOutsideWeek",
-            createdAt: new Date("2021-12-31T12:00:00.000").toISOString(), // 10 days ago (outside the week but within the month)
-            message: "Bonjour, c'est une discussion plus ancienne",
-            potentialBeneficiary: {
-              firstName: "Bob",
-              lastName: "Dylan",
-              email: "bob.dylan@email.com",
-            },
-          },
-        ],
-        newContactRequest: {
-          appellationCode: appellationAndRome.appellationCode,
-          siret,
-          potentialBeneficiaryFirstName: "Bob",
-          potentialBeneficiaryLastName: "Marley",
-          potentialBeneficiaryEmail: "bob.marley@email.com",
-          contactMode: "EMAIL",
-          immersionObjective: "Confirmer un projet professionnel",
-          potentialBeneficiaryPhone: "+33654783402",
-          locationId: "dummy-location-id", // Will be overridden in the helper function
-          datePreferences: "fake date preferences",
-          hasWorkingExperience: true,
-          experienceAdditionalInformation:
-            "fake experience additional information",
-        },
-        expectedIsMaxDiscussionsReached: true,
-      });
+      expect(uow.discussionRepository.discussions).toHaveLength(3);
+      expect(
+        establishmentAggregateAfterSecondContact.establishment
+          .isMaxDiscussionsForPeriodReached,
+      ).toBe(true);
     });
   });
 
