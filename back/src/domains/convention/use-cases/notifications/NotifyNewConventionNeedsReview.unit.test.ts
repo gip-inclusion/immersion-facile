@@ -156,7 +156,6 @@ describe("NotifyConventionNeedsReview", () => {
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -230,7 +229,6 @@ describe("NotifyConventionNeedsReview", () => {
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -250,7 +248,6 @@ describe("NotifyConventionNeedsReview", () => {
                 conventionInReview.signatories.beneficiary.lastName,
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl:
                 agencyWithoutCouncellorsAndValidators.logoUrl ?? undefined,
@@ -323,7 +320,6 @@ describe("NotifyConventionNeedsReview", () => {
                   .lastName,
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
               agencyLogoUrl:
                 agencyWithCounsellorsAndValidators.logoUrl ?? undefined,
@@ -438,7 +434,6 @@ describe("NotifyConventionNeedsReview", () => {
                   .lastName,
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -463,7 +458,6 @@ describe("NotifyConventionNeedsReview", () => {
                   .lastName,
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[4]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -488,7 +482,6 @@ describe("NotifyConventionNeedsReview", () => {
                   .lastName,
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[5]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -572,7 +565,6 @@ describe("NotifyConventionNeedsReview", () => {
                 acceptedByCounsellorConvention.signatories.beneficiary.lastName,
               businessName: acceptedByCounsellorConvention.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -592,7 +584,6 @@ describe("NotifyConventionNeedsReview", () => {
                 acceptedByCounsellorConvention.signatories.beneficiary.lastName,
               businessName: acceptedByCounsellorConvention.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -714,7 +705,6 @@ describe("NotifyConventionNeedsReview", () => {
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[3]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -741,7 +731,6 @@ describe("NotifyConventionNeedsReview", () => {
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[4]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",
@@ -768,7 +757,6 @@ describe("NotifyConventionNeedsReview", () => {
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[5]),
-              conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
               possibleRoleAction: "en considérer la validation",
               agencyLogoUrl: agencyWithValidatorsOnly.logoUrl ?? undefined,
               validatorName: "",

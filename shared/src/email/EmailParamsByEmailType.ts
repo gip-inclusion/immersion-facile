@@ -149,19 +149,6 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     magicLink: string;
   };
-  BENEFICIARY_OR_ESTABLISHMENT_REPRESENTATIVE_ALREADY_SIGNED_NOTIFICATION: {
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    conventionId: ConventionId;
-    conventionStatusLink: string;
-    establishmentRepresentativeName: string;
-    existingSignatureName: string;
-    immersionProfession: string;
-    internshipKind: InternshipKind;
-    magicLink: string;
-  };
   CANCELLED_CONVENTION_NOTIFICATION: {
     agencyName: string;
     agencyLogoUrl: AbsoluteUrl | undefined;
@@ -234,7 +221,6 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
-    conventionStatusLink: string;
     internshipKind: InternshipKind;
     justification: string;
     magicLink: string;
@@ -294,7 +280,6 @@ export type EmailParamsByEmailType = {
   };
   MAGIC_LINK_RENEWAL: {
     conventionId: ConventionId | undefined;
-    conventionStatusLink: string;
     internshipKind: InternshipKind;
     magicLink: string;
   };
@@ -319,7 +304,6 @@ export type EmailParamsByEmailType = {
     beneficiaryCurrentEmployerName?: string;
     businessName: string;
     conventionId: ConventionId;
-    conventionStatusLink: string;
     establishmentRepresentativeName: string;
     establishmentTutorName: string;
     internshipKind: InternshipKind;
@@ -345,7 +329,6 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     conventionId: ConventionId;
-    conventionStatusLink: string;
     internshipKind: InternshipKind;
     magicLink: string;
     possibleRoleAction: string;
