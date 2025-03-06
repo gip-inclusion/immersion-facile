@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import {
   ConventionId,
   ConventionJwtPayload,
+  ExcludeFromExisting,
   InternshipKind,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -38,7 +39,12 @@ const {
   isOpenedByDefault: false,
 });
 
-export type ConventionFormMode = "create" | "edit";
+export const creationFormModes = [
+  "create-from-scratch",
+  "create-from-shared",
+] as const;
+const allConventionFormModes = [...creationFormModes, "edit"] as const;
+export type ConventionFormMode = (typeof allConventionFormModes)[number];
 
 type ConventionFormWrapperProps = {
   internshipKind: InternshipKind;
@@ -66,7 +72,11 @@ export const ConventionFormWrapper = ({
   useScrollToTop(formSuccessfullySubmitted);
 
   useEffect(() => {
-    if (mode === "create") {
+    if (
+      creationFormModes.includes(
+        mode as ExcludeFromExisting<ConventionFormMode, "edit">,
+      )
+    ) {
       dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(
         conventionSlice.actions.showSummaryChangeRequested({
