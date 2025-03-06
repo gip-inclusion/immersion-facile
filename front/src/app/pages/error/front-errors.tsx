@@ -1,5 +1,4 @@
 import Button from "@codegouvfr/react-dsfr/Button";
-
 import {
   type ConventionId,
   type SiretDto,
@@ -11,7 +10,6 @@ import type {
   ErrorButton,
   FrontErrorProps,
 } from "src/app/contents/error/types";
-import { RenewEstablishmentMagicLinkButton } from "src/app/pages/establishment/RenewEstablishmentMagicLinkButton";
 import { routes } from "src/app/routes/routes";
 
 export class FrontSpecificError extends Error {
@@ -28,10 +26,16 @@ export const frontErrors = {
     pageNotFound: () =>
       new FrontSpecificError({
         title: "Page non trouvé",
+        subtitle: "La page que vous cherchez est introuvable.",
         description:
           "La page que vous cherchez est introuvable. Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible. <br>Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou effectuer une recherche avec notre moteur de recherche en haut de page.<br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.",
-        subtitle: "La page que vous cherchez est introuvable.",
-        buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
+        buttons: [HomeButton, ContactUsButton],
+      }),
+    unauthorized: () =>
+      new FrontSpecificError({
+        title: "Non-autorisé",
+        description: "Vous n'êtes pas autorisé à accéder à cette page.",
+        buttons: [HomeButton, ContactUsButton],
       }),
   },
   convention: {
@@ -68,7 +72,7 @@ export const frontErrors = {
       new FrontSpecificError({
         title: "Partenaire inconnu",
         description: `Nous n'avons aucun partenaire avec le nom : ${consumerName}. Veuillez vérifier l'orthographe.`,
-        buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
+        buttons: [HomeButton, ContactUsButton],
       }),
   },
   establishment: {
@@ -78,45 +82,43 @@ export const frontErrors = {
         description: `Nous n'avons trouvé aucun établissement ${
           siret ? `avec le siret ${siret}` : ""
         }.`,
-        buttons: siret
-          ? [
-              <RenewEstablishmentMagicLinkButton
-                id={domElementIds.establishment.edit.refreshEditLink}
-                siret={siret}
-                key={domElementIds.establishment.edit.refreshEditLink}
-              />,
-            ]
-          : [redirectToHomePageButtonContent, contactUsButtonContent],
+        buttons: [HomeButton, ContactUsButton],
       });
     },
-    expiredLink: ({ jwt, siret }: { jwt: string; siret: SiretDto }) => {
+    expiredLink: () => {
       return new FrontSpecificError({
         title: "Lien périmé",
-        description: `Le jwt : ${jwt} pour accéder au siret ${siret} est périmé...`,
-        buttons: [
-          <RenewEstablishmentMagicLinkButton
-            id={domElementIds.establishment.edit.refreshEditLink}
-            siret={siret}
-            key={domElementIds.establishment.edit.refreshEditLink}
-          />,
-        ],
+        description: `Nous n'utilisons plus de lien magique pour vous permettre de modifier votre fiche établissement. Pour effectuer cette action, connectez-vous à votre espace entreprise.`,
+        buttons: [EstablishmentDashboardButton],
       });
     },
   },
 };
 
-export const redirectToHomePageButtonContent: ErrorButton = (
+const EstablishmentDashboardButton: ErrorButton = (
+  <Button
+    priority="primary"
+    children="Accéder à mon espace entreprise"
+    linkProps={{
+      ...routes.establishmentDashboard().link,
+      id: domElementIds.error.establishmentDashboardButton,
+    }}
+  />
+);
+
+const HomeButton: ErrorButton = (
   <Button
     priority="primary"
     linkProps={{
       ...routes.home().link,
+      id: domElementIds.error.homeButton,
     }}
   >
     Page d'accueil
   </Button>
 );
 
-export const contactUsButtonContent = ({
+export const ContactUsButton = ({
   currentUrl,
   currentDate,
   error,
@@ -136,6 +138,7 @@ export const contactUsButtonContent = ({
       linkProps={{
         href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
         target: "_blank",
+        id: domElementIds.error.contactUsButton,
       }}
     >
       Contactez-nous
