@@ -1,4 +1,3 @@
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import React from "react";
 import {
   FixedStamp,
@@ -9,7 +8,6 @@ import {
   SectionTextEmbed,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { SiretModalContent } from "src/app/components/SiretModalContent";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import {
   heroHeaderContent,
@@ -24,19 +22,11 @@ type HomePageProps = {
   type: UserType;
 };
 
-const { Component: SiretModal, open: openSiretModal } = createModal({
-  isOpenedByDefault: false,
-  id: "siret",
-});
-
 export const HomePage = ({ type }: HomePageProps) => {
   const { enableTemporaryOperation } = useFeatureFlags();
   const storeDispatch = useDispatch();
 
-  const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(
-    storeDispatch,
-    openSiretModal,
-  );
+  const heroHeaderNavCardsWithDispatch = heroHeaderNavCards(storeDispatch);
   const { title, subtitle, displayName, icon, illustration } =
     heroHeaderContent[type];
   const sectionStatsDataForType = sectionStatsData[type];
@@ -54,11 +44,6 @@ export const HomePage = ({ type }: HomePageProps) => {
           patterns
           navCards={heroHeaderNavCardsWithDispatch[type]}
           parallax
-          siretModal={
-            <SiretModal title="Créer ou modifier votre établissement">
-              <SiretModalContent />
-            </SiretModal>
-          }
         />
         <SectionStats stats={sectionStatsDataForType} />
         <SectionTextEmbed

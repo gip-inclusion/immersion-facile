@@ -16,7 +16,6 @@ export type HeroHeaderProps = {
   parallax?: boolean;
   patterns?: boolean;
   navCards?: HeroHeaderNavCard[];
-  siretModal: JSX.Element;
 };
 
 export const heroHeaderComponentName = "im-hero-header";
@@ -29,7 +28,6 @@ export const HeroHeader = ({
   patterns,
   navCards,
   parallax,
-  siretModal,
   icon,
   typeDisplayName,
 }: HeroHeaderProps) => {
@@ -121,7 +119,6 @@ export const HeroHeader = ({
           </nav>
         </div>
       )}
-      {siretModal}
     </section>
   );
 };
