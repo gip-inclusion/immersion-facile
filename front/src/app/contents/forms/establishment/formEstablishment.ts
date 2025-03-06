@@ -1,9 +1,9 @@
 import {
-  type BusinessContactDto,
+  EstablishmentFormUserRight,
   type FormEstablishmentDto,
   type SiretDto,
   domElementIds,
-  immersionFacileContactEmail,
+  immersionFacileContactEmail
 } from "shared";
 import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
@@ -12,10 +12,13 @@ import type { FormFieldAttributesForContent } from "../types";
 type FormEstablishmentFieldKeys =
   | Exclude<
       keyof FormEstablishmentDto,
-      "id" | "naf" | "businessContact" | "source" | "isSearchable"
+      "id" | "naf" | "source" | "isSearchable"
     >
-  | `businessContact.${keyof BusinessContactDto}`
-  | "maxContactsPerMonthWhenAvailable";
+  | "maxContactsPerMonthWhenAvailable"
+  | `userRights.0.${
+      | keyof EstablishmentFormUserRight
+      | "firstName"
+      | "lastName"}`;
 
 type FormEstablishmentField = Partial<FormEstablishmentFieldKeys>;
 
@@ -52,42 +55,43 @@ export const formEstablishmentFieldsLabels = (
     id: domElementIds.establishment[mode].businessAddresses,
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
-  "businessContact.lastName": {
-    label: "Nom du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.lastName,
-  },
-  "businessContact.firstName": {
+  "userRights.0.firstName": {
     label: "Prénom du référent",
     required: true,
     id: domElementIds.establishment[mode].businessContact.firstName,
   },
-  "businessContact.job": {
+  "userRights.0.lastName": {
+    label: "Nom du référent",
+    required: true,
+    id: domElementIds.establishment[mode].businessContact.lastName,
+  },
+  "userRights.0.email": {
+    label: "Email du référent",
+    required: true,
+    id: domElementIds.establishment[mode].businessContact.email,
+  },
+  "userRights.0.job": {
     label: "Fonction du référent",
     required: true,
     id: domElementIds.establishment[mode].businessContact.job,
   },
-  "businessContact.phone": {
+  "userRights.0.phone": {
     label: "Numéro de téléphone (ne sera pas communiqué directement)",
     required: true,
     id: domElementIds.establishment[mode].businessContact.phone,
   },
-  "businessContact.email": {
-    label: "E-mail du référent",
-    required: true,
-    id: domElementIds.establishment[mode].businessContact.email,
+  "userRights.0.role": {
+    label: "",
+    id: "",
   },
-  "businessContact.copyEmails": {
-    label: "Autres destinataires",
-    hintText:
-      "Adresses mail à mettre en copie, les utilisateurs liés à ces adresses auront accès aux discussions",
-    placeholder: "Ex : cc1@mail.com, cc2@mail.com (optionnel)",
+  userRights: {
+    label: "Autres emails susceptibles de répondre aux demandes",
     id: domElementIds.establishment[mode].businessContact.copyEmails,
   },
-  "businessContact.contactMethod": {
+  contactMethod: {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
     required: true,
-    id: domElementIds.establishment[mode].businessContact.contactMethod,
+    id: domElementIds.establishment[mode].contactMethod,
   },
   isEngagedEnterprise: {
     label:

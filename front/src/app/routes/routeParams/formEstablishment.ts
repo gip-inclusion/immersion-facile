@@ -3,6 +3,7 @@ import {
   type AppellationAndRomeDto,
   type ContactMethod,
   type Email,
+  EstablishmentFormUserRights,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
   defaultMaxContactsPerMonth,
@@ -34,7 +35,15 @@ const copyEmailsSerializer: ValueSerializer<Email[]> = {
   stringify: (emails: Email[]) => JSON.stringify(emails),
 };
 
+const establishmentUserRightsSerializer: ValueSerializer<EstablishmentFormUserRights> =
+  {
+    parse: (raw) => JSON.parse(raw),
+    stringify: (userRights: EstablishmentFormUserRights) =>
+      JSON.stringify(userRights),
+  };
+
 export const formEstablishmentParamsInUrl = {
+  uRights: param.query.optional.ofType(establishmentUserRightsSerializer),
   source: param.query.optional.string,
   siret: param.query.optional.string,
   bName: param.query.optional.string,
@@ -83,15 +92,8 @@ export const formEstablishmentQueryParamsToFormEstablishmentDto = (
     code: params.nafCode ?? "",
     nomenclature: params.nafNomenclature ?? "",
   },
-  businessContact: {
-    lastName: params.bcLastName ?? "",
-    firstName: params.bcFirstName ?? "",
-    job: params.bcJob ?? "",
-    phone: params.bcPhone ?? "",
-    email: params.bcEmail ?? "",
-    contactMethod: params.bcContactMethod as ContactMethod,
-    copyEmails: params.bcCopyEmails ?? [],
-  },
+  contactMethod: params.bcContactMethod as ContactMethod,
+  userRights: params.uRights ?? [],
   website: params.website as AbsoluteUrl | "",
   additionalInformation: params.additionalInformation,
   appellations: params.appellations ?? [],
@@ -117,16 +119,11 @@ export const formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams =
         params.maxContactsPerMonth ?? defaultMaxContactsPerMonth,
       nafCode: params.naf?.code ?? "",
       nafNomenclature: params.naf?.nomenclature ?? "",
-      bcLastName: params.businessContact.lastName,
-      bcFirstName: params.businessContact.firstName,
-      bcJob: params.businessContact.job,
-      bcPhone: params.businessContact.phone,
-      bcEmail: params.businessContact.email,
-      bcContactMethod: params.businessContact.contactMethod ?? "",
+      uRights: params.userRights,
+      bcContactMethod: params.contactMethod ?? "",
       website: params.website,
       additionalInformation: params.additionalInformation,
       appellations: params.appellations,
-      bcCopyEmails: params.businessContact.copyEmails,
       ...(params.mtm_campaign
         ? {
             mtm_campaign: params.mtm_campaign,

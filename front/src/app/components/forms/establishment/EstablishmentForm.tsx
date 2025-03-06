@@ -6,6 +6,7 @@ import { keys } from "ramda";
 import {
   type ReactNode,
   useEffect,
+  useMemo,
   useRef,
   useState
 } from "react";
@@ -14,6 +15,7 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
+  EstablishmentFormUserRights,
   type FormEstablishmentDto,
   domElementIds,
   errors,
@@ -22,8 +24,8 @@ import {
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
 import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
+import { CreateIntroSection } from "src/app/components/forms/establishment/sections/CreateIntroSection";
 import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
-import { IntroSection } from "src/app/components/forms/establishment/sections/IntroSection";
 import { SearchableBySection } from "src/app/components/forms/establishment/sections/SearchableBySection";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -102,13 +104,31 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     route.name === "formEstablishmentForExternals";
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
   const isEstablishmentDashboard = route.name === "establishmentDashboard";
+
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
   const establishmentFeedback = useFeedbackTopic("form-establishment");
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const initialFormEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
+  );
+
+  const initialUserRights: EstablishmentFormUserRights = useMemo(
+    () =>
+      mode === "create"
+        ? [
+            {
+              email: federatedIdentity?.email ?? "",
+              job: "",
+              phone: "",
+              role: "establishment-admin",
+            },
+          ]
+        : initialFormEstablishment.userRights,
+
+    [federatedIdentity, initialFormEstablishment.userRights, mode],
   );
 
   const [availableForImmersion, setAvailableForImmersion] = useState<
@@ -121,19 +141,36 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
   );
   const acquisitionParams = useGetAcquisitionParams();
-  const methods = useForm<FormEstablishmentDto>({
-    defaultValues: {
+  const siretFromFederatedIdentity =
+    federatedIdentity?.provider === "connectedUser"
+      ? federatedIdentity.siret
+      : undefined;
+
+  const defaultFormValues = useMemo(
+    () => ({
       ...initialFormEstablishment,
       ...acquisitionParams,
       maxContactsPerMonth: undefined,
-    },
+      userRights: initialUserRights,
+      siret: siretFromFederatedIdentity,
+    }),
+    [
+      initialFormEstablishment,
+      acquisitionParams,
+      initialUserRights,
+      siretFromFederatedIdentity,
+    ],
+  );
+
+  const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
+
+  const methods = useForm<FormEstablishmentDto>({
+    defaultValues: defaultFormValues,
     resolver: zodResolver(formEstablishmentSchema),
     mode: "onTouched",
   });
   const { handleSubmit, getValues, reset, trigger } = methods;
   const formValues = getValues();
-  const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
-
   const debouncedFormValues = useDebounce(formValues);
 
   useInitialSiret(
@@ -220,14 +257,13 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   useEffect(() => {
     reset({
-      ...initialFormEstablishment,
-      ...acquisitionParams,
+      ...defaultFormValues,
       maxContactsPerMonth:
         mode === "create"
           ? undefined
           : initialFormEstablishment.maxContactsPerMonth,
     });
-  }, [initialFormEstablishment, acquisitionParams, reset, mode]);
+  }, [defaultFormValues, reset, mode, initialFormEstablishment]);
 
   useEffect(() => {
     if (isEstablishmentCreation) {
@@ -266,17 +302,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: {
-            name: P.union("formEstablishment", "formEstablishmentForExternals"),
-          },
-          inclusionConnectedJwt: P.nullish,
-        },
-        () => {
-          throw frontErrors.generic.unauthorized();
-        },
-      )
-      .with(
-        {
           route: { name: "manageEstablishmentAdmin" },
           adminJwt: P.not(P.nullish),
         },
@@ -290,15 +315,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           ),
-      )
-      .with(
-        {
-          route: { name: "manageEstablishmentAdmin" },
-          adminJwt: P.nullish,
-        },
-        () => {
-          throw frontErrors.generic.unauthorized();
-        },
       )
       .with(
         {
@@ -318,6 +334,26 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
+          route: {
+            name: P.union("formEstablishment", "formEstablishmentForExternals"),
+          },
+          inclusionConnectedJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
+      )
+      .with(
+        {
+          route: { name: "manageEstablishmentAdmin" },
+          adminJwt: P.nullish,
+        },
+        () => {
+          throw frontErrors.generic.unauthorized();
+        },
+      )
+      .with(
+        {
           route: { name: "establishmentDashboard" },
           inclusionConnectedJwt: P.nullish,
         },
@@ -327,13 +363,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .exhaustive();
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  if (isLoading) return <Loader />;
 
-  const onStepChange: OnStepChange = async (step, fieldsToValidate) => {
-    if (step && currentStep && step < currentStep) {
-      setCurrentStep(step);
+  const onStepChange: OnStepChange = async (targetStep, fieldsToValidate) => {
+    if (targetStep && currentStep && targetStep < currentStep) {
+      setCurrentStep(targetStep);
       return;
     }
     const validatedFields = await Promise.all(
@@ -346,7 +380,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         mode === "create"
       )
         return;
-      setCurrentStep(step);
+      setCurrentStep(targetStep);
     }
   };
 
@@ -408,9 +442,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 />
               </>
             ))
-            .with(0, () => (
-              <IntroSection onStepChange={onStepChange} mode={mode} />
-            ))
+            .with(0, () => <CreateIntroSection onStepChange={onStepChange} />)
             .otherwise((currentStep) => (
               <div className={fr.cx("fr-col-8")}>
                 <Stepper

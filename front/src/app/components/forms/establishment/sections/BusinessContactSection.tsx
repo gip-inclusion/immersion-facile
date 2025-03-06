@@ -10,7 +10,6 @@ export const BusinessContactSection = ({
   onStepChange,
   currentStep,
   mode,
-  setInvalidEmailMessage,
 }: {
   onStepChange: OnStepChange;
   currentStep: Step;
@@ -20,10 +19,7 @@ export const BusinessContactSection = ({
   const isStepMode = currentStep !== null;
   return (
     <section className={fr.cx("fr-mb-4w")}>
-      <BusinessContact
-        mode={mode}
-        setInvalidEmailMessage={setInvalidEmailMessage}
-      />
+      <BusinessContact mode={mode} />
       {isStepMode && (
         <ButtonsGroup
           inlineLayoutWhen="always"
@@ -44,16 +40,7 @@ export const BusinessContactSection = ({
             },
             {
               children: "Étape suivante",
-              onClick: () =>
-                onStepChange(4, [
-                  "businessContact.firstName",
-                  "businessContact.lastName",
-                  "businessContact.job",
-                  "businessContact.phone",
-                  "businessContact.email",
-                  "businessContact.copyEmails",
-                  "businessContact.contactMethod",
-                ]),
+              onClick: () => onStepChange(4, ["userRights", "contactMethod"]),
               iconId: "fr-icon-arrow-right-line",
               iconPosition: "right",
               id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
