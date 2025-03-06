@@ -299,49 +299,25 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     contactRequest: ContactEstablishmentRequestDto;
     now: Date;
   }) {
-    const maxContactsPerMonthForEstablishment =
+    const maxContactsPerMonth =
       establishmentAggregate.establishment.maxContactsPerMonth;
 
-    // Check if max contacts per month is reached
-    const isMarkedAsNotSearchable = await this.#checkAndUpdateForFullMonth({
+    const wasMaxForMonthReached = await this.#wasMaxForMonthReached({
       uow,
-      establishmentAggregate,
       siret: contactRequest.siret,
-      maxContactsPerMonth: maxContactsPerMonthForEstablishment,
+      maxContactsPerMonth: maxContactsPerMonth,
       now,
     });
 
-    if (isMarkedAsNotSearchable) return;
-
-    await this.#checkAndUpdateForOneWeek({
-      uow,
-      establishmentAggregate,
-      siret: contactRequest.siret,
-      maxContactsPerMonth: maxContactsPerMonthForEstablishment,
-      now,
-    });
-  }
-
-  async #checkAndUpdateForFullMonth({
-    uow,
-    establishmentAggregate,
-    siret,
-    maxContactsPerMonth,
-    now,
-  }: {
-    uow: UnitOfWork;
-    establishmentAggregate: EstablishmentAggregate;
-    siret: string;
-    maxContactsPerMonth: number;
-    now: Date;
-  }): Promise<boolean> {
-    const numberOfDiscussionsOfPastMonth =
-      await uow.discussionRepository.countDiscussionsForSiretSince(
-        siret,
-        subDays(now, normalizedMonthInDays),
-      );
-
-    if (maxContactsPerMonth <= numberOfDiscussionsOfPastMonth) {
+    if (
+      wasMaxForMonthReached ||
+      (await this.#wasMaxForWeekReached({
+        uow,
+        siret: contactRequest.siret,
+        maxContactsPerMonth,
+        now,
+      }))
+    ) {
       const updatedEstablishment: EstablishmentAggregate = {
         ...establishmentAggregate,
         establishment: {
@@ -354,26 +330,36 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         updatedEstablishment,
         now,
       );
-      return true;
     }
-
-    return false;
   }
 
-  /**
-   * Checks if the establishment has reached 1/4th of its maximum contacts within a week
-   * and updates it as not searchable if needed
-   * @returns true if the establishment was marked as not searchable
-   */
-  async #checkAndUpdateForOneWeek({
+  async #wasMaxForMonthReached({
     uow,
-    establishmentAggregate,
     siret,
     maxContactsPerMonth,
     now,
   }: {
     uow: UnitOfWork;
-    establishmentAggregate: EstablishmentAggregate;
+    siret: string;
+    maxContactsPerMonth: number;
+    now: Date;
+  }): Promise<boolean> {
+    const oneMonthAgo = subDays(now, normalizedMonthInDays);
+    const numberOfDiscussionsOfPastMonth =
+      await uow.discussionRepository.countDiscussionsForSiretSince(
+        siret,
+        oneMonthAgo,
+      );
+    return maxContactsPerMonth <= numberOfDiscussionsOfPastMonth;
+  }
+
+  async #wasMaxForWeekReached({
+    uow,
+    siret,
+    maxContactsPerMonth,
+    now,
+  }: {
+    uow: UnitOfWork;
     siret: string;
     maxContactsPerMonth: number;
     now: Date;
@@ -384,25 +370,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         siret,
         oneWeekAgo,
       );
-
-    const quarterOfMaxContacts = Math.ceil(maxContactsPerMonth / 4);
-
-    if (quarterOfMaxContacts <= numberOfDiscussionsOfPastWeek) {
-      const updatedEstablishment: EstablishmentAggregate = {
-        ...establishmentAggregate,
-        establishment: {
-          ...establishmentAggregate.establishment,
-          isMaxDiscussionsForPeriodReached: true,
-        },
-      };
-
-      await uow.establishmentAggregateRepository.updateEstablishmentAggregate(
-        updatedEstablishment,
-        now,
-      );
-      return true;
-    }
-
-    return false;
+    const maxContactsPerWeek = Math.ceil(maxContactsPerMonth / 4);
+    return maxContactsPerWeek <= numberOfDiscussionsOfPastWeek;
   }
 }
