@@ -161,6 +161,7 @@ export const throwIfNotAllowedForUser = async ({
   convention: ConventionReadDto;
 }): Promise<void> => {
   if ("role" in jwtPayload) {
+    if (jwtPayload.role === "back-office") return;
     if (!agencyModifierRoles.includes(jwtPayload.role as any))
       throw errors.convention.unsupportedRoleSendSignatureLink({
         role: jwtPayload.role as any,
@@ -198,6 +199,9 @@ export const throwIfNotAllowedForUser = async ({
   }
 
   const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+  if (userWithRights.isBackofficeAdmin) return;
+
   if (!userWithRights)
     throw errors.user.notFound({
       userId: jwtPayload.userId,

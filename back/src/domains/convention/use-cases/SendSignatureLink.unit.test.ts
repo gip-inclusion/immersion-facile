@@ -82,6 +82,15 @@ const connectedUserBuilder = new InclusionConnectedUserBuilder().withId(
 );
 const connectedUser = connectedUserBuilder.build();
 
+const backofficeAdminPayload: InclusionConnectDomainJwtPayload = {
+  userId: "bcc5c20e-6dd2-45cf-affe-927358005263",
+};
+
+const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withId(
+  backofficeAdminPayload.userId,
+);
+const backofficeAdmin = backofficeAdminBuilder.withIsAdmin(true).build();
+
 describe("Send signature link", () => {
   const config = new AppConfigBuilder().build();
   let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
@@ -519,6 +528,46 @@ describe("Send signature link", () => {
         ]);
       },
     );
+
+    it("When backoffice admin triggers it", async () => {
+      const shortLinkId = "link1";
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
+      uow.conventionRepository.setConventions([convention]);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+      uow.userRepository.users = [backofficeAdmin];
+
+      await usecase.execute(
+        {
+          conventionId,
+          role: "establishment-representative",
+        },
+        backofficeAdminPayload,
+      );
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+            userId: backofficeAdmin.id,
+          },
+          templatedContent: {
+            recipientPhone:
+              convention.signatories.establishmentRepresentative.phone,
+            kind: "LastReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
+            },
+          },
+        },
+      ]);
+    });
 
     it.each(["validator", "counsellor"] as const)(
       "When not connected %s triggers it",
