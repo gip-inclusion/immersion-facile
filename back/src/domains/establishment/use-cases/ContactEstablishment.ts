@@ -9,7 +9,6 @@ import {
   errors,
   normalizedMonthInDays,
 } from "shared";
-import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -105,19 +104,11 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     )?.appellationLabel;
 
     if (!appellationLabel) {
-      notifyToTeamAndThrowError(
-        errors.establishment.offerMissing({
-          siret,
-          appellationCode: contactRequest.appellationCode,
-          mode: "bad request",
-        }),
-      );
-
-      // we keep discord notification for now, but we will remove it when the bug is confirmed and fixed
-      // Than it will just be :
-      // throw new BadRequestError(
-      //   `Establishment with siret '${contactRequest.siret}' doesn't have an immersion offer with appellation code '${contactRequest.appellationCode}'.`,
-      // );
+      throw errors.establishment.offerMissing({
+        siret,
+        appellationCode: contactRequest.appellationCode,
+        mode: "bad request",
+      });
     }
 
     const discussion = await this.#createDiscussion({
@@ -308,16 +299,25 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     contactRequest: ContactEstablishmentRequestDto;
     now: Date;
   }) {
-    const maxContactsPerMonthForEstablishment =
+    const maxContactsPerMonth =
       establishmentAggregate.establishment.maxContactsPerMonth;
 
-    const numberOfDiscussionsOfPastMonth =
-      await uow.discussionRepository.countDiscussionsForSiretSince(
-        contactRequest.siret,
-        subDays(now, normalizedMonthInDays),
-      );
+    const wasMaxForMonthReached = await this.#wasMaxForMonthReached({
+      uow,
+      siret: contactRequest.siret,
+      maxContactsPerMonth: maxContactsPerMonth,
+      now,
+    });
 
-    if (maxContactsPerMonthForEstablishment <= numberOfDiscussionsOfPastMonth) {
+    if (
+      wasMaxForMonthReached ||
+      (await this.#wasMaxForWeekReached({
+        uow,
+        siret: contactRequest.siret,
+        maxContactsPerMonth,
+        now,
+      }))
+    ) {
       const updatedEstablishment: EstablishmentAggregate = {
         ...establishmentAggregate,
         establishment: {
@@ -331,5 +331,46 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         now,
       );
     }
+  }
+
+  async #wasMaxForMonthReached({
+    uow,
+    siret,
+    maxContactsPerMonth,
+    now,
+  }: {
+    uow: UnitOfWork;
+    siret: string;
+    maxContactsPerMonth: number;
+    now: Date;
+  }): Promise<boolean> {
+    const oneMonthAgo = subDays(now, normalizedMonthInDays);
+    const numberOfDiscussionsOfPastMonth =
+      await uow.discussionRepository.countDiscussionsForSiretSince(
+        siret,
+        oneMonthAgo,
+      );
+    return maxContactsPerMonth <= numberOfDiscussionsOfPastMonth;
+  }
+
+  async #wasMaxForWeekReached({
+    uow,
+    siret,
+    maxContactsPerMonth,
+    now,
+  }: {
+    uow: UnitOfWork;
+    siret: string;
+    maxContactsPerMonth: number;
+    now: Date;
+  }): Promise<boolean> {
+    const oneWeekAgo = subDays(now, 7);
+    const numberOfDiscussionsOfPastWeek =
+      await uow.discussionRepository.countDiscussionsForSiretSince(
+        siret,
+        oneWeekAgo,
+      );
+    const maxContactsPerWeek = Math.ceil(maxContactsPerMonth / 4);
+    return maxContactsPerWeek <= numberOfDiscussionsOfPastWeek;
   }
 }

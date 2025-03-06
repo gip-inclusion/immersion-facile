@@ -352,7 +352,7 @@ describe("ContactEstablishment", () => {
       ]);
     });
 
-    it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
+    it("switches establishment is searchable to false when the max contacts per month is reached", async () => {
       // préparation
       const establishmentAggregate = establishmentAggregateWithEmailContact
         .withIsMaxDiscussionsForPeriodReached(false)
@@ -471,6 +471,128 @@ describe("ContactEstablishment", () => {
       expect(uow.discussionRepository.discussions).toHaveLength(3);
       expect(
         establishmentAggregateAfterSecondContact.establishment
+          .isMaxDiscussionsForPeriodReached,
+      ).toBe(true);
+    });
+
+    it("switches establishment is searchable to false when the max contacts per week is reached", async () => {
+      // préparation
+      const establishmentAggregate = establishmentAggregateWithEmailContact
+        .withIsMaxDiscussionsForPeriodReached(false)
+        .withMaxContactsPerMonth(8) // Setting monthly limit to 8, which means weekly limit is 2 (8/4)
+        .withOffers([immersionOffer])
+        .build();
+      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+        establishmentAggregate,
+      );
+      const establishment = establishmentAggregate.establishment;
+
+      const connectionDate = new Date("2022-01-10T12:00:00.000");
+      timeGateway.setNextDate(connectionDate);
+
+      // Both discussions are within the past week
+      const discussion1Date = new Date("2022-01-09T12:00:00.000").toISOString();
+      const discussion2Date = new Date("2022-01-08T12:00:00.000").toISOString();
+
+      uow.discussionRepository.discussions = [
+        {
+          id: "discussion1",
+          appellationCode: appellationAndRome.appellationCode,
+          createdAt: discussion1Date,
+          siret,
+          businessName: "Entreprise 1",
+          address: establishment.locations[0].address,
+          potentialBeneficiary: {
+            firstName: "Antoine",
+            lastName: "Tourasse",
+            email: "antoine.tourasse@email.com",
+            phone: "+33654783402",
+            resumeLink: "http://fakelink.com",
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message: "Bonjour, j'aimerais faire une immersion.",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussion1Date,
+              attachments: [],
+            },
+          ],
+          immersionObjective: "Confirmer un projet professionnel",
+          status: "PENDING",
+        },
+        {
+          id: "discussion2",
+          appellationCode: appellationAndRome.appellationCode,
+          createdAt: discussion2Date,
+          siret,
+          businessName: "Entreprise 2",
+          address: establishment.locations[0].address,
+          potentialBeneficiary: {
+            firstName: "Jean",
+            lastName: "Dupont",
+            email: "jean.dupont@email.com",
+            phone: "+33654783403",
+            resumeLink: "http://fakelink.com",
+          },
+          establishmentContact: {
+            contactMethod: "EMAIL",
+            email: establishmentContact.email,
+            firstName: establishmentContact.firstName,
+            lastName: establishmentContact.lastName,
+            phone: establishmentAdminRight.phone,
+            job: establishmentAdminRight.job,
+            copyEmails: [establishmentContact.email],
+          },
+          exchanges: [
+            {
+              subject: "Demande de contact initiée par le bénéficiaire",
+              message: "Bonjour, je souhaite faire une immersion chez vous.",
+              recipient: "establishment",
+              sender: "potentialBeneficiary",
+              sentAt: discussion2Date,
+              attachments: [],
+            },
+          ],
+          immersionObjective: "Confirmer un projet professionnel",
+          status: "PENDING",
+        },
+      ];
+
+      uuidGenerator.setNextUuid("discussion3");
+      const thirdContactRequestDto: ContactEstablishmentRequestDto = {
+        appellationCode: appellationAndRome.appellationCode,
+        siret,
+        potentialBeneficiaryFirstName: "Marie",
+        potentialBeneficiaryLastName: "Martin",
+        potentialBeneficiaryEmail: "marie.martin@email.com",
+        contactMode: "EMAIL",
+        immersionObjective: "Confirmer un projet professionnel",
+        potentialBeneficiaryPhone: "+33654783404",
+        locationId: establishment.locations[0].id,
+        datePreferences: "fake date preferences",
+        hasWorkingExperience: true,
+        experienceAdditionalInformation:
+          "fake experience additional information",
+      };
+      await contactEstablishment.execute(thirdContactRequestDto);
+
+      const establishmentAggregateAfterThirdContact =
+        uow.establishmentAggregateRepository.establishmentAggregates[0];
+
+      expect(uow.discussionRepository.discussions).toHaveLength(3);
+      expect(
+        establishmentAggregateAfterThirdContact.establishment
           .isMaxDiscussionsForPeriodReached,
       ).toBe(true);
     });
