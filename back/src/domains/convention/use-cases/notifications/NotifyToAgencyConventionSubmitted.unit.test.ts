@@ -163,7 +163,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   });
 
   it("Sends notification email to agency validator when it is initially submitted, and agency has no counsellor", async () => {
-    const shortLinkIds = ["shortlink1", "shortlink2"];
+    const shortLinkIds = ["shortlink1"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
     const validConvention = new ConventionDtoBuilder()
       .withAgencyId(agencyWithOnlyValidator.id)
@@ -181,14 +181,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         now: timeGateway.now(),
         targetRoute: frontRoutes.manageConvention,
       }),
-      [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "validator",
-        email: validator.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-      }),
     });
 
     expectSavedNotificationsAndEvents({
@@ -200,7 +192,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
             internshipKind: validConvention.internshipKind,
             ...expectedParams(agencyWithOnlyValidator, validConvention),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
             agencyLogoUrl: agencyWithOnlyValidator.logoUrl ?? undefined,
           },
         },
@@ -209,12 +200,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   });
 
   it("Sends notification email only counsellors with agency that have validators and counsellors", async () => {
-    const shortLinkIds = [
-      "shortlink1",
-      "shortlink2",
-      "shortlink3",
-      "shortlink4",
-    ];
+    const shortLinkIds = ["shortlink1", "shortlink2"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
     const validConvention = new ConventionDtoBuilder()
@@ -240,22 +226,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         email: councellor2.email,
         now: timeGateway.now(),
       }),
-      [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-        email: councellor1.email,
-        now: timeGateway.now(),
-      }),
-      [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-        email: councellor2.email,
-        now: timeGateway.now(),
-      }),
     });
 
     expectSavedNotificationsAndEvents({
@@ -270,7 +240,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               validConvention,
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
@@ -285,7 +254,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               validConvention,
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
@@ -295,12 +263,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   });
 
   it("Sends notification email to agency with warning when beneficiary is PeConnected and beneficiary has no PE advisor", async () => {
-    const shortLinkIds = [
-      "shortlink1",
-      "shortlink2",
-      "shortlink3",
-      "shortlink4",
-    ];
+    const shortLinkIds = ["shortlink1", "shortlink2"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
     const ftIdentity: FtConnectIdentity = {
       provider: "peConnect",
@@ -341,22 +304,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         email: councellor2.email,
         now: timeGateway.now(),
       }),
-      [shortLinkIds[2]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-        email: councellor1.email,
-        now: timeGateway.now(),
-      }),
-      [shortLinkIds[3]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "counsellor",
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-        email: councellor2.email,
-        now: timeGateway.now(),
-      }),
     });
 
     expectSavedNotificationsAndEvents({
@@ -373,7 +320,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               validConvention,
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[2]),
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },
@@ -388,7 +334,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               validConvention,
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[3]),
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
             warning:
@@ -400,7 +345,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
   });
 
   it("Sends notification email only to peAdvisor when beneficiary is PeConnected and beneficiary has PE advisor", async () => {
-    const shortLinkIds = ["shortlink1", "shortlink2"];
+    const shortLinkIds = ["shortlink1"];
     shortLinkIdGeneratorGateway.addMoreShortLinkIds(shortLinkIds);
 
     const ftAdvisorEmail = "ft-advisor@gmail.com";
@@ -442,14 +387,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
         email: ftAdvisorEmail,
         now: timeGateway.now(),
       }),
-      [shortLinkIds[1]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        role: "validator",
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-        email: ftAdvisorEmail,
-        now: timeGateway.now(),
-      }),
     });
 
     expectSavedNotificationsAndEvents({
@@ -465,7 +402,6 @@ describe("NotifyToAgencyConventionSubmitted", () => {
               validConvention,
             ),
             magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
-            conventionStatusLink: makeShortLinkUrl(config, shortLinkIds[1]),
             agencyLogoUrl:
               agencyWithConsellorsAndValidator.logoUrl ?? undefined,
           },

@@ -11,6 +11,7 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
+  expectObjectInArrayToMatch,
   expectToEqual,
   technicalRoutes,
   unauthenticatedConventionRoutes,
@@ -168,7 +169,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     notificationGateway: InMemoryNotificationGateway,
     emails: Partial<TemplatedEmail>[],
   ) => {
-    expect(notificationGateway.getSentEmails()).toMatchObject(emails);
+    expectObjectInArrayToMatch(notificationGateway.getSentEmails(), emails);
   };
 
   const expectEventsInOutbox = (
@@ -233,6 +234,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
       [[VALID_EMAILS[2]], [VALID_EMAILS[0]], [VALID_EMAILS[1]]],
     );
 
+    expectEmailOfType(sentEmails[0], "NEW_CONVENTION_AGENCY_NOTIFICATION");
     const beneficiaryShortLinkSignEmail = expectEmailOfType(
       sentEmails[1],
       "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -336,14 +338,17 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     const sentEmails = gateways.notification.getSentEmails();
-    expect(sentEmails.map((email) => email.kind)).toStrictEqual([
-      "NEW_CONVENTION_AGENCY_NOTIFICATION",
-      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      "SIGNEE_HAS_SIGNED_CONVENTION",
-      "SIGNEE_HAS_SIGNED_CONVENTION",
-      "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-    ]);
+    expectArraysToEqualIgnoringOrder(
+      sentEmails.map((email) => email.kind),
+      [
+        "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        "SIGNEE_HAS_SIGNED_CONVENTION",
+        "SIGNEE_HAS_SIGNED_CONVENTION",
+        "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+      ],
+    );
 
     const needsReviewEmail = expectEmailOfType(
       sentEmails[sentEmails.length - 1],
@@ -415,17 +420,20 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     const sentEmails = gateways.notification.getSentEmails();
-    expect(sentEmails.map((email) => email.kind)).toStrictEqual([
-      "NEW_CONVENTION_AGENCY_NOTIFICATION",
-      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-      "SIGNEE_HAS_SIGNED_CONVENTION",
-      "SIGNEE_HAS_SIGNED_CONVENTION",
-      "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-      "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-      "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-    ]);
+    expectArraysToEqualIgnoringOrder(
+      sentEmails.map((email) => email.kind),
+      [
+        "NEW_CONVENTION_AGENCY_NOTIFICATION",
+        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+        "SIGNEE_HAS_SIGNED_CONVENTION",
+        "SIGNEE_HAS_SIGNED_CONVENTION",
+        "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+        "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+        "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      ],
+    );
 
     const needsToTriggerConventionSentEmail = expectEmailOfType(
       sentEmails[sentEmails.length - 1],

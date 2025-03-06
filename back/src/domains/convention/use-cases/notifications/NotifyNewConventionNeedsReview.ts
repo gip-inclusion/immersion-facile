@@ -112,10 +112,6 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,
             conventionId: convention.id,
-            conventionStatusLink: await makeShortMagicLink({
-              targetRoute: frontRoutes.conventionStatusDashboard,
-              lifetime: "long",
-            }),
             internshipKind: convention.internshipKind,
             magicLink: await makeShortMagicLink({
               targetRoute: frontRoutes.manageConvention,

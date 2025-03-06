@@ -138,7 +138,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     now: Date;
     agency: AgencyDto;
     conventionToSignLinkId: ShortLinkId;
-    conventionStatusLinkId: ShortLinkId;
   }) => {
     const { businessName } = convention;
     const {

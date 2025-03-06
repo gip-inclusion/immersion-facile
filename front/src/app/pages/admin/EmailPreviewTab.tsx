@@ -515,7 +515,6 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     agencyName: "AGENCY_NAME",
     magicLink: "http://MAGIC_LINK",
-    conventionStatusLink: "CONVENTION_STATUS_LINK",
     agencyLogoUrl: defaultEmailPreviewUrl,
     warning: "WARNING",
   },
