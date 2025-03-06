@@ -42,13 +42,31 @@ const defaultHeader = (agencyLogoUrl?: string) => `
     </tr>
   </table>`;
 
-export const cciCustomHtmlHeader = (agencyLogoUrl?: string): string => `
+export const cciCustomHtmlHeader = (
+  agencyKind: "cci" | "cma" | "chambre-agriculture",
+  agencyLogoUrl?: string,
+): string => `
 <table width="600">
   <tr>
     <td width="60%">
-      <a href="https://www.cci.fr/">
+      ${
+        agencyKind === "cci" &&
+        `<a href="https://www.cci.fr/">
         <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci.png" alt="Chambre de Commerce et d'Industrie" width="899" height="173" style="max-width: 350px; max-height: 120px; height: auto;"/>
-      </a>
+      </a>`
+      }
+      ${
+        agencyKind === "cma" &&
+        `<a href="https://www.cma.fr/">
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cma.png" alt="Chambre de Commerce et d'Industrie" width="899" height="173" style="max-width: 350px; max-height: 120px; height: auto;"/>
+      </a>`
+      }
+      ${
+        agencyKind === "chambre-agriculture" &&
+        `<a href="https://www.chambre-agriculture.fr/">
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-chambre-agriculture.png" alt="Chambre de Commerce et d'Industrie" width="899" height="173" style="max-width: 350px; max-height: 120px; height: auto;"/>
+      </a>`
+      }
     </td>
     ${
       agencyLogoUrl && agencyLogoUrl !== ""
