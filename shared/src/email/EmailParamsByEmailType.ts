@@ -12,6 +12,7 @@ import {
 import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
+import { ExtractFromExisting } from "../utils";
 import { DateString } from "../utils/date";
 import { Email } from "./email.dto";
 
@@ -24,9 +25,27 @@ export type UserParamsForMail = {
   email: Email;
 };
 
-type WithInternshipKind = {
-  internshipKind: InternshipKind;
+type WithInternshipKind =
+  | {
+      internshipKind: ExtractFromExisting<InternshipKind, "immersion">;
+    }
+  | {
+      internshipKind: ExtractFromExisting<InternshipKind, "mini-stage-cci">;
+      agencyKind: "cci" | "cma" | "chambre-agriculture";
+    };
+
+export const ensureAgencyKind = <T extends { internshipKind: InternshipKind }>(
+  params: T,
+): T => {
+  if (params.internshipKind === "mini-stage-cci" && !("agencyKind" in params)) {
+    return {
+      ...params,
+      agencyKind: "cci" as const,
+    };
+  }
+  return params;
 };
+
 export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: string;
