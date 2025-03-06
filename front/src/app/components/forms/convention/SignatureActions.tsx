@@ -17,10 +17,6 @@ import {
   getSignatoryProcessedData,
   isConventionRenewed,
 } from "shared";
-import {
-  RemindSignatoriesButton,
-  isRemindingAllowed,
-} from "src/app/components/forms/convention/RemindSignatoriesButton";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -114,15 +110,6 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
             >
               Annuler les signatures et demander une modification
             </Button>
-          </li>
-        )}
-        {isRemindingAllowed(convention, [signatory.role]) && (
-          <li>
-            <RemindSignatoriesButton
-              convention={convention}
-              priority="secondary"
-              id={domElementIds.conventionToSign.remindSignatoriesButton}
-            />
           </li>
         )}
       </ul>

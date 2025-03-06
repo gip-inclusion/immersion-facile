@@ -156,24 +156,7 @@ export const signConvention = async (
 
   await page.goto(magicLinks[signatoryIndex]);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
-  if (signatoryIndex === 1) {
-    await expect(
-      page.locator(
-        `#${domElementIds.conventionToSign.remindSignatoriesButton}`,
-      ),
-    ).toBeVisible();
-    await page.click(
-      `#${domElementIds.conventionToSign.remindSignatoriesButton}`,
-    );
-    await expect(
-      page.locator(`#${domElementIds.manageConvention.remindSignatoriesModal}`),
-    ).toBeVisible();
-    await page
-      .locator(
-        `#${domElementIds.manageConvention.remindSignatoriesModal} .fr-btn--close`,
-      )
-      .click();
-  }
+
   await expectLocatorToBeVisibleAndEnabled(
     await page.locator(
       `#${domElementIds.conventionToSign.openSignModalButton}`,
