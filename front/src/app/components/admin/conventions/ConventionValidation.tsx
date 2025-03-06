@@ -27,6 +27,7 @@ import { JwtKindProps } from "src/app/components/admin/conventions/ConventionMan
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { sendSignatureLinkSelectors } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.selectors";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -60,6 +61,7 @@ export const ConventionValidation = ({
   const { cx } = useStyles();
   const dispatch = useDispatch();
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
+  const isSending = useAppSelector(sendSignatureLinkSelectors.isSending);
   const hasErrorFeedback = feedbacks["send-signature-link"]?.level === "error";
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
@@ -163,6 +165,8 @@ export const ConventionValidation = ({
             {signatoryToSendSignatureLink?.signatoryPhone}
           </p>
 
+          <Feedback topic="send-signature-link" className={fr.cx("fr-my-4w")} />
+
           <ButtonsGroup
             inlineLayoutWhen="always"
             alignment="right"
@@ -179,13 +183,11 @@ export const ConventionValidation = ({
                   .submitSendSignatureLinkModalButton,
                 priority: "primary",
                 children: "Envoyer",
-                disabled: hasErrorFeedback,
+                disabled: hasErrorFeedback || isSending,
                 onClick: () => onSubmitSendSignatureLink(),
               },
             ]}
           />
-
-          <Feedback topic="send-signature-link" className={fr.cx("fr-my-2w")} />
         </sendSignatureLinkModal.Component>,
         document.body,
       )}
