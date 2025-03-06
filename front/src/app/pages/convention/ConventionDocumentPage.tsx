@@ -854,9 +854,10 @@ export const ConventionDocumentPage = ({
               <p className={fr.cx("fr-text--xs")}>
                 <strong>
                   La convention doit être établie, signée par toutes les parties
-                  et visée par la Chambre de Commerce et d’Industrie avant le
-                  démarrage de la période d’observation. Sans visa, la
-                  convention ne pourra être exécutée.
+                  et visée par une des 3 chambres consulaires (CCI, CMA ou
+                  chambre d'agriculture) avant le démarrage de la période
+                  d’observation. Sans visa, la convention ne pourra être
+                  exécutée.
                 </strong>
               </p>
               <p className={fr.cx("fr-text--xs")}>

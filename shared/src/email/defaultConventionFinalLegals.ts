@@ -28,7 +28,7 @@ La structure d’accompagnement s’engage, en la personne du conseiller référ
 Cette convention est établie en application des dispositions des articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de l’article L.4153-1 du code du travail, offrant la possibilité :
 • aux jeunes des deux derniers niveaux d’enseignement des collèges ou aux jeunes des lycées de réaliser des périodes d’observation en entreprise d’une durée maximale d’une semaine durant les vacances scolaires ;
 • aux étudiants de l’enseignement supérieur de réaliser des périodes d’observation en entreprise d’une durée maximale d’une semaine, en dehors des semaines réservées aux cours et au contrôle de connaissances.
-<strong>La convention doit être établie, signée par toutes les parties et visée par la Chambre de Commerce et d’Industrie avant le démarrage de la période d’observation. Sans visa, la convention ne pourra être exécutée.</strong>
+<strong>La convention doit être établie, signée par toutes les parties et visée par une des 3 chambres consulaires (CCI, CMA ou chambre d'agriculture) avant le démarrage de la période d’observation. Sans visa, la convention ne pourra être exécutée.</strong>
 
 TITRE PREMIER : DISPOSITIONS GÉNÉRALES
 
