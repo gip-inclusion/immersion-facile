@@ -81,9 +81,6 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       "shortLink1",
       "shortLink2",
       "shortLink3",
-      "shortLink4",
-      "shortLink5",
-      "shortLink6",
     ];
     shortLinkGenerator.addMoreShortLinkIds(deterministicShortLinks);
 
@@ -99,49 +96,21 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       }),
       [deterministicShortLinks[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
-        role: validConvention.signatories.beneficiary.role,
-        email: validConvention.signatories.beneficiary.email,
+        // biome-ignore lint/style/noNonNullAssertion:
+        role: validConvention.signatories.establishmentRepresentative!.role,
+        // biome-ignore lint/style/noNonNullAssertion:
+        email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
+        targetRoute: frontRoutes.conventionToSign,
       }),
       [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
         // biome-ignore lint/style/noNonNullAssertion:
-        role: validConvention.signatories.establishmentRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion:
-        email: validConvention.signatories.establishmentRepresentative!.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionToSign,
-      }),
-      [deterministicShortLinks[3]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion:
-        role: validConvention.signatories.establishmentRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion:
-        email: validConvention.signatories.establishmentRepresentative!.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
-      }),
-      [deterministicShortLinks[4]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion:
         role: validConvention.signatories.beneficiaryRepresentative!.role,
         // biome-ignore lint/style/noNonNullAssertion:
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
-      }),
-      [deterministicShortLinks[5]]: fakeGenerateMagicLinkUrlFn({
-        id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion:
-        role: validConvention.signatories.beneficiaryRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion:
-        email: validConvention.signatories.beneficiaryRepresentative!.email,
-        now: timeGateway.now(),
-        targetRoute: frontRoutes.conventionStatusDashboard,
-        lifetime: "long",
       }),
     });
 
@@ -166,7 +135,6 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       agency,
       config,
       conventionToSignLinkId: deterministicShortLinks[0],
-      conventionStatusLinkId: deterministicShortLinks[1],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: emailNotifications[1].templatedContent,
@@ -176,8 +144,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       now: timeGateway.now(),
       agency,
       config,
-      conventionToSignLinkId: deterministicShortLinks[2],
-      conventionStatusLinkId: deterministicShortLinks[3],
+      conventionToSignLinkId: deterministicShortLinks[1],
     });
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: emailNotifications[2].templatedContent,
@@ -189,8 +156,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       now: timeGateway.now(),
       agency,
       config,
-      conventionToSignLinkId: deterministicShortLinks[4],
-      conventionStatusLinkId: deterministicShortLinks[5],
+      conventionToSignLinkId: deterministicShortLinks[2],
     });
   });
 });

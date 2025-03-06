@@ -649,7 +649,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyName,
         businessName,
         conventionId,
-        conventionStatusLink,
         dateEnd,
         dateStart,
         firstName,
@@ -673,7 +672,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       
 
       Vous pouvez prendre connaissance de la demande en <a href="${magicLink}" target="_blank">cliquant ici</a>.
-      Vous pouvez également suivre <a href="${conventionStatusLink}" target="_blank">l'état de la convention en cliquant ici</a>.
       <ul>
         <li><strong>ATTENTION !</strong> Vous pouvez renvoyer un lien de signature par SMS en un clic aux signataires qui ont renseigné un numéro de mobile. Il vous suffit de cliquer sur le bouton 'Faire signer par SMS' dans l'encadré correspondant au signataire auquel vous souhaitez adresser le SMS.</li>
         <li>Vous pouvez dès maintenant demander des modifications ou la refuser si nécessaire.</li>   

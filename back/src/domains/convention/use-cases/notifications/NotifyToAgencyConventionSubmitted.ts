@@ -153,10 +153,6 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
                 targetRoute: frontRoutes.manageConvention,
                 lifetime: "short",
               }),
-              conventionStatusLink: await makeMagicShortLink({
-                targetRoute: frontRoutes.conventionStatusDashboard,
-                lifetime: "long",
-              }),
               agencyLogoUrl: agency.logoUrl ?? undefined,
               warning,
             },

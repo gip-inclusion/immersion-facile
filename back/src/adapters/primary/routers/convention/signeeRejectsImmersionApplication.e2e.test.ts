@@ -6,10 +6,10 @@ import {
   InclusionConnectedUserBuilder,
   UpdateConventionStatusRequestDto,
   conventionMagicLinkRoutes,
+  expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectsToMatch,
-  expectToEqual,
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -93,7 +93,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
 
   const sentEmails = gateways.notification.getSentEmails();
 
-  expectToEqual(
+  expectArraysToEqualIgnoringOrder(
     sentEmails.map((e) => e.recipients),
     [
       [validator.email],
@@ -102,6 +102,7 @@ const beneficiarySubmitsApplicationForTheFirstTime = async (
     ],
   );
 
+  expectEmailOfType(sentEmails[0], "NEW_CONVENTION_AGENCY_NOTIFICATION");
   const beneficiarySignEmail = expectEmailOfType(
     sentEmails[1],
     "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
