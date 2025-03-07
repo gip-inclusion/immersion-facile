@@ -646,7 +646,7 @@ export const defaultEmailValueByEmailKind: {
   SIGNEE_HAS_SIGNED_CONVENTION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
     conventionId: "CONVENTION_ID",
-    conventionStatusLink: "http://CONVENTION_STATUS_LINK",
+    magicLink: "http://CONVENTION_STATUS_LINK",
     internshipKind: "immersion",
     signedAt: new Date().toISOString(),
     agencyName: "AGENCY_NAME",
