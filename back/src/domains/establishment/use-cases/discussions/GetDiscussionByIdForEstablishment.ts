@@ -30,12 +30,15 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
 
     if (!discussion) throw errors.discussion.notFound({ discussionId });
 
-    if (!this.#hasUserRightToAccessDiscussion(user, discussion))
-      throw errors.discussion.accessForbidden({
-        discussionId,
-        userId: jwtPayload.userId,
-      });
+    if (await this.#hasUserRightToAccessDiscussion(uow, user, discussion))
+      return this.onAllowed(discussion, uow);
+    throw errors.discussion.accessForbidden({
+      discussionId,
+      userId: jwtPayload.userId,
+    });
+  }
 
+  private async onAllowed(discussion: DiscussionDto, uow: UnitOfWork) {
     const { appellationCode, ...rest } = discussion;
 
     const appellation = (
@@ -70,13 +73,24 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
       },
     };
   }
-  #hasUserRightToAccessDiscussion(
+
+  async #hasUserRightToAccessDiscussion(
+    uow: UnitOfWork,
     user: UserOnRepository,
     discussion: DiscussionDto,
   ) {
-    return (
+    if (
       discussion.establishmentContact.email === user.email ||
       discussion.establishmentContact.copyEmails.includes(user.email)
-    );
+    )
+      return true;
+
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        discussion.siret,
+      );
+
+    if (!establishment) return false;
+    return establishment.userRights.some((right) => right.userId === user.id);
   }
 }
