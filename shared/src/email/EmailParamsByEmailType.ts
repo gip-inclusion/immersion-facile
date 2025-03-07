@@ -415,7 +415,7 @@ export type EmailParamsByEmailType = {
   SIGNEE_HAS_SIGNED_CONVENTION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     conventionId: ConventionId;
-    conventionStatusLink: AbsoluteUrl;
+    magicLink: AbsoluteUrl;
     internshipKind: InternshipKind;
     signedAt: string;
     agencyName: string;

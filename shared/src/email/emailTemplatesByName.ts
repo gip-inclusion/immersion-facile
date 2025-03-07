@@ -1,4 +1,4 @@
-import { EmailButtonProps, createTemplatesByName } from "html-templates";
+import { createTemplatesByName } from "html-templates";
 import {
   ConventionId,
   InternshipKind,
@@ -25,12 +25,6 @@ const defaultSignature = (internshipKind: InternshipKind) =>
     Bonne journée, 
     L’équipe du Point Orientation Apprentissage
 `;
-
-const createConventionStatusButton = (link: string): EmailButtonProps => ({
-  url: link,
-  label: "Voir l'état de ma demande",
-  target: "_blank",
-});
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
@@ -710,7 +704,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       createEmailVariables: ({
         agencyLogoUrl,
         conventionId,
-        conventionStatusLink,
+        magicLink,
         internshipKind,
         signedAt,
         agencyName,
@@ -751,7 +745,13 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         `,
         },
         subContent: defaultSignature(internshipKind),
-        buttons: [createConventionStatusButton(conventionStatusLink)],
+        buttons: [
+          {
+            url: magicLink,
+            label: "Voir l'état de ma demande",
+            target: "_blank",
+          },
+        ],
         agencyLogoUrl,
       }),
       tags: ["confirmation de signature de convention"],
