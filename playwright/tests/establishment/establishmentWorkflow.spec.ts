@@ -1,14 +1,19 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import { expect, test } from "@playwright/test";
 import { addMonths } from "date-fns";
-import { FormEstablishmentDto, domElementIds } from "shared";
+import {
+  FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+  domElementIds,
+} from "shared";
 import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
-import { createNewEstablishment } from "./createNewEstablishment";
 import {
-  TestEstablishments,
-  fillEstablishmentFormFirstStep,
-} from "./establishmentForm.utils";
+  createEstablishmentForm,
+  goToCreateEstablishmentForm,
+  step0,
+} from "./createNewEstablishment";
+import { TestEstablishments } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";
 import {
   checkAvailabilityThoughBackOfficeAdmin,
@@ -40,58 +45,58 @@ test.describe("Establishment creation and modification workflow", () => {
     },
   ];
 
-  const initialEstablishmentInformations: Partial<FormEstablishmentDto> = {
-    businessContact: {
-      job: faker.person.jobType(),
-      phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "recette+initial-establishment@immersion-facile.beta.gouv.fr",
-      contactMethod: "PHONE",
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      copyEmails: [
-        "recette+copy-updated-establishment1@immersion-facile.beta.gouv.fr",
-      ],
-    },
-  };
+  const initialEstablishmentInformations: FormEstablishmentDto =
+    FormEstablishmentDtoBuilder.valid()
+      .withSiret("12345678901234") // A VERIFIER
+      .withContactMethod("PHONE")
+      .withEstablishmentFormUserRights([
+        {
+          role: "establishment-admin", // A VERIFIER
+          email: "toto.email@mail.com", // A VERIFIER
+          job: faker.person.jobType(),
+          phone: faker.helpers.fromRegExp(phoneRegexp),
+        },
+      ])
+      .build();
 
-  const updatedInformations: Partial<FormEstablishmentDto> = {
-    businessNameCustomized: faker.company.name(),
-    additionalInformation: faker.lorem.sentence(),
-    maxContactsPerMonth: faker.number.int({ min: 5, max: 7 }),
-    businessContact: {
-      job: faker.person.jobType(),
-      phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "admin+playwright@immersion-facile.beta.gouv.fr", //admin email required due to connexion to Establishment Dashboard
-      contactMethod: "PHONE",
-      firstName: "Jean",
-      lastName: "Immersion",
-      copyEmails: [
-        "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
-      ],
-    },
-    searchableBy: {
-      students: false,
-      jobSeekers: true,
-    },
-    nextAvailabilityDate: addMonths(new Date(), 1).toISOString(),
-    appellations: [],
-    businessAddresses: [
-      {
-        id: "fake-id",
-        rawAddress: "6 rue de la chaîne 86000 Poitiers",
-      },
-    ],
-    website: `https://${faker.internet.domainName()}`,
-    fitForDisabledWorkers: true,
-    isEngagedEnterprise: true,
-  };
+  const updatedInformations: Partial<FormEstablishmentDto> =
+    new FormEstablishmentDtoBuilder(initialEstablishmentInformations)
+      .withBusinessNameCustomized(faker.company.name())
+      .withAdditionalInformation(faker.lorem.sentence())
+      .withMaxContactsPerMonth(faker.number.int({ min: 5, max: 7 }))
+      .withEstablishmentFormUserRights([
+        {
+          role: "establishment-admin",
+          email: "toto.email@mail.com", // A VERIFIER
+          job: faker.person.jobType(),
+          phone: faker.helpers.fromRegExp(phoneRegexp),
+        },
+        {
+          role: "establishment-contact",
+          email:
+            "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
+        },
+      ])
+      .withContactMethod("PHONE")
+      .withSearchableBy({
+        students: false,
+        jobSeekers: true,
+      })
+      .withNextAvailabilityDate(addMonths(new Date(), 1))
+      .withBusinessAddresses([
+        {
+          id: "fake-id",
+          rawAddress: "6 rue de la chaîne 86000 Poitiers",
+        },
+      ])
+      .withWebsite(`https://${faker.internet.domainName()}`)
+      .withFitForDisabledWorkers(true)
+      .withIsEngagedEnterprise(true)
+      .build();
 
   test(
     "creates a new establishment",
-    createNewEstablishment(
-      initialEstablishmentInformations,
-      testEstablishments,
-    ),
+    createEstablishmentForm(initialEstablishmentInformations),
   );
 
   test.describe("Update establishment through magic link", () => {
@@ -135,9 +140,11 @@ test.describe("Establishment creation and modification workflow", () => {
   test.describe("Check displayed availability", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
-    test("in create establishment form - defaults values", async ({ page }) => {
-      const siretForAvailabilityCheck = "88462068300018";
-      await fillEstablishmentFormFirstStep(page, siretForAvailabilityCheck);
+    test("in create establishment form - availability button is not checked by default", async ({
+      page,
+    }) => {
+      await goToCreateEstablishmentForm(page);
+      await step0(page);
       const initialRadioButton = page.locator(
         `#${domElementIds.establishment.create.availabilityButton}`,
       );

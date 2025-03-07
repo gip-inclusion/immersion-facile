@@ -1,9 +1,11 @@
+import { AbsoluteUrl } from "../AbsoluteUrl";
 import { Builder } from "../Builder";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressAndPosition } from "../address/address.dto";
 import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { SiretDto } from "../siret/siret";
 import {
+  ContactMethod,
   EstablishmentCSVRow,
   EstablishmentFormUserRights,
   EstablishmentSearchableBy,
@@ -279,6 +281,41 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
       nextAvailabilityDate: nextAvailabilityDate?.toISOString(),
+    });
+  }
+
+  public withContactMethod(contactMethod: ContactMethod) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      contactMethod,
+    });
+  }
+
+  public withBusinessNameCustomized(businessNameCustomized?: string) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      businessNameCustomized,
+    });
+  }
+
+  public withAdditionalInformation(additionalInformation?: string) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      additionalInformation,
+    });
+  }
+
+  public withWebsite(website?: AbsoluteUrl) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      website,
+    });
+  }
+
+  public withIsEngagedEnterprise(isEngagedEnterprise?: boolean) {
+    return new FormEstablishmentDtoBuilder({
+      ...this.#dto,
+      isEngagedEnterprise,
     });
   }
 

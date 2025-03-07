@@ -1,7 +1,7 @@
 import { Page, expect } from "@playwright/test";
 import {
-  BusinessContactDto,
   DateTimeIsoString,
+  EstablishmentFormUserRights,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   domElementIds,
@@ -93,9 +93,9 @@ const editEstablishmentWithStepForm = async (
   updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
   testEstablishments: TestEstablishments,
 ): Promise<void> => {
-  const businessContact = updatedEstablishmentInfos.businessContact;
-  if (!businessContact)
-    throw new Error("Missing business contact for updatedEstablishmentInfos");
+  const userRights = updatedEstablishmentInfos.userRights;
+  if (!userRights)
+    throw new Error("Missing user rights for updatedEstablishmentInfos");
   const nextAvailabilityDate = updatedEstablishmentInfos.nextAvailabilityDate;
   if (!nextAvailabilityDate)
     throw new Error(
@@ -142,7 +142,7 @@ const editEstablishmentWithStepForm = async (
     updatedMaxContactsPerMonth,
   );
   await step2SearchableBy(page);
-  await step3BusinessContact(page, businessContact);
+  await step3BusinessContact(page, userRights);
   await step4AImmersionOffer(
     page,
     testEstablishments,
@@ -230,7 +230,7 @@ const step4AImmersionOffer = async (
 
 const step3BusinessContact = async (
   page: Page,
-  businessContact: BusinessContactDto,
+  userRights: EstablishmentFormUserRights,
 ): Promise<void> => {
   const firstNameLocator = page.locator(
     `#${domElementIds.establishment.edit.businessContact.firstName}`,
@@ -241,30 +241,14 @@ const step3BusinessContact = async (
   );
   await expectLocatorToBeReadOnly(lastNameLocator);
 
-  // Update email first in order to unlock firstname & lastname fields
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.email}`,
-    businessContact.email,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-    businessContact.firstName,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-    businessContact.lastName,
-  );
-
   await page.fill(
     `#${domElementIds.establishment.edit.businessContact.job}`,
-    businessContact.job,
+    userRights.job,
   );
 
   await page.fill(
     `#${domElementIds.establishment.edit.businessContact.phone}`,
-    businessContact.phone,
+    userRights.phone,
   );
 
   await page

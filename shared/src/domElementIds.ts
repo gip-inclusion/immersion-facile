@@ -376,9 +376,9 @@ export const domElementIds = {
         phone: "im-form-create-establishment__businessContact-phone",
         email: "im-form-create-establishment__businessContact-email",
         copyEmails: "im-form-create-establishment__businessContact-copy-emails",
-        contactMethod:
-          "im-form-create-establishment__businessContact-contact-method",
       },
+      contactMethod:
+        "im-form-create-establishment__businessContact-contact-method",
       isEngagedEnterprise:
         "im-form-create-establishment__is-engaged-enterprise",
       fitForDisabledWorkers:
@@ -422,9 +422,9 @@ export const domElementIds = {
         phone: "im-form-edit-establishment__businessContact-phone",
         email: "im-form-edit-establishment__businessContact-email",
         copyEmails: "im-form-edit-establishment__businessContact-copy-emails",
-        contactMethod:
-          "im-form-edit-establishment__businessContact-contact-method",
       },
+      contactMethod:
+        "im-form-edit-establishment__businessContact-contact-method",
       isEngagedEnterprise: "im-form-edit-establishment__is-engaged-enterprise",
       fitForDisabledWorkers:
         "im-form-edit-establishment__fit-for-disabled-workers",
