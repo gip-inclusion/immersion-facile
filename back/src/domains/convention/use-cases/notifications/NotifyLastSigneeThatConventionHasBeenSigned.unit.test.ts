@@ -69,8 +69,9 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
     uow.conventionRepository.setConventions([signedConvention]);
 
     await notifyLastSignee.execute({ convention: signedConvention });
-    const conventionStatusLink = fakeGenerateMagicLinkUrlFn({
-      targetRoute: frontRoutes.conventionStatusDashboard,
+
+    const magicLink = fakeGenerateMagicLinkUrlFn({
+      targetRoute: frontRoutes.manageConvention,
       id: signedConvention.id,
       role: "beneficiary",
       email: signedConvention.signatories.beneficiary.email,
@@ -86,7 +87,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
             conventionId: signedConvention.id,
             // biome-ignore lint/style/noNonNullAssertion: <explanation>
             signedAt: signedConvention.signatories.beneficiary.signedAt!,
-            conventionStatusLink,
+            magicLink,
             agencyLogoUrl: agency.logoUrl ?? undefined,
             agencyName: agency.name,
           },
@@ -118,8 +119,8 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
               signedConvention.signatories.establishmentRepresentative
                 .signedAt!,
             conventionId: signedConvention.id,
-            conventionStatusLink: fakeGenerateMagicLinkUrlFn({
-              targetRoute: frontRoutes.conventionStatusDashboard,
+            magicLink: fakeGenerateMagicLinkUrlFn({
+              targetRoute: frontRoutes.manageConvention,
               id: signedConvention.id,
               role: "establishment-representative",
               email:
