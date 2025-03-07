@@ -127,7 +127,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     signatory,
     recipient,
     agency,
-    conventionStatusLinkId,
     conventionToSignLinkId,
     config,
   }: {
@@ -139,7 +138,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     now: Date;
     agency: AgencyDto;
     conventionToSignLinkId: ShortLinkId;
-    conventionStatusLinkId: ShortLinkId;
   }) => {
     const { businessName } = convention;
     const {
@@ -169,7 +167,6 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
           config,
           conventionToSignLinkId,
         ),
-        conventionStatusLink: makeShortLinkUrl(config, conventionStatusLinkId),
         businessName,
         agencyLogoUrl: agency.logoUrl ?? undefined,
       },

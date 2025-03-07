@@ -319,7 +319,6 @@ describe("PgNotificationRepository", () => {
               businessName: "Essuie-tout",
               conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
               requesterName: "Yolo",
-              conventionStatusLink: "https://status.com",
               internshipKind: "immersion",
               justification: "Justification",
               magicLink: "https://magic-link.com",

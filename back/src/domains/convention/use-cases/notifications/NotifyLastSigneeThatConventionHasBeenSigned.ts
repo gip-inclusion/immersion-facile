@@ -65,8 +65,8 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
     lastSignee: { signedAt: string; email: string; role: SignatoryRole },
     agency: AgencyWithUsersRights,
   ): TemplatedEmail {
-    const conventionStatusLink = this.#generateConventionMagicLinkUrl({
-      targetRoute: frontRoutes.conventionStatusDashboard,
+    const magicLink = this.#generateConventionMagicLinkUrl({
+      targetRoute: frontRoutes.manageConvention,
       id: convention.id,
       role: lastSignee.role,
       email: lastSignee.email,
@@ -81,7 +81,7 @@ export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUs
         internshipKind: convention.internshipKind,
         conventionId: convention.id,
         signedAt: lastSignee.signedAt,
-        conventionStatusLink,
+        magicLink,
         agencyName: agency.name,
       },
       recipients: [lastSignee.email],
