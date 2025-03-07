@@ -1,3 +1,4 @@
+import { differenceInYears, startOfDay } from "date-fns";
 import { keys } from "ramda";
 import { WithAcquisition } from "../acquisition.dto";
 import { AddressDto, Postcode } from "../address/address.dto";
@@ -427,3 +428,10 @@ export const userHasEnoughRightsOnConvention = (
       agencyRight.agency.id === convention.agencyId &&
       agencyRight.roles.some((role) => allowedRoles.includes(role)),
   ) || !!user.isBackofficeAdmin;
+
+export const getExactAge = ({
+  birthDate,
+  referenceDate,
+}: { birthDate: Date; referenceDate: Date }): number => {
+  return differenceInYears(startOfDay(referenceDate), startOfDay(birthDate));
+};

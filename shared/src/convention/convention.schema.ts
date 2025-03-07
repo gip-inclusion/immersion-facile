@@ -90,6 +90,7 @@ import {
   conventionStatusesWithJustificationWithoutModifierRole,
   conventionStatusesWithValidator,
   conventionStatusesWithoutJustificationNorValidator,
+  getExactAge,
   internshipKinds,
   levelsOfEducation,
 } from "./convention.dto";
@@ -295,10 +296,10 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
   .refine(
     minorBeneficiaryHasRepresentative,
     ({ dateStart, signatories: { beneficiary } }) => {
-      const beneficiaryAgeAtConventionStart = differenceInYears(
-        new Date(dateStart),
-        new Date(beneficiary.birthdate),
-      );
+      const beneficiaryAgeAtConventionStart = getExactAge({
+        birthDate: new Date(beneficiary.birthdate),
+        referenceDate: new Date(dateStart),
+      });
       return {
         message: `Les bénéficiaires mineurs doivent renseigner un représentant légal. Le bénéficiaire aurait ${beneficiaryAgeAtConventionStart} ans au démarrage de la convention.`,
         path: [getConventionFieldName("signatories.beneficiaryRepresentative")],
