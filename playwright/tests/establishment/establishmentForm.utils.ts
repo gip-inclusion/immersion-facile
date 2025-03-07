@@ -1,31 +1,10 @@
 import { Page, expect } from "@playwright/test";
 import { SiretDto, domElementIds } from "shared";
-import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
 export type TestEstablishments = {
   siret: SiretDto;
   expectedAddress: string;
 }[];
-
-export const fillEstablishmentFormFirstStep = async (
-  page: Page,
-  siret: string,
-) => {
-  await page.goto("/");
-  await page.click(`#${domElementIds.home.heroHeader.establishment}`);
-  await page.click(
-    `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
-  );
-  await page.fill(
-    `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-    siret,
-  );
-  const addEstablishmentButton = page.locator(
-    `#${domElementIds.establishment.create.startFormButton}`,
-  );
-  await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
-  await addEstablishmentButton.click();
-};
 
 export const checkAvailibilityButtons = async (
   page: Page,

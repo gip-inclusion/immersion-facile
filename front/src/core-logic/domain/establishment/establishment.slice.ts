@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   ConnectedUserJwt,
-  EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
   defaultMaxContactsPerMonth,
@@ -14,7 +13,7 @@ import {
 
 export type EstablishmentUpdatePayload = {
   formEstablishment: FormEstablishmentDto;
-  jwt: EstablishmentJwt | ConnectedUserJwt;
+  jwt: ConnectedUserJwt;
 };
 
 export type EstablishmentDeletePayload = {
@@ -24,7 +23,7 @@ export type EstablishmentDeletePayload = {
 
 export type SiretAndJwtPayload = {
   siret: SiretDto;
-  jwt: EstablishmentJwt | ConnectedUserJwt;
+  jwt: ConnectedUserJwt;
 };
 
 export type EstablishmentRequestedPayload =
@@ -39,15 +38,8 @@ export const defaultFormEstablishmentValue = (
   businessName: "",
   businessAddresses: [],
   appellations: [emptyAppellationAndRome],
-  businessContact: {
-    firstName: "",
-    lastName: "",
-    job: "",
-    phone: "",
-    email: "",
-    contactMethod: "EMAIL",
-    copyEmails: [],
-  },
+  userRights: [],
+  contactMethod: "EMAIL",
   website: "",
   additionalInformation: "",
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -109,6 +101,7 @@ export const establishmentSlice = createSlice({
       state,
       _action: PayloadActionWithFeedbackTopic<{
         formEstablishment: FormEstablishmentDto;
+        jwt: ConnectedUserJwt;
       }>,
     ) => {
       state.isLoading = true;
@@ -169,28 +162,5 @@ export const establishmentSlice = createSlice({
     },
 
     clearEstablishmentRequested: () => initialState,
-
-    sendModificationLinkRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<{
-        siret: SiretDto;
-      }>,
-    ) => {
-      state.isLoading = true;
-    },
-    sendModificationLinkSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<{
-        siret: SiretDto;
-      }>,
-    ) => {
-      state.isLoading = false;
-    },
-    sendModificationLinkFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
   },
 });

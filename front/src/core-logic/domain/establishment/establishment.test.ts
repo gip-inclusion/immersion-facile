@@ -115,61 +115,6 @@ describe("Establishment", () => {
     });
   });
 
-  it("send modification link", () => {
-    expectEstablishmentStateToMatch({
-      isLoading: false,
-    });
-    store.dispatch(
-      establishmentSlice.actions.sendModificationLinkRequested({
-        siret: "siret-123",
-        feedbackTopic: "establishment-modification-link",
-      }),
-    );
-    expectEstablishmentStateToMatch({ isLoading: true });
-    dependencies.establishmentGateway.establishmentModificationResponse$.next(
-      undefined,
-    );
-    expectEstablishmentStateToMatch({
-      isLoading: false,
-    });
-    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "establishment-modification-link": {
-        on: "create",
-        level: "success",
-        message:
-          "Le lien de modification de l'entreprise a bien été envoyé par email.",
-        title: "Lien envoyé",
-      },
-    });
-  });
-
-  it("handle send modification link error", () => {
-    const errorMessage =
-      "Il y a eu un problème lors de l'envoi du lien de modification de l'entreprise.";
-    expectEstablishmentStateToMatch({
-      isLoading: false,
-    });
-    store.dispatch(
-      establishmentSlice.actions.sendModificationLinkRequested({
-        siret: "siret-123",
-        feedbackTopic: "establishment-modification-link",
-      }),
-    );
-    expect(establishmentSelectors.isLoading(store.getState())).toBe(true);
-    dependencies.establishmentGateway.establishmentModificationResponse$.error(
-      new Error(errorMessage),
-    );
-    expect(establishmentSelectors.isLoading(store.getState())).toBe(false);
-    expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-      "establishment-modification-link": {
-        on: "create",
-        level: "error",
-        message: errorMessage,
-        title: "Lien non envoyé",
-      },
-    });
-  });
-
   describe("establishment fetch", () => {
     it("fetches establishment on establishment creation (empty params)", () => {
       expectStoreToMatchInitialState();
@@ -295,6 +240,7 @@ describe("Establishment", () => {
         establishmentSlice.actions.createEstablishmentRequested({
           formEstablishment: formEstablishment,
           feedbackTopic: "form-establishment",
+          jwt: "some-jwt",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);
@@ -319,6 +265,7 @@ describe("Establishment", () => {
         establishmentSlice.actions.createEstablishmentRequested({
           formEstablishment: formEstablishment,
           feedbackTopic: "form-establishment",
+          jwt: "some-jwt",
         }),
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), true);

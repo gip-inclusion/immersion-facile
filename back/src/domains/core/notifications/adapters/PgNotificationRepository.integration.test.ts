@@ -70,13 +70,13 @@ const emailNotifications: EmailNotification[] = [
     createdAt: subHours(now, 3).toISOString(),
     followedIds: { agencyId },
     templatedContent: {
-      kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+      kind: "TEST_EMAIL",
       recipients: ["lulu@mail.com"],
       cc: ["bob@mail.com"],
       params: {
-        editFrontUrl: "http://edit-link.com",
-        businessAddresses: ["24 rue des boucher 67000 strasbourg"],
-        businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+        url: "https://google.com",
+        input1: "test input 1",
+        input2: "test input 2",
       },
       attachments: [
         {
