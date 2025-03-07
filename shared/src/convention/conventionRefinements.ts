@@ -1,4 +1,3 @@
-import { differenceInYears } from "date-fns";
 import differenceInDays from "date-fns/differenceInDays";
 import { addressSchema } from "../address/address.schema";
 import { DateString } from "../utils/date";
@@ -9,6 +8,7 @@ import {
   EstablishmentTutor,
   InternshipKind,
   Signatories,
+  getExactAge,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 
@@ -61,10 +61,10 @@ export const minorBeneficiaryHasRepresentative = ({
   signatories,
   dateSubmission,
 }: ConventionDto) => {
-  const beneficiaryAgeAtConventionStart = differenceInYears(
-    new Date(dateStart),
-    new Date(signatories.beneficiary.birthdate),
-  );
+  const beneficiaryAgeAtConventionStart = getExactAge({
+    birthDate: new Date(signatories.beneficiary.birthdate),
+    referenceDate: new Date(dateStart),
+  });
 
   const ruleAppliesFrom = new Date("2023-10-28");
   const conventionWasSubmittedBeforeRuleApplies =

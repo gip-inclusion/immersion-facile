@@ -949,6 +949,30 @@ describe("conventionDtoSchema", () => {
       });
     });
 
+    describe("accepts when beneficiary is major", () => {
+      it("from immersion start date", () => {
+        const convention = new ConventionDtoBuilder()
+          .withBeneficiaryBirthdate("2007-03-26")
+          .withDateStart("2025-03-26")
+          .withDateEnd("2025-03-28")
+          .withSchedule(reasonableSchedule)
+          .build();
+
+        expectConventionDtoToBeValid(convention);
+      });
+
+      it("before immersion start date", () => {
+        const convention = new ConventionDtoBuilder()
+          .withBeneficiaryBirthdate("2000-10-05")
+          .withDateStart("2025-10-05")
+          .withDateEnd("2025-10-10")
+          .withSchedule(reasonableSchedule)
+          .build();
+
+        expectConventionDtoToBeValid(convention);
+      });
+    });
+
     describe("convention with no beneficiary representative for a beneficiary under 18", () => {
       it("rejects when beneficiary is minor (when immersion starts) and no beneficiary representative was provided", () => {
         const immersionStartDate = new Date("2023-11-01");
