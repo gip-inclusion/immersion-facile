@@ -2190,23 +2190,24 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withIsMaxDiscussionsForPeriodReached(true)
       .build();
 
+    const createEstablishmentAggregateWithMaxContactPerMonth = (
+      maxContactsPerMonth: number,
+    ) =>
+      new EstablishmentAggregateBuilder(establishmentNotSearchable)
+        .withMaxContactsPerMonth(maxContactsPerMonth)
+        .withUserRights([osefUserRight])
+        .build();
+
     const establishmentIsNotSearchableAndMaxContactPerMonth0 =
-      new EstablishmentAggregateBuilder(establishmentNotSearchable)
-        .withMaxContactsPerMonth(0)
-        .withUserRights([osefUserRight])
-        .build();
-
+      createEstablishmentAggregateWithMaxContactPerMonth(0);
     const establishmentIsNotSearchableAndMaxContactPerMonth1 =
-      new EstablishmentAggregateBuilder(establishmentNotSearchable)
-        .withMaxContactsPerMonth(1)
-        .withUserRights([osefUserRight])
-        .build();
-
+      createEstablishmentAggregateWithMaxContactPerMonth(1);
     const establishmentIsNotSearchableAndMaxContactPerMonth2 =
-      new EstablishmentAggregateBuilder(establishmentNotSearchable)
-        .withMaxContactsPerMonth(2)
-        .withUserRights([osefUserRight])
-        .build();
+      createEstablishmentAggregateWithMaxContactPerMonth(2);
+    const establishmentIsNotSearchableAndMaxContactPerMonth4 =
+      createEstablishmentAggregateWithMaxContactPerMonth(4);
+    const establishmentIsNotSearchableAndMaxContactPerMonth8 =
+      createEstablishmentAggregateWithMaxContactPerMonth(8);
 
     const discussionAfterSinceDate = new DiscussionBuilder()
       .withSiret(
@@ -2227,22 +2228,34 @@ describe("PgEstablishmentAggregateRepository", () => {
     describe("update", () => {
       it(`update is searchable for establishments that: 
           - are not searchable
-          - have maxContactsPerMonth at 2
+          - have maxContactsPerMonth at 8
           - have 1 discussion since date`, async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          establishmentIsNotSearchableAndMaxContactPerMonth2,
+          establishmentIsNotSearchableAndMaxContactPerMonth8,
         );
-        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+
+        // Create a discussion for the establishment with maxContactsPerMonth=8
+        const discussionForEstablishment8 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth8.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(since, 1))
+          .build();
+
+        await pgDiscussionRepository.insert(discussionForEstablishment8);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           since,
         );
 
+        // The establishment should be made searchable again because 1 < Math.ceil(8/4) = 2
         expectToEqual(
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [
             new EstablishmentAggregateBuilder(
-              establishmentIsNotSearchableAndMaxContactPerMonth2,
+              establishmentIsNotSearchableAndMaxContactPerMonth8,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
               .withFitForDisabledWorkers(false)
@@ -2357,6 +2370,35 @@ describe("PgEstablishmentAggregateRepository", () => {
         expectToEqual(
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
           [establishmentIsNotSearchableAndMaxContactPerMonth1],
+        );
+      });
+
+      it(`do not update is searchable for establishments that: 
+          - are not searchable
+          - have maxContactsPerMonth at 4
+          - have 1 discussion since date (which is under monthly max but at weekly max)`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerMonth4,
+        );
+
+        const discussionForEstablishment4 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth4.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(since, 1))
+          .build();
+
+        await pgDiscussionRepository.insert(discussionForEstablishment4);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
+          since,
+        );
+
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [establishmentIsNotSearchableAndMaxContactPerMonth4],
         );
       });
     });
