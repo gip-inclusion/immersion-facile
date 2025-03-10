@@ -287,10 +287,9 @@ export class PgEstablishmentAggregateRepository
           .where("max_contacts_per_month", ">", 0)
           .where("discussions.created_at", ">", since)
           .groupBy("establishments.siret")
-          .havingRef(
-            (eb) => eb.fn.countAll(),
-            ">=",
-            "establishments.max_contacts_per_month",
+          .having(
+            sql<any>`COUNT(*) >= establishments.max_contacts_per_month 
+            OR COUNT(*) >= CEIL(establishments.max_contacts_per_month / 4)`,
           ),
       )
       .returning("siret")
