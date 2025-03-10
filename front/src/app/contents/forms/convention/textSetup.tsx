@@ -77,9 +77,10 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
         <>
           <p className={fr.cx("fr-text--xs")}>
             La convention doit être établie, signée par toutes les parties et
-            visée par la Chambre de Commerce et d’Industrie <u>avant</u> le
-            démarrage de la période d’observation en milieu professionnel. Sans
-            visa, la convention ne pourra être exécutée.
+            visée par une des 3 chambres consulaires (CCI, CMA ou chambre
+            d'agriculture) <u>avant</u> le démarrage de la période d’observation
+            en milieu professionnel. Sans visa, la convention ne pourra être
+            exécutée.
           </p>
           <p className={fr.cx("fr-text--xs", "fr-mt-2w")}>
             Cette convention est établie en application des dispositions des
