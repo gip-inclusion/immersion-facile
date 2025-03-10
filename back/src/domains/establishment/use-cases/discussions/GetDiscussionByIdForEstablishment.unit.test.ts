@@ -71,24 +71,6 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           errors.discussion.notFound({ discussionId: missingDiscussionId }),
         );
       });
-    });
-
-    describe("throws accessForbidden", () => {
-      it("when user have no email matching discussions's contact or copy emails", async () => {
-        const otherDiscussion = new DiscussionBuilder().build();
-
-        uow.discussionRepository.discussions = [otherDiscussion];
-
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(otherDiscussion.id, {
-            userId: user.id,
-          }),
-          errors.discussion.accessForbidden({
-            discussionId: otherDiscussion.id,
-            userId: user.id,
-          }),
-        );
-      });
 
       it("when missing establishment", async () => {
         uow.discussionRepository.discussions = [
@@ -103,8 +85,38 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
               userId: user.id,
             },
           ),
+          errors.establishment.notFound({
+            siret: discussionWithoutUserEmailInContact.siret,
+          }),
+        );
+      });
+    });
+
+    describe("throws accessForbidden", () => {
+      it("when user have no email matching discussions's contact or copy emails and no rights on establishment", async () => {
+        const otherDiscussion = new DiscussionBuilder().build();
+
+        uow.discussionRepository.discussions = [otherDiscussion];
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(otherDiscussion.siret)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                job: "",
+                phone: "",
+                userId: "",
+              },
+            ])
+            .build(),
+        ];
+
+        await expectPromiseToFailWithError(
+          getDiscussionByIdForEstablishment.execute(otherDiscussion.id, {
+            userId: user.id,
+          }),
           errors.discussion.accessForbidden({
-            discussionId: discussionWithoutUserEmailInContact.id,
+            discussionId: otherDiscussion.id,
             userId: user.id,
           }),
         );
