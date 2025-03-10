@@ -1,14 +1,10 @@
 import { faker } from "@faker-js/faker/locale/fr";
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { addMonths } from "date-fns";
-import { type FormEstablishmentDto, domElementIds } from "shared";
+import { type FormEstablishmentDto, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
-import { createNewEstablishment } from "./createNewEstablishment";
-import {
-  type TestEstablishments,
-  fillEstablishmentFormFirstStep,
-} from "./establishmentForm.utils";
+import { createEstablishmentForm } from "./createNewEstablishment";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";
 import {
   checkAvailabilityThoughBackOfficeAdmin,
@@ -18,152 +14,130 @@ import {
 } from "./manageEstablishment";
 import {
   updateEstablishmentAvailabilityThroughBackOfficeAdmin,
-  updateEstablishmentThroughMagicLink,
+  updateEstablishmentThroughEstablishmentDashboard,
 } from "./modifyEstablishment";
 import { searchEstablishmentAndExpectResultToHaveLength } from "./searchEstablishment";
 
 test.describe.configure({ mode: "serial" });
 
 test.describe("Establishment creation and modification workflow", () => {
-  const testEstablishments: TestEstablishments = [
-    {
-      siret: "41433740200039",
-      expectedAddress: "Avenue des Grands Crus 26600 Tain-l'Hermitage",
-    },
-    {
-      siret: "21590350100017",
-      expectedAddress: "Place Augustin Laurent 59000 Lille",
-    },
-    {
-      siret: "21310555400017",
-      expectedAddress: "1 Place du Capitole 31000 Toulouse",
-    },
-  ];
+  const initialEstablishmentInformations: FormEstablishmentDto =
+    FormEstablishmentDtoBuilder.valid()
+      .withSiret("13003013300016")
+      .withContactMethod("PHONE")
+      .withEstablishmentFormUserRights([
+        {
+          role: "establishment-admin",
+          email: testConfig.proConnect.username,
+          job: faker.person.jobType(),
+          phone: faker.helpers.fromRegExp(phoneRegexp),
+        },
+      ])
+      .withBusinessAddresses([
+        {
+          id: "",
+          rawAddress: "127 Rue de Grenelle 75007 Paris",
+        },
+      ])
+      .build();
 
-  const initialEstablishmentInformations: Partial<FormEstablishmentDto> = {
-    businessContact: {
-      job: faker.person.jobType(),
-      phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "recette+initial-establishment@immersion-facile.beta.gouv.fr",
-      contactMethod: "PHONE",
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      copyEmails: [
-        "recette+copy-updated-establishment1@immersion-facile.beta.gouv.fr",
-      ],
-    },
-  };
+  const updatedEstablishment: FormEstablishmentDto =
+    new FormEstablishmentDtoBuilder(initialEstablishmentInformations)
+      .withBusinessNameCustomized(faker.company.name())
+      .withAdditionalInformation(faker.lorem.sentence())
+      .withMaxContactsPerMonth(faker.number.int({ min: 5, max: 7 }))
+      .withEstablishmentFormUserRights([
+        {
+          role: "establishment-admin",
+          email: testConfig.proConnect.username,
+          job: faker.person.jobType(),
+          phone: faker.helpers.fromRegExp(phoneRegexp),
+        },
+        {
+          role: "establishment-contact",
+          email:
+            "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
+        },
+      ])
+      .withContactMethod("PHONE")
+      .withSearchableBy({
+        students: false,
+        jobSeekers: true,
+      })
+      .withNextAvailabilityDate(addMonths(new Date(), 1))
+      .withBusinessAddresses([
+        {
+          id: "fake-id",
+          rawAddress: "6 rue de la chaîne 86000 Poitiers",
+        },
+      ])
+      .withWebsite(`https://${faker.internet.domainName()}`)
+      .withFitForDisabledWorkers(true)
+      .withIsEngagedEnterprise(true)
+      .build();
 
-  const updatedInformations: Partial<FormEstablishmentDto> = {
-    businessNameCustomized: faker.company.name(),
-    additionalInformation: faker.lorem.sentence(),
-    maxContactsPerMonth: faker.number.int({ min: 5, max: 7 }),
-    businessContact: {
-      job: faker.person.jobType(),
-      phone: faker.helpers.fromRegExp(phoneRegexp),
-      email: "admin+playwright@immersion-facile.beta.gouv.fr", //admin email required due to connexion to Establishment Dashboard
-      contactMethod: "PHONE",
-      firstName: "Jean",
-      lastName: "Immersion",
-      copyEmails: [
-        "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
-      ],
-    },
-    searchableBy: {
-      students: false,
-      jobSeekers: true,
-    },
-    nextAvailabilityDate: addMonths(new Date(), 1).toISOString(),
-    appellations: [],
-    businessAddresses: [
-      {
-        id: "fake-id",
-        rawAddress: "6 rue de la chaîne 86000 Poitiers",
-      },
-    ],
-    website: `https://${faker.internet.domainName()}`,
-    fitForDisabledWorkers: true,
-    isEngagedEnterprise: true,
-  };
-
-  test(
-    "creates a new establishment",
-    createNewEstablishment(
-      initialEstablishmentInformations,
-      testEstablishments,
-    ),
-  );
-
-  test.describe("Update establishment through magic link", () => {
-    test.use({ storageState: testConfig.adminAuthFile });
-
+  test.describe("Create & update establishment as establishment admin", () => {
+    test.use({ storageState: testConfig.establishmentAuthFile });
     test(
-      "modifies an existing establishment through magic link",
-      updateEstablishmentThroughMagicLink(
-        updatedInformations,
-        testEstablishments,
-      ),
+      "creates a new establishment",
+      createEstablishmentForm(initialEstablishmentInformations),
     );
 
     test(
+      "modifies an existing establishment through establishment dashboard",
+      updateEstablishmentThroughEstablishmentDashboard(updatedEstablishment),
+    );
+
+    test(
+      "in establishment dashboard",
+      checkAvailabilityThoughEstablishmentDashboard(updatedEstablishment),
+    );
+  });
+
+  test.describe("Check establishment as backoffice admin", () => {
+    test.use({ storageState: testConfig.adminAuthFile });
+
+    test(
       "check that establishment has been updated through backoffice admin",
-      checkEstablishmentUpdatedThroughBackOfficeAdmin(
-        updatedInformations,
-        testEstablishments,
-      ),
+      checkEstablishmentUpdatedThroughBackOfficeAdmin(updatedEstablishment),
     );
   });
 
   test(
     "searches for non available establishment",
-    searchEstablishmentAndExpectResultToHaveLength(testEstablishments, 0),
+    searchEstablishmentAndExpectResultToHaveLength(updatedEstablishment, 0),
   );
 
   test.describe("Admin makes the establishment available", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test(
       "make the establishment available",
-      updateEstablishmentAvailabilityThroughBackOfficeAdmin(testEstablishments),
+      updateEstablishmentAvailabilityThroughBackOfficeAdmin(
+        updatedEstablishment,
+      ),
     );
   });
 
   test(
     "searches for available establishment",
-    searchEstablishmentAndExpectResultToHaveLength(testEstablishments, 1),
+    searchEstablishmentAndExpectResultToHaveLength(updatedEstablishment, 1),
   );
 
   test.describe("Check displayed availability", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-
-    test("in create establishment form - defaults values", async ({ page }) => {
-      const siretForAvailabilityCheck = "88462068300018";
-      await fillEstablishmentFormFirstStep(page, siretForAvailabilityCheck);
-      const initialRadioButton = page.locator(
-        `#${domElementIds.establishment.create.availabilityButton}`,
-      );
-      await expect(initialRadioButton.getByText("Oui")).not.toBeChecked();
-      await expect(initialRadioButton.getByText("Non")).not.toBeChecked();
-    });
-
     test(
       "in backoffice admin manage establishment",
-      checkAvailabilityThoughBackOfficeAdmin(testEstablishments),
-    );
-
-    test(
-      "in establishment dashboard",
-      checkAvailabilityThoughEstablishmentDashboard(testEstablishments),
+      checkAvailabilityThoughBackOfficeAdmin(updatedEstablishment),
     );
   });
 
   test.describe("Admin deletes an establishment", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("deletes an establishment", async ({ page }, { retry }) => {
+    test("deletes an establishment", async ({ page }) => {
       page.on("dialog", (dialog) => dialog.accept());
       await goToManageEtablishmentInBackOfficeAdmin(
         page,
-        retry,
-        testEstablishments,
+        updatedEstablishment.siret,
       );
       await deleteEstablishmentInBackOfficeAdmin(page);
     });

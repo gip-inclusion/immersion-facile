@@ -1,46 +1,48 @@
 import { type Page, expect } from "@playwright/test";
 import {
-  type BusinessContactDto,
-  type DateTimeIsoString,
-  type FormEstablishmentAddress,
+  EstablishmentFormUserRights,
   type FormEstablishmentDto,
-  domElementIds,
+  addressRoutes,
+  domElementIds
 } from "shared";
 import { testConfig } from "../../custom.config";
-import { goToAdminTab } from "../../utils/admin";
+import {
+  goToDashboard,
+  goToEstablishmentDashboardTab,
+} from "../../utils/dashboard";
 import {
   type PlaywrightTestCallback,
   expectLocatorToBeReadOnly,
-  expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
-import {
-  type TestEstablishments,
-  closeModal,
-  goToNextStep,
-} from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";
 
-export const updateEstablishmentThroughMagicLink =
-  (
-    updatedFormEstablishment: Partial<FormEstablishmentDto>,
-    testEstablishments: TestEstablishments,
-  ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    await getEditLinkThroughBackOfficeAdmin(page, retry, testEstablishments);
+export const updateEstablishmentThroughEstablishmentDashboard =
+  (updatedFormEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
+    await page.goto("/");
+    await goToDashboard(page, "establishment");
+    await expect(page.locator(".fr-tabs__list")).toBeVisible();
 
-    await editEstablishmentWithStepForm(
+    await goToEstablishmentDashboardTab(page, "fiche-entreprise");
+
+    await page.waitForURL(
+      `/tableau-de-bord-etablissement/fiche-entreprise?siret=${updatedFormEstablishment.siret}`,
+    );
+
+    await editEstablishmentInEstablishmentDashboard(
       page,
-      retry,
       updatedFormEstablishment,
-      testEstablishments,
     );
   };
 
 export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
-  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
+  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
+    await goToManageEtablishmentBySiretInAdmin(
+      page,
+      updatedEstablishment.siret,
+    );
 
     await page
       .locator(`#${domElementIds.establishment.admin.availabilityButton}`)
@@ -50,158 +52,174 @@ export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
     await expect(page.locator(".fr-alert--success")).toBeVisible();
   };
 
-const getEditLinkThroughBackOfficeAdmin = async (
+const editEstablishmentInEstablishmentDashboard = async (
   page: Page,
-  retry: number,
-  testEstablishments: TestEstablishments,
+  updatedEstablishment: FormEstablishmentDto,
 ): Promise<void> => {
-  await page.goto("/");
-  await page.click(`#${domElementIds.home.heroHeader.establishment}`);
-  await page.click(
-    `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
-  );
-  await page.fill(
-    `#${domElementIds.homeEstablishments.siretModal.siretFetcherInput}`,
-    testEstablishments[retry].siret,
-  );
+  const userRights = updatedEstablishment.userRights;
+  if (!userRights)
+    throw new Error("Missing user rights for updatedEstablishmentInfos");
 
-  await expectLocatorToBeVisibleAndEnabled(
-    await page.locator(
-      `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
-    ),
-  );
-
-  await page.click(
-    `#${domElementIds.homeEstablishments.siretModal.editEstablishmentButton}`,
-  );
-  await page.waitForTimeout(testConfig.timeForEventCrawler);
-  await closeModal(page);
-  // Go to admin page / go to notifications tab
-  await goToAdminTab(page, "adminNotifications");
-  const emailWrapper = page
-    .locator(".fr-accordion:has-text('EDIT_FORM_ESTABLISHMENT_LINK')")
-    .first();
-  await emailWrapper.click();
-  await emailWrapper.getByRole("link", { name: "Lien vers la page" }).click();
-
-  await page.waitForTimeout(4000);
+  await step1Availability(page, updatedEstablishment);
+  await step2SearchableBy(page);
+  await step3BusinessContact(page, userRights);
+  await step4AImmersionOffer(page, updatedEstablishment);
+  await step4BConfirm(page);
 };
 
-const editEstablishmentWithStepForm = async (
+const step1Availability = async (
   page: Page,
-  retry: number,
-  updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-  testEstablishments: TestEstablishments,
-): Promise<void> => {
-  const businessContact = updatedEstablishmentInfos.businessContact;
-  if (!businessContact)
-    throw new Error("Missing business contact for updatedEstablishmentInfos");
-  const nextAvailabilityDate = updatedEstablishmentInfos.nextAvailabilityDate;
-  if (!nextAvailabilityDate)
+  updatedEstablishment: FormEstablishmentDto,
+) => {
+  if (!updatedEstablishment.nextAvailabilityDate)
     throw new Error(
       "Missing next availability date for updatedEstablishmentInfos",
     );
 
-  const updatedMaxContactsPerMonth =
-    updatedEstablishmentInfos.maxContactsPerMonth;
-  if (!updatedMaxContactsPerMonth)
-    throw new Error(
-      "Missing max contacts per month for updatedEstablishmentInfos",
-    );
+  await page
+    .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
+    .getByText("Non")
+    .click();
 
-  const businessAddress = updatedEstablishmentInfos.businessAddresses
-    ? updatedEstablishmentInfos.businessAddresses[0]
-    : undefined;
+  await page
+    .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
+    .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
+
+  const maxContactPerMonthLocator = await page.locator(
+    `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
+  );
+
+  const maxContactPerMonthLocatorCurrentValue =
+    await maxContactPerMonthLocator.inputValue();
+  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
+  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
+    updatedEstablishment.maxContactsPerMonth.toString(),
+  );
+  await maxContactPerMonthLocator.fill(
+    updatedEstablishment.maxContactsPerMonth.toString(),
+  );
+
+  // await goToNextStep(page, 1, "edit");
+};
+
+const step2SearchableBy = async (page: Page) => {
+  await page
+    .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
+    .click();
+  // await goToNextStep(page, 2, "edit");
+};
+
+const step3BusinessContact = async (
+  page: Page,
+  userRights: EstablishmentFormUserRights,
+): Promise<void> => {
+  const firstAdmin = userRights.find(
+    (right) => right.role === "establishment-admin",
+  );
+
+  if (!firstAdmin)
+    throw new Error("No establishment admin provided on updated form");
+  const contactEmails = userRights
+    .filter((right) => right.role === "establishment-contact")
+    .map(({ email }) => email);
+
+  const firstNameLocator = page.locator(
+    `#${domElementIds.establishment.edit.businessContact.firstName}`,
+  );
+  await expectLocatorToBeReadOnly(firstNameLocator);
+
+  const lastNameLocator = page.locator(
+    `#${domElementIds.establishment.edit.businessContact.lastName}`,
+  );
+  await expectLocatorToBeReadOnly(lastNameLocator);
+
+  const adminEmailLocator = page.locator(
+    `#${domElementIds.establishment.edit.businessContact.email}`,
+  );
+  await expectLocatorToBeReadOnly(adminEmailLocator);
+
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.job}`,
+    firstAdmin.job,
+  );
+
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.phone}`,
+    firstAdmin.phone,
+  );
+
+  await page.fill(
+    `#${domElementIds.establishment.edit.businessContact.copyEmails}`,
+    contactEmails.join(","),
+  );
+
+  await page
+    .locator(`[for='${domElementIds.establishment.edit.contactMethod}-1']`)
+    .click();
+
+  // await goToNextStep(page, 3, "edit");
+};
+
+const step4AImmersionOffer = async (
+  page: Page,
+  updatedEstablishment: FormEstablishmentDto,
+) => {
+  const businessAddress = updatedEstablishment.businessAddresses.at(0);
+
   if (!businessAddress)
     throw new Error(
       "Missing first business address for updatedEstablishmentInfos",
     );
 
-  const businessNameCustomized =
-    updatedEstablishmentInfos.businessNameCustomized;
-  if (!businessNameCustomized)
+  // const businessNameCustomized = updatedEstablishment.businessNameCustomized;
+  if (!updatedEstablishment.businessNameCustomized)
     throw new Error(
       "Missing business name customized for updatedEstablishmentInfos",
     );
 
-  const additionalInformation = updatedEstablishmentInfos.additionalInformation;
-  if (!additionalInformation)
+  // const additionalInformation = updatedEstablishment.additionalInformation;
+  if (!updatedEstablishment.additionalInformation)
     throw new Error(
       "Missing additional information for updatedEstablishmentInfos",
     );
 
-  const website = updatedEstablishmentInfos.website;
-  if (!website)
+  // const website = updatedEstablishment.website;
+  if (!updatedEstablishment.website)
     throw new Error("Missing website for updatedEstablishmentInfos");
 
-  await start(page);
-
-  await step1Availability(
-    page,
-    nextAvailabilityDate,
-    updatedMaxContactsPerMonth,
-  );
-  await step2SearchableBy(page);
-  await step3BusinessContact(page, businessContact);
-  await step4AImmersionOffer(
-    page,
-    testEstablishments,
-    retry,
-    businessNameCustomized,
-    updatedEstablishmentInfos,
-    additionalInformation,
-    website,
-    businessAddress,
-  );
-  await step4BConfirm(page);
-};
-
-const step4BConfirm = async (page: Page) => {
-  await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
-  await expect(page.locator(".fr-alert--success")).toBeVisible();
-  await page.waitForTimeout(testConfig.timeForEventCrawler);
-};
-
-const step4AImmersionOffer = async (
-  page: Page,
-  testEstablishments: TestEstablishments,
-  retry: number,
-  businessNameCustomized: string,
-  updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-  additionalInformation: string,
-  website: string,
-  businessAddress: FormEstablishmentAddress,
-) => {
   await expect(
     page.locator(`#${domElementIds.establishment.edit.siret} input`),
   ).toBeDisabled();
   await expect(
     page.locator(`#${domElementIds.establishment.edit.siret} input`),
-  ).toHaveValue(testEstablishments[retry].siret);
+  ).toHaveValue(updatedEstablishment.siret);
 
   await page.fill(
     `#${domElementIds.establishment.edit.businessNameCustomized}`,
-    businessNameCustomized,
+    updatedEstablishment.businessNameCustomized,
   );
 
   await page.click(
     `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
-      updatedEstablishmentInfos.isEngagedEnterprise ? "1" : "0"
+      updatedEstablishment.isEngagedEnterprise ? "1" : "0"
     }]`,
   );
 
   await page.click(
     `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
-      updatedEstablishmentInfos.fitForDisabledWorkers ? "1" : "0"
+      updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
     }]`,
   );
 
   await page.fill(
     `#${domElementIds.establishment.edit.additionalInformation}`,
-    additionalInformation,
+    updatedEstablishment.additionalInformation,
   );
 
-  await page.fill(`#${domElementIds.establishment.edit.website}`, website);
+  await page.fill(
+    `#${domElementIds.establishment.edit.website}`,
+    updatedEstablishment.website,
+  );
 
   await page.click(
     `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
@@ -225,98 +243,12 @@ const step4AImmersionOffer = async (
     page,
     locator: `#${domElementIds.establishment.edit.businessAddresses}-0`,
     value: businessAddress.rawAddress,
+    endpoint: addressRoutes.lookupStreetAddress.url,
   });
 };
 
-const step3BusinessContact = async (
-  page: Page,
-  businessContact: BusinessContactDto,
-): Promise<void> => {
-  const firstNameLocator = page.locator(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-  );
-  await expectLocatorToBeReadOnly(firstNameLocator);
-  const lastNameLocator = page.locator(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-  );
-  await expectLocatorToBeReadOnly(lastNameLocator);
-
-  // Update email first in order to unlock firstname & lastname fields
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.email}`,
-    businessContact.email,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-    businessContact.firstName,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-    businessContact.lastName,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.job}`,
-    businessContact.job,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.phone}`,
-    businessContact.phone,
-  );
-
-  await page
-    .locator(
-      `[for='${domElementIds.establishment.edit.businessContact.contactMethod}-1']`,
-    )
-    .click();
-
-  await goToNextStep(page, 3, "edit");
-};
-
-const step2SearchableBy = async (page: Page) => {
-  await page
-    .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
-    .click();
-  await goToNextStep(page, 2, "edit");
-};
-
-const step1Availability = async (
-  page: Page,
-  nextAvailabilityDate: DateTimeIsoString,
-  updatedMaxContactsPerMonth: number,
-) => {
-  await page
-    .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
-    .getByText("Non")
-    .click();
-
-  await page
-    .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
-    .fill(nextAvailabilityDate.split("T")[0]);
-
-  const maxContactPerMonthLocator = await page.locator(
-    `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
-  );
-
-  const maxContactPerMonthLocatorCurrentValue =
-    await maxContactPerMonthLocator.inputValue();
-  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
-  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
-    updatedMaxContactsPerMonth.toString(),
-  );
-  await maxContactPerMonthLocator.fill(updatedMaxContactsPerMonth.toString());
-
-  await goToNextStep(page, 1, "edit");
-};
-
-const start = async (page: Page) => {
-  const startFormButtonLocator = await page.locator(
-    `#${domElementIds.establishment.edit.startFormButton}`,
-  );
-  await expectLocatorToBeVisibleAndEnabled(startFormButtonLocator);
-
-  await startFormButtonLocator.click();
+const step4BConfirm = async (page: Page) => {
+  await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
+  await expect(page.locator(".fr-alert--success")).toBeVisible();
+  await page.waitForTimeout(testConfig.timeForEventCrawler);
 };
