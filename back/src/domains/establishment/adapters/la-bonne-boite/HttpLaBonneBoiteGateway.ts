@@ -22,9 +22,8 @@ const lbbV2App = "api_labonneboitev2";
 
 export class HttpLaBonneBoiteGateway implements LaBonneBoiteGateway {
   #limiter = new Bottleneck({
-    reservoir: lbbMaxQueryPerSeconds,
-    reservoirRefreshInterval: 1000, // number of ms
-    reservoirRefreshAmount: lbbMaxQueryPerSeconds,
+    maxConcurrent: 1,
+    minTime: (1 / lbbMaxQueryPerSeconds) * 1000 * 2, // 2x is the number of instances of node running this.
   });
 
   constructor(
