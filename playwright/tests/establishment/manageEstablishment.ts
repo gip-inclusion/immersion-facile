@@ -1,13 +1,13 @@
 import { type Page, expect } from "@playwright/test";
 import {
   type FormEstablishmentDto,
+  addressRoutes,
   domElementIds,
   toDisplayedDate,
 } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
 import {
-  type TestEstablishments,
-  checkAvailibilityButtons,
+  checkAvailibilityButtons
 } from "./establishmentForm.utils";
 import {
   goToManageEstablishmentThroughEstablishmentDashboard,
@@ -15,31 +15,33 @@ import {
 } from "./establishmentNavigation.utils";
 
 export const checkEstablishmentUpdatedThroughBackOfficeAdmin =
-  (
-    updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
-    testEstablishments: TestEstablishments,
-  ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
-    await checkEstablishment(page, updatedEstablishmentInfos);
+  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
+    await goToManageEtablishmentBySiretInAdmin(
+      page,
+      updatedEstablishment.siret,
+    );
+    await checkEstablishment(page, updatedEstablishment);
   };
 
 export const checkAvailabilityThoughBackOfficeAdmin =
-  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    await goToManageEtablishmentBySiretInAdmin(page, retry, testEstablishments);
-    await checkAvailibilityButtons(page, "admin");
+  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
+    await goToManageEtablishmentBySiretInAdmin(
+      page,
+      updatedEstablishment.siret,
+    );
+    await checkAvailibilityButtons(page, "admin", "Oui");
   };
 
 export const checkAvailabilityThoughEstablishmentDashboard =
-  (testEstablishments: TestEstablishments): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
+  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
     await goToManageEstablishmentThroughEstablishmentDashboard(
       page,
-      testEstablishments,
-      retry,
+      updatedEstablishment,
     );
-    await checkAvailibilityButtons(page, "edit");
+    await checkAvailibilityButtons(page, "edit", "Non");
   };
 
 export const deleteEstablishmentInBackOfficeAdmin = async (
@@ -53,11 +55,19 @@ export const deleteEstablishmentInBackOfficeAdmin = async (
 
 const checkEstablishment = async (
   page: Page,
-  updatedEstablishmentInfos: Partial<FormEstablishmentDto>,
+  updatedEstablishmentInfos: FormEstablishmentDto,
 ): Promise<void> => {
-  const businessContact = updatedEstablishmentInfos.businessContact;
-  if (!businessContact)
+  await page.waitForResponse(`**${addressRoutes.lookupStreetAddress.url}**`);
+
+  const adminRight = updatedEstablishmentInfos.userRights.find(
+    (right) => right.role === "establishment-admin",
+  );
+  if (!adminRight)
     throw new Error("Missing business contact for updatedEstablishmentInfos");
+  const copyEmails = updatedEstablishmentInfos.userRights
+    .filter(({ role }) => role === "establishment-contact")
+    .map(({ email }) => email);
+
   const nextAvailabilityDate = updatedEstablishmentInfos.nextAvailabilityDate;
   if (!nextAvailabilityDate)
     throw new Error(
@@ -124,40 +134,26 @@ const checkEstablishment = async (
 
   await expect(
     await page
-      .locator(
-        `#${domElementIds.establishment.admin.businessContact.firstName}`,
-      )
-      .inputValue(),
-  ).toBe(businessContact.firstName);
-
-  await expect(
-    await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.lastName}`)
-      .inputValue(),
-  ).toBe(businessContact.lastName);
-
-  await expect(
-    await page
       .locator(`#${domElementIds.establishment.admin.businessContact.job}`)
       .inputValue(),
-  ).toBe(businessContact.job);
+  ).toBe(adminRight.job);
 
   await expect(
     await page
       .locator(`#${domElementIds.establishment.admin.businessContact.phone}`)
       .inputValue(),
-  ).toContain(businessContact.phone.substring(1));
+  ).toContain(adminRight.phone.substring(1));
 
   await expect(
     await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.email}`)
+      .locator(
+        `#${domElementIds.establishment.admin.businessContact.copyEmails}`,
+      )
       .inputValue(),
-  ).toBe(businessContact.email);
+  ).toContain(copyEmails.join(", "));
 
   await expect(
-    await page.locator(
-      `#${domElementIds.establishment.admin.businessContact.contactMethod}-1`,
-    ),
+    await page.locator(`#${domElementIds.establishment.admin.contactMethod}-1`),
   ).toBeChecked();
 
   await expect(

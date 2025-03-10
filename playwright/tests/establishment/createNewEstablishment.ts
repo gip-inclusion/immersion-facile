@@ -1,112 +1,149 @@
-import { faker } from "@faker-js/faker";
-import { expect } from "@playwright/test";
-import { type FormEstablishmentDto, domElementIds } from "shared";
+import { Page, expect } from "@playwright/test";
+import { AdminFormEstablishmentUserRight, type FormEstablishmentDto, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   type PlaywrightTestCallback,
+  expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
-  phoneRegexp,
 } from "../../utils/utils";
-import {
-  type TestEstablishments,
-  fillEstablishmentFormFirstStep,
-  goToNextStep,
-} from "./establishmentForm.utils";
+import { goToNextStep } from "./establishmentForm.utils";
 
-export const createNewEstablishment =
-  (
-    establishment: Partial<FormEstablishmentDto>,
-    establishments: TestEstablishments,
-  ): PlaywrightTestCallback =>
-  async ({ page }, { retry }) => {
-    const businessContact = establishment.businessContact;
-    if (!businessContact)
-      throw new Error("Missing business contact for createNewEstablishment");
-
-    await fillEstablishmentFormFirstStep(page, establishments[retry].siret);
-
-    await page
-      .locator(`#${domElementIds.establishment.create.availabilityButton}`)
-      .getByText("Oui")
-      .click();
-
-    await goToNextStep(page, 1, "create");
-    await page
-      .locator(`[for="${domElementIds.establishment.create.searchableBy}-2"]`) // searchable by students
-      .click();
-
-    await goToNextStep(page, 2, "create");
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.firstName}`,
-      businessContact.firstName,
+export const createEstablishmentForm =
+  (establishment: FormEstablishmentDto): PlaywrightTestCallback =>
+  async ({ page }) => {
+    const adminRight = establishment.userRights.find(
+      (right) => right.role === "establishment-admin",
     );
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.lastName}`,
-      businessContact.lastName,
-    );
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.job}`,
-      businessContact.job,
-    );
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.phone}`,
-      faker.helpers.fromRegExp(phoneRegexp),
-    );
-    await page.fill(
-      `#${domElementIds.establishment.create.businessContact.email}`,
-      "recette+establishment@immersion-facile.beta.gouv.fr",
-    );
-    await page
-      .locator(
-        `[for='${domElementIds.establishment.create.businessContact.contactMethod}-0']`,
-      )
-      .click();
+    if (!adminRight)
+      throw new Error("Missing admin right for createNewEstablishment");
 
-    await goToNextStep(page, 3, "create");
+    await goToCreateEstablishmentForm(page);
 
-    await expect(
-      page.locator(`#${domElementIds.establishment.create.siret}`),
-    ).toHaveValue(establishments[retry].siret);
+    await step0(page);
 
-    await expect(
-      page.locator(`#${domElementIds.establishment.create.businessName}`),
-    ).not.toHaveValue("");
-    await expect(
-      page.locator(
-        `#${domElementIds.establishment.create.addressAutocomplete}`,
-      ),
-    ).not.toHaveValue("");
-    await expect(
-      page.locator(
-        `#${domElementIds.establishment.create.businessAddresses}-0`,
-      ),
-    ).toHaveValue(establishments[retry].expectedAddress);
-    await page.click(
-      `#${domElementIds.establishment.create.appellations}-add-option-button`,
-    );
-    await page.fill(
-      `#${domElementIds.establishment.create.appellations} .im-select__input`,
-      "boulang",
-    );
-    await page
-      .locator(
-        `#${domElementIds.establishment.create.appellations} .im-select__option`,
-      )
-      .first()
-      .click();
+    await step1(page);
 
-    await page.click(
-      `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
-    );
+    await step2(page);
 
-    await fillAutocomplete({
-      page,
-      locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
-      value: "28 rue des mimosas",
-    });
+    await step3(page, adminRight);
 
-    await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
-    await expect(page.url()).toContain(`siret=${establishments[retry].siret}`);
-    await expect(page.locator(".fr-alert--success")).toBeVisible();
+    await step4(page, establishment);
+
     await page.waitForTimeout(testConfig.timeForEventCrawler);
   };
+
+export const goToCreateEstablishmentForm = async (page: Page) => {
+  await page.goto("/");
+  await page.click(`#${domElementIds.home.heroHeader.establishment}`);
+  await page.click(
+    `#${domElementIds.homeEstablishments.heroHeader.addEstablishmentForm}`,
+  );
+};
+
+export const step0 = async (page: Page) => {
+  const addEstablishmentButton = page.locator(
+    `#${domElementIds.establishment.create.startFormButton}`,
+  );
+  await expectLocatorToBeVisibleAndEnabled(addEstablishmentButton);
+  await addEstablishmentButton.click();
+};
+
+const step1 = async (page: Page) => {
+  const initialRadioButtonLocator = page.locator(
+    `#${domElementIds.establishment.create.availabilityButton}`,
+  );
+  await expect(initialRadioButtonLocator.getByText("Oui")).not.toBeChecked();
+  await expect(initialRadioButtonLocator.getByText("Non")).not.toBeChecked();
+
+  await initialRadioButtonLocator.getByText("Oui").click();
+
+  await goToNextStep(page, 1, "create");
+};
+
+const step2 = async (page: Page) => {
+  await page
+    .locator(`[for="${domElementIds.establishment.create.searchableBy}-2"]`) // searchable by students
+    .click();
+
+  await goToNextStep(page, 2, "create");
+};
+
+const step3 = async (
+  page: Page,
+  adminRight: AdminFormEstablishmentUserRight,
+) => {
+  await expect(
+    page.locator(
+      `#${domElementIds.establishment.create.businessContact.firstName}`,
+    ),
+  ).toHaveValue("Jean");
+  await expect(
+    page.locator(
+      `#${domElementIds.establishment.create.businessContact.lastName}`,
+    ),
+  ).toHaveValue("Immersion");
+  await expect(
+    page.locator(
+      `#${domElementIds.establishment.create.businessContact.email}`,
+    ),
+  ).toHaveValue(adminRight.email);
+
+  await page.fill(
+    `#${domElementIds.establishment.create.businessContact.job}`,
+    adminRight.job,
+  );
+  await page.fill(
+    `#${domElementIds.establishment.create.businessContact.phone}`,
+    adminRight.phone,
+    // faker.helpers.fromRegExp(phoneRegexp),
+  );
+
+  await page
+    .locator(`[for='${domElementIds.establishment.create.contactMethod}-0']`)
+    .click();
+
+  await goToNextStep(page, 3, "create");
+};
+
+const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
+  await expect(
+    page.locator(`#${domElementIds.establishment.create.siret}`),
+  ).toHaveValue(establishment.siret);
+
+  await expect(
+    page.locator(`#${domElementIds.establishment.create.businessName}`),
+  ).not.toHaveValue("");
+  await expect(
+    page.locator(`#${domElementIds.establishment.create.addressAutocomplete}`),
+  ).not.toHaveValue("");
+  await expect(
+    page.locator(`#${domElementIds.establishment.create.businessAddresses}-0`),
+  ).toHaveValue(establishment.businessAddresses[0].rawAddress);
+  await page.click(
+    `#${domElementIds.establishment.create.appellations}-add-option-button`,
+  );
+  await page.fill(
+    `#${domElementIds.establishment.create.appellations} .im-select__input`,
+    "boulang",
+  );
+  await page
+    .locator(
+      `#${domElementIds.establishment.create.appellations} .im-select__option`,
+    )
+    .first()
+    .click();
+
+  await page.click(
+    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+  );
+
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
+    value: "28 rue des mimosas",
+  });
+
+  await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
+  await expect(page.url()).toContain(`siret=${establishment.siret}`);
+  await expect(page.locator(".fr-alert--success")).toBeVisible();
+};
