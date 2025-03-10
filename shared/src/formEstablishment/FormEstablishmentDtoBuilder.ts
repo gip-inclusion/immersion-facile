@@ -250,7 +250,7 @@ export class FormEstablishmentDtoBuilder
     return new FormEstablishmentDtoBuilder({ ...this.#dto, businessAddresses });
   }
 
-  public withEstablishmentFormUserRights(
+  public withUserRights(
     establishmentFormUserRights: EstablishmentFormUserRights,
   ) {
     return new FormEstablishmentDtoBuilder({
@@ -358,10 +358,7 @@ const formEstablishmentToEstablishmentCsvRow = (
     throw new Error("first user right must be admin");
   return {
     businessAddress: establishment.businessAddresses[0].rawAddress,
-    // businessContact_phone: establishment.businessContact.phone,
-    // businessContact_job: establishment.businessContact.job,
     contactMethod: establishment.contactMethod,
-    // businessContact_copyEmails:establishment.businessContact.copyEmails.join(","),
     naf_code: establishment.naf?.code ?? "",
     businessName: establishment.businessName,
     businessNameCustomized: establishment.businessNameCustomized ?? "",
@@ -382,82 +379,82 @@ const formEstablishmentToEstablishmentCsvRow = (
     right1_phone: userRight1.phone,
     ...(userRight2
       ? {
-        right2_role: userRight2.role,
-        right2_job: userRight2.job,
-        right2_phone: userRight2.phone,
-        right2_email: userRight2.email,
-      }
+          right2_role: userRight2.role,
+          right2_job: userRight2.job,
+          right2_phone: userRight2.phone,
+          right2_email: userRight2.email,
+        }
       : {}),
     ...(userRight3
       ? {
-        right3_role: userRight3.role,
-        right3_job: userRight3.job,
-        right3_phone: userRight3.phone,
-        right3_email: userRight3.email,
-      }
+          right3_role: userRight3.role,
+          right3_job: userRight3.job,
+          right3_phone: userRight3.phone,
+          right3_email: userRight3.email,
+        }
       : {}),
 
     ...(userRight4
       ? {
-        right4_role: userRight4.role,
-        right4_job: userRight4.job,
-        right4_phone: userRight4.phone,
-        right4_email: userRight4.email,
-      }
+          right4_role: userRight4.role,
+          right4_job: userRight4.job,
+          right4_phone: userRight4.phone,
+          right4_email: userRight4.email,
+        }
       : {}),
 
     ...(userRight5
       ? {
-        right5_role: userRight5.role,
-        right5_job: userRight5.job,
-        right5_phone: userRight5.phone,
-        right5_email: userRight5.email,
-      }
+          right5_role: userRight5.role,
+          right5_job: userRight5.job,
+          right5_phone: userRight5.phone,
+          right5_email: userRight5.email,
+        }
       : {}),
 
     ...(userRight6
       ? {
-        right6_role: userRight6.role,
-        right6_job: userRight6.job,
-        right6_phone: userRight6.phone,
-        right6_email: userRight6.email,
-      }
+          right6_role: userRight6.role,
+          right6_job: userRight6.job,
+          right6_phone: userRight6.phone,
+          right6_email: userRight6.email,
+        }
       : {}),
 
     ...(userRight7
       ? {
-        right7_role: userRight7.role,
-        right7_job: userRight7.job,
-        right7_phone: userRight7.phone,
-        right7_email: userRight7.email,
-      }
+          right7_role: userRight7.role,
+          right7_job: userRight7.job,
+          right7_phone: userRight7.phone,
+          right7_email: userRight7.email,
+        }
       : {}),
 
     ...(userRight8
       ? {
-        right8_role: userRight8.role,
-        right8_job: userRight8.job,
-        right8_phone: userRight8.phone,
-        right8_email: userRight8.email,
-      }
+          right8_role: userRight8.role,
+          right8_job: userRight8.job,
+          right8_phone: userRight8.phone,
+          right8_email: userRight8.email,
+        }
       : {}),
 
     ...(userRight9
       ? {
-        right9_role: userRight9.role,
-        right9_job: userRight9.job,
-        right9_phone: userRight9.phone,
-        right9_email: userRight9.email,
-      }
+          right9_role: userRight9.role,
+          right9_job: userRight9.job,
+          right9_phone: userRight9.phone,
+          right9_email: userRight9.email,
+        }
       : {}),
 
     ...(userRight10
       ? {
-        right10_role: userRight10.role,
-        right10_job: userRight10.job,
-        right10_phone: userRight10.phone,
-        right10_email: userRight10.email,
-      }
+          right10_role: userRight10.role,
+          right10_job: userRight10.job,
+          right10_phone: userRight10.phone,
+          right10_email: userRight10.email,
+        }
       : {}),
   };
 };

@@ -76,12 +76,6 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       appellationLabel: "métier B.1",
     },
   ];
-  //
-  //
-  //
-  //
-  //
-  //
 
   const formAdminRight: AdminFormEstablishmentUserRight = {
     role: "establishment-admin",
@@ -155,7 +149,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
-        .withFormUserRights([formAdminRight, formContactRight])
+        .withUserRights([formAdminRight, formContactRight])
         .build();
 
       await insertEstablishmentAggregateFromForm.execute(
@@ -258,7 +252,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         .withNextAvailabilityDate(nextAvailabilityDate)
         .withAcquisition(withAcquisition)
         .withBusinessAddresses([defaultAddress.formAddress])
-        .withFormUserRights([formAdminRight, formContactRight])
+        .withUserRights([formAdminRight, formContactRight])
         .build();
 
       siretGateway.setSirenEstablishment({
@@ -335,7 +329,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
     it("Can't create establishment when same email is used in admin and copy contacts", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFormUserRights([
+        .withUserRights([
           formAdminRight,
           { role: "establishment-contact", email: formAdminRight.email },
         ])
@@ -356,11 +350,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
     it("Can't create establishment when same email is used in copy contacts", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFormUserRights([
-          formAdminRight,
-          formContactRight,
-          formContactRight,
-        ])
+        .withUserRights([formAdminRight, formContactRight, formContactRight])
         .build();
 
       await expectPromiseToFailWithError(
@@ -378,7 +368,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
     it("Can't create establishment when no admin right provided", async () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
-        .withFormUserRights([formContactRight])
+        .withUserRights([formContactRight])
         .build();
 
       await expectPromiseToFailWithError(
@@ -469,7 +459,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           appellationCode: "22222",
         },
       ])
-      .withFormUserRights([formAdminRight])
+      .withUserRights([formAdminRight])
       .build();
 
     siretGateway.setSirenEstablishment({

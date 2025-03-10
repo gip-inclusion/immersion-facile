@@ -96,7 +96,7 @@ describe("Add form establishment", () => {
       const response = await httpClient.addFormEstablishment({
         body: FormEstablishmentDtoBuilder.valid()
           .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
-          .withFormUserRights([adminFormRight])
+          .withUserRights([adminFormRight])
           .build(),
         headers: {
           authorization: generateInclusionConnectJwt(

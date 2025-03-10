@@ -95,7 +95,6 @@ const step3 = async (
   await page.fill(
     `#${domElementIds.establishment.create.businessContact.phone}`,
     adminRight.phone,
-    // faker.helpers.fromRegExp(phoneRegexp),
   );
 
   await page

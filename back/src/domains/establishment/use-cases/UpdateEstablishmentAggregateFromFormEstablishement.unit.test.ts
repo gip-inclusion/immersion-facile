@@ -182,7 +182,7 @@ describe("Update Establishment aggregate from form data", () => {
           rawAddress: addressDtoToString(rueGuillaumeTellDto),
         },
       ])
-      .withFormUserRights([updatedFormAdmin, updatedFormContact])
+      .withUserRights([updatedFormAdmin, updatedFormContact])
       .withNextAvailabilityDate(nextAvailabilityDate)
       .withMaxContactsPerMonth(10)
       .withSearchableBy({

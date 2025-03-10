@@ -98,15 +98,12 @@ const step1Availability = async (
   await maxContactPerMonthLocator.fill(
     updatedEstablishment.maxContactsPerMonth.toString(),
   );
-
-  // await goToNextStep(page, 1, "edit");
 };
 
 const step2SearchableBy = async (page: Page) => {
   await page
     .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
     .click();
-  // await goToNextStep(page, 2, "edit");
 };
 
 const step3BusinessContact = async (
@@ -171,19 +168,16 @@ const step4AImmersionOffer = async (
       "Missing first business address for updatedEstablishmentInfos",
     );
 
-  // const businessNameCustomized = updatedEstablishment.businessNameCustomized;
   if (!updatedEstablishment.businessNameCustomized)
     throw new Error(
       "Missing business name customized for updatedEstablishmentInfos",
     );
 
-  // const additionalInformation = updatedEstablishment.additionalInformation;
   if (!updatedEstablishment.additionalInformation)
     throw new Error(
       "Missing additional information for updatedEstablishmentInfos",
     );
 
-  // const website = updatedEstablishment.website;
   if (!updatedEstablishment.website)
     throw new Error("Missing website for updatedEstablishmentInfos");
 
