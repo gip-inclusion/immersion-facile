@@ -1061,7 +1061,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       En cas de difficulté, prévenez au plus vite votre ${
         internshipKind === "immersion"
           ? "conseiller"
-          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+          : "conseiller de la Chambre consulaire ayant émis la convention"
       } pour qu'il vous conseille au mieux. 
       
       ${

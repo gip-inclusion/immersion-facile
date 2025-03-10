@@ -67,9 +67,13 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     label:
       internshipKind === "immersion"
         ? "Votre structure d'accompagnement"
-        : "Choisissez le Point Orientation de la chambre de commerce et d’industrie proche de votre entreprise !",
+        : "Choisissez la Chambre consulaire correspondant à l'entreprise où se déroulera votre stage",
     id: conventionSectionIds.agencyId,
     required: true,
+    hintText:
+      internshipKind === "mini-stage-cci"
+        ? "Choisissez votre organisme : Chambre d'agriculture (secteur agricole), CMA (artisanat/métiers de bouche) ou CCI (commerce, services, industrie)."
+        : undefined,
     placeholder:
       internshipKind === "immersion"
         ? "Veuillez sélectionner une structure d'accompagnement"
