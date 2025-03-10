@@ -30,15 +30,18 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
 
     if (!discussion) throw errors.discussion.notFound({ discussionId });
 
-    if (await this.#hasUserRightToAccessDiscussion(uow, user, discussion))
-      return this.onAllowed(discussion, uow);
-    throw errors.discussion.accessForbidden({
-      discussionId,
-      userId: jwtPayload.userId,
-    });
+    if (!(await this.#hasUserRightToAccessDiscussion(uow, user, discussion)))
+      throw errors.discussion.accessForbidden({
+        discussionId,
+        userId: jwtPayload.userId,
+      });
+    return this.makeDiscussionRead(discussion, uow);
   }
 
-  private async onAllowed(discussion: DiscussionDto, uow: UnitOfWork) {
+  private async makeDiscussionRead(
+    discussion: DiscussionDto,
+    uow: UnitOfWork,
+  ): Promise<DiscussionReadDto> {
     const { appellationCode, ...rest } = discussion;
 
     const appellation = (
@@ -78,7 +81,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     uow: UnitOfWork,
     user: UserOnRepository,
     discussion: DiscussionDto,
-  ) {
+  ): Promise<boolean> {
     if (
       discussion.establishmentContact.email === user.email ||
       discussion.establishmentContact.copyEmails.includes(user.email)
@@ -90,7 +93,8 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
         discussion.siret,
       );
 
-    if (!establishment) return false;
+    if (!establishment)
+      throw errors.establishment.notFound({ siret: discussion.siret });
     return establishment.userRights.some((right) => right.userId === user.id);
   }
 }
