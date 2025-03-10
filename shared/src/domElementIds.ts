@@ -706,6 +706,12 @@ export const domElementIds = {
     },
     dashboard: {
       tabContainer: "im-agency-dashboard__tab-container",
+      initiateConventionModalButton:
+        "im-agency-dashboard__initiate-convention-modal-button",
+      initiateConventionButton:
+        "im-agency-dashboard__initiate-convention-button",
+      selectAgencyToInitiateConventionModal:
+        "im-agency-dashboard__select-agency-to-initiate-convention-modal",
     },
     agencyDetails: {
       editAgencyForm: "im-agency-dashboard-form-edit-agency",
