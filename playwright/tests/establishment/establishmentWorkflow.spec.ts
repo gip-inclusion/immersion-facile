@@ -25,7 +25,7 @@ test.describe("Establishment creation and modification workflow", () => {
     FormEstablishmentDtoBuilder.valid()
       .withSiret("13003013300016")
       .withContactMethod("PHONE")
-      .withEstablishmentFormUserRights([
+      .withUserRights([
         {
           role: "establishment-admin",
           email: testConfig.proConnect.username,
@@ -46,7 +46,7 @@ test.describe("Establishment creation and modification workflow", () => {
       .withBusinessNameCustomized(faker.company.name())
       .withAdditionalInformation(faker.lorem.sentence())
       .withMaxContactsPerMonth(faker.number.int({ min: 5, max: 7 }))
-      .withEstablishmentFormUserRights([
+      .withUserRights([
         {
           role: "establishment-admin",
           email: testConfig.proConnect.username,

@@ -33,9 +33,6 @@ export const goToManageEtablishmentBySiretInAdmin = async (
   );
   await siretInputLocator.waitFor();
   await siretInputLocator.fill(siret);
-  // await page.focus(
-  //   `#${domElementIds.admin.manageEstablishment.searchButton}`,
-  // );
   await page.click(`#${domElementIds.admin.manageEstablishment.searchButton}`);
   await page.waitForTimeout(1000); // waiting for fetch and render
   await expect(page.url()).toContain("pilotage-etablissement-admin");

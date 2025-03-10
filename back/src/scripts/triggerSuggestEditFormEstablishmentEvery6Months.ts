@@ -28,8 +28,13 @@ const startScript = async (): Promise<Report> => {
     createGetPgPoolFn(config),
   );
 
+  const numberOfDaysBeforeExpiration = 7;
+  const expiresInSeconds = numberOfDaysBeforeExpiration * 24 * 60 * 60;
   const generateInclusionConnectJwt: GenerateInclusionConnectJwt =
-    makeGenerateJwtES256<"inclusionConnect">(config.jwtPrivateKey, 3600);
+    makeGenerateJwtES256<"inclusionConnect">(
+      config.jwtPrivateKey,
+      expiresInSeconds,
+    );
 
   const suggestEditEstablishmentsScript = new SuggestEditEstablishmentsScript(
     uowPerformer,
