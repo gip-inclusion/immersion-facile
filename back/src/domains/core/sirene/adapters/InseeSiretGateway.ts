@@ -108,20 +108,11 @@ export class InseeSiretGateway implements SiretGateway {
         });
       }
 
-      logger.error({
-        message: `INSEE API Failed with ${response.status} : ${JSON.stringify(
-          response.body,
-          null,
-          2,
-        )}`,
-      });
-
-      throw errors.siretApi.unavailable({
-        serviceName: partnerNames.inseeSiret,
-        message: `${response.status} - ${
-          response.body.header?.message ?? JSON.stringify(response.body)
-        }`,
-      });
+      throw new Error(
+        `INSEE API Failed with ${
+          response.status
+        } - check datadog logs : ${JSON.stringify(response.body, null, 2)}`,
+      );
     });
   }
 
