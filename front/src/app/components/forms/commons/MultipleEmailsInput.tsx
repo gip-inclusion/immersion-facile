@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
-import { useEffect, useState } from "react";
+import { type ChangeEvent, type ReactNode, useEffect, useState } from "react";
 import {
   type OmitFromExistingKeys,
   notEqual,
@@ -21,7 +20,7 @@ export const MultipleEmailsInput = (
     setValues: (values: string[]) => void;
     disabled?: boolean;
     summaryHintText?: string;
-    hintText?: React.ReactNode;
+    hintText?: ReactNode;
   },
 ) => {
   const {
@@ -80,7 +79,7 @@ export const MultipleEmailsInput = (
   );
 };
 
-type OnInputChange = (event: React.ChangeEvent<HTMLInputElement>) => void;
+type OnInputChange = (event: ChangeEvent<HTMLInputElement>) => void;
 
 type InputContainerProps = {
   id: string;
@@ -89,7 +88,7 @@ type InputContainerProps = {
   onInputChange: OnInputChange;
   label?: string;
   placeholder?: string;
-  description?: React.ReactNode;
+  description?: ReactNode;
   validationSchema?: z.ZodSchema<unknown>;
   disabled?: boolean;
 };

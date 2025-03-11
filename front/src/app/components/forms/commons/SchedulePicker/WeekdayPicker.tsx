@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { addDays, differenceInCalendarDays } from "date-fns";
 import { uniq } from "ramda";
-import React from "react";
+
 import {
   type DateIntervalDto,
   type InternshipKind,

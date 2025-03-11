@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 
-import React, { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Loader } from "react-design-system";
 import type {
   ConventionEstablishmentRole,

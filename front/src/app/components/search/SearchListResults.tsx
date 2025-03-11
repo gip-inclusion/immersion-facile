@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Tag as ImTag,
   SearchResultIllustration,
@@ -115,9 +115,9 @@ export const SearchListResults = ({
                 return (
                   <div
                     className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-6")}
+                    key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                   >
                     <SearchResult
-                      key={`${searchResult.siret}-${searchResult.rome}-${searchResult.locationId}`}
                       establishment={searchResult}
                       illustration={
                         <SearchResultIllustration

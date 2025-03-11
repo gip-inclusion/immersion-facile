@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 
 export type SkipLink = {
   label: string;
@@ -12,11 +11,7 @@ export type SkipLinksProps = {
 
 export const SkipLinks = ({ links }: SkipLinksProps) => (
   <div className={fr.cx("fr-skiplinks")}>
-    <nav
-      className={fr.cx("fr-container")}
-      role="navigation"
-      aria-label="Accès rapide"
-    >
+    <nav className={fr.cx("fr-container")} aria-label="Accès rapide">
       <ul className={fr.cx("fr-skiplinks__list")}>
         {links?.map((link) => (
           <li key={link.anchor}>

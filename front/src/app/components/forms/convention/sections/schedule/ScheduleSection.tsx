@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addDays, differenceInCalendarDays, differenceInDays } from "date-fns";
-import type React from "react";
-import { useEffect, useState } from "react";
+
+import { type FocusEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   type ConventionReadDto,
@@ -67,7 +67,7 @@ export const ScheduleSection = () => {
     values.dateEnd,
   );
 
-  const onDateInputBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+  const onDateInputBlur = (event: FocusEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     const inputName = event.target.name;
     if (inputValue !== "" && isStringDate(inputValue)) {

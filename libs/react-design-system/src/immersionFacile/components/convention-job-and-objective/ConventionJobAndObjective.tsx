@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionJobAndObjective.styles";
 
 export type ConventionJobAndObjectiveProps = {
   jobTitle: string;
   objective: string;
-  jobIllustration: React.ReactNode;
-  objectiveIllustration: React.ReactNode;
+  jobIllustration: ReactNode;
+  objectiveIllustration: ReactNode;
 };
 
 export const ConventionJobAndObjective = ({

@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./OverFooter.css";
 import { OverFooterCol, type OverFooterColProps } from "./OverFooterCol";
@@ -14,7 +13,6 @@ export const OverFooter = ({ cols = [] }: OverFooterProps) => {
     <aside
       id="over-footer"
       className={cx(fr.cx("fr-pt-8w", "fr-pb-4w"), "over-footer")}
-      role="complementary"
       aria-label="Aide et informations complémentaires"
     >
       <div className={fr.cx("fr-container")}>

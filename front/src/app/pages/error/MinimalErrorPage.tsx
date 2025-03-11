@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React from "react";
+
 import { MainWrapper } from "react-design-system";
 import { contactUsButtonContent } from "src/app/pages/error/front-errors";
 

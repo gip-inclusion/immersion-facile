@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
-import type React from "react";
+
 import type { ReactNode } from "react";
 import {
   type Signatories,
@@ -112,7 +112,7 @@ export const createConventionFeedbackMessageByKind = (
 const InitialSubmitSuccessMessageBase = ({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const { cx } = useStyles();
   return (

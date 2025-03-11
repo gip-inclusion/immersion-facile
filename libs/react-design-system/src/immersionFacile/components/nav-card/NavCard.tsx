@@ -1,12 +1,12 @@
 import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import type { Link } from "type-route";
 import { type UserType, heroHeaderComponentName } from "../hero-header";
 import Styles from "./NavCard.styles";
 
 export type HeroHeaderNavCard = {
-  title: React.ReactNode;
+  title: ReactNode;
   icon?: FrIconClassName;
   overtitle?: string;
   type: UserType;

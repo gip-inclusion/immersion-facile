@@ -1,4 +1,4 @@
-import { existsSync } from "fs";
+import { existsSync } from "node:fs";
 import axios from "axios";
 import { arrayFromNumber } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";

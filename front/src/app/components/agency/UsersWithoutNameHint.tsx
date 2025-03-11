@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import { Tooltip } from "react-design-system";
 import { domElementIds } from "shared";
 

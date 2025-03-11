@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import React from "react";
+
 import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
@@ -40,6 +40,7 @@ export const AgencyUsersTable = ({
       ]}
       data={agencyUsers.map((agencyUser, index) => [
         <NameAndEmailInTable
+          key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}`}
           firstName={agencyUser.firstName}
           lastName={agencyUser.lastName}
           email={agencyUser.email}
@@ -50,6 +51,7 @@ export const AgencyUsersTable = ({
         agencyUser.agencyRights[agency.id].roles.map((role) => {
           return (
             <Badge
+              key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-${role}`}
               small
               className={fr.cx(agencyRoleToDisplay[role].className, "fr-mr-1w")}
             >
@@ -58,6 +60,7 @@ export const AgencyUsersTable = ({
           );
         }),
         <ButtonsGroup
+          key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-buttons`}
           inlineLayoutWhen={"always"}
           buttons={[
             {

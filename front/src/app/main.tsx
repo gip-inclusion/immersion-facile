@@ -4,7 +4,8 @@ import {
   browserTracingIntegration,
   replayIntegration,
 } from "@sentry/browser";
-import React from "react";
+import { StrictMode } from "react";
+
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { HelmetProvider } from "react-helmet-async";
@@ -21,7 +22,7 @@ startReactDsfr({ defaultColorScheme: "light" });
 const rootContainer = document.getElementById("root");
 if (!rootContainer) throw new Error("Html Element with Id 'root' is missing.");
 createRoot(rootContainer).render(
-  <React.StrictMode>
+  <StrictMode>
     <Provider store={store}>
       <ErrorBoundary
         fallbackRender={({ error }) => <MinimalErrorPage error={error} />}
@@ -34,7 +35,7 @@ createRoot(rootContainer).render(
         </HelmetProvider>
       </ErrorBoundary>
     </Provider>
-  </React.StrictMode>,
+  </StrictMode>,
 );
 
 SentryInit({

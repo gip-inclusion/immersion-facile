@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
   type AssessmentRole,

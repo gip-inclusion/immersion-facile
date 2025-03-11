@@ -3,8 +3,13 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Loader } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -117,7 +122,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     boolean | undefined
   >(undefined);
   const [invalidEmailMessage, setInvalidEmailMessage] =
-    useState<React.ReactNode | null>(null);
+    useState<ReactNode | null>(null);
 
   const [currentStep, setCurrentStep] = useState<Step>(
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
@@ -409,11 +414,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                     onClick={() => {
                       routes.adminEstablishments().push();
                     }}
-                    children="Retour au pilotage des établissements"
                     type="button"
                     priority="secondary"
                     className={fr.cx("fr-mb-4w")}
-                  />
+                  >
+                    Retour au pilotage des établissements
+                  </Button>
                 )}
                 <h1>Pilotage de l'entreprise {formValues.siret}</h1>
                 <h2>{steps[1].title}</h2>

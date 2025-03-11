@@ -4,7 +4,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
-import React, { type ElementRef, useEffect, useRef, useState } from "react";
+import { type ElementRef, useEffect, useRef, useState } from "react";
 import {
   Loader,
   MainWrapper,

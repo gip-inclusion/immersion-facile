@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Table from "@codegouvfr/react-dsfr/Table";
+import { Fragment } from "react";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   addressDtoToString,
@@ -26,7 +27,7 @@ export const AgencyAdminTabContent = (
 );
 
 const AdminAgencyLine = (agency: AgencyDtoForAgencyUsersAndAdmins) => [
-  <>
+  <Fragment key={`${agency.id}-agency-infos`}>
     <AgencyTag refersToAgencyName={agency.refersToAgencyName} />
     <AgencyStatusBadge status={agency.status} />
     <br />
@@ -35,10 +36,11 @@ const AdminAgencyLine = (agency: AgencyDtoForAgencyUsersAndAdmins) => [
     <span className={fr.cx("fr-hint-text")}>
       {addressDtoToString(agency.address)}
     </span>
-  </>,
+  </Fragment>,
   agencyKindToLabelIncludingIF[agency.kind],
 
   <a
+    key={`${agency.id}-see-agency-link`}
     {...routes.agencyDashboardAgencyDetails({
       agencyId: agency.id,
     })}

@@ -1,5 +1,5 @@
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import type { SiretDto } from "shared";

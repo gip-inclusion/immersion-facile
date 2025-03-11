@@ -6,7 +6,7 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import { keys } from "ramda";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ImmersionTextField } from "react-design-system";
 import {
   type EmailTemplatesByName,
@@ -186,7 +186,7 @@ const EmailVariableField = ({
     );
   return (
     <div className={fr.cx("fr-input-group", "fr-mb-2w")}>
-      <label className={fr.cx("fr-label")}>{variableName}</label>
+      <p className={fr.cx("fr-label")}>{variableName}</p>
       <pre className={fr.cx("fr-text--xs", "fr-m-auto")}>
         <code>{JSON.stringify(variableValue, null, 2)}</code>
       </pre>

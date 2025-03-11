@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { isSameDay } from "date-fns";
 import { clone } from "ramda";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,

@@ -1,4 +1,4 @@
-import React, { useId } from "react";
+import { type ReactElement, cloneElement, useId } from "react";
 
 export type TooltipProps =
   | {
@@ -9,7 +9,7 @@ export type TooltipProps =
     }
   | {
       type: "hover";
-      elementToDescribe: React.ReactElement;
+      elementToDescribe: ReactElement;
       description: string;
       id?: string;
       className?: string;
@@ -22,7 +22,7 @@ export const Tooltip = (props: TooltipProps) => {
     <>
       {props.type === "hover" && (
         <span>
-          {React.cloneElement(props.elementToDescribe, {
+          {cloneElement(props.elementToDescribe, {
             "aria-describedby": id,
           })}
           <span

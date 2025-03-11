@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import illustration from "src/assets/img/search.svg";
 
 export const SearchInfoSection = () => (

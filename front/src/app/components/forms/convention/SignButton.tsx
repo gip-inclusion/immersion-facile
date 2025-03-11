@@ -1,7 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import type React from "react";
+import type { MouseEventHandler } from "react";
+
 import { createPortal } from "react-dom";
 import {
   type InternshipKind,
@@ -26,7 +27,7 @@ type SignButtonProps = {
   onCloseSignModalWithoutSignature?: (value: boolean) => void;
   signatory: Signatory;
   internshipKind: InternshipKind;
-  onConfirmClick: React.MouseEventHandler<HTMLButtonElement>;
+  onConfirmClick: MouseEventHandler<HTMLButtonElement>;
   submitButtonId: string;
   className?: string;
 };

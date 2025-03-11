@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React, { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   type SubmitFeedBack,
   isFeedbackError,

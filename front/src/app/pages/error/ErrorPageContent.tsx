@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+
 import type { FrontErrorProps } from "src/app/contents/error/types";
 
 import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
@@ -12,7 +12,7 @@ export const ErrorPageContent = ({
   subtitle,
   description,
   buttons,
-}: ErrorPageContentProps): React.ReactElement => {
+}: ErrorPageContentProps) => {
   return (
     <div
       className={fr.cx(
@@ -34,17 +34,17 @@ export const ErrorPageContent = ({
         />
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
           {buttons.length
-            ? buttons.map((button) => (
-                <li>
-                  {typeof button === "function"
+            ? buttons.map((button) => {
+                const buttonJsx =
+                  typeof button === "function"
                     ? button({
                         currentUrl: window.location.href,
                         currentDate: new Date().toISOString(),
                         error: description,
                       })
-                    : button}
-                </li>
-              ))
+                    : button;
+                return <li key={buttonJsx.key}>{buttonJsx}</li>;
+              })
             : null}
         </ul>
       </div>

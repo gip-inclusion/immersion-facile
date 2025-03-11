@@ -4,8 +4,8 @@ import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { formatDistance } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
-import type React from "react";
-import { memo } from "react";
+
+import { type ReactNode, memo } from "react";
 import {
   type DateTimeIsoString,
   type SearchResultDto,
@@ -18,7 +18,7 @@ import "./SearchResult.scss";
 export type EnterpriseSearchResultProps = {
   establishment: SearchResultDto;
   linkProps: Link;
-  illustration?: React.ReactNode;
+  illustration?: ReactNode;
   disableButton?: boolean;
   preview?: boolean;
   showDistance?: boolean;

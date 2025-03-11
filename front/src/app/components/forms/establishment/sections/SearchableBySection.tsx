@@ -4,7 +4,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import {
   type EstablishmentSearchableBy,

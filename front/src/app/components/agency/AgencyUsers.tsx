@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { partition, values } from "ramda";
-import React, { useState } from "react";
+import { useMemo, useState } from "react";
 import { Tag } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
@@ -83,7 +83,7 @@ export const AgencyUsers = ({
   const isLocationAdmin =
     routeName === "adminAgencies" || routeName === "adminAgencyDetail";
 
-  const manageUserModal = React.useMemo(
+  const manageUserModal = useMemo(
     () =>
       createModal({
         isOpenedByDefault: false,
@@ -95,7 +95,7 @@ export const AgencyUsers = ({
     [isLocationAdmin],
   );
 
-  const removeUserModal = React.useMemo(
+  const removeUserModal = useMemo(
     () =>
       createModal({
         isOpenedByDefault: false,

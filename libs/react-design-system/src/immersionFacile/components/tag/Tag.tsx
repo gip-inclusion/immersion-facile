@@ -3,7 +3,7 @@ import {
   Tag as DsfrTag,
   type TagProps as DsfrTagProps,
 } from "@codegouvfr/react-dsfr/Tag";
-import React from "react";
+
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./Tag.styles";
 

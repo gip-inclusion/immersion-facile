@@ -1,4 +1,8 @@
-import type React from "react";
+import type {
+  ChangeEventHandler,
+  FocusEventHandler,
+  KeyboardEventHandler,
+} from "react";
 import { Input, InputGroup, TextArea, TextInputError } from "../inputs";
 import type { AutocompleteAttributeValue } from "../inputs/AutocompleteAttributeValue.type";
 import { Label } from "../label";
@@ -18,11 +22,9 @@ export interface ImmersionTextFieldProps {
   readOnly?: boolean;
   type?: string;
   value?: string;
-  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onKeyPress?: React.KeyboardEventHandler<
-    HTMLInputElement | HTMLTextAreaElement
-  >;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onKeyPress?: KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 }
 
 export const ImmersionTextField = ({

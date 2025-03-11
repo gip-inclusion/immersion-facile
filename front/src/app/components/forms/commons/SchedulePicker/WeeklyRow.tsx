@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { parseISO } from "date-fns";
-import React from "react";
+
 import { useWatch } from "react-hook-form";
 import {
   type ConventionReadDto,

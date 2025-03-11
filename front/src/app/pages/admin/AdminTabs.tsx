@@ -1,5 +1,6 @@
 import { Tabs, type TabsProps } from "@codegouvfr/react-dsfr/Tabs";
-import type React from "react";
+import type { ReactNode } from "react";
+
 import {
   type AdminTabRouteName,
   type OmitFromExistingKeys,
@@ -21,7 +22,7 @@ import type { Route } from "type-route";
 
 type RawAdminTab = Prettify<
   OmitFromExistingKeys<TabsProps.Controlled["tabs"][number], "tabId"> & {
-    content: React.ReactNode;
+    content: ReactNode;
   }
 >;
 

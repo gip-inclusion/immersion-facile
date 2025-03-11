@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+
 import { useStyles } from "tss-react/dsfr";
 import { useCopyButton } from "./useCopyButton";
 
@@ -35,7 +35,8 @@ export const CopyButton = (props: CopyButtonProperties) => {
         props.className,
       )}
       title={props.iconOnly ? copyButtonLabel : undefined}
-      children={props.iconOnly ? undefined : copyButtonLabel}
-    />
+    >
+      {props.iconOnly ? undefined : copyButtonLabel}
+    </Button>
   );
 };

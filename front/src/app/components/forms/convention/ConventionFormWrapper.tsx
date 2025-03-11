@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { ConventionSummary, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";

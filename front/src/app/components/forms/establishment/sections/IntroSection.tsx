@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";
@@ -26,13 +26,11 @@ export const IntroSection = ({
         </>
       )}
       {mode === "edit" && (
-        <>
-          <p>
-            Ce formulaire vous permet de modifier la façon dont vous apparaissez
-            sur notre annuaire d’entreprises destiné aux candidats. Ils pourront
-            vous trouver et vous contacter au rythme qui vous convient.
-          </p>
-        </>
+        <p>
+          Ce formulaire vous permet de modifier la façon dont vous apparaissez
+          sur notre annuaire d’entreprises destiné aux candidats. Ils pourront
+          vous trouver et vous contacter au rythme qui vous convient.
+        </p>
       )}
 
       <Button

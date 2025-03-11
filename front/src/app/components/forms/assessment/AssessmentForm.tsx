@@ -8,8 +8,8 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import type React from "react";
-import { useEffect, useState } from "react";
+
+import { type ChangeEvent, useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
@@ -350,7 +350,7 @@ const AssessmentStatusSection = ({
                   className={fr.cx("fr-col-12", "fr-col-sm-6")}
                   label="Heures manquées"
                   nativeInputProps={{
-                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
                       const value = +event.target.value;
                       setNumberOfMissedHoursDisplayed(value);
                       setValue(
@@ -371,7 +371,7 @@ const AssessmentStatusSection = ({
                   className={fr.cx("fr-col-12", "fr-col-sm-6")}
                   label="Minutes manquées"
                   nativeInputProps={{
-                    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
                       const value = +event.target.value;
                       setNumberOfMissedMinutesDisplayed(value);
                       setValue(

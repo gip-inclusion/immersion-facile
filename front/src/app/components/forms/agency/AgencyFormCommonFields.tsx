@@ -1,6 +1,6 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import type React from "react";
-import { useEffect, useState } from "react";
+
+import { type ReactNode, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   type AddressDto,
@@ -175,7 +175,7 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   },
 ];
 
-const descriptionByValidationSteps: Record<ValidationSteps, React.ReactNode> = {
+const descriptionByValidationSteps: Record<ValidationSteps, ReactNode> = {
   validatorsOnly: formAgencyFieldsLabels.counsellorEmails.hintText,
   counsellorsAndValidators: formAgencyFieldsLabels.validatorEmails.hintText,
 };

@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import { MainWrapper } from "react-design-system";
 import type { FormEstablishmentSource } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";

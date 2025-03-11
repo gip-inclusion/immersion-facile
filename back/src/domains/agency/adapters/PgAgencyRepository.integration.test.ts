@@ -109,9 +109,7 @@ describe("PgAgencyRepository", () => {
 
     agencyRepository = new PgAgencyRepository(makeKyselyDb(pool));
     userRepository = new PgUserRepository(makeKyselyDb(pool));
-  });
 
-  beforeEach(async () => {
     await userRepository.save(validator1);
     await userRepository.save(validator2);
     await userRepository.save(counsellor1);

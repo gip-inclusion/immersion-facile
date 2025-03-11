@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ExchangeMessage.styles";
 
@@ -8,7 +8,7 @@ export const ExchangeMessage = ({
   children,
 }: {
   sender: "establishment" | "potentialBeneficiary";
-  children: React.ReactNode;
+  children: ReactNode;
 }) => {
   const { cx } = useStyles();
   return (

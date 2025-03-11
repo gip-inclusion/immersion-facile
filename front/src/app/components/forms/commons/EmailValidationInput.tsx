@@ -1,6 +1,6 @@
 import { Input, type InputProps } from "@codegouvfr/react-dsfr/Input";
-import type React from "react";
-import { useState } from "react";
+
+import { type ChangeEvent, type FocusEvent, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { ValidateEmailFeedback, ValidateEmailStatus } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -31,7 +31,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
   });
 
   const onBlur = async (
-    event: React.FocusEvent<HTMLInputElement, Element>,
+    event: FocusEvent<HTMLInputElement, Element>,
   ): Promise<void> => {
     const { currentTarget } = event;
     trigger(props.nativeInputProps?.name)
@@ -64,7 +64,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
       });
   };
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     setCurrentInputValue(event.target.value);
     setStateRelated({
       state: "default",
@@ -90,7 +90,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
 const makeStateRelatedMessage = (
   feedback: ValidateEmailFeedback,
   message: string,
-): React.ReactNode =>
+) =>
   `${message}${
     feedback.proposal ? `Avez-vous voulu taper '${feedback.proposal}' ?` : ""
   }`;

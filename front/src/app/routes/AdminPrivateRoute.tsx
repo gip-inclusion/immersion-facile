@@ -1,4 +1,4 @@
-import type React from "react";
+import type { ReactElement } from "react";
 import { PageHeader } from "react-design-system";
 import {
   type FrontAdminRoute,
@@ -7,7 +7,7 @@ import {
 
 type AdminPrivateRouteProps = {
   route: FrontAdminRoute;
-  children: React.ReactElement;
+  children: ReactElement;
 };
 
 export const AdminPrivateRoute = ({

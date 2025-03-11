@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import type { ContactErrorKind } from "src/core-logic/ports/SearchGateway";
 
 type ErrorTitleAndDescription = {
@@ -20,9 +20,7 @@ type ActiveError =
 
 export const useContactEstablishmentError = (): {
   activeError: ActiveError;
-  setActiveErrorKind: React.Dispatch<
-    React.SetStateAction<ContactErrorKind | null>
-  >;
+  setActiveErrorKind: Dispatch<SetStateAction<ContactErrorKind | null>>;
 } => {
   const [activeErrorKind, setActiveErrorKind] =
     useState<ContactErrorKind | null>(null);

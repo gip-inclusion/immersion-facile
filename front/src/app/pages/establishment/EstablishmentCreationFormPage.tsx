@@ -1,4 +1,3 @@
-import React from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";

@@ -1,5 +1,5 @@
 import Button from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+
 import {
   type ConventionId,
   type SiretDto,
@@ -54,6 +54,7 @@ export const frontErrors = {
         } Merci de vous rapprocher de votre conseiller. Pour rappel, l'agence indiquée sur votre convention était : ${agencyName}.`,
         buttons: [
           <Button
+            key={"im-error__faq-button"}
             linkProps={{
               href: "https://immersion-facile.beta.gouv.fr/aide/",
               target: "_blank",
@@ -82,6 +83,7 @@ export const frontErrors = {
               <RenewEstablishmentMagicLinkButton
                 id={domElementIds.establishment.edit.refreshEditLink}
                 siret={siret}
+                key={domElementIds.establishment.edit.refreshEditLink}
               />,
             ]
           : [redirectToHomePageButtonContent, contactUsButtonContent],
@@ -95,6 +97,7 @@ export const frontErrors = {
           <RenewEstablishmentMagicLinkButton
             id={domElementIds.establishment.edit.refreshEditLink}
             siret={siret}
+            key={domElementIds.establishment.edit.refreshEditLink}
           />,
         ],
       });
@@ -105,11 +108,12 @@ export const frontErrors = {
 export const redirectToHomePageButtonContent: ErrorButton = (
   <Button
     priority="primary"
-    children="Page d'accueil"
     linkProps={{
       ...routes.home().link,
     }}
-  />
+  >
+    Page d'accueil
+  </Button>
 );
 
 export const contactUsButtonContent = ({
@@ -129,11 +133,12 @@ export const contactUsButtonContent = ({
   return (
     <Button
       priority="secondary"
-      children="Contactez-nous"
       linkProps={{
         href: `mailto:${immersionFacileContactEmail}?body=${emailBody}`,
         target: "_blank",
       }}
-    />
+    >
+      Contactez-nous
+    </Button>
   );
 };

@@ -3,7 +3,7 @@ import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   type ApiConsumer,
   type ApiConsumerContact,

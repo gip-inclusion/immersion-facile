@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode, RefObject } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./FormOverlay.styles";
 
@@ -8,8 +8,8 @@ export const FormOverlay = ({
   parentRef,
   isVisible,
 }: {
-  children: React.ReactNode;
-  parentRef?: React.RefObject<HTMLFormElement>;
+  children: ReactNode;
+  parentRef?: RefObject<HTMLFormElement>;
   isVisible: boolean;
 }) => {
   const { cx } = useStyles();

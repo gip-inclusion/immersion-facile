@@ -2,8 +2,14 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { type ModalProps, createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import type React from "react";
-import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
+import {
+  type Dispatch,
+  Fragment,
+  type MouseEvent,
+  type MouseEventHandler,
+  type SetStateAction,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 
@@ -27,7 +33,7 @@ import { JustificationModalContent } from "./JustificationModalContent";
 type SignatureActionsProperties = {
   signatory: Signatory;
   internshipKind: InternshipKind;
-  onSubmitClick: React.MouseEventHandler<HTMLButtonElement>;
+  onSubmitClick: MouseEventHandler<HTMLButtonElement>;
   onModificationRequired: (params: UpdateConventionStatusRequestDto) => void;
   convention: ConventionDto;
   newStatus: ConventionStatusWithJustification;
@@ -81,7 +87,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
         <li>
           <SignButton
             disabled={isLoading || submitFeedback.kind !== "idle"}
-            onConfirmClick={(event) => {
+            onConfirmClick={(event: MouseEvent<HTMLButtonElement>) => {
               setValue(fieldName, new Date().toISOString(), {
                 shouldValidate: true,
               });

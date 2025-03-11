@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import React from "react";
+
 import {
   ConventionFormLayout,
   type ConventionFormLayoutProperties,

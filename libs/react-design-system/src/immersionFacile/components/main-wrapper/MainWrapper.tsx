@@ -1,20 +1,20 @@
 import { type FrCxArg, fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { makeStyles } from "tss-react/dsfr";
 import Styles from "./MainWrapper.styles";
 
 type MainWrapperCommonProps = {
   vSpacing?: number;
   hSpacing?: number;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   layout: "default" | "boxed" | "fullscreen";
-  pageHeader?: React.ReactNode;
+  pageHeader?: ReactNode;
 };
 
 type WithBackground = {
   useBackground: true;
-  backgroundStyles?: React.CSSProperties;
+  backgroundStyles?: CSSProperties;
 };
 
 type WithoutBackground = {

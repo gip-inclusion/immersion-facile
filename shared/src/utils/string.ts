@@ -26,7 +26,7 @@ export const cleanStringToHTMLAttribute = (
 };
 
 export const removeDiacritics = (str: string) =>
-  str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  str.normalize("NFD").replace(/\p{Diacritic}/gu, "");
 
 export const toLowerCaseWithoutDiacritics = (str: string): string =>
   removeDiacritics(str).toLowerCase();

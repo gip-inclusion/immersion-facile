@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionTotalHours.styles";
 
@@ -8,7 +8,7 @@ export const ConventionTotalHours = ({
   illustration,
 }: {
   totalHours: string;
-  illustration: React.ReactNode;
+  illustration: ReactNode;
 }) => {
   const { cx } = useStyles();
   return (

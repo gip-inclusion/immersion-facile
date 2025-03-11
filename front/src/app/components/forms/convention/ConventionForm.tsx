@@ -3,10 +3,10 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import type React from "react";
 import {
   type Dispatch,
   type ElementRef,
+  type ReactNode,
   type SetStateAction,
   useCallback,
   useEffect,
@@ -112,7 +112,7 @@ export type EmailValidationErrorsState = Partial<
     | "Tuteur de l'entreprise"
     | "Représentant légal du bénéficiaire"
     | "Employeur actuel du bénéficiaire",
-    React.ReactNode
+    ReactNode
   >
 >;
 export type SetEmailValidationErrorsState = Dispatch<
@@ -545,7 +545,7 @@ export const ConventionForm = ({
                         </p>
                         <ul>
                           {keys(emailValidationErrors).map((key) => (
-                            <li>
+                            <li key={key}>
                               {key} : {emailValidationErrors[key]}
                             </li>
                           ))}

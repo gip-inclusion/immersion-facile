@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import { useStyles } from "tss-react/dsfr";
 
 export type OverFooterColProps = {

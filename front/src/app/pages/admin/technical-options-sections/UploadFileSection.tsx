@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useState } from "react";
+import { useState } from "react";
 import { File } from "react-design-system";
 import { useCopyButton } from "react-design-system";
 import { domElementIds } from "shared";
@@ -11,11 +11,11 @@ export const UploadFileSection = () => {
   const { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled } =
     useCopyButton("Copier l'URL du fichier");
   const [uploadedFileUrl, setUploadedFileUrl] = useState("");
-  const [error, setError] = React.useState<string>();
-  const [file, setFile] = React.useState<File | null>(null);
-  const [fileBase64, setFileBase64] = React.useState<
-    string | ArrayBuffer | null
-  >(null);
+  const [error, setError] = useState<string>();
+  const [file, setFile] = useState<File | null>(null);
+  const [fileBase64, setFileBase64] = useState<string | ArrayBuffer | null>(
+    null,
+  );
   const label = "Télécharger un document sur clever";
   const maxSize_Mo = 10;
   const onUploadClick = async () => {
@@ -58,7 +58,6 @@ export const UploadFileSection = () => {
           <div className={fr.cx("fr-col-3")}>
             <figure
               className={fr.cx("fr-content-media", "fr-m-0", "fr-mt-2w")}
-              role="group"
               aria-label="Aperçu de l'image"
             >
               <div className={fr.cx("fr-content-media__img")}>

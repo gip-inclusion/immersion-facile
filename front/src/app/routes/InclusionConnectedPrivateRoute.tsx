@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import type React from "react";
-import { useEffect } from "react";
+
+import { type ReactElement, useEffect } from "react";
 import {
   Loader,
   LoginForm,
@@ -66,8 +66,8 @@ type InclusionConnectPrivateRoute =
 
 type InclusionConnectedPrivateRouteProps = {
   route: InclusionConnectPrivateRoute;
-  children: React.ReactElement;
-  inclusionConnectConnexionPageHeader: React.ReactElement;
+  children: ReactElement;
+  inclusionConnectConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
 };
 

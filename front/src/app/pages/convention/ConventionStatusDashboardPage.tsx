@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { MetabaseView } from "src/app/components/MetabaseView";

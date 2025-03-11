@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import {
   ConventionRenewedInformations,
   Document,
@@ -312,26 +312,24 @@ export const ConventionDocumentPage = ({
             </>
           )}
           {agencyIsLoaded && !agencyInfo.refersToAgency && (
-            <>
-              <li>
-                <strong>{agencyInfo.name}</strong> (
-                {agencyInfo.address.streetNumberAndAddress},{" "}
-                {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
-                qualité d' <strong>agence prescriptrice.</strong>
-                <ul>
-                  {convention.agencyCounsellorEmails.length > 0 && (
-                    <li>
-                      <strong>Email du conseiller de 1er niveau : </strong>
-                      {convention.agencyCounsellorEmails[0]}
-                    </li>
-                  )}
+            <li>
+              <strong>{agencyInfo.name}</strong> (
+              {agencyInfo.address.streetNumberAndAddress},{" "}
+              {agencyInfo.address.postcode} {agencyInfo.address.city} {}) en
+              qualité d' <strong>agence prescriptrice.</strong>
+              <ul>
+                {convention.agencyCounsellorEmails.length > 0 && (
                   <li>
-                    <strong>Email du valideur : </strong>
-                    {convention.agencyValidatorEmails[0]}
+                    <strong>Email du conseiller de 1er niveau : </strong>
+                    {convention.agencyCounsellorEmails[0]}
                   </li>
-                </ul>
-              </li>
-            </>
+                )}
+                <li>
+                  <strong>Email du valideur : </strong>
+                  {convention.agencyValidatorEmails[0]}
+                </li>
+              </ul>
+            </li>
           )}
         </ul>
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>

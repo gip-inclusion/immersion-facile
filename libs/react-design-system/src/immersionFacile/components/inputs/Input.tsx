@@ -1,4 +1,9 @@
-import type React from "react";
+import type {
+  ChangeEventHandler,
+  FocusEventHandler,
+  HTMLInputTypeAttribute,
+  KeyboardEventHandler,
+} from "react";
 import type { AutocompleteAttributeValue } from "./AutocompleteAttributeValue.type";
 
 export type InputProperties = {
@@ -9,13 +14,11 @@ export type InputProperties = {
   name: string;
   placeholder?: string;
   readOnly?: boolean;
-  type?: React.HTMLInputTypeAttribute;
+  type?: HTMLInputTypeAttribute;
   value?: string;
-  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onKeyPress?: React.KeyboardEventHandler<
-    HTMLInputElement | HTMLTextAreaElement
-  >;
+  onBlur?: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onKeyPress?: KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 };
 export const Input = ({
   autoComplete,

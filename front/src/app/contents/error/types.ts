@@ -1,3 +1,5 @@
+import type { ReactElement } from "react";
+
 export type FrontErrorProps = {
   buttons: ErrorButton[];
   subtitle?: string;
@@ -6,8 +8,8 @@ export type FrontErrorProps = {
 };
 
 export type ErrorButton =
-  | React.ReactElement
-  | ((params: ContactErrorInformation) => React.ReactElement);
+  | ReactElement
+  | ((params: ContactErrorInformation) => ReactElement);
 
 export type ContactErrorInformation = {
   currentUrl: string;

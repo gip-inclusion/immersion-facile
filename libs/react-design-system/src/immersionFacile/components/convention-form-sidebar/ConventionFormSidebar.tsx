@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Stepper } from "@codegouvfr/react-dsfr/Stepper";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionFormSidebar.styles";
 
 export type ConventionFormSidebarProperties = {
   currentStep: number;
-  sidebarContent: Record<string, React.ReactNode>[];
-  sidebarFooter?: React.ReactNode;
+  sidebarContent: Record<string, ReactNode>[];
+  sidebarFooter?: ReactNode;
 };
 
 export const ConventionFormSidebar = ({

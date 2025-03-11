@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useCopyButton } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";

@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { mergeDeepRight } from "ramda";
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,

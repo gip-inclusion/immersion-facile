@@ -4,7 +4,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
 import { keys, values } from "ramda";
-import React, { type ElementRef, useEffect, useRef, useState } from "react";
+import { type ElementRef, Fragment, useEffect, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -324,7 +324,9 @@ export const AddEstablishmentsByBatch = () => {
               )}
               <tbody>
                 {candidateEstablishments.map((establishment, index) => (
-                  <>
+                  <Fragment
+                    key={`${establishment.formEstablishment?.siret}-${index}`}
+                  >
                     {establishment.formEstablishment && (
                       <tr
                         key={`${establishment.formEstablishment.siret}-${index}`}
@@ -336,18 +338,20 @@ export const AddEstablishmentsByBatch = () => {
                         }}
                       >
                         {values(establishment.formEstablishment).map(
-                          (value, index) => (
-                            <>
-                              {establishment.formEstablishment && (
-                                <td
-                                  key={`${establishment.formEstablishment.siret}-value-${index}`}
-                                  className={fr.cx("fr-text--xs")}
-                                >
-                                  {value ? JSON.stringify(value) : ""}
-                                </td>
-                              )}
-                            </>
-                          ),
+                          (value) => {
+                            const valueKey = JSON.stringify(value);
+                            return (
+                              <Fragment
+                                key={`${establishment.formEstablishment?.siret}-${valueKey}`}
+                              >
+                                {establishment.formEstablishment && (
+                                  <td className={fr.cx("fr-text--xs")}>
+                                    {value ? JSON.stringify(value) : ""}
+                                  </td>
+                                )}
+                              </Fragment>
+                            );
+                          },
                         )}
                       </tr>
                     )}
@@ -369,7 +373,7 @@ export const AddEstablishmentsByBatch = () => {
                         ))}
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
 import { type SearchResultDto, domElementIds } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
@@ -43,9 +43,11 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
               searchResult.appellations[0]?.appellationCode;
             if (!appellationCode) return null;
             return (
-              <div className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-4")}>
+              <div
+                className={fr.cx("fr-col-12", "fr-col-md-6", "fr-col-lg-4")}
+                key={`${searchResult.siret}-${searchResult.rome}`}
+              >
                 <SearchResult
-                  key={`${searchResult.siret}-${searchResult.rome}`}
                   illustration={
                     <SearchResultIllustration
                       illustration={searchIllustrations[0]}

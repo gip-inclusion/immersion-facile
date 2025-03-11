@@ -1,4 +1,3 @@
-import React from "react";
 import { MainWrapper } from "react-design-system";
 import {
   type ConventionJwtPayload,

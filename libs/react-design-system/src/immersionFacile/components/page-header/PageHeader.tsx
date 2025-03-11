@@ -1,15 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./PageHeader.styles";
 
 export type PageHeaderProps = {
   title: string;
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
   classes?: Partial<Record<"root" | "inner" | "title", string>>;
-  breadcrumbs?: React.ReactNode;
-  badge?: React.ReactNode;
+  breadcrumbs?: ReactNode;
+  badge?: ReactNode;
 };
 
 export const PageHeader = ({
@@ -29,7 +29,6 @@ export const PageHeader = ({
         ` ${className ?? ""}`,
         classes.root,
       )}
-      role="region"
       aria-label="En-tête de page"
     >
       {breadcrumbs && (

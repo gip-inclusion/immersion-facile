@@ -1,19 +1,20 @@
 import Input, { type InputProps } from "@codegouvfr/react-dsfr/Input";
 import type { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
-import type React from "react";
+import type { CSSProperties, ReactNode } from "react";
+
 import "./AutocompleteInput.css";
 
 export type AutocompleteInputProps = {
   disabled: boolean | undefined;
   headerClassName: string | undefined;
   id: string | undefined;
-  inputStyle: React.CSSProperties | undefined;
-  label: React.ReactNode;
+  inputStyle: CSSProperties | undefined;
+  label: ReactNode;
   params: AutocompleteRenderInputParams;
   placeholder: string | undefined;
   state?: InputProps["state"];
   stateRelatedMessage?: InputProps["stateRelatedMessage"];
-  hintText?: React.ReactNode;
+  hintText?: ReactNode;
 };
 
 export const AutocompleteInput = ({

@@ -3,7 +3,13 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Table from "@codegouvfr/react-dsfr/Table";
-import React, { type ElementRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type ElementRef,
+  Fragment,
+  useRef,
+  useState,
+} from "react";
 import { Tag } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -30,13 +36,12 @@ export const RegisterAgenciesForm = ({
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<SiretDto | undefined>(undefined);
 
-  const agencySearchBySiretOrNameInput =
-    React.useRef<ElementRef<"input">>(null);
+  const agencySearchBySiretOrNameInput = useRef<ElementRef<"input">>(null);
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [selectedAgencyIds, setSelectedAgencyIds] = useState<AgencyId[]>([]);
 
-  const onAgencySearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onAgencySearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.currentTarget.value);
     setSelectedAgencyIds([]);
     setIsAllChecked(false);
@@ -171,6 +176,7 @@ const AgencyTable = ({
       id={domElementIds.agencyDashboard.registerAgencies.table}
       headers={[
         <Checkbox
+          key={`${isAllChecked}-checkbox`}
           options={[
             {
               label: "",
@@ -193,6 +199,7 @@ const AgencyTable = ({
       ]}
       data={agencies.map((agency) => [
         <Checkbox
+          key={`${agency.id}-checkbox`}
           options={[
             {
               label: "",
@@ -212,7 +219,7 @@ const AgencyTable = ({
             },
           ]}
         />,
-        <>
+        <Fragment key={`${agency.id}-infos`}>
           <Tag
             theme={
               agency.refersToAgencyName
@@ -229,7 +236,7 @@ const AgencyTable = ({
           <strong>{agency.name}</strong>
           <br />
           <p>{agency.address.streetNumberAndAddress}</p>
-        </>,
+        </Fragment>,
       ])}
     />
   );

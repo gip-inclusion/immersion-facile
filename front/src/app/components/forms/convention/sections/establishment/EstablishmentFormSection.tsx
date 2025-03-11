@@ -4,7 +4,7 @@ import {
   RadioButtons,
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import type { ConventionDto, InternshipKind } from "shared";

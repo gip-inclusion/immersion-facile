@@ -5,7 +5,7 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -37,58 +37,56 @@ export const FeatureFlagsSection = () => {
     <>
       <h4>Les fonctionnalités optionnelles</h4>
       <FeatureFlagListWrapper>
-        <>
-          {!isLoading &&
-            keys(labelsByFeatureFlag).map((featureFlagName, index) => (
-              <div
-                key={featureFlagName}
-                className={fr.cx(index > 0 && "fr-mt-4w")}
-              >
-                {labelsByFeatureFlag[featureFlagName].title && (
-                  <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
-                )}
-                <ToggleSwitch
-                  label={labelsByFeatureFlag[featureFlagName].enableLabel}
-                  checked={featureFlags[featureFlagName].isActive}
-                  showCheckedHint={false}
-                  onChange={() => {
-                    const isConfirmed = window.confirm(
-                      "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
-                    );
+        {!isLoading &&
+          keys(labelsByFeatureFlag).map((featureFlagName, index) => (
+            <div
+              key={featureFlagName}
+              className={fr.cx(index > 0 && "fr-mt-4w")}
+            >
+              {labelsByFeatureFlag[featureFlagName].title && (
+                <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
+              )}
+              <ToggleSwitch
+                label={labelsByFeatureFlag[featureFlagName].enableLabel}
+                checked={featureFlags[featureFlagName].isActive}
+                showCheckedHint={false}
+                onChange={() => {
+                  const isConfirmed = window.confirm(
+                    "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
+                  );
 
-                    if (isConfirmed)
-                      dispatch(
-                        featureFlagsSlice.actions.setFeatureFlagRequested({
-                          flagName: featureFlagName,
-                          featureFlag: {
-                            ...featureFlags[featureFlagName],
-                            isActive: !featureFlags[featureFlagName].isActive,
-                          },
-                        }),
-                      );
-                  }}
-                />
-                {match(featureFlags[featureFlagName])
-                  .with({ kind: "textWithSeverity" }, (featureFlagText) => (
-                    <FeatureFlagTextWithSeverityForm
-                      featureFlag={featureFlagText}
+                  if (isConfirmed)
+                    dispatch(
+                      featureFlagsSlice.actions.setFeatureFlagRequested({
+                        flagName: featureFlagName,
+                        featureFlag: {
+                          ...featureFlags[featureFlagName],
+                          isActive: !featureFlags[featureFlagName].isActive,
+                        },
+                      }),
+                    );
+                }}
+              />
+              {match(featureFlags[featureFlagName])
+                .with({ kind: "textWithSeverity" }, (featureFlagText) => (
+                  <FeatureFlagTextWithSeverityForm
+                    featureFlag={featureFlagText}
+                    featureFlagName={featureFlagName}
+                  />
+                ))
+                .with(
+                  { kind: "textImageAndRedirect" },
+                  (featureFlagTextImageAndRedirect) => (
+                    <FeatureFlagTextImageAndRedirectForm
+                      featureFlag={featureFlagTextImageAndRedirect}
                       featureFlagName={featureFlagName}
                     />
-                  ))
-                  .with(
-                    { kind: "textImageAndRedirect" },
-                    (featureFlagTextImageAndRedirect) => (
-                      <FeatureFlagTextImageAndRedirectForm
-                        featureFlag={featureFlagTextImageAndRedirect}
-                        featureFlagName={featureFlagName}
-                      />
-                    ),
-                  )
-                  .with({ kind: "boolean" }, () => null)
-                  .exhaustive()}
-              </div>
-            ))}
-        </>
+                  ),
+                )
+                .with({ kind: "boolean" }, () => null)
+                .exhaustive()}
+            </div>
+          ))}
       </FeatureFlagListWrapper>
     </>
   );

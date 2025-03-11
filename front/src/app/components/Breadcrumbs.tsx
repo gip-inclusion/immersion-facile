@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { slice } from "ramda";
-import React from "react";
+
 import { errors } from "shared";
 import { getBreadcrumbs } from "src/app/contents/breadcrumbs/breadcrumbs";
 import { useRoute } from "../routes/routes";

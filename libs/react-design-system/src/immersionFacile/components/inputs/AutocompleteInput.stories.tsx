@@ -1,5 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import React from "react";
+
+import { createRef } from "react";
 import {
   AutocompleteInput,
   type AutocompleteInputProps,
@@ -43,7 +44,7 @@ export const Default: Story = {
       InputProps: {
         className: "",
         endAdornment: undefined,
-        ref: React.createRef(),
+        ref: createRef(),
         startAdornment: undefined,
       },
       inputProps: {},

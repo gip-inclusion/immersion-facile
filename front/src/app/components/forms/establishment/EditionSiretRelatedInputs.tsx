@@ -1,5 +1,5 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import type { FormEstablishmentDto } from "shared";
 import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";

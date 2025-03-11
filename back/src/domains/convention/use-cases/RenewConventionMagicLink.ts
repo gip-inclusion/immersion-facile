@@ -174,13 +174,13 @@ type LinkRenewData = {
 const extractDataFromExpiredJwt = (
   payload: ConventionJwtPayload,
 ): LinkRenewData =>
-// Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
-// else if (payload.version === 1) {...}
-({
-  role: payload.role,
-  applicationId: payload.applicationId,
-  emailHash: payload.emailHash,
-});
+  // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
+  // else if (payload.version === 1) {...}
+  ({
+    role: payload.role,
+    applicationId: payload.applicationId,
+    emailHash: payload.emailHash,
+  });
 
 const extractConventionJwtPayloadFromExpiredJwt = (
   config: AppConfig,

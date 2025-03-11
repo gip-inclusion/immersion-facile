@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import React, { type ElementRef } from "react";
+import { type ElementRef, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
@@ -15,7 +15,7 @@ export const UsersTab = () => {
   const dispatch = useDispatch();
   const query = useAppSelector(listUsersSelectors.query);
 
-  const inputElement = React.useRef<ElementRef<"input">>(null);
+  const inputElement = useRef<ElementRef<"input">>(null);
 
   return (
     <>
@@ -75,12 +75,18 @@ const UsersTable = () => {
       headers={["Utilisateur", "Nombre d'agences liées", "Actions"]}
       data={users.map((user) => [
         <NameAndEmailInTable
+          key={`${user.id}-name-and-email`}
           firstName={user.firstName}
           lastName={user.lastName}
           email={user.email}
         />,
         user.numberOfAgencies,
-        <a {...routes.adminUserDetail({ userId: user.id })}>Détails</a>,
+        <a
+          key={`${user.id}-details-link`}
+          {...routes.adminUserDetail({ userId: user.id })}
+        >
+          Détails
+        </a>,
       ])}
     />
   );

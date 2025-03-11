@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { type HeroHeaderNavCard, NavCard } from "../nav-card/NavCard";
 import Styles from "./HeroHeader.styles";

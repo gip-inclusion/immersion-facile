@@ -1,4 +1,3 @@
-import React from "react";
 import { MainWrapper } from "react-design-system";
 import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

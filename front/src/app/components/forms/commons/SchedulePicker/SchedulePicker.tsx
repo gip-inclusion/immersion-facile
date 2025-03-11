@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,

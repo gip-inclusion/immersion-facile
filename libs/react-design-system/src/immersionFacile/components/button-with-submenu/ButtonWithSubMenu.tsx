@@ -1,12 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
-import React, {
-  type ElementRef,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { type ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ButtonWithSubMenu.styles";
 

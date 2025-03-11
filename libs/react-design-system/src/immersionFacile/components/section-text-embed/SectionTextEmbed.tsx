@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import ReactPlayer from "react-player";
 import "./SectionTextEmbed.scss";
 

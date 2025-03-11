@@ -1,5 +1,5 @@
-import { cpus } from "os";
-import { cpuUsage, memoryUsage } from "process";
+import { cpus } from "node:os";
+import { cpuUsage, memoryUsage } from "node:process";
 import type { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
 import type { OpacifiedLogger } from "./logger";
 
@@ -89,5 +89,5 @@ const makeReport = (
 const makeEventLoopLagMeanMs = (eventLoopLagSamples: number[]): number =>
   eventLoopLagSamples.length > 0
     ? eventLoopLagSamples.reduce((acc, val) => acc + val, 0) /
-    eventLoopLagSamples.length
+      eventLoopLagSamples.length
     : 0;

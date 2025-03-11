@@ -1,10 +1,11 @@
 import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import type { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import type { ReactNode } from "react";
 import type { AutocompleteAttributeValue } from "react-design-system";
 
 export type FormFieldAttributesForContent = {
   label: string;
-  hintText?: React.ReactNode;
+  hintText?: ReactNode;
   placeholder?: string;
   id: string;
   required?: boolean;

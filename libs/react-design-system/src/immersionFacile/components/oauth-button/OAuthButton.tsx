@@ -1,12 +1,12 @@
 import { ProConnectButton } from "@codegouvfr/react-dsfr/ProConnectButton";
-import type React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./OAuthButton.scss";
+import type { MouseEvent } from "react";
 
 export interface OAuthButtonProps {
   authenticationEndpoint: string;
   provider: "pro-connect" | "inclusion-connect";
-  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void;
   layout?: "default" | "2-lines";
   id?: string;
 }

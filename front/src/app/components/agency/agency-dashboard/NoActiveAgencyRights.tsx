@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useState } from "react";
+import { useState } from "react";
 import type { AgencyRight, InclusionConnectedUser } from "shared";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";

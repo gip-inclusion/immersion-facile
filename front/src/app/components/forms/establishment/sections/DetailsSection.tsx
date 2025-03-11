@@ -5,11 +5,10 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { keys } from "ramda";
+import type { ReactNode } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { v4 as uuidV4 } from "uuid";
-
 import {
   type AppellationAndRomeDto,
   type FormEstablishmentDto,
@@ -33,6 +32,7 @@ import {
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { P, match } from "ts-pattern";
+import { v4 as uuidV4 } from "uuid";
 import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 import { MultipleAppellationInput } from "../MultipleAppellationInput";
 import { SearchResultPreview } from "../SearchResultPreview";
@@ -48,7 +48,7 @@ export const DetailsSection = ({
   mode: Mode;
   currentStep: Step;
   onStepChange: OnStepChange;
-  invalidEmailMessage: React.ReactNode | null;
+  invalidEmailMessage: ReactNode | null;
 }) => {
   const adminJwt = useAdminToken();
   const dispatch = useDispatch();
