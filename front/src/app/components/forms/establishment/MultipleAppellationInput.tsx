@@ -2,9 +2,9 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import {
-  AppellationAndRomeDto,
-  AppellationCode,
-  AppellationLabel,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type AppellationLabel,
   emptyAppellationAndRome,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";

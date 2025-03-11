@@ -1,5 +1,5 @@
 import { ProConnectButton } from "@codegouvfr/react-dsfr/ProConnectButton";
-import React from "react";
+import type React from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./OAuthButton.scss";
 

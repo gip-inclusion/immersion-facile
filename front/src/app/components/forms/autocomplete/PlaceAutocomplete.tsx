@@ -4,7 +4,7 @@ import {
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { LookupSearchResult } from "shared";
+import type { LookupSearchResult } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";

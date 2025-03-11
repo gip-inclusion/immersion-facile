@@ -2,7 +2,7 @@ import React from "react";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import {
+import type {
   FeedbackLevel,
   FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";

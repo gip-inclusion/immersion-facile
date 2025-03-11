@@ -1,4 +1,4 @@
-import { AlterColumnOptions, MigrationBuilder } from "node-pg-migrate";
+import type { AlterColumnOptions, MigrationBuilder } from "node-pg-migrate";
 
 const timestamptWithTimezone = (): AlterColumnOptions => ({
   type: "timestamptz",

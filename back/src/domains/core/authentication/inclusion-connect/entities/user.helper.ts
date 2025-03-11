@@ -1,7 +1,7 @@
-import { Email, UserId } from "shared";
-import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
+import type { Email, UserId } from "shared";
+import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 
 type CreateUserInfo = {
   email: Email;

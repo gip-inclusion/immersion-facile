@@ -7,7 +7,7 @@ import {
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
-import {
+import type {
   AgencyActorRequestModificationPayload,
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,

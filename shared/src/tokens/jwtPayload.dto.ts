@@ -1,12 +1,12 @@
-import { ConventionId } from "../convention/convention.dto";
-import {
+import type { ConventionId } from "../convention/convention.dto";
+import type {
   InclusionConnectedUser,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { Role } from "../role/role.dto";
-import { SiretDto } from "../siret/siret";
-import { Flavor } from "../typeFlavors";
-import { ValueOf } from "../utils";
+import type { Role } from "../role/role.dto";
+import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
+import type { ValueOf } from "../utils";
 
 export type CommonJwtPayload = {
   iat?: number; // number of seconds from 1970-01-01T00:00:00Z UTC until the specified UTC date/time, ignoring leap seconds

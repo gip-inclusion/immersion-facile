@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React from "react";
+import type React from "react";
 import { TextInputError } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
-  AppellationAndRomeDto,
-  ConventionReadDto,
+  type AppellationAndRomeDto,
+  type ConventionReadDto,
   domElementIds,
 } from "shared";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";

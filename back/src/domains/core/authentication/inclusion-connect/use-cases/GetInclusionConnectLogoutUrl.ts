@@ -1,12 +1,12 @@
 import {
-  AbsoluteUrl,
-  User,
-  WithIdToken,
+  type AbsoluteUrl,
+  type User,
+  type WithIdToken,
   errors,
   withIdTokenSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../../UseCase";
-import { OAuthGateway } from "../port/OAuthGateway";
+import type { OAuthGateway } from "../port/OAuthGateway";
 
 export type GetInclusionConnectLogoutUrl = ReturnType<
   typeof makeGetInclusionConnectLogoutUrl

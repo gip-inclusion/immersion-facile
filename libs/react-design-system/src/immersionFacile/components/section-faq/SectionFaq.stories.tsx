@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { SectionFaq, SectionFaqProps } from "./SectionFaq";
+import { SectionFaq, type SectionFaqProps } from "./SectionFaq";
 
 const Component = SectionFaq;
 type Story = StoryObj<typeof Component>;

@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   EmailNotification,
   NotificationsByKind,
   SmsNotification,

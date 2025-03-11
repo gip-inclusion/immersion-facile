@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
-import React, { ElementRef } from "react";
+import React, { type ElementRef } from "react";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";

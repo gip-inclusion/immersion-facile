@@ -1,6 +1,6 @@
 import {
-  ActionCreatorWithPayload,
-  PayloadAction,
+  type ActionCreatorWithPayload,
+  type PayloadAction,
   createSlice,
 } from "@reduxjs/toolkit";
 import { keys } from "shared";

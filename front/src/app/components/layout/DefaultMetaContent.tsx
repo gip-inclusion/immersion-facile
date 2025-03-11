@@ -1,15 +1,15 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import {
-  MetaContentType,
+  type MetaContentType,
   defaultMetaContents,
   defaultPageMetaContents,
   groupMetaContent,
   standardMetaContent,
 } from "src/app/contents/meta/metaContents";
-import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
-import { routes, useRoute } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
+import { type routes, useRoute } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
 export const DefaultMetaContent = (): JSX.Element => {
   const route = useRoute();

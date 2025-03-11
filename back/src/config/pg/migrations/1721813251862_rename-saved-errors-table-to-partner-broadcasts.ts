@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const oldTableName = "saved_errors";
 const newTableName = "broadcast_feedbacks";

@@ -1,10 +1,10 @@
 import Bottleneck from "bottleneck";
-import { SiretDto, SiretEstablishmentDto } from "shared";
-import { HttpClient } from "shared-routes";
-import { SiretGateway } from "../ports/SiretGateway";
-import {
+import type { SiretDto, SiretEstablishmentDto } from "shared";
+import type { HttpClient } from "shared-routes";
+import type { SiretGateway } from "../ports/SiretGateway";
+import type {
   AnnuaireDesEntreprisesSiretEstablishment,
-  type AnnuaireDesEntreprisesSiretRoutes,
+  AnnuaireDesEntreprisesSiretRoutes,
 } from "./AnnuaireDesEntreprisesSiretGateway.routes";
 import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 

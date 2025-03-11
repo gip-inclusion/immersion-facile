@@ -1,5 +1,5 @@
-import { HtmlToPdfRequest } from "shared";
-import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
+import type { HtmlToPdfRequest } from "shared";
+import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 export class InMemoryPdfGeneratorGateway implements PdfGeneratorGateway {
   public async make({

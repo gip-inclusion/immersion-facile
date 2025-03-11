@@ -1,5 +1,5 @@
-import { ConventionId } from "shared";
-import {
+import type { ConventionId } from "shared";
+import type {
   ConventionToSync,
   ConventionsToSyncRepository,
 } from "../ports/ConventionsToSyncRepository";

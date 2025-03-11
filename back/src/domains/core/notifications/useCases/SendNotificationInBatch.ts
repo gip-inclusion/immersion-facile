@@ -1,10 +1,10 @@
 import { executeInSequence } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { WithNotificationIdAndKind } from "../helpers/Notification";
-import { NotificationGateway } from "../ports/NotificationGateway";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { WithNotificationIdAndKind } from "../helpers/Notification";
+import type { NotificationGateway } from "../ports/NotificationGateway";
 
 const withNotificationIdAndKindArray: z.Schema<WithNotificationIdAndKind[]> =
   z.array(

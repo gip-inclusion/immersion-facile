@@ -1,12 +1,12 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import { expect, test } from "@playwright/test";
 import { addMonths } from "date-fns";
-import { FormEstablishmentDto, domElementIds } from "shared";
+import { type FormEstablishmentDto, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
 import { createNewEstablishment } from "./createNewEstablishment";
 import {
-  TestEstablishments,
+  type TestEstablishments,
   fillEstablishmentFormFirstStep,
 } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";

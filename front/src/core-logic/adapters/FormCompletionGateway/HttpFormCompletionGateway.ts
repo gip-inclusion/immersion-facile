@@ -1,18 +1,18 @@
-import { Observable, from } from "rxjs";
+import { type Observable, from } from "rxjs";
 import {
-  AppellationMatchDto,
-  FormCompletionRoutes,
-  GetSiretInfo,
-  GetSiretInfoError,
-  SiretDto,
+  type AppellationMatchDto,
+  type FormCompletionRoutes,
+  type GetSiretInfo,
+  type GetSiretInfoError,
+  type SiretDto,
   siretApiMissingEstablishmentMessage,
   siretApiUnavailableSiretErrorMessage,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
-import { HttpClient, HttpResponse } from "shared-routes";
+import type { HttpClient, HttpResponse } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
 import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
-import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 import { P, match } from "ts-pattern";
 
 export class HttpFormCompletionGateway implements FormCompletionGateway {

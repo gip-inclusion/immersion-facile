@@ -1,6 +1,10 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/browser";
-import { Epic, combineEpics, createEpicMiddleware } from "redux-observable";
+import {
+  type Epic,
+  combineEpics,
+  createEpicMiddleware,
+} from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";
 import { agenciesAdminEpics } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
@@ -62,7 +66,7 @@ import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { partnersErroredConventionEpics } from "../domain/partnersErroredConvention/partnersErroredConvention.epics";
 import { partnersErroredConventionSlice } from "../domain/partnersErroredConvention/partnersErroredConvention.slice";
-import { AppEpic } from "./redux.helpers";
+import type { AppEpic } from "./redux.helpers";
 
 const allEpics: AppEpic<any>[] = [
   ...agenciesAdminEpics,

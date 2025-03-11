@@ -1,21 +1,21 @@
-import { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
-import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import {
-  ConventionSummaryField,
+  type ConventionSummaryField,
   ConventionWeeklySchedule,
   CopyButton,
 } from "react-design-system";
-import {
+import type {
   ConventionSummarySection,
   ConventionSummarySubSection,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
 import {
-  ConventionReadDto,
-  DateString,
-  Phone,
-  ScheduleDto,
-  SignatoryRole,
+  type ConventionReadDto,
+  type DateString,
+  type Phone,
+  type ScheduleDto,
+  type SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   makeSiretDescriptionLink,

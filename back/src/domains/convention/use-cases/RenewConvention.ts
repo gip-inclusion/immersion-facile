@@ -1,21 +1,21 @@
 import {
-  AgencyRole,
+  type AgencyRole,
   BadRequestError,
-  ConventionDto,
-  ConventionId,
-  ConventionRelatedJwtPayload,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionRelatedJwtPayload,
   ForbiddenError,
   NotFoundError,
-  RenewConventionParams,
-  Role,
+  type RenewConventionParams,
+  type Role,
   clearSignaturesAndValidationDate,
   errors,
   renewConventionParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { AddConvention } from "./AddConvention";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { AddConvention } from "./AddConvention";
 
 export class RenewConvention extends TransactionalUseCase<
   RenewConventionParams,

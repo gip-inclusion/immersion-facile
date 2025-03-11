@@ -1,9 +1,9 @@
-import { HttpClient } from "shared-routes";
-import {
+import type { HttpClient } from "shared-routes";
+import type {
   CrispGateway,
   InitiateCrispConversationParams,
 } from "../ports/CrispGateway";
-import { CrispHeaders, CrispRoutes } from "./crispRoutes";
+import type { CrispHeaders, CrispRoutes } from "./crispRoutes";
 
 export type CrispConfig = {
   id: string;

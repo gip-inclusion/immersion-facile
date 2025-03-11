@@ -1,31 +1,31 @@
 import {
   AgencyDtoBuilder,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
   ConventionDtoBuilder,
-  EmailNotification,
+  type EmailNotification,
   InclusionConnectedUserBuilder,
-  Role,
-  ShortLinkId,
+  type Role,
+  type ShortLinkId,
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
-import { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
+import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
-  WithNotificationIdAndKind,
+  type WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";

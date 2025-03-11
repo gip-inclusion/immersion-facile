@@ -1,6 +1,6 @@
 import { zAnyObj } from "shared";
 import { z } from "zod";
-import {
+import type {
   OpenCageDataFeatureCollection,
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";

@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr/fr";
-import React from "react";
+import type React from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./DiscussionMeta.styles";
 

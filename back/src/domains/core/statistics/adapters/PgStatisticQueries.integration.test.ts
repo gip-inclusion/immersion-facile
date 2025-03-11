@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -19,7 +19,7 @@ import { makeUniqueUserForTest } from "../../../../utils/user";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../../convention/adapters/PgConventionRepository";
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
-import { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
+import type { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
 import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

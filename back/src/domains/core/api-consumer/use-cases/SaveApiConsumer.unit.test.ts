@@ -1,8 +1,8 @@
 import { addMilliseconds, addYears } from "date-fns";
 import {
-  ApiConsumer,
+  type ApiConsumer,
   InclusionConnectedUserBuilder,
-  Role,
+  type Role,
   createApiConsumerParamsFromApiConsumer,
   errors,
   expectPromiseToFailWithError,
@@ -13,7 +13,7 @@ import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

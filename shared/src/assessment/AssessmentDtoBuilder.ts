@@ -1,6 +1,6 @@
-import { Builder } from "../Builder";
-import { ConventionId } from "../convention/convention.dto";
-import { AssessmentDto } from "./assessment.dto";
+import type { Builder } from "../Builder";
+import type { ConventionId } from "../convention/convention.dto";
+import type { AssessmentDto } from "./assessment.dto";
 
 const minimalAssessment: AssessmentDto = {
   conventionId: "aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa",

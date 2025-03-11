@@ -1,8 +1,8 @@
 import { calculateDurationInSecondsFrom } from "shared";
-import { AppConfig } from "../config/bootstrap/appConfig";
-import { OpacifiedLogger, createLogger } from "../utils/logger";
+import type { AppConfig } from "../config/bootstrap/appConfig";
+import { type OpacifiedLogger, createLogger } from "../utils/logger";
 import { notifyTeam } from "../utils/notifyTeam";
-import { SentryInstance, configureSentry } from "./configureSentry";
+import { type SentryInstance, configureSentry } from "./configureSentry";
 
 export const handleCRONScript = async <
   T extends Record<string, unknown> | void,

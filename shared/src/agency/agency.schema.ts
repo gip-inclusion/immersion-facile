@@ -2,11 +2,11 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { addressSchema } from "../address/address.schema";
-import {
+import type {
   UpdateAgencyStatusParams,
   UpdateAgencyStatusParamsWithoutId,
 } from "../admin/admin.dto";
-import { Email } from "../email/email.dto";
+import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
@@ -18,18 +18,18 @@ import {
   zStringMinLength1,
 } from "../zodUtils";
 import {
-  AgencyDto,
-  AgencyDtoForAgencyUsersAndAdmins,
-  AgencyId,
-  AgencyIdResponse,
-  AgencyKind,
-  AgencyOption,
-  CreateAgencyDto,
-  ListAgencyOptionsRequestDto,
-  PrivateListAgenciesRequestDto,
-  WithAgencyDto,
-  WithAgencyId,
-  WithAgencyStatus,
+  type AgencyDto,
+  type AgencyDtoForAgencyUsersAndAdmins,
+  type AgencyId,
+  type AgencyIdResponse,
+  type AgencyKind,
+  type AgencyOption,
+  type CreateAgencyDto,
+  type ListAgencyOptionsRequestDto,
+  type PrivateListAgenciesRequestDto,
+  type WithAgencyDto,
+  type WithAgencyId,
+  type WithAgencyStatus,
   agencyKindFilters,
   agencyKindList,
   allAgencyStatuses,

@@ -3,10 +3,10 @@ import { addDays, differenceInCalendarDays } from "date-fns";
 import { uniq } from "ramda";
 import React from "react";
 import {
-  DateIntervalDto,
-  InternshipKind,
-  SelectedDaysOfTheWeekDto,
-  WeekdayNumber,
+  type DateIntervalDto,
+  type InternshipKind,
+  type SelectedDaysOfTheWeekDto,
+  type WeekdayNumber,
   arrayFromNumber,
   convertLocaleDateToUtcTimezoneDate,
   frenchDayMapping,

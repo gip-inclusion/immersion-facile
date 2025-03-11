@@ -1,10 +1,10 @@
-import { Email, expectToEqual } from "shared";
+import { type Email, expectToEqual } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { EstablishmentMarketingGatewayDto } from "../../ports/EstablishmentMarketingGateway";
+import type { EstablishmentMarketingGatewayDto } from "../../ports/EstablishmentMarketingGateway";
 import { brevoContactRoutes } from "./BrevoContact.routes";
 import {
-  BrevoContact,
+  type BrevoContact,
   BrevoEstablishmentMarketingGateway,
 } from "./BrevoEstablishmentMarketingGateway";
 

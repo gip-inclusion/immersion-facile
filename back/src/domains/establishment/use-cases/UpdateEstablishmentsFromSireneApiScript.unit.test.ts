@@ -1,10 +1,10 @@
 import subDays from "date-fns/subDays";
-import { SiretEstablishmentDto, expectToEqual } from "shared";
+import { type SiretEstablishmentDto, expectToEqual } from "shared";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import {

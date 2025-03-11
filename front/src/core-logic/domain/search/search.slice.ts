@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   AppellationAndRomeDto,
   SearchQueryBaseWithoutAppellationsAndRomeDto,
   SearchQueryParamsDto,
@@ -8,7 +8,7 @@ import {
   SiretAndAppellationDto,
   WithAcquisition,
 } from "shared";
-import {
+import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";

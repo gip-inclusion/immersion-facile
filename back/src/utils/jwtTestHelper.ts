@@ -1,9 +1,9 @@
 import {
-  CreateConventionMagicLinkPayloadProperties,
+  type CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
-import { GenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
-import { GenerateApiConsumerJwt } from "../domains/core/jwt";
+import type { GenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
+import type { GenerateApiConsumerJwt } from "../domains/core/jwt";
 
 export const generateApiConsumerJwtTestFn: GenerateApiConsumerJwt = ({ id }) =>
   `FAKE-API-CONSUMER-JWT-${id}`;

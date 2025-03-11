@@ -1,12 +1,12 @@
 import { emailSchema, numberOfEmployeesRangeSchema } from "shared";
 import { z } from "zod";
 import {
-  CreateContactAttributes,
-  CreateContactBody,
-  DeleteContactFromListModeEmailResponseBody,
-  DeleteContactFromListRequestBodyModeEmail,
-  GetContactInfoAttributes,
-  GetContactInfoResponseBody,
+  type CreateContactAttributes,
+  type CreateContactBody,
+  type DeleteContactFromListModeEmailResponseBody,
+  type DeleteContactFromListRequestBodyModeEmail,
+  type GetContactInfoAttributes,
+  type GetContactInfoResponseBody,
   typesPublic,
 } from "./BrevoContact.dto";
 

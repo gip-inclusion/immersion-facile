@@ -1,21 +1,21 @@
 import { uniqBy } from "ramda";
 import {
   path,
-  AppellationAndRomeDto,
-  AppellationCode,
-  GeoPositionDto,
-  RomeCode,
-  SearchResultDto,
-  SiretDto,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type GeoPositionDto,
+  type RomeCode,
+  type SearchResultDto,
+  type SiretDto,
   conflictErrorSiret,
   errors,
   pathEq,
   replaceArrayElement,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { hasSearchMadeGeoParams } from "../entities/SearchMadeEntity";
-import {
+import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
   SearchImmersionParams,

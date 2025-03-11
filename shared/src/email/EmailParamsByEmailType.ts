@@ -1,19 +1,19 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import {
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type {
   AssessmentDtoCompleted,
   AssessmentDtoPartiallyCompleted,
 } from "../assessment/assessment.dto";
-import {
+import type {
   ConventionId,
   ImmersionObjective,
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
-import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
-import { DateString } from "../utils/date";
-import { Email } from "./email.dto";
+import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { SiretDto } from "../siret/siret";
+import type { DateString } from "../utils/date";
+import type { Email } from "./email.dto";
 
 export type UserParamsForMail = {
   agencyName: string;

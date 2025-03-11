@@ -1,17 +1,17 @@
 import { addDays, startOfToday } from "date-fns";
 import {
-  AgencyKind,
-  AppellationAndRomeDto,
-  AppellationCode,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
-  FtConnectIdentity,
-  ImmersionObjective,
-  InternshipKind,
-  LevelOfEducation,
-  NafCode,
-  ScheduleDto,
+  type AgencyKind,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
+  type FtConnectIdentity,
+  type ImmersionObjective,
+  type InternshipKind,
+  type LevelOfEducation,
+  type NafCode,
+  type ScheduleDto,
   addressDtoToString,
   addressStringToDto,
   appellationCodeSchema,
@@ -22,14 +22,14 @@ import {
   reasonableSchedule,
   toDateString,
 } from "shared";
-import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
-import { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
-import { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
-import { searchParams } from "src/app/routes/routes";
+import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
+import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
+import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
+import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import type { searchParams } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
-import { ValueSerializer, param } from "type-route";
+import { type ValueSerializer, param } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 type ConventionRoutes =

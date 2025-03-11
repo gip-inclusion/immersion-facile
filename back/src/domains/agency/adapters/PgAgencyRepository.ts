@@ -1,33 +1,33 @@
 import { sql } from "kysely";
 import { map, partition, toPairs } from "ramda";
 import {
-  AbsoluteUrl,
-  AddressDto,
-  AgencyDto,
-  AgencyId,
-  AgencyKind,
-  AgencyRole,
-  AgencyStatus,
-  AgencyUsersRights,
-  AgencyWithUsersRights,
+  type AbsoluteUrl,
+  type AddressDto,
+  type AgencyDto,
+  type AgencyId,
+  type AgencyKind,
+  type AgencyRole,
+  type AgencyStatus,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
   ConflictError,
-  DepartmentCode,
-  OmitFromExistingKeys,
-  UserId,
-  WithUserFilters,
+  type DepartmentCode,
+  type OmitFromExistingKeys,
+  type UserId,
+  type WithUserFilters,
   errors,
   isTruthy,
   isWithAgencyRole,
   pipeWithValue,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
-import {
+import type {
   AgencyRepository,
   AgencyRightOfUser,
   GetAgenciesFilters,

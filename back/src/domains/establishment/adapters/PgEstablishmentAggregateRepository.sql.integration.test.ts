@@ -1,23 +1,26 @@
 import { subMonths } from "date-fns";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
-  Exchange,
-  User,
+  type Exchange,
+  type User,
   UserBuilder,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";

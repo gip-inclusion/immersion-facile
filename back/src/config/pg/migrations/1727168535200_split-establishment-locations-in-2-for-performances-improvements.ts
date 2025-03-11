@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const establishmentsLocations = "establishments_locations";
 const establishmentsLocationPositions = "establishments_location_positions";

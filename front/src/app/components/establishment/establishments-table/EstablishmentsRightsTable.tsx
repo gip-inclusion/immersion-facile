@@ -1,8 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Table from "@codegouvfr/react-dsfr/Table";
-import { ReactNode } from "react";
-import { WithEstablishmentData } from "shared";
+import type { ReactNode } from "react";
+import type { WithEstablishmentData } from "shared";
 import { establishmentRoleToDisplay } from "../establishment-users";
 import { EstablishmentLineAdminsInfos } from "./establishment-line/EstablishmentLineAdminInfos";
 import { EstablishmentLineBusinessName } from "./establishment-line/EstablishmentLineBusinessName";

@@ -1,4 +1,4 @@
-import {
+import type {
   AbsoluteUrl,
   Email,
   ExternalId,
@@ -6,7 +6,7 @@ import {
   WithIdToken,
   WithSourcePage,
 } from "shared";
-import { OAuthJwt } from "../entities/OngoingOAuth";
+import type { OAuthJwt } from "../entities/OngoingOAuth";
 
 export type GetAccessTokenParams = WithSourcePage & {
   code: string;

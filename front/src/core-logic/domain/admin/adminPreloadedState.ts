@@ -4,7 +4,7 @@ import { fetchUserInitialState } from "src/core-logic/domain/admin/fetchUser/fet
 import { icUsersAdminInitialState } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { listUsersInitialState } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsInitialState } from "src/core-logic/domain/admin/notifications/notificationsSlice";
-import { RootState } from "src/core-logic/storeConfig/store";
+import type { RootState } from "src/core-logic/storeConfig/store";
 import { apiConsumerInitialState } from "../apiConsumer/apiConsumer.slice";
 
 type AdminState = RootState["admin"];

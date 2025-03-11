@@ -1,11 +1,11 @@
 import { subMonths } from "date-fns";
-import { SiretDto, castError } from "shared";
+import { type SiretDto, castError } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
 import { UseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { SuggestEditEstablishment } from "./SuggestEditEstablishment";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SuggestEditEstablishment } from "./SuggestEditEstablishment";
 
 const logger = createLogger(__filename);
 

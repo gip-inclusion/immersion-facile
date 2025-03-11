@@ -1,4 +1,4 @@
-import { MatchRangeDto, filterNotFalsy } from "shared";
+import { type MatchRangeDto, filterNotFalsy } from "shared";
 
 export const normalize = (s: string): string =>
   s

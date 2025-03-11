@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { File, FileProperties } from "./File";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { File, type FileProperties } from "./File";
 
 const Component = File;
 type Story = StoryObj<typeof Component>;

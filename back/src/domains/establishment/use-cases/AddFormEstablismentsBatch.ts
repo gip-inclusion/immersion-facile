@@ -1,17 +1,17 @@
 import {
-  EstablishmentBatchReport,
-  FormEstablishmentBatchDto,
-  InclusionConnectedUser,
+  type EstablishmentBatchReport,
+  type FormEstablishmentBatchDto,
+  type InclusionConnectedUser,
   castError,
   executeInSequence,
   formEstablishmentBatchSchema,
   slugify,
 } from "shared";
 import { UseCase } from "../../core/UseCase";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
-import { GroupEntity } from "../entities/GroupEntity";
-import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
+import type { GroupEntity } from "../entities/GroupEntity";
+import type { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,

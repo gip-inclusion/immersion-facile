@@ -2,7 +2,7 @@ import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
-  AccessTokenResponse,
+  type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";

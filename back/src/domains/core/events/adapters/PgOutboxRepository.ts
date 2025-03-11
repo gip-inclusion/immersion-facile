@@ -1,6 +1,6 @@
 import { differenceWith, propEq } from "ramda";
-import { DateString, replaceArrayElement } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { type DateString, replaceArrayElement } from "shared";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
 import type {
   DomainEvent,
@@ -9,7 +9,7 @@ import type {
   EventPublication,
   EventStatus,
 } from "../events";
-import { OutboxRepository } from "../ports/OutboxRepository";
+import type { OutboxRepository } from "../ports/OutboxRepository";
 
 export type StoredEventRow = {
   id: string;
@@ -37,7 +37,7 @@ export class PgOutboxRepository implements OutboxRepository {
       .where("status", "=", status)
       .executeTakeFirst()) as { total: string };
 
-    return parseInt(result.total);
+    return Number.parseInt(result.total);
   }
 
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {

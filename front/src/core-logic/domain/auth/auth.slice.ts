@@ -1,6 +1,6 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { AbsoluteUrl, FederatedIdentity } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { AbsoluteUrl, FederatedIdentity } from "shared";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;

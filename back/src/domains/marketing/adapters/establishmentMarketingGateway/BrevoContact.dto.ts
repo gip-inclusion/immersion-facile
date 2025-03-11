@@ -1,4 +1,4 @@
-import { DateString, Email } from "shared";
+import type { DateString, Email } from "shared";
 
 export type CreateContactBody = {
   email?: string;

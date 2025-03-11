@@ -1,6 +1,6 @@
-import { AbsoluteUrl, ShortLinkId } from "shared";
+import type { AbsoluteUrl, ShortLinkId } from "shared";
 import { z } from "zod";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 
 export type PgShortLinkRepositoryDto = {
   short_link_id: string;

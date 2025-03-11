@@ -1,21 +1,21 @@
 import {
-  FederatedIdentity,
-  InclusionConnectedUser,
+  type FederatedIdentity,
+  type InclusionConnectedUser,
   expectToEqual,
 } from "shared";
-import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
+import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
-  FederatedIdentityWithUser,
+  type FederatedIdentityWithUser,
   authSlice,
 } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
   provider: "peConnect",

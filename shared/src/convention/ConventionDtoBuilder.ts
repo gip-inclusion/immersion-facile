@@ -1,30 +1,30 @@
-import { Builder } from "../Builder";
-import { WithAcquisition } from "../acquisition.dto";
-import { AgencyId } from "../agency/agency.dto";
-import { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import {
+import type { Builder } from "../Builder";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AgencyId } from "../agency/agency.dto";
+import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type {
   DateIntervalDto,
   ScheduleDto,
   Weekday,
 } from "../schedule/Schedule.dto";
 import { reasonableSchedule } from "../schedule/ScheduleUtils";
-import { NumberEmployeesRange, SiretDto } from "../siret/siret";
-import { DateString } from "../utils/date";
+import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
+import type { DateString } from "../utils/date";
 import {
-  Beneficiary,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
-  ConventionId,
-  ConventionStatus,
-  ConventionValidatorInputName,
-  ConventionValidatorInputNames,
-  EstablishmentRepresentative,
-  EstablishmentTutor,
-  ImmersionObjective,
-  InternshipKind,
-  Renewed,
+  type Beneficiary,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionStatus,
+  type ConventionValidatorInputName,
+  type ConventionValidatorInputNames,
+  type EstablishmentRepresentative,
+  type EstablishmentTutor,
+  type ImmersionObjective,
+  type InternshipKind,
+  type Renewed,
   isBeneficiary,
   isBeneficiaryStudent,
 } from "./convention.dto";

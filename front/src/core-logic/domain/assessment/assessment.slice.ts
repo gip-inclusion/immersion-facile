@@ -1,10 +1,10 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { AssessmentDto, ConventionId } from "shared";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { AssessmentDto, ConventionId } from "shared";
+import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
+import type { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
 
 export interface AssessmentState {
   isLoading: boolean;

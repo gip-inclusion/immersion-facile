@@ -1,6 +1,6 @@
-import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
-import { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
-import { AutocompleteAttributeValue } from "react-design-system";
+import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
+import type { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import type { AutocompleteAttributeValue } from "react-design-system";
 
 export type FormFieldAttributesForContent = {
   label: string;

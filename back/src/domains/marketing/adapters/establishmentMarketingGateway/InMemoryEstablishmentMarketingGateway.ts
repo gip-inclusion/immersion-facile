@@ -1,6 +1,6 @@
-import { Email, SiretDto } from "shared";
+import type { Email, SiretDto } from "shared";
 
-import {
+import type {
   EstablishmentMarketingGateway,
   EstablishmentMarketingGatewayDto,
 } from "../../ports/EstablishmentMarketingGateway";

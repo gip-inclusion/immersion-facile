@@ -1,18 +1,18 @@
 import {
-  AppellationAndRomeDto,
+  type AppellationAndRomeDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
 import { LaBonneBoiteCompanyDtoBuilder } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
 import {
-  GetExternalSearchResult,
+  type GetExternalSearchResult,
   makeGetExternalSearchResult,
 } from "./GetExternalSearchResult";
 

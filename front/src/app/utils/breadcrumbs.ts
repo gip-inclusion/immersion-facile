@@ -1,6 +1,6 @@
-import { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
+import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { flatten, keys } from "ramda";
-import {
+import type {
   Breadcrumbs,
   BreadcrumbsItem,
 } from "src/app/contents/breadcrumbs/breadcrumbs";

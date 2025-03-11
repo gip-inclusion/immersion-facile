@@ -1,6 +1,6 @@
 import { subDays } from "date-fns";
 import { keys } from "ramda";
-import { SiretDto } from "shared";
+import type { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
@@ -12,7 +12,7 @@ import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeG
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  SendEstablishmentLeadReminderOutput,
+  type SendEstablishmentLeadReminderOutput,
   SendEstablishmentLeadReminderScript,
 } from "../domains/establishment/use-cases/SendEstablishmentLeadReminderScript";
 import { createLogger } from "../utils/logger";

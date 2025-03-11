@@ -1,8 +1,12 @@
 import { sql } from "kysely";
-import { DataWithPagination, PaginationQueryParams, errors } from "shared";
+import {
+  type DataWithPagination,
+  type PaginationQueryParams,
+  errors,
+} from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { StatisticQueries } from "../ports/StatisticQueries";
-import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
+import type { StatisticQueries } from "../ports/StatisticQueries";
+import type { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
 export class PgStatisticQueries implements StatisticQueries {
   #transaction: KyselyDb;

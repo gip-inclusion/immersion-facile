@@ -1,15 +1,15 @@
 import { filter as ramdaFilter } from "ramda";
-import { Observable, delay, map, of } from "rxjs";
+import { type Observable, delay, map, of } from "rxjs";
 import {
-  ContactEstablishmentRequestDto,
-  GroupSlug,
-  GroupWithResults,
-  SearchQueryParamsDto,
-  SearchResultDto,
-  SiretAndAppellationDto,
+  type ContactEstablishmentRequestDto,
+  type GroupSlug,
+  type GroupWithResults,
+  type SearchQueryParamsDto,
+  type SearchResultDto,
+  type SiretAndAppellationDto,
   sleep,
 } from "shared";
-import { SearchGateway } from "src/core-logic/ports/SearchGateway";
+import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
 import { groupWithResultsStub, seedSearchResults } from "./simulatedSearchData";
 
 export class SimulatedSearchGateway implements SearchGateway {

@@ -1,4 +1,4 @@
-import { DomainEvent, EventStatus } from "../events";
+import type { DomainEvent, EventStatus } from "../events";
 
 export interface OutboxRepository {
   countAllEvents(params: { status: EventStatus }): Promise<number>;

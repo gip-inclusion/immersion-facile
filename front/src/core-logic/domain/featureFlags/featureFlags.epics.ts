@@ -1,7 +1,7 @@
 import { filter, map, switchMap } from "rxjs";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

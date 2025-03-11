@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import {
+import type { Observable } from "rxjs";
+import type {
   AbsoluteUrl,
   AgencyId,
   ConventionSupportedJwt,
@@ -9,7 +9,7 @@ import {
   MarkPartnersErroredConventionAsHandledRequest,
   WithIdToken,
 } from "shared";
-import { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
+import type { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
 
 export interface InclusionConnectedGateway {
   getCurrentUser$(token: string): Observable<InclusionConnectedUser>;

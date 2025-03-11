@@ -1,8 +1,8 @@
-import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
-import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
+import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
-import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
+import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 import type { AppellationWithShortLabel } from "./HttpRome4Gateway";
 
 const logger = createLogger(__filename);

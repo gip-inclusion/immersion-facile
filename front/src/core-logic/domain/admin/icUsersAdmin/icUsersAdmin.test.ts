@@ -1,13 +1,13 @@
 import { values } from "ramda";
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyId,
-  AgencyRight,
-  InclusionConnectedUser,
-  RejectIcUserRoleForAgencyParams,
-  User,
-  UserParamsForAgency,
+  type AgencyId,
+  type AgencyRight,
+  type InclusionConnectedUser,
+  type RejectIcUserRoleForAgencyParams,
+  type User,
+  type UserParamsForAgency,
   errors,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -15,18 +15,18 @@ import {
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import {
-  IcUsersAdminFeedback,
-  IcUsersAdminState,
-  NormalizedIcUserById,
-  NormalizedInclusionConnectedUser,
+  type IcUsersAdminFeedback,
+  type IcUsersAdminState,
+  type NormalizedIcUserById,
+  type NormalizedInclusionConnectedUser,
   icUsersAdminInitialState,
   icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacksSelectors } from "../../feedback/feedback.selectors";
 import { agencyAdminSelectors } from "../agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminInitialState } from "../agenciesAdmin/agencyAdmin.slice";

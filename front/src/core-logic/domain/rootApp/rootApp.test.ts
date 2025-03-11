@@ -1,12 +1,12 @@
-import { CombinedState } from "@reduxjs/toolkit";
+import type { CombinedState } from "@reduxjs/toolkit";
 import { InclusionConnectedUserBuilder } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("rootApp epic", () => {
   let store: ReduxStore;

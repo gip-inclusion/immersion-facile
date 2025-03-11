@@ -1,5 +1,5 @@
-import { ConventionId, FtExternalId } from "shared";
-import {
+import type { ConventionId, FtExternalId } from "shared";
+import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
 } from "../dto/FtConnect.dto";

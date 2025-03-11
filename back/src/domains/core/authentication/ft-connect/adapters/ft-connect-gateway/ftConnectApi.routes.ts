@@ -1,15 +1,15 @@
-import { AbsoluteUrl, queryParamsAsString } from "shared";
+import { type AbsoluteUrl, queryParamsAsString } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
-import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
+import type { AppConfig } from "../../../../../../config/bootstrap/appConfig";
+import type { AccessTokenDto } from "../../dto/AccessToken.dto";
+import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import {
-  ExternalAccessToken,
-  ExternalFtConnectAdvisor,
-  ExternalFtConnectOAuthGrantPayload,
-  ExternalFtConnectUser,
+  type ExternalAccessToken,
+  type ExternalFtConnectAdvisor,
+  type ExternalFtConnectOAuthGrantPayload,
+  type ExternalFtConnectUser,
   ftConnectAccessTokenHeadersSchema,
 } from "./ftConnectApi.dto";
 import { ftConnectHeadersSchema } from "./ftConnectApi.schema";

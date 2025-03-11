@@ -1,4 +1,4 @@
-import { Page, expect, test as setup } from "@playwright/test";
+import { type Page, expect, test as setup } from "@playwright/test";
 import { domElementIds, frontRoutes } from "shared";
 import { testConfig } from "../custom.config";
 

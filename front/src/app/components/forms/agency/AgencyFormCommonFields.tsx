@@ -1,9 +1,10 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  AddressDto,
-  CreateAgencyDto,
+  type AddressDto,
+  type CreateAgencyDto,
   addressDtoToString,
   domElementIds,
   emailSchema,

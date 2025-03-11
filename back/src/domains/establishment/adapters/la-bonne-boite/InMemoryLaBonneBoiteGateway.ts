@@ -1,9 +1,9 @@
-import { RomeDto, SearchResultDto, SiretDto } from "shared";
-import {
+import type { RomeDto, SearchResultDto, SiretDto } from "shared";
+import type {
   LaBonneBoiteGateway,
   SearchCompaniesParams,
 } from "../../ports/LaBonneBoiteGateway";
-import { LaBonneBoiteCompanyDto } from "./LaBonneBoiteCompanyDto";
+import type { LaBonneBoiteCompanyDto } from "./LaBonneBoiteCompanyDto";
 
 export class InMemoryLaBonneBoiteGateway implements LaBonneBoiteGateway {
   constructor(

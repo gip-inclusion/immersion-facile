@@ -1,6 +1,6 @@
-import { KeysOfUnion, ValueOf } from "../utils";
-import { Email, EmailAttachment } from "./email.dto";
-import { emailTemplatesByName } from "./emailTemplatesByName";
+import type { KeysOfUnion, ValueOf } from "../utils";
+import type { Email, EmailAttachment } from "./email.dto";
+import type { emailTemplatesByName } from "./emailTemplatesByName";
 
 export type GenericTemplatedEmail<
   K extends string,

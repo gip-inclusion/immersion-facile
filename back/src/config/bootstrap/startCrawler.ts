@@ -1,5 +1,5 @@
 import { subscribeToEvents } from "../../domains/core/events/subscribeToEvents";
-import { AppDependencies } from "./createAppDependencies";
+import type { AppDependencies } from "./createAppDependencies";
 
 export const startCrawler = (deps: AppDependencies) => {
   subscribeToEvents(deps);

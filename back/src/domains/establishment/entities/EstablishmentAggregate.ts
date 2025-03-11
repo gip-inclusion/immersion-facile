@@ -1,6 +1,6 @@
-import { EstablishmentRole, Phone, UserId } from "shared";
-import { EstablishmentEntity } from "./EstablishmentEntity";
-import { OfferEntity } from "./OfferEntity";
+import type { EstablishmentRole, Phone, UserId } from "shared";
+import type { EstablishmentEntity } from "./EstablishmentEntity";
+import type { OfferEntity } from "./OfferEntity";
 
 export type EstablishmentAggregate = {
   establishment: EstablishmentEntity;

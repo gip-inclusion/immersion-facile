@@ -5,14 +5,14 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  FeatureFlagName,
-  FeatureFlagTextImageAndRedirect,
-  FeatureFlagTextWithSeverity,
+  type FeatureFlagName,
+  type FeatureFlagTextImageAndRedirect,
+  type FeatureFlagTextWithSeverity,
   featureFlagTextImageAndRedirectValueSchema,
   featureFlagTextWithSeverityValueSchema,
 } from "shared";

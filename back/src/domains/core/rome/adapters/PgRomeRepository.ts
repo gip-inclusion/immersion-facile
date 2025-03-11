@@ -1,14 +1,14 @@
 import { sql } from "kysely";
 import {
-  AppellationAndRomeDto,
-  AppellationCode,
-  RomeDto,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type RomeDto,
   castError,
   removeDiacritics,
 } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
-import { RomeRepository } from "../ports/RomeRepository";
+import type { RomeRepository } from "../ports/RomeRepository";
 
 const logger = createLogger(__filename);
 
@@ -20,7 +20,7 @@ export class PgRomeRepository implements RomeRepository {
   ): Promise<string | undefined> {
     return this.transaction
       .selectFrom("public_appellations_data")
-      .where("ogr_appellation", "=", parseInt(romeCodeAppellation))
+      .where("ogr_appellation", "=", Number.parseInt(romeCodeAppellation))
       .select("code_rome")
       .execute()
       .then((results) => {
@@ -50,7 +50,7 @@ export class PgRomeRepository implements RomeRepository {
       .where(
         "appellations.ogr_appellation",
         "in",
-        codes.map((code) => parseInt(code)),
+        codes.map((code) => Number.parseInt(code)),
       )
       .select([
         "appellations.ogr_appellation",
@@ -82,7 +82,11 @@ export class PgRomeRepository implements RomeRepository {
         "appellations.legacy_code_rome_v3",
         "romes.code_rome",
       )
-      .where("appellations.ogr_appellation", "=", parseInt(appellationCode))
+      .where(
+        "appellations.ogr_appellation",
+        "=",
+        Number.parseInt(appellationCode),
+      )
       .select([
         "appellations.ogr_appellation",
         "appellations.libelle_appellation_long",

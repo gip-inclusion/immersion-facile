@@ -5,12 +5,12 @@ import {
   expectObjectInArrayToMatch,
   expectToEqual,
 } from "shared";
-import { AppConfig } from "../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
-  ExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -19,11 +19,11 @@ import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/ad
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { SendEstablishmentLeadReminderScript } from "./SendEstablishmentLeadReminderScript";
 
 const now = new Date("2021-05-15T08:00:00.000Z");

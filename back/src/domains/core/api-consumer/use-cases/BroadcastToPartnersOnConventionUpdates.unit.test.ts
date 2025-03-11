@@ -2,25 +2,25 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
-  SubscriptionParams,
+  type SubscriptionParams,
   cartographeAppellationAndRome,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { BroadcastFeedback } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
+import type { BroadcastFeedback } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import {
-  CallbackParams,
+  type CallbackParams,
   InMemorySubscribersGateway,
 } from "../adapters/InMemorySubscribersGateway";
-import { SubscriberResponse } from "../ports/SubscribersGateway";
+import type { SubscriberResponse } from "../ports/SubscribersGateway";
 import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {

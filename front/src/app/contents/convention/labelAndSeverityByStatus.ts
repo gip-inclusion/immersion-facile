@@ -1,4 +1,4 @@
-import { ConventionStatus } from "shared";
+import type { ConventionStatus } from "shared";
 
 export const labelAndSeverityByStatus: Record<
   ConventionStatus,

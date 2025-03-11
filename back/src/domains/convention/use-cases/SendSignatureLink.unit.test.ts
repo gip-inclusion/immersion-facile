@@ -3,9 +3,9 @@ import { subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  InclusionConnectDomainJwtPayload,
+  type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
-  Notification,
+  type Notification,
   UserBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
@@ -18,22 +18,22 @@ import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
-  SaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   MIN_HOURS_BETWEEN_REMINDER,
-  SendSignatureLink,
+  type SendSignatureLink,
   makeSendSignatureLink,
 } from "./SendSignatureLink";
 

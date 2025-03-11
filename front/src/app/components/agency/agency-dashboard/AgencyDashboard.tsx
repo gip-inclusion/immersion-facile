@@ -1,18 +1,18 @@
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import {
-  AgencyRight,
-  ConnectedUserJwt,
-  WithDashboards,
+  type AgencyRight,
+  type ConnectedUserJwt,
+  type WithDashboards,
   domElementIds,
 } from "shared";
 import {
-  AgencyDashboardRouteName,
-  AgencyTabRoute,
-  FrontAgencyDashboardRoute,
+  type AgencyDashboardRouteName,
+  type AgencyTabRoute,
+  type FrontAgencyDashboardRoute,
   agencyDashboardTabsList,
 } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
-import { DashboardTab } from "src/app/utils/dashboard";
+import type { DashboardTab } from "src/app/utils/dashboard";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";
 import { ConventionTabContent } from "./tabs/ConventionTabContent";
 import { ErroredConventionTabContent } from "./tabs/ErroredConventionTabContent";

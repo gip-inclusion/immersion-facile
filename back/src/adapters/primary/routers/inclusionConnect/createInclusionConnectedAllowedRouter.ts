@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { errors, inclusionConnectedAllowedRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
-import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 
 export const createInclusionConnectedAllowedRouter = (

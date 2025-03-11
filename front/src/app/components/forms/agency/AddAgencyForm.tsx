@@ -2,20 +2,20 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import RadioButtons, {
-  RadioButtonsProps,
+  type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ErrorNotifications, LinkHome } from "react-design-system";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDto,
-  AgencyKind,
-  AllowedAgencyKindToAdd,
-  CreateAgencyDto,
-  DepartmentCode,
+  type AgencyDto,
+  type AgencyKind,
+  type AllowedAgencyKindToAdd,
+  type CreateAgencyDto,
+  type DepartmentCode,
   allAgencyKindsAllowedToAdd,
   createAgencySchema,
   domElementIds,
@@ -42,7 +42,7 @@ import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import {
-  AgenciesSubmitFeedback,
+  type AgenciesSubmitFeedback,
   agenciesSlice,
 } from "src/core-logic/domain/agencies/agencies.slice";
 import { P, match } from "ts-pattern";

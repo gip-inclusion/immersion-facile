@@ -11,16 +11,16 @@ import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConnectedUserJwt,
-  ConventionJwt,
-  ConventionReadDto,
-  ConventionStatus,
-  ConventionSupportedJwt,
-  DateIntervalDto,
-  ExcludeFromExisting,
-  RenewConventionParams,
-  Role,
-  UpdateConventionStatusRequestDto,
+  type ConnectedUserJwt,
+  type ConventionJwt,
+  type ConventionReadDto,
+  type ConventionStatus,
+  type ConventionSupportedJwt,
+  type DateIntervalDto,
+  type ExcludeFromExisting,
+  type RenewConventionParams,
+  type Role,
+  type UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   hasAllowedRole,
@@ -47,8 +47,8 @@ import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  ConventionFeedbackKind,
-  ConventionSubmitFeedback,
+  type ConventionFeedbackKind,
+  type ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";

@@ -1,11 +1,11 @@
-import { Observable, from } from "rxjs";
-import { NafRoutes, NafSectionSuggestion } from "shared";
-import { HttpClient } from "shared-routes";
+import { type Observable, from } from "rxjs";
+import type { NafRoutes, NafSectionSuggestion } from "shared";
+import type { HttpClient } from "shared-routes";
 import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { NafGateway } from "src/core-logic/ports/NafGateway";
+import type { NafGateway } from "src/core-logic/ports/NafGateway";
 import { match } from "ts-pattern";
 
 export class HttpNafGateway implements NafGateway {

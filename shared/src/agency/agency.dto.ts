@@ -1,15 +1,15 @@
 import { keys, omit } from "ramda";
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { WithAcquisition } from "../acquisition.dto";
-import { AddressDto, DepartmentCode } from "../address/address.dto";
-import { Email } from "../email/email.dto";
-import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
-import {
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AddressDto, DepartmentCode } from "../address/address.dto";
+import type { Email } from "../email/email.dto";
+import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
+import type {
   AgencyRole,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { SiretDto } from "../siret/siret";
-import { Flavor } from "../typeFlavors";
+import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 
 export type CodeSafir = Flavor<string, "CodeSafir">;

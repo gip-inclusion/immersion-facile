@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { useEffect, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
-import { HeroHeaderNavCard, NavCard } from "../nav-card/NavCard";
+import { type HeroHeaderNavCard, NavCard } from "../nav-card/NavCard";
 import Styles from "./HeroHeader.styles";
 
 export type UserType = "default" | "candidate" | "establishment" | "agency";

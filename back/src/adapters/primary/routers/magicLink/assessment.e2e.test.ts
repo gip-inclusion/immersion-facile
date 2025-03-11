@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
-  AssessmentDto,
+  type AssessmentDto,
   ConventionDtoBuilder,
-  ConventionJwt,
-  ConventionMagicLinkRoutes,
+  type ConventionJwt,
+  type ConventionMagicLinkRoutes,
   InclusionConnectedUserBuilder,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
@@ -12,12 +12,15 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Assessment routes", () => {

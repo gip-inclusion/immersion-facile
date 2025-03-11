@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
-  AssessmentDto,
-  ConventionDomainPayload,
+  type AssessmentDto,
+  type ConventionDomainPayload,
   ConventionDtoBuilder,
   ForbiddenError,
   InclusionConnectedUserBuilder,
-  Role,
+  type Role,
   allRoles,
   conventionStatuses,
   errors,
@@ -22,12 +22,15 @@ import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { acceptedConventionStatusesForAssessment } from "../entities/AssessmentEntity";
-import { CreateAssessment, makeCreateAssessment } from "./CreateAssessment";
+import {
+  type CreateAssessment,
+  makeCreateAssessment,
+} from "./CreateAssessment";
 
 describe("CreateAssessment", () => {
   const agency = new AgencyDtoBuilder().build();

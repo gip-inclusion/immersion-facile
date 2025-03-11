@@ -1,11 +1,15 @@
-import { Pool } from "pg";
-import { ConventionDto, ConventionDtoBuilder, expectToEqual } from "shared";
+import type { Pool } from "pg";
+import {
+  type ConventionDto,
+  ConventionDtoBuilder,
+  expectToEqual,
+} from "shared";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { DomainEvent, DomainTopic } from "../events";
-import { CreateNewEvent, makeCreateNewEvent } from "../ports/EventBus";
+import type { DomainEvent, DomainTopic } from "../events";
+import { type CreateNewEvent, makeCreateNewEvent } from "../ports/EventBus";
 import { PgOutboxQueries } from "./PgOutboxQueries";
 import { PgOutboxRepository } from "./PgOutboxRepository";
 

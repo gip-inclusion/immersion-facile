@@ -1,13 +1,13 @@
 import {
   InclusionConnectedUserBuilder,
-  SetFeatureFlagParam,
+  type SetFeatureFlagParam,
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
 } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { SetFeatureFlag } from "./SetFeatureFlag";

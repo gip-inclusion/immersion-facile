@@ -1,26 +1,26 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  InclusionConnectDomainJwtPayload,
+  type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
+import type { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../core/events/ports/EventBus";
 import {
-  BroadcastFeedback,
+  type BroadcastFeedback,
   broadcastToFtServiceName,
 } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";

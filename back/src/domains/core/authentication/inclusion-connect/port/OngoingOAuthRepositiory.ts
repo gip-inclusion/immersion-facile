@@ -1,5 +1,5 @@
-import { IdentityProvider, OAuthState } from "shared";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { IdentityProvider, OAuthState } from "shared";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
 
 export interface OngoingOAuthRepository {
   save(onGoingOAuth: OngoingOAuth): Promise<void>;

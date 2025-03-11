@@ -1,7 +1,7 @@
 import axios from "axios";
 import { firstValueFrom } from "rxjs";
 import {
-  GetSiretInfoError,
+  type GetSiretInfoError,
   apiSirenNotAvailableSiret,
   conflictErrorSiret,
   expectToEqual,
@@ -9,7 +9,7 @@ import {
   tooManySirenRequestsSiret,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 import { HttpFormCompletionGateway } from "./HttpFormCompletionGateway";
 import { SimulatedFormCompletionGateway } from "./SimulatedFormCompletionGateway";
 

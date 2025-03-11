@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const sentAtDiscussionIdUniqueConstraintName = "exchanges_discussion_id_unique";
 const exchangeTable = "exchanges";

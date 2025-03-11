@@ -1,9 +1,9 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
-  AgencyWithUsersRights,
+  type AgencyWithUsersRights,
   ConflictError,
-  GeoPositionDto,
+  type GeoPositionDto,
   InclusionConnectedUserBuilder,
   activeAgencyStatuses,
   errors,
@@ -11,11 +11,14 @@ import {
   expectToEqual,
   miniStageAgencyKinds,
 } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import { AgencyWithoutRights } from "../ports/AgencyRepository";
+import type { AgencyWithoutRights } from "../ports/AgencyRepository";
 import {
   PgAgencyRepository,
   safirConflictErrorMessage,

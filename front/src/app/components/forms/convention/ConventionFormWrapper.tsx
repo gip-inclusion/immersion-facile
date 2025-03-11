@@ -7,10 +7,10 @@ import { ConventionSummary, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  ConventionId,
-  ConventionJwtPayload,
-  ExcludeFromExisting,
-  InternshipKind,
+  type ConventionId,
+  type ConventionJwtPayload,
+  type ExcludeFromExisting,
+  type InternshipKind,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   toDisplayedDate,
@@ -20,15 +20,15 @@ import { ConventionForm } from "src/app/components/forms/convention/ConventionFo
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { type ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
-import { type ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
-import { type ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
+import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
+import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
+import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 const {
   Component: ConfirmDuplicateConventionModal,

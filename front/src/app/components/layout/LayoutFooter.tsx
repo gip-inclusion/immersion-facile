@@ -9,10 +9,10 @@ import {
   Footer,
   FooterStyles,
   MinistereEmploiLogo,
-  NavLink,
-  NavTopGroupLinks,
+  type NavLink,
+  type NavTopGroupLinks,
   OverFooter,
-  OverFooterCols,
+  type OverFooterCols,
 } from "react-design-system";
 import { domElementIds } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";

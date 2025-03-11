@@ -1,7 +1,7 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   ImmersionTextField,
-  ImmersionTextFieldProps,
+  type ImmersionTextFieldProps,
 } from "./ImmersionTextField";
 
 const Component = ImmersionTextField;

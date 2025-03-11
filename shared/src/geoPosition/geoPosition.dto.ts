@@ -1,4 +1,4 @@
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 type Latitude = Flavor<number, "Latitude">;
 type Longitude = Flavor<number, "Longitude">;

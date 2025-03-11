@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const agencyTableName = "agencies";
 const siretColumnName = "agency_siret";

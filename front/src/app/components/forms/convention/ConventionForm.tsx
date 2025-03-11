@@ -3,10 +3,11 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React, {
-  Dispatch,
-  ElementRef,
-  SetStateAction,
+import type React from "react";
+import {
+  type Dispatch,
+  type ElementRef,
+  type SetStateAction,
   useCallback,
   useEffect,
   useRef,
@@ -18,16 +19,21 @@ import {
   ErrorNotifications,
   Loader,
 } from "react-design-system";
-import { FormProvider, SubmitHandler, get, useForm } from "react-hook-form";
+import {
+  FormProvider,
+  type SubmitHandler,
+  get,
+  useForm,
+} from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  AgencyKindFilter,
-  Beneficiary,
-  ConventionReadDto,
-  DepartmentCode,
-  ExcludeFromExisting,
-  FederatedIdentity,
-  InternshipKind,
+  type AgencyKindFilter,
+  type Beneficiary,
+  type ConventionReadDto,
+  type DepartmentCode,
+  type ExcludeFromExisting,
+  type FederatedIdentity,
+  type InternshipKind,
   addressDtoToString,
   conventionSchema,
   domElementIds,
@@ -62,7 +68,7 @@ import {
 
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import {
-  ConventionPresentation,
+  type ConventionPresentation,
   conventionPresentationSchema,
   undefinedIfEmptyString,
 } from "src/app/components/forms/convention/conventionHelpers";
@@ -70,8 +76,8 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errors as errorMessage } from "shared";
 import {
-  ConventionFormMode,
-  SupportedConventionRoutes,
+  type ConventionFormMode,
+  type SupportedConventionRoutes,
   creationFormModes,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
@@ -88,10 +94,10 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
+import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  NumberOfSteps,
+  type NumberOfSteps,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";

@@ -1,8 +1,8 @@
 import { keys, mergeRight } from "ramda";
-import React from "react";
-import { InternshipKind, domElementIds } from "shared";
-import { ConventionField } from "../../admin/types";
-import { FormFieldAttributesForContent } from "../types";
+import type React from "react";
+import { type InternshipKind, domElementIds } from "shared";
+import type { ConventionField } from "../../admin/types";
+import type { FormFieldAttributesForContent } from "../types";
 
 export type FormFieldsObjectForContent<T> = Record<
   keyof T,

@@ -1,12 +1,12 @@
 import {
-  AbsoluteUrl,
-  AppellationDto,
-  RomeDto,
+  type AbsoluteUrl,
+  type AppellationDto,
+  type RomeDto,
   withAuthorizationHeaders,
 } from "shared";
-import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
+import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
+import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 
 export type AppellationWithShortLabel = AppellationDto & {
   romeCode: string;

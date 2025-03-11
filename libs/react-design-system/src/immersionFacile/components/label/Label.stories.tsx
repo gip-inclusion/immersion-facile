@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { Label, LabelProperties } from "./Label";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { Label, type LabelProperties } from "./Label";
 
 const Component = Label;
 type Story = StoryObj<typeof Component>;

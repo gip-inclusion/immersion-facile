@@ -1,4 +1,4 @@
-import { EmailButtonProps } from "./components/email";
+import type { EmailButtonProps } from "./components/email";
 
 type CreateEmailVariable<P> = (params: P) => {
   bypassLayout?: boolean;

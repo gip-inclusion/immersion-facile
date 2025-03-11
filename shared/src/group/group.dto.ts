@@ -1,6 +1,6 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { SearchResultDto } from "../search/SearchResult.dto";
-import { Flavor } from "../typeFlavors";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { SearchResultDto } from "../search/SearchResult.dto";
+import type { Flavor } from "../typeFlavors";
 
 export type GroupName = Flavor<string, "GroupName">;
 export type GroupSlug = Flavor<string, "GroupSlug">;

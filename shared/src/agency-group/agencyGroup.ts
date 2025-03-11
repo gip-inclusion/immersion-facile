@@ -1,6 +1,6 @@
-import { DepartmentCode } from "../address/address.dto";
-import { AgencyId } from "../agency/agency.dto";
-import { SiretDto } from "../siret/siret";
+import type { DepartmentCode } from "../address/address.dto";
+import type { AgencyId } from "../agency/agency.dto";
+import type { SiretDto } from "../siret/siret";
 
 type AgencyGroupCommon = {
   siret: SiretDto;

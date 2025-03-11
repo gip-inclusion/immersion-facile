@@ -1,11 +1,11 @@
 import {
-  AssessmentDto,
-  ConventionDto,
-  ConventionStatus,
+  type AssessmentDto,
+  type ConventionDto,
+  type ConventionStatus,
   calculateTotalImmersionHoursBetweenDateComplex,
   errors,
 } from "shared";
-import { EntityFromDto } from "../../../utils/EntityFromDto";
+import type { EntityFromDto } from "../../../utils/EntityFromDto";
 
 export type AssessmentEntity = EntityFromDto<AssessmentDto, "Assessment"> & {
   numberOfHoursActuallyMade: number | null;

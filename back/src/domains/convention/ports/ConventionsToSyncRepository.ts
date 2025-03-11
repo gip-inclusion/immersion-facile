@@ -1,4 +1,4 @@
-import { ConventionId } from "shared";
+import type { ConventionId } from "shared";
 
 export type ConventionToSync = {
   id: ConventionId;

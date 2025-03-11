@@ -1,11 +1,11 @@
 import {
-  AgencyId,
-  InclusionConnectDomainJwtPayload,
-  InclusionConnectedUser,
+  type AgencyId,
+  type InclusionConnectDomainJwtPayload,
+  type InclusionConnectedUser,
   errors,
 } from "shared";
-import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (
   uow: UnitOfWork,

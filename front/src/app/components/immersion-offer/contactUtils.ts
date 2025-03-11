@@ -1,4 +1,4 @@
-import { AppellationCode, AppellationDto } from "shared";
+import type { AppellationCode, AppellationDto } from "shared";
 
 export const getDefaultAppellationCode = (
   appellations: AppellationDto[],

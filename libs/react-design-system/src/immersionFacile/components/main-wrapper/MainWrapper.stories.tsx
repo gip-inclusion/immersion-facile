@@ -1,6 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { MainWrapper, MainWrapperProps } from "./MainWrapper";
+import { MainWrapper, type MainWrapperProps } from "./MainWrapper";
 
 const Component = MainWrapper;
 type Story = StoryObj<typeof Component>;

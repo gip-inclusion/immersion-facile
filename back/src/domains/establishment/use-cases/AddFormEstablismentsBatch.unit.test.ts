@@ -1,8 +1,8 @@
 import {
-  FormEstablishmentBatchDto,
-  FormEstablishmentDto,
+  type FormEstablishmentBatchDto,
+  type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  GroupOptions,
+  type GroupOptions,
   InclusionConnectedUserBuilder,
   defaultAddress,
   defaultValidFormEstablishment,
@@ -21,7 +21,7 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

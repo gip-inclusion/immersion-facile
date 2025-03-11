@@ -1,18 +1,19 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { ModalProps, createModal } from "@codegouvfr/react-dsfr/Modal";
+import { type ModalProps, createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
+import type React from "react";
+import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 
 import {
-  ConventionDto,
-  ConventionStatusWithJustification,
-  InternshipKind,
-  Role,
-  Signatory,
-  UpdateConventionStatusRequestDto,
+  type ConventionDto,
+  type ConventionStatusWithJustification,
+  type InternshipKind,
+  type Role,
+  type Signatory,
+  type UpdateConventionStatusRequestDto,
   domElementIds,
   getSignatoryProcessedData,
   isConventionRenewed,

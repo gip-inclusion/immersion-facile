@@ -1,9 +1,9 @@
 import type { AxiosInstance } from "axios";
-import { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl } from "shared";
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
-import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
-import {
+import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
+import type {
   FtAgenciesReferential,
   FtAgencyFromReferential,
 } from "../../../establishment/ports/FtAgenciesReferential";

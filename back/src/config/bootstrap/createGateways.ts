@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { type AxiosInstance } from "axios";
 import { Pool } from "pg";
 import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
@@ -15,35 +15,35 @@ import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adap
 import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
 import { InMemoryFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
-import { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
+import type { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
 import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { makeProConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/proConnect.routes";
-import { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
+import type { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";
-import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
+import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { EmailableEmailValidationGateway } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway";
 import { emailableValidationRoutes } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.routes";
 import { InMemoryEmailValidationGateway } from "../../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
 import { InMemoryDocumentGateway } from "../../domains/core/file-storage/adapters/InMemoryDocumentGateway";
 import { S3DocumentGateway } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
-import { DocumentGateway } from "../../domains/core/file-storage/port/DocumentGateway";
+import type { DocumentGateway } from "../../domains/core/file-storage/port/DocumentGateway";
 import { BrevoNotificationGateway } from "../../domains/core/notifications/adapters/BrevoNotificationGateway";
 import { brevoNotificationGatewayRoutes } from "../../domains/core/notifications/adapters/BrevoNotificationGateway.routes";
 import { InMemoryNotificationGateway } from "../../domains/core/notifications/adapters/InMemoryNotificationGateway";
-import { NotificationGateway } from "../../domains/core/notifications/ports/NotificationGateway";
+import type { NotificationGateway } from "../../domains/core/notifications/ports/NotificationGateway";
 import { InMemoryPdfGeneratorGateway } from "../../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
 import {
   ScalingoPdfGeneratorGateway,
   makeScalingoPdfGeneratorRoutes,
 } from "../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
-import { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
+import type { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../domains/core/retry-strategy/ports/RetryStrategy";
 import { DiagorienteAppellationsGateway } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway";
 import {
-  DiagorienteAccessTokenResponse,
+  type DiagorienteAccessTokenResponse,
   diagorienteAppellationsRoutes,
   diagorienteTokenScope,
 } from "../../domains/core/rome/adapters/DiagorienteAppellationsGateway.routes";
@@ -58,11 +58,11 @@ import { makeInseeExternalRoutes } from "../../domains/core/sirene/adapters/Inse
 import { HttpCrispGateway } from "../../domains/core/support/adapters/HttpCrispGateway";
 import { InMemoryCrispApi } from "../../domains/core/support/adapters/InMemoryCrispApi";
 import { crispRoutes } from "../../domains/core/support/adapters/crispRoutes";
-import { CrispGateway } from "../../domains/core/support/ports/CrispGateway";
+import type { CrispGateway } from "../../domains/core/support/ports/CrispGateway";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";
-import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
+import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
+import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { HttpLaBonneBoiteGateway } from "../../domains/establishment/adapters/la-bonne-boite/HttpLaBonneBoiteGateway";
 import { InMemoryLaBonneBoiteGateway } from "../../domains/establishment/adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
 import { createLbbRoutes } from "../../domains/establishment/adapters/la-bonne-boite/LaBonneBoite.routes";
@@ -73,13 +73,13 @@ import { BrevoEstablishmentMarketingGateway } from "../../domains/marketing/adap
 import { InMemoryEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { createLogger } from "../../utils/logger";
 import {
-  AccessTokenResponse,
-  AppConfig,
+  type AccessTokenResponse,
+  type AppConfig,
   makeEmailAllowListPredicate,
 } from "./appConfig";
 import { getWithCache } from "./cache";
 import {
-  LogInputCbOnSuccess,
+  type LogInputCbOnSuccess,
   logPartnerResponses,
 } from "./logPartnerResponses";
 import { partnerNames } from "./partnerNames";

@@ -1,9 +1,9 @@
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   AgencyDtoBuilder,
-  AuthenticateWithOAuthCodeParams,
-  IdToken,
-  User,
+  type AuthenticateWithOAuthCodeParams,
+  type IdToken,
+  type User,
   allowedStartOAuthLoginPages,
   errors,
   expectObjectInArrayToMatch,
@@ -17,7 +17,7 @@ import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
@@ -25,8 +25,8 @@ import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { GetAccessTokenPayload } from "../port/OAuthGateway";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 describe("AuthenticateWithInclusionCode use case", () => {

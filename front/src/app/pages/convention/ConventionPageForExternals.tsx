@@ -3,8 +3,8 @@ import { MainWrapper } from "react-design-system";
 import { ConventionFormWrapper } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 import { ErrorPage } from "../error/ErrorPage";
 
 export type ConventionImmersionForExternalsRoute = Route<

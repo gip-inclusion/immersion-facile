@@ -1,14 +1,14 @@
 import {
-  GetSiretRequestDto,
-  SiretEstablishmentDto,
+  type GetSiretRequestDto,
+  type SiretEstablishmentDto,
   errors,
   getSiretRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
-import { SiretGateway } from "../ports/SiretGateway";
+import type { SiretGateway } from "../ports/SiretGateway";
 
 export class GetSiretIfNotAlreadySaved extends TransactionalUseCase<
   GetSiretRequestDto,

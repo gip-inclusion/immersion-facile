@@ -1,12 +1,12 @@
 import {
-  FormCompletionRoutes,
+  type FormCompletionRoutes,
   expectHttpResponseToEqual,
   formCompletionRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { SuperTest, Test } from "supertest";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

@@ -1,20 +1,20 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import RadioButtons, {
-  RadioButtonsProps,
+  type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  EstablishmentSearchableBy,
-  FormEstablishmentDto,
+  type EstablishmentSearchableBy,
+  type FormEstablishmentDto,
   domElementIds,
 } from "shared";
 import allUsersSvg from "../../../../../assets/img/all.svg";
 import jobSeekerSvg from "../../../../../assets/img/jobseeker.svg";
 import studentSvg from "../../../../../assets/img/student.svg";
-import { Mode, OnStepChange, Step } from "../EstablishmentForm";
+import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 const searchableByValues: Record<
   "all" | keyof EstablishmentSearchableBy,

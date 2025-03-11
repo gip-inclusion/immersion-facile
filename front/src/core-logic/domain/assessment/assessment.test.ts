@@ -1,10 +1,10 @@
-import { AssessmentDto, errors, expectToEqual } from "shared";
+import { type AssessmentDto, errors, expectToEqual } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { assessmentSelectors } from "./assessment.selectors";
 import { assessmentSlice } from "./assessment.slice";
 

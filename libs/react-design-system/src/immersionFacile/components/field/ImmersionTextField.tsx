@@ -1,6 +1,6 @@
-import React from "react";
+import type React from "react";
 import { Input, InputGroup, TextArea, TextInputError } from "../inputs";
-import { AutocompleteAttributeValue } from "../inputs/AutocompleteAttributeValue.type";
+import type { AutocompleteAttributeValue } from "../inputs/AutocompleteAttributeValue.type";
 import { Label } from "../label";
 import { FieldDescription } from "./FieldDescription";
 

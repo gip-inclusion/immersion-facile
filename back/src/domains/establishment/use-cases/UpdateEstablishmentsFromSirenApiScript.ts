@@ -1,13 +1,13 @@
 import subDays from "date-fns/subDays";
 import { keys } from "ramda";
-import { SiretDto, SiretEstablishmentDto } from "shared";
+import type { SiretDto, SiretEstablishmentDto } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
-import { SiretGateway } from "../../core/sirene/ports/SiretGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import {
+import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type {
   UpdateEstablishmentsWithInseeDataParams,
   ValuesToUpdateFromInseeApi,
 } from "../ports/EstablishmentAggregateRepository";

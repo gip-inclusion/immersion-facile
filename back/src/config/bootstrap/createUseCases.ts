@@ -1,11 +1,11 @@
 import { keys } from "ramda";
 import {
-  ApiConsumerId,
-  FindSimilarConventionsParams,
-  FindSimilarConventionsResponseDto,
+  type ApiConsumerId,
+  type FindSimilarConventionsParams,
+  type FindSimilarConventionsResponseDto,
   NotFoundError,
-  ShortLinkId,
-  SiretDto,
+  type ShortLinkId,
+  type SiretDto,
 } from "shared";
 import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
@@ -55,7 +55,7 @@ import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../do
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
-import { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
+import type { TransactionalUseCase, UseCase } from "../../domains/core/UseCase";
 import { LookupLocation } from "../../domains/core/address/use-cases/LookupLocation";
 import { LookupStreetAddress } from "../../domains/core/address/use-cases/LookupStreetAddress";
 import { BroadcastToPartnersOnConventionUpdates } from "../../domains/core/api-consumer/use-cases/BroadcastToPartnersOnConventionUpdates";
@@ -69,13 +69,13 @@ import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../dom
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
-import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
+import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
 import { makeCreateNewEvent } from "../../domains/core/events/ports/EventBus";
 import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFeatureFlag";
 import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
-import {
+import type {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
@@ -95,9 +95,9 @@ import { GetSiret } from "../../domains/core/sirene/use-cases/GetSiret";
 import { GetSiretIfNotAlreadySaved } from "../../domains/core/sirene/use-cases/GetSiretIfNotAlreadySaved";
 import { makeGetEstablishmentStats } from "../../domains/core/statistics/use-cases/GetEstablishmentStats";
 import { makeSendSupportTicketToCrisp } from "../../domains/core/support/use-cases/SendSupportTicketToCrisp";
-import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
-import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
+import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
+import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
 import { makeAssessmentReminder } from "../../domains/establishment/use-cases/AssessmentReminder";
@@ -133,8 +133,8 @@ import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/u
 import { makeRemoveUserFromAgency } from "../../domains/inclusion-connected-users/use-cases/RemoveUserFromAgency";
 import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateUserForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
-import { AppConfig } from "./appConfig";
-import { Gateways } from "./createGateways";
+import type { AppConfig } from "./appConfig";
+import type { Gateways } from "./createGateways";
 import {
   makeGenerateConventionMagicLinkUrl,
   makeGenerateEditFormEstablishmentUrl,

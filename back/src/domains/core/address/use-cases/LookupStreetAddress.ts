@@ -1,11 +1,11 @@
 import {
-  AddressAndPosition,
-  ConventionJwtPayload,
-  WithLookupAddressQueryParams,
+  type AddressAndPosition,
+  type ConventionJwtPayload,
+  type WithLookupAddressQueryParams,
   withLookupStreetAddressQueryParamsSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";
-import { AddressGateway } from "../ports/AddressGateway";
+import type { AddressGateway } from "../ports/AddressGateway";
 
 export class LookupStreetAddress extends UseCase<
   WithLookupAddressQueryParams,

@@ -1,8 +1,11 @@
-import { Pool } from "pg";
-import { AppellationCode, NafCode, expectToEqual } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { Pool } from "pg";
+import { type AppellationCode, type NafCode, expectToEqual } from "shared";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool, optional } from "../../../config/pg/pgUtils";
-import { GeoParams, SearchMadeEntity } from "../entities/SearchMadeEntity";
+import type { GeoParams, SearchMadeEntity } from "../entities/SearchMadeEntity";
 import { PgSearchMadeRepository } from "./PgSearchMadeRepository";
 
 describe("PgSearchesMadeRepository", () => {

@@ -4,7 +4,7 @@ import React from "react";
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";
-import { Mode, OnStepChange } from "../EstablishmentForm";
+import type { Mode, OnStepChange } from "../EstablishmentForm";
 
 export const IntroSection = ({
   onStepChange,

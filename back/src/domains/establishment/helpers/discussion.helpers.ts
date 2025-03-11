@@ -1,4 +1,4 @@
-import { DiscussionDto, Exchange } from "shared";
+import type { DiscussionDto, Exchange } from "shared";
 
 export const addExchangeToDiscussion = (
   discussion: DiscussionDto,

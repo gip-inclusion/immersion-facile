@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 const viewEstablishments = "view_establishments";
 const viewEstablishmentsWithAggregatedOffers =
   "view_establishments_with_aggregated_offers";

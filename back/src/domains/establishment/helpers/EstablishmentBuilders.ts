@@ -1,24 +1,24 @@
 import {
-  AbsoluteUrl,
-  Builder,
-  ContactMethod,
-  EstablishmentSearchableBy,
-  FormEstablishmentSource,
-  Location,
-  NafDto,
-  NumberEmployeesRange,
-  RomeCode,
-  WithAcquisition,
+  type AbsoluteUrl,
+  type Builder,
+  type ContactMethod,
+  type EstablishmentSearchableBy,
+  type FormEstablishmentSource,
+  type Location,
+  type NafDto,
+  type NumberEmployeesRange,
+  type RomeCode,
+  type WithAcquisition,
   defaultMaxContactsPerMonth,
   errors,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
-import {
+import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { OfferEntity } from "../entities/OfferEntity";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { OfferEntity } from "../entities/OfferEntity";
 
 export const TEST_APPELLATION_LABEL = "test_appellation_label";
 export const TEST_APPELLATION_CODE = "12345";

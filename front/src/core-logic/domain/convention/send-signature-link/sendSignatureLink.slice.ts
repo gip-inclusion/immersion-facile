@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ConventionSupportedJwt, SendSignatureLinkRequestDto } from "shared";
+import type {
+  ConventionSupportedJwt,
+  SendSignatureLinkRequestDto,
+} from "shared";
 
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface SendSignatureLinkState {
   isSending: boolean;

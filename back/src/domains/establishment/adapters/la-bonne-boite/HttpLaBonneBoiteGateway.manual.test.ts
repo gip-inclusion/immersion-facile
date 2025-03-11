@@ -1,7 +1,12 @@
-import { GeoPositionDto, NafCode, RomeDto, expectToEqual } from "shared";
+import {
+  type GeoPositionDto,
+  type NafCode,
+  type RomeDto,
+  expectToEqual,
+} from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import {
-  AccessTokenResponse,
+  type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtFetchSharedClient } from "../../../../config/helpers/createFetchSharedClients";
@@ -10,7 +15,7 @@ import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/I
 import { withNoCache } from "../../../core/caching-gateway/adapters/withNoCache";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
-import { SearchCompaniesParams } from "../../ports/LaBonneBoiteGateway";
+import type { SearchCompaniesParams } from "../../ports/LaBonneBoiteGateway";
 import { HttpLaBonneBoiteGateway } from "./HttpLaBonneBoiteGateway";
 import { createLbbRoutes } from "./LaBonneBoite.routes";
 import { LaBonneBoiteCompanyDtoBuilder } from "./LaBonneBoiteCompanyDtoBuilder";

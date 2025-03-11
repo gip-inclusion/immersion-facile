@@ -1,4 +1,4 @@
-import { AddressDto, GroupWithResults, SearchResultDto } from "shared";
+import type { AddressDto, GroupWithResults, SearchResultDto } from "shared";
 
 const defaultNaf = "MyNaf";
 const defaultAddress: AddressDto = {

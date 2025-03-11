@@ -1,5 +1,5 @@
-import { Observable, from } from "rxjs";
-import {
+import { type Observable, from } from "rxjs";
+import type {
   ContactEstablishmentRequestDto,
   GroupSlug,
   GroupWithResults,
@@ -9,13 +9,13 @@ import {
   SearchRoutes,
   SiretAndAppellationDto,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import {
+import type {
   ContactErrorKind,
   SearchGateway,
 } from "src/core-logic/ports/SearchGateway";

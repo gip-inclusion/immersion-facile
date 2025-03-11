@@ -5,7 +5,7 @@ import { domElementIds, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes, useRoute } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 export const InitiateConventionPage = () => {
   const route = useRoute() as Route<typeof routes.initiateConvention>;

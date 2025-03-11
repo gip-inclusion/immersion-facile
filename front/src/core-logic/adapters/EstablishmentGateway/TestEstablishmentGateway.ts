@@ -1,11 +1,11 @@
-import { Observable, Subject } from "rxjs";
-import {
+import { type Observable, Subject } from "rxjs";
+import type {
   ConnectedUserJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
 } from "shared";
-import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class TestEstablishmentGateway implements EstablishmentGateway {
   public addFormEstablishmentResult$ = new Subject<void>();

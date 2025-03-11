@@ -1,4 +1,4 @@
-import { GroupName, GroupOptions, GroupSlug, SiretDto } from "shared";
+import type { GroupName, GroupOptions, GroupSlug, SiretDto } from "shared";
 
 export type GroupEntity = {
   slug: GroupSlug;

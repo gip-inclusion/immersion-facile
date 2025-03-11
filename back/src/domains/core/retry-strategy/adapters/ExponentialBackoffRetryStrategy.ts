@@ -3,10 +3,10 @@ import {
   minutesToMilliseconds,
   secondsToMilliseconds,
 } from "date-fns";
-import { RandomFn, SleepFn } from "shared";
+import type { RandomFn, SleepFn } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { RetryStrategy, RetryableError } from "../ports/RetryStrategy";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { type RetryStrategy, RetryableError } from "../ports/RetryStrategy";
 
 export const defaultMaxBackoffPeriodMs = minutesToMilliseconds(1);
 export const defaultRetryDeadlineMs = minutesToMilliseconds(5);

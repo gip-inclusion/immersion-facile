@@ -1,18 +1,18 @@
 import {
   ConventionDtoBuilder,
   DiscussionBuilder,
-  DiscussionDto,
+  type DiscussionDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import {
-  MarkDiscussionLinkedToConvention,
+  type MarkDiscussionLinkedToConvention,
   makeMarkDiscussionLinkedToConvention,
 } from "./MarkDiscussionLinkedToConvention";
 

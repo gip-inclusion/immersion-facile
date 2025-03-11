@@ -5,19 +5,19 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import {
-  ConventionDto,
-  ConventionStatusWithJustification,
-  Role,
-  Signatory,
-  UpdateConventionStatusRequestDto,
+  type ConventionDto,
+  type ConventionStatusWithJustification,
+  type Role,
+  type Signatory,
+  type UpdateConventionStatusRequestDto,
   doesStatusNeedsJustification,
   domElementIds,
   signatoryTitleByRole,
   updateConventionStatusRequestSchema,
 } from "shared";
-import { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
+import type { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
@@ -47,11 +47,12 @@ export const JustificationModalContent = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onFormSubmit: SubmitHandler<Partial<UpdateConventionStatusRequestDto>> =
-    (values) => {
-      onSubmit(updateConventionStatusRequestSchema.parse(values));
-      closeModal();
-    };
+  const onFormSubmit: SubmitHandler<
+    Partial<UpdateConventionStatusRequestDto>
+  > = (values) => {
+    onSubmit(updateConventionStatusRequestSchema.parse(values));
+    closeModal();
+  };
 
   const conventionSignatories: Signatory[] = Object.values(
     convention.signatories,

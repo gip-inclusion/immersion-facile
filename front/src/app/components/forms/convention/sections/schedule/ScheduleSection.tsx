@@ -2,12 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { addDays, differenceInCalendarDays, differenceInDays } from "date-fns";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  ConventionReadDto,
-  DateIntervalDto,
-  Weekday,
+  type ConventionReadDto,
+  type DateIntervalDto,
+  type Weekday,
   convertLocaleDateToUtcTimezoneDate,
   isStringDate,
   maximumCalendarDayByInternshipKind,

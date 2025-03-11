@@ -1,14 +1,14 @@
 import {
-  InclusionConnectedUser,
-  PartialAgencyDto,
-  UpdateAgencyStatusParams,
+  type InclusionConnectedUser,
+  type PartialAgencyDto,
+  type UpdateAgencyStatusParams,
   errors,
   updateAgencyStatusParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<

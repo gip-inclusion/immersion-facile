@@ -1,12 +1,12 @@
 import {
-  GetUsersFilters,
-  InclusionConnectedUser,
-  UserInList,
-  UserWithAdminRights,
+  type GetUsersFilters,
+  type InclusionConnectedUser,
+  type UserInList,
+  type UserWithAdminRights,
   getUsersFiltersSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
 export type GetUsers = ReturnType<typeof makeGetUsers>;

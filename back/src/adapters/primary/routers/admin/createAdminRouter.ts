@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
-  GetDashboardParams,
-  WithAgencyIdAndUserId,
+  type GetDashboardParams,
+  type WithAgencyIdAndUserId,
   adminRoutes,
   agencyRoutes,
   errors,

@@ -2,13 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  ConventionDto,
-  ConventionReadDto,
-  DailyScheduleDto,
-  DateIntervalDto,
-  ScheduleDto,
+  type ConventionDto,
+  type ConventionReadDto,
+  type DailyScheduleDto,
+  type DateIntervalDto,
+  type ScheduleDto,
   ScheduleDtoBuilder,
-  SelectedDaysOfTheWeekDto,
+  type SelectedDaysOfTheWeekDto,
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,

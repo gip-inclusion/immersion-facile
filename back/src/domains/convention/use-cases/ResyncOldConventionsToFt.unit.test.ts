@@ -1,8 +1,8 @@
 import subDays from "date-fns/subDays";
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  ConventionDto,
+  type ConventionDto,
   ConventionDtoBuilder,
   errors,
   expectToEqual,
@@ -11,12 +11,12 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryFranceTravailGateway } from "../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import {
-  FranceTravailConvention,
+  type FranceTravailConvention,
   conventionStatusToFranceTravailStatus,
 } from "../ports/FranceTravailGateway";
 import { ResyncOldConventionsToFt } from "./ResyncOldConventionsToFt";

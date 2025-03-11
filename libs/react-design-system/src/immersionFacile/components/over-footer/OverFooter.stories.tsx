@@ -1,5 +1,9 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { OverFooter, OverFooterCols, OverFooterProps } from "./OverFooter";
+import {
+  OverFooter,
+  type OverFooterCols,
+  type OverFooterProps,
+} from "./OverFooter";
 
 const Component = OverFooter;
 type Story = StoryObj<typeof Component>;

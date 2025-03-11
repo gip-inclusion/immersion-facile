@@ -1,5 +1,5 @@
-import { AppellationDto, toLowerCaseWithoutDiacritics } from "shared";
-import { AppellationsGateway } from "../ports/AppellationsGateway";
+import { type AppellationDto, toLowerCaseWithoutDiacritics } from "shared";
+import type { AppellationsGateway } from "../ports/AppellationsGateway";
 
 export class InMemoryAppellationsGateway implements AppellationsGateway {
   public async searchAppellations(query: string): Promise<AppellationDto[]> {

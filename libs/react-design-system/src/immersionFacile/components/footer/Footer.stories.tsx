@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { Footer, FooterProps } from "./Footer";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { Footer, type FooterProps } from "./Footer";
 
 const Component = Footer;
 type Story = StoryObj<typeof Component>;

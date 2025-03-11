@@ -1,12 +1,12 @@
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyRight,
+  type AgencyRight,
   ConventionDtoBuilder,
-  ConventionReadDto,
-  InclusionConnectedUser,
+  type ConventionReadDto,
+  type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  WithAgencyIds,
+  type WithAgencyIds,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
@@ -21,11 +21,11 @@ import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.sele
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { FederatedIdentityWithUser, authSlice } from "../auth/auth.slice";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import { type FederatedIdentityWithUser, authSlice } from "../auth/auth.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 

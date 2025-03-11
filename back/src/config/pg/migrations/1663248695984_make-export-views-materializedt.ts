@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 // Unchanged queries (views remain the same but just turn into materialized views)
 const SQL_view_siret_with_department_region = `SELECT e.siret, department_name, region_name

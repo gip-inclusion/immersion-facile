@@ -1,6 +1,6 @@
-import { LocationId } from "../address/address.dto";
-import { AgencyId, AgencyStatus } from "../agency/agency.dto";
-import {
+import type { LocationId } from "../address/address.dto";
+import type { AgencyId, AgencyStatus } from "../agency/agency.dto";
+import type {
   ApiConsumerRightName,
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
@@ -10,33 +10,33 @@ import type {
   ConventionStatus,
   ReminderKind,
 } from "../convention/convention.dto";
-import { DiscussionId } from "../discussion/discussion.dto";
-import { Email } from "../email/email.dto";
-import { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
-import { StoredFileId } from "../file/file.dto";
-import { FileValidationError } from "../file/file.validators";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { GroupSlug } from "../group/group.dto";
-import {
+import type { DiscussionId } from "../discussion/discussion.dto";
+import type { Email } from "../email/email.dto";
+import type { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
+import type { StoredFileId } from "../file/file.dto";
+import type { FileValidationError } from "../file/file.validators";
+import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { GroupSlug } from "../group/group.dto";
+import type {
   IdentityProvider,
   OAuthState,
 } from "../inclusionConnect/inclusionConnect.dto";
-import {
+import type {
   AgencyRole,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import {
+import type {
   NotificationId,
   NotificationKind,
 } from "../notifications/notifications.dto";
-import { AgencyModifierRole, Role, SignatoryRole } from "../role/role.dto";
+import type { AgencyModifierRole, Role, SignatoryRole } from "../role/role.dto";
 import {
   agencyModifierTitleByRole,
   signatoryTitleByRole,
 } from "../role/role.utils";
-import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { ShortLinkId } from "../shortLink/shortLink.dto";
-import { SiretDto } from "../siret/siret";
+import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { ShortLinkId } from "../shortLink/shortLink.dto";
+import type { SiretDto } from "../siret/siret";
 import { toDisplayedDate } from "../utils/date";
 import {
   BadRequestError,

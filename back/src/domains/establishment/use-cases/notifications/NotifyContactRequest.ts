@@ -1,7 +1,7 @@
 import { ascend, prop, sort } from "ramda";
 import {
-  ContactEstablishmentEventPayload,
-  TemplatedEmail,
+  type ContactEstablishmentEventPayload,
+  type TemplatedEmail,
   addressDtoToString,
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
@@ -10,9 +10,9 @@ import {
 } from "shared";
 
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
   protected inputSchema = contactEstablishmentEventPayloadSchema;

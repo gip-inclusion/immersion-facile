@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { LinkHome, LinkHomeProps } from "./LinkHome";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { LinkHome, type LinkHomeProps } from "./LinkHome";
 
 const Component = LinkHome;
 type Story = StoryObj<typeof Component>;

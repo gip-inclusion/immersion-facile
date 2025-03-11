@@ -1,12 +1,12 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  AbsoluteUrl,
-  ShortLinkId,
+  type AbsoluteUrl,
+  type ShortLinkId,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";

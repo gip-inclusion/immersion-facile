@@ -1,6 +1,6 @@
 import { appellationCodesSchema, zToBoolean, zToNumber } from "shared";
 import { z } from "zod";
-import { SearchParamsPublicV2 } from "./SearchParamsPublicV2.dto";
+import type { SearchParamsPublicV2 } from "./SearchParamsPublicV2.dto";
 
 export const searchParamsPublicV2Schema: z.Schema<SearchParamsPublicV2> =
   z.object({

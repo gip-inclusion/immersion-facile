@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {
+import type {
   ApiConsumerJwt,
   ApiConsumerJwtPayload,
   AppSupportedJwt,

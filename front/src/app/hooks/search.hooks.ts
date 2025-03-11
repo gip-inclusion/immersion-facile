@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { keys } from "shared";
 import {
-  AcquisitionParams,
+  type AcquisitionParams,
   acquisitionParams,
   routes,
   searchParams,
@@ -11,10 +11,10 @@ import {
   getUrlParameters,
 } from "src/app/utils/url.utils";
 import {
-  SearchPageParams,
+  type SearchPageParams,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 export const encodedSearchUriParams = [
   "place",

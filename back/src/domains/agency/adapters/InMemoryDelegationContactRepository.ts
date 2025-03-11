@@ -1,6 +1,6 @@
 import { values } from "ramda";
-import { Email, isTruthy } from "shared";
-import { DelegationContactRepository } from "../ports/DelegationContactRepository";
+import { type Email, isTruthy } from "shared";
+import type { DelegationContactRepository } from "../ports/DelegationContactRepository";
 
 type DelegationContactDto = {
   province: string;

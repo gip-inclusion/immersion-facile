@@ -1,5 +1,9 @@
-import { Request, Response } from "express";
-import { AbsoluteUrl, FTConnectError, ManagedFTConnectError } from "shared";
+import type { Request, Response } from "express";
+import {
+  type AbsoluteUrl,
+  FTConnectError,
+  ManagedFTConnectError,
+} from "shared";
 import { createLogger } from "../../utils/logger";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 

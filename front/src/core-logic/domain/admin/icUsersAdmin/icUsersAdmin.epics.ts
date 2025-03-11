@@ -1,7 +1,7 @@
-import { PayloadAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import {
+import type {
   AgencyId,
   AgencyRight,
   InclusionConnectedUser,
@@ -10,14 +10,14 @@ import {
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
-import { type AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
+import type { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
-  NormalizedIcUserById,
+  type NormalizedIcUserById,
   icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

@@ -4,8 +4,8 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
-  Notification,
-  TemplatedEmail,
+  type Notification,
+  type TemplatedEmail,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
@@ -14,18 +14,18 @@ import {
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
-  ExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
-  SaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

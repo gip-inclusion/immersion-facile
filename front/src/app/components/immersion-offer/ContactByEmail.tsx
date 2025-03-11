@@ -3,15 +3,16 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ElementRef, useMemo, useRef, useState } from "react";
+import type React from "react";
+import { type ElementRef, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
-  AppellationDto,
-  ContactEstablishmentByMailDto,
-  ImmersionObjective,
-  OmitFromExistingKeys,
+  type AppellationDto,
+  type ContactEstablishmentByMailDto,
+  type ImmersionObjective,
+  type OmitFromExistingKeys,
   contactEstablishmentByMailFormSchema,
   conventionObjectiveOptions,
   domElementIds,
@@ -27,9 +28,9 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { type routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import { EmailValidationInput } from "../forms/commons/EmailValidationInput";
 
 type ContactByEmailProps = {

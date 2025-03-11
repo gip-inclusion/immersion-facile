@@ -1,19 +1,19 @@
 import { sql } from "kysely";
 import {
-  DateTimeIsoString,
-  Group,
-  GroupSlug,
-  GroupWithResults,
-  SiretDto,
+  type DateTimeIsoString,
+  type Group,
+  type GroupSlug,
+  type GroupWithResults,
+  type SiretDto,
   groupWithResultsSchema,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { GroupEntity } from "../entities/GroupEntity";
-import { GroupRepository } from "../ports/GroupRepository";
+import type { GroupEntity } from "../entities/GroupEntity";
+import type { GroupRepository } from "../ports/GroupRepository";
 
 export class PgGroupRepository implements GroupRepository {
   constructor(private transaction: KyselyDb) {}

@@ -1,7 +1,7 @@
-import { Observable, from } from "rxjs";
-import { ConventionJwt, EstablishmentLeadRoutes } from "shared";
-import { HttpClient } from "shared-routes";
-import { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
+import { type Observable, from } from "rxjs";
+import type { ConventionJwt, EstablishmentLeadRoutes } from "shared";
+import type { HttpClient } from "shared-routes";
+import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 import { P, match } from "ts-pattern";
 import {
   otherwiseThrow,

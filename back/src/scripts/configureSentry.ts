@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/node";
-import { AppConfig } from "../config/bootstrap/appConfig";
+import type { AppConfig } from "../config/bootstrap/appConfig";
 import { version } from "./version";
 
 export const configureSentry = (appConfig: AppConfig) => {

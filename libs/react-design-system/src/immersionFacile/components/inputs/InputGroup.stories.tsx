@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { InputGroup, InputGroupProperties } from "./InputGroup";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { InputGroup, type InputGroupProperties } from "./InputGroup";
 
 const Component = InputGroup;
 type Story = StoryObj<typeof Component>;

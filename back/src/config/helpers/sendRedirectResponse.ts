@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { AbsoluteUrl } from "shared";
+import type { Request, Response } from "express";
+import type { AbsoluteUrl } from "shared";
 import { handleHttpJsonResponseError } from "./handleHttpJsonResponseError";
 
 export const sendRedirectResponse = async (

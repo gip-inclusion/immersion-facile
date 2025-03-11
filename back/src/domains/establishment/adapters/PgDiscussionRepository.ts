@@ -2,24 +2,24 @@ import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
 import {
-  ContactMethod,
-  DiscussionDto,
-  DiscussionId,
-  DiscussionStatus,
-  DiscussionStatusWithRejection,
-  Exchange,
-  RejectionKind,
-  SiretDto,
+  type ContactMethod,
+  type DiscussionDto,
+  type DiscussionId,
+  type DiscussionStatus,
+  type DiscussionStatusWithRejection,
+  type Exchange,
+  type RejectionKind,
+  type SiretDto,
   errors,
   pipeWithValue,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
-import {
+import type { Database } from "../../../config/pg/kysely/model/database";
+import type {
   DiscussionRepository,
   GetDiscussionsParams,
   HasDiscussionMatchingParams,
@@ -39,7 +39,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("created_at", ">=", since)
       .executeTakeFirst();
 
-    return result ? parseInt(result.count) : 0;
+    return result ? Number.parseInt(result.count) : 0;
   }
 
   public async deleteOldMessages(endedSince: Date) {

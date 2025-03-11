@@ -1,8 +1,8 @@
 import { partition } from "ramda";
-import { AgencyRight } from "..";
+import type { AgencyRight } from "..";
 import { errors } from "../errors/errors";
-import { AgencyDto } from "./agency.dto";
-import { AgencyPublicDisplayDto } from "./publicAgency.dto";
+import type { AgencyDto } from "./agency.dto";
+import type { AgencyPublicDisplayDto } from "./publicAgency.dto";
 
 export const toAgencyPublicDisplayDto = (
   agency: AgencyDto,

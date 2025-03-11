@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
+import type {
   ConventionSupportedJwt,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import { PayloadActionWithFeedbackTopic } from "../feedback/feedback.slice";
+import type { PayloadActionWithFeedbackTopic } from "../feedback/feedback.slice";
 
 export interface PartnersErroredConventionState {
   isLoading: boolean;

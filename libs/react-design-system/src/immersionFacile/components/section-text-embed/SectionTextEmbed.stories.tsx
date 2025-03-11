@@ -1,5 +1,8 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { SectionTextEmbed, SectionTextEmbedProps } from "./SectionTextEmbed";
+import {
+  SectionTextEmbed,
+  type SectionTextEmbedProps,
+} from "./SectionTextEmbed";
 
 const Component = SectionTextEmbed;
 type Story = StoryObj<typeof Component>;

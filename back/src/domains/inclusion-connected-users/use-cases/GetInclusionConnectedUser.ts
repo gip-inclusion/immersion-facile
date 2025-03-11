@@ -1,14 +1,14 @@
 import {
-  InclusionConnectedUser,
-  WithOptionalUserId,
+  type InclusionConnectedUser,
+  type WithOptionalUserId,
   errors,
   withOptionalUserIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 

@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
 
 type FeatureFlagSeverity = (typeof featureFlagSeverities)[number];
 

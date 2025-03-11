@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { ConventionId } from "../convention/convention.dto";
+import type { ConventionId } from "../convention/convention.dto";
 import {
   validateEmailInputSchema,
   validateEmailResponseSchema,

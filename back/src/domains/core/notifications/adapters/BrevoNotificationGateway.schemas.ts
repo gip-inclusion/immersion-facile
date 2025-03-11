@@ -1,7 +1,7 @@
 import {
-  AbsoluteUrl,
-  EmailAttachment,
-  Phone,
+  type AbsoluteUrl,
+  type EmailAttachment,
+  type Phone,
   absoluteUrlSchema,
   emailAttachmentSchema,
   emailSchema,

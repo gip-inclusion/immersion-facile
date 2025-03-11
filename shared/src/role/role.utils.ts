@@ -1,5 +1,5 @@
-import { Signatories } from "..";
-import { AgencyModifierRole, SignatoryRole } from "./role.dto";
+import type { Signatories } from "..";
+import type { AgencyModifierRole, SignatoryRole } from "./role.dto";
 
 export const signatoryTitleByRole: Record<SignatoryRole, string> = {
   beneficiary: "bénéficiaire",

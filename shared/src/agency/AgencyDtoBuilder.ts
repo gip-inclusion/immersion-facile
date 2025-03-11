@@ -1,8 +1,13 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { Builder } from "../Builder";
-import { WithAcquisition } from "../acquisition.dto";
-import { AddressDto, DepartmentCode } from "../address/address.dto";
-import { AgencyDto, AgencyId, AgencyKind, AgencyStatus } from "./agency.dto";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { Builder } from "../Builder";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AddressDto, DepartmentCode } from "../address/address.dto";
+import type {
+  AgencyDto,
+  AgencyId,
+  AgencyKind,
+  AgencyStatus,
+} from "./agency.dto";
 
 const defaultAddress: AddressDto = {
   streetNumberAndAddress: "26 rue de l'adresse par défaut",

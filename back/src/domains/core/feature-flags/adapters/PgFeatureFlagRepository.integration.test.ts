@@ -1,17 +1,17 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  FeatureFlags,
+  type FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
-import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
+import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 import { PgFeatureFlagRepository } from "./PgFeatureFlagRepository";
 
 describe("PG getFeatureFlags", () => {

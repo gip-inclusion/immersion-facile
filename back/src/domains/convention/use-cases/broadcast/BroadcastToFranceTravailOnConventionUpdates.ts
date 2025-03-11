@@ -1,22 +1,22 @@
 import {
-  AgencyDto,
-  AgencyKind,
-  ConventionDto,
-  FeatureFlags,
-  ImmersionObjective,
-  WithConventionDto,
+  type AgencyDto,
+  type AgencyKind,
+  type ConventionDto,
+  type FeatureFlags,
+  type ImmersionObjective,
+  type WithConventionDto,
   errors,
   withConventionSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
-  FranceTravailConvention,
-  FranceTravailGateway,
+  type FranceTravailConvention,
+  type FranceTravailGateway,
   conventionStatusToFranceTravailStatus,
   isBroadcastResponseOk,
 } from "../../ports/FranceTravailGateway";

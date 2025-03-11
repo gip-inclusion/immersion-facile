@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
-import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
@@ -14,16 +14,16 @@ import {
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  ConventionReadDto,
-  Phone,
-  SignatoryRole,
+  type ConventionReadDto,
+  type Phone,
+  type SignatoryRole,
   domElementIds,
   isConventionRenewed,
   isValidMobilePhone,
   signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
-import { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
+import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

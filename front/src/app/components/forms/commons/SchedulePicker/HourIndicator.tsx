@@ -5,7 +5,7 @@ import {
   CCI_WEEKLY_LIMITED_SCHEDULE_HOURS,
   CCI_WEEKLY_MAX_PERMITTED_HOURS,
   IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
-  InternshipKind,
+  type InternshipKind,
 } from "shared";
 import { formatHoursString } from "./TotalWeeklylHoursIndicator";
 

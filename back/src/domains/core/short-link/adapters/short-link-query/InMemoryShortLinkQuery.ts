@@ -1,5 +1,5 @@
-import { AbsoluteUrl, ShortLinkId, errors } from "shared";
-import { ShortLinkQuery } from "../../ports/ShortLinkQuery";
+import { type AbsoluteUrl, type ShortLinkId, errors } from "shared";
+import type { ShortLinkQuery } from "../../ports/ShortLinkQuery";
 
 export class InMemoryShortLinkQuery implements ShortLinkQuery {
   protected shortLinks: Partial<Record<ShortLinkId, AbsoluteUrl>> = {};

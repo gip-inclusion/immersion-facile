@@ -1,5 +1,5 @@
-import { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
-import { NpsRepository } from "../ports/NpsRepository";
+import type { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
+import type { NpsRepository } from "../ports/NpsRepository";
 
 export class InMemoryNpsRepository implements NpsRepository {
   #nps: ValidatedConventionNps[] = [];

@@ -1,18 +1,18 @@
 import { subDays, subHours } from "date-fns";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  ConventionId,
-  EmailAttachment,
-  EmailNotification,
-  Notification,
-  SmsNotification,
-  TemplatedEmail,
-  TemplatedSms,
+  type ConventionId,
+  type EmailAttachment,
+  type EmailNotification,
+  type Notification,
+  type SmsNotification,
+  type TemplatedEmail,
+  type TemplatedSms,
   expectArraysToEqual,
   expectToEqual,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";

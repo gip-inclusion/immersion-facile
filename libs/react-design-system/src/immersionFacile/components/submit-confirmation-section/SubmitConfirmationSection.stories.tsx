@@ -1,7 +1,7 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   SubmitConfirmationSection,
-  SubmitConfirmationSectionProps,
+  type SubmitConfirmationSectionProps,
 } from "./SubmitConfirmationSection";
 
 const Component = SubmitConfirmationSection;

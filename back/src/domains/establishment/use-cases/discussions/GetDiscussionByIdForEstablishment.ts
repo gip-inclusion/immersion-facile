@@ -1,14 +1,14 @@
 import {
-  DiscussionDto,
-  DiscussionId,
-  DiscussionReadDto,
-  InclusionConnectDomainJwtPayload,
+  type DiscussionDto,
+  type DiscussionId,
+  type DiscussionReadDto,
+  type InclusionConnectDomainJwtPayload,
   discussionIdSchema,
   errors,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   DiscussionId,

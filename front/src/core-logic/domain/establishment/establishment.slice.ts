@@ -1,13 +1,13 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
-  ConnectedUserJwt,
-  EstablishmentJwt,
-  FormEstablishmentDto,
-  SiretDto,
+  type ConnectedUserJwt,
+  type EstablishmentJwt,
+  type FormEstablishmentDto,
+  type SiretDto,
   defaultMaxContactsPerMonth,
 } from "shared";
 import { emptyAppellationAndRome } from "shared";
-import {
+import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";

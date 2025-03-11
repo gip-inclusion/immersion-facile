@@ -2,9 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { Loader } from "react-design-system";
-import { ConventionEstablishmentRole, InclusionConnectedUser } from "shared";
+import type {
+  ConventionEstablishmentRole,
+  InclusionConnectedUser,
+} from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -13,10 +16,10 @@ import { DiscussionManageContent } from "src/app/components/admin/establishments
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { routes } from "src/app/routes/routes";
-import { DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
+import { type DashboardTab, getDashboardTabs } from "src/app/utils/dashboard";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import { ManageDiscussionFormSection } from "./ManageDiscussionFormSection";
 
 const currentUserRoleToDisplay = (role: ConventionEstablishmentRole) =>

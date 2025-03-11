@@ -1,9 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React, { Dispatch, SetStateAction } from "react";
+import type React from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { domElementIds } from "shared";
 import { BusinessContact } from "../BusinessContact";
-import { Mode, OnStepChange, Step } from "../EstablishmentForm";
+import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 export const BusinessContactSection = ({
   onStepChange,

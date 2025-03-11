@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
-  DashboardUrlAndName,
-  GetAdminDashboardParams,
-  GetConventionMagicLinkDashboardParams,
+  type DashboardUrlAndName,
+  type GetAdminDashboardParams,
+  type GetConventionMagicLinkDashboardParams,
   allDashboardNames,
   simpleDashboardNames,
 } from "./dashboard.dto";

@@ -1,14 +1,17 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  UnauthenticatedConventionRoutes,
+  type UnauthenticatedConventionRoutes,
   expectHttpResponseToEqual,
   unauthenticatedConventionRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../utils/buildTestApp";
 
 describe("security e2e", () => {
   const peAgency = new AgencyDtoBuilder().withKind("pole-emploi").build();

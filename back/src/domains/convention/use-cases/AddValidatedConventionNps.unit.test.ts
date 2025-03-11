@@ -1,4 +1,4 @@
-import { TallyForm, expectObjectsToMatch } from "shared";
+import { type TallyForm, expectObjectsToMatch } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,

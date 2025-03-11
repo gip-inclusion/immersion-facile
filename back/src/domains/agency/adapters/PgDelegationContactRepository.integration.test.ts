@@ -1,6 +1,9 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgDelegationContactRepository } from "./PgDelegationContactRepository";
 

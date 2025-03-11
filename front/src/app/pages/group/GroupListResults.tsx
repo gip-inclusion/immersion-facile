@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useState } from "react";
-import { SearchResultIllustration, Tag as ImTag } from "react-design-system";
-import { SearchResultDto, domElementIds } from "shared";
+import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
+import { type SearchResultDto, domElementIds } from "shared";
 import { SearchResult } from "src/app/components/search/SearchResult";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
@@ -26,7 +26,7 @@ export const GroupListResults = ({ results }: GroupListResultsProps) => {
   const [resultsPerPage, setResultsPerPage] = useState<ResultsPerPageOptions>(
     defaultResultsPerPage,
   );
-  const resultsPerPageValue = parseInt(resultsPerPage);
+  const resultsPerPageValue = Number.parseInt(resultsPerPage);
   const totalPages = Math.ceil(results.length / resultsPerPageValue);
   const getSearchResultsForPage = (currentPage: number): SearchResultDto[] => {
     const start = currentPage * resultsPerPageValue;

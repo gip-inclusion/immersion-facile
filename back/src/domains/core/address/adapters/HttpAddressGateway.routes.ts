@@ -1,7 +1,7 @@
-import { OpenCageGeoSearchKey } from "shared";
+import type { OpenCageGeoSearchKey } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { GeoCodingQueryParams } from "./HttpAddressGateway.dto";
+import type { GeoCodingQueryParams } from "./HttpAddressGateway.dto";
 import {
   openCageDataFeatureCollectionSchema,
   openCageDataSearchResultCollectionSchema,

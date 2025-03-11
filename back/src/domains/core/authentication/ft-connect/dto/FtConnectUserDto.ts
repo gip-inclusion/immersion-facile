@@ -1,4 +1,4 @@
-import { FtExternalId } from "shared";
+import type { FtExternalId } from "shared";
 
 export type FtConnectUserDto = {
   isJobseeker: boolean;

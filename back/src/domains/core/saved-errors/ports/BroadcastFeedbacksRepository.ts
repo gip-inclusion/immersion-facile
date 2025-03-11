@@ -1,11 +1,11 @@
-import {
+import type {
   AbsoluteUrl,
   ApiConsumerId,
   ApiConsumerName,
   ConventionId,
   ConventionStatus,
 } from "shared";
-import { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
+import type { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
 
 export type ConventionBroadcastRequestParams = {
   conventionId: ConventionId;

@@ -1,6 +1,6 @@
-import { SiretDto } from "shared";
-import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import type { SiretDto } from "shared";
+import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import type { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
 
 export interface EstablishmentLeadRepository {
   save(establishmentLead: EstablishmentLead): Promise<void>;

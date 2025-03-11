@@ -1,11 +1,11 @@
 import { ignoreTabs } from "html-templates";
 import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
-import { HttpClient, HttpResponse } from "shared-routes";
+import type { HttpClient, HttpResponse } from "shared-routes";
 import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
-import { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
+import type { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
-import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
-import { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas";
+import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
+import type { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 

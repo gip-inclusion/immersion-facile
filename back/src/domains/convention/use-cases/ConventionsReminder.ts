@@ -1,18 +1,18 @@
 import { addBusinessDays, differenceInBusinessDays, subDays } from "date-fns";
 import {
-  ConventionDto,
-  ConventionId,
-  ConventionStatus,
-  ReminderKind,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionStatus,
+  type ReminderKind,
   castError,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { DomainEvent } from "../../core/events/events";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { DomainEvent } from "../../core/events/events";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 const agencyStatuses: ConventionStatus[] = ["IN_REVIEW"];
 const signatoryStatuses: ConventionStatus[] = [

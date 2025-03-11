@@ -1,6 +1,6 @@
-import axios, { AxiosError, AxiosInstance } from "axios";
-import { SubscriptionParams, castError } from "shared";
-import {
+import axios, { type AxiosError, type AxiosInstance } from "axios";
+import { type SubscriptionParams, castError } from "shared";
+import type {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscriberErrorFeedback,
   SubscriberResponse,

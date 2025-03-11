@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Environment } from "shared";
+import type { Environment } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createLogger } from "./logger";
 

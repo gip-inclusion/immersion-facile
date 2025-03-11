@@ -1,5 +1,9 @@
-import { GetSiretRequestDto, SiretEstablishmentDto, errors } from "shared";
-import { SiretGateway } from "../ports/SiretGateway";
+import {
+  type GetSiretRequestDto,
+  type SiretEstablishmentDto,
+  errors,
+} from "shared";
+import type { SiretGateway } from "../ports/SiretGateway";
 
 export const getSiretEstablishmentFromApi = async (
   { siret, includeClosedEstablishments }: GetSiretRequestDto,

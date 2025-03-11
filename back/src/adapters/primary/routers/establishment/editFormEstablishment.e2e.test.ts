@@ -1,9 +1,9 @@
 import { addDays, millisecondsToSeconds, subYears } from "date-fns";
 import {
-  EstablishmentRoutes,
-  FormEstablishmentDto,
+  type EstablishmentRoutes,
+  type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectJwtPayload,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   createEstablishmentJwtPayload,
   currentJwtVersions,
@@ -15,28 +15,31 @@ import {
   expiredMagicLinkErrorMessage,
   updatedAddress1,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import supertest from "supertest";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type supertest from "supertest";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import {
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
+  type GenerateEditFormEstablishmentJwt,
+  type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
 import {
   TEST_OPEN_ESTABLISHMENT_1,
   TEST_OPEN_ESTABLISHMENT_2,
 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
-import { TimeGateway } from "../../../../domains/core/time-gateway/ports/TimeGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import {
+import type { TimeGateway } from "../../../../domains/core/time-gateway/ports/TimeGateway";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("Edit form establishments", () => {
   let httpClient: HttpClient<EstablishmentRoutes>;

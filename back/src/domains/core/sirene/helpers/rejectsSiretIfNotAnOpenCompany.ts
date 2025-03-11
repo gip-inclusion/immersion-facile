@@ -1,5 +1,5 @@
 import { errors } from "shared";
-import { SiretGateway } from "../ports/SiretGateway";
+import type { SiretGateway } from "../ports/SiretGateway";
 import { getSiretEstablishmentFromApi } from "./getSirenEstablishmentFromApi";
 
 export const rejectsSiretIfNotAnOpenCompany = async (

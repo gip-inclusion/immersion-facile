@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { ContactMethod } from "shared";
+import type { ContactMethod } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type ImmersionOfferLabelsProps = {

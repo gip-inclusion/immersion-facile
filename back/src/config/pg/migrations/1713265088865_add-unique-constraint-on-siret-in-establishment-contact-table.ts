@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const constraintName = "contact_unique_siret";
 const establishmentsContactTableName = "establishments_contacts";

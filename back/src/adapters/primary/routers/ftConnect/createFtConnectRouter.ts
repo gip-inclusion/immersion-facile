@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { ManagedFTConnectError, ftConnect, loginFtConnect } from "shared";
-import { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
+import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendRedirectResponseWithManagedErrors } from "../../../../config/helpers/sendRedirectResponseWithManagedErrors";
 import { makeFtConnectLoginPageUrl } from "../../../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 

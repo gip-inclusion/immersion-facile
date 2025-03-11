@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  ConventionDto,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionStatus,
+  type ConventionStatus,
   InclusionConnectedUserBuilder,
-  UpdateConventionStatusRequestDto,
+  type UpdateConventionStatusRequestDto,
   conventionMagicLinkRoutes,
   expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
@@ -14,10 +14,13 @@ import {
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryConventionRepository } from "../../../../domains/convention/adapters/InMemoryConventionRepository";
-import { UserOnRepository } from "../../../../domains/core/authentication/inclusion-connect/port/UserRepository";
+import type { InMemoryConventionRepository } from "../../../../domains/convention/adapters/InMemoryConventionRepository";
+import type { UserOnRepository } from "../../../../domains/core/authentication/inclusion-connect/port/UserRepository";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type TestAppAndDeps,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

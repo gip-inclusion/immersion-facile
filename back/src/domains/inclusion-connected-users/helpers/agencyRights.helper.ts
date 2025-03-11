@@ -1,9 +1,9 @@
 import { values } from "ramda";
 import {
-  AgencyId,
-  AgencyRole,
-  AgencyUsersRights,
-  AgencyWithUsersRights,
+  type AgencyId,
+  type AgencyRole,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
   errors,
 } from "shared";
 

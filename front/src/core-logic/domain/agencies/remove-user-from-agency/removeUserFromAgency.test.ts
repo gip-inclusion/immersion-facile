@@ -5,10 +5,10 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const agencyDto = new AgencyDtoBuilder().build();
 

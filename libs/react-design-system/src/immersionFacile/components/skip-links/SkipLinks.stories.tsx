@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { SkipLinks, SkipLinksProps } from "./SkipLinks";
+import { SkipLinks, type SkipLinksProps } from "./SkipLinks";
 
 const Component = SkipLinks;
 type Story = StoryObj<typeof Component>;

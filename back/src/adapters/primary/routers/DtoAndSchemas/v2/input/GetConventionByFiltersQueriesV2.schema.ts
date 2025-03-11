@@ -1,6 +1,6 @@
-import { ConventionStatus, conventionStatuses } from "shared";
+import { type ConventionStatus, conventionStatuses } from "shared";
 import { z } from "zod";
-import { GetConventionsFilters } from "../../../../../../domains/convention/ports/ConventionQueries";
+import type { GetConventionsFilters } from "../../../../../../domains/convention/ports/ConventionQueries";
 
 export type GetConventionsByFiltersQueryParamsV2 = {
   startDateGreater?: Date;

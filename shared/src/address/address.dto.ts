@@ -1,9 +1,9 @@
-import { Builder } from "../Builder";
-import {
+import type { Builder } from "../Builder";
+import type {
   GeoPositionDto,
   WithGeoPosition,
 } from "../geoPosition/geoPosition.dto";
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 export type DepartmentName = Flavor<string, "DepartmentName">;
 export type DepartmentCode = Flavor<string, "DepartmentCode">;

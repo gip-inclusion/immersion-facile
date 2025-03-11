@@ -1,14 +1,14 @@
 import {
-  InclusionConnectDomainJwtPayload,
-  MarkPartnersErroredConventionAsHandledRequest,
+  type InclusionConnectDomainJwtPayload,
+  type MarkPartnersErroredConventionAsHandledRequest,
   errors,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { CreateNewEvent } from "../../../core/events/ports/EventBus";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getUserWithRights } from "../../../inclusion-connected-users/helpers/userRights.helper";
 
 export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase<

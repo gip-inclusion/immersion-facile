@@ -1,17 +1,17 @@
 import {
-  Expression,
-  ExpressionWrapper,
+  type Expression,
+  type ExpressionWrapper,
   Kysely,
   PostgresDialect,
-  RawBuilder,
-  Simplify,
+  type RawBuilder,
+  type Simplify,
   sql,
 } from "kysely";
-import { Pool } from "pg";
-import { Falsy } from "ramda";
+import type { Pool } from "pg";
+import type { Falsy } from "ramda";
 import { createLogger } from "../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
-import { Database } from "./model/database";
+import type { Database } from "./model/database";
 
 export const jsonBuildObject = <O extends Record<string, Expression<unknown>>>(
   obj: O,

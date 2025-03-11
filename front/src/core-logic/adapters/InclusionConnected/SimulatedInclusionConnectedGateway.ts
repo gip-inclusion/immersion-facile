@@ -1,15 +1,15 @@
-import { Observable, Subject, delay, of, throwError } from "rxjs";
+import { type Observable, Subject, delay, of, throwError } from "rxjs";
 import {
-  AbsoluteUrl,
-  AgencyId,
+  type AbsoluteUrl,
+  type AgencyId,
   DiscussionBuilder,
-  DiscussionReadDto,
-  DiscussionRejected,
-  InclusionConnectedUser,
-  MarkPartnersErroredConventionAsHandledRequest,
+  type DiscussionReadDto,
+  type DiscussionRejected,
+  type InclusionConnectedUser,
+  type MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
-import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
+import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 const simulatedUserConnected: InclusionConnectedUser = {
   email: "fake@user.com",

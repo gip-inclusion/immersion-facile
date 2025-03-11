@@ -1,17 +1,17 @@
-import { Observable, from } from "rxjs";
+import { type Observable, from } from "rxjs";
 import {
-  AssessmentDto,
-  ConventionId,
-  ConventionMagicLinkRoutes,
+  type AssessmentDto,
+  type ConventionId,
+  type ConventionMagicLinkRoutes,
   errors,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import {
+import type {
   AssessmentAndJwt,
   AssessmentGateway,
 } from "src/core-logic/ports/AssessmentGateway";

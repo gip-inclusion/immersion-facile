@@ -5,16 +5,16 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDtoForAgencyUsersAndAdmins,
-  AgencyId,
-  AgencyRight,
-  RejectIcUserRoleForAgencyParams,
-  User,
-  UserId,
-  UserParamsForAgency,
+  type AgencyDtoForAgencyUsersAndAdmins,
+  type AgencyId,
+  type AgencyRight,
+  type RejectIcUserRoleForAgencyParams,
+  type User,
+  type UserId,
+  type UserParamsForAgency,
   domElementIds,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";

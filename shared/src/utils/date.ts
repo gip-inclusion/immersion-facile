@@ -1,7 +1,7 @@
 // Matches valid dates of the format 'yyyy-mm-dd'.
 import { addHours, format, isValid } from "date-fns";
 import { z } from "zod";
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 export type DateString = Flavor<string, "DateString">;
 

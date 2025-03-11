@@ -1,8 +1,9 @@
-import React, { lazy, useEffect } from "react";
+import type React from "react";
+import { lazy, useEffect } from "react";
 import { PageHeader } from "react-design-system";
 import {
-  AdminTabRouteName,
-  EstablishmentDashboardTab,
+  type AdminTabRouteName,
+  type EstablishmentDashboardTab,
   adminTabRouteNames,
   establishmentDashboardTabsList,
 } from "shared";
@@ -35,7 +36,7 @@ import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
 import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail";
@@ -50,7 +51,7 @@ import { HomePage } from "../pages/home/HomePage";
 import { AssessmentPage } from "../pages/immersion-assessment/AssessmentPage";
 import { SearchResultPage } from "../pages/search/SearchResultPage";
 import {
-  StandardPageSlugs,
+  type StandardPageSlugs,
   standardPageSlugs,
 } from "./routeParams/standardPage";
 import { routes, useRoute } from "./routes";

@@ -1,12 +1,12 @@
 import { expectToEqual } from "shared";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacksSelectors } from "../feedback/feedback.selectors";
 import {
-  PartnersErroredConventionState,
+  type PartnersErroredConventionState,
   partnersErroredConventionSlice,
 } from "./partnersErroredConvention.slice";
 

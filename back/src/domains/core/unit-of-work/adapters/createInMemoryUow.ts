@@ -28,7 +28,7 @@ import { InMemoryRomeRepository } from "../../rome/adapters/InMemoryRomeReposito
 import { InMemoryBroadcastFeedbacksRepository } from "../../saved-errors/adapters/InMemoryBroadcastFeedbacksRepository";
 import { InMemoryShortLinkRepository } from "../../short-link/adapters/short-link-repository/InMemoryShortLinkRepository";
 import { InMemoryStatisticQueries } from "../../statistics/adapters/InMemoryStatisticQueries";
-import { UnitOfWork } from "../ports/UnitOfWork";
+import type { UnitOfWork } from "../ports/UnitOfWork";
 
 export const createInMemoryUow = () => {
   const outboxRepository = new InMemoryOutboxRepository();

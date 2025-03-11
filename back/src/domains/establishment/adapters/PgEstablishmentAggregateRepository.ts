@@ -2,31 +2,31 @@ import { sql } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
 import { equals, pick } from "ramda";
 import {
-  AppellationAndRomeDto,
-  AppellationCode,
-  AppellationDto,
-  DateTimeIsoString,
-  EstablishmentSearchableByValue,
-  LocationId,
-  NafCode,
-  RomeCode,
-  SearchSortedBy,
-  SiretDto,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type AppellationDto,
+  type DateTimeIsoString,
+  type EstablishmentSearchableByValue,
+  type LocationId,
+  type NafCode,
+  type RomeCode,
+  type SearchSortedBy,
+  type SiretDto,
   castError,
   errors,
   pipeWithValue,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { OfferEntity } from "../entities/OfferEntity";
-import { GeoParams } from "../entities/SearchMadeEntity";
-import {
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { OfferEntity } from "../entities/OfferEntity";
+import type { GeoParams } from "../entities/SearchMadeEntity";
+import type {
   EstablishmentAggregateFilters,
   EstablishmentAggregateRepository,
   OfferWithSiret,
@@ -95,7 +95,7 @@ export class PgEstablishmentAggregateRepository
       .insertInto("immersion_offers")
       .values(
         offersWithSiret.map((offerWithSiret) => ({
-          appellation_code: parseInt(offerWithSiret.appellationCode),
+          appellation_code: Number.parseInt(offerWithSiret.appellationCode),
           siret: offerWithSiret.siret,
           created_at: sql`${offerWithSiret.createdAt.toISOString()}`,
         })),
@@ -542,7 +542,9 @@ export class PgEstablishmentAggregateRepository
       .where(
         "ogr_appellation",
         "in",
-        appellationCodes.map((appellationCode) => parseInt(appellationCode)),
+        appellationCodes.map((appellationCode) =>
+          Number.parseInt(appellationCode),
+        ),
       )
       .execute();
 
@@ -576,7 +578,7 @@ export class PgEstablishmentAggregateRepository
         .insertInto("immersion_offers")
         .values(
           offersToAdd.map((offerToAdd) => ({
-            appellation_code: parseInt(offerToAdd.appellationCode),
+            appellation_code: Number.parseInt(offerToAdd.appellationCode),
             created_at: sql`${offerToAdd.createdAt.toISOString()}`,
             siret,
           })),
@@ -622,7 +624,7 @@ export class PgEstablishmentAggregateRepository
           "appellation_code",
           "in",
           offersToRemoveByAppellationCode.map((appellationCode) =>
-            parseInt(appellationCode),
+            Number.parseInt(appellationCode),
           ),
         )
         .execute();
@@ -867,7 +869,7 @@ const searchImmersionResultsQuery = (
                     ? eb.where(
                         "immersion_offers.appellation_code",
                         "=",
-                        parseInt(appellationCode),
+                        Number.parseInt(appellationCode),
                       )
                     : eb,
               ).as("offer"),

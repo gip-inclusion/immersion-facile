@@ -1,11 +1,11 @@
 import {
-  AppellationAndRomeDto,
+  type AppellationAndRomeDto,
   BusinessContactDtoBuilder,
   FormEstablishmentDtoBuilder,
-  NafDto,
-  NumberEmployeesRange,
+  type NafDto,
+  type NumberEmployeesRange,
   UserBuilder,
-  WithAcquisition,
+  type WithAcquisition,
   defaultAddress,
   errors,
   expectObjectInArrayToMatch,
@@ -25,7 +25,7 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

@@ -1,11 +1,11 @@
 import {
-  AppellationAndRomeDto,
-  EstablishmentDomainPayload,
-  EstablishmentJwtPayload,
+  type AppellationAndRomeDto,
+  type EstablishmentDomainPayload,
+  type EstablishmentJwtPayload,
   FormEstablishmentDtoBuilder,
-  InclusionConnectDomainJwtPayload,
+  type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
-  SiretDto,
+  type SiretDto,
   UserBuilder,
   addressDtoToString,
   defaultAddress,
@@ -26,7 +26,7 @@ import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGa
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

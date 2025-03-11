@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConventionReadDto,
+  type ConventionReadDto,
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  FetchConventionRequestedPayload,
+  type FetchConventionRequestedPayload,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 

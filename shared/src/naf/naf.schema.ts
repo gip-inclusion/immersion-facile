@@ -3,12 +3,12 @@ import { z } from "zod";
 import { searchTextSchema } from "../search/searchText.schema";
 import { zStringMinLength1 } from "../zodUtils";
 import {
-  NafCode,
-  NafDto,
-  NafSectionSuggestion,
-  NafSectionSuggestionsParams,
-  NafSectorCode,
-  WithNafCodes,
+  type NafCode,
+  type NafDto,
+  type NafSectionSuggestion,
+  type NafSectionSuggestionsParams,
+  type NafSectorCode,
+  type WithNafCodes,
   nafSectorCodes,
   nafSectorLabels,
 } from "./naf.dto";

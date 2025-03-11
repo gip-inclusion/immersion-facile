@@ -1,15 +1,15 @@
 import Bottleneck from "bottleneck";
-import { Point } from "geojson";
+import type { Point } from "geojson";
 import {
-  AddressAndPosition,
-  AddressDto,
-  City,
-  DepartmentName,
-  GeoPositionDto,
-  LookupSearchResult,
-  OpenCageGeoSearchKey,
-  Postcode,
-  StreetNumberAndAddress,
+  type AddressAndPosition,
+  type AddressDto,
+  type City,
+  type DepartmentName,
+  type GeoPositionDto,
+  type LookupSearchResult,
+  type OpenCageGeoSearchKey,
+  type Postcode,
+  type StreetNumberAndAddress,
   errors,
   filterNotFalsy,
   getDepartmentCodeFromDepartmentNameOrCity,
@@ -17,16 +17,16 @@ import {
   lookupStreetAddressQueryMinLength,
   lookupStreetAddressSpecialCharsRegex,
 } from "shared";
-import { HttpClient } from "shared-routes";
-import { WithCache } from "../../caching-gateway/port/WithCache";
-import { AddressGateway } from "../ports/AddressGateway";
-import {
+import type { HttpClient } from "shared-routes";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
+import type { AddressGateway } from "../ports/AddressGateway";
+import type {
   OpenCageDataAddressComponents,
   OpenCageDataProperties,
   OpenCageDataSearchResultCollection,
 } from "./HttpAddressGateway.dto";
 import {
-  AddressesRoutes,
+  type AddressesRoutes,
   addressesExternalRoutes,
 } from "./HttpAddressGateway.routes";
 
@@ -241,8 +241,8 @@ const toLookupSearchResults = (
   input.results.map((result) => ({
     label: result.formatted,
     position: {
-      lat: parseFloat(result.geometry.lat),
-      lon: parseFloat(result.geometry.lng),
+      lat: Number.parseFloat(result.geometry.lat),
+      lon: Number.parseFloat(result.geometry.lng),
     },
   }));
 

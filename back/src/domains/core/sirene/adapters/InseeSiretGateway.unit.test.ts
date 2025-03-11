@@ -1,6 +1,6 @@
 import { expectToEqual } from "shared";
 import {
-  InseeApiRawEstablishment,
+  type InseeApiRawEstablishment,
   convertSirenRawEstablishmentToSirenEstablishmentDto,
 } from "./InseeSiretGateway";
 

@@ -1,13 +1,13 @@
 import { addMilliseconds, subDays } from "date-fns";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   DiscussionBuilder,
-  GeoPositionDto,
-  Location,
+  type GeoPositionDto,
+  type Location,
   LocationBuilder,
-  SearchResultDto,
+  type SearchResultDto,
   UserBuilder,
-  WithAcquisition,
+  type WithAcquisition,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
@@ -15,7 +15,10 @@ import {
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import {
   rueBitcheDto,
@@ -23,11 +26,11 @@ import {
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import {
+import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import type { SearchMade } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -553,9 +556,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   nafLabel:
                     "Activités des organisations et organismes extraterritoriaux",
                 }),
-              ]
-
-              .sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
+              ].sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
             );
           });
 
@@ -633,9 +634,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   nafLabel:
                     "Commerce de détail d'ordinateurs, d'unités périphériques et de logiciels en magasin spécialisé",
                 }),
-              ]
-
-              .sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
+              ].sort(sortSearchResultsByDistanceAndRomeAndSiretOnRandomResults),
             );
           });
         });

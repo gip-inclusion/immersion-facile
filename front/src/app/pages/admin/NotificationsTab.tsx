@@ -3,10 +3,10 @@ import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { keys } from "ramda";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { type ReactNode, useEffect, useState } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import {
+import type {
   EmailNotification,
   EmailVariables,
   Notification,

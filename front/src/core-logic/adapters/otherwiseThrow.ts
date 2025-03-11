@@ -1,5 +1,5 @@
-import { HttpErrorBody, messageAndIssuesToString } from "shared";
-import { HttpResponse } from "shared-routes";
+import { type HttpErrorBody, messageAndIssuesToString } from "shared";
+import type { HttpResponse } from "shared-routes";
 
 export const logBodyAndThrow = <R extends HttpResponse<number, unknown>>({
   body,

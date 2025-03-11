@@ -1,16 +1,16 @@
 import { toPairs } from "ramda";
 import {
-  AgencyDto,
-  AgencyRight,
-  AgencyRole,
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-  Email,
-  UserId,
+  type AgencyDto,
+  type AgencyRight,
+  type AgencyRole,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
+  type Email,
+  type UserId,
   errors,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const toAgencyWithRights = (
   { counsellorEmails, validatorEmails, ...rest }: AgencyDto,

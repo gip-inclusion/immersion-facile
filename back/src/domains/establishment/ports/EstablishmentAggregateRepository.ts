@@ -1,4 +1,4 @@
-import {
+import type {
   AppellationAndRomeDto,
   AppellationCode,
   DateTimeIsoString,
@@ -7,10 +7,10 @@ import {
   SiretDto,
   UserId,
 } from "shared";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { OfferEntity } from "../entities/OfferEntity";
-import { SearchMade } from "../entities/SearchMadeEntity";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { OfferEntity } from "../entities/OfferEntity";
+import type { SearchMade } from "../entities/SearchMadeEntity";
 
 export type RepositorySearchResultDto = Omit<SearchResultDto, "urlOfPartner">;
 export type RepositorySearchImmertionResult = Omit<

@@ -1,5 +1,5 @@
-import { RomeDto, SearchResultDto, SiretDto, WithNafCodes } from "shared";
-import { GeoParams } from "../entities/SearchMadeEntity";
+import type { RomeDto, SearchResultDto, SiretDto, WithNafCodes } from "shared";
+import type { GeoParams } from "../entities/SearchMadeEntity";
 
 export type SearchCompaniesParams = RomeDto & GeoParams & WithNafCodes;
 

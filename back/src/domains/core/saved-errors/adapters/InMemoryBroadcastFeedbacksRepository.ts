@@ -1,6 +1,6 @@
-import { ConventionId, errors } from "shared";
+import { type ConventionId, errors } from "shared";
 
-import {
+import type {
   BroadcastFeedback,
   BroadcastFeedbacksRepository,
 } from "../ports/BroadcastFeedbacksRepository";

@@ -1,5 +1,5 @@
 import { addDays, parseISO } from "date-fns";
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const batchSize = 100;
 

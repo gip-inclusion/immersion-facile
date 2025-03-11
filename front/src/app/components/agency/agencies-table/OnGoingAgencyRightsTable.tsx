@@ -1,10 +1,10 @@
 import Table from "@codegouvfr/react-dsfr/Table";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useDispatch } from "react-redux";
-import { AgencyRight, UserId } from "shared";
+import type { AgencyRight, UserId } from "shared";
 import { AgencyLineRightsCTAs } from "src/app/components/agency/agencies-table/agency-line/AgencyLineRightsCTAs";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
-import { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 import { AgencyLineAgencyName } from "./agency-line/AgencyLineAgencyName";
 import { AgencyLineCaracteristics } from "./agency-line/AgencyLineCaracteristics";

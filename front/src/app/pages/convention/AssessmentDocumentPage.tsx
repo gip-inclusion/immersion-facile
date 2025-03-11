@@ -15,11 +15,11 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { escapeHtml } from "src/app/utils/sanitize";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
 

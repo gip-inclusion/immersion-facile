@@ -1,4 +1,4 @@
-import { RomeCode } from "shared";
+import type { RomeCode } from "shared";
 
 export type OfferEntity = {
   appellationCode: string;

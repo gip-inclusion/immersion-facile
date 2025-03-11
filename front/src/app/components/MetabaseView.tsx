@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
-import { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";

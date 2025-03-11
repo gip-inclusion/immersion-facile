@@ -1,18 +1,18 @@
 import { equals } from "ramda";
 import {
-  ConventionDto,
-  SiretDto,
-  WithSiretDto,
+  type ConventionDto,
+  type SiretDto,
+  type WithSiretDto,
   errors,
   isSuperEstablishment,
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
-import { MarketingContact } from "../entities/MarketingContact";
-import {
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { MarketingContact } from "../entities/MarketingContact";
+import type {
   ConventionInfos,
   EstablishmentMarketingGateway,
   EstablishmentMarketingSearchableBy,

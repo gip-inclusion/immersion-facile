@@ -1,19 +1,19 @@
 import {
-  NafSectionSuggestion,
+  type NafSectionSuggestion,
   expectArraysToEqual,
   expectToEqual,
 } from "shared";
 import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
 import {
-  NafState,
+  type NafState,
   initialState,
   nafSlice,
 } from "src/core-logic/domain/naf/naf.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("naf slice", () => {
   const expectedResults: NafSectionSuggestion[] = [

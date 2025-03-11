@@ -1,11 +1,11 @@
 import {
-  GroupWithResults,
-  WithGroupSlug,
+  type GroupWithResults,
+  type WithGroupSlug,
   errors,
   withGroupSlugSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetOffersByGroupSlug extends TransactionalUseCase<
   WithGroupSlug,

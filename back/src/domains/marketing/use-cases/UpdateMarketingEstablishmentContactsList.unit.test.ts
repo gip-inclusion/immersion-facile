@@ -13,17 +13,17 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
+import type { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryEstablishmentMarketingGateway } from "../adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
-import { MarketingContact } from "../entities/MarketingContact";
-import { EstablishmentMarketingGatewayDto } from "../ports/EstablishmentMarketingGateway";
-import { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
+import type { MarketingContact } from "../entities/MarketingContact";
+import type { EstablishmentMarketingGatewayDto } from "../ports/EstablishmentMarketingGateway";
+import type { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
 import {
-  UpdateMarketingEstablishmentContactList,
+  type UpdateMarketingEstablishmentContactList,
   makeUpdateMarketingEstablishmentContactList,
 } from "./UpdateMarketingEstablishmentContactsList";
 

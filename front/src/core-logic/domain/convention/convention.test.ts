@@ -1,27 +1,27 @@
 import { addDays } from "date-fns";
 import {
-  Beneficiary,
+  type Beneficiary,
   ConventionDtoBuilder,
-  ConventionReadDto,
-  DashboardUrlAndName,
-  EstablishmentRepresentative,
-  EstablishmentTutor,
+  type ConventionReadDto,
+  type DashboardUrlAndName,
+  type EstablishmentRepresentative,
+  type EstablishmentTutor,
   ScheduleDtoBuilder,
-  SignatoryRole,
+  type SignatoryRole,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
-  ConventionState,
-  ConventionSubmitFeedback,
-  RenewConventionPayload,
+  type ConventionState,
+  type ConventionSubmitFeedback,
+  type RenewConventionPayload,
   conventionSlice,
   initialConventionState,
 } from "./convention.slice";

@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { HeroHeader, HeroHeaderProps } from "./HeroHeader";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { HeroHeader, type HeroHeaderProps } from "./HeroHeader";
 
 const Component = HeroHeader;
 type Story = StoryObj<typeof Component>;

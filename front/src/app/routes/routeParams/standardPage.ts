@@ -1,4 +1,4 @@
-import { ValueSerializer } from "type-route";
+import type { ValueSerializer } from "type-route";
 
 export type StandardPageSlugs = (typeof standardPageSlugs)[number];
 

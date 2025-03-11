@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import {
-  InclusionConnectedUser,
-  UserParamsForAgency,
+  type InclusionConnectedUser,
+  type UserParamsForAgency,
   domElementIds,
 } from "shared";
 import { routes } from "src/app/routes/routes";

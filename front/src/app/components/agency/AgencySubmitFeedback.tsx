@@ -1,7 +1,7 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { immersionFacileDelegationEmail } from "shared";
-import { AgencyAdminSuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
-import { AgenciesFeedbackKind } from "src/core-logic/domain/agencies/agencies.slice";
+import type { AgencyAdminSuccessFeedbackKind } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import type { AgenciesFeedbackKind } from "src/core-logic/domain/agencies/agencies.slice";
 
 export const agencyAdminSubmitMessageByKind: Record<
   AgencyAdminSuccessFeedbackKind,

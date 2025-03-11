@@ -1,6 +1,6 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { filter } from "ramda";
-import {
+import type {
   AgencyId,
   AgencyRight,
   InclusionConnectedUser,
@@ -13,8 +13,8 @@ import {
   WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
-import { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
+import type { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import type { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
 
 export type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
   InclusionConnectedUser,

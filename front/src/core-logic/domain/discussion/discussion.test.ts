@@ -1,12 +1,16 @@
-import { DiscussionBuilder, DiscussionReadDto, expectToEqual } from "shared";
+import {
+  DiscussionBuilder,
+  type DiscussionReadDto,
+  expectToEqual,
+} from "shared";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-import { DiscussionState, discussionSlice } from "./discussion.slice";
+import { type DiscussionState, discussionSlice } from "./discussion.slice";
 
 describe("Discussion slice", () => {
   let store: ReduxStore;

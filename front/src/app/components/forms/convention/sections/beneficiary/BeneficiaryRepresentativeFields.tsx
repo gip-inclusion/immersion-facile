@@ -2,12 +2,12 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  ConventionReadDto,
+  type ConventionReadDto,
   filterNotFalsy,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
-import {
+import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
 } from "src/app/components/forms/convention/ConventionForm";

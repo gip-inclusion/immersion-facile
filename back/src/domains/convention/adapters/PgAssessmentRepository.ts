@@ -1,12 +1,17 @@
 import { sql } from "kysely";
-import { AssessmentStatus, ConventionId, DateString, errors } from "shared";
 import {
-  KyselyDb,
+  type AssessmentStatus,
+  type ConventionId,
+  type DateString,
+  errors,
+} from "shared";
+import {
+  type KyselyDb,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { assessmentEntitySchema } from "../../../utils/assessment";
-import { AssessmentEntity } from "../entities/AssessmentEntity";
-import { AssessmentRepository } from "../ports/AssessmentRepository";
+import type { AssessmentEntity } from "../entities/AssessmentEntity";
+import type { AssessmentRepository } from "../ports/AssessmentRepository";
 
 const createAssessmentQueryBuilder = (transaction: KyselyDb) => {
   return transaction.selectFrom("immersion_assessments").select((eb) => [

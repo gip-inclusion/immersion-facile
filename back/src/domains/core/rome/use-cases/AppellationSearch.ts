@@ -1,6 +1,6 @@
 import {
-  AppellationAndRomeDto,
-  AppellationMatchDto,
+  type AppellationAndRomeDto,
+  type AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
   zStringMinLength1,
 } from "shared";
@@ -8,9 +8,9 @@ import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { findMatchRanges } from "../../../../utils/textSearch";
 import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { AppellationsGateway } from "../ports/AppellationsGateway";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { AppellationsGateway } from "../ports/AppellationsGateway";
 
 const logger = createLogger(__filename);
 

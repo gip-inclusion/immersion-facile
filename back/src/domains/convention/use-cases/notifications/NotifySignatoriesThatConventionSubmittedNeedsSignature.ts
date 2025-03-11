@@ -1,27 +1,27 @@
 import { values } from "ramda";
 import {
-  AgencyDto,
-  ConventionDto,
-  CreateConventionMagicLinkPayloadProperties,
-  Signatory,
-  TemplatedEmail,
-  WithConventionDto,
+  type AgencyDto,
+  type ConventionDto,
+  type CreateConventionMagicLinkPayloadProperties,
+  type Signatory,
+  type TemplatedEmail,
+  type WithConventionDto,
   errors,
   filterNotFalsy,
   frontRoutes,
   withConventionSchema,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
-import { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 

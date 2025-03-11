@@ -3,9 +3,9 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  AgencyRight,
-  User,
-  UserParamsForAgency,
+  type AgencyRight,
+  type User,
+  type UserParamsForAgency,
   distinguishAgencyRights,
   domElementIds,
 } from "shared";

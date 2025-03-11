@@ -1,12 +1,12 @@
 import { prop, sortBy } from "ramda";
-import { SiretDto } from "shared";
-import {
+import type { SiretDto } from "shared";
+import type {
   EstablishmentLead,
   EstablishmentLeadEvent,
   EstablishmentLeadEventKind,
 } from "../entities/EstablishmentLeadEntity";
-import { EstablishmentLeadRepository } from "../ports/EstablishmentLeadRepository";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import type { EstablishmentLeadRepository } from "../ports/EstablishmentLeadRepository";
+import type { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
 
 export class InMemoryEstablishmentLeadRepository
   implements EstablishmentLeadRepository

@@ -8,7 +8,7 @@ import {
   openEmailInAdmin,
 } from "../../utils/admin";
 import {
-  ConventionSubmitted,
+  type ConventionSubmitted,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,

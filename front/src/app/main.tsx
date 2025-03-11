@@ -1,7 +1,7 @@
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 import {
-  browserTracingIntegration,
   init as SentryInit,
+  browserTracingIntegration,
   replayIntegration,
 } from "@sentry/browser";
 import React from "react";

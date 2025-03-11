@@ -1,15 +1,15 @@
-import { Observable, of } from "rxjs";
+import { type Observable, of } from "rxjs";
 import {
-  AbsoluteUrl,
-  ConventionSupportedJwt,
-  Email,
-  FeatureFlags,
-  HtmlToPdfRequest,
-  ValidateEmailFeedback,
+  type AbsoluteUrl,
+  type ConventionSupportedJwt,
+  type Email,
+  type FeatureFlags,
+  type HtmlToPdfRequest,
+  type ValidateEmailFeedback,
   sleep,
 } from "shared";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
+import type { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class SimulatedTechnicalGateway implements TechnicalGateway {
   public getAllFeatureFlags$ = (): Observable<FeatureFlags> =>

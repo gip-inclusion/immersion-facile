@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const handledByAgencyColumnName = "handled_by_agency";
 const viewConventionsErroredName = "view_conventions_errored";

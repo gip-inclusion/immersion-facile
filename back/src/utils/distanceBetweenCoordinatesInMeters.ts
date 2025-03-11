@@ -1,6 +1,6 @@
 // Takes two coordinates (in degrees) and returns distance in meters.
 
-import { GeoPositionDto } from "shared";
+import type { GeoPositionDto } from "shared";
 
 // Taken from https://www.movable-type.co.uk/scripts/latlong.html (MIT license)
 export const distanceBetweenCoordinatesInMeters = (

@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
-  AbsoluteUrl,
-  ProcessEnv,
+  type AbsoluteUrl,
+  type ProcessEnv,
   environments,
   filterNotFalsy,
   inclusionConnectImmersionRoutes,
@@ -12,10 +12,10 @@ import {
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
 } from "shared";
-import { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
-import { DomainTopic } from "../../domains/core/events/events";
-import { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
-import { CrispConfig } from "../../domains/core/support/adapters/HttpCrispGateway";
+import type { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
+import type { DomainTopic } from "../../domains/core/events/events";
+import type { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
+import type { CrispConfig } from "../../domains/core/support/adapters/HttpCrispGateway";
 
 export type AccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
@@ -109,7 +109,7 @@ export class AppConfig {
   }
 
   public get brevoEstablishmentContactListId(): number {
-    return parseInt(
+    return Number.parseInt(
       this.#throwIfNotDefinedOrDefault("BREVO_ESTABLISHMENT_CONTACT_LIST_ID"),
     );
   }
@@ -263,7 +263,7 @@ export class AppConfig {
   }
 
   public get externalAxiosTimeout(): number {
-    return parseInt(
+    return Number.parseInt(
       this.#throwIfNotDefinedOrDefault("EXTERNAL_AXIOS_TIMEOUT", "10000"),
     );
   }
@@ -357,7 +357,7 @@ export class AppConfig {
   }
 
   public get maxConventionsToSyncWithPe() {
-    return parseInt(
+    return Number.parseInt(
       this.#throwIfNotDefinedOrDefault("MAX_CONVENTIONS_TO_SYNC_WITH_PE", "50"),
     );
   }
@@ -372,7 +372,7 @@ export class AppConfig {
   }
 
   public get minimumNumberOfDaysBetweenSimilarContactRequests(): number {
-    return parseInt(
+    return Number.parseInt(
       this.#throwIfNotDefinedOrDefault(
         "MINIMUM_NUMBER_OF_DAYS_BETWEEN_SIMILAR_CONTACT_REQUESTS",
         "7",
@@ -388,7 +388,7 @@ export class AppConfig {
   }
 
   public get nodeProcessReportInterval(): number {
-    return parseInt(
+    return Number.parseInt(
       this.#throwIfNotDefinedOrDefault("NODE_PROCESS_REPORT_INTERVAL", "30000"),
     );
   }
@@ -577,19 +577,19 @@ export class AppConfig {
 
   public get updateEstablishmentFromInseeConfig() {
     return {
-      maxEstablishmentsPerBatch: parseInt(
+      maxEstablishmentsPerBatch: Number.parseInt(
         this.#throwIfNotDefinedOrDefault(
           "MAX_ESTABLISHMENTS_PER_BATCH",
           "1000",
         ),
       ),
-      maxEstablishmentsPerFullRun: parseInt(
+      maxEstablishmentsPerFullRun: Number.parseInt(
         this.#throwIfNotDefinedOrDefault(
           "MAX_ESTABLISHMENTS_PER_FULL_RUN",
           "5000",
         ),
       ),
-      numberOfDaysAgoToCheckForInseeUpdates: parseInt(
+      numberOfDaysAgoToCheckForInseeUpdates: Number.parseInt(
         this.#throwIfNotDefinedOrDefault(
           "NUMBER_OF_DAYS_AGO_TO_CHECK_FOR_INSEE_UPDATES",
           "30",
@@ -602,7 +602,7 @@ export class AppConfig {
 // Parsers
 
 const parseInteger = (str: string | undefined, defaultValue: number): number =>
-  str ? parseInt(str) : defaultValue;
+  str ? Number.parseInt(str) : defaultValue;
 
 // Format: <string>,<string>,...
 const parseStringList = (str: string | undefined, separator = ","): string[] =>

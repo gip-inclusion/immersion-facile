@@ -1,14 +1,14 @@
 import {
-  AbsoluteUrl,
-  AppellationAndRomeDto,
-  ContactMethod,
-  Email,
-  FormEstablishmentDto,
-  FormEstablishmentSource,
+  type AbsoluteUrl,
+  type AppellationAndRomeDto,
+  type ContactMethod,
+  type Email,
+  type FormEstablishmentDto,
+  type FormEstablishmentSource,
   defaultMaxContactsPerMonth,
 } from "shared";
-import { AcquisitionParams } from "src/app/routes/routes";
-import { ValueSerializer, param } from "type-route";
+import type { AcquisitionParams } from "src/app/routes/routes";
+import { type ValueSerializer, param } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 export type FormEstablishmentParamsInUrl = Partial<{

@@ -1,18 +1,18 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { DateString, errorToString } from "shared";
+import { type DateString, errorToString } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import {
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type {
   DomainEvent,
   DomainTopic,
   EventFailure,
   EventPublication,
   SubscriptionId,
 } from "../events";
-import { EventBus, EventCallback } from "../ports/EventBus";
+import type { EventBus, EventCallback } from "../ports/EventBus";
 
 const logger = createLogger(__filename);
 

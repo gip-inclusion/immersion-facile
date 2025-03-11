@@ -2,8 +2,8 @@ import subDays from "date-fns/subDays";
 import { normalizedMonthInDays } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 export class MarkEstablishmentsAsSearchableScript extends UseCase<
   void,

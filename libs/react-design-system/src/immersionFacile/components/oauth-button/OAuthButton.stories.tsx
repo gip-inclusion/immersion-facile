@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { OAuthButton, OAuthButtonProps } from "./OAuthButton";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { OAuthButton, type OAuthButtonProps } from "./OAuthButton";
 
 const Component = OAuthButton;
 type Story = StoryObj<typeof Component>;

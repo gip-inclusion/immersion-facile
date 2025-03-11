@@ -1,5 +1,5 @@
 import {
-  WithSourcePage,
+  type WithSourcePage,
   allowedStartOAuthLoginPages,
   expectToEqual,
   queryParamsAsString,

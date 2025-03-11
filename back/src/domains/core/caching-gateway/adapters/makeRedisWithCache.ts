@@ -2,7 +2,7 @@ import { type RedisClientType, createClient } from "redis";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
-import { DefaultCacheConfig, MakeWithCache } from "../port/WithCache";
+import type { DefaultCacheConfig, MakeWithCache } from "../port/WithCache";
 
 const logger = createLogger(__filename);
 

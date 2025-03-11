@@ -1,6 +1,6 @@
-import { AbsoluteUrl, queryParamsAsString } from "shared";
-import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
-import {
+import { type AbsoluteUrl, queryParamsAsString } from "shared";
+import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
+import type {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,

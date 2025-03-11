@@ -1,15 +1,15 @@
 import {
   ConventionDtoBuilder,
-  ConventionJwt,
-  ConventionMagicLinkRoutes,
+  type ConventionJwt,
+  type ConventionMagicLinkRoutes,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 const conventionId = "my-Convention-id";

@@ -1,16 +1,16 @@
 import {
-  AbsoluteUrl,
-  CreateConventionMagicLinkPayloadProperties,
-  EstablishmentJwtPayload,
-  OmitFromExistingKeys,
+  type AbsoluteUrl,
+  type CreateConventionMagicLinkPayloadProperties,
+  type EstablishmentJwtPayload,
+  type OmitFromExistingKeys,
   createConventionMagicLinkPayload,
   frontRoutes,
 } from "shared";
-import {
+import type {
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
 } from "../../domains/core/jwt";
-import { AppConfig } from "./appConfig";
+import type { AppConfig } from "./appConfig";
 
 export const makeGenerateEditFormEstablishmentUrl =
   (

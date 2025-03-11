@@ -3,7 +3,7 @@ import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { conventionSchema } from "../convention/convention.schema";
 import { expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
-import {
+import type {
   DateIntervalDto,
   ScheduleDto,
   SelectedDaysOfTheWeekDto,

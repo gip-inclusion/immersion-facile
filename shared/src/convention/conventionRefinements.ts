@@ -1,13 +1,13 @@
 import differenceInDays from "date-fns/differenceInDays";
 import { addressSchema } from "../address/address.schema";
-import { DateString } from "../utils/date";
+import type { DateString } from "../utils/date";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
-  ConventionDto,
-  ConventionStatus,
-  EstablishmentTutor,
-  InternshipKind,
-  Signatories,
+  type ConventionDto,
+  type ConventionStatus,
+  type EstablishmentTutor,
+  type InternshipKind,
+  type Signatories,
   getExactAge,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";

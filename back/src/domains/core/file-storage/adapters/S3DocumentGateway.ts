@@ -1,8 +1,8 @@
 import * as AWS from "aws-sdk";
-import { AbsoluteUrl, StoredFileId } from "shared";
+import type { AbsoluteUrl, StoredFileId } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { StoredFile } from "../entity/StoredFile";
-import { DocumentGateway } from "../port/DocumentGateway";
+import type { StoredFile } from "../entity/StoredFile";
+import type { DocumentGateway } from "../port/DocumentGateway";
 
 const logger = createLogger(__filename);
 

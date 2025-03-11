@@ -1,18 +1,18 @@
 import {
-  GetSiretInfo,
-  SiretEstablishmentDto,
+  type GetSiretInfo,
+  type SiretEstablishmentDto,
   tooManiSirenRequestsSiretErrorMessage,
 } from "shared";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import {
-  SiretState,
+  type SiretState,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("Siret validation and fetching", () => {
   let store: ReduxStore;

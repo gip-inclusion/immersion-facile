@@ -1,23 +1,23 @@
-import { Observable, from } from "rxjs";
+import { type Observable, from } from "rxjs";
 import {
-  AbsoluteUrl,
-  AgencyId,
-  DiscussionReadDto,
-  DiscussionRejected,
-  InclusionConnectedAllowedRoutes,
-  InclusionConnectedUser,
-  MarkPartnersErroredConventionAsHandledRequest,
-  WithIdToken,
+  type AbsoluteUrl,
+  type AgencyId,
+  type DiscussionReadDto,
+  type DiscussionRejected,
+  type InclusionConnectedAllowedRoutes,
+  type InclusionConnectedUser,
+  type MarkPartnersErroredConventionAsHandledRequest,
+  type WithIdToken,
   makeRejection,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
-import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
+import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import { P, match } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway

@@ -1,4 +1,4 @@
-import {
+import type {
   AddressDto,
   Builder,
   GeoPositionDto,
@@ -6,7 +6,7 @@ import {
   OmitFromExistingKeys,
 } from "shared";
 import {
-  LaBonneBoiteApiResultV2Props,
+  type LaBonneBoiteApiResultV2Props,
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
 

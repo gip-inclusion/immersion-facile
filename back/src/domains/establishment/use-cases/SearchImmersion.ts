@@ -1,22 +1,22 @@
 import { prop, propEq } from "ramda";
 import {
-  ApiConsumer,
-  AppellationCode,
-  SearchQueryParamsDto,
-  SearchResultDto,
-  SiretDto,
-  WithNafCodes,
+  type ApiConsumer,
+  type AppellationCode,
+  type SearchQueryParamsDto,
+  type SearchResultDto,
+  type SiretDto,
+  type WithNafCodes,
   errors,
   searchParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
-import { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
-import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
+import type { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
+import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class SearchImmersion extends TransactionalUseCase<
   SearchQueryParamsDto,

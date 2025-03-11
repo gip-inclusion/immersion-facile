@@ -1,22 +1,25 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  AppellationDto,
-  Group,
-  GroupOptions,
-  Location,
-  SearchResultDto,
+  type AppellationDto,
+  type Group,
+  type GroupOptions,
+  type Location,
+  type SearchResultDto,
   UserBuilder,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { GroupEntity } from "../entities/GroupEntity";
+import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { GroupEntity } from "../entities/GroupEntity";
 import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,

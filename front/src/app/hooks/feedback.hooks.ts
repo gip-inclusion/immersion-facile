@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import {
+import type {
   ActionKindAndLevel,
   FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";

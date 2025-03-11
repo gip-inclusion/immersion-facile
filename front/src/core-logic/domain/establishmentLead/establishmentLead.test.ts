@@ -1,17 +1,17 @@
-import { ConventionJwt, expectToEqual } from "shared";
+import { type ConventionJwt, expectToEqual } from "shared";
 import {
   establishmentLeadErrorSelector,
   establishmentLeadStatus,
 } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";
 import {
-  EstablishmentLeadUIStatus,
+  type EstablishmentLeadUIStatus,
   establishmentLeadSlice,
 } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const jwt: ConventionJwt = "";
 

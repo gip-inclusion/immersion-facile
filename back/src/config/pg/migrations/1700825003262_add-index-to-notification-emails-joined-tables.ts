@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createIndex("notifications_email_recipients", "notifications_email_id");
   pgm.createIndex("notifications_email_attachments", "notifications_email_id");

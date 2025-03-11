@@ -1,6 +1,6 @@
-import { AbsoluteUrl, StoredFileId } from "shared";
-import { StoredFile } from "../entity/StoredFile";
-import { DocumentGateway } from "../port/DocumentGateway";
+import type { AbsoluteUrl, StoredFileId } from "shared";
+import type { StoredFile } from "../entity/StoredFile";
+import type { DocumentGateway } from "../port/DocumentGateway";
 
 export class InMemoryDocumentGateway implements DocumentGateway {
   storedFiles: Partial<Record<StoredFileId, StoredFile>> = {};

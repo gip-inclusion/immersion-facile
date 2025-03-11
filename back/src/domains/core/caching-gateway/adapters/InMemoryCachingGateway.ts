@@ -1,6 +1,6 @@
 import { addSeconds } from "date-fns";
 import isAfter from "date-fns/isAfter";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 
 export class InMemoryCachingGateway<T> {
   readonly #cache: Partial<Record<string, Promise<CacheEntry<T>>>> = {};

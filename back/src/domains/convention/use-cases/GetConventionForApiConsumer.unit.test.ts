@@ -1,8 +1,8 @@
 import { addYears } from "date-fns";
 import {
   AgencyDtoBuilder,
-  ApiConsumer,
-  ApiConsumerRights,
+  type ApiConsumer,
+  type ApiConsumerRights,
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -11,7 +11,7 @@ import { ForbiddenError, NotFoundError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetConventionForApiConsumer } from "./GetConventionForApiConsumer";

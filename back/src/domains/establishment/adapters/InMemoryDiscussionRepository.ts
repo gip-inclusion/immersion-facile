@@ -1,6 +1,6 @@
 import isAfter from "date-fns/isAfter";
-import { DiscussionDto, DiscussionId, SiretDto } from "shared";
-import {
+import type { DiscussionDto, DiscussionId, SiretDto } from "shared";
+import type {
   DiscussionRepository,
   GetDiscussionsParams,
   HasDiscussionMatchingParams,

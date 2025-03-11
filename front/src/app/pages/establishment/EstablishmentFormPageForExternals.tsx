@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { MainWrapper } from "react-design-system";
-import { FormEstablishmentSource } from "shared";
+import type { FormEstablishmentSource } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.formEstablishmentForExternals>;

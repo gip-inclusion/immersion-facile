@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
-  InternshipKind,
-  ShareLinkByEmailDto,
+  type InternshipKind,
+  type ShareLinkByEmailDto,
   domElementIds,
   shareLinkByEmailSchema,
 } from "shared";

@@ -4,15 +4,15 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useState } from "react";
 import { MainWrapper } from "react-design-system";
 import {
-  ConventionJwtPayload,
-  RenewMagicLinkRequestDto,
+  type ConventionJwtPayload,
+  type RenewMagicLinkRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;

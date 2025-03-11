@@ -1,4 +1,4 @@
-import { NotEmptyArray } from "shared";
+import type { NotEmptyArray } from "shared";
 
 const ftAdvisorImmersionKinds = ["PLACEMENT", "CAPEMPLOI"] as const;
 export const ftAdvisorKinds = [

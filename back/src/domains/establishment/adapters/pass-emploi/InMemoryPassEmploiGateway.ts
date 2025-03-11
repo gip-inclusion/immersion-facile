@@ -1,4 +1,4 @@
-import {
+import type {
   PassEmploiGateway,
   PassEmploiNotificationParams,
 } from "../../ports/PassEmploiGateway";

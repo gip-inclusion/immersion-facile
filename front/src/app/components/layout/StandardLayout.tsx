@@ -3,9 +3,9 @@ import { renderContent } from "html-templates/src/components/email";
 import React from "react";
 import { MainWrapper } from "react-design-system";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
-import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 import { HeaderFooterLayout } from "./HeaderFooterLayout";
 
 type StandardLayoutProps = {

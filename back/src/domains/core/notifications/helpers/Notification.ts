@@ -1,16 +1,16 @@
-import {
+import type {
   Notification,
   NotificationContent,
   NotificationId,
   NotificationKind,
 } from "shared";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../events/ports/EventBus";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 
 export type WithNotificationIdAndKind = {
   id: NotificationId;

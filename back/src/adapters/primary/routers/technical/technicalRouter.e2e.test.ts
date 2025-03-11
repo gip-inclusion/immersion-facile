@@ -1,11 +1,11 @@
 import { createHmac } from "crypto";
 import {
-  AbsoluteUrl,
-  BrevoInboundBody,
+  type AbsoluteUrl,
+  type BrevoInboundBody,
   DiscussionBuilder,
-  ShortLinkId,
-  TechnicalRoutes,
-  ValidateEmailFeedback,
+  type ShortLinkId,
+  type TechnicalRoutes,
+  type ValidateEmailFeedback,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
@@ -13,14 +13,17 @@ import {
   expectToEqual,
   technicalRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { GenerateConventionJwt } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { SuperTest, Test } from "supertest";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { GenerateConventionJwt } from "../../../../domains/core/jwt";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 const discussionId = "my-discussion-id";
 const domain = "immersion-facile.beta.gouv.fr";

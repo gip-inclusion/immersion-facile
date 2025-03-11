@@ -1,7 +1,7 @@
 import { cpus } from "os";
 import { cpuUsage, memoryUsage } from "process";
-import { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
-import { OpacifiedLogger } from "./logger";
+import type { TimeGateway } from "../domains/core/time-gateway/ports/TimeGateway";
+import type { OpacifiedLogger } from "./logger";
 
 export const startSamplingEventLoopLag = (
   eventLoopLagSamples: number[],
@@ -89,5 +89,5 @@ const makeReport = (
 const makeEventLoopLagMeanMs = (eventLoopLagSamples: number[]): number =>
   eventLoopLagSamples.length > 0
     ? eventLoopLagSamples.reduce((acc, val) => acc + val, 0) /
-      eventLoopLagSamples.length
+    eventLoopLagSamples.length
     : 0;

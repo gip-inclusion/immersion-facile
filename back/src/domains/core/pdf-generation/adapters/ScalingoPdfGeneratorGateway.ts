@@ -1,12 +1,12 @@
 import {
-  AbsoluteUrl,
-  HtmlToPdfRequest,
+  type AbsoluteUrl,
+  type HtmlToPdfRequest,
   withAuthorizationHeaders,
 } from "shared";
-import { HttpClient, defineRoute, defineRoutes } from "shared-routes";
+import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
-import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
+import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
+import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 type ScalingoPdfGeneratorRoutes = ReturnType<
   typeof makeScalingoPdfGeneratorRoutes

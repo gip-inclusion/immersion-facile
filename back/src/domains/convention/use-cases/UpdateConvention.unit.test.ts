@@ -1,8 +1,8 @@
 import {
-  ConventionDomainPayload,
+  type ConventionDomainPayload,
   ConventionDtoBuilder,
-  ConventionId,
-  EstablishmentTutor,
+  type ConventionId,
+  type EstablishmentTutor,
   InclusionConnectedUserBuilder,
   conventionStatuses,
   errors,
@@ -10,13 +10,13 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

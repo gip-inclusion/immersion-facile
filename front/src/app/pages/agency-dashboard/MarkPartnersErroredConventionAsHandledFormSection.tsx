@@ -9,8 +9,8 @@ import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConnectedUserJwt,
-  MarkPartnersErroredConventionAsHandledRequest,
+  type ConnectedUserJwt,
+  type MarkPartnersErroredConventionAsHandledRequest,
   domElementIds,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";

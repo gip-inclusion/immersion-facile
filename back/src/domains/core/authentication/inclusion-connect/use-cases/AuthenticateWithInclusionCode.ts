@@ -1,10 +1,10 @@
 import {
-  AbsoluteUrl,
-  AuthenticateWithOAuthCodeParams,
-  AuthenticatedUserQueryParams,
-  OAuthCode,
-  User,
-  WithSourcePage,
+  type AbsoluteUrl,
+  type AuthenticateWithOAuthCodeParams,
+  type AuthenticatedUserQueryParams,
+  type OAuthCode,
+  type User,
+  type WithSourcePage,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
   errors,
@@ -13,19 +13,19 @@ import {
 } from "shared";
 import { notifyTeam } from "../../../../../utils/notifyTeam";
 import {
-  AgencyRightOfUser,
+  type AgencyRightOfUser,
   removeAgencyRightsForUser,
   updateAgencyRightsForUser,
 } from "../../../../agency/ports/AgencyRepository";
 import { TransactionalUseCase } from "../../../UseCase";
-import { CreateNewEvent } from "../../../events/ports/EventBus";
-import { GenerateInclusionConnectJwt } from "../../../jwt";
-import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { GetAccessTokenPayload, OAuthGateway } from "../port/OAuthGateway";
+import type { CreateNewEvent } from "../../../events/ports/EventBus";
+import type { GenerateInclusionConnectJwt } from "../../../jwt";
+import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { GetAccessTokenPayload, OAuthGateway } from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 

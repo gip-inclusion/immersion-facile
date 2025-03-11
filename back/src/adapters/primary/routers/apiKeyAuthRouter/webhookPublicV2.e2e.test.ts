@@ -1,22 +1,22 @@
 import {
-  ApiConsumer,
-  WebhookSubscription,
+  type ApiConsumer,
+  type WebhookSubscription,
   errors,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
+import type { SuperTest, Test } from "supertest";
 import {
   authorizedSubscriptionApiConsumer,
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
-  PublicApiV2WebhooksRoutes,
+  type PublicApiV2WebhooksRoutes,
   publicApiV2WebhooksRoutes,
 } from "./publicApiV2.routes";
 

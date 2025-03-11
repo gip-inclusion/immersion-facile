@@ -1,5 +1,5 @@
 import {
-  CaptureAddressGroupsResult,
+  type CaptureAddressGroupsResult,
   captureAddressGroups,
   inferDepartmentCode,
 } from "../utils/address";

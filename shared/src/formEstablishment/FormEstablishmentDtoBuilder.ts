@@ -1,10 +1,10 @@
-import { Builder } from "../Builder";
-import { WithAcquisition } from "../acquisition.dto";
-import { AddressAndPosition } from "../address/address.dto";
-import { Email } from "../email/email.dto";
-import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
-import {
+import type { Builder } from "../Builder";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AddressAndPosition } from "../address/address.dto";
+import type { Email } from "../email/email.dto";
+import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { SiretDto } from "../siret/siret";
+import type {
   BusinessContactDto,
   EstablishmentCSVRow,
   EstablishmentSearchableBy,

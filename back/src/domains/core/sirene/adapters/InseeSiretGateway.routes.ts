@@ -1,7 +1,7 @@
-import { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { SirenGatewayAnswer } from "./InseeSiretGateway";
+import type { SirenGatewayAnswer } from "./InseeSiretGateway";
 
 // The documentation can be found here:
 // https://portail-api.insee.fr/catalog/all > Api Sirene Privée > Documentation

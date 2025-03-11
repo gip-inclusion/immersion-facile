@@ -1,17 +1,17 @@
 import { addDays } from "date-fns";
 import {
-  AdminRoutes,
+  type AdminRoutes,
   AgencyDtoBuilder,
-  AgencyRole,
-  ApiConsumer,
-  ApiConsumerJwt,
-  ConnectedUserJwt,
-  FeatureFlags,
-  InclusionConnectJwtPayload,
-  InclusionConnectedUser,
+  type AgencyRole,
+  type ApiConsumer,
+  type ApiConsumerJwt,
+  type ConnectedUserJwt,
+  type FeatureFlags,
+  type InclusionConnectJwtPayload,
+  type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  SetFeatureFlagParam,
-  User,
+  type SetFeatureFlagParam,
+  type User,
   adminRoutes,
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
@@ -26,21 +26,24 @@ import {
   technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import { HttpClient } from "shared-routes";
-import { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
+import type { HttpClient } from "shared-routes";
+import type { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
-  GenerateApiConsumerJwt,
-  GenerateInclusionConnectJwt,
+  type GenerateApiConsumerJwt,
+  type GenerateInclusionConnectJwt,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Admin router", () => {

@@ -7,22 +7,22 @@ import {
   dateTimeIsoStringSchema,
   makeDateStringSchema,
 } from "../schedule/Schedule.schema";
-import { ApiConsumerJwt } from "../tokens/jwt.dto";
+import type { ApiConsumerJwt } from "../tokens/jwt.dto";
 import {
   localization,
   stringWithMaxLength255,
   zStringMinLength1,
 } from "../zodUtils";
 import {
-  ApiConsumer,
-  ApiConsumerContact,
-  ApiConsumerName,
-  ApiConsumerSubscriptionId,
-  CallbackHeaders,
-  CreateWebhookSubscription,
-  WebhookSubscription,
-  WriteApiConsumerParams,
-  WriteApiConsumerRights,
+  type ApiConsumer,
+  type ApiConsumerContact,
+  type ApiConsumerName,
+  type ApiConsumerSubscriptionId,
+  type CallbackHeaders,
+  type CreateWebhookSubscription,
+  type WebhookSubscription,
+  type WriteApiConsumerParams,
+  type WriteApiConsumerRights,
   apiConsumerKinds,
   authorizedCallbackHeaderKeys,
 } from "./ApiConsumer";

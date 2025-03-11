@@ -1,4 +1,4 @@
-import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
+import type { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
 
 const followedIds: ColumnDefinitions = {
   convention_id: { type: "uuid", notNull: false },

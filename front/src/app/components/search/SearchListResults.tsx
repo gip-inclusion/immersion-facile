@@ -3,11 +3,15 @@ import { Pagination } from "@codegouvfr/react-dsfr/Pagination";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  SearchResultIllustration,
   Tag as ImTag,
+  SearchResultIllustration,
   useStyleUtils,
 } from "react-design-system";
-import { SearchResultDto, domElementIds, isSuperEstablishment } from "shared";
+import {
+  type SearchResultDto,
+  domElementIds,
+  isSuperEstablishment,
+} from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -41,7 +45,7 @@ export const SearchListResults = ({
   );
   const [activeMarkerKey, setActiveMarkerKey] = useState<string | null>(null);
   const { cx, classes } = useStyleUtils();
-  const resultsPerPageValue = parseInt(resultsPerPage);
+  const resultsPerPageValue = Number.parseInt(resultsPerPage);
   const totalPages = Math.ceil(searchResults.length / resultsPerPageValue);
   const hasResults = displayedResults.length > 0;
 

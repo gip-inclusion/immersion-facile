@@ -1,9 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { values } from "ramda";
-import React, { ReactNode } from "react";
-import { Signatories, Signatory, SignatoryRole, filterNotFalsy } from "shared";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import type React from "react";
+import type { ReactNode } from "react";
 import {
+  type Signatories,
+  type Signatory,
+  type SignatoryRole,
+  filterNotFalsy,
+} from "shared";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
+import type {
   ConventionFeedbackKind,
   ConventionSubmitFeedback,
 } from "src/core-logic/domain/convention/convention.slice";

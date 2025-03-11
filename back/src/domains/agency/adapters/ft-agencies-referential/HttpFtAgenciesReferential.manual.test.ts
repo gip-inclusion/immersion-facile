@@ -1,5 +1,5 @@
 import {
-  AccessTokenResponse,
+  type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";

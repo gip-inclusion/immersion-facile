@@ -1,12 +1,12 @@
-import { ConnectedUserJwt, Flavor, UserWithRights } from "..";
-import { ConventionDto } from "../convention/convention.dto";
-import {
+import type { ConnectedUserJwt, Flavor, UserWithRights } from "..";
+import type { ConventionDto } from "../convention/convention.dto";
+import type {
   AgencyRole,
   User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { ConventionEstablishmentRole, Role } from "../role/role.dto";
-import { allowedStartOAuthLoginPages } from "../routes/routes";
-import { ExcludeFromExisting, ExtractFromExisting } from "../utils";
+import type { ConventionEstablishmentRole, Role } from "../role/role.dto";
+import type { allowedStartOAuthLoginPages } from "../routes/routes";
+import type { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
 export type IdToken = Flavor<string, "IdToken">;
 export type IdentityProvider = "proConnect";

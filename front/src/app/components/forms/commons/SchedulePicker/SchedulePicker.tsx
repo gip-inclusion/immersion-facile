@@ -3,10 +3,10 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  ConventionDto,
-  ConventionReadDto,
-  DateIntervalDto,
-  Weekday,
+  type ConventionDto,
+  type ConventionReadDto,
+  type DateIntervalDto,
+  type Weekday,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
 } from "shared";

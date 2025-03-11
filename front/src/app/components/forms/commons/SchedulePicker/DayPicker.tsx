@@ -1,8 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import {
-  DailyScheduleDto,
-  DateIntervalDto,
+  type DailyScheduleDto,
+  type DateIntervalDto,
   makeImmersionTimetable,
 } from "shared";
 import { DayCircle } from "./DayCircle";

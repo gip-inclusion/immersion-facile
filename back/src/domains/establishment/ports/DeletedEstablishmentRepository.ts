@@ -1,4 +1,4 @@
-import { SiretDto } from "shared";
+import type { SiretDto } from "shared";
 
 export type DeletedEstablishmentDto = {
   siret: SiretDto;

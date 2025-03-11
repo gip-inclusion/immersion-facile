@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { UserParamsForAgency, WithAgencyId } from "shared";
-import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface CreateUserOnAgencyState {
   isLoading: boolean;

@@ -1,12 +1,12 @@
 import Bottleneck from "bottleneck";
-import { ValidateEmailFeedback } from "shared";
-import { HttpClient } from "shared-routes";
+import type { ValidateEmailFeedback } from "shared";
+import type { HttpClient } from "shared-routes";
 import { createLogger } from "../../../../utils/logger";
-import { WithCache } from "../../caching-gateway/port/WithCache";
-import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
-import { EmailableApiKey } from "./EmailableEmailValidationGateway.dto";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
+import type { EmailValidationGetaway } from "../ports/EmailValidationGateway";
+import type { EmailableApiKey } from "./EmailableEmailValidationGateway.dto";
 import {
-  EmailableValidationRoutes,
+  type EmailableValidationRoutes,
   emailableValidationRoutes,
 } from "./EmailableEmailValidationGateway.routes";
 

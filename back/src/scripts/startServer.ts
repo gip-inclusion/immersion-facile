@@ -11,7 +11,7 @@ const logger = createLogger(__filename);
 
 const getPort = (): number => {
   if (!process.env.PORT) return 1234;
-  return parseInt(process.env.PORT);
+  return Number.parseInt(process.env.PORT);
 };
 
 const appConfig = AppConfig.createFromEnv();

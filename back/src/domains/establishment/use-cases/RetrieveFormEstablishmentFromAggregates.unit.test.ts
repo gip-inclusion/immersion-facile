@@ -1,8 +1,8 @@
 import {
-  FormEstablishmentDto,
+  type FormEstablishmentDto,
   InclusionConnectedUserBuilder,
-  SiretDto,
-  User,
+  type SiretDto,
+  type User,
   UserBuilder,
   addressDtoToString,
   errors,
@@ -12,10 +12,10 @@ import {
 } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

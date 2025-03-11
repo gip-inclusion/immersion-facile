@@ -1,7 +1,7 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   ConventionSummary,
-  ConventionSummaryProperties,
+  type ConventionSummaryProperties,
 } from "./ConventionSummary";
 
 const Component = ConventionSummary;

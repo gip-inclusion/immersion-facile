@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Badge, BadgeProps } from "@codegouvfr/react-dsfr/Badge";
-import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import React, { ReactNode } from "react";
+import { Badge, type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import React, { type ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { CopyButton } from "../copy-button/CopyButton";
 import { conventionSummaryStyles } from "./ConventionSummary.styles";

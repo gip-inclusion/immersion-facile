@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import {
+import type { Observable } from "rxjs";
+import type {
   ApiConsumerName,
   ConnectedUserJwt,
   ConventionDto,
@@ -17,7 +17,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
+import type { FetchConventionRequestedPayload } from "../domain/convention/convention.slice";
 
 export interface ConventionGateway {
   retrieveFromToken$(

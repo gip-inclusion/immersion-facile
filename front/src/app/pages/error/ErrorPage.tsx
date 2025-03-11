@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { FrontErrorProps } from "src/app/contents/error/types";
+import type { FrontErrorProps } from "src/app/contents/error/types";
 import { FrontSpecificError } from "src/app/pages/error/front-errors";
 import { ErrorPageContent } from "./ErrorPageContent";
 

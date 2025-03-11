@@ -1,13 +1,13 @@
 import {
-  ApiConsumer,
-  ApiConsumerSubscriptionId,
+  type ApiConsumer,
+  type ApiConsumerSubscriptionId,
   apiConsumerSubscriptionIdSchema,
   errors,
   findRightNameFromSubscriptionId,
   isApiConsumerAllowed,
 } from "shared";
 import { TransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export class DeleteSubscription extends TransactionalUseCase<
   ApiConsumerSubscriptionId,

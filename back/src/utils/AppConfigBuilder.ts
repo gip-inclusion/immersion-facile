@@ -1,4 +1,4 @@
-import { Builder, ProcessEnv } from "shared";
+import type { Builder, ProcessEnv } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 
 const defaultConfigParams = {

@@ -2,12 +2,12 @@ import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { ApiConsumerBuilder } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { fakeEstablishmentStatsResponse } from "../adapters/InMemoryStatisticQueries";
 import {
-  GetEstablishmentStats,
+  type GetEstablishmentStats,
   makeGetEstablishmentStats,
 } from "./GetEstablishmentStats";
 

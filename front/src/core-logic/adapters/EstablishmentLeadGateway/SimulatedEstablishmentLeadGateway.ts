@@ -1,6 +1,6 @@
-import { Observable, delay, of, throwError } from "rxjs";
-import { ConventionJwt } from "shared";
-import { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
+import { type Observable, delay, of, throwError } from "rxjs";
+import type { ConventionJwt } from "shared";
+import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 
 const failedJwt: ConventionJwt = "failedJwt";
 

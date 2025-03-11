@@ -1,28 +1,28 @@
 import {
   DiscussionBuilder,
-  DiscussionDto,
-  DiscussionStatus,
+  type DiscussionDto,
+  type DiscussionStatus,
   InclusionConnectedUserBuilder,
-  RejectionKind,
+  type RejectionKind,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
-  ExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  RejectDiscussionAndSendNotification,
+  type RejectDiscussionAndSendNotification,
   makeRejectDiscussionAndSendNotification,
 } from "./RejectDiscussionAndSendNotification";
 

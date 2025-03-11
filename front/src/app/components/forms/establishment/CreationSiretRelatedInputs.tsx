@@ -8,8 +8,8 @@ import { useDispatch } from "react-redux";
 import { v4 as uuidV4 } from "uuid";
 
 import {
-  FormEstablishmentDto,
-  NumberEmployeesRange,
+  type FormEstablishmentDto,
+  type NumberEmployeesRange,
   addressDtoToString,
   defaultMaxContactsPerMonth,
   domElementIds,

@@ -1,5 +1,5 @@
 import { keys } from "ramda";
-import { ApiConsumer, WebhookSubscription } from "shared";
+import type { ApiConsumer, WebhookSubscription } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../UseCase";
 

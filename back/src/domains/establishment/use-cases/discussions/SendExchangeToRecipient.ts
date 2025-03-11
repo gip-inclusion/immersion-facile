@@ -1,17 +1,17 @@
 import {
-  EmailAttachment,
-  Exchange,
-  WithDiscussionId,
+  type EmailAttachment,
+  type Exchange,
+  type WithDiscussionId,
   createOpaqueEmail,
   errors,
   immersionFacileNoReplyEmailSender,
   withDiscussionSchemaId,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussionId> {
   protected inputSchema = withDiscussionSchemaId;

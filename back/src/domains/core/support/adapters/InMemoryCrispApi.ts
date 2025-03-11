@@ -1,4 +1,4 @@
-import {
+import type {
   CrispGateway,
   InitiateCrispConversationParams,
 } from "../ports/CrispGateway";

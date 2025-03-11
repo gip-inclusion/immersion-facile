@@ -1,4 +1,4 @@
-import { SearchResultDto } from "./SearchResult.dto";
+import type { SearchResultDto } from "./SearchResult.dto";
 
 export const getMapsLink = (searchResultData: SearchResultDto | undefined) => {
   if (!searchResultData) return;

@@ -1,16 +1,16 @@
 import {
-  EmailNotification,
-  NotificationsByKind,
-  SmsNotification,
+  type EmailNotification,
+  type NotificationsByKind,
+  type SmsNotification,
   expectToEqual,
 } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("notifications slice", () => {
   let store: ReduxStore;

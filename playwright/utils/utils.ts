@@ -1,8 +1,8 @@
 import {
-  Locator,
-  Page,
-  PlaywrightTestArgs,
-  TestInfo,
+  type Locator,
+  type Page,
+  type PlaywrightTestArgs,
+  type TestInfo,
   expect,
 } from "@playwright/test";
 import { testConfig } from "../custom.config";

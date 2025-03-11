@@ -1,6 +1,6 @@
 import { makezTrimmedString, zUuidLike } from "shared";
 import { z } from "zod";
-import { ConventionFtUserAdvisorDto } from "../dto/FtConnect.dto";
+import type { ConventionFtUserAdvisorDto } from "../dto/FtConnect.dto";
 import { immersionFranceTravailAdvisors } from "../dto/FtConnectAdvisor.dto";
 
 export const conventionFranceTravailUserAdvisorDtoSchema: z.Schema<ConventionFtUserAdvisorDto> =

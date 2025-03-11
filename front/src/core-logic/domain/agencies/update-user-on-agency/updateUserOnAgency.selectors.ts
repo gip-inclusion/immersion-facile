@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { RootState } from "src/core-logic/storeConfig/store";
+import type { RootState } from "src/core-logic/storeConfig/store";
 
 const updateUserOnAgencyState = ({ agency }: RootState) =>
   agency.updateUserOnAgency;

@@ -1,7 +1,7 @@
 import { createAxiosInstance } from "../../../../utils/axiosUtils";
 import { createLogger } from "../../../../utils/logger";
 import { notifyToTeamAndThrowError } from "../../../../utils/notifyTeam";
-import {
+import type {
   PassEmploiGateway,
   PassEmploiNotificationParams,
 } from "../../ports/PassEmploiGateway";

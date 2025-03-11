@@ -1,7 +1,7 @@
 import {
-  ApiConsumer,
-  DataWithPagination,
-  PaginationQueryParams,
+  type ApiConsumer,
+  type DataWithPagination,
+  type PaginationQueryParams,
   errors,
   paginationRequiredQueryParamsSchema,
 } from "shared";

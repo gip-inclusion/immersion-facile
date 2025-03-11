@@ -12,20 +12,23 @@ import {
 import { clone, prop, uniq } from "ramda";
 import {
   IMMERSION_WEEKLY_LIMITED_SCHEDULE_HOURS,
-  RenewConventionParams,
+  type RenewConventionParams,
 } from "../convention/convention.dto";
 import { isConventionOld } from "../convention/convention.schema";
 import { arrayFromNumber } from "../utils";
-import { DateString, convertLocaleDateToUtcTimezoneDate } from "../utils/date";
 import {
-  DailyScheduleDto,
-  DateIntervalDto,
-  ScheduleDto,
-  SelectedDaysOfTheWeekDto,
-  TimePeriodDto,
-  TimePeriodsDto,
-  Weekday,
-  WeekdayNumber,
+  type DateString,
+  convertLocaleDateToUtcTimezoneDate,
+} from "../utils/date";
+import {
+  type DailyScheduleDto,
+  type DateIntervalDto,
+  type ScheduleDto,
+  type SelectedDaysOfTheWeekDto,
+  type TimePeriodDto,
+  type TimePeriodsDto,
+  type Weekday,
+  type WeekdayNumber,
   weekdays,
 } from "./Schedule.dto";
 
@@ -392,7 +395,7 @@ export const calculateWeeklyHoursFromSchedule = (
 export const calculateWeeklyHours = (
   week: WeeklyImmersionTimetableDto,
 ): number =>
-  parseFloat(
+  Number.parseFloat(
     week
       .reduce(
         (previousValue, currentDay) =>

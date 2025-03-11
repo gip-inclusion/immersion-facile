@@ -1,8 +1,8 @@
-import React from "react";
+import type React from "react";
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
-  FrontAgencyDashboardRoute,
+  type FrontAgencyDashboardRoute,
   InclusionConnectedPrivateRoute,
 } from "src/app/routes/InclusionConnectedPrivateRoute";
 

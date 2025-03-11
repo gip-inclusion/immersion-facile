@@ -1,4 +1,4 @@
-import { AddressDto } from "shared";
+import type { AddressDto } from "shared";
 
 export const getRandomAddress = (): AddressDto =>
   seedAddresses[Math.floor(Math.random() * seedAddresses.length)];

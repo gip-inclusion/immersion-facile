@@ -1,7 +1,11 @@
-import { Pool } from "pg";
-import { ApiConsumer, WebhookSubscription, expectToEqual } from "shared";
+import type { Pool } from "pg";
 import {
-  KyselyDb,
+  type ApiConsumer,
+  type WebhookSubscription,
+  expectToEqual,
+} from "shared";
+import {
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";

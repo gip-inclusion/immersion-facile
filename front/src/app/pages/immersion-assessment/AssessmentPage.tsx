@@ -3,8 +3,8 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import {
-  AssessmentRole,
-  ConventionJwtPayload,
+  type AssessmentRole,
+  type ConventionJwtPayload,
   assessmentRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
@@ -13,8 +13,8 @@ import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentFo
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
 

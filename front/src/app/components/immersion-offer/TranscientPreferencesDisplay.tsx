@@ -3,15 +3,15 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useEffect, useState } from "react";
 import { FormOverlay } from "react-design-system";
 import {
-  ImmersionObjective,
+  type ImmersionObjective,
   isStringImmersionObjective,
   keys,
   labelsForImmersionObjective,
 } from "shared";
 import { inputsLabelsByKey } from "src/app/components/immersion-offer/ContactByEmail";
 import {
-  ContactTranscientData,
-  TranscientData,
+  type ContactTranscientData,
+  type TranscientData,
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
 

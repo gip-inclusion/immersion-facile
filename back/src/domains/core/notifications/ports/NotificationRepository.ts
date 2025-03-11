@@ -1,5 +1,11 @@
-import { ConventionId, Email, EmailType, Phone, TemplatedSms } from "shared";
-import {
+import type {
+  ConventionId,
+  Email,
+  EmailType,
+  Phone,
+  TemplatedSms,
+} from "shared";
+import type {
   EmailNotification,
   Notification,
   NotificationId,

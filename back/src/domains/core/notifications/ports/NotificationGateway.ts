@@ -1,4 +1,9 @@
-import { Flavor, NotificationId, TemplatedEmail, TemplatedSms } from "shared";
+import type {
+  Flavor,
+  NotificationId,
+  TemplatedEmail,
+  TemplatedSms,
+} from "shared";
 
 export type Base64 = Flavor<string, "Base64">;
 

@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { MainWrapper } from "react-design-system";
 import { technicalRoutes } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

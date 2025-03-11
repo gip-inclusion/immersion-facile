@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { NafSectionSuggestion } from "shared";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { NafSectionSuggestion } from "shared";
 
 export type NafState = {
   isLoading: boolean;

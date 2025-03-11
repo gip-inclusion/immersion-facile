@@ -1,6 +1,10 @@
 import { z } from "zod";
-import { Builder } from "../Builder";
-import { DailyScheduleDto, DateIntervalDto, ScheduleDto } from "./Schedule.dto";
+import type { Builder } from "../Builder";
+import type {
+  DailyScheduleDto,
+  DateIntervalDto,
+  ScheduleDto,
+} from "./Schedule.dto";
 import {
   selectedDaysOfTheWeekSchema,
   timePeriodsSchema,

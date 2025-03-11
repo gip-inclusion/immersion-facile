@@ -2,7 +2,7 @@ import { z } from "zod";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zUuidLike } from "../zodUtils";
-import {
+import type {
   SearchResultQuery,
   SiretAndAppellationDto,
 } from "./SiretAndAppellation.dto";

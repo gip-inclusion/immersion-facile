@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import {
-  EstablishmentRoutes,
-  InclusionConnectJwtPayload,
+  type EstablishmentRoutes,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   UserBuilder,
   addressDtoToString,
@@ -13,22 +13,25 @@ import {
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import supertest from "supertest";
+import type supertest from "supertest";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
-import {
+import type {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
   const backofficeAdminUser = new InclusionConnectedUserBuilder()

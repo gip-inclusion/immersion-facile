@@ -1,10 +1,10 @@
-import { AgencyGroup, CodeSafir, DepartmentCode } from "shared";
+import type { AgencyGroup, CodeSafir, DepartmentCode } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   cast,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
-import { AgencyGroupRepository } from "../ports/AgencyGroupRepository";
+import type { AgencyGroupRepository } from "../ports/AgencyGroupRepository";
 
 export class PgAgencyGroupRepository implements AgencyGroupRepository {
   #transaction: KyselyDb;

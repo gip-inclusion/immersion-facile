@@ -1,11 +1,11 @@
 import {
-  SearchResultDto,
-  SiretAndAppellationDto,
+  type SearchResultDto,
+  type SiretAndAppellationDto,
   errors,
   siretAndAppellationSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
+import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export type GetExternalSearchResult = ReturnType<
   typeof makeGetExternalSearchResult

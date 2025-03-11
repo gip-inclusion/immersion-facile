@@ -2,9 +2,9 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
-  InclusionConnectedAllowedRoutes,
+  type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
-  User,
+  type User,
   currentJwtVersions,
   displayRouteName,
   errors,
@@ -16,15 +16,15 @@ import {
   queryParamsAsString,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { Gateways } from "../../../../config/bootstrap/createGateways";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { SuperTest, Test } from "supertest";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { Gateways } from "../../../../config/bootstrap/createGateways";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 

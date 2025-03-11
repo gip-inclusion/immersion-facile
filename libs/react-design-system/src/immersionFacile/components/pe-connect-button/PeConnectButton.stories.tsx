@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { PeConnectButton, PeConnectButtonProps } from "./PeConnectButton";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { PeConnectButton, type PeConnectButtonProps } from "./PeConnectButton";
 
 const Component = PeConnectButton;
 type Story = StoryObj<typeof Component>;

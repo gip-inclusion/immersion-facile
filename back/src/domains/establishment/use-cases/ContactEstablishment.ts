@@ -1,22 +1,22 @@
 import subDays from "date-fns/subDays";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
-  BusinessContactDto,
-  ContactEstablishmentRequestDto,
-  DiscussionDto,
+  type BusinessContactDto,
+  type ContactEstablishmentRequestDto,
+  type DiscussionDto,
   contactEstablishmentRequestSchema,
   emailTemplatesByName,
   errors,
   normalizedMonthInDays,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { businessContactFromEstablishmentAggregateAndUsers } from "../helpers/businessContact.helpers";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {

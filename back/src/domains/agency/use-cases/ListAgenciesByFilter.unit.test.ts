@@ -1,5 +1,5 @@
 import {
-  AddressDto,
+  type AddressDto,
   AgencyDtoBuilder,
   activeAgencyStatuses,
   expectToEqual,

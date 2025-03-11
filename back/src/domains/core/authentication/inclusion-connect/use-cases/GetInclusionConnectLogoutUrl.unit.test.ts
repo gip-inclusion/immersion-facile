@@ -1,5 +1,5 @@
 import {
-  User,
+  type User,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -7,16 +7,16 @@ import {
 } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import {
-  GetInclusionConnectLogoutUrl,
+  type GetInclusionConnectLogoutUrl,
   makeGetInclusionConnectLogoutUrl,
 } from "./GetInclusionConnectLogoutUrl";
 

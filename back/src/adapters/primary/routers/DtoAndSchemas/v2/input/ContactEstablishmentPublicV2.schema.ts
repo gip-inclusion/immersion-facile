@@ -1,5 +1,5 @@
 import {
-  ImmersionObjective,
+  type ImmersionObjective,
   appellationCodeSchema,
   conventionObjectiveOptions,
   emailSchema,
@@ -12,7 +12,7 @@ import {
   zUuidLike,
 } from "shared";
 import { z } from "zod";
-import {
+import type {
   ContactEstablishmentByMailPublicV2Dto,
   ContactEstablishmentPublicV2Dto,
 } from "./ContactEstablishmentPublicV2.dto";

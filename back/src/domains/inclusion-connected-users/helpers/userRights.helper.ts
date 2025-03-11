@@ -1,14 +1,14 @@
 import {
-  UserId,
-  UserWithRights,
-  WithEstablishmentData,
-  WithEstablishments,
+  type UserId,
+  type UserWithRights,
+  type WithEstablishmentData,
+  type WithEstablishments,
   errors,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
-import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 
 export const getUserWithRights = async (
   uow: UnitOfWork,

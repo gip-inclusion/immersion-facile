@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { AgencyDto } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { AgencyDto } from "shared";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type UpdateAgencyState = {
   isLoading: boolean;

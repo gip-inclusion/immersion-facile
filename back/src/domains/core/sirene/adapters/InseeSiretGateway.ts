@@ -1,26 +1,26 @@
 import Bottleneck from "bottleneck";
 import { format, formatISO } from "date-fns";
 import {
-  NafDto,
-  OmitFromExistingKeys,
-  SiretDto,
-  SiretEstablishmentDto,
+  type NafDto,
+  type OmitFromExistingKeys,
+  type SiretDto,
+  type SiretEstablishmentDto,
   errors,
   filterNotFalsy,
   queryParamsAsString,
 } from "shared";
-import { HttpClient } from "shared-routes";
-import {
+import type { HttpClient } from "shared-routes";
+import type {
   AccessTokenResponse,
   InseeAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
-import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
-import { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { SiretGateway } from "../ports/SiretGateway";
-import { InseeExternalRoutes } from "./InseeSiretGateway.routes";
+import type { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
+import type { RetryStrategy } from "../../retry-strategy/ports/RetryStrategy";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { SiretGateway } from "../ports/SiretGateway";
+import type { InseeExternalRoutes } from "./InseeSiretGateway.routes";
 import { getNumberEmployeesRangeByTefenCode } from "./SiretGateway.common";
 
 const logger = createLogger(__filename);

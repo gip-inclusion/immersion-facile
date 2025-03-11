@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
   ConventionDtoBuilder,
-  EmailNotification,
+  type EmailNotification,
   InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -12,7 +12,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";

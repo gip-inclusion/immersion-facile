@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 const viewAgenciesTable = "view_agencies";
 const viewAgenciesByDepartmentTable = "view_agencies_by_department";
 const viewConventionsTable = "view_conventions";

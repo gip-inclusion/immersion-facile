@@ -1,4 +1,4 @@
-import { AgencyGroup, CodeSafir } from "shared";
+import type { AgencyGroup, CodeSafir } from "shared";
 
 export interface AgencyGroupRepository {
   getByCodeSafir(codeSafir: CodeSafir): Promise<AgencyGroup | undefined>;

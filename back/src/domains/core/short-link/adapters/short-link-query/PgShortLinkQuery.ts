@@ -1,7 +1,12 @@
-import { AbsoluteUrl, ShortLinkId, absoluteUrlSchema, castError } from "shared";
-import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import {
+  type AbsoluteUrl,
+  type ShortLinkId,
+  absoluteUrlSchema,
+  castError,
+} from "shared";
+import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
-import { ShortLinkQuery } from "../../ports/ShortLinkQuery";
+import type { ShortLinkQuery } from "../../ports/ShortLinkQuery";
 
 const logger = createLogger(__filename);
 

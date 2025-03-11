@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import { NafSectionSuggestion } from "shared";
+import type { Observable } from "rxjs";
+import type { NafSectionSuggestion } from "shared";
 
 export interface NafGateway {
   getNafSuggestions$(searchText: string): Observable<NafSectionSuggestion[]>;

@@ -1,7 +1,7 @@
 import { addDays, subDays } from "date-fns";
 import {
-  EstablishmentRoutes,
-  InclusionConnectJwtPayload,
+  type EstablishmentRoutes,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   UserBuilder,
   currentJwtVersions,
@@ -12,14 +12,14 @@ import {
   expectToEqual,
   inclusionConnectTokenExpiredMessage,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import {
+import type {
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
-import { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 

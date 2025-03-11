@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const llbRequestsTableName = "lbb_requests";
 export async function up(pgm: MigrationBuilder): Promise<void> {

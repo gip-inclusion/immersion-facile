@@ -1,11 +1,11 @@
-import { Observable, from } from "rxjs";
+import { type Observable, from } from "rxjs";
 import {
-  Location,
-  LookupLocationInput,
-  LookupSearchResult,
+  type Location,
+  type LookupLocationInput,
+  type LookupSearchResult,
   sleep,
 } from "shared";
-import { AddressGateway } from "src/core-logic/ports/AddressGateway";
+import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {
   constructor(private simulatedLatencyMs: number | undefined = undefined) {}

@@ -1,7 +1,7 @@
 import {
-  ConventionReadDto,
-  ConventionStatus,
-  Role,
+  type ConventionReadDto,
+  type ConventionStatus,
+  type Role,
   statusTransitionConfigs,
 } from "shared";
 

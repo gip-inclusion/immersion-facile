@@ -1,23 +1,23 @@
 import { parseISO } from "date-fns";
 import {
-  AgencyDto,
-  AgencyWithUsersRights,
-  ConventionDto,
-  EmailNotification,
-  Notification,
-  NotificationId,
-  NotificationKind,
-  ShortLinkId,
-  Signatory,
-  SmsNotification,
-  TemplatedEmail,
+  type AgencyDto,
+  type AgencyWithUsersRights,
+  type ConventionDto,
+  type EmailNotification,
+  type Notification,
+  type NotificationId,
+  type NotificationKind,
+  type ShortLinkId,
+  type Signatory,
+  type SmsNotification,
+  type TemplatedEmail,
   concatValidatorNames,
   displayEmergencyContactInfos,
   expectToEqual,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
-import {
+import type {
   EmailNotificationFilters,
   NotificationRepository,
   SmsNotificationFilters,

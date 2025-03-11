@@ -1,27 +1,27 @@
-import { Observable, Subject, from } from "rxjs";
+import { type Observable, Subject, from } from "rxjs";
 import {
-  AddConventionInput,
-  AgencyOption,
-  ApiConsumerName,
-  ConnectedUserJwt,
-  ConventionDto,
+  type AddConventionInput,
+  type AgencyOption,
+  type ApiConsumerName,
+  type ConnectedUserJwt,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionJwt,
-  ConventionReadDto,
-  ConventionSupportedJwt,
-  DashboardUrlAndName,
-  FindSimilarConventionsParams,
-  RenewConventionParams,
-  RenewMagicLinkRequestDto,
-  SendSignatureLinkRequestDto,
-  ShareLinkByEmailDto,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
+  type ConventionId,
+  type ConventionJwt,
+  type ConventionReadDto,
+  type ConventionSupportedJwt,
+  type DashboardUrlAndName,
+  type FindSimilarConventionsParams,
+  type RenewConventionParams,
+  type RenewMagicLinkRequestDto,
+  type SendSignatureLinkRequestDto,
+  type ShareLinkByEmailDto,
+  type UpdateConventionStatusRequestDto,
+  type WithConventionId,
   sleep,
 } from "shared";
-import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
-import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
+import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
+import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
 const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
   .withStatus("DRAFT")
@@ -66,7 +66,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
   };
 
-  constructor(private simulatedLatency?: number) {}
+  constructor(private simulatedLatency?: number) { }
 
   broadcastConventionAgain$(
     _params: WithConventionId,

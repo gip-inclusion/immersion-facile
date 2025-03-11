@@ -1,12 +1,12 @@
 import { addDays } from "date-fns";
 import {
-  ApiConsumer,
-  AppellationAndRomeDto,
-  NafCode,
-  RomeDto,
-  SearchQueryParamsDto,
-  SearchQueryParamsWithGeoParams,
-  SearchResultDto,
+  type ApiConsumer,
+  type AppellationAndRomeDto,
+  type NafCode,
+  type RomeDto,
+  type SearchQueryParamsDto,
+  type SearchQueryParamsWithGeoParams,
+  type SearchResultDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -14,16 +14,16 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../adapters/InMemoryEstablishmentAggregateRepository";
 import { InMemoryLaBonneBoiteGateway } from "../adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
-import { LaBonneBoiteCompanyDto } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
+import type { LaBonneBoiteCompanyDto } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
-import { SearchMadeEntity } from "../entities/SearchMadeEntity";
+import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import type { SearchMadeEntity } from "../entities/SearchMadeEntity";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,

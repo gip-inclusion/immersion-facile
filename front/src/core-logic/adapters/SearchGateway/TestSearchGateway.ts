@@ -1,5 +1,5 @@
-import { Observable, Subject } from "rxjs";
-import {
+import { type Observable, Subject } from "rxjs";
+import type {
   ContactEstablishmentRequestDto,
   GroupSlug,
   GroupWithResults,
@@ -7,7 +7,7 @@ import {
   SearchResultDto,
   SiretAndAppellationDto,
 } from "shared";
-import { SearchGateway } from "src/core-logic/ports/SearchGateway";
+import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
 
 export class TestSearchGateway implements SearchGateway {
   public contactEstablishmentResponse$ = new Subject<

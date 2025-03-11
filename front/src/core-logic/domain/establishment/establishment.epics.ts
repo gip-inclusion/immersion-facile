@@ -1,15 +1,15 @@
 import { filter, map, of, switchMap, tap } from "rxjs";
 import {
-  SiretAndJwtPayload,
+  type SiretAndJwtPayload,
   defaultFormEstablishmentValue,
   establishmentSlice,
 } from "src/core-logic/domain/establishment/establishment.slice";
 import {
-  SiretAction,
+  type SiretAction,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

@@ -1,4 +1,4 @@
-import { DiscussionId, ExchangeRole } from "../discussion/discussion.dto";
+import type { DiscussionId, ExchangeRole } from "../discussion/discussion.dto";
 
 export const createOpaqueEmail = (
   discussionId: DiscussionId,

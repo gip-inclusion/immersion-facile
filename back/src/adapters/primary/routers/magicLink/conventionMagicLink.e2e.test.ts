@@ -2,14 +2,14 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionMagicLinkRoutes,
-  InclusionConnectJwtPayload,
+  type ConventionId,
+  type ConventionMagicLinkRoutes,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  RenewConventionParams,
-  Role,
+  type RenewConventionParams,
+  type Role,
   ScheduleDtoBuilder,
-  User,
+  type User,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   errors,
@@ -17,16 +17,19 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
-import {
+import type { SuperTest, Test } from "supertest";
+import type {
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("Magic link router", () => {
   const payloadMeta = {

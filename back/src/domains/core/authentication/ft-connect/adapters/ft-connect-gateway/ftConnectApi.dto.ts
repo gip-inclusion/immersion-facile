@@ -1,7 +1,7 @@
-import { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl } from "shared";
 import { z } from "zod";
-import { BearerToken } from "../../dto/BearerToken";
-import { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
+import type { BearerToken } from "../../dto/BearerToken";
+import type { FtConnectAdvisorsKind } from "../../dto/FtConnectAdvisor.dto";
 
 export type ExternalAccessToken = {
   access_token: string;

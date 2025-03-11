@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { NPSForm, NPSFormProps } from "./NPSForm";
+import { NPSForm, type NPSFormProps } from "./NPSForm";
 
 const Component = NPSForm;
 type Story = StoryObj<typeof Component>;

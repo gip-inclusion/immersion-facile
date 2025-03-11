@@ -1,19 +1,19 @@
 import Bottleneck from "bottleneck";
 import {
-  AppellationDto,
+  type AppellationDto,
   appellationCodeSchema,
   cancellableSleep,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
 import { createLogger } from "../../../../utils/logger";
-import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
-import { WithCache } from "../../caching-gateway/port/WithCache";
-import { AppellationsGateway } from "../ports/AppellationsGateway";
+import type { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
+import type { WithCache } from "../../caching-gateway/port/WithCache";
+import type { AppellationsGateway } from "../ports/AppellationsGateway";
 import {
-  DiagorienteAccessTokenResponse,
-  DiagorienteAppellationsRoutes,
-  DiagorienteRawResponse,
+  type DiagorienteAccessTokenResponse,
+  type DiagorienteAppellationsRoutes,
+  type DiagorienteRawResponse,
   diagorienteAppellationsRoutes,
   diagorienteTokenScope,
 } from "./DiagorienteAppellationsGateway.routes";

@@ -1,7 +1,7 @@
 import { addHours } from "date-fns";
 import {
   DiscussionBuilder,
-  Exchange,
+  type Exchange,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -9,7 +9,7 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
-  ExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { InMemoryNotificationGateway } from "../../../core/notifications/adapters/InMemoryNotificationGateway";
@@ -17,7 +17,7 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";

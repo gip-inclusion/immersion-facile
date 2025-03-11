@@ -1,15 +1,15 @@
 import React from "react";
 import { MainWrapper } from "react-design-system";
 import {
-  ConventionJwtPayload,
+  type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
-import { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
+import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManagePageProps = {

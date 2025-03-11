@@ -1,6 +1,6 @@
-import { Builder } from "../Builder";
-import { Email } from "../email/email.dto";
-import {
+import type { Builder } from "../Builder";
+import type { Email } from "../email/email.dto";
+import type {
   AgencyRight,
   InclusionConnectedUser,
   User,

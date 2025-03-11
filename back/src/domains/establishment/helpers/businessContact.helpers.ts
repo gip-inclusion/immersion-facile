@@ -1,6 +1,6 @@
-import { BusinessContactDto, errors } from "shared";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import {
+import { type BusinessContactDto, errors } from "shared";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type {
   EstablishmentAdminRight,
   EstablishmentAggregate,
 } from "../entities/EstablishmentAggregate";

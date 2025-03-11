@@ -3,8 +3,8 @@ import MockAdapter from "axios-mock-adapter";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
-  AccessTokenConfig,
-  AccessTokenResponse,
+  type AccessTokenConfig,
+  type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
@@ -12,8 +12,8 @@ import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/I
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
 import {
-  FranceTravailBroadcastResponse,
-  FranceTravailConvention,
+  type FranceTravailBroadcastResponse,
+  type FranceTravailConvention,
   isBroadcastResponseOk,
 } from "../../ports/FranceTravailGateway";
 import { createFranceTravailRoutes } from "./FrancetTravailRoutes";

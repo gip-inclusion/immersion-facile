@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { DiscussionId } from "../discussion/discussion.dto";
+import type { DiscussionId } from "../discussion/discussion.dto";
 import { discussionIdSchema } from "../discussion/discussion.schema";
-import { ConventionDto } from "./convention.dto";
+import type { ConventionDto } from "./convention.dto";
 import { conventionSchema } from "./convention.schema";
 
 // those are put in a different file in purpose

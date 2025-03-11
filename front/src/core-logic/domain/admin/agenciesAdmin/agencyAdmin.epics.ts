@@ -1,14 +1,14 @@
-import { PayloadAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 import { debounceTime, distinctUntilChanged, filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { type AgencyId, allAgencyStatuses, looksLikeSiret } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import { type IcUsersAdminAction } from "../icUsersAdmin/icUsersAdmin.epics";
+import type { IcUsersAdminAction } from "../icUsersAdmin/icUsersAdmin.epics";
 import { icUsersAdminSlice } from "../icUsersAdmin/icUsersAdmin.slice";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 

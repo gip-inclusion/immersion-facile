@@ -3,17 +3,18 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import {
-  UserParamsForAgency,
+  type UserParamsForAgency,
   domElementIds,
   toLowerCaseWithoutDiacritics,
   userParamsForAgencySchema,
 } from "shared";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
-import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
+import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { P, match } from "ts-pattern";

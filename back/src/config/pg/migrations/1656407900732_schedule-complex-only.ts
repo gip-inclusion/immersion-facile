@@ -1,5 +1,5 @@
 import { addDays, getDay, parseISO } from "date-fns";
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 import { z } from "zod";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

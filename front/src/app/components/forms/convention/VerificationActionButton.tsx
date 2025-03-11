@@ -1,21 +1,26 @@
-import { FrIconClassName, fr } from "@codegouvfr/react-dsfr";
+import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { Dispatch, Fragment, SetStateAction, useState } from "react";
+import React, {
+  type Dispatch,
+  Fragment,
+  type SetStateAction,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { type SubmitHandler, useForm } from "react-hook-form";
 import {
-  ConventionDto,
-  ConventionId,
-  ConventionStatus,
-  ConventionStatusWithValidator,
-  Role,
-  UpdateConventionStatusRequestDto,
-  WithValidatorInfo,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionStatus,
+  type ConventionStatusWithValidator,
+  type Role,
+  type UpdateConventionStatusRequestDto,
+  type WithValidatorInfo,
   doesStatusNeedsJustification,
   doesStatusNeedsValidators,
   domElementIds,

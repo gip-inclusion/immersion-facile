@@ -1,7 +1,7 @@
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 import { FTConnectError, HTTP_STATUS, ManagedFTConnectError } from "shared";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
-import { FtConnectExternalRoutes } from "./ftConnectApi.routes";
+import type { FtConnectExternalRoutes } from "./ftConnectApi.routes";
 
 type FtConnectTargetsKind = keyof FtConnectExternalRoutes;
 

@@ -1,6 +1,6 @@
 import { validateEmailReasonSchema, zStringMinLength1 } from "shared";
 import { z } from "zod";
-import {
+import type {
   EmailableApiKey,
   EmailableEmailValidationParams,
   EmailableEmailValidationStatus,

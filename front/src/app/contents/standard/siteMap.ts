@@ -1,4 +1,4 @@
-import { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
+import type { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 

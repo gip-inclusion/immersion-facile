@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { UserParamsForAgency } from "shared";
+import type { UserParamsForAgency } from "shared";
 import { UserProfile } from "src/app/components/user-profile/UserProfile";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { adminFetchUserSelectors } from "src/core-logic/domain/admin/fetchUser/fetchUser.selectors";
 import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
@@ -12,7 +12,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type AdminUserDetailProps = {
   route: Route<typeof routes.adminUserDetail>;

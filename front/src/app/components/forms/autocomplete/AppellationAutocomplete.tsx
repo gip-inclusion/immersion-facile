@@ -4,8 +4,8 @@ import {
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import {
-  AppellationAndRomeDto,
-  AppellationMatchDto,
+  type AppellationAndRomeDto,
+  type AppellationMatchDto,
   ROME_AND_APPELLATION_MIN_SEARCH_TEXT_LENGTH,
 } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";

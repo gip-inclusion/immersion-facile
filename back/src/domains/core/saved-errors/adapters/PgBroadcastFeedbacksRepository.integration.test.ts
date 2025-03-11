@@ -1,24 +1,24 @@
 import axios, { isAxiosError } from "axios";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  ConventionId,
+  type ConventionId,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   cast,
   jsonBuildObject,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
-import { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
+import type { SubscriberErrorFeedback } from "../../api-consumer/ports/SubscribersGateway";
 import {
-  BroadcastFeedback,
-  BroadcastFeedbackResponse,
-  ConventionBroadcastRequestParams,
+  type BroadcastFeedback,
+  type BroadcastFeedbackResponse,
+  type ConventionBroadcastRequestParams,
   broadcastToFtServiceName,
 } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";

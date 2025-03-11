@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { useCopyButton } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto, domElementIds } from "shared";
+import { type ConventionReadDto, domElementIds } from "shared";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { match } from "ts-pattern";
 import { ShareForm } from "./ShareForm";

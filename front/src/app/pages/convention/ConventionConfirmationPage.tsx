@@ -3,14 +3,14 @@ import { useMemo } from "react";
 import {
   MainWrapper,
   SectionConventionNextSteps,
-  SectionConventionNextStepsProps,
+  type SectionConventionNextStepsProps,
   SubmitConfirmationSection,
 } from "react-design-system";
 import { useCopyButton } from "react-design-system";
 import { errors, zUuidLike } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 import { nextStepIllustrations } from "../../../assets/img/illustrations";
 
 type ConventionConfirmationPageProps = {

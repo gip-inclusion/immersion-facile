@@ -5,7 +5,7 @@ import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zToBoolean, zToNumber } from "../zodUtils";
-import { SearchQueryParamsDto } from "./SearchQueryParams.dto";
+import type { SearchQueryParamsDto } from "./SearchQueryParams.dto";
 
 const geoParamsSchema = z.discriminatedUnion("sortedBy", [
   z.object({

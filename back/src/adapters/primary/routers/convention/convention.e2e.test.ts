@@ -1,18 +1,18 @@
 import { addDays } from "date-fns";
 import {
-  AddConventionInput,
+  type AddConventionInput,
   AgencyDtoBuilder,
-  ConventionDto,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionMagicLinkRoutes,
-  InclusionConnectJwtPayload,
+  type ConventionId,
+  type ConventionMagicLinkRoutes,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  Role,
-  TechnicalRoutes,
-  UnauthenticatedConventionRoutes,
-  User,
-  WithAuthorizationHeader,
+  type Role,
+  type TechnicalRoutes,
+  type UnauthenticatedConventionRoutes,
+  type User,
+  type WithAuthorizationHeader,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   currentJwtVersions,
@@ -28,21 +28,24 @@ import {
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
-  GenerateConventionJwt,
-  GenerateInclusionConnectJwt,
+  type GenerateConventionJwt,
+  type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

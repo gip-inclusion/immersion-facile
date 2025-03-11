@@ -1,5 +1,5 @@
-import { GroupSlug, GroupWithResults, SiretDto } from "shared";
-import { GroupEntity } from "../entities/GroupEntity";
+import type { GroupSlug, GroupWithResults, SiretDto } from "shared";
+import type { GroupEntity } from "../entities/GroupEntity";
 
 export interface GroupRepository {
   groupsWithSiret(siret: SiretDto): Promise<GroupEntity[]>;

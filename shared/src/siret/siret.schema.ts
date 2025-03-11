@@ -3,12 +3,12 @@ import { nafSchema } from "../naf/naf.schema";
 import { removeSpaces } from "../utils/string";
 import { zStringMinLength1 } from "../zodUtils";
 import {
-  GetSiretInfo,
-  GetSiretRequestDto,
-  NumberEmployeesRange,
-  SiretDto,
-  SiretEstablishmentDto,
-  WithSiretDto,
+  type GetSiretInfo,
+  type GetSiretRequestDto,
+  type NumberEmployeesRange,
+  type SiretDto,
+  type SiretEstablishmentDto,
+  type WithSiretDto,
   numberEmployeesRanges,
   siretInfoErrors,
   siretRegex,

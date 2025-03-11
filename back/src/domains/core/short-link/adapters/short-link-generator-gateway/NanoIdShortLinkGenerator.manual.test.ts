@@ -1,4 +1,4 @@
-import { ShortLinkId } from "shared";
+import type { ShortLinkId } from "shared";
 import { NanoIdShortLinkIdGeneratorGateway } from "./NanoIdShortLinkIdGeneratorGateway";
 
 describe("shortLinkGenerator manual test", () => {

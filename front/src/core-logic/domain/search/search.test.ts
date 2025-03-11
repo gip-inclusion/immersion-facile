@@ -1,21 +1,21 @@
 import {
-  LocationId,
-  SearchQueryParamsDto,
-  SearchResultDto,
+  type LocationId,
+  type SearchQueryParamsDto,
+  type SearchResultDto,
   expectToEqual,
 } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  SearchStatus,
+  type SearchStatus,
   initialState,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const formSearchResult1 = {
   siret: "form1",

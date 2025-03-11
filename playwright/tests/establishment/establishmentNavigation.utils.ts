@@ -1,7 +1,7 @@
-import { Page, expect } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
 import { domElementIds } from "shared";
 import { goToAdminTab } from "../../utils/admin";
-import { TestEstablishments } from "./establishmentForm.utils";
+import type { TestEstablishments } from "./establishmentForm.utils";
 
 export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   page: Page,

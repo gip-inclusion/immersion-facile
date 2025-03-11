@@ -1,7 +1,7 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { AgencyId } from "../agency/agency.dto";
-import { ConventionId } from "../convention/convention.dto";
-import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { AgencyId } from "../agency/agency.dto";
+import type { ConventionId } from "../convention/convention.dto";
+import type { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 
 export type DashboardName =
   | AdminDashboardName

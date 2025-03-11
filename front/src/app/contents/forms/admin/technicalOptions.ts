@@ -1,9 +1,9 @@
-import {
+import type {
   FeatureFlagTextImageAndRedirect,
   FeatureFlagTextWithSeverity,
 } from "shared";
-import { FormFieldAttributesForContent } from "src/app/contents/forms/types";
-import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
+import type { FormFieldAttributesForContent } from "src/app/contents/forms/types";
+import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 
 export type FormTextImageAndRedirectFieldsLabels = FormFieldsObjectForContent<
   Record<

@@ -1,5 +1,5 @@
 import { keys, trim } from "ramda";
-import { AddressDto } from "../address/address.dto";
+import type { AddressDto } from "../address/address.dto";
 
 export interface CaptureAddressGroupsResult {
   address: string;

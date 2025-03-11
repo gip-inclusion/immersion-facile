@@ -1,6 +1,6 @@
-import { Observable, Subject, delay, of } from "rxjs";
-import { NafSectionSuggestion } from "shared";
-import { NafGateway } from "src/core-logic/ports/NafGateway";
+import { type Observable, Subject, delay, of } from "rxjs";
+import type { NafSectionSuggestion } from "shared";
+import type { NafGateway } from "src/core-logic/ports/NafGateway";
 
 export class SimulatedNafGateway implements NafGateway {
   public nafSuggestions$ = new Subject<NafSectionSuggestion[]>();

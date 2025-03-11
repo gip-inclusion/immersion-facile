@@ -1,4 +1,4 @@
-import { MigrationBuilder, PgLiteral } from "node-pg-migrate";
+import { type MigrationBuilder, PgLiteral } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.dropColumn("immersion_applications", "pe_external_id");

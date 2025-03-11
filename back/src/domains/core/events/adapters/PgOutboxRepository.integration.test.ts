@@ -1,20 +1,20 @@
 import { CompiledQuery } from "kysely";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   ConventionDtoBuilder,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { DomainEvent, DomainTopic } from "../events";
+import type { DomainEvent, DomainTopic } from "../events";
 import { makeCreateNewEvent } from "../ports/EventBus";
-import { PgOutboxRepository, StoredEventRow } from "./PgOutboxRepository";
+import { PgOutboxRepository, type StoredEventRow } from "./PgOutboxRepository";
 
 describe("PgOutboxRepository", () => {
   let pool: Pool;

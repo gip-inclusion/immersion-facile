@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { Express } from "express";
+import express, { type Express } from "express";
 import type { HttpError } from "http-errors";
 import PinoHttp from "pino-http";
 import { createAddressRouter } from "../../adapters/primary/routers/address/createAddressRouter";
@@ -18,19 +18,19 @@ import { createNafRouter } from "../../adapters/primary/routers/naf/createNafRou
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";
 import { createSearchRouter } from "../../adapters/primary/routers/search/createSearchRouter";
 import { createTechnicalRouter } from "../../adapters/primary/routers/technical/createTechnicalRouter";
-import { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
-import {
+import type { EventCrawler } from "../../domains/core/events/ports/EventCrawler";
+import type {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
+import type { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { legacyCreateLogger } from "../../utils/logger";
-import { AppConfig } from "./appConfig";
+import type { AppConfig } from "./appConfig";
 import { createAppDependencies } from "./createAppDependencies";
-import { Gateways } from "./createGateways";
+import type { Gateways } from "./createGateways";
 import { detectHtmlInParamsMiddleware } from "./detectHtmlInParamsMiddleware";
 import { startCrawler } from "./startCrawler";
 

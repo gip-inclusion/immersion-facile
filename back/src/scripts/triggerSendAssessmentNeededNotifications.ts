@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { keys } from "ramda";
-import { DateRange } from "shared";
+import type { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";

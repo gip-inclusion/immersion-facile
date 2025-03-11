@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const tableNames = ["form_establishments", "establishments"];
 const searchableByStudentColumnName = "searchable_by_students";

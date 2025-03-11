@@ -1,31 +1,31 @@
-import { Observable, from } from "rxjs";
+import { type Observable, from } from "rxjs";
 import {
-  AdminRoutes,
-  ApiConsumer,
-  ApiConsumerJwt,
-  ConnectedUserJwt,
-  DashboardUrlAndName,
-  EstablishmentBatchReport,
-  FormEstablishmentBatchDto,
-  GetDashboardParams,
-  GetUsersFilters,
-  InclusionConnectedUser,
-  RejectIcUserRoleForAgencyParams,
-  SetFeatureFlagParam,
-  UserId,
-  UserInList,
-  UserParamsForAgency,
-  WithAgencyIdAndUserId,
-  WithUserFilters,
+  type AdminRoutes,
+  type ApiConsumer,
+  type ApiConsumerJwt,
+  type ConnectedUserJwt,
+  type DashboardUrlAndName,
+  type EstablishmentBatchReport,
+  type FormEstablishmentBatchDto,
+  type GetDashboardParams,
+  type GetUsersFilters,
+  type InclusionConnectedUser,
+  type RejectIcUserRoleForAgencyParams,
+  type SetFeatureFlagParam,
+  type UserId,
+  type UserInList,
+  type UserParamsForAgency,
+  type WithAgencyIdAndUserId,
+  type WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { AdminGateway } from "src/core-logic/ports/AdminGateway";
+import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import { P, match } from "ts-pattern";
 
 export class HttpAdminGateway implements AdminGateway {

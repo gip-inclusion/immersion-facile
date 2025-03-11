@@ -1,6 +1,6 @@
 import { filter, map } from "rxjs";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

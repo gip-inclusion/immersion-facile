@@ -1,18 +1,21 @@
 import { P, match } from "ts-pattern";
-import { Builder } from "../Builder";
-import { WithAcquisition } from "../acquisition.dto";
-import { AddressDto } from "../address/address.dto";
-import { ConventionId, ImmersionObjective } from "../convention/convention.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import {
+import type { Builder } from "../Builder";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AddressDto } from "../address/address.dto";
+import type {
+  ConventionId,
+  ImmersionObjective,
+} from "../convention/convention.dto";
+import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
-import { Flavor } from "../typeFlavors";
+import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
-import { OmitFromExistingKeys } from "../utils";
-import { DateString } from "../utils/date";
+import type { OmitFromExistingKeys } from "../utils";
+import type { DateString } from "../utils/date";
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export type ExchangeRole = (typeof exchangeRoles)[number];

@@ -1,14 +1,14 @@
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import {
-  LoggerParamsWithMessage,
+  type LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
-import { DomainEvent, EventStatus } from "../events";
-import { EventBus } from "../ports/EventBus";
-import { EventCrawler } from "../ports/EventCrawler";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { DomainEvent, EventStatus } from "../events";
+import type { EventBus } from "../ports/EventBus";
+import type { EventCrawler } from "../ports/EventCrawler";
 
 const logger = createLogger(__filename);
 

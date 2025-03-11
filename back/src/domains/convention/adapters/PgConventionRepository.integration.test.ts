@@ -1,24 +1,27 @@
 import { addDays, subDays } from "date-fns";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
-  AppellationAndRomeDto,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
+  type AppellationAndRomeDto,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  EstablishmentRepresentative,
-  EstablishmentTutor,
-  FtConnectToken,
-  WithAcquisition,
+  type ConventionId,
+  type EstablishmentRepresentative,
+  type EstablishmentTutor,
+  type FtConnectToken,
+  type WithAcquisition,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";

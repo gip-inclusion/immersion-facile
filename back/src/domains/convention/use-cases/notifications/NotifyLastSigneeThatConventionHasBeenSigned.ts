@@ -1,20 +1,20 @@
 import {
-  AgencyWithUsersRights,
-  ConventionDto,
-  Signatory,
-  SignatoryRole,
-  TemplatedEmail,
-  WithConventionDto,
+  type AgencyWithUsersRights,
+  type ConventionDto,
+  type Signatory,
+  type SignatoryRole,
+  type TemplatedEmail,
+  type WithConventionDto,
   errors,
   frontRoutes,
   withConventionSchema,
 } from "shared";
-import { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
+import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyLastSigneeThatConventionHasBeenSigned extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

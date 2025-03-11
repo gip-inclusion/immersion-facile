@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
-import {
+import type {
   ExternalAccessToken,
   ExternalFtConnectAdvisor,
   ExternalFtConnectUser,

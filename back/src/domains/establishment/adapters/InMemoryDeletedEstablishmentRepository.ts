@@ -1,5 +1,5 @@
-import { SiretDto } from "shared";
-import {
+import type { SiretDto } from "shared";
+import type {
   DeletedEstablishmentDto,
   DeletedEstablishmentRepository,
 } from "../ports/DeletedEstablishmentRepository";

@@ -1,11 +1,11 @@
-import {
+import type {
   AddressDto,
   FormEstablishmentAddress,
   Location,
   LocationId,
   SiretDto,
 } from "shared";
-import { AddressGateway } from "../domains/core/address/ports/AddressGateway";
+import type { AddressGateway } from "../domains/core/address/ports/AddressGateway";
 
 export const rawAddressToLocation = async (
   addressGateway: AddressGateway,

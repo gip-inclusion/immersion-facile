@@ -1,12 +1,12 @@
-import { WithConventionDto, WithSiretDto, keys } from "shared";
+import { type WithConventionDto, type WithSiretDto, keys } from "shared";
 import type { AppDependencies } from "../../../config/bootstrap/createAppDependencies";
-import {
+import type {
   InstantiatedUseCase,
   UseCases,
 } from "../../../config/bootstrap/createUseCases";
-import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
-import { DomainTopic } from "./events";
-import { NarrowEvent } from "./ports/EventBus";
+import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { DomainTopic } from "./events";
+import type { NarrowEvent } from "./ports/EventBus";
 
 type DomainUseCase = UseCases[keyof UseCases];
 

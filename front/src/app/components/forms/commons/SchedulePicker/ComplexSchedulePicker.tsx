@@ -4,10 +4,10 @@ import { clone } from "ramda";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  ConventionDto,
-  ConventionReadDto,
-  ScheduleDto,
-  TimePeriodsDto,
+  type ConventionDto,
+  type ConventionReadDto,
+  type ScheduleDto,
+  type TimePeriodsDto,
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   convertLocaleDateToUtcTimezoneDate,

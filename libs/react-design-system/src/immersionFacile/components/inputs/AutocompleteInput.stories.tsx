@@ -1,6 +1,9 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { AutocompleteInput, AutocompleteInputProps } from "./AutocompleteInput";
+import {
+  AutocompleteInput,
+  type AutocompleteInputProps,
+} from "./AutocompleteInput";
 
 const Component = AutocompleteInput;
 type Story = StoryObj<typeof Component>;

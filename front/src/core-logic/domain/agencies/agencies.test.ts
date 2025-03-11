@@ -1,11 +1,15 @@
-import { AgencyDtoBuilder, AgencyOption, AgencyPublicDisplayDto } from "shared";
+import {
+  AgencyDtoBuilder,
+  type AgencyOption,
+  type AgencyPublicDisplayDto,
+} from "shared";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
-import { AgenciesState, agenciesSlice } from "./agencies.slice";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import { type AgenciesState, agenciesSlice } from "./agencies.slice";
 
 describe("Agencies in store", () => {
   let store: ReduxStore;

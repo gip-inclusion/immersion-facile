@@ -1,21 +1,21 @@
 import { keys } from "ramda";
 import {
-  ApiConsumer,
-  ApiConsumerJwt,
-  ApiConsumerRight,
-  ApiConsumerRights,
-  CreateWebhookSubscription,
-  InclusionConnectedUser,
-  WriteApiConsumerParams,
+  type ApiConsumer,
+  type ApiConsumerJwt,
+  type ApiConsumerRight,
+  type ApiConsumerRights,
+  type CreateWebhookSubscription,
+  type InclusionConnectedUser,
+  type WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/authorization.helper";
 import { TransactionalUseCase } from "../../UseCase";
-import { CreateNewEvent } from "../../events/ports/EventBus";
-import { GenerateApiConsumerJwt } from "../../jwt";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../events/ports/EventBus";
+import type { GenerateApiConsumerJwt } from "../../jwt";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export class SaveApiConsumer extends TransactionalUseCase<
   WriteApiConsumerParams,

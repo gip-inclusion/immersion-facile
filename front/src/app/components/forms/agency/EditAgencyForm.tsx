@@ -8,8 +8,8 @@ import { ErrorNotifications } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDto,
-  CreateAgencyDto,
+  type AgencyDto,
+  type CreateAgencyDto,
   agencyKindToLabel,
   agencyStatusToLabel,
   allAgencyStatuses,
@@ -18,9 +18,9 @@ import {
 } from "shared";
 import { UploadFile } from "src/app/components/UploadFile";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
-import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
+import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import {
-  FormAgencyFieldsLabels,
+  type FormAgencyFieldsLabels,
   formAgencyFieldsLabels,
 } from "src/app/contents/forms/agency/formAgency";
 import {

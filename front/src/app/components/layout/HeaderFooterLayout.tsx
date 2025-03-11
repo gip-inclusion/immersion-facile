@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { SkipLink, SkipLinks } from "react-design-system";
+import React, { type ReactNode } from "react";
+import { type SkipLink, SkipLinks } from "react-design-system";
 import { LayoutFooter } from "./LayoutFooter";
 import { LayoutHeader } from "./LayoutHeader";
 

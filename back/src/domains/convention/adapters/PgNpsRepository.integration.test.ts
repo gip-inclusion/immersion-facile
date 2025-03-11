@@ -1,8 +1,11 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { expectObjectsToMatch } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
+import type { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
 import { PgNpsRepository } from "./PgNpsRepository";
 
 describe("PgNpsRepository", () => {

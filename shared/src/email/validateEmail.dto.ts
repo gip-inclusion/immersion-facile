@@ -1,4 +1,4 @@
-import { Email } from "./email.dto";
+import type { Email } from "./email.dto";
 
 export const validateEmailStatuses = [
   "accepted_email",

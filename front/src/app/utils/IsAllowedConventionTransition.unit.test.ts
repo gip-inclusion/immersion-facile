@@ -1,8 +1,8 @@
 import {
   ConventionDtoBuilder,
-  ConventionReadDto,
-  ConventionStatus,
-  Role,
+  type ConventionReadDto,
+  type ConventionStatus,
+  type Role,
 } from "shared";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 

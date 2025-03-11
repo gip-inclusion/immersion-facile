@@ -1,15 +1,15 @@
 import {
-  TallyForm,
-  TemplatedEmail,
+  type TallyForm,
+  type TemplatedEmail,
   errors,
   getTallyFormValueOf,
   tallyFormSchema,
 } from "shared";
-import { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
+import type { DelegationContactRepository } from "../../../agency/ports/DelegationContactRepository";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyAgencyDelegationContact extends TransactionalUseCase<TallyForm> {
   protected inputSchema = tallyFormSchema;

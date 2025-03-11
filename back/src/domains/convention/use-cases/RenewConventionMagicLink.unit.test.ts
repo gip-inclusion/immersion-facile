@@ -1,35 +1,35 @@
 import {
   AgencyDtoBuilder,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  RenewMagicLinkRequestDto,
-  Role,
+  type ConventionId,
+  type RenewMagicLinkRequestDto,
+  type Role,
   createConventionMagicLinkPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { AppConfig } from "../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
-import { WithTriggeredBy } from "../../core/events/events";
+import type { WithTriggeredBy } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../core/jwt";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
-import { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
+import type { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
 
 describe("RenewConventionMagicLink use case", () => {
   const currentEmployer: BeneficiaryCurrentEmployer = {

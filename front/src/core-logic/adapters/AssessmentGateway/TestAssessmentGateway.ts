@@ -1,6 +1,6 @@
-import { Observable, Subject } from "rxjs";
-import { AssessmentDto, ConventionId } from "shared";
-import {
+import { type Observable, Subject } from "rxjs";
+import type { AssessmentDto, ConventionId } from "shared";
+import type {
   AssessmentAndJwt,
   AssessmentGateway,
 } from "src/core-logic/ports/AssessmentGateway";

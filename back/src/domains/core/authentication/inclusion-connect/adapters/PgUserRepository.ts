@@ -1,7 +1,14 @@
-import { SqlBool, sql } from "kysely";
-import { Email, GetUsersFilters, User, UserId, errors, isTruthy } from "shared";
-import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
-import { UserOnRepository, UserRepository } from "../port/UserRepository";
+import { type SqlBool, sql } from "kysely";
+import {
+  type Email,
+  type GetUsersFilters,
+  type User,
+  type UserId,
+  errors,
+  isTruthy,
+} from "shared";
+import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import type { UserOnRepository, UserRepository } from "../port/UserRepository";
 
 type PersistenceAuthenticatedUser = {
   id: string;

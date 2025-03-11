@@ -1,9 +1,9 @@
-import { ConventionId, FtExternalId, errors } from "shared";
-import {
+import { type ConventionId, type FtExternalId, errors } from "shared";
+import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
 } from "../dto/FtConnect.dto";
-import {
+import type {
   ConventionAndFtExternalIds,
   ConventionFranceTravailAdvisorRepository,
 } from "../port/ConventionFranceTravailAdvisorRepository";

@@ -1,19 +1,19 @@
 import { addDays } from "date-fns";
 import {
-  AdminRoutes,
-  ConnectedUserJwt,
-  EmailNotification,
-  InclusionConnectJwtPayload,
+  type AdminRoutes,
+  type ConnectedUserJwt,
+  type EmailNotification,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  SmsNotification,
+  type SmsNotification,
   adminRoutes,
   currentJwtVersions,
   displayRouteName,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("Get last notification route", () => {

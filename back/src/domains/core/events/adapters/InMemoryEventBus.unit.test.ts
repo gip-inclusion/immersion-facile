@@ -6,7 +6,7 @@ import {
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import type {
@@ -15,7 +15,7 @@ import type {
   EventFailure,
   EventPublication,
 } from "../events";
-import { EventBus } from "../ports/EventBus";
+import type { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus, getLastPublication } from "./InMemoryEventBus";
 
 const domainEvt: DomainEvent = {
