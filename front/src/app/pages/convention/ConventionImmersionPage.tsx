@@ -55,7 +55,7 @@ export const ConventionImmersionPage = ({
     jwt,
     mtm_campaign: _,
     mtm_kwd: __,
-    initiatedFromUserDashboard,
+    skipIntro,
     ...routeParamsWithoutJwtAndTrackers
   } = route.params;
 
@@ -69,12 +69,8 @@ export const ConventionImmersionPage = ({
     () =>
       keys(routeParamsWithoutJwtAndTrackers).length > 0 &&
       !isPeConnected &&
-      !initiatedFromUserDashboard,
-    [
-      routeParamsWithoutJwtAndTrackers,
-      isPeConnected,
-      initiatedFromUserDashboard,
-    ],
+      !skipIntro,
+    [routeParamsWithoutJwtAndTrackers, isPeConnected, skipIntro],
   );
 
   const [displaySharedConventionMessage, setDisplaySharedConventionMessage] =

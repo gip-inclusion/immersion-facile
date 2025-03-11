@@ -172,7 +172,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   conventionImmersion: defineRoute(
     {
       jwt: param.query.optional.string,
-      initiatedFromUserDashboard: param.query.optional.boolean,
+      skipIntro: param.query.optional.boolean,
       ...conventionParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
