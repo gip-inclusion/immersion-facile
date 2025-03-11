@@ -34,16 +34,18 @@ export const createTechnicalRouter = (
       (req, res) =>
         sendHttpResponse(req, res, async () => {
           if (!req.file) throw errors.file.missingFileInParams();
-          return deps.useCases.uploadFile.execute({
-            file: {
-              name: req.file.originalname,
-              encoding: req.file.encoding,
-              size: req.file.size,
-              buffer: req.file.buffer,
-              mimetype: req.file.mimetype,
+          return deps.useCases.uploadFile.execute(
+            {
+              file: {
+                name: req.file.originalname,
+                encoding: req.file.encoding,
+                size: req.file.size,
+                buffer: req.file.buffer,
+                mimetype: req.file.mimetype,
+              },
             },
-            connectedUser: req.payloads?.currentUser,
-          });
+            req.payloads?.currentUser,
+          );
         }),
     );
 

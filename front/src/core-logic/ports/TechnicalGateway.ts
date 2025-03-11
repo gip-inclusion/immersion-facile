@@ -1,6 +1,7 @@
 import type { Observable } from "rxjs";
 import type {
   AbsoluteUrl,
+  ConnectedUserJwt,
   ConventionSupportedJwt,
   Email,
   FeatureFlags,
@@ -10,7 +11,7 @@ import type {
 
 export interface TechnicalGateway {
   getAllFeatureFlags$(): Observable<FeatureFlags>;
-  uploadFile(file: File): Promise<AbsoluteUrl>;
+  uploadFile(file: File, jwt: ConnectedUserJwt): Promise<AbsoluteUrl>;
   htmlToPdf(
     params: HtmlToPdfRequest,
     jwt: ConventionSupportedJwt,
