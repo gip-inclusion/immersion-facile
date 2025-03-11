@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import type { Link } from "type-route";
 import Styles from "./FixedStamp.styles";
@@ -21,11 +20,7 @@ export const FixedStamp = ({
 }: FixedStampProps) => {
   const { cx } = useStyles();
   return (
-    <aside
-      className={cx(Styles.root)}
-      role="complementary"
-      aria-label="Mise en avant temporaire"
-    >
+    <aside className={cx(Styles.root)} aria-label="Mise en avant temporaire">
       {image && <div className={cx(Styles.imageWrapper)}>{image}</div>}
       <div className={cx(Styles.content)}>
         {overtitle && overtitle !== "" && (

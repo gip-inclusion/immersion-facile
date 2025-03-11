@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {

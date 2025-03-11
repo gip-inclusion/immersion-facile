@@ -1,16 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import classNames, { type ArgumentArray } from "classnames";
-import type React from "react";
+import type { ChangeEventHandler, ReactNode } from "react";
 
 export type FileProperties = {
   accept?: string;
   className?: ArgumentArray;
   errorMessage?: string;
-  hint?: React.ReactNode;
+  hint?: ReactNode;
   id: string;
   label: string;
   multiple?: boolean;
-  onChange?: React.ChangeEventHandler<HTMLInputElement> | undefined;
+  onChange?: ChangeEventHandler<HTMLInputElement> | undefined;
 };
 
 /**

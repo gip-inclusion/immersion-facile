@@ -66,7 +66,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
   };
 
-  constructor(private simulatedLatency?: number) { }
+  constructor(private simulatedLatency?: number) {}
 
   broadcastConventionAgain$(
     _params: WithConventionId,

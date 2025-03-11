@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import type React from "react";
+import type { ReactNode } from "react";
 import { TextInputError } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
@@ -12,7 +12,7 @@ import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/A
 
 type ConventionFormProfessionProps = {
   label: string;
-  hintText?: React.ReactNode;
+  hintText?: ReactNode;
   disabled?: boolean;
   initialFieldValue: AppellationAndRomeDto;
 };

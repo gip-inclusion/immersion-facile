@@ -5,8 +5,14 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type React from "react";
-import { type ElementRef, useMemo, useRef, useState } from "react";
+
+import {
+  type ElementRef,
+  type ReactNode,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   type AppellationDto,
@@ -70,7 +76,7 @@ export const ContactByEmail = ({
   const route = useRoute() as Route<typeof routes.searchResult>;
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
-    useState<React.ReactNode | null>(null);
+    useState<ReactNode | null>(null);
 
   const {
     getTranscientDataForScope,

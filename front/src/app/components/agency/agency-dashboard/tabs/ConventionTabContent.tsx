@@ -5,12 +5,12 @@ import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  domElementIds,
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
   type AgencyRight,
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
+  domElementIds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { MetabaseView } from "../../../MetabaseView";

@@ -3,8 +3,8 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type React from "react";
-import { useEffect, useState } from "react";
+
+import { type ReactNode, useEffect, useState } from "react";
 import { keys } from "react-design-system";
 import { FormProvider, useForm } from "react-hook-form";
 import {
@@ -94,7 +94,7 @@ export const AgencyUserModificationForm = ({
   if (!agencyUser) return null;
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
-    useState<React.ReactNode | null>(null);
+    useState<ReactNode | null>(null);
 
   return (
     <FormProvider {...methods}>

@@ -1,5 +1,5 @@
 import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
-import React from "react";
+
 import { MainWrapper } from "react-design-system";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

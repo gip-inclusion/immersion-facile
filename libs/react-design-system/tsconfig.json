@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "target": "ES2018",
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "ES2015"],
     "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": false,
+    "skipLibCheck": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
@@ -12,15 +12,14 @@
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "strictNullChecks": true,
+    "noImplicitOverride": true,
     "noEmit": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "baseUrl": "./src",
     "paths": {
       "src/*": ["./*"],
-      "shared/*": ["./../../shared/*"]
-    },
-    "noImplicitOverride": true
+      "shared": ["../../shared/src/index.ts"]
+    }
   },
   "include": ["./src"]
 }

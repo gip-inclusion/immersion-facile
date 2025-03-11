@@ -1,5 +1,5 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React from "react";
+
 import { useFormContext } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { type ConventionReadDto, toLowerCaseWithoutDiacritics } from "shared";

@@ -1,6 +1,6 @@
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniq } from "ramda";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext, useWatch } from "react-hook-form";
 import {

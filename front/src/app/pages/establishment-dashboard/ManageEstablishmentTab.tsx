@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import React from "react";
+
 import { type WithEstablishmentData, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes } from "src/app/routes/routes";

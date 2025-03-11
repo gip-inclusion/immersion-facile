@@ -68,7 +68,7 @@ export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
   openSiretModal,
 ) => {
-  const onSiretModalOpenClick = (event: React.MouseEvent) => {
+  const onSiretModalOpenClick = (event: MouseEvent) => {
     event.preventDefault();
     openSiretModal();
     storeDispatch(establishmentSlice.actions.gotReady());

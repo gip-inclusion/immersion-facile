@@ -6,7 +6,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { formatDistance } from "date-fns";
 import { fr as french } from "date-fns/locale";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,

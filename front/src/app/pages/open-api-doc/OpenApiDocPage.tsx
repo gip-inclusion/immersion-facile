@@ -1,11 +1,11 @@
-import type React from "react";
+import type { ReactElement } from "react";
 import { MainWrapper } from "react-design-system";
 import { technicalRoutes } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
-const OpenApiDocPage = (): React.ReactElement => (
+const OpenApiDocPage = (): ReactElement => (
   <HeaderFooterLayout>
     <MainWrapper layout="default" vSpacing={0}>
       <SwaggerUI

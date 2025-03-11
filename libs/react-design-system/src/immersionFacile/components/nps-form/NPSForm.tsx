@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { keys } from "../../utils";
 

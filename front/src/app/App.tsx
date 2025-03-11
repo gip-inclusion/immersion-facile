@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import { useLayoutEffect } from "react";
 import { CrispChat } from "react-design-system";
 import { ErrorBoundary } from "react-error-boundary";
 import { useDispatch } from "react-redux";

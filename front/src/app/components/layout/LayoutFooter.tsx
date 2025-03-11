@@ -4,7 +4,7 @@ import {
   headerFooterDisplayItem,
 } from "@codegouvfr/react-dsfr/Display";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
-import React from "react";
+
 import {
   Footer,
   FooterStyles,

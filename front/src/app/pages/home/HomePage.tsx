@@ -1,5 +1,5 @@
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React from "react";
+
 import {
   FixedStamp,
   HeroHeader,

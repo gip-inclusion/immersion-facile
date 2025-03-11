@@ -1,5 +1,5 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   type ConventionReadDto,

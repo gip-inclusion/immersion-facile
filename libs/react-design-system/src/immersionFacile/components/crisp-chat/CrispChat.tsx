@@ -1,4 +1,4 @@
-import React, { type ElementRef, useEffect, useRef } from "react";
+import { type ElementRef, useEffect, useRef } from "react";
 
 type CrispChatProperties = {
   crispWebsiteId: string;

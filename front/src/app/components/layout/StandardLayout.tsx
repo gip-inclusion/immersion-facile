@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { renderContent } from "html-templates/src/components/email";
-import React from "react";
+
 import { MainWrapper } from "react-design-system";
 import { getStandardContents } from "src/app/contents/standard/textSetup";
 import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";

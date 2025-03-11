@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 
 export type AgencyErrorTextProperties = {
   isFetchAgencyOptionsError: boolean;

@@ -1,4 +1,8 @@
-import type React from "react";
+import type {
+  ChangeEventHandler,
+  FocusEventHandler,
+  KeyboardEventHandler,
+} from "react";
 
 export type TextAreaProperties = {
   disabled?: boolean;
@@ -8,11 +12,9 @@ export type TextAreaProperties = {
   placeholder?: string;
   readOnly?: boolean;
   value?: string;
-  onKeyPress?: React.KeyboardEventHandler<
-    HTMLInputElement | HTMLTextAreaElement
-  >;
-  onChange?: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
-  onBlur?: React.FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onKeyPress?: KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onChange?: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
+  onBlur?: FocusEventHandler<HTMLInputElement | HTMLTextAreaElement>;
 };
 export const TextArea = ({
   disabled,

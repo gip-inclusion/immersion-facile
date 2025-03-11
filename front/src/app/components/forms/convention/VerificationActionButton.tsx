@@ -5,12 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, {
-  type Dispatch,
-  Fragment,
-  type SetStateAction,
-  useState,
-} from "react";
+import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
 import { createPortal } from "react-dom";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {

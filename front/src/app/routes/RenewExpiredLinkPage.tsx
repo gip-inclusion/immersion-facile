@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import React, { useState } from "react";
+import { useState } from "react";
 import { MainWrapper } from "react-design-system";
 import {
   type ConventionJwtPayload,

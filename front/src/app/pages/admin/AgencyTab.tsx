@@ -1,5 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+
 import type { AgencyDto } from "shared";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";

@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import type { MigrationBuilder } from "node-pg-migrate";
 import format from "pg-format";
 

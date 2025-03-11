@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import type React from "react";
-import type { Dispatch, SetStateAction } from "react";
+
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 import { domElementIds } from "shared";
 import { BusinessContact } from "../BusinessContact";
 import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
@@ -15,7 +15,7 @@ export const BusinessContactSection = ({
   onStepChange: OnStepChange;
   currentStep: Step;
   mode: Mode;
-  setInvalidEmailMessage: Dispatch<SetStateAction<React.ReactNode | null>>;
+  setInvalidEmailMessage: Dispatch<SetStateAction<ReactNode | null>>;
 }) => {
   const isStepMode = currentStep !== null;
   return (

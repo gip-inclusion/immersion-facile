@@ -5,7 +5,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ErrorNotifications } from "react-design-system";
 import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";

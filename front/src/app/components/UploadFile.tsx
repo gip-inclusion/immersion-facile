@@ -1,4 +1,4 @@
-import * as React from "react";
+import { type ChangeEvent, type ReactNode, useState } from "react";
 import { File } from "react-design-system";
 import type { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
@@ -6,7 +6,7 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 
 interface UploadLogoProps {
   label: string;
-  hint?: React.ReactNode;
+  hint?: ReactNode;
   maxSize_Mo: number;
   setFileUrl: (fileUrl: AbsoluteUrl) => void;
 }
@@ -17,10 +17,10 @@ export const UploadFile = ({
   label,
   hint,
 }: UploadLogoProps) => {
-  const [error, setError] = React.useState<string>();
+  const [error, setError] = useState<string>();
   return (
     <File
-      onChange={async (e) => {
+      onChange={async (e: ChangeEvent<HTMLInputElement>) => {
         let file = null;
         if (e.target.files?.length) {
           file = e.target.files[0];

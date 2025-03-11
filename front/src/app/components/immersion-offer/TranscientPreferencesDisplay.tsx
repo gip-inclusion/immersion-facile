@@ -1,6 +1,6 @@
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useEffect, useState } from "react";
+import { type RefObject, useEffect, useState } from "react";
 import { FormOverlay } from "react-design-system";
 import {
   type ImmersionObjective,
@@ -31,7 +31,7 @@ type TranscientPreferencesDisplayWithModeModal = {
 
 type TranscientPreferencesDisplayWithModeFormOverlay = {
   mode: "form-overlay";
-  parentRef: React.RefObject<HTMLFormElement>;
+  parentRef: RefObject<HTMLFormElement>;
 };
 
 type TranscientPreferencesDisplayProps = TranscientPreferencesDisplayBaseProps &
@@ -148,7 +148,7 @@ const renderTranscientKeyValues = (data: ContactTranscientData) => {
 const renderValue = (
   key: keyof ContactTranscientData,
   value: string | boolean | number | ImmersionObjective,
-): React.ReactNode => {
+) => {
   if (typeof value === "boolean") {
     return value ? "Oui" : "Non";
   }

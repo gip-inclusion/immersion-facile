@@ -1,6 +1,6 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import React from "react";
+
 import {
   type ConventionSummaryField,
   ConventionWeeklySchedule,

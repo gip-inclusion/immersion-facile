@@ -7,7 +7,7 @@ export const AgencyLineAdminEmails = ({
 }: { agencyRight: AgencyRight }): ReactNode => (
   <ul className={fr.cx("fr-raw-list")}>
     {agencyRight.agency.admins.map((admin) => (
-      <li>
+      <li key={`${admin}-admin-email`}>
         <a
           href={`mailto:${admin}`}
           target="_blank"

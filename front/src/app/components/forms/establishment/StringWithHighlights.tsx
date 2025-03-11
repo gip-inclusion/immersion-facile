@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import {
   type SliceOfString,
   highlightStringsFromMatches,

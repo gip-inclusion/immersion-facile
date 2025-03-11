@@ -1,12 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./SectionConventionNextSteps.styles";
 
 export type SectionConventionNextStepsProps = {
   nextSteps: {
     illustration: string;
-    content: React.ReactNode;
+    content: ReactNode;
   }[];
 };
 
@@ -23,7 +23,10 @@ export const SectionConventionNextSteps = ({
 
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           {nextSteps.map(({ content, illustration }) => (
-            <div className={fr.cx("fr-col-12", "fr-col-md-4")}>
+            <div
+              key={`${content}-${illustration}`}
+              className={fr.cx("fr-col-12", "fr-col-md-4")}
+            >
               <div
                 className={cx(
                   fr.cx("fr-m-auto", "fr-mb-5w", "fr-pt-md-4w"),
@@ -33,7 +36,7 @@ export const SectionConventionNextSteps = ({
                 <img
                   className={Styles.illustration}
                   src={illustration}
-                  alt={""}
+                  alt=""
                 />
               </div>
               {content}

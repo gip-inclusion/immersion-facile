@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import { cleanStringToHTMLAttribute } from "shared";
 
 type ValueAndLabel<T> = {
@@ -35,7 +35,6 @@ export const RadioGroup = <T extends string | number | string[] | boolean>({
         aria-labelledby={
           error ? "radio-error-legend radio-error-desc-error" : ""
         }
-        role="group"
       >
         <legend className={fr.cx("fr-fieldset__legend", "fr-text--regular")}>
           {groupLabel}

@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./MaintenanceCallout.styles";
 

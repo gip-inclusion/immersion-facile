@@ -1,8 +1,9 @@
 import type { TabsProps } from "@codegouvfr/react-dsfr/Tabs";
+import type { ReactNode } from "react";
 import type { EstablishmentDashboardTab } from "shared";
 
 export type DashboardTab = TabsProps.Controlled["tabs"][number] & {
-  content: React.ReactNode;
+  content: ReactNode;
 };
 
 export const getDashboardTabs = (

@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Header, type HeaderProps } from "@codegouvfr/react-dsfr/Header";
 import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
-import React from "react";
+
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
@@ -65,6 +65,7 @@ export const LayoutHeader = () => {
       },
     },
     <ButtonWithSubMenu
+      key={`${quickAccessIds.initiateConvention}-button-with-sub-menu`}
       navItems={[
         {
           text: "Je suis un candidat",

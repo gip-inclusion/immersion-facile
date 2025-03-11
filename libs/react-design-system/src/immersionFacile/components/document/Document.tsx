@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import React, { type ReactElement } from "react";
+import { type ReactElement, type ReactNode, cloneElement } from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./Document.scss";
 
@@ -8,10 +8,10 @@ const componentName = "im-convention-document";
 
 export type ConventionDocumentProperties = {
   printButtonLabel: string;
-  children: React.ReactNode;
-  logos: React.ReactNode[];
+  children: ReactNode;
+  logos: ReactNode[];
   title: string;
-  customActions?: React.ReactNode[];
+  customActions?: ReactNode[];
 };
 
 export const Document = ({
@@ -23,9 +23,9 @@ export const Document = ({
 }: ConventionDocumentProperties) => {
   const { cx } = useStyles();
   const renderLogos = () =>
-    logos?.map((logo: React.ReactNode, index) => {
+    logos?.map((logo: ReactNode, index) => {
       const LogoElement = logo as ReactElement;
-      const LogoElementWithClassName = React.cloneElement(LogoElement, {
+      const LogoElementWithClassName = cloneElement(LogoElement, {
         className: cx(`${componentName}__logo`),
         // biome-ignore lint/suspicious/noArrayIndexKey: Index is ok here
         key: `${componentName}__logo-${index}`,

@@ -1,9 +1,9 @@
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./SearchResultIllustration.styles";
 
 type SearchResultIllustrationProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   illustration: string;
 };
 

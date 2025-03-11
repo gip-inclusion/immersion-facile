@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
 
 export type FieldDescriptionProperties = {
   description?: string;

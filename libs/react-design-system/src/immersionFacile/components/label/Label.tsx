@@ -1,5 +1,3 @@
-import React from "react";
-
 export type LabelProperties = {
   label?: string;
   htmlFor?: string;

@@ -1,11 +1,11 @@
-import type React from "react";
+import type { Dispatch, SetStateAction } from "react";
 import type { AddressAndPosition } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 export const getAddressesFromApi = async (
   term: string,
-  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
-  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
+  setOptions: Dispatch<SetStateAction<AddressAndPosition[]>>,
+  setIsSearching: Dispatch<SetStateAction<boolean>>,
 ): Promise<AddressAndPosition[]> => {
   try {
     setIsSearching(true);

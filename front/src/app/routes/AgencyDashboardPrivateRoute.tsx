@@ -1,4 +1,4 @@
-import type React from "react";
+import type { ReactElement } from "react";
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
@@ -8,7 +8,7 @@ import {
 
 type AgencyDashboardPrivateRouteProps = {
   route: FrontAgencyDashboardRoute;
-  children: React.ReactElement;
+  children: ReactElement;
 };
 
 export const AgencyDashboardPrivateRoute = ({

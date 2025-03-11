@@ -1,4 +1,4 @@
-import * as crypto from "crypto";
+import * as crypto from "node:crypto";
 import { decode } from "js-base64";
 import { type Email, type SiretDto, currentJwtVersions } from "..";
 import type {

@@ -10,7 +10,8 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
-import React from "react";
+import { useState } from "react";
+
 import {
   CopyButton,
   DiscussionMeta,
@@ -210,28 +211,27 @@ const DiscussionDetails = ({
           Discussion avec {discussion.potentialBeneficiary.firstName}{" "}
           {discussion.potentialBeneficiary.lastName}
         </h1>
-        <DiscussionMeta
-          children={[
-            <p
-              id={domElementIds.establishmentDashboard.discussion.statusBadge}
-              className={fr.cx("fr-badge", `fr-badge--${statusBadge.severity}`)}
+        <DiscussionMeta>
+          <p
+            key="status-badge"
+            id={domElementIds.establishmentDashboard.discussion.statusBadge}
+            className={fr.cx("fr-badge", `fr-badge--${statusBadge.severity}`)}
+          >
+            {statusBadge.label}
+          </p>
+          {discussion.immersionObjective}
+          {discussion.appellation.appellationLabel}
+          {discussion.potentialBeneficiary.resumeLink && (
+            <a
+              href={discussion.potentialBeneficiary.resumeLink}
+              title={"CV du candidat"}
+              target="_blank"
+              rel="noreferrer"
             >
-              {statusBadge.label}
-            </p>,
-            discussion.immersionObjective,
-            discussion.appellation.appellationLabel,
-            discussion.potentialBeneficiary.resumeLink && (
-              <a
-                href={discussion.potentialBeneficiary.resumeLink}
-                title={"CV du candidat"}
-                target="_blank"
-                rel="noreferrer"
-              >
-                CV
-              </a>
-            ),
-          ]}
-        />
+              CV
+            </a>
+          )}
+        </DiscussionMeta>
         <ButtonsGroup
           inlineLayoutWhen="always"
           buttonsSize="small"
@@ -242,7 +242,7 @@ const DiscussionDetails = ({
             <Highlight className={fr.cx("fr-ml-0", "fr-pt-2w", "fr-pb-1w")}>
               <p className={fr.cx("fr-text--sm", "fr-mb-2w")}>
                 Vous ne parvenez pas à répondre au candidat ? Copiez dans votre
-                presse papier l’adresse email sécurisée de cette discussion et
+                presse papier l'adresse email sécurisée de cette discussion et
                 utilisez-la directement depuis votre boîte mail.
               </p>
               <CopyButton
@@ -383,8 +383,9 @@ const RejectApplicationForm = ({
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
-  const [dataToSend, setDataToSend] =
-    React.useState<WithDiscussionRejection | null>(null);
+  const [dataToSend, setDataToSend] = useState<WithDiscussionRejection | null>(
+    null,
+  );
   const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
     {
       label:

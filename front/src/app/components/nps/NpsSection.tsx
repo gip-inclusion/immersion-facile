@@ -1,4 +1,3 @@
-import React from "react";
 import { NPSForm } from "react-design-system";
 import { type ConventionReadDto, type Role, npsFormIds } from "shared";
 

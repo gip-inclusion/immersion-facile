@@ -1,5 +1,6 @@
 import { keys, mergeRight } from "ramda";
-import type React from "react";
+
+import type { ReactNode } from "react";
 import { type InternshipKind, domElementIds } from "shared";
 import type { ConventionField } from "../../admin/types";
 import type { FormFieldAttributesForContent } from "../types";
@@ -653,7 +654,7 @@ const fieldsToExclude = {
 
 type SidebarStepContent = {
   title: string;
-  description: React.ReactNode;
+  description: ReactNode;
 };
 
 export const sidebarStepContent = (

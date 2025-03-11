@@ -45,7 +45,9 @@
       "front/dist",
       "*.js",
       "*.tar.gz",
-      ".vscode"
+      ".vscode",
+      "libs/react-design-system/public/dsfr",
+      "*.css"
     ]
   },
   "formatter": {
@@ -61,7 +63,9 @@
       "front/dist",
       "*.js",
       "*.tar.gz",
-      ".vscode"
+      ".vscode",
+      "libs/react-design-system/public/dsfr",
+      "*.css"
     ]
   },
   "files": {

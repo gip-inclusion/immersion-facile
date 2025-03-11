@@ -1,12 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { FooterProps as FooterPropsDsfr } from "@codegouvfr/react-dsfr/Footer";
-import type React from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import FooterStyles from "./Footer.styles";
 
 export type NavLink = {
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
-  label: React.ReactNode;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
+  label: ReactNode;
   href?: string;
   active?: boolean;
   target?: string;
@@ -26,8 +26,8 @@ export type FooterProps = {
   links?: NavLink[];
   navTopGroupLinks?: NavTopGroupLinks[];
   bottomLinks?: (NavLink | FooterPropsDsfr.BottomItem.Button)[];
-  partnersLogos?: React.ReactNode;
-  plateformeInclusionLogo?: React.ReactNode;
+  partnersLogos?: ReactNode;
+  plateformeInclusionLogo?: ReactNode;
 };
 
 const TopLink = ({ link }: { link: NavLink }) => {

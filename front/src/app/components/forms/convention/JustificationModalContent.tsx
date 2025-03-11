@@ -4,7 +4,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
+
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionDto,
@@ -90,16 +90,14 @@ export const JustificationModalContent = ({
   return (
     <>
       {newStatus === "DRAFT" && (
-        <>
-          <Alert
-            severity="warning"
-            title="Attention !"
-            className={fr.cx("fr-mb-2w")}
-            description="Ne surtout pas demander de modification pour relancer un signataire manquant. 
+        <Alert
+          severity="warning"
+          title="Attention !"
+          className={fr.cx("fr-mb-2w")}
+          description="Ne surtout pas demander de modification pour relancer un signataire manquant. 
             Cela revient à annuler les signatures déjà enregistrées. 
             Si vous souhaitez le relancer, contactez-le directement par e-mail ou par téléphone."
-          />
-        </>
+        />
       )}
       {newStatus === "REJECTED" && (
         <Alert

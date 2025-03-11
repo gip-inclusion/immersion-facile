@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
-import React from "react";
+
 import { CopyButton } from "react-design-system";
 import type { AgencyId } from "shared";
 

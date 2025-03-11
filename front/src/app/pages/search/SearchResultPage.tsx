@@ -2,8 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import type React from "react";
-import { type ElementRef, useEffect, useRef, useState } from "react";
+import {
+  type ElementRef,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Loader, MainWrapper } from "react-design-system";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
@@ -51,7 +56,7 @@ const SearchResultSection = ({
   children,
 }: {
   title?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => (
   <div className={fr.cx("fr-mb-4w")}>
     <h2 className={fr.cx("fr-text--md", "fr-mb-1v")}>{title}</h2>
@@ -521,11 +526,7 @@ export const SearchResultPage = ({
               <Alert
                 title="Bravo !"
                 description={
-                  <>
-                    <p>
-                      {getFeedBackMessage(currentSearchResult?.contactMode)}
-                    </p>
-                  </>
+                  <p>{getFeedBackMessage(currentSearchResult?.contactMode)}</p>
                 }
                 severity="success"
                 className={fr.cx("fr-my-4w")}

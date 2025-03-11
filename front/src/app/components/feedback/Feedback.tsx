@@ -1,5 +1,6 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import type React from "react";
+import type { ReactNode } from "react";
+
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import type {
@@ -15,7 +16,7 @@ type FeedbackProps = {
     message: string;
   }) => JSX.Element;
   closable?: boolean;
-  children?: React.ReactNode;
+  children?: ReactNode;
   className?: string;
 };
 

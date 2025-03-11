@@ -1,7 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Autocomplete from "@mui/material/Autocomplete";
-import type React from "react";
-import { useEffect, useState } from "react";
+
+import {
+  type CSSProperties,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+  type SyntheticEvent,
+  useEffect,
+  useState,
+} from "react";
 import {
   AutocompleteInput,
   type AutocompleteInputProps,
@@ -16,10 +24,10 @@ export type AddressAutocompleteProps = {
   initialSearchTerm?: string;
   disabled?: boolean;
   headerClassName?: string;
-  inputStyle?: React.CSSProperties;
+  inputStyle?: CSSProperties;
   setFormValue: (p: AddressAndPosition) => void;
   placeholder?: string;
-  hintText?: React.ReactNode;
+  hintText?: ReactNode;
   notice?: string;
   id?: string;
   useFirstAddressOnInitialSearchTerm?: boolean;
@@ -146,13 +154,11 @@ export const AddressAutocomplete = ({
 
 const onAutocompleteChange =
   (
-    setSelectedOption: React.Dispatch<
-      React.SetStateAction<AddressAndPosition | null>
-    >,
+    setSelectedOption: Dispatch<SetStateAction<AddressAndPosition | null>>,
     setFormValue: (p: AddressAndPosition) => void,
   ) =>
   (
-    _: React.SyntheticEvent<Element, Event>,
+    _: SyntheticEvent<Element, Event>,
     selectedOption: AddressAndPosition | null,
   ) => {
     setSelectedOption(selectedOption ?? null);
@@ -175,8 +181,8 @@ const effectDebounceSearchTerm = (
   debounceSearchTerm: string,
   initialSearchTerm: string,
   selectedOption: AddressAndPosition | null,
-  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>,
-  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>,
+  setOptions: Dispatch<SetStateAction<AddressAndPosition[]>>,
+  setIsSearching: Dispatch<SetStateAction<boolean>>,
 ): void => {
   if (
     !debounceSearchTerm ||
@@ -193,11 +199,9 @@ const effectDebounceSearchTerm = (
 type EffectInitialSearchTermProps = {
   initialSearchTerm: string;
   selectedOption: AddressAndPosition | null;
-  setOptions: React.Dispatch<React.SetStateAction<AddressAndPosition[]>>;
-  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedOption: React.Dispatch<
-    React.SetStateAction<AddressAndPosition | null>
-  >;
+  setOptions: Dispatch<SetStateAction<AddressAndPosition[]>>;
+  setIsSearching: Dispatch<SetStateAction<boolean>>;
+  setSelectedOption: Dispatch<SetStateAction<AddressAndPosition | null>>;
   setFormValue: (p: AddressAndPosition) => void;
   shouldSetFirstAddressInForm?: boolean;
 };

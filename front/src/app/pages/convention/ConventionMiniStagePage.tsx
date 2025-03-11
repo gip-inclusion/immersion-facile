@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { keys } from "shared";
 import {

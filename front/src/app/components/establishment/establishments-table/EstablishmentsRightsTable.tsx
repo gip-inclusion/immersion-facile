@@ -36,7 +36,11 @@ const makeEstablishmentRightLine = (
   return [
     EstablishmentLineBusinessName({ withEstablishmentData }),
     EstablishmentLineAdminsInfos({ withEstablishmentData }),
-    <Badge small className={fr.cx(roleDisplay.className, "fr-mr-1w")}>
+    <Badge
+      small
+      className={fr.cx(roleDisplay.className, "fr-mr-1w")}
+      key={roleDisplay.label}
+    >
       {roleDisplay.label}
     </Badge>,
   ];

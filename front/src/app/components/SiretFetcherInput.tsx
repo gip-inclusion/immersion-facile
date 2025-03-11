@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+
 import { ImmersionTextField } from "react-design-system";
 import { domElementIds } from "shared";
 import { useEstablishmentSiret } from "src/app/hooks/siret.hooks";

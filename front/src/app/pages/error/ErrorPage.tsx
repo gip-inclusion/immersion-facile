@@ -1,4 +1,4 @@
-import type React from "react";
+import type { ReactElement } from "react";
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import type { FrontErrorProps } from "src/app/contents/error/types";
@@ -21,9 +21,7 @@ const getPageContentProps = (
   };
 };
 
-export const ErrorPage = ({
-  error,
-}: ErrorPageProperties): React.ReactElement => {
+export const ErrorPage = ({ error }: ErrorPageProperties): ReactElement => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={0}>

@@ -1,5 +1,4 @@
-import type React from "react";
-import { lazy, useEffect } from "react";
+import { type ReactElement, type ReactNode, lazy, useEffect } from "react";
 import { PageHeader } from "react-design-system";
 import {
   type AdminTabRouteName,
@@ -63,7 +62,7 @@ const OpenApiDocPage = lazy(
 type Routes = typeof routes;
 
 const adminRoutes: {
-  [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+  [K in AdminTabRouteName]: (route: Route<Routes[K]>) => ReactElement;
 } = adminTabRouteNames.reduce(
   (acc, tabRouteName) => ({
     ...acc,
@@ -75,7 +74,7 @@ const adminRoutes: {
   }),
 
   {} as {
-    [K in AdminTabRouteName]: (route: Route<Routes[K]>) => React.ReactElement;
+    [K in AdminTabRouteName]: (route: Route<Routes[K]>) => ReactElement;
   },
 );
 
@@ -87,7 +86,7 @@ const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
 };
 
 const getPageByRouteName: {
-  [K in keyof Routes]: (route: Route<Routes[K]>) => React.ReactNode;
+  [K in keyof Routes]: (route: Route<Routes[K]>) => ReactNode;
 } = {
   addAgency: () => <AddAgencyPage />,
   admin: (route) => (
@@ -226,12 +225,12 @@ const getPageByRouteName: {
   ),
 };
 
-export const Router = (): React.ReactNode => {
+export const Router = (): ReactNode => {
   const route = useRoute();
   const routeName = route.name;
   return routeName === false ? (
     <ErrorPage error={frontErrors.generic.pageNotFound()} />
   ) : (
-    (getPageByRouteName[routeName](route as Route<unknown>) as React.ReactNode)
+    (getPageByRouteName[routeName](route as Route<unknown>) as ReactNode)
   );
 };

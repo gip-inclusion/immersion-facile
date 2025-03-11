@@ -1,4 +1,3 @@
-import React from "react";
 import { Tag } from "react-design-system";
 
 export const AgencyTag = ({

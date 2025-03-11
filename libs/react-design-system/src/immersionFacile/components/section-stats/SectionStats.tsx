@@ -1,4 +1,3 @@
-import React from "react";
 import "./SectionStats.scss";
 
 export type SectionStatsProps = {

@@ -1,4 +1,4 @@
-import querystring from "querystring";
+import querystring from "node:querystring";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";

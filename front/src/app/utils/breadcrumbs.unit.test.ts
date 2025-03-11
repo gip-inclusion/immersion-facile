@@ -1,19 +1,6 @@
 import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
+import { makeBreadcrumbsSegments } from "src/app/utils/breadcrumbs";
 import type { Route } from "type-route";
-import { makeBreadcrumbsSegments } from "./breadcrumbs";
-
-const makeFakeRoute = (name: string): Route<any> => ({
-  name,
-  link: {
-    href: `/${name}`,
-    onClick: () => {},
-  },
-  action: null,
-  params: {},
-  href: `/${name}`,
-  push: () => {},
-  replace: () => {},
-});
 
 describe("makeBreadcrumbsSegments", () => {
   it("should returns segments for a route at level 1", () => {
@@ -96,6 +83,19 @@ describe("makeBreadcrumbsSegments", () => {
   });
 });
 
+const makeFakeRoute = (name: string): Route<any> => ({
+  name,
+  link: {
+    href: `/${name}`,
+    onClick: () => {},
+  },
+  action: null,
+  params: {},
+  href: `/${name}`,
+  push: () => {},
+  replace: () => {},
+});
+
 const testBreadcrumbsSet = {
   homeCandidates: {
     label: "Candidats",
@@ -122,6 +122,24 @@ const testRootAncestor: BreadcrumbProps["segments"][0] = {
   },
 };
 
-export const getTestBreadcrumbs = makeBreadcrumbsSegments<
-  typeof testBreadcrumbsSet
->(testBreadcrumbsSet, testRootAncestor);
+const getTestBreadcrumbs = makeBreadcrumbsSegments<typeof testBreadcrumbsSet>(
+  testBreadcrumbsSet,
+  testRootAncestor,
+);
+
+// Type safety tests
+
+getTestBreadcrumbs({
+  // @ts-expect-error
+  currentRouteKey: "not-known-route-name",
+});
+
+getTestBreadcrumbs({
+  // root at level 1
+  currentRouteKey: "homeCandidates",
+});
+
+getTestBreadcrumbs({
+  // deep level
+  currentRouteKey: "search",
+});

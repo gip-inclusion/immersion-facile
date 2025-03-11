@@ -1,5 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+
 import { MainWrapper } from "react-design-system";
 import { ConventionManageContent } from "src/app/components/admin/conventions/ConventionManageContent";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";

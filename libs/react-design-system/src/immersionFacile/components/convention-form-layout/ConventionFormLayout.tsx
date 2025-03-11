@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import type React from "react";
+import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ConventionFormLayout.styles";
 
 export type ConventionFormLayoutProperties = {
-  form: React.ReactNode;
-  sidebar: React.ReactNode;
+  form: ReactNode;
+  sidebar: ReactNode;
 };
 
 export const ConventionFormLayout = ({

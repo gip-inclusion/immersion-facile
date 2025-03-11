@@ -4,8 +4,13 @@ import {
   RadioButtons,
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import type React from "react";
-import { type Dispatch, type SetStateAction, useState } from "react";
+
+import {
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+  useState,
+} from "react";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import {
   type DotNestedKeys,
@@ -55,7 +60,7 @@ export const BusinessContact = ({
   setInvalidEmailMessage,
 }: {
   mode: Mode;
-  setInvalidEmailMessage: Dispatch<SetStateAction<React.ReactNode | null>>;
+  setInvalidEmailMessage: Dispatch<SetStateAction<ReactNode | null>>;
 }) => {
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels(mode),

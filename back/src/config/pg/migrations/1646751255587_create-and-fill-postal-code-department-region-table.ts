@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "node:fs";
 import type { MigrationBuilder } from "node-pg-migrate";
 
 export const up = async (pgm: MigrationBuilder) => {

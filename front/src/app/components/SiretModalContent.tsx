@@ -1,4 +1,3 @@
-import React from "react";
 import { SiretFetcherInput } from "./SiretFetcherInput";
 
 export const SiretModalContent = () => (
