@@ -5,9 +5,12 @@ import { useState } from "react";
 import { File } from "react-design-system";
 import { useCopyButton } from "react-design-system";
 import { domElementIds } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 export const UploadFileSection = () => {
+  const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
   const { onCopyButtonClick, copyButtonLabel, copyButtonIsDisabled } =
     useCopyButton("Copier l'URL du fichier");
   const [uploadedFileUrl, setUploadedFileUrl] = useState("");
@@ -18,10 +21,15 @@ export const UploadFileSection = () => {
   );
   const label = "Télécharger un document sur clever";
   const maxSize_Mo = 10;
+
+  if (!connectedUserJwt) return null;
+
   const onUploadClick = async () => {
     if (!file) return;
-    const fileUrl =
-      await outOfReduxDependencies.technicalGateway.uploadFile(file);
+    const fileUrl = await outOfReduxDependencies.technicalGateway.uploadFile(
+      file,
+      connectedUserJwt,
+    );
     setUploadedFileUrl(fileUrl);
   };
   const toBase64 = (file: File) => {

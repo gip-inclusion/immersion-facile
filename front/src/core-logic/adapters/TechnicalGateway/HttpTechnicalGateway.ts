@@ -2,6 +2,7 @@ import type { AxiosInstance } from "axios";
 import { type Observable, from, map } from "rxjs";
 import {
   type AbsoluteUrl,
+  type ConnectedUserJwt,
   type ConventionSupportedJwt,
   type Email,
   type FeatureFlags,
@@ -58,12 +59,16 @@ export class HttpTechnicalGateway implements TechnicalGateway {
       );
   }
 
-  public async uploadFile(file: File): Promise<AbsoluteUrl> {
+  public async uploadFile(
+    file: File,
+    jwt: ConnectedUserJwt,
+  ): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
     const { data } = await this.axiosInstance.post(
       `/${uploadFileRoute}`,
       formData,
+      { headers: { authorization: jwt } },
     );
     return data;
   }

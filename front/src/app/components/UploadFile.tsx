@@ -2,7 +2,9 @@ import { type ChangeEvent, type ReactNode, useState } from "react";
 import { File } from "react-design-system";
 import type { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 interface UploadLogoProps {
   label: string;
@@ -18,6 +20,9 @@ export const UploadFile = ({
   hint,
 }: UploadLogoProps) => {
   const [error, setError] = useState<string>();
+  const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
+
+  if (!connectedUserJwt) return null;
   return (
     <File
       onChange={async (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +38,10 @@ export const UploadFile = ({
         if (!file) return;
 
         const fileUrl =
-          await outOfReduxDependencies.technicalGateway.uploadFile(file);
+          await outOfReduxDependencies.technicalGateway.uploadFile(
+            file,
+            connectedUserJwt,
+          );
         setFileUrl(fileUrl);
       }}
       label={label}

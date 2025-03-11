@@ -33,7 +33,6 @@ export const makeInclusionConnectAuthMiddleware = (
         throw errors.user.notFound({ userId: payload.userId });
 
       req.payloads = { inclusion: payload, currentUser: currentIcUser };
-
       return next();
     } catch (error: any) {
       return res.status(unauthorizedError.status).json({
