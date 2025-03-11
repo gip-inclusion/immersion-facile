@@ -1,39 +1,42 @@
 import { addDays, addHours, parseISO } from "date-fns";
 import subDays from "date-fns/subDays";
 import { sql } from "kysely";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyId,
-  AgencyKind,
-  AppellationCode,
-  ConventionDto,
+  type AgencyId,
+  type AgencyKind,
+  type AppellationCode,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionReadDto,
-  ConventionStatus,
+  type ConventionId,
+  type ConventionReadDto,
+  type ConventionStatus,
   DATE_START,
-  EmailNotification,
+  type EmailNotification,
   InclusionConnectedUserBuilder,
-  Notification,
-  SiretDto,
+  type Notification,
+  type SiretDto,
   concatValidatorNames,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
-import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
-import { ConventionRepository } from "../ports/ConventionRepository";
+import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
+import type { ConventionRepository } from "../ports/ConventionRepository";
 import { PgConventionQueries } from "./PgConventionQueries";
 import { PgConventionRepository } from "./PgConventionRepository";
 

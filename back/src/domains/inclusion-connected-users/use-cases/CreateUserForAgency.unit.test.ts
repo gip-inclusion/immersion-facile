@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
   InclusionConnectedUserBuilder,
-  User,
-  UserParamsForAgency,
+  type User,
+  type UserParamsForAgency,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -12,20 +12,20 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { StubDashboardGateway } from "../../core/dashboard/adapters/StubDashboardGateway";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import {
-  CreateUserForAgency,
+  type CreateUserForAgency,
   makeCreateUserForAgency,
 } from "./CreateUserForAgency";
 

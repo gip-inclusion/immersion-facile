@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
@@ -8,13 +8,16 @@ import {
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import { AssessmentEntity } from "../entities/AssessmentEntity";
+import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionRepository } from "./PgConventionRepository";
 

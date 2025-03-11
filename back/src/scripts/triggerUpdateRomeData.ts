@@ -4,11 +4,14 @@ import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
 import { pipeWithValue, removeDiacritics, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
-import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
-import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import {
-  AppellationWithShortLabel,
+  type AccessTokenResponse,
+  AppConfig,
+} from "../config/bootstrap/appConfig";
+import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { type KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import {
+  type AppellationWithShortLabel,
   HttpRome4Gateway,
   makeRome4Routes,
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome4Gateway";
@@ -110,7 +113,7 @@ const insertAppellations =
             const labelWithoutSpecialCharacters =
               removeAccentsAndParenthesis(appellationLabel);
             return {
-              ogr_appellation: parseInt(appellationCode, 10),
+              ogr_appellation: Number.parseInt(appellationCode, 10),
               code_rome: romeCode,
               libelle_appellation_long: appellationLabel,
               libelle_appellation_long_without_special_char:

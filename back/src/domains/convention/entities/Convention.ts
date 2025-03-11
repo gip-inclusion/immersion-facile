@@ -1,18 +1,18 @@
 import { intersection, toPairs, uniq } from "ramda";
 import {
-  AgencyDto,
-  AgencyId,
-  AgencyWithUsersRights,
-  ApiConsumer,
-  ConventionDto,
-  ConventionId,
-  ConventionReadDto,
-  ConventionRelatedJwtPayload,
-  ConventionStatus,
+  type AgencyDto,
+  type AgencyId,
+  type AgencyWithUsersRights,
+  type ApiConsumer,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionReadDto,
+  type ConventionRelatedJwtPayload,
+  type ConventionStatus,
   ForbiddenError,
-  Role,
-  Signatories,
-  SignatoryRole,
+  type Role,
+  type Signatories,
+  type SignatoryRole,
   agencyModifierRoles,
   errors,
   isSomeEmailMatchingEmailHash,
@@ -20,7 +20,7 @@ import {
   statusTransitionConfigs,
 } from "shared";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export const throwIfTransitionNotAllowed = ({

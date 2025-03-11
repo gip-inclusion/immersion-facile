@@ -1,13 +1,13 @@
 import {
-  AgencyPublicDisplayDto,
-  WithAgencyId,
+  type AgencyPublicDisplayDto,
+  type WithAgencyId,
   errors,
   toAgencyPublicDisplayDto,
   withAgencyIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetAgencyPublicInfoById extends TransactionalUseCase<
   WithAgencyId,

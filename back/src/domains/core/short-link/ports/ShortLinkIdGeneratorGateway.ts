@@ -1,4 +1,4 @@
-import { ShortLinkId } from "shared";
+import type { ShortLinkId } from "shared";
 
 export interface ShortLinkIdGeneratorGateway {
   generate(): ShortLinkId;

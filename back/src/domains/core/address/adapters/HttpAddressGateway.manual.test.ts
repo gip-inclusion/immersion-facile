@@ -1,10 +1,10 @@
 import axios from "axios";
 import {
-  AddressAndPosition,
-  AddressDto,
-  GeoPositionDto,
-  Location,
-  LookupSearchResult,
+  type AddressAndPosition,
+  type AddressDto,
+  type GeoPositionDto,
+  type Location,
+  type LookupSearchResult,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -12,7 +12,7 @@ import {
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
-import { AddressGateway } from "../ports/AddressGateway";
+import type { AddressGateway } from "../ports/AddressGateway";
 import { HttpAddressGateway } from "./HttpAddressGateway";
 import { addressesExternalRoutes } from "./HttpAddressGateway.routes";
 

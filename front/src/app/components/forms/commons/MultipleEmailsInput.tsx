@@ -1,12 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
-  OmitFromExistingKeys,
+  type OmitFromExistingKeys,
   notEqual,
   validateMultipleEmailRegex,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
-import { z } from "zod";
+import type { z } from "zod";
 
 const componentName = "im-fillable-list";
 

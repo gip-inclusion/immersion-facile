@@ -1,23 +1,23 @@
 import { sql } from "kysely";
 import { map, uniq } from "ramda";
 import {
-  EmailNotification,
-  Notification,
-  NotificationId,
-  NotificationKind,
-  NotificationsByKind,
-  SmsNotification,
-  TemplatedEmail,
-  TemplatedSms,
+  type EmailNotification,
+  type Notification,
+  type NotificationId,
+  type NotificationKind,
+  type NotificationsByKind,
+  type SmsNotification,
+  type TemplatedEmail,
+  type TemplatedSms,
   exhaustiveCheck,
   pipeWithValue,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import {
+import type {
   EmailNotificationFilters,
   NotificationRepository,
   SmsNotificationFilters,

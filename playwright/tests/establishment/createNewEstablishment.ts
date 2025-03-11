@@ -1,14 +1,14 @@
 import { faker } from "@faker-js/faker";
 import { expect } from "@playwright/test";
-import { FormEstablishmentDto, domElementIds } from "shared";
+import { type FormEstablishmentDto, domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
-  PlaywrightTestCallback,
+  type PlaywrightTestCallback,
   fillAutocomplete,
   phoneRegexp,
 } from "../../utils/utils";
 import {
-  TestEstablishments,
+  type TestEstablishments,
   fillEstablishmentFormFirstStep,
   goToNextStep,
 } from "./establishmentForm.utils";

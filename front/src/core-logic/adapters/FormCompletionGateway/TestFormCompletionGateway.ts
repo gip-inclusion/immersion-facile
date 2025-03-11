@@ -1,6 +1,11 @@
-import { BehaviorSubject, Observable, Subject, delay, of } from "rxjs";
-import { AppellationMatchDto, GetSiretInfo, RomeDto, sleep } from "shared";
-import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import { BehaviorSubject, type Observable, Subject, delay, of } from "rxjs";
+import {
+  type AppellationMatchDto,
+  type GetSiretInfo,
+  type RomeDto,
+  sleep,
+} from "shared";
+import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 
 export class TestFormCompletionGateway implements FormCompletionGateway {
   public getSiretInfoCallCount = 0;

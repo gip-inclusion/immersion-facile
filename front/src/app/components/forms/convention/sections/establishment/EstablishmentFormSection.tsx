@@ -2,13 +2,13 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import {
   RadioButtons,
-  RadioButtonsProps,
+  type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { ConventionDto, InternshipKind } from "shared";
-import {
+import type { ConventionDto, InternshipKind } from "shared";
+import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
 } from "src/app/components/forms/convention/ConventionForm";

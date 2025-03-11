@@ -1,11 +1,11 @@
 import {
-  AgencyWithUsersRights,
-  ConventionReadDto,
-  ConventionRelatedJwtPayload,
-  EmailHash,
-  Role,
-  UserId,
-  WithConventionId,
+  type AgencyWithUsersRights,
+  type ConventionReadDto,
+  type ConventionRelatedJwtPayload,
+  type EmailHash,
+  type Role,
+  type UserId,
+  type WithConventionId,
   errors,
   getIcUserRoleForAccessingConvention,
   withConventionIdSchema,
@@ -16,7 +16,7 @@ import {
   isHashMatchPeAdvisorEmail,
 } from "../../../utils/emailHash";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export class GetConvention extends TransactionalUseCase<

@@ -1,4 +1,4 @@
-import { AbsoluteUrl, Flavor } from "shared";
+import type { AbsoluteUrl, Flavor } from "shared";
 import { z } from "zod";
 
 export const apiBrevoUrl: AbsoluteUrl = "https://api.sendinblue.com/v3";

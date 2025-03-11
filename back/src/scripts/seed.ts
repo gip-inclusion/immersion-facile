@@ -1,9 +1,9 @@
 import { AppConfig } from "../config/bootstrap/appConfig";
 import {
-  AppDependencies,
+  type AppDependencies,
   createAppDependencies,
 } from "../config/bootstrap/createAppDependencies";
-import { KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { type KyselyDb, makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { agencySeed } from "./seed/agencySeed";
 import { conventionSeed } from "./seed/conventionSeed";
 import { establishmentSeed } from "./seed/establishmentSeed";

@@ -1,5 +1,5 @@
-import { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
-import { Route } from "type-route";
+import type { BreadcrumbProps } from "@codegouvfr/react-dsfr/Breadcrumb";
+import type { Route } from "type-route";
 import { makeBreadcrumbsSegments } from "./breadcrumbs";
 
 const makeFakeRoute = (name: string): Route<any> => ({

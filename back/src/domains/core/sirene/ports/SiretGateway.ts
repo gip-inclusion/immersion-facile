@@ -1,4 +1,4 @@
-import { SiretDto, SiretEstablishmentDto } from "shared";
+import type { SiretDto, SiretEstablishmentDto } from "shared";
 
 export interface SiretGateway {
   getEstablishmentBySiret(

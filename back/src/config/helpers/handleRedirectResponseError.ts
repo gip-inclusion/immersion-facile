@@ -1,8 +1,8 @@
-import { Response } from "express";
+import type { Response } from "express";
 import {
-  AbsoluteUrl,
-  FTConnectError,
-  ManagedFTConnectError,
+  type AbsoluteUrl,
+  type FTConnectError,
+  type ManagedFTConnectError,
   queryParamsAsString,
 } from "shared";
 

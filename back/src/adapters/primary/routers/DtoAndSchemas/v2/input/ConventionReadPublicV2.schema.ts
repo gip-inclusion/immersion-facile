@@ -5,7 +5,7 @@ import {
   siretSchema,
 } from "shared";
 import { z } from "zod";
-import { ConventionReadPublicV2Dto } from "./ConventionReadPublicV2.dto";
+import type { ConventionReadPublicV2Dto } from "./ConventionReadPublicV2.dto";
 
 export const conventionReadPublicV2Schema: z.Schema<ConventionReadPublicV2Dto> =
   conventionSchema.and(

@@ -1,15 +1,15 @@
 import {
-  AbsoluteUrl,
-  ShareLinkByEmailDto,
+  type AbsoluteUrl,
+  type ShareLinkByEmailDto,
   shareLinkByEmailSchema,
 } from "shared";
-import { AppConfig } from "../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { makeShortLink } from "../../core/short-link/ShortLink";
-import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkByEmailDto> {
   protected inputSchema = shareLinkByEmailSchema;

@@ -1,10 +1,10 @@
-import {
+import type {
   AddressAndPosition,
   AddressDto,
   GeoPositionDto,
   LookupSearchResult,
 } from "shared";
-import { AddressGateway } from "../ports/AddressGateway";
+import type { AddressGateway } from "../ports/AddressGateway";
 
 export class InMemoryAddressGateway implements AddressGateway {
   #address?: AddressDto;

@@ -1,5 +1,5 @@
-import { MainWrapperProps } from "react-design-system";
-import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
+import type { MainWrapperProps } from "react-design-system";
+import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
 import accessibilityContent from "./accessibilite";
 import budgetContent from "./budget";
 import cguContent from "./cgu";

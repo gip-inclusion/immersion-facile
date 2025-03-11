@@ -1,4 +1,4 @@
-import { DateRange } from "shared";
+import type { DateRange } from "shared";
 
 export const getDateRangeFromScriptParams = ({
   scriptParams,

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { searchResultSchema } from "../search/SearchResult.schema";
 import { zStringMinLength1 } from "../zodUtils";
-import {
+import type {
   Group,
   GroupOptions,
   GroupSlug,

@@ -1,6 +1,6 @@
-import { DateString } from "shared";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
+import type { DateString } from "shared";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type {
   DomainEvent,
   DomainTopic,

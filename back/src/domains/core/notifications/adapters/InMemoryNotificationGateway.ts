@@ -1,8 +1,8 @@
 import { prop } from "ramda";
-import { DateString, TemplatedEmail, TemplatedSms } from "shared";
+import type { DateString, TemplatedEmail, TemplatedSms } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
-import { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
 
 export const sendSmsErrorPhoneNumber = "0699999999";
 export class InMemoryNotificationGateway implements NotificationGateway {

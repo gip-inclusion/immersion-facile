@@ -1,12 +1,12 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
   CreateAgencyDto,
   ListAgencyOptionsRequestDto,
 } from "shared";
-import { SubmitFeedBack } from "../SubmitFeedback";
+import type { SubmitFeedBack } from "../SubmitFeedback";
 
 export type AgenciesFeedbackKind =
   | "agencyAdded"

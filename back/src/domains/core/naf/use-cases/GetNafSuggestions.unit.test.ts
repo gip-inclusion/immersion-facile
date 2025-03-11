@@ -1,10 +1,13 @@
-import { NafSectionSuggestion, expectToEqual } from "shared";
+import { type NafSectionSuggestion, expectToEqual } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
-import { GetNafSuggestions, makeGetNafSuggestions } from "./GetNafSuggestions";
+import {
+  type GetNafSuggestions,
+  makeGetNafSuggestions,
+} from "./GetNafSuggestions";
 
 describe("NafSuggestions", () => {
   let getNafSuggestions: GetNafSuggestions;

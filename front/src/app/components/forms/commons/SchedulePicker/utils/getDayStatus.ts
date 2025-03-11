@@ -1,5 +1,5 @@
 import { isSameDay } from "date-fns";
-import { DailyImmersionTimetableDto } from "shared";
+import type { DailyImmersionTimetableDto } from "shared";
 
 export type DayStatus = "empty" | "hasTime" | "isSelected";
 

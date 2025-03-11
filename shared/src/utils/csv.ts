@@ -1,4 +1,4 @@
-import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const establishmentAppellationsFromCSVToDto = (
   appellationsRow: string,
@@ -22,7 +22,7 @@ export const csvBooleanToBoolean = (value: string) => {
     throw new Error(
       "Boolean: value is undefined, please provide 1 or 0 or 'true'...",
     );
-  return Boolean(parseInt(value)) || value.toLowerCase() === "true";
+  return Boolean(Number.parseInt(value)) || value.toLowerCase() === "true";
 };
 
 export const isCSVCellEmptyString = (value: string) => value.trim() === "";

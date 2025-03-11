@@ -7,7 +7,7 @@ import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { NotEmptyArray } from "../utils";
+import type { NotEmptyArray } from "../utils";
 import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
@@ -18,7 +18,7 @@ import {
   zStringMinLength1,
   zUuidLike,
 } from "../zodUtils";
-import {
+import type {
   BusinessContactDto,
   CSVBoolean,
   ContactMethod,

@@ -1,7 +1,11 @@
 import { keys } from "ramda";
-import { FeatureFlags, SetFeatureFlagParam, hasFeatureFlagValue } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
+import {
+  type FeatureFlags,
+  type SetFeatureFlagParam,
+  hasFeatureFlagValue,
+} from "shared";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
 export class PgFeatureFlagRepository implements FeatureFlagRepository {
   constructor(private transaction: KyselyDb) {}

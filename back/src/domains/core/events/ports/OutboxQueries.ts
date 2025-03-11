@@ -1,4 +1,4 @@
-import { DomainEvent } from "../events";
+import type { DomainEvent } from "../events";
 
 export interface OutboxQueries {
   getEventsToPublish: (params: { limit: number }) => Promise<DomainEvent[]>;

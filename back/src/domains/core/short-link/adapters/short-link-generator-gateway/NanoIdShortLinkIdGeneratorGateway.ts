@@ -1,7 +1,7 @@
 import { nanoid } from "nanoid";
-import { ShortLinkId } from "shared";
+import type { ShortLinkId } from "shared";
 import { createLogger } from "../../../../../utils/logger";
-import { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
+import type { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
 
 const logger = createLogger(__filename);
 

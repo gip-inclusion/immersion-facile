@@ -2,15 +2,15 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   BadRequestError,
-  ConventionDomainPayload,
+  type ConventionDomainPayload,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionRelatedJwtPayload,
+  type ConventionId,
+  type ConventionRelatedJwtPayload,
   ForbiddenError,
   InclusionConnectedUserBuilder,
   NotFoundError,
-  RenewConventionParams,
-  Role,
+  type RenewConventionParams,
+  type Role,
   ScheduleDtoBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -22,7 +22,7 @@ import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGa
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

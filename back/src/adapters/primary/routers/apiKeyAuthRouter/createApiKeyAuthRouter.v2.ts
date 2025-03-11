@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { andThen, keys, map } from "ramda";
 import {
-  ApiConsumer,
-  LocationId,
-  SearchQueryParamsDto,
-  SiretDto,
-  WithAcquisition,
+  type ApiConsumer,
+  type LocationId,
+  type SearchQueryParamsDto,
+  type SiretDto,
+  type WithAcquisition,
   defaultPageInPagination,
   defaultPerPageInPagination,
   errors,
@@ -17,7 +17,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
 import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
-import { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
 import { contactEstablishmentPublicV2ToDomain } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import { contactEstablishmentPublicV2Schema } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.schema";

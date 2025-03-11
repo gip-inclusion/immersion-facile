@@ -1,13 +1,13 @@
 import {
-  BusinessContactDto,
-  FormEstablishmentDto,
-  SiretDto,
+  type BusinessContactDto,
+  type FormEstablishmentDto,
+  type SiretDto,
   domElementIds,
   immersionFacileContactEmail,
 } from "shared";
-import { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
-import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
-import { FormFieldAttributesForContent } from "../types";
+import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
+import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
+import type { FormFieldAttributesForContent } from "../types";
 
 type FormEstablishmentFieldKeys =
   | Exclude<

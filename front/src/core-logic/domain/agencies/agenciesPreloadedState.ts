@@ -1,4 +1,4 @@
-import { RootState } from "src/core-logic/storeConfig/store";
+import type { RootState } from "src/core-logic/storeConfig/store";
 
 import { createUserOnAgencyInitialState } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencyInitialState } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";

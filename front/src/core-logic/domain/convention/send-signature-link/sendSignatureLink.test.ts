@@ -1,15 +1,15 @@
 import { expectObjectsToMatch, expectToEqual } from "shared";
 import {
-  SendSignatureLinkState,
+  type SendSignatureLinkState,
   sendSignatureLinkInitialState,
   sendSignatureLinkSlice,
 } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("sendSignatureLink slice", () => {
   let store: ReduxStore;

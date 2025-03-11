@@ -1,4 +1,8 @@
-import { AddConventionInput, addConventionInputSchema, errors } from "shared";
+import {
+  type AddConventionInput,
+  addConventionInputSchema,
+  errors,
+} from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type MarkDiscussionLinkedToConvention = ReturnType<

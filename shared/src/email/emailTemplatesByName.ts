@@ -1,13 +1,13 @@
 import { createTemplatesByName } from "html-templates";
 import {
-  ConventionId,
-  InternshipKind,
+  type ConventionId,
+  type InternshipKind,
   labelsForImmersionObjective,
 } from "../convention/convention.dto";
-import { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
-import { EmailParamsByEmailType } from "./EmailParamsByEmailType";
+import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import {
@@ -273,7 +273,7 @@ export const emailTemplatesByName =
         const lastDayOfPresence =
           assessment.status === "COMPLETED"
             ? conventionDateEnd
-            : assessment.lastDayOfPresence ?? "";
+            : (assessment.lastDayOfPresence ?? "");
         return {
           subject: `Pour information : évaluation ${
             internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"
@@ -295,9 +295,9 @@ export const emailTemplatesByName =
          --><li>Date réelle de fin de l'immersion : ${
            isStringDate(lastDayOfPresence)
              ? toDisplayedDate({
-                  date: new Date(lastDayOfPresence),
-                  withHours: false,
-                })
+                 date: new Date(lastDayOfPresence),
+                 withHours: false,
+               })
              : "DATE INVALIDE"
          }
           </ul>

@@ -1,14 +1,14 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  User,
-  UserId,
+  type User,
+  type UserId,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";

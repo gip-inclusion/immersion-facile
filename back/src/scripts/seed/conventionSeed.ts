@@ -1,6 +1,6 @@
 import {
-  AgencyId,
-  AgencyKind,
+  type AgencyId,
+  type AgencyKind,
   ConventionDtoBuilder,
   conventionSchema,
   frontRoutes,
@@ -10,7 +10,7 @@ import {
 import { AppConfig } from "../../config/bootstrap/appConfig";
 import { makeGenerateConventionMagicLinkUrl } from "../../config/bootstrap/magicLinkUrl";
 import { makeGenerateJwtES256 } from "../../domains/core/jwt";
-import { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { franceMerguez } from "./establishmentSeed";
 import { getRandomAgencyId } from "./seed.helpers";

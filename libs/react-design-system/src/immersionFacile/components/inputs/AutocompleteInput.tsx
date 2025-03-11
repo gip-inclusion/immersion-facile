@@ -1,6 +1,6 @@
-import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
-import { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
-import React from "react";
+import Input, { type InputProps } from "@codegouvfr/react-dsfr/Input";
+import type { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
+import type React from "react";
 import "./AutocompleteInput.css";
 
 export type AutocompleteInputProps = {

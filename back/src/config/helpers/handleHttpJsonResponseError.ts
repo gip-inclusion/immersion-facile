@@ -1,9 +1,9 @@
 import * as Sentry from "@sentry/node";
 import { isAxiosError } from "axios";
-import { Request, Response } from "express";
-import { HttpError, HttpErrorResponseBody } from "shared";
+import type { Request, Response } from "express";
+import { HttpError, type HttpErrorResponseBody } from "shared";
 import { ZodError } from "zod";
-import { LoggerParamsWithMessage, createLogger } from "../../utils/logger";
+import { type LoggerParamsWithMessage, createLogger } from "../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../utils/notifyTeam";
 
 const logger = createLogger(__filename);

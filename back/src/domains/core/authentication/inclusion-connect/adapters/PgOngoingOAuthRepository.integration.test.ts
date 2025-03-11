@@ -1,11 +1,11 @@
-import { Pool } from "pg";
-import { User, expectToEqual } from "shared";
+import type { Pool } from "pg";
+import { type User, expectToEqual } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 import { PgUserRepository } from "./PgUserRepository";
 

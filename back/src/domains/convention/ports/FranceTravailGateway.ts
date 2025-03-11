@@ -1,6 +1,6 @@
-import { AgencyKind, ConventionStatus, DateString } from "shared";
-import { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
-import { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
+import type { AgencyKind, ConventionStatus, DateString } from "shared";
+import type { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
+import type { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
 
 // This is an interface contract with France Travail (conventions broadcast).
 // ! Beware of NOT breaking contract ! !

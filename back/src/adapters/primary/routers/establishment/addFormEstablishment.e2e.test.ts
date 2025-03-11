@@ -1,5 +1,5 @@
 import {
-  EstablishmentRoutes,
+  type EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
   defaultValidFormEstablishment,
   displayRouteName,
@@ -7,19 +7,22 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
+import type { SuperTest, Test } from "supertest";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Add form establishment", () => {

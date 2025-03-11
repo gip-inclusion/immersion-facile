@@ -1,4 +1,4 @@
-import { AbsoluteUrl, absoluteUrlSchema } from "./AbsoluteUrl";
+import { type AbsoluteUrl, absoluteUrlSchema } from "./AbsoluteUrl";
 export type ProcessEnv = { [key: string]: string | undefined };
 
 type ThrowIfNotInArrayParams<T> = {

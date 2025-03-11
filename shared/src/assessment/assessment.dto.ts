@@ -1,5 +1,5 @@
-import { ConventionId } from "../convention/convention.dto";
-import { DateString } from "../utils/date";
+import type { ConventionId } from "../convention/convention.dto";
+import type { DateString } from "../utils/date";
 
 export type AssessmentStatus = AssessmentDto["status"];
 export const assessmentStatuses: AssessmentStatus[] = [

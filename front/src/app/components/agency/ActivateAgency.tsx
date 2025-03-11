@@ -9,8 +9,8 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyId,
-  UpdateAgencyStatusParams,
+  type AgencyId,
+  type UpdateAgencyStatusParams,
   domElementIds,
   withAgencyIdSchema,
   zStringMinLength1,

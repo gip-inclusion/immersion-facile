@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
-  AssessmentDto,
-  ConventionDomainPayload,
+  type AssessmentDto,
+  type ConventionDomainPayload,
   ConventionDtoBuilder,
-  ConventionJwtPayload,
+  type ConventionJwtPayload,
   InclusionConnectedUserBuilder,
-  Role,
+  type Role,
   allRoles,
   errors,
   expectPromiseToFailWithError,
@@ -17,11 +17,11 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { makeHashByRolesForTest } from "../../../utils/emailHash";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import {
-  GetAssessmentByConventionId,
+  type GetAssessmentByConventionId,
   makeGetAssessmentByConventionId,
 } from "./GetAssessmentByConventionId";
 

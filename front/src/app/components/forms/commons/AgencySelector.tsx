@@ -1,22 +1,22 @@
-import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { keys, uniq } from "ramda";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext, useWatch } from "react-hook-form";
 import {
-  AgencyId,
-  AgencyKind,
-  AgencyOption,
-  AllowedAgencyKindToAdd,
-  ConventionReadDto,
-  CreateAgencyDto,
-  DepartmentCode,
+  type AgencyId,
+  type AgencyKind,
+  type AgencyOption,
+  type AllowedAgencyKindToAdd,
+  type ConventionReadDto,
+  type CreateAgencyDto,
+  type DepartmentCode,
   agencyKindToLabel,
   allAgencyKindsAllowedToAdd,
   departmentNameToDepartmentCode,
   fitForDelegationAgencyKind,
 } from "shared";
-import { FormFieldAttributes } from "src/app/contents/forms/types";
+import type { FormFieldAttributes } from "src/app/contents/forms/types";
 import { AgencyErrorText } from "../convention/sections/agency/AgencyErrorText";
 
 type AgencySelectorProps = {

@@ -4,7 +4,7 @@ import {
   type RSAutocompleteComponentProps,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { NafSectionSuggestion } from "shared";
+import type { NafSectionSuggestion } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
 import { nafSlice } from "src/core-logic/domain/naf/naf.slice";

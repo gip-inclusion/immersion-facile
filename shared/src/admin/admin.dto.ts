@@ -1,15 +1,15 @@
-import {
+import type {
   ActiveOrRejectedStatus,
   AgencyId,
   WithAgencyId,
 } from "../agency/agency.dto";
-import { ConventionId } from "../convention/convention.dto";
-import { Email } from "../email/email.dto";
-import {
+import type { ConventionId } from "../convention/convention.dto";
+import type { Email } from "../email/email.dto";
+import type {
   AgencyRole,
   UserId,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { SiretDto } from "../siret/siret";
+import type { SiretDto } from "../siret/siret";
 
 export type WithAgencyIdAndUserId = {
   agencyId: AgencyId;

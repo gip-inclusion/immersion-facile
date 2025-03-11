@@ -9,7 +9,7 @@ import {
   requestMinTime,
 } from "./DiagorienteAppellationsGateway";
 import {
-  DiagorienteAccessTokenResponse,
+  type DiagorienteAccessTokenResponse,
   diagorienteAppellationsRoutes,
   diagorienteTokenScope,
 } from "./DiagorienteAppellationsGateway.routes";

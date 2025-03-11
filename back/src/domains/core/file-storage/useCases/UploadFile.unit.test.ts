@@ -9,8 +9,8 @@ import {
 import { v4 as uuid } from "uuid";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { InMemoryDocumentGateway } from "../adapters/InMemoryDocumentGateway";
-import { StoredFile } from "../entity/StoredFile";
-import { FileInput, UploadFile } from "./UploadFile";
+import type { StoredFile } from "../entity/StoredFile";
+import { type FileInput, UploadFile } from "./UploadFile";
 
 describe("UploadFile use case", () => {
   let documentGateway: InMemoryDocumentGateway;

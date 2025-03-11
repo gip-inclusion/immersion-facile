@@ -2,7 +2,10 @@ import axios from "axios";
 import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
+import {
+  type AccessTokenResponse,
+  AppConfig,
+} from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
 import { partnerNames } from "../config/bootstrap/partnerNames";

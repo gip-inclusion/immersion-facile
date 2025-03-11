@@ -1,4 +1,4 @@
-import {
+import type {
   Beneficiary,
   BeneficiaryRepresentative,
 } from "../convention/convention.dto";

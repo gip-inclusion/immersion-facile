@@ -1,9 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import React from "react";
+import type React from "react";
 import { createPortal } from "react-dom";
-import { InternshipKind, Signatory, getSignatoryProcessedData } from "shared";
+import {
+  type InternshipKind,
+  type Signatory,
+  getSignatoryProcessedData,
+} from "shared";
 
 export const createSignModalParams = {
   isOpenedByDefault: false,

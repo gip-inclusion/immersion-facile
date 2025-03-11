@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { CopyButton, CopyButtonProperties } from "./CopyButton";
+import { CopyButton, type CopyButtonProperties } from "./CopyButton";
 
 const Component = CopyButton;
 type Story = StoryObj<typeof Component>;

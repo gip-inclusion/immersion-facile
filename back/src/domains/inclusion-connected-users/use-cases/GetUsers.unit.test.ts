@@ -6,10 +6,10 @@ import {
 } from "shared";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { GetUsers, makeGetUsers } from "./GetUsers";
+import { type GetUsers, makeGetUsers } from "./GetUsers";
 
 const randomUser = new InclusionConnectedUserBuilder()
   .withId("not-admin-id")

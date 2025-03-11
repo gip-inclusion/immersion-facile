@@ -1,12 +1,12 @@
 import {
-  ApiConsumerSubscriptionId,
+  type ApiConsumerSubscriptionId,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { ConventionJwt } from "shared";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { ConventionJwt } from "shared";
 
 export type EstablishmentLeadUIStatus =
   | "idle"

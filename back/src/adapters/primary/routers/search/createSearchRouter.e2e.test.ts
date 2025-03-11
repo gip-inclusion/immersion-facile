@@ -1,25 +1,25 @@
 import {
-  AppellationAndRomeDto,
-  Group,
-  SearchQueryParamsWithGeoParams,
-  SearchResultDto,
-  SearchRoutes,
-  SiretDto,
+  type AppellationAndRomeDto,
+  type Group,
+  type SearchQueryParamsWithGeoParams,
+  type SearchResultDto,
+  type SearchRoutes,
+  type SiretDto,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
   searchImmersionRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { establishmentAggregateToSearchResultByRomeForFirstLocation } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import { stubSearchResult } from "../../../../domains/establishment/adapters/InMemoryGroupRepository";
-import { LaBonneBoiteCompanyDto } from "../../../../domains/establishment/adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
+import type { LaBonneBoiteCompanyDto } from "../../../../domains/establishment/adapters/la-bonne-boite/LaBonneBoiteCompanyDto";
 import { LaBonneBoiteCompanyDtoBuilder } from "../../../../domains/establishment/adapters/la-bonne-boite/LaBonneBoiteCompanyDtoBuilder";
-import { EstablishmentEntity } from "../../../../domains/establishment/entities/EstablishmentEntity";
-import { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
-import { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
+import type { EstablishmentEntity } from "../../../../domains/establishment/entities/EstablishmentEntity";
+import type { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
+import type { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
@@ -27,7 +27,10 @@ import {
   defaultLocation,
   defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 const siret1 = "12345678901234";
 const siret2 = "11111111111111";

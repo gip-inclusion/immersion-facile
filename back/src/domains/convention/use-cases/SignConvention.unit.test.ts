@@ -1,13 +1,13 @@
 import {
   AgencyDtoBuilder,
-  BeneficiaryRepresentative,
-  ConventionDto,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionStatus,
-  EstablishmentRepresentative,
+  type ConventionId,
+  type ConventionStatus,
+  type EstablishmentRepresentative,
   InclusionConnectedUserBuilder,
-  Signatories,
+  type Signatories,
   allRoles,
   allSignatoryRoles,
   conventionStatuses,
@@ -18,12 +18,12 @@ import {
 } from "shared";
 import { ForbiddenError, NotFoundError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { DomainEvent } from "../../core/events/events";
+import type { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

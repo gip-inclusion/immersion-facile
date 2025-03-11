@@ -1,4 +1,4 @@
-import { NumberEmployeesRange } from "shared";
+import type { NumberEmployeesRange } from "shared";
 
 export const getNumberEmployeesRangeByTefenCode = (
   tefenCode?: string,

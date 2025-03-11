@@ -2,28 +2,28 @@ import { addDays, isBefore } from "date-fns";
 import subDays from "date-fns/subDays";
 import { propEq, toPairs } from "ramda";
 import {
-  ConventionDto,
-  ConventionId,
-  ConventionReadDto,
-  ConventionScope,
-  DateRange,
-  FindSimilarConventionsParams,
-  SiretDto,
-  UserId,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionReadDto,
+  type ConventionScope,
+  type DateRange,
+  type FindSimilarConventionsParams,
+  type SiretDto,
+  type UserId,
   errors,
   validatedConventionStatuses,
 } from "shared";
 import { NotFoundError } from "shared";
-import { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
-import { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
-import { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
-import {
+import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
+import type { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
+import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
+import type {
   AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
 } from "../ports/ConventionQueries";
-import { InMemoryConventionRepository } from "./InMemoryConventionRepository";
+import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 export class InMemoryConventionQueries implements ConventionQueries {
   constructor(

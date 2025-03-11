@@ -1,10 +1,10 @@
 import querystring from "querystring";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
-import { AbsoluteUrl, castError } from "shared";
-import { HttpClient } from "shared-routes";
-import {
+import { type AbsoluteUrl, castError } from "shared";
+import type { HttpClient } from "shared-routes";
+import type {
   AccessTokenConfig,
   AccessTokenResponse,
 } from "../../../../config/bootstrap/appConfig";
@@ -13,24 +13,27 @@ import {
   isRetryableError,
 } from "../../../../utils/axiosUtils";
 import {
-  LoggerParamsWithMessage,
+  type LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
 import {
   notifyErrorObjectToTeam,
   notifyTeam,
 } from "../../../../utils/notifyTeam";
-import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
+import type { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
-  RetryStrategy,
+  type RetryStrategy,
   RetryableError,
 } from "../../../core/retry-strategy/ports/RetryStrategy";
-import {
+import type {
   FranceTravailBroadcastResponse,
   FranceTravailConvention,
   FranceTravailGateway,
 } from "../../ports/FranceTravailGateway";
-import { FrancetTravailRoutes, getFtTestPrefix } from "./FrancetTravailRoutes";
+import {
+  type FrancetTravailRoutes,
+  getFtTestPrefix,
+} from "./FrancetTravailRoutes";
 
 const logger = createLogger(__filename);
 

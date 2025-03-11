@@ -1,21 +1,21 @@
-import { Page, expect } from "@playwright/test";
+import { type Page, expect } from "@playwright/test";
 import {
-  BusinessContactDto,
-  DateTimeIsoString,
-  FormEstablishmentAddress,
-  FormEstablishmentDto,
+  type BusinessContactDto,
+  type DateTimeIsoString,
+  type FormEstablishmentAddress,
+  type FormEstablishmentDto,
   domElementIds,
 } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";
 import {
-  PlaywrightTestCallback,
+  type PlaywrightTestCallback,
   expectLocatorToBeReadOnly,
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
 import {
-  TestEstablishments,
+  type TestEstablishments,
   closeModal,
   goToNextStep,
 } from "./establishmentForm.utils";

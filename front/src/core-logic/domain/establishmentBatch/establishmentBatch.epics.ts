@@ -1,9 +1,9 @@
 import { filter, map, switchMap } from "rxjs";
 import {
-  AbsoluteUrl,
-  CSVBoolean,
-  FormEstablishmentDto,
-  FormEstablishmentSource,
+  type AbsoluteUrl,
+  type CSVBoolean,
+  type FormEstablishmentDto,
+  type FormEstablishmentSource,
   csvBooleanToBoolean,
   defaultMaxContactsPerMonth,
   establishmentAppellationsFromCSVToDto,
@@ -15,14 +15,14 @@ import {
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 import { v4 as uuidV4 } from "uuid";
 import { z } from "zod";
 import {
-  FormEstablishmentDtoWithErrors,
+  type FormEstablishmentDtoWithErrors,
   establishmentBatchSlice,
 } from "./establishmentBatch.slice";
 

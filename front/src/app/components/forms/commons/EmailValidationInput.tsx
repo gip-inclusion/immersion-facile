@@ -1,7 +1,8 @@
-import { Input, InputProps } from "@codegouvfr/react-dsfr/Input";
-import React, { useState } from "react";
+import { Input, type InputProps } from "@codegouvfr/react-dsfr/Input";
+import type React from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { ValidateEmailFeedback, ValidateEmailStatus } from "shared";
+import type { ValidateEmailFeedback, ValidateEmailStatus } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 
 type EmailValidationInputProps = InputProps.RegularInput & {

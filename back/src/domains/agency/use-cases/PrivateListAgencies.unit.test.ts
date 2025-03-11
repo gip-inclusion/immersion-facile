@@ -2,7 +2,7 @@ import { AgencyDtoBuilder, expectToEqual } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
+import type { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
 import { PrivateListAgencies } from "./PrivateListAgencies";
 
 describe("PrivateListAgencies use case", () => {

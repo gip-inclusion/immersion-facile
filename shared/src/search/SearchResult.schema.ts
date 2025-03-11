@@ -6,7 +6,7 @@ import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellat
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
 import { zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
-import { SearchResultDto } from "./SearchResult.dto";
+import type { SearchResultDto } from "./SearchResult.dto";
 
 export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
   rome: romeCodeSchema,

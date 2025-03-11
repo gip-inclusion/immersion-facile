@@ -1,4 +1,4 @@
-import {
+import type {
   FtAgenciesReferential,
   FtAgencyFromReferential,
 } from "../../../establishment/ports/FtAgenciesReferential";

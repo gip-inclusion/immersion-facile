@@ -1,7 +1,7 @@
 import { subDays } from "date-fns";
 import {
   ConventionDtoBuilder,
-  ConventionJwtPayload,
+  type ConventionJwtPayload,
   createConventionMagicLinkPayload,
   errors,
   expectPromiseToFailWithError,
@@ -10,10 +10,10 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { MarkEstablishmentLeadAsRegistrationRejected } from "./MarkEstablishmentLeadAsRegistrationRejected";
 
 const convention = new ConventionDtoBuilder().build();

@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import { AssessmentDto, ConventionId } from "shared";
+import type { Observable } from "rxjs";
+import type { AssessmentDto, ConventionId } from "shared";
 
 export type AssessmentAndJwt = {
   assessment: AssessmentDto;

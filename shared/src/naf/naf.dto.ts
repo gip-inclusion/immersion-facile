@@ -1,4 +1,4 @@
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 export const nafSectorCodes = [
   "0",

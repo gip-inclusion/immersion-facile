@@ -1,25 +1,25 @@
 import {
   AgencyDtoBuilder,
-  AgencyRight,
-  InclusionConnectedUser,
+  type AgencyRight,
+  type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  UserParamsForAgency,
+  type UserParamsForAgency,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
-import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("UpdateUserOnAgency slice", () => {
   let store: ReduxStore;

@@ -1,5 +1,5 @@
-import { NafDto } from "../naf/naf.dto";
-import { Flavor } from "../typeFlavors";
+import type { NafDto } from "../naf/naf.dto";
+import type { Flavor } from "../typeFlavors";
 
 // Matches strings containing exactly 14 digits with any number of interspersed whitespaces.
 export const siretRegex = /^(?:\s*\d){14}\s*$/;

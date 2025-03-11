@@ -1,18 +1,21 @@
 import { addDays, addHours, subDays } from "date-fns";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
-  AppellationAndRomeDto,
+  type AppellationAndRomeDto,
   DiscussionBuilder,
-  DiscussionDto,
-  Exchange,
+  type DiscussionDto,
+  type Exchange,
   UserBuilder,
-  WithAcquisition,
+  type WithAcquisition,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -20,7 +23,7 @@ import {
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
 } from "../helpers/EstablishmentBuilders";
-import { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
+import type { HasDiscussionMatchingParams } from "../ports/DiscussionRepository";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

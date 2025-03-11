@@ -6,7 +6,7 @@ import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import {
-  FormEstablishmentDto,
+  type FormEstablishmentDto,
   domElementIds,
   immersionFacileContactEmail,
   toDateString,
@@ -21,7 +21,7 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
-import { Mode, OnStepChange, Step } from "../EstablishmentForm";
+import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 export const AvailabilitySection = ({
   mode,

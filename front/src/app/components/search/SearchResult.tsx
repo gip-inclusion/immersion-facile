@@ -4,14 +4,15 @@ import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { formatDistance } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
-import React, { memo } from "react";
+import type React from "react";
+import { memo } from "react";
 import {
-  DateTimeIsoString,
-  SearchResultDto,
+  type DateTimeIsoString,
+  type SearchResultDto,
   domElementIds,
   frenchEstablishmentKinds,
 } from "shared";
-import { Link } from "type-route";
+import type { Link } from "type-route";
 import "./SearchResult.scss";
 
 export type EnterpriseSearchResultProps = {

@@ -2,22 +2,25 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { sql } from "kysely";
 import {
-  Beneficiary,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
-  ConventionId,
-  Email,
-  EstablishmentRepresentative,
-  EstablishmentTutor,
-  InternshipKind,
+  type Beneficiary,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
+  type ConventionId,
+  type Email,
+  type EstablishmentRepresentative,
+  type EstablishmentTutor,
+  type InternshipKind,
   errors,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
   validatedConventionStatuses,
 } from "shared";
-import { KyselyDb, falsyToNull } from "../../../config/pg/kysely/kyselyUtils";
-import { ConventionRepository } from "../ports/ConventionRepository";
+import {
+  type KyselyDb,
+  falsyToNull,
+} from "../../../config/pg/kysely/kyselyUtils";
+import type { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {

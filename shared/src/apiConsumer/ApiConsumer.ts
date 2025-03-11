@@ -1,10 +1,10 @@
 import { keys } from "ramda";
-import { AbsoluteUrl } from "../AbsoluteUrl";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
-import { Flavor } from "../typeFlavors";
-import { Either, ReplaceTypeAtKey } from "../utils";
-import { DateString, DateTimeIsoString } from "../utils/date";
+import type { Flavor } from "../typeFlavors";
+import type { Either, ReplaceTypeAtKey } from "../utils";
+import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type ApiConsumerId = Flavor<string, "ApiConsumerId">;
 

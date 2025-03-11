@@ -1,7 +1,7 @@
 import { expectArraysToEqual } from "shared";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryPassEmploiGateway } from "../../adapters/pass-emploi/InMemoryPassEmploiGateway";
@@ -10,7 +10,7 @@ import {
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../../helpers/EstablishmentBuilders";
-import { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
+import type { PassEmploiNotificationParams } from "../../ports/PassEmploiGateway";
 import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "./NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm";
 
 describe("Notify pass-emploi", () => {

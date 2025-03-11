@@ -1,18 +1,18 @@
 import Bottleneck from "bottleneck";
-import { Email, numberOfEmployeesRangeSchema } from "shared";
-import { HttpClient } from "shared-routes";
-import { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
-import {
+import { type Email, numberOfEmployeesRangeSchema } from "shared";
+import type { HttpClient } from "shared-routes";
+import type { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
+import type {
   EstablishmentMarketingGateway,
   EstablishmentMarketingGatewayDto,
   EstablishmentMarketingSearchableBy,
 } from "../../ports/EstablishmentMarketingGateway";
-import {
+import type {
   CreateContactBody,
   GetContactInfoResponseBody,
   TypePublic,
 } from "./BrevoContact.dto";
-import { BrevoContactRoutes } from "./BrevoContact.routes";
+import type { BrevoContactRoutes } from "./BrevoContact.routes";
 
 type BrevoEstablishmentMarketingGatewayParams = {
   httpClient: HttpClient<BrevoContactRoutes>;

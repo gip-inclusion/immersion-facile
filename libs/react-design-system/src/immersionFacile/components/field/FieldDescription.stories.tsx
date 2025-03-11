@@ -1,7 +1,7 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   FieldDescription,
-  FieldDescriptionProperties,
+  type FieldDescriptionProperties,
 } from "./FieldDescription";
 
 const Component = FieldDescription;

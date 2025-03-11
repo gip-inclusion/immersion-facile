@@ -1,4 +1,4 @@
-import { GeoPositionDto, RomeCode } from "shared";
+import type { GeoPositionDto, RomeCode } from "shared";
 
 export type PassEmploiNotificationParams = {
   immersions: { siret: string; rome: RomeCode; location: GeoPositionDto }[];

@@ -1,17 +1,17 @@
 import { keys } from "ramda";
 import {
-  InclusionConnectedUser,
-  User,
-  UserParamsForAgency,
+  type InclusionConnectedUser,
+  type User,
+  type UserParamsForAgency,
   errors,
   userParamsForAgencySchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 

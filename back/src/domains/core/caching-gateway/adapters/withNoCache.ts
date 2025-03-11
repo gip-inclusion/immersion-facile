@@ -1,3 +1,3 @@
-import { WithCache } from "../port/WithCache";
+import type { WithCache } from "../port/WithCache";
 
 export const withNoCache: WithCache = ({ cb }) => cb;

@@ -1,14 +1,14 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
 } from "shared";
-import {
+import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import { z } from "zod";
+import type { z } from "zod";
 
 export type FormEstablishmentDtoWithErrors = {
   formEstablishment: FormEstablishmentDto | null;

@@ -1,5 +1,5 @@
-import { Page, expect } from "@playwright/test";
-import { SiretDto, domElementIds } from "shared";
+import { type Page, expect } from "@playwright/test";
+import { type SiretDto, domElementIds } from "shared";
 import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
 export type TestEstablishments = {

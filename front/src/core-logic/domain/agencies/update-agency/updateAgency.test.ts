@@ -1,14 +1,14 @@
-import { AgencyDto, AgencyDtoBuilder, expectToEqual } from "shared";
+import { type AgencyDto, AgencyDtoBuilder, expectToEqual } from "shared";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { updateAgencySelectors } from "src/core-logic/domain/agencies/update-agency/updateAgency.selectors";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
 
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("update agency", () => {
   let store: ReduxStore;

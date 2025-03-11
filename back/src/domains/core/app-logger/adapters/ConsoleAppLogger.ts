@@ -1,4 +1,4 @@
-import { AppLogger } from "../ports/AppLogger";
+import type { AppLogger } from "../ports/AppLogger";
 
 export class ConsoleAppLogger implements AppLogger {
   public debug(...messages: unknown[]): void {

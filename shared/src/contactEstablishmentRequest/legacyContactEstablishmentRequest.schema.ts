@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import {
-  ImmersionObjective,
+  type ImmersionObjective,
   conventionObjectiveOptions,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
@@ -20,7 +20,7 @@ import {
   preferInPersonContactSchema,
   preferPhoneContactSchema,
 } from "./contactEstablishmentRequest.schema";
-import {
+import type {
   LegacyContactEstablishmentByMailDto,
   LegacyContactEstablishmentByPhoneDto,
   LegacyContactEstablishmentInPersonDto,

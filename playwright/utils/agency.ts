@@ -1,6 +1,11 @@
 import { faker } from "@faker-js/faker";
-import { Page, expect } from "@playwright/test";
-import { AgencyId, addressRoutes, domElementIds, frontRoutes } from "shared";
+import { type Page, expect } from "@playwright/test";
+import {
+  type AgencyId,
+  addressRoutes,
+  domElementIds,
+  frontRoutes,
+} from "shared";
 import { goToAdminTab } from "./admin";
 import { expectLocatorToBeVisibleAndEnabled, fillAutocomplete } from "./utils";
 

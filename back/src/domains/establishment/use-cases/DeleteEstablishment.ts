@@ -1,16 +1,16 @@
 import {
-  InclusionConnectedUser,
-  SiretDto,
+  type InclusionConnectedUser,
+  type SiretDto,
   addressDtoToString,
   errors,
   siretSchema,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 type DeleteEstablishmentPayload = {

@@ -1,4 +1,4 @@
-import { InternshipKind } from "../convention/convention.dto";
+import type { InternshipKind } from "../convention/convention.dto";
 
 export const defaultConventionFinalLegals = (internshipKind: InternshipKind) =>
   internshipKind === "immersion"

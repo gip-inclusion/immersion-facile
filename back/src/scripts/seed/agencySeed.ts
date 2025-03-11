@@ -1,5 +1,5 @@
-import { AgencyId, AgencyKind } from "shared";
-import { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
+import type { AgencyId, AgencyKind } from "shared";
+import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import {
   insertAgencySeed,
   insertSpecificAgenciesWithUserRight,

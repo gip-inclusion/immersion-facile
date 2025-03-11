@@ -3,13 +3,13 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Table from "@codegouvfr/react-dsfr/Table";
-import React, { ElementRef, useState } from "react";
+import React, { type ElementRef, useState } from "react";
 import { Tag } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  AgencyId,
-  InclusionConnectedUser,
-  SiretDto,
+  type AgencyId,
+  type InclusionConnectedUser,
+  type SiretDto,
   agencyKindToLabelIncludingIF,
   domElementIds,
   looksLikeSiret,

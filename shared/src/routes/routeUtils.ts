@@ -1,5 +1,5 @@
-import { PathParameters, SharedRoute, Url } from "shared-routes";
-import { UnknownResponses } from "shared-routes/defineRoutes";
+import type { PathParameters, SharedRoute, Url } from "shared-routes";
+import type { UnknownResponses } from "shared-routes/defineRoutes";
 
 export const makeUrlWithParams = <
   U extends Url,

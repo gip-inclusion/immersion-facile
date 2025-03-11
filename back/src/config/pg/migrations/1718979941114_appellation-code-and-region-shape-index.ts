@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const appellationCodeTable = "searches_made__appellation_code";
 const appellationDataTable = "public_appellations_data";

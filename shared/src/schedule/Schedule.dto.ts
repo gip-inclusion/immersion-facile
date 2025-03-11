@@ -1,5 +1,5 @@
-import { NotEmptyArray } from "../utils";
-import { DateString, DateTimeIsoString } from "../utils/date";
+import type { NotEmptyArray } from "../utils";
+import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export const normalizedMonthInDays = 28;
 

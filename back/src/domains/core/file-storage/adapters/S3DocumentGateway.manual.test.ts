@@ -1,6 +1,6 @@
 import { expectToEqual } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { StoredFile } from "../entity/StoredFile";
+import type { StoredFile } from "../entity/StoredFile";
 import { S3DocumentGateway } from "./S3DocumentGateway";
 
 describe("S3DocumentGateway manual test", () => {

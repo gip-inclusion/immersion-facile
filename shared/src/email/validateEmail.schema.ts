@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { emailSchema } from "./email.schema";
 import {
-  ValidateEmailFeedback,
-  ValidateEmailInput,
+  type ValidateEmailFeedback,
+  type ValidateEmailInput,
   validateEmailStatuses,
 } from "./validateEmail.dto";
 

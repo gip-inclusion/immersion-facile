@@ -1,4 +1,4 @@
-import { SiretDto } from "shared";
+import type { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateEditFormEstablishmentUrl } from "../config/bootstrap/magicLinkUrl";

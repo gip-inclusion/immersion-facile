@@ -4,7 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { ErrorMessage } from "@hookform/error-message";
 import React, { useState } from "react";
 import {
-  TimePeriodDto,
+  type TimePeriodDto,
   domElementIds,
   removeAtIndex,
   replaceArrayElement,

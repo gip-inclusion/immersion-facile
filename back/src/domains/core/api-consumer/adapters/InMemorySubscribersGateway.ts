@@ -1,5 +1,5 @@
-import { SubscriptionParams } from "shared";
-import {
+import type { SubscriptionParams } from "shared";
+import type {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscriberResponse,
   SubscribersGateway,

@@ -1,4 +1,4 @@
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 export type RomeCode = Flavor<string, "CodeRome">;
 export type AppellationCode = Flavor<string, "AppellationCode">;

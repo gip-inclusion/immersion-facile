@@ -1,7 +1,11 @@
 import { z } from "zod";
-import { DateString, dateRegExp, dateTimeIsoStringSchema } from "../utils/date";
-import { localization, zStringMinLength1, zTimeString } from "../zodUtils";
 import {
+  type DateString,
+  dateRegExp,
+  dateTimeIsoStringSchema,
+} from "../utils/date";
+import { localization, zStringMinLength1, zTimeString } from "../zodUtils";
+import type {
   DailyScheduleDto,
   ScheduleDto,
   SelectedDaysOfTheWeekDto,

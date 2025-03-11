@@ -1,31 +1,31 @@
 import {
-  AgencyId,
-  ContactEstablishmentEventPayload,
-  ConventionId,
-  DateString,
-  EstablishmentJwtPayload,
-  Flavor,
-  IdentityProvider,
-  RejectIcUserRoleForAgencyParams,
-  Role,
-  SiretDto,
-  UserId,
-  WithAgencyId,
-  WithAgencyIdAndUserId,
-  WithAssessmentDto,
-  WithConventionDto,
-  WithConventionIdLegacy,
-  WithDiscussionId,
-  WithSiretDto,
+  type AgencyId,
+  type ContactEstablishmentEventPayload,
+  type ConventionId,
+  type DateString,
+  type EstablishmentJwtPayload,
+  type Flavor,
+  type IdentityProvider,
+  type RejectIcUserRoleForAgencyParams,
+  type Role,
+  type SiretDto,
+  type UserId,
+  type WithAgencyId,
+  type WithAgencyIdAndUserId,
+  type WithAssessmentDto,
+  type WithConventionDto,
+  type WithConventionIdLegacy,
+  type WithDiscussionId,
+  type WithSiretDto,
   roleSchema,
   siretSchema,
   userIdSchema,
 } from "shared";
 import { z } from "zod";
-import { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
-import { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
-import { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
-import {
+import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
+import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
+import type {
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,
 } from "./eventPayload.dto";

@@ -1,6 +1,6 @@
-import { IdentityProvider, OAuthState, UserId } from "shared";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
+import type { IdentityProvider, OAuthState, UserId } from "shared";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   // for test purpose

@@ -10,10 +10,10 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  AgencyModifierRole,
-  ConventionId,
-  ConventionReadDto,
-  SignatoryRole,
+  type AgencyModifierRole,
+  type ConventionId,
+  type ConventionReadDto,
+  type SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
@@ -31,10 +31,10 @@ import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import logoIf from "/assets/img/logo-if.svg";
 import logoRf from "/assets/img/logo-rf.svg";
 

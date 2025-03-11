@@ -1,7 +1,7 @@
-import { WithAcquisition } from "../acquisition.dto";
-import { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
-import { WithNafCodes } from "../naf/naf.dto";
-import {
+import type { WithAcquisition } from "../acquisition.dto";
+import type { EstablishmentSearchableByValue } from "../formEstablishment/FormEstablishment.dto";
+import type { WithNafCodes } from "../naf/naf.dto";
+import type {
   AppellationCode,
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";

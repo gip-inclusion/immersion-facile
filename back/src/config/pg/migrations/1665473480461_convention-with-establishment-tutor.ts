@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.renameColumn("conventions", "mentor_id", "establishment_tutor_id");

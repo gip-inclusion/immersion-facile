@@ -4,7 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
-  WithDiscussionId,
+  type WithDiscussionId,
   domElementIds,
   withDiscussionSchemaId,
 } from "shared";

@@ -1,7 +1,12 @@
 import { values } from "ramda";
-import { GroupSlug, GroupWithResults, SearchResultDto, SiretDto } from "shared";
-import { GroupEntity } from "../entities/GroupEntity";
-import { GroupRepository } from "../ports/GroupRepository";
+import type {
+  GroupSlug,
+  GroupWithResults,
+  SearchResultDto,
+  SiretDto,
+} from "shared";
+import type { GroupEntity } from "../entities/GroupEntity";
+import type { GroupRepository } from "../ports/GroupRepository";
 
 export const stubSearchResult: SearchResultDto = {
   rome: "D1101",

@@ -1,12 +1,12 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   ApiConsumer,
   ApiConsumerJwt,
   ApiConsumerName,
   ConnectedUserJwt,
   WithConventionId,
 } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 type ApiConsumerState = {
   isLoading: boolean;

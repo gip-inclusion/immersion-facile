@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const conventionStatusTranslationsTable = "convention_status_translations";
 export async function up(pgm: MigrationBuilder): Promise<void> {

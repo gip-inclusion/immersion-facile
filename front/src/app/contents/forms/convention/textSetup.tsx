@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { ConventionId, InternshipKind } from "shared";
+import type { ConventionId, InternshipKind } from "shared";
 
 export const useConventionTexts = (internshipKind: InternshipKind) =>
   immersionTexts(internshipKind);

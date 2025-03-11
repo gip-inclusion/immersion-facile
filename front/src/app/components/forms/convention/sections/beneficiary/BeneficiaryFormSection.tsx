@@ -6,10 +6,10 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  BeneficiaryRepresentative,
-  ConventionReadDto,
-  DateString,
-  InternshipKind,
+  type BeneficiaryRepresentative,
+  type ConventionReadDto,
+  type DateString,
+  type InternshipKind,
   addressDtoToString,
   domElementIds,
   emailSchema,
@@ -20,7 +20,7 @@ import {
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
-import {
+import type {
   EmailValidationErrorsState,
   SetEmailValidationErrorsState,
 } from "src/app/components/forms/convention/ConventionForm";

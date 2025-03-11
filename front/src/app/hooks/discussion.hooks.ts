@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { ConnectedUserJwt, DiscussionId } from "shared";
+import type { ConnectedUserJwt, DiscussionId } from "shared";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { useAppSelector } from "./reduxHooks";

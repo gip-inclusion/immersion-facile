@@ -1,5 +1,5 @@
 import { type FrCxArg, fr } from "@codegouvfr/react-dsfr";
-import React from "react";
+import type React from "react";
 import { makeStyles } from "tss-react/dsfr";
 import Styles from "./MainWrapper.styles";
 

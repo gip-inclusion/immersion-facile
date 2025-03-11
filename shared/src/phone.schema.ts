@@ -1,7 +1,7 @@
-import { CountryCode, isValidPhoneNumber } from "libphonenumber-js";
+import { type CountryCode, isValidPhoneNumber } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { z } from "zod";
-import { Phone } from "./sms/smsTemplateByName";
+import type { Phone } from "./sms/smsTemplateByName";
 import { zStringMinLength1 } from "./zodUtils";
 
 const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];

@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const oldGroupTableName = "establishment_groups";
 const oldGroupSiretTableName = "establishment_groups__sirets";

@@ -1,5 +1,5 @@
 import {
-  SiretEstablishmentDto,
+  type SiretEstablishmentDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,

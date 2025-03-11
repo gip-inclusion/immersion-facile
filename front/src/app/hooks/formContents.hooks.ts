@@ -1,7 +1,12 @@
-import { type ErrorNotificationsProps } from "react-design-system";
+import type { ErrorNotificationsProps } from "react-design-system";
 import { type FieldValues, type FormState, get } from "react-hook-form";
-import { AddressDto, DotNestedKeys, keys, toDotNotation } from "shared";
 import {
+  type AddressDto,
+  type DotNestedKeys,
+  keys,
+  toDotNotation,
+} from "shared";
+import type {
   FormFieldAttributes,
   FormFieldAttributesForContent,
 } from "../contents/forms/types";
@@ -165,7 +170,7 @@ const getErrorLabel = (
   if (field.includes(".") && doesSplittedKeyContainsIndex(field.split("."))) {
     const splittedField = field.split(".");
     const [domain, entryIndex] = splittedField;
-    return `${labels[domain]} (${parseInt(entryIndex) + 1})`;
+    return `${labels[domain]} (${Number.parseInt(entryIndex) + 1})`;
   }
   return labels[field];
 };

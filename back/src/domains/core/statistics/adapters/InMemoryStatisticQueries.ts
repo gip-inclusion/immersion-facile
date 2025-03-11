@@ -1,6 +1,6 @@
-import { DataWithPagination } from "shared";
-import { StatisticQueries } from "../ports/StatisticQueries";
-import { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
+import type { DataWithPagination } from "shared";
+import type { StatisticQueries } from "../ports/StatisticQueries";
+import type { EstablishmentStat } from "../use-cases/GetEstablishmentStats";
 
 export const fakeEstablishmentStatsResponse: DataWithPagination<EstablishmentStat> =
   {

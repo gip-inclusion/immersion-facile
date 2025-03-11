@@ -1,8 +1,12 @@
-import { Page, expect } from "@playwright/test";
-import { FormEstablishmentDto, domElementIds, toDisplayedDate } from "shared";
-import { PlaywrightTestCallback } from "../../utils/utils";
+import { type Page, expect } from "@playwright/test";
 import {
-  TestEstablishments,
+  type FormEstablishmentDto,
+  domElementIds,
+  toDisplayedDate,
+} from "shared";
+import type { PlaywrightTestCallback } from "../../utils/utils";
+import {
+  type TestEstablishments,
   checkAvailibilityButtons,
 } from "./establishmentForm.utils";
 import {

@@ -1,33 +1,33 @@
 import { differenceInYears, startOfDay } from "date-fns";
 import { keys } from "ramda";
-import { WithAcquisition } from "../acquisition.dto";
-import { AddressDto, Postcode } from "../address/address.dto";
-import { AgencyId, AgencyKind } from "../agency/agency.dto";
-import { Email } from "../email/email.dto";
-import { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
-import {
+import type { WithAcquisition } from "../acquisition.dto";
+import type { AddressDto, Postcode } from "../address/address.dto";
+import type { AgencyId, AgencyKind } from "../agency/agency.dto";
+import type { Email } from "../email/email.dto";
+import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type {
   AgencyRole,
   UserWithAdminRights,
   UserWithAgencyRights,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import {
-  ModifierRole,
-  Role,
-  SignatoryRole,
+  type ModifierRole,
+  type Role,
+  type SignatoryRole,
   allSignatoryRoles,
 } from "../role/role.dto";
-import {
+import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { ScheduleDto } from "../schedule/Schedule.dto";
-import { NumberEmployeesRange, SiretDto } from "../siret/siret";
-import {
+import type { ScheduleDto } from "../schedule/Schedule.dto";
+import type { NumberEmployeesRange, SiretDto } from "../siret/siret";
+import type {
   AppSupportedJwt,
   expiredMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
-import { Flavor } from "../typeFlavors";
-import { DateString } from "../utils/date";
+import type { Flavor } from "../typeFlavors";
+import type { DateString } from "../utils/date";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
 

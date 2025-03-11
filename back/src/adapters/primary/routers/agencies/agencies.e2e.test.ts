@@ -1,10 +1,10 @@
 import { addDays } from "date-fns";
 import {
-  AddressDto,
+  type AddressDto,
   AgencyDtoBuilder,
-  AgencyRoutes,
-  ConnectedUserJwt,
-  CreateAgencyDto,
+  type AgencyRoutes,
+  type ConnectedUserJwt,
+  type CreateAgencyDto,
   InclusionConnectedUserBuilder,
   agencyRoutes,
   currentJwtVersions,
@@ -13,14 +13,17 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Agency routes", () => {

@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { TextArea, TextAreaProperties } from "./TextArea";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { TextArea, type TextAreaProperties } from "./TextArea";
 
 const Component = TextArea;
 type Story = StoryObj<typeof Component>;

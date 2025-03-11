@@ -1,7 +1,7 @@
 // TODO: find the standard for gouv.fr phone verification
 
 import { values } from "ramda";
-import { Flavor } from "./typeFlavors";
+import type { Flavor } from "./typeFlavors";
 
 export type SleepFn = typeof sleep;
 

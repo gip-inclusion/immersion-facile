@@ -1,24 +1,24 @@
 import path from "path";
-import { AxiosResponse } from "axios";
-import { Request } from "express";
-import { QueryResult } from "kysely";
-import pino, { Logger, LoggerOptions } from "pino";
+import type { AxiosResponse } from "axios";
+import type { Request } from "express";
+import type { QueryResult } from "kysely";
+import pino, { type Logger, type LoggerOptions } from "pino";
 import { complement, isNil, pickBy } from "ramda";
-import {
+import type {
   AgencyId,
   ConventionId,
   FtExternalId,
   SearchQueryParamsDto,
   SiretDto,
 } from "shared";
-import { HttpResponse } from "shared-routes";
+import type { HttpResponse } from "shared-routes";
 import type { AuthorisationStatus } from "../config/bootstrap/authMiddleware";
-import { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
-import { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
-import { DomainEvent, DomainTopic } from "../domains/core/events/events";
-import { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEntity";
-import { SearchCompaniesParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
-import { NodeProcessReport } from "./nodeProcessReport";
+import type { SubscriberResponse } from "../domains/core/api-consumer/ports/SubscribersGateway";
+import type { TypeOfEvent } from "../domains/core/events/adapters/EventCrawlerImplementations";
+import type { DomainEvent, DomainTopic } from "../domains/core/events/events";
+import type { SearchMadeEntity } from "../domains/establishment/entities/SearchMadeEntity";
+import type { SearchCompaniesParams } from "../domains/establishment/ports/LaBonneBoiteGateway";
+import type { NodeProcessReport } from "./nodeProcessReport";
 
 type LogStatus = "debug" | "info" | "ok" | "warn" | "error" | "alert";
 
@@ -64,22 +64,22 @@ export type PartnerApiCall = {
   route: RouteMethodAndUrl;
   durationInMs: number;
   response:
-    | { kind: "cache-hit" }
-    | {
-        kind: "success";
-        status: number;
-      }
-    | {
-        kind: "failure";
-        status: number;
-        body: Record<string, unknown>;
-        headers?: unknown;
-        input?: {
-          body?: unknown;
-          queryParams?: unknown;
-          urlParams?: unknown;
-        };
-      };
+  | { kind: "cache-hit" }
+  | {
+    kind: "success";
+    status: number;
+  }
+  | {
+    kind: "failure";
+    status: number;
+    body: Record<string, unknown>;
+    headers?: unknown;
+    input?: {
+      body?: unknown;
+      queryParams?: unknown;
+      urlParams?: unknown;
+    };
+  };
 };
 
 type ApiConsumerCall = {
@@ -179,87 +179,87 @@ export const createLogger = (filename: string): OpacifiedLogger => {
 
   const makeLogFunction =
     (method: LogMethod): LoggerFunction =>
-    ({
-      partnerApiCall,
-      cacheKey,
-      adapters,
-      agencyId,
-      conventionId,
-      crawlerInfo,
-      durationInSeconds,
-      error,
-      events,
-      message,
-      nodeProcessReport,
-      notificationId,
-      ftConnect,
-      reportContent,
-      request,
-      requestId,
-      sharedRouteResponse,
-      subscriberResponse,
-      axiosResponse,
-      schemaParsingInput,
-      searchMade,
-      searchLBB,
-      logStatus,
-      authorisationStatus,
-      franceTravailGatewayStatus,
-      subscriptionId,
-      topic,
-      useCaseName,
-      searchParams,
-      siret,
-      romeLabel,
-      apiConsumerCall,
-      crispTicket,
-      ...rest
-    }) => {
-      const _noValuesForgotten: Record<string, never> = rest;
-      if (method === "level") return {};
-
-      const opacifiedLogContent = {
+      ({
+        partnerApiCall,
+        cacheKey,
         adapters,
-        apiConsumerCall,
         agencyId,
         conventionId,
         crawlerInfo,
         durationInSeconds,
         error,
-        events: sanitizeEvents(events),
+        events,
+        message,
         nodeProcessReport,
         notificationId,
         ftConnect,
         reportContent,
         request,
         requestId,
-        sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
+        sharedRouteResponse,
         subscriberResponse,
         axiosResponse,
         schemaParsingInput,
         searchMade,
         searchLBB,
-        status: logStatus ?? logMethodToLogStatus[method],
+        logStatus,
         authorisationStatus,
         franceTravailGatewayStatus,
         subscriptionId,
         topic,
         useCaseName,
         searchParams,
-        partnerApiCall,
         siret,
         romeLabel,
-        cacheKey,
+        apiConsumerCall,
         crispTicket,
+        ...rest
+      }) => {
+        const _noValuesForgotten: Record<string, never> = rest;
+        if (method === "level") return {};
+
+        const opacifiedLogContent = {
+          adapters,
+          apiConsumerCall,
+          agencyId,
+          conventionId,
+          crawlerInfo,
+          durationInSeconds,
+          error,
+          events: sanitizeEvents(events),
+          nodeProcessReport,
+          notificationId,
+          ftConnect,
+          reportContent,
+          request,
+          requestId,
+          sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
+          subscriberResponse,
+          axiosResponse,
+          schemaParsingInput,
+          searchMade,
+          searchLBB,
+          status: logStatus ?? logMethodToLogStatus[method],
+          authorisationStatus,
+          franceTravailGatewayStatus,
+          subscriptionId,
+          topic,
+          useCaseName,
+          searchParams,
+          partnerApiCall,
+          siret,
+          romeLabel,
+          cacheKey,
+          crispTicket,
+        };
+
+        const opacifiedWithoutNullOrUndefined = pickBy(
+          complement(isNil),
+          opacifiedLogContent,
+        );
+
+        logger[method](opacifiedWithoutNullOrUndefined, message);
       };
-
-      const opacifiedWithoutNullOrUndefined = pickBy(
-        complement(isNil),
-        opacifiedLogContent,
-      );
-
-      logger[method](opacifiedWithoutNullOrUndefined, message);
-    };
 
   return {
     debug: makeLogFunction("debug"),

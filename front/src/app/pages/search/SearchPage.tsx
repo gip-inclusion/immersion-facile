@@ -2,9 +2,9 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import { Select, SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import { Select, type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { includes, keys } from "ramda";
-import React, { ElementRef, useEffect, useRef, useState } from "react";
+import React, { type ElementRef, useEffect, useRef, useState } from "react";
 import {
   Loader,
   MainWrapper,
@@ -16,9 +16,9 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  LatLonDistance,
-  SearchSortedBy,
-  ValueOf,
+  type LatLonDistance,
+  type SearchSortedBy,
+  type ValueOf,
   domElementIds,
   searchSortedByOptions,
 } from "shared";
@@ -33,17 +33,17 @@ import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { encodedSearchUriParams, useSearch } from "src/app/hooks/search.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  SearchPageParams,
+  type SearchPageParams,
   initialState,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import "./SearchPage.scss";
 import Styles from "./SearchPage.styles";
 
@@ -299,7 +299,9 @@ export const SearchPage = ({
                       id: domElementIds.search.distanceSelect,
                       value: `${distanceKm === undefined ? "" : distanceKm}`,
                       onChange: (event) => {
-                        const value = parseInt(event.currentTarget.value);
+                        const value = Number.parseInt(
+                          event.currentTarget.value,
+                        );
                         setValue("distanceKm", value);
                         if (!value) {
                           setValue("sortedBy", "date");
@@ -530,7 +532,9 @@ export const SearchPage = ({
                           id: domElementIds.search.distanceSelect,
                           value: `${tempValue.distanceKm || ""}`,
                           onChange: (event) => {
-                            const value = parseInt(event.currentTarget.value);
+                            const value = Number.parseInt(
+                              event.currentTarget.value,
+                            );
                             setTempValue({
                               ...tempValue,
                               distanceKm: value,

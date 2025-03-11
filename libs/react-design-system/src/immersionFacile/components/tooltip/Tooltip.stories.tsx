@@ -1,6 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { Tooltip, TooltipProps } from "./Tooltip";
+import { Tooltip, type TooltipProps } from "./Tooltip";
 
 const Component = Tooltip;
 type Story = StoryObj<typeof Component>;

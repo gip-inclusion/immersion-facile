@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { WithAgencyIdAndUserId, agencyRoutes, errors } from "shared";
+import { type WithAgencyIdAndUserId, agencyRoutes, errors } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";

@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import {
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type {
   AbsoluteUrl,
   AgencyId,
   ConnectedUserJwt,
@@ -14,8 +14,8 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
-import { SubmitFeedBack } from "../SubmitFeedback";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { SubmitFeedBack } from "../SubmitFeedback";
 
 type ConventionValidationFeedbackKind =
   | "rejected"

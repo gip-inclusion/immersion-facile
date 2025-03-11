@@ -1,4 +1,9 @@
-import { GeoPositionDto, RomeDto, SearchResultDto, SiretDto } from "shared";
+import type {
+  GeoPositionDto,
+  RomeDto,
+  SearchResultDto,
+  SiretDto,
+} from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../../utils/distanceBetweenCoordinatesInMeters";
 
 export type LaBonneBoiteApiResultV2Props = {

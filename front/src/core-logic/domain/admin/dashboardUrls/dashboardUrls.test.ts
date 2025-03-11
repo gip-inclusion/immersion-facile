@@ -1,14 +1,14 @@
-import { DashboardUrlAndName, expectObjectsToMatch } from "shared";
+import { type DashboardUrlAndName, expectObjectsToMatch } from "shared";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import {
-  DashboardUrls,
+  type DashboardUrls,
   dashboardUrlsSlice,
 } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("dashboardUrls slice", () => {
   let store: ReduxStore;

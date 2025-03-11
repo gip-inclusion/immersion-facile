@@ -1,5 +1,5 @@
-import { DateString } from "shared";
-import { TimeGateway } from "../ports/TimeGateway";
+import type { DateString } from "shared";
+import type { TimeGateway } from "../ports/TimeGateway";
 
 export class CustomTimeGateway implements TimeGateway {
   #nextDates: Date[] = [];

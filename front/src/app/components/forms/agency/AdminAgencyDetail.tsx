@@ -3,12 +3,12 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AgencyOverview } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type AdminAgencyDetailProps = {
   route: Route<typeof routes.adminAgencyDetail>;

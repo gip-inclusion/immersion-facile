@@ -1,22 +1,25 @@
 import { addDays } from "date-fns";
 import {
-  AdminRoutes,
-  ConnectedUserJwt,
-  FormEstablishmentBatchDto,
-  FormEstablishmentDto,
+  type AdminRoutes,
+  type ConnectedUserJwt,
+  type FormEstablishmentBatchDto,
+  type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectJwtPayload,
+  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   adminRoutes,
   currentJwtVersions,
   expectHttpResponseToEqual,
   updatedAddress1,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("POST /add-form-establishment-batch", () => {
   const adminBuilder = new InclusionConnectedUserBuilder()

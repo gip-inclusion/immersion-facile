@@ -1,5 +1,5 @@
-import { ShortLinkId } from "shared";
-import { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
+import type { ShortLinkId } from "shared";
+import type { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
 
 export class DeterministShortLinkIdGeneratorGateway
   implements ShortLinkIdGeneratorGateway

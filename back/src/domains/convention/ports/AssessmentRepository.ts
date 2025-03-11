@@ -1,5 +1,5 @@
-import { ConventionId } from "shared";
-import { AssessmentEntity } from "../entities/AssessmentEntity";
+import type { ConventionId } from "shared";
+import type { AssessmentEntity } from "../entities/AssessmentEntity";
 
 export interface AssessmentRepository {
   save: (assessment: AssessmentEntity) => Promise<void>;

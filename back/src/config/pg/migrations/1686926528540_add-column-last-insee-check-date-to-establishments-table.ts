@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const establishementsTable = "establishments";
 const lastInseeCheckDateColumn = "last_insee_check_date";

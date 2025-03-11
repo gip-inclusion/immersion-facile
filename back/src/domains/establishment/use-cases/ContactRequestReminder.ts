@@ -1,17 +1,17 @@
 import { addDays } from "date-fns";
 import {
-  DiscussionDto,
+  type DiscussionDto,
   createOpaqueEmail,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import {
+import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type ContactRequestReminderMode = "3days" | "7days";
 export type ContactRequestReminder = ReturnType<

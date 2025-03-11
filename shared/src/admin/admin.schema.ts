@@ -8,7 +8,7 @@ import {
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringMinLength1 } from "../zodUtils";
-import {
+import type {
   GetUsersFilters,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,

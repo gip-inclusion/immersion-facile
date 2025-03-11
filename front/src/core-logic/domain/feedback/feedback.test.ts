@@ -3,13 +3,13 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  ActionKindAndLevel,
-  FeedbackTopic,
+  type ActionKindAndLevel,
+  type FeedbackTopic,
   feedbackMapping,
   getLevelAndActionKindFromActionKindAndLevel,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 describe("Feedbacks", () => {
   let store: ReduxStore;

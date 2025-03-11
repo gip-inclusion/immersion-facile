@@ -1,12 +1,12 @@
 import {
-  AbsoluteUrl,
-  WithSiretDto,
+  type AbsoluteUrl,
+  type WithSiretDto,
   siretSchema,
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { LaBonneBoiteApiResultV2Props } from "./LaBonneBoiteCompanyDto";
+import type { LaBonneBoiteApiResultV2Props } from "./LaBonneBoiteCompanyDto";
 
 type HttpGetLaBonneBoiteCompanyParamsV2 = {
   bbox?: string;

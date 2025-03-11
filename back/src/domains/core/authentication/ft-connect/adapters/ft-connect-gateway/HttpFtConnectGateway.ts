@@ -1,22 +1,22 @@
 import axios from "axios";
 import Bottleneck from "bottleneck";
 import { HTTP_STATUS, queryParamsAsString } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
 import {
-  LoggerParamsWithMessage,
-  OpacifiedLogger,
+  type LoggerParamsWithMessage,
+  type OpacifiedLogger,
   createLogger,
 } from "../../../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
-import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
+import type { AccessTokenDto } from "../../dto/AccessToken.dto";
+import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
 import { externalAccessTokenSchema } from "../../port/AccessToken.schema";
-import { FtConnectGateway } from "../../port/FtConnectGateway";
-import {
+import type { FtConnectGateway } from "../../port/FtConnectGateway";
+import type {
   ExternalFtConnectAdvisor,
   ExternalFtConnectUser,
   FtConnectHeaders,
@@ -24,7 +24,7 @@ import {
 } from "./ftConnectApi.dto";
 import { ftConnectErrorStrategy } from "./ftConnectApi.error";
 import {
-  FtConnectExternalRoutes,
+  type FtConnectExternalRoutes,
   toAccessToken,
   toFtConnectAdvisorDto,
   toFtConnectUserDto,

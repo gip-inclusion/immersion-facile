@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
-  AllowedStartInclusionConnectLoginSourcesKind,
-  IdToken,
-  InclusionConnectImmersionRoutes,
-  WithSourcePage,
+  type AllowedStartInclusionConnectLoginSourcesKind,
+  type IdToken,
+  type InclusionConnectImmersionRoutes,
+  type WithSourcePage,
   allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
@@ -13,17 +13,20 @@ import {
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { SuperTest, Test } from "supertest";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { fakeProviderConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("inclusion connection flow", () => {
   const state = "my-state";

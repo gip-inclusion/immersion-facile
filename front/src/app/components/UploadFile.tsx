@@ -1,6 +1,6 @@
 import * as React from "react";
 import { File } from "react-design-system";
-import { AbsoluteUrl } from "shared";
+import type { AbsoluteUrl } from "shared";
 import { domElementIds } from "shared";
 import { outOfReduxDependencies } from "src/config/dependencies";
 

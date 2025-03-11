@@ -1,11 +1,15 @@
-import { FormEstablishmentDto, Location, noContactPerMonth } from "shared";
-import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import {
+  type FormEstablishmentDto,
+  type Location,
+  noContactPerMonth,
+} from "shared";
+import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type {
   EstablishmentAggregate,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
-import { EstablishmentEntity } from "../entities/EstablishmentEntity";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 
 export const makeEstablishmentAggregate = ({
   timeGateway,

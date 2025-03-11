@@ -2,7 +2,7 @@ import { filter } from "rxjs";
 import { delay, map, switchMap } from "rxjs/operators";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

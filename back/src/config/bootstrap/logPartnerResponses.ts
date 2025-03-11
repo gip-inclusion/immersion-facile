@@ -1,4 +1,4 @@
-import { HttpClientOptions } from "shared-routes/validations";
+import type { HttpClientOptions } from "shared-routes/validations";
 import { createLogger } from "../../utils/logger";
 
 const logger = createLogger(__filename);

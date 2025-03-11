@@ -5,10 +5,11 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
-import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
+import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
@@ -17,15 +18,15 @@ import {
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AssessmentDto,
-  AssessmentStatus,
-  ConventionDto,
-  ConventionId,
-  ConventionReadDto,
-  DotNestedKeys,
-  InternshipKind,
-  WithEndedWithAJob,
-  WithEstablishmentComments,
+  type AssessmentDto,
+  type AssessmentStatus,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionReadDto,
+  type DotNestedKeys,
+  type InternshipKind,
+  type WithEndedWithAJob,
+  type WithEstablishmentComments,
   assessmentDtoSchema,
   assessmentStatuses,
   computeTotalHours,

@@ -1,6 +1,6 @@
-import { AbsoluteUrl } from "shared";
-import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
-import { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
+import type { AbsoluteUrl } from "shared";
+import type { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
+import type { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 
 export class InMemoryNavigationGateway implements NavigationGateway {
   // test purpose

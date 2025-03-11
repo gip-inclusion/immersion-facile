@@ -4,8 +4,8 @@ import { prop, propEq } from "ramda";
 import React from "react";
 import { useDispatch } from "react-redux";
 import {
-  AgencyId,
-  AgencyOption,
+  type AgencyId,
+  type AgencyOption,
   activeAgencyStatuses,
   agencyStatusToLabel,
   domElementIds,

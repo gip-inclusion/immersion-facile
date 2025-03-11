@@ -2,7 +2,7 @@ import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
 import {
   ConventionFormLayout,
-  ConventionFormLayoutProperties,
+  type ConventionFormLayoutProperties,
 } from "./ConventionFormLayout";
 
 const Component = ConventionFormLayout;

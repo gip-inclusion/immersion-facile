@@ -1,4 +1,4 @@
-import { RedisClientType } from "redis";
+import type { RedisClientType } from "redis";
 import { expectPromiseToFailWithError, expectToEqual } from "shared";
 import { getTestRedisClient, makeRedisWithCache } from "./makeRedisWithCache";
 

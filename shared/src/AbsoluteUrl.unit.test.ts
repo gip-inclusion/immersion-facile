@@ -1,5 +1,5 @@
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   absoluteUrlSchema,
   callbackUrlSchema,
   toAbsoluteUrl,

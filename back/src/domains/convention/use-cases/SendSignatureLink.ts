@@ -1,12 +1,12 @@
 import { subHours } from "date-fns";
 import {
-  ConventionId,
-  ConventionReadDto,
-  ConventionRelatedJwtPayload,
-  ConventionStatus,
-  CreateConventionMagicLinkPayloadProperties,
-  SignatoryRole,
-  UserId,
+  type ConventionId,
+  type ConventionReadDto,
+  type ConventionRelatedJwtPayload,
+  type ConventionStatus,
+  type CreateConventionMagicLinkPayloadProperties,
+  type SignatoryRole,
+  type UserId,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
@@ -14,15 +14,15 @@ import {
   signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
-import { AppConfig } from "../../../config/bootstrap/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
+import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
-import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   throwErrorIfPhoneNumberNotValid,
   throwErrorIfSignatoryAlreadySigned,

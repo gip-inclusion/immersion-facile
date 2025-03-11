@@ -2,14 +2,15 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import React, { ElementRef, useEffect, useRef, useState } from "react";
+import type React from "react";
+import { type ElementRef, useEffect, useRef, useState } from "react";
 import { Loader, MainWrapper } from "react-design-system";
 import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
 import {
-  AppellationDto,
-  ContactMethod,
-  SearchResultDto,
+  type AppellationDto,
+  type ContactMethod,
+  type SearchResultDto,
   getMapsLink,
   makeAppellationInformationUrl,
   makeNafClassInformationUrl,
@@ -31,7 +32,7 @@ import { routes, useRoute } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { P, match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 const getFeedBackMessage = (contactMethod?: ContactMethod) => {
   switch (contactMethod) {
@@ -139,8 +140,9 @@ export const SearchResultPage = ({
     }
   }, [dispatch, isExternal, params]);
 
-  const pluralFromAppellations = (appellations: AppellationDto[] | undefined) =>
-    appellations && appellations.length > 1 ? "s" : "";
+  const pluralFromAppellations = (
+    appellations: AppellationDto[] | undefined,
+  ) => (appellations && appellations.length > 1 ? "s" : "");
   const onFormSubmitSuccess = () => {
     document.body.scrollIntoView({
       behavior: "smooth",

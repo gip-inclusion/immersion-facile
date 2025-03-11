@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto } from "shared";
+import type { ConventionReadDto } from "shared";
 import { HourIndicator } from "./HourIndicator";
 
 // ex: Formats 16.5 to 16h30

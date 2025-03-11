@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import React from "react";
 import { CopyButton } from "react-design-system";
-import { AgencyId } from "shared";
+import type { AgencyId } from "shared";
 
 export const CopyAgencyId = ({ agencyId }: { agencyId: AgencyId }) => {
   return (

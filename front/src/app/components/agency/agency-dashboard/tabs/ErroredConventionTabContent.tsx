@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import {
+import type {
   AgencyRight,
   ConnectedUserJwt,
   WithAgencyDashboards,

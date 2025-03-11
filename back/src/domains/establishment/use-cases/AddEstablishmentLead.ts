@@ -1,9 +1,9 @@
-import { WithConventionDto, errors, withConventionSchema } from "shared";
+import { type WithConventionDto, errors, withConventionSchema } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 
 export class AddEstablishmentLead extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

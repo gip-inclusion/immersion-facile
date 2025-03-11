@@ -1,10 +1,10 @@
 import {
-  ContactEstablishmentEventPayload,
+  type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   errors,
 } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 
 export type NotifyCandidateThatContactRequestHasBeenSent = ReturnType<
   typeof makeNotifyCandidateThatContactRequestHasBeenSent

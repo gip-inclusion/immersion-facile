@@ -1,27 +1,27 @@
 import subDays from "date-fns/subDays";
 import { difference } from "ramda";
 import {
-  AbsoluteUrl,
-  AgencyRole,
-  ConventionId,
-  ConventionReadDto,
-  Email,
+  type AbsoluteUrl,
+  type AgencyRole,
+  type ConventionId,
+  type ConventionReadDto,
+  type Email,
   errors,
   executeInSequence,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
-import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
-import { ConventionRepository } from "../../convention/ports/ConventionRepository";
+import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
+import type { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import {
+import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 type AssessmentReminderOutput = {
   numberOfReminders: number;

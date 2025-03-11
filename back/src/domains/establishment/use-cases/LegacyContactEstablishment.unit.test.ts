@@ -1,11 +1,11 @@
 import { addHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
-  AppellationAndRomeDto,
-  ContactEstablishmentRequestDto,
+  type AppellationAndRomeDto,
+  type ContactEstablishmentRequestDto,
   DiscussionBuilder,
-  LegacyContactEstablishmentRequestDto,
-  Location,
+  type LegacyContactEstablishmentRequestDto,
+  type Location,
   UserBuilder,
   errors,
   expectArraysToEqual,
@@ -17,12 +17,12 @@ import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
+import type {
   EstablishmentAdminRight,
   EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";

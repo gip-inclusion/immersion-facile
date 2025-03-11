@@ -1,4 +1,4 @@
-import { type FullConfig } from "@playwright/test";
+import type { FullConfig } from "@playwright/test";
 import dotEnv from "dotenv";
 
 export default async function (_config: FullConfig) {

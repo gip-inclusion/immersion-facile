@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const regionTableName = "public_department_region";
 const searchesMadeTableName = "searches_made";

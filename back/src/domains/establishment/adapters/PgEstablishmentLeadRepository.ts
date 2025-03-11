@@ -1,12 +1,12 @@
-import { SiretDto } from "shared";
+import type { SiretDto } from "shared";
 import { P, match } from "ts-pattern";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import {
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type {
   EstablishmentLead,
   EstablishmentLeadEvent,
 } from "../entities/EstablishmentLeadEntity";
-import { EstablishmentLeadRepository } from "../ports/EstablishmentLeadRepository";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import type { EstablishmentLeadRepository } from "../ports/EstablishmentLeadRepository";
+import type { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
 
 export class PgEstablishmentLeadRepository
   implements EstablishmentLeadRepository

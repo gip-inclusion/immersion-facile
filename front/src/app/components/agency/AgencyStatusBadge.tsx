@@ -1,6 +1,6 @@
-import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
+import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import { AgencyStatus, agencyStatusToLabel } from "shared";
+import { type AgencyStatus, agencyStatusToLabel } from "shared";
 
 const agencyStatusToSeverity: Record<AgencyStatus, AlertProps.Severity> = {
   "from-api-PE": "success",

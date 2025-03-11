@@ -5,13 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import {
-  ManageConventionAdminForm,
+  type ManageConventionAdminForm,
   domElementIds,
   manageConventionAdminFormSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type SelectConventionFromIdFormProps = {
   routeNameToRedirectTo: Route<

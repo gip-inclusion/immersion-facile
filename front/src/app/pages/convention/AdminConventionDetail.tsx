@@ -1,8 +1,8 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 import { ConventionManageContent } from "../../components/admin/conventions/ConventionManageContent";
 
 type ConventionManageAdminPageProps = {

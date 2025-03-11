@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { values } from "ramda";
-import { User } from "shared";
-import { RootState } from "src/core-logic/storeConfig/store";
+import type { User } from "shared";
+import type { RootState } from "src/core-logic/storeConfig/store";
 
 const icUsersAdminState = ({ admin }: RootState) =>
   admin.inclusionConnectedUsersAdmin;

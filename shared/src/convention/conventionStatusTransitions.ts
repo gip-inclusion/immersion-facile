@@ -1,4 +1,4 @@
-import { Role } from "../role/role.dto";
+import type { Role } from "../role/role.dto";
 import type { ConventionReadDto, ConventionStatus } from "./convention.dto";
 
 export type StatusTransitionConfig = {

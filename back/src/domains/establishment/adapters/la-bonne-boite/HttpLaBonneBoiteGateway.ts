@@ -1,15 +1,15 @@
 import Bottleneck from "bottleneck";
-import { RomeDto, SearchResultDto, SiretDto } from "shared";
-import { HttpClient } from "shared-routes";
-import { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
-import { WithCache } from "../../../core/caching-gateway/port/WithCache";
-import {
+import type { RomeDto, SearchResultDto, SiretDto } from "shared";
+import type { HttpClient } from "shared-routes";
+import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
+import type { WithCache } from "../../../core/caching-gateway/port/WithCache";
+import type {
   LaBonneBoiteGateway,
   SearchCompaniesParams,
 } from "../../ports/LaBonneBoiteGateway";
-import { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
+import type { LaBonneBoiteRoutes } from "./LaBonneBoite.routes";
 import {
-  LaBonneBoiteApiResultV2Props,
+  type LaBonneBoiteApiResultV2Props,
   LaBonneBoiteCompanyDto,
 } from "./LaBonneBoiteCompanyDto";
 

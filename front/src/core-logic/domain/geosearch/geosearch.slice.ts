@@ -1,5 +1,5 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { LookupLocationInput, LookupSearchResult } from "shared";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import type { LookupLocationInput, LookupSearchResult } from "shared";
 
 type GeoSearchState = {
   suggestions: LookupSearchResult[];

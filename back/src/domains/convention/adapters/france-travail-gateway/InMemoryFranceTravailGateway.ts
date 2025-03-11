@@ -1,5 +1,5 @@
-import { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
-import {
+import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
+import type {
   FranceTravailBroadcastResponse,
   FranceTravailConvention,
   FranceTravailGateway,

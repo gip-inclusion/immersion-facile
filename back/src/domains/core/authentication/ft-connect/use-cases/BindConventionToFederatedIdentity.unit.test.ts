@@ -4,9 +4,9 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { InMemoryOutboxRepository } from "../../../events/adapters/InMemoryOutboxRepository";
+import type { InMemoryOutboxRepository } from "../../../events/adapters/InMemoryOutboxRepository";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
@@ -15,9 +15,9 @@ import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemory
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   CONVENTION_ID_DEFAULT_UUID,
-  InMemoryConventionFranceTravailAdvisorRepository,
+  type InMemoryConventionFranceTravailAdvisorRepository,
 } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
-import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
+import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
 import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { BindConventionToFederatedIdentity } from "./BindConventionToFederatedIdentity";
 

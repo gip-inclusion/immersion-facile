@@ -1,11 +1,11 @@
-import { UserInList, expectToEqual } from "shared";
+import { type UserInList, expectToEqual } from "shared";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const someUser: UserInList = {
   id: "some-user-id",

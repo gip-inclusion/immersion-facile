@@ -1,6 +1,6 @@
-import { Email } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { DelegationContactRepository } from "../ports/DelegationContactRepository";
+import type { Email } from "shared";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { DelegationContactRepository } from "../ports/DelegationContactRepository";
 
 export class PgDelegationContactRepository
   implements DelegationContactRepository

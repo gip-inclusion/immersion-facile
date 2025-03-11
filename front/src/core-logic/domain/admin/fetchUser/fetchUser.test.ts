@@ -1,7 +1,7 @@
 import {
   AgencyDtoBuilder,
-  AgencyRight,
-  InclusionConnectedUser,
+  type AgencyRight,
+  type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -14,10 +14,10 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const icUser = new InclusionConnectedUserBuilder().build();
 

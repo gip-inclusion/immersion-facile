@@ -1,6 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { ConventionDocumentProperties, Document } from "./Document";
+import { type ConventionDocumentProperties, Document } from "./Document";
 
 const Component = Document;
 type Story = StoryObj<typeof Component>;

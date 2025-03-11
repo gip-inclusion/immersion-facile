@@ -1,11 +1,11 @@
-import { ConventionReadDto } from "shared";
-import { InMemoryConventionQueries } from "../../convention/adapters/InMemoryConventionQueries";
+import type { ConventionReadDto } from "shared";
+import type { InMemoryConventionQueries } from "../../convention/adapters/InMemoryConventionQueries";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
-import {
+import type {
   EstablishmentLeadQueries,
   GetLastConventionsByUniqLastEventKindParams,
 } from "../ports/EstablishmentLeadQueries";
-import { InMemoryEstablishmentLeadRepository } from "./InMemoryEstablishmentLeadRepository";
+import type { InMemoryEstablishmentLeadRepository } from "./InMemoryEstablishmentLeadRepository";
 
 export class InMemoryEstablishmentLeadQueries
   implements EstablishmentLeadQueries

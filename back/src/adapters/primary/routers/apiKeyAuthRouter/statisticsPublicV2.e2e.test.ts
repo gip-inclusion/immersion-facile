@@ -1,12 +1,12 @@
 import { displayRouteName, expectHttpResponseToEqual } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import { fakeEstablishmentStatsResponse } from "../../../../domains/core/statistics/adapters/InMemoryStatisticQueries";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import {
-  PublicApiV2StatisticsRoutes,
+  type PublicApiV2StatisticsRoutes,
   publicApiV2StatisticsRoutes,
 } from "./publicApiV2.routes";
 

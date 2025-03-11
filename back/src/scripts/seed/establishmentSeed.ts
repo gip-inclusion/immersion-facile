@@ -1,5 +1,5 @@
 import { DiscussionBuilder } from "shared";
-import { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,

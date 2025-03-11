@@ -1,8 +1,8 @@
 import { prop, uniqBy } from "ramda";
 import {
-  FormEstablishmentDto,
-  InclusionConnectedUser,
-  WithFormEstablishmentDto,
+  type FormEstablishmentDto,
+  type InclusionConnectedUser,
+  type WithFormEstablishmentDto,
   errors,
   withFormEstablishmentSchema,
 } from "shared";
@@ -10,17 +10,17 @@ import { rawAddressToLocation } from "../../../utils/address";
 import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { AddressGateway } from "../../core/address/ports/AddressGateway";
+import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { TriggeredBy } from "../../core/events/events";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { TriggeredBy } from "../../core/events/events";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
-import { SiretGateway } from "../../core/sirene/ports/SiretGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregate";
 
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<

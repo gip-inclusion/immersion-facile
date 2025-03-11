@@ -1,8 +1,8 @@
-import { Location } from "shared";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { OfferEntity } from "../entities/OfferEntity";
+import type { Location } from "shared";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { OfferEntity } from "../entities/OfferEntity";
 import { OfferEntityBuilder } from "../helpers/EstablishmentBuilders";
-import { RepositorySearchResultDto } from "../ports/EstablishmentAggregateRepository";
+import type { RepositorySearchResultDto } from "../ports/EstablishmentAggregateRepository";
 
 export const makeExpectedSearchResult = ({
   establishment: establishmentAggregate,

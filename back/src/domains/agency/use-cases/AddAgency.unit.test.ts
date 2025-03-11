@@ -1,10 +1,10 @@
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
   BadRequestError,
-  CreateAgencyDto,
+  type CreateAgencyDto,
   InclusionConnectedUserBuilder,
-  User,
+  type User,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -14,7 +14,7 @@ import { ConflictError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import {
@@ -24,7 +24,7 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

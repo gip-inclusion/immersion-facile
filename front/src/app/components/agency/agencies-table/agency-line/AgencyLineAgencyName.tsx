@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { ReactNode } from "react";
-import { AgencyRight, addressDtoToString } from "shared";
+import type { ReactNode } from "react";
+import { type AgencyRight, addressDtoToString } from "shared";
 import { routes } from "src/app/routes/routes";
 
 export const AgencyLineAgencyName = ({

@@ -1,4 +1,4 @@
-import { StoredFileId } from "shared";
+import type { StoredFileId } from "shared";
 
 export interface StoredFile {
   id: StoredFileId;

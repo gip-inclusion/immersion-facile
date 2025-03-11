@@ -1,34 +1,34 @@
 import supertest from "supertest";
-import { AppConfig } from "../config/bootstrap/appConfig";
-import { Gateways } from "../config/bootstrap/createGateways";
+import type { AppConfig } from "../config/bootstrap/appConfig";
+import type { Gateways } from "../config/bootstrap/createGateways";
 import { createApp } from "../config/bootstrap/server";
-import { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
-import { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
-import { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
-import { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
-import { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
-import { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
-import { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
-import { InMemoryDocumentGateway } from "../domains/core/file-storage/adapters/InMemoryDocumentGateway";
-import {
+import type { InMemoryFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/InMemoryFranceTravailGateway";
+import type { InMemoryAddressGateway } from "../domains/core/address/adapters/InMemoryAddressGateway";
+import type { InMemorySubscribersGateway } from "../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import type { InMemoryFtConnectGateway } from "../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
+import type { InMemoryOAuthGateway } from "../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
+import type { StubDashboardGateway } from "../domains/core/dashboard/adapters/StubDashboardGateway";
+import type { InMemoryEmailValidationGateway } from "../domains/core/email-validation/adapters/InMemoryEmailValidationGateway";
+import type { BasicEventCrawler } from "../domains/core/events/adapters/EventCrawlerImplementations";
+import type { InMemoryDocumentGateway } from "../domains/core/file-storage/adapters/InMemoryDocumentGateway";
+import type {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
   GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
-import { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
-import { InMemoryAppellationsGateway } from "../domains/core/rome/adapters/InMemoryAppellationsGateway";
-import { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
-import { InMemorySiretGateway } from "../domains/core/sirene/adapters/InMemorySiretGateway";
-import { InMemoryCrispApi } from "../domains/core/support/adapters/InMemoryCrispApi";
-import { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
-import { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
-import { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
-import { InMemoryEstablishmentMarketingGateway } from "../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
+import type { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
+import type { InMemoryAppellationsGateway } from "../domains/core/rome/adapters/InMemoryAppellationsGateway";
+import type { DeterministShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import type { InMemorySiretGateway } from "../domains/core/sirene/adapters/InMemorySiretGateway";
+import type { InMemoryCrispApi } from "../domains/core/support/adapters/InMemoryCrispApi";
+import type { CustomTimeGateway } from "../domains/core/time-gateway/adapters/CustomTimeGateway";
+import type { InMemoryUnitOfWork } from "../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { UuidGenerator } from "../domains/core/uuid-generator/ports/UuidGenerator";
+import type { InMemoryLaBonneBoiteGateway } from "../domains/establishment/adapters/la-bonne-boite/InMemoryLaBonneBoiteGateway";
+import type { InMemoryPassEmploiGateway } from "../domains/establishment/adapters/pass-emploi/InMemoryPassEmploiGateway";
+import type { InMemoryEstablishmentMarketingGateway } from "../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
 import { AppConfigBuilder } from "./AppConfigBuilder";
 
 export type InMemoryGateways = {

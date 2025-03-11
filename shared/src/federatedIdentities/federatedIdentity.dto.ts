@@ -1,6 +1,6 @@
-import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
-import { ConnectedUserJwt } from "../tokens/jwt.dto";
-import { Flavor } from "../typeFlavors";
+import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
+import type { ConnectedUserJwt } from "../tokens/jwt.dto";
+import type { Flavor } from "../typeFlavors";
 
 export type FederatedIdentityProvider =
   (typeof federatedIdentityProviders)[number];

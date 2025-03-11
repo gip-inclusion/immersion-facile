@@ -1,5 +1,5 @@
-import { UnknownSharedRoute } from "shared-routes";
-import { PartnerKey } from "../../../../config/bootstrap/partnerNames";
+import type { UnknownSharedRoute } from "shared-routes";
+import type { PartnerKey } from "../../../../config/bootstrap/partnerNames";
 
 export type DefaultCacheConfig = {
   defaultCacheDurationInHours: number;

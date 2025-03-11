@@ -1,14 +1,14 @@
 import {
-  Builder,
-  NafDto,
-  NumberEmployeesRange,
-  SiretDto,
-  SiretEstablishmentDto,
+  type Builder,
+  type NafDto,
+  type NumberEmployeesRange,
+  type SiretDto,
+  type SiretEstablishmentDto,
   errors,
   tooManySirenRequestsSiret,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";
-import { SiretGateway } from "../ports/SiretGateway";
+import type { SiretGateway } from "../ports/SiretGateway";
 
 const logger = createLogger(__filename);
 

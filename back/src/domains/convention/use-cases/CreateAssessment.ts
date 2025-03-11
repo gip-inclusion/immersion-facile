@@ -1,7 +1,7 @@
 import {
-  AssessmentDto,
-  ConventionDomainPayload,
-  ConventionDto,
+  type AssessmentDto,
+  type ConventionDomainPayload,
+  type ConventionDto,
   ForbiddenError,
   assessmentDtoSchema,
   errors,
@@ -9,10 +9,10 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { throwForbiddenIfNotAllowedForAssessments } from "../../../utils/assessment";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
-  AssessmentEntity,
+  type AssessmentEntity,
   createAssessmentEntity,
 } from "../entities/AssessmentEntity";
 import { retrieveConventionWithAgency } from "../entities/Convention";

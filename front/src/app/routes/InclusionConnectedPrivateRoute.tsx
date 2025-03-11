@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import React, { useEffect } from "react";
+import type React from "react";
+import { useEffect } from "react";
 import {
   Loader,
   LoginForm,
@@ -9,7 +10,7 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  AllowedStartOAuthLoginPage,
+  type AllowedStartOAuthLoginPage,
   absoluteUrlSchema,
   domElementIds,
   inclusionConnectImmersionRoutes,
@@ -17,14 +18,14 @@ import {
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
+import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 export type FrontAdminRoute =
   | FrontAdminRouteTab

@@ -1,9 +1,9 @@
 import {
-  AgencyKind,
-  AgencyKindFilter,
-  AgencyOption,
-  AgencyWithUsersRights,
-  ListAgencyOptionsRequestDto,
+  type AgencyKind,
+  type AgencyKindFilter,
+  type AgencyOption,
+  type AgencyWithUsersRights,
+  type ListAgencyOptionsRequestDto,
   activeAgencyStatuses,
   agencyKindList,
   listAgencyOptionsRequestSchema,
@@ -11,8 +11,8 @@ import {
   removeSpaces,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { GetAgenciesFilters } from "../ports/AgencyRepository";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { GetAgenciesFilters } from "../ports/AgencyRepository";
 
 export class ListAgencyOptionsByFilter extends TransactionalUseCase<
   ListAgencyOptionsRequestDto,

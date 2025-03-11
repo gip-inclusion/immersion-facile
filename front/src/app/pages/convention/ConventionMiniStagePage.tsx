@@ -2,12 +2,12 @@ import React, { useMemo, useRef } from "react";
 import { MainWrapper, PageHeader } from "react-design-system";
 import { keys } from "shared";
 import {
-  ConventionFormMode,
+  type ConventionFormMode,
   ConventionFormWrapper,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
 export type ConventionMiniStagePageRoute = Route<
   typeof routes.conventionMiniStage

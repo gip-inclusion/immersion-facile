@@ -1,4 +1,4 @@
-import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
 

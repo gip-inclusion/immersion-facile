@@ -3,7 +3,7 @@ import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import {
-  AccessTokenResponse,
+  type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";

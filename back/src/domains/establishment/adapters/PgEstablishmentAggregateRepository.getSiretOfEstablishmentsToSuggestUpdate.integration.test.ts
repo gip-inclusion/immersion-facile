@@ -1,13 +1,16 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { UserBuilder, expectToEqual } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
+import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 

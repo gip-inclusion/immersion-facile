@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 export const up = async (pgm: MigrationBuilder): Promise<void> => {
   pgm.createType("establishment_status", ["DEACTIVATED_FOR_LACK_OF_RESPONSES"]);

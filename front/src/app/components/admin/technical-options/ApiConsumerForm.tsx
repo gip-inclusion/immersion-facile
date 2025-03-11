@@ -10,9 +10,9 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  AgencyKind,
-  ApiConsumer,
-  ConventionScope,
+  type AgencyKind,
+  type ApiConsumer,
+  type ConventionScope,
   apiConsumerKinds,
   apiConsumerSchema,
   conventionScopeKeys,

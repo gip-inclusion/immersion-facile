@@ -1,7 +1,7 @@
-import React from "react";
+import type React from "react";
 import { PageHeader } from "react-design-system";
 import {
-  FrontAdminRoute,
+  type FrontAdminRoute,
   InclusionConnectedPrivateRoute,
 } from "src/app/routes/InclusionConnectedPrivateRoute";
 

@@ -11,8 +11,8 @@ import { useCopyButton } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  ApiConsumer,
-  ApiConsumerJwt,
+  type ApiConsumer,
+  type ApiConsumerJwt,
   domElementIds,
   toDateString,
   toDisplayedDate,

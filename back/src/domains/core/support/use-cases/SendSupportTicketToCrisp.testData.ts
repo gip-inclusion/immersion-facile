@@ -1,4 +1,4 @@
-import { TallyForm } from "shared";
+import type { TallyForm } from "shared";
 
 export const johnDoeEmail = "john.doe@gmail.com";
 export const crispMessageContent = "J'ai eu un problème, que voici...";

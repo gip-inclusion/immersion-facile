@@ -1,5 +1,5 @@
 import { sql } from "kysely";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 
 export const updateAllEstablishmentScoresQuery = async (
   db: KyselyDb,

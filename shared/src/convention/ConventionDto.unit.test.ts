@@ -1,12 +1,12 @@
 import { addDays, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
-import { ZodError, z } from "zod";
+import { ZodError, type z } from "zod";
 import {
   CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE,
   DATE_CONSIDERED_OLD,
-  DailyScheduleDto,
-  DateIntervalDto,
-  Weekday,
+  type DailyScheduleDto,
+  type DateIntervalDto,
+  type Weekday,
   toDateString,
 } from "..";
 import {
@@ -20,14 +20,14 @@ import {
 } from "../test.helpers";
 import { ConventionDtoBuilder, DATE_START } from "./ConventionDtoBuilder";
 import {
-  Beneficiary,
-  BeneficiaryCurrentEmployer,
-  BeneficiaryRepresentative,
-  ConventionDto,
-  ConventionInternshipKindSpecific,
-  ConventionReadDto,
-  EstablishmentRepresentative,
-  InternshipKind,
+  type Beneficiary,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
+  type ConventionInternshipKindSpecific,
+  type ConventionReadDto,
+  type EstablishmentRepresentative,
+  type InternshipKind,
   conventionStatuses,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";

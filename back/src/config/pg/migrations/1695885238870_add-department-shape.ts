@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 import departments from "../static-data/departements-avec-outre-mer.json";
 const tableName = "public_department_region";
 

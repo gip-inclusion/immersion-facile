@@ -1,6 +1,6 @@
 import { partition } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
-import { EmailType, TemplatedEmail } from "./email/email";
+import type { EmailType, TemplatedEmail } from "./email/email";
 import { BadRequestError } from "./errors/httpErrors";
 
 export const expectPromiseToFail = async (promise: Promise<unknown>) => {

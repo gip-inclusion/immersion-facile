@@ -1,7 +1,7 @@
-import { Pool } from "pg";
-import { NafSectionSuggestion, expectToEqual } from "shared";
+import type { Pool } from "pg";
+import { type NafSectionSuggestion, expectToEqual } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";

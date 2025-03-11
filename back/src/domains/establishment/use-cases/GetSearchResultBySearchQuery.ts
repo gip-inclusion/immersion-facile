@@ -1,12 +1,12 @@
 import {
-  ApiConsumer,
-  SearchResultDto,
-  SearchResultQuery,
+  type ApiConsumer,
+  type SearchResultDto,
+  type SearchResultQuery,
   errors,
   searchResultQuerySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetSearchResultBySearchQuery extends TransactionalUseCase<
   SearchResultQuery,

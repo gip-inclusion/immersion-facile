@@ -1,24 +1,24 @@
 import { values } from "ramda";
-import { Observable, Subject, from, of, throwError } from "rxjs";
+import { type Observable, Subject, from, of, throwError } from "rxjs";
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyId,
-  AgencyOption,
-  AgencyPublicDisplayDto,
-  ConnectedUserJwt,
-  CreateAgencyDto,
-  InclusionConnectedUser,
-  ListAgencyOptionsRequestDto,
-  UpdateAgencyStatusParams,
-  UserParamsForAgency,
-  WithAgencyId,
-  WithAgencyIdAndUserId,
+  type AgencyId,
+  type AgencyOption,
+  type AgencyPublicDisplayDto,
+  type ConnectedUserJwt,
+  type CreateAgencyDto,
+  type InclusionConnectedUser,
+  type ListAgencyOptionsRequestDto,
+  type UpdateAgencyStatusParams,
+  type UserParamsForAgency,
+  type WithAgencyId,
+  type WithAgencyIdAndUserId,
   errors,
   toAgencyDtoForAgencyUsersAndAdmins,
   toAgencyPublicDisplayDto,
 } from "shared";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("test-agency-1-front")

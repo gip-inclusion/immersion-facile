@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserParamsForAgency } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { UserParamsForAgency } from "shared";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 type UpdateUserOnAgencyState = {
   isLoading: boolean;

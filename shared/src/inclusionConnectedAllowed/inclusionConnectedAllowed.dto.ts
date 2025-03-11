@@ -1,18 +1,18 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import {
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type {
   AgencyDtoForAgencyUsersAndAdmins,
   AgencyId,
 } from "../agency/agency.dto";
-import { DiscussionId } from "../discussion/discussion.dto";
-import { Email } from "../email/email.dto";
-import { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
-import {
+import type { DiscussionId } from "../discussion/discussion.dto";
+import type { Email } from "../email/email.dto";
+import type { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
+import type {
   ConventionEstablishmentRole,
   EstablishmentRole,
 } from "../role/role.dto";
-import { SiretDto } from "../siret/siret";
-import { Flavor } from "../typeFlavors";
-import { DateTimeIsoString } from "../utils/date";
+import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
+import type { DateTimeIsoString } from "../utils/date";
 
 export type AgencyRole = (typeof allAgencyRoles)[number];
 export const allAgencyRoles = [

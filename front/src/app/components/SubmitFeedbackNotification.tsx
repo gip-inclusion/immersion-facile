@@ -1,8 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import {
-  SubmitFeedBack,
+  type SubmitFeedBack,
   isFeedbackError,
 } from "src/core-logic/domain/SubmitFeedback";
 

@@ -1,22 +1,22 @@
 import { toPairs } from "ramda";
 import {
-  AgencyId,
-  AgencyRole,
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-  CreateAgencyDto,
-  UserId,
+  type AgencyId,
+  type AgencyRole,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
+  type CreateAgencyDto,
+  type UserId,
   createAgencySchema,
   errors,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { SiretGateway } from "../../core/sirene/ports/SiretGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import { throwConflictErrorOnSimilarAgencyFound } from "../entities/Agency";
 
 type WithUserIdAndIsNotified = {

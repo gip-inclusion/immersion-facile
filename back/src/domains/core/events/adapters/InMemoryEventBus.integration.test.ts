@@ -1,8 +1,8 @@
 import { CompiledQuery } from "kysely";
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { expectObjectsToMatch, expectToEqual } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -10,11 +10,11 @@ import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
 import type { DomainEvent, EventPublication } from "../events";
-import { EventBus } from "../ports/EventBus";
+import type { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";
 import {
   PgOutboxRepository,
-  StoredEventRow,
+  type StoredEventRow,
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
 

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
-import {
+import type {
   AddressAndPosition,
   AddressDto,
   DepartmentCode,

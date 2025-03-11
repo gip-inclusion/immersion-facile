@@ -1,13 +1,13 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   ConventionDtoBuilder,
-  ConventionReadDto,
-  SubscriptionParams,
+  type ConventionReadDto,
+  type SubscriptionParams,
   expectToEqual,
 } from "shared";
-import { ConventionUpdatedSubscriptionCallbackBody } from "../ports/SubscribersGateway";
+import type { ConventionUpdatedSubscriptionCallbackBody } from "../ports/SubscribersGateway";
 import { HttpSubscribersGateway } from "./HttpSubscribersGateway";
 
 describe("HttpSubscribersGateway", () => {

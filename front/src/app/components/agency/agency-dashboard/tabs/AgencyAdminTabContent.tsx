@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Table from "@codegouvfr/react-dsfr/Table";
 import {
-  AgencyDtoForAgencyUsersAndAdmins,
+  type AgencyDtoForAgencyUsersAndAdmins,
   addressDtoToString,
   agencyKindToLabelIncludingIF,
 } from "shared";

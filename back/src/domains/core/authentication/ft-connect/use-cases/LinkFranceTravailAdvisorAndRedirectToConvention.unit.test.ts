@@ -1,17 +1,17 @@
 import { authFailed, expectToEqual, notJobSeeker } from "shared";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import { InMemoryFtConnectGateway } from "../adapters/ft-connect-gateway/InMemoryFtConnectGateway";
-import { AccessTokenDto } from "../dto/AccessToken.dto";
-import {
+import type { AccessTokenDto } from "../dto/AccessToken.dto";
+import type {
   FtConnectAdvisorDto,
   FtConnectImmersionAdvisorDto,
 } from "../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
 import { conventionFranceTravailUserAdvisorFromDto } from "../entities/ConventionFranceTravailAdvisorEntity";
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "./LinkFranceTravailAdvisorAndRedirectToConvention";
 

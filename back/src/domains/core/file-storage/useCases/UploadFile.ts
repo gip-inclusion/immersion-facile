@@ -1,15 +1,15 @@
 import {
-  AbsoluteUrl,
-  InclusionConnectedUser,
+  type AbsoluteUrl,
+  type InclusionConnectedUser,
   errors,
   validateFile,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../UseCase";
-import { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
+import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { StoredFile } from "../entity/StoredFile";
-import { DocumentGateway } from "../port/DocumentGateway";
+import type { DocumentGateway } from "../port/DocumentGateway";
 
 export type FileInput = Omit<StoredFile, "id">;
 

@@ -1,12 +1,12 @@
 import { keys, values } from "ramda";
 import {
-  Email,
-  GetUsersFilters,
-  UserId,
-  UserWithAdminRights,
+  type Email,
+  type GetUsersFilters,
+  type UserId,
+  type UserWithAdminRights,
   errors,
 } from "shared";
-import { UserOnRepository, UserRepository } from "../port/UserRepository";
+import type { UserOnRepository, UserRepository } from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
   #usersById: Record<string, UserWithAdminRights> = {};

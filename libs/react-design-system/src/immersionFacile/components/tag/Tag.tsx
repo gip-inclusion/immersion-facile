@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import {
   Tag as DsfrTag,
-  TagProps as DsfrTagProps,
+  type TagProps as DsfrTagProps,
 } from "@codegouvfr/react-dsfr/Tag";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";

@@ -1,4 +1,4 @@
-import { WithEstablishmentData } from "shared";
+import type { WithEstablishmentData } from "shared";
 import { EstablishmentsRightsTable } from "./EstablishmentsRightsTable";
 
 export const EstablishmentsTablesSection = ({

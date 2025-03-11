@@ -1,5 +1,5 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { PageHeader, PageHeaderProps } from "./PageHeader";
+import { PageHeader, type PageHeaderProps } from "./PageHeader";
 
 const Component = PageHeader;
 type Story = StoryObj<typeof Component>;

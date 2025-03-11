@@ -1,5 +1,5 @@
-import { Flavor } from "..";
-import { PayloadKey } from "./jwtPayload.dto";
+import type { Flavor } from "..";
+import type { PayloadKey } from "./jwtPayload.dto";
 
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
 export type ConventionJwt = Flavor<string, "ConventionJwt">;

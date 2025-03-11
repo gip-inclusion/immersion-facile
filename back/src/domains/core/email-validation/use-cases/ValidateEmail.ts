@@ -1,10 +1,10 @@
 import {
   type ValidateEmailFeedback,
-  ValidateEmailInput,
+  type ValidateEmailInput,
   validateEmailInputSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";
-import { EmailValidationGetaway } from "../ports/EmailValidationGateway";
+import type { EmailValidationGetaway } from "../ports/EmailValidationGateway";
 
 export class ValidateEmail extends UseCase<
   ValidateEmailInput,

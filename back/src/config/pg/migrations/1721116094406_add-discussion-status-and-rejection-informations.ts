@@ -1,5 +1,5 @@
-import { MigrationBuilder } from "node-pg-migrate";
-import { DiscussionStatus, RejectionKind } from "shared";
+import type { MigrationBuilder } from "node-pg-migrate";
+import type { DiscussionStatus, RejectionKind } from "shared";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   pgm.createType("discussion_status", [

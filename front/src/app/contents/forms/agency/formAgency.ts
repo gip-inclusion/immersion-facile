@@ -1,11 +1,11 @@
 import {
-  AddressDto,
-  CreateAgencyDto,
-  GeoPositionDto,
+  type AddressDto,
+  type CreateAgencyDto,
+  type GeoPositionDto,
   domElementIds,
 } from "shared";
-import { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
-import { FormFieldAttributesForContent } from "../types";
+import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
+import type { FormFieldAttributesForContent } from "../types";
 
 export type FormAgencyFieldsLabels = FormFieldsObjectForContent<
   Record<

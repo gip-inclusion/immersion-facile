@@ -1,4 +1,4 @@
-import { MatchRangeDto } from "shared";
+import type { MatchRangeDto } from "shared";
 
 export type SliceOfString = {
   startIndexInclusive: number;

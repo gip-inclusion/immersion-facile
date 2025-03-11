@@ -1,13 +1,13 @@
 import { createLogger } from "../../../../../utils/logger";
-import {
+import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
 } from "../dto/FtConnect.dto";
-import {
+import type {
   FtConnectAdvisorDto,
   FtConnectImmersionAdvisorDto,
 } from "../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
 
 export const conventionFranceTravailUserAdvisorFromDto = (
   dto: FtUserAndAdvisor,

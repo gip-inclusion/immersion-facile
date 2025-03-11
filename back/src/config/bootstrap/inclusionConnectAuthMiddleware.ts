@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { errors, inclusionConnectTokenExpiredMessage } from "shared";
-import { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
+import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
-import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
-import { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
+import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getIcUserByUserId } from "../../domains/inclusion-connected-users/helpers/inclusionConnectedUser.helper";
 
 export const makeInclusionConnectAuthMiddleware = (

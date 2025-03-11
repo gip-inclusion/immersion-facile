@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { allowedStartOAuthLoginPages } from "../routes/routes";
-import { AuthenticateWithOAuthCodeParams } from "./inclusionConnect.dto";
+import type { AuthenticateWithOAuthCodeParams } from "./inclusionConnect.dto";
 
 export const withSourcePageSchema = z.object({
   page: z.enum(allowedStartOAuthLoginPages),

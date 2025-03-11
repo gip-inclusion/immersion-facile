@@ -1,15 +1,15 @@
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   AgencyDtoBuilder,
-  AgencyWithUsersRights,
-  ConventionDto,
+  type AgencyWithUsersRights,
+  type ConventionDto,
   ConventionDtoBuilder,
-  EstablishmentRepresentative,
-  GenericActor,
+  type EstablishmentRepresentative,
+  type GenericActor,
   InclusionConnectedUserBuilder,
-  ReminderKind,
-  Role,
-  TemplatedEmail,
+  type ReminderKind,
+  type Role,
+  type TemplatedEmail,
   conventionStatuses,
   errors,
   expectPromiseToFailWithError,
@@ -17,22 +17,22 @@ import {
   frontRoutes,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
-  ExpectSavedNotificationsBatchAndEvent,
+  type ExpectSavedNotificationsBatchAndEvent,
   makeExpectSavedNotificationsBatchAndEvent,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";

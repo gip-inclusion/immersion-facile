@@ -1,4 +1,4 @@
-import { ApiConsumer, ApiConsumerId } from "shared";
+import type { ApiConsumer, ApiConsumerId } from "shared";
 
 export type GetApiConsumerById = (
   id: ApiConsumerId,

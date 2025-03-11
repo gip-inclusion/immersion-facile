@@ -1,11 +1,11 @@
 import {
-  GetSiretRequestDto,
-  SiretEstablishmentDto,
+  type GetSiretRequestDto,
+  type SiretEstablishmentDto,
   getSiretRequestSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";
-import { SiretGateway } from "../ports/SiretGateway";
+import type { SiretGateway } from "../ports/SiretGateway";
 
 export class GetSiret extends UseCase<
   GetSiretRequestDto,

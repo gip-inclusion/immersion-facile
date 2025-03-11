@@ -1,9 +1,13 @@
-import { ApiConsumer, ConventionReadDto, conventionStatuses } from "shared";
+import {
+  type ApiConsumer,
+  type ConventionReadDto,
+  conventionStatuses,
+} from "shared";
 import { ForbiddenError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { GetConventionsFilters } from "../ports/ConventionQueries";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { GetConventionsFilters } from "../ports/ConventionQueries";
 
 const MAX_CONVENTIONS_RETURNED = 100;
 

@@ -1,11 +1,11 @@
-import {
+import type {
   AbsoluteUrl,
   AdminDashboardName,
   AgencyId,
   ConventionId,
   UserId,
 } from "shared";
-import { DashboardGateway } from "../port/DashboardGateway";
+import type { DashboardGateway } from "../port/DashboardGateway";
 
 export class StubDashboardGateway implements DashboardGateway {
   getAgencyUserUrl(

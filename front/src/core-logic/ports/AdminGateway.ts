@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import {
+import type { Observable } from "rxjs";
+import type {
   ApiConsumer,
   ApiConsumerJwt,
   ConnectedUserJwt,

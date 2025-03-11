@@ -1,8 +1,8 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { type Locator, type Page, expect } from "@playwright/test";
 import {
-  AdminTabRouteName,
-  EmailType,
-  EstablishmentDashboardTab,
+  type AdminTabRouteName,
+  type EmailType,
+  type EstablishmentDashboardTab,
   adminTabRouteNames,
   adminTabs,
   domElementIds,

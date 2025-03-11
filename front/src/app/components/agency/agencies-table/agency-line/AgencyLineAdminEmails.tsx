@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { ReactNode } from "react";
-import { AgencyRight } from "shared";
+import type { ReactNode } from "react";
+import type { AgencyRight } from "shared";
 
 export const AgencyLineAdminEmails = ({
   agencyRight,

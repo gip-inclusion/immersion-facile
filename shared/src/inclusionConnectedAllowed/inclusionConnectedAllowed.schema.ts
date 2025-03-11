@@ -3,7 +3,7 @@ import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyDtoForAgencyUsersAndAdminsSchema } from "../agency/agency.schema";
 import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
-import { IdToken } from "../inclusionConnect/inclusionConnect.dto";
+import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
 import {
   conventionEstablishmentsRoles,
   establishmentsRoles,
@@ -12,16 +12,16 @@ import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
-  AgencyRight,
-  InclusionConnectedUser,
-  User,
-  UserId,
-  UserInList,
-  WithAgencyDashboards,
-  WithDiscussionId,
-  WithEstablishmentDashboards,
-  WithEstablishmentData,
-  WithOptionalUserId,
+  type AgencyRight,
+  type InclusionConnectedUser,
+  type User,
+  type UserId,
+  type UserInList,
+  type WithAgencyDashboards,
+  type WithDiscussionId,
+  type WithEstablishmentDashboards,
+  type WithEstablishmentData,
+  type WithOptionalUserId,
   allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
 

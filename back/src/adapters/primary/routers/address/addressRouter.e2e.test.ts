@@ -1,13 +1,13 @@
 import {
-  AddressRoutes,
-  LookupSearchResult,
+  type AddressRoutes,
+  type LookupSearchResult,
   addressRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryAddressGateway } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
+import type { InMemoryAddressGateway } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import {
   expected8bdduportAddressAndPositions,
   query8bdduportLookup,

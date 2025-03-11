@@ -1,5 +1,5 @@
-import { Observable, Subject } from "rxjs";
-import {
+import { type Observable, Subject } from "rxjs";
+import type {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
@@ -7,8 +7,8 @@ import {
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
-import { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
+import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 export class TestInclusionConnectedGateway
   implements InclusionConnectedGateway

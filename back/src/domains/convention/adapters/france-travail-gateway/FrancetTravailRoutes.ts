@@ -1,7 +1,7 @@
-import { AbsoluteUrl, withAuthorizationHeaders } from "shared";
+import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
-import { FranceTravailConvention } from "../../ports/FranceTravailGateway";
+import type { FranceTravailConvention } from "../../ports/FranceTravailGateway";
 
 export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
   ["https://api.peio.pe-qvr.fr", "https://api-r.es-qvr.fr"].includes(ftApiUrl)

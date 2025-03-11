@@ -1,7 +1,7 @@
 import { filter, map, switchMap } from "rxjs";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

@@ -1,26 +1,26 @@
 import {
-  AbsoluteUrl,
-  WithSourcePage,
+  type AbsoluteUrl,
+  type WithSourcePage,
   decodeJwtWithoutSignatureCheck,
   errors,
   queryParamsAsString,
 } from "shared";
-import { HttpClient } from "shared-routes";
-import { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
+import type { HttpClient } from "shared-routes";
+import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../../../../utils/logger";
 import {
-  ProConnectOAuthIdTokenPayload,
+  type ProConnectOAuthIdTokenPayload,
   proConnectAuthTokenPayloadSchema,
 } from "../../entities/OAuthIdTokenPayload";
-import {
+import type {
   GetAccessTokenParams,
   GetAccessTokenResult,
   GetLoginUrlParams,
   GetLogoutUrlParams,
   OAuthGateway,
 } from "../../port/OAuthGateway";
-import { ProConnectRoutes } from "./proConnect.routes";
+import type { ProConnectRoutes } from "./proConnect.routes";
 
 export type OAuthLogoutQueryParams = {
   post_logout_redirect_uri: AbsoluteUrl;

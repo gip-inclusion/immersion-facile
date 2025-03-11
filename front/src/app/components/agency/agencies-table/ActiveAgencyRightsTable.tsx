@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Table from "@codegouvfr/react-dsfr/Table";
-import { ReactNode } from "react";
-import { AgencyRight } from "shared";
+import type { ReactNode } from "react";
+import type { AgencyRight } from "shared";
 import { agencyRoleToDisplay } from "../AgencyUsers";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 import { AgencyLineAgencyName } from "./agency-line/AgencyLineAgencyName";

@@ -1,7 +1,7 @@
-import { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import type { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import {
-  AgencyKind,
-  AllowedAgencyKindToAdd,
+  type AgencyKind,
+  type AllowedAgencyKindToAdd,
   agencyKindList,
   agencyKindToLabel,
   allAgencyKindsAllowedToAdd,

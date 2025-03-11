@@ -1,4 +1,4 @@
-import { CreateAgencyDto } from "./agency.dto";
+import type { CreateAgencyDto } from "./agency.dto";
 
 export type AgencyPublicDisplayDtoWithoutRefersToAgency = Pick<
   CreateAgencyDto,

@@ -1,6 +1,6 @@
-import { NafSectionSuggestion } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { NafRepository } from "../port/NafRepository";
+import type { NafSectionSuggestion } from "shared";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { NafRepository } from "../port/NafRepository";
 
 export class PgNafRepository implements NafRepository {
   constructor(private transaction: KyselyDb) {}

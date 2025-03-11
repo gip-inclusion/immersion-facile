@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { WithAgencyIdAndUserId } from "shared";
-import { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export interface RemoveUserFromAgencyState {
   isLoading: boolean;

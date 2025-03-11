@@ -1,5 +1,5 @@
-import { Observable, Subject } from "rxjs";
-import {
+import { type Observable, Subject } from "rxjs";
+import type {
   ApiConsumer,
   ApiConsumerJwt,
   ConnectedUserJwt,
@@ -15,7 +15,7 @@ import {
   UserParamsForAgency,
   WithAgencyIdAndUserId,
 } from "shared";
-import { AdminGateway } from "src/core-logic/ports/AdminGateway";
+import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 export class TestAdminGateway implements AdminGateway {
   public apiConsumers$ = new Subject<ApiConsumer[]>();

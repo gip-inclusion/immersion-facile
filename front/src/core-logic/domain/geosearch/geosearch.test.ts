@@ -1,15 +1,15 @@
 import {
-  LookupSearchResult,
+  type LookupSearchResult,
   expectArraysToEqual,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { geosearchSlice } from "./geosearch.slice";
 
 describe("Geosearch epic", () => {

@@ -1,5 +1,9 @@
-import { Dispatch } from "@reduxjs/toolkit";
-import { FaqCardProps, HeroHeaderNavCard, Stat } from "react-design-system";
+import type { Dispatch } from "@reduxjs/toolkit";
+import type {
+  FaqCardProps,
+  HeroHeaderNavCard,
+  Stat,
+} from "react-design-system";
 import { domElementIds } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";

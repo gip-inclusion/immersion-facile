@@ -1,4 +1,7 @@
-import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
+import {
+  type AccessTokenResponse,
+  AppConfig,
+} from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";

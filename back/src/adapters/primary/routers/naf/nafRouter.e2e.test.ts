@@ -1,14 +1,14 @@
 import {
-  NafRoutes,
-  NafSectionSuggestion,
-  NafSectionSuggestionsParams,
+  type NafRoutes,
+  type NafSectionSuggestion,
+  type NafSectionSuggestionsParams,
   displayRouteName,
   expectHttpResponseToEqual,
   nafRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("naf Router", () => {

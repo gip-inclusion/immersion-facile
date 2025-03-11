@@ -1,6 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { ConnectedUserJwt, authFailed } from "shared";
-import { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
+import { type ConnectedUserJwt, authFailed } from "shared";
+import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 

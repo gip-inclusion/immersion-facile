@@ -9,10 +9,10 @@ import {
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { GetAgencyById, makeGetAgencyById } from "./GetAgencyById";
+import { type GetAgencyById, makeGetAgencyById } from "./GetAgencyById";
 
 describe("getAgencyByIdForDashboard", () => {
   const peAgency = new AgencyDtoBuilder()

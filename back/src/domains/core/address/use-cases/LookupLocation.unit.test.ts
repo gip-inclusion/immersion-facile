@@ -1,4 +1,7 @@
-import { LookupSearchResult, WithLookupLocationInputQueryParams } from "shared";
+import type {
+  LookupSearchResult,
+  WithLookupLocationInputQueryParams,
+} from "shared";
 import { InMemoryAddressGateway } from "../adapters/InMemoryAddressGateway";
 import { LookupLocation } from "./LookupLocation";
 

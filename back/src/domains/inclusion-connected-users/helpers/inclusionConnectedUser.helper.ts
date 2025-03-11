@@ -1,22 +1,22 @@
 import { toPairs, uniq, values } from "ramda";
 import {
-  AbsoluteUrl,
-  AgencyId,
-  AgencyRight,
-  AgencyWithUsersRights,
-  ConventionsEstablishmentDashboard,
-  EstablishmentDashboards,
-  InclusionConnectedUser,
-  UserId,
-  UserWithAgencyRights,
-  WithDashboards,
+  type AbsoluteUrl,
+  type AgencyId,
+  type AgencyRight,
+  type AgencyWithUsersRights,
+  type ConventionsEstablishmentDashboard,
+  type EstablishmentDashboards,
+  type InclusionConnectedUser,
+  type UserId,
+  type UserWithAgencyRights,
+  type WithDashboards,
   agencyRoleIsNotToReview,
 } from "shared";
-import { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
-import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "./userRights.helper";
 
 export const getIcUserByUserId = async (

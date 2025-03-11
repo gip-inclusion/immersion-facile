@@ -1,5 +1,5 @@
-import { Observable, from } from "rxjs";
-import {
+import { type Observable, from } from "rxjs";
+import type {
   AgencyDto,
   AgencyId,
   AgencyOption,
@@ -14,13 +14,13 @@ import {
   WithAgencyId,
   WithAgencyIdAndUserId,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import { P, match } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {

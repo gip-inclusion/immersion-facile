@@ -1,13 +1,13 @@
 import { andThen } from "ramda";
-import { ConventionDto, filter, pipeWithValue } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import { type ConventionDto, filter, pipeWithValue } from "shared";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import { validateConventionResults } from "../../convention/adapters/PgConventionQueries";
 import {
   createConventionQueryBuilder,
   makeGetLastConventionWithSiretInList,
 } from "../../convention/adapters/pgConventionSql";
 import { isSiretsListFilled } from "../entities/EstablishmentLeadEntity";
-import {
+import type {
   EstablishmentLeadQueries,
   GetLastConventionsByUniqLastEventKindParams,
 } from "../ports/EstablishmentLeadQueries";

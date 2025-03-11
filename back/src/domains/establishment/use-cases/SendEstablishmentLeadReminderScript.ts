@@ -1,26 +1,26 @@
 import {
-  AbsoluteUrl,
-  ConventionDto,
-  ConventionId,
-  SiretDto,
+  type AbsoluteUrl,
+  type ConventionDto,
+  type ConventionId,
+  type SiretDto,
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
-import { AppConfig } from "../../../config/bootstrap/appConfig";
-import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
+import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { makeShortLink } from "../../core/short-link/ShortLink";
-import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
-  EstablishmentLeadEventKind,
+  type EstablishmentLeadEventKind,
   establishmentLeadEventKind,
 } from "../entities/EstablishmentLeadEntity";
 

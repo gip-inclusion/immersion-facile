@@ -1,5 +1,5 @@
 import minutesToSeconds from "date-fns/minutesToSeconds";
-import { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
+import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryCachingGateway } from "./InMemoryCachingGateway";
 

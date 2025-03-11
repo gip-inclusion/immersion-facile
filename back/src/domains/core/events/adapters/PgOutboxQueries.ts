@@ -1,10 +1,10 @@
 import { groupBy, isNil, map, prop, reject, values } from "ramda";
 import { pipeWithValue } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
-import { DomainEvent } from "../events";
-import { OutboxQueries } from "../ports/OutboxQueries";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { DomainEvent } from "../events";
+import type { OutboxQueries } from "../ports/OutboxQueries";
 import {
-  StoredEventRow,
+  type StoredEventRow,
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
 

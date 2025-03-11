@@ -5,10 +5,10 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 export const ConventionStatusDashboardPage = ({
   route,

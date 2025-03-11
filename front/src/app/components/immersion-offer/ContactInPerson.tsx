@@ -3,11 +3,11 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { ElementRef, useMemo, useRef } from "react";
+import React, { type ElementRef, useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
-  AppellationDto,
-  ContactEstablishmentInPersonDto,
+  type AppellationDto,
+  type ContactEstablishmentInPersonDto,
   contactEstablishmentInPersonSchema,
   domElementIds,
 } from "shared";
@@ -20,9 +20,9 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { type routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type ContactInPersonProps = {
   appellations: AppellationDto[];

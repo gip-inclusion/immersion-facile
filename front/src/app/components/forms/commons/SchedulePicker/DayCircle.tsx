@@ -2,7 +2,7 @@ import checkCircleIconSvg from "src/assets/img/check-circle-icon.svg";
 
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
-import { DayStatus } from "./utils/getDayStatus";
+import type { DayStatus } from "./utils/getDayStatus";
 
 type DayCircleProps = {
   dayStatus: DayStatus;

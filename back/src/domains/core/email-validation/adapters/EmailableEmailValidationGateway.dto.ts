@@ -1,4 +1,4 @@
-import { Flavor, ValidateEmailStatus } from "shared";
+import type { Flavor, ValidateEmailStatus } from "shared";
 
 export type EmailableApiKey = Flavor<string, "EmailableApiKey">;
 

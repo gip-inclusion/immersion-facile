@@ -1,6 +1,6 @@
 import Button from "@codegouvfr/react-dsfr/Button";
-import { ReactNode } from "react";
-import { AgencyRight, domElementIds } from "shared";
+import type { ReactNode } from "react";
+import { type AgencyRight, domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
 
 export const AgencyLineRightsCTAs = ({

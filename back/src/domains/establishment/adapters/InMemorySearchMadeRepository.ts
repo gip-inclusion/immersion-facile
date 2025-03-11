@@ -1,6 +1,9 @@
 import { createLogger } from "../../../utils/logger";
-import { SearchMadeEntity, SearchMadeId } from "../entities/SearchMadeEntity";
-import { SearchMadeRepository } from "../ports/SearchMadeRepository";
+import type {
+  SearchMadeEntity,
+  SearchMadeId,
+} from "../entities/SearchMadeEntity";
+import type { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 const logger = createLogger(__filename);
 

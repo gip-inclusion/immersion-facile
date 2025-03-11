@@ -1,8 +1,9 @@
-import { FrIconClassName, fr } from "@codegouvfr/react-dsfr";
-import { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Tag from "@codegouvfr/react-dsfr/Tag";
-import React, { ElementRef, useLayoutEffect, useRef, useState } from "react";
+import type React from "react";
+import { type ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { prefix } from "../rs-autocomplete";
 import Styles from "./SearchFilter.styles";

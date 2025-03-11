@@ -1,15 +1,15 @@
 import {
   ConventionDtoBuilder,
-  ConventionReadDto,
-  CreateWebhookSubscription,
+  type ConventionReadDto,
+  type CreateWebhookSubscription,
   conventionReadSchema,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
-import { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
-import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
+import type { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
+import type { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
+import type { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
   publicApiV2ConventionRoutes,
   publicApiV2SearchEstablishmentRoutes,

@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import Select, { SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
 import React from "react";
@@ -21,13 +21,13 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  DiscussionId,
-  DiscussionReadDto,
-  DiscussionStatus,
-  Email,
-  RejectionKind,
-  WithDiscussionId,
-  WithDiscussionRejection,
+  type DiscussionId,
+  type DiscussionReadDto,
+  type DiscussionStatus,
+  type Email,
+  type RejectionKind,
+  type WithDiscussionId,
+  type WithDiscussionRejection,
   addressDtoToString,
   createOpaqueEmail,
   discussionRejectionSchema,
@@ -35,7 +35,7 @@ import {
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
-import { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
+import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeebackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { InternshipKind } from "./convention/convention.dto";
+import type { InternshipKind } from "./convention/convention.dto";
 import { internshipKindSchema } from "./convention/convention.schema";
 import { emailSchema } from "./email/email.schema";
 import { zStringMinLength1 } from "./zodUtils";

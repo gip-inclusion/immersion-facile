@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { Role, SignatoryRole, allRoles, allSignatoryRoles } from "./role.dto";
+import {
+  type Role,
+  type SignatoryRole,
+  allRoles,
+  allSignatoryRoles,
+} from "./role.dto";
 
 export const roleSchema: z.Schema<Role> = z.enum(allRoles);
 

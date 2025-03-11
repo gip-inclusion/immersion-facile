@@ -1,18 +1,18 @@
 import {
-  AppellationAndRomeDto,
-  EstablishmentDomainPayload,
-  EstablishmentJwtPayload,
-  FormEstablishmentDto,
-  InclusionConnectDomainJwtPayload,
-  InclusionConnectJwtPayload,
-  SiretDto,
+  type AppellationAndRomeDto,
+  type EstablishmentDomainPayload,
+  type EstablishmentJwtPayload,
+  type FormEstablishmentDto,
+  type InclusionConnectDomainJwtPayload,
+  type InclusionConnectJwtPayload,
+  type SiretDto,
   addressDtoToString,
   errors,
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import {
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type {
   EstablishmentAdminRight,
   EstablishmentAggregate,
 } from "../entities/EstablishmentAggregate";

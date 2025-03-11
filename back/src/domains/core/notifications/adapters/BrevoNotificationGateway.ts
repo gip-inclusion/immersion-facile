@@ -1,6 +1,6 @@
 import Bottleneck from "bottleneck";
 import {
-  GenerateHtmlOptions,
+  type GenerateHtmlOptions,
   configureGenerateHtmlFromTemplate,
 } from "html-templates";
 import {
@@ -8,19 +8,19 @@ import {
   cciCustomHtmlHeader,
 } from "html-templates/src/components/email";
 import {
-  NotificationId,
+  type NotificationId,
   type TemplatedEmail,
   type TemplatedSms,
   emailTemplatesByName,
   errors,
   smsTemplatesByName,
 } from "shared";
-import { HttpClient } from "shared-routes";
-import { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
+import type { HttpClient } from "shared-routes";
+import type { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { createLogger } from "../../../../utils/logger";
-import { Base64, NotificationGateway } from "../ports/NotificationGateway";
-import { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
-import {
+import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
+import type {
   RecipientOrSender,
   SendTransactEmailRequestBody,
   SendTransactSmsRequestBody,

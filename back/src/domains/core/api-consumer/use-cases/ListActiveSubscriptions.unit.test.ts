@@ -1,12 +1,12 @@
-import { WebhookSubscription } from "shared";
+import type { WebhookSubscription } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../unit-of-work/adapters/createInMemoryUow";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import {
-  ListActiveSubscriptions,
+  type ListActiveSubscriptions,
   makeListActiveSubscriptions,
 } from "./ListActiveSubscriptions";
 

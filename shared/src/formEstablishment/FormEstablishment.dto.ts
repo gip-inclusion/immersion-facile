@@ -1,15 +1,15 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
-import { WithAcquisition } from "../acquisition.dto";
-import { LocationId } from "../address/address.dto";
-import { ApiConsumerName } from "../apiConsumer/ApiConsumer";
-import { Email } from "../email/email.dto";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { LocationId } from "../address/address.dto";
+import type { ApiConsumerName } from "../apiConsumer/ApiConsumer";
+import type { Email } from "../email/email.dto";
 import type { GroupName } from "../group/group.dto";
-import { NafDto } from "../naf/naf.dto";
-import { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
-import { Flavor } from "../typeFlavors";
+import type { NafDto } from "../naf/naf.dto";
+import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { SiretDto } from "../siret/siret";
+import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
-import { DateTimeIsoString } from "../utils/date";
+import type { DateTimeIsoString } from "../utils/date";
 
 export type ImmersionContactInEstablishmentId = Flavor<
   string,

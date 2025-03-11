@@ -1,26 +1,26 @@
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyId,
-  AgencyOption,
-  AgencyRight,
-  InclusionConnectedUser,
+  type AgencyId,
+  type AgencyOption,
+  type AgencyRight,
+  type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import {
-  AgencyAdminState,
-  AgencyAdminSubmitFeedback,
+  type AgencyAdminState,
+  type AgencyAdminSubmitFeedback,
   agencyAdminInitialState,
   agencyAdminSlice,
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   AGENCY_NEEDING_REVIEW_1,
   AGENCY_NEEDING_REVIEW_2,

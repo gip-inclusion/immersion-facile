@@ -1,5 +1,5 @@
-import { Observable, Subject, from } from "rxjs";
-import {
+import { type Observable, Subject, from } from "rxjs";
+import type {
   AgencyDto,
   AgencyId,
   AgencyOption,
@@ -13,7 +13,7 @@ import {
   WithAgencyId,
   WithAgencyIdAndUserId,
 } from "shared";
-import { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
   public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();

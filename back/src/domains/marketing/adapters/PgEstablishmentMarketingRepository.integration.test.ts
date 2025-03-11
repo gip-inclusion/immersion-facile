@@ -1,9 +1,12 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import { expectToEqual } from "shared";
-import { KyselyDb, makeKyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import {
+  type KyselyDb,
+  makeKyselyDb,
+} from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { MarketingContact } from "../entities/MarketingContact";
-import { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
+import type { MarketingContact } from "../entities/MarketingContact";
+import type { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
 import { PgEstablishmentMarketingRepository } from "./PgEstablishmentMarketingRepository";
 
 describe("PgAgencyRepository", () => {

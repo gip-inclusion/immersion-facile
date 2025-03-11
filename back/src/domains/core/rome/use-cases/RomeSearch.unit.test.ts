@@ -1,4 +1,4 @@
-import { RomeDto } from "shared";
+import type { RomeDto } from "shared";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryRomeRepository } from "../adapters/InMemoryRomeRepository";

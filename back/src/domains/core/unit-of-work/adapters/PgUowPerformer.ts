@@ -1,8 +1,8 @@
 import { castError } from "shared";
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
-import { UnitOfWork } from "../ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
+import type { UnitOfWork } from "../ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 

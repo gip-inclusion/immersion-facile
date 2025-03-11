@@ -1,5 +1,5 @@
 import { filter, join } from "ramda";
-import {
+import type {
   Beneficiary,
   BeneficiaryRepresentative,
   InternshipKind,

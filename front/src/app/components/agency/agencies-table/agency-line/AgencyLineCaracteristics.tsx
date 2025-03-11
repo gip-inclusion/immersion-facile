@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
-  AgencyRight,
+  type AgencyRight,
   activeAgencyStatuses,
   agencyKindToLabelIncludingIF,
 } from "shared";

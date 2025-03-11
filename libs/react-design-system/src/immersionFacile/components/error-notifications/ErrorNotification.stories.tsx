@@ -1,7 +1,7 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   ErrorNotifications,
-  ErrorNotificationsProps,
+  type ErrorNotificationsProps,
 } from "./ErrorNotifications";
 
 const Component = ErrorNotifications;

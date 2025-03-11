@@ -1,7 +1,7 @@
-import { TallyForm, tallyFormSchema } from "shared";
+import { type TallyForm, tallyFormSchema } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
 
 export class AddValidatedConventionNps extends TransactionalUseCase<TallyForm> {
   inputSchema = tallyFormSchema;

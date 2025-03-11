@@ -1,5 +1,5 @@
-import { Observable, from } from "rxjs";
-import {
+import { type Observable, from } from "rxjs";
+import type {
   AddConventionInput,
   ApiConsumerName,
   AuthenticatedConventionRoutes,
@@ -21,7 +21,7 @@ import {
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   logBodyAndThrow,
   otherwiseThrow,
@@ -29,8 +29,8 @@ import {
   throwServiceUnavailableWithExplicitMessage,
   throwTooManyRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
-import { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
+import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
+import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import { P, match } from "ts-pattern";
 
 export class HttpConventionGateway implements ConventionGateway {

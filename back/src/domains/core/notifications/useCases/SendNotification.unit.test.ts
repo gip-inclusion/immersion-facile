@@ -1,6 +1,6 @@
 import {
-  TemplatedEmail,
-  TemplatedSms,
+  type TemplatedEmail,
+  type TemplatedSms,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
@@ -10,7 +10,7 @@ import {
   InMemoryNotificationGateway,
   sendSmsErrorPhoneNumber,
 } from "../adapters/InMemoryNotificationGateway";
-import { InMemoryNotificationRepository } from "../adapters/InMemoryNotificationRepository";
+import type { InMemoryNotificationRepository } from "../adapters/InMemoryNotificationRepository";
 import { SendNotification } from "./SendNotification";
 
 const someDate = new Date("2023-01-01").toISOString();

@@ -1,18 +1,18 @@
 import { values } from "ramda";
 import {
   AgencyDtoBuilder,
-  AgencyRole,
-  BadRequestError,
-  ConventionDto,
+  type AgencyRole,
+  type BadRequestError,
+  type ConventionDto,
   ConventionDtoBuilder,
-  ConventionId,
-  ConventionRelatedJwtPayload,
-  ConventionStatus,
-  Email,
-  ExcludeFromExisting,
-  Role,
-  UnauthorizedError,
-  UpdateConventionStatusRequestDto,
+  type ConventionId,
+  type ConventionRelatedJwtPayload,
+  type ConventionStatus,
+  type Email,
+  type ExcludeFromExisting,
+  type Role,
+  type UnauthorizedError,
+  type UpdateConventionStatusRequestDto,
   allRoles,
   conventionStatuses,
   createConventionMagicLinkPayload,
@@ -22,20 +22,20 @@ import {
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
-import { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
-import { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
-import { DomainTopic, TriggeredBy } from "../../core/events/events";
+import type { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
+import type { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
+import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import {
-  NarrowEvent,
+  type NarrowEvent,
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
+import type { InMemoryConventionRepository } from "../adapters/InMemoryConventionRepository";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 
 const allInclusionConnectedTestUsers = [

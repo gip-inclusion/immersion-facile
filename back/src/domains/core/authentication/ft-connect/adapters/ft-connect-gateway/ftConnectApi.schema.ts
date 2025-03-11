@@ -1,11 +1,11 @@
 import { emailSchema, zStringMinLength1 } from "shared";
 import { z } from "zod";
-import { BearerToken } from "../../dto/BearerToken";
+import type { BearerToken } from "../../dto/BearerToken";
 import {
-  FtConnectAdvisorsKind,
+  type FtConnectAdvisorsKind,
   ftAdvisorKinds,
 } from "../../dto/FtConnectAdvisor.dto";
-import {
+import type {
   ExternalFtConnectAdvisor,
   ExternalFtConnectStatut,
   ExternalFtConnectUser,

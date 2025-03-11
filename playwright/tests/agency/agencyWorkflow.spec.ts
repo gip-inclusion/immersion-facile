@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { AgencyId } from "shared";
+import type { AgencyId } from "shared";
 import { testConfig } from "../../custom.config";
 import {
   fillAndSubmitBasicAgencyForm,

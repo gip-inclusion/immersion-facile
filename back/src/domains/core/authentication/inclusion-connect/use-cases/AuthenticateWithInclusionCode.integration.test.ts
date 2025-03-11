@@ -1,7 +1,7 @@
-import { Pool } from "pg";
-import { AbsoluteUrl, expectObjectsToMatch } from "shared";
+import type { Pool } from "pg";
+import { type AbsoluteUrl, expectObjectsToMatch } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
@@ -9,14 +9,14 @@ import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryOAuthGateway,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
-import { OngoingOAuth } from "../entities/OngoingOAuth";
-import { GetAccessTokenPayload } from "../port/OAuthGateway";
+import type { OngoingOAuth } from "../entities/OngoingOAuth";
+import type { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
 const correctToken = "my-correct-token";

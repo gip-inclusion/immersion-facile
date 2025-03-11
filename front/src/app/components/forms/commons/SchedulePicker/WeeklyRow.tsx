@@ -3,9 +3,9 @@ import { parseISO } from "date-fns";
 import React from "react";
 import { useWatch } from "react-hook-form";
 import {
-  ConventionReadDto,
-  InternshipKind,
-  WeeklyImmersionTimetableDto,
+  type ConventionReadDto,
+  type InternshipKind,
+  type WeeklyImmersionTimetableDto,
   calculateWeeklyHours,
 } from "shared";
 import { DayCircle } from "./DayCircle";

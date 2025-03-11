@@ -2,8 +2,8 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
-  Role,
-  User,
+  type Role,
+  type User,
   errors,
   establishmentsRoles,
   expectPromiseToFailWithError,
@@ -13,7 +13,7 @@ import {
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";

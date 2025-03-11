@@ -1,11 +1,11 @@
 import {
-  FeatureFlags,
-  SetFeatureFlagParam,
+  type FeatureFlags,
+  type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
-import { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
+import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 
 export const defaultFlags: FeatureFlags = {
   enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {

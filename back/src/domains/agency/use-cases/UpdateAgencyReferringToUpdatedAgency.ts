@@ -1,17 +1,17 @@
 import { toPairs, uniq } from "ramda";
 import {
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-  InclusionConnectedUser,
-  WithAgencyId,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
+  type InclusionConnectedUser,
+  type WithAgencyId,
   errors,
   keys,
   withAgencyIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyId,

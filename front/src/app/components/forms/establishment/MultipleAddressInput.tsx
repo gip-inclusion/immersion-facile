@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { AddressDto, FormEstablishmentAddress } from "shared";
+import type { AddressDto, FormEstablishmentAddress } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { useStyles } from "tss-react/dsfr";
 

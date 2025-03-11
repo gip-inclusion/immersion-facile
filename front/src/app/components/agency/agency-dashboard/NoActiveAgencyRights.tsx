@@ -1,10 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import React, { useState } from "react";
-import { AgencyRight, InclusionConnectedUser } from "shared";
+import type { AgencyRight, InclusionConnectedUser } from "shared";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { OnGoingAgencyRightsTable } from "../agencies-table/OnGoingAgencyRightsTable";
 
 export function NoActiveAgencyRights({

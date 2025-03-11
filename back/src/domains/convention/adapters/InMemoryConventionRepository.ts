@@ -2,14 +2,14 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import { values } from "ramda";
 import {
-  ConventionDto,
-  ConventionId,
-  ConventionReadDto,
-  Email,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionReadDto,
+  type Email,
   errors,
   validatedConventionStatuses,
 } from "shared";
-import { ConventionRepository } from "../ports/ConventionRepository";
+import type { ConventionRepository } from "../ports/ConventionRepository";
 
 export class InMemoryConventionRepository implements ConventionRepository {
   #conventions: Record<string, ConventionDto> = {};

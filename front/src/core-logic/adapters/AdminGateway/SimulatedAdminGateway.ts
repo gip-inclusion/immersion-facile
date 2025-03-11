@@ -1,25 +1,25 @@
-import { Observable, of, throwError } from "rxjs";
+import { type Observable, of, throwError } from "rxjs";
 import {
   AgencyDtoBuilder,
-  AgencyRight,
-  ApiConsumer,
-  ApiConsumerJwt,
-  ConnectedUserJwt,
-  DashboardUrlAndName,
-  EstablishmentBatchReport,
-  FormEstablishmentBatchDto,
-  GetDashboardParams,
-  GetUsersFilters,
-  InclusionConnectedUser,
-  NotificationsByKind,
-  RejectIcUserRoleForAgencyParams,
-  UserId,
-  UserInList,
-  UserParamsForAgency,
-  WithAgencyIdAndUserId,
+  type AgencyRight,
+  type ApiConsumer,
+  type ApiConsumerJwt,
+  type ConnectedUserJwt,
+  type DashboardUrlAndName,
+  type EstablishmentBatchReport,
+  type FormEstablishmentBatchDto,
+  type GetDashboardParams,
+  type GetUsersFilters,
+  type InclusionConnectedUser,
+  type NotificationsByKind,
+  type RejectIcUserRoleForAgencyParams,
+  type UserId,
+  type UserInList,
+  type UserParamsForAgency,
+  type WithAgencyIdAndUserId,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import { AdminGateway } from "src/core-logic/ports/AdminGateway";
+import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 
 const simulatedAgencyRights: AgencyRight[] = [
   {

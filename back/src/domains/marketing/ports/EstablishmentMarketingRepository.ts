@@ -1,5 +1,5 @@
-import { Email, SiretDto } from "shared";
-import { MarketingContact } from "../entities/MarketingContact";
+import type { Email, SiretDto } from "shared";
+import type { MarketingContact } from "../entities/MarketingContact";
 
 export type EstablishmentMarketingContactEntity = {
   contactEmail: Email;

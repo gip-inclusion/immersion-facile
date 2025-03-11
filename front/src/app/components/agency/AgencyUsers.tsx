@@ -1,4 +1,4 @@
-import { FrClassName, fr } from "@codegouvfr/react-dsfr";
+import { type FrClassName, fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -8,18 +8,18 @@ import { Tag } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
-  AgencyDto,
-  AgencyRole,
-  UserParamsForAgency,
+  type AgencyDto,
+  type AgencyRole,
+  type UserParamsForAgency,
   domElementIds,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
-import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
+import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import {
-  NormalizedIcUserById,
-  NormalizedInclusionConnectedUser,
+  type NormalizedIcUserById,
+  type NormalizedInclusionConnectedUser,
   icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";

@@ -4,10 +4,10 @@ import { keys } from "ramda";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { FederatedIdentityProvider, loginFtConnect } from "shared";
+import { type FederatedIdentityProvider, loginFtConnect } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
-  ConventionFormMode,
+  type ConventionFormMode,
   ConventionFormWrapper,
 } from "src/app/components/forms/convention/ConventionFormWrapper";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
@@ -21,7 +21,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 export type ConventionImmersionPageRoute = Route<
   typeof routes.conventionImmersion

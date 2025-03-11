@@ -1,21 +1,21 @@
 import { keys } from "ramda";
 import {
-  AgencyUsersRights,
-  AgencyWithUsersRights,
-  Email,
-  InclusionConnectedUser,
-  UserParamsForAgency,
+  type AgencyUsersRights,
+  type AgencyWithUsersRights,
+  type Email,
+  type InclusionConnectedUser,
+  type UserParamsForAgency,
   errors,
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import {
+import type {
   UserOnRepository,
   UserRepository,
 } from "../../core/authentication/inclusion-connect/port/UserRepository";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {
   rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences,
   rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin,

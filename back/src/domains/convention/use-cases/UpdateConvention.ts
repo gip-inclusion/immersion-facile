@@ -1,18 +1,18 @@
 import {
-  ConventionDomainPayload,
-  ConventionDto,
-  ConventionStatus,
-  InclusionConnectDomainJwtPayload,
-  UpdateConventionRequestDto,
-  WithConventionIdLegacy,
+  type ConventionDomainPayload,
+  type ConventionDto,
+  type ConventionStatus,
+  type InclusionConnectDomainJwtPayload,
+  type UpdateConventionRequestDto,
+  type WithConventionIdLegacy,
   errors,
   updateConventionRequestSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { TriggeredBy } from "../../core/events/events";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { TriggeredBy } from "../../core/events/events";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateConvention extends TransactionalUseCase<

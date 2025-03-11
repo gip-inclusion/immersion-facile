@@ -1,6 +1,6 @@
 import {
   AgencyDtoBuilder,
-  AgencyPublicDisplayDto,
+  type AgencyPublicDisplayDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -8,7 +8,7 @@ import {
 import { toAgencyWithRights } from "../../../utils/agency";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { GetAgencyPublicInfoById } from "./GetAgencyPublicInfoById";

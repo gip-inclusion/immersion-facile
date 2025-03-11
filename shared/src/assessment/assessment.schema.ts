@@ -2,11 +2,11 @@ import { z } from "zod";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
 import {
-  AssessmentDto,
-  DateRange,
-  WithAssessmentDto,
-  WithEndedWithAJob,
-  WithEstablishmentComments,
+  type AssessmentDto,
+  type DateRange,
+  type WithAssessmentDto,
+  type WithEndedWithAJob,
+  type WithEstablishmentComments,
   typeOfContracts,
 } from "./assessment.dto";
 

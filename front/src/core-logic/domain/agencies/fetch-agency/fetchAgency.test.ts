@@ -1,13 +1,13 @@
 import { values } from "ramda";
 import {
-  AgencyDto,
+  type AgencyDto,
   AgencyDtoBuilder,
-  AgencyRight,
-  InclusionConnectedUser,
+  type AgencyRight,
+  type InclusionConnectedUser,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import {
+import type {
   NormalizedIcUserById,
   NormalizedInclusionConnectedUser,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -15,7 +15,7 @@ import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesP
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import {
-  FetchAgencyState,
+  type FetchAgencyState,
   fetchAgencyInitialState,
   fetchAgencySlice,
 } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
@@ -25,10 +25,10 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const agencyDto = new AgencyDtoBuilder().build();
 const agencyWithAdminEmails = toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []);

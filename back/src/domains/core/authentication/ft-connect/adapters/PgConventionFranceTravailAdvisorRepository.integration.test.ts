@@ -1,4 +1,4 @@
-import { Pool } from "pg";
+import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -7,7 +7,7 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
@@ -17,12 +17,12 @@ import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyReposito
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
 import { PgUserRepository } from "../../inclusion-connect/adapters/PgUserRepository";
-import {
+import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
 } from "../dto/FtConnect.dto";
-import { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import type { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
 import { PgConventionFranceTravailAdvisorRepository } from "./PgConventionFranceTravailAdvisorRepository";
 
 const conventionId = "88401348-bad9-4933-87c6-405b8a8fe4cc";

@@ -1,5 +1,5 @@
-import { AbsoluteUrl } from "shared";
-import { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
+import type { AbsoluteUrl } from "shared";
+import type { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 
 export interface NavigationGateway {
   navigateToEstablishmentForm(

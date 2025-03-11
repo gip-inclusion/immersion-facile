@@ -1,4 +1,8 @@
-import { InclusionConnectedUser, UserParamsForAgency, errors } from "shared";
+import {
+  type InclusionConnectedUser,
+  type UserParamsForAgency,
+  errors,
+} from "shared";
 
 export const updateUserAgencyRights = (
   user: InclusionConnectedUser,

@@ -2,7 +2,7 @@ import { debounceTime, distinctUntilChanged, filter, map } from "rxjs";
 import { switchMap } from "rxjs/operators";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

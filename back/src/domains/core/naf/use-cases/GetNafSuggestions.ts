@@ -1,6 +1,6 @@
 import {
-  NafSectionSuggestion,
-  NafSectionSuggestionsParams,
+  type NafSectionSuggestion,
+  type NafSectionSuggestionsParams,
   nafSectionSuggestionsParamsSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../UseCase";

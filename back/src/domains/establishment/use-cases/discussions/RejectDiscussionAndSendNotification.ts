@@ -1,8 +1,8 @@
 import {
-  DiscussionDto,
-  Exchange,
-  InclusionConnectedUser,
-  RejectionKind,
+  type DiscussionDto,
+  type Exchange,
+  type InclusionConnectedUser,
+  type RejectionKind,
   createOpaqueEmail,
   discussionIdSchema,
   discussionRejectionSchema,
@@ -13,8 +13,8 @@ import {
 } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { addExchangeToDiscussion } from "../../helpers/discussion.helpers";
 
 export type RejectDiscussionAndSendNotification = ReturnType<

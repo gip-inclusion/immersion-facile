@@ -1,11 +1,11 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type {
   AgencyDto,
   AgencyId,
   AgencyOption,
   UpdateAgencyStatusParams,
 } from "shared";
-import { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
+import type { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 
 export type AgencyAdminSuccessFeedbackKind = "agencyUpdated";
 

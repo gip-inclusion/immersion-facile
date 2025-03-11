@@ -1,6 +1,6 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import {
-  EstablishmentDashboardTab,
+  type EstablishmentDashboardTab,
   domElementIds,
   establishmentDashboardTabsList,
 } from "shared";

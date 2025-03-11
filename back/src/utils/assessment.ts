@@ -1,14 +1,14 @@
 import {
-  AgencyDto,
-  ConventionDomainPayload,
-  ConventionDto,
-  Role,
+  type AgencyDto,
+  type ConventionDomainPayload,
+  type ConventionDto,
+  type Role,
   assessmentDtoSchema,
   errors,
   isSomeEmailMatchingEmailHash,
 } from "shared";
 import { z } from "zod";
-import { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
+import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 
 type AssessmentMode = "CreateAssessment" | "GetAssessment";
 export const throwForbiddenIfNotAllowedForAssessments = (

@@ -4,7 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import { useFormContext } from "react-hook-form";
-import { ConventionReadDto, conventionObjectiveOptions } from "shared";
+import { type ConventionReadDto, conventionObjectiveOptions } from "shared";
 import { ConventionFormProfession } from "src/app/components/forms/convention/ConventionFormProfession";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";

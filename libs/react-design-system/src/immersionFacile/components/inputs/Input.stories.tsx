@@ -1,5 +1,5 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { Input, InputProperties } from "./Input";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import { Input, type InputProperties } from "./Input";
 
 const Component = Input;
 type Story = StoryObj<typeof Component>;

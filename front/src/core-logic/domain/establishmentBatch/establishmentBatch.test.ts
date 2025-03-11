@@ -1,19 +1,19 @@
 import {
-  EstablishmentBatchReport,
-  EstablishmentCSVRow,
-  FormEstablishmentBatchDto,
-  FormEstablishmentDto,
+  type EstablishmentBatchReport,
+  type EstablishmentCSVRow,
+  type FormEstablishmentBatchDto,
+  type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   expectToEqual,
 } from "shared";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { candidateEstablishmentMapper } from "./establishmentBatch.epics";
 import {
-  FormEstablishmentDtoWithErrors,
+  type FormEstablishmentDtoWithErrors,
   establishmentBatchSlice,
 } from "./establishmentBatch.slice";
 

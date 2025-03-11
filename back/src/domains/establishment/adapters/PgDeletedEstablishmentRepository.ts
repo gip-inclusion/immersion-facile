@@ -1,6 +1,6 @@
-import { SiretDto } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import {
+import type { SiretDto } from "shared";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type {
   DeletedEstablishmentDto,
   DeletedEstablishmentRepository,
 } from "../ports/DeletedEstablishmentRepository";

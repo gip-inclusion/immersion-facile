@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 
 const tableName = "postal_code_department_region";
 const viewAgenciesByDepartmentName = "view_agencies_by_department";

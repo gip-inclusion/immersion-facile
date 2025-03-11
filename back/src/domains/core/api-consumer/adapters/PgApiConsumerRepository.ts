@@ -1,25 +1,25 @@
 import { sql } from "kysely";
-import { InsertObjectOrList } from "kysely/dist/cjs/parser/insert-values-parser";
+import type { InsertObjectOrList } from "kysely/dist/cjs/parser/insert-values-parser";
 import { keys, mapObjIndexed } from "ramda";
 import {
-  ApiConsumer,
-  ApiConsumerContact,
-  ApiConsumerId,
-  ApiConsumerRights,
-  DateString,
-  Email,
-  WebhookSubscription,
+  type ApiConsumer,
+  type ApiConsumerContact,
+  type ApiConsumerId,
+  type ApiConsumerRights,
+  type DateString,
+  type Email,
+  type WebhookSubscription,
   apiConsumerSchema,
   eventToRightName,
 } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../../config/pg/kysely/model/database";
-import { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
+import type { Database } from "../../../../config/pg/kysely/model/database";
+import type { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   #transaction: KyselyDb;
@@ -174,7 +174,9 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
               emails: cast<Email[]>(eb.ref("c.contact_emails")),
               phone: eb.ref("c.contact_phone"),
             }),
-            subscriptions: sql<WebhookSubscription[]>` JSON_AGG(JSON_BUILD_OBJECT(
+            subscriptions: sql<
+              WebhookSubscription[]
+            >` JSON_AGG(JSON_BUILD_OBJECT(
                 'callbackUrl', s.callback_url,
                 'callbackHeaders', s.callback_headers,
                 'createdAt', date_to_iso(s.created_at),

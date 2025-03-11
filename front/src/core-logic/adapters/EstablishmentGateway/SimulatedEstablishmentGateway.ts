@@ -1,11 +1,11 @@
-import { Observable, delay, of } from "rxjs";
-import {
+import { type Observable, delay, of } from "rxjs";
+import type {
   ConnectedUserJwt,
   EstablishmentJwt,
   FormEstablishmentDto,
   SiretDto,
 } from "shared";
-import { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
+import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
   constructor(

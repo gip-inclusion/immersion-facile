@@ -2,7 +2,7 @@ import { filter, map, switchMap } from "rxjs";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

@@ -1,5 +1,5 @@
-import { FrClassName } from "@codegouvfr/react-dsfr";
-import { EstablishmentRole } from "shared";
+import type { FrClassName } from "@codegouvfr/react-dsfr";
+import type { EstablishmentRole } from "shared";
 
 type EstablishmentDisplayedRoleAndClass = {
   label: string;

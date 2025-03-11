@@ -1,9 +1,9 @@
 import { partition } from "ramda";
 import {
-  AgencyGroup,
-  AgencyRight,
-  AgencyWithUsersRights,
-  UserWithRights,
+  type AgencyGroup,
+  type AgencyRight,
+  type AgencyWithUsersRights,
+  type UserWithRights,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -14,8 +14,8 @@ import {
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { UserAuthenticatedPayload } from "../../core/events/events";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UserAuthenticatedPayload } from "../../core/events/events";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../helpers/userRights.helper";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({

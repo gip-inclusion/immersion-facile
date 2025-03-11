@@ -1,28 +1,28 @@
 import {
-  AgencyRole,
-  AgencyWithUsersRights,
-  ConventionDto,
-  ConventionId,
-  DateRange,
-  Email,
+  type AgencyRole,
+  type AgencyWithUsersRights,
+  type ConventionDto,
+  type ConventionId,
+  type DateRange,
+  type Email,
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
   withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
-import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { CreateNewEvent } from "../../core/events/ports/EventBus";
-import {
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 const logger = createLogger(__filename);
 

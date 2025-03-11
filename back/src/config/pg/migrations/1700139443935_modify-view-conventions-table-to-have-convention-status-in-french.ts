@@ -1,4 +1,4 @@
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 const viewConventionsTable = "view_conventions";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

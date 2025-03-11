@@ -1,8 +1,8 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+import type React from "react";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import {
+import type {
   FeedbackLevel,
   FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";

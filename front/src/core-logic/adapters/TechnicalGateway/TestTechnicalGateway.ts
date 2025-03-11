@@ -1,5 +1,5 @@
 import { Subject } from "rxjs";
-import {
+import type {
   AbsoluteUrl,
   ConventionSupportedJwt,
   Email,
@@ -7,7 +7,7 @@ import {
   HtmlToPdfRequest,
   ValidateEmailFeedback,
 } from "shared";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
+import type { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 
 export class TestTechnicalGateway implements TechnicalGateway {
   // test purposes only

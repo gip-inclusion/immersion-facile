@@ -1,10 +1,10 @@
-import { AbsoluteUrl, frontRoutes } from "shared";
+import { type AbsoluteUrl, frontRoutes } from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
-  GenerateApiConsumerJwt,
-  GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
+  type GenerateApiConsumerJwt,
+  type GenerateConventionJwt,
+  type GenerateEditFormEstablishmentJwt,
+  type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../domains/core/jwt";
 import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
@@ -13,7 +13,7 @@ import {
   makeHandleManagedRedirectResponseError,
   makeHandleRawRedirectResponseError,
 } from "../helpers/handleRedirectResponseError";
-import { AppConfig } from "./appConfig";
+import type { AppConfig } from "./appConfig";
 import {
   makeConsumerMiddleware,
   makeMagicLinkAuthMiddleware,

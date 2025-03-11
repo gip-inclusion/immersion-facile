@@ -1,6 +1,6 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { LoginForm, LoginFormSectionProps } from "./LoginForm";
+import { LoginForm, type LoginFormSectionProps } from "./LoginForm";
 
 const Component = LoginForm;
 type Story = StoryObj<typeof Component>;

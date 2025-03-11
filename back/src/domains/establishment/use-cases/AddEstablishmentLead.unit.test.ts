@@ -1,6 +1,6 @@
 import subDays from "date-fns/subDays";
 import {
-  ConventionDto,
+  type ConventionDto,
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -9,12 +9,12 @@ import {
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEstablishmentLeadRepository";
-import { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
+import type { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEstablishmentLeadRepository";
+import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { AddEstablishmentLead } from "./AddEstablishmentLead";
 

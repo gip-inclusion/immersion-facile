@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React from "react";
-import { AgencyDto } from "shared";
+import type { AgencyDto } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { agencyAdminSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyTag } from "src/app/components/agency/AgencyTag";
@@ -11,12 +11,12 @@ import { EditAgencyForm } from "src/app/components/forms/agency/EditAgencyForm";
 
 import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 
-import { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { Route } from "type-route";
+import type { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { Route } from "type-route";
 
 export type AgencyOverviewRouteName = Route<
   | typeof routes.adminAgencyDetail

@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useMemo, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
-  AppellationDto,
-  ContactEstablishmentByPhoneDto,
+  type AppellationDto,
+  type ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
   domElementIds,
 } from "shared";
@@ -20,9 +20,9 @@ import {
 import { useContactEstablishmentError } from "src/app/components/search/useContactEstablishmentError";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { routes, useRoute } from "src/app/routes/routes";
+import { type routes, useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type ContactByPhoneProps = {
   appellations: AppellationDto[];

@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { FooterProps as FooterPropsDsfr } from "@codegouvfr/react-dsfr/Footer";
-import React from "react";
+import type { FooterProps as FooterPropsDsfr } from "@codegouvfr/react-dsfr/Footer";
+import type React from "react";
 import { useStyles } from "tss-react/dsfr";
 import FooterStyles from "./Footer.styles";
 

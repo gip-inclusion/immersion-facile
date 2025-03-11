@@ -1,15 +1,15 @@
 import {
-  ConventionDto,
-  FtConnectIdentity,
-  WithConventionDto,
+  type ConventionDto,
+  type FtConnectIdentity,
+  type WithConventionDto,
   authFailed,
   isFtConnectIdentity,
   withConventionSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../UseCase";
-import { CreateNewEvent } from "../../../events/ports/EventBus";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { CreateNewEvent } from "../../../events/ports/EventBus";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export class BindConventionToFederatedIdentity extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

@@ -1,25 +1,25 @@
 import {
-  AgencyWithUsersRights,
-  ConventionDto,
+  type AgencyWithUsersRights,
+  type ConventionDto,
   ConventionDtoBuilder,
   frontRoutes,
   reasonableSchedule,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../../utils/jwtTestHelper";
 import {
-  ExpectSavedNotificationsAndEvents,
+  type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  InMemoryUnitOfWork,
+  type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { FtUserAndAdvisor } from "../dto/FtConnect.dto";
-import { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
+import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
+import type { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "./NotifyFranceTravailUserAdvisorOnConventionFullySigned";
 
 describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {

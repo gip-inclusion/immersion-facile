@@ -1,4 +1,4 @@
-import { ConventionReadDto } from "shared";
+import type { ConventionReadDto } from "shared";
 
 export type ConventionReadPublicV2Dto = ConventionReadDto;
 

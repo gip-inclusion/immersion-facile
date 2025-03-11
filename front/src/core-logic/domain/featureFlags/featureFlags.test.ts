@@ -1,5 +1,5 @@
 import {
-  FeatureFlags,
+  type FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
@@ -7,14 +7,14 @@ import {
 } from "shared";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import {
-  FeatureFlagsState,
+  type FeatureFlagsState,
   featureFlagsSlice,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const defaultFeatureFlags: FeatureFlags = {
   enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {

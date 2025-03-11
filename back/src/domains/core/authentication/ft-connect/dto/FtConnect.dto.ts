@@ -1,14 +1,14 @@
 import {
-  Beneficiary,
-  FederatedIdentityProvider,
-  FtConnectToken,
-  FtExternalId,
-  InternshipKind,
+  type Beneficiary,
+  type FederatedIdentityProvider,
+  type FtConnectToken,
+  type FtExternalId,
+  type InternshipKind,
   notJobSeeker,
 } from "shared";
-import { EntityFromDto } from "../../../../../utils/EntityFromDto";
-import { FtConnectImmersionAdvisorDto } from "./FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "./FtConnectUserDto";
+import type { EntityFromDto } from "../../../../../utils/EntityFromDto";
+import type { FtConnectImmersionAdvisorDto } from "./FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "./FtConnectUserDto";
 
 export type ConventionFtUserAdvisorDto = {
   peExternalId: FtExternalId;

@@ -1,10 +1,10 @@
-import { WithAcquisition } from "../acquisition.dto";
-import { LocationId } from "../address/address.dto";
-import { ImmersionObjective } from "../convention/convention.dto";
-import { DiscussionId } from "../discussion/discussion.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
+import type { WithAcquisition } from "../acquisition.dto";
+import type { LocationId } from "../address/address.dto";
+import type { ImmersionObjective } from "../convention/convention.dto";
+import type { DiscussionId } from "../discussion/discussion.dto";
+import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { SiretDto } from "../siret/siret";
 
 export type ContactInformations<T extends ContactMethod> = {
   appellationCode: AppellationCode;

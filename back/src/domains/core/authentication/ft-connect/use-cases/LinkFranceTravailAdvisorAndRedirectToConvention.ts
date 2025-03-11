@@ -1,21 +1,21 @@
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   authFailed,
   frontRoutes,
   queryParamsAsString,
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../../UseCase";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
-import { AccessTokenDto } from "../dto/AccessToken.dto";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { AccessTokenDto } from "../dto/AccessToken.dto";
 import {
-  ConventionFtConnectFields,
-  FtUserAndAdvisor,
+  type ConventionFtConnectFields,
+  type FtUserAndAdvisor,
   toPartialConventionDtoWithFtIdentity,
 } from "../dto/FtConnect.dto";
 import { chooseValidAdvisor } from "../entities/ConventionFranceTravailAdvisorEntity";
-import { FtConnectGateway } from "../port/FtConnectGateway";
+import type { FtConnectGateway } from "../port/FtConnectGateway";
 
 export class LinkFranceTravailAdvisorAndRedirectToConvention extends TransactionalUseCase<
   string,

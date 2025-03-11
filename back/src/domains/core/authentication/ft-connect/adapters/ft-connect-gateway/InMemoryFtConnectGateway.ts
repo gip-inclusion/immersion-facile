@@ -1,7 +1,7 @@
-import { AccessTokenDto } from "../../dto/AccessToken.dto";
-import { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../../dto/FtConnectUserDto";
-import { FtConnectGateway } from "../../port/FtConnectGateway";
+import type { AccessTokenDto } from "../../dto/AccessToken.dto";
+import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
+import type { FtConnectGateway } from "../../port/FtConnectGateway";
 
 export class InMemoryFtConnectGateway implements FtConnectGateway {
   #accessToken: AccessTokenDto | undefined = undefined;

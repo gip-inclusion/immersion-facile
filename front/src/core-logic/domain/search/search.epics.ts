@@ -1,11 +1,11 @@
 import { concatWith, filter, map, of, switchMap, take } from "rxjs";
-import { SearchResultDto, searchResultSchema } from "shared";
+import { type SearchResultDto, searchResultSchema } from "shared";
 import {
-  SearchResultPayload,
+  type SearchResultPayload,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import {
+import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";

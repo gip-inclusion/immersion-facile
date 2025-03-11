@@ -1,12 +1,12 @@
-import { AddressDto, LocationId } from "../address/address.dto";
-import { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import { GeoPositionDto } from "../geoPosition/geoPosition.dto";
-import {
+import type { AddressDto, LocationId } from "../address/address.dto";
+import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
+import type {
   AppellationDto,
   RomeCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
-import { DateTimeIsoString } from "../utils/date";
+import type { SiretDto } from "../siret/siret";
+import type { DateTimeIsoString } from "../utils/date";
 
 export type SearchResultDto = {
   rome: RomeCode;

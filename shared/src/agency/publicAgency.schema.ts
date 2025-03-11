@@ -5,7 +5,7 @@ import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { stringWithMaxLength255 } from "../zodUtils";
 import { agencyIdSchema, agencyKindSchema } from "./agency.schema";
-import {
+import type {
   AgencyPublicDisplayDto,
   AgencyPublicDisplayDtoWithoutRefersToAgency,
   WithOptionalRefersToAgency,

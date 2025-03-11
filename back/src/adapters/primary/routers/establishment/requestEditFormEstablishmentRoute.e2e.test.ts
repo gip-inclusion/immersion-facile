@@ -1,11 +1,11 @@
 import {
-  EstablishmentRoutes,
+  type EstablishmentRoutes,
   UserBuilder,
   displayRouteName,
   establishmentRoutes,
   expectHttpResponseToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";

@@ -1,5 +1,5 @@
-import { AgencyId, AgencyRefersToInConvention, errors } from "shared";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { type AgencyId, type AgencyRefersToInConvention, errors } from "shared";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 
 export const getReferedAgency = async (
   uow: UnitOfWork,

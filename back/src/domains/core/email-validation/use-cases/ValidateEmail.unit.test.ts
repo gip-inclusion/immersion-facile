@@ -1,6 +1,6 @@
 import {
-  ValidateEmailFeedback,
-  ValidateEmailInput,
+  type ValidateEmailFeedback,
+  type ValidateEmailInput,
   expectPromiseToFail,
 } from "shared";
 import { InMemoryEmailValidationGateway } from "../adapters/InMemoryEmailValidationGateway";

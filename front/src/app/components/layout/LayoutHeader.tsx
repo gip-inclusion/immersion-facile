@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Header, HeaderProps } from "@codegouvfr/react-dsfr/Header";
-import { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import { Header, type HeaderProps } from "@codegouvfr/react-dsfr/Header";
+import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
 import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import React from "react";
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
@@ -12,7 +12,7 @@ import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 
 import {
-  AgencyDashboardRouteName,
+  type AgencyDashboardRouteName,
   agencyDashboardRoutes,
 } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { routes, useRoute } from "src/app/routes/routes";

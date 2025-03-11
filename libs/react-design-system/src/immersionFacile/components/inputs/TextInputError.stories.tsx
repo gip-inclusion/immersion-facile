@@ -1,5 +1,8 @@
-import { ArgTypes, Meta, StoryObj } from "@storybook/react";
-import { TextInputError, TextInputErrorProperties } from "./TextInputError";
+import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
+import {
+  TextInputError,
+  type TextInputErrorProperties,
+} from "./TextInputError";
 
 const Component = TextInputError;
 type Story = StoryObj<typeof Component>;

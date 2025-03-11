@@ -1,7 +1,7 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import {
   MaintenanceCallout,
-  MaintenanceCalloutProps,
+  type MaintenanceCalloutProps,
 } from "./MaintenanceCallout";
 
 const Component = MaintenanceCallout;

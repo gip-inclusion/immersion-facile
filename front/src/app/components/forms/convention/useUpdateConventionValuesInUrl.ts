@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { objectToDependencyList } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
-import { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
+import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { conventionParams, routes, useRoute } from "src/app/routes/routes";
 import {
   filterParamsForRoute,

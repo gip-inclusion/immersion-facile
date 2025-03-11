@@ -1,24 +1,24 @@
 import { partition } from "ramda";
 import {
-  TemplatedEmail,
-  TemplatedSms,
+  type TemplatedEmail,
+  type TemplatedSms,
   exhaustiveCheck,
   expectToEqual,
 } from "shared";
 import {
-  EmailNotification,
-  Notification,
-  NotificationKind,
-  SmsNotification,
+  type EmailNotification,
+  type Notification,
+  type NotificationKind,
+  type SmsNotification,
   notificationKinds,
 } from "shared";
-import { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";
-import {
+import type { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";
+import type {
   NotificationAddedEvent,
   NotificationBatchAddedEvent,
 } from "../domains/core/events/events";
-import { InMemoryNotificationRepository } from "../domains/core/notifications/adapters/InMemoryNotificationRepository";
-import { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
+import type { InMemoryNotificationRepository } from "../domains/core/notifications/adapters/InMemoryNotificationRepository";
+import type { WithNotificationIdAndKind } from "../domains/core/notifications/helpers/Notification";
 
 export type ExpectSavedNotificationsAndEvents = ReturnType<
   typeof makeExpectSavedNotificationsAndEvents

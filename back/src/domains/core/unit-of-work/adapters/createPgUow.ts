@@ -1,4 +1,4 @@
-import { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { PgAgencyGroupRepository } from "../../../agency/adapters/PgAgencyGroupRepository";
 import { PgAgencyRepository } from "../../../agency/adapters/PgAgencyRepository";
 import { PgDelegationContactRepository } from "../../../agency/adapters/PgDelegationContactRepository";
@@ -29,7 +29,7 @@ import { PgRomeRepository } from "../../rome/adapters/PgRomeRepository";
 import { PgBroadcastFeedbacksRepository } from "../../saved-errors/adapters/PgBroadcastFeedbacksRepository";
 import { PgShortLinkRepository } from "../../short-link/adapters/short-link-repository/PgShortLinkRepository";
 import { PgStatisticQueries } from "../../statistics/adapters/PgStatisticQueries";
-import { UnitOfWork } from "../ports/UnitOfWork";
+import type { UnitOfWork } from "../ports/UnitOfWork";
 
 export const createPgUow = (transaction: KyselyDb): UnitOfWork => {
   const shortLinkRepository = new PgShortLinkRepository(transaction);

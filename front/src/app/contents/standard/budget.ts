@@ -1,4 +1,4 @@
-import { StandardPageContent } from "src/app/contents/standard/textSetup";
+import type { StandardPageContent } from "src/app/contents/standard/textSetup";
 
 export default {
   title: "Budget",

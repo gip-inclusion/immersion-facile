@@ -2,7 +2,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { SiretDto } from "shared";
+import type { SiretDto } from "shared";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";

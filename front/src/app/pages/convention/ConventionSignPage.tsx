@@ -5,8 +5,8 @@ import React, { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  ConventionJwtPayload,
-  SignatoryRole,
+  type ConventionJwtPayload,
+  type SignatoryRole,
   allSignatoryRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
@@ -16,13 +16,13 @@ import { ConventionSignForm } from "src/app/components/forms/convention/Conventi
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { P, match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
 import { HeaderFooterLayout } from "../../components/layout/HeaderFooterLayout";
 import { useConventionTexts } from "../../contents/forms/convention/textSetup";
 import { useConvention } from "../../hooks/convention.hooks";
 import { useExistingSiret } from "../../hooks/siret.hooks";
-import { routes } from "../../routes/routes";
+import type { routes } from "../../routes/routes";
 import { ShowErrorOrRedirectToRenewMagicLink } from "./ShowErrorOrRedirectToRenewMagicLink";
 
 interface ConventionSignPageProperties {

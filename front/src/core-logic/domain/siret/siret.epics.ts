@@ -1,12 +1,17 @@
-import { Observable, filter, iif, map, of, switchMap } from "rxjs";
-import { GetSiretInfo, GetSiretInfoError, SiretDto, siretSchema } from "shared";
+import { type Observable, filter, iif, map, of, switchMap } from "rxjs";
 import {
-  SiretAction,
+  type GetSiretInfo,
+  type GetSiretInfoError,
+  type SiretDto,
+  siretSchema,
+} from "shared";
+import {
+  type SiretAction,
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
-import { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
+import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
-import { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
+import type { AppEpic } from "src/core-logic/storeConfig/redux.helpers";
 
 type SiretEpic = AppEpic<SiretAction>;
 

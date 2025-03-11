@@ -1,5 +1,9 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
-import { OpacifiedLogger, createLogger } from "./logger";
+import axios, {
+  type AxiosError,
+  type AxiosInstance,
+  type AxiosRequestConfig,
+} from "axios";
+import { type OpacifiedLogger, createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
 

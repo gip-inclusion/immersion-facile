@@ -1,6 +1,6 @@
 import {
-  ContactEstablishmentRequestDto,
-  SearchRoutes,
+  type ContactEstablishmentRequestDto,
+  type SearchRoutes,
   UserBuilder,
   errors,
   expectArraysToEqualIgnoringOrder,
@@ -9,16 +9,19 @@ import {
   expectToEqual,
   searchImmersionRoutes,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import {
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
-import { InMemoryGateways, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Contact establishment public v2 e2e", () => {

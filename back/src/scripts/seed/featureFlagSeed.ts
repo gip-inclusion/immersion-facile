@@ -1,10 +1,10 @@
 import {
-  FeatureFlags,
+  type FeatureFlags,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
-import { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const featureFlagsSeed = async (uow: UnitOfWork) => {
   // biome-ignore lint/suspicious/noConsoleLog: <explanation>

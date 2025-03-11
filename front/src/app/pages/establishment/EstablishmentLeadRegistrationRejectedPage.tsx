@@ -4,7 +4,10 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import React, { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { ConventionJwtPayload, decodeJwtWithoutSignatureCheck } from "shared";
+import {
+  type ConventionJwtPayload,
+  decodeJwtWithoutSignatureCheck,
+} from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -13,7 +16,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { establishmentLeadStatus } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type EstablishmentFormForExternalsProps = {
   route: Route<typeof routes.unregisterEstablishmentLead>;

@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button, { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import React from "react";
 import { useStyles } from "tss-react/dsfr";
 import { useCopyButton } from "./useCopyButton";

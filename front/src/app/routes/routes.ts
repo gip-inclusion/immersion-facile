@@ -1,13 +1,18 @@
 import {
-  AdminTabRouteName,
-  AuthenticatedUserQueryParams,
-  ValueOf,
+  type AdminTabRouteName,
+  type AuthenticatedUserQueryParams,
+  type ValueOf,
   adminTabRouteNames,
   adminTabs,
   frontRoutes,
 } from "shared";
 import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
-import { ValueSerializer, createRouter, defineRoute, param } from "type-route";
+import {
+  type ValueSerializer,
+  createRouter,
+  defineRoute,
+  param,
+} from "type-route";
 import {
   appellationAndRomeDtoArraySerializer,
   appellationStringSerializer,

@@ -1,7 +1,7 @@
 import {
-  AgencyDto,
-  AgencyId,
-  InclusionConnectedUser,
+  type AgencyDto,
+  type AgencyId,
+  type InclusionConnectedUser,
   agencyIdSchema,
   errors,
 } from "shared";

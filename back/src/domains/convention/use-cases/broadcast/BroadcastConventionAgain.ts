@@ -6,16 +6,16 @@ import {
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
-  InclusionConnectedUser,
-  WithConventionId,
+  type InclusionConnectedUser,
+  type WithConventionId,
   errors,
   userHasEnoughRightsOnConvention,
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
-import { CreateNewEvent } from "../../../core/events/ports/EventBus";
-import { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
-import { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
+import type { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 
 const BROADCAST_FEEDBACK_DEBOUNCE_HOUR = 4;
 

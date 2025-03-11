@@ -1,16 +1,17 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Stepper, { StepperProps } from "@codegouvfr/react-dsfr/Stepper";
+import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader } from "react-design-system";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  DotNestedKeys,
-  EstablishmentJwtPayload,
-  FormEstablishmentDto,
+  type DotNestedKeys,
+  type EstablishmentJwtPayload,
+  type FormEstablishmentDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
@@ -43,9 +44,9 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { Feedback } from "src/core-logic/domain/feedback/feedback.slice";
+import type { Feedback } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type RouteByMode = {
   create:

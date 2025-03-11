@@ -1,6 +1,6 @@
 import { values } from "ramda";
 import { InclusionConnectedUserBuilder, UserBuilder } from "shared";
-import { KyselyDb } from "../../config/pg/kysely/kyselyUtils";
+import type { KyselyDb } from "../../config/pg/kysely/kyselyUtils";
 
 export const seedUsers = {
   icUser: new InclusionConnectedUserBuilder()

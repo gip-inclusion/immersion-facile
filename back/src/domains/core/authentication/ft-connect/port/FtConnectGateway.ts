@@ -1,6 +1,6 @@
-import { AccessTokenDto } from "../dto/AccessToken.dto";
-import { FtConnectAdvisorDto } from "../dto/FtConnectAdvisor.dto";
-import { FtConnectUserDto } from "../dto/FtConnectUserDto";
+import type { AccessTokenDto } from "../dto/AccessToken.dto";
+import type { FtConnectAdvisorDto } from "../dto/FtConnectAdvisor.dto";
+import type { FtConnectUserDto } from "../dto/FtConnectUserDto";
 
 export interface FtConnectGateway {
   getAccessToken(

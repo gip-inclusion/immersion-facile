@@ -7,7 +7,7 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { localization } from "../zodUtils";
-import {
+import type {
   EmailNotification,
   FollowedIds,
   NotificationCommonFields,

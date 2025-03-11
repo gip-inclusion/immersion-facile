@@ -1,7 +1,7 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
-  FeatureFlags,
-  SetFeatureFlagParam,
+  type FeatureFlags,
+  type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,

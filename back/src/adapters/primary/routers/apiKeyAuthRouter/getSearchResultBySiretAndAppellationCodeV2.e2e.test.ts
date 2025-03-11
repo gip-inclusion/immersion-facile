@@ -1,18 +1,18 @@
 import {
-  AppellationAndRomeDto,
+  type AppellationAndRomeDto,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
+import type { SuperTest, Test } from "supertest";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { TEST_ROME_LABEL } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import {
   EstablishmentAggregateBuilder,
@@ -23,9 +23,9 @@ import {
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";
-import { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
+import type { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";
 import {
-  PublicApiV2SearchEstablishmentRoutes,
+  type PublicApiV2SearchEstablishmentRoutes,
   publicApiV2SearchEstablishmentRoutes,
 } from "./publicApiV2.routes";
 

@@ -1,9 +1,9 @@
-import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
-import React from "react";
+import { Tabs, type TabsProps } from "@codegouvfr/react-dsfr/Tabs";
+import type React from "react";
 import {
-  AdminTabRouteName,
-  OmitFromExistingKeys,
-  Prettify,
+  type AdminTabRouteName,
+  type OmitFromExistingKeys,
+  type Prettify,
   adminTabs,
   keys,
 } from "shared";
@@ -17,7 +17,7 @@ import { TechnicalOptionsTab } from "src/app/pages/admin/TechnicalOptionsTab";
 import { UsersTab } from "src/app/pages/admin/UsersTab";
 import { routes } from "src/app/routes/routes";
 import { ENV } from "src/config/environmentVariables";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type RawAdminTab = Prettify<
   OmitFromExistingKeys<TabsProps.Controlled["tabs"][number], "tabId"> & {

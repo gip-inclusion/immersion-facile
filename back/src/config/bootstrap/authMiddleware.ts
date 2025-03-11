@@ -1,19 +1,19 @@
 import Bottleneck from "bottleneck";
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import type { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
-  ApiConsumer,
-  ExtractFromExisting,
-  PayloadKey,
+  type ApiConsumer,
+  type ExtractFromExisting,
+  type PayloadKey,
   castError,
   currentJwtVersions,
   expiredMagicLinkErrorMessage,
 } from "shared";
-import { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
-import { JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
-import { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
+import type { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
+import { type JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
+import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
-import { AppConfig } from "./appConfig";
+import type { AppConfig } from "./appConfig";
 
 const logger = createLogger(__filename);
 

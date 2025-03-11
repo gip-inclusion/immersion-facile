@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
-import { ConventionDto } from "../convention/convention.dto";
+import type { ConventionDto } from "../convention/convention.dto";
 import { calculateTotalImmersionHoursBetweenDateComplex } from "../schedule/ScheduleUtils";
-import { DateString, hoursValueToHoursDisplayed } from "../utils/date";
-import { AssessmentStatus } from "./assessment.dto";
+import { type DateString, hoursValueToHoursDisplayed } from "../utils/date";
+import type { AssessmentStatus } from "./assessment.dto";
 
 export const computeTotalHours = ({
   convention,

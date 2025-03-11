@@ -1,6 +1,6 @@
-import { ConventionExternalId, ConventionId } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { ConventionExternalIdRepository } from "../ports/ConventionExternalIdRepository";
+import type { ConventionExternalId, ConventionId } from "shared";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { ConventionExternalIdRepository } from "../ports/ConventionExternalIdRepository";
 
 export class PgConventionExternalIdRepository
   implements ConventionExternalIdRepository

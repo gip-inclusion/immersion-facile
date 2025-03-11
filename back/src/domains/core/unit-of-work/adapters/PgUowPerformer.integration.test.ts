@@ -1,17 +1,17 @@
-import { Pool } from "pg";
-import { Notification, expectPromiseToFailWithError } from "shared";
+import type { Pool } from "pg";
+import { type Notification, expectPromiseToFailWithError } from "shared";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import {
-  CreateNewEvent,
+  type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
-import { UnitOfWork } from "../ports/UnitOfWork";
+import type { UnitOfWork } from "../ports/UnitOfWork";
 import { PgUowPerformer } from "./PgUowPerformer";
 import { createPgUow } from "./createPgUow";
 

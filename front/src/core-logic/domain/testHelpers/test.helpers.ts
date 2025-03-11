@@ -1,5 +1,5 @@
 import {
-  FeatureFlags,
+  type FeatureFlags,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,

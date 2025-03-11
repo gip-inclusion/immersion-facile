@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFranceTravailRoutes } from "../../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
-import { AppConfig } from "../bootstrap/appConfig";
+import type { AppConfig } from "../bootstrap/appConfig";
 
 export const createFtAxiosSharedClient = (
   config: AppConfig,

@@ -1,13 +1,13 @@
 import { sql } from "kysely";
 import { uniq } from "ramda";
-import { AppellationCode, NafCode } from "shared";
-import { KyselyDb, values } from "../../../config/pg/kysely/kyselyUtils";
+import type { AppellationCode, NafCode } from "shared";
+import { type KyselyDb, values } from "../../../config/pg/kysely/kyselyUtils";
 import {
-  SearchMadeEntity,
-  SearchMadeId,
+  type SearchMadeEntity,
+  type SearchMadeId,
   hasSearchMadeGeoParams,
 } from "../entities/SearchMadeEntity";
-import { SearchMadeRepository } from "../ports/SearchMadeRepository";
+import type { SearchMadeRepository } from "../ports/SearchMadeRepository";
 
 export class PgSearchMadeRepository implements SearchMadeRepository {
   constructor(private transaction: KyselyDb) {}

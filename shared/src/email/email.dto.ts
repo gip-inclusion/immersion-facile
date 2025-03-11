@@ -1,4 +1,4 @@
-import { Flavor } from "../typeFlavors";
+import type { Flavor } from "../typeFlavors";
 
 export type Email = Flavor<string, "Email">;
 

@@ -1,4 +1,4 @@
-import { Email } from "shared";
+import type { Email } from "shared";
 
 export type MarketingContact = {
   firstName: string; //PRENOM

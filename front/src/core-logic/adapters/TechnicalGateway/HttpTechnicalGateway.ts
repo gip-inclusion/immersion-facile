@@ -1,21 +1,21 @@
-import { AxiosInstance } from "axios";
-import { Observable, from, map } from "rxjs";
+import type { AxiosInstance } from "axios";
+import { type Observable, from, map } from "rxjs";
 import {
-  AbsoluteUrl,
-  ConventionSupportedJwt,
-  Email,
-  FeatureFlags,
-  HtmlToPdfRequest,
-  TechnicalRoutes,
-  ValidateEmailFeedback,
+  type AbsoluteUrl,
+  type ConventionSupportedJwt,
+  type Email,
+  type FeatureFlags,
+  type HtmlToPdfRequest,
+  type TechnicalRoutes,
+  type ValidateEmailFeedback,
   uploadFileRoute,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
+import type { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
 import { match } from "ts-pattern";
 
 export class HttpTechnicalGateway implements TechnicalGateway {

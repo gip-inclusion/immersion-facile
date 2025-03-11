@@ -1,8 +1,8 @@
 import {
-  EstablishmentDashboardTab,
+  type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
 } from "shared";
-import { ValueSerializer } from "type-route";
+import type { ValueSerializer } from "type-route";
 
 export const icUserEstablishmentDashboardTabSerializer: ValueSerializer<EstablishmentDashboardTab> =
   {

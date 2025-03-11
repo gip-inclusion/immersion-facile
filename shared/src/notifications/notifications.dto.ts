@@ -1,11 +1,11 @@
-import { AgencyId } from "../agency/agency.dto";
-import { ConventionId } from "../convention/convention.dto";
-import { TemplatedEmail } from "../email/email";
-import { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { SiretDto } from "../siret/siret";
-import { TemplatedSms } from "../sms/smsTemplateByName";
-import { Flavor } from "../typeFlavors";
-import { DateString } from "../utils/date";
+import type { AgencyId } from "../agency/agency.dto";
+import type { ConventionId } from "../convention/convention.dto";
+import type { TemplatedEmail } from "../email/email";
+import type { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { SiretDto } from "../siret/siret";
+import type { TemplatedSms } from "../sms/smsTemplateByName";
+import type { Flavor } from "../typeFlavors";
+import type { DateString } from "../utils/date";
 
 export type NotificationId = Flavor<string, "NotificationId">;
 

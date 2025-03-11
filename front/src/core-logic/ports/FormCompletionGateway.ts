@@ -1,5 +1,5 @@
-import { Observable } from "rxjs";
-import { AppellationMatchDto, GetSiretInfo, SiretDto } from "shared";
+import type { Observable } from "rxjs";
+import type { AppellationMatchDto, GetSiretInfo, SiretDto } from "shared";
 
 export interface FormCompletionGateway {
   isSiretAlreadySaved(siret: SiretDto): Observable<boolean>;

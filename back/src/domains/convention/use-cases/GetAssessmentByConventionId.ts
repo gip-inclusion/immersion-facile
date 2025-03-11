@@ -1,7 +1,7 @@
 import {
-  AssessmentDto,
-  ConventionDomainPayload,
-  WithConventionId,
+  type AssessmentDto,
+  type ConventionDomainPayload,
+  type WithConventionId,
   errors,
   withConventionIdSchema,
 } from "shared";

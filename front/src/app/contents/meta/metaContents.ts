@@ -1,6 +1,6 @@
-import { GroupName } from "shared";
-import { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
-import { FrontRouteKeys } from "src/app/routes/routes";
+import type { GroupName } from "shared";
+import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
+import type { FrontRouteKeys } from "src/app/routes/routes";
 
 export type MetaContentType = {
   title: string;

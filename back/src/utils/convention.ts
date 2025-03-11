@@ -1,4 +1,10 @@
-import { AgencyDto, ConventionDto, Email, Role, errors } from "shared";
+import {
+  type AgencyDto,
+  type ConventionDto,
+  type Email,
+  type Role,
+  errors,
+} from "shared";
 
 export const conventionEmailsByRole = (
   convention: ConventionDto,

@@ -1,4 +1,4 @@
-import { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
+import type { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export type SiretAndRomeDto = {
   rome: RomeCode;

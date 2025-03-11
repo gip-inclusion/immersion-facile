@@ -6,12 +6,12 @@ import {
   ConventionRenewedInformations,
   ConventionSummary,
 } from "react-design-system";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  ConventionDto,
-  ConventionReadDto,
-  UpdateConventionStatusRequestDto,
+  type ConventionDto,
+  type ConventionReadDto,
+  type UpdateConventionStatusRequestDto,
   domElementIds,
   isConventionRenewed,
   toDisplayedDate,
@@ -25,8 +25,8 @@ import {
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  ConventionFeedbackKind,
-  ConventionSubmitFeedback,
+  type ConventionFeedbackKind,
+  type ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { SignatureActions } from "./SignatureActions";

@@ -1,12 +1,12 @@
 import {
-  ConventionJwtPayload,
-  ConventionRelatedJwtPayload,
-  HtmlToPdfRequest,
+  type ConventionJwtPayload,
+  type ConventionRelatedJwtPayload,
+  type HtmlToPdfRequest,
   errors,
   htmlToPdfRequestSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";
-import { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
+import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";
 
 export class HtmlToPdf extends UseCase<
   HtmlToPdfRequest,

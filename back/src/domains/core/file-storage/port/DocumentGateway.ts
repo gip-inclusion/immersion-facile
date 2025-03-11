@@ -1,5 +1,5 @@
-import { AbsoluteUrl, StoredFileId } from "shared";
-import { StoredFile } from "../entity/StoredFile";
+import type { AbsoluteUrl, StoredFileId } from "shared";
+import type { StoredFile } from "../entity/StoredFile";
 
 export interface DocumentGateway {
   save(document: StoredFile): Promise<void>;

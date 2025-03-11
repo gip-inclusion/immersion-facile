@@ -3,11 +3,11 @@ import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import React from "react";
-import { AgencyDto, domElementIds } from "shared";
+import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
-import { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
-import { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
+import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 
 type AgencyUsersTableProps = {
   agencyUsers: NormalizedInclusionConnectedUser[];

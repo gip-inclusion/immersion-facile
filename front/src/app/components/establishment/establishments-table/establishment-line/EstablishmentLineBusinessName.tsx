@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { ReactNode } from "react";
-import { WithEstablishmentData } from "shared";
+import type { ReactNode } from "react";
+import type { WithEstablishmentData } from "shared";
 import { EstablishmentTag } from "../../EstablishmentTag";
 
 export const EstablishmentLineBusinessName = ({

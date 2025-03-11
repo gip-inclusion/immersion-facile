@@ -1,12 +1,12 @@
 import {
-  ConventionJwtPayload,
-  ConventionSupportedJwt,
+  type ConventionJwtPayload,
+  type ConventionSupportedJwt,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 // this hook should be use only in admin route
 export const useAdminToken = () => {

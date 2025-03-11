@@ -2,13 +2,14 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import {
   RadioButtons,
-  RadioButtonsProps,
+  type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import React, { Dispatch, SetStateAction, useState } from "react";
-import { UseFormRegisterReturn, useFormContext } from "react-hook-form";
+import type React from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
+import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import {
-  DotNestedKeys,
-  FormEstablishmentDto,
+  type DotNestedKeys,
+  type FormEstablishmentDto,
   emailSchema,
   toLowerCaseWithoutDiacritics,
 } from "shared";
@@ -19,7 +20,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { EmailValidationInput } from "../commons/EmailValidationInput";
-import { Mode } from "./EstablishmentForm";
+import type { Mode } from "./EstablishmentForm";
 
 const preferredContactMethodOptions = (
   register: UseFormRegisterReturn<string>,

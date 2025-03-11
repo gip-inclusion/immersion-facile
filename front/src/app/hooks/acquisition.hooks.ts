@@ -1,7 +1,7 @@
 import { equals, values } from "ramda";
 import { useEffect, useState } from "react";
-import { WithAcquisition } from "shared";
-import { acquisitionParams } from "src/app/routes/routes";
+import type { WithAcquisition } from "shared";
+import type { acquisitionParams } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import { outOfReduxDependencies } from "src/config/dependencies";
 

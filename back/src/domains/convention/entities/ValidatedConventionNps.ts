@@ -1,4 +1,4 @@
-import { ConventionId, Role } from "shared";
+import type { ConventionId, Role } from "shared";
 
 export type ValidatedConventionNps = {
   conventionId: ConventionId | null;

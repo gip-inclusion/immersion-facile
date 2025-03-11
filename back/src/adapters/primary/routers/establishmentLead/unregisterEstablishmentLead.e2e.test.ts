@@ -1,8 +1,8 @@
 import { subDays } from "date-fns";
 import {
   ConventionDtoBuilder,
-  ConventionJwt,
-  EstablishmentLeadRoutes,
+  type ConventionJwt,
+  type EstablishmentLeadRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
   errors,
@@ -10,17 +10,17 @@ import {
   expectHttpResponseToEqual,
   expiredMagicLinkErrorMessage,
 } from "shared";
-import { HttpClient } from "shared-routes";
+import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { SuperTest, Test } from "supertest";
+import type { SuperTest, Test } from "supertest";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { GenerateConventionJwt } from "../../../../domains/core/jwt";
-import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
-import { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
+import type { GenerateConventionJwt } from "../../../../domains/core/jwt";
+import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 const convention = new ConventionDtoBuilder().build();

@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import {
-  FeatureFlag,
-  FeatureFlagBoolean,
-  FeatureFlagTextImageAndRedirect,
-  FeatureFlagTextWithSeverity,
-  FeatureFlags,
-  SetFeatureFlagParam,
+  type FeatureFlag,
+  type FeatureFlagBoolean,
+  type FeatureFlagTextImageAndRedirect,
+  type FeatureFlagTextWithSeverity,
+  type FeatureFlags,
+  type SetFeatureFlagParam,
   featureFlagNames,
 } from "./featureFlags.dto";
 

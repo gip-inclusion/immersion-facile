@@ -1,6 +1,6 @@
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
-import { NpsRepository } from "../ports/NpsRepository";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { ValidatedConventionNps } from "../entities/ValidatedConventionNps";
+import type { NpsRepository } from "../ports/NpsRepository";
 
 export class PgNpsRepository implements NpsRepository {
   #transaction: KyselyDb;

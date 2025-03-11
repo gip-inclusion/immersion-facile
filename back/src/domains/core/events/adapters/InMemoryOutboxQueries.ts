@@ -1,7 +1,7 @@
 import { createLogger } from "../../../../utils/logger";
-import { DomainEvent } from "../events";
-import { OutboxQueries } from "../ports/OutboxQueries";
-import { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
+import type { DomainEvent } from "../events";
+import type { OutboxQueries } from "../ports/OutboxQueries";
+import type { InMemoryOutboxRepository } from "./InMemoryOutboxRepository";
 
 const logger = createLogger(__filename);
 

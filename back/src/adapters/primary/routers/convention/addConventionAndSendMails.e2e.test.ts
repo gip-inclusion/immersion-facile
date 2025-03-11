@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
-  ConventionDto,
+  type ConventionDto,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
-  Signatories,
-  TemplatedEmail,
-  UpdateConventionStatusRequestDto,
+  type Signatories,
+  type TemplatedEmail,
+  type UpdateConventionStatusRequestDto,
   VALID_EMAILS,
   conventionMagicLinkRoutes,
   expectArraysToEqualIgnoringOrder,
@@ -17,12 +17,15 @@ import {
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import supertest from "supertest";
-import { InMemoryOutboxRepository } from "../../../../domains/core/events/adapters/InMemoryOutboxRepository";
-import { DomainEvent } from "../../../../domains/core/events/events";
-import { InMemoryNotificationGateway } from "../../../../domains/core/notifications/adapters/InMemoryNotificationGateway";
+import type supertest from "supertest";
+import type { InMemoryOutboxRepository } from "../../../../domains/core/events/adapters/InMemoryOutboxRepository";
+import type { DomainEvent } from "../../../../domains/core/events/events";
+import type { InMemoryNotificationGateway } from "../../../../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { TestAppAndDeps, buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type TestAppAndDeps,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

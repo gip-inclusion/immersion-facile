@@ -1,10 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import React, { Fragment } from "react";
 import {
-  SliceOfString,
+  type SliceOfString,
   highlightStringsFromMatches,
 } from "src/app/utils/highlightStringsFromMatches";
-import { Proposal } from "./Proposal";
+import type { Proposal } from "./Proposal";
 
 export const StringWithHighlights = ({
   description,

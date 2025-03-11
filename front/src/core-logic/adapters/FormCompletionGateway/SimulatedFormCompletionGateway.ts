@@ -1,10 +1,10 @@
-import { BehaviorSubject, Observable, Subject, delay, of } from "rxjs";
+import { BehaviorSubject, type Observable, Subject, delay, of } from "rxjs";
 import {
-  AppellationMatchDto,
-  GetSiretInfo,
-  RomeDto,
-  SiretDto,
-  SiretEstablishmentDto,
+  type AppellationMatchDto,
+  type GetSiretInfo,
+  type RomeDto,
+  type SiretDto,
+  type SiretEstablishmentDto,
   apiSirenNotAvailableSiret,
   apiSirenUnexpectedError,
   conflictErrorSiret,
@@ -16,7 +16,7 @@ import {
   tooManiSirenRequestsSiretErrorMessage,
   tooManySirenRequestsSiret,
 } from "shared";
-import { FormCompletionGateway } from "../../ports/FormCompletionGateway";
+import type { FormCompletionGateway } from "../../ports/FormCompletionGateway";
 
 export class SimulatedFormCompletionGateway implements FormCompletionGateway {
   readonly #romeDtos$: Subject<RomeDto[]>;

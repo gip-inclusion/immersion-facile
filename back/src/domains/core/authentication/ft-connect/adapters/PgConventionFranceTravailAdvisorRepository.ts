@@ -1,14 +1,14 @@
-import { ConventionId, FtExternalId } from "shared";
-import { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
+import type { ConventionId, FtExternalId } from "shared";
+import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../utils/schema.utils";
-import {
+import type {
   ConventionFtUserAdvisorDto,
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,
 } from "../dto/FtConnect.dto";
 import { isFtAdvisorImmersionKind } from "../dto/FtConnectAdvisor.dto";
-import {
+import type {
   ConventionAndFtExternalIds,
   ConventionFranceTravailAdvisorRepository,
 } from "../port/ConventionFranceTravailAdvisorRepository";

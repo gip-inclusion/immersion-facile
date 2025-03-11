@@ -1,5 +1,5 @@
 import { keys } from "ramda";
-import { Environment } from "../environment";
+import type { Environment } from "../environment";
 
 type AdminTabProps = {
   slug: string;

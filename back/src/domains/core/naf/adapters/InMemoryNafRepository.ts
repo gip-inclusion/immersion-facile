@@ -1,5 +1,5 @@
-import { NafSectionSuggestion } from "shared";
-import { NafRepository } from "../port/NafRepository";
+import type { NafSectionSuggestion } from "shared";
+import type { NafRepository } from "../port/NafRepository";
 
 export class InMemoryNafRepository implements NafRepository {
   async getNafSuggestions(searchText: string): Promise<NafSectionSuggestion[]> {

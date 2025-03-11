@@ -1,5 +1,5 @@
-import { ConventionDto } from "shared";
-import { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
+import type { ConventionDto } from "shared";
+import type { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
 
 export type GetLastConventionsByUniqLastEventKindParams =
   EstablishmentLeadReminderParams & { maxResults: number };

@@ -11,16 +11,16 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
-  Attachment,
-  DiscussionAccepted,
-  DiscussionId,
-  DiscussionPending,
-  DiscussionReadDto,
-  DiscussionRejected,
-  DiscussionStatusWithRejection,
-  Exchange,
-  ExchangeRole,
-  WithDiscussionRejection,
+  type Attachment,
+  type DiscussionAccepted,
+  type DiscussionId,
+  type DiscussionPending,
+  type DiscussionReadDto,
+  type DiscussionRejected,
+  type DiscussionStatusWithRejection,
+  type Exchange,
+  type ExchangeRole,
+  type WithDiscussionRejection,
   exchangeRoles,
 } from "./discussion.dto";
 

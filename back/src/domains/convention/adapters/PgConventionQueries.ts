@@ -2,24 +2,24 @@ import { addDays, subDays } from "date-fns";
 import { sql } from "kysely";
 import { andThen } from "ramda";
 import {
-  ConventionDto,
-  ConventionId,
-  ConventionReadDto,
-  ConventionScope,
-  ConventionStatus,
-  DateRange,
-  FindSimilarConventionsParams,
-  SiretDto,
+  type ConventionDto,
+  type ConventionId,
+  type ConventionReadDto,
+  type ConventionScope,
+  type ConventionStatus,
+  type DateRange,
+  type FindSimilarConventionsParams,
+  type SiretDto,
   conventionReadSchema,
   conventionSchema,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import { Database } from "../../../config/pg/kysely/model/database";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
-import {
+import type {
   AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,

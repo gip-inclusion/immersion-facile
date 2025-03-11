@@ -1,6 +1,6 @@
-import { ConventionId } from "shared";
-import { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
-import {
+import type { ConventionId } from "shared";
+import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
+import type {
   ConventionToSync,
   ConventionsToSyncRepository,
 } from "../ports/ConventionsToSyncRepository";

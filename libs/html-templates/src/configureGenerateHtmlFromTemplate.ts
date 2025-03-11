@@ -8,7 +8,7 @@ import {
   renderHighlight,
   renderLegals,
 } from "./components/email";
-import { HtmlTemplateEmailData } from "./createTemplatesByName";
+import type { HtmlTemplateEmailData } from "./createTemplatesByName";
 import { ignoreTabs } from "./helpers/formatters";
 
 type Attachement = { url: string } | { name: string; content: string };

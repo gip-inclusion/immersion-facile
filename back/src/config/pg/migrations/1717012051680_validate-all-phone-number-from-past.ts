@@ -1,9 +1,9 @@
 import {
-  CountryCode,
+  type CountryCode,
   isValidPhoneNumber,
   parsePhoneNumber,
 } from "libphonenumber-js";
-import { MigrationBuilder } from "node-pg-migrate";
+import type { MigrationBuilder } from "node-pg-migrate";
 import { z } from "zod";
 
 const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];

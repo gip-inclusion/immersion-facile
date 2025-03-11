@@ -1,18 +1,18 @@
 import { toPairs } from "ramda";
 import {
-  AgencyId,
-  AgencyWithUsersRights,
-  ConventionDto,
-  ConventionReadDto,
-  Email,
-  EmailHash,
-  Role,
-  UserWithAdminRights,
+  type AgencyId,
+  type AgencyWithUsersRights,
+  type ConventionDto,
+  type ConventionReadDto,
+  type Email,
+  type EmailHash,
+  type Role,
+  type UserWithAdminRights,
   errors,
   isSomeEmailMatchingEmailHash,
   makeEmailHash,
 } from "shared";
-import { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 import { conventionEmailsByRole } from "./convention";
 

@@ -1,4 +1,10 @@
-import { Email, ExternalId, SiretDto, emailSchema, siretSchema } from "shared";
+import {
+  type Email,
+  type ExternalId,
+  type SiretDto,
+  emailSchema,
+  siretSchema,
+} from "shared";
 import { z } from "zod";
 
 type ProviderTokenPayloadBase = {

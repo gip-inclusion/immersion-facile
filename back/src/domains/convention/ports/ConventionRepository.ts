@@ -1,4 +1,4 @@
-import { ConventionDto, ConventionId, Email } from "shared";
+import type { ConventionDto, ConventionId, Email } from "shared";
 
 export interface ConventionRepository {
   getIdsByEstablishmentRepresentativeEmail(

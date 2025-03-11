@@ -2,9 +2,9 @@ import React, { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  ConventionJwtPayload,
-  Role,
-  WithConventionId,
+  type ConventionJwtPayload,
+  type Role,
+  type WithConventionId,
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredMagicLinkErrorMessage,
 } from "shared";
@@ -17,7 +17,7 @@ import { match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
   ConventionManageActions,
-  JwtKindProps,
+  type JwtKindProps,
 } from "./ConventionManageActions";
 import { ConventionValidation } from "./ConventionValidation";
 

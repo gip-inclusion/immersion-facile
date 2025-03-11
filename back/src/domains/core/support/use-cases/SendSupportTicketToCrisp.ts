@@ -1,9 +1,9 @@
-import { ConventionId, TallyForm, tallyFormSchema } from "shared";
+import { type ConventionId, type TallyForm, tallyFormSchema } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { createTransactionalUseCase } from "../../UseCase";
-import { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
-import { CrispGateway } from "../ports/CrispGateway";
+import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import type { CrispGateway } from "../ports/CrispGateway";
 
 const logger = createLogger(__filename);
 

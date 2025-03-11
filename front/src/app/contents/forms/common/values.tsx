@@ -1,4 +1,4 @@
-import { RadioButtonsProps } from "@codegouvfr/react-dsfr/RadioButtons";
+import type { RadioButtonsProps } from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 import eyeOffSvg from "../../../../assets/img/eye-off.svg";
 import eyeSvg from "../../../../assets/img/eye.svg";

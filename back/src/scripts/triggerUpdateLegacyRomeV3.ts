@@ -2,12 +2,15 @@ import axios from "axios";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
-import { AppellationCode, RomeCode, pipeWithValue } from "shared";
+import { type AppellationCode, type RomeCode, pipeWithValue } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
-import { AccessTokenResponse, AppConfig } from "../config/bootstrap/appConfig";
+import {
+  type AccessTokenResponse,
+  AppConfig,
+} from "../config/bootstrap/appConfig";
 import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import {
-  KyselyDb,
+  type KyselyDb,
   makeKyselyDb,
   values,
 } from "../config/pg/kysely/kyselyUtils";

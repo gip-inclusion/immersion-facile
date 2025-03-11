@@ -1,5 +1,5 @@
 import {
-  ConventionJwtPayload,
+  type ConventionJwtPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,

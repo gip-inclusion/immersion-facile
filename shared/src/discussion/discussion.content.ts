@@ -1,5 +1,5 @@
 import { frontRoutes } from "../routes/routes";
-import {
+import type {
   DiscussionDto,
   DiscussionReadDto,
   RejectionKind,

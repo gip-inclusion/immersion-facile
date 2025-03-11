@@ -1,12 +1,12 @@
-import { ApiConsumer, ConventionDtoBuilder, expectToEqual } from "shared";
+import { type ApiConsumer, ConventionDtoBuilder, expectToEqual } from "shared";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  TestDependencies,
+  type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
 const apiConsumer1: ApiConsumer = {
   id: "1",

@@ -1,4 +1,4 @@
-import { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
+import type { ColumnDefinitions, MigrationBuilder } from "node-pg-migrate";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {
   const columns: ColumnDefinitions = {
@@ -525,7 +525,9 @@ const lines: TableLine[] = [
   },
 ];
 
-const addLinesQuery = (lines: TableLine[]) => `INSERT INTO public_department_region (department_code, department_name, region_name)
+const addLinesQuery = (
+  lines: TableLine[],
+) => `INSERT INTO public_department_region (department_code, department_name, region_name)
 VALUES\n${lines.map(lineToInsertValue).join(",\n")};`;
 
 const lineToInsertValue = (line: TableLine) =>

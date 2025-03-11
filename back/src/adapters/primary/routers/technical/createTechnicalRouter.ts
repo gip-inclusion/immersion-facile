@@ -4,7 +4,7 @@ import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import {
   ForbiddenError,
-  TallyForm,
+  type TallyForm,
   errors,
   technicalRoutes,
   uploadFileRoute,

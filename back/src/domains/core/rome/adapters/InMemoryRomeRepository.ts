@@ -1,12 +1,12 @@
 import {
-  AppellationAndRomeDto,
-  AppellationCode,
-  RomeCode,
-  RomeDto,
+  type AppellationAndRomeDto,
+  type AppellationCode,
+  type RomeCode,
+  type RomeDto,
   cartographeAppellationAndRome,
 } from "shared";
 import { normalize } from "../../../../utils/textSearch";
-import { RomeRepository } from "../ports/RomeRepository";
+import type { RomeRepository } from "../ports/RomeRepository";
 
 const defaultAppellations: AppellationAndRomeDto[] = [
   {

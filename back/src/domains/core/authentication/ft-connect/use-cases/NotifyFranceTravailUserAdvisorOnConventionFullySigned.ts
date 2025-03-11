@@ -1,10 +1,14 @@
-import { WithConventionDto, frontRoutes, withConventionSchema } from "shared";
-import { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
+import {
+  type WithConventionDto,
+  frontRoutes,
+  withConventionSchema,
+} from "shared";
+import type { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../UseCase";
-import { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
-import { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
-import { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
+import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;

@@ -3,10 +3,10 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { AgencyOverview } from "src/app/components/forms/agency/AgencyOverview";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { routes } from "src/app/routes/routes";
+import type { routes } from "src/app/routes/routes";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
-import { Route } from "type-route";
+import type { Route } from "type-route";
 
 type AgencyDetailForAgencyDashboardProps = {
   route: Route<typeof routes.agencyDashboardAgencyDetails>;

@@ -1,7 +1,7 @@
 import { asyncScheduler } from "rxjs";
 import { createStorageDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createStorageDeviceRepository";
 import { ReactNavigationGateway } from "src/core-logic/adapters/NavigationGateway/ReactNavigationGateway";
-import {
+import type {
   LocalStoragePair,
   SessionStoragePair,
 } from "src/core-logic/ports/DeviceRepository";

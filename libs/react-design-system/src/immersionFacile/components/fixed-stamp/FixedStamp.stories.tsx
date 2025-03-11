@@ -1,6 +1,6 @@
 import type { ArgTypes, Meta, StoryObj } from "@storybook/react";
 import React from "react";
-import { FixedStamp, FixedStampProps } from "./FixedStamp";
+import { FixedStamp, type FixedStampProps } from "./FixedStamp";
 
 const Component = FixedStamp;
 type Story = StoryObj<typeof Component>;

@@ -1,18 +1,18 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
+import type { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { keys } from "ramda";
 import React, { useState } from "react";
 import {
-  ApiConsumer,
-  ApiConsumerContact,
-  ApiConsumerId,
-  ApiConsumerKind,
-  ApiConsumerName,
-  ApiConsumerRights,
-  ConventionScope,
-  NoScope,
+  type ApiConsumer,
+  type ApiConsumerContact,
+  type ApiConsumerId,
+  type ApiConsumerKind,
+  type ApiConsumerName,
+  type ApiConsumerRights,
+  type ConventionScope,
+  type NoScope,
   domElementIds,
 } from "shared";
 
