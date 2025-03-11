@@ -335,6 +335,10 @@ export const createGateways = async (
           partnerName: partnerNames.inseeSiret,
           routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
           logInputCbOnSuccess: logQwhenExists,
+          axiosInstance: axios.create({
+            timeout: config.externalAxiosTimeout,
+            validateStatus: () => true,
+          }),
         }),
         timeGateway,
         noRetries,
