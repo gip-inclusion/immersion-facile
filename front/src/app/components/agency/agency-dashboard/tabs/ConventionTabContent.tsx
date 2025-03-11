@@ -35,7 +35,7 @@ export const ConventionTabContent = (
         agencyDepartment: agency.address.departmentCode,
         agencyKind: agency.kind,
         agencyId: agency.id,
-        initiatedFromUserDashboard: true,
+        skipIntro: true,
       })
       .push();
   };
