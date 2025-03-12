@@ -13,6 +13,7 @@ import {
   DashboardUrlAndName,
   FindSimilarConventionsParams,
   RenewConventionParams,
+  RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -110,10 +111,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.conventionRenewalResult$;
   }
 
-  public async renewMagicLink(
-    _expiredJwt: string,
-    _originalUrl: string,
-  ): Promise<void> {
+  public async renewMagicLink(_: RenewMagicLinkRequestDto): Promise<void> {
     // This is supposed to ask the backend to send a new email to the owner of the expired magic link.
     // Since this operation makes no sense for local development, the implementation here is left empty.
     this.simulatedLatency && (await sleep(this.simulatedLatency));

@@ -1,11 +1,10 @@
 import {
   AgencyDtoBuilder,
-  BadRequestError,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
-  NotFoundError,
+  ConventionId,
   RenewMagicLinkRequestDto,
   Role,
   createConventionMagicLinkPayload,
@@ -127,7 +126,8 @@ describe("RenewConventionMagicLink use case", () => {
         });
 
         const request: RenewMagicLinkRequestDto = {
-          originalUrl: "immersionfacile.fr/verifier-et-signer",
+          originalUrl: "http://immersionfacile.fr/verifier-et-signer",
+
           expiredJwt: generateConventionJwt(expiredPayload),
         };
 
@@ -183,7 +183,9 @@ describe("RenewConventionMagicLink use case", () => {
       });
 
       const request: RenewMagicLinkRequestDto = {
-        originalUrl: "immersionfacile.fr%2Fverifier-et-signer",
+        originalUrl: encodeURIComponent(
+          "http://immersionfacile.fr/verifier-et-signer",
+        ),
         expiredJwt: generateConventionJwt(expiredPayload),
       };
 
@@ -195,21 +197,23 @@ describe("RenewConventionMagicLink use case", () => {
 
   describe("Wrong paths", () => {
     it("requires a valid application id", async () => {
-      const payload = createConventionMagicLinkPayload({
-        id: "not-a-valid-id",
-        role: "counsellor",
-        email,
-        now: timeGateway.now(),
-      });
+      const invalidConventionId: ConventionId = "not-a-valid-id";
 
       const request: RenewMagicLinkRequestDto = {
-        originalUrl: "immersionfacile.com/%jwt%",
-        expiredJwt: generateConventionJwt(payload),
+        originalUrl: "https://immersionfacile.com/%jwt%",
+        expiredJwt: generateConventionJwt(
+          createConventionMagicLinkPayload({
+            id: invalidConventionId,
+            role: "counsellor",
+            email,
+            now: timeGateway.now(),
+          }),
+        ),
       };
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new NotFoundError("not-a-valid-id"),
+        errors.convention.notFound({ conventionId: invalidConventionId }),
       );
     });
 
@@ -220,36 +224,36 @@ describe("RenewConventionMagicLink use case", () => {
         .build();
       uow.conventionRepository.setConventions([convention]);
 
-      const payload = createConventionMagicLinkPayload({
-        id: validConvention.id,
-        role: "counsellor",
-        email,
-        now: timeGateway.now(),
-      });
-
       const request: RenewMagicLinkRequestDto = {
-        originalUrl: "immersionfacile.com/%jwt%",
-        expiredJwt: generateConventionJwt(payload),
+        originalUrl: "https://immersionfacile.com/%jwt%",
+        expiredJwt: generateConventionJwt(
+          createConventionMagicLinkPayload({
+            id: convention.id,
+            role: "counsellor",
+            email,
+            now: timeGateway.now(),
+          }),
+        ),
       };
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        errors.agencies.notFound({ missingAgencyIds: [storedUnknownId] }),
+        errors.agency.notFound({ agencyId: storedUnknownId }),
       );
     });
 
     // Admins use non-magic-link based authentication, so no need to renew these.
     it("Refuses to generate backoffice magic links", async () => {
-      const payload = createConventionMagicLinkPayload({
-        id: validConvention.id,
-        role: "back-office",
-        email,
-        now: timeGateway.now(),
-      });
-
       const request: RenewMagicLinkRequestDto = {
-        originalUrl: "immersionfacile.com/verification",
-        expiredJwt: generateConventionJwt(payload),
+        originalUrl: "https://immersionfacile.com/verification",
+        expiredJwt: generateConventionJwt(
+          createConventionMagicLinkPayload({
+            id: validConvention.id,
+            role: "back-office",
+            email,
+            now: timeGateway.now(),
+          }),
+        ),
       };
 
       await expectPromiseToFailWithError(
@@ -259,23 +263,29 @@ describe("RenewConventionMagicLink use case", () => {
     });
 
     it("does not accept to renew links from url that are not supported", async () => {
-      const payload = createConventionMagicLinkPayload({
-        id: validConvention.id,
-        role: "counsellor",
-        email,
-        now: timeGateway.now(),
-      });
-
       const request: RenewMagicLinkRequestDto = {
         originalUrl: "immersionfacile.com/",
-        expiredJwt: generateConventionJwt(payload),
+        expiredJwt: generateConventionJwt(
+          createConventionMagicLinkPayload({
+            id: validConvention.id,
+            role: "counsellor",
+            email,
+            now: timeGateway.now(),
+          }),
+        ),
       };
 
       await expectPromiseToFailWithError(
         useCase.execute(request),
-        new BadRequestError(
-          `Wrong link format, should be one of the supported route: /demande-immersion, /verifier-et-signer, /pilotage-convention, /bilan-immersion. It was : ${request.originalUrl}`,
-        ),
+        errors.convention.unsupportedRenewRoute({
+          originalUrl: request.originalUrl,
+          supportedRenewRoutes: [
+            "demande-immersion",
+            "verifier-et-signer",
+            "pilotage-convention",
+            "bilan-immersion",
+          ],
+        }),
       );
     });
   });

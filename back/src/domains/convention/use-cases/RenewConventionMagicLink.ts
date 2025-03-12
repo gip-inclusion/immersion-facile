@@ -1,15 +1,13 @@
 import { TokenExpiredError, decode } from "jsonwebtoken";
 import {
-  AgencyWithUsersRights,
-  BadRequestError,
-  ConventionDto,
+  AppSupportedJwt,
   ConventionId,
   ConventionJwtPayload,
   ForbiddenError,
   InternshipKind,
-  NotFoundError,
   RenewMagicLinkRequestDto,
   Role,
+  errors,
   frontRoutes,
   makeEmailHash,
   renewMagicLinkRequestSchema,
@@ -19,7 +17,6 @@ import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
 import { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
-import { createLogger } from "../../../utils/logger";
 import { TransactionalUseCase } from "../../core/UseCase";
 import { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
@@ -27,8 +24,6 @@ import { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLi
 import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-
-const logger = createLogger(__filename);
 
 export class RenewConventionMagicLink extends TransactionalUseCase<
   RenewMagicLinkRequestDto,
@@ -68,22 +63,22 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
     uow: UnitOfWork,
   ) {
     const { emailHash, role, applicationId } = extractDataFromExpiredJwt(
-      this.#extractValidPayload(expiredJwt),
+      extractConventionJwtPayloadFromExpiredJwt(this.#config, expiredJwt),
     );
 
-    const convention = await this.#getConvention(uow, applicationId);
+    const convention = await uow.conventionRepository.getById(applicationId);
+    if (!convention)
+      throw errors.convention.notFound({ conventionId: applicationId });
+
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     const emails = conventionEmailsByRoleForMagicLinkRenewal(
-      role,
       convention,
-      await agencyWithRightToAgencyDto(
-        uow,
-        await this.#getAgency(uow, convention),
-      ),
+      await agencyWithRightToAgencyDto(uow, agency),
     )[role];
     if (emails instanceof Error) throw emails;
-
-    const route = this.#findRouteToRenew(originalUrl);
 
     // Only renew the link if the email hash matches
     await this.#onEmails(
@@ -91,78 +86,10 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       emailHash,
       applicationId,
       role,
-      route,
+      this.#findRouteToRenew(originalUrl),
       uow,
       convention.internshipKind,
     );
-  }
-
-  #extractValidPayload(expiredJwt: string) {
-    const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(this.#config);
-    let payloadToExtract: any | undefined;
-    try {
-      // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
-      // probably expired or an old version.
-      payloadToExtract = verifyJwt(expiredJwt);
-    } catch (err) {
-      // If this JWT is signed by us but expired, deal with it.
-      if (err instanceof TokenExpiredError) {
-        payloadToExtract = decode(expiredJwt) as ConventionJwtPayload;
-      } else {
-        // Perhaps this is a JWT that is signed by a compromised key.
-        try {
-          verifyDeprecatedJwt(expiredJwt);
-          // If the above didn't throw, this is a JWT that we issued. Renew it.
-          // However, we cannot trust the contents of it, as the private key was potentially
-          // compromised. Therefore, only use the convention ID and the role from it, and fill
-          // the remaining data from the database to prevent a hacker from getting magic links
-          // for any convention form.
-          payloadToExtract = decode(expiredJwt);
-        } catch (_) {
-          // We don't want to renew this JWT.
-          throw new ForbiddenError();
-        }
-      }
-    }
-    if (payloadToExtract) return payloadToExtract;
-    throw new BadRequestError("Malformed expired JWT");
-  }
-
-  #findRouteToRenew(originalUrl: string) {
-    const supportedRenewRoutes = [
-      frontRoutes.conventionImmersionRoute,
-      frontRoutes.conventionToSign,
-      frontRoutes.manageConvention,
-      frontRoutes.assessment,
-    ];
-    const routeToRenew = supportedRenewRoutes.find((supportedRoute) =>
-      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
-    );
-    if (routeToRenew) return routeToRenew;
-    throw new BadRequestError(
-      `Wrong link format, should be one of the supported route: ${supportedRenewRoutes
-        .map((route) => `/${route}`)
-        .join(", ")}. It was : ${originalUrl}`,
-    );
-  }
-
-  async #getAgency(
-    uow: UnitOfWork,
-    convention: ConventionDto,
-  ): Promise<AgencyWithUsersRights> {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (agency) return agency;
-    logger.error({
-      agencyId: convention.agencyId,
-      message: "No Agency Config found for this agency code",
-    });
-    throw new BadRequestError(convention.agencyId);
-  }
-
-  async #getConvention(uow: UnitOfWork, conventionId: ConventionId) {
-    const convention = await uow.conventionRepository.getById(conventionId);
-    if (convention) return convention;
-    throw new NotFoundError(conventionId);
   }
 
   async #onEmails(
@@ -214,11 +141,27 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
         );
       }
     }
-    if (!foundHit) {
-      throw new BadRequestError(
-        "Le lien magique n'est plus associé à cette demande d'immersion",
-      );
-    }
+    if (!foundHit) throw errors.convention.magicLinkNotAssociatedToConvention();
+  }
+
+  #findRouteToRenew(originalUrl: string) {
+    const supportedRenewRoutes: string[] = [
+      frontRoutes.conventionImmersionRoute,
+      frontRoutes.conventionToSign,
+      frontRoutes.manageConvention,
+      frontRoutes.assessment,
+    ];
+
+    const supportedRouteToRenew = supportedRenewRoutes.find((supportedRoute) =>
+      decodeURIComponent(originalUrl).includes(`/${supportedRoute}`),
+    );
+
+    if (!supportedRouteToRenew)
+      throw errors.convention.unsupportedRenewRoute({
+        supportedRenewRoutes,
+        originalUrl,
+      });
+    return supportedRouteToRenew;
   }
 }
 
@@ -228,19 +171,48 @@ type LinkRenewData = {
   applicationId: ConventionId;
   emailHash?: string;
 };
-const extractDataFromExpiredJwt: (payload: any) => LinkRenewData = (
-  payload: any,
-) =>
-  !payload.version
-    ? {
-        role: payload.roles[0],
-        applicationId: payload.applicationId,
-        emailHash: undefined,
+const extractDataFromExpiredJwt = (
+  payload: ConventionJwtPayload,
+): LinkRenewData =>
+  // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
+  // else if (payload.version === 1) {...}
+  ({
+    role: payload.role,
+    applicationId: payload.applicationId,
+    emailHash: payload.emailHash,
+  });
+
+const extractConventionJwtPayloadFromExpiredJwt = (
+  config: AppConfig,
+  expiredJwt: AppSupportedJwt,
+): ConventionJwtPayload => {
+  const { verifyJwt, verifyDeprecatedJwt } = verifyJwtConfig(config);
+  let payloadToExtract: ConventionJwtPayload | undefined;
+  try {
+    // If the following doesn't throw, we're dealing with a JWT that we signed, so it's
+    // probably expired or an old version.
+    payloadToExtract = verifyJwt(expiredJwt) as ConventionJwtPayload;
+  } catch (err) {
+    // If this JWT is signed by us but expired, deal with it.
+    if (err instanceof TokenExpiredError) {
+      payloadToExtract = decode(expiredJwt) as ConventionJwtPayload;
+    } else {
+      // Perhaps this is a JWT that is signed by a compromised key.
+      try {
+        verifyDeprecatedJwt(expiredJwt);
+        // If the above didn't throw, this is a JWT that we issued. Renew it.
+        // However, we cannot trust the contents of it, as the private key was potentially
+        // compromised. Therefore, only use the convention ID and the role from it, and fill
+        // the remaining data from the database to prevent a hacker from getting magic links
+        // for any convention form.
+        payloadToExtract = decode(expiredJwt) as ConventionJwtPayload;
+      } catch (_) {
+        // We don't want to renew this JWT.
+        throw new ForbiddenError();
       }
-    : // Once there are more JWT versions, expand this code to upgrade old JWTs, e.g.:
-      // else if (payload.version === 1) {...}
-      {
-        role: payload.role,
-        applicationId: payload.applicationId,
-        emailHash: payload.emailHash,
-      };
+    }
+  }
+  // Convention JWT payload is not validated
+  if (payloadToExtract) return payloadToExtract;
+  throw errors.convention.malformedExpiredJwt();
+};

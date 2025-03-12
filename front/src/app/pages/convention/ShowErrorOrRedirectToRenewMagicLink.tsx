@@ -17,7 +17,7 @@ export const ShowErrorOrRedirectToRenewMagicLink = ({
   routes
     .renewConventionMagicLink({
       expiredJwt: jwt,
-      originalURL: window.location.href,
+      originalUrl: window.location.href,
     })
     .replace();
   return null;

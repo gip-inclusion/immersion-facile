@@ -150,7 +150,11 @@ export const unauthenticatedConventionRoutes = defineRoutes({
     url: "/renew-magic-link",
     method: "get",
     queryParamsSchema: renewMagicLinkRequestSchema,
-    responses: { 200: expressEmptyResponseBody },
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      404: httpErrorSchema,
+    },
   }),
   findSimilarConventions: defineRoute({
     url: "/find-similar-immersion",

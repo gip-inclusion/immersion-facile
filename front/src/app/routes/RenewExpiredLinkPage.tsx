@@ -3,8 +3,12 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import React, { useState } from "react";
 import { MainWrapper } from "react-design-system";
-import { ConventionJwtPayload, domElementIds } from "shared";
-import { decodeMagicLinkJwtWithoutSignatureCheck } from "shared";
+import {
+  ConventionJwtPayload,
+  RenewMagicLinkRequestDto,
+  decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
+} from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
@@ -14,17 +18,13 @@ interface RenewExpiredLinkProps {
   route: Route<typeof routes.renewConventionMagicLink>;
 }
 
-interface RenewExpiredLinkContentsProps {
-  expiredJwt: string;
-  originalURL: string;
-}
-
-export const RenewExpiredLinkContent = ({
-  expiredJwt,
-  originalURL,
-}: RenewExpiredLinkContentsProps) => {
+export const RenewExpiredLinkContent = (
+  renewMagicLinkRequestDto: RenewMagicLinkRequestDto,
+) => {
   const jwtPayload =
-    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(expiredJwt);
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+      renewMagicLinkRequestDto.expiredJwt,
+    );
   // Flag that tracks if the link renewal had already been requested.
   const [requested, setRequested] = useState(false);
   // Tracks the success of the server request.
@@ -38,7 +38,7 @@ export const RenewExpiredLinkContent = ({
       return;
     }
 
-    if (!expiredJwt) {
+    if (!renewMagicLinkRequestDto.expiredJwt) {
       setRequestSuccessful(false);
       setErrorMessage("URL invalide");
       return;
@@ -46,7 +46,7 @@ export const RenewExpiredLinkContent = ({
 
     setRequested(true);
     outOfReduxDependencies.conventionGateway
-      .renewMagicLink(expiredJwt, originalURL)
+      .renewMagicLink(renewMagicLinkRequestDto)
       .then(() => {
         setRequestSuccessful(true);
       })
@@ -120,7 +120,7 @@ export const RenewExpiredLinkPage = ({ route }: RenewExpiredLinkProps) => (
     <MainWrapper layout="boxed">
       <RenewExpiredLinkContent
         expiredJwt={route.params.expiredJwt}
-        originalURL={route.params.originalURL}
+        originalUrl={route.params.originalUrl}
       />
     </MainWrapper>
   </HeaderFooterLayout>

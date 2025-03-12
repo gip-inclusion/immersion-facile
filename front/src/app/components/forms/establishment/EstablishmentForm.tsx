@@ -159,7 +159,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         routes
           .renewConventionMagicLink({
             expiredJwt: jwt,
-            originalURL: window.location.href,
+            originalUrl: window.location.href,
           })
           .replace();
       }
