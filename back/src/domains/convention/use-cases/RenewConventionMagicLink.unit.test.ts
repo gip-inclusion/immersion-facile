@@ -1,9 +1,11 @@
 import {
   AgencyDtoBuilder,
+  BadRequestError,
   BeneficiaryCurrentEmployer,
   BeneficiaryRepresentative,
   ConventionDto,
   ConventionDtoBuilder,
+  NotFoundError,
   RenewMagicLinkRequestDto,
   Role,
   createConventionMagicLinkPayload,
@@ -12,7 +14,6 @@ import {
   expectToEqual,
   frontRoutes,
 } from "shared";
-import { BadRequestError, NotFoundError } from "shared";
 import { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -107,6 +108,7 @@ describe("RenewConventionMagicLink use case", () => {
         "establishment-representative",
         validConvention.signatories.establishmentRepresentative.email,
       ],
+      ["establishment-tutor", validConvention.establishmentTutor.email],
       ...defaultAgency.counsellorEmails.map(
         (counsellorEmail): [Role, string] => ["counsellor", counsellorEmail],
       ),
