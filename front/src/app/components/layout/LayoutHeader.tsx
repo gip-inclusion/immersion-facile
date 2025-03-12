@@ -69,38 +69,26 @@ export const LayoutHeader = () => {
       key={`${quickAccessIds.initiateConvention}-button-with-sub-menu`}
       navItems={[
         {
-          text: "Je suis un candidat",
-          isActive: false,
-          linkProps: {
-            ...routes.beneficiaryDashboard().link,
-            id: quickAccessIds.beneficiary,
-          },
+          children: "Je suis un candidat",
+          id: quickAccessIds.beneficiary,
+          linkProps: routes.beneficiaryDashboard().link,
         },
         {
-          text: "Je suis une entreprise",
-          isActive: false,
-          linkProps: {
-            ...routes.establishmentDashboard().link,
-            id: quickAccessIds.establishment,
-          },
+          children: "Je suis une entreprise",
+          id: quickAccessIds.establishment,
+          linkProps: routes.establishmentDashboard().link,
         },
         {
-          text: "Je suis un prescripteur",
-          isActive: false,
-          linkProps: {
-            ...routes.agencyDashboardMain().link,
-            id: quickAccessIds.agency,
-          },
+          children: "Je suis un prescripteur",
+          id: quickAccessIds.agency,
+          linkProps: routes.agencyDashboardMain().link,
         },
         ...(isInclusionConnected
           ? [
               {
-                text: "Mon profil",
-                isActive: false,
-                linkProps: {
-                  ...routes.myProfile().link,
-                  id: quickAccessIds.myAccount,
-                },
+                children: "Mon profil",
+                id: quickAccessIds.myAccount,
+                linkProps: routes.myProfile().link,
               },
             ]
           : []),
