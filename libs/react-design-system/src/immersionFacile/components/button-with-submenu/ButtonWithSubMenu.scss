@@ -15,5 +15,15 @@
 
   &__list {
     width: max-content;
+    box-shadow: var(--border-default-grey) 0px 2px 8px 0px;
+  }
+
+  &__list-element {
+    list-style: none;
+    list-style-type: none;
+
+    [href] {
+      background-image: none;
+    } 
   }
 }
