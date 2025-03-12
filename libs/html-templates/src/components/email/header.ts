@@ -46,9 +46,9 @@ export const cciCustomHtmlHeader = (agencyLogoUrl?: string): string => `
 <table width="600">
   <tr>
     <td width="60%">
-      <a href="https://www.cci.fr/">
-        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci.png" alt="Chambre de Commerce et d'Industrie" width="899" height="173" style="max-width: 350px; max-height: 120px; height: auto;"/>
-      </a>
+      
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" alt="Chambre de Commerce et d'Industrie" width="699" height="173" style="max-width: 200px; max-height: 120px; height: auto;"/>
+      
     </td>
     ${
       agencyLogoUrl && agencyLogoUrl !== ""

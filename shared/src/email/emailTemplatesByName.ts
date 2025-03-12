@@ -20,7 +20,7 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 `
     : `
     Bonne journée, 
-    L’équipe du Point Orientation Apprentissage
+    L’équipe de votre chambre consulaire.
 `;
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
