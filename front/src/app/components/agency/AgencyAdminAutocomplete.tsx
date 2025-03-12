@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Autocomplete from "@mui/material/Autocomplete";
 import { prop, propEq } from "ramda";
 
 import { useDispatch } from "react-redux";

@@ -99,15 +99,21 @@ export const BeneficiaryCurrentEmployerFields = ({
         {...formFields[
           "signatories.beneficiaryCurrentEmployer.businessAddress"
         ]}
-        initialSearchTerm={
+        initialInputValue={
           values.signatories.beneficiaryCurrentEmployer?.businessAddress
         }
-        setFormValue={({ address }) =>
+        onAddressSelected={(addressAndPosition) => {
           setValue(
             "signatories.beneficiaryCurrentEmployer.businessAddress",
-            addressDtoToString(address),
-          )
-        }
+            addressDtoToString(addressAndPosition.address),
+          );
+        }}
+        onAddressClear={() => {
+          setValue(
+            "signatories.beneficiaryCurrentEmployer.businessAddress",
+            "",
+          );
+        }}
         {...getFieldError(
           "signatories.beneficiaryCurrentEmployer.businessAddress",
         )}
