@@ -177,16 +177,14 @@ const AgencyLogoUpload = () => {
   const formValues = getValues();
 
   return (
-    <>
-      <UploadFile
-        setFileUrl={(value) => setValue("logoUrl", value)}
-        maxSize_Mo={2}
-        {...formAgencyFieldsLabels.logoUrl}
-        hint={fieldsContent.logoUrl.hintText}
-      />
-      {formValues.logoUrl && (
-        <img src={formValues.logoUrl} alt="uploaded-logo" width="100px" />
-      )}
-    </>
+    <UploadFile
+      setUploadedFileUrl={(value) => setValue("logoUrl", value)}
+      {...(formValues.logoUrl ? { initialFileUrl: formValues.logoUrl } : {})}
+      maxSize_Mo={2}
+      {...formAgencyFieldsLabels.logoUrl}
+      hint={fieldsContent.logoUrl.hintText}
+      id={domElementIds.addAgency.uploadLogoInput}
+      shouldDisplayFeedback={false}
+    />
   );
 };

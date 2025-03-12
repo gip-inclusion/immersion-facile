@@ -65,11 +65,12 @@ export class HttpTechnicalGateway implements TechnicalGateway {
   ): Promise<AbsoluteUrl> {
     const formData = new FormData();
     formData.append(uploadFileRoute, file);
-    const { data } = await this.axiosInstance.post(
+    const { data, status } = await this.axiosInstance.post(
       `/${uploadFileRoute}`,
       formData,
       { headers: { authorization: jwt } },
     );
+    if (status !== 200) throw new Error(data.message);
     return data;
   }
 }
