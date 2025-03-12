@@ -3,7 +3,6 @@ import {
   type BrevoEmailItem,
   type BrevoInboundBody,
   type DiscussionId,
-  type Exchange,
   type ExchangeRole,
   brevoInboundBodySchema,
   errors,
@@ -13,7 +12,6 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { addExchangeToDiscussion } from "../../helpers/discussion.helpers";
 
 const defaultSubject = "Sans objet";
 
@@ -78,23 +76,25 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
         ? "potentialBeneficiary"
         : "establishment";
 
-    const exchange: Exchange = {
-      subject: item.Subject || defaultSubject,
-      message: processEmailMessage(item),
-      sentAt: new Date(item.SentAtDate).toISOString(),
-      recipient: recipientKind,
-      sender,
-      attachments: item.Attachments
-        ? item.Attachments.map(({ Name, DownloadToken }) => ({
-            name: Name,
-            link: DownloadToken,
-          }))
-        : [],
-    };
-
-    await uow.discussionRepository.update(
-      addExchangeToDiscussion(discussion, exchange),
-    );
+    await uow.discussionRepository.update({
+      ...discussion,
+      exchanges: [
+        ...discussion.exchanges,
+        {
+          subject: item.Subject || defaultSubject,
+          message: processEmailMessage(item),
+          sentAt: new Date(item.SentAtDate).toISOString(),
+          recipient: recipientKind,
+          sender,
+          attachments: item.Attachments
+            ? item.Attachments.map(({ Name, DownloadToken }) => ({
+                name: Name,
+                link: DownloadToken,
+              }))
+            : [],
+        },
+      ],
+    });
 
     await uow.outboxRepository.save(
       this.#createNewEvent({

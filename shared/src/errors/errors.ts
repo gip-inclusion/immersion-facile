@@ -10,7 +10,7 @@ import type {
   ConventionStatus,
   ReminderKind,
 } from "../convention/convention.dto";
-import type { DiscussionId } from "../discussion/discussion.dto";
+import type { DiscussionId, RejectionKind } from "../discussion/discussion.dto";
 import type { Email } from "../email/email.dto";
 import type { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import type { StoredFileId } from "../file/file.dto";
@@ -656,6 +656,8 @@ export const errors = {
       new BadRequestError(
         "Aucun critère n'a été fourni pour vérifier l'existence d'une mise en relation.",
       ),
+    unsupportedRejectionKind: (rejectionKind: RejectionKind) =>
+      new BadRequestError(`La raison ${rejectionKind} n'est pas supportée.`),
   },
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>

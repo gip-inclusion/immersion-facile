@@ -26,6 +26,7 @@ import {
   type DiscussionReadDto,
   type DiscussionStatus,
   type Email,
+  RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
   type WithDiscussionId,
   type WithDiscussionRejection,
@@ -383,9 +384,8 @@ const RejectApplicationForm = ({
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
-  const [dataToSend, setDataToSend] = useState<WithDiscussionRejection | null>(
-    null,
-  );
+  const [rejectParams, setRejectParams] =
+    useState<RejectDiscussionAndSendNotificationParam | null>(null);
   const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
     {
       label:
@@ -403,67 +403,67 @@ const RejectApplicationForm = ({
     },
   ];
   if (!inclusionConnectedJwt) throw new Error("No jwt found");
-  return dataToSend ? (
-    <>
-      <p>
-        Voici l'email qui sera envoyé au candidat si vous rejetez sa candidature
-        :
-      </p>
-      <Card
-        title={`Sujet : ${
-          rejectDiscussionEmailParams({
-            discussion,
-            ...dataToSend,
-          }).subject
-        }`}
-        className={fr.cx("fr-mb-2w")}
-        desc={
-          <div
-            dangerouslySetInnerHTML={{
-              __html:
-                renderContent(
-                  rejectDiscussionEmailParams({
-                    discussion,
-                    ...dataToSend,
-                  }).htmlContent,
-                  { wrapInTable: false },
-                ) ?? "",
-            }}
-          />
-        }
-      />
-      <ButtonsGroup
-        buttons={[
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationCancelButton,
-            priority: "secondary",
-            children: "Annuler",
-            type: "button",
-            onClick: () => setDataToSend(null),
-          },
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitButton,
-            priority: "primary",
-            children: "Rejeter la candidature et notifier le candidat",
-            onClick: () =>
-              dispatch(
-                discussionSlice.actions.updateDiscussionStatusRequested({
-                  discussionId: discussion.id,
-                  status: "REJECTED",
-                  feedbackTopic: "dashboard-discussion-rejection",
-                  ...dataToSend,
-                  jwt: inclusionConnectedJwt,
-                }),
-              ),
-          },
-        ]}
-        inlineLayoutWhen="always"
-      />
-    </>
-  ) : (
-    <form onSubmit={handleSubmit(setDataToSend)}>
+  if (rejectParams) {
+    const { htmlContent, subject } = rejectDiscussionEmailParams(
+      rejectParams,
+      discussion,
+    );
+    return (
+      <>
+        <p>
+          Voici l'email qui sera envoyé au candidat si vous rejetez sa
+          candidature :
+        </p>
+        <Card
+          title={`Sujet : ${subject}`}
+          className={fr.cx("fr-mb-2w")}
+          desc={
+            <div
+              dangerouslySetInnerHTML={{
+                __html:
+                  renderContent(htmlContent, { wrapInTable: false }) ?? "",
+              }}
+            />
+          }
+        />
+        <ButtonsGroup
+          buttons={[
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .rejectApplicationCancelButton,
+              priority: "secondary",
+              children: "Annuler",
+              type: "button",
+              onClick: () => setRejectParams(null),
+            },
+            {
+              id: domElementIds.establishmentDashboard.discussion
+                .rejectApplicationSubmitButton,
+              priority: "primary",
+              children: "Rejeter la candidature et notifier le candidat",
+              onClick: () =>
+                dispatch(
+                  discussionSlice.actions.updateDiscussionStatusRequested({
+                    status: "REJECTED",
+                    feedbackTopic: "dashboard-discussion-rejection",
+                    ...rejectParams,
+                    jwt: inclusionConnectedJwt,
+                  }),
+                ),
+            },
+          ]}
+          inlineLayoutWhen="always"
+        />
+      </>
+    );
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit((values) =>
+        setRejectParams({ ...values, discussionId: discussion.id }),
+      )}
+    >
       <Select
         label="Pour quel motif souhaitez-vous refuser cette candidature ?"
         nativeSelectProps={{

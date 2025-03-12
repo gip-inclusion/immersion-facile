@@ -1,25 +1,21 @@
+import { errors } from "../errors/errors";
 import { frontRoutes } from "../routes/routes";
 import type {
   DiscussionDto,
   DiscussionReadDto,
-  RejectionKind,
+  RejectDiscussionAndSendNotificationParam,
 } from "./discussion.dto";
 
-export const rejectDiscussionEmailParams = ({
-  discussion,
-  rejectionKind,
-  rejectionReason,
-}: {
-  discussion: DiscussionDto | DiscussionReadDto;
-  rejectionKind: RejectionKind;
-  rejectionReason?: string;
-}) => ({
+export const rejectDiscussionEmailParams = (
+  params: RejectDiscussionAndSendNotificationParam,
+  discussion: DiscussionDto | DiscussionReadDto,
+) => ({
   subject: `L’entreprise ${discussion.businessName} ne souhaite pas donner suite à votre candidature à l’immersion`, // TODO check content
   htmlContent: `Bonjour, 
   
 Malheureusement, nous ne souhaitons pas donner suite à votre candidature à l’immersion.
 
-La raison du refus est : ${makeRejectionText(rejectionKind, rejectionReason)}
+La raison du refus est : ${makeRejectionText(params)}
 
 N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/${
     frontRoutes.search
@@ -32,15 +28,12 @@ ${discussion.establishmentContact.firstName} ${
 });
 
 const makeRejectionText = (
-  rejectionKind: RejectionKind,
-  rejectionReason?: string,
-) => {
-  const textForRejectionKind: Record<RejectionKind, string> = {
-    UNABLE_TO_HELP:
-      "l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.",
-    NO_TIME:
-      "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
-    OTHER: rejectionReason ?? "Raison du refus non spécifiée",
-  };
-  return textForRejectionKind[rejectionKind];
+  params: RejectDiscussionAndSendNotificationParam,
+): string => {
+  if (params.rejectionKind === "OTHER") return params.rejectionReason;
+  if (params.rejectionKind === "UNABLE_TO_HELP")
+    return "l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.";
+  if (params.rejectionKind === "NO_TIME")
+    return "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.";
+  throw errors.discussion.unsupportedRejectionKind(params.rejectionKind);
 };
