@@ -16,4 +16,7 @@ export type DataWithPagination<T> = {
 };
 
 export const defaultPageInPagination = 1;
-export const defaultPerPageInPagination = 100;
+export const defaultPerPageInApiPagination = 100;
+
+export const defaultPerPageInWebPagination = 20;
+export const maxPerPageInWebPagination = 100;
