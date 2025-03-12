@@ -5,11 +5,13 @@ import type { AddressDto, Postcode } from "../address/address.dto";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type { DateFilter } from "../filters";
 import type {
   AgencyRole,
   UserWithAdminRights,
   UserWithAgencyRights,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import {
   type ModifierRole,
   type Role,
@@ -27,6 +29,7 @@ import type {
   expiredMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
+import type { NotEmptyArray } from "../utils";
 import type { DateString } from "../utils/date";
 
 export type ConventionStatus = (typeof conventionStatuses)[number];
@@ -437,4 +440,27 @@ export const getExactAge = ({
   referenceDate,
 }: { birthDate: Date; referenceDate: Date }): number => {
   return differenceInYears(startOfDay(referenceDate), startOfDay(birthDate));
+};
+
+export type GetPaginatedConventionsFilters = {
+  actorEmailContains?: string;
+  establishmentNameContains?: string;
+  beneficiaryNameContains?: string;
+  statuses?: NotEmptyArray<ConventionStatus>;
+  agencyIds?: NotEmptyArray<string>;
+  agencyDepartmentCodes?: NotEmptyArray<string>;
+  dateStart?: DateFilter;
+  dateEnd?: DateFilter;
+  dateSubmission?: DateFilter;
+};
+
+export type GetPaginatedConventionsSortBy = keyof Pick<
+  ConventionDto,
+  "dateValidation" | "dateStart" | "dateSubmission"
+>;
+
+export type GetConventionsForAgencyUserParams = {
+  filters?: GetPaginatedConventionsFilters;
+  sortBy?: GetPaginatedConventionsSortBy;
+  pagination?: PaginationQueryParams;
 };

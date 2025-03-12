@@ -9,6 +9,7 @@ import type {
   DateRange,
   ExtractFromExisting,
   FindSimilarConventionsParams,
+  GetConventionsForAgencyUserParams,
   NotEmptyArray,
   PaginationQueryParams,
   SiretDto,
@@ -42,29 +43,11 @@ export type GetConventionsParams = {
   sortBy: GetConventionsSortBy;
 };
 
-export type GetPaginatedConventionsFilters = {
-  actorEmailContains?: string;
-  establishmentNameContains?: string;
-  beneficiaryNameContains?: string;
-  statuses?: NotEmptyArray<ConventionStatus>;
-  agencyIds?: NotEmptyArray<string>;
-  agencyDepartmentCodes?: NotEmptyArray<string>;
-  dateStart?: DateFilter;
-  dateEnd?: DateFilter;
-  dateSubmission?: DateFilter;
-};
-
-export type GetPaginatedConventionsForAgencyUserParams = {
-  agencyUserId: UserId;
-  pagination: Required<PaginationQueryParams>;
-  filters?: GetPaginatedConventionsFilters;
-  sortBy?: GetPaginatedConventionsSortBy;
-};
-
-export type GetPaginatedConventionsSortBy = keyof Pick<
-  ConventionDto,
-  "dateValidation" | "dateStart" | "dateSubmission"
->;
+export type GetPaginatedConventionsForAgencyUserParams =
+  GetConventionsForAgencyUserParams & {
+    agencyUserId: UserId;
+    pagination: Required<PaginationQueryParams>;
+  };
 
 export interface ConventionQueries {
   getConventionById: (

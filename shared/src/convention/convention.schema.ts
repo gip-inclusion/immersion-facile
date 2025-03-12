@@ -8,6 +8,11 @@ import {
 } from "../agency/agency.schema";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
+import { dateFilterSchema } from "../filters";
+import {
+  createPaginatedSchema,
+  paginationQueryParamsSchema,
+} from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { allModifierRoles, allRoles } from "../role/role.dto";
 import { signatoryRoleSchema } from "../role/role.schema";
@@ -65,6 +70,7 @@ import {
   type FindSimilarConventionsParams,
   type FindSimilarConventionsResponseDto,
   type GenerateMagicLinkRequestDto,
+  type GetConventionsForAgencyUserParams,
   IMMERSION_BENEFICIARY_MINIMUM_AGE_REQUIREMENT,
   type ImmersionObjective,
   type InternshipKind,
@@ -650,3 +656,25 @@ export const findSimilarConventionsResponseSchema: z.Schema<FindSimilarConventio
   z.object({
     similarConventionIds: z.array(conventionIdSchema),
   });
+
+export const getConventionsForAgencyUserParamsSchema: z.Schema<GetConventionsForAgencyUserParams> =
+  z.object({
+    filters: z.object({
+      actorEmailContains: z.string().optional(),
+      establishmentNameContains: z.string().optional(),
+      beneficiaryNameContains: z.string().optional(),
+      statuses: z.array(z.enum(conventionStatuses)).nonempty().optional(),
+      agencyIds: z.array(agencyIdSchema).nonempty().optional(),
+      agencyDepartmentCodes: z.array(z.string()).nonempty().optional(),
+      dateStart: dateFilterSchema.optional(),
+      dateEnd: dateFilterSchema.optional(),
+      dateSubmission: dateFilterSchema.optional(),
+    }),
+    sortBy: z
+      .enum(["dateValidation", "dateStart", "dateSubmission"])
+      .optional(),
+    pagination: paginationQueryParamsSchema.optional(),
+  });
+
+export const paginatedConventionsSchema =
+  createPaginatedSchema(conventionSchema);
