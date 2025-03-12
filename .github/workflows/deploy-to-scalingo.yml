@@ -51,7 +51,16 @@ jobs:
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Deploy back
-        run: scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
+        run: |
+          # first attempt
+          scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
+          
+          # If first attempt fails, retry once
+          if [ $? -ne 0 ]; then
+            echo "Back deployment failed! Retrying in 5 seconds..."
+            sleep 5
+            scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
+          fi
       - name: Deploy front
         run: scalingo --app if-${{ inputs.environment }}-front --region ${{ inputs.region }} deploy front-build.tar.gz ${{ inputs.tag }}
       - name: Send Slack notification
