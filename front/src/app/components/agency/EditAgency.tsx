@@ -22,8 +22,17 @@ export const EditAgency = () => {
       </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
-          title="Je sélectionne une agence (nom ou SIRET)"
-          placeholder={"Ex : Agence de Berry"}
+          label="Je sélectionne une agence (nom ou SIRET)"
+          selectProps={{
+            inputId: "agency-autocomplete",
+            placeholder: "Ex : Agence de Berry",
+          }}
+          onAgencySelected={(agency) => {
+            console.log(agency);
+          }}
+          onAgencyClear={() => {
+            console.log("clear");
+          }}
         />
       </div>
       {/* //Todo remove this from agency tab to redirect on agency detail admin page when select an agency in autocomplete */}
