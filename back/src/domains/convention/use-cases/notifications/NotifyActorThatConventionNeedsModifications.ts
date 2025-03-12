@@ -118,7 +118,10 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
         justification,
         signature: agency.signature,
         magicLink: await makeShortMagicLink({
-          targetRoute: frontRoutes.conventionImmersionRoute,
+          targetRoute:
+            convention.internshipKind === "immersion"
+              ? frontRoutes.conventionImmersionRoute
+              : frontRoutes.conventionMiniStageRoute,
           lifetime: "short",
         }),
         agencyLogoUrl: agency.logoUrl ?? undefined,
