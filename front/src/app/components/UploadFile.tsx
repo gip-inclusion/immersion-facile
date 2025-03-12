@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { type ChangeEvent, type ReactNode, useState } from "react";
 import { CopyButton, File } from "react-design-system";
-import type { AbsoluteUrl } from "shared";
+import { type AbsoluteUrl, errors } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -36,7 +36,7 @@ export const UploadFile = ({
   );
   const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
 
-  if (!connectedUserJwt) return null;
+  if (!connectedUserJwt) throw errors.user.noJwtProvided();
 
   const toBase64 = (file: File) => {
     const reader = new FileReader();
@@ -56,10 +56,7 @@ export const UploadFile = ({
     <>
       <File
         onChange={async (e: ChangeEvent<HTMLInputElement>) => {
-          let file = null;
-          if (e.target.files?.length) {
-            file = e.target.files[0];
-          }
+          const file = e.target.files?.length ? e.target.files[0] : null;
           if (file && file.size > 1_000_000 * maxSize_Mo) {
             setError(`Le fichier ne peut pas faire plus de ${maxSize_Mo} Mo`);
             return;
@@ -67,20 +64,16 @@ export const UploadFile = ({
           setError(undefined);
           if (!file) return;
 
-          try {
-            const fileUrl =
-              await outOfReduxDependencies.technicalGateway.uploadFile(
-                file,
-                connectedUserJwt,
-              );
-            setUploadedFile(file, fileUrl);
-          } catch (error: any) {
-            const errorMessage =
-              "message" in error
-                ? error.message
-                : "Une erreur est survenue lors de l'upload de fichier";
-            setUploadError(errorMessage);
-          }
+          await outOfReduxDependencies.technicalGateway
+            .uploadFile(file, connectedUserJwt)
+            .then((fileUrl) => setUploadedFile(file, fileUrl))
+            .catch((error) =>
+              setUploadError(
+                "message" in error
+                  ? error.message
+                  : "Une erreur est survenue lors de l'upload de fichier",
+              ),
+            );
         }}
         label={label}
         hint={hint}
