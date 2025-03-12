@@ -13,7 +13,11 @@ export const makeInclusionConnectAuthMiddleware = (
   timeGateway: TimeGateway,
 ) => {
   const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtPublicKey);
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: Request<any, any, any, any>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     const unauthorizedError = {
       status: errors.user.unauthorized().httpCode,
       message: errors.user.unauthorized().message,

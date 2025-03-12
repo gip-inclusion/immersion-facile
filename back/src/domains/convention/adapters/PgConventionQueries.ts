@@ -11,6 +11,8 @@ import {
   type DateFilter,
   type DateRange,
   type FindSimilarConventionsParams,
+  type GetPaginatedConventionsFilters,
+  type GetPaginatedConventionsSortBy,
   type NotEmptyArray,
   type PaginationQueryParams,
   type SiretDto,
@@ -31,8 +33,6 @@ import type {
   GetConventionsFilters,
   GetConventionsParams,
   GetConventionsSortBy,
-  GetPaginatedConventionsFilters,
-  GetPaginatedConventionsSortBy,
 } from "../ports/ConventionQueries";
 import {
   createConventionQueryBuilder,

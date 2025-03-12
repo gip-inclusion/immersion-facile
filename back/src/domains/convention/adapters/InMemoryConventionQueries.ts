@@ -28,6 +28,9 @@ import type {
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 export class InMemoryConventionQueries implements ConventionQueries {
+  public paginatedConventionsParams: GetPaginatedConventionsForAgencyUserParams[] =
+    [];
+
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
@@ -123,9 +126,29 @@ export class InMemoryConventionQueries implements ConventionQueries {
   }
 
   public async getPaginatedConventionsForAgencyUser(
-    _params: GetPaginatedConventionsForAgencyUserParams,
+    params: GetPaginatedConventionsForAgencyUserParams,
   ): Promise<DataWithPagination<ConventionDto>> {
-    throw new Error("Method not implemented.");
+    // Store the params for later inspection in tests
+    this.paginatedConventionsParams.push(params);
+
+    // Get all conventions
+    const conventions = this.conventionRepository.conventions;
+
+    // Apply pagination
+    const { page, perPage } = params.pagination;
+    const startIndex = (page - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, conventions.length);
+    const paginatedData = conventions.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      pagination: {
+        totalRecords: conventions.length,
+        currentPage: page,
+        totalPages: Math.ceil(conventions.length / perPage),
+        numberPerPage: perPage,
+      },
+    };
   }
 
   public async getConventionsByScope(params: {

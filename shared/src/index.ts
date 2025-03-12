@@ -84,6 +84,7 @@ export * from "./naf/naf.routes";
 export * from "./naf/naf.schema";
 export * from "./notifications/notifications.dto";
 export * from "./npsForms";
+export * from "./pagination/pagination";
 export * from "./pagination/pagination.dto";
 export * from "./pagination/pagination.schema";
 export * from "./phone.schema";

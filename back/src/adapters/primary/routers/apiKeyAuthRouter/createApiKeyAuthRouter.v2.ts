@@ -7,7 +7,7 @@ import {
   type SiretDto,
   type WithAcquisition,
   defaultPageInPagination,
-  defaultPerPageInPagination,
+  defaultPerPageInApiPagination,
   errors,
   eventToRightName,
   isApiConsumerAllowed,
@@ -196,7 +196,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         if (!req.apiConsumer) throw errors.user.unauthorized();
 
         const page = req.query.page ?? defaultPageInPagination;
-        const perPage = req.query.perPage ?? defaultPerPageInPagination;
+        const perPage = req.query.perPage ?? defaultPerPageInApiPagination;
 
         return deps.useCases.getEstablishmentStats.execute(
           {

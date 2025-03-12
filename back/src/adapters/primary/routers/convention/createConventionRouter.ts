@@ -59,5 +59,18 @@ export const createConventionRouter = (deps: AppDependencies) => {
       }),
   );
 
+  authenticatedConventionSharedRouter.getConventionsForAgencyUser(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return await deps.useCases.getConventionsForAgencyUser.execute(
+          { ...req.query },
+          currentUser,
+        );
+      }),
+  );
+
   return expressRouter;
 };
