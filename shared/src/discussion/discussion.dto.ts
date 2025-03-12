@@ -1,4 +1,5 @@
 import { P, match } from "ts-pattern";
+import { WithDiscussionId } from "..";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
@@ -7,7 +8,7 @@ import type {
   ImmersionObjective,
 } from "../convention/convention.dto";
 import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import type {
+import {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -115,6 +116,15 @@ export type Exchange = {
   sentAt: DateString;
   attachments: Attachment[];
 };
+
+export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
+  (
+    | {
+        rejectionKind: Extract<RejectionKind, "OTHER">;
+        rejectionReason: string;
+      }
+    | { rejectionKind: Exclude<RejectionKind, "OTHER"> }
+  );
 
 const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
 
@@ -368,21 +378,3 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     return new DiscussionBuilder(updatedDiscussion);
   }
 }
-
-export const makeRejection = ({
-  rejectionKind,
-  rejectionReason,
-}: {
-  rejectionKind: RejectionKind;
-  rejectionReason?: string;
-}) => {
-  if (rejectionKind === "OTHER") {
-    return {
-      rejectionKind,
-      rejectionReason: rejectionReason ?? "default rejection reason",
-    };
-  }
-  return {
-    rejectionKind,
-  };
-};

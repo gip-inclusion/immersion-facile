@@ -8,7 +8,6 @@ import {
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
   type WithIdToken,
-  makeRejection,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -123,15 +122,19 @@ export class HttpInclusionConnectedGateway
       discussionId: string;
     } & DiscussionRejected,
   ): Observable<void> {
-    const { jwt, discussionId, status } = params;
     return from(
       this.httpClient
         .updateDiscussionStatus({
-          headers: { authorization: jwt },
-          urlParams: { discussionId },
+          headers: { authorization: params.jwt },
+          urlParams: { discussionId: params.discussionId },
           body: {
-            status,
-            ...makeRejection({ ...params }),
+            status: params.status,
+            ...(params.rejectionKind === "OTHER"
+              ? {
+                  rejectionKind: params.rejectionKind,
+                  rejectionReason: params.rejectionReason,
+                }
+              : { rejectionKind: params.rejectionKind }),
           },
         })
         .then((response) =>
