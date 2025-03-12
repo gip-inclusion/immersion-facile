@@ -35,7 +35,6 @@ export const conventionEmailsByRole = (
 });
 
 export const conventionEmailsByRoleForMagicLinkRenewal = (
-  role: Role,
   convention: ConventionDto,
   agency: AgencyDto,
 ): Record<Role, string[] | Error> => {
@@ -43,9 +42,6 @@ export const conventionEmailsByRoleForMagicLinkRenewal = (
     ...conventionEmailsByRole(convention, agency),
     "back-office": errors.convention.roleHasNoMagicLink({
       role: "back-office",
-    }),
-    "establishment-tutor": errors.convention.unsupportedRoleRenewMagicLink({
-      role,
     }),
   };
 };
