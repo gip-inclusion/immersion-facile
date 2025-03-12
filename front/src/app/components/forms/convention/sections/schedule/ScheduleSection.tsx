@@ -89,7 +89,10 @@ export const ScheduleSection = () => {
           newDates.start = newDates.end;
       }
 
-      if (!shouldUpdateDateAndSchedule(newDates.start, newDates.end)) {
+      if (
+        !shouldUpdateDateAndSchedule(newDates.start, newDates.end) &&
+        inputName === "dateStart"
+      ) {
         alert(
           `Attention, votre ${
             values.internshipKind === "immersion" ? "immersion" : "stage"
