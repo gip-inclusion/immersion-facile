@@ -8,6 +8,7 @@ import {
   ConventionMagicLinkRoutes,
   InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
+  Role,
   TechnicalRoutes,
   UnauthenticatedConventionRoutes,
   User,
@@ -724,7 +725,7 @@ describe("convention e2e", () => {
         },
       });
     });
-  }); // tuka bonjour
+  });
 
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.renewConvention,
@@ -794,6 +795,52 @@ describe("convention e2e", () => {
       expect(
         makeVerifyJwtES256(appConfig.jwtPublicKey)(renewedJwt),
       ).toBeDefined();
+    });
+
+    it("400 - renew not allowed for back-office", async () => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(
+          AgencyDtoBuilder.create(convention.agencyId)
+            .withName("TEST-name")
+            .withSignature("TEST-signature")
+            .build(),
+        ),
+      ];
+      gateways.timeGateway.setNextDate(new Date());
+
+      generateConventionJwt = makeGenerateJwtES256<"convention">(
+        appConfig.jwtPrivateKey,
+        3600 * 24, // one day
+      );
+
+      const unsupportedRole: Role = "back-office";
+
+      const response = await unauthenticatedRequest.renewMagicLink({
+        queryParams: {
+          expiredJwt: generateConventionJwt(
+            createConventionMagicLinkPayload({
+              id: convention.id,
+              role: unsupportedRole,
+              email: convention.establishmentTutor.email,
+              now: gateways.timeGateway.now(),
+            }),
+          ),
+          originalUrl: encodeURIComponent(
+            `https://${appConfig.immersionFacileBaseUrl}/${frontRoutes.assessment}`,
+          ),
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          message: errors.convention.roleHasNoMagicLink({
+            role: unsupportedRole,
+          }).message,
+          status: 400,
+        },
+      });
     });
   });
 });

@@ -207,6 +207,11 @@ export const errors = {
       new BadRequestError(
         `Le  ${signatoryTitleByRole[signatoryRole]} a déjà signé la convention ${conventionId}.`,
       ),
+    magicLinkNotAssociatedToConvention: () =>
+      new BadRequestError(
+        "Le lien magique n'est plus associé à cette demande d'immersion",
+      ),
+    malformedExpiredJwt: () => new BadRequestError("Malformed expired JWT"),
     missingActor: ({
       conventionId,
       role,
@@ -227,13 +232,18 @@ export const errors = {
       new BadRequestError(
         `Validation manquante par le ${agencyModifierTitleByRole[role]}.`,
       ),
-    unsupportedRoleRenewMagicLink: ({ role }: { role: Role }) =>
-      new BadRequestError(
-        `Le rôle ${role} n'est pas supporté pour le renouvellement de lien magique.`,
-      ),
     unsupportedRoleSendSignatureLink: ({ role }: { role: Role }) =>
       new ForbiddenError(
         `Le rôle ${role} n'est pas supporté pour l'envoi du lien de signature aux signataires`,
+      ),
+    unsupportedRenewRoute: ({
+      supportedRenewRoutes,
+      originalUrl,
+    }: { supportedRenewRoutes: string[]; originalUrl: string }) =>
+      new BadRequestError(
+        `Lien non supporté, le lien doit faire partie des liens supportés suivants: ${supportedRenewRoutes
+          .map((route) => `/${route}`)
+          .join(", ")}. Lien fourni : ${originalUrl}`,
       ),
     forbiddenReminder: ({
       convention,

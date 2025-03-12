@@ -22,7 +22,10 @@ import {
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import { ScheduleDto } from "../schedule/Schedule.dto";
 import { NumberEmployeesRange, SiretDto } from "../siret/siret";
-import { expiredMagicLinkErrorMessage } from "../tokens/jwt.dto";
+import {
+  AppSupportedJwt,
+  expiredMagicLinkErrorMessage,
+} from "../tokens/jwt.dto";
 import { Flavor } from "../typeFlavors";
 import { DateString } from "../utils/date";
 
@@ -368,7 +371,7 @@ export type GenerateMagicLinkResponseDto = {
 
 export type RenewMagicLinkRequestDto = {
   originalUrl: string;
-  expiredJwt: string;
+  expiredJwt: AppSupportedJwt;
 };
 
 export type RenewMagicLinkResponse = {

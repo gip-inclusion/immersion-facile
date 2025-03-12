@@ -284,7 +284,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   openApiDoc: defineRoute("/doc-api"),
   renewConventionMagicLink: defineRoute(
-    { expiredJwt: param.query.string, originalURL: param.query.string },
+    { expiredJwt: param.query.string, originalUrl: param.query.string },
     () => `/${frontRoutes.magicLinkRenewal}`,
   ),
   search: defineRoute(searchParams, () => `/${frontRoutes.search}`),

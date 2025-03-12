@@ -70,7 +70,7 @@ export const ConventionManageContent = ({
     routes
       .renewConventionMagicLink({
         expiredJwt: jwtParams.jwt,
-        originalURL: window.location.href,
+        originalUrl: window.location.href,
       })
       .replace();
   }

@@ -14,6 +14,7 @@ import {
   FindSimilarConventionsParams,
   InclusionConnectedAllowedRoutes,
   RenewConventionParams,
+  RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   UnauthenticatedConventionRoutes,
@@ -168,10 +169,10 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public async renewMagicLink(
-    expiredJwt: string,
-    originalUrl: string,
-  ): Promise<void> {
+  public async renewMagicLink({
+    expiredJwt,
+    originalUrl,
+  }: RenewMagicLinkRequestDto): Promise<void> {
     await this.unauthenticatedHttpClient.renewMagicLink({
       queryParams: {
         expiredJwt,

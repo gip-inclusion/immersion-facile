@@ -11,6 +11,7 @@ import {
   DiscussionId,
   FindSimilarConventionsParams,
   RenewConventionParams,
+  RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
   UpdateConventionStatusRequestDto,
@@ -58,7 +59,9 @@ export interface ConventionGateway {
     params: SendSignatureLinkRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
-  renewMagicLink(expiredJwt: string, originalUrl: string): Promise<void>;
+  renewMagicLink(
+    renewMagicLinkRequestDto: RenewMagicLinkRequestDto,
+  ): Promise<void>;
   renewConvention$(
     params: RenewConventionParams,
     jwt: ConventionSupportedJwt,
