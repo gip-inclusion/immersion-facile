@@ -23,7 +23,7 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 `
     : `
     Bonne journée, 
-    L’équipe du Point Orientation Apprentissage
+    L’équipe de votre chambre consulaire.
 `;
 
 const createConventionStatusButton = (link: string): EmailButtonProps => ({
