@@ -1,0 +1,141 @@
+version: 2
+
+models:
+  - name: conventions
+    description: "Transformed and enriched conventions data for analytics"
+    columns:
+      - name: convention_id
+        description: "Primary key - UUID of the convention"
+        tests:
+          - not_null
+          - unique
+      - name: created_at
+        description: "Timestamp when the convention was created"
+      - name: updated_at
+        description: "Timestamp when the convention was last updated"
+      - name: status
+        description: "Current status of the convention"
+      - name: agency_name
+        description: "Name of the agency managing the convention"
+      - name: agency_kind
+        description: "Type of agency"
+      - name: department_code
+        description: "Department code where the agency is located"
+      - name: date_submission
+        description: "Timestamp when the convention was submitted"
+      - name: date_start
+        description: "Timestamp when the immersion starts"
+      - name: date_end
+        description: "Timestamp when the immersion ends"
+      - name: immersion_duration_days
+        description: "Duration of the immersion in days"
+      - name: siret
+        description: "SIRET number of the business"
+      - name: business_name
+        description: "Name of the business"
+      - name: immersion_objective
+        description: "Objective of the immersion"
+      - name: immersion_activities
+        description: "Activities performed during the immersion"
+      - name: immersion_skills
+        description: "Skills to be developed during the immersion"
+      - name: work_conditions
+        description: "Working conditions during the immersion"
+      - name: appellation_label
+        description: "Label of the job appellation"
+      - name: rome_code
+        description: "ROME code for the job category"
+      - name: rome_label
+        description: "Label of the ROME code"
+      - name: internship_kind
+        description: "Type of internship"
+      - name: date_validation
+        description: "Timestamp when the convention was validated"
+      - name: date_approval
+        description: "Timestamp when the convention was approved"
+      - name: establishment_number_employees
+        description: "Number of employees in the establishment"
+      
+      # Beneficiary information
+      - name: beneficiary_first_name
+        description: "First name of the beneficiary"
+      - name: beneficiary_last_name
+        description: "Last name of the beneficiary"
+      - name: beneficiary_email
+        description: "Email of the beneficiary"
+      - name: beneficiary_signed_at
+        description: "Timestamp when the beneficiary signed the convention"
+      
+      # Establishment tutor information
+      - name: tutor_first_name
+        description: "First name of the establishment tutor"
+      - name: tutor_last_name
+        description: "Last name of the establishment tutor"
+      - name: tutor_email
+        description: "Email of the establishment tutor"
+      - name: tutor_signed_at
+        description: "Timestamp when the tutor signed the convention"
+      
+      # Establishment representative information
+      - name: representative_first_name
+        description: "First name of the establishment representative"
+      - name: representative_last_name
+        description: "Last name of the establishment representative"
+      - name: representative_email
+        description: "Email of the establishment representative"
+      - name: representative_signed_at
+        description: "Timestamp when the representative signed the convention"
+      
+      # Assessment information
+      - name: assessment_status
+        description: "Status of the immersion assessment"
+      - name: number_of_hours_actually_made
+        description: "Number of hours actually completed in the immersion"
+      - name: number_of_missed_hours
+        description: "Number of hours missed during the immersion"
+      - name: ended_with_a_job
+        description: "Whether the immersion led to employment"
+      - name: type_of_contract
+        description: "Type of contract if the immersion led to employment"
+      - name: contract_start_date
+        description: "Start date of the contract if the immersion led to employment"
+      
+      # Time metrics
+      - name: submission_date
+        description: "Date of submission (day level)"
+      - name: submission_month
+        description: "Month of submission"
+      - name: submission_quarter
+        description: "Quarter of submission"
+      - name: submission_year
+        description: "Year of submission"
+      - name: days_to_approval
+        description: "Number of days between submission and approval"
+      - name: days_to_validation
+        description: "Number of days between submission and validation"
+      
+      # Acquisition source
+      - name: acquisition_campaign
+        description: "Marketing campaign that led to the convention"
+      - name: acquisition_keyword
+        description: "Marketing keyword that led to the convention"
+      
+      # Renewal information
+      - name: renewed_from
+        description: "ID of the convention this one was renewed from"
+      - name: renewed_justification
+        description: "Justification for the renewal"
+      
+      # Status information
+      - name: status_justification
+        description: "Justification for the current status"
+      
+      # Protection information
+      - name: individual_protection
+        description: "Whether individual protection is provided"
+      - name: individual_protection_description
+        description: "Description of the individual protection"
+      - name: sanitary_prevention
+        description: "Whether sanitary prevention is provided"
+      - name: sanitary_prevention_description
+        description: "Description of the sanitary prevention" 

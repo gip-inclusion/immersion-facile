@@ -1,0 +1,149 @@
+version: 2
+
+sources:
+  - name: immersion
+    description: "Immersion Facilitee application database"
+    database: immersion-db  # This should match the database name in your profiles.yml
+    schema: public  # This should match the schema where your tables are located
+    tables:
+      - name: conventions
+        description: "Immersion applications/conventions data"
+        columns:
+          - name: id
+            description: "Primary key - UUID of the convention"
+          - name: created_at
+            description: "Timestamp when the convention was created"
+          - name: updated_at
+            description: "Timestamp when the convention was last updated"
+          - name: status
+            description: "Current status of the convention (convention_status_type)"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+          - name: date_submission
+            description: "Timestamp when the convention was submitted"
+          - name: date_start
+            description: "Timestamp when the immersion starts"
+          - name: date_end
+            description: "Timestamp when the immersion ends"
+          - name: siret
+            description: "SIRET number of the business"
+          - name: business_name
+            description: "Name of the business"
+          - name: immersion_objective
+            description: "Objective of the immersion (convention_objective_type)"
+          - name: immersion_appellation
+            description: "Foreign key to public_appellations_data table"
+          - name: date_validation
+            description: "Timestamp when the convention was validated"
+          - name: internship_kind
+            description: "Type of internship"
+          - name: date_approval
+            description: "Timestamp when the convention was approved"
+          - name: acquisition_campaign
+            description: "Marketing campaign that led to the convention"
+          - name: acquisition_keyword
+            description: "Marketing keyword that led to the convention"
+
+      - name: actors
+        description: "People involved in conventions (beneficiaries, tutors, representatives)"
+        columns:
+          - name: id
+            description: "Primary key - ID of the actor"
+          - name: first_name
+            description: "First name of the actor"
+          - name: last_name
+            description: "Last name of the actor"
+          - name: email
+            description: "Email of the actor"
+          - name: phone
+            description: "Phone number of the actor"
+          - name: signed_at
+            description: "Timestamp when the actor signed the convention"
+
+      - name: agencies
+        description: "Agencies managing immersion applications"
+        columns:
+          - name: id
+            description: "Primary key - UUID of the agency"
+          - name: name
+            description: "Name of the agency"
+          - name: kind
+            description: "Type of agency"
+          - name: department_code
+            description: "Department code where the agency is located"
+
+      - name: public_appellations_data
+        description: "Job appellations reference data"
+        columns:
+          - name: ogr_appellation
+            description: "Primary key - ID of the appellation"
+          - name: libelle_appellation_long
+            description: "Label of the job appellation"
+          - name: code_rome
+            description: "ROME code for the job category"
+
+      - name: public_romes_data
+        description: "ROME codes reference data"
+        columns:
+          - name: code_rome
+            description: "Primary key - ROME code"
+          - name: libelle_rome
+            description: "Label of the ROME code"
+
+      - name: immersion_assessments
+        description: "Assessments of completed immersions"
+        columns:
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: status
+            description: "Status of the assessment"
+          - name: number_of_hours_actually_made
+            description: "Number of hours actually completed in the immersion"
+          - name: number_of_missed_hours
+            description: "Number of hours missed during the immersion"
+          - name: ended_with_a_job
+            description: "Whether the immersion led to employment"
+          - name: type_of_contract
+            description: "Type of contract if the immersion led to employment"
+          - name: contract_start_date
+            description: "Start date of the contract if the immersion led to employment"
+
+      - name: users
+        description: "User accounts information"
+        columns:
+          - name: id
+            description: "Primary key"
+          - name: created_at
+            description: "Timestamp when the user was created"
+          - name: email
+            description: "User's email address"
+          - name: first_name
+            description: "User's first name"
+          - name: last_name
+            description: "User's last name"
+
+      - name: sessions
+        description: "User session data"
+        columns:
+          - name: id
+            description: "Primary key"
+          - name: user_id
+            description: "Foreign key to users table"
+          - name: started_at
+            description: "Timestamp when the session started"
+          - name: ended_at
+            description: "Timestamp when the session ended"
+
+      - name: activities
+        description: "User activity events"
+        columns:
+          - name: id
+            description: "Primary key"
+          - name: user_id
+            description: "Foreign key to users table"
+          - name: session_id
+            description: "Foreign key to sessions table"
+          - name: activity_type
+            description: "Type of activity (login, search, etc.)"
+          - name: created_at
+            description: "Timestamp when the activity occurred" 
