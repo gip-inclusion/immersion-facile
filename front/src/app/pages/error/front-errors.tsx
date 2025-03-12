@@ -87,6 +87,17 @@ export const frontErrors = {
           : [redirectToHomePageButtonContent, contactUsButtonContent],
       });
     },
+    formError: ({
+      message,
+      siret,
+      title,
+    }: { title?: string; message: string; siret: SiretDto }) =>
+      new FrontSpecificError({
+        buttons: [redirectToHomePageButtonContent, contactUsButtonContent],
+        description: message,
+        title: `Erreur - Formulaire de proposition d'immersion - Entreprise ${siret}`,
+        subtitle: title,
+      }),
     expiredLink: ({ jwt, siret }: { jwt: string; siret: SiretDto }) => {
       return new FrontSpecificError({
         title: "Lien périmé",

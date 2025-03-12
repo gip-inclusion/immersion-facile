@@ -148,8 +148,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     (feedback: Feedback, jwt: string) => {
       if (feedback.level === "error") {
         if (!feedback.message.includes(expiredMagicLinkErrorMessage)) {
-          throw frontErrors.establishment.expiredLink({
-            jwt,
+          throw frontErrors.establishment.formError({
+            title: feedback.title,
+            message: feedback.message,
             siret:
               decodeMagicLinkJwtWithoutSignatureCheck<EstablishmentJwtPayload>(
                 jwt,
