@@ -16,3 +16,12 @@ logs2
 immersion-facile.code-workspace
 dev-dist
 coverage
+
+bi/.venv/
+bi/__pycache__/
+bi/**/*.py[cod]
+bi/.user.yml
+bi/.env
+bi/target/
+bi/dbt_packages/
+bi/logs/
