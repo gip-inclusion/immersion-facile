@@ -183,6 +183,14 @@ export const errors = {
       new BadRequestError(
         `Impossible de relancer la demande de signature pour les conventions ayant le statut "${status}".`,
       ),
+    transferNotAllowedForStatus: ({
+      status,
+    }: {
+      status: ConventionStatus;
+    }) =>
+      new BadRequestError(
+        `Impossible de transférer les convention ayant le statut "${status}".`,
+      ),
     twoStepsValidationBadStatus: ({
       targetStatus,
       conventionId,

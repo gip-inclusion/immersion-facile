@@ -317,6 +317,11 @@ export type SendSignatureLinkRequestDto = WithConventionId & {
   signatoryRole: SignatoryRole;
 };
 
+export type TransferConventionToAgencyRequestDto = WithConventionId & {
+  agencyId: AgencyId;
+  justification: string;
+};
+
 export type UpdateConventionRequestDto = {
   convention: ConventionDto;
 };
