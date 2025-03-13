@@ -19,6 +19,7 @@ import {
   type ScheduleDto,
   type SiretDto,
   type UserId,
+  allAgencyRoles,
   conventionReadSchema,
   pipeWithValue,
 } from "shared";
@@ -306,7 +307,13 @@ export const createConventionQueryBuilderForAgencyUser = ({
   const builder = transaction
     .selectFrom("users__agencies")
     .innerJoin("conventions", "users__agencies.agency_id", "conventions.agency_id")
-    .where("users__agencies.user_id", "=", agencyUserId);
+    .where("users__agencies.user_id", "=", agencyUserId)
+    .where(({ eb }) => eb.or([
+      sql<boolean>`users__agencies.roles ? 'counsellor'`,
+      sql<boolean>`users__agencies.roles ? 'validator'`,
+      sql<boolean>`users__agencies.roles ? 'agency-admin'`,
+      sql<boolean>`users__agencies.roles ? 'agency-viewer'`,
+    ]));
 
   const builderWithJoins = createCommonJoins(builder);
   return createConventionSelection(builderWithJoins);
