@@ -8,7 +8,7 @@ import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { OnStepChange } from "../EstablishmentForm";
+import type { OnStepChange } from "../EstablishmentForm";
 
 export const CreateIntroSection = ({
   onStepChange,
@@ -41,13 +41,14 @@ export const CreateIntroSection = ({
             </p>
             <Button
               priority="primary"
-              children="Accéder à mon espace"
               linkProps={{
                 ...routes.establishmentDashboard({ tab: "conventions" }).link,
                 id: domElementIds.establishment.create
                   .navigateToEstablishmentDashboard,
               }}
-            />
+            >
+              Accéder à mon espace
+            </Button>
           </>
         ) : (
           <>

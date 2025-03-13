@@ -1,5 +1,5 @@
 import { type EstablishmentFormUserRights, errors } from "shared";
-import { type UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
   EstablishmentAdminRight,

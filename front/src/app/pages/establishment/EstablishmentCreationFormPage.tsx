@@ -2,8 +2,8 @@ import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
-import { routes } from "src/app/routes/routes";
-import { Route } from "type-route";
+import type { routes } from "src/app/routes/routes";
+import type { Route } from "type-route";
 
 type EstablishmentCreationFormPage = {
   route: Route<typeof routes.formEstablishment>;

@@ -98,12 +98,13 @@ export const frontErrors = {
 const EstablishmentDashboardButton: ErrorButton = (
   <Button
     priority="primary"
-    children="Accéder à mon espace entreprise"
     linkProps={{
       ...routes.establishmentDashboard().link,
       id: domElementIds.error.establishmentDashboardButton,
     }}
-  />
+  >
+    Accéder à mon espace entreprise
+  </Button>
 );
 
 const HomeButton: ErrorButton = (

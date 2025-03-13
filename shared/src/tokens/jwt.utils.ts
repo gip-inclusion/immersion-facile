@@ -1,7 +1,7 @@
 import * as crypto from "node:crypto";
 import { decode } from "js-base64";
-import { type Email, UserId, currentJwtVersions } from "..";
-import {
+import { type Email, type UserId, currentJwtVersions } from "..";
+import type {
   ConventionJwtPayload,
   CreateConventionMagicLinkPayloadProperties,
   EmailHash,

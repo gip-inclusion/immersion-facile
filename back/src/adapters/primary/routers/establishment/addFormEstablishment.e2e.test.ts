@@ -1,5 +1,5 @@
 import {
-  AdminFormEstablishmentUserRight,
+  type AdminFormEstablishmentUserRight,
   type EstablishmentRoutes,
   FormEstablishmentDtoBuilder,
   InclusionConnectedUserBuilder,
@@ -20,7 +20,7 @@ import {
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
