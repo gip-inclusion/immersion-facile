@@ -464,3 +464,28 @@ export type GetConventionsForAgencyUserParams = {
   sortBy?: GetPaginatedConventionsSortBy;
   pagination?: PaginationQueryParams;
 };
+
+export type FlatGetConventionsForAgencyUserParams = {
+  // pagination
+  page?: number;
+  perPage?: number;
+
+  // sort
+  sortBy?: GetPaginatedConventionsSortBy;
+
+  // filters
+  actorEmailContains?: string;
+  establishmentNameContains?: string;
+  beneficiaryNameContains?: string;
+  statuses?: NotEmptyArray<ConventionStatus>;
+  agencyIds?: NotEmptyArray<string>;
+  agencyDepartmentCodes?: NotEmptyArray<string>;
+
+  // date filters
+  dateStartFrom?: DateString;
+  dateStartTo?: DateString;
+  dateEndFrom?: DateString;
+  dateEndTo?: DateString;
+  dateSubmissionFrom?: DateString;
+  dateSubmissionTo?: DateString;
+};

@@ -1,11 +1,13 @@
 import { z } from "zod";
+import { makeDateStringSchema } from "./schedule/Schedule.schema";
+import type { DateString } from "./utils/date";
 
 export type DateFilter = {
-  from?: Date;
-  to?: Date;
+  from?: DateString;
+  to?: DateString;
 };
 
 export const dateFilterSchema: z.Schema<DateFilter> = z.object({
-  from: z.date().optional(),
-  to: z.date().optional(),
+  from: makeDateStringSchema().optional(),
+  to: makeDateStringSchema().optional(),
 });
