@@ -11,7 +11,7 @@ import {
   conventionReadSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
-  getConventionsForAgencyUserParamsSchema,
+  flatGetConventionsForAgencyUserParamsSchema,
   paginatedConventionsSchema,
   renewConventionParamsSchema,
   renewMagicLinkRequestSchema,
@@ -190,7 +190,7 @@ export const authenticatedConventionRoutes = defineRoutes({
     method: "get",
     url: "/conventions-for-agency-user",
     ...withAuthorizationHeaders,
-    queryParamsSchema: getConventionsForAgencyUserParamsSchema,
+    queryParamsSchema: flatGetConventionsForAgencyUserParamsSchema,
     responses: {
       200: paginatedConventionsSchema,
       400: httpErrorSchema,

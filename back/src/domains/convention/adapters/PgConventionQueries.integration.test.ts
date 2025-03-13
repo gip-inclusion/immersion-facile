@@ -1153,7 +1153,7 @@ describe("Pg implementation of ConventionQueries", () => {
         });
 
       expect(resultPage1.data.length).toBe(2);
-      expect(resultPage1.pagination.totalRecords).toBe(1);
+      expect(resultPage1.pagination.totalRecords).toBe(2);
       expectToEqual(resultPage1.data, [conventionD, conventionC]);
 
       const resultPage2 =
@@ -1212,8 +1212,8 @@ describe("Pg implementation of ConventionQueries", () => {
           pagination: { page: 1, perPage: 10 },
           filters: {
             dateStart: {
-              from: new Date("2023-02-01"),
-              to: new Date("2023-03-31"),
+              from: "2023-02-01",
+              to: "2023-03-31",
             },
           },
           sortBy: "dateSubmission",
@@ -1260,8 +1260,8 @@ describe("Pg implementation of ConventionQueries", () => {
           filters: {
             statuses: ["DRAFT", "IN_REVIEW"],
             dateSubmission: {
-              from: new Date("2023-01-01"),
-              to: new Date("2023-02-15"),
+              from: "2023-01-01",
+              to: "2023-02-15",
             },
           },
           sortBy: "dateStart",

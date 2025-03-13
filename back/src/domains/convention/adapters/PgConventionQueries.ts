@@ -298,10 +298,10 @@ export class PgConventionQueries implements ConventionQueries {
     return {
       data: data.map(({ dto }) => dto),
       pagination: {
-        currentPage: 1,
-        totalPages: 1,
-        numberPerPage: 1,
-        totalRecords: 1,
+        currentPage: pagination.page,
+        totalPages: Math.ceil(data.length / pagination.perPage),
+        numberPerPage: pagination.perPage,
+        totalRecords: data.length,
       },
     };
   }
