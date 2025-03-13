@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   authenticatedConventionRoutes,
   errors,
+  flatParamsToGetConventionsForAgencyUserParams,
   unauthenticatedConventionRoutes,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
@@ -66,7 +67,7 @@ export const createConventionRouter = (deps: AppDependencies) => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
         return await deps.useCases.getConventionsForAgencyUser.execute(
-          { ...req.query },
+          flatParamsToGetConventionsForAgencyUserParams(req.query),
           currentUser,
         );
       }),
