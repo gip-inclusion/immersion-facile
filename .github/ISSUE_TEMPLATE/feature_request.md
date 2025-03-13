@@ -5,10 +5,6 @@ title: ETQ 'qui?', un titre court svp
 type: feature
 ---
 
-### :construction: Epic
-
-<!-- Lier l'Epic du tableau IF horizon 2 mois qui englobe cette story -->
-
 ### :thinking: Contexte et problématique
 
 <!-- Décrire la problématique observée, le contexte et en quoi une solution serait utile. -->
