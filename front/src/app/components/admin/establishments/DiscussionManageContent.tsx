@@ -10,8 +10,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import {
   CopyButton,
   DiscussionMeta,
@@ -53,7 +52,9 @@ import {
 } from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
+import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
 
@@ -90,6 +91,14 @@ export const DiscussionManageContent = ({
       }
     },
   );
+
+  useEffect(
+    () => () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+    [dispatch],
+  );
+
   if (isLoading) return <Loader />;
   if (fetchError) throw new Error(fetchError);
 
@@ -191,6 +200,7 @@ const DiscussionDetails = ({
 
   return (
     <>
+      <Feedback topic={"dashboard-discussion-rejection"} />
       <header>
         <Button
           type="button"
@@ -204,7 +214,7 @@ const DiscussionDetails = ({
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
           iconPosition="left"
-          className={fr.cx("fr-mb-2w")}
+          className={fr.cx("fr-my-2w")}
         >
           Retour
         </Button>
