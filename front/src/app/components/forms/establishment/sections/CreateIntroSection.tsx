@@ -6,8 +6,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes } from "src/app/routes/routes";
-import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";
-
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { OnStepChange } from "../EstablishmentForm";
 
@@ -74,8 +73,17 @@ export const CreateIntroSection = ({
           </>
         )}
       </div>
-      <div className={fr.cx("fr-col-lg-6")}>
-        <img src={formIntroIllustration} alt="exemple de recherche" />
+      <div
+        className={fr.cx(
+          "fr-col-12",
+          "fr-col-lg-6",
+          "fr-hidden",
+          "fr-unhidden-lg",
+          "fr-px-12w",
+          "fr-py-4w",
+        )}
+      >
+        <img src={commonIllustrations.annuaireDesEntreprises} alt="" />
       </div>
     </section>
   );
