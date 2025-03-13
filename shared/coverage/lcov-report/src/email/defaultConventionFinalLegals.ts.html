@@ -1,0 +1,322 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for src/email/defaultConventionFinalLegals.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/email</a> defaultConventionFinalLegals.ts</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">50% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>1/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/1</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">50% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>1/2</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input oninput="onInput()" type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line medium'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { InternshipKind } from "../convention/convention.dto";
+&nbsp;
+export const defaultConventionFinalLegals = <span class="fstat-no" title="function not covered" >(i</span>nternshipKind: InternshipKind) =&gt;
+<span class="cstat-no" title="statement not covered" >  internshipKind === "immersion"</span>
+    ? `&lt;strong&gt;*Obligations des parties :&lt;/strong&gt;
+Le bénéficiaire s’engage à exercer les activités et tâches telles que définies dans la présente convention et à mettre en œuvre l’ensemble des actions lui permettant d’atteindre les objectifs d’insertion socioprofessionnelle attendus, et notamment :
+• Respecter le règlement intérieur de la structure d’accueil et les consignes qui lui sont données et informer le conseiller référent de tout retard ou absence en fournissant les documents justificatifs requis ;
+• Se conformer à l’ensemble des dispositions et mesures en matière d’hygiène et de sécurité applicables aux salariés dans la structure d’accueil, notamment en matière de port obligatoire des EPI et propres aux activités et tâches confiées ;
+• Informer le conseiller référent de tout incident et/ou accident ;
+• Informer le conseiller référent et/ou la personne responsable de son accueil et de son suivi des difficultés qu’il pourrait rencontrer dans la mise en œuvre de cette période ; • Auto évaluer l’apport de la période de mise en situation en milieu professionnel dans la construction de son parcours d’insertion socioprofessionnelle.
+La structure d’accueil s’engage à prendre l’ensemble des dispositions nécessaires en vue de permettre au bénéficiaire d’exercer les activités et tâches telles que définies dans la présente convention, à l’accompagner afin de lui permettre d’atteindre les objectifs d’insertion socioprofessionnelle attendus, et notamment à :
+• Désigner une personne chargée d’accueillir, d’aider, d’informer, de guider et d’évaluer le bénéficiaire pendant la période de mise en situation en milieu professionnel ;
+• Ne pas faire exécuter au bénéficiaire une tâche régulière correspondant à un poste de travail permanent, à un accroissement temporaire d’activité, à un emploi saisonnier ou au remplacement d’un salarié en cas d’absence ou de suspension de son contrat de travail ;
+• S’assurer que la mise en situation en milieu professionnel respecte les règles applicables à ses salariés pour ce qui a trait aux durées quotidienne et hebdomadaire de présence, à la présence de nuit, au repos quotidien, hebdomadaire et aux jours fériés ;
+• Etre couvert par une assurance Multirisque Professionnelle en cours de validité tant à l’encontre de tiers que sur des biens de la structure d’accueil. ;
+• Mettre en œuvre toutes les dispositions nécessaires en vue de se conformer aux articles R.4141-3-1 et suivants du code du travail en matière d’information des salariés sur les règles d’hygiène et de sécurité applicables dans son établissement et fournir l’ensemble des EPI nécessaires ;
+• Prévenir dès connaissance des faits, et au plus tard dans les 24 heures, la structure d’accompagnement de tout accident survenant soit au cours ou sur le lieu de la mise en situation en milieu professionnel, soit au cours du trajet domicile-structure d’accueil ;
+• Donner accès aux moyens de transport et installations collectifs ;
+• Libérer, à la demande de la structure d’accompagnement, le bénéficiaire chaque fois que cela s’avère nécessaire.
+La structure d’accompagnement s’engage, en la personne du conseiller référent, à assurer la mise en œuvre de la période de mise en situation en milieu professionnel et notamment à :
+• Assurer l’accompagnement dans la structure d’accueil du bénéficiaire au travers de visites et d’entretiens sous toute forme ;
+• Intervenir, à la demande de la structure d’accueil et/ou du bénéficiaire pour régler toute difficulté pouvant survenir pendant la période de mise en situation en milieu professionnel ;
+• Informer sans délai l’organisme prescripteur ou, si le bénéficiaire est salarié, l’employeur de ce dernier, de tout accident survenant au cours ou sur le lieu de la mise en situation en milieu professionnel ou de trajet qui lui serait signalé dans le cadre de cette période ;
+• Réaliser le bilan / évaluation de la mise en situation réalisée, transmis, le cas échéant, à l’organisme prescripteur L’organisme prescripteur s’engage, à :
+• Analyser la pertinence de la période de mise en situation en milieu professionnel proposée et d’en définir des objectifs adaptés aux besoins, possibilités et capacités tant du bénéficiaire que de la structure d’accueil ;
+• Procéder à la déclaration dans les 48 heures de tout accident de travail ou de trajet qui lui serait signalé auprès de la Caisse Primaire d’Assurance Maladie du lieu de résidence du bénéficiaire dès lors qu’il couvre le risque AT/MP.`
+    : `&lt;strong&gt;*CONVENTION RELATIVE À L’ORGANISATION DES PERIODES D’OBSERVATION EN MILIEU PROFESSIONNEL&lt;/strong&gt;
+Cette convention est établie en application des dispositions des articles L124-3-1, L332-3-1 et L332-3-2 du code de l’éducation et de l’article L.4153-1 du code du travail, offrant la possibilité :
+• aux jeunes des deux derniers niveaux d’enseignement des collèges ou aux jeunes des lycées de réaliser des périodes d’observation en entreprise d’une durée maximale d’une semaine durant les vacances scolaires ;
+• aux étudiants de l’enseignement supérieur de réaliser des périodes d’observation en entreprise d’une durée maximale d’une semaine, en dehors des semaines réservées aux cours et au contrôle de connaissances.
+&lt;strong&gt;La convention doit être établie, signée par toutes les parties et visée par la Chambre de Commerce et d’Industrie avant le démarrage de la période d’observation. Sans visa, la convention ne pourra être exécutée.&lt;/strong&gt;
+&nbsp;
+TITRE PREMIER : DISPOSITIONS GÉNÉRALES
+&nbsp;
+Article 1 – Objet
+La présente convention a pour objet la mise en œuvre d’une période d’observation en milieu professionnel, au bénéfice du jeune ci-dessus désigné.
+&nbsp;
+Article 2 – Modalités particulières
+Les objectifs et les modalités de la période d’observation sont consignés dans l’annexe pédagogique.
+Les modalités de prise en charge des frais afférents à cette période ainsi que les modalités d’assurances sont définies dans l’annexe financière.
+&nbsp;
+Article 3 – Organisation
+L’organisation de la période d’observation est déterminée d’un commun accord entre les parties ci-dessus désignées,
+avec le concours de la Chambre de Commerce et d’Industrie .
+&nbsp;
+Article 4 – Conditions financières
+Durant la période d’observation en milieu professionnel, le jeune ne peut prétendre à aucune rémunération ou gratification de l’entreprise ou de l’organisme d’accueil.
+Le visa de la présente convention ne donne lieu à aucune facturation de la part de la Chambre de Commerce et d’Industrie.
+&nbsp;
+Article 5 – Activité
+Durant la période d’observation, le jeune participe à des activités de l’entreprise, en liaison avec les objectifs précisés dans l’annexe pédagogique, sous le contrôle des personnels responsables de leur encadrement en milieu professionnel.
+Il est soumis aux règles générales en vigueur dans l’entreprise ou l’organisme d’accueil, notamment en matière de santé, sécurité, d’horaires et de discipline. Le jeune est tenu au respect du secret professionnel.
+De même, les parties signataires de la convention s’engagent à mettre en œuvre et respecter les consignes publiées par les services de l’Etat, notamment pour exemple celles concernant les mesures de prévention des risques de contamination en matière sanitaire.
+En application des articles L 4153-8 et D 4153-15 et suivants du code du travail, relatif aux travaux interdits et règlementés, le jeune, s’il est mineur, ne peut accéder aux machines, appareils ou produits dont l’usage est proscrit aux mineurs. Il ne peut ni procéder à des manœuvres ou manipulations sur d’autres machines, produits ou appareils de production, ni effectuer les travaux légers autorisés aux mineurs par le même code.
+&nbsp;
+Article 6 – Responsabilités
+Le chef d’entreprise prend les dispositions nécessaires pour garantir sa responsabilité civile chaque fois qu’elle sera engagée (en application de l’article 1242 du code civil) :
+• soit en souscrivant une assurance particulière garantissant sa responsabilité civile en cas de faute imputable à l’entreprise ;
+• soit en ajoutant à son contrat déjà souscrit “responsabilité civile entreprise” ou “responsabilité civile professionnelle” un avenant relatif à l’accueil du jeune, si ce risque n’est pas déjà couvert.
+Une assurance couvrant la responsabilité civile du jeune est contractée par son représentant légal, ou le jeune lui-même s’il est majeur ou émancipé, pour les dommages qu’il pourrait causer ou subir pendant la période d’observation en milieu professionnel, ainsi qu’en dehors de l’entreprise, ou sur le trajet menant, soit au lieu où se déroule la période d’observation, soit au domicile.
+&nbsp;
+Article 7 – Accident
+En cas d’accident survenant au jeune, soit en milieu professionnel, soit au cours du trajet, le responsable de l’entreprise, le responsable légal du jeune, ou directement le jeune s’il est assuré à son nom, déclarent l’accident à leurs assureurs respectifs dans les délais contractuels et s’engagent à adresser, pour information, la déclaration d’accident au référent de la Chambre de Commerce et d’Industrie.
+&nbsp;
+Article 8 – Difficultés
+Le chef d’entreprise, les parents ou le représentant légal du jeune si celui-ci est mineur, ou le jeune directement si celuici est majeur, ainsi que le référent de la Chambre de Commerce et d’Industrie, se tiendront mutuellement informés des difficultés qui pourraient naître de l’application de la présente convention et prendront, d’un commun accord les dispositions propres à les résoudre notamment en cas de manquement à la discipline.
+Les difficultés qui pourraient être rencontrées lors de toute période en milieu professionnel et notamment toute absence du jeune, seront aussitôt portées à la connaissance du référent de la Chambre de Commerce et d’Industrie.
+&nbsp;
+Article 9 – Durée
+La présente convention est signée pour la durée de la période d’observation en milieu professionnel, qui ne peut dépasser 5 jours.
+&nbsp;
+Article 10 - Protection des données personnelles
+Les données personnelles recueillies via ce formulaire font l'objet, par le Responsable de traitement représenté par la Chambre de Commerce et d’Industrie, d'un traitement informatisé et/ou papier destiné à l’établissement de la convention de stage et à des fins statistiques, et sont conservées pendant une durée de cinq ans. Aucune information personnelle n'est cédée à quelconque tiers.
+Conformément à la loi "Informatique et Libertés" du 6 janvier 1978 modifiée et au Règlement Général sur la Protection des Données, vous pouvez accéder aux données à caractère personnel vous concernant, les faire rectifier ou effacer après le délai de prescription de la fin de la convention. Vous disposez également du droit de limitation, de portabilité, et le cas échéant, d’opposition du traitement de vos données. Pour exercer vos droits, vous pouvez contacter le DPO (Délégué à la Protection des données personnelles) de la Chambre de Commerce et d’Industrie concernée par mail en précisant la mention « Mini-Stage ». La politique de protection des données personnelles de la CCI est détaillée dans sa charte sur son site internet. 
+&nbsp;
+TITRE II - DISPOSITIONS PARTICULIÈRES
+&nbsp;
+La durée de la présence hebdomadaire des jeunes en milieu professionnel ne peut excéder 30 heures pour les jeunes de moins de 15 ans (6 heures par jour) et 35 heures pour les jeunes de 15 ans et plus répartis sur 5 jours (7 heures par jour).
+`;
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2025-03-19T09:26:15.396Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    

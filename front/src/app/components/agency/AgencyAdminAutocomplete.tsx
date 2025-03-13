@@ -1,6 +1,9 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import Autocomplete from "@mui/material/Autocomplete";
 import { prop, propEq } from "ramda";
+import { useState } from "react";
+import {
+  RSAutocomplete,
+  type RSAutocompleteComponentProps,
+} from "react-design-system";
 
 import { useDispatch } from "react-redux";
 import {
@@ -15,7 +18,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
   const dispatch = useDispatch();
@@ -34,116 +36,86 @@ export const useAgencyAdminAutocomplete = () => {
   };
 };
 
-type AgencyAdminAutocompleteProps = {
-  title: string;
-  initialValue?: AgencyOption | undefined;
-  className?: string;
-  placeholder: string;
+export type AgencyAdminAutocompleteProps = RSAutocompleteComponentProps<
+  "agency",
+  AgencyOption
+> & {
+  useNaturalLanguage?: boolean;
+  initialValue?: AgencyOption;
 };
 
-const isOneOfTheOptionsLabel = (options: AgencyOption[], searchTerm: string) =>
-  options.map(prop("name")).includes(searchTerm);
-
 export const AgencyAdminAutocomplete = ({
-  title,
+  label,
   className,
-  placeholder = "Ex : boulangère, infirmier",
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const {
     agencySearchQuery: agencySearchText,
     isSearching,
     agencyOptions,
-    agency,
+    agency: selectedAgency,
   } = useAppSelector(agencyAdminSelectors.agencyState);
   const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
-
-  const { cx } = useStyles();
-
+  const [inputValue, setInputValue] = useState(agencySearchText);
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
 
-  const getNameFromAgencyIdAsReactElement = (agencyId?: AgencyId) => {
-    if (!agencyId) return;
-    const agencyOption = agencyOptions.find(propEq(agencyId, "id"));
-    if (!agencyOption) return;
-
-    return (
-      <>
-        {agencyOption.name}&nbsp;
-        {!activeAgencyStatuses.includes(agencyOption.status) && (
-          <AgencyStatusBadge status={agencyOption.status} />
-        )}
-      </>
-    );
-  };
-
-  const getNameFromAgencyIdAsString = (
-    agencyId?: AgencyId,
-  ): string | undefined => {
-    if (!agencyId) return;
-    const agencyOption = agencyOptions.find(propEq(agencyId, "id"));
-    if (!agencyOption) return;
-
-    const status = !activeAgencyStatuses.includes(agencyOption.status)
-      ? agencyStatusToLabel[agencyOption.status]
-      : "";
-    return `${agencyOption.name}${status ? ` [${status}]` : ""}`;
-  };
-
-  const sortedAgencyOptions: AgencyId[] = [...agencyOptions]
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map(prop("id"));
+  const sortedAgencyOptions: AgencyOption[] = [...agencyOptions].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
 
   return (
-    <>
-      <Autocomplete
-        disablePortal
-        filterOptions={(x) => x}
-        options={sortedAgencyOptions}
-        id={domElementIds.admin.agencyTab.editAgencyAutocompleteInput}
-        value={agency ? agency.id : ""}
-        noOptionsText={
-          agencySearchText
-            ? noOptionText
-            : "Saisissez le nom ou le siret d'une agence"
-        }
-        getOptionLabel={(option: AgencyId) => option}
-        renderOption={(props, option) => (
-          <li {...props}>{getNameFromAgencyIdAsReactElement(option)}</li>
-        )}
-        onChange={(_, selectedAgencyId: AgencyId | null) => {
-          if (!selectedAgencyId) return;
-          selectOption(selectedAgencyId);
-        }}
-        onInputChange={(_, newSearchTerm) => {
-          if (!isOneOfTheOptionsLabel(agencyOptions, newSearchTerm)) {
-            updateSearchTerm(newSearchTerm);
+    <RSAutocomplete
+      label={label}
+      selectProps={{
+        options: sortedAgencyOptions.map((option) => ({
+          label: option.name,
+          value: option,
+        })),
+        id: domElementIds.admin.agencyTab.editAgencyAutocompleteInput,
+        value: selectedAgency?.id
+          ? {
+              label: selectedAgency.name,
+              value: selectedAgency,
+            }
+          : undefined,
+        noOptionsMessage: () => noOptionText,
+        isLoading: isSearching,
+        inputValue,
+        loadingMessage: () => "Recherche d'agence en cours...",
+        placeholder: "Rechercher une agence",
+        onChange: (searchResult, actionMeta) => {
+          if (
+            actionMeta.action === "clear" ||
+            actionMeta.action === "remove-value"
+          ) {
+            return;
           }
-        }}
-        renderInput={(params) => (
-          <div
-            ref={params.InputProps.ref}
-            className={cx("im-autocomplete-search")}
-          >
-            <label
-              className={cx(fr.cx("fr-label"), className)}
-              htmlFor={"search"}
-            >
-              {title}
-            </label>
-            <input
-              {...params.inputProps}
-              value={getNameFromAgencyIdAsString(
-                params.inputProps.value?.toString(),
+          if (searchResult) {
+            updateSearchTerm(searchResult.label);
+            selectOption(searchResult.value.id);
+          }
+        },
+        onInputChange: (searchTerm) => {
+          setInputValue(searchTerm);
+          updateSearchTerm(searchTerm);
+        },
+        components: {
+          Option: (optionComponentProps) => (
+            <>
+              {optionComponentProps.data.label}
+              {!activeAgencyStatuses.includes(
+                optionComponentProps.data.value.status,
+              ) && (
+                <AgencyStatusBadge
+                  status={optionComponentProps.data.value.status}
+                />
               )}
-              className={fr.cx("fr-input")}
-              placeholder={placeholder}
-              type="text"
-            />
-          </div>
-        )}
-      />
-    </>
+            </>
+          ),
+        },
+      }}
+      className={className}
+    />
   );
 };

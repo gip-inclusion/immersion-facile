@@ -1,5 +1,4 @@
 export * from "./AutocompleteAttributeValue.type";
-export * from "./AutocompleteInput";
 export * from "./Input";
 export * from "./InputGroup";
 export * from "./TextArea";

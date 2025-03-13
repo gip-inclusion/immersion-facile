@@ -29,7 +29,6 @@ type AgencyFormCommonFieldsProps = {
 type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
 
 export const AgencyFormCommonFields = ({
-  addressInitialValue,
   refersToOtherAgency,
   mode,
   disableAgencyName,
@@ -65,7 +64,23 @@ export const AgencyFormCommonFields = ({
     if (!isFetchingSiret && establishmentInfos)
       setValue("name", establishmentInfos.businessName);
   }, [establishmentInfos, isFetchingSiret, setValue]);
-
+  const valueFromStore = establishmentInfos
+    ? {
+        label: establishmentInfos.businessAddress,
+        value: {
+          address: {
+            streetNumberAndAddress: establishmentInfos.businessAddress,
+            postcode: "",
+            departmentCode: "",
+            city: "",
+          },
+          position: {
+            lat: 0,
+            lon: 0,
+          },
+        },
+      }
+    : undefined;
   return (
     <>
       <Input
@@ -103,19 +118,42 @@ export const AgencyFormCommonFields = ({
       />
       <AddressAutocomplete
         {...formContents.address}
-        initialSearchTerm={
-          establishmentInfos
-            ? establishmentInfos.businessAddress
-            : addressInitialValue && addressDtoToString(addressInitialValue)
-        }
-        setFormValue={({ position, address }) => {
-          setValue("position", position);
-          setValue("address", address);
-          setValue("coveredDepartments", [address.departmentCode]);
+        selectProps={{
+          inputId: domElementIds.addAgency.addressAutocomplete,
+          value: valueFromStore,
         }}
-        id={domElementIds.addAgency.addressAutocomplete}
+        initialInputValue={
+          establishmentInfos ? establishmentInfos.businessAddress : ""
+        }
+        initialValue={
+          formValues.address && formValues.position
+            ? {
+                address: formValues.address,
+                position: formValues.position,
+              }
+            : valueFromStore?.value
+        }
+        onAddressSelected={(addressAndPosition) => {
+          setValue("address", addressAndPosition.address);
+          setValue("position", addressAndPosition.position);
+          setValue("coveredDepartments", [
+            addressAndPosition.address.departmentCode,
+          ]);
+        }}
+        onAddressClear={() => {
+          setValue("address", {
+            streetNumberAndAddress: "",
+            postcode: "",
+            departmentCode: "",
+            city: "",
+          });
+          setValue("position", {
+            lat: 0,
+            lon: 0,
+          });
+          setValue("coveredDepartments", []);
+        }}
         disabled={isFetchingSiret}
-        useFirstAddressOnInitialSearchTerm
         {...getFieldError("address")}
       />
       {!refersToOtherAgency && (
@@ -170,7 +208,7 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
   },
   {
     label:
-      "2: La convention est examinée par une personne puis validée par quelqu’un d’autre",
+      "2: La convention est examinée par une personne puis validée par quelqu'un d'autre",
     value: "counsellorsAndValidators",
   },
 ];

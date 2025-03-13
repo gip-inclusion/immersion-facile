@@ -46,11 +46,44 @@ export const MultipleAddressInput = ({
               <AddressAutocomplete
                 disabled={disabled}
                 label={"Rechercher un lieu *"}
-                initialSearchTerm={currentAddresses[index].rawAddress}
-                useFirstAddressOnInitialSearchTerm={false}
+                selectProps={{
+                  defaultValue: {
+                    label: address.rawAddress,
+                    value: {
+                      address: {
+                        streetNumberAndAddress: address.rawAddress,
+                        postcode: "",
+                        departmentCode: "",
+                        city: "",
+                      },
+                      position: {
+                        lat: 0,
+                        lon: 0,
+                      },
+                    },
+                  },
+                  value: {
+                    label: address.rawAddress,
+                    value: {
+                      address: {
+                        streetNumberAndAddress: address.rawAddress,
+                        postcode: "",
+                        departmentCode: "",
+                        city: "",
+                      },
+                      position: {
+                        lat: 0,
+                        lon: 0,
+                      },
+                    },
+                  },
+                }}
                 id={`${id}-${index}`}
-                setFormValue={({ address }) => {
-                  onAddressAdded(address, index);
+                onAddressSelected={(addressAndPosition) => {
+                  onAddressAdded(addressAndPosition.address, index);
+                }}
+                onAddressClear={() => {
+                  onAddressDeleted(index);
                 }}
               />
             </div>

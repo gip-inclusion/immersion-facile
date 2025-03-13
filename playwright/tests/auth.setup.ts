@@ -8,6 +8,7 @@ setup("authenticate as admin", async ({ page }) => {
   await page.goto("/");
   const adminButton = await page.locator("#fr-header-main-navigation-button-4");
   await loginWithIdentityProvider(page, "admin", "ProConnect");
+  await page.waitForTimeout(10000);
   await expect(adminButton).toBeVisible();
   await page.context().storageState({ path: adminAuthFile });
 });
