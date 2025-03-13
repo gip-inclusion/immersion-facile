@@ -6,10 +6,10 @@ import {
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import {
-  ContactFormEstablishmentUserRight,
+  type ContactFormEstablishmentUserRight,
   type FormEstablishmentDto,
   domElementIds,
-  emailSchema
+  emailSchema,
 } from "shared";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import {
-  EstablishmentRole,
+  type EstablishmentRole,
   type Role,
   type SignatoryRole,
   allRoles,

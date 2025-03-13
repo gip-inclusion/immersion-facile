@@ -1,9 +1,9 @@
 import { type Page, expect } from "@playwright/test";
 import {
-  EstablishmentFormUserRights,
+  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
   addressRoutes,
-  domElementIds
+  domElementIds,
 } from "shared";
 import { testConfig } from "../../custom.config";
 import {

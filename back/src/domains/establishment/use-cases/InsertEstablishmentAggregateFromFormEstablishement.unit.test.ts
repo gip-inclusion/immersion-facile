@@ -1,7 +1,7 @@
 import {
-  AdminFormEstablishmentUserRight,
+  type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
-  ContactFormEstablishmentUserRight,
+  type ContactFormEstablishmentUserRight,
   FormEstablishmentDtoBuilder,
   InclusionConnectedUserBuilder,
   type NafDto,

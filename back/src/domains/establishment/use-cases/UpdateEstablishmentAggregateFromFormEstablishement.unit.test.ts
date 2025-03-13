@@ -1,7 +1,7 @@
 import {
-  AdminFormEstablishmentUserRight,
+  type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
-  ContactFormEstablishmentUserRight,
+  type ContactFormEstablishmentUserRight,
   FormEstablishmentDtoBuilder,
   type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
@@ -29,7 +29,7 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import {
+import type {
   EstablishmentAdminRight,
   EstablishmentContactRight,
 } from "../entities/EstablishmentAggregate";

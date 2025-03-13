@@ -1,11 +1,11 @@
-import { FormEstablishmentDto, errors, noContactPerMonth } from "shared";
+import { type FormEstablishmentDto, errors, noContactPerMonth } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
-import { NafAndNumberOfEmpolyee } from "../../../utils/siret";
-import { AddressGateway } from "../../core/address/ports/AddressGateway";
+import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
+import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
-import { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type {
   EstablishmentAggregate,
   EstablishmentUserRight,

@@ -1,5 +1,9 @@
-import { Page, expect } from "@playwright/test";
-import { AdminFormEstablishmentUserRight, type FormEstablishmentDto, domElementIds } from "shared";
+import { type Page, expect } from "@playwright/test";
+import {
+  type AdminFormEstablishmentUserRight,
+  type FormEstablishmentDto,
+  domElementIds,
+} from "shared";
 import { testConfig } from "../../custom.config";
 import {
   type PlaywrightTestCallback,

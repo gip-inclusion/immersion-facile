@@ -1,9 +1,9 @@
 import {
-  EstablishmentFormUserRight,
+  type EstablishmentFormUserRight,
   type FormEstablishmentDto,
   type SiretDto,
   domElementIds,
-  immersionFacileContactEmail
+  immersionFacileContactEmail,
 } from "shared";
 import type { Mode } from "src/app/components/forms/establishment/EstablishmentForm";
 import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";

@@ -1,5 +1,5 @@
 import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
-import { WithSiretDto } from "../siret/siret";
+import type { WithSiretDto } from "../siret/siret";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 

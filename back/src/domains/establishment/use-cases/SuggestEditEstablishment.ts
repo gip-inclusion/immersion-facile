@@ -1,5 +1,5 @@
 import {
-  AbsoluteUrl,
+  type AbsoluteUrl,
   type SiretDto,
   addressDtoToString,
   createInclusionConnectJwtPayload,
@@ -10,7 +10,7 @@ import {
 import { generateEditFormEstablishmentUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
-import { GenerateInclusionConnectJwt } from "../../core/jwt";
+import type { GenerateInclusionConnectJwt } from "../../core/jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

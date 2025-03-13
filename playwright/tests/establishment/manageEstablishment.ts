@@ -6,9 +6,7 @@ import {
   toDisplayedDate,
 } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
-import {
-  checkAvailibilityButtons
-} from "./establishmentForm.utils";
+import { checkAvailibilityButtons } from "./establishmentForm.utils";
 import {
   goToManageEstablishmentThroughEstablishmentDashboard,
   goToManageEtablishmentBySiretInAdmin,

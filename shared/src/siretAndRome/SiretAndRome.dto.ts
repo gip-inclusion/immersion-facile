@@ -1,5 +1,5 @@
 import type { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
-import { SiretDto } from "../siret/siret";
+import type { SiretDto } from "../siret/siret";
 
 export type SiretAndRomeDto = {
   rome: RomeCode;

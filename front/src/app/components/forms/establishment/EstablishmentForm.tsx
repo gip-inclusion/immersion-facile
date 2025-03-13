@@ -3,23 +3,17 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import {
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
-  EstablishmentFormUserRights,
+  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
   domElementIds,
   errors,
-  formEstablishmentSchema
+  formEstablishmentSchema,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";

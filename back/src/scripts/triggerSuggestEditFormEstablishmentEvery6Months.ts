@@ -2,7 +2,7 @@ import type { SiretDto } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import {
-  GenerateInclusionConnectJwt,
+  type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";

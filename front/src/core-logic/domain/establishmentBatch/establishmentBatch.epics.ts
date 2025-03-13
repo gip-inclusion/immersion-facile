@@ -2,12 +2,12 @@ import { uniq } from "ramda";
 import { filter, map, switchMap } from "rxjs";
 import {
   type AbsoluteUrl,
-  AdminFormEstablishmentUserRight,
+  type AdminFormEstablishmentUserRight,
   type CSVBoolean,
-  ContactFormEstablishmentUserRight,
-  EstablishmentCSVRow,
-  EstablishmentFormUserRights,
-  EstablishmentRole,
+  type ContactFormEstablishmentUserRight,
+  type EstablishmentCSVRow,
+  type EstablishmentFormUserRights,
+  type EstablishmentRole,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
   csvBooleanToBoolean,

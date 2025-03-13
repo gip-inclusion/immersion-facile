@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { domElementIds, FormEstablishmentDto, frontRoutes } from "shared";
+import { type FormEstablishmentDto, domElementIds, frontRoutes } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
 
 export const searchEstablishmentAndExpectResultToHaveLength =

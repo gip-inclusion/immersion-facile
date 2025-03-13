@@ -3,7 +3,7 @@ import {
   type AppellationAndRomeDto,
   type ContactMethod,
   type Email,
-  EstablishmentFormUserRights,
+  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
   defaultMaxContactsPerMonth,

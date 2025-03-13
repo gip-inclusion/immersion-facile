@@ -1,4 +1,4 @@
-import { AbsoluteUrl } from "../AbsoluteUrl";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
