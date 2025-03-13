@@ -1286,5 +1286,40 @@ describe("Pg implementation of ConventionQueries", () => {
       );
       expect(allConventionsBelongToUsersAgency).toBe(true);
     });
+
+    it("should not return conventions if user has no appropriate role", async () => {
+      const userWithoutProperRole = new InclusionConnectedUserBuilder()
+        .withEmail("no-proper-role@mail.com")
+        .withId("99999999-9999-9999-9999-999999999999")
+        .buildUser();
+
+      await new PgUserRepository(db).save(userWithoutProperRole);
+
+      // Get the existing agency
+      const existingAgency = await agencyRepo.getById(agency.id);
+      if (!existingAgency) throw new Error(`Agency ${agency.id} not found`);
+
+      // Update the agency with the new user rights
+      await agencyRepo.update({
+        ...existingAgency,
+        usersRights: {
+          ...existingAgency.usersRights,
+          [userWithoutProperRole.id]: {
+            isNotifiedByEmail: true,
+            roles: ["to-review"],
+          },
+        },
+      });
+
+      const result =
+        await conventionQueries.getPaginatedConventionsForAgencyUser({
+          agencyUserId: userWithoutProperRole.id,
+          pagination: { page: 1, perPage: 10 },
+          sortBy: "dateSubmission",
+        });
+
+      expect(result.data.length).toBe(0);
+      expectToEqual(result.data, []);
+    });
   });
 });
