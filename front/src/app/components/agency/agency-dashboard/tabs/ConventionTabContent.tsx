@@ -11,6 +11,7 @@ import {
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
   domElementIds,
+  miniStageAgencyKinds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { MetabaseView } from "../../../MetabaseView";
@@ -30,6 +31,17 @@ export const ConventionTabContent = (
   const redirectToConventionPage = (
     agency: AgencyDtoForAgencyUsersAndAdmins,
   ) => {
+    if (miniStageAgencyKinds.includes(agency.kind)) {
+      routes
+        .conventionMiniStage({
+          agencyDepartment: agency.address.departmentCode,
+          agencyKind: agency.kind,
+          agencyId: agency.id,
+        })
+        .push();
+      return;
+    }
+
     routes
       .conventionImmersion({
         agencyDepartment: agency.address.departmentCode,
