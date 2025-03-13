@@ -1,7 +1,10 @@
 import {
   type DiscussionDto,
+  Email,
+  EstablishmentRole,
   type InclusionConnectedUser,
   RejectDiscussionAndSendNotificationParam,
+  UserId,
   createOpaqueEmail,
   discussionIdSchema,
   discussionRejectionSchema,
@@ -13,6 +16,7 @@ import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export type RejectDiscussionAndSendNotification = ReturnType<
   typeof makeRejectDiscussionAndSendNotification
@@ -37,7 +41,12 @@ export const makeRejectDiscussionAndSendNotification =
         })
         .and(discussionRejectionSchema),
     },
-    async ({ inputParams, uow, deps, currentUser }) => {
+    async ({
+      inputParams,
+      uow,
+      deps,
+      currentUser: { id: userId, email: userEmail },
+    }) => {
       const discussion = await uow.discussionRepository.getById(
         inputParams.discussionId,
       );
@@ -51,10 +60,17 @@ export const makeRejectDiscussionAndSendNotification =
           discussionId: discussion.id,
         });
 
-      if (!userHasRights(currentUser, discussion))
+      if (
+        !(await userHasRights({
+          uow,
+          currentUserId: userId,
+          currentUserEmail: userEmail,
+          discussion,
+        }))
+      )
         throw errors.discussion.rejectForbidden({
           discussionId: discussion.id,
-          userId: currentUser.id,
+          userId,
         });
 
       const { htmlContent, subject } = rejectDiscussionEmailParams(
@@ -110,15 +126,46 @@ export const makeRejectDiscussionAndSendNotification =
         },
         followedIds: {
           establishmentSiret: discussion.siret,
-          userId: currentUser.id,
+          userId,
         },
       });
     },
   );
 
-const userHasRights = (
-  currentUser: InclusionConnectedUser,
-  discussion: DiscussionDto,
-) => {
-  return currentUser.email === discussion.establishmentContact.email;
+const userHasRights = async ({
+  uow,
+  currentUserId,
+  currentUserEmail,
+  discussion,
+}: {
+  uow: UnitOfWork;
+  currentUserId: UserId;
+  currentUserEmail: Email;
+  discussion: DiscussionDto;
+}) => {
+  if (discussion.establishmentContact.email === currentUserEmail) return true;
+  if (discussion.establishmentContact.copyEmails.includes(currentUserEmail))
+    return true;
+
+  const establishment =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      discussion.siret,
+    );
+  if (!establishment)
+    throw errors.establishment.notFound({ siret: discussion.siret });
+
+  if (
+    establishment.userRights.some(
+      ({ role, userId }) =>
+        allowedEstablishmentRolesForRejection.includes(role) &&
+        userId === currentUserId,
+    )
+  )
+    return true;
+  return false;
 };
+
+const allowedEstablishmentRolesForRejection: EstablishmentRole[] = [
+  "establishment-admin",
+  "establishment-contact",
+];

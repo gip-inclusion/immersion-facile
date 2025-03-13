@@ -24,7 +24,8 @@ import type { Gateways } from "../../../../config/bootstrap/createGateways";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
-import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
+import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
@@ -555,6 +556,19 @@ describe("InclusionConnectedAllowedRoutes", () => {
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(discussion.siret)
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: "other",
+              job: "",
+              phone: "",
+            },
+          ])
+          .build(),
+      ];
       inMemoryUow.discussionRepository.discussions = [discussion];
       inMemoryUow.userRepository.users = [user];
 
