@@ -23,7 +23,7 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 `
     : `
     Bonne journée, 
-    L’équipe du Point Orientation Apprentissage
+    L’équipe de votre chambre consulaire.
 `;
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
@@ -1064,7 +1064,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       En cas de difficulté, prévenez au plus vite votre ${
         internshipKind === "immersion"
           ? "conseiller"
-          : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+          : "conseiller de la Chambre consulaire ayant émis la convention"
       } pour qu'il vous conseille au mieux. 
       
       ${
