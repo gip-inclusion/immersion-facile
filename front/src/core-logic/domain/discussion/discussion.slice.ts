@@ -5,7 +5,10 @@ import type {
   DiscussionReadDto,
   DiscussionRejected,
 } from "shared";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FetchDiscussionRequestedPayload = {
   jwt: ConnectedUserJwt;
@@ -51,7 +54,7 @@ export const discussionSlice = createSlice({
     },
     fetchDiscussionFailed: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+      _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
     },
@@ -69,9 +72,7 @@ export const discussionSlice = createSlice({
     },
     updateDiscussionStatusFailed: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{
-        errorMessage: string;
-      }>,
+      _action: PayloadActionWithFeedbackTopicError,
     ) => {
       state.isLoading = false;
     },
