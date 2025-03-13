@@ -239,24 +239,30 @@ export const BeneficiaryFormSection = ({
         <>
           <AddressAutocomplete
             {...formContents["signatories.beneficiary.address"]}
-            initialSearchTerm={
+            initialInputValue={
               values.signatories.beneficiary.address &&
               addressDtoToString(values.signatories.beneficiary.address)
             }
-            setFormValue={({ address }) => {
-              setValue("signatories.beneficiary.address.city", address.city);
+            onAddressSelected={(addressAndPosition) => {
+              setValue(
+                "signatories.beneficiary.address.city",
+                addressAndPosition.address.city,
+              );
               setValue(
                 "signatories.beneficiary.address.postcode",
-                address.postcode,
+                addressAndPosition.address.postcode,
               );
               setValue(
                 "signatories.beneficiary.address.streetNumberAndAddress",
-                address.streetNumberAndAddress,
+                addressAndPosition.address.streetNumberAndAddress,
               );
               setValue(
                 "signatories.beneficiary.address.departmentCode",
-                address.departmentCode,
+                addressAndPosition.address.departmentCode,
               );
+            }}
+            onAddressClear={() => {
+              setValue("signatories.beneficiary.address", undefined);
             }}
             id={
               domElementIds.conventionImmersionRoute.beneficiarySection.address

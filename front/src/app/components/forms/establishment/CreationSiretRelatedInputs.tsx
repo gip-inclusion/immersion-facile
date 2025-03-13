@@ -28,6 +28,7 @@ export const CreationSiretRelatedInputs = () => {
     setValue,
     register,
     formState: { touchedFields },
+    getValues,
   } = useFormContext<FormEstablishmentDto>();
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels("create"),
@@ -108,15 +109,58 @@ export const CreationSiretRelatedInputs = () => {
         {...getFieldError("businessNameCustomized")}
       />
       <AddressAutocomplete
-        initialSearchTerm={establishmentInfos?.businessAddress}
+        initialInputValue={establishmentInfos?.businessAddress}
         label={"Vérifiez l'adresse de votre établissement *"}
-        id={domElementIds.establishment.create.addressAutocomplete}
-        setFormValue={({ address }) =>
+        selectProps={{
+          inputId: domElementIds.establishment.create.addressAutocomplete,
+          value: getValues("businessAddresses.0")
+            ? {
+                label: getValues("businessAddresses.0").rawAddress,
+                value: {
+                  address: {
+                    streetNumberAndAddress: getValues("businessAddresses.0")
+                      .rawAddress,
+                    postcode: "",
+                    departmentCode: "",
+                    city: "",
+                  },
+                  position: {
+                    lat: 0,
+                    lon: 0,
+                  },
+                },
+              }
+            : establishmentInfos
+              ? {
+                  label: establishmentInfos.businessAddress,
+                  value: {
+                    address: {
+                      streetNumberAndAddress:
+                        establishmentInfos.businessAddress,
+                      postcode: "",
+                      departmentCode: "",
+                      city: "",
+                    },
+                    position: {
+                      lat: 0,
+                      lon: 0,
+                    },
+                  },
+                }
+              : undefined,
+        }}
+        onAddressSelected={(addressAndPosition) => {
           setValue("businessAddresses.0", {
             id: uuidV4(),
-            rawAddress: addressDtoToString(address),
-          })
-        }
+            rawAddress: addressDtoToString(addressAndPosition.address),
+          });
+        }}
+        onAddressClear={() => {
+          setValue("businessAddresses.0", {
+            id: "",
+            rawAddress: "",
+          });
+        }}
         disabled={isFetchingSiret}
       />
     </>
