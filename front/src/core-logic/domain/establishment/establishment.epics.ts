@@ -16,33 +16,6 @@ import type {
 
 type EstablishmentAction = ActionOfSlice<typeof establishmentSlice>;
 
-const requestEstablishmentModification: AppEpic<EstablishmentAction> = (
-  action$,
-  _,
-  { establishmentGateway },
-) =>
-  action$.pipe(
-    filter(establishmentSlice.actions.sendModificationLinkRequested.match),
-    switchMap((action) => {
-      return establishmentGateway
-        .requestEstablishmentModification$(action.payload.siret)
-        .pipe(
-          map(() =>
-            establishmentSlice.actions.sendModificationLinkSucceeded({
-              feedbackTopic: action.payload.feedbackTopic,
-              siret: action.payload.siret,
-            }),
-          ),
-          catchEpicError((error) =>
-            establishmentSlice.actions.sendModificationLinkFailed({
-              errorMessage: error.message,
-              feedbackTopic: action.payload.feedbackTopic,
-            }),
-          ),
-        );
-    }),
-  );
-
 const redirectToEstablishmentFormPageEpic: AppEpic<
   EstablishmentAction | SiretAction
 > = (action$, state$, { navigationGateway }) =>
@@ -114,7 +87,10 @@ const createFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
     filter(establishmentSlice.actions.createEstablishmentRequested.match),
     switchMap((action) =>
       establishmentGateway
-        .addFormEstablishment$(action.payload.formEstablishment)
+        .addFormEstablishment$(
+          action.payload.formEstablishment,
+          action.payload.jwt,
+        )
         .pipe(
           map(() =>
             establishmentSlice.actions.createEstablishmentSucceeded({
@@ -190,7 +166,6 @@ const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
   );
 
 export const establishmentEpics = [
-  requestEstablishmentModification,
   redirectToEstablishmentFormPageEpic,
   fetchEstablishmentEpic,
   createFormEstablishmentEpic,

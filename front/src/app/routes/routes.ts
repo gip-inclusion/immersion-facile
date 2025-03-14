@@ -203,10 +203,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { count: param.path.number },
     (params) => `/debug/populate/${params.count}`,
   ),
-  editFormEstablishment: defineRoute(
-    { jwt: param.query.string },
-    () => `/${frontRoutes.editFormEstablishmentRoute}`,
-  ),
   establishmentDashboard: defineRoute(
     {
       ...inclusionConnectedParams,
@@ -220,7 +216,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
   ),
   formEstablishment: defineRoute(
-    establishmentParams,
+    {
+      ...inclusionConnectedParams,
+      ...establishmentParams,
+    },
     () => `/${frontRoutes.establishment}`,
   ),
   formEstablishmentForExternals: defineRoute(

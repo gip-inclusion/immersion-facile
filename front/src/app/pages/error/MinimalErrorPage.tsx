@@ -3,7 +3,7 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 
 import { MainWrapper } from "react-design-system";
-import { contactUsButtonContent } from "src/app/pages/error/front-errors";
+import { ContactUsButton } from "src/app/pages/error/front-errors";
 
 export const MinimalErrorPage = ({ error }: { error: Error }) => {
   return (
@@ -26,7 +26,7 @@ export const MinimalErrorPage = ({ error }: { error: Error }) => {
           {
             priority: "secondary",
             children: "Contactez-nous",
-            linkProps: contactUsButtonContent({
+            linkProps: ContactUsButton({
               currentUrl: window.location.href,
               currentDate: new Date().toISOString(),
               error: error.message,

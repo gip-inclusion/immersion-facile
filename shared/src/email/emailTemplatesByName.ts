@@ -10,10 +10,7 @@ import { isStringDate, toDisplayedDate } from "../utils/date";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
-import {
-  immersionFacileContactEmail,
-  immersionFacileDelegationEmail,
-} from "./knownEmailsAddresses";
+import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
   internshipKind === "immersion"
@@ -1616,34 +1613,6 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
             url: `${editFrontUrl}&shouldUpdateAvailability=true&mtm_campaign=transactionnel-etablissement-suggestion-mise-a-jour`,
           },
         ],
-      }),
-    },
-    EDIT_FORM_ESTABLISHMENT_LINK: {
-      niceName: "Établissement - Lien d'édition",
-      tags: ["modification établissement"],
-      createEmailVariables: ({
-        editFrontUrl,
-        businessName,
-        businessAddresses,
-      }) => ({
-        subject:
-          "Immersion Facilitée - Modification de la fiche de votre entreprise",
-        greetings: "Bonjour,",
-        content: `
-      Vous avez demandé à modifier les informations concernant votre entreprise: ${businessName} (${businessAddresses[0]}). 
-
-      Vous pouvez ajouter ou supprimer des métiers, modifier l'adresse de l'entreprise,  les coordonnées du référent “Immersion” dans votre entreprise ou le mode de contact souhaité, etc.  
-      `,
-        buttons: [
-          {
-            label: "Modifier ma fiche entreprise",
-            url: `${editFrontUrl}&mtm_campaign=transactionnel-etablissement-lien-edition`,
-          },
-        ],
-        highlight: {
-          content: `Si vous n'êtes pas à l'origine de cette demande, nous vous recommandons de nous contacter rapidement par mail : ${immersionFacileContactEmail}.`,
-        },
-        subContent: defaultSignature("immersion"),
       }),
     },
     ESTABLISHMENT_DELETED: {

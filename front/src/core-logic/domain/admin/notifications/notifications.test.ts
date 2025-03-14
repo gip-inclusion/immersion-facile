@@ -33,12 +33,12 @@ describe("notifications slice", () => {
           kind: "email",
           followedIds: {},
           templatedContent: {
-            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+            kind: "TEST_EMAIL",
             recipients: ["bob@mail.com"],
             params: {
-              editFrontUrl: "my-url",
-              businessAddresses: ["24 rue des boucher 67000 strasbourg"],
-              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+              url: "https://my-url",
+              input1: "24 rue des boucher 67000 strasbourg",
+              input2: "SAS FRANCE MERGUEZ DISTRIBUTION",
             },
           },
         },
@@ -83,12 +83,12 @@ describe("notifications slice", () => {
           kind: "email",
           followedIds: {},
           templatedContent: {
-            kind: "EDIT_FORM_ESTABLISHMENT_LINK",
+            kind: "TEST_EMAIL",
             recipients: ["bob@mail.com"],
             params: {
-              editFrontUrl: "my-url",
-              businessAddresses: ["24 rue des boucher 67000 strasbourg"],
-              businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
+              url: "https://my-url",
+              input1: "24 rue des boucher 67000 strasbourg",
+              input2: "SAS FRANCE MERGUEZ DISTRIBUTION",
             },
           },
         },

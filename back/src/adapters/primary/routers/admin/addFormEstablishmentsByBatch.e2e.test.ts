@@ -14,6 +14,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
@@ -98,7 +99,7 @@ describe("POST /add-form-establishment-batch", () => {
 
     expectHttpResponseToEqual(response, {
       status: 401,
-      body: { status: 401, message: "Provided token is invalid" },
+      body: { status: 401, message: invalidTokenMessage },
     });
   });
 

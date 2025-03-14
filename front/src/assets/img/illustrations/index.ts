@@ -1,3 +1,4 @@
+import annuaireDesEntreprises from "./annuaire-des-entreprises.webp";
 import contact from "./contact.webp";
 import documentsAdministratifs from "./documents-administratifs.webp";
 import error from "./error-illustration.webp";
@@ -19,6 +20,7 @@ export const commonIllustrations = {
   objective,
   success,
   reachData,
+  annuaireDesEntreprises,
 };
 export const searchIllustrations = [search1, search2, search3, search4];
 export const loginIllustration = login;

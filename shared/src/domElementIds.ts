@@ -378,9 +378,9 @@ export const domElementIds = {
         phone: "im-form-create-establishment__businessContact-phone",
         email: "im-form-create-establishment__businessContact-email",
         copyEmails: "im-form-create-establishment__businessContact-copy-emails",
-        contactMethod:
-          "im-form-create-establishment__businessContact-contact-method",
       },
+      contactMethod:
+        "im-form-create-establishment__businessContact-contact-method",
       isEngagedEnterprise:
         "im-form-create-establishment__is-engaged-enterprise",
       fitForDisabledWorkers:
@@ -400,6 +400,8 @@ export const domElementIds = {
       availabilityButton: "im-form-create-establishment__availability-button",
       nextAvailabilityDateInput:
         "im-form-create-establishment__next-availability-date",
+      navigateToEstablishmentDashboard:
+        "im-form-create-establishment__navigate-establishment-dahsboard-button",
       previousButtonFromStepAndMode: ({ currentStep }) =>
         `im-form-create-establishment__previous-button--step-${currentStep}`,
       nextButtonFromStepAndMode: ({ currentStep }) =>
@@ -422,9 +424,9 @@ export const domElementIds = {
         phone: "im-form-edit-establishment__businessContact-phone",
         email: "im-form-edit-establishment__businessContact-email",
         copyEmails: "im-form-edit-establishment__businessContact-copy-emails",
-        contactMethod:
-          "im-form-edit-establishment__businessContact-contact-method",
       },
+      contactMethod:
+        "im-form-edit-establishment__businessContact-contact-method",
       isEngagedEnterprise: "im-form-edit-establishment__is-engaged-enterprise",
       fitForDisabledWorkers:
         "im-form-edit-establishment__fit-for-disabled-workers",
@@ -482,9 +484,9 @@ export const domElementIds = {
         email: "im-form-manage-establishment-admin__businessContact-email",
         copyEmails:
           "im-form-manage-establishment-admin__businessContact-copy-emails",
-        contactMethod:
-          "im-form-manage-establishment-admin__businessContact-contact-method",
       },
+      contactMethod:
+        "im-form-manage-establishment-admin__businessContact-contact-method",
       isEngagedEnterprise:
         "im-form-manage-establishment-admin__is-engaged-enterprise",
       fitForDisabledWorkers:
@@ -692,7 +694,12 @@ export const domElementIds = {
       "im-convention-to-sign__submit-modification-request-button",
   },
   editFormEstablishmentRoute: {},
-  error: {},
+  error: {
+    establishmentDashboardButton:
+      "im-error-page__establishment-dashboard-button",
+    homeButton: "im-error-page__home-button",
+    contactUsButton: "im-error-contact-us-button",
+  },
   conventionMiniStageRoute: {},
 
   agencyDashboard: {

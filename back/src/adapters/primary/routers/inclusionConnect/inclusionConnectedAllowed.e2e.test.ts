@@ -21,6 +21,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { Gateways } from "../../../../config/bootstrap/createGateways";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
@@ -153,7 +154,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { message: "Provided token is invalid", status: 401 },
+        body: { message: invalidTokenMessage, status: 401 },
         status: 401,
       });
     });
@@ -258,7 +259,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { message: "Provided token is invalid", status: 401 },
+        body: { message: invalidTokenMessage, status: 401 },
         status: 401,
       });
     });
@@ -636,7 +637,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { message: "Provided token is invalid", status: 401 },
+        body: { message: invalidTokenMessage, status: 401 },
       });
     });
 

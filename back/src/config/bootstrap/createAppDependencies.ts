@@ -3,7 +3,6 @@ import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEve
 import {
   type GenerateApiConsumerJwt,
   type GenerateConventionJwt,
-  type GenerateEditFormEstablishmentJwt,
   type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
 } from "../../domains/core/jwt";
@@ -46,8 +45,6 @@ export const createAppDependencies = async (config: AppConfig) => {
   const oneHourInSeconds = 3600;
   const oneDayInSecond = oneHourInSeconds * 24;
 
-  const generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt =
-    makeGenerateJwtES256<"establishment">(config.jwtPrivateKey, oneDayInSecond);
   const generateApiConsumerJwt: GenerateApiConsumerJwt =
     makeGenerateJwtES256<"apiConsumer">(
       config.apiJwtPrivateKey,
@@ -76,7 +73,6 @@ export const createAppDependencies = async (config: AppConfig) => {
     config,
     gateways,
     generateConventionJwt,
-    generateEditEstablishmentJwt,
     generateInclusionConnectJwt,
     generateApiConsumerJwt,
     uowPerformer,
@@ -92,10 +88,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       "convention",
     ),
     errorHandlers,
-    establishmentMagicLinkAuthMiddleware: makeMagicLinkAuthMiddleware(
-      config,
-      "establishment",
-    ),
     apiConsumerMiddleware: makeConsumerMiddleware(
       useCases.getApiConsumerById.execute,
       gateways.timeGateway,
@@ -107,7 +99,6 @@ export const createAppDependencies = async (config: AppConfig) => {
       gateways.dashboardGateway,
       gateways.timeGateway,
     ),
-    generateEditEstablishmentJwt,
     generateConventionJwt,
     generateApiConsumerJwt,
     generateInclusionConnectJwt,

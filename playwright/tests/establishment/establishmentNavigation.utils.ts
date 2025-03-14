@@ -1,12 +1,14 @@
 import { type Page, expect } from "@playwright/test";
-import { domElementIds } from "shared";
+import {
+  type FormEstablishmentDto,
+  type SiretDto,
+  domElementIds,
+} from "shared";
 import { goToAdminTab } from "../../utils/admin";
-import type { TestEstablishments } from "./establishmentForm.utils";
 
 export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   page: Page,
-  testEstablishments: TestEstablishments,
-  retry: number,
+  establishment: FormEstablishmentDto,
 ) => {
   await page.goto("/");
   await page.locator("#fr-header-main-navigation-button-2").click();
@@ -19,15 +21,14 @@ export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   );
   if ((await establishmentSelector.count()) > 0) {
     await establishmentSelector.selectOption({
-      value: testEstablishments[retry].siret,
+      value: establishment.siret,
     });
   }
 };
 
 export const goToManageEtablishmentBySiretInAdmin = async (
   page: Page,
-  retry: number,
-  testEstablishments: TestEstablishments,
+  siret: SiretDto,
 ) => {
   await page.goto("/");
   await goToAdminTab(page, "adminEstablishments");
@@ -35,10 +36,7 @@ export const goToManageEtablishmentBySiretInAdmin = async (
     `#${domElementIds.admin.manageEstablishment.siretInput}`,
   );
   await siretInputLocator.waitFor();
-  await siretInputLocator.fill(testEstablishments[retry].siret);
-  // await page.focus(
-  //   `#${domElementIds.admin.manageEstablishment.searchButton}`,
-  // );
+  await siretInputLocator.fill(siret);
   await page.click(`#${domElementIds.admin.manageEstablishment.searchButton}`);
   await page.waitForTimeout(1000); // waiting for fetch and render
   await expect(page.url()).toContain("pilotage-etablissement-admin");

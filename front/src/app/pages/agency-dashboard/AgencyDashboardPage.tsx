@@ -9,7 +9,6 @@ import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
@@ -29,21 +28,19 @@ export const AgencyDashboardPage = ({
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   const feedbackTopic: FeedbackTopic = "dashboard-agency-register-user";
 
-  const siretInDeviceStorage =
-    outOfReduxDependencies.localDeviceRepository.get("connectedUserSiret");
-
   useEffect(() => {
-    if (siretInDeviceStorage)
+    if (federatedIdentity && federatedIdentity.provider === "connectedUser")
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
-          siret: siretInDeviceStorage,
+          siret: federatedIdentity.siret,
           status: ["active", "from-api-PE"],
         }),
       );
-  }, [dispatch, siretInDeviceStorage]);
+  }, [dispatch, federatedIdentity]);
 
   return (
     <>
@@ -69,11 +66,12 @@ export const AgencyDashboardPage = ({
               );
             return (
               <>
-                {siretInDeviceStorage ? (
+                {federatedIdentity &&
+                federatedIdentity.provider === "connectedUser" ? (
                   <strong className={fr.cx("fr-mt-4w", "fr-text--lead")}>
                     Bonjour {currentUser.firstName} {currentUser.lastName}, vous
-                    avez sélectionné le SIRET {siretInDeviceStorage} lors de la
-                    création de votre compte sur ProConnect
+                    avez sélectionné le SIRET {federatedIdentity.siret} lors de
+                    la création de votre compte sur ProConnect
                   </strong>
                 ) : (
                   <p>
@@ -86,8 +84,9 @@ export const AgencyDashboardPage = ({
 
                 <RegisterAgenciesForm
                   currentUser={currentUser}
-                  {...(siretInDeviceStorage
-                    ? { initialSiret: siretInDeviceStorage }
+                  {...(federatedIdentity &&
+                  federatedIdentity.provider === "connectedUser"
+                    ? { initialSiret: federatedIdentity.siret }
                     : {})}
                 />
               </>

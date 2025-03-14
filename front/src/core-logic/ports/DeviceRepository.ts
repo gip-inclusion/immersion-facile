@@ -13,8 +13,7 @@ export type LocalStoragePair =
   | GenericPair<"partialConventionInUrl", Partial<ConventionParamsInUrl>>
   | GenericPair<"adminToken", string>
   | GenericPair<"federatedIdentityWithUser", FederatedIdentityWithUser>
-  | GenericPair<"searchResultExternal", SearchResultDto>
-  | GenericPair<"connectedUserSiret", string>;
+  | GenericPair<"searchResultExternal", SearchResultDto>;
 
 export type SessionStoragePair =
   | GenericPair<"acquisitionParams", WithAcquisition>

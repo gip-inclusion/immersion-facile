@@ -11,7 +11,7 @@ import {
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import formIntroIllustration from "src/assets/img/form-establishment-intro.webp";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { establishmentLeadStatus } from "src/core-logic/domain/establishmentLead/establishmentLead.selectors";
@@ -119,8 +119,17 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
               Je m'inscris en 2 minutes
             </Button>
           </div>
-          <div className={fr.cx("fr-col-lg-6", "fr-mt-auto")}>
-            <img src={formIntroIllustration} alt="" />
+          <div
+            className={fr.cx(
+              "fr-col-12",
+              "fr-col-lg-6",
+              "fr-hidden",
+              "fr-unhidden-lg",
+              "fr-px-12w",
+              "fr-py-4w",
+            )}
+          >
+            <img src={commonIllustrations.annuaireDesEntreprises} alt="" />
           </div>
         </section>
       </MainWrapper>

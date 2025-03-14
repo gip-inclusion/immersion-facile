@@ -21,7 +21,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
 import { routes } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
-import { outOfReduxDependencies } from "src/config/dependencies";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -61,6 +60,7 @@ export type FrontAgencyDashboardRoute =
 type InclusionConnectPrivateRoute =
   | FrontAdminRoute
   | FrontAgencyDashboardRoute
+  | Route<typeof routes.formEstablishment>
   | Route<typeof routes.establishmentDashboard>
   | Route<typeof routes.myProfile>;
 
@@ -69,21 +69,6 @@ type InclusionConnectedPrivateRouteProps = {
   children: ReactElement;
   inclusionConnectConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
-};
-
-const proConnectProvider = {
-  name: "ProConnect",
-  buttonProvider: "pro-connect" as const,
-  baseline:
-    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-};
-
-const getPage = (
-  route: InclusionConnectPrivateRoute,
-): AllowedStartOAuthLoginPage => {
-  if (route.name === "establishmentDashboard") return "establishmentDashboard";
-  if (route.name === "agencyDashboardMain") return "agencyDashboard";
-  return "admin";
 };
 
 export const InclusionConnectedPrivateRoute = ({
@@ -124,14 +109,12 @@ export const InclusionConnectedPrivateRoute = ({
             lastName,
             firstName,
             idToken,
+            siret,
           },
           feedbackTopic: "auth-global",
         }),
       );
-      outOfReduxDependencies.localDeviceRepository.set(
-        "connectedUserSiret",
-        siret,
-      );
+
       const { token: _, ...routeParams } = route.params;
       routes[route.name](routeParams as any).replace();
     }
@@ -224,4 +207,19 @@ export const InclusionConnectedPrivateRoute = ({
       <MainWrapper layout="default">{children}</MainWrapper>
     </HeaderFooterLayout>
   );
+};
+
+const proConnectProvider = {
+  name: "ProConnect",
+  buttonProvider: "pro-connect" as const,
+  baseline:
+    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+};
+
+const getPage = (
+  route: InclusionConnectPrivateRoute,
+): AllowedStartOAuthLoginPage => {
+  if (route.name === "establishmentDashboard") return "establishmentDashboard";
+  if (route.name === "agencyDashboardMain") return "agencyDashboard";
+  return "admin";
 };

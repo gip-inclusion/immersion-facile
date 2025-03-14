@@ -1,4 +1,4 @@
-import type { EstablishmentRole, Phone, UserId } from "shared";
+import type { EstablishmentRole, UserId, WithJobAndPhone } from "shared";
 import type { EstablishmentEntity } from "./EstablishmentEntity";
 import type { OfferEntity } from "./OfferEntity";
 
@@ -15,11 +15,6 @@ export type WithEstablishmentAggregate = {
 type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
   userId: UserId;
   role: Role;
-};
-
-type WithJobAndPhone = {
-  job: string;
-  phone: Phone;
 };
 
 export type EstablishmentAdminRight =

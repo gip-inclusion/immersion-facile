@@ -521,6 +521,8 @@ export const errors = {
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,
       ),
+    notFoundByEmail: ({ email }: { email: Email }) =>
+      new NotFoundError(`Aucun utilisateur trouvé avec l'email '${email}'.`),
     forbidden: ({ userId }: { userId: UserId }) =>
       new ForbiddenError(
         `L'utilisateur qui a l'identifiant "${userId}" n'a pas le droit d'accéder à cette ressource.`,

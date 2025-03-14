@@ -104,7 +104,6 @@ const getUseCasesByTopics = (
   ConventionReminderRequired: [useCases.notifyConventionReminder],
 
   // Establishment form related
-  FormEstablishmentEditLinkSent: [],
   UpdatedEstablishmentAggregateInsertedFromForm: [
     useCases.updateMarketingEstablishmentContactList,
   ],

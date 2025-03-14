@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
-import { useSendModifyEstablishmentLink } from "src/app/hooks/establishment.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -132,7 +131,6 @@ export const useEstablishmentSiret = () => {
     establishmentSelectors.isReadyForRedirection,
   );
   const clearSiret = () => updateSiret("");
-  const { sendModifyEstablishmentLink } = useSendModifyEstablishmentLink();
   return {
     currentSiret,
     siretErrorToDisplay,
@@ -140,6 +138,5 @@ export const useEstablishmentSiret = () => {
     isReadyForRequestOrRedirection,
     clearSiret,
     updateSiret,
-    sendModifyEstablishmentLink,
   };
 };

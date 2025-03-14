@@ -8,9 +8,6 @@ import { domElementIds } from "shared";
 import type { UserType } from "src/app/pages/home/HomePage";
 import { routes } from "src/app/routes/routes";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
-
 import heroHeaderAgencyIllustration from "/src/assets/img/illustration-agency-hero.webp";
 import heroHeaderCandidateIllustration from "/src/assets/img/illustration-candidate-hero.webp";
 import heroHeaderDefaultIllustration from "/src/assets/img/illustration-default-hero.webp";
@@ -63,22 +60,7 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
 
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
-  openSiretModal: () => void,
-) => Record<UserType, HeroHeaderNavCard[]> = (
-  storeDispatch: Dispatch,
-  openSiretModal,
-) => {
-  const onSiretModalOpenClick = (event: MouseEvent) => {
-    event.preventDefault();
-    openSiretModal();
-    storeDispatch(establishmentSlice.actions.gotReady());
-    storeDispatch(
-      siretSlice.actions.siretModified({
-        siret: "",
-        feedbackTopic: "siret-input",
-      }),
-    );
-  };
+) => Record<UserType, HeroHeaderNavCard[]> = (storeDispatch: Dispatch) => {
   return {
     default: [
       {
@@ -126,16 +108,13 @@ export const heroHeaderNavCards: (
     ],
     establishment: [
       {
-        title: "Proposer des immersions ou les modifier",
+        title: "Proposer des immersions",
         icon: "fr-icon-award-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.addEstablishmentForm,
-        link: {
-          href: "",
-          onClick: onSiretModalOpenClick,
-        },
+        link: routes.formEstablishment().link,
         alternateTitle:
-          "Proposer une immersion ou modifier mon entreprise : mon entreprise apparaîtra dans les résultats de recherche des candidats.",
+          "Proposer une immersion : mon entreprise apparaîtra dans les résultats de recherche des candidats.",
       },
       {
         title: "Remplir la demande de convention",

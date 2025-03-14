@@ -14,6 +14,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -126,7 +127,7 @@ describe("Assessment routes", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
     });
 

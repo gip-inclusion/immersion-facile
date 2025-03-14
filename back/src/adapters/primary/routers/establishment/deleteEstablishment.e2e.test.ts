@@ -4,6 +4,7 @@ import {
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   UserBuilder,
+  createInclusionConnectJwtPayload,
   currentJwtVersions,
   displayRouteName,
   errors,
@@ -14,10 +15,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import type {
-  GenerateEditFormEstablishmentJwt,
-  GenerateInclusionConnectJwt,
-} from "../../../../domains/core/jwt";
+import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
@@ -51,17 +49,12 @@ describe("Delete establishment", () => {
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let uow: InMemoryUnitOfWork;
-  let generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();
-    ({
-      inMemoryUow: uow,
-      generateEditEstablishmentJwt,
-      generateInclusionConnectJwt,
-    } = testAppAndDeps);
+    ({ inMemoryUow: uow, generateInclusionConnectJwt } = testAppAndDeps);
     const request = testAppAndDeps.request;
     timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
@@ -141,25 +134,30 @@ describe("Delete establishment", () => {
 
   it(`${displayRouteName(
     establishmentRoutes.deleteEstablishment,
-  )} 401 - Access refused with edit establishment JWT`, async () => {
+  )} 403 - Access refused with establishment admin user JWT`, async () => {
+    const now = new Date();
+    timeGateway.setNextDate(now);
     const response = await httpClient.deleteEstablishment({
       urlParams: {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateEditEstablishmentJwt({
-          siret: establishmentAggregate.establishment.siret,
-          version: currentJwtVersions.establishment,
-        }),
+        authorization: generateInclusionConnectJwt(
+          createInclusionConnectJwtPayload({
+            userId: user.id,
+            now: timeGateway.now(),
+            durationDays: 2,
+          }),
+        ),
       },
     });
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: "Veuillez vous authentifier",
-        status: 401,
+        message: errors.user.forbidden({ userId: user.id }).message,
+        status: 403,
       },
-      status: 401,
+      status: 403,
     });
   });
 

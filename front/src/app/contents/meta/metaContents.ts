@@ -59,11 +59,6 @@ export const defaultPageMetaContents: Partial<
     title: "DebugPopulateDB",
     description: "Faciliter la réalisation des immersions professionnelles.",
   },
-  editFormEstablishment: {
-    title: "Formulaire d'édition entreprise",
-    description:
-      "Modifier une entreprise accueillante de PMSMP et immersions professionnelles.",
-  },
   formEstablishment: {
     title: "Formulaire de référencement entreprise",
     description:

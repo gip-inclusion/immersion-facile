@@ -30,6 +30,7 @@ import type { HttpClient } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -212,7 +213,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
     });
   });
@@ -352,7 +353,7 @@ describe("Admin router", () => {
       });
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
     });
   });
@@ -752,7 +753,7 @@ describe("Admin router", () => {
 
       expectResponseAndReturnJwt(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
       expectToEqual(inMemoryUow.apiConsumerRepository.consumers, []);
     });
@@ -792,7 +793,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
     });
   });
@@ -831,7 +832,7 @@ describe("Admin router", () => {
 
       expectHttpResponseToEqual(response, {
         status: 401,
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
       });
     });
   });

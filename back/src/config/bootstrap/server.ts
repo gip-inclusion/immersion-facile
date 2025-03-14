@@ -22,7 +22,6 @@ import type { EventCrawler } from "../../domains/core/events/ports/EventCrawler"
 import type {
   GenerateApiConsumerJwt,
   GenerateConventionJwt,
-  GenerateEditFormEstablishmentJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -42,7 +41,6 @@ type CreateAppProperties = {
   eventCrawler: EventCrawler;
   generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateConventionJwt: GenerateConventionJwt;
-  generateEditEstablishmentJwt: GenerateEditFormEstablishmentJwt;
   generateInclusionConnectJwt: GenerateInclusionConnectJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow?: InMemoryUnitOfWork;
@@ -108,7 +106,6 @@ export const createApp = async (
     eventCrawler: deps.eventCrawler,
     generateApiConsumerJwt: deps.generateApiConsumerJwt,
     generateConventionJwt: deps.generateConventionJwt,
-    generateEditEstablishmentJwt: deps.generateEditEstablishmentJwt,
     generateInclusionConnectJwt: deps.generateInclusionConnectJwt,
     uuidGenerator: deps.uuidGenerator,
   };

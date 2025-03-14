@@ -1,7 +1,5 @@
 import {
-  type AppellationAndRomeDto,
-  type EstablishmentDomainPayload,
-  type EstablishmentJwtPayload,
+  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
   type InclusionConnectDomainJwtPayload,
   type InclusionConnectJwtPayload,
@@ -13,25 +11,23 @@ import {
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
-  EstablishmentAdminRight,
   EstablishmentAggregate,
+  EstablishmentUserRight,
 } from "../entities/EstablishmentAggregate";
 
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  EstablishmentDomainPayload | InclusionConnectDomainJwtPayload
+  InclusionConnectDomainJwtPayload
 > {
   protected inputSchema = siretSchema;
 
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    jwtPayload?: EstablishmentJwtPayload | InclusionConnectJwtPayload,
+    jwtPayload?: InclusionConnectJwtPayload,
   ) {
     if (!jwtPayload) throw errors.user.noJwtProvided();
-    const isValidEstablishmentJwtPayload =
-      "siret" in jwtPayload && siret === jwtPayload.siret;
 
     const establishmentAggregate =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
@@ -40,105 +36,79 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
 
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    if (isValidEstablishmentJwtPayload)
-      return this.#onValidJwt(uow, establishmentAggregate);
+    const currentUser = await uow.userRepository.getById(jwtPayload.userId);
+    if (!currentUser) throw errors.user.notFound({ userId: jwtPayload.userId });
 
-    const isValidIcJwtPayload = "userId" in jwtPayload;
-    if (isValidIcJwtPayload) {
-      const currentUser = await uow.userRepository.getById(jwtPayload.userId);
-      if (!currentUser)
-        throw errors.user.notFound({ userId: jwtPayload.userId });
-
-      if (
-        establishmentAggregate.userRights.some(
-          (right) => right.userId === currentUser.id,
-        ) ||
-        currentUser.isBackofficeAdmin
-      )
-        return this.#onValidJwt(uow, establishmentAggregate);
-    }
+    if (
+      establishmentAggregate.userRights.some(
+        (right) => right.userId === currentUser.id,
+      ) ||
+      currentUser.isBackofficeAdmin
+    )
+      return this.#makeFormEstablishement(uow, establishmentAggregate);
 
     throw errors.user.unauthorized();
   }
 
-  async #onValidJwt(
+  async #makeFormEstablishement(
     uow: UnitOfWork,
     establishmentAggregate: EstablishmentAggregate,
-  ) {
-    return establishmentAggregateToFormEstablishement(
-      establishmentAggregate,
-      await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
-        establishmentAggregate.establishment.siret,
+  ): Promise<FormEstablishmentDto> {
+    return {
+      siret: establishmentAggregate.establishment.siret,
+      source: "immersion-facile",
+      website: establishmentAggregate.establishment.website,
+      additionalInformation:
+        establishmentAggregate.establishment.additionalInformation,
+      businessName: establishmentAggregate.establishment.name,
+      businessNameCustomized:
+        establishmentAggregate.establishment.customizedName,
+      businessAddresses: establishmentAggregate.establishment.locations.map(
+        (location) => ({
+          id: location.id,
+          rawAddress: addressDtoToString(location.address),
+        }),
       ),
-      uow,
+      isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
+      fitForDisabledWorkers:
+        establishmentAggregate.establishment.fitForDisabledWorkers,
+      naf: establishmentAggregate.establishment?.nafDto,
+      appellations:
+        await uow.establishmentAggregateRepository.getOffersAsAppellationAndRomeDtosBySiret(
+          establishmentAggregate.establishment.siret,
+        ),
+      userRights: await this.#makeFormUserRights(
+        uow,
+        establishmentAggregate.userRights,
+      ),
+      contactMethod: establishmentAggregate.establishment.contactMethod,
+      maxContactsPerMonth:
+        establishmentAggregate.establishment.maxContactsPerMonth,
+      nextAvailabilityDate:
+        establishmentAggregate.establishment.nextAvailabilityDate,
+      searchableBy: establishmentAggregate.establishment.searchableBy,
+    };
+  }
+
+  async #makeFormUserRights(
+    uow: UnitOfWork,
+    userRights: EstablishmentUserRight[],
+  ): Promise<EstablishmentFormUserRights> {
+    const users = await uow.userRepository.getByIds(
+      userRights.map(({ userId }) => userId),
     );
+
+    return userRights.map(({ role, userId, job, phone }) => {
+      const user = users.find(({ id }) => id === userId);
+      if (!user) throw errors.user.notFound({ userId });
+      return role === "establishment-admin"
+        ? {
+            role,
+            email: user.email,
+            job,
+            phone,
+          }
+        : { role, email: user.email, job, phone };
+    });
   }
 }
-
-export const establishmentAggregateToFormEstablishement = async (
-  establishmentAggregate: EstablishmentAggregate,
-  appellations: AppellationAndRomeDto[],
-  uow: UnitOfWork,
-): Promise<FormEstablishmentDto> => {
-  const firstAdminRight = establishmentAggregate.userRights.find(
-    (right): right is EstablishmentAdminRight =>
-      right.role === "establishment-admin",
-  );
-
-  if (!firstAdminRight)
-    throw errors.establishment.adminNotFound({
-      siret: establishmentAggregate.establishment.siret,
-    });
-
-  const firstEstablishmentAdmin = await uow.userRepository.getById(
-    firstAdminRight.userId,
-  );
-
-  if (!firstEstablishmentAdmin)
-    throw errors.user.notFound({ userId: firstAdminRight.userId });
-
-  const establishmentContacts = await uow.userRepository.getByIds(
-    establishmentAggregate.userRights
-      .filter(({ role }) => role === "establishment-contact")
-      .map(({ userId }) => userId),
-  );
-
-  return {
-    siret: establishmentAggregate.establishment.siret,
-    source: "immersion-facile",
-    website: establishmentAggregate.establishment.website,
-    additionalInformation:
-      establishmentAggregate.establishment.additionalInformation,
-    businessName: establishmentAggregate.establishment.name,
-    businessNameCustomized: establishmentAggregate.establishment.customizedName,
-    businessAddresses: establishmentAggregate.establishment.locations.map(
-      (location) => ({
-        id: location.id,
-        rawAddress: addressDtoToString(location.address),
-      }),
-    ),
-    isEngagedEnterprise: establishmentAggregate.establishment.isCommited,
-    fitForDisabledWorkers:
-      establishmentAggregate.establishment.fitForDisabledWorkers,
-    naf: establishmentAggregate.establishment?.nafDto,
-    appellations,
-    businessContact: {
-      contactMethod: establishmentAggregate.establishment.contactMethod,
-      firstName: firstEstablishmentAdmin.firstName.length
-        ? firstEstablishmentAdmin.firstName
-        : "NON CONNU",
-      lastName: firstEstablishmentAdmin.lastName.length
-        ? firstEstablishmentAdmin.lastName
-        : "NON CONNU",
-      email: firstEstablishmentAdmin.email,
-      job: firstAdminRight.job,
-      phone: firstAdminRight.phone,
-      copyEmails: establishmentContacts.map(({ email }) => email),
-    },
-    maxContactsPerMonth:
-      establishmentAggregate.establishment.maxContactsPerMonth,
-    nextAvailabilityDate:
-      establishmentAggregate.establishment.nextAvailabilityDate,
-    searchableBy: establishmentAggregate.establishment.searchableBy,
-  } satisfies FormEstablishmentDto;
-};

@@ -13,6 +13,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
+import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
@@ -114,7 +115,7 @@ describe("Unregister establishment lead", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { status: 401, message: "Provided token is invalid" },
+        body: { status: 401, message: invalidTokenMessage },
         status: 401,
       });
     });
