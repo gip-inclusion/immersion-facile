@@ -1,10 +1,10 @@
 import {
   type DiscussionDto,
-  Email,
-  EstablishmentRole,
+  type Email,
+  type EstablishmentRole,
   type InclusionConnectedUser,
-  RejectDiscussionAndSendNotificationParam,
-  UserId,
+  type RejectDiscussionAndSendNotificationParam,
+  type UserId,
   createOpaqueEmail,
   discussionIdSchema,
   discussionRejectionSchema,
@@ -16,7 +16,7 @@ import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export type RejectDiscussionAndSendNotification = ReturnType<
   typeof makeRejectDiscussionAndSendNotification

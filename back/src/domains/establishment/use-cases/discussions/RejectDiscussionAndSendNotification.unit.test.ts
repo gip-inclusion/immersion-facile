@@ -2,7 +2,7 @@ import {
   DiscussionBuilder,
   type DiscussionDto,
   InclusionConnectedUserBuilder,
-  RejectDiscussionAndSendNotificationParam,
+  type RejectDiscussionAndSendNotificationParam,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,

@@ -1,5 +1,5 @@
 import { P, match } from "ts-pattern";
-import { WithDiscussionId } from "..";
+import type { WithDiscussionId } from "..";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
@@ -8,7 +8,7 @@ import type {
   ImmersionObjective,
 } from "../convention/convention.dto";
 import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
-import {
+import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
