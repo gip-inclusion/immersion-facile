@@ -293,7 +293,7 @@ describe("Send signature link", () => {
             },
             viewerJwtPayload,
           ),
-          errors.convention.unsupportedRoleSendSignatureLink({
+          errors.convention.unsupportedRole({
             role: "agency-viewer",
           }),
         );

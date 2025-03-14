@@ -3,12 +3,17 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type TransferConventionToAgencyRequestDto,
+  type UserId,
   errors,
   transferConventionToAgencyRequestSchema,
 } from "shared";
+import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
+import type { AgencyRepository } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
-import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   throwErrorOnConventionIdMismatch,
   throwIfNotAllowedForUser,
@@ -23,7 +28,8 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
   void,
   ConventionRelatedJwtPayload,
   {
-    createNewEvent: CreateNewEvent;
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
   }
 >(
   {
@@ -51,13 +57,15 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       "READY_TO_SIGN",
     ]);
 
-    const agency = await uow.agencyRepository.getById(inputParams.agencyId);
+    await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
+      agencyId: convention.agencyId,
+      agencyRepository: uow.agencyRepository,
+    });
 
-    if (!agency) {
-      throw errors.agency.notFound({
-        agencyId: inputParams.agencyId,
-      });
-    }
+    await throwErrorIfAgencyNotFound({
+      agencyId: inputParams.agencyId,
+      agencyRepository: uow.agencyRepository,
+    });
 
     await throwIfNotAllowedForUser({
       uow,
@@ -84,12 +92,13 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
 
     await Promise.all([
       uow.conventionRepository.update(updatedConvention),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "ConventionTransferredToAgency",
-          payload: { convention: updatedConvention, triggeredBy },
-        }),
-      ),
+      sendEmailsToSignatories({
+        userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
+        convention,
+        uow,
+        deps,
+        jwtPayload,
+      }),
     ]);
   },
 );
@@ -103,4 +112,53 @@ const throwErrorIfConventionStatusNotAllowed = (
       status: status,
     });
   }
+};
+
+const throwErrorIfUserIsValidatorOfAgencyWithRefersTo = async ({
+  agencyId,
+  agencyRepository,
+}: { agencyId: string; agencyRepository: AgencyRepository }) => {
+  const agency = await agencyRepository.getById(agencyId);
+  if (agency?.refersToAgencyId) {
+    throw errors.convention.unsupportedRole({ role: "validator" });
+  }
+};
+
+const sendEmailsToSignatories = async ({
+  userId,
+  convention,
+  uow,
+  deps,
+  jwtPayload,
+}: {
+  userId: UserId | undefined;
+  convention: ConventionDto;
+  uow: UnitOfWork;
+  deps: {
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  };
+  jwtPayload: ConventionRelatedJwtPayload;
+}) => {
+  // const shortLink = await deps.shortLinkIdGeneratorGateway.generateShortLinkId(
+  //   convention.id,
+  // );
+
+  convention.signatories.map((signatory) => {
+    deps.saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      followedIds: {
+        conventionId: convention.id,
+        agencyId: convention.agencyId,
+        establishmentSiret: convention.siret,
+        userId,
+      },
+      templatedContent: {
+
+        recipientEmail: jwtPayload.email,
+        kind: "LastReminderForSignatories",
+        params: { shortLink: shortLink },
+      },
+    });
+  });
 };

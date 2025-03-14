@@ -240,9 +240,9 @@ export const errors = {
       new BadRequestError(
         `Validation manquante par le ${agencyModifierTitleByRole[role]}.`,
       ),
-    unsupportedRoleSendSignatureLink: ({ role }: { role: Role }) =>
+    unsupportedRole: ({ role }: { role: Role }) =>
       new ForbiddenError(
-        `Le rôle ${role} n'est pas supporté pour l'envoi du lien de signature aux signataires`,
+        `Le rôle ${role} n'est pas supporté pour cette fonctionnalité.`,
       ),
     unsupportedRenewRoute: ({
       supportedRenewRoutes,

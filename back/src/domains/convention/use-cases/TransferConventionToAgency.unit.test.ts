@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyRole,
   ConventionDtoBuilder,
   type ConventionStatus,
   type InclusionConnectDomainJwtPayload,
@@ -22,17 +23,29 @@ import {
   type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { TestUuidGenerator, UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type TransferConventionToAgency,
   makeTransferConventionToAgency,
 } from "./TransferConventionToAgency";
+import { makeSaveNotificationAndRelatedEvent, type SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 
 const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
 const otherAgency = new AgencyDtoBuilder().withId("other-agency-id").build();
 
 const agency = new AgencyDtoBuilder().build();
+
+const agencyWithRefersTo = new AgencyDtoBuilder()
+.withId("agency-with-refers-to")
+.withRefersToAgencyInfo({
+  refersToAgencyId: agency.id,
+  refersToAgencyName: agency.name,
+})
+.build();
 
 const convention = new ConventionDtoBuilder()
   .withId(conventionId)
@@ -63,19 +76,24 @@ const connectedUser = new InclusionConnectedUserBuilder()
   .build();
 
 describe("TransferConventionToAgency", () => {
-  let createNewEvent: CreateNewEvent;
+  let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let uow: InMemoryUnitOfWork;
   let usecase: TransferConventionToAgency;
-
+  let timeGateway: TimeGateway;
+  let shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway
+  ;
   beforeEach(() => {
-    createNewEvent = makeCreateNewEvent({
-      timeGateway: new CustomTimeGateway(),
-      uuidGenerator: new TestUuidGenerator(),
-    });
     uow = createInMemoryUow();
+    timeGateway = new CustomTimeGateway();
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+    saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
+      new UuidV4Generator(),
+      timeGateway,
+    );
+    
     usecase = makeTransferConventionToAgency({
       uowPerformer: new InMemoryUowPerformer(uow),
-      deps: { createNewEvent },
+      deps: { saveNotificationAndRelatedEvent, shortLinkIdGeneratorGateway },
     });
   });
 
@@ -209,32 +227,70 @@ describe("TransferConventionToAgency", () => {
         );
       });
 
-      it("throws unauthorized if user has not enough rights on agency", async () => {
-        uow.conventionRepository.setConventions([convention]);
+      it.each(["agency-viewer", "agency-admin", "to-review"] as AgencyRole[])(
+        "throws unauthorized if user has not enough rights on agency",
+        async (role) => {
+          uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {
+              [connectedUserPayload.userId]: {
+                roles: [role],
+                isNotifiedByEmail: false,
+              },
+            }),
+            toAgencyWithRights(otherAgency, {}),
+          ];
+          uow.userRepository.users = [connectedUser];
+
+          await expectPromiseToFailWithError(
+            usecase.execute(
+              {
+                conventionId,
+                agencyId: otherAgency.id,
+                justification: "test",
+              },
+              connectedUserPayload,
+            ),
+            errors.user.notEnoughRightOnAgency({
+              userId: connectedUserPayload.userId,
+              agencyId: convention.agencyId,
+            }),
+          );
+        },
+      );
+
+      it("if agencyWithRefersTo, throws an error if validator attempts to change agency", async () => {
+        const preValidatedConvention = new ConventionDtoBuilder(convention)
+          .withAgencyId(agencyWithRefersTo.id)
+          .build();
+        uow.conventionRepository.setConventions([preValidatedConvention]);
+        uow.userRepository.users = [connectedUser];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [connectedUserPayload.userId]: {
-              roles: ["agency-viewer"],
-              isNotifiedByEmail: false,
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agencyWithRefersTo, {
+            [connectedUserPayload.userId]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
             },
           }),
           toAgencyWithRights(otherAgency, {}),
         ];
-        uow.userRepository.users = [connectedUser];
 
         await expectPromiseToFailWithError(
           usecase.execute(
             {
-              conventionId,
+              conventionId: preValidatedConvention.id,
               agencyId: otherAgency.id,
               justification: "test",
             },
             connectedUserPayload,
           ),
-          errors.user.notEnoughRightOnAgency({
-            userId: connectedUserPayload.userId,
-            agencyId: convention.agencyId,
-          }),
+          errors.convention.unsupportedRole({ role: "validator" }),
         );
       });
     });
@@ -257,13 +313,101 @@ describe("TransferConventionToAgency", () => {
           }),
         );
       });
+
+      it.each(["to-review", "agency-viewer", "agency-admin"] as AgencyRole[])(
+        "throws bad request if unauthorized if user role is not allowed",
+        async (role) => {
+          uow.conventionRepository.setConventions([convention]);
+          uow.agencyRepository.agencies = [
+            toAgencyWithRights(agency, {}),
+            toAgencyWithRights(otherAgency, {}),
+          ];
+          const jwtPayload = createConventionMagicLinkPayload({
+            id: conventionId,
+            role,
+            email: notConnectedUser.email,
+            now: new Date(),
+          });
+
+          await expectPromiseToFailWithError(
+            usecase.execute(
+              {
+                conventionId,
+                agencyId: otherAgency.id,
+                justification: "test",
+              },
+              jwtPayload,
+            ),
+            errors.convention.unsupportedRole({
+              role,
+            }),
+          );
+        },
+      );
+
+      it("if agencyWithRefersTo, throws an error if validator attempts to change agency", async () => {
+        const preValidatedConvention = new ConventionDtoBuilder(convention)
+          .withAgencyId(agencyWithRefersTo.id)
+          .build();
+        uow.conventionRepository.setConventions([preValidatedConvention]);
+        uow.userRepository.users = [notConnectedUser];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agencyWithRefersTo, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(otherAgency, {}),
+        ];
+        const jwtPayload = createConventionMagicLinkPayload({
+          id: preValidatedConvention.id,
+          role: "validator",
+          email: notConnectedUser.email,
+          now: new Date(),
+        });
+
+        await expectPromiseToFailWithError(
+          usecase.execute(
+            {
+              conventionId: preValidatedConvention.id,
+              agencyId: otherAgency.id,
+              justification: "test",
+            },
+            jwtPayload,
+          ),
+          errors.convention.unsupportedRole({ role: "validator" }),
+        );
+      });
     });
   });
 
-  describe("Right paths", () => {
-    it.each(conventionStatusesWithoutJustificationNorValidator)(
-      "should transfer convention to agency",
+  describe("Right paths: transfer convention to agency", () => {
+    // peut redemander un transfer et écrase la justification précédente
+    // counseiller et valideur peuvent faire la demande
+    // double étape de validation de la même agence
+
+    it.each([conventionStatusesWithoutJustificationNorValidator[0]])(
+      "and send notification emails to signatories",
       async () => {
+        uow.conventionRepository.setConventions([convention]);
+        uow.userRepository.users = [notConnectedUser];
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [notConnectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(otherAgency, {})
+        ];
+
         await usecase.execute(
           {
             conventionId,
