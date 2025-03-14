@@ -25,7 +25,7 @@ import {
   type DiscussionReadDto,
   type DiscussionStatus,
   type Email,
-  RejectDiscussionAndSendNotificationParam,
+  type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
   type WithDiscussionId,
   type WithDiscussionRejection,

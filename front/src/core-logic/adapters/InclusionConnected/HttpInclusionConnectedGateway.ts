@@ -1,13 +1,13 @@
 import { type Observable, from } from "rxjs";
-import {
-  type AbsoluteUrl,
-  type AgencyId,
-  type DiscussionReadDto,
-  type DiscussionRejected,
-  type InclusionConnectedAllowedRoutes,
-  type InclusionConnectedUser,
-  type MarkPartnersErroredConventionAsHandledRequest,
-  type WithIdToken,
+import type {
+  AbsoluteUrl,
+  AgencyId,
+  DiscussionReadDto,
+  DiscussionRejected,
+  InclusionConnectedAllowedRoutes,
+  InclusionConnectedUser,
+  MarkPartnersErroredConventionAsHandledRequest,
+  WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
