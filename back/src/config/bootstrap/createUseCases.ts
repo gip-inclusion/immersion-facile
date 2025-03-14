@@ -747,6 +747,7 @@ export const createUseCases = (
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
       },
     }),
+    transferConventionToAgency: makeTransferConventionToAgency(uowPerformer)
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 
