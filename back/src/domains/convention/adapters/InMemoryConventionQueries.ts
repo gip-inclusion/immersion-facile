@@ -6,14 +6,15 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  type DataWithPagination,
   type DateRange,
   type FindSimilarConventionsParams,
+  NotFoundError,
   type SiretDto,
   type UserId,
   errors,
   validatedConventionStatuses,
 } from "shared";
-import { NotFoundError } from "shared";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -22,10 +23,14 @@ import type {
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
+  GetPaginatedConventionsForAgencyUserParams,
 } from "../ports/ConventionQueries";
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
 
 export class InMemoryConventionQueries implements ConventionQueries {
+  public paginatedConventionsParams: GetPaginatedConventionsForAgencyUserParams[] =
+    [];
+
   constructor(
     private readonly conventionRepository: InMemoryConventionRepository,
     private readonly agencyRepository: InMemoryAgencyRepository,
@@ -118,6 +123,32 @@ export class InMemoryConventionQueries implements ConventionQueries {
 
       return new Date(previousDate).getTime() - new Date(currentDate).getTime();
     });
+  }
+
+  public async getPaginatedConventionsForAgencyUser(
+    params: GetPaginatedConventionsForAgencyUserParams,
+  ): Promise<DataWithPagination<ConventionDto>> {
+    // Store the params for later inspection in tests
+    this.paginatedConventionsParams.push(params);
+
+    // Get all conventions
+    const conventions = this.conventionRepository.conventions;
+
+    // Apply pagination
+    const { page, perPage } = params.pagination;
+    const startIndex = (page - 1) * perPage;
+    const endIndex = Math.min(startIndex + perPage, conventions.length);
+    const paginatedData = conventions.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      pagination: {
+        totalRecords: conventions.length,
+        currentPage: page,
+        totalPages: Math.ceil(conventions.length / perPage),
+        numberPerPage: perPage,
+      },
+    };
   }
 
   public async getConventionsByScope(params: {
