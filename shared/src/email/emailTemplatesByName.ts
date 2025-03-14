@@ -1115,6 +1115,72 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyLogoUrl,
       }),
     },
+    CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
+      niceName: "Convention - Changement prescripteur pour agence",
+      tags: ["changement prescripteur demande d'immersion pour prescripteur"],
+      createEmailVariables: ({
+        previousAgencyName,
+        justification,
+        magicLink,
+        conventionId,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        beneficiaryEmail,
+        beneficiaryPhone,
+        internshipKind,
+      }) => ({
+        subject: `${previousAgencyName} vous a transmis une demande d'immersion`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `${previousAgencyName} a redirigé une demande d'immersion professionnelle vers votre structure pour la raison suivante :
+
+${justification}
+
+Vous pouvez vous rapprocher du candidat ${beneficiaryFirstName} ${beneficiaryLastName}
+Email : ${beneficiaryEmail}
+Tél : ${beneficiaryPhone}`,
+        buttons: [
+          {
+            url: magicLink,
+            label: "Examiner la demande",
+          },
+        ],
+        subContent: `
+      ${defaultSignature(internshipKind)}
+      `,
+      }),
+    },
+    CONVENTION_TRANSFERRED_SIGNATORY_NOTIFICATION: {
+      niceName: "Convention - Changement prescripteur pour signataire",
+      tags: ["changement prescripteur demande d'immersion pour signataire"],
+      createEmailVariables: ({
+        internshipKind,
+        immersionProfession,
+        previousAgencyName,
+        newAgencyName,
+        agencyAddress,
+        businessName,
+        justification,
+        magicLink,
+        conventionId,
+      }) => ({
+        subject: `Changement de prescripteur de la demande d'immersion pour observer l'activité de ${immersionProfession} au sein de ${businessName}`,
+        greetings: greetingsWithConventionId(conventionId),
+        content: `Nous vous informons que le prescripteur ${previousAgencyName} a redirigé votre demande d'immersion professionnelle vers un autre prescripteur pour la raison suivante :
+
+        ${justification}
+        
+        Vous pouvez vous rapprocher de votre conseiller chez ${newAgencyName} - ${agencyAddress} pour suivre votre demande.`,
+        buttons: [
+          {
+            url: magicLink,
+            label: "Voir l'état de ma demande",
+          },
+        ],
+        subContent: `
+      ${defaultSignature(internshipKind)}
+      `,
+      }),
+    },
     NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION: {
       niceName: "Convention - Demande de signature après modification",
       tags: ["demande signature demande de convention après modification"],
