@@ -55,6 +55,7 @@ export const RSAutocomplete = <T,>({
         {hintText && <span className="fr-hint-text">{hintText}</span>}
       </label>
       <Select
+        {...selectProps}
         classNamePrefix={prefix}
         className={cx(`${prefix}`, hasError ? "im-select--has-error" : "")}
         unstyled
@@ -90,7 +91,6 @@ export const RSAutocomplete = <T,>({
         hideSelectedOptions
         isClearable
         id={`${selectProps?.inputId}-wrapper`}
-        {...selectProps}
       />
 
       {hasError && <p className="fr-error-text">{stateRelatedMessage}</p>}

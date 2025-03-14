@@ -5,7 +5,6 @@ import { useFormContext } from "react-hook-form";
 import {
   type AddressDto,
   type CreateAgencyDto,
-  addressDtoToString,
   domElementIds,
   emailSchema,
 } from "shared";
@@ -29,7 +28,6 @@ type AgencyFormCommonFieldsProps = {
 type ValidationSteps = "validatorsOnly" | "counsellorsAndValidators";
 
 export const AgencyFormCommonFields = ({
-  addressInitialValue,
   refersToOtherAgency,
   mode,
   disableAgencyName,
@@ -103,19 +101,33 @@ export const AgencyFormCommonFields = ({
       />
       <AddressAutocomplete
         {...formContents.address}
-        initialSearchTerm={
-          establishmentInfos
-            ? establishmentInfos.businessAddress
-            : addressInitialValue && addressDtoToString(addressInitialValue)
-        }
-        setFormValue={({ position, address }) => {
-          setValue("position", position);
-          setValue("address", address);
-          setValue("coveredDepartments", [address.departmentCode]);
+        selectProps={{
+          inputId: domElementIds.addAgency.addressAutocomplete,
         }}
-        id={domElementIds.addAgency.addressAutocomplete}
+        initialInputValue={
+          establishmentInfos ? establishmentInfos.businessAddress : ""
+        }
+        onAddressSelected={(addressAndPosition) => {
+          setValue("address", addressAndPosition.address);
+          setValue("position", addressAndPosition.position);
+          setValue("coveredDepartments", [
+            addressAndPosition.address.departmentCode,
+          ]);
+        }}
+        onAddressClear={() => {
+          setValue("address", {
+            streetNumberAndAddress: "",
+            postcode: "",
+            departmentCode: "",
+            city: "",
+          });
+          setValue("position", {
+            lat: 0,
+            lon: 0,
+          });
+          setValue("coveredDepartments", []);
+        }}
         disabled={isFetchingSiret}
-        useFirstAddressOnInitialSearchTerm
         {...getFieldError("address")}
       />
       {!refersToOtherAgency && (

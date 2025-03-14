@@ -194,15 +194,21 @@ export const CreationSiretRelatedInputs = () => {
         {...getFieldError("businessNameCustomized")}
       />
       <AddressAutocomplete
-        initialSearchTerm={establishmentInfos?.businessAddress}
+        initialInputValue={establishmentInfos?.businessAddress}
         label={"Vérifiez l'adresse de votre établissement *"}
         id={domElementIds.establishment.create.addressAutocomplete}
-        setFormValue={({ address }) =>
+        onAddressSelected={(addressAndPosition) => {
           setValue("businessAddresses.0", {
             id: uuidV4(),
-            rawAddress: addressDtoToString(address),
-          })
-        }
+            rawAddress: addressDtoToString(addressAndPosition.address),
+          });
+        }}
+        onAddressClear={() => {
+          setValue("businessAddresses.0", {
+            id: "",
+            rawAddress: "",
+          });
+        }}
         disabled={isFetchingSiret}
       />
     </>

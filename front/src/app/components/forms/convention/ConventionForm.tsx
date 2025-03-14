@@ -491,22 +491,45 @@ export const ConventionForm = ({
                     }
                     {...makeAccordionProps(4)}
                   >
-                    <ScheduleSection />
                     <AddressAutocomplete
                       {...formContents.immersionAddress}
-                      initialSearchTerm={
-                        conventionValues.immersionAddress ??
-                        establishmentInfos?.businessAddress
-                      }
-                      setFormValue={({ address }) =>
+                      initialInputValue={conventionValues.immersionAddress}
+                      selectProps={{
+                        inputId:
+                          domElementIds.conventionImmersionRoute
+                            .conventionSection.immersionAddress,
+                        defaultValue: establishmentInfos
+                          ? {
+                              label: establishmentInfos.businessAddress,
+                              value: {
+                                address: {
+                                  streetNumberAndAddress:
+                                    establishmentInfos.businessAddress, // Provide a fake address and position dto from businessAddress
+                                  postcode: "",
+                                  departmentCode: "",
+                                  city: "",
+                                },
+                                position: {
+                                  lat: 0,
+                                  lon: 0,
+                                },
+                              },
+                            }
+                          : undefined,
+                      }}
+                      onAddressSelected={(addressAndPosition) => {
                         setValue(
                           "immersionAddress",
-                          addressDtoToString(address),
-                        )
-                      }
+                          addressDtoToString(addressAndPosition.address),
+                        );
+                      }}
+                      onAddressClear={() => {
+                        setValue("immersionAddress", "");
+                      }}
                       disabled={isFetchingSiret}
                       {...getFieldError("immersionAddress")}
                     />
+                    <ScheduleSection />
                   </Accordion>
                   <Accordion
                     label={
