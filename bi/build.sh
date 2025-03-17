@@ -10,20 +10,22 @@ if [ "$CURRENT_DIR" != "bi" ]; then
 fi
 
 # Create a temporary directory for the bundle
-mkdir -p dbt-bundle
+mkdir -p dbt-build
 
 # Copy the bi folder contents while respecting .gitignore
 cd ..
-git archive HEAD:bi | tar -x -C bi/dbt-bundle
+git archive HEAD:bi | tar -x -C bi/dbt-build
 
 # Remove any .env files that might have been included
 cd bi
-find dbt-bundle -type f -name ".env*" -delete
+find dbt-build -type f -name ".env*" -delete
 
-# Create the final tar archive
-tar -czf dbt-bundle.tar.gz -C dbt-bundle .
+# Create the final tar archive with simpler options
+cd dbt-build
+tar -czf ../dbt-build.tar.gz .
 
 # Clean up
-rm -rf dbt-bundle
+cd ..
+#rm -rf dbt-build
 
-echo "Bundle created successfully: dbt-bundle.tar.gz"
+echo "Built created successfully: dbt-build.tar.gz"
