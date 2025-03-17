@@ -99,6 +99,14 @@ jobs:
       SCALINGO_API_TOKEN: ${{ secrets.SCALINGO_API_TOKEN }}
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  
+  deploy-dbt:
+    name: Deploy DBT
+    needs:
+      - deploy-prod
+    uses: ./.github/workflows/deploy-dbt.yml
+    with:
+      tag: "v${{ github.run_number }}"
 
   create-release:
     needs:
