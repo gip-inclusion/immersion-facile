@@ -1,4 +1,3 @@
-import { prop, propEq } from "ramda";
 import { useState } from "react";
 import {
   RSAutocomplete,
@@ -10,7 +9,6 @@ import {
   type AgencyId,
   type AgencyOption,
   activeAgencyStatuses,
-  agencyStatusToLabel,
   domElementIds,
 } from "shared";
 import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
@@ -40,7 +38,6 @@ export type AgencyAdminAutocompleteProps = RSAutocompleteComponentProps<
   "agency",
   AgencyOption
 > & {
-  useNaturalLanguage?: boolean;
   initialValue?: AgencyOption;
 };
 
