@@ -25,3 +25,5 @@ bi/.env
 bi/target/
 bi/dbt_packages/
 bi/logs/
+bi/dbt-bundle.tar.gz
+bi/dbt-bundle/
