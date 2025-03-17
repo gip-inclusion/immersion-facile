@@ -79,8 +79,8 @@ export const BusinessContact = ({
         hintText={
           "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
         }
+        disabled
         nativeInputProps={{
-          readOnly: true,
           value: federatedIdentity?.firstName,
           id: domElementIds.establishment[mode].businessContact.firstName,
         }}
@@ -90,8 +90,8 @@ export const BusinessContact = ({
         hintText={
           "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
         }
+        disabled
         nativeInputProps={{
-          readOnly: true,
           value: federatedIdentity?.lastName,
           id: domElementIds.establishment[mode].businessContact.lastName,
         }}
@@ -101,8 +101,8 @@ export const BusinessContact = ({
         hintText={
           "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
         }
+        disabled
         nativeInputProps={{
-          readOnly: true,
           ...register("userRights.0.email"),
           value: getValues("userRights.0.email"),
           id: domElementIds.establishment[mode].businessContact.email,

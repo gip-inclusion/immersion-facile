@@ -71,6 +71,7 @@ export const CreationSiretRelatedInputs = () => {
       <Input
         label={formContents.siret.label}
         hintText={formContents.siret.hintText}
+        disabled={isFetchingSiret}
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
@@ -78,7 +79,6 @@ export const CreationSiretRelatedInputs = () => {
             updateSiret(event.target.value);
             setValue("siret", event.target.value);
           },
-          readOnly: isFetchingSiret,
         }}
         state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
         stateRelatedMessage={
@@ -89,21 +89,21 @@ export const CreationSiretRelatedInputs = () => {
       <Input
         label={formContents.businessName.label}
         hintText={formContents.businessName.hintText}
+        disabled
         nativeInputProps={{
           ...formContents.businessName,
           ...register("businessName"),
-          readOnly: true,
         }}
       />
       <Input
         label={formContents.businessNameCustomized.label}
         hintText={formContents.businessNameCustomized.hintText}
+        disabled={isFetchingSiret}
         nativeInputProps={{
           ...formContents.businessNameCustomized,
           ...register("businessNameCustomized", {
             setValueAs: (value) => (value ? value : undefined),
           }),
-          readOnly: isFetchingSiret,
         }}
         {...getFieldError("businessNameCustomized")}
       />
