@@ -44,7 +44,10 @@ import {
   keys,
   notJobSeeker,
 } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import {
+  AddressAutocomplete,
+  addressStringToFakeAddressAndPosition,
+} from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   AgencySelector,
   departmentOptions,
@@ -501,19 +504,9 @@ export const ConventionForm = ({
                         defaultValue: establishmentInfos
                           ? {
                               label: establishmentInfos.businessAddress,
-                              value: {
-                                address: {
-                                  streetNumberAndAddress:
-                                    establishmentInfos.businessAddress, // Provide a fake address and position dto from businessAddress
-                                  postcode: "",
-                                  departmentCode: "",
-                                  city: "",
-                                },
-                                position: {
-                                  lat: 0,
-                                  lon: 0,
-                                },
-                              },
+                              value: addressStringToFakeAddressAndPosition(
+                                establishmentInfos.businessAddress,
+                              ),
                             }
                           : undefined,
                       }}

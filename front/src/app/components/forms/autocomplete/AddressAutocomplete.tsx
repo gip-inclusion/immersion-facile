@@ -125,3 +125,15 @@ export const AddressAutocomplete = ({
     </div>
   );
 };
+
+export const addressStringToFakeAddressAndPosition = (
+  address: string,
+): AddressAndPosition => ({
+  address: {
+    streetNumberAndAddress: address,
+    postcode: "",
+    departmentCode: "",
+    city: "",
+  },
+  position: { lat: 0, lon: 0 },
+});
