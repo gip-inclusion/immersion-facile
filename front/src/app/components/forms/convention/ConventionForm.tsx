@@ -496,19 +496,17 @@ export const ConventionForm = ({
                   >
                     <AddressAutocomplete
                       {...formContents.immersionAddress}
-                      initialInputValue={conventionValues.immersionAddress}
+                      initialValue={
+                        establishmentInfos
+                          ? addressStringToFakeAddressAndPosition(
+                              establishmentInfos.businessAddress,
+                            )
+                          : undefined
+                      }
                       selectProps={{
                         inputId:
                           domElementIds.conventionImmersionRoute
                             .conventionSection.immersionAddress,
-                        defaultValue: establishmentInfos
-                          ? {
-                              label: establishmentInfos.businessAddress,
-                              value: addressStringToFakeAddressAndPosition(
-                                establishmentInfos.businessAddress,
-                              ),
-                            }
-                          : undefined,
                       }}
                       onAddressSelected={(addressAndPosition) => {
                         setValue(
