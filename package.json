@@ -31,6 +31,7 @@
     "bi:setup": "cd bi && ./setup.sh",
     "bi:debug": "cd bi && ./run_dbt.sh debug",
     "bi:run": "cd bi && ./run_dbt.sh run",
+    "bi:build": "cd bi && ./build.sh",
     "bi:fullcheck": "cd bi && ./activate.sh && ./run_dbt.sh debug && ./run_dbt.sh run"
   },
   "devDependencies": {
