@@ -1,7 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import type { AddressDto, FormEstablishmentAddress } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import {
+  AddressAutocomplete,
+  addressStringToFakeAddressAndPosition,
+} from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { useStyles } from "tss-react/dsfr";
 
 type MultipleAddressInputProps = {
@@ -49,33 +52,15 @@ export const MultipleAddressInput = ({
                 selectProps={{
                   defaultValue: {
                     label: address.rawAddress,
-                    value: {
-                      address: {
-                        streetNumberAndAddress: address.rawAddress,
-                        postcode: "",
-                        departmentCode: "",
-                        city: "",
-                      },
-                      position: {
-                        lat: 0,
-                        lon: 0,
-                      },
-                    },
+                    value: addressStringToFakeAddressAndPosition(
+                      address.rawAddress,
+                    ),
                   },
                   value: {
                     label: address.rawAddress,
-                    value: {
-                      address: {
-                        streetNumberAndAddress: address.rawAddress,
-                        postcode: "",
-                        departmentCode: "",
-                        city: "",
-                      },
-                      position: {
-                        lat: 0,
-                        lon: 0,
-                      },
-                    },
+                    value: addressStringToFakeAddressAndPosition(
+                      address.rawAddress,
+                    ),
                   },
                 }}
                 id={`${id}-${index}`}

@@ -8,7 +8,10 @@ import {
   defaultMaxContactsPerMonth,
   domElementIds,
 } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import {
+  AddressAutocomplete,
+  addressStringToFakeAddressAndPosition,
+} from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   getFormContents,
@@ -116,19 +119,9 @@ export const CreationSiretRelatedInputs = () => {
           value: getValues("businessAddresses.0")
             ? {
                 label: getValues("businessAddresses.0").rawAddress,
-                value: {
-                  address: {
-                    streetNumberAndAddress: getValues("businessAddresses.0")
-                      .rawAddress,
-                    postcode: "",
-                    departmentCode: "",
-                    city: "",
-                  },
-                  position: {
-                    lat: 0,
-                    lon: 0,
-                  },
-                },
+                value: addressStringToFakeAddressAndPosition(
+                  getValues("businessAddresses.0").rawAddress,
+                ),
               }
             : establishmentInfos
               ? {
