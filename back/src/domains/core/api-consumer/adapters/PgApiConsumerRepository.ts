@@ -19,7 +19,13 @@ import {
   jsonStripNulls,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
+import { createLogger } from "../../../../utils/logger";
 import type { ApiConsumerRepository } from "../ports/ApiConsumerRepository";
+
+const logger = createLogger(__filename);
+
+const debugDoubleBroadcastMessage = (message: string) =>
+  `Debug Mission Local, message en double. ${message}`;
 
 export class PgApiConsumerRepository implements ApiConsumerRepository {
   #transaction: KyselyDb;
@@ -45,6 +51,11 @@ export class PgApiConsumerRepository implements ApiConsumerRepository {
   }
 
   public async save(apiConsumer: ApiConsumer): Promise<void> {
+    logger.warn({
+      message: debugDoubleBroadcastMessage(
+        `Updated ApiConsumer : ${JSON.stringify(apiConsumer)}`,
+      ),
+    });
     await this.#insertApiConsumer(apiConsumer);
     await this.#clearSubscriptionsOfConsumer(apiConsumer.id);
     await this.#insertSubscriptions(apiConsumer);

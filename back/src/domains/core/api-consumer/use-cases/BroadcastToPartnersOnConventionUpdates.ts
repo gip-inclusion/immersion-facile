@@ -22,6 +22,9 @@ import type { SubscribersGateway } from "../ports/SubscribersGateway";
 
 const logger = createLogger(__filename);
 
+const debugDoubleBroadcastMessage = (message: string) =>
+  `Debug Mission Local, message en double. ${message}`;
+
 const isConsumerSubscribedToConventionUpdated = (apiConsumer: ApiConsumer) => {
   const conventionUpdatedCallbackParams =
     apiConsumer.rights.convention.subscriptions.find(
@@ -92,6 +95,15 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
       ),
     );
 
+    if (agencyWithRights.kind === "mission-locale") {
+      logger.warn({
+        message: debugDoubleBroadcastMessage(
+          `apiConsumers.length: ${apiConsumers.length}. ${apiConsumers.length > 1 ? JSON.stringify(apiConsumers) : ""}`,
+        ),
+        conventionId: convention.id,
+      });
+    }
+
     await Promise.all(
       apiConsumers.map(this.#notifySubscriber(uow, conventionRead)),
     );
@@ -141,6 +153,13 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         ...conventionRead,
         immersionAppellation,
       };
+
+      if (conventionRead.agencyKind === "mission-locale") {
+        logger.warn({
+          message: debugDoubleBroadcastMessage("About to broadcast convention"),
+          conventionId: convention.id,
+        });
+      }
 
       const response = await this.#subscribersGateway.notify(
         {
