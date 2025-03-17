@@ -20,4 +20,4 @@ jobs:
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
 
       - name: Deploy DBT
-        run: scalingo --app if-prod-nightly-db --region osc-secnum-fr1 deploy dbt-bundle.tar.gz ${{ inputs.tag }}
+        run: scalingo --app if-prod-nightly-db --region osc-secnum-fr1 deploy dbt-build.tar.gz ${{ inputs.tag }}
