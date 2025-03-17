@@ -53,10 +53,10 @@ jobs:
       - name: Deploy back
         run: |
           # first attempt
-          scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
+          scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }} || deploy_failed=true
           
           # If first attempt fails, retry once
-          if [ $? -ne 0 ]; then
+          if [ "$deploy_failed" = true ]; then
             echo "Back deployment failed! Retrying in 5 seconds..."
             sleep 5
             scalingo --app if-${{ inputs.environment }}-back --region ${{ inputs.region }} deploy back-build.tar.gz ${{ inputs.tag }}
