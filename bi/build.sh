@@ -20,10 +20,12 @@ git archive HEAD:bi | tar -x -C bi/dbt-bundle
 cd bi
 find dbt-bundle -type f -name ".env*" -delete
 
-# Create the final tar archive
-tar -czf dbt-bundle.tar.gz -C dbt-bundle .
+# Create the final tar archive with simpler options
+cd dbt-bundle
+tar -czf ../dbt-bundle.tar.gz .
 
 # Clean up
+cd ..
 rm -rf dbt-bundle
 
 echo "Bundle created successfully: dbt-bundle.tar.gz"
