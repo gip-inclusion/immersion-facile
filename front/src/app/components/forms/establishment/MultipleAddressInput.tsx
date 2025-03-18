@@ -50,20 +50,13 @@ export const MultipleAddressInput = ({
                 disabled={disabled}
                 label={"Rechercher un lieu *"}
                 selectProps={{
-                  defaultValue: {
-                    label: address.rawAddress,
-                    value: addressStringToFakeAddressAndPosition(
-                      address.rawAddress,
-                    ),
-                  },
-                  value: {
-                    label: address.rawAddress,
-                    value: addressStringToFakeAddressAndPosition(
-                      address.rawAddress,
-                    ),
-                  },
+                  inputId: `${id}-${index}`,
                 }}
-                id={`${id}-${index}`}
+                initialValue={
+                  address.rawAddress
+                    ? addressStringToFakeAddressAndPosition(address.rawAddress)
+                    : undefined
+                }
                 onAddressSelected={(addressAndPosition) => {
                   onAddressAdded(addressAndPosition.address, index);
                 }}

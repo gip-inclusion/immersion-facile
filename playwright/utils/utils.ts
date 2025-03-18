@@ -35,16 +35,19 @@ export const fillAutocomplete = async ({
   endpoint?: string;
 }) => {
   await page.locator(locator).fill(value);
-  await Promise.all([
-    page.waitForTimeout(testConfig.timeForDebounce),
-    ...(endpoint ? [page.waitForResponse(`**${endpoint}**`)] : []),
-  ]);
-
-  await page.waitForSelector(`${locator}[aria-controls]`);
-  const listboxId = await page.locator(locator).getAttribute("aria-controls");
+  if (endpoint) {
+    await page.waitForResponse(`**${endpoint}**`);
+  }
+  const listbox = await page.locator(locator);
+  await listbox.waitFor();
+  const listboxId = await listbox.getAttribute("aria-controls");
+  await expect(listboxId).not.toBeNull();
   const firstOption = page
-    .locator(`#${listboxId} li, .im-select__menu-list > div`)
+    .locator(
+      `#${listboxId} li, .im-select__menu-list > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
+    )
     .nth(0); // TODO: clean when AdressAutocomplete use react-select
+  await firstOption.waitFor();
   await expect(firstOption).toBeVisible();
   await firstOption.click();
 };

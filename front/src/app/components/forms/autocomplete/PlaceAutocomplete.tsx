@@ -58,11 +58,9 @@ export const PlaceAutocomplete = ({
           }
         },
         options,
-        onInputChange: (value, actionMeta) => {
+        onInputChange: (value) => {
           setSearchTerm(value);
-          if (actionMeta.action === "input-change") {
-            dispatch(geosearchSlice.actions.queryHasChanged(value));
-          }
+          dispatch(geosearchSlice.actions.queryHasChanged(value));
         },
       }}
     />
