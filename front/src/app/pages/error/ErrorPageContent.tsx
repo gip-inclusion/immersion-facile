@@ -28,10 +28,7 @@ export const ErrorPageContent = ({
       <div className={fr.cx("fr-py-0", "fr-col-12", "fr-col-md-6")}>
         <h1>{title}</h1>
         <p className={fr.cx("fr-text--lead", "fr-mb-3w")}>{subtitle}</p>
-        <p
-          className={fr.cx("fr-text--sm", "fr-mb-3w")}
-          dangerouslySetInnerHTML={{ __html: description }}
-        />
+        <p className={fr.cx("fr-text--sm", "fr-mb-3w")}>{description}</p>
         <ul className={fr.cx("fr-btns-group", "fr-btns-group--inline-md")}>
           {buttons.length
             ? buttons.map((button) => {
