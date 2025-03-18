@@ -4,7 +4,7 @@ import { version } from "./version";
 
 export const configureSentry = (appConfig: AppConfig) => {
   Sentry.init({
-    dsn: "https://5e4e6bbc93a34f3fa4a05aed8373dfe7@sentry.gip-inclusion.cloud-ed.fr/6",
+    dsn: "https://eb7a121cd835308163ca9966e5c82c98@o4508405260615680.ingest.de.sentry.io/4508999044038736",
     integrations: [],
     release: version,
     environment: appConfig.envType,
