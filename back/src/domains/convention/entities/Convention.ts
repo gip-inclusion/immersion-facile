@@ -163,7 +163,7 @@ export const throwIfNotAllowedForUser = async ({
   if ("role" in jwtPayload) {
     if (jwtPayload.role === "back-office") return;
     if (!agencyModifierRoles.includes(jwtPayload.role as any))
-      throw errors.convention.unsupportedRoleSendSignatureLink({
+      throw errors.convention.unsupportedRole({
         role: jwtPayload.role as any,
       });
 
