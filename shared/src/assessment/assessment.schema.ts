@@ -4,6 +4,7 @@ import { localization, zEnumValidation, zStringMinLength1 } from "../zodUtils";
 import {
   type AssessmentDto,
   type DateRange,
+  type LegacyAssessmentDto,
   type WithAssessmentDto,
   type WithEndedWithAJob,
   type WithEstablishmentComments,
@@ -77,3 +78,10 @@ export const withDateRangeSchema: z.Schema<DateRange> = z
     ({ from, to }) => from < to,
     "La date de fin doit être après la date de début.",
   );
+
+export const legacyAssessmentDtoSchema: z.Schema<LegacyAssessmentDto> =
+  z.object({
+    status: z.enum(["FINISHED", "ABANDONED"]),
+    conventionId: z.string(),
+    establishmentFeedback: zStringMinLength1,
+  });
