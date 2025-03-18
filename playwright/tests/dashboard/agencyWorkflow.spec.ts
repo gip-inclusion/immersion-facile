@@ -9,7 +9,6 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Agency dashboard workflow", () => {
   let agencyId: AgencyId | null = null;
-
   test.describe("Agency creation", () => {
     test("creates a new agency", async ({ page }) => {
       agencyId = await fillAndSubmitBasicAgencyForm(page, {

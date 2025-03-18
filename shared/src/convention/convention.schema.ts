@@ -82,6 +82,7 @@ import {
   type RenewMagicLinkResponse,
   type SendSignatureLinkRequestDto,
   type Signatories,
+  type TransferConventionToAgencyRequestDto,
   type UpdateConventionRequestDto,
   type UpdateConventionStatusRequestDto,
   type UpdateConventionStatusWithJustificationWithModifierRole,
@@ -517,6 +518,13 @@ export const sendSignatureLinkRequestSchema: z.Schema<SendSignatureLinkRequestDt
   z.object({
     conventionId: conventionIdSchema,
     signatoryRole: signatoryRoleSchema,
+  });
+
+export const transferConventionToAgencyRequestSchema: z.Schema<TransferConventionToAgencyRequestDto> =
+  z.object({
+    conventionId: conventionIdSchema,
+    agencyId: agencyIdSchema,
+    justification: zStringMinLength1,
   });
 
 export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkPartnersErroredConventionAsHandledRequest> =
