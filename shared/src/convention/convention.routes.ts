@@ -20,6 +20,7 @@ import {
   renewMagicLinkRequestSchema,
   renewMagicLinkResponseSchema,
   sendSignatureLinkRequestSchema,
+  transferConventionToAgencyRequestSchema,
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
   withConventionIdLegacySchema,
@@ -116,6 +117,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
       400: httpErrorSchema,
     },
   }),
+
   sendSignatureLink: defineRoute({
     url: "/auth/convention/signatories/send-signature-link",
     method: "post",
@@ -127,6 +129,19 @@ export const conventionMagicLinkRoutes = defineRoutes({
       403: httpErrorSchema,
       404: httpErrorSchema,
       429: httpErrorSchema,
+    },
+  }),
+
+  transferConventionToAgency: defineRoute({
+    url: "/auth/convention/transfer-to-agency",
+    method: "post",
+    requestBodySchema: transferConventionToAgencyRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
     },
   }),
 });
