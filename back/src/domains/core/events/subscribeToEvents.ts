@@ -79,6 +79,7 @@ const getUseCasesByTopics = (
       useCases.updateMarketingEstablishmentContactList,
     ),
   ],
+  ConventionTransferredToAgency: [],
 
   // Edge cases for immersion application.
   ConventionRequiresModification: [
