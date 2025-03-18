@@ -139,6 +139,7 @@ import {
   makeGenerateConventionMagicLinkUrl,
   makeGenerateEditFormEstablishmentUrl,
 } from "./magicLinkUrl";
+import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 
 export const createUseCases = (
   config: AppConfig,
@@ -746,6 +747,10 @@ export const createUseCases = (
         generateConventionMagicLinkUrl,
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
       },
+    }),
+    transferConventionToAgency: makeTransferConventionToAgency({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

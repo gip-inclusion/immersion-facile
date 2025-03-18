@@ -28,6 +28,7 @@ import type { WithNotificationIdAndKind } from "../notifications/helpers/Notific
 import type {
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,
+  TransferConventionToAgencyPayload,
 } from "./eventPayload.dto";
 
 export type SubscriptionId = Flavor<string, "SubscriptionId">;
@@ -115,7 +116,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
   | GenericEvent<"ConventionBroadcastRequested", WithConventionDto & WithTriggeredBy>
-
+  | GenericEvent<"ConventionTransferredToAgency", TransferConventionToAgencyPayload & WithTriggeredBy>
   // UNHAPPY PATHS
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
