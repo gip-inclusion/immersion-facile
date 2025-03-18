@@ -39,7 +39,7 @@ createRoot(rootContainer).render(
 );
 
 SentryInit({
-  dsn: "https://c2909f1d7f384d17bde3e75e250f2828@sentry.gip-inclusion.cloud-ed.fr/2",
+  dsn: "https://8bbb3df20b0910b08f2f435e46f6390f@o4508405260615680.ingest.de.sentry.io/4508999055507536",
   integrations: [browserTracingIntegration(), replayIntegration()],
   release: import.meta.env.VITE_RELEASE_TAG,
   environment: ENV.envType,
