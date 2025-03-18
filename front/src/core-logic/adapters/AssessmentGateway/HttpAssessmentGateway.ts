@@ -3,6 +3,7 @@ import {
   type AssessmentDto,
   type ConventionId,
   type ConventionMagicLinkRoutes,
+  type LegacyAssessmentDto,
   errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -45,7 +46,9 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   public getAssessment$({
     conventionId,
     jwt,
-  }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
+  }: { conventionId: ConventionId; jwt: string }): Observable<
+    AssessmentDto | LegacyAssessmentDto
+  > {
     return from(
       this.httpClient
         .getAssessmentByConventionId({
