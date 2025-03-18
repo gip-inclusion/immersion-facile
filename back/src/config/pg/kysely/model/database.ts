@@ -646,10 +646,10 @@ interface ImmersionAssessments {
   number_of_hours_actually_made: number | null;
   last_day_of_presence: Timestamp | null;
   number_of_missed_hours: number | null;
-  ended_with_a_job: boolean;
+  ended_with_a_job: boolean | null;
   type_of_contract: string | null;
   contract_start_date: Timestamp | null;
-  establishment_advices: string;
+  establishment_advices: string | null;
   establishment_feedback: string;
   created_at: Generated<Timestamp | null>;
   updated_at: Generated<Timestamp | null>;

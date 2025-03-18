@@ -1,14 +1,17 @@
 import { sql } from "kysely";
 import {
+  type AssessmentDto,
   type AssessmentStatus,
   type ConventionId,
   type DateString,
+  type LegacyAssessmentDto,
   errors,
 } from "shared";
 import {
   type KyselyDb,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
+import type { EntityFromDto } from "../../../utils/EntityFromDto";
 import { assessmentEntitySchema } from "../../../utils/assessment";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import type { AssessmentRepository } from "../ports/AssessmentRepository";
@@ -84,11 +87,18 @@ export class PgAssessmentRepository implements AssessmentRepository {
   }
 
   public async save(assessmentEntity: AssessmentEntity): Promise<void> {
-    await this.transaction
-      .insertInto("immersion_assessments")
-      .values({
-        convention_id: assessmentEntity.conventionId,
-        status: assessmentEntity.status,
+    const getNonLegacyFields = (assessmentEntity: AssessmentEntity) => {
+      if (!("establishmentAdvices" in assessmentEntity)) return {};
+
+      return {
+        ended_with_a_job: assessmentEntity.endedWithAJob,
+        type_of_contract: assessmentEntity.endedWithAJob
+          ? assessmentEntity.typeOfContract
+          : null,
+        contract_start_date: assessmentEntity.endedWithAJob
+          ? assessmentEntity.contractStartDate
+          : null,
+        establishment_advices: assessmentEntity.establishmentAdvices,
         last_day_of_presence:
           assessmentEntity.status === "PARTIALLY_COMPLETED"
             ? assessmentEntity.lastDayOfPresence
@@ -97,15 +107,16 @@ export class PgAssessmentRepository implements AssessmentRepository {
           assessmentEntity.status === "PARTIALLY_COMPLETED"
             ? assessmentEntity.numberOfMissedHours
             : null,
-        ended_with_a_job: assessmentEntity.endedWithAJob,
-        type_of_contract: assessmentEntity.endedWithAJob
-          ? assessmentEntity.typeOfContract
-          : null,
-        contract_start_date: assessmentEntity.endedWithAJob
-          ? assessmentEntity.contractStartDate
-          : null,
+      };
+    };
+
+    await this.transaction
+      .insertInto("immersion_assessments")
+      .values({
+        convention_id: assessmentEntity.conventionId,
+        status: assessmentEntity.status,
         establishment_feedback: assessmentEntity.establishmentFeedback,
-        establishment_advices: assessmentEntity.establishmentAdvices,
+        ...getNonLegacyFields(assessmentEntity),
         number_of_hours_actually_made:
           assessmentEntity.numberOfHoursActuallyMade,
       })

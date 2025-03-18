@@ -1,7 +1,10 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { shareLinkByEmailSchema } from "../ShareLinkByEmailDto";
 import { apiConsumerReadSchema } from "../apiConsumer/apiConsumer.schema";
-import { assessmentDtoSchema } from "../assessment/assessment.schema";
+import {
+  assessmentDtoSchema,
+  legacyAssessmentDtoSchema,
+} from "../assessment/assessment.schema";
 import { dashboardUrlAndNameSchema } from "../dashboard/dashboard.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -42,7 +45,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     method: "get",
     ...withAuthorizationHeaders,
     responses: {
-      200: assessmentDtoSchema,
+      200: assessmentDtoSchema.or(legacyAssessmentDtoSchema),
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,

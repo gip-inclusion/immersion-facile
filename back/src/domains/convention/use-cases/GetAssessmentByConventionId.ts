@@ -1,6 +1,7 @@
 import {
   type AssessmentDto,
   type ConventionDomainPayload,
+  type LegacyAssessmentDto,
   type WithConventionId,
   errors,
   withConventionIdSchema,
@@ -16,11 +17,11 @@ export type GetAssessmentByConventionId = ReturnType<
 >;
 export const makeGetAssessmentByConventionId = createTransactionalUseCase<
   WithConventionId,
-  AssessmentDto,
+  AssessmentDto | LegacyAssessmentDto,
   ConventionDomainPayload | undefined
 >(
   {
-    name: "GetAssessment",
+    name: "GetAssessmentByConventionId",
     inputSchema: withConventionIdSchema,
   },
   async ({ uow, currentUser, inputParams }) => {
