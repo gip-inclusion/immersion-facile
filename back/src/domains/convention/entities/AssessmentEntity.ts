@@ -2,12 +2,16 @@ import {
   type AssessmentDto,
   type ConventionDto,
   type ConventionStatus,
+  type LegacyAssessmentDto,
   calculateTotalImmersionHoursBetweenDateComplex,
   errors,
 } from "shared";
 import type { EntityFromDto } from "../../../utils/EntityFromDto";
 
-export type AssessmentEntity = EntityFromDto<AssessmentDto, "Assessment"> & {
+export type AssessmentEntity = EntityFromDto<
+  AssessmentDto | LegacyAssessmentDto,
+  "Assessment"
+> & {
   numberOfHoursActuallyMade: number | null;
 };
 
@@ -52,4 +56,4 @@ export const toAssessmentDto = ({
   _entityName,
   numberOfHoursActuallyMade: _,
   ...assessmentEntity
-}: AssessmentEntity): AssessmentDto => assessmentEntity;
+}: AssessmentEntity): AssessmentDto | LegacyAssessmentDto => assessmentEntity;

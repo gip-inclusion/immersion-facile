@@ -5,6 +5,7 @@ import {
   ConventionDtoBuilder,
   type ConventionJwtPayload,
   InclusionConnectedUserBuilder,
+  type LegacyAssessmentDto,
   type Role,
   allRoles,
   errors,
@@ -20,6 +21,10 @@ import {
   type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import {
+  type AssessmentEntity,
+  createAssessmentEntity,
+} from "../entities/AssessmentEntity";
 import {
   type GetAssessmentByConventionId,
   makeGetAssessmentByConventionId,
@@ -195,5 +200,31 @@ describe("GetAssessmentByConventionId", () => {
         );
       },
     );
+
+    it("can also get an assessment with legacy format", async () => {
+      const legacyAssessment: LegacyAssessmentDto = {
+        status: "FINISHED",
+        conventionId: convention.id,
+        establishmentFeedback: "this is my feedback",
+      };
+      const assessmentEntity: AssessmentEntity = {
+        _entityName: "Assessment",
+        ...legacyAssessment,
+        numberOfHoursActuallyMade: 0,
+      };
+      uow.assessmentRepository.setAssessments([assessmentEntity]);
+
+      const assessment = await getAssessment.execute(
+        { conventionId: convention.id },
+        {
+          role: "validator",
+          applicationId: convention.id,
+          emailHash: makeHashByRolesForTest(convention, counsellor, validator)
+            .validator,
+        },
+      );
+
+      expectToEqual(assessment, legacyAssessment);
+    });
   });
 });
