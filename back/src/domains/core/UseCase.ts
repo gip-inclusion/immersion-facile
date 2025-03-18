@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import type { Logger } from "pino";
 import {
   type ConventionJwtPayload,
@@ -58,7 +59,9 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
 
       return uowPerformer
         .perform((uow) =>
-          cb({ inputParams: validParams, uow, deps, currentUser }),
+          Sentry.startSpan({ name }, () =>
+            cb({ inputParams: validParams, uow, deps, currentUser }),
+          ),
         )
         .then((result) => {
           logger.info({
@@ -114,7 +117,9 @@ export abstract class UseCase<
       logger as Logger,
     );
 
-    const result = await this._execute(validParams, jwtPayload);
+    const result = await Sentry.startSpan({ name: useCaseName }, () =>
+      this._execute(validParams, jwtPayload),
+    );
     const durationInSeconds = calculateDurationInSecondsFrom(startDate);
     logger.info({
       useCaseName,
@@ -155,7 +160,11 @@ export abstract class TransactionalUseCase<
     const searchParams = getSearchParams(useCaseName, validParams);
 
     return this.uowPerformer
-      .perform((uow) => this._execute(validParams, uow, jwtPayload))
+      .perform((uow) =>
+        Sentry.startSpan({ name: useCaseName }, () =>
+          this._execute(validParams, uow, jwtPayload),
+        ),
+      )
       .then((result) => {
         logger.info({
           useCaseName,
