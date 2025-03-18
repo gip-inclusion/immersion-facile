@@ -1,5 +1,5 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { AssessmentDto, ConventionId } from "shared";
+import type { AssessmentDto, ConventionId, LegacyAssessmentDto } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -8,7 +8,7 @@ import type { AssessmentAndJwt } from "src/core-logic/ports/AssessmentGateway";
 
 export interface AssessmentState {
   isLoading: boolean;
-  currentAssessment: AssessmentDto | null;
+  currentAssessment: AssessmentDto | LegacyAssessmentDto | null;
 }
 
 const initialState: AssessmentState = {
@@ -43,7 +43,10 @@ export const assessmentSlice = createSlice({
     ) => {
       state.isLoading = true;
     },
-    getAssessmentSucceeded: (state, action: PayloadAction<AssessmentDto>) => {
+    getAssessmentSucceeded: (
+      state,
+      action: PayloadAction<AssessmentDto | LegacyAssessmentDto>,
+    ) => {
       state.isLoading = false;
       state.currentAssessment = action.payload;
     },

@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { Document, Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  type AssessmentDto,
+  type LegacyAssessmentDto,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
@@ -25,6 +27,12 @@ import logoRf from "/assets/img/logo-rf.svg";
 
 type AssessmentDocumentPageProps = {
   route: Route<typeof routes.assessmentDocument>;
+};
+
+const isLegacyAssessment = (
+  assessment: AssessmentDto | LegacyAssessmentDto,
+): assessment is LegacyAssessmentDto => {
+  return assessment.status === "FINISHED" || assessment.status === "ABANDONED";
 };
 
 export const AssessmentDocumentPage = ({
@@ -60,6 +68,8 @@ export const AssessmentDocumentPage = ({
     return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
+
+  const isAssessmentLegacy = isLegacyAssessment(assessment);
 
   return (
     <MainWrapper layout="default" vSpacing={8}>
@@ -146,12 +156,23 @@ export const AssessmentDocumentPage = ({
           :
         </h2>
         <ul>
-          <li>
-            {convention.internshipKind === "immersion"
-              ? "L'immersion a-t-elle"
-              : "Le mini-stage a-il"}{" "}
-            eu lieu ? {assessment.status === "DID_NOT_SHOW" ? "Non" : "Oui"}
-          </li>
+          {!isAssessmentLegacy && (
+            <li>
+              {convention.internshipKind === "immersion"
+                ? "L'immersion a-t-elle"
+                : "Le mini-stage a-il"}{" "}
+              eu lieu ? {assessment.status === "DID_NOT_SHOW" ? "Non" : "Oui"}
+            </li>
+          )}
+          {isAssessmentLegacy && (
+            <li>
+              {convention.internshipKind === "immersion"
+                ? "L'immersion a-t-elle"
+                : "Le mini-stage a-il"}{" "}
+              jusqu'au bout ?{" "}
+              {assessment.status === "ABANDONED" ? "Non" : "Oui"}
+            </li>
+          )}
           {assessment.status === "COMPLETED" && (
             <>
               <li>
@@ -195,34 +216,38 @@ export const AssessmentDocumentPage = ({
             </>
           )}
         </ul>
-        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
-          Résultats de{" "}
-          {convention.internshipKind === "immersion"
-            ? "l'immersion"
-            : "du mini-stage"}{" "}
-          :
-        </h2>
-        <ul>
-          <li>
-            {convention.internshipKind === "immersion"
-              ? "L'immersion a-t-elle débouchée"
-              : "Le mini-stage a-t-il débouché"}{" "}
-            sur une embauche ? {assessment.endedWithAJob ? "Oui" : "Non"}
-          </li>
-          {assessment.endedWithAJob && (
-            <>
+        {!isAssessmentLegacy && (
+          <>
+            <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+              Résultats de{" "}
+              {convention.internshipKind === "immersion"
+                ? "l'immersion"
+                : "du mini-stage"}{" "}
+              :
+            </h2>
+            <ul>
               <li>
-                Date d'embauche:{" "}
-                {toDisplayedDate({
-                  date: convertLocaleDateToUtcTimezoneDate(
-                    new Date(assessment.contractStartDate),
-                  ),
-                })}
+                {convention.internshipKind === "immersion"
+                  ? "L'immersion a-t-elle débouchée"
+                  : "Le mini-stage a-t-il débouché"}{" "}
+                sur une embauche ? {assessment.endedWithAJob ? "Oui" : "Non"}
               </li>
-              <li>Type de contrat : {assessment.typeOfContract}</li>
-            </>
-          )}
-        </ul>
+              {assessment.endedWithAJob && (
+                <>
+                  <li>
+                    Date d'embauche:{" "}
+                    {toDisplayedDate({
+                      date: convertLocaleDateToUtcTimezoneDate(
+                        new Date(assessment.contractStartDate),
+                      ),
+                    })}
+                  </li>
+                  <li>Type de contrat : {assessment.typeOfContract}</li>
+                </>
+              )}
+            </ul>
+          </>
+        )}
         <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Appréciation générale :</h2>
         <p
           dangerouslySetInnerHTML={{
@@ -232,15 +257,21 @@ export const AssessmentDocumentPage = ({
             ),
           }}
         />
-        <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>Conseils pour la suite :</h2>
-        <p
-          dangerouslySetInnerHTML={{
-            __html: escapeHtml(assessment.establishmentAdvices).replace(
-              /\n/g,
-              "<br />",
-            ),
-          }}
-        />
+        {!isAssessmentLegacy && (
+          <>
+            <h2 className={fr.cx("fr-h4", "fr-mt-4w")}>
+              Conseils pour la suite :
+            </h2>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: escapeHtml(assessment.establishmentAdvices).replace(
+                  /\n/g,
+                  "<br />",
+                ),
+              }}
+            />
+          </>
+        )}
         <hr className={fr.cx("fr-hr", "fr-mb-6w", "fr-mt-10w")} />
         <footer className={fr.cx("fr-text--xs")}>
           <p>
