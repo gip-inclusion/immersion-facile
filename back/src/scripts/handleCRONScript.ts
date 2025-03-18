@@ -1,8 +1,23 @@
-import { calculateDurationInSecondsFrom } from "shared";
+import type { captureCheckIn } from "@sentry/node";
+import { calculateDurationInSecondsFrom, pipeWithValue, slugify } from "shared";
 import type { AppConfig } from "../config/bootstrap/appConfig";
 import { type OpacifiedLogger, createLogger } from "../utils/logger";
 import { notifyTeam } from "../utils/notifyTeam";
-import { type SentryInstance, configureSentry } from "./configureSentry";
+import { configureSentry } from "./configureSentry";
+
+const camelToKebab = (str: string) =>
+  str
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z])([A-Z])(?=[a-z])/g, "$1-$2")
+    .toLowerCase();
+
+type MonitorConfig = NonNullable<Parameters<typeof captureCheckIn>[1]>;
+const defaultMonitorConfig: MonitorConfig = {
+  schedule: { type: "interval", unit: "day", value: 1 },
+  timezone: "Europe/Paris",
+  checkinMargin: 120,
+  maxRuntime: 30,
+};
 
 export const handleCRONScript = async <
   T extends Record<string, unknown> | void,
@@ -12,27 +27,51 @@ export const handleCRONScript = async <
   script: () => Promise<T>,
   handleResults: (results: T) => string,
   logger: OpacifiedLogger = createLogger(__filename),
+  monitorConfig: MonitorConfig = defaultMonitorConfig,
 ) => {
-  const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
+  const sanitizedName = pipeWithValue(name, camelToKebab, slugify);
+  const sentry = configureSentry(config.envType);
 
-  const sentry = configureSentry(config);
+  try {
+    const startTime = Date.now();
+    const checkInId = sentry.captureCheckIn(
+      {
+        monitorSlug: sanitizedName,
+        status: "in_progress",
+      },
+      { ...defaultMonitorConfig, ...monitorConfig },
+    );
 
-  const sentryCheckInId = sentry.captureCheckIn({
-    monitorSlug: name,
-    status: "in_progress",
-  });
+    const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
+    const contextParams: ScriptContextParams = {
+      context,
+      logger,
+      name,
+      start: new Date(),
+    };
 
-  const contextParams: ScriptContextParams = {
-    context,
-    logger,
-    name,
-    start: new Date(),
-    sentryCheckInId,
-    sentry,
-  };
-  return script()
-    .then(onScriptSuccess<T>({ ...contextParams, handleResults }))
-    .catch(onScriptError(contextParams));
+    try {
+      const results = await script();
+      sentry.captureCheckIn({
+        checkInId,
+        monitorSlug: sanitizedName,
+        status: "ok",
+        duration: (Date.now() - startTime) / 1000,
+      });
+      await onScriptSuccess<T>({ ...contextParams, handleResults })(results);
+    } catch (error) {
+      sentry.captureCheckIn({
+        checkInId,
+        monitorSlug: sanitizedName,
+        status: "error",
+        duration: (Date.now() - startTime) / 1000,
+      });
+      await onScriptError(contextParams)(error);
+    }
+  } finally {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    process.exit(0);
+  }
 };
 
 type ScriptContextParams = {
@@ -40,8 +79,6 @@ type ScriptContextParams = {
   context: string;
   logger: OpacifiedLogger;
   name: string;
-  sentryCheckInId: string;
-  sentry: SentryInstance;
 };
 
 const onScriptSuccess =
@@ -51,12 +88,10 @@ const onScriptSuccess =
     logger,
     name,
     handleResults,
-    sentryCheckInId,
-    sentry,
   }: ScriptContextParams & {
     handleResults: (results: T) => string;
   }) =>
-  (results: T): Promise<void> => {
+  async (results: T): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
     const reportTitle = `✅ Success at ${new Date().toISOString()} - ${context}`;
     const reportContent = handleResults({ ...results, durationInSeconds });
@@ -74,28 +109,13 @@ const onScriptSuccess =
       reportContent,
       "----------------------------------------",
     ].join("\n");
-    sentry.captureCheckIn({
-      checkInId: sentryCheckInId,
-      status: "ok",
-      monitorSlug: name,
-      duration: durationInSeconds,
-    });
 
-    return notifyTeam({ rawContent: report, isError: false }).finally(() =>
-      process.exit(0),
-    );
+    await notifyTeam({ rawContent: report, isError: false });
   };
 
 const onScriptError =
-  ({
-    start,
-    context,
-    logger,
-    name,
-    sentryCheckInId,
-    sentry,
-  }: ScriptContextParams) =>
-  (error: any): Promise<void> => {
+  ({ start, context, logger, name }: ScriptContextParams) =>
+  async (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
     const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
       error.message
@@ -114,14 +134,5 @@ const onScriptError =
       "----------------------------------------",
     ].join("\n");
 
-    sentry.captureCheckIn({
-      checkInId: sentryCheckInId,
-      status: "error",
-      monitorSlug: name,
-      duration: durationInSeconds,
-    });
-
-    return notifyTeam({ rawContent: report, isError: false }).finally(() =>
-      process.exit(0),
-    );
+    await notifyTeam({ rawContent: report, isError: true });
   };

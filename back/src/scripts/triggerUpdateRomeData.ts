@@ -150,4 +150,8 @@ handleCRONScript(
       `Number of appellations: ${numberOfAppellations}`,
     ].join("\n"),
   logger,
+  {
+    schedule: { type: "interval", unit: "month", value: 1 },
+    checkinMargin: 2 * 24 * 60, // 2 days margin
+  },
 );
