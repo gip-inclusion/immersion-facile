@@ -58,11 +58,9 @@ export const NafAutocomplete = ({
           label: option.label,
           value: option,
         })),
-        onInputChange: (value, actionMeta) => {
+        onInputChange: (value) => {
           setSearchTerm(value);
-          if (actionMeta.action === "input-change") {
-            dispatch(nafSlice.actions.queryHasChanged(value));
-          }
+          dispatch(nafSlice.actions.queryHasChanged(value));
         },
       }}
     />

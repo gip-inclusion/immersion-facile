@@ -69,7 +69,7 @@ export const CreationSiretRelatedInputs = () => {
         : defaultMaxContactsPerMonth,
     );
   }, [establishmentInfos]);
-
+  const businessAddress = getValues("businessAddresses.0")?.rawAddress;
   return (
     <>
       <Input
@@ -112,35 +112,20 @@ export const CreationSiretRelatedInputs = () => {
         {...getFieldError("businessNameCustomized")}
       />
       <AddressAutocomplete
-        initialInputValue={establishmentInfos?.businessAddress}
+        initialValue={
+          businessAddress
+            ? addressStringToFakeAddressAndPosition(businessAddress)
+            : undefined
+        }
         label={"Vérifiez l'adresse de votre établissement *"}
         selectProps={{
           inputId: domElementIds.establishment.create.addressAutocomplete,
-          value: getValues("businessAddresses.0")
+          value: businessAddress
             ? {
-                label: getValues("businessAddresses.0").rawAddress,
-                value: addressStringToFakeAddressAndPosition(
-                  getValues("businessAddresses.0").rawAddress,
-                ),
+                label: businessAddress,
+                value: addressStringToFakeAddressAndPosition(businessAddress),
               }
-            : establishmentInfos
-              ? {
-                  label: establishmentInfos.businessAddress,
-                  value: {
-                    address: {
-                      streetNumberAndAddress:
-                        establishmentInfos.businessAddress,
-                      postcode: "",
-                      departmentCode: "",
-                      city: "",
-                    },
-                    position: {
-                      lat: 0,
-                      lon: 0,
-                    },
-                  },
-                }
-              : undefined,
+            : undefined,
         }}
         onAddressSelected={(addressAndPosition) => {
           setValue("businessAddresses.0", {

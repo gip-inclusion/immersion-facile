@@ -31,14 +31,21 @@ export const fillAndSubmitBasicAgencyForm = async (
     .fill(override?.siret ?? "751 984 972 00016");
 
   await expect(
-    await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`),
-  ).toHaveValue(override?.rawAddress ?? "55 Rue Boissonade 75014 Paris");
+    await page.locator(
+      `#${domElementIds.addAgency.addressAutocomplete}-wrapper .im-select__single-value`,
+    ),
+  ).toContainText(
+    (override?.rawAddress ?? "55 Rue Boissonade 75014 Paris").toUpperCase(),
+  );
 
   await page
     .locator(`#${domElementIds.addAgency.nameInput}`)
     .fill(override?.customizedName ?? "Cap emploi de Bayonne");
-  await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).click();
-  await page.locator(`#${domElementIds.addAgency.addressAutocomplete}`).clear();
+  await page
+    .locator(
+      `#${domElementIds.addAgency.addressAutocomplete}-wrapper .im-select__clear-indicator`,
+    )
+    .click();
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.addAgency.addressAutocomplete}`,

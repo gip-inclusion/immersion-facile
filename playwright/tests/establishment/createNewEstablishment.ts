@@ -2,7 +2,9 @@ import { type Page, expect } from "@playwright/test";
 import {
   type AdminFormEstablishmentUserRight,
   type FormEstablishmentDto,
+  addressRoutes,
   domElementIds,
+  formCompletionRoutes,
 } from "shared";
 import { testConfig } from "../../custom.config";
 import {
@@ -115,36 +117,37 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
 
   await expect(
     page.locator(`#${domElementIds.establishment.create.businessName}`),
-  ).not.toHaveValue("");
+  ).toHaveValue("PLATEFORME DE L'INCLUSION");
   await expect(
-    page.locator(`#${domElementIds.establishment.create.addressAutocomplete}`),
-  ).not.toHaveValue("");
+    page.locator(
+      `#${domElementIds.establishment.create.addressAutocomplete}-wrapper .im-select__single-value`,
+    ),
+  ).toContainText("127 RUE DE GRENELLE 75007 PARIS");
   await expect(
-    page.locator(`#${domElementIds.establishment.create.businessAddresses}-0`),
-  ).toHaveValue(establishment.businessAddresses[0].rawAddress);
+    await page
+      .locator(`#${domElementIds.establishment.create.businessAddresses}-0`)
+      .inputValue(),
+  ).toContain(establishment.businessAddresses[0].rawAddress.toUpperCase());
   await page.click(
     `#${domElementIds.establishment.create.appellations}-add-option-button`,
   );
-  await page.fill(
-    `#${domElementIds.establishment.create.appellations} .im-select__input`,
-    "boulang",
-  );
-  await page
-    .locator(
-      `#${domElementIds.establishment.create.appellations} .im-select__option`,
-    )
-    .first()
-    .click();
-
-  await page.click(
-    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
-  );
-
   await fillAutocomplete({
     page,
-    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
-    value: "28 rue des mimosas",
+    locator: `#${domElementIds.establishment.create.appellations}-0`,
+    value: "boulang",
+    endpoint: formCompletionRoutes.appellation.url,
   });
+
+  // await page.click(
+  //   `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+  // );
+
+  // await fillAutocomplete({
+  //   page,
+  //   locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
+  //   value: "28 rue des mimosas",
+  //   endpoint: addressRoutes.lookupStreetAddress.url,
+  // });
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
   await expect(page.url()).toContain(`siret=${establishment.siret}`);

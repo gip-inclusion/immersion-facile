@@ -9,7 +9,10 @@ import {
   domElementIds,
   emailSchema,
 } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import {
+  AddressAutocomplete,
+  addressStringToFakeAddressAndPosition,
+} from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
@@ -67,18 +70,9 @@ export const AgencyFormCommonFields = ({
   const valueFromStore = establishmentInfos
     ? {
         label: establishmentInfos.businessAddress,
-        value: {
-          address: {
-            streetNumberAndAddress: establishmentInfos.businessAddress,
-            postcode: "",
-            departmentCode: "",
-            city: "",
-          },
-          position: {
-            lat: 0,
-            lon: 0,
-          },
-        },
+        value: addressStringToFakeAddressAndPosition(
+          establishmentInfos.businessAddress,
+        ),
       }
     : undefined;
   return (
@@ -93,6 +87,7 @@ export const AgencyFormCommonFields = ({
             updateSiret(event.target.value);
             setValue("agencySiret", event.target.value);
           },
+          readOnly: isFetchingSiret,
         }}
         state={
           siretErrorToDisplay && formState.touchedFields.agencySiret
@@ -104,7 +99,6 @@ export const AgencyFormCommonFields = ({
             ? siretErrorToDisplay
             : ""
         }
-        disabled={isFetchingSiret}
       />
       <Input
         label={formContents.name.label}
@@ -120,13 +114,9 @@ export const AgencyFormCommonFields = ({
         {...formContents.address}
         selectProps={{
           inputId: domElementIds.addAgency.addressAutocomplete,
-          value: valueFromStore,
         }}
-        initialInputValue={
-          establishmentInfos ? establishmentInfos.businessAddress : ""
-        }
         initialValue={
-          formValues.address && formValues.position
+          formHasAddressValues(formValues)
             ? {
                 address: formValues.address,
                 position: formValues.position,
@@ -216,4 +206,13 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
 const descriptionByValidationSteps: Record<ValidationSteps, ReactNode> = {
   validatorsOnly: formAgencyFieldsLabels.counsellorEmails.hintText,
   counsellorsAndValidators: formAgencyFieldsLabels.validatorEmails.hintText,
+};
+
+const formHasAddressValues = (formValues: CreateAgencyDto) => {
+  return (
+    formValues.address &&
+    formValues.position &&
+    formValues.position.lat !== 0 &&
+    formValues.position.lon !== 0
+  );
 };

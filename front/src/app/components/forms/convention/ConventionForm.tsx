@@ -376,6 +376,14 @@ export const ConventionForm = ({
     }
   }, [fetchedConvention, reset]);
 
+  const getBusinessAddressInitialValue = () => {
+    const businessAddress =
+      conventionValues.immersionAddress ?? establishmentInfos?.businessAddress;
+    return businessAddress
+      ? addressStringToFakeAddressAndPosition(businessAddress)
+      : undefined;
+  };
+
   return (
     <FormProvider {...methods}>
       {conventionIsLoading && <Loader />}
@@ -496,13 +504,7 @@ export const ConventionForm = ({
                   >
                     <AddressAutocomplete
                       {...formContents.immersionAddress}
-                      initialValue={
-                        establishmentInfos
-                          ? addressStringToFakeAddressAndPosition(
-                              establishmentInfos.businessAddress,
-                            )
-                          : undefined
-                      }
+                      initialValue={getBusinessAddressInitialValue()}
                       selectProps={{
                         inputId:
                           domElementIds.conventionImmersionRoute

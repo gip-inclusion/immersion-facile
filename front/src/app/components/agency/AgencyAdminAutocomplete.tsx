@@ -69,7 +69,7 @@ export const AgencyAdminAutocomplete = ({
           label: option.name,
           value: option,
         })),
-        id: domElementIds.admin.agencyTab.editAgencyAutocompleteInput,
+        inputId: domElementIds.admin.agencyTab.editAgencyAutocompleteInput,
         value: selectedAgency?.id
           ? {
               label: selectedAgency.name,

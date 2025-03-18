@@ -32,14 +32,24 @@ export const AddressAutocomplete = ({
   disabled,
   selectProps,
 }: AddressAutocompleteProps) => {
-  const initialOption = useMemo(() => initialValue ?? null, [initialValue]);
   const [searchTerm, setSearchTerm] = useState<string>(
     initialInputValue ||
-      (initialOption ? addressDtoToString(initialOption.address) : ""),
+      (initialValue ? addressDtoToString(initialValue.address) : ""),
   );
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
+  const [selectedOption, setSelectedOption] = useState<
+    AddressAndPosition | undefined
+  >(initialValue);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
+
+  if (
+    initialValue &&
+    addressDtoToString(initialValue.address) &&
+    selectedOption === undefined
+  ) {
+    setSelectedOption(initialValue);
+  }
 
   useEffect(() => {
     (async () => {
@@ -81,48 +91,55 @@ export const AddressAutocomplete = ({
     if (isSearching || searchTerm !== debounceSearchTerm) return "...";
     return "Aucune adresse trouvée";
   };
+
   return (
-    <div className={fr.cx("fr-input-group")}>
-      <RSAutocomplete
-        label={label}
-        disabled={disabled}
-        selectProps={{
-          ...selectProps,
-          isLoading: isSearching,
-          inputId: selectProps?.inputId ?? "im-select__input--address",
-          loadingMessage: () => <>Recherche d'adresse en cours... 🔎</>,
-          inputValue: searchTerm,
-          defaultValue: initialOption
-            ? {
-                label: addressDtoToString(initialOption.address),
-                value: initialOption,
-              }
-            : undefined,
-          noOptionsMessage: () =>
-            noOptionText({ isSearching, debounceSearchTerm, searchTerm }),
-          onChange: (searchResult, actionMeta) => {
-            if (
-              actionMeta.action === "clear" ||
-              actionMeta.action === "remove-value"
-            ) {
-              onAddressClear();
+    <RSAutocomplete
+      label={label}
+      disabled={disabled}
+      selectProps={{
+        ...selectProps,
+        isLoading: isSearching,
+        inputId: selectProps?.inputId ?? "im-select__input--address",
+        loadingMessage: () => <>Recherche d'adresse en cours... 🔎</>,
+        inputValue: searchTerm,
+        value: selectedOption
+          ? {
+              label: addressDtoToString(selectedOption.address),
+              value: selectedOption,
             }
-            if (searchResult && actionMeta.action === "select-option") {
-              onAddressSelected(searchResult.value);
+          : undefined,
+        defaultValue: initialValue
+          ? {
+              label: addressDtoToString(initialValue.address),
+              value: initialValue,
             }
-          },
-          onInputChange: (value) => {
-            setSearchTerm(value);
-          },
-          options: options.map((option) => ({
-            value: option,
-            label: addressDtoToString(option.address),
-          })),
-          placeholder:
-            selectProps?.placeholder ?? "Ex : 123 Rue de la Paix 75001 Paris",
-        }}
-      />
-    </div>
+          : undefined,
+        noOptionsMessage: () =>
+          noOptionText({ isSearching, debounceSearchTerm, searchTerm }),
+        onChange: (searchResult, actionMeta) => {
+          if (
+            actionMeta.action === "clear" ||
+            actionMeta.action === "remove-value"
+          ) {
+            onAddressClear();
+            setSelectedOption(undefined);
+          }
+          if (searchResult && actionMeta.action === "select-option") {
+            onAddressSelected(searchResult.value);
+            setSelectedOption(searchResult.value);
+          }
+        },
+        onInputChange: (value) => {
+          setSearchTerm(value);
+        },
+        options: options.map((option) => ({
+          value: option,
+          label: addressDtoToString(option.address),
+        })),
+        placeholder:
+          selectProps?.placeholder ?? "Ex : 123 Rue de la Paix 75001 Paris",
+      }}
+    />
   );
 };
 

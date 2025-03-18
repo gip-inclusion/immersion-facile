@@ -6,6 +6,7 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,
   addressDtoToString,
+  domElementIds,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
@@ -96,12 +97,22 @@ export const BeneficiaryCurrentEmployerFields = ({
         )}
       />
       <AddressAutocomplete
-        {...formFields[
-          "signatories.beneficiaryCurrentEmployer.businessAddress"
-        ]}
+        label={
+          formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]
+            .label
+        }
+        hintText={
+          formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]
+            .hintText
+        }
         initialInputValue={
           values.signatories.beneficiaryCurrentEmployer?.businessAddress
         }
+        selectProps={{
+          inputId:
+            formFields["signatories.beneficiaryCurrentEmployer.businessAddress"]
+              .id,
+        }}
         onAddressSelected={(addressAndPosition) => {
           setValue(
             "signatories.beneficiaryCurrentEmployer.businessAddress",
