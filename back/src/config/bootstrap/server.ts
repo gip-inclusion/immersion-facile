@@ -50,11 +50,13 @@ export const createApp = async (
   config: AppConfig,
 ): Promise<CreateAppProperties> => {
   const app = express();
+
   app.use(
     PinoHttp({
       logger,
     }),
   );
+
   app.use((req, res, next) => {
     bodyParser.json({ limit: "800kb" })(req, res, (httpError?: HttpError) => {
       if (httpError) {

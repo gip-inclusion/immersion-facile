@@ -1,14 +1,15 @@
 import * as Sentry from "@sentry/node";
-import type { AppConfig } from "../config/bootstrap/appConfig";
+
+import type { Environment } from "shared";
 import { version } from "./version";
 
-export const configureSentry = (appConfig: AppConfig) => {
+export const configureSentry = (envType: Environment) => {
   Sentry.init({
     dsn: "https://eb7a121cd835308163ca9966e5c82c98@o4508405260615680.ingest.de.sentry.io/4508999044038736",
     integrations: [],
+    tracesSampleRate: 1.0,
+    environment: envType,
     release: version,
-    environment: appConfig.envType,
-    tracesSampleRate: 1,
   });
 
   return Sentry;
