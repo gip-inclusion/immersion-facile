@@ -33,6 +33,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
+import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -734,6 +735,10 @@ export const createUseCases = (
     }),
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
+    }),
+    transferConventionToAgency: makeTransferConventionToAgency({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
