@@ -52,7 +52,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@sentry/node": "^9.6.0",
+    "@sentry/node": "^9.6.1",
+    "@sentry/profiling-node": "^9.6.1",
     "@types/geojson": "^7946.0.10",
     "aws-sdk": "^2.1213.0",
     "axios": "^1.8.2",
