@@ -15,7 +15,7 @@ import {
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
-import { sendHttpResponseForApiV2 } from "../../../../config/helpers/sendHttpResponse";
+import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { validateAndParseZodSchemaV2 } from "../../../../config/helpers/validateAndParseZodSchema";
 import type { UnitOfWorkPerformer } from "../../../../domains/core/unit-of-work/ports/UnitOfWorkPerformer";
 import { createLogger } from "../../../../utils/logger";
@@ -59,7 +59,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   searchEstablishmentV2Router.searchImmersion(
     deps.apiConsumerMiddleware,
     async (req, res) =>
-      sendHttpResponseForApiV2(req, res, async () => {
+      sendHttpResponse(req, res, async () => {
         if (
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
@@ -88,7 +88,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   searchEstablishmentV2Router.getOfferBySiretAndAppellationCode(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponseForApiV2(req, res, async () => {
+      sendHttpResponse(req, res, async () => {
         if (
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
@@ -118,7 +118,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   searchEstablishmentV2Router.contactEstablishment(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponseForApiV2(req, res.status(201), () => {
+      sendHttpResponse(req, res.status(201), () => {
         if (
           !isApiConsumerAllowed({
             apiConsumer: req.apiConsumer,
@@ -146,7 +146,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   conventionV2Router.getConventionById(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponseForApiV2(req, res, async () => {
+    sendHttpResponse(req, res, async () => {
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
@@ -169,7 +169,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   conventionV2Router.getConventions(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponseForApiV2(req, res, async () => {
+    sendHttpResponse(req, res, async () => {
       if (
         !isApiConsumerAllowed({
           apiConsumer: req.apiConsumer,
@@ -192,7 +192,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   statisticsV2Router.getEstablishmentStats(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponseForApiV2(req, res, async () => {
+      sendHttpResponse(req, res, async () => {
         if (!req.apiConsumer) throw errors.user.unauthorized();
 
         const page = req.query.page ?? defaultPageInPagination;
@@ -209,7 +209,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   );
 
   webhooksV2Router.subscribeToWebhook(deps.apiConsumerMiddleware, (req, res) =>
-    sendHttpResponseForApiV2(req, res.status(201), async () => {
+    sendHttpResponse(req, res.status(201), async () => {
       const event = req.body.subscribedEvent;
       const rightNeeded = eventToRightName(event);
 
@@ -229,7 +229,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   webhooksV2Router.listActiveSubscriptions(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponseForApiV2(req, res.status(200), async () => {
+      sendHttpResponse(req, res.status(200), async () => {
         const apiConsumer = req.apiConsumer;
         if (
           !apiConsumer ||
@@ -250,7 +250,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
   webhooksV2Router.unsubscribeToWebhook(
     deps.apiConsumerMiddleware,
     (req, res) =>
-      sendHttpResponseForApiV2(req, res.status(204), async () => {
+      sendHttpResponse(req, res.status(204), async () => {
         await deps.useCases.deleteSubscription.execute(
           req.params.subscriptionId,
           req.apiConsumer,
