@@ -32,6 +32,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
+import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -139,7 +140,6 @@ import {
   makeGenerateConventionMagicLinkUrl,
   makeGenerateEditFormEstablishmentUrl,
 } from "./magicLinkUrl";
-import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 
 export const createUseCases = (
   config: AppConfig,
@@ -469,6 +469,11 @@ export const createUseCases = (
           gateways.timeGateway,
           gateways.shortLinkGenerator,
           config,
+        ),
+      notifyAllActorsThatConventionHasBeenTransferred:
+        new NotifyAllActorsThatConventionHasBeenTransferred(
+          uowPerformer,
+          saveNotificationAndRelatedEvent,
         ),
       notifyNewConventionNeedsReview: new NotifyNewConventionNeedsReview(
         uowPerformer,
