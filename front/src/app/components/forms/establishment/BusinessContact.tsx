@@ -74,34 +74,38 @@ export const BusinessContact = ({
       <h2 className={fr.cx("fr-text--lead")}>
         Qui répondra aux demandes des candidats ?
       </h2>
-      <Input
-        label={"Prénom du référent"}
-        hintText={
-          "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
-        }
-        disabled
-        nativeInputProps={{
-          value: federatedIdentity?.firstName,
-          id: domElementIds.establishment[mode].businessContact.firstName,
-        }}
-      />
-      <Input
-        label={"Nom du référent"}
-        hintText={
-          "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
-        }
-        disabled
-        nativeInputProps={{
-          value: federatedIdentity?.lastName,
-          id: domElementIds.establishment[mode].businessContact.lastName,
-        }}
-      />
+      {mode === "create" && (
+        <>
+          <Input
+            label={"Prénom du référent"}
+            hintText={
+              "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+            }
+            disabled
+            nativeInputProps={{
+              value: federatedIdentity?.firstName,
+              id: domElementIds.establishment[mode].businessContact.firstName,
+            }}
+          />
+          <Input
+            label={"Nom du référent"}
+            hintText={
+              "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+            }
+            disabled
+            nativeInputProps={{
+              value: federatedIdentity?.lastName,
+              id: domElementIds.establishment[mode].businessContact.lastName,
+            }}
+          />
+        </>
+      )}
       <Input
         label={"Email du référent"}
         hintText={
           "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
         }
-        disabled
+        disabled={mode === "create"}
         nativeInputProps={{
           ...register("userRights.0.email"),
           value: getValues("userRights.0.email"),
