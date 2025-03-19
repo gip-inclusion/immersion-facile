@@ -7,12 +7,14 @@ import Styles from "./ButtonWithSubMenu.styles";
 export type ButtonWithSubMenuProps = {
   navItems: (ButtonProps & { id: string })[];
   buttonLabel: string;
+  buttonIconId?: ButtonProps["iconId"];
   id?: string;
 };
 
 export const ButtonWithSubMenu = ({
   navItems,
   buttonLabel,
+  buttonIconId,
   id,
 }: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
@@ -41,26 +43,34 @@ export const ButtonWithSubMenu = ({
     };
   }, []);
 
-  const isMobile = id?.includes("-mobile");
-
   return (
     <div className={cx(Styles.root)}>
       <Button
-        ref={toggleButtonRef}
-        className={cx(fr.cx("fr-m-md-0"))}
-        iconId="fr-icon-account-line"
-        iconPosition="left"
-        id={buttonId}
-        nativeButtonProps={{
-          "aria-controls": `${buttonId}-submenu`,
-        }}
-        onClick={() => {
-          setIsOpen((isOpen) => !isOpen);
-        }}
-        priority="tertiary"
-      >
-        {buttonLabel}
-      </Button>
+        {...({
+          ref: toggleButtonRef,
+          className: cx(fr.cx("fr-m-md-0", "fr-pr-0")),
+          id: buttonId,
+          nativeButtonProps: {
+            "aria-controls": `${buttonId}-submenu`,
+            type: "button",
+          },
+          onClick: () => setIsOpen((isOpen) => !isOpen),
+          priority: "tertiary",
+          ...(buttonIconId && {
+            iconId: buttonIconId,
+            iconPosition: "left" as const,
+          }),
+          children: (
+            <>
+              {buttonLabel}
+              <span
+                className={fr.cx("fr-icon-arrow-down-s-line", "fr-mx-2v")}
+                aria-hidden="true"
+              />
+            </>
+          ),
+        } as ButtonProps)}
+      />
 
       <div
         className={cx(
@@ -82,11 +92,7 @@ export const ButtonWithSubMenu = ({
                   <a
                     className={fr.cx("fr-nav__link")}
                     {...item.linkProps}
-                    id={
-                      isMobile
-                        ? `${item.linkProps.id}-mobile`
-                        : item.linkProps.id
-                    }
+                    id={item.linkProps.id}
                   >
                     {item.children}
                   </a>
