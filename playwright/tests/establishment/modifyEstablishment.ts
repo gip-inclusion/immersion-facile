@@ -12,7 +12,7 @@ import {
 } from "../../utils/dashboard";
 import {
   type PlaywrightTestCallback,
-  expectLocatorToBeReadOnly,
+  expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";
@@ -120,20 +120,10 @@ const step3BusinessContact = async (
     .filter((right) => right.role === "establishment-contact")
     .map(({ email }) => email);
 
-  const firstNameLocator = page.locator(
-    `#${domElementIds.establishment.edit.businessContact.firstName}`,
-  );
-  await expectLocatorToBeReadOnly(firstNameLocator);
-
-  const lastNameLocator = page.locator(
-    `#${domElementIds.establishment.edit.businessContact.lastName}`,
-  );
-  await expectLocatorToBeReadOnly(lastNameLocator);
-
   const adminEmailLocator = page.locator(
     `#${domElementIds.establishment.edit.businessContact.email}`,
   );
-  await expectLocatorToBeReadOnly(adminEmailLocator);
+  await expectLocatorToBeVisibleAndEnabled(adminEmailLocator);
 
   await page.fill(
     `#${domElementIds.establishment.edit.businessContact.job}`,
