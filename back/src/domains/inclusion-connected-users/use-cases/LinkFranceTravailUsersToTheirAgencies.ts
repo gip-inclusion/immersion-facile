@@ -10,7 +10,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import {
-  getAgencyEmailsByRole,
+  getAgencyAndAdminEmailsByAgencyId,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -84,6 +84,11 @@ const updateAgenciesOfGroup = async (
     user.agencyRights,
   );
 
+  const agenciesWithAdminEmailsById = await getAgencyAndAdminEmailsByAgencyId({
+    uow,
+    agencyIds: agenciesRelatedToGroup.map(({ id }) => id),
+  });
+
   const otherAgencyRights = await Promise.all(
     agenciesRelatedToGroup
       .filter((agency) => activeAgencyStatuses.includes(agency.status))
@@ -92,21 +97,20 @@ const updateAgenciesOfGroup = async (
           (agencyRight) => agencyRight.agency.id === agency.id,
         );
 
-        return existingAgencyRight &&
+        if (
+          existingAgencyRight &&
           agencyRoleIsNotToReview(existingAgencyRight.roles)
-          ? existingAgencyRight
-          : {
-              agency: toAgencyDtoForAgencyUsersAndAdmins(
-                agency,
-                await getAgencyEmailsByRole({
-                  agency,
-                  role: "agency-admin",
-                  uow,
-                }),
-              ),
-              roles: ["agency-viewer"],
-              isNotifiedByEmail: false,
-            };
+        )
+          return existingAgencyRight;
+
+        return {
+          agency: toAgencyDtoForAgencyUsersAndAdmins(
+            agency,
+            agenciesWithAdminEmailsById[agency.id].adminEmails,
+          ),
+          roles: ["agency-viewer"],
+          isNotifiedByEmail: false,
+        };
       }),
   );
 
