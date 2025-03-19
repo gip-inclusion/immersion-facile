@@ -16,6 +16,7 @@ import {
   type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
   type ShareLinkByEmailDto,
+  type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
   type WithConventionId,
   sleep,
@@ -58,6 +59,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public broadcastConventionAgainResult$ = new Subject<void>();
 
   public sendSignatureLinkResult$ = new Subject<void>();
+
+  public transferConventionToAgencyResult$ = new Subject<void>();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -142,6 +145,13 @@ export class InMemoryConventionGateway implements ConventionGateway {
     _jwt: ConventionJwt | ConnectedUserJwt,
   ): Observable<void> {
     return this.conventionSignedResult$;
+  }
+
+  public transferConventionToAgency$(
+    _params: TransferConventionToAgencyRequestDto,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return this.transferConventionToAgencyResult$;
   }
 
   public updateConvention$(
