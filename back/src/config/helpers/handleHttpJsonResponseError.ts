@@ -18,15 +18,6 @@ export const handleHttpJsonResponseError = (
   req: Request,
   res: Response,
   error: any,
-): Response<any, Record<string, any>> => {
-  Sentry.captureException(error);
-  return handleHttpJsonResponseErrorForApiV2(req, res, error);
-};
-
-export const handleHttpJsonResponseErrorForApiV2 = (
-  req: Request,
-  res: Response,
-  error: any,
 ): Response<any, Record<string, ErrorObject>> => {
   return error instanceof HttpError
     ? res.status(error.httpCode).json({
@@ -83,6 +74,8 @@ const onNotHttpError = (error: any, req: Request, res: Response) => {
           value: JSON.stringify(error),
         });
   }
+
+  Sentry.captureException(error);
 
   return res.status(500).json({
     message: error.message,
