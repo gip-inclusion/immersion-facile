@@ -1,19 +1,20 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
-import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { type ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ButtonWithSubMenu.styles";
+
+export type ButtonWithSubMenuProps = {
+  navItems: (ButtonProps & { id: string })[];
+  buttonLabel: string;
+  id?: string;
+};
 
 export const ButtonWithSubMenu = ({
   navItems,
   buttonLabel,
   id,
-}: {
-  navItems: MainNavigationProps.Item.Link[];
-  buttonLabel: string;
-  id?: string;
-}) => {
+}: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { cx } = useStyles();
@@ -70,20 +71,39 @@ export const ButtonWithSubMenu = ({
         id={`${buttonId}-submenu`}
         aria-hidden={!isOpen}
       >
-        <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
-          {navItems.map((item) => (
-            <li key={item.linkProps.id}>
-              <a
-                className={fr.cx("fr-nav__link")}
-                {...item.linkProps}
-                id={
-                  isMobile ? `${item.linkProps.id}-mobile` : item.linkProps.id
-                }
+        <ul className={cx(fr.cx("fr-menu__list", "fr-p-0"), Styles.list)}>
+          {navItems.map((item) => {
+            //  return item.linkProps &&<li key={item.linkProps.id}>
+            //     <a
+            //       className={fr.cx("fr-nav__link")}
+            //       {...item.linkProps}
+            //       id={
+            //         isMobile
+            //           ? `${item.linkProps.id}-mobile`
+            //           : item.linkProps.id
+            //       }
+            //     >
+            //       {item.children}
+            //     </a>
+            //   </li>
+            // }
+            return (
+              <li
+                key={item.id}
+                className={cx(fr.cx("fr-p-0"), Styles.listElement)}
               >
-                {item.text}
-              </a>
-            </li>
-          ))}
+                <Button
+                  priority="tertiary"
+                  {...item}
+                  className={cx(
+                    fr.cx("fr-nav__link"),
+                    Styles.listElementButton,
+                  )}
+                  id={isMobile ? `${item.id}-mobile` : item.id}
+                />
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

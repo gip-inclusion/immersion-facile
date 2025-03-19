@@ -1,16 +1,29 @@
 .im-button-with-sub-menu {
   position: relative;
+
   &__menu {
     max-height: 999px;
     overflow: auto;
     top: 100%;
     right: 0;
     max-width: 18rem;
+
     &--hidden {
       display: none;
     }
   }
+
   &__list {
     width: max-content;
+    box-shadow: inset 0 0 0 1px var(--border-default-grey);
+  }
+
+  &__list-element {
+    list-style: none;
+    list-style-type: none;
+  }
+
+  &__list-element-button {
+    box-shadow: 0 calc(-1rem - 1px) 0 -1rem var(--border-default-grey);
   }
 }
