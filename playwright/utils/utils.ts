@@ -35,10 +35,11 @@ export const fillAutocomplete = async ({
   endpoint?: string;
 }) => {
   await page.locator(locator).fill(value);
-  await page.waitForTimeout(testConfig.timeForDebounce);
-  if (endpoint) {
-    await page.waitForResponse(`**${endpoint}**`);
-  }
+  await Promise.all([
+    page.waitForTimeout(testConfig.timeForDebounce),
+    ...(endpoint ? [page.waitForResponse(`**${endpoint}**`)] : []),
+  ]);
+
   await page.waitForSelector(`${locator}[aria-controls]`);
   const listboxId = await page.locator(locator).getAttribute("aria-controls");
   const firstOption = page
