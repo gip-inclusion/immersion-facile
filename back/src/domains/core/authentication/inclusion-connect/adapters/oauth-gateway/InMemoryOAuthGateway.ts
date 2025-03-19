@@ -1,4 +1,4 @@
-import { type AbsoluteUrl, queryParamsAsString } from "shared";
+import { type AbsoluteUrl, errors, queryParamsAsString } from "shared";
 import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import type {
   GetAccessTokenParams,
@@ -32,7 +32,7 @@ export class InMemoryOAuthGateway implements OAuthGateway {
     _: GetAccessTokenParams,
   ): Promise<GetAccessTokenResult> {
     if (this.#getAccessTokenResult) return this.#getAccessTokenResult;
-    throw new Error("No access token provided (in memory)");
+    throw errors.generic.fakeError("No access token provided (in memory)");
   }
 
   public async getLogoutUrl(params: GetLogoutUrlParams): Promise<AbsoluteUrl> {

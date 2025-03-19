@@ -266,9 +266,11 @@ export const throwErrorIfPhoneNumberNotValid = ({
   signatoryKey: keyof Signatories;
   signatoryRole: SignatoryRole;
 }) => {
-  if (!convention.signatories[signatoryKey]) {
-    throw new Error();
-  }
+  if (!convention.signatories[signatoryKey])
+    throw errors.convention.missingActor({
+      conventionId: convention.id,
+      role: signatoryRole,
+    });
 
   if (!isValidMobilePhone(convention.signatories[signatoryKey]?.phone))
     throw errors.convention.invalidMobilePhoneNumber({

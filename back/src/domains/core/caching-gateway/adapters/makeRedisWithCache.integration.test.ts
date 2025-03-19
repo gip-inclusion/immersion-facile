@@ -1,12 +1,13 @@
 import type { RedisClientType } from "redis";
-import { expectPromiseToFailWithError, expectToEqual } from "shared";
+import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { getTestRedisClient, makeRedisWithCache } from "./makeRedisWithCache";
 
 describe("createRedisWithCache implementation", () => {
   const calls: string[] = [];
   const someCallToAPartner = async (query: string) => {
     calls.push(query);
-    if (query === "throw") throw new Error("Throwing as requested");
+    if (query === "throw")
+      throw errors.generic.testError("Throwing as requested");
     return {
       value: `value is : ${query}`,
     };
@@ -54,13 +55,13 @@ describe("createRedisWithCache implementation", () => {
 
     await expectPromiseToFailWithError(
       cachedCallToPartner(query),
-      new Error("Throwing as requested"),
+      errors.generic.testError("Throwing as requested"),
     );
     expect(calls).toEqual([query]);
 
     await expectPromiseToFailWithError(
       cachedCallToPartner(query),
-      new Error("Throwing as requested"),
+      errors.generic.testError("Throwing as requested"),
     );
     expect(calls).toEqual([query, query]);
   });

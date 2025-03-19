@@ -19,7 +19,7 @@ export class InMemoryConventionRepository implements ConventionRepository {
   }
 
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<number> {
-    throw new Error("not implemented");
+    throw errors.generic.fakeError("not implemented");
   }
 
   public async getIdsValidatedByEndDateAround(

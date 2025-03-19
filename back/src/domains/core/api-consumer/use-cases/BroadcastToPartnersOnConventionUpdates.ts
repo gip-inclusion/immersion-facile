@@ -144,9 +144,10 @@ export class BroadcastToPartnersOnConventionUpdates extends TransactionalUseCase
         );
 
       if (!conventionUpdatedCallbackParams) {
-        throw new Error(
-          `No callback params found for convention.updated : apiConsumer : ${apiConsumer.id} | convention : ${conventionRead.id}`,
-        );
+        throw errors.apiConsumer.missingCallbackParams({
+          conventionId: conventionRead.id,
+          consumerId: apiConsumer.id,
+        });
       }
 
       const convention = {

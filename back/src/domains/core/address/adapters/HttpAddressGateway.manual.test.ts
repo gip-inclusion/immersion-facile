@@ -422,7 +422,7 @@ describe("HttpOpenCageDataAddressGateway", () => {
         httpAddressGateway.lookupStreetAddress(
           "a A d S E a a a a a a a a a a a a a a",
         ),
-        new Error("Request failed with status code 400"),
+        errors.generic.testError("Request failed with status code 400"),
       );
     });
 

@@ -1,5 +1,10 @@
 import { prop } from "ramda";
-import type { DateString, TemplatedEmail, TemplatedSms } from "shared";
+import {
+  type DateString,
+  type TemplatedEmail,
+  type TemplatedSms,
+  errors,
+} from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
@@ -24,7 +29,8 @@ export class InMemoryNotificationGateway implements NotificationGateway {
 
   public async getAttachmentContent(link: string): Promise<Base64 | null> {
     const attachment = this.attachmentsByLinks[link];
-    if (!attachment) throw new Error(`No attachment found by link ${link}.`);
+    if (!attachment)
+      throw errors.generic.fakeError(`No attachment found by link ${link}.`);
     if (attachment === "not-a-blob") return null;
     return attachment;
   }
@@ -44,7 +50,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
 
   public async sendSms(sms: TemplatedSms): Promise<void> {
     if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`)
-      throw new Error(
+      throw errors.generic.fakeError(
         `Send SMS Error with phone number ${sms.recipientPhone}.`,
       );
     this.#sentSms.push(sms);

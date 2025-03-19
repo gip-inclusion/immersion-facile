@@ -6,7 +6,7 @@ import type {
 
 export type ConventionAndFtExternalIds = {
   conventionId: ConventionId;
-  peExternalId: FtExternalId;
+  ftExternalId: FtExternalId;
 };
 
 export interface ConventionFranceTravailAdvisorRepository {

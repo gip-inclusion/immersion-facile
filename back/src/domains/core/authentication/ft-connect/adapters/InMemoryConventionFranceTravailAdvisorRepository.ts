@@ -15,10 +15,10 @@ export class InMemoryConventionFranceTravailAdvisorRepository
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
-    peExternalId: FtExternalId,
+    userFtExternalId: FtExternalId,
   ): Promise<ConventionAndFtExternalIds> {
     const entity: ConventionFtUserAdvisorEntity =
-      await this.#getAlreadyOpenIfExist(peExternalId);
+      await this.#getAlreadyOpenIfExist(userFtExternalId);
     this.#upsertWithClosedConvention(entity, {
       ...entity,
       conventionId,
@@ -26,7 +26,7 @@ export class InMemoryConventionFranceTravailAdvisorRepository
 
     return {
       conventionId,
-      peExternalId,
+      ftExternalId: userFtExternalId,
     };
   }
 

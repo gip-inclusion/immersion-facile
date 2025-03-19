@@ -6,7 +6,6 @@ import {
   agencyRoutes,
   errors,
 } from "shared";
-import { BadRequestError } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -29,14 +28,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (req.params.dashboardName === "agency" && !req.query.agencyId)
-          throw new BadRequestError(
-            "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
-          );
+          throw errors.agency.missingParamAgencyId();
+
         const useCaseParams: GetDashboardParams = {
           name: req.params.dashboardName as any,
           ...(req.query.agencyId ? req.query : {}),
         };
-
         return deps.useCases.getDashboard.execute(useCaseParams);
       }),
   );

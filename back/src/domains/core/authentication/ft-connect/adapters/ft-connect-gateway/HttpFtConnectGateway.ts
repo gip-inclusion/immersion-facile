@@ -1,6 +1,6 @@
 import axios from "axios";
 import Bottleneck from "bottleneck";
-import { HTTP_STATUS, queryParamsAsString } from "shared";
+import { HTTP_STATUS, errors, queryParamsAsString } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
@@ -322,7 +322,7 @@ const manageFtConnectError = (
   if (!(error instanceof Error))
     throw new UnhandledError(
       `Is not an error: ${JSON.stringify(error)}`,
-      new Error("Not an error class"),
+      errors.generic.notAnError(),
     );
   if (axios.isAxiosError(error)) {
     logger.error({

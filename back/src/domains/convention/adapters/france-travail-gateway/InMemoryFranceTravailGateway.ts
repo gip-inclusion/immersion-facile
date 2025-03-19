@@ -1,3 +1,4 @@
+import { errors } from "shared";
 import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import type {
   FranceTravailBroadcastResponse,
@@ -24,7 +25,7 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
     convention: FranceTravailConvention,
   ): Promise<FranceTravailBroadcastResponse> {
     if (convention.statut === "DEMANDE_OBSOLETE") {
-      throw new Error("fake axios error");
+      throw errors.generic.fakeError("fake axios error");
     }
     this.notifications.push(convention);
     return this.#nextResponse;
