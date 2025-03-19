@@ -1,0 +1,8 @@
+{
+  "jobs": [
+    {
+      "command": "30 5 * * * ./run_dbt.sh run",
+      "size": "L"
+    }
+  ]
+}

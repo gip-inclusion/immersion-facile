@@ -1,0 +1,23 @@
+name: "Deploy DBT app to nightly"
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        type: string
+        required: true
+
+jobs:
+  deploy-dbt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create DBT bundle
+        run: cd bi && ./build.sh
+
+      - name: Login to Scalingo
+        run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
+
+      - name: Deploy DBT
+        run: scalingo --app if-prod-nightly-db --region osc-secnum-fr1 deploy dbt-bundle.tar.gz ${{ inputs.tag }}
