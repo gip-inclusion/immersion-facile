@@ -1,6 +1,10 @@
 import axios, { type AxiosInstance } from "axios";
 import { Pool } from "pg";
-import { exhaustiveCheck, immersionFacileNoReplyEmailSender } from "shared";
+import {
+  errors,
+  exhaustiveCheck,
+  immersionFacileNoReplyEmailSender,
+} from "shared";
 import type { UnknownSharedRoute } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
@@ -91,10 +95,8 @@ export const createGetPgPoolFn = (config: AppConfig): GetPgPoolFn => {
   let pgPool: Pool;
   return () => {
     if (config.repositories !== "PG" && config.romeRepository !== "PG")
-      throw new Error(
-        `Unexpected pg pool creation: REPOSITORIES=${config.repositories},
-         ROME_GATEWAY=${config.romeRepository}`,
-      );
+      throw errors.config.badConfig(`Unexpected pg pool creation: REPOSITORIES=${config.repositories},
+       ROME_GATEWAY=${config.romeRepository}`);
     if (!pgPool) {
       const { host, pathname } = new URL(config.pgImmersionDbUrl);
       logger.info({

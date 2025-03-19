@@ -7,6 +7,7 @@ import {
   type PayloadKey,
   castError,
   currentJwtVersions,
+  errors,
   expiredMagicLinkErrorMessage,
 } from "shared";
 import type { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
@@ -139,7 +140,7 @@ export const verifyJwtConfig = <K extends JwtKind>(config: AppConfig) => {
   const verifyDeprecatedJwt = config.previousJwtPublicKey
     ? makeVerifyJwtES256<K>(config.previousJwtPublicKey)
     : () => {
-        throw new Error("No deprecated JWT private key provided");
+        throw errors.user.missingPreviousJwtPublicKey();
       };
 
   return { verifyJwt, verifyDeprecatedJwt };

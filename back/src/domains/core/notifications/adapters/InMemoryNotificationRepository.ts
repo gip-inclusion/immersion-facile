@@ -13,6 +13,7 @@ import {
   type TemplatedEmail,
   concatValidatorNames,
   displayEmergencyContactInfos,
+  errors,
   expectToEqual,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -57,7 +58,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
   }
 
   public deleteAllEmailAttachements(): Promise<number> {
-    throw new Error("Not implemented");
+    throw errors.generic.fakeError("Not implemented");
   }
 
   public async getByIdAndKind(

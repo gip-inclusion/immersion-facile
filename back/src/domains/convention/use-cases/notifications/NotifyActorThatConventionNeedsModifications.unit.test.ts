@@ -8,6 +8,7 @@ import {
   type ModifierRole,
   type Role,
   type ShortLinkId,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
@@ -270,9 +271,10 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
           requesterRole,
           modifierRole,
         }),
-        new Error(
-          `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryCurrentEmployer.id}`,
-        ),
+        errors.convention.missingActor({
+          conventionId: conventionWithoutBeneficiaryCurrentEmployer.id,
+          role: modifierRole,
+        }),
       );
     });
 
@@ -290,9 +292,10 @@ describe("NotifyActorThatConventionNeedsModifications", () => {
           requesterRole,
           modifierRole,
         }),
-        new Error(
-          `No actor with role ${modifierRole} for convention ${conventionWithoutBeneficiaryRepresentative.id}`,
-        ),
+        errors.convention.missingActor({
+          conventionId: conventionWithoutBeneficiaryRepresentative.id,
+          role: modifierRole,
+        }),
       );
     });
   });

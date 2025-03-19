@@ -61,7 +61,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
   public async update(agency: PartialAgencyDto) {
     const agencyToUdpate = this.#agencies[agency.id];
     if (!agencyToUdpate) {
-      throw new Error(`Agency ${agency.id} does not exist`);
+      throw errors.agency.notFound({ agencyId: agency.id });
     }
     this.#agencies[agency.id] = { ...agencyToUdpate, ...agency };
   }

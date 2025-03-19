@@ -408,7 +408,7 @@ const makeTestAcceptsStatusUpdate =
 
     if (expectedDomainTopic === "ConventionRequiresModification") {
       if (updateStatusParams.status !== "DRAFT")
-        throw new Error(
+        throw errors.generic.testError(
           `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
         );
       const roles = defineRolesForTest(
@@ -417,7 +417,7 @@ const makeTestAcceptsStatusUpdate =
       );
 
       if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
-        throw new Error(
+        throw errors.generic.testError(
           `Roles '${roles}' not supported according to ${JSON.stringify(
             testAcceptNewStatusParams,
           )}`,
@@ -712,7 +712,7 @@ const defineRolesForTest = (
     )?.usersRights[testAcceptNewStatusParams.userId]?.roles ?? [];
 
   if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
-    throw new Error(
+    throw errors.generic.testError(
       `Roles '${roles}' not supported according to ${JSON.stringify(
         testAcceptNewStatusParams,
       )}`,

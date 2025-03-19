@@ -399,7 +399,7 @@ const makeBroadcastFeedback = async (params: {
           : "https://www.google.com/yolo?hl=fr&tab=ww",
       )
       .then(() => {
-        throw new Error("Should not occurs");
+        throw errors.generic.testError("Should not occurs");
       })
       .catch((error) => {
         if (isAxiosError(error)) return error;
@@ -414,7 +414,7 @@ const makeBroadcastFeedback = async (params: {
         message: "Some message",
         error:
           params.errorMode === "not-axios-error"
-            ? new Error("Not axios error")
+            ? errors.generic.testError("Not axios error")
             : error,
       },
       requestParams: { conventionId: params.conventionId },

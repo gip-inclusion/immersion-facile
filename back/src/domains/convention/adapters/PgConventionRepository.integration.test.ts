@@ -1103,7 +1103,7 @@ describe("PgConventionRepository", () => {
     expectedBeneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
   ) => {
     const convention = await conventionRepository.getById(conventionId);
-    if (!convention) throw new Error("No result");
+    if (!convention) throw errors.generic.testError("No result");
     expectToEqual(
       convention.signatories.beneficiaryCurrentEmployer,
       expectedBeneficiaryCurrentEmployer,
@@ -1119,7 +1119,7 @@ describe("PgConventionRepository", () => {
 
   const expectTutorAndRepToHaveSameId = async (conventionId: ConventionId) => {
     const result = await tutorIdAndRepIdFromConventionId(conventionId);
-    if (!result) throw new Error("No result");
+    if (!result) throw errors.generic.testError("No result");
     expectToEqual(
       result.establishment_representative_id,
       result.establishment_tutor_id,
@@ -1130,7 +1130,7 @@ describe("PgConventionRepository", () => {
     conventionId: ConventionId,
   ) => {
     const result = await tutorIdAndRepIdFromConventionId(conventionId);
-    if (!result) throw new Error("No result");
+    if (!result) throw errors.generic.testError("No result");
     expect(
       result.establishment_representative_id !== result.establishment_tutor_id,
     ).toBe(true);

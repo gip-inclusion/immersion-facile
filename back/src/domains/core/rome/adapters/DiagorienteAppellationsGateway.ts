@@ -3,6 +3,7 @@ import {
   type AppellationDto,
   appellationCodeSchema,
   cancellableSleep,
+  errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { partnerNames } from "../../../../config/bootstrap/partnerNames";
@@ -124,11 +125,9 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
             },
           })
           .then(({ status, body }) => {
-            if (status !== 200) {
-              throw new Error(
-                `Unexpected status code ${status} for getAccessToken, calling Diagoriente API`,
-              );
-            }
+            if (status !== 200)
+              throw errors.generic.unsupportedStatus({ body, status });
+
             return body;
           }),
       ),

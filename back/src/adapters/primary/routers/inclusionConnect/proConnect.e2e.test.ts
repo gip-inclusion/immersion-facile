@@ -5,6 +5,7 @@ import {
   allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   displayRouteName,
+  errors,
   expectHttpResponseToEqual,
   frontRoutes,
   inclusionConnectImmersionRoutes,
@@ -118,7 +119,8 @@ describe("proConnect flow", () => {
           status: 302,
         });
 
-        if (response.status !== 302) throw new Error("Response must be 302");
+        if (response.status !== 302)
+          throw errors.generic.testError("Response must be 302");
         const locationHeader = response.headers.location as string;
         const locationPrefix = `${appConfig.immersionFacileBaseUrl}/${frontRoutes[page]}?token=`;
 

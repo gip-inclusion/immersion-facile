@@ -4,6 +4,7 @@ import {
   type CreateConventionMagicLinkPayloadProperties,
   type Role,
   type TemplatedEmail,
+  errors,
   frontRoutes,
 } from "shared";
 import { P, match } from "ts-pattern";
@@ -41,11 +42,8 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
     const agency = await uow.agencyRepository.getById(
       payload.convention.agencyId,
     );
-    if (!agency) {
-      throw new Error(
-        `Unable to send mail. No agency config found for ${payload.convention.agencyId}`,
-      );
-    }
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: payload.convention.agencyId });
 
     const recipientOrError = recipientByModifierRole(payload);
     if (recipientOrError instanceof Error) throw recipientOrError;
@@ -134,7 +132,6 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
 const recipientByModifierRole = (
   payload: ConventionRequiresModificationPayload,
 ): string | Error => {
-  const missingActorConventionErrorMessage = `No actor with role ${payload.modifierRole} for convention ${payload.convention.id}`;
   const strategy = match(payload)
     .with(
       { modifierRole: "beneficiary" },
@@ -154,7 +151,10 @@ const recipientByModifierRole = (
       ({ beneficiaryCurrentEmployer }) =>
         beneficiaryCurrentEmployer
           ? beneficiaryCurrentEmployer.email
-          : new Error(missingActorConventionErrorMessage),
+          : errors.convention.missingActor({
+              conventionId: payload.convention.id,
+              role: payload.modifierRole,
+            }),
     )
     .with(
       {
@@ -166,7 +166,10 @@ const recipientByModifierRole = (
       ({ beneficiaryRepresentative }) =>
         beneficiaryRepresentative
           ? beneficiaryRepresentative.email
-          : new Error(missingActorConventionErrorMessage),
+          : errors.convention.missingActor({
+              conventionId: payload.convention.id,
+              role: payload.modifierRole,
+            }),
     )
     .with(
       { modifierRole: P.union("counsellor", "validator") },
@@ -182,7 +185,6 @@ const requesterNameByRole = (
   convention: ConventionDto,
   agency: AgencyDto,
 ): string | Error => {
-  const wrongRequesterUser = `Actor with role ${requesterRole} is not allowed to request a modification`;
   const strategy: Record<Role, string | Error> = {
     "beneficiary-current-employer": `${convention.signatories.beneficiaryCurrentEmployer?.firstName} ${convention.signatories.beneficiaryCurrentEmployer?.lastName} (l'employeur actuel du bénéficiaire)`,
     "beneficiary-representative": `${convention.signatories.beneficiaryRepresentative?.firstName} ${convention.signatories.beneficiaryRepresentative?.lastName} (le représentant légal du bénéficiaire)`,
@@ -192,9 +194,10 @@ const requesterNameByRole = (
     validator: agency.name,
     "back-office": "L'équipe Immersion Facilitée",
     "agency-admin": "Le responsable d'agence",
-    "establishment-tutor": new Error(wrongRequesterUser),
-    "agency-viewer": new Error(wrongRequesterUser),
-    "to-review": new Error(wrongRequesterUser),
+    "establishment-tutor":
+      errors.convention.forbiddenModification(requesterRole),
+    "agency-viewer": errors.convention.forbiddenModification(requesterRole),
+    "to-review": errors.convention.forbiddenModification(requesterRole),
   };
   return strategy[requesterRole];
 };

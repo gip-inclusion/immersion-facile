@@ -1,6 +1,6 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { expectToEqual } from "shared";
+import { errors, expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   type AccessTokenConfig,
@@ -73,7 +73,7 @@ describe("HttpFranceTravailGateway", () => {
       );
 
       if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
-        throw new Error("Should not occurs");
+        throw errors.generic.testError("Should not occurs");
 
       const { status, subscriberErrorFeedback } = response;
       expectToEqual(status, expected.status);
@@ -128,7 +128,7 @@ describe("HttpFranceTravailGateway", () => {
       );
 
       if (!isBroadcastResponseOk(expected))
-        throw new Error("Should not occurs");
+        throw errors.generic.testError("Should not occurs");
       expectToEqual(response, expected);
     },
   );
@@ -178,7 +178,7 @@ describe("HttpFranceTravailGateway", () => {
       await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
 
     if (isBroadcastResponseOk(response))
-      throw new Error("PE broadcast OK must not occurs");
+      throw errors.generic.testError("PE broadcast OK must not occurs");
 
     const { status, subscriberErrorFeedback } = response;
     expectToEqual(status, 500);
@@ -231,7 +231,7 @@ describe("HttpFranceTravailGateway", () => {
       await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
 
     if (isBroadcastResponseOk(response))
-      throw new Error("PE broadcast OK must not occurs");
+      throw errors.generic.testError("PE broadcast OK must not occurs");
 
     const { status, subscriberErrorFeedback } = response;
     expectToEqual(status, 500);

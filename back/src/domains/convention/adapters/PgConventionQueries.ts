@@ -12,6 +12,7 @@ import {
   type SiretDto,
   conventionReadSchema,
   conventionSchema,
+  errors,
   pipeWithValue,
   validatedConventionStatuses,
 } from "shared";
@@ -224,7 +225,7 @@ export class PgConventionQueries implements ConventionQueries {
     return conventions.map((pgResult) => {
       const agencyFields = agencyFieldsByAgencyIds[pgResult.dto.agencyId];
       if (!agencyFields)
-        throw new Error(`Agency ${pgResult.dto.agencyId} not found`);
+        throw errors.agency.notFound({ agencyId: pgResult.dto.agencyId });
 
       return validateAndParseZodSchemaV2(
         conventionReadSchema,
