@@ -14,6 +14,7 @@ import type {
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
+  TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
   WithConventionId,
 } from "shared";
@@ -69,5 +70,9 @@ export interface ConventionGateway {
   broadcastConventionAgain$(
     params: WithConventionId,
     jwt: ConnectedUserJwt,
+  ): Observable<void>;
+  transferConventionToAgency$(
+    params: TransferConventionToAgencyRequestDto,
+    jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }

@@ -13,6 +13,7 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
+import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -40,6 +41,7 @@ const topics = [
   "agency-for-dashboard",
   "assessment",
   "send-signature-link",
+  "transfer-convention-to-agency",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -412,6 +414,22 @@ export const feedbackMapping: Record<
       action: assessmentSlice.actions.getAssessmentFailed,
       title: "Problème lors de la récupération du bilan",
       message: "Un problème est survenu lors de la récupération du bilan",
+    },
+  },
+  "transfer-convention-to-agency": {
+    "create.success": {
+      action:
+        transferConventionToAgencySlice.actions
+          .transferConventionToAgencySucceeded,
+      title: "La convention a bien été transférée",
+      message: "La convention a bien été transférée au nouvel organisme",
+    },
+    "create.error": {
+      action:
+        transferConventionToAgencySlice.actions
+          .transferConventionToAgencyFailed,
+      title: "Problème lors du transfert de la convention",
+      message: "Une erreur est survenue lors du transfert de la convention",
     },
   },
 };
