@@ -1,6 +1,7 @@
-import { toPairs } from "ramda";
+import { filter, map, toPairs, union, uniq } from "ramda";
 import {
   type AgencyDto,
+  type AgencyId,
   type AgencyRight,
   type AgencyRole,
   type AgencyUsersRights,
@@ -8,8 +9,10 @@ import {
   type Email,
   type UserId,
   errors,
+  pipeWithValue,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
+import type { UserOnRepository } from "../domains/core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const toAgencyWithRights = (
@@ -91,22 +94,21 @@ export const getAgencyRightByUserId = async (
   const agenciesRightsForUser =
     await uow.agencyRepository.getAgenciesRightsByUserId(userId);
 
+  const agenciesWithAdminEmailsById = await getAgencyAndAdminEmailsByAgencyId({
+    uow,
+    agencyIds: agenciesRightsForUser.map((agency) => agency.agencyId),
+  });
+
   return Promise.all(
     agenciesRightsForUser.map<Promise<AgencyRight>>(
       async ({ isNotifiedByEmail, roles, agencyId }) => {
-        const agency = await uow.agencyRepository.getById(agencyId);
-        if (!agency) throw errors.agency.notFound({ agencyId });
+        const agencyWithAdminEmails = agenciesWithAdminEmailsById[agencyId];
+        if (!agencyWithAdminEmails) throw errors.agency.notFound({ agencyId });
+        const { agency, adminEmails } = agencyWithAdminEmails;
         return {
           isNotifiedByEmail,
           roles,
-          agency: toAgencyDtoForAgencyUsersAndAdmins(
-            agency,
-            await getAgencyEmailsByRole({
-              agency,
-              role: "agency-admin",
-              uow,
-            }),
-          ),
+          agency: toAgencyDtoForAgencyUsersAndAdmins(agency, adminEmails),
         };
       },
     ),
@@ -135,19 +137,43 @@ export const updateRightsOnMultipleAgenciesForUser = async (
   );
 };
 
-export const getAgencyEmailsByRole = async ({
-  agency,
-  role,
+export const getAgencyAndAdminEmailsByAgencyId = async ({
   uow,
-}: {
-  agency: AgencyWithUsersRights;
-  role: AgencyRole;
-  uow: UnitOfWork;
-}): Promise<Email[]> => {
-  const adminUserIds = toPairs(agency.usersRights)
-    .filter(([_, rights]) => rights?.roles.includes(role))
-    .map(([id]) => id);
+  agencyIds,
+}: { uow: UnitOfWork; agencyIds: AgencyId[] }): Promise<
+  Record<AgencyId, { agency: AgencyWithUsersRights; adminEmails: Email[] }>
+> => {
+  const agencies = await uow.agencyRepository.getByIds(agencyIds);
 
-  const users = await uow.userRepository.getByIds(adminUserIds);
-  return users.map((user) => user.email);
+  const agencyAdminUserIds = agencies.flatMap((agency) =>
+    pipeWithValue(
+      agency.usersRights,
+      toPairs,
+      filter(([_, rights]) => rights?.roles.includes("agency-admin")),
+      map(([id]) => id),
+      uniq,
+    ),
+  );
+
+  const usersWithAgencyAdminRole =
+    await uow.userRepository.getByIds(agencyAdminUserIds);
+
+  const usersWithAdminRoleById = usersWithAgencyAdminRole.reduce<
+    Record<UserId, UserOnRepository>
+  >((acc, user) => {
+    acc[user.id] = user;
+    return acc;
+  }, {});
+
+  return agencies.reduce<
+    Record<AgencyId, { agency: AgencyWithUsersRights; adminEmails: Email[] }>
+  >((acc, agency) => {
+    acc[agency.id] = {
+      agency,
+      adminEmails: toPairs(agency.usersRights)
+        .filter(([_, rights]) => rights?.roles.includes("agency-admin"))
+        .map(([userId]) => usersWithAdminRoleById[userId].email),
+    };
+    return acc;
+  }, {});
 };
