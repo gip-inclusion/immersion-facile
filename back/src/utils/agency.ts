@@ -11,9 +11,9 @@ import {
   pipeWithValue,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
+import type { AgencyRepository } from "../domains/agency/ports/AgencyRepository";
 import type { UserOnRepository } from "../domains/core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
-import type { AgencyRepository } from "../domains/agency/ports/AgencyRepository";
 
 export const toAgencyWithRights = (
   { counsellorEmails, validatorEmails, ...rest }: AgencyDto,
@@ -178,10 +178,11 @@ export const getAgencyAndAdminEmailsByAgencyId = async ({
   }, {});
 };
 
-export const throwErrorIfAgencyNotFound = async ({ agencyId, agencyRepository }: { agencyId: string, agencyRepository: AgencyRepository }) => {
-  const agency = await agencyRepository.getById(
-    agencyId,
-  );
+export const throwErrorIfAgencyNotFound = async ({
+  agencyId,
+  agencyRepository,
+}: { agencyId: string; agencyRepository: AgencyRepository }) => {
+  const agency = await agencyRepository.getById(agencyId);
 
   if (!agency) {
     throw errors.agency.notFound({
