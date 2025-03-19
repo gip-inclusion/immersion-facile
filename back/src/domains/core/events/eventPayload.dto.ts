@@ -36,7 +36,8 @@ export type ConventionReminderPayload = {
   conventionId: ConventionId;
 };
 
-export type TransferConventionToAgencyPayload = WithConventionDto & WithAgencyId & {
-  justification: string;
-  previousAgencyId: AgencyId;
-};
+export type TransferConventionToAgencyPayload = WithConventionDto &
+  WithAgencyId & {
+    justification: string;
+    previousAgencyId: AgencyId;
+  };
