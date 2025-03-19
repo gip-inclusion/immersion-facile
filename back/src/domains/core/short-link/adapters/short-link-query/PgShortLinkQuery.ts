@@ -3,6 +3,7 @@ import {
   type ShortLinkId,
   absoluteUrlSchema,
   castError,
+  errors,
 } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
@@ -21,8 +22,7 @@ export class PgShortLinkQuery implements ShortLinkQuery {
       .select(["short_link_id", "url"])
       .executeTakeFirst()
       .then((result) => {
-        if (!result)
-          throw new Error(shortLinkIdNotFoundErrorMessage(shortLinkId));
+        if (!result) throw errors.shortLink.notFound({ shortLinkId });
         logger.info({
           message: `PgShortLinkQueryGetByIdSuccess ${result.short_link_id}`,
         });
@@ -37,7 +37,3 @@ export class PgShortLinkQuery implements ShortLinkQuery {
       });
   }
 }
-
-export const shortLinkIdNotFoundErrorMessage = (
-  shortLinkId: ShortLinkId,
-): string => `ShortLinkId '${shortLinkId}' not found.`;

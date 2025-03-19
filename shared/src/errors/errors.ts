@@ -1,6 +1,7 @@
 import type { LocationId } from "../address/address.dto";
 import type { AgencyId, AgencyStatus } from "../agency/agency.dto";
 import type {
+  ApiConsumerId,
   ApiConsumerRightName,
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
@@ -38,6 +39,7 @@ import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellati
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
 import { toDisplayedDate } from "../utils/date";
+import { ManagedFTConnectError } from "./ftConnectErrors";
 import {
   BadRequestError,
   ConflictError,
@@ -49,11 +51,79 @@ import {
 } from "./httpErrors";
 
 export const errors = {
+  pdfGenerator: {
+    makeFailed: ({
+      body,
+      conventionId,
+      requestId,
+      status,
+    }: {
+      requestId: string;
+      conventionId: ConventionId;
+      status: number;
+      body: any;
+    }) =>
+      new Error(
+        `[requestId : ${requestId}, conventionId : ${conventionId}] Pdf generation failed with status ${status} - ${body}`,
+      ),
+  },
+  event: {
+    saveNewPublicationFailed: (eventId: string) =>
+      new Error(`saveNewPublication of event ${eventId} failed`),
+    subscriptionFailed: ({
+      subscriptionId,
+      error,
+      errorMessage,
+      eventId,
+      eventTopic,
+    }: {
+      eventId: string; // Domain event on back only
+      eventTopic: string;
+      subscriptionId: string;
+      errorMessage: string;
+      error: any;
+    }) =>
+      new Error(
+        [
+          `Could not process event with id : ${eventId}.`,
+          `Subscription ${subscriptionId} failed on topic ${eventTopic}.`,
+          `Error was : ${errorMessage}`,
+        ].join("\n"),
+        { cause: error },
+      ),
+  },
+  config: {
+    badConfig: (message: string) => new Error(message),
+  },
+  ftConnect: {
+    noAuth: () => new ManagedFTConnectError("peConnectNoAuthorisation"),
+    associationFailed: ({
+      conventionId,
+      ftExternalId,
+      rowCount,
+    }: {
+      rowCount: number;
+      conventionId: ConventionId;
+      ftExternalId: FtExternalId;
+    }) =>
+      new Error(
+        `Association between Convention and userAdvisor failed. rowCount: ${rowCount}, conventionId: ${conventionId}, peExternalId: ${ftExternalId}`,
+      ),
+  },
   generic: {
     schemaValidation: (issues: string[]) =>
       new BadRequestError(
         "Schema validation failed. See issues for details.",
         issues,
+      ),
+    notAnError: () => new Error("Not an error class"),
+    testError: (message: string) => new Error(message),
+    fakeError: (message: string) => new Error(message),
+    unsupportedStatus: ({ body, status }: { status: number; body: any }) =>
+      new Error(
+        `Unsupported response status ${
+          status
+        } with body '${JSON.stringify(body)}'`,
       ),
   },
   file: {
@@ -136,6 +206,10 @@ export const errors = {
     forbiddenStatus: ({ status }: { status: ConventionStatus }) =>
       new ForbiddenError(
         `Impossible de créer une convention avec le statut "${status}"`,
+      ),
+    forbiddenModification: (requesterRole: Role) =>
+      new ForbiddenError(
+        `Actor with role ${requesterRole} is not allowed to request a modification`,
       ),
     forbiddenMissingRights: ({
       conventionId,
@@ -431,6 +505,10 @@ export const errors = {
       `Le refersToAgencyId de l'agence '${agencyWithRefersToId}' ne correspond pas avec l'agence '${referedAgencyId}' à laquelle elle est référencée.`,
   },
   agency: {
+    missingParamAgencyId: () =>
+      new BadRequestError(
+        "You need to provide agency Id in query params : http://.../agency?agencyId=your-id",
+      ),
     alreadyExist: (agencyId: AgencyId) =>
       new ConflictError(`L'agence avec id '${agencyId}' existe déjà.`),
     notFound: ({ agencyId }: { agencyId: AgencyId }) =>
@@ -583,6 +661,8 @@ export const errors = {
       new ForbiddenError(
         "Vous n'avez pas les droits nécessaires pour modifier ces rôles.",
       ),
+    missingPreviousJwtPublicKey: () =>
+      new Error("No deprecated JWT private key provided"),
     notEnoughRightOnAgency: ({
       userId,
       agencyId,
@@ -674,6 +754,13 @@ export const errors = {
     missingRights: ({ rightName }: { rightName: ApiConsumerRightName }) =>
       new ForbiddenError(
         `You do not have the "SUBSCRIPTION" kind associated to the "${rightName}" right.`,
+      ),
+    missingCallbackParams: ({
+      consumerId,
+      conventionId,
+    }: { consumerId: ApiConsumerId; conventionId: ConventionId }) =>
+      new NotFoundError(
+        `No callback params found for convention.updated : apiConsumer : ${consumerId} | convention : ${conventionId}`,
       ),
     missing: ({ id }: { id: ApiConsumerSubscriptionId }) =>
       new NotFoundError(`subscription ${id} not found`),

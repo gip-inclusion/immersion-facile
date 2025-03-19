@@ -1,8 +1,9 @@
-import type {
-  AddressAndPosition,
-  AddressDto,
-  GeoPositionDto,
-  LookupSearchResult,
+import {
+  type AddressAndPosition,
+  type AddressDto,
+  type GeoPositionDto,
+  type LookupSearchResult,
+  errors,
 } from "shared";
 import type { AddressGateway } from "../ports/AddressGateway";
 
@@ -16,7 +17,8 @@ export class InMemoryAddressGateway implements AddressGateway {
   public async getAddressFromPosition(
     position: GeoPositionDto,
   ): Promise<AddressDto | undefined> {
-    if (position.lat === 1111 && position.lon === 1111) throw new Error();
+    if (position.lat === 1111 && position.lon === 1111)
+      throw errors.generic.fakeError("getAddressFromPosition fake error");
     return this.#address;
   }
 
@@ -32,7 +34,9 @@ export class InMemoryAddressGateway implements AddressGateway {
     const nextLookupStreetAndAddresses =
       this.#nextLookupStreetAndAddresses.shift();
     if (!nextLookupStreetAndAddresses)
-      throw new Error("No nextLookupStreetAndAddresses provided.");
+      throw errors.generic.fakeError(
+        "No nextLookupStreetAndAddresses provided.",
+      );
     return nextLookupStreetAndAddresses;
   }
 

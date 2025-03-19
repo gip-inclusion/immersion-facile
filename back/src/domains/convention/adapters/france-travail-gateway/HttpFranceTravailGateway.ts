@@ -2,7 +2,7 @@ import querystring from "node:querystring";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
 import { secondsToMilliseconds } from "date-fns";
-import { type AbsoluteUrl, castError } from "shared";
+import { type AbsoluteUrl, castError, errors } from "shared";
 import type { HttpClient } from "shared-routes";
 import type {
   AccessTokenConfig,
@@ -159,11 +159,10 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
             body: response.body,
           };
 
-        throw new Error(
-          `Unsupported response status ${
-            response.status
-          } with body '${JSON.stringify(response.body)}'`,
-        );
+        throw errors.generic.unsupportedStatus({
+          body: response.body,
+          status: response.status,
+        });
       })
       .catch((err): FranceTravailBroadcastResponse => {
         const error = castError(err);

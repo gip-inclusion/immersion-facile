@@ -1,4 +1,5 @@
 import Bottleneck from "bottleneck";
+import { response } from "express";
 import {
   type GenerateHtmlOptions,
   configureGenerateHtmlFromTemplate,
@@ -81,13 +82,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
       },
     });
     if (response.status !== 200)
-      throw new Error(
-        `Unexpected status code ${response.status}. Body: ${JSON.stringify(
-          response.body,
-          null,
-          2,
-        )}`,
-      );
+      throw errors.generic.unsupportedStatus({
+        body: JSON.stringify(response.body, null, 2),
+        status: response.status,
+      });
     if (!(response.body instanceof Blob)) {
       return null;
     }
@@ -163,11 +161,11 @@ export class BrevoNotificationGateway implements NotificationGateway {
         headers: this.#brevoHeaders,
         body,
       });
-      if (response.status !== 201) {
-        throw new Error(
-          `Unexpected status code ${response.status}, when sending email to Brevo. You can view details on datadog.`,
-        );
-      }
+      if (response.status !== 201)
+        throw errors.generic.unsupportedStatus({
+          body: response.body,
+          status: response.status,
+        });
       return response;
     });
   }
@@ -178,11 +176,11 @@ export class BrevoNotificationGateway implements NotificationGateway {
         headers: this.#brevoHeaders,
         body,
       });
-      if (response.status !== 201) {
-        throw new Error(
-          `Unexpected status code ${response.status}, when sending SMS to Brevo. You can view details on datadog.`,
-        );
-      }
+      if (response.status !== 201)
+        throw errors.generic.unsupportedStatus({
+          body: response.body,
+          status: response.status,
+        });
       return response;
     });
   }

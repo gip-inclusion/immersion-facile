@@ -2,6 +2,7 @@ import type { Pool } from "pg";
 import {
   type AbsoluteUrl,
   type ShortLinkId,
+  errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -14,10 +15,7 @@ import {
   deleteShortLinkById,
   insertShortLinkQuery,
 } from "../PgShortLinkHelpers";
-import {
-  PgShortLinkQuery,
-  shortLinkIdNotFoundErrorMessage,
-} from "./PgShortLinkQuery";
+import { PgShortLinkQuery } from "./PgShortLinkQuery";
 
 describe("PgShortLinkQuery", () => {
   let pool: Pool;
@@ -56,7 +54,7 @@ describe("PgShortLinkQuery", () => {
       const shortLinkId: ShortLinkId = "notFoundId";
       await expectPromiseToFailWithError(
         pgShortLinkQuery.getById(shortLinkId),
-        new Error(shortLinkIdNotFoundErrorMessage(shortLinkId)),
+        errors.shortLink.notFound({ shortLinkId }),
       );
     });
   });

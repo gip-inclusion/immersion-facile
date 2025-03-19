@@ -1,4 +1,4 @@
-import type { ShortLinkId } from "shared";
+import { type ShortLinkId, errors } from "shared";
 import type { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
 
 export class DeterministShortLinkIdGeneratorGateway
@@ -13,7 +13,10 @@ export class DeterministShortLinkIdGeneratorGateway
 
   public generate(): ShortLinkId {
     const nextShortLink = this.#nextShortLinkIds.shift();
-    if (nextShortLink) return nextShortLink;
-    throw new Error("No more shortlinkIds available. Please be determinist.");
+    if (!nextShortLink)
+      throw errors.generic.fakeError(
+        "No more shortlinkIds available. Please be determinist.",
+      );
+    return nextShortLink;
   }
 }

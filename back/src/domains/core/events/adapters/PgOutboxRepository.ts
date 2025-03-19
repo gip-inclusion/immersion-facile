@@ -1,5 +1,5 @@
 import { differenceWith, propEq } from "ramda";
-import { type DateString, replaceArrayElement } from "shared";
+import { type DateString, errors, replaceArrayElement } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../utils/logger";
 import type {
@@ -124,8 +124,7 @@ export class PgOutboxRepository implements OutboxRepository {
 
     const publicationId = results.at(0)?.id;
 
-    if (!publicationId)
-      throw new Error(`saveNewPublication of event ${eventId} failed`);
+    if (!publicationId) throw errors.event.saveNewPublicationFailed(eventId);
 
     if (failures.length === 0) return;
 

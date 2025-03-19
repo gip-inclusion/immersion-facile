@@ -3,6 +3,7 @@ import MockAdapter from "axios-mock-adapter";
 import {
   FTConnectError,
   ManagedFTConnectError,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   testManagedFTConnectError,
@@ -104,7 +105,7 @@ describe("HttpFtConnectGateway", () => {
           ftConnectGateway.getAccessToken(""),
           new ManagedFTConnectError(
             "peConnectInvalidGrant",
-            new Error("Request failed with status code 400"),
+            errors.generic.testError("Request failed with status code 400"),
           ),
         );
       });
@@ -113,7 +114,10 @@ describe("HttpFtConnectGateway", () => {
         mock.onPost(routes.exchangeCodeForAccessToken.url).abortRequest();
         await testManagedFTConnectError(
           () => ftConnectGateway.getAccessToken(""),
-          new ManagedFTConnectError("peConnectConnectionAborted", new Error()),
+          new ManagedFTConnectError(
+            "peConnectConnectionAborted",
+            errors.generic.testError(""),
+          ),
         );
       });
     });
@@ -246,7 +250,7 @@ describe("HttpFtConnectGateway", () => {
             ftConnectGateway.getUserAndAdvisors(accessToken),
             new ManagedFTConnectError(
               "peConnectConnectionAborted",
-              new Error("Request aborted"),
+              errors.generic.testError("Request aborted"),
             ),
           );
         });
