@@ -128,26 +128,28 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
       .locator(`#${domElementIds.establishment.create.businessAddresses}-0`)
       .inputValue(),
   ).toContain(establishment.businessAddresses[0].rawAddress.toUpperCase());
+
+  await page.click(
+    `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
+  );
+
+  await fillAutocomplete({
+    page,
+    locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
+    value: "28 rue des mimosas",
+    endpoint: addressRoutes.lookupStreetAddress.url,
+  });
+
   await page.click(
     `#${domElementIds.establishment.create.appellations}-add-option-button`,
   );
+  await page.waitForTimeout(5000);
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.establishment.create.appellations}-0`,
     value: "boulang",
     endpoint: formCompletionRoutes.appellation.url,
   });
-
-  // await page.click(
-  //   `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
-  // );
-
-  // await fillAutocomplete({
-  //   page,
-  //   locator: `#${domElementIds.establishment.create.businessAddresses}-1`,
-  //   value: "28 rue des mimosas",
-  //   endpoint: addressRoutes.lookupStreetAddress.url,
-  // });
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
   await expect(page.url()).toContain(`siret=${establishment.siret}`);

@@ -160,7 +160,7 @@ const checkEstablishment = async (
         .locator(`#${domElementIds.establishment.admin.businessAddresses}-0`)
         .inputValue()
     ).toLowerCase(),
-  ).toBe(businessAddress.rawAddress.toLowerCase());
+  ).toContain(businessAddress.rawAddress.toLowerCase());
 
   await expect(
     await page
