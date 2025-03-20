@@ -123,7 +123,7 @@ export class PgUserRepository implements UserRepository {
   public async getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]> {
     if (filters.emailContains === "") return [];
     const usersInDb = await this.#getUserQueryBuilder()
-      .where("users.email", "ilike", `%${filters.emailContains}%`)
+      .where("users.email", "like", `%${filters.emailContains.toLowerCase()}%`)
       .execute();
     return usersInDb
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))
@@ -141,7 +141,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByEmail(email: Email): Promise<User | undefined> {
     const response = await this.#getUserQueryBuilder()
-      .where("users.email", "ilike", email)
+      .where("users.email", "=", email.toLowerCase())
       .executeTakeFirst();
     return this.#toAuthenticatedUser(response);
   }
