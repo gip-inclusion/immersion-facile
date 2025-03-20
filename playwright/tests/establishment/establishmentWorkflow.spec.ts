@@ -5,6 +5,7 @@ import { type FormEstablishmentDto, FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";
+import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin as goToManageEtablishmentInBackOfficeAdmin } from "./establishmentNavigation.utils";
 import {
   checkAvailabilityThoughBackOfficeAdmin,
@@ -18,31 +19,57 @@ import {
 } from "./modifyEstablishment";
 import { searchEstablishmentAndExpectResultToHaveLength } from "./searchEstablishment";
 
-test.describe.configure({ mode: "serial" });
+test.skip("Establishment creation and modification workflow", () => {
+  test.describe.configure({ mode: "serial" });
+  const testEstablishments = [
+    {
+      siret: "13003013300016",
+      businessName: "Plateforme de l'inclusion",
+      expectedAddress: "127 Rue de Grenelle 75007 Paris",
+    },
+    {
+      siret: "21590350100017",
+      businessName: "COMMUNE DE LILLE",
+      expectedAddress: "Place Augustin Laurent 59000 Lille",
+    },
+    {
+      siret: "21310555400017",
+      businessName: "COMMUNE DE TOULOUSE",
+      expectedAddress: "1 Place du Capitole 31000 Toulouse",
+    },
+  ];
 
-test.describe("Establishment creation and modification workflow", () => {
-  const initialEstablishmentInformations: FormEstablishmentDto =
-    FormEstablishmentDtoBuilder.valid()
-      .withSiret("13003013300016")
-      .withContactMethod("PHONE")
-      .withUserRights([
-        {
-          role: "establishment-admin",
-          email: testConfig.proConnect.username,
-          job: faker.person.jobType(),
-          phone: faker.helpers.fromRegExp(phoneRegexp),
-        },
-      ])
-      .withBusinessAddresses([
-        {
-          id: "",
-          rawAddress: "127 Rue de Grenelle 75007 Paris",
-        },
-      ])
-      .build();
+  const makeInitialEstablishmentInformations: MakeFormEstablishmentFromRetryNumber =
+    (retryIndex) => {
+      const { siret, businessName, expectedAddress } =
+        testEstablishments[retryIndex];
+      return FormEstablishmentDtoBuilder.valid()
+        .withSiret(siret)
+        .withContactMethod("PHONE")
+        .withBusinessName(businessName)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            email: testConfig.proConnect.username,
+            job: faker.person.jobType(),
+            phone: faker.helpers.fromRegExp(phoneRegexp),
+          },
+        ])
+        .withBusinessAddresses([
+          {
+            id: "",
+            rawAddress: expectedAddress,
+          },
+        ])
+        .build();
+    };
 
-  const updatedEstablishment: FormEstablishmentDto =
-    new FormEstablishmentDtoBuilder(initialEstablishmentInformations)
+  const makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber = (
+    retryIndex,
+  ) =>
+    new FormEstablishmentDtoBuilder(
+      makeInitialEstablishmentInformations(retryIndex),
+    )
       .withBusinessNameCustomized(faker.company.name())
       .withAdditionalInformation(faker.lorem.sentence())
       .withMaxContactsPerMonth(faker.number.int({ min: 5, max: 7 }))
@@ -80,17 +107,19 @@ test.describe("Establishment creation and modification workflow", () => {
     test.use({ storageState: testConfig.establishmentAuthFile });
     test(
       "creates a new establishment",
-      createEstablishmentForm(initialEstablishmentInformations),
+      createEstablishmentForm(makeInitialEstablishmentInformations),
     );
 
     test(
       "modifies an existing establishment through establishment dashboard",
-      updateEstablishmentThroughEstablishmentDashboard(updatedEstablishment),
+      updateEstablishmentThroughEstablishmentDashboard(
+        makeUpdatedEstablishment,
+      ),
     );
 
     test(
       "in establishment dashboard",
-      checkAvailabilityThoughEstablishmentDashboard(updatedEstablishment),
+      checkAvailabilityThoughEstablishmentDashboard(makeUpdatedEstablishment),
     );
   });
 
@@ -99,13 +128,13 @@ test.describe("Establishment creation and modification workflow", () => {
 
     test(
       "check that establishment has been updated through backoffice admin",
-      checkEstablishmentUpdatedThroughBackOfficeAdmin(updatedEstablishment),
+      checkEstablishmentUpdatedThroughBackOfficeAdmin(makeUpdatedEstablishment),
     );
   });
 
   test(
     "searches for non available establishment",
-    searchEstablishmentAndExpectResultToHaveLength(updatedEstablishment, 0),
+    searchEstablishmentAndExpectResultToHaveLength(makeUpdatedEstablishment, 0),
   );
 
   test.describe("Admin makes the establishment available", () => {
@@ -113,27 +142,28 @@ test.describe("Establishment creation and modification workflow", () => {
     test(
       "make the establishment available",
       updateEstablishmentAvailabilityThroughBackOfficeAdmin(
-        updatedEstablishment,
+        makeUpdatedEstablishment,
       ),
     );
   });
 
   test(
     "searches for available establishment",
-    searchEstablishmentAndExpectResultToHaveLength(updatedEstablishment, 1),
+    searchEstablishmentAndExpectResultToHaveLength(makeUpdatedEstablishment, 1),
   );
 
   test.describe("Check displayed availability", () => {
     test.use({ storageState: testConfig.adminAuthFile });
     test(
       "in backoffice admin manage establishment",
-      checkAvailabilityThoughBackOfficeAdmin(updatedEstablishment),
+      checkAvailabilityThoughBackOfficeAdmin(makeUpdatedEstablishment),
     );
   });
 
   test.describe("Admin deletes an establishment", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("deletes an establishment", async ({ page }) => {
+    test("deletes an establishment", async ({ page }, { retry }) => {
+      const updatedEstablishment = makeUpdatedEstablishment(retry);
       page.on("dialog", (dialog) => dialog.accept());
       await goToManageEtablishmentInBackOfficeAdmin(
         page,

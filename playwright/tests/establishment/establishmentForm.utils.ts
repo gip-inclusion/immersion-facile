@@ -1,5 +1,9 @@
 import { type Page, expect } from "@playwright/test";
-import { domElementIds } from "shared";
+import { type FormEstablishmentDto, domElementIds } from "shared";
+
+export type MakeFormEstablishmentFromRetryNumber = (
+  retryIndex: number,
+) => FormEstablishmentDto;
 
 export const checkAvailibilityButtons = async (
   page: Page,

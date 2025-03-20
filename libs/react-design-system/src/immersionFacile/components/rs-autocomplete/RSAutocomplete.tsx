@@ -56,11 +56,6 @@ export const RSAutocomplete = <T,>({
       </label>
       <Select
         {...selectProps}
-        onInputChange={(value, actionMeta) => {
-          if (actionMeta.action === "input-change") {
-            selectProps?.onInputChange?.(value, actionMeta);
-          }
-        }}
         classNamePrefix={prefix}
         className={cx(`${prefix}`, hasError ? "im-select--has-error" : "")}
         unstyled

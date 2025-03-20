@@ -15,11 +15,15 @@ import {
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
+import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";
 
 export const updateEstablishmentThroughEstablishmentDashboard =
-  (updatedFormEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
-  async ({ page }) => {
+  (
+    makeUpdatedFormEstablishment: MakeFormEstablishmentFromRetryNumber,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    const updatedFormEstablishment = makeUpdatedFormEstablishment(retry);
     await page.goto("/");
     await goToDashboard(page, "establishment");
     await expect(page.locator(".fr-tabs__list")).toBeVisible();
@@ -37,8 +41,11 @@ export const updateEstablishmentThroughEstablishmentDashboard =
   };
 
 export const updateEstablishmentAvailabilityThroughBackOfficeAdmin =
-  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
-  async ({ page }) => {
+  (
+    makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    const updatedEstablishment = makeUpdatedEstablishment(retry);
     await goToManageEtablishmentBySiretInAdmin(
       page,
       updatedEstablishment.siret,
