@@ -7,8 +7,12 @@ import Styles from "./ButtonWithSubMenu.styles";
 export type ButtonWithSubMenuProps = {
   navItems: (ButtonProps & { id: string })[];
   buttonLabel: string;
-  buttonIconId?: ButtonProps["iconId"];
+  buttonIconId: Exclude<ButtonProps["iconId"], undefined>;
   id?: string;
+  openedTop?: boolean;
+  className?: string;
+  priority?: ButtonProps["priority"];
+  iconPosition?: ButtonProps["iconPosition"];
 };
 
 export const ButtonWithSubMenu = ({
@@ -16,6 +20,10 @@ export const ButtonWithSubMenu = ({
   buttonLabel,
   buttonIconId,
   id,
+  openedTop,
+  className,
+  priority,
+  iconPosition,
 }: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -44,50 +52,43 @@ export const ButtonWithSubMenu = ({
   }, []);
 
   return (
-    <div className={cx(Styles.root)}>
+    <div
+      className={cx(
+        Styles.root,
+        isOpen && Styles.isOpened,
+        openedTop && Styles.openedTop,
+      )}
+    >
       <Button
-        {...({
-          ref: toggleButtonRef,
-          className: cx(fr.cx("fr-m-md-0", "fr-pr-0")),
-          id: buttonId,
-          nativeButtonProps: {
-            "aria-controls": `${buttonId}-submenu`,
-            type: "button",
-          },
-          onClick: () => setIsOpen((isOpen) => !isOpen),
-          priority: "tertiary",
-          ...(buttonIconId && {
-            iconId: buttonIconId,
-            iconPosition: "left" as const,
-          }),
-          children: (
-            <>
-              {buttonLabel}
-              <span
-                className={fr.cx("fr-icon-arrow-down-s-line", "fr-mx-2v")}
-                aria-hidden="true"
-              />
-            </>
-          ),
-        } as ButtonProps)}
-      />
+        ref={toggleButtonRef}
+        className={cx(fr.cx("fr-m-md-0"), className)}
+        id={buttonId}
+        nativeButtonProps={{
+          "aria-controls": `${buttonId}-submenu`,
+          type: "button",
+        }}
+        onClick={() => setIsOpen((isOpen) => !isOpen)}
+        priority={priority ?? "tertiary"}
+        iconId={buttonIconId}
+        iconPosition={iconPosition ?? "left"}
+      >
+        {buttonLabel}
+      </Button>
 
       <div
-        className={cx(
-          fr.cx("fr-menu"),
-          Styles.menu,
-          !isOpen && Styles.menuHidden,
-        )}
+        className={cx(fr.cx("fr-menu"), Styles.menu)}
         id={`${buttonId}-submenu`}
         aria-hidden={!isOpen}
       >
-        <ul className={cx(fr.cx("fr-menu__list", "fr-p-0"), Styles.list)}>
+        <ul
+          className={cx(
+            fr.cx("fr-menu__list", "fr-p-0", "fr-mb-0"),
+            Styles.list,
+          )}
+        >
           {navItems.map((item) => {
             return (
-              <li
-                key={item.id}
-                className={cx(fr.cx("fr-p-0"), Styles.listElement)}
-              >
+              <li key={item.id} className={fr.cx("fr-p-0")}>
                 {item.linkProps ? (
                   <a
                     className={fr.cx("fr-nav__link")}

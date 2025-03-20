@@ -4,6 +4,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import type { routes } from "src/app/routes/routes";
@@ -48,10 +49,12 @@ export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        <ConventionManageContent
-          jwtParams={jwtParams}
-          conventionId={conventionId}
-        />
+        <WithFeedbackReplacer topic="transfer-convention-to-agency">
+          <ConventionManageContent
+            jwtParams={jwtParams}
+            conventionId={conventionId}
+          />
+        </WithFeedbackReplacer>
       </MainWrapper>
     </HeaderFooterLayout>
   );

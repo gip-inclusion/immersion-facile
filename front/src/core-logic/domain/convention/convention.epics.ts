@@ -1,6 +1,7 @@
 import { concatMap, delay, filter, map, switchMap } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -61,7 +62,10 @@ const getConventionEpic: ConventionEpic = (
       (action) =>
         conventionSlice.actions.fetchConventionRequested.match(action) ||
         conventionSlice.actions.signConventionSucceeded.match(action) ||
-        conventionSlice.actions.statusChangeSucceeded.match(action),
+        conventionSlice.actions.statusChangeSucceeded.match(action) ||
+        transferConventionToAgencySlice.actions.transferConventionToAgencySucceeded.match(
+          action,
+        ),
     ),
     switchMap((action) => {
       const params = conventionSlice.actions.statusChangeSucceeded.match(action)
