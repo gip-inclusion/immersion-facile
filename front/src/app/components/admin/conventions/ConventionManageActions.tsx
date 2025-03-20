@@ -6,7 +6,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { addBusinessDays, addDays } from "date-fns";
 import { useState } from "react";
-import { ErrorNotifications } from "react-design-system";
+import { ButtonWithSubMenu, ErrorNotifications } from "react-design-system";
 import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -33,7 +33,11 @@ import {
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
-import { VerificationActionButton } from "src/app/components/forms/convention/VerificationActionButton";
+import {
+  ModalWrapper,
+  getVerificationActionButtonProps,
+  // VerificationActionButton,
+} from "src/app/components/forms/convention/VerificationActionButton";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
@@ -156,47 +160,94 @@ export const ConventionManageActions = ({
         }}
       >
         {isAllowedConventionTransition(convention, "REJECTED", roles) && (
-          <VerificationActionButton
-            disabled={disabled}
-            initialStatus={convention.status}
-            newStatus="REJECTED"
-            convention={convention}
-            onSubmit={createOnSubmitWithFeedbackKind("rejected")}
-            currentSignatoryRoles={requesterRoles}
-            modalTitle={t.verification.rejectConvention}
-          >
-            {t.verification.rejectConvention}
-          </VerificationActionButton>
+          <>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.rejectConvention,
+                modalTitle: t.verification.rejectConvention,
+                verificationAction: "REJECT",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.rejectConvention,
+                modalTitle: t.verification.rejectConvention,
+                verificationAction: "REJECT",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+              }).modalWrapperProps}
+            />
+          </>
         )}
 
         {isAllowedConventionTransition(convention, "DEPRECATED", roles) && (
-          <VerificationActionButton
-            disabled={disabled}
-            initialStatus={convention.status}
-            newStatus="DEPRECATED"
-            onSubmit={createOnSubmitWithFeedbackKind("deprecated")}
-            convention={convention}
-            currentSignatoryRoles={requesterRoles}
-            modalTitle={t.verification.markAsDeprecated}
-          >
-            {t.verification.markAsDeprecated}
-          </VerificationActionButton>
+          <>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.markAsDeprecated,
+                modalTitle: t.verification.markAsDeprecated,
+                verificationAction: "DEPRECATE",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.markAsDeprecated,
+                modalTitle: t.verification.markAsDeprecated,
+                verificationAction: "DEPRECATE",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+              }).modalWrapperProps}
+            />
+          </>
         )}
 
         {isAllowedConventionTransition(convention, "DRAFT", roles) && (
-          <VerificationActionButton
-            disabled={disabled}
-            initialStatus={convention.status}
-            newStatus="DRAFT"
-            onSubmit={createOnSubmitWithFeedbackKind(
-              "modificationAskedFromCounsellorOrValidator",
-            )}
-            convention={convention}
-            currentSignatoryRoles={requesterRoles}
-            modalTitle={t.verification.modifyConventionTitle}
-          >
-            {t.verification.modifyConvention}
-          </VerificationActionButton>
+          <>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.modifyConvention,
+                modalTitle: t.verification.modifyConvention,
+                verificationAction: "REQUEST_EDIT",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind(
+                  "modificationAskedFromCounsellorOrValidator",
+                ),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.modifyConvention,
+                modalTitle: t.verification.modifyConvention,
+                verificationAction: "REQUEST_EDIT",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind(
+                  "modificationAskedFromCounsellorOrValidator",
+                ),
+              }).modalWrapperProps}
+            />
+          </>
         )}
 
         {isAllowedConventionTransition(
@@ -204,26 +255,44 @@ export const ConventionManageActions = ({
           "ACCEPTED_BY_COUNSELLOR",
           roles,
         ) && (
-          <VerificationActionButton
-            initialStatus={convention.status}
-            newStatus="ACCEPTED_BY_COUNSELLOR"
-            convention={convention}
-            onSubmit={createOnSubmitWithFeedbackKind("markedAsEligible")}
-            disabled={disabled || convention.status !== "IN_REVIEW"}
-            currentSignatoryRoles={requesterRoles}
-            onCloseValidatorModalWithoutValidatorInfo={
-              setValidatorWarningMessage
-            }
-            modalTitle={
-              convention.status === "ACCEPTED_BY_COUNSELLOR"
-                ? t.verification.conventionAlreadyMarkedAsEligible
-                : t.verification.markAsEligible
-            }
-          >
-            {convention.status === "ACCEPTED_BY_COUNSELLOR"
-              ? t.verification.conventionAlreadyMarkedAsEligible
-              : t.verification.markAsEligible}
-          </VerificationActionButton>
+          <>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children:
+                  convention.status === "ACCEPTED_BY_COUNSELLOR"
+                    ? t.verification.conventionAlreadyMarkedAsEligible
+                    : t.verification.markAsEligible,
+                modalTitle:
+                  convention.status === "ACCEPTED_BY_COUNSELLOR"
+                    ? t.verification.conventionAlreadyMarkedAsEligible
+                    : t.verification.markAsEligible,
+                verificationAction: "ACCEPT_COUNSELLOR",
+                disabled: disabled || convention.status !== "IN_REVIEW",
+                convention,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children:
+                  convention.status === "ACCEPTED_BY_COUNSELLOR"
+                    ? t.verification.conventionAlreadyMarkedAsEligible
+                    : t.verification.markAsEligible,
+                modalTitle:
+                  convention.status === "ACCEPTED_BY_COUNSELLOR"
+                    ? t.verification.conventionAlreadyMarkedAsEligible
+                    : t.verification.markAsEligible,
+                verificationAction: "ACCEPT_COUNSELLOR",
+                disabled: disabled || convention.status !== "IN_REVIEW",
+                convention,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+              }).modalWrapperProps}
+            />
+          </>
         )}
 
         {isAllowedConventionTransition(
@@ -231,54 +300,80 @@ export const ConventionManageActions = ({
           "ACCEPTED_BY_VALIDATOR",
           roles,
         ) && (
-          <VerificationActionButton
-            initialStatus={convention.status}
-            newStatus="ACCEPTED_BY_VALIDATOR"
-            convention={convention}
-            onSubmit={createOnSubmitWithFeedbackKind("markedAsValidated")}
-            disabled={
-              disabled ||
-              (convention.status !== "IN_REVIEW" &&
-                convention.status !== "ACCEPTED_BY_COUNSELLOR")
-            }
-            currentSignatoryRoles={requesterRoles}
-            onCloseValidatorModalWithoutValidatorInfo={
-              setValidatorWarningMessage
-            }
-            modalTitle={
-              convention.status === "ACCEPTED_BY_VALIDATOR"
-                ? t.verification.conventionAlreadyValidated
-                : t.verification.markAsValidated
-            }
-          >
-            {convention.status === "ACCEPTED_BY_VALIDATOR"
-              ? t.verification.conventionAlreadyValidated
-              : t.verification.markAsValidated}
-          </VerificationActionButton>
+          <>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children:
+                  convention.status === "ACCEPTED_BY_VALIDATOR"
+                    ? t.verification.conventionAlreadyValidated
+                    : t.verification.markAsValidated,
+                modalTitle:
+                  convention.status === "ACCEPTED_BY_VALIDATOR"
+                    ? t.verification.conventionAlreadyValidated
+                    : t.verification.markAsValidated,
+                verificationAction: "ACCEPT_VALIDATOR",
+                convention,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+                onCloseValidatorModalWithoutValidatorInfo:
+                  setValidatorWarningMessage,
+                disabled:
+                  disabled ||
+                  (convention.status !== "IN_REVIEW" &&
+                    convention.status !== "ACCEPTED_BY_COUNSELLOR"),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children:
+                  convention.status === "ACCEPTED_BY_VALIDATOR"
+                    ? t.verification.conventionAlreadyValidated
+                    : t.verification.markAsValidated,
+                modalTitle:
+                  convention.status === "ACCEPTED_BY_VALIDATOR"
+                    ? t.verification.conventionAlreadyValidated
+                    : t.verification.markAsValidated,
+                verificationAction: "ACCEPT_VALIDATOR",
+                convention,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+              }).modalWrapperProps}
+            />
+          </>
         )}
 
         {isAllowedConventionTransition(convention, "CANCELLED", roles) && (
           <>
-            <VerificationActionButton
-              initialStatus={convention.status}
-              newStatus="CANCELLED"
-              convention={convention}
-              onSubmit={createOnSubmitWithFeedbackKind("cancelled")}
-              disabled={
-                disabled || convention.status !== "ACCEPTED_BY_VALIDATOR"
-              }
-              currentSignatoryRoles={requesterRoles}
-              modalTitle={
-                convention.status === "CANCELLED"
-                  ? t.verification.conventionAlreadyCancelled
-                  : t.verification.markAsCancelled
-              }
-            >
-              {convention.status === "CANCELLED"
-                ? t.verification.conventionAlreadyCancelled
-                : t.verification.markAsCancelled}
-            </VerificationActionButton>
+            <Button
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.markAsCancelled,
+                modalTitle: t.verification.markAsCancelled,
+                verificationAction: "CANCEL",
+                convention,
+                disabled:
+                  disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
 
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+              }).buttonProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: t.verification.markAsCancelled,
+                modalTitle: t.verification.markAsCancelled,
+                verificationAction: "CANCEL",
+                convention,
+                disabled:
+                  disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
+
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+              }).modalWrapperProps}
+            />
             <Button
               iconId="fr-icon-file-pdf-line"
               className={fr.cx("fr-m-1w")}

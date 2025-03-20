@@ -51,7 +51,7 @@ export const conventionStatusesWithoutJustificationNorValidator = [
 ] as const;
 
 export const doesStatusNeedsJustification = (
-  status: ConventionStatus,
+  status: ConventionStatus | null,
 ): status is ConventionStatusWithJustification =>
   conventionStatusesWithJustification.includes(
     status as ConventionStatusWithJustification,
@@ -59,7 +59,7 @@ export const doesStatusNeedsJustification = (
 
 export const doesStatusNeedsValidators = (
   initialStatus: ConventionStatus,
-  targetStatus: ConventionStatus,
+  targetStatus: ConventionStatus | null,
 ): targetStatus is ConventionStatusWithValidator => {
   const isValidatorRequired = conventionStatusesWithValidator.includes(
     targetStatus as ConventionStatusWithValidator,

@@ -1,5 +1,5 @@
 import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -27,7 +27,7 @@ export type VerificationActionButtonProps = {
   onSubmit: (params: UpdateConventionStatusRequestDto) => void;
   disabled?: boolean;
   initialStatus: ConventionStatus;
-  newStatus: VerificationActions;
+  verificationAction: VerificationActions;
   children: string;
   convention: ConventionDto;
   currentSignatoryRoles: Role[];
@@ -37,10 +37,27 @@ export type VerificationActionButtonProps = {
   modalTitle: string;
 };
 
-export type VerificationActions = Exclude<
-  ConventionStatus,
-  "READY_TO_SIGN" | "PARTIALLY_SIGNED" | "IN_REVIEW"
->;
+type VerificationActions =
+  | "ACCEPT_COUNSELLOR"
+  | "ACCEPT_VALIDATOR"
+  | "REQUEST_EDIT"
+  | "REJECT"
+  | "CANCEL"
+  | "DEPRECATE";
+//| "TRANSFER";
+
+const newStatusByVerificationActions: Record<
+  VerificationActions,
+  ConventionStatus | null
+> = {
+  ACCEPT_COUNSELLOR: "ACCEPTED_BY_COUNSELLOR",
+  ACCEPT_VALIDATOR: "ACCEPTED_BY_VALIDATOR",
+  REQUEST_EDIT: "DRAFT",
+  REJECT: "REJECTED",
+  CANCEL: "CANCELLED",
+  DEPRECATE: "DEPRECATED",
+  //TRANSFER: null,
+};
 
 const createRejectModalParams = {
   id: domElementIds.manageConvention.rejectedModal,
@@ -92,50 +109,66 @@ const {
   close: closeValidatorModal,
 } = createModal(createValidatorModalParams);
 
-const modalByStatus = (status: VerificationActions) => {
+// const createTransferConventionModalParams = {
+//   id: domElementIds.manageConvention.transferConventionModal,
+//   isOpenedByDefault: false,
+// };
+// const {
+//   Component: TransferConventionModal,
+//   open: openTransferConventionModal,
+//   close: closeTransferConventionModal,
+// } = createModal(createTransferConventionModalParams);
+
+export const modalByAction = (verificationAction: VerificationActions) => {
   const modals = {
-    DRAFT: {
+    REQUEST_EDIT: {
       modal: DraftModal,
       openModal: openDraftModal,
       closeModal: closeDraftModal,
       createModalParams: createDraftModalParams,
     },
-    REJECTED: {
+    REJECT: {
       modal: RejectModal,
       openModal: openRejectModal,
       closeModal: closeRejectModal,
       createModalParams: createRejectModalParams,
     },
-    CANCELLED: {
+    CANCEL: {
       modal: CancelModal,
       openModal: openCancelModal,
       closeModal: closeCancelModal,
       createModalParams: createCancelModalParams,
     },
-    DEPRECATED: {
+    DEPRECATE: {
       modal: DeprecateModal,
       openModal: openDeprecateModal,
       closeModal: closeDeprecateModal,
       createModalParams: createDeprecatedModalParams,
     },
-    ACCEPTED_BY_COUNSELLOR: {
+    ACCEPT_COUNSELLOR: {
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
       createModalParams: createValidatorModalParams,
     },
-    ACCEPTED_BY_VALIDATOR: {
+    ACCEPT_VALIDATOR: {
       modal: ValidatorModal,
       openModal: openValidatorModal,
       closeModal: closeValidatorModal,
       createModalParams: createValidatorModalParams,
     },
+    // TRANSFER: {
+    //   modal: TransferConventionModal,
+    //   openModal: openTransferConventionModal,
+    //   closeModal: closeTransferConventionModal,
+    //   createModalParams: createTransferConventionModalParams,
+    // },
   };
-  return modals[status];
+  return modals[verificationAction];
 };
 
-export const VerificationActionButton = ({
-  newStatus,
+export const getVerificationActionButtonProps = ({
+  verificationAction,
   disabled,
   children,
   onSubmit,
@@ -144,67 +177,63 @@ export const VerificationActionButton = ({
   initialStatus,
   onCloseValidatorModalWithoutValidatorInfo,
   modalTitle,
-}: VerificationActionButtonProps) => {
-  const iconByStatus: Partial<Record<ConventionStatus, FrIconClassName>> = {
-    REJECTED: "fr-icon-close-circle-line",
-    DRAFT: "fr-icon-edit-line",
-    CANCELLED: "fr-icon-delete-bin-line",
+}: VerificationActionButtonProps): {
+  buttonProps: ButtonProps;
+  modalWrapperProps: ModalWrapperProps;
+} => {
+  const iconByAction: Partial<Record<VerificationActions, FrIconClassName>> = {
+    REJECT: "fr-icon-close-circle-line",
+    REQUEST_EDIT: "fr-icon-edit-line",
+    CANCEL: "fr-icon-delete-bin-line",
   };
-  const selectedIcon = iconByStatus[newStatus];
+  const selectedIcon = iconByAction[verificationAction];
   const actionButtonStatusId: Record<VerificationActions, string> = {
-    DRAFT: domElementIds.manageConvention.conventionValidationRequestEditButton,
-    REJECTED: domElementIds.manageConvention.conventionValidationRejectButton,
-    ACCEPTED_BY_VALIDATOR:
+    REQUEST_EDIT:
+      domElementIds.manageConvention.conventionValidationRequestEditButton,
+    REJECT: domElementIds.manageConvention.conventionValidationRejectButton,
+    ACCEPT_VALIDATOR:
       domElementIds.manageConvention.conventionValidationValidateButton,
-    ACCEPTED_BY_COUNSELLOR:
+    ACCEPT_COUNSELLOR:
       domElementIds.manageConvention.conventionValidationValidateButton,
-    CANCELLED: domElementIds.manageConvention.conventionValidationCancelButton,
-    DEPRECATED:
+    CANCEL: domElementIds.manageConvention.conventionValidationCancelButton,
+    DEPRECATE:
       domElementIds.manageConvention.conventionValidationDeprecateButton,
+    //TRANSFER: domElementIds.manageConvention.conventionValidationTransferButton,
   };
 
-  const onActionButtonClick = () => modalByStatus(newStatus).openModal();
+  const onActionButtonClick = () =>
+    modalByAction(verificationAction).openModal();
+  return {
+    buttonProps: {
+      id: actionButtonStatusId[verificationAction],
+      children: children,
+      iconId: selectedIcon ?? "fr-icon-checkbox-circle-line",
+      priority:
+        verificationAction === "REJECT" || verificationAction === "DEPRECATE"
+          ? "secondary"
+          : "primary",
 
-  return (
-    <>
-      <Button
-        iconId={selectedIcon ?? "fr-icon-checkbox-circle-line"}
-        priority={
-          newStatus === "REJECTED" || newStatus === "DEPRECATED"
-            ? "secondary"
-            : "primary"
-        }
-        onClick={onActionButtonClick}
-        className={fr.cx("fr-m-1w")}
-        disabled={disabled}
-        nativeButtonProps={{
-          id: actionButtonStatusId[newStatus],
-        }}
-      >
-        {children}
-      </Button>
-      {(doesStatusNeedsJustification(newStatus) ||
-        doesStatusNeedsValidators(initialStatus, newStatus)) && (
-        <ModalWrapper
-          title={modalTitle}
-          initialStatus={initialStatus}
-          newStatus={newStatus}
-          onSubmit={onSubmit}
-          convention={convention}
-          currentSignatoryRoles={currentSignatoryRoles}
-          onCloseValidatorModalWithoutValidatorInfo={
-            onCloseValidatorModalWithoutValidatorInfo
-          }
-        />
-      )}
-    </>
-  );
+      onClick: onActionButtonClick,
+      className: fr.cx("fr-m-1w"),
+      disabled: disabled,
+    },
+    modalWrapperProps: {
+      title: modalTitle,
+      initialStatus: initialStatus,
+      verificationAction: verificationAction,
+      onSubmit: onSubmit,
+      convention: convention,
+      currentSignatoryRoles: currentSignatoryRoles,
+      onCloseValidatorModalWithoutValidatorInfo:
+        onCloseValidatorModalWithoutValidatorInfo,
+    },
+  };
 };
 
 export type ModalWrapperProps = {
   title: string;
   initialStatus: ConventionStatus;
-  newStatus: VerificationActions;
+  verificationAction: VerificationActions;
   onSubmit: VerificationActionButtonProps["onSubmit"];
   convention: ConventionDto;
   currentSignatoryRoles: Role[];
@@ -213,24 +242,29 @@ export type ModalWrapperProps = {
   >;
 };
 
-const ModalWrapper = (props: ModalWrapperProps) => {
+export const ModalWrapper = (props: ModalWrapperProps) => {
   const {
-    newStatus,
+    verificationAction,
     convention,
     initialStatus,
     currentSignatoryRoles,
     onSubmit,
     onCloseValidatorModalWithoutValidatorInfo,
   } = props;
-  const modalObject = modalByStatus(newStatus);
+  const modalObject = modalByAction(verificationAction);
   const { createModalParams } = modalObject;
   const isModalOpen = useIsModalOpen(createModalParams);
   const Modal = modalObject.modal;
   const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
 
   if (
-    !doesStatusNeedsJustification(newStatus) &&
-    !doesStatusNeedsValidators(initialStatus, newStatus)
+    !doesStatusNeedsJustification(
+      newStatusByVerificationActions[verificationAction],
+    ) &&
+    !doesStatusNeedsValidators(
+      initialStatus,
+      newStatusByVerificationActions[verificationAction],
+    )
   )
     return null;
 
@@ -247,21 +281,30 @@ const ModalWrapper = (props: ModalWrapperProps) => {
       <Fragment
         key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
       >
-        {doesStatusNeedsJustification(newStatus) && (
+        {/* {verificationAction === "TRANSFER" && (
+          // <TransferConventionModalContent />
+          "test"
+        )} */}
+        {doesStatusNeedsJustification(
+          newStatusByVerificationActions[verificationAction],
+        ) && (
           <JustificationModalContent
             onSubmit={onSubmit}
             closeModal={closeModal}
-            newStatus={newStatus}
+            newStatus={newStatusByVerificationActions[verificationAction]}
             convention={convention}
             currentSignatoryRoles={currentSignatoryRoles}
             onModalPropsChange={onModalPropsChange}
           />
         )}
-        {!doesStatusNeedsJustification(newStatus) && (
+        {doesStatusNeedsValidators(
+          initialStatus,
+          newStatusByVerificationActions[verificationAction],
+        ) && (
           <ValidatorModalContent
             onSubmit={onSubmit}
             closeModal={closeModal}
-            newStatus={newStatus}
+            newStatus={newStatusByVerificationActions[verificationAction]}
             conventionId={convention.id}
             onCloseValidatorModalWithoutValidatorInfo={
               onCloseValidatorModalWithoutValidatorInfo
