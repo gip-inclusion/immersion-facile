@@ -6,6 +6,7 @@ import {
   assessmentDtoSchema,
   errors,
   isSomeEmailMatchingEmailHash,
+  legacyAssessmentDtoSchema,
 } from "shared";
 import { z } from "zod";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
@@ -28,7 +29,7 @@ export const throwForbiddenIfNotAllowedForAssessments = (
 };
 
 export const assessmentEntitySchema: z.Schema<AssessmentEntity> =
-  assessmentDtoSchema.and(
+  assessmentDtoSchema.or(legacyAssessmentDtoSchema).and(
     z.object({
       _entityName: z.literal("Assessment"),
       numberOfHoursActuallyMade: z.number().or(z.null()),
