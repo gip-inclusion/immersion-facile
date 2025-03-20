@@ -257,16 +257,17 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const Modal = modalObject.modal;
   const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
 
-  // if (
-  //   !doesStatusNeedsJustification(
-  //     newStatusByVerificationActions[verificationAction],
-  //   ) &&
-  //   !doesStatusNeedsValidators(
-  //     initialStatus,
-  //     newStatusByVerificationActions[verificationAction],
-  //   )
-  // )
-  //   return null;
+  if (
+    verificationAction !== "TRANSFER" &&
+    !doesStatusNeedsJustification(
+      newStatusByVerificationActions[verificationAction],
+    ) &&
+    !doesStatusNeedsValidators(
+      initialStatus,
+      newStatusByVerificationActions[verificationAction],
+    )
+  )
+    return null;
 
   const { closeModal } = modalObject;
   const onModalPropsChange = (newProps: Partial<ModalWrapperProps>) => {

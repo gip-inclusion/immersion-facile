@@ -226,7 +226,19 @@ export const ConventionManageActions = ({
                 {
                   ...getVerificationActionButtonProps({
                     initialStatus: convention.status,
-                    children: t.verification.modifyConvention,
+                    children: t.verification.modifyConventionAgency,
+                    modalTitle: t.verification.modifyConventionAgencyTitle,
+                    verificationAction: "TRANSFER",
+                    convention,
+                    disabled,
+                    currentSignatoryRoles: requesterRoles,
+                    onSubmit: () => {},
+                  }).buttonProps,
+                },
+                {
+                  ...getVerificationActionButtonProps({
+                    initialStatus: convention.status,
+                    children: t.verification.modifyConventionOtherInformations,
                     modalTitle: t.verification.modifyConvention,
                     verificationAction: "REQUEST_EDIT",
                     convention,
@@ -235,18 +247,6 @@ export const ConventionManageActions = ({
                     onSubmit: createOnSubmitWithFeedbackKind(
                       "modificationAskedFromCounsellorOrValidator",
                     ),
-                  }).buttonProps,
-                },
-                {
-                  ...getVerificationActionButtonProps({
-                    initialStatus: convention.status,
-                    children: "children",
-                    modalTitle: "titre",
-                    verificationAction: "TRANSFER",
-                    convention,
-                    disabled,
-                    currentSignatoryRoles: requesterRoles,
-                    onSubmit: () => {},
                   }).buttonProps,
                 },
               ]}
@@ -268,7 +268,7 @@ export const ConventionManageActions = ({
             <ModalWrapper
               {...getVerificationActionButtonProps({
                 initialStatus: convention.status,
-                children: t.verification.modifyConvention,
+                children: t.verification.modifyConventionOtherInformations,
                 modalTitle: t.verification.modifyConvention,
                 verificationAction: "REQUEST_EDIT",
                 convention,
@@ -282,8 +282,8 @@ export const ConventionManageActions = ({
             <ModalWrapper
               {...getVerificationActionButtonProps({
                 initialStatus: convention.status,
-                children: "children",
-                modalTitle: "titre",
+                children: t.verification.modifyConventionAgency,
+                modalTitle: t.verification.modifyConventionAgencyTitle,
                 verificationAction: "TRANSFER",
                 convention,
                 disabled,
