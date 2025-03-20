@@ -1,5 +1,10 @@
 import type { Pool } from "pg";
-import { AgencyDtoBuilder, type AgencyGroup, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  type AgencyGroup,
+  errors,
+  expectToEqual,
+} from "shared";
 import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
@@ -93,7 +98,7 @@ const insertAgencyGroup = async ({
     agencyGroup.agencyIds.length > 1 &&
     agencyGroup.agencyIds[0] !== agency.id
   )
-    throw new Error("Agency not supported in tests. tests");
+    throw errors.generic.testError("Agency not supported in tests. tests");
 
   const validator = makeUniqueUserForTest(uuid());
 

@@ -1,6 +1,7 @@
 import {
   BadRequestError,
   ConventionDtoBuilder,
+  errors,
   expectArraysToMatch,
 } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
@@ -364,7 +365,7 @@ describe("InMemoryEventBus", () => {
         "ConventionSubmittedByBeneficiary",
         failedSubscriptionId,
         () => {
-          throw new Error("4th failure");
+          throw errors.generic.testError("4th failure");
         },
       );
 

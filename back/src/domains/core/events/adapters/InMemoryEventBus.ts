@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { type DateString, errorToString } from "shared";
+import { type DateString, errorToString, errors } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -217,6 +217,7 @@ export const getLastPublication = (
       return 0;
     })
     .at(-1);
+
 function onSubscriptionError(
   error: any,
   event: DomainEvent,
@@ -225,15 +226,15 @@ function onSubscriptionError(
 ) {
   monitorErrorInCallback(error, event);
   const errorMessage = errorToString(error);
-  if (throwOnPublishFailure) {
-    throw new Error(
-      [
-        `Could not process event with id : ${event.id}.`,
-        `Subscription ${subscriptionId} failed on topic ${event.topic}.`,
-        `Error was : ${errorMessage}`,
-      ].join("\n"),
-      { cause: error },
-    );
-  }
+
+  if (throwOnPublishFailure)
+    throw errors.event.subscriptionFailed({
+      eventId: event.id,
+      eventTopic: event.topic,
+      subscriptionId,
+      errorMessage,
+      error,
+    });
+
   return { subscriptionId, errorMessage };
 }

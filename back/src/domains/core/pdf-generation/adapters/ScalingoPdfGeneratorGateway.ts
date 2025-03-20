@@ -1,6 +1,7 @@
 import {
   type AbsoluteUrl,
   type HtmlToPdfRequest,
+  errors,
   withAuthorizationHeaders,
 } from "shared";
 import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
@@ -56,19 +57,24 @@ export class ScalingoPdfGeneratorGateway implements PdfGeneratorGateway {
   }: HtmlToPdfRequest): Promise<string> {
     const requestId = this.#uuidGenerator.new();
 
-    const response = await this.#httpClient.generate({
-      headers: { authorization: this.#apiKey },
-      body: { htmlContent },
-      queryParams: {
-        request_id: requestId,
-      },
-    });
+    return this.#httpClient
+      .generate({
+        headers: { authorization: this.#apiKey },
+        body: { htmlContent },
+        queryParams: {
+          request_id: requestId,
+        },
+      })
+      .then((response) => {
+        if (response.status !== 200)
+          throw errors.pdfGenerator.makeFailed({
+            conventionId,
+            requestId,
+            body: response.body,
+            status: response.status,
+          });
 
-    if (response.status !== 200)
-      throw new Error(
-        `[requestId : ${requestId}, conventionId : ${conventionId}] Pdf generation failed with status ${response.status} - ${response.body}`,
-      );
-
-    return response.body;
+        return response.body;
+      });
   }
 }

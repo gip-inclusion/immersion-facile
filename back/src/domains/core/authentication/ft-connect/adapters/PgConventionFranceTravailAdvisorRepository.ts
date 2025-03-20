@@ -1,4 +1,4 @@
-import type { ConventionId, FtExternalId } from "shared";
+import { type ConventionId, type FtExternalId, errors } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
 import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../utils/schema.utils";
@@ -25,24 +25,26 @@ export class PgConventionFranceTravailAdvisorRepository
 
   public async associateConventionAndUserAdvisor(
     conventionId: ConventionId,
-    peExternalId: FtExternalId,
+    userFtExternalId: FtExternalId,
   ): Promise<ConventionAndFtExternalIds> {
     const result = await this.transaction
       .updateTable("partners_pe_connect")
       .set({ convention_id: conventionId })
-      .where("user_pe_external_id", "=", peExternalId)
+      .where("user_pe_external_id", "=", userFtExternalId)
       .where("convention_id", "=", CONVENTION_ID_DEFAULT_UUID)
       .returning("convention_id")
       .execute();
 
     if (result.length !== 1)
-      throw new Error(
-        `Association between Convention and userAdvisor failed. rowCount: ${result.length}, conventionId: ${conventionId}, peExternalId: ${peExternalId}`,
-      );
+      throw errors.ftConnect.associationFailed({
+        rowCount: result.length,
+        conventionId,
+        ftExternalId: userFtExternalId,
+      });
 
     return {
       conventionId,
-      peExternalId,
+      ftExternalId: userFtExternalId,
     };
   }
 

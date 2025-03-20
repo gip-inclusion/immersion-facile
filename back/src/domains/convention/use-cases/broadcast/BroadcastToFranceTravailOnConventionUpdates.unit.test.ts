@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type FeatureFlags,
+  errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -221,7 +222,7 @@ describe("Broadcasts events to France Travail", () => {
 
     await expectPromiseToFailWithError(
       broadcastToFranceTravailOnConventionUpdates.execute({ convention }),
-      new Error("fake axios error"),
+      errors.generic.fakeError("fake axios error"),
     );
   });
 

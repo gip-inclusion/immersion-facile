@@ -2,6 +2,7 @@ import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
+  errors,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -185,9 +186,11 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           userFtExternalId,
         ),
       ).rejects.toThrow(
-        new Error(
-          "Association between Convention and userAdvisor failed. rowCount: 0, conventionId: 88401348-bad9-4933-87c6-405b8a8fe4cc, peExternalId: 92f44bbf-103d-4312-bd74-217c7d79f618",
-        ),
+        errors.ftConnect.associationFailed({
+          rowCount: 0,
+          conventionId,
+          ftExternalId: userFtExternalId,
+        }),
       );
     });
 

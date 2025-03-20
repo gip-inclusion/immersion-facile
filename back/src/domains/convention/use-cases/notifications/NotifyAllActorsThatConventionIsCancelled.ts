@@ -1,4 +1,4 @@
-import { type WithConventionDto, withConventionSchema } from "shared";
+import { type WithConventionDto, errors, withConventionSchema } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -24,11 +24,9 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
     uow: UnitOfWork,
   ): Promise<void> {
     const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
-    if (!agency) {
-      throw new Error(
-        `Unable to send mail. No agency config found for ${convention.agencyId}`,
-      );
-    }
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
     const beneficiary = convention.signatories.beneficiary;
 
     const recipients = getAllConventionRecipientsEmail(

@@ -253,11 +253,13 @@ describe("Agency routes", () => {
         const validator = await inMemoryUow.userRepository.findByEmail(
           parisMissionLocaleParams.validatorEmails[0],
         );
-        if (!validator) throw new Error("Missing validator user");
+        if (!validator)
+          throw errors.generic.testError("Missing validator user");
         const counsellor = await inMemoryUow.userRepository.findByEmail(
           parisMissionLocaleParams.counsellorEmails[0],
         );
-        if (!counsellor) throw new Error("Missing counsellor user");
+        if (!counsellor)
+          throw errors.generic.testError("Missing counsellor user");
 
         expectToEqual(inMemoryUow.userRepository.users, [
           backofficeAdminUser,

@@ -197,8 +197,7 @@ describe("Add Convention", () => {
     });
 
     it("Throws errors when the SIRET endpoint throws erorrs", async () => {
-      const error = new Error("test error");
-      siretGateway.setError(error);
+      siretGateway.setError(errors.generic.testError("test error"));
 
       await expectPromiseToFailWithError(
         addConvention.execute({ convention: validConvention }),
