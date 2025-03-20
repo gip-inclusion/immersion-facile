@@ -30,10 +30,7 @@ import {
   type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import {
-  TestUuidGenerator,
-  UuidV4Generator,
-} from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type TransferConventionToAgency,
   makeTransferConventionToAgency,

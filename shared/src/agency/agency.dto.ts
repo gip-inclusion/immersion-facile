@@ -2,7 +2,10 @@ import { keys, omit } from "ramda";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
+import type { InternshipKind } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
+import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import type { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type {
   AgencyRole,
@@ -196,3 +199,19 @@ export const toAgencyDtoForAgencyUsersAndAdmins = (
     : omit(["counsellorEmails", "validatorEmails"], agency)),
   admins,
 });
+
+export const makeListAgencyOptionsKindFilter = ({
+  internshipKind,
+  shouldListAll,
+  federatedIdentity,
+}: {
+  internshipKind: InternshipKind;
+  shouldListAll: boolean;
+  federatedIdentity: FederatedIdentity | null;
+}): AgencyKindFilter => {
+  if (internshipKind === "mini-stage-cci") return "miniStageOnly";
+  if (shouldListAll) return "miniStageExcluded";
+  return federatedIdentity && isFtConnectIdentity(federatedIdentity)
+    ? "immersionPeOnly"
+    : "miniStageExcluded";
+};

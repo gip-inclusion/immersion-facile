@@ -1,15 +1,13 @@
 import { partition } from "ramda";
 import {
-  type TemplatedEmail,
-  type TemplatedSms,
-  exhaustiveCheck,
-  expectToEqual,
-} from "shared";
-import {
   type EmailNotification,
   type Notification,
   type NotificationKind,
   type SmsNotification,
+  type TemplatedEmail,
+  type TemplatedSms,
+  exhaustiveCheck,
+  expectToEqual,
   notificationKinds,
 } from "shared";
 import type { InMemoryOutboxRepository } from "../domains/core/events/adapters/InMemoryOutboxRepository";

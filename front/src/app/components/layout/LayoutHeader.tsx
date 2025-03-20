@@ -67,6 +67,7 @@ export const LayoutHeader = () => {
     },
     <ButtonWithSubMenu
       key={`${quickAccessIds.initiateConvention}-button-with-sub-menu`}
+      buttonIconId="fr-icon-account-line"
       navItems={[
         {
           children: "Je suis un candidat",

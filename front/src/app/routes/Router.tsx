@@ -18,7 +18,7 @@ import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/Be
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
-import { ConventionManageInclusionConnectedPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
+import { ConventionManageConnectedUserPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
@@ -191,7 +191,7 @@ const getPageByRouteName: {
   searchResultExternal: () => <SearchResultPage isExternal />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionInclusionConnected: (route) => (
-    <ConventionManageInclusionConnectedPage route={route} />
+    <ConventionManageConnectedUserPage route={route} />
   ),
   manageDiscussion: (route) => <DiscussionManagePage route={route} />,
   myProfile: (route) => (
