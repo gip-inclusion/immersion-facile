@@ -43,7 +43,7 @@ SentryInit({
   integrations: [browserTracingIntegration(), replayIntegration()],
   release: import.meta.env.VITE_RELEASE_TAG,
   environment: ENV.envType,
-  tracesSampleRate: 1,
+  tracesSampleRate: 0.01,
   tracePropagationTargets: [
     "http://localhost:3000/api",
     "https://staging.immersion-facile.beta.gouv.fr/api",
