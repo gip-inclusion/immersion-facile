@@ -51,7 +51,7 @@ describe("transferConventionToAgency slice", () => {
       {
         level: "success",
         message: "La convention a bien été transférée au nouvel organisme",
-        on: "create",
+        on: "update",
         title: "La convention a bien été transférée",
       },
     );
@@ -86,7 +86,7 @@ describe("transferConventionToAgency slice", () => {
       {
         level: "error",
         message: errorMessage,
-        on: "create",
+        on: "update",
         title: "Problème lors du transfert de la convention",
       },
     );

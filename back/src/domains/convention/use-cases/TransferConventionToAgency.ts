@@ -7,12 +7,10 @@ import {
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
-import type { AgencyRepository } from "../../agency/ports/AgencyRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { throwIfIcUserNotBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import {
   throwErrorOnConventionIdMismatch,

@@ -417,14 +417,14 @@ export const feedbackMapping: Record<
     },
   },
   "transfer-convention-to-agency": {
-    "create.success": {
+    "update.success": {
       action:
         transferConventionToAgencySlice.actions
           .transferConventionToAgencySucceeded,
       title: "La convention a bien été transférée",
       message: "La convention a bien été transférée au nouvel organisme",
     },
-    "create.error": {
+    "update.error": {
       action:
         transferConventionToAgencySlice.actions
           .transferConventionToAgencyFailed,

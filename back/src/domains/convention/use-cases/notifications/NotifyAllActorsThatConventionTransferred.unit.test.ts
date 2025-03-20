@@ -15,7 +15,6 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import type { TransferConventionToAgencyPayload } from "../../../core/events/eventPayload.dto";
-import { transferConventionToAgencyPayloadSchema } from "../../../core/events/eventPayload.schema";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
