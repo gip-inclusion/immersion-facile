@@ -23,6 +23,7 @@ import { makeGetApiConsumersByConvention } from "../../domains/convention/use-ca
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
 import { GetConvention } from "../../domains/convention/use-cases/GetConvention";
 import { GetConventionForApiConsumer } from "../../domains/convention/use-cases/GetConventionForApiConsumer";
+import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-cases/GetConventionsForAgencyUser";
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
@@ -730,6 +731,9 @@ export const createUseCases = (
         generateConventionMagicLinkUrl,
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
       },
+    }),
+    getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
+      uowPerformer,
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

@@ -13,6 +13,8 @@ import type {
   ConventionRenewed,
   ConventionStatus,
   ConventionValidatorInputName,
+  FlatGetConventionsForAgencyUserParams,
+  GetConventionsForAgencyUserParams,
   Signatories,
   Signatory,
 } from "./convention.dto";
@@ -217,3 +219,56 @@ export const getSignatoryProcessedData = (
   ...processedDataBySignatoryRole[signatory.role],
   signatoryFullName: `${signatory.firstName} ${signatory.lastName}`,
 });
+
+export const flatParamsToGetConventionsForAgencyUserParams = (
+  flatParams: FlatGetConventionsForAgencyUserParams,
+): GetConventionsForAgencyUserParams => {
+  const {
+    sortBy,
+    page,
+    perPage,
+    actorEmailContains,
+    establishmentNameContains,
+    beneficiaryNameContains,
+    statuses,
+    agencyIds,
+    agencyDepartmentCodes,
+    dateStartFrom,
+    dateStartTo,
+    dateEndFrom,
+    dateEndTo,
+    dateSubmissionFrom,
+    dateSubmissionTo,
+    ...rest
+  } = flatParams;
+
+  rest satisfies Record<string, never>;
+
+  return {
+    filters: {
+      actorEmailContains,
+      establishmentNameContains,
+      beneficiaryNameContains,
+      statuses,
+      agencyIds,
+      agencyDepartmentCodes,
+      dateStart: (dateStartFrom || dateStartTo) && {
+        from: dateStartFrom,
+        to: dateStartTo,
+      },
+      dateEnd: (dateEndFrom || dateEndTo) && {
+        from: dateEndFrom,
+        to: dateEndTo,
+      },
+      dateSubmission: (dateSubmissionFrom || dateSubmissionTo) && {
+        from: dateSubmissionFrom,
+        to: dateSubmissionTo,
+      },
+    },
+    sortBy,
+    pagination: {
+      page,
+      perPage,
+    },
+  };
+};

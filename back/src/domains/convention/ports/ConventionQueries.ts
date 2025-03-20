@@ -4,11 +4,17 @@ import type {
   ConventionReadDto,
   ConventionScope,
   ConventionStatus,
+  DataWithPagination,
+  DateFilter,
   DateRange,
   ExtractFromExisting,
   FindSimilarConventionsParams,
+  GetConventionsForAgencyUserParams,
+  NotEmptyArray,
+  PaginationQueryParams,
   SiretDto,
   TemplatedEmail,
+  UserId,
 } from "shared";
 
 export type GetConventionsFilters = {
@@ -37,6 +43,12 @@ export type GetConventionsParams = {
   sortBy: GetConventionsSortBy;
 };
 
+export type GetPaginatedConventionsForAgencyUserParams =
+  GetConventionsForAgencyUserParams & {
+    agencyUserId: UserId;
+    pagination: Required<PaginationQueryParams>;
+  };
+
 export interface ConventionQueries {
   getConventionById: (
     id: ConventionId,
@@ -44,6 +56,10 @@ export interface ConventionQueries {
   findSimilarConventions(
     params: FindSimilarConventionsParams,
   ): Promise<ConventionId[]>;
+
+  getPaginatedConventionsForAgencyUser(
+    params: GetPaginatedConventionsForAgencyUserParams,
+  ): Promise<DataWithPagination<ConventionDto>>;
 
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;

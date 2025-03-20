@@ -2,10 +2,12 @@ import { addDays } from "date-fns";
 import {
   type AddConventionInput,
   AgencyDtoBuilder,
+  type AuthenticatedConventionRoutes,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
+  type DataWithPagination,
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   type Role,
@@ -13,6 +15,7 @@ import {
   type UnauthenticatedConventionRoutes,
   type User,
   type WithAuthorizationHeader,
+  authenticatedConventionRoutes,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   currentJwtVersions,
@@ -844,6 +847,121 @@ describe("convention e2e", () => {
           status: 400,
         },
       });
+    });
+  });
+
+  describe("GetConventionsForAgencyUser", () => {
+    let authenticatedRequest: HttpClient<AuthenticatedConventionRoutes>;
+
+    const convention1 = new ConventionDtoBuilder()
+      .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
+      .withAgencyId(peAgency.id)
+      .withDateStart(new Date("2023-03-15").toISOString())
+      .withDateEnd(new Date("2023-03-20").toISOString())
+      .withDateSubmission(new Date("2023-03-10").toISOString())
+      .withStatus("ACCEPTED_BY_VALIDATOR")
+      .build();
+
+    const convention2 = new ConventionDtoBuilder()
+      .withId("bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb")
+      .withAgencyId(peAgency.id)
+      .withDateStart(new Date("2023-02-15").toISOString())
+      .withDateEnd(new Date("2023-02-20").toISOString())
+      .withDateSubmission(new Date("2023-02-10").toISOString())
+      .withStatus("DRAFT")
+      .build();
+
+    beforeEach(async () => {
+      const testApp = await buildTestApp(new AppConfigBuilder().build());
+      const request = testApp.request;
+
+      ({
+        eventCrawler,
+        gateways,
+        generateConventionJwt,
+        generateInclusionConnectJwt,
+        inMemoryUow,
+        appConfig,
+      } = testApp);
+
+      authenticatedRequest = createSupertestSharedClient(
+        authenticatedConventionRoutes,
+        request,
+      );
+
+      inMemoryUow.userRepository.users = [validator];
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ];
+      inMemoryUow.conventionRepository.setConventions([
+        convention1,
+        convention2,
+      ]);
+    });
+
+    it("401 - Unauthorized when not correctly authenticated", async () => {
+      const response = await authenticatedRequest.getConventionsForAgencyUser({
+        headers: { authorization: "invalid-token" },
+        queryParams: {},
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "Provided token is invalid",
+        },
+      });
+    });
+
+    it("200 - Successfully gets conventions with date filter", async () => {
+      gateways.timeGateway.setNextDate(new Date());
+      const jwt = generateInclusionConnectJwt({
+        userId: validator.id,
+        version: currentJwtVersions.inclusion,
+        iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
+      });
+
+      const response = await authenticatedRequest.getConventionsForAgencyUser({
+        headers: { authorization: jwt },
+        queryParams: {
+          dateStartFrom: "2023-01-01",
+          statuses: ["ACCEPTED_BY_VALIDATOR", "DRAFT"],
+          sortBy: "dateStart",
+          page: 1,
+          perPage: 10,
+        },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: {
+          data: [convention1, convention2],
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+            totalRecords: 2,
+          },
+        },
+      });
+
+      expectToEqual(inMemoryUow.conventionQueries.paginatedConventionsParams, [
+        {
+          agencyUserId: validator.id,
+          filters: {
+            dateStart: { from: "2023-01-01" },
+            statuses: ["ACCEPTED_BY_VALIDATOR", "DRAFT"],
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          sortBy: "dateStart",
+        },
+      ]);
     });
   });
 });
