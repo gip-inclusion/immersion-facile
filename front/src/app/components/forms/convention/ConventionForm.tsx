@@ -27,12 +27,10 @@ import {
 } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  type AgencyKindFilter,
   type Beneficiary,
   type ConventionReadDto,
   type DepartmentCode,
   type ExcludeFromExisting,
-  type FederatedIdentity,
   type InternshipKind,
   addressDtoToString,
   conventionSchema,
@@ -42,6 +40,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
   keys,
+  makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
 import {
@@ -630,22 +629,6 @@ export const ConventionForm = ({
       />
     </FormProvider>
   );
-};
-
-const makeListAgencyOptionsKindFilter = ({
-  internshipKind,
-  shouldListAll,
-  federatedIdentity,
-}: {
-  internshipKind: InternshipKind;
-  shouldListAll: boolean;
-  federatedIdentity: FederatedIdentity | null;
-}): AgencyKindFilter => {
-  if (internshipKind === "mini-stage-cci") return "miniStageOnly";
-  if (shouldListAll) return "miniStageExcluded";
-  return federatedIdentity && isFtConnectIdentity(federatedIdentity)
-    ? "immersionPeOnly"
-    : "miniStageExcluded";
 };
 
 const makeInitialBenefiaryForm = (
