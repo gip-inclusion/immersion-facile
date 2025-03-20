@@ -1,4 +1,9 @@
 import { keys, omit } from "ramda";
+import {
+  type FederatedIdentity,
+  type InternshipKind,
+  isFtConnectIdentity,
+} from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";

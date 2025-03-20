@@ -366,8 +366,13 @@ export const domElementIds = {
       "im-convention-validation__submit-renew-modal-button",
     openRenewModalButton: "im-convention-validation__open-renew-modal-button",
     openDocumentButton: "im-convention-validation__open-document-button",
+    transferConventionModal:
+      "im-convention-validation__open-transfer-agency-button",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
+    transferConventionToAgencyCancelButton:
+      "im-transfer-agency-modal__cancel-button",
+    transferConventionToAgencyButton: "im-transfer-agency-modal__submit-button",
   },
 
   unsubscribeEstablishmentLead: {},
