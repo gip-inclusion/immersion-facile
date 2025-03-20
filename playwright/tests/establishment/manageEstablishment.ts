@@ -6,15 +6,21 @@ import {
   toDisplayedDate,
 } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
-import { checkAvailibilityButtons } from "./establishmentForm.utils";
+import {
+  type MakeFormEstablishmentFromRetryNumber,
+  checkAvailibilityButtons,
+} from "./establishmentForm.utils";
 import {
   goToManageEstablishmentThroughEstablishmentDashboard,
   goToManageEtablishmentBySiretInAdmin,
 } from "./establishmentNavigation.utils";
 
 export const checkEstablishmentUpdatedThroughBackOfficeAdmin =
-  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
-  async ({ page }) => {
+  (
+    makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    const updatedEstablishment = makeUpdatedEstablishment(retry);
     await goToManageEtablishmentBySiretInAdmin(
       page,
       updatedEstablishment.siret,
@@ -23,8 +29,11 @@ export const checkEstablishmentUpdatedThroughBackOfficeAdmin =
   };
 
 export const checkAvailabilityThoughBackOfficeAdmin =
-  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
-  async ({ page }) => {
+  (
+    makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    const updatedEstablishment = makeUpdatedEstablishment(retry);
     await goToManageEtablishmentBySiretInAdmin(
       page,
       updatedEstablishment.siret,
@@ -33,8 +42,11 @@ export const checkAvailabilityThoughBackOfficeAdmin =
   };
 
 export const checkAvailabilityThoughEstablishmentDashboard =
-  (updatedEstablishment: FormEstablishmentDto): PlaywrightTestCallback =>
-  async ({ page }) => {
+  (
+    makeUpdatedEstablishment: MakeFormEstablishmentFromRetryNumber,
+  ): PlaywrightTestCallback =>
+  async ({ page }, { retry }) => {
+    const updatedEstablishment = makeUpdatedEstablishment(retry);
     await goToManageEstablishmentThroughEstablishmentDashboard(
       page,
       updatedEstablishment,
