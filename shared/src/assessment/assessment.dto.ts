@@ -63,3 +63,9 @@ export type DateRange = {
   from: Date;
   to: Date;
 };
+
+export type LegacyAssessmentDto = {
+  status: "FINISHED" | "ABANDONED";
+  conventionId: ConventionId;
+  establishmentFeedback: string;
+};

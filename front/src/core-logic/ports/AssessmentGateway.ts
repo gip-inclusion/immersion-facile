@@ -1,5 +1,5 @@
 import type { Observable } from "rxjs";
-import type { AssessmentDto, ConventionId } from "shared";
+import type { AssessmentDto, ConventionId, LegacyAssessmentDto } from "shared";
 
 export type AssessmentAndJwt = {
   assessment: AssessmentDto;
@@ -11,5 +11,5 @@ export interface AssessmentGateway {
   getAssessment$(params: {
     conventionId: ConventionId;
     jwt: string;
-  }): Observable<AssessmentDto>;
+  }): Observable<AssessmentDto | LegacyAssessmentDto>;
 }
