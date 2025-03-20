@@ -11,11 +11,16 @@
     &--hidden {
       display: none;
     }
+    &--opened-top {
+      top: auto;
+      bottom: 100%;
+    }
   }
 
   &__list {
     width: max-content;
     box-shadow: var(--border-default-grey) 0px 2px 8px 0px;
+    margin-bottom: 0;
   }
 
   &__list-element {

@@ -9,6 +9,7 @@ export type ButtonWithSubMenuProps = {
   buttonLabel: string;
   buttonIconId?: ButtonProps["iconId"];
   id?: string;
+  openedTop?: boolean;
 };
 
 export const ButtonWithSubMenu = ({
@@ -16,6 +17,7 @@ export const ButtonWithSubMenu = ({
   buttonLabel,
   buttonIconId,
   id,
+  openedTop,
 }: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -77,6 +79,7 @@ export const ButtonWithSubMenu = ({
           fr.cx("fr-menu"),
           Styles.menu,
           !isOpen && Styles.menuHidden,
+          openedTop && Styles.menuOpenedTop,
         )}
         id={`${buttonId}-submenu`}
         aria-hidden={!isOpen}

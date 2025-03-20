@@ -219,6 +219,38 @@ export const ConventionManageActions = ({
 
         {isAllowedConventionTransition(convention, "DRAFT", roles) && (
           <>
+            <ButtonWithSubMenu
+              buttonLabel={t.verification.modifyConvention}
+              openedTop={true}
+              navItems={[
+                {
+                  ...getVerificationActionButtonProps({
+                    initialStatus: convention.status,
+                    children: t.verification.modifyConvention,
+                    modalTitle: t.verification.modifyConvention,
+                    verificationAction: "REQUEST_EDIT",
+                    convention,
+                    disabled,
+                    currentSignatoryRoles: requesterRoles,
+                    onSubmit: createOnSubmitWithFeedbackKind(
+                      "modificationAskedFromCounsellorOrValidator",
+                    ),
+                  }).buttonProps,
+                },
+                {
+                  ...getVerificationActionButtonProps({
+                    initialStatus: convention.status,
+                    children: "children",
+                    modalTitle: "titre",
+                    verificationAction: "TRANSFER",
+                    convention,
+                    disabled,
+                    currentSignatoryRoles: requesterRoles,
+                    onSubmit: () => {},
+                  }).buttonProps,
+                },
+              ]}
+            />
             <Button
               {...getVerificationActionButtonProps({
                 initialStatus: convention.status,
@@ -245,6 +277,18 @@ export const ConventionManageActions = ({
                 onSubmit: createOnSubmitWithFeedbackKind(
                   "modificationAskedFromCounsellorOrValidator",
                 ),
+              }).modalWrapperProps}
+            />
+            <ModalWrapper
+              {...getVerificationActionButtonProps({
+                initialStatus: convention.status,
+                children: "children",
+                modalTitle: "titre",
+                verificationAction: "TRANSFER",
+                convention,
+                disabled,
+                currentSignatoryRoles: requesterRoles,
+                onSubmit: () => {},
               }).modalWrapperProps}
             />
           </>

@@ -318,6 +318,7 @@ export const domElementIds = {
   },
 
   manageConvention: {
+    conventionValidationTransferButton: "im-convention-validation__transfer-button",
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
@@ -355,6 +356,8 @@ export const domElementIds = {
       "im-convention-validation__submit-renew-modal-button",
     openRenewModalButton: "im-convention-validation__open-renew-modal-button",
     openDocumentButton: "im-convention-validation__open-document-button",
+    transferConventionModal:
+      "im-convention-validation__open-transfer-agency-button",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
   },

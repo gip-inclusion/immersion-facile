@@ -43,8 +43,8 @@ type VerificationActions =
   | "REQUEST_EDIT"
   | "REJECT"
   | "CANCEL"
-  | "DEPRECATE";
-//| "TRANSFER";
+  | "DEPRECATE"
+  | "TRANSFER";
 
 const newStatusByVerificationActions: Record<
   VerificationActions,
@@ -56,7 +56,7 @@ const newStatusByVerificationActions: Record<
   REJECT: "REJECTED",
   CANCEL: "CANCELLED",
   DEPRECATE: "DEPRECATED",
-  //TRANSFER: null,
+  TRANSFER: null,
 };
 
 const createRejectModalParams = {
@@ -109,15 +109,15 @@ const {
   close: closeValidatorModal,
 } = createModal(createValidatorModalParams);
 
-// const createTransferConventionModalParams = {
-//   id: domElementIds.manageConvention.transferConventionModal,
-//   isOpenedByDefault: false,
-// };
-// const {
-//   Component: TransferConventionModal,
-//   open: openTransferConventionModal,
-//   close: closeTransferConventionModal,
-// } = createModal(createTransferConventionModalParams);
+const createTransferConventionModalParams = {
+  id: domElementIds.manageConvention.transferConventionModal,
+  isOpenedByDefault: false,
+};
+const {
+  Component: TransferConventionModal,
+  open: openTransferConventionModal,
+  close: closeTransferConventionModal,
+} = createModal(createTransferConventionModalParams);
 
 export const modalByAction = (verificationAction: VerificationActions) => {
   const modals = {
@@ -157,12 +157,12 @@ export const modalByAction = (verificationAction: VerificationActions) => {
       closeModal: closeValidatorModal,
       createModalParams: createValidatorModalParams,
     },
-    // TRANSFER: {
-    //   modal: TransferConventionModal,
-    //   openModal: openTransferConventionModal,
-    //   closeModal: closeTransferConventionModal,
-    //   createModalParams: createTransferConventionModalParams,
-    // },
+    TRANSFER: {
+      modal: TransferConventionModal,
+      openModal: openTransferConventionModal,
+      closeModal: closeTransferConventionModal,
+      createModalParams: createTransferConventionModalParams,
+    },
   };
   return modals[verificationAction];
 };
@@ -178,7 +178,7 @@ export const getVerificationActionButtonProps = ({
   onCloseValidatorModalWithoutValidatorInfo,
   modalTitle,
 }: VerificationActionButtonProps): {
-  buttonProps: ButtonProps;
+  buttonProps: ButtonProps & { id: string; children: string };
   modalWrapperProps: ModalWrapperProps;
 } => {
   const iconByAction: Partial<Record<VerificationActions, FrIconClassName>> = {
@@ -198,7 +198,7 @@ export const getVerificationActionButtonProps = ({
     CANCEL: domElementIds.manageConvention.conventionValidationCancelButton,
     DEPRECATE:
       domElementIds.manageConvention.conventionValidationDeprecateButton,
-    //TRANSFER: domElementIds.manageConvention.conventionValidationTransferButton,
+    TRANSFER: domElementIds.manageConvention.conventionValidationTransferButton,
   };
 
   const onActionButtonClick = () =>
@@ -206,7 +206,7 @@ export const getVerificationActionButtonProps = ({
   return {
     buttonProps: {
       id: actionButtonStatusId[verificationAction],
-      children: children,
+      children,
       iconId: selectedIcon ?? "fr-icon-checkbox-circle-line",
       priority:
         verificationAction === "REJECT" || verificationAction === "DEPRECATE"
@@ -257,16 +257,16 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const Modal = modalObject.modal;
   const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
 
-  if (
-    !doesStatusNeedsJustification(
-      newStatusByVerificationActions[verificationAction],
-    ) &&
-    !doesStatusNeedsValidators(
-      initialStatus,
-      newStatusByVerificationActions[verificationAction],
-    )
-  )
-    return null;
+  // if (
+  //   !doesStatusNeedsJustification(
+  //     newStatusByVerificationActions[verificationAction],
+  //   ) &&
+  //   !doesStatusNeedsValidators(
+  //     initialStatus,
+  //     newStatusByVerificationActions[verificationAction],
+  //   )
+  // )
+  //   return null;
 
   const { closeModal } = modalObject;
   const onModalPropsChange = (newProps: Partial<ModalWrapperProps>) => {
@@ -281,10 +281,9 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
       <Fragment
         key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
       >
-        {/* {verificationAction === "TRANSFER" && (
+        {verificationAction === "TRANSFER" &&
           // <TransferConventionModalContent />
-          "test"
-        )} */}
+          "test"}
         {doesStatusNeedsJustification(
           newStatusByVerificationActions[verificationAction],
         ) && (
