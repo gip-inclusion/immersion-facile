@@ -1,5 +1,10 @@
 import test, { expect, type Page } from "@playwright/test";
-import { addressRoutes, domElementIds, frontRoutes } from "shared";
+import {
+  addressRoutes,
+  domElementIds,
+  formCompletionRoutes,
+  frontRoutes,
+} from "shared";
 import {
   expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
@@ -42,6 +47,7 @@ test.describe("Search", () => {
       page,
       locator: `#${domElementIds.search.appellationAutocomplete}`,
       value: "Boulanger",
+      endpoint: formCompletionRoutes.appellation.url,
     });
     await fillAutocomplete({
       page,
