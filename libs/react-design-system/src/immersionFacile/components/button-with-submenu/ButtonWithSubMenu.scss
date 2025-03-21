@@ -1,6 +1,6 @@
 .im-button-with-sub-menu {
   position: relative;
-
+  
   &__menu {
     max-height: 999px;
     overflow: auto;
@@ -21,6 +21,7 @@
     width: max-content;
     box-shadow: var(--border-default-grey) 0px 2px 8px 0px;
     margin-bottom: 0;
+    max-width: 100%
   }
 
   &__list-element {

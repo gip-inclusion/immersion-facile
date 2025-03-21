@@ -42,6 +42,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
   keys,
+  makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -616,21 +617,6 @@ export const ConventionForm = ({
   );
 };
 
-const makeListAgencyOptionsKindFilter = ({
-  internshipKind,
-  shouldListAll,
-  federatedIdentity,
-}: {
-  internshipKind: InternshipKind;
-  shouldListAll: boolean;
-  federatedIdentity: FederatedIdentity | null;
-}): AgencyKindFilter => {
-  if (internshipKind === "mini-stage-cci") return "miniStageOnly";
-  if (shouldListAll) return "miniStageExcluded";
-  return federatedIdentity && isFtConnectIdentity(federatedIdentity)
-    ? "immersionPeOnly"
-    : "miniStageExcluded";
-};
 
 const makeInitialBenefiaryForm = (
   beneficiary: Beneficiary<"immersion" | "mini-stage-cci">,

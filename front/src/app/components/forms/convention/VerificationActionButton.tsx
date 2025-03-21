@@ -14,6 +14,7 @@ import {
   type ConventionStatus,
   type ConventionStatusWithValidator,
   type Role,
+  type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
   type WithValidatorInfo,
   doesStatusNeedsJustification,
@@ -21,10 +22,16 @@ import {
   domElementIds,
   withValidatorInfoSchema,
 } from "shared";
+import { TransferConventionModalContent } from "src/app/components/forms/convention/TransferConventionModalContent";
+import type { ConventionFeedbackKind } from "src/core-logic/domain/convention/convention.slice";
 import { JustificationModalContent } from "./JustificationModalContent";
 
 export type VerificationActionButtonProps = {
-  onSubmit: (params: UpdateConventionStatusRequestDto) => void;
+  onSubmit: (
+    params:
+      | UpdateConventionStatusRequestDto
+      | TransferConventionToAgencyRequestDto,
+  ) => void;
   disabled?: boolean;
   initialStatus: ConventionStatus;
   verificationAction: VerificationActions;
@@ -214,7 +221,7 @@ export const getVerificationActionButtonProps = ({
           : "primary",
 
       onClick: onActionButtonClick,
-      className: fr.cx("fr-m-1w"),
+      className: fr.cx("fr-mx-1w", "fr-mb-2w"),
       disabled: disabled,
     },
     modalWrapperProps: {
@@ -282,9 +289,13 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
       <Fragment
         key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
       >
-        {verificationAction === "TRANSFER" &&
-          // <TransferConventionModalContent />
-          "test"}
+        {verificationAction === "TRANSFER" && (
+          <TransferConventionModalContent
+            onSubmit={onSubmit}
+            closeModal={closeModal}
+            convention={convention}
+          />
+        )}
         {doesStatusNeedsJustification(
           newStatusByVerificationActions[verificationAction],
         ) && (

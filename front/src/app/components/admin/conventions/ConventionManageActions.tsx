@@ -20,6 +20,7 @@ import {
   type ExcludeFromExisting,
   type RenewConventionParams,
   type Role,
+  type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -31,12 +32,12 @@ import {
   userHasEnoughRightsOnConvention,
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import {
   ModalWrapper,
   getVerificationActionButtonProps,
-  // VerificationActionButton,
 } from "src/app/components/forms/convention/VerificationActionButton";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
@@ -55,6 +56,7 @@ import {
   type ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { v4 as uuidV4 } from "uuid";
 import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
@@ -101,15 +103,41 @@ export const ConventionManageActions = ({
     string | null
   >(null);
   const createOnSubmitWithFeedbackKind =
-    (feedbackKind: ConventionFeedbackKind) =>
-    (updateStatusParams: UpdateConventionStatusRequestDto) =>
-      dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          jwt: jwtParams.jwt,
-          feedbackKind,
-          updateStatusParams,
-        }),
-      );
+    (feedbackKind: ConventionFeedbackKind | "transfer-convention-to-agency") =>
+    (
+      params:
+        | UpdateConventionStatusRequestDto
+        | TransferConventionToAgencyRequestDto,
+    ) => {
+      if (
+        "agencyId" in params &&
+        feedbackKind === "transfer-convention-to-agency"
+      ) {
+        return dispatch(
+          transferConventionToAgencySlice.actions.transferConventionToAgencyRequested(
+            {
+              agencyId: params.agencyId,
+              conventionId: params.conventionId,
+              justification: params.justification,
+              jwt: jwtParams.jwt,
+              feedbackTopic: feedbackKind,
+            },
+          ),
+        );
+      }
+      if (
+        "status" in params &&
+        feedbackKind !== "transfer-convention-to-agency"
+      ) {
+        return dispatch(
+          conventionSlice.actions.statusChangeRequested({
+            jwt: jwtParams.jwt,
+            feedbackKind,
+            updateStatusParams: params,
+          }),
+        );
+      }
+    };
 
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
@@ -153,6 +181,7 @@ export const ConventionManageActions = ({
         submitFeedback={submitFeedback}
         signatories={convention.signatories}
       />
+      
       <div
         style={{
           display: "flex",
@@ -222,6 +251,7 @@ export const ConventionManageActions = ({
             <ButtonWithSubMenu
               buttonLabel={t.verification.modifyConvention}
               openedTop={true}
+              className={fr.cx("fr-mx-1w", "fr-mb-2w")}
               navItems={[
                 {
                   ...getVerificationActionButtonProps({
@@ -232,7 +262,9 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: () => {},
+                    onSubmit: createOnSubmitWithFeedbackKind(
+                      "transfer-convention-to-agency",
+                    ),
                   }).buttonProps,
                 },
                 {
@@ -288,7 +320,9 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: () => {},
+                onSubmit: createOnSubmitWithFeedbackKind(
+                  "transfer-convention-to-agency",
+                ),
               }).modalWrapperProps}
             />
           </>
@@ -499,7 +533,6 @@ export const ConventionManageActions = ({
     </div>
   );
 };
-
 type RenewConventionParamsInForm = RenewConventionParams &
   Pick<ConventionReadDto, "internshipKind" | "signatories">;
 

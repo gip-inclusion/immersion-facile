@@ -10,6 +10,7 @@ export type ButtonWithSubMenuProps = {
   buttonIconId?: ButtonProps["iconId"];
   id?: string;
   openedTop?: boolean;
+  className?: string;
 };
 
 export const ButtonWithSubMenu = ({
@@ -18,6 +19,7 @@ export const ButtonWithSubMenu = ({
   buttonIconId,
   id,
   openedTop,
+  className,
 }: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -50,7 +52,7 @@ export const ButtonWithSubMenu = ({
       <Button
         {...({
           ref: toggleButtonRef,
-          className: cx(fr.cx("fr-m-md-0", "fr-pr-0")),
+          className: cx(className),
           id: buttonId,
           nativeButtonProps: {
             "aria-controls": `${buttonId}-submenu`,

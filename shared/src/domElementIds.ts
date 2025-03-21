@@ -350,6 +350,7 @@ export const domElementIds = {
       "im-convention-validation__send-signature-link-modal",
     submitSendSignatureLinkModalButton:
       "im-convention-validation__send-signature-link-modal-button",
+
     openSignModalButton: "im-convention-validation__open-sign-modal-button",
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:
@@ -360,6 +361,8 @@ export const domElementIds = {
       "im-convention-validation__open-transfer-agency-button",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
+    transferConventionToAgencyCancelButton: "im-transfer-agency-modal__cancel-button",
+    transferConventionToAgencyButton: "im-transfer-agency-modal__submit-button",
   },
 
   unsubscribeEstablishmentLead: {},
