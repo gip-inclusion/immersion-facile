@@ -45,22 +45,17 @@ const defaultHeader = (agencyLogoUrl?: string) => `
 export const cciCustomHtmlHeader = (agencyLogoUrl?: string): string => `
 <table width="600">
   <tr>
-    <td width="60%">
-      
-        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" alt="Chambre de Commerce et d'Industrie" width="699" height="173" style="max-width: 200px; max-height: 120px; height: auto;"/>
-      
-    </td>
     ${
       agencyLogoUrl && agencyLogoUrl !== ""
         ? `
       <td width="60%" align="right">
-        <img src="${agencyLogoUrl}" alt="Votre agence CCI" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
+        <img src="${agencyLogoUrl}" alt="Votre chambre consulaire" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
       </td>
       `
         : `
       <td width="40%">
         <div style="margin-left: 20px;">
-          <p style="color: #161616; font-weight: bold; font-size: 20px; margin: 0">Chambre de Commerce et d'Industrie</p>
+          <p style="color: #161616; font-weight: bold; font-size: 20px; margin: 0">Chambre consulaire</p>
           <p style="color: #3A3A3A; font-size: 14px; margin: 0">Mini stage</p>
         </div>
       </td>
