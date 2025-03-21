@@ -28,7 +28,20 @@ export const cciCustomHtmlFooter = () => `<table>
   </tr>
   <tr>
     <td align="center" style="padding: 20px;">
-      <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" alt="Chambre de Commerce et d'Industrie"/>
-    </td>
+  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;" align="center">
+    <tr> 
+      
+      <td align="center" style="padding: 0 10px;"> 
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/69269953-4d8a-4ad8-b09e-23d556237119.png" alt="Chambre d'agriculture" /> 
+      </td> 
+      <td align="center" style="padding: 0 10px;"> 
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/79aa605d-1307-4ed8-bcb4-c5ff6472a892.png" alt="Chambre des métiers et de l'artisanat" /> 
+      </td> 
+      <td align="center" style="padding: 0 10px;"> 
+        <img src="https://immersion.cellar-c2.services.clever-cloud.com/logo-cci-blanc.png" alt="Chambre de Commerce et d'Industrie" /> 
+      </td>
+    </tr> 
+  </table> 
+</td>
   </tr>
 </table>`;
