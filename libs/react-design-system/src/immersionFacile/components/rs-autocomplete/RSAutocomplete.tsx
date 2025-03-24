@@ -4,6 +4,7 @@ import type { InputProps } from "@codegouvfr/react-dsfr/Input";
 import Select, {
   type Props as SelectProps,
   type GroupBase,
+  type OptionProps,
 } from "react-select";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./RSAutocomplete.styles";
@@ -45,6 +46,7 @@ export const RSAutocomplete = <T,>({
 }: RSAutocompleteProps<T>) => {
   const hasError = state === "error";
   const { cx } = useStyles();
+  const CustomizedOption = selectProps?.components?.Option;
   return (
     <div
       className={cx(fr.cx("fr-input-group"), className)}
@@ -73,6 +75,17 @@ export const RSAutocomplete = <T,>({
         }}
         components={{
           DropdownIndicator: () => null,
+          ...(CustomizedOption
+            ? {
+                Option: (
+                  props: OptionProps<
+                    OptionType<T>,
+                    false,
+                    GroupBase<OptionType<T>>
+                  >,
+                ) => <CustomizedOption {...props} />,
+              }
+            : {}),
         }}
         noOptionsMessage={
           selectProps?.noOptionsMessage ||
