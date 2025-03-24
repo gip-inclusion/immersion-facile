@@ -5,6 +5,7 @@ import {
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
   InclusionConnectedUserBuilder,
+  type LegacyAssessmentDto,
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   displayRouteName,
@@ -15,6 +16,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import type { AssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -183,6 +185,62 @@ describe("Assessment routes", () => {
           status: 403,
           message: errors.assessment.conventionIdMismatch().message,
         },
+      });
+    });
+  });
+
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.getAssessmentByConventionId,
+  )} to get assessment`, () => {
+    it("returns 200 if the jwt is valid and assessment is assessmentDto", async () => {
+      const assessment: AssessmentDto = {
+        conventionId: convention.id,
+        status: "COMPLETED",
+        establishmentFeedback: "The guy left after one day",
+        endedWithAJob: false,
+        establishmentAdvices: "mon conseil",
+      };
+
+      await httpClient.createAssessment({
+        body: assessment,
+        headers: { authorization: jwt },
+      });
+
+      const response = await httpClient.getAssessmentByConventionId({
+        headers: { authorization: jwt },
+        urlParams: { conventionId: convention.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: assessment,
+      });
+    });
+
+    it("returns 200 if the jwt is valid and assessment is legacyAssessmentDto", async () => {
+      const legacyAssessment: LegacyAssessmentDto = {
+        conventionId: convention.id,
+        status: "FINISHED",
+        establishmentFeedback: "The guy left after one day",
+      };
+
+      await inMemoryUow.conventionRepository.setConventions([convention]);
+
+      await inMemoryUow.assessmentRepository.setAssessments([
+        {
+          _entityName: "Assessment",
+          ...legacyAssessment,
+        } as AssessmentEntity, // force type to AssessmentEntity to simulate a legacy assessment in DB
+      ]);
+
+      const response = await httpClient.getAssessmentByConventionId({
+        headers: { authorization: jwt },
+        urlParams: { conventionId: convention.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: legacyAssessment,
       });
     });
   });
