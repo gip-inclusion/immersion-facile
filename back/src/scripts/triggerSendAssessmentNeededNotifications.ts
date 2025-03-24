@@ -82,7 +82,11 @@ handleCRONScript(
   "sendAssessmentFormNotificationsScript",
   config,
   sendAssessmentFormNotificationsScript,
-  ({ numberOfImmersionEndingTomorrow, errors = {} }) => {
+  ({
+    numberOfImmersionEndingTomorrow,
+    numberOfConventionsWithAlreadyExistingAssessment,
+    errors = {},
+  }) => {
     const failures = keys(errors);
     const numberOfFailures = failures.length;
     const numberOfSuccess = numberOfImmersionEndingTomorrow - numberOfFailures;
@@ -96,6 +100,7 @@ handleCRONScript(
 
     return [
       `Total of immersion ending tomorrow : ${numberOfSuccess}`,
+      `Number of conventions with already existing assessment : ${numberOfConventionsWithAlreadyExistingAssessment}`,
       `Number of successfully sent Assessments : ${numberOfSuccess}`,
       `Number of failures : ${numberOfFailures}`,
       ...(numberOfFailures > 0 ? [`Failures : ${errorsAsString}`] : []),
