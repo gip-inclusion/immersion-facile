@@ -43,9 +43,9 @@ export const fillAutocomplete = async ({
   await expect(listboxId).not.toBeNull();
   const firstOption = page
     .locator(
-      `#${listboxId} li, .im-select__menu-list > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
+      `#${listboxId} > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
     )
-    .nth(0); // TODO: clean when AdressAutocomplete use react-select
+    .first();
   await firstOption.waitFor();
   await expect(firstOption).toBeVisible();
   await firstOption.click();

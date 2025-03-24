@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test:local": "playwright test -g 'creates a new establishment'",
+    "test:local": "playwright test",
     "test:local-on-staging": "BASE_URL=https://staging.immersion-facile.beta.gouv.fr playwright test",
     "test:ci": "CI=true playwright test",
     "show-report": "playwright show-report",

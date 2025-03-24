@@ -411,6 +411,26 @@ describe("agencyAdmin", () => {
     });
   });
 
+  it("clear agency", () => {
+    const agencyDto = new AgencyDtoBuilder().withId("1").build();
+    const agencyNeedingReviewDto = new AgencyDtoBuilder().withId("2").build();
+
+    ({ store, dependencies } = createTestStore({
+      admin: adminPreloadedState({
+        agencyAdmin: {
+          ...agencyAdminInitialState,
+          agency: agencyDto,
+          agencyNeedingReview: agencyNeedingReviewDto,
+        },
+      }),
+    }));
+    store.dispatch(agencyAdminSlice.actions.clearAgencyRequested());
+    expectAgencyAdminStateToMatch({
+      agency: null,
+      agencyNeedingReview: null,
+    });
+  });
+
   const expectAgencyAdminStateToMatch = (params: Partial<AgencyAdminState>) => {
     expectToEqual(agencyAdminSelectors.agencyState(store.getState()), {
       ...agencyAdminInitialState,

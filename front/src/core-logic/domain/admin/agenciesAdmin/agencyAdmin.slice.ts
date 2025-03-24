@@ -143,5 +143,9 @@ export const agencyAdminSlice = createSlice({
         action.payload.agencyNeedingReviewOptions;
       state.agencyNeedingReview = action.payload.agencyNeedingReview;
     },
+    clearAgencyRequested: (state) => {
+      state.agency = null;
+      state.agencyNeedingReview = null;
+    },
   },
 });

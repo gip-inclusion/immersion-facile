@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { useState } from "react";
 import {
   RSAutocomplete,
@@ -16,6 +17,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
   const dispatch = useDispatch();
@@ -31,6 +33,8 @@ export const useAgencyAdminAutocomplete = () => {
         }),
       );
     },
+    clearOption: () =>
+      dispatch(agencyAdminSlice.actions.clearAgencyRequested()),
   };
 };
 
@@ -52,7 +56,8 @@ export const AgencyAdminAutocomplete = ({
     agencyOptions,
     agency: selectedAgency,
   } = useAppSelector(agencyAdminSelectors.agencyState);
-  const { updateSearchTerm, selectOption } = useAgencyAdminAutocomplete();
+  const { updateSearchTerm, selectOption, clearOption } =
+    useAgencyAdminAutocomplete();
   const [inputValue, setInputValue] = useState(agencySearchText);
   const noOptionText =
     isSearching || !agencySearchText ? "..." : "Aucune agence trouvée";
@@ -60,6 +65,7 @@ export const AgencyAdminAutocomplete = ({
   const sortedAgencyOptions: AgencyOption[] = [...agencyOptions].sort((a, b) =>
     a.name.localeCompare(b.name),
   );
+  const { cx } = useStyles();
 
   return (
     <RSAutocomplete
@@ -86,6 +92,7 @@ export const AgencyAdminAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
+            clearOption();
             return;
           }
           if (searchResult) {
@@ -98,17 +105,21 @@ export const AgencyAdminAutocomplete = ({
           updateSearchTerm(searchTerm);
         },
         components: {
-          Option: (optionComponentProps) => (
-            <>
-              {optionComponentProps.data.label}
-              {!activeAgencyStatuses.includes(
-                optionComponentProps.data.value.status,
-              ) && (
-                <AgencyStatusBadge
-                  status={optionComponentProps.data.value.status}
-                />
+          Option: ({ innerRef, innerProps, data }) => (
+            <div
+              ref={innerRef}
+              {...innerProps}
+              className={cx(
+                innerProps.className,
+                fr.cx("fr-nav__link"),
+                "im-select__option",
               )}
-            </>
+            >
+              {data.label}
+              {!activeAgencyStatuses.includes(data.value.status) && (
+                <AgencyStatusBadge status={data.value.status} />
+              )}
+            </div>
           ),
         },
       }}
