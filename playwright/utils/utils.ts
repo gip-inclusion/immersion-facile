@@ -5,7 +5,6 @@ import {
   type TestInfo,
   expect,
 } from "@playwright/test";
-import { testConfig } from "../custom.config";
 
 export type PlaywrightTestCallback = (
   args: PlaywrightTestArgs,

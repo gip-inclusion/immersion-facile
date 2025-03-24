@@ -6,7 +6,6 @@ import { AgencyUsers } from "src/app/components/agency/AgencyUsers";
 import { CopyAgencyId } from "src/app/components/agency/CopyAgencyId";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import "src/assets/admin.css";
-import { Loader } from "react-design-system";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";

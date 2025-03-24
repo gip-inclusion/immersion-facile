@@ -7,7 +7,6 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
-  type DataWithPagination,
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   type Role,

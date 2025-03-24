@@ -5,7 +5,6 @@ import { useFormContext } from "react-hook-form";
 import {
   type AddressDto,
   type CreateAgencyDto,
-  addressDtoToString,
   domElementIds,
   emailSchema,
 } from "shared";

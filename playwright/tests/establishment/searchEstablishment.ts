@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test";
-import { type FormEstablishmentDto, domElementIds, frontRoutes } from "shared";
+import { domElementIds, frontRoutes } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 

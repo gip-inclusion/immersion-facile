@@ -1,17 +1,14 @@
 import { sql } from "kysely";
 import {
-  type AssessmentDto,
   type AssessmentStatus,
   type ConventionId,
   type DateString,
-  type LegacyAssessmentDto,
   errors,
 } from "shared";
 import {
   type KyselyDb,
   jsonBuildObject,
 } from "../../../config/pg/kysely/kyselyUtils";
-import type { EntityFromDto } from "../../../utils/EntityFromDto";
 import { assessmentEntitySchema } from "../../../utils/assessment";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import type { AssessmentRepository } from "../ports/AssessmentRepository";

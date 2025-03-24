@@ -1,5 +1,4 @@
 import Bottleneck from "bottleneck";
-import { response } from "express";
 import {
   type GenerateHtmlOptions,
   configureGenerateHtmlFromTemplate,
