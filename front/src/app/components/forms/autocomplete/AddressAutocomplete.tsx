@@ -1,5 +1,4 @@
-import { fr } from "@codegouvfr/react-dsfr";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   RSAutocomplete,
   type RSAutocompleteComponentProps,

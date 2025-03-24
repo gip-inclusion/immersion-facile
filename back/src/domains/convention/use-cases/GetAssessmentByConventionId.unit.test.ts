@@ -21,10 +21,7 @@ import {
   type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
-import {
-  type AssessmentEntity,
-  createAssessmentEntity,
-} from "../entities/AssessmentEntity";
+import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import {
   type GetAssessmentByConventionId,
   makeGetAssessmentByConventionId,

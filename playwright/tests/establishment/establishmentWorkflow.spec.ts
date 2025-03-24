@@ -1,7 +1,7 @@
 import { faker } from "@faker-js/faker/locale/fr";
 import { test } from "@playwright/test";
 import { addMonths } from "date-fns";
-import { type FormEstablishmentDto, FormEstablishmentDtoBuilder } from "shared";
+import { FormEstablishmentDtoBuilder } from "shared";
 import { testConfig } from "../../custom.config";
 import { phoneRegexp } from "../../utils/utils";
 import { createEstablishmentForm } from "./createNewEstablishment";

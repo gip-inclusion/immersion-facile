@@ -1,5 +1,4 @@
 import {
-  type FormEstablishmentDto,
   type InclusionConnectedUser,
   type WithFormEstablishmentDto,
   errors,
@@ -8,7 +7,6 @@ import {
 import { getNafAndNumberOfEmployee } from "../../../utils/siret";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
-import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";

@@ -1,9 +1,8 @@
-import { filter, map, toPairs, union, uniq } from "ramda";
+import { filter, map, toPairs, uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyId,
   type AgencyRight,
-  type AgencyRole,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   type Email,

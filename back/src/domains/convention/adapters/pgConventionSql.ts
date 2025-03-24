@@ -19,7 +19,6 @@ import {
   type ScheduleDto,
   type SiretDto,
   type UserId,
-  allAgencyRoles,
   conventionReadSchema,
   pipeWithValue,
 } from "shared";

@@ -6,7 +6,6 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,
   addressDtoToString,
-  domElementIds,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
