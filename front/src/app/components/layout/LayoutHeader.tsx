@@ -117,7 +117,7 @@ export const LayoutHeader = () => {
   if (isPeConnected || isInclusionConnected) {
     tools.push({
       iconId: "fr-icon-lock-line",
-      text: isPeConnected ? "Se déconnecter (PE Connect)" : "Se déconnecter",
+      text: isPeConnected ? "Se déconnecter (FT Connect)" : "Se déconnecter",
       buttonProps: {
         onClick: () => {
           dispatch(

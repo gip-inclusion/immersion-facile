@@ -149,7 +149,7 @@ export const EstablishmentDashboardPage = ({
         .otherwise(() => (
           <Alert
             severity="error"
-            title="Vous n'êtes pas connecté avec Inclusion Connect."
+            title="Vous n'êtes pas connecté avec ProConnect."
           />
         ))}
     </>
