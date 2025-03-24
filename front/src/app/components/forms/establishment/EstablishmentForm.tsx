@@ -136,9 +136,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
   const acquisitionParams = useGetAcquisitionParams();
   const siretFromFederatedIdentity =
+    !initialFormEstablishment.siret &&
     federatedIdentity?.provider === "connectedUser"
       ? federatedIdentity.siret
-      : undefined;
+      : initialFormEstablishment.siret;
 
   const defaultFormValues = useMemo(
     () => ({
