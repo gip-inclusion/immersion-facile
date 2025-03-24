@@ -1,3 +1,4 @@
+import { map } from "ramda";
 import {
   type AgencyRole,
   type AgencyWithUsersRights,
@@ -29,6 +30,7 @@ const logger = createLogger(__filename);
 type SendAssessmentFormNotificationsOutput = {
   errors?: Record<ConventionId, Error>;
   numberOfImmersionEndingTomorrow: number;
+  numberOfConventionsWithAlreadyExistingAssessment: number;
 };
 
 export class SendAssessmentNeededNotifications extends TransactionalUseCase<
@@ -77,17 +79,31 @@ export class SendAssessmentNeededNotifications extends TransactionalUseCase<
         "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       );
 
+    const conventionIdsWithAlreadyExistingAssessment =
+      await uow.assessmentRepository
+        .getByConventionIds(conventions.map((convention) => convention.id))
+        .then(map(({ conventionId }) => conventionId));
+
     logger.info({
       message: `[${now.toISOString()}]: About to send assessment email to ${
         conventions.length
       } establishments`,
     });
-    if (conventions.length === 0) return { numberOfImmersionEndingTomorrow: 0 };
+    if (conventions.length === 0)
+      return {
+        numberOfImmersionEndingTomorrow: 0,
+        numberOfConventionsWithAlreadyExistingAssessment: 0,
+      };
 
     const errors: Record<ConventionId, Error> = {};
 
+    const conventionsToSendEmailTo = conventions.filter(
+      (convention) =>
+        !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+    );
+
     await Promise.all(
-      conventions.map(async (convention) => {
+      conventionsToSendEmailTo.map(async (convention) => {
         try {
           await this.#sendEmailsWithAssessmentCreationLink({ uow, convention });
           await this.#sendEmailToBeneficiary({ uow, convention });
@@ -99,6 +115,8 @@ export class SendAssessmentNeededNotifications extends TransactionalUseCase<
 
     return {
       numberOfImmersionEndingTomorrow: conventions.length,
+      numberOfConventionsWithAlreadyExistingAssessment:
+        conventionIdsWithAlreadyExistingAssessment.length,
       errors,
     };
   }

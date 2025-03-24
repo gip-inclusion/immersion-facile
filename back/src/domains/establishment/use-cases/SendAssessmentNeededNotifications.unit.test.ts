@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
+  AssessmentDtoBuilder,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
   type Notification,
@@ -550,6 +551,117 @@ describe("SendAssessmentNeededNotifications", () => {
       // Assert
       expectToEqual(uow.notificationRepository.notifications, [notification]);
       expectToEqual(uow.outboxRepository.events, []);
+    });
+
+    describe("When an assessment as already been filled", () => {
+      it("Does not send emails if the convention already has an assessment filled", async () => {
+        uow.conventionRepository.setConventions([conventionEndingYesterday]);
+        const assessmentDto = new AssessmentDtoBuilder()
+          .withConventionId(conventionEndingYesterday.id)
+          .build();
+        uow.assessmentRepository.setAssessments([
+          {
+            _entityName: "Assessment",
+            numberOfHoursActuallyMade: 10,
+            ...assessmentDto,
+          },
+        ]);
+
+        expectToEqual(uow.outboxRepository.events, []);
+
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: oneDayAgo,
+            to: now,
+          },
+        });
+
+        expectToEqual(uow.notificationRepository.notifications, []);
+        expectToEqual(uow.outboxRepository.events, []);
+      });
+
+      it("Only sends the conventions were no assessment was filled when there are several conventions", async () => {
+        const conventionEndingYesterdayWithoutAssessment =
+          new ConventionDtoBuilder({ ...conventionEndingYesterday })
+            .withId("aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaa00")
+            .build();
+        uow.conventionRepository.setConventions([
+          conventionEndingYesterday,
+          conventionEndingYesterdayWithoutAssessment,
+        ]);
+
+        const assessmentDto = new AssessmentDtoBuilder()
+          .withConventionId(conventionEndingYesterday.id)
+          .build();
+
+        uow.assessmentRepository.setAssessments([
+          {
+            _entityName: "Assessment",
+            numberOfHoursActuallyMade: 10,
+            ...assessmentDto,
+          },
+        ]);
+
+        expectToEqual(uow.outboxRepository.events, []);
+
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: oneDayAgo,
+            to: now,
+          },
+        });
+
+        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+          {
+            kind: "email",
+            followedIds: {
+              conventionId: conventionEndingYesterdayWithoutAssessment.id,
+              agencyId: conventionEndingYesterdayWithoutAssessment.agencyId,
+            },
+            templatedContent: {
+              kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+              recipients: expect.any(Array),
+              params: expect.any(Object),
+            },
+          },
+          {
+            kind: "email",
+            followedIds: {
+              conventionId: conventionEndingYesterdayWithoutAssessment.id,
+              agencyId: conventionEndingYesterdayWithoutAssessment.agencyId,
+            },
+            templatedContent: {
+              kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+              recipients: [validator1.email],
+              params: expect.any(Object),
+            },
+          },
+          {
+            kind: "email",
+            followedIds: {
+              conventionId: conventionEndingYesterdayWithoutAssessment.id,
+              agencyId: conventionEndingYesterdayWithoutAssessment.agencyId,
+            },
+            templatedContent: {
+              kind: "ASSESSMENT_AGENCY_NOTIFICATION",
+              recipients: [counsellor.email],
+              params: expect.any(Object),
+            },
+          },
+          {
+            kind: "email",
+            followedIds: {
+              conventionId: conventionEndingYesterdayWithoutAssessment.id,
+              agencyId: conventionEndingYesterdayWithoutAssessment.agencyId,
+            },
+            templatedContent: {
+              kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
+              recipients: expect.any(Array),
+              params: expect.any(Object),
+            },
+          },
+        ]);
+      });
     });
   });
 
