@@ -4,14 +4,8 @@ import { useFormContext } from "react-hook-form";
 import {
   type FormEstablishmentDto,
   type NumberEmployeesRange,
-  addressDtoToString,
   defaultMaxContactsPerMonth,
-  domElementIds,
 } from "shared";
-import {
-  AddressAutocomplete,
-  addressStringToFakeAddressAndPosition,
-} from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   getFormContents,
@@ -31,7 +25,6 @@ export const CreationSiretRelatedInputs = () => {
     setValue,
     register,
     formState: { touchedFields },
-    getValues,
   } = useFormContext<FormEstablishmentDto>();
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels("create"),
@@ -69,7 +62,6 @@ export const CreationSiretRelatedInputs = () => {
         : defaultMaxContactsPerMonth,
     );
   }, [establishmentInfos]);
-  const businessAddress = getValues("businessAddresses.0")?.rawAddress;
   return (
     <>
       <Input
@@ -110,36 +102,6 @@ export const CreationSiretRelatedInputs = () => {
           }),
         }}
         {...getFieldError("businessNameCustomized")}
-      />
-      <AddressAutocomplete
-        initialValue={
-          businessAddress
-            ? addressStringToFakeAddressAndPosition(businessAddress)
-            : undefined
-        }
-        label={"Vérifiez l'adresse de votre établissement *"}
-        selectProps={{
-          inputId: domElementIds.establishment.create.addressAutocomplete,
-          value: businessAddress
-            ? {
-                label: businessAddress,
-                value: addressStringToFakeAddressAndPosition(businessAddress),
-              }
-            : undefined,
-        }}
-        onAddressSelected={(addressAndPosition) => {
-          setValue("businessAddresses.0", {
-            id: uuidV4(),
-            rawAddress: addressDtoToString(addressAndPosition.address),
-          });
-        }}
-        onAddressClear={() => {
-          setValue("businessAddresses.0", {
-            id: "",
-            rawAddress: "",
-          });
-        }}
-        disabled={isFetchingSiret}
       />
     </>
   );
