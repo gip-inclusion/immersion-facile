@@ -58,6 +58,9 @@ export const heroHeaderContent: Record<UserType, HeroHeaderInfos> = {
   },
 };
 
+export const ressourcesAndWebinarsUrl =
+  "https://pages.immersion-facile.beta.gouv.fr/ressources-webinaires-prescripteurs-immersion-professionnelle-pmsmp";
+
 export const heroHeaderNavCards: (
   storeDispatch: Dispatch,
 ) => Record<UserType, HeroHeaderNavCard[]> = (storeDispatch: Dispatch) => {
@@ -190,7 +193,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-book-2-line",
         type: "agency",
         id: domElementIds.home.heroHeader.resourcesAndWebinars,
-        link: { href: "https://pages.immersion-facile.beta.gouv.fr" },
+        link: { href: ressourcesAndWebinarsUrl },
         alternateTitle:
           "Ressources et webinaires : découvrez nos ressources dédiées pour guider et être guidé.",
       },
