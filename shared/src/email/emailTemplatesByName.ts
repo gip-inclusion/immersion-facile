@@ -20,7 +20,7 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 `
     : `
     Bonne journée, 
-    L’équipe de votre chambre consulaire.
+    L’équipe de votre Chambre consulaire.
 `;
 
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
@@ -535,7 +535,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
             <strong>Votre signature est obligatoire</strong> pour permettre à votre ${
               internshipKind === "immersion"
                 ? "conseiller"
-                : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+                : "conseiller de la Chambre consulaire ayant émis la convention"
             } de valider la convention. Merci !
           
           <strong>Ouvrez la demande via le bouton ci-dessous puis vérifiez les informations :</strong>
@@ -550,7 +550,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         subContent: `La décision de votre ${
           internshipKind === "immersion"
             ? "conseiller"
-            : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+            : "conseiller de la de la Chambre consulaire ayant émis la convention"
         } vous sera transmise par mail.
   
           ${defaultSignature(internshipKind)}
@@ -1194,7 +1194,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       Vous pouvez vous rapprocher de votre conseiller${
         internshipKind === "immersion"
           ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
+          : " de la Chambre consulaire ayant émis la convention"
       } pour en échanger.      
       
       Bien cordialement,       
@@ -1247,7 +1247,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       Vous pouvez vous rapprocher de votre conseiller${
         internshipKind === "immersion"
           ? ""
-          : " de la chambre de commerce et d'instrustrie - CCI"
+          : " de la Chambre consulaire ayant émis la convention"
       } pour en échanger ou établir une nouvelle demande si nécessaire.      
       
       Bien cordialement,       
@@ -1868,7 +1868,7 @@ Profil du candidat :
         }. Elle va être transmise à votre ${
           internshipKind === "immersion"
             ? "conseiller"
-            : "conseiller de la Chambre de Commerce et d'Instrustrie - CCI"
+            : "conseiller de la Chambre consulaire ayant émis la convention"
         } référent.
       
       Il vous informera par mail de la validation ou non ${

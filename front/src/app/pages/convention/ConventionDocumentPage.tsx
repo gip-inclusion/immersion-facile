@@ -852,7 +852,7 @@ export const ConventionDocumentPage = ({
               <p className={fr.cx("fr-text--xs")}>
                 <strong>
                   La convention doit être établie, signée par toutes les parties
-                  et visée par une des 3 chambres consulaires (CCI, CMA ou
+                  et visée par une des 3 Chambres consulaires (CCI, CMA ou
                   chambre d'agriculture) avant le démarrage de la période
                   d’observation. Sans visa, la convention ne pourra être
                   exécutée.
@@ -885,7 +885,7 @@ export const ConventionDocumentPage = ({
                 prétendre à aucune rémunération ou gratification de l’entreprise
                 ou de l’organisme d’accueil. Le visa de la présente convention
                 ne donne lieu à aucune facturation de la part de la Chambre
-                Consulaire émettant la convention.
+                consulaire émettant la convention.
               </p>
               <p className={fr.cx("fr-text--xs")}>
                 Article 5 – Activité Durant la période d’observation, le jeune
@@ -947,8 +947,8 @@ export const ConventionDocumentPage = ({
                 en cas de manquement à la discipline. Les difficultés qui
                 pourraient être rencontrées lors de toute période en milieu
                 professionnel et notamment toute absence du jeune, seront
-                aussitôt portées à la connaissance du référent de la Chambre de
-                Commerce et d’Industrie.
+                aussitôt portées à la connaissance du référent de la Chambre
+                consulaire émettant la convention.
               </p>
               <p className={fr.cx("fr-text--xs")}>
                 Article 9 – Durée La présente convention est signée pour la
