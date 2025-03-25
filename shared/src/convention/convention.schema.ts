@@ -103,11 +103,13 @@ import {
 } from "./convention.dto";
 import {
   getConventionTooLongMessageAndPath,
+  getOverMaxWorkedDaysMessageAndPath,
   isTutorEmailDifferentThanBeneficiaryRelatedEmails,
   minorBeneficiaryHasRepresentative,
   mustBeSignedByEveryone,
   startDateIsBeforeEndDate,
   underMaxCalendarDuration,
+  underMaxPresenceDays,
   validateBeneficiaryAddressAndParse,
 } from "./conventionRefinements";
 
@@ -300,6 +302,7 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
     path: [getConventionFieldName("dateEnd")],
   })
   .refine(underMaxCalendarDuration, getConventionTooLongMessageAndPath)
+  .refine(underMaxPresenceDays, getOverMaxWorkedDaysMessageAndPath)
   .refine(
     minorBeneficiaryHasRepresentative,
     ({ dateStart, signatories: { beneficiary } }) => {

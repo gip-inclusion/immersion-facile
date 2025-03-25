@@ -103,12 +103,17 @@ export const conventionStatuses = [
   ...conventionStatusesWithValidator,
 ] as const;
 
+export const maxPresenceDaysByInternshipKind: Record<InternshipKind, number> = {
+  immersion: 30,
+  "mini-stage-cci": 5,
+};
+
 export const maximumCalendarDayByInternshipKind: Record<
   InternshipKind,
   number
 > = {
   immersion: 30,
-  "mini-stage-cci": 5,
+  "mini-stage-cci": 8,
 };
 
 export const DATE_CONSIDERED_OLD = new Date("2024-08-31");
@@ -123,6 +128,8 @@ export const CCI_WEEKLY_MAX_PERMITTED_HOURS = 35;
 export const CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE = new Date(
   "2023-12-22",
 );
+
+export const MAX_PRESENCE_DAYS_RELEASE_DATE = new Date("2025-03-27");
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",

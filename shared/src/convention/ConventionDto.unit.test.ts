@@ -1,4 +1,4 @@
-import { addDays, subDays, subYears } from "date-fns";
+import { addDays, format, subDays, subYears } from "date-fns";
 import { keys } from "ramda";
 import { ZodError, type z } from "zod";
 import {
@@ -6,7 +6,10 @@ import {
   DATE_CONSIDERED_OLD,
   type DailyScheduleDto,
   type DateIntervalDto,
+  type DateString,
+  MAX_PRESENCE_DAYS_RELEASE_DATE,
   type Weekday,
+  maxPresenceDaysByInternshipKind,
   toDateString,
 } from "..";
 import {
@@ -36,7 +39,10 @@ import {
   conventionReadSchema,
   conventionSchema,
 } from "./convention.schema";
-import { getConventionTooLongMessageAndPath } from "./conventionRefinements";
+import {
+  getConventionTooLongMessageAndPath,
+  getOverMaxWorkedDaysMessageAndPath,
+} from "./conventionRefinements";
 
 const currentEmployer: BeneficiaryCurrentEmployer = {
   role: "beneficiary-current-employer",
@@ -303,6 +309,45 @@ describe("conventionDtoSchema", () => {
     ]);
   });
 
+  describe("contraints on number of day of presence", () => {
+    const dateStart = new Date("2025-03-31");
+
+    const maxCalendarDays =
+      maximumCalendarDayByInternshipKind["mini-stage-cci"];
+    const maxPresenceDays = maxPresenceDaysByInternshipKind["mini-stage-cci"];
+
+    const makeConvention = (dateSubmission: DateString) =>
+      new ConventionDtoBuilder()
+        .withInternshipKind("mini-stage-cci")
+        .withDateSubmission(dateSubmission)
+        .withDateStart(dateStart.toISOString())
+        .withDateEnd(addDays(dateStart, maxCalendarDays).toISOString())
+        .withSchedule(reasonableSchedule, ["samedi", "dimanche"])
+        .build();
+
+    describe(`when submission date is before ${format(MAX_PRESENCE_DAYS_RELEASE_DATE, "dd/MM/yyyy")} (date where we shipped in prod)`, () => {
+      it(`accepts conventions with more than ${maxPresenceDays} days of presence for internshipKind: 'mini-stage-cci'`, () => {
+        const convention = makeConvention(
+          subDays(new Date(MAX_PRESENCE_DAYS_RELEASE_DATE), 1).toISOString(),
+        );
+
+        expectConventionDtoToBeValid(convention);
+      });
+    });
+
+    describe(`when submission date is after ${format(MAX_PRESENCE_DAYS_RELEASE_DATE, "dd/MM/yyyy")} (date where we shipped in prod)`, () => {
+      it(`reject conventions with more than ${maxPresenceDays} days of presence for intershipKind: 'mini-stage-cci'`, () => {
+        const convention = makeConvention(
+          addDays(new Date(MAX_PRESENCE_DAYS_RELEASE_DATE), 1).toISOString(),
+        );
+
+        expectConventionInvalidWithIssueMessages(conventionSchema, convention, [
+          getOverMaxWorkedDaysMessageAndPath(convention).message,
+        ]);
+      });
+    });
+  });
+
   describe("constraints on convention start and end dates", () => {
     it("rejects misformatted submission dates", () => {
       const convention = new ConventionDtoBuilder()
@@ -514,7 +559,13 @@ describe("conventionDtoSchema", () => {
             .withDateEnd(
               addDays(new Date(DATE_START), maxCalendarDays + 1).toISOString(),
             )
-            .withSchedule(reasonableSchedule, ["dimanche"])
+            .withSchedule(reasonableSchedule, [
+              "lundi",
+              "mercredi",
+              "vendredi",
+              "samedi",
+              "dimanche",
+            ])
             .build();
 
           expectConventionInvalidWithIssueMessages(
@@ -543,7 +594,12 @@ describe("conventionDtoSchema", () => {
             .withInternshipKind(internshipKind)
             .withDateStart(dateStart)
             .withDateEnd(dateEnd)
-            .withSchedule(reasonableSchedule, ["dimanche"])
+            .withSchedule(reasonableSchedule, [
+              "jeudi",
+              "vendredi",
+              "samedi",
+              "dimanche",
+            ])
             .build();
 
           expectConventionDtoToBeValid(convention);
