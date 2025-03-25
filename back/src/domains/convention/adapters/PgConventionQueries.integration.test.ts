@@ -564,7 +564,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const matchingSiret: SiretDto = "11112222333344";
     const matchingAppellation: AppellationCode = "140927";
     const matchingBirthDate = new Date("1992-01-01").toISOString();
-    const matchingBeneficiaryLastname = "Dupont";
+    const matchingBeneficiaryLastname = "M'GOMA";
     const matchingDateStart = new Date("2021-01-09").toISOString();
     const someMatchingStatus = "DRAFT";
     const conventionMatchingIdA: ConventionId =
@@ -1072,6 +1072,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const conventionA = new ConventionDtoBuilder()
       .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
       .withAgencyId(agencyId)
+      .withBeneficiaryEmail("beneficiary@convention-a.com")
       .withStatus("DRAFT")
       .withDateStart(new Date("2023-01-15").toISOString())
       .withDateEnd(new Date("2023-01-20").toISOString())
@@ -1263,12 +1264,13 @@ describe("Pg implementation of ConventionQueries", () => {
               from: "2023-01-01",
               to: "2023-02-15",
             },
+            actorEmailContains: "@convention-a.com",
           },
           sortBy: "dateStart",
         });
 
-      expect(result.data.length).toBe(2);
-      expectToEqual(result.data, [conventionB, conventionA]);
+      expect(result.data.length).toBe(1);
+      expectToEqual(result.data, [conventionA]);
     });
 
     it("should only return conventions from agencies the user belongs to", async () => {
