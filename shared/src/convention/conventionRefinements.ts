@@ -1,5 +1,6 @@
 import differenceInDays from "date-fns/differenceInDays";
 import { addressSchema } from "../address/address.schema";
+import type { ScheduleDto } from "../schedule/Schedule.dto";
 import type { DateString } from "../utils/date";
 import { allSignatoriesSigned, getConventionFieldName } from "./convention";
 import {
@@ -7,8 +8,10 @@ import {
   type ConventionStatus,
   type EstablishmentTutor,
   type InternshipKind,
+  MAX_PRESENCE_DAYS_RELEASE_DATE,
   type Signatories,
   getExactAge,
+  maxPresenceDaysByInternshipKind,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 
@@ -41,6 +44,31 @@ export const getConventionTooLongMessageAndPath = ({
   internshipKind,
 }: DatesAndInternshipKing) => ({
   message: `La durée maximale calendaire d'une immersion est de ${maximumCalendarDayByInternshipKind[internshipKind]} jours.`,
+  path: [getConventionFieldName("dateEnd")],
+});
+
+type WithScheduleAndInternshipKind = {
+  schedule: ScheduleDto;
+  internshipKind: InternshipKind;
+  dateSubmission: DateString;
+};
+
+export const underMaxPresenceDays = ({
+  schedule,
+  internshipKind,
+  dateSubmission,
+}: WithScheduleAndInternshipKind): boolean => {
+  if (new Date(dateSubmission) < new Date(MAX_PRESENCE_DAYS_RELEASE_DATE))
+    return true;
+  const maxWorkedDays = maxPresenceDaysByInternshipKind[internshipKind];
+  return schedule.workedDays <= maxWorkedDays;
+};
+
+export const getOverMaxWorkedDaysMessageAndPath = ({
+  internshipKind,
+  schedule,
+}: WithScheduleAndInternshipKind) => ({
+  message: `Le nombre maximum de jours de présence est ${maxPresenceDaysByInternshipKind[internshipKind]} jours. Actuellement, il y a ${schedule.workedDays} jours de présence.`,
   path: [getConventionFieldName("dateEnd")],
 });
 
