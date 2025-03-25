@@ -49,7 +49,7 @@ export const cciCustomHtmlHeader = (agencyLogoUrl?: string): string => `
       agencyLogoUrl && agencyLogoUrl !== ""
         ? `
       <td width="60%" align="right">
-        <img src="${agencyLogoUrl}" alt="Votre chambre consulaire" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
+        <img src="${agencyLogoUrl}" alt="Votre Chambre consulaire" style="max-width: 150px; max-height: 120px; height: auto; margin-left: 20px;"/>
       </td>
       `
         : `
