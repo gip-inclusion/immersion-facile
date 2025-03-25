@@ -65,12 +65,7 @@ export class PgConventionQueries implements ConventionQueries {
         "=",
         params.beneficiaryBirthdate,
       )
-      .where(
-        (eb) =>
-          sql<any>`${eb.ref("b.last_name")} = ${sql.lit(
-            params.beneficiaryLastName,
-          )}`,
-      )
+      .where("b.last_name", "=", params.beneficiaryLastName)
       .where(
         "conventions.date_start",
         "<=",
@@ -369,11 +364,11 @@ const filterEmail =
 
     return builder.where((eb) => {
       return eb.or([
-        sql<any>`${eb.ref("b.email")} ILIKE ${sql.lit(pattern)}`,
-        sql<any>`${eb.ref("er.email")} ILIKE ${sql.lit(pattern)}`,
-        sql<any>`${eb.ref("et.email")} ILIKE ${sql.lit(pattern)}`,
-        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${sql.lit(pattern)}`,
-        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${sql.lit(pattern)}`,
+        sql<any>`${eb.ref("b.email")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("er.email")} ILIKE ${pattern}`,
+        sql<any>`${eb.ref("et.email")} ILIKE ${pattern}`,
+        sql<any>`br.email IS NOT NULL AND br.email ILIKE ${pattern}`,
+        sql<any>`bce.email IS NOT NULL AND bce.email ILIKE ${pattern}`,
       ]);
     });
   };
@@ -410,8 +405,8 @@ const filterByBeneficiaryName =
         nameWords.flatMap((nameWord) => {
           const pattern = `%${nameWord}%`;
           return [
-            sql<any>`${eb.ref("b.first_name")} ILIKE ${sql.lit(pattern)}`,
-            sql<any>`${eb.ref("b.last_name")} ILIKE ${sql.lit(pattern)}`,
+            sql<any>`${eb.ref("b.first_name")} ILIKE ${pattern}`,
+            sql<any>`${eb.ref("b.last_name")} ILIKE ${pattern}`,
           ];
         }),
       ),
