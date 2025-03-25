@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  type AgencyKind,
   ConventionDtoBuilder,
   InclusionConnectedUserBuilder,
   errors,
@@ -100,27 +101,37 @@ describe("GetApiConsumersByConvention", () => {
       [],
     );
   });
+  it.each([
+    "conseil-departemental",
+    "pole-emploi",
+    "cap-emploi",
+  ] as AgencyKind[])(
+    "return an array with France Travail if convention is of kind %s and if user has right on the convention",
+    async (kind) => {
+      const agencyWithKind = new AgencyDtoBuilder().withKind(kind).build();
+      const conventionWithAgencyOfKind = new ConventionDtoBuilder()
+        .withAgencyId(agencyWithKind.id)
+        .build();
+      uow.conventionRepository.setConventions([conventionWithAgencyOfKind]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agencyWithKind, {
+          [user.id]: {
+            isNotifiedByEmail: true,
+            roles: ["validator", "counsellor"],
+          },
+        }),
+      ];
+      uow.userRepository.users = [user];
 
-  it("return an array with France Travail if convention is of kind pole emploi and if user has right on the convention", async () => {
-    uow.conventionRepository.setConventions([conventionWithFtAgency]);
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(ftAgency, {
-        [user.id]: {
-          isNotifiedByEmail: true,
-          roles: ["validator", "counsellor"],
-        },
-      }),
-    ];
-    uow.userRepository.users = [user];
-
-    expectToEqual(
-      await getApiConsumersByConvention.execute(
-        { conventionId: conventionWithFtAgency.id },
-        icUser,
-      ),
-      ["France Travail"],
-    );
-  });
+      expectToEqual(
+        await getApiConsumersByConvention.execute(
+          { conventionId: conventionWithAgencyOfKind.id },
+          icUser,
+        ),
+        ["France Travail"],
+      );
+    },
+  );
 
   it("return an array with the api partners names link to the convention if user has right on the convention", async () => {
     const now = new Date("2024-07-22");

@@ -1,4 +1,5 @@
 import {
+  type AgencyKind,
   type AgencyWithUsersRights,
   type ApiConsumer,
   type ApiConsumerName,
@@ -60,9 +61,17 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
         apiConsumer.rights.convention.subscriptions.length !== 0 &&
         isConventionInScope(apiConsumer, agency),
     );
+
+    const agencyKindsAllowedToBroadcastToFT: AgencyKind[] = [
+      "pole-emploi",
+      "cap-emploi",
+      "conseil-departemental",
+    ];
     return [
       ...conventionApiConsurmers.map(({ name }) => name),
-      ...(agency.kind === "pole-emploi" ? ["France Travail"] : []),
+      ...(agencyKindsAllowedToBroadcastToFT.includes(agency.kind)
+        ? ["France Travail"]
+        : []),
     ];
   },
 );
