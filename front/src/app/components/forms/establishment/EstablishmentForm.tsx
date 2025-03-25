@@ -277,6 +277,12 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [debouncedFormValues, isEstablishmentCreation]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(establishmentSlice.actions.clearEstablishmentRequested());
+    };
+  }, [dispatch]);
+
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
     match({ route, adminJwt, inclusionConnectedJwt })
       .with(
