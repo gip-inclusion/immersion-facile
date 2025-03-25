@@ -6,6 +6,7 @@ import { useIsDark } from "@codegouvfr/react-dsfr/useIsDark";
 import { ButtonWithSubMenu, MaintenanceCallout } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
+import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
@@ -281,7 +282,7 @@ export const LayoutHeader = () => {
           text: "Ressources et webinaires",
           isActive: false,
           linkProps: {
-            href: "https://pages.immersion-facile.beta.gouv.fr/",
+            href: ressourcesAndWebinarsUrl,
             id: agencyIds.resourcesAndWebinars,
           },
         },

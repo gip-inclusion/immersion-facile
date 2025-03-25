@@ -16,6 +16,7 @@ import {
 } from "react-design-system";
 import { domElementIds } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
+import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { routes } from "src/app/routes/routes";
 import { makeStyles, useStyles } from "tss-react/dsfr";
 import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
@@ -207,7 +208,7 @@ const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   },
   {
     label: "Ressources et webinaires",
-    href: "https://pages.immersion-facile.beta.gouv.fr/",
+    href: ressourcesAndWebinarsUrl,
     id: bottomsLinksIds.resourcesAndWebinars,
   },
   headerFooterDisplayItem,
