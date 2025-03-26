@@ -34,6 +34,8 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentEpics } from "src/core-logic/domain/assessment/assessment.epics";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { conventionActionEpics } from "src/core-logic/domain/convention/convention-action/conventionAction.epics";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { transferConventionToAgencyEpics } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.epic";
@@ -101,6 +103,7 @@ const allEpics: AppEpic<any>[] = [
   ...nafEpics,
   ...sendSignatureLinkEpics,
   ...transferConventionToAgencyEpics,
+  ...conventionActionEpics,
 ];
 
 const appReducer = combineReducers({
@@ -140,6 +143,7 @@ const appReducer = combineReducers({
   [transferConventionToAgencySlice.name]:
     transferConventionToAgencySlice.reducer,
   [nafSlice.name]: nafSlice.reducer,
+  [conventionActionSlice.name]: conventionActionSlice.reducer,
 });
 
 const rootReducer: typeof appReducer = (state, action) =>

@@ -165,28 +165,28 @@ export const conventionSlice = createSlice({
     },
 
     // Sign convention
-    signConventionRequested: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = true;
-    },
-    signConventionSucceeded: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = false;
-    },
-    signConventionFailed: setFeedbackAsErrored,
+    // signConventionRequested: (
+    //   state,
+    //   _action: PayloadAction<{
+    //     conventionId: ConventionId;
+    //     jwt: ConventionJwt | ConnectedUserJwt;
+    //   }>,
+    // ) => {
+    //   state.isLoading = true;
+    // },
+    // signConventionSucceeded: (
+    //   state,
+    //   _action: PayloadAction<{
+    //     conventionId: ConventionId;
+    //     jwt: ConventionJwt | ConnectedUserJwt;
+    //   }>,
+    // ) => {
+    //   state.isLoading = false;
+    // },
+    // signConventionFailed: setFeedbackAsErrored,
 
     // Modification requested
-    _statusChangeRequested: (
+    statusChangeRequested: (
       state,
       _action: PayloadAction<StatusChangePayload>,
     ) => {
@@ -287,23 +287,23 @@ export const conventionSlice = createSlice({
     },
     getSimilarConventionsFailed: setFeedbackAsErrored,
 
-    broadcastConventionToPartnerRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<WithConventionId>,
-    ) => {
-      state.isBroadcasting = true;
-    },
-    broadcastConventionToPartnerSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic,
-    ) => {
-      state.isBroadcasting = false;
-    },
-    broadcastConventionToPartnerFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
-    ) => {
-      state.isBroadcasting = false;
-    },
+    // broadcastConventionToPartnerRequested: (
+    //   state,
+    //   _action: PayloadActionWithFeedbackTopic<WithConventionId>,
+    // ) => {
+    //   state.isBroadcasting = true;
+    // },
+    // broadcastConventionToPartnerSucceeded: (
+    //   state,
+    //   _action: PayloadActionWithFeedbackTopic,
+    // ) => {
+    //   state.isBroadcasting = false;
+    // },
+    // broadcastConventionToPartnerFailed: (
+    //   state,
+    //   _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
+    // ) => {
+    //   state.isBroadcasting = false;
+    // },
   },
 });
