@@ -34,13 +34,15 @@ export const handleCRONScript = async <
 
   try {
     const startTime = Date.now();
-    const checkInId = sentry.captureCheckIn(
-      {
-        monitorSlug: sanitizedName,
-        status: "in_progress",
-      },
-      { ...defaultMonitorConfig, ...monitorConfig },
-    );
+    const checkInId = sentry
+      ? sentry.captureCheckIn(
+          {
+            monitorSlug: sanitizedName,
+            status: "in_progress",
+          },
+          { ...defaultMonitorConfig, ...monitorConfig },
+        )
+      : undefined;
 
     const context = `${config.envType} - ${config.immersionFacileBaseUrl}`;
     const contextParams: ScriptContextParams = {
@@ -52,20 +54,24 @@ export const handleCRONScript = async <
 
     try {
       const results = await script();
-      sentry.captureCheckIn({
-        checkInId,
-        monitorSlug: sanitizedName,
-        status: "ok",
-        duration: (Date.now() - startTime) / 1000,
-      });
+      if (sentry) {
+        sentry.captureCheckIn({
+          checkInId,
+          monitorSlug: sanitizedName,
+          status: "ok",
+          duration: (Date.now() - startTime) / 1000,
+        });
+      }
       await onScriptSuccess<T>({ ...contextParams, handleResults })(results);
     } catch (error) {
-      sentry.captureCheckIn({
-        checkInId,
-        monitorSlug: sanitizedName,
-        status: "error",
-        duration: (Date.now() - startTime) / 1000,
-      });
+      if (sentry) {
+        sentry.captureCheckIn({
+          checkInId,
+          monitorSlug: sanitizedName,
+          status: "error",
+          duration: (Date.now() - startTime) / 1000,
+        });
+      }
       await onScriptError(contextParams)(error);
     }
   } finally {
