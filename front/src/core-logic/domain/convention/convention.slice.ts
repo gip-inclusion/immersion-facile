@@ -186,7 +186,7 @@ export const conventionSlice = createSlice({
     signConventionFailed: setFeedbackAsErrored,
 
     // Modification requested
-    statusChangeRequested: (
+    _statusChangeRequested: (
       state,
       _action: PayloadAction<StatusChangePayload>,
     ) => {

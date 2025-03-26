@@ -28,7 +28,7 @@ import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { JustificationModalContent } from "./JustificationModalContent";
+import { JustificationModalContent } from "./manage-actions/modals/JustificationModalContent";
 
 type SignatureActionsProperties = {
   signatory: Signatory;
