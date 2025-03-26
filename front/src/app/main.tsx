@@ -38,17 +38,19 @@ createRoot(rootContainer).render(
   </StrictMode>,
 );
 
-SentryInit({
-  dsn: "https://8bbb3df20b0910b08f2f435e46f6390f@o4508405260615680.ingest.de.sentry.io/4508999055507536",
-  integrations: [browserTracingIntegration(), replayIntegration()],
-  release: import.meta.env.VITE_RELEASE_TAG,
-  environment: ENV.envType,
-  tracesSampleRate: 0.01,
-  tracePropagationTargets: [
-    "http://localhost:3000/api",
-    "https://staging.immersion-facile.beta.gouv.fr/api",
-    "https://immersion-facile.beta.gouv.fr/api",
-  ],
-  replaysOnErrorSampleRate: 1,
-  replaysSessionSampleRate: 0,
-});
+if (ENV.envType !== "local") {
+  SentryInit({
+    dsn: "https://8bbb3df20b0910b08f2f435e46f6390f@o4508405260615680.ingest.de.sentry.io/4508999055507536",
+    integrations: [browserTracingIntegration(), replayIntegration()],
+    release: import.meta.env.VITE_RELEASE_TAG,
+    environment: ENV.envType,
+    tracesSampleRate: 0.01,
+    tracePropagationTargets: [
+      "http://localhost:3000/api",
+      "https://staging.immersion-facile.beta.gouv.fr/api",
+      "https://immersion-facile.beta.gouv.fr/api",
+    ],
+    replaysOnErrorSampleRate: 1,
+    replaysSessionSampleRate: 0,
+  });
+}
