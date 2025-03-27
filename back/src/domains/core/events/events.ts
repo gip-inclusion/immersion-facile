@@ -5,6 +5,9 @@ import {
   type DateString,
   type Flavor,
   type IdentityProvider,
+  type NotificationErrored,
+  type NotificationId,
+  type NotificationKind,
   type RejectIcUserRoleForAgencyParams,
   type Role,
   type UserId,
@@ -124,6 +127,7 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
+  | GenericEvent<"DiscussionExchangeDeliveryFailed", { notificationId: NotificationId, notificationKind: NotificationKind, errored: NotificationErrored }>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
