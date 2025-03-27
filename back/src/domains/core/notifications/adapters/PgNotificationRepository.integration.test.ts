@@ -5,6 +5,7 @@ import {
   type EmailAttachment,
   type EmailNotification,
   type Notification,
+  type NotificationErrored,
   type SmsNotification,
   type TemplatedEmail,
   type TemplatedSms,
@@ -270,6 +271,49 @@ describe("PgNotificationRepository", () => {
         "sms",
       );
       expect(smsResponse).toEqual(smsNotification);
+    });
+  });
+
+  describe("markErrored", () => {
+    it("should mark the notification as errored, and drop it when null is passed", async () => {
+      const notification = emailNotifications[0];
+
+      await pgNotificationRepository.save(notification);
+
+      const errored: NotificationErrored = {
+        httpStatus: 400,
+        message: "error",
+        occurredAt: new Date().toISOString(),
+      };
+
+      await pgNotificationRepository.markErrored({
+        notificationId: notification.id,
+        notificationKind: notification.kind,
+        errored,
+      });
+      const response = await pgNotificationRepository.getByIdAndKind(
+        notification.id,
+        "email",
+      );
+      expect(response).toBeDefined();
+      if (!response) throw new Error("response is undefined (unreachable)");
+
+      expectToEqual(response.errored, errored);
+
+      await pgNotificationRepository.markErrored({
+        notificationId: notification.id,
+        notificationKind: notification.kind,
+        errored: null,
+      });
+
+      const response2 = await pgNotificationRepository.getByIdAndKind(
+        notification.id,
+        "email",
+      );
+      expect(response2).toBeDefined();
+      if (!response2) throw new Error("response2 is undefined (unreachable)");
+
+      expect(response2.errored).toBeUndefined();
     });
   });
 

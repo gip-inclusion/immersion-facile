@@ -1,11 +1,19 @@
 import {
+  type SmsNotification,
   type TemplatedEmail,
   type TemplatedSms,
   errors,
   expectPromiseToFailWithError,
+  expectToEqual,
 } from "shared";
+import {
+  type CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../events/ports/EventBus";
+import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryNotificationGateway,
   sendSmsErrorPhoneNumber,
@@ -19,13 +27,26 @@ describe("SendNotification UseCase", () => {
   let notificationGateway: InMemoryNotificationGateway;
   let notificationRepository: InMemoryNotificationRepository;
   let sendNotification: SendNotification;
+  let timeGateway: CustomTimeGateway;
+  let createNewEvent: CreateNewEvent;
 
   beforeEach(() => {
     notificationGateway = new InMemoryNotificationGateway();
     const uow = createInMemoryUow();
     notificationRepository = uow.notificationRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
-    sendNotification = new SendNotification(uowPerformer, notificationGateway);
+    const uuidGenerator = new TestUuidGenerator();
+    timeGateway = new CustomTimeGateway();
+    createNewEvent = makeCreateNewEvent({
+      timeGateway: timeGateway,
+      uuidGenerator: uuidGenerator,
+    });
+    sendNotification = new SendNotification(
+      uowPerformer,
+      notificationGateway,
+      timeGateway,
+      createNewEvent,
+    );
   });
 
   describe("Wrong paths", () => {
@@ -41,24 +62,40 @@ describe("SendNotification UseCase", () => {
     it("when error occurres in SMS sending", async () => {
       const id = "notif-abc";
 
-      notificationRepository.notifications = [
-        {
-          id,
-          kind: "sms",
-          templatedContent: {
-            kind: "FirstReminderForSignatories",
-            params: { shortLink: "https://my-link.com" },
-            recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
-          },
-          createdAt: someDate,
-          followedIds: { conventionId: "convention-123" },
+      const now = new Date();
+      timeGateway.setNextDate(now);
+
+      const smsNotification: SmsNotification = {
+        id,
+        kind: "sms",
+        templatedContent: {
+          kind: "FirstReminderForSignatories",
+          params: { shortLink: "https://my-link.com" },
+          recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
         },
-      ];
+        createdAt: someDate,
+        followedIds: { conventionId: "convention-123" },
+      };
+
+      notificationRepository.notifications = [smsNotification];
+
+      const errorMessage = "Send SMS Error with phone number 33699999999.";
 
       await expectPromiseToFailWithError(
         sendNotification.execute({ id, kind: "sms" }),
-        new Error("Send SMS Error with phone number 33699999999."),
+        new Error(errorMessage),
       );
+
+      expectToEqual(notificationRepository.notifications, [
+        {
+          ...smsNotification,
+          errored: {
+            occurredAt: now.toISOString(),
+            httpStatus: 555,
+            message: errorMessage,
+          },
+        },
+      ]);
     });
   });
 

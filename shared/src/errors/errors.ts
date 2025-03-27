@@ -118,7 +118,11 @@ export const errors = {
       ),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
-    fakeError: (message: string) => new Error(message),
+    fakeError: (message: string, httpStatus?: number) => {
+      const error = new Error(message);
+      if (httpStatus) (error as any).httpStatus = httpStatus;
+      return error;
+    },
     unsupportedStatus: ({ body, status }: { status: number; body: any }) =>
       new Error(
         `Unsupported response status ${
