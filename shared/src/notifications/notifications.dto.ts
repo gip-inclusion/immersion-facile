@@ -5,7 +5,7 @@ import type { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllo
 import type { SiretDto } from "../siret/siret";
 import type { TemplatedSms } from "../sms/smsTemplateByName";
 import type { Flavor } from "../typeFlavors";
-import type { DateString } from "../utils/date";
+import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type NotificationId = Flavor<string, "NotificationId">;
 
@@ -31,10 +31,17 @@ export type FollowedIds = {
   userId?: UserId;
 };
 
+export type NotificationErrored = {
+  occurredAt: DateTimeIsoString;
+  httpStatus: number;
+  message: string;
+};
+
 export type NotificationCommonFields = {
   id: NotificationId;
   createdAt: DateString;
   followedIds: FollowedIds;
+  errored?: NotificationErrored;
 };
 
 export type Notification = NotificationCommonFields & NotificationContent;

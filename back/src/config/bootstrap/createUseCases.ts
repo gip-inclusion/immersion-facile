@@ -205,6 +205,8 @@ export const createUseCases = (
       sendNotification: new SendNotification(
         uowPerformer,
         gateways.notification,
+        gateways.timeGateway,
+        createNewEvent,
       ),
       sendNotificationsInBatch: new SendNotificationInBatch(
         uowPerformer,
