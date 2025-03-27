@@ -40,7 +40,6 @@ export const newStatusByVerificationAction = {
 
 export type VerificationAction = keyof typeof newStatusByVerificationAction;
 
-
 export const getVerificationActionProps = ({
   verificationAction,
   disabled,

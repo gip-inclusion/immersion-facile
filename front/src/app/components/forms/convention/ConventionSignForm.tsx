@@ -25,11 +25,7 @@ import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
-import {
-  type ConventionFeedbackKind,
-  type ConventionSubmitFeedback,
-  conventionSlice,
-} from "src/core-logic/domain/convention/convention.slice";
+import type { ConventionSubmitFeedback } from "src/core-logic/domain/convention/convention.slice";
 import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {

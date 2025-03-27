@@ -52,7 +52,6 @@ import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConvention
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  type ConventionFeedbackKind,
   type ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
@@ -102,42 +101,81 @@ export const ConventionManageActions = ({
     string | null
   >(null);
 
-  const createOnSubmitWithFeedbackKind =
-    (feedbackKind: ConventionFeedbackKind | "transfer-convention-to-agency") =>
-    (
-      params:
-        | UpdateConventionStatusRequestDto
-        | TransferConventionToAgencyRequestDto,
-    ) => {
-      if (
-        "agencyId" in params &&
-        feedbackKind === "transfer-convention-to-agency"
-      ) {
+  const createOnSubmitWithFeedbackKind = (
+    params:
+      | UpdateConventionStatusRequestDto
+      | TransferConventionToAgencyRequestDto,
+  ) => {
+    if ("agencyId" in params) {
+      dispatch(
+        conventionActionSlice.actions.transferConventionToAgencyRequested({
+          transferConventionToAgencyParams: {
+            agencyId: params.agencyId,
+            conventionId: params.conventionId,
+            justification: params.justification,
+          },
+          jwt: jwtParams.jwt,
+          feedbackTopic: "transfer-convention-to-agency",
+        }),
+      );
+    }
+    if ("status" in params) {
+      if (params.status === "ACCEPTED_BY_COUNSELLOR") {
         dispatch(
-          conventionActionSlice.actions.transferConventionToAgencyRequested({
-            transferConventionToAgencyParams: {
-              agencyId: params.agencyId,
-              conventionId: params.conventionId,
-              justification: params.justification,
-            },
+          conventionActionSlice.actions.acceptByCounsellorRequested({
             jwt: jwtParams.jwt,
-            feedbackTopic: feedbackKind,
-          }),
-        );
-      }
-      if (
-        "status" in params &&
-        feedbackKind !== "transfer-convention-to-agency"
-      ) {
-        dispatch(
-          conventionSlice.actions.statusChangeRequested({
-            jwt: jwtParams.jwt,
-            feedbackKind,
+            feedbackTopic: "convention-action-accept-by-counsellor",
             updateStatusParams: params,
           }),
         );
       }
-    };
+      if (params.status === "ACCEPTED_BY_VALIDATOR") {
+        dispatch(
+          conventionActionSlice.actions.acceptByValidatorRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-accept-by-validator",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "REJECTED") {
+        dispatch(
+          conventionActionSlice.actions.rejectConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-reject",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "DEPRECATED") {
+        dispatch(
+          conventionActionSlice.actions.deprecateConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-deprecate",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "CANCELLED") {
+        dispatch(
+          conventionActionSlice.actions.cancelConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-cancel",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "DRAFT") {
+        dispatch(
+          conventionActionSlice.actions.editConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-edit",
+            updateStatusParams: params,
+          }),
+        );
+      }
+    }
+  };
 
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
@@ -204,9 +242,7 @@ export const ConventionManageActions = ({
               convention,
               disabled,
               currentSignatoryRoles: requesterRoles,
-              onSubmit: createOnSubmitWithFeedbackKind(
-                "transfer-convention-to-agency",
-              ),
+              onSubmit: createOnSubmitWithFeedbackKind,
             }).buttonProps,
             id: domElementIds.manageConvention
               .conventionValidationTransferButton,
@@ -222,9 +258,7 @@ export const ConventionManageActions = ({
         convention,
         disabled,
         currentSignatoryRoles: requesterRoles,
-        onSubmit: createOnSubmitWithFeedbackKind(
-          "modificationAskedFromCounsellorOrValidator",
-        ),
+        onSubmit: createOnSubmitWithFeedbackKind,
       }).buttonProps,
       id: domElementIds.manageConvention.conventionValidationRequestEditButton,
     },
@@ -276,7 +310,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
               iconId="fr-icon-close-circle-line"
               id={
@@ -292,7 +326,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -309,7 +343,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
               iconId="fr-icon-checkbox-circle-line"
               id={
@@ -326,7 +360,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -353,9 +387,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
 
@@ -368,9 +400,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "transfer-convention-to-agency",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
               </>
@@ -386,9 +416,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).buttonProps}
                   iconId="fr-icon-edit-line"
                   id={
@@ -406,9 +434,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
               </>
@@ -437,7 +463,7 @@ export const ConventionManageActions = ({
                 disabled: disabled || convention.status !== "IN_REVIEW",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
               iconId="fr-icon-checkbox-circle-line"
               id={
@@ -460,7 +486,7 @@ export const ConventionManageActions = ({
                 disabled: disabled || convention.status !== "IN_REVIEW",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -486,7 +512,7 @@ export const ConventionManageActions = ({
                 verificationAction: "ACCEPT_VALIDATOR",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
                 onCloseValidatorModalWithoutValidatorInfo:
                   setValidatorWarningMessage,
                 disabled:
@@ -514,7 +540,7 @@ export const ConventionManageActions = ({
                 verificationAction: "ACCEPT_VALIDATOR",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -533,7 +559,7 @@ export const ConventionManageActions = ({
                   disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
 
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
               iconId="fr-icon-close-circle-line"
               id={
@@ -551,7 +577,7 @@ export const ConventionManageActions = ({
                   disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
 
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
             <Button

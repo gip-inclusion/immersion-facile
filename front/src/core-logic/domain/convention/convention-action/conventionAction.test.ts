@@ -926,10 +926,10 @@ describe("convention action slice", () => {
     expectConventionActionState({
       isLoading: false,
     });
-    expectFeebackState({});
+    expectFeedbackState({});
   };
 
-  const expectFeebackState = (feedbackState: Partial<Feedbacks>) => {
+  const expectFeedbackState = (feedbackState: Partial<Feedbacks>) => {
     expectObjectsToMatch(store.getState().feedbacks, feedbackState);
   };
 

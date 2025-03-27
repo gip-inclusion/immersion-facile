@@ -49,9 +49,6 @@ export const TransferModalContent = ({
     conventionId,
     justification,
   }) => {
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-    console.log("onSubmit ====>", agencyId, conventionId, justification);
-
     onSubmit({ agencyId, conventionId, justification });
     closeModal();
   };

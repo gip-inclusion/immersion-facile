@@ -13,7 +13,6 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 

@@ -1,6 +1,5 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { keys } from "shared";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbacks } from "src/core-logic/domain/feedback/feedback.content";
 
 const topics = [
