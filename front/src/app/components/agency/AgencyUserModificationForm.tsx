@@ -13,11 +13,11 @@ import {
   toLowerCaseWithoutDiacritics,
   userParamsForAgencySchema,
 } from "shared";
-import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { P, match } from "ts-pattern";
+import { userRoleToDisplay } from "../../contents/userRoleToDisplay";
 
 export const AgencyUserModificationForm = ({
   agencyUser,
@@ -63,12 +63,12 @@ export const AgencyUserModificationForm = ({
     reset(agencyUser);
   }, [agencyUser, reset]);
 
-  const availableRoles = keys(agencyRoleToDisplay).filter(
+  const availableRoles = keys(userRoleToDisplay).filter(
     (role) => role !== "to-review",
   );
   const checkboxOptions = availableRoles.map((availableRole) => {
     return {
-      label: agencyRoleToDisplay[availableRole].label,
+      label: userRoleToDisplay[availableRole].label,
       nativeInputProps: {
         name: register("roles").name,
         checked: values.roles.includes(availableRole),
@@ -81,7 +81,7 @@ export const AgencyUserModificationForm = ({
           });
         },
       },
-      hintText: agencyRoleToDisplay[availableRole].description,
+      hintText: userRoleToDisplay[availableRole].description,
     };
   });
 

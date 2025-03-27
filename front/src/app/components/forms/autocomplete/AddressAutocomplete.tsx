@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   RSAutocomplete,
   type RSAutocompleteComponentProps,
@@ -35,46 +35,55 @@ export const AddressAutocomplete = ({
     initialInputValue ||
       (initialValue ? addressDtoToString(initialValue.address) : ""),
   );
+
   const [options, setOptions] = useState<AddressAndPosition[]>([]);
   const [selectedOption, setSelectedOption] = useState<
     AddressAndPosition | undefined
   >(initialValue);
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
-
-  if (
-    initialValue &&
-    addressDtoToString(initialValue.address) &&
-    selectedOption === undefined
-  ) {
-    setSelectedOption(initialValue);
-  }
-
-  useEffect(() => {
-    (async () => {
-      const sanitizedTerm = debounceSearchTerm.trim();
+  const initialValueAddress = initialValue
+    ? addressDtoToString(initialValue.address)
+    : undefined;
+  const fetchAddresses = useCallback(
+    async (term: string): Promise<AddressAndPosition[]> => {
+      const sanitizedTerm = term.trim();
       if (
         !sanitizedTerm ||
         sanitizedTerm.length < lookupStreetAddressQueryMinLength
       ) {
-        setOptions([]);
         return [];
       }
       try {
         setIsSearching(true);
-        const addresses =
-          await outOfReduxDependencies.addressGateway.lookupStreetAddress(
-            sanitizedTerm,
-          );
-        setOptions(addresses);
+        return await outOfReduxDependencies.addressGateway.lookupStreetAddress(
+          sanitizedTerm,
+        );
       } catch (e: any) {
         // biome-ignore lint/suspicious/noConsoleLog: <explanation>
         console.log("AddressAutocomplete", e);
+        return [];
       } finally {
         setIsSearching(false);
       }
-    })();
-  }, [debounceSearchTerm]);
+    },
+    [],
+  );
+  if (initialValue && initialValueAddress && selectedOption === undefined) {
+    setSelectedOption(initialValue);
+    if (isFakeAddressAndPosition(initialValue)) {
+      setSearchTerm(initialValueAddress);
+      fetchAddresses(initialValueAddress).then((options) => {
+        setOptions(options);
+        setSelectedOption(options[0]);
+        onAddressSelected(options[0]);
+      });
+    }
+  }
+
+  useEffect(() => {
+    fetchAddresses(debounceSearchTerm).then(setOptions);
+  }, [debounceSearchTerm, fetchAddresses]);
 
   const noOptionText = ({
     isSearching,
@@ -153,3 +162,17 @@ export const addressStringToFakeAddressAndPosition = (
   },
   position: { lat: 0, lon: 0 },
 });
+
+const isFakeAddressAndPosition = ({
+  address,
+  position,
+}: AddressAndPosition): boolean => {
+  return (
+    address.streetNumberAndAddress !== "" &&
+    address.postcode === "" &&
+    address.departmentCode === "" &&
+    address.city === "" &&
+    position.lat === 0 &&
+    position.lon === 0
+  );
+};

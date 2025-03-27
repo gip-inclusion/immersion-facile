@@ -9,8 +9,8 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
-  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   domElementIds,
   errors,
   formEstablishmentSchema,
@@ -109,7 +109,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const initialUserRights: EstablishmentFormUserRights = useMemo(
+  const initialUserRights: FormEstablishmentUserRight[] = useMemo(
     () =>
       mode === "create"
         ? [

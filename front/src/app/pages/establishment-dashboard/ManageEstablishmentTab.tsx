@@ -3,6 +3,7 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { type WithEstablishmentData, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
+import { EstablishmentUsersList } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
 import { routes } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import type { Route } from "type-route";
@@ -56,7 +57,12 @@ export const ManageEstablishmentsTab = ({
             }}
           />
         )}
-        {route.params.siret && <EstablishmentForm mode="edit" />}
+        {route.params.siret && (
+          <>
+            <EstablishmentUsersList />
+            <EstablishmentForm mode="edit" />
+          </>
+        )}
       </div>
     </>
   );
