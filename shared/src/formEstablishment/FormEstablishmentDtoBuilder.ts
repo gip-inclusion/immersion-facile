@@ -7,11 +7,11 @@ import type { SiretDto } from "../siret/siret";
 import type {
   ContactMethod,
   EstablishmentCSVRow,
-  EstablishmentFormUserRights,
   EstablishmentSearchableBy,
   FormEstablishmentAddress,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  FormEstablishmentUserRight,
 } from "./FormEstablishment.dto";
 import {
   defaultMaxContactsPerMonth,
@@ -251,7 +251,7 @@ export class FormEstablishmentDtoBuilder
   }
 
   public withUserRights(
-    establishmentFormUserRights: EstablishmentFormUserRights,
+    establishmentFormUserRights: FormEstablishmentUserRight[],
   ) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,

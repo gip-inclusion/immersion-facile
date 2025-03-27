@@ -40,6 +40,7 @@ const topics = [
   "agency-for-dashboard",
   "assessment",
   "send-signature-link",
+  "establishment-dashboard-users-rights",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
@@ -412,6 +413,19 @@ export const feedbackMapping: Record<
       action: assessmentSlice.actions.getAssessmentFailed,
       title: "Problème lors de la récupération du bilan",
       message: "Un problème est survenu lors de la récupération du bilan",
+    },
+  },
+  "establishment-dashboard-users-rights": {
+    "update.success": {
+      action: establishmentSlice.actions.updateEstablishmentSucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: establishmentSlice.actions.updateEstablishmentFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
 };
