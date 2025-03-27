@@ -34,9 +34,7 @@ export const fillAndSubmitBasicAgencyForm = async (
     await page.locator(
       `#${domElementIds.addAgency.addressAutocomplete}-wrapper .im-select__single-value`,
     ),
-  ).toContainText(
-    (override?.rawAddress ?? "55 Rue Boissonade 75014 Paris").toUpperCase(),
-  );
+  ).toContainText(override?.rawAddress ?? "55 Rue Boissonade 75014 Paris");
 
   await page
     .locator(`#${domElementIds.addAgency.nameInput}`)
