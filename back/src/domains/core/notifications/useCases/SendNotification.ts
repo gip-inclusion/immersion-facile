@@ -45,6 +45,14 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     try {
       await this.#sendNotification(notification);
+      const notificationHadErroredBefore = notification.errored !== undefined;
+      if (notificationHadErroredBefore) {
+        await uow.notificationRepository.markErrored({
+          notificationId: notification.id,
+          notificationKind: notification.kind,
+          errored: null,
+        });
+      }
     } catch (error: any) {
       const errored: NotificationErrored = {
         occurredAt: this.timeGateway.now().toISOString(),
@@ -58,18 +66,21 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
         errored,
       });
 
-      // if (
-      //   notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
-      //   !notification.errored
-      // ) {
-      //
-      //   await uow.outboxRepository.save(
-      //     this.createNewEvent({
-      //       topic: "DISCUSSION_EXCHANGE_DELIVERY_FAILED",
-      //       payload: { notificationId, errored },
-      //     }),
-      //   );
-      // }
+      if (
+        notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
+        !notification.errored
+      ) {
+        await uow.outboxRepository.save(
+          this.createNewEvent({
+            topic: "DiscussionExchangeDeliveryFailed",
+            payload: {
+              notificationId: notification.id,
+              notificationKind: notification.kind,
+              errored,
+            },
+          }),
+        );
+      }
       throw error;
     }
   }

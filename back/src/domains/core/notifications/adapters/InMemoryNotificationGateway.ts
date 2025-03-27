@@ -10,6 +10,10 @@ import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
 
 export const sendSmsErrorPhoneNumber = "0699999999";
+export const emailThatTriggerSendEmailError =
+  "email-that-triggers-send-email-error@mail.com";
+export const fakeHttpStatusErrorCode = 555;
+
 export class InMemoryNotificationGateway implements NotificationGateway {
   public attachmentsByLinks: Partial<Record<string, Base64>> = {
     default: "",
@@ -45,14 +49,20 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   }
 
   public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+    if (templatedEmail.recipients.includes(emailThatTriggerSendEmailError)) {
+      throw errors.generic.fakeError(
+        `fake Send Email Error with email ${emailThatTriggerSendEmailError}`,
+        fakeHttpStatusErrorCode,
+      );
+    }
     this.#pushEmail(templatedEmail);
   }
 
   public async sendSms(sms: TemplatedSms): Promise<void> {
     if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`) {
       throw errors.generic.fakeError(
-        `Send SMS Error with phone number ${sms.recipientPhone}.`,
-        555,
+        `fake Send SMS Error with phone number ${sms.recipientPhone}.`,
+        fakeHttpStatusErrorCode,
       );
     }
 
