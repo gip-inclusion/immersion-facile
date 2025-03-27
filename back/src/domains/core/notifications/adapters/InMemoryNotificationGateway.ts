@@ -49,10 +49,13 @@ export class InMemoryNotificationGateway implements NotificationGateway {
   }
 
   public async sendSms(sms: TemplatedSms): Promise<void> {
-    if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`)
+    if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`) {
       throw errors.generic.fakeError(
         `Send SMS Error with phone number ${sms.recipientPhone}.`,
+        555,
       );
+    }
+
     this.#sentSms.push(sms);
   }
 
