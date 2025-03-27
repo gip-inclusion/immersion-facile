@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
-  cciCustomHtmlFooter,
   cciCustomHtmlHeader,
+  defaultEmailFooter,
 } from "html-templates/src/components/email";
 import { keys } from "ramda";
 import { useState } from "react";
@@ -39,7 +39,7 @@ export const EmailPreviewTab = () => {
       emailVariables.internshipKind === "mini-stage-cci"
       ? {
           header: cciCustomHtmlHeader,
-          footer: cciCustomHtmlFooter,
+          footer: () => defaultEmailFooter("mini-stage-cci"),
         }
       : { footer: undefined, header: undefined },
   )(currentTemplate, emailVariables, {
