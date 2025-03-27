@@ -49,13 +49,13 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
   type ConventionFeedbackKind,
   type ConventionSubmitFeedback,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
-import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { v4 as uuidV4 } from "uuid";
 import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
@@ -114,15 +114,15 @@ export const ConventionManageActions = ({
         feedbackKind === "transfer-convention-to-agency"
       ) {
         dispatch(
-          transferConventionToAgencySlice.actions.transferConventionToAgencyRequested(
-            {
+          conventionActionSlice.actions.transferConventionToAgencyRequested({
+            transferConventionToAgencyParams: {
               agencyId: params.agencyId,
               conventionId: params.conventionId,
               justification: params.justification,
-              jwt: jwtParams.jwt,
-              feedbackTopic: feedbackKind,
             },
-          ),
+            jwt: jwtParams.jwt,
+            feedbackTopic: feedbackKind,
+          }),
         );
       }
       if (
@@ -601,9 +601,10 @@ export const ConventionManageActions = ({
             className={fr.cx("fr-m-1w")}
             onConfirmClick={() => {
               dispatch(
-                conventionSlice.actions.signConventionRequested({
+                conventionActionSlice.actions.signConventionRequested({
                   jwt: jwtParams.jwt,
                   conventionId: convention.id,
+                  feedbackTopic: "convention-action-sign",
                 }),
               );
             }}

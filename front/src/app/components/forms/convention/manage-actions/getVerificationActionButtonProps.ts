@@ -40,19 +40,6 @@ export const newStatusByVerificationAction = {
 
 export type VerificationAction = keyof typeof newStatusByVerificationAction;
 
-// const actionButtonStatusId: Record<VerificationAction, string> = {
-//   REQUEST_EDIT:
-//     domElementIds.manageConvention.conventionValidationRequestEditButton,
-//   REJECT: domElementIds.manageConvention.conventionValidationRejectButton,
-//   ACCEPT_VALIDATOR:
-//     domElementIds.manageConvention.conventionValidationValidateButton,
-//   ACCEPT_COUNSELLOR:
-//     domElementIds.manageConvention.conventionValidationValidateButton,
-//   CANCEL: domElementIds.manageConvention.conventionValidationCancelButton,
-//   DEPRECATE:
-//     domElementIds.manageConvention.conventionValidationDeprecateButton,
-//   TRANSFER: domElementIds.manageConvention.conventionValidationTransferButton,
-// };
 
 export const getVerificationActionProps = ({
   verificationAction,

@@ -29,6 +29,7 @@ const topics = [
   "convention-action-edit",
   "convention-action-accept-by-validator",
   "convention-action-accept-by-counsellor",
+  "convention-action-sign",
 ] as const;
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";

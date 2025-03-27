@@ -1,6 +1,8 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { type Observable, filter } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { delay, map, switchMap } from "rxjs/operators";
+import { isStringJson } from "shared";
+import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import type {
   PayloadActionWithFeedbackTopicError,
   PayloadWithFeedbackTopic,
@@ -138,51 +140,71 @@ const acceptByCounsellorEpic = makeConventionStatusChangeEpic({
   failedAction: conventionActionSlice.actions.acceptByCounsellorFailed,
 });
 
-// const conventionStatusChangeEpic: ConventionActionEpic = (
-//   action$,
-//   _,
-//   { conventionGateway },
-// ) =>
-//   action$.pipe(
-//     filter(
-//       conventionActionSlice.actions.acceptByCounsellorRequested.match ||
-//         conventionActionSlice.actions.acceptByValidatorRequested.match ||
-//         conventionActionSlice.actions.cancelConventionRequested.match ||
-//         conventionActionSlice.actions.deprecateConventionRequested.match ||
-//         conventionActionSlice.actions.rejectConventionRequested.match ||
-//         conventionActionSlice.actions.editConventionRequested.match,
-//     ),
-//     switchMap(({ payload, type }) =>
-//       conventionGateway
-//         .updateConventionStatus$(payload.updateStatusParams, payload.jwt)
-//         .pipe(
-//           map(() => {
-//             const successAction = successActionMap[type];
-//             if (!successAction) throw new Error("Unknown action type");
-//             return successAction(payload);
-//           }),
-//           catchEpicError((error: Error) => {
-//             if (
-//               error.message.includes(
-//                 "Convention should be reviewed by counsellor",
-//               )
-//             )
-//               return conventionActionSlice.actions.acceptByCounsellorSucceeded(
-//                 payload,
-//               );
+const minimumDelayBeforeItIsPossibleToBroadcastAgainMs = 10_000;
 
-//             const failedAction = failedActionMap[type];
-//             if (!failedAction) throw new Error("Unknown action type");
-//             return failedAction({
-//               errorMessage: error.message,
-//               feedbackTopic: payload.feedbackTopic,
-//             });
-//           }),
-//         ),
-//     ),
-//   );
+const broadcastConventionAgainEpic: ConventionActionEpic = (
+  action$,
+  state$,
+  { conventionGateway, scheduler },
+) =>
+  action$.pipe(
+    filter(
+      conventionActionSlice.actions.broadcastConventionToPartnerRequested.match,
+    ),
+    switchMap(({ payload }) =>
+      conventionGateway
+        .broadcastConventionAgain$(
+          { conventionId: payload.conventionId },
+          getAdminToken(state$.value),
+        )
+        .pipe(
+          delay(minimumDelayBeforeItIsPossibleToBroadcastAgainMs, scheduler),
+          map(() =>
+            conventionActionSlice.actions.broadcastConventionToPartnerSucceeded(
+              {
+                conventionId: payload.conventionId,
+                feedbackTopic: payload.feedbackTopic,
+              },
+            ),
+          ),
+          catchEpicError((error: Error) => {
+            return conventionActionSlice.actions.broadcastConventionToPartnerFailed(
+              {
+                errorMessage: isStringJson(error.message[0])
+                  ? JSON.parse(error.message).message
+                  : error.message,
+                feedbackTopic: payload.feedbackTopic,
+              },
+            );
+          }),
+        ),
+    ),
+  );
+
+const signConventionEpic: ConventionActionEpic = (
+  action$,
+  _,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionActionSlice.actions.signConventionRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway.signConvention$(payload.conventionId, payload.jwt).pipe(
+        map(() =>
+          conventionActionSlice.actions.signConventionSucceeded(payload),
+        ),
+        catchEpicError((error: Error) =>
+          conventionActionSlice.actions.signConventionFailed({
+            feedbackTopic: payload.feedbackTopic,
+            errorMessage: error.message,
+          }),
+        ),
+      ),
+    ),
+  );
 
 export const conventionActionEpics = [
+  broadcastConventionAgainEpic,
   transferConventionToAgencyEpic,
   cancelConventionEpic,
   deprecateConventionEpic,
@@ -190,6 +212,7 @@ export const conventionActionEpics = [
   editConventionEpic,
   acceptByValidatorEpic,
   acceptByCounsellorEpic,
+  signConventionEpic,
 ];
 
 type ConventionStatusChangeAction = ActionCreatorWithPayload<

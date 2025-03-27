@@ -38,8 +38,6 @@ import { conventionActionEpics } from "src/core-logic/domain/convention/conventi
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
-import { transferConventionToAgencyEpics } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.epic";
-import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { establishmentEpics } from "src/core-logic/domain/establishment/establishment.epics";
 import { establishmentLeadEpics } from "src/core-logic/domain/establishmentLead/establishmentLead.epics";
 import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/establishmentLead.slice";
@@ -102,7 +100,6 @@ const allEpics: AppEpic<any>[] = [
   ...removeUserFromAgencyEpics,
   ...nafEpics,
   ...sendSignatureLinkEpics,
-  ...transferConventionToAgencyEpics,
   ...conventionActionEpics,
 ];
 
@@ -140,8 +137,6 @@ const appReducer = combineReducers({
   [sendSignatureLinkSlice.name]: sendSignatureLinkSlice.reducer,
   [searchSlice.name]: searchSlice.reducer,
   [siretSlice.name]: siretSlice.reducer,
-  [transferConventionToAgencySlice.name]:
-    transferConventionToAgencySlice.reducer,
   [nafSlice.name]: nafSlice.reducer,
   [conventionActionSlice.name]: conventionActionSlice.reducer,
 });

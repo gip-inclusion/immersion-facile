@@ -9,7 +9,6 @@ import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
-import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
@@ -367,16 +366,12 @@ export const feedbacks: Record<
   },
   "transfer-convention-to-agency": {
     "update.success": {
-      action:
-        transferConventionToAgencySlice.actions
-          .transferConventionToAgencySucceeded,
+      action: conventionActionSlice.actions.transferConventionToAgencySucceeded,
       title: "La convention a bien été transférée",
       message: "La convention a bien été transférée au nouvel organisme",
     },
     "update.error": {
-      action:
-        transferConventionToAgencySlice.actions
-          .transferConventionToAgencyFailed,
+      action: conventionActionSlice.actions.transferConventionToAgencyFailed,
       title: "Problème lors du transfert de la convention",
       message: "Une erreur est survenue lors du transfert de la convention",
     },
@@ -453,6 +448,18 @@ export const feedbacks: Record<
       title: "Problème lors de la pré-validation de la convention",
       message:
         "Une erreur est survenue lors de la pré-validation de la convention",
+    },
+  },
+  "convention-action-sign": {
+    "update.success": {
+      action: conventionActionSlice.actions.signConventionSucceeded,
+      title: "La convention a bien été signée",
+      message: "La convention a bien été signée",
+    },
+    "update.error": {
+      action: conventionActionSlice.actions.signConventionFailed,
+      title: "Problème lors de la signature de la convention",
+      message: "Une erreur est survenue lors de la signature de la convention",
     },
   },
 };

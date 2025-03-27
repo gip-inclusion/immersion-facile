@@ -11,6 +11,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -92,7 +93,7 @@ export const BroadcastAgainButton = ({
                 isModalButtonDisabled || isBroadcasting || hasErrorFeedback,
               onClick: () => {
                 dispatch(
-                  conventionSlice.actions.broadcastConventionToPartnerRequested(
+                  conventionActionSlice.actions.broadcastConventionToPartnerRequested(
                     {
                       conventionId: conventionId,
                       feedbackTopic: "broadcast-convention-again",

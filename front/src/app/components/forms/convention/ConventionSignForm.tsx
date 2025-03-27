@@ -20,6 +20,7 @@ import { ConventionFeedbackNotification } from "src/app/components/forms/convent
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
@@ -80,23 +81,24 @@ export const ConventionSignForm = ({
     }
 
     dispatch(
-      conventionSlice.actions.signConventionRequested({
+      conventionActionSlice.actions.signConventionRequested({
         conventionId: convention.id,
         jwt,
+        feedbackTopic: "convention-action-sign",
       }),
     );
   };
 
-  const onModificationRequired =
-    (feedbackKind: ConventionFeedbackKind) =>
-    (updateStatusParams: UpdateConventionStatusRequestDto) =>
-      dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          jwt,
-          feedbackKind,
-          updateStatusParams,
-        }),
-      );
+  const onModificationRequired = (
+    updateStatusParams: UpdateConventionStatusRequestDto,
+  ) =>
+    dispatch(
+      conventionActionSlice.actions.editConventionRequested({
+        jwt,
+        updateStatusParams,
+        feedbackTopic: "convention-action-edit",
+      }),
+    );
 
   if (alreadySigned) {
     return (
@@ -160,9 +162,7 @@ export const ConventionSignForm = ({
             })}
             convention={convention}
             newStatus="DRAFT"
-            onModificationRequired={onModificationRequired(
-              "modificationsAskedFromSignatory",
-            )}
+            onModificationRequired={onModificationRequired}
             currentSignatoryRole={currentSignatory.role}
             onCloseSignModalWithoutSignature={setIsModalClosedWithoutSignature}
           />

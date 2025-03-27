@@ -24,6 +24,11 @@ type TransferConventionToAgencyPayload = {
   transferConventionToAgencyParams: TransferConventionToAgencyRequestDto;
 };
 
+type SignPayload = {
+  conventionId: ConventionId;
+  jwt: ConventionJwt | ConnectedUserJwt;
+};
+
 export interface ConventionActionState {
   isLoading: boolean;
   isBroadcasting: boolean;
@@ -34,196 +39,88 @@ export const conventionActionInitialState: ConventionActionState = {
   isBroadcasting: false,
 };
 
-type SignPayload = {
-  conventionId: ConventionId;
-  jwt: ConventionJwt | ConnectedUserJwt;
-};
+const setIsLoading =
+  <PayloadAction>(isLoading: boolean) =>
+  (state: ConventionActionState, _action: PayloadAction) => {
+    state.isLoading = isLoading;
+  };
+const setIsBroadcasting =
+  <PayloadAction>(isBroadcasting: boolean) =>
+  (state: ConventionActionState, _action: PayloadAction) => {
+    state.isBroadcasting = isBroadcasting;
+  };
 
 export const conventionActionSlice = createSlice({
   name: "conventionAction",
   initialState: conventionActionInitialState,
   reducers: {
-    cancelConventionRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
+    cancelConventionRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    cancelConventionSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    cancelConventionFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    cancelConventionSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
+    editConventionRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    editConventionSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    editConventionFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    cancelConventionFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
+    deprecateConventionRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    deprecateConventionSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    deprecateConventionFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    editConventionRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
+    rejectConventionRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    rejectConventionSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    rejectConventionFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    editConventionSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
+    acceptByCounsellorRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    acceptByCounsellorSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    acceptByCounsellorFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    editConventionFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
+    acceptByValidatorRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
+    acceptByValidatorSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
+    acceptByValidatorFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    deprecateConventionRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
+    transferConventionToAgencyRequested:
+      setIsLoading<
+        PayloadActionWithFeedbackTopic<TransferConventionToAgencyPayload>
+      >(true),
+    transferConventionToAgencySucceeded:
+      setIsLoading<
+        PayloadActionWithFeedbackTopic<TransferConventionToAgencyPayload>
+      >(false),
+    transferConventionToAgencyFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    deprecateConventionSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
+    broadcastConventionToPartnerRequested:
+      setIsBroadcasting<PayloadActionWithFeedbackTopic<WithConventionId>>(true),
+    broadcastConventionToPartnerSucceeded:
+      setIsBroadcasting<PayloadActionWithFeedbackTopic<WithConventionId>>(
+        false,
+      ),
+    broadcastConventionToPartnerFailed:
+      setIsBroadcasting<PayloadActionWithFeedbackTopicError>(false),
 
-    deprecateConventionFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
-
-    rejectConventionRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
-
-    rejectConventionSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
-
-    rejectConventionFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
-    acceptByCounsellorRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
-
-    acceptByCounsellorSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
-
-    acceptByCounsellorFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
-    acceptByValidatorRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
-
-    acceptByValidatorSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-    },
-
-    acceptByValidatorFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
-
-    transferConventionToAgencyRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<TransferConventionToAgencyPayload>,
-    ) => {
-      state.isLoading = true;
-    },
-
-    transferConventionToAgencySucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<TransferConventionToAgencyPayload>,
-    ) => {
-      state.isLoading = false;
-    },
-
-    transferConventionToAgencyFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
-
-    broadcastConventionToPartnerRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<WithConventionId>,
-    ) => {
-      state.isBroadcasting = true;
-    },
-    broadcastConventionToPartnerSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic,
-    ) => {
-      state.isBroadcasting = false;
-    },
-    broadcastConventionToPartnerFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isBroadcasting = false;
-    },
-
-    signConventionRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<SignPayload>,
-    ) => {
-      state.isLoading = true;
-    },
-    signConventionSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<SignPayload>,
-    ) => {
-      state.isLoading = false;
-    },
-    signConventionFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopicError,
-    ) => {
-      state.isLoading = false;
-    },
+    signConventionRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<SignPayload>>(true),
+    signConventionSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<SignPayload>>(false),
+    signConventionFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
   },
 });
