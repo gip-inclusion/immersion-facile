@@ -5,6 +5,7 @@ import {
   type ConventionDto,
   type EmailNotification,
   type Notification,
+  type NotificationErrored,
   type NotificationId,
   type NotificationKind,
   type ShortLinkId,
@@ -15,6 +16,7 @@ import {
   displayEmergencyContactInfos,
   errors,
   expectToEqual,
+  replaceElementWhere,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
@@ -108,6 +110,26 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   public async saveBatch(notifications: Notification[]): Promise<void> {
     this.notifications.push(...notifications);
+  }
+
+  public async markErrored(params: {
+    notificationId: NotificationId;
+    notificationKind: NotificationKind;
+    errored: NotificationErrored | null;
+  }): Promise<void> {
+    const notification = this.notifications.find(
+      ({ id }) => id === params.notificationId,
+    );
+    if (!notification)
+      throw new Error(
+        `Notification ${params.notificationId} not found (In Memory Repository)`,
+      );
+
+    this.notifications = replaceElementWhere(
+      this.notifications,
+      { ...notification, errored: params.errored ?? undefined },
+      ({ id }) => id === params.notificationId,
+    );
   }
 }
 

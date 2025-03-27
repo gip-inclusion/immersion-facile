@@ -1,16 +1,15 @@
 import type {
   ConventionId,
   Email,
-  EmailType,
-  Phone,
-  TemplatedSms,
-} from "shared";
-import type {
   EmailNotification,
+  EmailType,
   Notification,
+  NotificationErrored,
   NotificationId,
   NotificationKind,
+  Phone,
   SmsNotification,
+  TemplatedSms,
 } from "shared";
 
 export type EmailNotificationFilters = {
@@ -29,6 +28,11 @@ export interface NotificationRepository {
   getSmsByIds: (ids: NotificationId[]) => Promise<SmsNotification[]>;
   getEmailsByIds: (ids: NotificationId[]) => Promise<EmailNotification[]>;
   save: (notification: Notification) => Promise<void>;
+  markErrored: (params: {
+    notificationId: NotificationId;
+    notificationKind: NotificationKind;
+    errored: NotificationErrored | null;
+  }) => Promise<void>;
   saveBatch: (notifications: Notification[]) => Promise<void>;
   getByIdAndKind: (
     id: NotificationId,
