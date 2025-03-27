@@ -10,6 +10,7 @@ import {
 } from "shared";
 import { useDebounce } from "src/app/hooks/useDebounce";
 import { outOfReduxDependencies } from "src/config/dependencies";
+import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
 
 export type AddressAutocompleteProps = RSAutocompleteComponentProps<
   "address",
@@ -20,6 +21,27 @@ export type AddressAutocompleteProps = RSAutocompleteComponentProps<
   onAddressSelected: (address: AddressAndPosition) => void;
   onAddressClear: () => void;
   initialInputValue?: string;
+};
+
+const lookupAddresses = async (
+  searchTerm: string,
+  addressGateway: AddressGateway,
+  lookupStreetAddressQueryMinLength: number,
+): Promise<AddressAndPosition[]> => {
+  const sanitizedTerm = searchTerm.trim();
+  if (
+    !sanitizedTerm ||
+    sanitizedTerm.length < lookupStreetAddressQueryMinLength
+  ) {
+    return [];
+  }
+  try {
+    return await addressGateway.lookupStreetAddress(sanitizedTerm);
+  } catch (e: any) {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    console.log("AddressAutocomplete", e);
+    return [];
+  }
 };
 
 export const AddressAutocomplete = ({
@@ -42,37 +64,36 @@ export const AddressAutocomplete = ({
   const [isSearching, setIsSearching] = useState(false);
   const debounceSearchTerm = useDebounce(searchTerm);
 
-  if (
-    initialValue &&
-    addressDtoToString(initialValue.address) &&
-    selectedOption === undefined
-  ) {
-    setSelectedOption(initialValue);
-  }
+  useEffect(() => {
+    if (
+      initialValue &&
+      addressDtoToString(initialValue.address) &&
+      selectedOption === undefined
+    ) {
+      (async () => {
+        setIsSearching(true);
+        const addresses = await lookupAddresses(
+          addressDtoToString(initialValue.address),
+          outOfReduxDependencies.addressGateway,
+          lookupStreetAddressQueryMinLength,
+        );
+        setOptions(addresses);
+        setSelectedOption(addresses[0]);
+        onAddressSelected(addresses[0]);
+        setIsSearching(false);
+      })();
+    }
+  }, [initialValue, selectedOption, onAddressSelected]);
 
   useEffect(() => {
     (async () => {
-      const sanitizedTerm = debounceSearchTerm.trim();
-      if (
-        !sanitizedTerm ||
-        sanitizedTerm.length < lookupStreetAddressQueryMinLength
-      ) {
-        setOptions([]);
-        return [];
-      }
-      try {
-        setIsSearching(true);
-        const addresses =
-          await outOfReduxDependencies.addressGateway.lookupStreetAddress(
-            sanitizedTerm,
-          );
-        setOptions(addresses);
-      } catch (e: any) {
-        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-        console.log("AddressAutocomplete", e);
-      } finally {
-        setIsSearching(false);
-      }
+      setIsSearching(true);
+      const addresses = await lookupAddresses(
+        debounceSearchTerm,
+        outOfReduxDependencies.addressGateway,
+        lookupStreetAddressQueryMinLength,
+      );
+      setOptions(addresses);
     })();
   }, [debounceSearchTerm]);
 
