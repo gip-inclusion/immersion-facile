@@ -316,8 +316,8 @@ const regulatoryConditionContent = (
         <p>
           <strong>Article 3</strong> – Organisation L’organisation de la période
           d’observation est déterminée d’un commun accord entre les parties
-          ci-dessus désignées, avec le concours de la Chambre de Commerce et
-          d’Industrie.
+          ci-dessus désignées, avec le concours de la Chambre consulaire
+          concernée.
         </p>
       </div>
 
@@ -327,7 +327,8 @@ const regulatoryConditionContent = (
           d’observation en milieu professionnel, le jeune ne peut prétendre à
           aucune rémunération ou gratification de l’entreprise ou de l’organisme
           d’accueil. Le visa de la présente convention ne donne lieu à aucune
-          facturation de la part de la Chambre de Commerce et d’Industrie.
+          facturation de la part de la Chambre consulaire émettant la
+          convention.
         </p>
       </div>
 
@@ -382,7 +383,7 @@ const regulatoryConditionContent = (
           directement le jeune s’il est assuré à son nom, déclarent l’accident à
           leurs assureurs respectifs dans les délais contractuels et s’engagent
           à adresser, pour information, la déclaration d’accident au référent de
-          la Chambre de Commerce et d’Industrie.
+          la Chambre consulaire émettant la convention.
         </p>
       </div>
 
@@ -391,14 +392,14 @@ const regulatoryConditionContent = (
           <strong>Article 8</strong> – Difficultés Le chef d’entreprise, les
           parents ou le représentant légal du jeune si celui-ci est mineur, ou
           le jeune directement si celuici est majeur, ainsi que le référent de
-          la Chambre de Commerce et d’Industrie, se tiendront mutuellement
-          informés des difficultés qui pourraient naître de l’application de la
-          présente convention et prendront, d’un commun accord les dispositions
-          propres à les résoudre notamment en cas de manquement à la discipline.
-          Les difficultés qui pourraient être rencontrées lors de toute période
-          en milieu professionnel et notamment toute absence du jeune, seront
-          aussitôt portées à la connaissance du référent de la Chambre de
-          Commerce et d’Industrie.
+          la Chambre consulaire émettant la convention, se tiendront
+          mutuellement informés des difficultés qui pourraient naître de
+          l’application de la présente convention et prendront, d’un commun
+          accord les dispositions propres à les résoudre notamment en cas de
+          manquement à la discipline. Les difficultés qui pourraient être
+          rencontrées lors de toute période en milieu professionnel et notamment
+          toute absence du jeune, seront aussitôt portées à la connaissance du
+          référent de la Chambre consulaire émettant la convention.
         </p>
       </div>
 
@@ -414,24 +415,24 @@ const regulatoryConditionContent = (
         <p>
           <strong>Article 10</strong> - Protection des données personnelles Les
           données personnelles recueillies via ce formulaire font l'objet, par
-          le Responsable de traitement représenté par la Chambre de Commerce et
-          d’Industrie, d'un traitement informatisé et/ou papier destiné à
-          l’établissement de la convention de stage et à des fins statistiques,
-          et sont conservées pendant une durée de cinq ans. Aucune information
-          personnelle n'est cédée à quelconque tiers. Conformément à la loi
-          "Informatique et Libertés" du 6 janvier 1978 modifiée et au Règlement
-          Général sur la Protection des Données, vous pouvez accéder aux données
-          à caractère personnel vous concernant, les faire rectifier ou effacer
-          après le délai de prescription de la fin de la convention. Vous
-          disposez également du droit de limitation, de portabilité, et le cas
-          échéant, d’opposition du traitement de vos données. Pour exercer vos
-          droits, vous pouvez contacter le DPO (Délégué à la Protection des
-          données personnelles) de la Chambre de Commerce et d’Industrie
+          le Responsable de traitement représenté par la Chambre consulaire
+          émettant la convention, d'un traitement informatisé et/ou papier
+          destiné à l’établissement de la convention de stage et à des fins
+          statistiques, et sont conservées pendant une durée de cinq ans. Aucune
+          information personnelle n'est cédée à quelconque tiers. Conformément à
+          la loi "Informatique et Libertés" du 6 janvier 1978 modifiée et au
+          Règlement Général sur la Protection des Données, vous pouvez accéder
+          aux données à caractère personnel vous concernant, les faire rectifier
+          ou effacer après le délai de prescription de la fin de la convention.
+          Vous disposez également du droit de limitation, de portabilité, et le
+          cas échéant, d’opposition du traitement de vos données. Pour exercer
+          vos droits, vous pouvez contacter le DPO (Délégué à la Protection des
+          données personnelles) de la Chambre consulaire émettant la convention
           concernée par mail en précisant la mention « Mini-Stage ». La
-          politique de protection des données personnelles de la CCI est
-          détaillée dans sa charte sur son site internet. TITRE II -
-          DISPOSITIONS PARTICULIÈRES La durée de la présence hebdomadaire des
-          jeunes en milieu professionnel ne peut excéder 30 heures pour les
+          politique de protection des données personnelles de la Chambre
+          consulaire est détaillée dans sa charte sur son site internet. TITRE
+          II - DISPOSITIONS PARTICULIÈRES La durée de la présence hebdomadaire
+          des jeunes en milieu professionnel ne peut excéder 30 heures pour les
           jeunes de moins de 15 ans (6 heures par jour) et 35 heures pour les
           jeunes de 15 ans et plus répartis sur 5 jours (7 heures par jour).
         </p>

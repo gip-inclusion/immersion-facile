@@ -4,8 +4,8 @@ import {
   configureGenerateHtmlFromTemplate,
 } from "html-templates";
 import {
-  cciCustomHtmlFooter,
   cciCustomHtmlHeader,
+  defaultEmailFooter,
 } from "html-templates/src/components/email";
 import {
   type NotificationId,
@@ -113,7 +113,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
           email.params.internshipKind === "mini-stage-cci"
           ? {
               header: cciCustomHtmlHeader,
-              footer: cciCustomHtmlFooter,
+              footer: () => defaultEmailFooter("mini-stage-cci"),
             }
           : { footer: undefined, header: undefined },
       )(email.kind, email.params, this.config.generateHtmlOptions),
