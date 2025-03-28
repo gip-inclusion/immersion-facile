@@ -1,19 +1,30 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
-import type { MainNavigationProps } from "@codegouvfr/react-dsfr/MainNavigation";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { type ElementRef, useLayoutEffect, useRef, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./ButtonWithSubMenu.styles";
 
+export type ButtonWithSubMenuProps = {
+  navItems: (ButtonProps & { id: string })[];
+  buttonLabel: string;
+  buttonIconId: Exclude<ButtonProps["iconId"], undefined>;
+  id?: string;
+  openedTop?: boolean;
+  className?: string;
+  priority?: ButtonProps["priority"];
+  iconPosition?: ButtonProps["iconPosition"];
+};
+
 export const ButtonWithSubMenu = ({
   navItems,
   buttonLabel,
+  buttonIconId,
   id,
-}: {
-  navItems: MainNavigationProps.Item.Link[];
-  buttonLabel: string;
-  id?: string;
-}) => {
+  openedTop,
+  className,
+  priority,
+  iconPosition,
+}: ButtonWithSubMenuProps) => {
   const buttonId = id ?? "button-with-submenu";
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { cx } = useStyles();
@@ -40,50 +51,65 @@ export const ButtonWithSubMenu = ({
     };
   }, []);
 
-  const isMobile = id?.includes("-mobile");
-
   return (
-    <div className={cx(Styles.root)}>
+    <div
+      className={cx(
+        Styles.root,
+        isOpen && Styles.isOpened,
+        openedTop && Styles.openedTop,
+      )}
+    >
       <Button
         ref={toggleButtonRef}
-        className={cx(fr.cx("fr-m-md-0"))}
-        iconId="fr-icon-account-line"
-        iconPosition="left"
+        className={cx(fr.cx("fr-m-md-0"), className)}
         id={buttonId}
         nativeButtonProps={{
           "aria-controls": `${buttonId}-submenu`,
+          type: "button",
         }}
-        onClick={() => {
-          setIsOpen((isOpen) => !isOpen);
-        }}
-        priority="tertiary"
+        onClick={() => setIsOpen((isOpen) => !isOpen)}
+        priority={priority ?? "tertiary"}
+        iconId={buttonIconId}
+        iconPosition={iconPosition ?? "left"}
       >
         {buttonLabel}
       </Button>
 
       <div
-        className={cx(
-          fr.cx("fr-menu"),
-          Styles.menu,
-          !isOpen && Styles.menuHidden,
-        )}
+        className={cx(fr.cx("fr-menu"), Styles.menu)}
         id={`${buttonId}-submenu`}
         aria-hidden={!isOpen}
       >
-        <ul className={cx(fr.cx("fr-menu__list"), Styles.list)}>
-          {navItems.map((item) => (
-            <li key={item.linkProps.id}>
-              <a
-                className={fr.cx("fr-nav__link")}
-                {...item.linkProps}
-                id={
-                  isMobile ? `${item.linkProps.id}-mobile` : item.linkProps.id
-                }
-              >
-                {item.text}
-              </a>
-            </li>
-          ))}
+        <ul
+          className={cx(
+            fr.cx("fr-menu__list", "fr-p-0", "fr-mb-0"),
+            Styles.list,
+          )}
+        >
+          {navItems.map((item) => {
+            return (
+              <li key={item.id} className={fr.cx("fr-p-0")}>
+                {item.linkProps ? (
+                  <a
+                    className={fr.cx("fr-nav__link")}
+                    {...item.linkProps}
+                    id={item.linkProps.id}
+                  >
+                    {item.children}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className={fr.cx("fr-nav__link")}
+                    {...item.nativeButtonProps}
+                    onClick={item?.onClick ? item?.onClick : undefined}
+                  >
+                    {item.children}
+                  </button>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

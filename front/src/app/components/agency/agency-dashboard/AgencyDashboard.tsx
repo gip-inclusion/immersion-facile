@@ -5,6 +5,7 @@ import {
   type WithDashboards,
   domElementIds,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import {
   type AgencyDashboardRouteName,
   type AgencyTabRoute,
@@ -34,19 +35,26 @@ export const AgencyDashboard = ({
     inclusionConnectedJwt,
   });
   return (
-    <Tabs
-      tabs={agencyTabs.map((tab) => ({
-        ...tab,
-        isDefault: currentTab === tab.tabId,
-      }))}
-      id={domElementIds.agencyDashboard.dashboard.tabContainer}
-      selectedTabId={currentTab}
-      onTabChange={(tab) => {
-        if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
-      }}
-    >
-      {agencyTabs.find((tab) => tab.tabId === currentTab)?.content}
-    </Tabs>
+    <>
+      <Feedback
+        topic="transfer-convention-to-agency"
+        className="fr-mb-2w"
+        closable
+      />
+      <Tabs
+        tabs={agencyTabs.map((tab) => ({
+          ...tab,
+          isDefault: currentTab === tab.tabId,
+        }))}
+        id={domElementIds.agencyDashboard.dashboard.tabContainer}
+        selectedTabId={currentTab}
+        onTabChange={(tab) => {
+          if (isAgencyDashboardTabRoute(tab)) routes[tab]().push();
+        }}
+      >
+        {agencyTabs.find((tab) => tab.tabId === currentTab)?.content}
+      </Tabs>
+    </>
   );
 };
 

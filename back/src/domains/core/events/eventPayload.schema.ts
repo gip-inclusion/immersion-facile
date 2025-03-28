@@ -1,4 +1,5 @@
 import {
+  agencyIdSchema,
   agencyModifierRoles,
   allRoles,
   allSignatoryRoles,
@@ -12,6 +13,7 @@ import type {
   ConventionReminderPayload,
   ConventionRequiresModificationPayload,
   SignatoryRequestModificationPayload,
+  TransferConventionToAgencyPayload,
 } from "./eventPayload.dto";
 
 const agencyActorRequestConventionModificationPayloadSchema: z.Schema<AgencyActorRequestModificationPayload> =
@@ -41,4 +43,12 @@ export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload
   z.object({
     reminderKind: z.enum(reminderKinds),
     conventionId: z.string(),
+  });
+
+export const transferConventionToAgencyPayloadSchema: z.Schema<TransferConventionToAgencyPayload> =
+  z.object({
+    convention: conventionSchema,
+    justification: zStringMinLength1,
+    agencyId: agencyIdSchema,
+    previousAgencyId: agencyIdSchema,
   });

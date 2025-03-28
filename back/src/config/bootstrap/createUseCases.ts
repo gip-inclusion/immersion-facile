@@ -33,6 +33,7 @@ import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-ca
 import { makeSendSignatureLink } from "../../domains/convention/use-cases/SendSignatureLink";
 import { ShareConventionLinkByEmail } from "../../domains/convention/use-cases/ShareConventionLinkByEmail";
 import { SignConvention } from "../../domains/convention/use-cases/SignConvention";
+import { makeTransferConventionToAgency } from "../../domains/convention/use-cases/TransferConventionToAgency";
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -45,6 +46,7 @@ import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/conven
 import { NotifyAllActorsThatConventionIsCancelled } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsCancelled";
 import { NotifyAllActorsThatConventionIsDeprecated } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsDeprecated";
 import { NotifyAllActorsThatConventionIsRejected } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionIsRejected";
+import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/convention/use-cases/notifications/NotifyAllActorsThatConventionTransferred";
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
 import { NotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
@@ -650,6 +652,17 @@ export const createUseCases = (
           timeGateway: gateways.timeGateway,
         },
       }),
+    notifyAllActorsThatConventionHasBeenTransferred:
+      makeNotifyAllActorsThatConventionTransferred({
+        uowPerformer,
+        deps: {
+          saveNotificationAndRelatedEvent,
+          generateConventionMagicLinkUrl,
+          timeGateway: gateways.timeGateway,
+          shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+          config,
+        },
+      }),
     listActiveSubscriptions: makeListActiveSubscriptions({
       uowPerformer,
     }),
@@ -734,6 +747,10 @@ export const createUseCases = (
     }),
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
+    }),
+    transferConventionToAgency: makeTransferConventionToAgency({
+      uowPerformer,
+      deps: { createNewEvent },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };

@@ -17,6 +17,7 @@ import type {
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
   ShareLinkByEmailDto,
+  TransferConventionToAgencyRequestDto,
   UnauthenticatedConventionRoutes,
   UpdateConventionStatusRequestDto,
   WithConventionId,
@@ -232,6 +233,26 @@ export class HttpConventionGateway implements ConventionGateway {
         .then((response) =>
           match(response)
             .with({ status: 200 }, () => undefined)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public transferConventionToAgency$(
+    params: TransferConventionToAgencyRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .transferConventionToAgency({
+          body: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

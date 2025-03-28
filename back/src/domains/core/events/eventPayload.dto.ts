@@ -1,10 +1,13 @@
 import type {
+  AgencyId,
   AgencyModifierRole,
   ConventionDto,
   ConventionId,
   ReminderKind,
   Role,
   SignatoryRole,
+  WithAgencyId,
+  WithConventionDto,
 } from "shared";
 
 type ConventionRequireModificationCommon = {
@@ -32,3 +35,9 @@ export type ConventionReminderPayload = {
   reminderKind: ReminderKind;
   conventionId: ConventionId;
 };
+
+export type TransferConventionToAgencyPayload = WithConventionDto &
+  WithAgencyId & {
+    justification: string;
+    previousAgencyId: AgencyId;
+  };
