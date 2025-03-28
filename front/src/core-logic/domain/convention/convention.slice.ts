@@ -2,7 +2,6 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
   AgencyId,
-  ConnectedUserJwt,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
@@ -11,10 +10,7 @@ import type {
   FindSimilarConventionsParams,
   RenewConventionParams,
   SignatoryRole,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
 } from "shared";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import type { SubmitFeedBack } from "../SubmitFeedback";
 
 type ConventionValidationFeedbackKind =
@@ -91,12 +87,6 @@ export type FetchConventionRequestedPayload = {
   conventionId: ConventionId;
 };
 
-type StatusChangePayload = {
-  feedbackKind: ConventionFeedbackKind;
-  jwt: ConventionSupportedJwt;
-  updateStatusParams: UpdateConventionStatusRequestDto;
-};
-
 const setFeedbackAsErrored = (
   state: ConventionState,
   action: PayloadAction<string>,
@@ -163,43 +153,6 @@ export const conventionSlice = createSlice({
       state.fetchError = action.payload;
       state.isLoading = false;
     },
-
-    // Sign convention
-    signConventionRequested: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = true;
-    },
-    signConventionSucceeded: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = false;
-    },
-    signConventionFailed: setFeedbackAsErrored,
-
-    // Modification requested
-    statusChangeRequested: (
-      state,
-      _action: PayloadAction<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
-    statusChangeSucceeded: (
-      state,
-      action: PayloadAction<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-      state.feedback = { kind: action.payload.feedbackKind };
-    },
-    statusChangeFailed: setFeedbackAsErrored,
 
     // get convention status dashboard
     conventionStatusDashboardRequested: (
@@ -286,24 +239,5 @@ export const conventionSlice = createSlice({
       state.similarConventionIds = payload;
     },
     getSimilarConventionsFailed: setFeedbackAsErrored,
-
-    broadcastConventionToPartnerRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<WithConventionId>,
-    ) => {
-      state.isBroadcasting = true;
-    },
-    broadcastConventionToPartnerSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic,
-    ) => {
-      state.isBroadcasting = false;
-    },
-    broadcastConventionToPartnerFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
-    ) => {
-      state.isBroadcasting = false;
-    },
   },
 });

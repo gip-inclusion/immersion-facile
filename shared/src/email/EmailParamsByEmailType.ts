@@ -227,7 +227,28 @@ export type EmailParamsByEmailType = {
     signature: string;
     requesterName: string;
   };
-
+  CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
+    previousAgencyName: string;
+    justification: string;
+    magicLink: string;
+    conventionId: ConventionId;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    beneficiaryEmail: string;
+    beneficiaryPhone: string;
+    internshipKind: InternshipKind;
+  };
+  CONVENTION_TRANSFERRED_SIGNATORY_NOTIFICATION: {
+    internshipKind: InternshipKind;
+    immersionProfession: string;
+    previousAgencyName: string;
+    newAgencyName: string;
+    agencyAddress: string;
+    businessName: string;
+    justification: string;
+    magicLink: string;
+    conventionId: ConventionId;
+  };
   ESTABLISHMENT_CONTACT_REQUEST_REMINDER: {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;

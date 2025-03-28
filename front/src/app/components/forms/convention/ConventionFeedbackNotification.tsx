@@ -41,7 +41,7 @@ const labelByRole: Record<SignatoryRole, string> = {
   "establishment-representative": "Le responsable de l'entreprise",
 };
 
-export const createConventionFeedbackMessageByKind = (
+const createConventionFeedbackMessageByKind = (
   signatories: Signatories,
 ): Record<
   ConventionFeedbackKind,

@@ -6,7 +6,7 @@ import type {
   FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-export const useFeebackEventCallback = (
+export const useFeedbackEventCallback = (
   topic: FeedbackTopic,
   event: ActionKindAndLevel,
   callback: () => void,

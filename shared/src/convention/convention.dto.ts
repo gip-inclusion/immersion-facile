@@ -54,7 +54,7 @@ export const conventionStatusesWithoutJustificationNorValidator = [
 ] as const;
 
 export const doesStatusNeedsJustification = (
-  status: ConventionStatus,
+  status: ConventionStatus | null,
 ): status is ConventionStatusWithJustification =>
   conventionStatusesWithJustification.includes(
     status as ConventionStatusWithJustification,
@@ -62,7 +62,7 @@ export const doesStatusNeedsJustification = (
 
 export const doesStatusNeedsValidators = (
   initialStatus: ConventionStatus,
-  targetStatus: ConventionStatus,
+  targetStatus: ConventionStatus | null,
 ): targetStatus is ConventionStatusWithValidator => {
   const isValidatorRequired = conventionStatusesWithValidator.includes(
     targetStatus as ConventionStatusWithValidator,
@@ -325,6 +325,11 @@ export type WithConventionDto = {
 
 export type SendSignatureLinkRequestDto = WithConventionId & {
   signatoryRole: SignatoryRole;
+};
+
+export type TransferConventionToAgencyRequestDto = WithConventionId & {
+  agencyId: AgencyId;
+  justification: string;
 };
 
 export type UpdateConventionRequestDto = {
