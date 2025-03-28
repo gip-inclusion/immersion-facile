@@ -536,6 +536,12 @@ interface UsersAdmins {
   user_id: string;
 }
 
+type NotificationErrored = JSONColumnType<{
+  occurredAt: DateTimeIsoString;
+  message: string;
+  httpStatus: number;
+}>;
+
 interface NotificationsEmail {
   id: string;
   email_kind: string;
@@ -548,6 +554,7 @@ interface NotificationsEmail {
   reply_to_email: string | null;
   sender_email: string | null;
   sender_name: string | null;
+  errored: NotificationErrored | null;
 }
 
 interface NotificationsEmailAttachments {
@@ -573,6 +580,7 @@ interface NotificationsSms {
   establishment_siret: string | null;
   agency_id: string | null;
   params: Json | null;
+  errored: NotificationErrored | null;
 }
 
 interface OutboxFailures {
