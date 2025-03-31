@@ -254,13 +254,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .exhaustive();
   }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
 
-  // TODO : X2 ?
-  useEffect(() => {
-    return () => {
-      dispatch(establishmentSlice.actions.clearEstablishmentRequested());
-    };
-  }, [dispatch]);
-
   useEffect(() => {
     reset({
       ...defaultFormValues,
@@ -288,7 +281,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [debouncedFormValues, isEstablishmentCreation]);
 
-  // TODO :  X2 ?
   useEffect(() => {
     return () => {
       dispatch(establishmentSlice.actions.clearEstablishmentRequested());
