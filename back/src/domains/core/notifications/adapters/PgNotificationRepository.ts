@@ -3,9 +3,9 @@ import { map, uniq } from "ramda";
 import {
   type EmailNotification,
   type Notification,
-  type NotificationErrored,
   type NotificationId,
   type NotificationKind,
+  type NotificationState,
   type NotificationsByKind,
   type SmsNotification,
   type TemplatedEmail,
@@ -179,21 +179,21 @@ export class PgNotificationRepository implements NotificationRepository {
     ]);
   }
 
-  async markErrored({
+  async updateState({
     notificationId,
     notificationKind,
-    errored: newErrored,
+    state: newState,
   }: {
     notificationId: NotificationId;
     notificationKind: NotificationKind;
-    errored: NotificationErrored | null;
+    state: NotificationState | undefined;
   }) {
-    const errored = newErrored ? JSON.stringify(newErrored) : null;
+    const state = newState ? JSON.stringify(newState) : null;
 
     if (notificationKind === "email") {
       await this.transaction
         .updateTable("notifications_email")
-        .set({ errored })
+        .set({ state })
         .where("id", "=", notificationId)
         .execute();
     }
@@ -201,7 +201,7 @@ export class PgNotificationRepository implements NotificationRepository {
     if (notificationKind === "sms") {
       await this.transaction
         .updateTable("notifications_sms")
-        .set({ errored })
+        .set({ state })
         .where("id", "=", notificationId)
         .execute();
     }
@@ -352,10 +352,10 @@ const getSmsNotificationBuilder = (transaction: KyselyDb) =>
           establishmentId: eb.ref("establishment_siret"),
           agencyId: eb.ref("agency_id"),
         }),
-        errored: eb
+        state: eb
           .case()
-          .when("errored", "is not", null)
-          .then(eb.ref("errored"))
+          .when("state", "is not", null)
+          .then(eb.ref("state"))
           .else(null)
           .end(),
         templatedContent: jsonBuildObject({
@@ -392,10 +392,10 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
             establishmentId: ref("establishment_siret"),
             agencyId: ref("agency_id"),
           }),
-          errored: eb
+          state: eb
             .case()
-            .when("errored", "is not", null)
-            .then(eb.ref("errored"))
+            .when("state", "is not", null)
+            .then(eb.ref("state"))
             .else(null)
             .end(),
           templatedContent: jsonBuildObject({

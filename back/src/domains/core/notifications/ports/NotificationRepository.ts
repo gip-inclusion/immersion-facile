@@ -4,9 +4,9 @@ import type {
   EmailNotification,
   EmailType,
   Notification,
-  NotificationErrored,
   NotificationId,
   NotificationKind,
+  NotificationState,
   Phone,
   SmsNotification,
   TemplatedSms,
@@ -28,10 +28,10 @@ export interface NotificationRepository {
   getSmsByIds: (ids: NotificationId[]) => Promise<SmsNotification[]>;
   getEmailsByIds: (ids: NotificationId[]) => Promise<EmailNotification[]>;
   save: (notification: Notification) => Promise<void>;
-  markErrored: (params: {
+  updateState: (params: {
     notificationId: NotificationId;
     notificationKind: NotificationKind;
-    errored: NotificationErrored | null;
+    state: NotificationState | undefined;
   }) => Promise<void>;
   saveBatch: (notifications: Notification[]) => Promise<void>;
   getByIdAndKind: (

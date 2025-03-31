@@ -94,7 +94,8 @@ describe("SendNotification UseCase", () => {
           new Error(errorMessage),
         );
 
-        const errored: NotificationErrored = {
+        const notificationState: NotificationErrored = {
+          status: "errored",
           occurredAt: now.toISOString(),
           httpStatus: fakeHttpStatusErrorCode,
           message: errorMessage,
@@ -103,7 +104,7 @@ describe("SendNotification UseCase", () => {
         expectToEqual(uow.notificationRepository.notifications, [
           {
             ...smsNotification,
-            errored,
+            state: notificationState,
           },
         ]);
       });
@@ -127,7 +128,8 @@ describe("SendNotification UseCase", () => {
           const now = new Date();
           timeGateway.setNextDate(now);
 
-          const errored: NotificationErrored = {
+          const notificationState: NotificationErrored = {
+            status: "errored",
             occurredAt: now.toISOString(),
             httpStatus: fakeHttpStatusErrorCode,
             message:
@@ -139,7 +141,7 @@ describe("SendNotification UseCase", () => {
               id: emailNotification.id,
               kind: "email",
             }),
-            new Error(errored.message),
+            new Error(notificationState.message),
           );
 
           expectArraysToMatch(uow.outboxRepository.events, [
@@ -148,7 +150,7 @@ describe("SendNotification UseCase", () => {
               payload: {
                 notificationId: emailNotification.id,
                 notificationKind: emailNotification.kind,
-                errored,
+                errored: notificationState,
               },
             },
           ]);
@@ -157,7 +159,8 @@ describe("SendNotification UseCase", () => {
         it("does not trigger the event, if the notification was already errored, but it should update the notification", async () => {
           const alreadyErroredEmailNotif: EmailNotification = {
             ...emailNotification,
-            errored: {
+            state: {
+              status: "errored",
               occurredAt: new Date().toISOString(),
               httpStatus: 404,
               message: "some error",
@@ -169,7 +172,8 @@ describe("SendNotification UseCase", () => {
           const now = new Date();
           timeGateway.setNextDate(now);
 
-          const errored: NotificationErrored = {
+          const notificationState: NotificationErrored = {
+            status: "errored",
             occurredAt: now.toISOString(),
             httpStatus: fakeHttpStatusErrorCode,
             message:
@@ -181,11 +185,11 @@ describe("SendNotification UseCase", () => {
               id: emailNotification.id,
               kind: "email",
             }),
-            new Error(errored.message),
+            new Error(notificationState.message),
           );
 
           expectArraysToMatch(uow.notificationRepository.notifications, [
-            { ...alreadyErroredEmailNotif, errored },
+            { ...alreadyErroredEmailNotif, state: notificationState },
           ]);
 
           expectArraysToMatch(uow.outboxRepository.events, []);
@@ -198,7 +202,8 @@ describe("SendNotification UseCase", () => {
               ...emailNotification.templatedContent,
               recipients: ["does-not-error@mail.com"],
             },
-            errored: {
+            state: {
+              status: "errored",
               occurredAt: new Date().toISOString(),
               httpStatus: 404,
               message: "some error",
@@ -216,7 +221,7 @@ describe("SendNotification UseCase", () => {
           });
 
           expectArraysToMatch(uow.notificationRepository.notifications, [
-            { ...alreadyErroredEmailNotif, errored: undefined },
+            { ...alreadyErroredEmailNotif, state: undefined },
           ]);
 
           expectArraysToMatch(uow.outboxRepository.events, []);

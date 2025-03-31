@@ -537,11 +537,18 @@ interface UsersAdmins {
   user_id: string;
 }
 
-type NotificationErrored = JSONColumnType<{
-  occurredAt: DateTimeIsoString;
-  message: string;
-  httpStatus: number;
-}>;
+type NotificationState = JSONColumnType<
+  | {
+      status: "to-be-sent" | "accepted";
+      occurredAt: DateTimeIsoString;
+    }
+  | {
+      status: "errored";
+      occurredAt: DateTimeIsoString;
+      message: string;
+      httpStatus: number;
+    }
+>;
 
 interface NotificationsEmail {
   id: string;
@@ -555,7 +562,7 @@ interface NotificationsEmail {
   reply_to_email: string | null;
   sender_email: string | null;
   sender_name: string | null;
-  errored: NotificationErrored | null;
+  state: NotificationState | null;
 }
 
 interface NotificationsEmailAttachments {
@@ -581,7 +588,7 @@ interface NotificationsSms {
   establishment_siret: string | null;
   agency_id: string | null;
   params: Json | null;
-  errored: NotificationErrored | null;
+  state: NotificationState | null;
 }
 
 interface OutboxFailures {

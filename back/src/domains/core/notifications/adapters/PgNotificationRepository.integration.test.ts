@@ -280,16 +280,17 @@ describe("PgNotificationRepository", () => {
 
       await pgNotificationRepository.save(notification);
 
-      const errored: NotificationErrored = {
+      const notificationState: NotificationErrored = {
+        status: "errored",
         httpStatus: 400,
         message: "error",
         occurredAt: new Date().toISOString(),
       };
 
-      await pgNotificationRepository.markErrored({
+      await pgNotificationRepository.updateState({
         notificationId: notification.id,
         notificationKind: notification.kind,
-        errored,
+        state: notificationState,
       });
       const response = await pgNotificationRepository.getByIdAndKind(
         notification.id,
@@ -298,12 +299,12 @@ describe("PgNotificationRepository", () => {
       expect(response).toBeDefined();
       if (!response) throw new Error("response is undefined (unreachable)");
 
-      expectToEqual(response.errored, errored);
+      expectToEqual(response.state, notificationState);
 
-      await pgNotificationRepository.markErrored({
+      await pgNotificationRepository.updateState({
         notificationId: notification.id,
         notificationKind: notification.kind,
-        errored: null,
+        state: undefined,
       });
 
       const response2 = await pgNotificationRepository.getByIdAndKind(
@@ -313,7 +314,7 @@ describe("PgNotificationRepository", () => {
       expect(response2).toBeDefined();
       if (!response2) throw new Error("response2 is undefined (unreachable)");
 
-      expect(response2.errored).toBeUndefined();
+      expect(response2.state).toBeUndefined();
     });
   });
 
