@@ -45,30 +45,35 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     try {
       await this.#sendNotification(notification);
-      const notificationHadErroredBefore = notification.errored !== undefined;
+      const notificationHadErroredBefore =
+        notification.state?.status === "errored";
       if (notificationHadErroredBefore) {
-        await uow.notificationRepository.markErrored({
+        await uow.notificationRepository.updateState({
           notificationId: notification.id,
           notificationKind: notification.kind,
-          errored: null,
+          state: {
+            status: "accepted",
+            occurredAt: this.timeGateway.now().toISOString(),
+          },
         });
       }
     } catch (error: any) {
-      const errored: NotificationErrored = {
+      const notificationState: NotificationErrored = {
+        status: "errored",
         occurredAt: this.timeGateway.now().toISOString(),
         httpStatus: error.httpStatus,
         message: error.message,
       };
 
-      await uow.notificationRepository.markErrored({
+      await uow.notificationRepository.updateState({
         notificationId: notification.id,
         notificationKind: notification.kind,
-        errored,
+        state: notificationState,
       });
 
       if (
         notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
-        !notification.errored
+        notification.state?.status !== "errored"
       ) {
         await uow.outboxRepository.save(
           this.createNewEvent({
@@ -76,11 +81,12 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
             payload: {
               notificationId: notification.id,
               notificationKind: notification.kind,
-              errored,
+              errored: notificationState,
             },
           }),
         );
       }
+
       throw error;
     }
   }

@@ -1,12 +1,10 @@
 import Bottleneck from "bottleneck";
 import {
   type GenerateHtmlOptions,
-  configureGenerateHtmlFromTemplate,
-} from "html-templates";
-import {
   cciCustomHtmlHeader,
+  configureGenerateHtmlFromTemplate,
   defaultEmailFooter,
-} from "html-templates/src/components/email";
+} from "html-templates";
 import {
   type NotificationId,
   type TemplatedEmail,

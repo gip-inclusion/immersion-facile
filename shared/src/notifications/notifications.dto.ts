@@ -31,7 +31,15 @@ export type FollowedIds = {
   userId?: UserId;
 };
 
+export type NotificationState =
+  | {
+      status: "to-be-sent" | "accepted";
+      occurredAt: DateTimeIsoString;
+    }
+  | NotificationErrored;
+
 export type NotificationErrored = {
+  status: "errored";
   occurredAt: DateTimeIsoString;
   httpStatus: number;
   message: string;
@@ -41,7 +49,7 @@ export type NotificationCommonFields = {
   id: NotificationId;
   createdAt: DateString;
   followedIds: FollowedIds;
-  errored?: NotificationErrored;
+  state?: NotificationState;
 };
 
 export type Notification = NotificationCommonFields & NotificationContent;
