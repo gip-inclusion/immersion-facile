@@ -38,9 +38,11 @@ import {
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
+import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
 
@@ -103,6 +105,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     authSelectors.inclusionConnectToken,
   );
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const establishmentFeedback = useFeedbackTopic("form-establishment");
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const initialFormEstablishment = useAppSelector(
@@ -183,7 +186,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             name: P.union("formEstablishment", "formEstablishmentForExternals"),
           },
         },
-        ({ route }) =>
+        ({ route }) => {
           dispatch(
             establishmentSlice.actions.fetchEstablishmentRequested({
               establishmentRequested:
@@ -192,7 +195,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                 ),
               feedbackTopic: "form-establishment",
             }),
-          ),
+          );
+          if (currentUser)
+            dispatch(
+              fetchUserSlice.actions.fetchUserRequested({
+                userId: currentUser.id,
+              }),
+            );
+        },
       )
       .with(
         { route: { name: "manageEstablishmentAdmin" }, adminJwt: P.nullish },
@@ -244,6 +254,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .exhaustive();
   }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
 
+  // TODO : X2 ?
   useEffect(() => {
     return () => {
       dispatch(establishmentSlice.actions.clearEstablishmentRequested());
@@ -277,6 +288,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     }
   }, [debouncedFormValues, isEstablishmentCreation]);
 
+  // TODO :  X2 ?
   useEffect(() => {
     return () => {
       dispatch(establishmentSlice.actions.clearEstablishmentRequested());
