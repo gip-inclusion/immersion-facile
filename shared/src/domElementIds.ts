@@ -208,6 +208,7 @@ export const domElementIds = {
     stepsForValidationInput: "im-form-add-agency__steps-for-validation",
     submitButton: "im-form-add-agency__submit-button",
     refersToAgencyId: "im-form-add-agency__refers-to-agency-id",
+    phoneNumberInput: "im-form-add-agency__phone-number",
     addressAutocomplete: "im-form-add-agency__address-autocomplete-input",
   },
 

@@ -132,4 +132,10 @@ export const formAgencyFieldsLabels: FormAgencyFieldsLabels = {
     label: "",
     id: "",
   },
+  phoneNumber: {
+    label: "Numéro de téléphone",
+    id: domElementIds.addAgency.phoneNumberInput,
+    hintText:
+      "Dans l'éventualité que nous vous contactions pour valider le référencement de votre structure, merci de nous indiquer votre numéro de téléphone",
+  },
 };

@@ -38,6 +38,7 @@ const emptyAgency: AgencyDto = {
   refersToAgencyName: null,
   codeSafir: null,
   rejectionJustification: null,
+  phoneNumber: "+33600000000",
 };
 
 export class AgencyDtoBuilder implements Builder<AgencyDto> {

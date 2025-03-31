@@ -303,6 +303,7 @@ const agency3: AgencyWithUsersRights = {
   refersToAgencyName: null,
   codeSafir: null,
   rejectionJustification: null,
+  phoneNumber: "+33600000003",
 };
 
 const agency1: AgencyWithUsersRights = {
@@ -332,6 +333,7 @@ const agency1: AgencyWithUsersRights = {
   refersToAgencyName: null,
   codeSafir: null,
   rejectionJustification: null,
+  phoneNumber: "+33600000001",
 };
 const testAgencies: AgencyWithUsersRights[] = [
   {
@@ -361,6 +363,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     refersToAgencyName: null,
     codeSafir: null,
     rejectionJustification: null,
+    phoneNumber: "+33600000000",
   },
   agency1,
   {
@@ -392,6 +395,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     refersToAgencyName: null,
     rejectionJustification: null,
     codeSafir: null,
+    phoneNumber: "+33600000002",
   },
   agency3,
   {
@@ -421,6 +425,7 @@ const testAgencies: AgencyWithUsersRights[] = [
     refersToAgencyName: agency3.name,
     rejectionJustification: null,
     codeSafir: null,
+    phoneNumber: "+33600000004",
   },
   {
     id: "test-agency-5-back-with-refers-to",
@@ -449,5 +454,6 @@ const testAgencies: AgencyWithUsersRights[] = [
     refersToAgencyName: agency1.name,
     rejectionJustification: null,
     codeSafir: null,
+    phoneNumber: "+33600000005",
   },
 ];
