@@ -1,6 +1,6 @@
 import {
-  type EstablishmentFormUserRight,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   type SiretDto,
   domElementIds,
   immersionFacileContactEmail,
@@ -16,7 +16,7 @@ type FormEstablishmentFieldKeys =
     >
   | "maxContactsPerMonthWhenAvailable"
   | `userRights.0.${
-      | keyof EstablishmentFormUserRight
+      | keyof FormEstablishmentUserRight
       | "firstName"
       | "lastName"}`;
 

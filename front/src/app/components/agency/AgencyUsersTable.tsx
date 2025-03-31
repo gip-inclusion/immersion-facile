@@ -5,9 +5,9 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 
 import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
-import { agencyRoleToDisplay } from "src/app/components/agency/AgencyUsers";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { userRoleToDisplay } from "../../contents/userRoleToDisplay";
 
 type AgencyUsersTableProps = {
   agencyUsers: NormalizedInclusionConnectedUser[];
@@ -53,9 +53,9 @@ export const AgencyUsersTable = ({
             <Badge
               key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-${role}`}
               small
-              className={fr.cx(agencyRoleToDisplay[role].className, "fr-mr-1w")}
+              className={fr.cx(userRoleToDisplay[role].className, "fr-mr-1w")}
             >
-              {agencyRoleToDisplay[role].label}
+              {userRoleToDisplay[role].label}
             </Badge>
           );
         }),

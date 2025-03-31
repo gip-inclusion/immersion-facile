@@ -1,7 +1,7 @@
 import { type Page, expect } from "@playwright/test";
 import {
-  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   addressRoutes,
   domElementIds,
 } from "shared";
@@ -115,7 +115,7 @@ const step2SearchableBy = async (page: Page) => {
 
 const step3BusinessContact = async (
   page: Page,
-  userRights: EstablishmentFormUserRights,
+  userRights: FormEstablishmentUserRight[],
 ): Promise<void> => {
   const firstAdmin = userRights.find(
     (right) => right.role === "establishment-admin",

@@ -1,6 +1,6 @@
 import {
-  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   type InclusionConnectDomainJwtPayload,
   type InclusionConnectJwtPayload,
   type SiretDto,
@@ -93,7 +93,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
   async #makeFormUserRights(
     uow: UnitOfWork,
     userRights: EstablishmentUserRight[],
-  ): Promise<EstablishmentFormUserRights> {
+  ): Promise<FormEstablishmentUserRight[]> {
     const users = await uow.userRepository.getByIds(
       userRights.map(({ userId }) => userId),
     );

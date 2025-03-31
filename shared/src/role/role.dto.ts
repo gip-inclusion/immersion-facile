@@ -59,4 +59,5 @@ export const establishmentsRoles = [
   "establishment-admin",
   "establishment-contact",
 ] as const;
+
 export type EstablishmentRole = (typeof establishmentsRoles)[number];

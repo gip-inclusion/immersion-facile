@@ -802,6 +802,7 @@ export const domElementIds = {
     },
     manageEstablishments: {
       selectEstablishmentInput: "im-manage-establishment__establishment-select",
+      addUserButton: "im-manage-establishment__add-user-button",
     },
   },
   searchDiagoriente: {},

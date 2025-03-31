@@ -1,4 +1,4 @@
-import { type EstablishmentFormUserRights, errors } from "shared";
+import { type FormEstablishmentUserRight, errors } from "shared";
 import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
@@ -10,7 +10,7 @@ export const establishmentFormUserRightsFromEstablishmentAggregateAndUsers =
   async (
     uow: UnitOfWork,
     establishmentAggregate: EstablishmentAggregate,
-  ): Promise<EstablishmentFormUserRights> => {
+  ): Promise<FormEstablishmentUserRight[]> => {
     const firstAdminRight = establishmentAggregate.userRights.find(
       (right): right is EstablishmentAdminRight =>
         right.role === "establishment-admin",

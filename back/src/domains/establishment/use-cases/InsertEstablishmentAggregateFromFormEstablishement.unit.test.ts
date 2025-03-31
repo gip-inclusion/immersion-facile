@@ -378,7 +378,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         ),
         errors.inputs.badSchema({
           flattenErrors: [
-            "formEstablishment.userRights : La structure accueillante nécéssite au moins un administrateur pour être valide.",
+            "formEstablishment.userRights : La structure accueillante nécessite au moins un administrateur pour être valide.",
           ],
         }),
       );
