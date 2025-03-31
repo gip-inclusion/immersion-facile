@@ -3,9 +3,9 @@ import {
   type AppellationAndRomeDto,
   type ContactMethod,
   type Email,
-  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
+  type FormEstablishmentUserRight,
   defaultMaxContactsPerMonth,
 } from "shared";
 import type { AcquisitionParams } from "src/app/routes/routes";
@@ -35,12 +35,13 @@ const copyEmailsSerializer: ValueSerializer<Email[]> = {
   stringify: (emails: Email[]) => JSON.stringify(emails),
 };
 
-const establishmentUserRightsSerializer: ValueSerializer<EstablishmentFormUserRights> =
-  {
-    parse: (raw) => JSON.parse(raw),
-    stringify: (userRights: EstablishmentFormUserRights) =>
-      JSON.stringify(userRights),
-  };
+const establishmentUserRightsSerializer: ValueSerializer<
+  FormEstablishmentUserRight[]
+> = {
+  parse: (raw) => JSON.parse(raw),
+  stringify: (userRights: FormEstablishmentUserRight[]) =>
+    JSON.stringify(userRights),
+};
 
 export const formEstablishmentParamsInUrl = {
   uRights: param.query.optional.ofType(establishmentUserRightsSerializer),

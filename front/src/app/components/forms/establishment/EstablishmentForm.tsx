@@ -1,5 +1,4 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
@@ -9,8 +8,8 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
-  type EstablishmentFormUserRights,
   type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   domElementIds,
   errors,
   formEstablishmentSchema,
@@ -45,6 +44,7 @@ import { establishmentSlice } from "src/core-logic/domain/establishment/establis
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
+import { EstablishmentUsersList } from "../../../pages/establishment-dashboard/EstablishmentUsersList";
 
 type RouteByMode = {
   create:
@@ -112,7 +112,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     establishmentSelectors.formEstablishment,
   );
 
-  const initialUserRights: EstablishmentFormUserRights = useMemo(
+  const initialUserRights: FormEstablishmentUserRight[] = useMemo(
     () =>
       mode === "create"
         ? [
@@ -252,7 +252,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         },
       )
       .exhaustive();
-  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute]);
+  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute, currentUser]);
 
   useEffect(() => {
     reset({
@@ -368,8 +368,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .exhaustive();
 
-  if (isLoading) return <Loader />;
-
   const onStepChange: OnStepChange = async (targetStep, fieldsToValidate) => {
     if (targetStep && currentStep && targetStep < currentStep) {
       setCurrentStep(targetStep);
@@ -391,111 +389,102 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
 
   return (
     <WithFeedbackReplacer topic="form-establishment">
-      <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          id={domElementIds.establishment[mode].form}
-          data-matomo-name={domElementIds.establishment[mode].form}
-        >
-          {match(currentStep)
-            .with(null, () => (
-              <>
-                {isEstablishmentAdmin && (
-                  <Button
-                    onClick={() => {
-                      routes.adminEstablishments().push();
-                    }}
-                    type="button"
-                    priority="secondary"
-                    className={fr.cx("fr-mb-4w")}
-                  >
-                    Retour au pilotage des établissements
-                  </Button>
-                )}
-                <h1>Pilotage de l'entreprise {formValues.siret}</h1>
-                <h2>{steps[1].title}</h2>
-                <AvailabilitySection
-                  mode={mode}
-                  onStepChange={onStepChange}
-                  currentStep={currentStep}
-                  setAvailableForImmersion={setAvailableForImmersion}
-                  availableForImmersion={availableForImmersion}
-                  shouldUpdateAvailability={Boolean(
-                    initialUrlParams.current.shouldUpdateAvailability,
-                  )}
-                />
-                <h2>{steps[2].title}</h2>
-                <SearchableBySection
-                  mode={mode}
-                  onStepChange={onStepChange}
-                  currentStep={currentStep}
-                />
-                <h2>{steps[3].title}</h2>
-                <BusinessContactSection
-                  mode={mode}
-                  onStepChange={onStepChange}
-                  currentStep={currentStep}
-                  setInvalidEmailMessage={setInvalidEmailMessage}
-                />
-                <h2>{steps[4].title}</h2>
-                <DetailsSection
-                  mode={mode}
-                  isEstablishmentAdmin={isEstablishmentAdmin}
-                  currentStep={currentStep}
-                  onStepChange={onStepChange}
-                  invalidEmailMessage={invalidEmailMessage}
-                />
-              </>
-            ))
-            .with(0, () => <CreateIntroSection onStepChange={onStepChange} />)
-            .otherwise((currentStep) => (
-              <div className={fr.cx("fr-col-8")}>
-                <Stepper
-                  currentStep={currentStep}
-                  stepCount={keys(steps).length}
-                  title={steps[currentStep].title}
-                  nextTitle={steps[currentStep].nextTitle}
-                />
-                {match(currentStep)
-                  .with(1, () => (
-                    <AvailabilitySection
-                      mode={mode}
-                      onStepChange={onStepChange}
-                      currentStep={currentStep}
-                      availableForImmersion={availableForImmersion}
-                      setAvailableForImmersion={setAvailableForImmersion}
-                      shouldUpdateAvailability={undefined}
-                    />
-                  ))
-                  .with(2, () => (
-                    <SearchableBySection
-                      mode={mode}
-                      onStepChange={onStepChange}
-                      currentStep={currentStep}
-                    />
-                  ))
-                  .with(3, () => (
-                    <BusinessContactSection
-                      mode={mode}
-                      onStepChange={onStepChange}
-                      currentStep={currentStep}
-                      setInvalidEmailMessage={setInvalidEmailMessage}
-                    />
-                  ))
-                  .with(4, () => (
-                    <DetailsSection
-                      isEstablishmentAdmin={isEstablishmentAdmin}
-                      mode={mode}
-                      currentStep={currentStep}
-                      onStepChange={onStepChange}
-                      invalidEmailMessage={invalidEmailMessage}
-                    />
-                  ))
-                  .exhaustive()}
-              </div>
-            ))}
-        </form>
-      </FormProvider>
+      <>
+        {isLoading && <Loader />}
+        <FormProvider {...methods}>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            id={domElementIds.establishment[mode].form}
+            data-matomo-name={domElementIds.establishment[mode].form}
+          >
+            {match(currentStep)
+              .with(null, () => (
+                <>
+                  <EstablishmentUsersList />
+                  <h2>{steps[1].title}</h2>
+                  <AvailabilitySection
+                    mode={mode}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                    setAvailableForImmersion={setAvailableForImmersion}
+                    availableForImmersion={availableForImmersion}
+                    shouldUpdateAvailability={Boolean(
+                      initialUrlParams.current.shouldUpdateAvailability,
+                    )}
+                  />
+                  <h2>{steps[2].title}</h2>
+                  <SearchableBySection
+                    mode={mode}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                  />
+                  <h2>{steps[3].title}</h2>
+                  <BusinessContactSection
+                    mode={mode}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                    setInvalidEmailMessage={setInvalidEmailMessage}
+                  />
+                  <h2>{steps[4].title}</h2>
+                  <DetailsSection
+                    mode={mode}
+                    isEstablishmentAdmin={isEstablishmentAdmin}
+                    currentStep={currentStep}
+                    onStepChange={onStepChange}
+                    invalidEmailMessage={invalidEmailMessage}
+                  />
+                </>
+              ))
+              .with(0, () => <CreateIntroSection onStepChange={onStepChange} />)
+              .otherwise((currentStep) => (
+                <div className={fr.cx("fr-col-8")}>
+                  <Stepper
+                    currentStep={currentStep}
+                    stepCount={keys(steps).length}
+                    title={steps[currentStep].title}
+                    nextTitle={steps[currentStep].nextTitle}
+                  />
+                  {match(currentStep)
+                    .with(1, () => (
+                      <AvailabilitySection
+                        mode={mode}
+                        onStepChange={onStepChange}
+                        currentStep={currentStep}
+                        availableForImmersion={availableForImmersion}
+                        setAvailableForImmersion={setAvailableForImmersion}
+                        shouldUpdateAvailability={undefined}
+                      />
+                    ))
+                    .with(2, () => (
+                      <SearchableBySection
+                        mode={mode}
+                        onStepChange={onStepChange}
+                        currentStep={currentStep}
+                      />
+                    ))
+                    .with(3, () => (
+                      <BusinessContactSection
+                        mode={mode}
+                        onStepChange={onStepChange}
+                        currentStep={currentStep}
+                        setInvalidEmailMessage={setInvalidEmailMessage}
+                      />
+                    ))
+                    .with(4, () => (
+                      <DetailsSection
+                        isEstablishmentAdmin={isEstablishmentAdmin}
+                        mode={mode}
+                        currentStep={currentStep}
+                        onStepChange={onStepChange}
+                        invalidEmailMessage={invalidEmailMessage}
+                      />
+                    ))
+                    .exhaustive()}
+                </div>
+              ))}
+          </form>
+        </FormProvider>
+      </>
     </WithFeedbackReplacer>
   );
 };

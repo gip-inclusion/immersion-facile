@@ -50,8 +50,8 @@ const withEstablishmentSiretAndName: z.Schema<WithEstablishmentData> = z.object(
     role: z.enum(establishmentsRoles),
     admins: z.array(
       z.object({
-        firstName: zStringMinLength1,
-        lastName: zStringMinLength1,
+        firstName: zStringCanBeEmpty,
+        lastName: zStringCanBeEmpty,
         email: emailSchema,
       }),
     ),

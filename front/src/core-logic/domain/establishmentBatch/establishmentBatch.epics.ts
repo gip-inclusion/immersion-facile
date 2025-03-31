@@ -6,10 +6,10 @@ import {
   type CSVBoolean,
   type ContactFormEstablishmentUserRight,
   type EstablishmentCSVRow,
-  type EstablishmentFormUserRights,
   type EstablishmentRole,
   type FormEstablishmentDto,
   type FormEstablishmentSource,
+  type FormEstablishmentUserRight,
   csvBooleanToBoolean,
   defaultMaxContactsPerMonth,
   establishmentAppellationsFromCSVToDto,
@@ -145,16 +145,16 @@ export const establishmentBatchEpics = [
 
 const makeUserRightsFromCSV = (
   csvRow: EstablishmentCSVRow,
-): EstablishmentFormUserRights => {
+): FormEstablishmentUserRight[] => {
   const rightsKey = keys(csvRow)
     .filter((csvRowKey) =>
       csvRowKey.includes("right" as keyof EstablishmentCSVRow),
     )
     .filter((csvRowKey) => !csvRowKey.includes("1"));
 
-  const items = uniq(
-    rightsKey.map((key) => key.split("_")),
-  ).reduce<EstablishmentFormUserRights>((acc, current) => {
+  const items = uniq(rightsKey.map((key) => key.split("_"))).reduce<
+    FormEstablishmentUserRight[]
+  >((acc, current) => {
     const role = csvRow[`${current}_role` as keyof EstablishmentCSVRow] as
       | EstablishmentRole
       | undefined;

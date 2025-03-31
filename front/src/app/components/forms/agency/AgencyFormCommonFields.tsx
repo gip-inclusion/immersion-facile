@@ -3,6 +3,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { type ReactNode, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
+  type AddressAndPosition,
   type AddressDto,
   type CreateAgencyDto,
   domElementIds,
@@ -63,8 +64,9 @@ export const AgencyFormCommonFields = ({
   if (shouldResetCounsellorEmails) setValue("counsellorEmails", []);
 
   useEffect(() => {
-    if (!isFetchingSiret && establishmentInfos)
+    if (!isFetchingSiret && establishmentInfos) {
       setValue("name", establishmentInfos.businessName);
+    }
   }, [establishmentInfos, isFetchingSiret, setValue]);
   const valueFromStore = establishmentInfos
     ? {
@@ -74,6 +76,11 @@ export const AgencyFormCommonFields = ({
         ),
       }
     : undefined;
+  const onAddressSelected = (addressAndPosition: AddressAndPosition) => {
+    setValue("address", addressAndPosition.address);
+    setValue("position", addressAndPosition.position);
+    setValue("coveredDepartments", [addressAndPosition.address.departmentCode]);
+  };
   return (
     <>
       <Input
@@ -113,6 +120,7 @@ export const AgencyFormCommonFields = ({
         {...formContents.address}
         selectProps={{
           inputId: domElementIds.addAgency.addressAutocomplete,
+          inputValue: establishmentInfos?.businessAddress,
         }}
         initialValue={
           formHasAddressValues(formValues)
@@ -122,13 +130,7 @@ export const AgencyFormCommonFields = ({
               }
             : valueFromStore?.value
         }
-        onAddressSelected={(addressAndPosition) => {
-          setValue("address", addressAndPosition.address);
-          setValue("position", addressAndPosition.position);
-          setValue("coveredDepartments", [
-            addressAndPosition.address.departmentCode,
-          ]);
-        }}
+        onAddressSelected={onAddressSelected}
         onAddressClear={() => {
           setValue("address", {
             streetNumberAndAddress: "",
