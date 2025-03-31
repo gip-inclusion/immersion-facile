@@ -36,6 +36,7 @@ export type CreateAgencyDto = {
   signature: string;
   refersToAgencyId: AgencyId | null;
   refersToAgencyName: string | null;
+  phoneNumber: string;
 } & WithAcquisition;
 
 export type AgencyDtoSensitiveFields = {

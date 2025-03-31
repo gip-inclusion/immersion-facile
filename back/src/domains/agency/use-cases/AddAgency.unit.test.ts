@@ -59,6 +59,7 @@ describe("AddAgency use case", () => {
     agencySiret: TEST_OPEN_ESTABLISHMENT_1.siret,
     refersToAgencyId: null,
     refersToAgencyName: null,
+    phoneNumber: "+33600000001",
   };
 
   const createAgencyWithRefersToParams: CreateAgencyDto = {
@@ -80,6 +81,7 @@ describe("AddAgency use case", () => {
     refersToAgencyId: createParisMissionLocaleParams.id,
     refersToAgencyName: createParisMissionLocaleParams.name,
     logoUrl: null,
+    phoneNumber: "+33600000001",
   };
   const uuids = ["uuid1", "uuid2", "uuid3", "uuid4"];
 

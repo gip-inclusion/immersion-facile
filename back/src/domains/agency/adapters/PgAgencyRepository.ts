@@ -69,6 +69,7 @@ export class PgAgencyRepository implements AgencyRepository {
         refers_to_agency_id: agency.refersToAgencyId,
         acquisition_campaign: agency.acquisitionCampaign,
         acquisition_keyword: agency.acquisitionKeyword,
+        phone_number: agency.phoneNumber,
       }))
       .execute()
       .catch((error) => {
@@ -355,6 +356,7 @@ export class PgAgencyRepository implements AgencyRepository {
           rejectionJustification: ref("agencies.rejection_justification"),
           acquisitionCampaign: ref("agencies.acquisition_campaign"),
           acquisitionKeyword: ref("agencies.acquisition_keyword"),
+          phoneNumber: ref("agencies.phone_number"),
           usersRights: fn.coalesce(
             fn
               .jsonAgg(
