@@ -65,6 +65,9 @@ test.describe("Convention creation and modification workflow", () => {
         .getByRole("link")
         .click();
       await page
+        .locator(`#${domElementIds.manageConvention.edit.actionsButton}`)
+        .click();
+      await page
         .locator(`#${domElementIds.manageConvention.edit.requestEditButton}`)
         .click();
 
@@ -85,9 +88,7 @@ test.describe("Convention creation and modification workflow", () => {
       await expect(page.locator(".fr-alert--success")).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);
     });
-    test.skip("signatory edit the convention and re-submit it", async ({
-      page,
-    }) => {
+    test("signatory edit the convention and re-submit it", async ({ page }) => {
       await page.goto("/");
       await goToAdminTab(page, "adminNotifications");
       const emailWrapper = await openEmailInAdmin(
@@ -103,7 +104,7 @@ test.describe("Convention creation and modification workflow", () => {
       await page.goto(href);
       await submitEditConventionForm(page, href, conventionSubmitted);
     });
-    test.describe.skip("signs convention for signatories", () => {
+    test.describe("signs convention for signatories", () => {
       const signatoriesMagicLinks: string[] = [];
       const signatories = 4;
 

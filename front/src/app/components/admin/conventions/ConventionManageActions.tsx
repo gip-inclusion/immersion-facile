@@ -328,6 +328,7 @@ export const ConventionManageActions = ({
                   priority={"secondary"}
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
+                  id={domElementIds.manageConvention.edit.actionsButton}
                 />
                 <ModalWrapper
                   {...getVerificationActionButtonProps({

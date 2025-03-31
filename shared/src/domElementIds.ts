@@ -320,7 +320,7 @@ export const domElementIds = {
 
   manageConvention: {
     edit: {
-      button: "im-convention__edit-actions-button",
+      actionsButton: "im-convention__edit-actions-button",
       requestEditModal: "im-convention__request-edit-modal",
       requestEditButton: "im-convention__open-request-edit-modal-button",
       requestEditCancelButton: "im-convention__request-edit-cancel-button",
