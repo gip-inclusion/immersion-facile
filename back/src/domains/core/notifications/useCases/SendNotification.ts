@@ -45,18 +45,14 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     try {
       await this.#sendNotification(notification);
-      const notificationHadErroredBefore =
-        notification.state?.status === "errored";
-      if (notificationHadErroredBefore) {
-        await uow.notificationRepository.updateState({
-          notificationId: notification.id,
-          notificationKind: notification.kind,
-          state: {
-            status: "accepted",
-            occurredAt: this.timeGateway.now().toISOString(),
-          },
-        });
-      }
+      await uow.notificationRepository.updateState({
+        notificationId: notification.id,
+        notificationKind: notification.kind,
+        state: {
+          status: "accepted",
+          occurredAt: this.timeGateway.now().toISOString(),
+        },
+      });
     } catch (error: any) {
       const notificationState: NotificationErrored = {
         status: "errored",
