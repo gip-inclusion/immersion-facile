@@ -129,16 +129,16 @@ export const TransferConventionModalContent = ({
                 closeModal();
               },
               nativeButtonProps: {
-                id: domElementIds.manageConvention
-                  .transferConventionToAgencyCancelButton,
+                id: domElementIds.manageConvention.edit
+                  .transferToAgencyCancelButton,
               },
               children: "Annuler et revenir en arrière",
             },
             {
               type: "submit",
               nativeButtonProps: {
-                id: domElementIds.manageConvention
-                  .transferConventionToAgencyButton,
+                id: domElementIds.manageConvention.edit
+                  .transferToAgencySubmitButton,
               },
               children: "Terminer",
             },
