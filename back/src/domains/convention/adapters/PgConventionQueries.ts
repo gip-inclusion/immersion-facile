@@ -88,6 +88,8 @@ export class PgConventionQueries implements ConventionQueries {
     finishingRange: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
+    const daysBeforeFinishing = 2;
+    const daysAfterFinishing = 2;
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.status", "in", validatedConventionStatuses)
       .where(
@@ -104,12 +106,16 @@ export class PgConventionQueries implements ConventionQueries {
               .where(
                 sql`notifications_email.created_at`,
                 ">=",
-                subDays(finishingRange.from, 1).toISOString().split("T")[0],
+                subDays(finishingRange.from, daysBeforeFinishing)
+                  .toISOString()
+                  .split("T")[0],
               )
               .where(
                 sql`notifications_email.created_at`,
                 "<=",
-                addDays(finishingRange.to, 2).toISOString().split("T")[0],
+                addDays(finishingRange.to, daysAfterFinishing)
+                  .toISOString()
+                  .split("T")[0],
               )
               .whereRef(
                 "conventions.id",
@@ -138,12 +144,16 @@ export class PgConventionQueries implements ConventionQueries {
               .where(
                 sql`notifications_email.created_at`,
                 ">=",
-                subDays(finishingRange.from, 1).toISOString().split("T")[0],
+                subDays(finishingRange.from, daysBeforeFinishing)
+                  .toISOString()
+                  .split("T")[0],
               )
               .where(
                 sql`notifications_email.created_at`,
                 "<=",
-                addDays(finishingRange.to, 1).toISOString().split("T")[0],
+                addDays(finishingRange.to, daysAfterFinishing)
+                  .toISOString()
+                  .split("T")[0],
               )
               .whereRef(
                 "conventions.id",
@@ -156,9 +166,7 @@ export class PgConventionQueries implements ConventionQueries {
       .orderBy("conventions.date_start", "desc")
       .execute();
 
-    return await pgResults.map((pgResult) =>
-      conventionSchema.parse(pgResult.dto),
-    );
+    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto));
   }
 
   public async getConventionById(

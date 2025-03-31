@@ -110,7 +110,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
   }
 
   async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
-    const now = this.#timeGateway.now();
     return this.#uowPerformer.perform(async (uow) => {
       const conventions =
         await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
@@ -123,17 +122,19 @@ export class SendAssessmentNeededNotifications extends UseCase<
           .getByConventionIds(conventions.map((convention) => convention.id))
           .then(map(({ conventionId }) => conventionId));
 
+      const conventionsToSendAssessmentEmailTo = conventions.filter(
+        (convention) =>
+          !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+      );
+
       logger.info({
-        message: `[${now.toISOString()}]: About to send assessment email to ${
-          conventions.length
+        message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${
+          conventionsToSendAssessmentEmailTo.length
         } establishments`,
       });
 
       return {
-        conventions: conventions.filter(
-          (convention) =>
-            !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
-        ),
+        conventions: conventionsToSendAssessmentEmailTo,
         numberOfConventionsWithAlreadyExistingAssessment:
           conventionIdsWithAlreadyExistingAssessment.length,
       };
