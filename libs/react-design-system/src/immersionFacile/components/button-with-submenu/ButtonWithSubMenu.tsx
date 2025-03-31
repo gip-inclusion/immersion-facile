@@ -51,6 +51,8 @@ export const ButtonWithSubMenu = ({
     };
   }, []);
 
+  const mobileSuffix = id?.includes("-mobile") ? "-mobile" : "";
+
   return (
     <div
       className={cx(
@@ -93,7 +95,7 @@ export const ButtonWithSubMenu = ({
                   <a
                     className={fr.cx("fr-nav__link")}
                     {...item.linkProps}
-                    id={item.linkProps.id}
+                    id={`${item.linkProps.id ?? item.id}${mobileSuffix}`}
                   >
                     {item.children}
                   </a>
@@ -103,6 +105,7 @@ export const ButtonWithSubMenu = ({
                     className={fr.cx("fr-nav__link")}
                     {...item.nativeButtonProps}
                     onClick={item?.onClick ? item?.onClick : undefined}
+                    id={`${item.id}${mobileSuffix}`}
                   >
                     {item.children}
                   </button>
