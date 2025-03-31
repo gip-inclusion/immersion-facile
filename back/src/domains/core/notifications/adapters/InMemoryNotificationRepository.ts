@@ -5,9 +5,9 @@ import {
   type ConventionDto,
   type EmailNotification,
   type Notification,
-  type NotificationErrored,
   type NotificationId,
   type NotificationKind,
+  type NotificationState,
   type ShortLinkId,
   type Signatory,
   type SmsNotification,
@@ -112,10 +112,10 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     this.notifications.push(...notifications);
   }
 
-  public async markErrored(params: {
+  public async updateState(params: {
     notificationId: NotificationId;
     notificationKind: NotificationKind;
-    errored: NotificationErrored | null;
+    state: NotificationState | undefined;
   }): Promise<void> {
     const notification = this.notifications.find(
       ({ id }) => id === params.notificationId,
@@ -127,7 +127,7 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
     this.notifications = replaceElementWhere(
       this.notifications,
-      { ...notification, errored: params.errored ?? undefined },
+      { ...notification, state: params.state },
       ({ id }) => id === params.notificationId,
     );
   }

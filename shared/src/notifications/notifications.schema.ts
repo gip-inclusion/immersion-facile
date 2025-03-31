@@ -3,7 +3,10 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
 import { userIdSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
-import { makeDateStringSchema } from "../schedule/Schedule.schema";
+import {
+  dateTimeIsoStringSchema,
+  makeDateStringSchema,
+} from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
 import { localization } from "../zodUtils";
@@ -12,6 +15,7 @@ import type {
   FollowedIds,
   NotificationCommonFields,
   NotificationId,
+  NotificationState,
   NotificationsByKind,
   SmsNotification,
 } from "./notifications.dto";
@@ -27,10 +31,25 @@ const followedIdsSchema: z.Schema<FollowedIds> = z.object({
   userId: userIdSchema.optional(),
 });
 
+const notificationStateSchema: z.Schema<NotificationState> = z
+  .object({
+    status: z.enum(["to-be-sent", "accepted"]),
+    occurredAt: dateTimeIsoStringSchema,
+  })
+  .or(
+    z.object({
+      status: z.literal("errored"),
+      occurredAt: dateTimeIsoStringSchema,
+      httpStatus: z.number(),
+      message: z.string(),
+    }),
+  );
+
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,
   createdAt: makeDateStringSchema(),
   followedIds: followedIdsSchema,
+  state: notificationStateSchema,
 });
 
 const emailNotificationSchema: z.Schema<EmailNotification> =
