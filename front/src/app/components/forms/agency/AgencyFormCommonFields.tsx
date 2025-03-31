@@ -145,6 +145,15 @@ export const AgencyFormCommonFields = ({
         disabled={isFetchingSiret}
         {...getFieldError("address")}
       />
+      <Input
+        label={formContents.phoneNumber.label}
+        hintText={formContents.phoneNumber.hintText}
+        nativeInputProps={{
+          ...register("phoneNumber"),
+          ...formContents.phoneNumber,
+        }}
+        {...getFieldError("phoneNumber")}
+      />
       {!refersToOtherAgency && (
         <RadioGroup
           {...formContents.stepsForValidation}
