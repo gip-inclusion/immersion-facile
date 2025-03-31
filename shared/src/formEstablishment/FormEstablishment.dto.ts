@@ -39,11 +39,9 @@ export type ContactFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-contact"> &
     Partial<WithJobAndPhone>;
 
-export type EstablishmentFormUserRight =
+export type FormEstablishmentUserRight =
   | AdminFormEstablishmentUserRight
   | ContactFormEstablishmentUserRight;
-
-export type EstablishmentFormUserRights = EstablishmentFormUserRight[];
 
 export type FormEstablishmentSourceInUrl =
   | "immersion-facile"
@@ -72,7 +70,7 @@ export type FormEstablishmentDto = {
   additionalInformation?: string;
   appellations: AppellationAndRomeDto[]; // at least one
   businessAddresses: FormEstablishmentAddress[];
-  userRights: EstablishmentFormUserRights;
+  userRights: FormEstablishmentUserRight[];
   businessName: string;
   businessNameCustomized?: string;
   contactMethod: ContactMethod;

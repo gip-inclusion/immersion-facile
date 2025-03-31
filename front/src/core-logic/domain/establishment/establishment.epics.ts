@@ -123,6 +123,7 @@ const editFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
         .pipe(
           map(() =>
             establishmentSlice.actions.updateEstablishmentSucceeded({
+              establishmentUpdate: action.payload.establishmentUpdate,
               feedbackTopic: action.payload.feedbackTopic,
             }),
           ),
