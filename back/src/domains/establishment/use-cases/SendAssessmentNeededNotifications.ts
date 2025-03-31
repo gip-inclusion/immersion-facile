@@ -7,6 +7,7 @@ import {
   type DateRange,
   type Email,
   castError,
+  executeInSequence,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
   withDateRangeSchema,
@@ -15,7 +16,7 @@ import { z } from "zod";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
-import { TransactionalUseCase } from "../../core/UseCase";
+import { UseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type {
   NotificationContentAndFollowedIds,
@@ -33,14 +34,16 @@ type SendAssessmentFormNotificationsOutput = {
   numberOfConventionsWithAlreadyExistingAssessment: number;
 };
 
-export class SendAssessmentNeededNotifications extends TransactionalUseCase<
-  {
-    conventionEndDate?: DateRange;
-  },
+type SendAssessmentParams = {
+  conventionEndDate: DateRange;
+};
+
+export class SendAssessmentNeededNotifications extends UseCase<
+  SendAssessmentParams,
   SendAssessmentFormNotificationsOutput
 > {
   protected inputSchema = z.object({
-    conventionEndDate: withDateRangeSchema.optional(),
+    conventionEndDate: withDateRangeSchema,
   });
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -51,6 +54,8 @@ export class SendAssessmentNeededNotifications extends TransactionalUseCase<
 
   readonly #createNewEvent: CreateNewEvent;
 
+  readonly #uowPerformer: UnitOfWorkPerformer;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
@@ -58,8 +63,8 @@ export class SendAssessmentNeededNotifications extends TransactionalUseCase<
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     createNewEvent: CreateNewEvent,
   ) {
-    super(uowPerformer);
-
+    super();
+    this.#uowPerformer = uowPerformer;
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
@@ -67,58 +72,72 @@ export class SendAssessmentNeededNotifications extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: {
-      conventionEndDate: DateRange;
-    },
-    uow: UnitOfWork,
+    params: SendAssessmentParams,
   ): Promise<SendAssessmentFormNotificationsOutput> {
-    const now = this.#timeGateway.now();
-    const conventions =
-      await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-        params.conventionEndDate,
-        "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-      );
+    const errors: Record<ConventionId, Error> = {};
+    const { conventions, numberOfConventionsWithAlreadyExistingAssessment } =
+      await this.#getConventionsToSendEmailTo(params);
 
-    const conventionIdsWithAlreadyExistingAssessment =
-      await uow.assessmentRepository
-        .getByConventionIds(conventions.map((convention) => convention.id))
-        .then(map(({ conventionId }) => conventionId));
-
-    logger.info({
-      message: `[${now.toISOString()}]: About to send assessment email to ${
-        conventions.length
-      } establishments`,
-    });
     if (conventions.length === 0)
       return {
         numberOfImmersionEndingTomorrow: 0,
         numberOfConventionsWithAlreadyExistingAssessment: 0,
       };
 
-    const errors: Record<ConventionId, Error> = {};
-
-    const conventionsToSendEmailTo = conventions.filter(
-      (convention) =>
-        !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
-    );
-
-    await Promise.all(
-      conventionsToSendEmailTo.map(async (convention) => {
-        try {
-          await this.#sendEmailsWithAssessmentCreationLink({ uow, convention });
-          await this.#sendEmailToBeneficiary({ uow, convention });
-        } catch (error) {
-          errors[convention.id] = castError(error);
-        }
-      }),
+    await executeInSequence(conventions, (convention) =>
+      this.#sendEmailsForConvention(convention, errors),
     );
 
     return {
       numberOfImmersionEndingTomorrow: conventions.length,
-      numberOfConventionsWithAlreadyExistingAssessment:
-        conventionIdsWithAlreadyExistingAssessment.length,
+      numberOfConventionsWithAlreadyExistingAssessment,
       errors,
     };
+  }
+
+  async #sendEmailsForConvention(
+    convention: ConventionDto,
+    errors: Record<ConventionId, Error>,
+  ) {
+    await this.#uowPerformer.perform(async (uow) => {
+      try {
+        await this.#sendEmailsWithAssessmentCreationLink({ uow, convention });
+        await this.#sendEmailToBeneficiary({ uow, convention });
+      } catch (error) {
+        errors[convention.id] = castError(error);
+      }
+    });
+  }
+
+  async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
+    const now = this.#timeGateway.now();
+    return this.#uowPerformer.perform(async (uow) => {
+      const conventions =
+        await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          params.conventionEndDate,
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+        );
+
+      const conventionIdsWithAlreadyExistingAssessment =
+        await uow.assessmentRepository
+          .getByConventionIds(conventions.map((convention) => convention.id))
+          .then(map(({ conventionId }) => conventionId));
+
+      logger.info({
+        message: `[${now.toISOString()}]: About to send assessment email to ${
+          conventions.length
+        } establishments`,
+      });
+
+      return {
+        conventions: conventions.filter(
+          (convention) =>
+            !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+        ),
+        numberOfConventionsWithAlreadyExistingAssessment:
+          conventionIdsWithAlreadyExistingAssessment.length,
+      };
+    });
   }
 
   async #sendEmailToBeneficiary({
