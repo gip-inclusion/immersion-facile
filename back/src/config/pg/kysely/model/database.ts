@@ -189,6 +189,7 @@ interface Agencies extends WithAcquisition {
   covered_departments: Json;
   refers_to_agency_id: string | null;
   rejection_justification: string | null;
+  phone_number: string;
 }
 
 export interface BroadcastFeedbacks {
