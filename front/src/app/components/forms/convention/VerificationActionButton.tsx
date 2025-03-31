@@ -66,7 +66,7 @@ const {
 } = createModal(createRejectModalParams);
 
 const createDraftModalParams = {
-  id: domElementIds.manageConvention.draftModal,
+  id: domElementIds.manageConvention.edit.requestEditModal,
   isOpenedByDefault: false,
 };
 const {
@@ -106,7 +106,7 @@ const {
 } = createModal(createValidatorModalParams);
 
 const createTransferConventionModalParams = {
-  id: domElementIds.manageConvention.transferConventionModal,
+  id: domElementIds.manageConvention.edit.transferToAgencyModal,
   isOpenedByDefault: false,
 };
 const {
@@ -184,8 +184,7 @@ export const getVerificationActionButtonProps = ({
   };
   const selectedIcon = iconByAction[verificationAction];
   const actionButtonStatusId: Record<VerificationAction, string> = {
-    REQUEST_EDIT:
-      domElementIds.manageConvention.conventionValidationRequestEditButton,
+    REQUEST_EDIT: domElementIds.manageConvention.edit.requestEditButton,
     REJECT: domElementIds.manageConvention.conventionValidationRejectButton,
     ACCEPT_VALIDATOR:
       domElementIds.manageConvention.conventionValidationValidateButton,
@@ -194,7 +193,7 @@ export const getVerificationActionButtonProps = ({
     CANCEL: domElementIds.manageConvention.conventionValidationCancelButton,
     DEPRECATE:
       domElementIds.manageConvention.conventionValidationDeprecateButton,
-    TRANSFER: domElementIds.manageConvention.conventionValidationTransferButton,
+    TRANSFER: domElementIds.manageConvention.edit.transferToAgencyButton,
   };
 
   const onActionButtonClick = () =>
