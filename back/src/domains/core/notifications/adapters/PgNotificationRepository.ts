@@ -24,6 +24,11 @@ import type {
   SmsNotificationFilters,
 } from "../ports/NotificationRepository";
 
+const getDefaultNotificationState = (): NotificationState => ({
+  status: "to-be-sent",
+  occurredAt: new Date().toISOString(),
+});
+
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
     private transaction: KyselyDb,
@@ -261,6 +266,9 @@ export class PgNotificationRepository implements NotificationRepository {
           establishment_siret: notification.followedIds.establishmentSiret,
           agency_id: notification.followedIds.agencyId,
           params: JSON.stringify(notification.templatedContent.params),
+          state: JSON.stringify(
+            notification.state ?? getDefaultNotificationState(),
+          ),
         })),
       )
       .execute();
@@ -314,7 +322,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .insertInto("notifications_email")
       .values(
         notifications.map(
-          ({ id, createdAt, followedIds, templatedContent }) => ({
+          ({ id, createdAt, followedIds, templatedContent, state }) => ({
             id: id,
             created_at: createdAt,
             email_kind: templatedContent.kind,
@@ -326,6 +334,7 @@ export class PgNotificationRepository implements NotificationRepository {
             reply_to_email: templatedContent.replyTo?.email,
             sender_email: templatedContent.sender?.email,
             sender_name: templatedContent.sender?.name,
+            state: JSON.stringify(state ?? getDefaultNotificationState()),
           }),
         ),
       )

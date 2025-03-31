@@ -221,7 +221,10 @@ describe("SendNotification UseCase", () => {
           });
 
           expectArraysToMatch(uow.notificationRepository.notifications, [
-            { ...alreadyErroredEmailNotif, state: undefined },
+            {
+              ...alreadyErroredEmailNotif,
+              state: { status: "accepted", occurredAt: now.toISOString() },
+            },
           ]);
 
           expectArraysToMatch(uow.outboxRepository.events, []);
