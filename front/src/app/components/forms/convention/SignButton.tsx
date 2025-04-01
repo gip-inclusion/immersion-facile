@@ -336,7 +336,8 @@ const regulatoryConditionContent = (
         <p>
           <strong>Article 5</strong> – Activité Durant la période d’observation,
           le jeune participe à des activités de l’entreprise, en liaison avec
-          les objectifs précisés dans l’annexe pédagogique, sous le contrôle des
+          les objectifs précisés dans les dispositions relatives aux conditions
+          de réalisation du mini-stage de découverte, sous le contrôle des
           personnels responsables de leur encadrement en milieu professionnel.
           Il est soumis aux règles générales en vigueur dans l’entreprise ou
           l’organisme d’accueil, notamment en matière de santé, sécurité,

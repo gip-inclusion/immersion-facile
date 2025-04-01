@@ -48,7 +48,7 @@ Durant la période d’observation en milieu professionnel, le jeune ne peut pr�
 Le visa de la présente convention ne donne lieu à aucune facturation de la part de la Chambre consulaire concernée.
 
 Article 5 – Activité
-Durant la période d’observation, le jeune participe à des activités de l’entreprise, en liaison avec les objectifs précisés dans l’annexe pédagogique, sous le contrôle des personnels responsables de leur encadrement en milieu professionnel.
+Durant la période d’observation, le jeune participe à des activités de l’entreprise, en liaison avec les objectifs précisés dans les dispositions relatives aux conditions de réalisation du mini-stage de découverte, sous le contrôle des personnels responsables de leur encadrement en milieu professionnel.
 Il est soumis aux règles générales en vigueur dans l’entreprise ou l’organisme d’accueil, notamment en matière de santé, sécurité, d’horaires et de discipline. Le jeune est tenu au respect du secret professionnel.
 De même, les parties signataires de la convention s’engagent à mettre en œuvre et respecter les consignes publiées par les services de l’Etat, notamment pour exemple celles concernant les mesures de prévention des risques de contamination en matière sanitaire.
 En application des articles L 4153-8 et D 4153-15 et suivants du code du travail, relatif aux travaux interdits et règlementés, le jeune, s’il est mineur, ne peut accéder aux machines, appareils ou produits dont l’usage est proscrit aux mineurs. Il ne peut ni procéder à des manœuvres ou manipulations sur d’autres machines, produits ou appareils de production, ni effectuer les travaux légers autorisés aux mineurs par le même code.
