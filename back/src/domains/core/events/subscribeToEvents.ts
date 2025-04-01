@@ -28,7 +28,9 @@ const getUseCasesByTopics = (
     useCases.sendExchangeToRecipient,
     useCases.updateMarketingEstablishmentContactList,
   ],
-  DiscussionExchangeDeliveryFailed: [],
+  DiscussionExchangeDeliveryFailed: [
+    useCases.warnSenderThatMessageCouldNotBeDelivered,
+  ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
   // "Happy case" for immersion application.
   ConventionSubmittedByBeneficiary: [

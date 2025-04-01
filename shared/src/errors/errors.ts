@@ -824,6 +824,16 @@ export const errors = {
             : ""
         }`,
       ),
+    smsNotSupported: () =>
+      new Error(
+        "Le SMS n'est pas supporté pour la gestion de mail non envoyés.",
+      ),
+    doesNotNeedToBeWarned: (params: { notificationId: string }) =>
+      new BadRequestError(
+        `La notification ${params.notificationId} n'est pas en erreur, il n'est pas nécessaire de prévenir l'envoyeur.`,
+      ),
+    noSenderEmail: ({ notificationId }: { notificationId: string }) =>
+      new Error(`Missing sender email in notification ${notificationId}`),
   },
   dashboard: {
     establishmentConventionForbidden: () =>

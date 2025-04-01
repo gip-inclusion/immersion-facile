@@ -121,6 +121,7 @@ import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/u
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { makeRejectDiscussionAndSendNotification } from "../../domains/establishment/use-cases/discussions/RejectDiscussionAndSendNotification";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
+import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
 import { NotifyContactRequest } from "../../domains/establishment/use-cases/notifications/NotifyContactRequest";
@@ -754,6 +755,11 @@ export const createUseCases = (
       uowPerformer,
       deps: { createNewEvent },
     }),
+    warnSenderThatMessageCouldNotBeDelivered:
+      makeWarnSenderThatMessageCouldNotBeDelivered({
+        uowPerformer,
+        deps: { saveNotificationAndRelatedEvent },
+      }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

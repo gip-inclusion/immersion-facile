@@ -14,13 +14,14 @@ import type {
   EmailNotification,
   FollowedIds,
   NotificationCommonFields,
+  NotificationErrored,
   NotificationId,
   NotificationState,
   NotificationsByKind,
   SmsNotification,
 } from "./notifications.dto";
 
-const notificationIdSchema: z.Schema<NotificationId> = z
+export const notificationIdSchema: z.Schema<NotificationId> = z
   .string()
   .uuid(localization.invalidUuid);
 
@@ -31,19 +32,20 @@ const followedIdsSchema: z.Schema<FollowedIds> = z.object({
   userId: userIdSchema.optional(),
 });
 
+export const notificationErroredSchema: z.Schema<NotificationErrored> =
+  z.object({
+    status: z.literal("errored"),
+    occurredAt: dateTimeIsoStringSchema,
+    httpStatus: z.number(),
+    message: z.string(),
+  });
+
 const notificationStateSchema: z.Schema<NotificationState> = z
   .object({
     status: z.enum(["to-be-sent", "accepted"]),
     occurredAt: dateTimeIsoStringSchema,
   })
-  .or(
-    z.object({
-      status: z.literal("errored"),
-      occurredAt: dateTimeIsoStringSchema,
-      httpStatus: z.number(),
-      message: z.string(),
-    }),
-  );
+  .or(notificationErroredSchema);
 
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,
