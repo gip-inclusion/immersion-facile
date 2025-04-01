@@ -1926,7 +1926,7 @@ Profil du candidat :
         subject: "Échec d'envoi d'email",
         content: `
         <p>Bonjour,</p>
-        <p>Votre email n'a pas pu être envoyé. Nous avons rencontrer l'erreur suivante :</p>
+        <p>Votre email n'a pas pu être envoyé. Nous avons rencontré l'erreur suivante :</p>
         
         <p>${errorMessage}</p>
         
@@ -1936,7 +1936,10 @@ Profil du candidat :
         </ul>
         
         <p>Vous pouvez essayer de renvoyer l'email en évitant les pièces jointes (ou bien en utilisant uniquement des formats pdf ou des images).</p>
-        `,
+
+        Bonne journée,
+        <br/>
+        L'équipe Immersion Facile`,
       }),
     },
     FULL_PREVIEW_EMAIL: {
