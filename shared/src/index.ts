@@ -83,6 +83,7 @@ export * from "./naf/naf.dto";
 export * from "./naf/naf.routes";
 export * from "./naf/naf.schema";
 export * from "./notifications/notifications.dto";
+export * from "./notifications/notifications.schema";
 export * from "./npsForms";
 export * from "./pagination/pagination";
 export * from "./pagination/pagination.dto";
