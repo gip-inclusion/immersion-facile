@@ -3,11 +3,9 @@ import {
   type NotificationId,
   type NotificationKind,
   errors,
-} from "shared";
-import {
   notificationErroredSchema,
   notificationIdSchema,
-} from "shared/src/notifications/notifications.schema";
+} from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
