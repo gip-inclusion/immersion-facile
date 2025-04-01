@@ -1917,7 +1917,28 @@ Profil du candidat :
         content: htmlContent,
       }),
     },
-
+    WARN_DISCUSSION_DELIVERY_FAILED: {
+      niceName:
+        "Établissement - Alerte de problème d'envoi d'un échange dans une discussion",
+      tags: ["envoi impossible"],
+      createEmailVariables: ({ recipientsInEmailInError, errorMessage }) => ({
+        bypassLayout: true,
+        subject: "Échec d'envoi d'email",
+        content: `
+        <p>Bonjour,</p>
+        <p>Votre email n'a pas pu être envoyé. Nous avons rencontrer l'erreur suivante :</p>
+        
+        <p>${errorMessage}</p>
+        
+        <p>Les destinataires suivants n'ont pas reçu l'email :</p>
+        <ul>
+          ${recipientsInEmailInError.map((recipient) => `<li>${recipient}</li>`).join("")}
+        </ul>
+        
+        <p>Vous pouvez essayer de renvoyer l'email en évitant les pièces jointes (ou bien en utilisant uniquement des formats pdf ou des images).</p>
+        `,
+      }),
+    },
     FULL_PREVIEW_EMAIL: {
       niceName: "Tech - Preview email complet (tous les blocs)",
       tags: ["aperçu pour tests"],
