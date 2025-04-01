@@ -272,6 +272,10 @@ export type EmailParamsByEmailType = {
     subject: string;
     htmlContent: string;
   };
+  WARN_DISCUSSION_DELIVERY_FAILED: {
+    recipientsInEmailInError: string[];
+    errorMessage: string;
+  };
   ESTABLISHMENT_DELETED: {
     businessName: string;
     siret: SiretDto;
