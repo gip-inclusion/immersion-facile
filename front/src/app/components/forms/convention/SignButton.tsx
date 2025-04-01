@@ -295,73 +295,77 @@ const regulatoryConditionContent = (
   ) : (
     <>
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 1 – Objet</h3>
         <p>
-          <strong>Article 1</strong> – Objet La présente convention a pour objet
-          la mise en œuvre d’une période d’observation en milieu professionnel,
-          au bénéfice du jeune ci-dessus désigné.
+          La présente convention a pour objet la mise en œuvre d’une période
+          d’observation en milieu professionnel, au bénéfice du jeune ci-dessus
+          désigné.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 2 – Modalités particulières</h3>
         <p>
-          <strong>Article 2</strong> – Modalités particulières Les objectifs et
-          les modalités de la période d’observation sont consignés dans l’annexe
-          pédagogique. Les modalités de prise en charge des frais afférents à
-          cette période ainsi que les modalités d’assurances sont définies dans
-          l’annexe financière.
+          Les objectifs et les modalités de la période d’observation sont
+          consignés dans l’annexe pédagogique. Les modalités de prise en charge
+          des frais afférents à cette période ainsi que les modalités
+          d’assurances sont définies dans l’annexe financière.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 3 – Organisation</h3>
         <p>
-          <strong>Article 3</strong> – Organisation L’organisation de la période
-          d’observation est déterminée d’un commun accord entre les parties
-          ci-dessus désignées, avec le concours de la Chambre consulaire
-          concernée.
+          L’organisation de la période d’observation est déterminée d’un commun
+          accord entre les parties ci-dessus désignées, avec le concours de la
+          Chambre consulaire concernée.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 4 – Conditions financières</h3>
         <p>
-          <strong>Article 4</strong> – Conditions financières Durant la période
-          d’observation en milieu professionnel, le jeune ne peut prétendre à
-          aucune rémunération ou gratification de l’entreprise ou de l’organisme
-          d’accueil. Le visa de la présente convention ne donne lieu à aucune
-          facturation de la part de la Chambre consulaire émettant la
-          convention.
+          Durant la période d’observation en milieu professionnel, le jeune ne
+          peut prétendre à aucune rémunération ou gratification de l’entreprise
+          ou de l’organisme d’accueil. Le visa de la présente convention ne
+          donne lieu à aucune facturation de la part de la Chambre consulaire
+          émettant la convention.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 5 – Activité</h3>
         <p>
-          <strong>Article 5</strong> – Activité Durant la période d’observation,
-          le jeune participe à des activités de l’entreprise, en liaison avec
-          les objectifs précisés dans les dispositions relatives aux conditions
-          de réalisation du mini-stage de découverte, sous le contrôle des
-          personnels responsables de leur encadrement en milieu professionnel.
-          Il est soumis aux règles générales en vigueur dans l’entreprise ou
-          l’organisme d’accueil, notamment en matière de santé, sécurité,
-          d’horaires et de discipline. Le jeune est tenu au respect du secret
-          professionnel. De même, les parties signataires de la convention
-          s’engagent à mettre en œuvre et respecter les consignes publiées par
-          les services de l’Etat, notamment pour exemple celles concernant les
-          mesures de prévention des risques de contamination en matière
-          sanitaire. En application des articles L 4153-8 et D 4153-15 et
-          suivants du code du travail, relatif aux travaux interdits et
-          règlementés, le jeune, s’il est mineur, ne peut accéder aux machines,
-          appareils ou produits dont l’usage est proscrit aux mineurs. Il ne
-          peut ni procéder à des manœuvres ou manipulations sur d’autres
-          machines, produits ou appareils de production, ni effectuer les
-          travaux légers autorisés aux mineurs par le même code.
+          Durant la période d’observation, le jeune participe à des activités de
+          l’entreprise, en liaison avec les objectifs précisés dans les
+          dispositions relatives aux conditions de réalisation du mini-stage de
+          découverte, sous le contrôle des personnels responsables de leur
+          encadrement en milieu professionnel. personnels responsables de leur
+          encadrement en milieu professionnel. Il est soumis aux règles
+          générales en vigueur dans l’entreprise ou l’organisme d’accueil,
+          notamment en matière de santé, sécurité, d’horaires et de discipline.
+          Le jeune est tenu au respect du secret professionnel. De même, les
+          parties signataires de la convention s’engagent à mettre en œuvre et
+          respecter les consignes publiées par les services de l’Etat, notamment
+          pour exemple celles concernant les mesures de prévention des risques
+          de contamination en matière sanitaire. En application des articles L
+          4153-8 et D 4153-15 et suivants du code du travail, relatif aux
+          travaux interdits et règlementés, le jeune, s’il est mineur, ne peut
+          accéder aux machines, appareils ou produits dont l’usage est proscrit
+          aux mineurs. Il ne peut ni procéder à des manœuvres ou manipulations
+          sur d’autres machines, produits ou appareils de production, ni
+          effectuer les travaux légers autorisés aux mineurs par le même code.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 6 – Responsabilités</h3>
         <p>
-          <strong>Article 6</strong> – Responsabilités Le chef d’entreprise
-          prend les dispositions nécessaires pour garantir sa responsabilité
-          civile chaque fois qu’elle sera engagée (en application de l’article
-          1242 du code civil) : • soit en souscrivant une assurance particulière
+          Le chef d’entreprise prend les dispositions nécessaires pour garantir
+          sa responsabilité civile chaque fois qu’elle sera engagée (en
+          application de l’article 1242 du code civil) : • soit en souscrivant
+          une assurance particulière garantissant sa responsabilité civile en
+          cas de faute imputable à l’entreprise ; • soit en ajoutant à son
           garantissant sa responsabilité civile en cas de faute imputable à
           l’entreprise ; • soit en ajoutant à son contrat déjà souscrit
           “responsabilité civile entreprise” ou “responsabilité civile
@@ -377,27 +381,28 @@ const regulatoryConditionContent = (
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 7 – Accident</h3>
         <p>
-          <strong>Article 7</strong> – Accident En cas d’accident survenant au
-          jeune, soit en milieu professionnel, soit au cours du trajet, le
-          responsable de l’entreprise, le responsable légal du jeune, ou
-          directement le jeune s’il est assuré à son nom, déclarent l’accident à
-          leurs assureurs respectifs dans les délais contractuels et s’engagent
-          à adresser, pour information, la déclaration d’accident au référent de
-          la Chambre consulaire émettant la convention.
+          En cas d’accident survenant au jeune, soit en milieu professionnel,
+          soit au cours du trajet, le responsable de l’entreprise, le
+          responsable légal du jeune, ou directement le jeune s’il est assuré à
+          son nom, déclarent l’accident à leurs assureurs respectifs dans les
+          délais contractuels et s’engagent à adresser, pour information, la
+          déclaration d’accident au référent de la Chambre consulaire émettant
+          la convention.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 8 – Difficultés</h3>
         <p>
-          <strong>Article 8</strong> – Difficultés Le chef d’entreprise, les
-          parents ou le représentant légal du jeune si celui-ci est mineur, ou
-          le jeune directement si celuici est majeur, ainsi que le référent de
-          la Chambre consulaire émettant la convention, se tiendront
-          mutuellement informés des difficultés qui pourraient naître de
-          l’application de la présente convention et prendront, d’un commun
-          accord les dispositions propres à les résoudre notamment en cas de
-          manquement à la discipline. Les difficultés qui pourraient être
+          Le chef d’entreprise, les parents ou le représentant légal du jeune si
+          celui-ci est mineur, ou le jeune directement si celuici est majeur,
+          ainsi que le référent de la Chambre consulaire émettant la convention,
+          se tiendront mutuellement informés des difficultés qui pourraient
+          naître de l’application de la présente convention et prendront, d’un
+          commun accord les dispositions propres à les résoudre notamment en cas
+          de manquement à la discipline. Les difficultés qui pourraient être
           rencontrées lors de toute période en milieu professionnel et notamment
           toute absence du jeune, seront aussitôt portées à la connaissance du
           référent de la Chambre consulaire émettant la convention.
@@ -405,18 +410,20 @@ const regulatoryConditionContent = (
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>Article 9 – Durée</h3>
         <p>
-          <strong>Article 9</strong> – Durée La présente convention est signée
-          pour la durée de la période d’observation en milieu professionnel, qui
-          ne peut dépasser 5 jours.
+          La présente convention est signée pour la durée de la période
+          d’observation en milieu professionnel, qui ne peut dépasser 5 jours.
         </p>
       </div>
 
       <div className={fr.cx("fr-mb-5v")}>
+        <h3 className={fr.cx("fr-h6")}>
+          Article 10 – Protection des données personnelles
+        </h3>
         <p>
-          <strong>Article 10</strong> - Protection des données personnelles Les
-          données personnelles recueillies via ce formulaire font l'objet, par
-          le Responsable de traitement représenté par la Chambre consulaire
+          Les données personnelles recueillies via ce formulaire font l'objet,
+          par le Responsable de traitement représenté par la Chambre consulaire
           émettant la convention, d'un traitement informatisé et/ou papier
           destiné à l’établissement de la convention de stage et à des fins
           statistiques, et sont conservées pendant une durée de cinq ans. Aucune
