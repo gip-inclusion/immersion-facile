@@ -364,6 +364,8 @@ export const domElementIds = {
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:
       "im-convention-validation__submit-renew-modal-button",
+    renewModalCancelButton:
+      "im-convention-validation__renew-modal-cancel-button",
     openRenewModalButton: "im-convention-validation__open-renew-modal-button",
     openDocumentButton: "im-convention-validation__open-document-button",
     transferConventionModal:

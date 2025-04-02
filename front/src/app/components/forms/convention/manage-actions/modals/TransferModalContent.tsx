@@ -21,7 +21,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 
-export const TransferConventionModalContent = ({
+export const TransferModalContent = ({
   onSubmit,
   closeModal,
   convention,

@@ -17,7 +17,7 @@ import {
   signatoryTitleByRole,
   updateConventionStatusRequestSchema,
 } from "shared";
-import type { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
+import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
