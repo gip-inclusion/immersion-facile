@@ -46,7 +46,7 @@ export const AgencyDashboardPage = ({
     <>
       <h1>Mon espace prescripteur</h1>
       {isLoading && <Loader />}
-      <Feedback topic={feedbackTopic} />
+      <Feedback topics={[feedbackTopic]} />
 
       {match({ currentUser })
         .with(

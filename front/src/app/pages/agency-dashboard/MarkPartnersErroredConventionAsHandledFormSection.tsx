@@ -149,7 +149,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             document.body,
           )}
         </form>
-        <Feedback topic="partner-conventions" />
+        <Feedback topics={["partner-conventions"]} />
       </div>
     </section>
   );

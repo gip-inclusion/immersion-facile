@@ -37,7 +37,7 @@ export const AgencyDashboard = ({
   return (
     <>
       <Feedback
-        topic="transfer-convention-to-agency"
+        topics={["transfer-convention-to-agency"]}
         className="fr-mb-2w"
         closable
       />

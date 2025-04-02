@@ -200,7 +200,7 @@ const DiscussionDetails = ({
 
   return (
     <>
-      <Feedback topic={"dashboard-discussion-rejection"} />
+      <Feedback topics={["dashboard-discussion-rejection"]} />
       <header>
         <Button
           type="button"
