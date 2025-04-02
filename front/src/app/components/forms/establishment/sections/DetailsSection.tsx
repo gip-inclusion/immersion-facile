@@ -258,7 +258,7 @@ export const DetailsSection = ({
         visible={submitCount !== 0 && Object.values(errors).length > 0}
       />
 
-      <Feedback topic="form-establishment" />
+      <Feedback topics={["form-establishment"]} />
 
       {invalidEmailMessage !== null && (
         <Alert

@@ -194,7 +194,7 @@ export const SearchResultPage = ({
                   className={fr.cx("fr-my-4w")}
                 />
               )}
-              <Feedback topic="search-result" />
+              <Feedback topics={["search-result"]} />
               <Button
                 type="button"
                 onClick={onGoBackClick}

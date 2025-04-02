@@ -46,7 +46,7 @@ export const AgenciesTablesSection = ({
 
   return (
     <>
-      <Feedback topic="user" />
+      <Feedback topics={["user"]} />
       {toReviewAgencyRights.length > 0 && (
         <>
           <h2 className={fr.cx("fr-h4")}>
