@@ -91,7 +91,10 @@ describe("SendNotification UseCase", () => {
 
         await expectPromiseToFailWithError(
           sendNotification.execute({ id, kind: "sms" }),
-          new Error(errorMessage),
+          errors.generic.unsupportedStatus({
+            status: fakeHttpStatusErrorCode, // some fake status that happens on backend perhaps
+            body: errorMessage,
+          }),
         );
 
         const notificationState: NotificationErrored = {
@@ -141,7 +144,10 @@ describe("SendNotification UseCase", () => {
               id: emailNotification.id,
               kind: "email",
             }),
-            new Error(notificationState.message),
+            errors.generic.unsupportedStatus({
+              status: fakeHttpStatusErrorCode,
+              body: notificationState.message,
+            }),
           );
 
           expectArraysToMatch(uow.outboxRepository.events, [
@@ -185,7 +191,10 @@ describe("SendNotification UseCase", () => {
               id: emailNotification.id,
               kind: "email",
             }),
-            new Error(notificationState.message),
+            errors.generic.unsupportedStatus({
+              status: fakeHttpStatusErrorCode,
+              body: notificationState.message,
+            }),
           );
 
           expectArraysToMatch(uow.notificationRepository.notifications, [

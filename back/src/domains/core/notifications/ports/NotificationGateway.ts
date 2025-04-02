@@ -7,14 +7,18 @@ import type {
 
 export type Base64 = Flavor<string, "Base64">;
 
+export type SendNotificationResult =
+  | { isOk: true }
+  | { isOk: false; error: { message: string; httpStatus: number } };
+
 export interface NotificationGateway {
   sendEmail(
     templatedEmail: TemplatedEmail,
     notificationId?: NotificationId,
-  ): Promise<void>;
+  ): Promise<SendNotificationResult>;
   sendSms(
     sendSmsParams: TemplatedSms,
     notificationId?: NotificationId,
-  ): Promise<void>;
+  ): Promise<SendNotificationResult>;
   getAttachmentContent(downloadToken: string): Promise<Base64 | null>;
 }

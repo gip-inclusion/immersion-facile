@@ -4,6 +4,7 @@ import {
   errors,
   exhaustiveCheck,
 } from "shared";
+import { match } from "ts-pattern";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
@@ -43,48 +44,55 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     if (!notification) throw errors.notification.notFound({ id, kind });
 
-    try {
-      await this.#sendNotification(notification);
-      await uow.notificationRepository.updateState({
-        notificationId: notification.id,
-        notificationKind: notification.kind,
-        state: {
-          status: "accepted",
+    const result = await this.#sendNotification(notification);
+
+    await match(result)
+      .with({ isOk: true }, async () => {
+        await uow.notificationRepository.updateState({
+          notificationId: notification.id,
+          notificationKind: notification.kind,
+          state: {
+            status: "accepted",
+            occurredAt: this.timeGateway.now().toISOString(),
+          },
+        });
+      })
+      .with({ isOk: false }, async ({ error }) => {
+        const notificationState: NotificationErrored = {
+          status: "errored",
           occurredAt: this.timeGateway.now().toISOString(),
-        },
-      });
-    } catch (error: any) {
-      const notificationState: NotificationErrored = {
-        status: "errored",
-        occurredAt: this.timeGateway.now().toISOString(),
-        httpStatus: error.httpStatus,
-        message: error.message,
-      };
+          httpStatus: error.httpStatus,
+          message: error.message,
+        };
 
-      await uow.notificationRepository.updateState({
-        notificationId: notification.id,
-        notificationKind: notification.kind,
-        state: notificationState,
-      });
+        await uow.notificationRepository.updateState({
+          notificationId: notification.id,
+          notificationKind: notification.kind,
+          state: notificationState,
+        });
 
-      if (
-        notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
-        notification.state?.status !== "errored"
-      ) {
-        await uow.outboxRepository.save(
-          this.createNewEvent({
-            topic: "DiscussionExchangeDeliveryFailed",
-            payload: {
-              notificationId: notification.id,
-              notificationKind: notification.kind,
-              errored: notificationState,
-            },
-          }),
-        );
-      }
+        if (
+          notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
+          notification.state?.status !== "errored"
+        ) {
+          await uow.outboxRepository.save(
+            this.createNewEvent({
+              topic: "DiscussionExchangeDeliveryFailed",
+              payload: {
+                notificationId: notification.id,
+                notificationKind: notification.kind,
+                errored: notificationState,
+              },
+            }),
+          );
+        }
 
-      throw error;
-    }
+        throw errors.generic.unsupportedStatus({
+          status: error.httpStatus,
+          body: error.message,
+        });
+      })
+      .exhaustive();
   }
 
   #sendNotification(notification: Notification) {
