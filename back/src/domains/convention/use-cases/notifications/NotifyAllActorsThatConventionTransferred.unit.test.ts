@@ -97,7 +97,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
     uow.agencyRepository.agencies = [toAgencyWithRights(previousAgency, {})];
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      convention,
+      conventionId: convention.id,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
     };
@@ -111,7 +111,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
   it("throw if previous agency not found", async () => {
     const input: TransferConventionToAgencyPayload = {
       agencyId: newAgency.id,
-      convention,
+      conventionId: convention.id,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
     };
@@ -119,6 +119,25 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
     await expectPromiseToFailWithError(
       usecase.execute(input),
       errors.agency.notFound({ agencyId: previousAgency.id }),
+    );
+  });
+
+  it("throw if convention not found", async () => {
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(previousAgency, {}),
+      toAgencyWithRights(newAgency, {}),
+    ];
+
+    const input: TransferConventionToAgencyPayload = {
+      agencyId: newAgency.id,
+      conventionId: convention.id,
+      justification: "agency change",
+      previousAgencyId: previousAgency.id,
+    };
+
+    await expectPromiseToFailWithError(
+      usecase.execute(input),
+      errors.convention.notFound({ conventionId: convention.id }),
     );
   });
 
@@ -139,7 +158,7 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
 
     await usecase.execute({
       agencyId: newAgency.id,
-      convention,
+      conventionId: convention.id,
       justification: "agency change",
       previousAgencyId: previousAgency.id,
     });

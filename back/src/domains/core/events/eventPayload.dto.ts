@@ -7,7 +7,7 @@ import type {
   Role,
   SignatoryRole,
   WithAgencyId,
-  WithConventionDto,
+  WithConventionId,
 } from "shared";
 
 type ConventionRequireModificationCommon = {
@@ -36,7 +36,7 @@ export type ConventionReminderPayload = {
   conventionId: ConventionId;
 };
 
-export type TransferConventionToAgencyPayload = WithConventionDto &
+export type TransferConventionToAgencyPayload = WithConventionId &
   WithAgencyId & {
     justification: string;
     previousAgencyId: AgencyId;

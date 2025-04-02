@@ -41,7 +41,7 @@ export const makeNotifyAllActorsThatConventionTransferred =
       inputSchema: transferConventionToAgencyPayloadSchema,
     },
     async ({ inputParams, uow, deps }) => {
-      const { agencyId, convention, justification, previousAgencyId } =
+      const { agencyId, conventionId, justification, previousAgencyId } =
         inputParams;
 
       const previousAgency =
@@ -56,6 +56,11 @@ export const makeNotifyAllActorsThatConventionTransferred =
       }
 
       const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+      const convention = await uow.conventionRepository.getById(conventionId);
+      if (!convention) {
+        throw errors.convention.notFound({ conventionId });
+      }
 
       const signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[] =
         uniq([
