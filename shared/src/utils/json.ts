@@ -1,8 +1,8 @@
-export const safeTryJsonParse = (toJsonParse: string) => {
+export const isStringJson = (string: string) => {
   try {
-    return { payload: JSON.parse(toJsonParse) };
-  } catch (e) {
-    console.error(e);
-    return toJsonParse;
+    JSON.parse(string);
+    return true;
+  } catch (_error) {
+    return false;
   }
 };
