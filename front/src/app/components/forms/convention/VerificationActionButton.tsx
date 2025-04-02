@@ -43,6 +43,17 @@ export type VerificationActionButtonProps = {
   modalTitle: string;
 };
 
+const allVerificationActions = [
+  "ACCEPT_COUNSELLOR",
+  "ACCEPT_VALIDATOR",
+  "REQUEST_EDIT",
+  "REJECT",
+  "CANCEL",
+  "DEPRECATE",
+  "TRANSFER",
+] as const;
+type VerificationAction = (typeof allVerificationActions)[number];
+
 const newStatusByVerificationAction = {
   ACCEPT_COUNSELLOR: "ACCEPTED_BY_COUNSELLOR",
   ACCEPT_VALIDATOR: "ACCEPTED_BY_VALIDATOR",
@@ -50,10 +61,7 @@ const newStatusByVerificationAction = {
   REJECT: "REJECTED",
   CANCEL: "CANCELLED",
   DEPRECATE: "DEPRECATED",
-  TRANSFER: null,
-} satisfies Record<string, ConventionStatus | null>;
-
-type VerificationAction = keyof typeof newStatusByVerificationAction;
+} satisfies Record<Exclude<VerificationAction, "TRANSFER">, ConventionStatus>;
 
 const createRejectModalParams = {
   id: domElementIds.manageConvention.rejectedModal,
@@ -283,32 +291,34 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             convention={convention}
           />
         )}
-        {doesStatusNeedsJustification(
-          newStatusByVerificationAction[verificationAction],
-        ) && (
-          <JustificationModalContent
-            onSubmit={onSubmit}
-            closeModal={closeModal}
-            newStatus={newStatusByVerificationAction[verificationAction]}
-            convention={convention}
-            currentSignatoryRoles={currentSignatoryRoles}
-            onModalPropsChange={onModalPropsChange}
-          />
-        )}
-        {doesStatusNeedsValidators(
-          initialStatus,
-          newStatusByVerificationAction[verificationAction],
-        ) && (
-          <ValidatorModalContent
-            onSubmit={onSubmit}
-            closeModal={closeModal}
-            newStatus={newStatusByVerificationAction[verificationAction]}
-            conventionId={convention.id}
-            onCloseValidatorModalWithoutValidatorInfo={
-              onCloseValidatorModalWithoutValidatorInfo
-            }
-          />
-        )}
+        {verificationAction !== "TRANSFER" &&
+          doesStatusNeedsJustification(
+            newStatusByVerificationAction[verificationAction],
+          ) && (
+            <JustificationModalContent
+              onSubmit={onSubmit}
+              closeModal={closeModal}
+              newStatus={newStatusByVerificationAction[verificationAction]}
+              convention={convention}
+              currentSignatoryRoles={currentSignatoryRoles}
+              onModalPropsChange={onModalPropsChange}
+            />
+          )}
+        {verificationAction !== "TRANSFER" &&
+          doesStatusNeedsValidators(
+            initialStatus,
+            newStatusByVerificationAction[verificationAction],
+          ) && (
+            <ValidatorModalContent
+              onSubmit={onSubmit}
+              closeModal={closeModal}
+              newStatus={newStatusByVerificationAction[verificationAction]}
+              conventionId={convention.id}
+              onCloseValidatorModalWithoutValidatorInfo={
+                onCloseValidatorModalWithoutValidatorInfo
+              }
+            />
+          )}
       </Fragment>
     </Modal>,
     document.body,
