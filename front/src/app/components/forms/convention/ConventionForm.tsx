@@ -51,6 +51,11 @@ import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
+import {
+  type ConventionPresentation,
+  conventionPresentationSchema,
+  undefinedIfEmptyString,
+} from "src/app/components/forms/convention/conventionHelpers";
 import { BeneficiaryFormSection } from "src/app/components/forms/convention/sections/beneficiary/BeneficiaryFormSection";
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
@@ -67,13 +72,6 @@ import {
   makeFieldError,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
-
-import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
-import {
-  type ConventionPresentation,
-  conventionPresentationSchema,
-  undefinedIfEmptyString,
-} from "src/app/components/forms/convention/conventionHelpers";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errors as errorMessage } from "shared";
@@ -137,7 +135,6 @@ export const ConventionForm = ({
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
 
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
@@ -587,10 +584,6 @@ export const ConventionForm = ({
                   Vérifier la demande
                 </Button>
               </div>
-              <ConventionFeedbackNotification
-                submitFeedback={submitFeedback}
-                signatories={conventionValues.signatories}
-              />
             </form>
           </>
         }
