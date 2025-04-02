@@ -3,6 +3,7 @@ import {
   agencyModifierRoles,
   allRoles,
   allSignatoryRoles,
+  conventionIdSchema,
   conventionSchema,
   reminderKinds,
   zStringMinLength1,
@@ -47,7 +48,7 @@ export const conventionReminderPayloadSchema: z.Schema<ConventionReminderPayload
 
 export const transferConventionToAgencyPayloadSchema: z.Schema<TransferConventionToAgencyPayload> =
   z.object({
-    convention: conventionSchema,
+    conventionId: conventionIdSchema,
     justification: zStringMinLength1,
     agencyId: agencyIdSchema,
     previousAgencyId: agencyIdSchema,
