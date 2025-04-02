@@ -15,7 +15,6 @@ import {
   domElementIds,
   toDisplayedDate,
 } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -178,7 +177,6 @@ const ConventionSummarySection = () => {
   const dispatch = useDispatch();
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const convention = useAppSelector(conventionSelectors.convention);
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const similarConventionIds = useAppSelector(
     conventionSelectors.similarConventionIds,
   );
@@ -222,18 +220,12 @@ const ConventionSummarySection = () => {
         isLoading && <Loader />
       }
       {convention && (
-        <>
-          <ConventionSummary
-            submittedAt={toDisplayedDate({
-              date: new Date(convention.dateSubmission),
-            })}
-            summary={makeConventionSections(convention)}
-          />
-          <ConventionFeedbackNotification
-            submitFeedback={submitFeedback}
-            signatories={convention.signatories}
-          />
-        </>
+        <ConventionSummary
+          submittedAt={toDisplayedDate({
+            date: new Date(convention.dateSubmission),
+          })}
+          summary={makeConventionSections(convention)}
+        />
       )}
       {convention?.internshipKind === "mini-stage-cci" && (
         <Alert
