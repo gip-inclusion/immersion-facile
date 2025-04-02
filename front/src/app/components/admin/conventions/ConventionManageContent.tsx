@@ -46,7 +46,7 @@ export const ConventionManageContent = ({
       ],
     )
     .with(
-      { name: "manageConventionInclusionConnected" },
+      { name: "manageConventionConnectedUser" },
       ({ inclusionConnectedRoles }): Role[] => inclusionConnectedRoles,
     )
     .otherwise((): Role[] => []);

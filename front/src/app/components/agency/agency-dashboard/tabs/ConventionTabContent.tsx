@@ -72,7 +72,7 @@ export const ConventionTabContent = (
         </Button>
       </div>
 
-      <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionInclusionConnected" />
+      <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
       <MetabaseView
         title="Tableau de bord agence"
         subtitle="Cliquer sur l'identifiant de la convention pour y accéder."

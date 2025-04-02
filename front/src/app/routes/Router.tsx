@@ -190,7 +190,7 @@ const getPageByRouteName: {
   searchResult: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage isExternal />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
-  manageConventionInclusionConnected: (route) => (
+  manageConventionConnectedUser: (route) => (
     <ConventionManageConnectedUserPage route={route} />
   ),
   manageDiscussion: (route) => <DiscussionManagePage route={route} />,

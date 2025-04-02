@@ -274,7 +274,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { jwt: param.query.string },
     () => `/${frontRoutes.manageConvention}`,
   ),
-  manageConventionInclusionConnected: defineRoute(
+  manageConventionConnectedUser: defineRoute(
     { conventionId: param.query.string },
     () => `/${frontRoutes.manageConventionInclusionConnected}`,
   ),
