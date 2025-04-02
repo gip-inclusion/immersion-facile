@@ -92,7 +92,7 @@ export const makeNotifyAllActorsThatConventionTransferred =
       );
 
       await Promise.all([
-        ...sendAgencyEmail(
+        ...sendAgencyEmails(
           agencyRecipientsRoleAndEmail,
           convention,
           uow,
@@ -127,7 +127,7 @@ export const makeNotifyAllActorsThatConventionTransferred =
     },
   );
 
-const sendAgencyEmail = (
+const sendAgencyEmails = (
   agencyRecipientsRoleAndEmail: { role: Role; email: Email }[],
   convention: ConventionDto,
   uow: UnitOfWork,

@@ -114,24 +114,20 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   sharedRouter.transferConventionToAgency(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        return match(req.payloads)
-          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
-            deps.useCases.transferConventionToAgency.execute(
-              req.body,
-              convention,
-            ),
-          )
-          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.transferConventionToAgency.execute(
-              req.body,
-              inclusion,
-            ),
-          )
-          .otherwise(() => {
-            throw errors.user.unauthorized();
-          });
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.transferConventionToAgency.execute(
+          req.body,
+          match(req.payloads)
+            .with(
+              { convention: P.not(P.nullish) },
+              ({ convention }) => convention,
+            )
+            .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) => inclusion)
+            .otherwise(() => {
+              throw errors.user.unauthorized();
+            }),
+        ),
+      ),
   );
 
   sharedRouter.sendSignatureLink(

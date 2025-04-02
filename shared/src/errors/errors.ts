@@ -263,7 +263,7 @@ export const errors = {
       status: ConventionStatus;
     }) =>
       new BadRequestError(
-        `Impossible de transférer les convention ayant le statut "${status}".`,
+        `Impossible de transférer les conventions ayant le statut "${status}".`,
       ),
     twoStepsValidationBadStatus: ({
       targetStatus,

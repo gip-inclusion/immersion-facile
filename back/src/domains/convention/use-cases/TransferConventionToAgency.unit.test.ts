@@ -36,49 +36,53 @@ import {
   makeTransferConventionToAgency,
 } from "./TransferConventionToAgency";
 
-const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
-
-const otherAgency = new AgencyDtoBuilder().withId("other-agency-id").build();
-
-const agency = new AgencyDtoBuilder().build();
-
-const agencyWithRefersTo = new AgencyDtoBuilder()
-  .withId("agency-with-refers-to")
-  .withRefersToAgencyInfo({
-    refersToAgencyId: agency.id,
-    refersToAgencyName: agency.name,
-  })
-  .build();
-
-const convention = new ConventionDtoBuilder()
-  .withId(conventionId)
-  .withStatus("READY_TO_SIGN")
-  .withAgencyId(agency.id)
-  .signedByEstablishmentRepresentative(undefined)
-  .signedByBeneficiary(undefined)
-  .withBeneficiarySignedAt(undefined)
-  .build();
-
-const notConnectedUser = new UserBuilder()
-  .withEmail("validator@mail.com")
-  .build();
-
-const validatorJwtPayload = createConventionMagicLinkPayload({
-  id: conventionId,
-  role: "validator",
-  email: notConnectedUser.email,
-  now: new Date(),
-});
-
-const connectedUserPayload: InclusionConnectDomainJwtPayload = {
-  userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
-};
-
-const connectedUser = new InclusionConnectedUserBuilder()
-  .withId(connectedUserPayload.userId)
-  .build();
-
 describe("TransferConventionToAgency", () => {
+  const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
+
+  const otherAgency = new AgencyDtoBuilder().withId("other-agency-id").build();
+
+  const agency = new AgencyDtoBuilder().build();
+
+  const agencyWithRefersTo = new AgencyDtoBuilder()
+    .withId("agency-with-refers-to")
+    .withRefersToAgencyInfo({
+      refersToAgencyId: agency.id,
+      refersToAgencyName: agency.name,
+    })
+    .build();
+
+  const convention = new ConventionDtoBuilder()
+    .withId(conventionId)
+    .withStatus("READY_TO_SIGN")
+    .withAgencyId(agency.id)
+    .signedByEstablishmentRepresentative(undefined)
+    .signedByBeneficiary(undefined)
+    .withBeneficiarySignedAt(undefined)
+    .build();
+
+  const preValidatedConvention = new ConventionDtoBuilder(convention)
+    .withAgencyId(agencyWithRefersTo.id)
+    .build();
+
+  const notConnectedUser = new UserBuilder()
+    .withEmail("validator@mail.com")
+    .build();
+
+  const validatorJwtPayload = createConventionMagicLinkPayload({
+    id: conventionId,
+    role: "validator",
+    email: notConnectedUser.email,
+    now: new Date(),
+  });
+
+  const connectedUserPayload: InclusionConnectDomainJwtPayload = {
+    userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
+  };
+
+  const connectedUser = new InclusionConnectedUserBuilder()
+    .withId(connectedUserPayload.userId)
+    .build();
+
   let createNewEvent: CreateNewEvent;
   let uow: InMemoryUnitOfWork;
   let usecase: TransferConventionToAgency;
@@ -109,7 +113,7 @@ describe("TransferConventionToAgency", () => {
       "ACCEPTED_BY_COUNSELLOR",
       "ACCEPTED_BY_VALIDATOR",
     ] as ConventionStatus[])(
-      "should throw an error if convention status %s does not allow convention to be transfer",
+      "should throw an error if convention status %s does not allow convention to be transferred",
       async (status) => {
         const conventionWithStatus = new ConventionDtoBuilder(convention)
           .withStatus(status)
@@ -182,8 +186,8 @@ describe("TransferConventionToAgency", () => {
       );
     });
 
-    describe("connected user", () => {
-      it("throws not found if connected user id does not exist", async () => {
+    describe("with connected user", () => {
+      it("throws not found if connected user does not exist", async () => {
         const unexistingUserPayload: InclusionConnectDomainJwtPayload = {
           userId: "bcc5c20e-6dd2-45cf-affe-927358005267",
         };
@@ -263,9 +267,6 @@ describe("TransferConventionToAgency", () => {
       );
 
       it("if agencyWithRefersTo, throws an error if validator attempts to change agency", async () => {
-        const preValidatedConvention = new ConventionDtoBuilder(convention)
-          .withAgencyId(agencyWithRefersTo.id)
-          .build();
         uow.conventionRepository.setConventions([preValidatedConvention]);
         uow.userRepository.users = [connectedUser];
         uow.agencyRepository.agencies = [
@@ -298,7 +299,7 @@ describe("TransferConventionToAgency", () => {
       });
     });
 
-    describe("not connected user", () => {
+    describe("with convention jwt payload", () => {
       it("throws bad request if requested convention does not match the one in jwt", async () => {
         const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
 
@@ -349,9 +350,6 @@ describe("TransferConventionToAgency", () => {
       );
 
       it("if agencyWithRefersTo, throws an error if validator attempts to change agency", async () => {
-        const preValidatedConvention = new ConventionDtoBuilder(convention)
-          .withAgencyId(agencyWithRefersTo.id)
-          .build();
         uow.conventionRepository.setConventions([preValidatedConvention]);
         uow.userRepository.users = [notConnectedUser];
         uow.agencyRepository.agencies = [
@@ -392,7 +390,7 @@ describe("TransferConventionToAgency", () => {
   });
 
   describe("Right paths: transfer of convention", () => {
-    describe("connected user", () => {
+    describe("with connected user", () => {
       it.each(["validator", "counsellor", "back-office"] as Role[])(
         "triggered by inclusion-connected user with role %s",
         async (role) => {
@@ -432,7 +430,12 @@ describe("TransferConventionToAgency", () => {
           );
 
           expectToEqual(transferedConvention.agencyId, otherAgency.id);
-
+          expectToEqual(uow.conventionRepository.conventions, [
+            {
+              ...convention,
+              agencyId: otherAgency.id,
+            },
+          ]);
           expectArraysToMatch(uow.outboxRepository.events, [
             {
               topic: "ConventionTransferredToAgency",
@@ -609,7 +612,7 @@ describe("TransferConventionToAgency", () => {
       });
     });
 
-    describe("not connected user", () => {
+    describe("with convention jwt payload", () => {
       it.each(["validator", "counsellor", "back-office"] as Role[])(
         "triggered by jwt role %s",
         async (role) => {

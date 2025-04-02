@@ -18,7 +18,7 @@ import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/Be
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
 import { ConventionImmersionPage } from "src/app/pages/convention/ConventionImmersionPage";
-import { ConventionManageConnectedUserPage } from "src/app/pages/convention/ConventionManageInclusionConnectedPage";
+import { ConventionManageConnectedUserPage } from "src/app/pages/convention/ConventionManageConnectedUserPage";
 import { ConventionMiniStagePage } from "src/app/pages/convention/ConventionMiniStagePage";
 import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage";
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
