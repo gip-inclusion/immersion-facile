@@ -7,7 +7,11 @@ import {
 } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type {
+  Base64,
+  NotificationGateway,
+  SendNotificationResult,
+} from "../ports/NotificationGateway";
 
 export const sendSmsErrorPhoneNumber = "0699999999";
 export const emailThatTriggerSendEmailError =
@@ -48,25 +52,35 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     return this.#sentSms;
   }
 
-  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+  public async sendEmail(
+    templatedEmail: TemplatedEmail,
+  ): Promise<SendNotificationResult> {
     if (templatedEmail.recipients.includes(emailThatTriggerSendEmailError)) {
-      throw errors.generic.fakeError(
-        `fake Send Email Error with email ${emailThatTriggerSendEmailError}`,
-        fakeHttpStatusErrorCode,
-      );
+      return {
+        isOk: false,
+        error: {
+          message: `fake Send Email Error with email ${emailThatTriggerSendEmailError}`,
+          httpStatus: fakeHttpStatusErrorCode,
+        },
+      };
     }
     this.#pushEmail(templatedEmail);
+    return { isOk: true };
   }
 
-  public async sendSms(sms: TemplatedSms): Promise<void> {
+  public async sendSms(sms: TemplatedSms): Promise<SendNotificationResult> {
     if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`) {
-      throw errors.generic.fakeError(
-        `fake Send SMS Error with phone number ${sms.recipientPhone}.`,
-        fakeHttpStatusErrorCode,
-      );
+      return {
+        isOk: false,
+        error: {
+          message: `fake Send SMS Error with phone number ${sms.recipientPhone}.`,
+          httpStatus: fakeHttpStatusErrorCode,
+        },
+      };
     }
 
     this.#sentSms.push(sms);
+    return { isOk: true };
   }
 
   #pushEmail(templatedEmail: TemplatedEmail) {

@@ -48,16 +48,18 @@ export class SendNotificationInBatch extends TransactionalUseCase<
 
     await Promise.all([
       executeInSequence(smsNotifications, (notification) =>
-        this.notificationGateway.sendSms(
-          notification.templatedContent,
-          notification.id,
-        ),
+        this.notificationGateway
+          .sendSms(notification.templatedContent, notification.id)
+          .then(() => {
+            /* do nothing */
+          }),
       ),
       executeInSequence(emailNotifications, (notification) =>
-        this.notificationGateway.sendEmail(
-          notification.templatedContent,
-          notification.id,
-        ),
+        this.notificationGateway
+          .sendEmail(notification.templatedContent, notification.id)
+          .then(() => {
+            /* do nothing */
+          }),
       ),
     ]);
   }

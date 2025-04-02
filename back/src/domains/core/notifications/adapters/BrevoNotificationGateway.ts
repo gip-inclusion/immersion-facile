@@ -16,7 +16,11 @@ import {
 import type { HttpClient } from "shared-routes";
 import type { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { createLogger } from "../../../../utils/logger";
-import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type {
+  Base64,
+  NotificationGateway,
+  SendNotificationResult,
+} from "../ports/NotificationGateway";
 import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import type {
   RecipientOrSender,
@@ -94,7 +98,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   public async sendEmail(
     email: TemplatedEmail,
     notificationId?: NotificationId,
-  ) {
+  ): Promise<SendNotificationResult> {
     if (email.recipients.length === 0) {
       throw errors.notification.missingRecipient({ notificationId });
     }
@@ -118,15 +122,16 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: email.sender ?? this.config.defaultSender,
     };
 
-    if (emailData.to.length === 0) return;
+    if (emailData.to.length === 0) return { isOk: true };
 
     await this.#sendTransacEmail(emailData);
+    return { isOk: true };
   }
 
   public sendSms(
     { kind, params, recipientPhone }: TemplatedSms,
     notificationId?: NotificationId,
-  ): Promise<void> {
+  ): Promise<SendNotificationResult> {
     logger.info({
       notificationId,
       message: "sendTransactSmsTotal",
@@ -148,7 +153,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
           notificationId,
           message: "sendTransactSmsError",
         });
-        throw error;
+        return error;
       });
   }
 
@@ -158,12 +163,17 @@ export class BrevoNotificationGateway implements NotificationGateway {
         headers: this.#brevoHeaders,
         body,
       });
+
       if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      return response;
+        return {
+          isOk: false,
+          error: {
+            message: JSON.stringify(response.body),
+            httpStatus: response.status,
+          },
+        };
+
+      return { isOk: true };
     });
   }
 
@@ -173,12 +183,17 @@ export class BrevoNotificationGateway implements NotificationGateway {
         headers: this.#brevoHeaders,
         body,
       });
+
       if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      return response;
+        return {
+          isOk: false,
+          error: {
+            message: JSON.stringify(response.body),
+            httpStatus: response.status,
+          },
+        };
+
+      return { isOk: true };
     });
   }
 
