@@ -3,8 +3,8 @@ version: 2
 sources:
   - name: immersion
     description: "Immersion Facilitee application database"
-    database: immersion-db  # This should match the database name in your profiles.yml
-    schema: public  # This should match the schema where your tables are located
+    database: "{{ env_var('DBT_DATABASE', 'immersion-db') }}" # This will use the DBT_DATABASE environment variable
+    schema: public # This should match the schema where your tables are located
     tables:
       - name: conventions
         description: "Immersion applications/conventions data"
@@ -146,4 +146,4 @@ sources:
           - name: activity_type
             description: "Type of activity (login, search, etc.)"
           - name: created_at
-            description: "Timestamp when the activity occurred" 
+            description: "Timestamp when the activity occurred"
