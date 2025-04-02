@@ -30,35 +30,36 @@ import {
   makeNotifyAllActorsThatConventionTransferred,
 } from "./NotifyAllActorsThatConventionTransferred";
 
-const previousAgency = new AgencyDtoBuilder().withId("previous-agency").build();
-const newAgency = new AgencyDtoBuilder().withId("new-agency").build();
-const convention = new ConventionDtoBuilder()
-  .withAgencyId(newAgency.id)
-  .withEstablishmentTutor({
-    email: "establishment-tutor@example.com",
-    firstName: "Establishment",
-    lastName: "Tutor",
-    phone: "0606060606",
-    role: "establishment-tutor",
-    job: "Job",
-  })
-  .withEstablishmentRepresentative({
-    email: "establishment-representative@example.com",
-    firstName: "Establishment",
-    lastName: "Representative",
-    phone: "0606060606",
-    role: "establishment-representative",
-  })
-  .build();
-const connectedUserPayload: InclusionConnectDomainJwtPayload = {
-  userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
-};
-
-const connectedUser = new InclusionConnectedUserBuilder()
-  .withId(connectedUserPayload.userId)
-  .build();
-
 describe("NotifyAllActorsThatConventionTransferred", () => {
+  const previousAgency = new AgencyDtoBuilder()
+    .withId("previous-agency")
+    .build();
+  const newAgency = new AgencyDtoBuilder().withId("new-agency").build();
+  const convention = new ConventionDtoBuilder()
+    .withAgencyId(newAgency.id)
+    .withEstablishmentTutor({
+      email: "establishment-tutor@example.com",
+      firstName: "Establishment",
+      lastName: "Tutor",
+      phone: "0606060606",
+      role: "establishment-tutor",
+      job: "Job",
+    })
+    .withEstablishmentRepresentative({
+      email: "establishment-representative@example.com",
+      firstName: "Establishment",
+      lastName: "Representative",
+      phone: "0606060606",
+      role: "establishment-representative",
+    })
+    .build();
+  const connectedUserPayload: InclusionConnectDomainJwtPayload = {
+    userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
+  };
+
+  const connectedUser = new InclusionConnectedUserBuilder()
+    .withId(connectedUserPayload.userId)
+    .build();
   const config: AppConfig = new AppConfigBuilder()
     .withTestPresetPreviousKeys()
     .build();
