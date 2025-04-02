@@ -23,6 +23,7 @@ chmod +x setup.sh
 ```
 
 This script will:
+
 - Create a Python virtual environment in `.venv`
 - Install the required dependencies from `requirements.txt`
 
@@ -43,6 +44,7 @@ The database connection is configured in `profiles.yml`. The configuration suppo
 You can customize the database connection using environment variables. The easiest way is to use the `.env` file:
 
 1. Copy the sample file to create your own `.env` file (if it doesn't exist already):
+
    ```bash
    cp .env.sample .env
    ```
@@ -50,7 +52,6 @@ You can customize the database connection using environment variables. The easie
 2. Edit the `.env` file with your database credentials:
    ```bash
    # Database connection settings
-   DBT_TARGET=dev
    DBT_HOST=localhost
    DBT_USER=immersion
    DBT_PASSWORD=your_password
@@ -61,26 +62,6 @@ You can customize the database connection using environment variables. The easie
    ```
 
 The `run_dbt.sh` script will automatically load these environment variables when you run dbt commands.
-
-#### Using the Production Target
-
-To use the production target, simply update your `.env` file with the production settings:
-
-```bash
-# Set target to production
-DBT_TARGET=production
-
-# Provide production connection details
-DBT_HOST=your-production-host
-DBT_USER=your-production-user
-DBT_PASSWORD=your-production-password
-DBT_DATABASE=your-production-database
-```
-
-You can also temporarily override the target on the command line without changing your `.env` file:
-```bash
-DBT_TARGET=production ./run_dbt.sh run
-```
 
 ### Running dbt
 
@@ -117,6 +98,7 @@ This script ensures that dbt uses the local `profiles.yml` file, loads environme
 ## Current Models
 
 The project currently includes:
+
 - `conventions` - Analytics for conventions data
 
 ## Development Workflow
@@ -128,4 +110,4 @@ The project currently includes:
 
 ## Documentation
 
-For more information about dbt, visit [dbt documentation](https://docs.getdbt.com/). 
+For more information about dbt, visit [dbt documentation](https://docs.getdbt.com/).

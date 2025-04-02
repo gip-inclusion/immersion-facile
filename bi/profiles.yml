@@ -1,7 +1,7 @@
 immersion_bi:
-  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  target: db
   outputs:
-    dev:
+    db:
       type: postgres
       host: "{{ env_var('DBT_HOST', 'localhost') }}"
       user: "{{ env_var('DBT_USER', 'immersion') }}"
@@ -10,16 +10,3 @@ immersion_bi:
       dbname: "{{ env_var('DBT_DATABASE', 'immersion-db') }}"
       schema: public
       threads: 4
-    
-    production:
-      type: postgres
-      host: "{{ env_var('DBT_HOST') }}"
-      user: "{{ env_var('DBT_USER') }}"
-      password: "{{ env_var('DBT_PASSWORD') }}"
-      port: "{{ env_var('DBT_PORT', 5432) | as_number }}"
-      dbname: "{{ env_var('DBT_DATABASE') }}"
-      schema: public
-      threads: 4
-
-
-

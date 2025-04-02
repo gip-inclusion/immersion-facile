@@ -39,8 +39,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        command:
-          [ "pnpm fast-checks", "pnpm typecheck", "pnpm back test" ]
+        command: ["pnpm fast-checks", "pnpm typecheck", "pnpm back test"]
 
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +63,6 @@ jobs:
     env:
       TEST_DATABASE_URL: postgresql://immersion:password@localhost:5432/immersion-db
       TEST_REDIS_URL: redis://@localhost:6379
-      DBT_TARGET: dev
       DBT_HOST: localhost
       DBT_USER: immersion
       DBT_PASSWORD: password
@@ -114,7 +112,7 @@ jobs:
 
   playwright-tests:
     name: "Playwright tests"
-    if: github.ref != 'refs/heads/main'  # Skip this job on main branch
+    if: github.ref != 'refs/heads/main' # Skip this job on main branch
     runs-on: ubuntu-latest
     env:
       NODE_ENV: test
