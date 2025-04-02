@@ -1,5 +1,6 @@
-import { errors, exhaustiveCheck } from "shared";
+import { BadRequestError, errors, exhaustiveCheck } from "shared";
 import { z } from "zod";
+import { unwrapOrThrow } from "../../../../utils/resultAsync";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -38,15 +39,29 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     switch (notification.kind) {
       case "email":
-        return this.notificationGateway.sendEmail(
-          notification.templatedContent,
-          notification.id,
+        return unwrapOrThrow(
+          this.notificationGateway
+            .sendEmail(notification.templatedContent, notification.id)
+            .mapErr((error) => {
+              if (error instanceof BadRequestError) return error;
+              return errors.generic.unsupportedStatus({
+                status: error.status,
+                body: error.message,
+              });
+            }),
         );
-      case "sms":
-        return this.notificationGateway.sendSms(
-          notification.templatedContent,
-          notification.id,
+      case "sms": {
+        return unwrapOrThrow(
+          this.notificationGateway
+            .sendSms(notification.templatedContent, notification.id)
+            .mapErr((error) =>
+              errors.generic.unsupportedStatus({
+                status: error.status,
+                body: error.message,
+              }),
+            ),
         );
+      }
       default:
         return exhaustiveCheck(notification, {
           variableName: "notification",
