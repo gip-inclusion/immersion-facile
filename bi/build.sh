@@ -10,11 +10,11 @@ if [ "$CURRENT_DIR" != "bi" ]; then
 fi
 
 # Create a temporary directory for the bundle
-mkdir -p dbt-build
+mkdir -p dbt-build/app
 
 # Copy the bi folder contents while respecting .gitignore
 cd ..
-git archive HEAD:bi | tar -x -C bi/dbt-build
+git archive HEAD:bi | tar -x -C bi/dbt-build/app
 
 # Remove any .env files that might have been included
 cd bi

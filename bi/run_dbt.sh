@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Activate virtual environment if not already activated
-if [[ "$VIRTUAL_ENV" == "" ]]; then
+# Check if we're in a virtual environment or in production
+if [[ "$VIRTUAL_ENV" == "" && -d .venv ]]; then
+  # Only activate venv if it exists and we're not in production
   source .venv/bin/activate
 fi
 
