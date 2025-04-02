@@ -502,11 +502,12 @@ export const calculateScheduleTotalDurationInDays = (
 
 export const isSundayInSchedule = (complexSchedule: DailyScheduleDto[]) => {
   const sunday = 0;
-  return complexSchedule.some(
-    (week) =>
-      getDay(convertLocaleDateToUtcTimezoneDate(parseISO(week.date))) ===
-        sunday && week.timePeriods.length > 0,
-  );
+  return complexSchedule.some((week) => {
+    return (
+      convertLocaleDateToUtcTimezoneDate(parseISO(week.date)).getUTCDay() ===
+        sunday && week.timePeriods.length > 0
+    );
+  });
 };
 
 const makeWeeklyPrettyPrint = (
