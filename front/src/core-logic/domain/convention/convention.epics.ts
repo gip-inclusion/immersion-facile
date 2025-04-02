@@ -1,7 +1,6 @@
-import { concatMap, delay, filter, map, switchMap } from "rxjs";
+import { concatMap, filter, map, switchMap } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
-import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
-import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -61,25 +60,45 @@ const getConventionEpic: ConventionEpic = (
     filter(
       (action) =>
         conventionSlice.actions.fetchConventionRequested.match(action) ||
-        conventionSlice.actions.signConventionSucceeded.match(action) ||
-        conventionSlice.actions.statusChangeSucceeded.match(action) ||
-        transferConventionToAgencySlice.actions.transferConventionToAgencySucceeded.match(
+        conventionActionSlice.actions.signConventionSucceeded.match(action) ||
+        conventionActionSlice.actions.acceptByCounsellorSucceeded.match(
+          action,
+        ) ||
+        conventionActionSlice.actions.acceptByValidatorSucceeded.match(
+          action,
+        ) ||
+        conventionActionSlice.actions.deprecateConventionSucceeded.match(
+          action,
+        ) ||
+        conventionActionSlice.actions.rejectConventionSucceeded.match(action) ||
+        conventionActionSlice.actions.editConventionSucceeded.match(action) ||
+        conventionActionSlice.actions.cancelConventionSucceeded.match(action) ||
+        conventionActionSlice.actions.transferConventionToAgencySucceeded.match(
           action,
         ),
     ),
     switchMap((action) => {
-      const params = conventionSlice.actions.statusChangeSucceeded.match(action)
-        ? {
-            conventionId: action.payload.updateStatusParams.conventionId,
-            jwt: action.payload.jwt,
-          }
-        : action.payload;
-      return conventionGateway.retrieveFromToken$(params);
+      if ("updateStatusParams" in action.payload) {
+        return conventionGateway.retrieveFromToken$({
+          conventionId: action.payload.updateStatusParams.conventionId,
+          jwt: action.payload.jwt,
+        });
+      }
+      if ("transferConventionToAgencyParams" in action.payload) {
+        return conventionGateway.retrieveFromToken$({
+          conventionId:
+            action.payload.transferConventionToAgencyParams.conventionId,
+          jwt: action.payload.jwt,
+        });
+      }
+      return conventionGateway.retrieveFromToken$(action.payload);
     }),
-    map(conventionSlice.actions.fetchConventionSucceeded),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.fetchConventionFailed(error.message),
-    ),
+    map((convention) => {
+      return conventionSlice.actions.fetchConventionSucceeded(convention);
+    }),
+    catchEpicError((error: Error) => {
+      return conventionSlice.actions.fetchConventionFailed(error.message);
+    }),
   );
 
 const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
@@ -104,54 +123,6 @@ const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
     ]),
   );
 
-const signConventionEpic: ConventionEpic = (
-  action$,
-  _,
-  { conventionGateway },
-) =>
-  action$.pipe(
-    filter(conventionSlice.actions.signConventionRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway
-        .signConvention$(payload.conventionId, payload.jwt)
-        .pipe(
-          map(() => conventionSlice.actions.signConventionSucceeded(payload)),
-        ),
-    ),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.signConventionFailed(error.message),
-    ),
-  );
-
-const conventionStatusChangeEpic: ConventionEpic = (
-  action$,
-  _,
-  { conventionGateway },
-) =>
-  action$.pipe(
-    filter(conventionSlice.actions.statusChangeRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway
-        .updateConventionStatus$(payload.updateStatusParams, payload.jwt)
-        .pipe(
-          map(() => conventionSlice.actions.statusChangeSucceeded(payload)),
-          catchEpicError((error: Error) => {
-            if (
-              error.message.includes(
-                "Convention should be reviewed by counsellor",
-              )
-            )
-              return conventionSlice.actions.statusChangeSucceeded({
-                ...payload,
-                feedbackKind: "missingCounsellorValidationError",
-              });
-
-            return conventionSlice.actions.statusChangeFailed(error.message);
-          }),
-        ),
-    ),
-  );
-
 const getConventionStatusDashboardUrl: ConventionEpic = (
   action$,
   _,
@@ -170,65 +141,10 @@ const getConventionStatusDashboardUrl: ConventionEpic = (
     ),
   );
 
-const renewConventionEpic: ConventionEpic = (
-  action$,
-  _,
-  { conventionGateway },
-) =>
-  action$.pipe(
-    filter(conventionSlice.actions.renewConventionRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway.renewConvention$(payload.params, payload.jwt),
-    ),
-    map(conventionSlice.actions.renewConventionSucceeded),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.renewConventionFailed(error.message),
-    ),
-  );
-
-const minimumDelayBeforeItIsPossibleToBroadcastAgainMs = 10_000;
-
-const broadcastConventionAgainEpic: ConventionEpic = (
-  action$,
-  state$,
-  { conventionGateway, scheduler },
-) =>
-  action$.pipe(
-    filter(conventionSlice.actions.broadcastConventionToPartnerRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway
-        .broadcastConventionAgain$(
-          { conventionId: payload.conventionId },
-          getAdminToken(state$.value),
-        )
-        .pipe(
-          delay(minimumDelayBeforeItIsPossibleToBroadcastAgainMs, scheduler),
-          map(() =>
-            conventionSlice.actions.broadcastConventionToPartnerSucceeded({
-              feedbackTopic: payload.feedbackTopic,
-            }),
-          ),
-          catchEpicError((error: Error) => {
-            const isJsonError = error.message[0] === "{";
-            return conventionSlice.actions.broadcastConventionToPartnerFailed({
-              errorMessage: isJsonError
-                ? JSON.parse(error.message).message
-                : error.message,
-              feedbackTopic: payload.feedbackTopic,
-            });
-          }),
-        ),
-    ),
-  );
-
 export const conventionEpics = [
   saveConventionEpic,
   getConventionEpic,
-  signConventionEpic,
-  conventionStatusChangeEpic,
   reflectFetchedConventionOnFormUi,
   getConventionStatusDashboardUrl,
-  renewConventionEpic,
   getSimilarConventionsEpic,
-  broadcastConventionAgainEpic,
 ];
