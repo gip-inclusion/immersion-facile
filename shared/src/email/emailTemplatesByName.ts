@@ -1695,7 +1695,68 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         l'équipe d'Immersion Facilitée`,
       }),
     },
+    ESTABLISHMENT_USER_RIGHTS_UPDATED: {
+      niceName: "Compte - Etablissement - Modification d’un utilisateur",
+      tags: ["compte_etablissement_modificationUtilisateur"],
+      createEmailVariables: ({
+        businessName,
+        updatedRole,
+        firstName,
+        lastName,
+        triggeredByUserFirstName,
+        triggeredByUserLastName,
+      }) => ({
+        subject: "Votre rôle sur Immersion Facilitée a été mis à jour",
+        greetings: `Bonjour ${firstName} ${lastName},`,
+        content: `
+          Votre rôle sur Immersion Facilitée pour l'établissement <strong>${businessName}</strong> a été modifié par ${triggeredByUserFirstName} ${triggeredByUserLastName}.
+          
+          <strong>Votre nouveau rôle :</strong> ${updatedRole}
+          
+          ${
+            updatedRole
+              ? `L'administrateur accède aux conventions, aux candidatures (lecture et réponse) et peut gérer la fiche entreprise et les utilisateurs de l'établissement.`
+              : `Le contact accède aux conventions et aux candidatures (lecture et réponse) de l'établissement.`
+          }
 
+          Si cette modification ne vous semble pas justifiée, contactez ${triggeredByUserFirstName} ${triggeredByUserLastName} ou notre support.
+        `,
+        subContent: defaultSignature("immersion"),
+      }),
+    },
+    ESTABLISHMENT_USER_RIGHTS_ADDED: {
+      niceName: "Compte - Etablissement - Ajout d’un utilisateur",
+      tags: ["compte_etablissement_ajoutUtilisateur"],
+      createEmailVariables: ({
+        businessName,
+        role,
+        firstName,
+        lastName,
+        triggeredByUserFirstName,
+        triggeredByUserLastName,
+      }) => ({
+        subject: `Droit ajouté pour ${businessName}`,
+        greetings: `Bonjour ${firstName && lastName ? `${firstName} ${lastName}` : ""},`,
+        content: `
+          Vous avez été ajouté(e) comme ${role === "establishment-admin" ? "administrateur" : "contact"} sur Immersion Facilitée pour l’établissement ${businessName} par ${triggeredByUserFirstName} ${triggeredByUserLastName}.
+
+          ${
+            role === "establishment-admin"
+              ? "L’administrateur accède aux conventions, aux candidatures (lecture et réponse) et peut gérer la fiche entreprise et les utilisateurs de l’établissement."
+              : "Le contact accède aux conventions et aux candidatures (lecture et réponse) de l’établissement."
+          }
+
+          Créez votre compte dès maintenant pour accéder à votre espace :
+        `,
+        buttons: [
+          {
+            label: "Créer mon compte",
+            url: `${frontRoutes.establishmentDashboard}`,
+          },
+        ],
+        subContent: defaultSignature("immersion"),
+      }),
+    },
     CONTACT_BY_EMAIL_REQUEST: {
       niceName: "Établissement - Mise en relation par mail",
       tags: ["mise en relation mail"],
