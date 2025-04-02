@@ -2,47 +2,23 @@ import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type {
   AbsoluteUrl,
   AgencyId,
-  ConnectedUserJwt,
   ConventionId,
   ConventionJwt,
   ConventionReadDto,
   ConventionSupportedJwt,
   DiscussionId,
   FindSimilarConventionsParams,
-  RenewConventionParams,
   SignatoryRole,
-  UpdateConventionStatusRequestDto,
-  WithConventionId,
 } from "shared";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import type { SubmitFeedBack } from "../SubmitFeedback";
 
-type ConventionValidationFeedbackKind =
-  | "rejected"
-  | "modificationAskedFromCounsellorOrValidator"
-  | "markedAsEligible"
-  | "markedAsValidated"
-  | "cancelled"
-  | "deprecated"
-  | "renewed";
+type ConventionSignatoryFeedbackKind = "justSubmitted";
 
-type ConventionSignatoryFeedbackKind =
-  | "justSubmitted"
-  | "modificationsAskedFromSignatory";
-
-export type ConventionFeedbackKind =
-  | ConventionSignatoryFeedbackKind
-  | ConventionValidationFeedbackKind
-  | "missingCounsellorValidationError";
+export type ConventionFeedbackKind = ConventionSignatoryFeedbackKind;
 
 export type ConventionSubmitFeedback = SubmitFeedBack<ConventionFeedbackKind>;
 
 export type NumberOfSteps = 1 | 2 | 3 | 4 | 5;
-
-export type RenewConventionPayload = {
-  jwt: ConventionSupportedJwt;
-  params: RenewConventionParams;
-};
 
 export interface ConventionState {
   formUi: {
@@ -62,7 +38,6 @@ export interface ConventionState {
   feedback: ConventionSubmitFeedback;
   currentSignatoryRole: SignatoryRole | null;
   similarConventionIds: ConventionId[];
-  isBroadcasting: boolean;
 }
 
 export const initialConventionState: ConventionState = {
@@ -83,18 +58,11 @@ export const initialConventionState: ConventionState = {
   feedback: { kind: "idle" },
   currentSignatoryRole: null,
   similarConventionIds: [],
-  isBroadcasting: false,
 };
 
 export type FetchConventionRequestedPayload = {
   jwt: ConventionSupportedJwt;
   conventionId: ConventionId;
-};
-
-type StatusChangePayload = {
-  feedbackKind: ConventionFeedbackKind;
-  jwt: ConventionSupportedJwt;
-  updateStatusParams: UpdateConventionStatusRequestDto;
 };
 
 const setFeedbackAsErrored = (
@@ -164,43 +132,6 @@ export const conventionSlice = createSlice({
       state.isLoading = false;
     },
 
-    // Sign convention
-    signConventionRequested: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = true;
-    },
-    signConventionSucceeded: (
-      state,
-      _action: PayloadAction<{
-        conventionId: ConventionId;
-        jwt: ConventionJwt | ConnectedUserJwt;
-      }>,
-    ) => {
-      state.isLoading = false;
-    },
-    signConventionFailed: setFeedbackAsErrored,
-
-    // Modification requested
-    statusChangeRequested: (
-      state,
-      _action: PayloadAction<StatusChangePayload>,
-    ) => {
-      state.isLoading = true;
-    },
-    statusChangeSucceeded: (
-      state,
-      action: PayloadAction<StatusChangePayload>,
-    ) => {
-      state.isLoading = false;
-      state.feedback = { kind: action.payload.feedbackKind };
-    },
-    statusChangeFailed: setFeedbackAsErrored,
-
     // get convention status dashboard
     conventionStatusDashboardRequested: (
       state,
@@ -258,17 +189,6 @@ export const conventionSlice = createSlice({
     setCurrentStep: (state, { payload }: PayloadAction<NumberOfSteps>) => {
       state.formUi.currentStep = payload;
     },
-    renewConventionRequested: (
-      state,
-      _action: PayloadAction<RenewConventionPayload>,
-    ) => {
-      state.isLoading = true;
-    },
-    renewConventionSucceeded: (state) => {
-      state.isLoading = false;
-      state.feedback = { kind: "renewed" };
-    },
-    renewConventionFailed: setFeedbackAsErrored,
 
     // Get similar conventions
     getSimilarConventionsRequested: (
@@ -286,24 +206,5 @@ export const conventionSlice = createSlice({
       state.similarConventionIds = payload;
     },
     getSimilarConventionsFailed: setFeedbackAsErrored,
-
-    broadcastConventionToPartnerRequested: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<WithConventionId>,
-    ) => {
-      state.isBroadcasting = true;
-    },
-    broadcastConventionToPartnerSucceeded: (
-      state,
-      _action: PayloadActionWithFeedbackTopic,
-    ) => {
-      state.isBroadcasting = false;
-    },
-    broadcastConventionToPartnerFailed: (
-      state,
-      _action: PayloadActionWithFeedbackTopic<{ errorMessage: string }>,
-    ) => {
-      state.isBroadcasting = false;
-    },
   },
 });
