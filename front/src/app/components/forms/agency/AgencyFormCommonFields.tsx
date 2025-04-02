@@ -164,18 +164,18 @@ export const AgencyFormCommonFields = ({
           disabled={mode === "edit"}
         />
       )}
-      {(validationSteps === "counsellorsAndValidators" ||
-        refersToOtherAgency) && (
-        <MultipleEmailsInput
-          {...formContents.counsellorEmails}
-          initialValue={formValues.counsellorEmails.join(", ")}
-          valuesInList={watch("counsellorEmails")}
-          setValues={(values) => setValue("counsellorEmails", values)}
-          validationSchema={emailSchema}
-          disabled={mode === "edit"}
-        />
-      )}
-      {!refersToOtherAgency && (
+      {mode === "create" &&
+        (validationSteps === "counsellorsAndValidators" ||
+          refersToOtherAgency) && (
+          <MultipleEmailsInput
+            {...formContents.counsellorEmails}
+            initialValue={formValues.counsellorEmails.join(", ")}
+            valuesInList={watch("counsellorEmails")}
+            setValues={(values) => setValue("counsellorEmails", values)}
+            validationSchema={emailSchema}
+          />
+        )}
+      {mode === "create" && !refersToOtherAgency && (
         <MultipleEmailsInput
           {...formContents.validatorEmails}
           initialValue={formValues.validatorEmails.join(", ")}
@@ -183,7 +183,6 @@ export const AgencyFormCommonFields = ({
           valuesInList={watch("validatorEmails")}
           setValues={(values) => setValue("validatorEmails", values)}
           validationSchema={emailSchema}
-          disabled={mode === "edit"}
         />
       )}
       <Input
