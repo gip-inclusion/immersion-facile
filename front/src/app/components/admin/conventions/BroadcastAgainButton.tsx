@@ -11,8 +11,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { conventionActionSelectors } from "src/core-logic/domain/convention/convention-action/conventionAction.selectors";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
@@ -31,7 +31,9 @@ export const BroadcastAgainButton = ({
   const dispatch = useDispatch();
   const jwt = useAppSelector(authSelectors.inclusionConnectToken);
   const isLoadingApiConsumer = useAppSelector(apiConsumerSelectors.isLoading);
-  const isBroadcasting = useAppSelector(conventionSelectors.isBroadcasting);
+  const isBroadcasting = useAppSelector(
+    conventionActionSelectors.isBroadcasting,
+  );
   const consumerNames = useAppSelector(apiConsumerSelectors.apiConsumerNames);
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const hasErrorFeedback =
@@ -92,7 +94,7 @@ export const BroadcastAgainButton = ({
                 isModalButtonDisabled || isBroadcasting || hasErrorFeedback,
               onClick: () => {
                 dispatch(
-                  conventionSlice.actions.broadcastConventionToPartnerRequested(
+                  conventionActionSlice.actions.broadcastConventionToPartnerRequested(
                     {
                       conventionId: conventionId,
                       feedbackTopic: "broadcast-convention-again",
@@ -109,7 +111,7 @@ export const BroadcastAgainButton = ({
               <li key={consumerName}>{consumerName}</li>
             ))}
           </ul>
-          <Feedback topic="broadcast-convention-again" />
+          <Feedback topics={["broadcast-convention-again"]} />
         </broadcastAgainModal.Component>,
         document.body,
       )}

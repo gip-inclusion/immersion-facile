@@ -1,23 +1,15 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { addBusinessDays, addDays } from "date-fns";
 import { intersection } from "ramda";
 import { useState } from "react";
-import { ButtonWithSubMenu, ErrorNotifications } from "react-design-system";
-import { createPortal } from "react-dom";
-import { FormProvider, useForm } from "react-hook-form";
+import { ButtonWithSubMenu } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConnectedUserJwt,
   type ConventionJwt,
   type ConventionReadDto,
   type ConventionStatus,
-  type ConventionSupportedJwt,
-  type DateIntervalDto,
   type ExcludeFromExisting,
   type RenewConventionParams,
   type Role,
@@ -28,39 +20,21 @@ import {
   hasAllowedRole,
   isConventionRenewed,
   isConventionValidated,
-  reasonableSchedule,
-  renewConventionParamsSchema,
   userHasEnoughRightsOnConvention,
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
-import {
-  ModalWrapper,
-  getVerificationActionButtonProps,
-} from "src/app/components/forms/convention/VerificationActionButton";
-import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
+import { ModalWrapper } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
+import { getVerificationActionProps } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import {
-  displayReadableError,
-  getFormContents,
-  makeFieldError,
-  toErrorsWithLabels,
-} from "src/app/hooks/formContents.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import {
-  type ConventionFeedbackKind,
-  type ConventionSubmitFeedback,
-  conventionSlice,
-} from "src/core-logic/domain/convention/convention.slice";
-import { transferConventionToAgencySlice } from "src/core-logic/domain/convention/transfer-convention-to-agency/transferConventionToAgency.slice";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import type { ConventionSubmitFeedback } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { v4 as uuidV4 } from "uuid";
-import { ScheduleSection } from "../../forms/convention/sections/schedule/ScheduleSection";
 
 export type JwtKindProps =
   | {
@@ -83,11 +57,6 @@ type ConventionManageActionsProps = {
   submitFeedback: ConventionSubmitFeedback;
 };
 
-const renewModal = createModal({
-  id: domElementIds.manageConvention.renewModal,
-  isOpenedByDefault: false,
-});
-
 export const ConventionManageActions = ({
   convention,
   roles,
@@ -99,46 +68,96 @@ export const ConventionManageActions = ({
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const feedback = useAppSelector(conventionSelectors.feedback);
+  const renewFeedback = useFeedbackTopic("convention-action-renew");
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
   >(null);
-  const createOnSubmitWithFeedbackKind =
-    (feedbackKind: ConventionFeedbackKind | "transfer-convention-to-agency") =>
-    (
-      params:
-        | UpdateConventionStatusRequestDto
-        | TransferConventionToAgencyRequestDto,
-    ) => {
-      if (
-        "agencyId" in params &&
-        feedbackKind === "transfer-convention-to-agency"
-      ) {
+
+  const createOnSubmitWithFeedbackKind = (
+    params:
+      | UpdateConventionStatusRequestDto
+      | TransferConventionToAgencyRequestDto
+      | RenewConventionParams,
+  ) => {
+    if ("agencyId" in params) {
+      dispatch(
+        conventionActionSlice.actions.transferConventionToAgencyRequested({
+          transferConventionToAgencyParams: {
+            agencyId: params.agencyId,
+            conventionId: params.conventionId,
+            justification: params.justification,
+          },
+          jwt: jwtParams.jwt,
+          feedbackTopic: "transfer-convention-to-agency",
+        }),
+      );
+    }
+    if ("schedule" in params) {
+      dispatch(
+        conventionActionSlice.actions.renewConventionRequested({
+          params,
+          jwt: jwtParams.jwt,
+          feedbackTopic: "convention-action-renew",
+        }),
+      );
+    }
+    if ("status" in params) {
+      if (params.status === "ACCEPTED_BY_COUNSELLOR") {
         dispatch(
-          transferConventionToAgencySlice.actions.transferConventionToAgencyRequested(
-            {
-              agencyId: params.agencyId,
-              conventionId: params.conventionId,
-              justification: params.justification,
-              jwt: jwtParams.jwt,
-              feedbackTopic: feedbackKind,
-            },
-          ),
-        );
-      }
-      if (
-        "status" in params &&
-        feedbackKind !== "transfer-convention-to-agency"
-      ) {
-        dispatch(
-          conventionSlice.actions.statusChangeRequested({
+          conventionActionSlice.actions.acceptByCounsellorRequested({
             jwt: jwtParams.jwt,
-            feedbackKind,
+            feedbackTopic: "convention-action-accept-by-counsellor",
             updateStatusParams: params,
           }),
         );
       }
-    };
+      if (params.status === "ACCEPTED_BY_VALIDATOR") {
+        dispatch(
+          conventionActionSlice.actions.acceptByValidatorRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-accept-by-validator",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "REJECTED") {
+        dispatch(
+          conventionActionSlice.actions.rejectConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-reject",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "DEPRECATED") {
+        dispatch(
+          conventionActionSlice.actions.deprecateConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-deprecate",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "CANCELLED") {
+        dispatch(
+          conventionActionSlice.actions.cancelConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-cancel",
+            updateStatusParams: params,
+          }),
+        );
+      }
+      if (params.status === "DRAFT") {
+        dispatch(
+          conventionActionSlice.actions.editConventionRequested({
+            jwt: jwtParams.jwt,
+            feedbackTopic: "convention-action-edit",
+            updateStatusParams: params,
+          }),
+        );
+      }
+    }
+  };
 
   const disabled = submitFeedback.kind !== "idle";
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
@@ -196,32 +215,36 @@ export const ConventionManageActions = ({
   const navItems = [
     ...(shouldShowTransferButton()
       ? [
-          getVerificationActionButtonProps({
-            initialStatus: convention.status,
-            children: t.verification.modifyConventionAgency,
-            modalTitle: t.verification.modifyConventionAgencyTitle,
-            verificationAction: "TRANSFER",
-            convention,
-            disabled,
-            currentSignatoryRoles: requesterRoles,
-            onSubmit: createOnSubmitWithFeedbackKind(
-              "transfer-convention-to-agency",
-            ),
-          }).buttonProps,
+          {
+            ...getVerificationActionProps({
+              initialStatus: convention.status,
+              children: t.verification.modifyConventionAgency,
+              modalTitle: t.verification.modifyConventionAgencyTitle,
+              verificationAction: "TRANSFER",
+              convention,
+              disabled,
+              currentSignatoryRoles: requesterRoles,
+              onSubmit: createOnSubmitWithFeedbackKind,
+            }).buttonProps,
+
+            id: domElementIds.manageConvention
+              .conventionValidationTransferButton,
+          },
         ]
       : []),
-    getVerificationActionButtonProps({
-      initialStatus: convention.status,
-      children: t.verification.modifyConventionOtherInformations,
-      modalTitle: t.verification.modifyConvention,
-      verificationAction: "REQUEST_EDIT",
-      convention,
-      disabled,
-      currentSignatoryRoles: requesterRoles,
-      onSubmit: createOnSubmitWithFeedbackKind(
-        "modificationAskedFromCounsellorOrValidator",
-      ),
-    }).buttonProps,
+    {
+      ...getVerificationActionProps({
+        initialStatus: convention.status,
+        children: t.verification.modifyConventionOtherInformations,
+        modalTitle: t.verification.modifyConvention,
+        verificationAction: "REQUEST_EDIT",
+        convention,
+        disabled,
+        currentSignatoryRoles: requesterRoles,
+        onSubmit: createOnSubmitWithFeedbackKind,
+      }).buttonProps,
+      id: domElementIds.manageConvention.conventionValidationRequestEditButton,
+    },
   ];
 
   return (
@@ -245,11 +268,21 @@ export const ConventionManageActions = ({
           title="Attention !"
         />
       )}
-      <ConventionFeedbackNotification
-        submitFeedback={submitFeedback}
-        signatories={convention.signatories}
+
+      <Feedback
+        topics={[
+          "transfer-convention-to-agency",
+          "convention-action-accept-by-counsellor",
+          "convention-action-accept-by-validator",
+          "convention-action-reject",
+          "convention-action-deprecate",
+          "convention-action-cancel",
+          "convention-action-edit",
+          "convention-action-renew",
+        ]}
+        className="fr-mb-2w"
+        closable
       />
-      <Feedback topic="transfer-convention-to-agency" className="fr-mb-2w" />
 
       <div
         style={{
@@ -262,7 +295,7 @@ export const ConventionManageActions = ({
         {isAllowedConventionTransition(convention, "REJECTED", roles) && (
           <>
             <Button
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.rejectConvention,
                 modalTitle: t.verification.rejectConvention,
@@ -270,11 +303,15 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
+              iconId="fr-icon-close-circle-line"
+              id={
+                domElementIds.manageConvention.conventionValidationRejectButton
+              }
             />
             <ModalWrapper
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.rejectConvention,
                 modalTitle: t.verification.rejectConvention,
@@ -282,7 +319,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("rejected"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -291,7 +328,7 @@ export const ConventionManageActions = ({
         {isAllowedConventionTransition(convention, "DEPRECATED", roles) && (
           <>
             <Button
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.markAsDeprecated,
                 modalTitle: t.verification.markAsDeprecated,
@@ -299,11 +336,16 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
+              iconId="fr-icon-checkbox-circle-line"
+              id={
+                domElementIds.manageConvention
+                  .conventionValidationDeprecateButton
+              }
             />
             <ModalWrapper
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.markAsDeprecated,
                 modalTitle: t.verification.markAsDeprecated,
@@ -311,7 +353,7 @@ export const ConventionManageActions = ({
                 convention,
                 disabled,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("deprecated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -331,7 +373,7 @@ export const ConventionManageActions = ({
                   id={domElementIds.manageConvention.edit.actionsButton}
                 />
                 <ModalWrapper
-                  {...getVerificationActionButtonProps({
+                  {...getVerificationActionProps({
                     initialStatus: convention.status,
                     children: t.verification.modifyConventionOtherInformations,
                     modalTitle: t.verification.modifyConvention,
@@ -339,14 +381,12 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
 
                 <ModalWrapper
-                  {...getVerificationActionButtonProps({
+                  {...getVerificationActionProps({
                     initialStatus: convention.status,
                     children: t.verification.modifyConventionAgency,
                     modalTitle: t.verification.modifyConventionAgencyTitle,
@@ -354,9 +394,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "transfer-convention-to-agency",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
               </>
@@ -364,7 +402,7 @@ export const ConventionManageActions = ({
             {navItems.length === 1 && (
               <>
                 <Button
-                  {...getVerificationActionButtonProps({
+                  {...getVerificationActionProps({
                     initialStatus: convention.status,
                     children: t.verification.modifyConvention,
                     modalTitle: t.verification.modifyConvention,
@@ -372,14 +410,17 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).buttonProps}
+                  iconId="fr-icon-edit-line"
+                  id={
+                    domElementIds.manageConvention
+                      .conventionValidationRequestEditButton
+                  }
                 />
 
                 <ModalWrapper
-                  {...getVerificationActionButtonProps({
+                  {...getVerificationActionProps({
                     initialStatus: convention.status,
                     children: t.verification.modifyConventionOtherInformations,
                     modalTitle: t.verification.modifyConvention,
@@ -387,9 +428,7 @@ export const ConventionManageActions = ({
                     convention,
                     disabled,
                     currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind(
-                      "modificationAskedFromCounsellorOrValidator",
-                    ),
+                    onSubmit: createOnSubmitWithFeedbackKind,
                   }).modalWrapperProps}
                 />
               </>
@@ -404,7 +443,7 @@ export const ConventionManageActions = ({
         ) && (
           <>
             <Button
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children:
                   convention.status === "ACCEPTED_BY_COUNSELLOR"
@@ -418,11 +457,16 @@ export const ConventionManageActions = ({
                 disabled: disabled || convention.status !== "IN_REVIEW",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
+              iconId="fr-icon-checkbox-circle-line"
+              id={
+                domElementIds.manageConvention
+                  .conventionValidationValidateButton
+              }
             />
             <ModalWrapper
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children:
                   convention.status === "ACCEPTED_BY_COUNSELLOR"
@@ -436,7 +480,7 @@ export const ConventionManageActions = ({
                 disabled: disabled || convention.status !== "IN_REVIEW",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsEligible"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -449,7 +493,7 @@ export const ConventionManageActions = ({
         ) && (
           <>
             <Button
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children:
                   convention.status === "ACCEPTED_BY_VALIDATOR"
@@ -462,7 +506,7 @@ export const ConventionManageActions = ({
                 verificationAction: "ACCEPT_VALIDATOR",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
                 onCloseValidatorModalWithoutValidatorInfo:
                   setValidatorWarningMessage,
                 disabled:
@@ -470,9 +514,14 @@ export const ConventionManageActions = ({
                   (convention.status !== "IN_REVIEW" &&
                     convention.status !== "ACCEPTED_BY_COUNSELLOR"),
               }).buttonProps}
+              iconId="fr-icon-checkbox-circle-line"
+              id={
+                domElementIds.manageConvention
+                  .conventionValidationValidateButton
+              }
             />
             <ModalWrapper
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children:
                   convention.status === "ACCEPTED_BY_VALIDATOR"
@@ -485,7 +534,7 @@ export const ConventionManageActions = ({
                 verificationAction: "ACCEPT_VALIDATOR",
                 convention,
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("markedAsValidated"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
           </>
@@ -494,7 +543,7 @@ export const ConventionManageActions = ({
         {isAllowedConventionTransition(convention, "CANCELLED", roles) && (
           <>
             <Button
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.markAsCancelled,
                 modalTitle: t.verification.markAsCancelled,
@@ -504,11 +553,15 @@ export const ConventionManageActions = ({
                   disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
 
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).buttonProps}
+              iconId="fr-icon-close-circle-line"
+              id={
+                domElementIds.manageConvention.conventionValidationCancelButton
+              }
             />
             <ModalWrapper
-              {...getVerificationActionButtonProps({
+              {...getVerificationActionProps({
                 initialStatus: convention.status,
                 children: t.verification.markAsCancelled,
                 modalTitle: t.verification.markAsCancelled,
@@ -518,7 +571,7 @@ export const ConventionManageActions = ({
                   disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
 
                 currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind("cancelled"),
+                onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
             <Button
@@ -551,16 +604,34 @@ export const ConventionManageActions = ({
             allowedRoles: ["counsellor", "validator"],
             candidateRoles: roles,
           }) && (
-            <Button
-              iconId="fr-icon-file-add-line"
-              className={fr.cx("fr-m-1w")}
-              priority="secondary"
-              disabled={feedback.kind === "renewed"}
-              onClick={() => renewModal.open()}
-              id={domElementIds.manageConvention.openRenewModalButton}
-            >
-              Renouveler la convention
-            </Button>
+            <>
+              <Button
+                {...getVerificationActionProps({
+                  initialStatus: convention.status,
+                  children: "Renouveler la convention",
+                  modalTitle: "Renouvellement de convention",
+                  verificationAction: "RENEW",
+                  convention,
+                  disabled: renewFeedback?.level === "success",
+                  currentSignatoryRoles: requesterRoles,
+                  onSubmit: createOnSubmitWithFeedbackKind,
+                }).buttonProps}
+                iconId="fr-icon-file-add-line"
+                id={domElementIds.manageConvention.openRenewModalButton}
+              />
+              <ModalWrapper
+                {...getVerificationActionProps({
+                  initialStatus: convention.status,
+                  children: "Renouveler la convention",
+                  modalTitle: "Renouvellement de convention",
+                  verificationAction: "RENEW",
+                  convention,
+                  disabled: renewFeedback?.level === "success",
+                  currentSignatoryRoles: requesterRoles,
+                  onSubmit: createOnSubmitWithFeedbackKind,
+                }).modalWrapperProps}
+              />
+            </>
           )}
         {shouldShowSignatureAction && (
           <SignButton
@@ -568,9 +639,10 @@ export const ConventionManageActions = ({
             className={fr.cx("fr-m-1w")}
             onConfirmClick={() => {
               dispatch(
-                conventionSlice.actions.signConventionRequested({
+                conventionActionSlice.actions.signConventionRequested({
                   jwt: jwtParams.jwt,
                   conventionId: convention.id,
+                  feedbackTopic: "convention-action-sign",
                 }),
               );
             }}
@@ -582,16 +654,6 @@ export const ConventionManageActions = ({
             }
           />
         )}
-        {feedback.kind !== "renewed" &&
-          createPortal(
-            <renewModal.Component title="Renouvellement de convention">
-              <RenewConventionForm
-                convention={convention}
-                jwt={jwtParams.jwt}
-              />
-            </renewModal.Component>,
-            document.body,
-          )}
 
         {currentUser &&
           userHasEnoughRightsOnConvention(currentUser, convention, [
@@ -600,96 +662,5 @@ export const ConventionManageActions = ({
           ]) && <BroadcastAgainButton conventionId={convention.id} />}
       </div>
     </div>
-  );
-};
-type RenewConventionParamsInForm = RenewConventionParams &
-  Pick<ConventionReadDto, "internshipKind" | "signatories">;
-
-export const RenewConventionForm = ({
-  convention,
-  jwt,
-}: {
-  convention: ConventionReadDto;
-  jwt: ConventionSupportedJwt;
-}) => {
-  const dispatch = useDispatch();
-  const renewedDefaultDateStart = addBusinessDays(
-    new Date(convention.dateEnd),
-    1,
-  );
-  const defaultDateInterval: DateIntervalDto = {
-    start: renewedDefaultDateStart,
-    end: addDays(new Date(convention.dateEnd), convention.schedule.workedDays),
-  };
-  const defaultValues = {
-    id: uuidV4(),
-    dateStart: defaultDateInterval.start.toISOString(),
-    dateEnd: defaultDateInterval.end.toISOString(),
-    schedule: reasonableSchedule(defaultDateInterval),
-    internshipKind: convention.internshipKind,
-    renewed: {
-      from: convention.id,
-      justification: "",
-    },
-    signatories: convention.signatories,
-  };
-  const methods = useForm<RenewConventionParamsInForm>({
-    defaultValues,
-    resolver: zodResolver(renewConventionParamsSchema),
-    mode: "onTouched",
-  });
-  const { errors, submitCount } = methods.formState;
-  const getFieldError = makeFieldError(methods.formState);
-
-  const conventionValues = methods.getValues();
-
-  const { getFormErrors } = getFormContents(
-    formConventionFieldsLabels(conventionValues.internshipKind),
-  );
-  const onSubmit = (data: RenewConventionParams) => {
-    dispatch(
-      conventionSlice.actions.renewConventionRequested({
-        params: data,
-        jwt,
-      }),
-    );
-    renewModal.close();
-  };
-  return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        id="im-convention-renew-form"
-      >
-        <Input
-          label="Id de la convention renouvelée"
-          hintText={
-            "Il n'est pas modificable, mais vous pouvez le copier pour le garder de côté"
-          }
-          nativeInputProps={{
-            ...methods.register("id"),
-            readOnly: true,
-            defaultValue: defaultValues.id,
-          }}
-        />
-        <ScheduleSection />
-        <Input
-          label="Motif de renouvellement *"
-          textArea
-          nativeTextAreaProps={methods.register("renewed.justification")}
-          {...getFieldError("renewed.justification")}
-        />
-        <ErrorNotifications
-          errorsWithLabels={toErrorsWithLabels({
-            labels: getFormErrors(),
-            errors: displayReadableError(errors),
-          })}
-          visible={submitCount !== 0 && Object.values(errors).length > 0}
-        />
-        <Button id={domElementIds.manageConvention.submitRenewModalButton}>
-          Renouveler la convention
-        </Button>
-      </form>
-    </FormProvider>
   );
 };
