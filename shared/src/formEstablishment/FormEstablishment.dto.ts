@@ -32,6 +32,11 @@ export type WithJobAndPhone = {
   phone: Phone;
 };
 
+export type WithFirstNameAndLastName = {
+  firstName: string;
+  lastName: string;
+};
+
 export type AdminFormEstablishmentUserRight =
   GenericFormEstablishmentUserRight<"establishment-admin"> & WithJobAndPhone;
 

@@ -2,6 +2,7 @@ import {
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
   type ContactFormEstablishmentUserRight,
+  type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
@@ -11,16 +12,22 @@ import {
   defaultAddress,
   errors,
   expectObjectInArrayToMatch,
+  expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   updatedAddress1,
   updatedAddress2,
 } from "shared";
 import {
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import {
   InMemoryAddressGateway,
   rueGuillaumeTellDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -64,6 +71,7 @@ describe("Update Establishment aggregate from form data", () => {
         uuidGenerator,
         timeGateway,
         makeCreateNewEvent({ timeGateway, uuidGenerator }),
+        makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
       );
   });
 
@@ -386,6 +394,7 @@ describe("Update Establishment aggregate from form data", () => {
   });
 
   describe("Behavior of EditFormEstablishment", () => {
+    let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
     const existingFormEstablishment =
       FormEstablishmentDtoBuilder.valid().build();
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.fullyUpdated()
@@ -540,6 +549,11 @@ describe("Update Establishment aggregate from form data", () => {
         newAdminRight.userId,
         newContactRight.userId,
       ]);
+
+      expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+        uow.notificationRepository,
+        uow.outboxRepository,
+      );
     });
 
     describe("Wrong paths", () => {
@@ -647,6 +661,168 @@ describe("Update Establishment aggregate from form data", () => {
           uow.establishmentAggregateRepository.establishmentAggregates,
           [updatedEstablishmentAggregate],
         );
+      });
+      it("sends a notification to added and updated user & update formEstablishment and userRights on repository with a IC payload with user with establishment-admin rights", async () => {
+        uow.userRepository.users = [inclusionConnectedUser];
+        uuidGenerator.setNextUuids([
+          "next-user-1",
+          "notification-id-1",
+          "event-id-1",
+          "notification-id-2",
+          "event-id-2",
+        ]);
+        const newAdminEmail = "new.admin@gmail.com";
+        const newAdminRight: EstablishmentAdminRight = {
+          role: "establishment-admin",
+          job: "new job",
+          phone: "+33612345679",
+          userId: "next-user-1",
+        };
+        const updatedFormEstablishmentWithUserRights: FormEstablishmentDto = {
+          ...updatedFormEstablishment,
+          userRights: [
+            {
+              role: "establishment-contact",
+              email: inclusionConnectedUser.email,
+            },
+            {
+              role: newAdminRight.role,
+              email: newAdminEmail,
+              job: newAdminRight.job,
+              phone: newAdminRight.phone,
+            },
+          ],
+        };
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          { formEstablishment: updatedFormEstablishmentWithUserRights },
+          {
+            userId: inclusionConnectedUser.id,
+          },
+        );
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            {
+              ...updatedEstablishmentAggregate,
+              userRights: [
+                {
+                  userId: inclusionConnectedUser.id,
+                  role: "establishment-contact",
+                },
+                newAdminRight,
+              ],
+            },
+          ],
+        );
+
+        expectObjectsToMatch(uow.userRepository.users, [
+          inclusionConnectedUser,
+          {
+            id: newAdminRight.userId,
+            email: newAdminEmail,
+            firstName: "",
+            lastName: "",
+            createdAt: now.toISOString(),
+            externalId: null,
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "ESTABLISHMENT_USER_RIGHTS_ADDED",
+              params: {
+                businessName:
+                  updatedFormEstablishmentWithUserRights.businessNameCustomized ??
+                  updatedFormEstablishmentWithUserRights.businessName,
+                firstName: "",
+                lastName: "", // User is not connected at this moment, can't have firstname / lastname
+                triggeredByUserFirstName: icBackofficeAdminUser.firstName,
+                triggeredByUserLastName: icBackofficeAdminUser.lastName,
+                role: "establishment-admin",
+              },
+              recipients: [newAdminEmail],
+            },
+            {
+              kind: "ESTABLISHMENT_USER_RIGHTS_UPDATED",
+              params: {
+                businessName:
+                  updatedFormEstablishmentWithUserRights.businessNameCustomized ??
+                  updatedFormEstablishmentWithUserRights.businessName,
+                firstName: inclusionConnectedUser.firstName,
+                lastName: inclusionConnectedUser.lastName,
+                triggeredByUserFirstName: icBackofficeAdminUser.firstName,
+                triggeredByUserLastName: icBackofficeAdminUser.lastName,
+                updatedRole: "establishment-contact",
+              },
+              recipients: [inclusionConnectedUser.email],
+            },
+          ],
+        });
+      });
+      it("doesn't send any notification if userRight is not updated or deleted with a IC payload with user with establishment-admin rights", async () => {
+        const establishmentContactUser = new UserBuilder()
+          .withId("establishment-contact-user")
+          .withEmail("establishment-contact@gmail.com")
+          .build();
+        uow.userRepository.users = [
+          inclusionConnectedUser,
+          establishmentContactUser,
+        ];
+
+        const existingEstablishmentAdminRight: EstablishmentAdminRight = {
+          userId: inclusionConnectedUser.id,
+          role: "establishment-admin",
+          job: "new job",
+          phone: "+33612345679",
+        };
+
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          {
+            ...existingEstablishmentAggregate,
+            userRights: [
+              existingEstablishmentAdminRight,
+              {
+                userId: establishmentContactUser.id,
+                role: "establishment-contact",
+              },
+            ],
+          },
+        ];
+
+        const updatedFormEstablishmentWithUserRights: FormEstablishmentDto = {
+          ...updatedFormEstablishment,
+          userRights: [
+            {
+              role: existingEstablishmentAdminRight.role,
+              email: inclusionConnectedUser.email,
+              job: existingEstablishmentAdminRight.job,
+              phone: existingEstablishmentAdminRight.phone,
+            },
+          ],
+        };
+
+        await updateEstablishmentAggregateFromFormUseCase.execute(
+          { formEstablishment: updatedFormEstablishmentWithUserRights },
+          {
+            userId: establishmentContactUser.id,
+          },
+        );
+
+        expectToEqual(
+          uow.establishmentAggregateRepository.establishmentAggregates,
+          [
+            {
+              ...updatedEstablishmentAggregate,
+              userRights: [existingEstablishmentAdminRight],
+            },
+          ],
+        );
+
+        expectSavedNotificationsAndEvents({
+          emails: [],
+        });
       });
     });
   });

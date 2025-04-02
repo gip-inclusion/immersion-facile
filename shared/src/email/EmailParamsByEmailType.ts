@@ -10,6 +10,7 @@ import type {
   Renewed,
 } from "../convention/convention.dto";
 import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type { DateString } from "../utils/date";
@@ -285,6 +286,22 @@ export type EmailParamsByEmailType = {
     businessName: string;
     registerEstablishmentShortLink: string;
     unsubscribeToEmailShortLink: string;
+  };
+  ESTABLISHMENT_USER_RIGHTS_UPDATED: {
+    businessName: string;
+    firstName: string;
+    lastName: string;
+    triggeredByUserFirstName: string;
+    triggeredByUserLastName: string;
+    updatedRole: EstablishmentRole;
+  };
+  ESTABLISHMENT_USER_RIGHTS_ADDED: {
+    businessName: string;
+    firstName: string;
+    lastName: string;
+    triggeredByUserFirstName: string;
+    triggeredByUserLastName: string;
+    role: EstablishmentRole;
   };
   FULL_PREVIEW_EMAIL: {
     agencyLogoUrl: AbsoluteUrl | undefined;

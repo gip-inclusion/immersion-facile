@@ -693,4 +693,20 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
     validatorName: "VALIDATOR_NAME",
   },
+  ESTABLISHMENT_USER_RIGHTS_UPDATED: {
+    businessName: "BUSINESS_NAME",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+    triggeredByUserFirstName: "ADMIN_FIRST_NAME",
+    triggeredByUserLastName: "ADMIN_LAST_NAME",
+    updatedRole: "establishment-contact",
+  },
+  ESTABLISHMENT_USER_RIGHTS_ADDED: {
+    businessName: "BUSINESS_NAME",
+    firstName: "FIRST_NAME",
+    lastName: "LAST_NAME",
+    triggeredByUserFirstName: "ADMIN_FIRST_NAME",
+    triggeredByUserLastName: "ADMIN_LAST_NAME",
+    role: "establishment-admin",
+  },
 };
