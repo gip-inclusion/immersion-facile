@@ -48,7 +48,7 @@ export const EstablishmentDashboardPage = ({
       tabId: "conventions",
       content: (
         <>
-          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionInclusionConnected" />
+          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
           {conventions ? (
             <MetabaseView
               title={`Tableau des conventions en cours

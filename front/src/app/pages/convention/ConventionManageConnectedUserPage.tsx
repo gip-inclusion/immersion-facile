@@ -10,7 +10,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Route } from "type-route";
 
 type ConventionManageConnectedUserPageProps = {
-  route: Route<typeof routes.manageConventionInclusionConnected>;
+  route: Route<typeof routes.manageConventionConnectedUser>;
 };
 
 export const ConventionManageConnectedUserPage = ({
