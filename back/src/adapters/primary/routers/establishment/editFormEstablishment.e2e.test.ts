@@ -152,7 +152,7 @@ describe("Edit form establishments", () => {
         status: 200,
       },
     );
-    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(4);
 
     expectEstablishmentInRepoUpdated(
       inMemoryUow,
@@ -202,7 +202,7 @@ describe("Edit form establishments", () => {
         status: 200,
       },
     );
-    expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+    expect(inMemoryUow.outboxRepository.events).toHaveLength(4);
     expectEstablishmentInRepoUpdated(
       inMemoryUow,
       gateways.timeGateway,
@@ -327,7 +327,7 @@ function expectEstablishmentInRepoUpdated(
   existingEstablishment: EstablishmentAggregate,
   formEstablishment: FormEstablishmentDto,
 ) {
-  expect(inMemoryUow.outboxRepository.events).toHaveLength(1);
+  expect(inMemoryUow.outboxRepository.events).toHaveLength(4);
 
   expect(
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates,
