@@ -47,7 +47,7 @@ export const statusTransitionConfigs: Record<
       isError:
         conventionRead.status === "IN_REVIEW" &&
         conventionRead.agencyCounsellorEmails.length > 0,
-      errorMessage: `Cannot go to status 'ACCEPTED_BY_VALIDATOR' for convention '${conventionRead.id}'. Convention should be reviewed by counsellor`,
+      errorMessage: `Vous ne pouvez pas valider la convention: '${conventionRead.id}', elle doit d'abord être revue et marquée comme éligible par un conseiller.`,
     }),
   },
 
