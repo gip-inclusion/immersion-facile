@@ -212,7 +212,9 @@ export const AgencyUsers = ({
       <h5 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h5>
       <UsersWithoutNameHint />
       <Feedback
-        topic={isLocationAdmin ? "agency-user" : "agency-user-for-dashboard"}
+        topics={
+          isLocationAdmin ? ["agency-user"] : ["agency-user-for-dashboard"]
+        }
       />
       <Button
         iconId="fr-icon-file-add-line"

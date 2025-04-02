@@ -50,7 +50,7 @@ export const AgencyOverview = ({
           messageByKind={agencyAdminSubmitMessageByKind}
         />
       ) : (
-        <Feedback topic="agency-for-dashboard" />
+        <Feedback topics={["agency-for-dashboard"]} />
       )}
       {agency && (
         <>

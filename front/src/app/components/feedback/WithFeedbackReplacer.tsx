@@ -42,6 +42,6 @@ export const WithFeedbackReplacer = ({
       message: feedback.message,
     })
   ) : (
-    <Feedback topic={topic} />
+    <Feedback topics={[topic]} />
   );
 };

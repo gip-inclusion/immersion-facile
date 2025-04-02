@@ -297,7 +297,7 @@ export const AddEstablishmentsByBatch = () => {
               </Button>
             </div>
             <Feedback
-              topic="establishments-batch"
+              topics={["establishments-batch"]}
               render={({ level }) => (
                 <Alert
                   severity={level}

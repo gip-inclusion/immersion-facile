@@ -6,10 +6,11 @@ import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.sele
 import type {
   FeedbackLevel,
   FeedbackTopic,
+  Feedback as FeedbackType,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 type FeedbackProps = {
-  topic: FeedbackTopic;
+  topics: FeedbackTopic[];
   render?: (props: {
     level: FeedbackLevel;
     title?: string;
@@ -20,39 +21,65 @@ type FeedbackProps = {
   className?: string;
 };
 
+type ValidFeedback = {
+  topic: FeedbackTopic;
+  feedback: FeedbackType;
+};
+
 export const Feedback = ({
-  topic,
+  topics = [],
   render,
   closable,
   className,
 }: FeedbackProps) => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  const feedback = feedbacks[topic];
-  if (!feedback) return null;
+
+  const relevantFeedbacks: ValidFeedback[] = topics
+    .map((t) => ({ topic: t, feedback: feedbacks[t] }))
+    .filter((item): item is ValidFeedback => !!item.feedback);
+
+  if (relevantFeedbacks.length === 0) return null;
+
   if (render) {
-    return render({
-      level: feedback.level,
-      title: feedback.title,
-      message: feedback.message,
-    });
+    return (
+      <>
+        {relevantFeedbacks.map(({ topic, feedback }) => (
+          <div key={topic}>
+            {render({
+              level: feedback.level,
+              title: feedback.title,
+              message: feedback.message,
+            })}
+          </div>
+        ))}
+      </>
+    );
   }
 
-  return closable === true ? (
-    <Alert
-      severity={feedback.level}
-      title={feedback.title}
-      description={feedback.message}
-      small
-      closable={closable}
-      className={className}
-    />
-  ) : (
-    <Alert
-      severity={feedback.level}
-      title={feedback.title}
-      description={feedback.message}
-      small
-      className={className}
-    />
+  return (
+    <>
+      {relevantFeedbacks.map(({ topic, feedback }) =>
+        closable === true ? (
+          <Alert
+            key={topic}
+            severity={feedback.level}
+            title={feedback.title}
+            description={feedback.message}
+            small
+            closable={closable}
+            className={className}
+          />
+        ) : (
+          <Alert
+            key={topic}
+            severity={feedback.level}
+            title={feedback.title}
+            description={feedback.message}
+            small
+            className={className}
+          />
+        ),
+      )}
+    </>
   );
 };
