@@ -42,7 +42,7 @@ export const notificationErroredSchema: z.Schema<NotificationErrored> =
 
 const notificationStateSchema: z.Schema<NotificationState> = z
   .object({
-    status: z.enum(["to-be-sent", "accepted"]),
+    status: z.enum(["to-be-send", "accepted"]),
     occurredAt: dateTimeIsoStringSchema,
   })
   .or(notificationErroredSchema);

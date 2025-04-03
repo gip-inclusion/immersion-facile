@@ -33,7 +33,7 @@ export type FollowedIds = {
 
 export type NotificationState =
   | {
-      status: "to-be-sent" | "accepted";
+      status: "to-be-send" | "accepted";
       occurredAt: DateTimeIsoString;
     }
   | NotificationErrored;

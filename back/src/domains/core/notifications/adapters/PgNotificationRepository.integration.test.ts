@@ -6,10 +6,12 @@ import {
   type EmailNotification,
   type Notification,
   type NotificationErrored,
+  type NotificationState,
   type SmsNotification,
   type TemplatedEmail,
   type TemplatedSms,
   expectArraysToEqual,
+  expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import {
@@ -129,6 +131,18 @@ const emailNotificationsReOrderedByDate = [
 
 const maxRetrievedNotifications = 2;
 
+const withToBeSendState: { state: NotificationState } = {
+  state: {
+    status: "to-be-send",
+    occurredAt: expect.any(String),
+  },
+};
+
+const addWithToBeSentState = <T extends Notification>(notification: T): T => ({
+  ...notification,
+  ...withToBeSendState,
+});
+
 describe("PgNotificationRepository", () => {
   let pool: Pool;
   let db: KyselyDb;
@@ -163,7 +177,7 @@ describe("PgNotificationRepository", () => {
         smsNotificationId,
         "sms",
       );
-      expect(response).toEqual(smsNotification);
+      expectToEqual(response, { ...smsNotification, ...withToBeSendState });
     });
 
     it("saves Email notification in a dedicated table, then gets it", async () => {
@@ -182,7 +196,7 @@ describe("PgNotificationRepository", () => {
         id,
         "email",
       );
-      expect(response).toEqual(emailNotification);
+      expectToEqual(response, { ...emailNotification, ...withToBeSendState });
     });
 
     it("save and eliminates duplicates when they exit", async () => {
@@ -203,13 +217,14 @@ describe("PgNotificationRepository", () => {
         id,
         "email",
       );
-      expect(response).toEqual({
+      expectObjectsToMatch(response, {
         ...emailNotification,
         templatedContent: {
           ...emailNotification.templatedContent,
           recipients: ["bob@mail.com", "jane@mail.com"],
           cc: ["copy@mail.com"],
         },
+        ...withToBeSendState,
       });
     });
 
@@ -229,13 +244,14 @@ describe("PgNotificationRepository", () => {
         id,
         "email",
       );
-      expect(response).toEqual({
+      expectToEqual(response, {
         ...emailNotification,
         templatedContent: {
           ...emailNotification.templatedContent,
           recipients: ["bob@mail.com"],
           cc: [],
         },
+        ...withToBeSendState,
       });
     });
   });
@@ -250,14 +266,16 @@ describe("PgNotificationRepository", () => {
       const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
-        emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
+        emailNotificationsReOrderedByDate
+          .slice(0, maxRetrievedNotifications)
+          .map(addWithToBeSentState),
       );
 
       const smsResponse = await pgNotificationRepository.getByIdAndKind(
         smsNotificationId,
         "sms",
       );
-      expect(smsResponse).toEqual(smsNotification);
+      expectToEqual(smsResponse, { ...smsNotification, ...withToBeSendState });
     });
 
     it("saves a batch of notifications sms only", async () => {
@@ -270,7 +288,7 @@ describe("PgNotificationRepository", () => {
         smsNotificationId,
         "sms",
       );
-      expect(smsResponse).toEqual(smsNotification);
+      expectToEqual(smsResponse, { ...smsNotification, ...withToBeSendState });
     });
   });
 
@@ -329,7 +347,9 @@ describe("PgNotificationRepository", () => {
       const response = await pgNotificationRepository.getLastEmailsByFilters();
       expectToEqual(
         response,
-        emailNotificationsReOrderedByDate.slice(0, maxRetrievedNotifications),
+        emailNotificationsReOrderedByDate
+          .slice(0, maxRetrievedNotifications)
+          .map(addWithToBeSentState),
       );
     });
 
@@ -340,7 +360,9 @@ describe("PgNotificationRepository", () => {
           email: emailNotification.templatedContent.recipients[0],
           emailType: emailNotification.templatedContent.kind,
         });
-        expectToEqual(response, [emailNotification]);
+        expectToEqual(response, [
+          { ...emailNotification, ...withToBeSendState },
+        ]);
       });
 
       it("returns matching email when all filters match", async () => {
@@ -379,7 +401,9 @@ describe("PgNotificationRepository", () => {
           conventionId: emailNotification.followedIds.conventionId,
         });
 
-        expectToEqual(response, [emailNotification]);
+        expectToEqual(response, [
+          { ...emailNotification, ...withToBeSendState },
+        ]);
       });
 
       it("returns empty array when no match found", async () => {
@@ -406,7 +430,10 @@ describe("PgNotificationRepository", () => {
         emailNotifications[0].id,
         emailNotifications[1].id,
       ]);
-      expectToEqual(response, [emailNotifications[0], emailNotifications[1]]);
+      expectToEqual(response, [
+        { ...emailNotifications[0], ...withToBeSendState },
+        { ...emailNotifications[1], ...withToBeSendState },
+      ]);
     });
   });
 
@@ -421,7 +448,7 @@ describe("PgNotificationRepository", () => {
       const response = await pgNotificationRepository.getSmsByIds([
         smsNotification.id,
       ]);
-      expectToEqual(response, [smsNotification]);
+      expectToEqual(response, [{ ...smsNotification, ...withToBeSendState }]);
     });
   });
 
@@ -450,11 +477,10 @@ describe("PgNotificationRepository", () => {
       const notifications =
         await pgNotificationRepository.getLastNotifications();
       expectToEqual(notifications, {
-        emails: emailNotificationsReOrderedByDate.slice(
-          0,
-          maxRetrievedNotifications,
-        ),
-        sms: smsNotifications,
+        emails: emailNotificationsReOrderedByDate
+          .slice(0, maxRetrievedNotifications)
+          .map(addWithToBeSentState),
+        sms: smsNotifications.map(addWithToBeSentState),
       });
     });
   });
@@ -511,7 +537,7 @@ describe("PgNotificationRepository", () => {
               ],
             },
           },
-        ],
+        ].map(addWithToBeSentState),
       });
     });
   });
@@ -560,7 +586,7 @@ describe("PgNotificationRepository", () => {
           smsKind,
           recipientPhoneNumber: recipientPhone,
         }),
-        lastSmsNotification,
+        { ...lastSmsNotification, ...withToBeSendState },
       );
     });
 
@@ -594,36 +620,15 @@ const createTemplatedEmailAndNotification = ({
   id?: string;
 }) => {
   const email: TemplatedEmail = {
-    kind: "AGENCY_WAS_ACTIVATED",
+    kind: "AGENCY_WAS_REJECTED",
     recipients,
     sender,
     cc,
     params: {
       agencyName: "My agency",
-      agencyLogoUrl: "https://my-logo.com",
-      refersToOtherAgency: false,
-      agencyReferdToName: undefined,
-      users: [
-        {
-          firstName: "Jean",
-          lastName: "Dupont",
-          email: "jean-dupont@gmail.com",
-          agencyName: "Agence du Grand Est",
-          isNotifiedByEmail: true,
-          roles: ["validator"],
-        },
-
-        {
-          firstName: "Jeanne",
-          lastName: "Dupont",
-          email: "jeanne-dupont@gmail.com",
-          agencyName: "Agence du Grand Est",
-          isNotifiedByEmail: true,
-          roles: ["counsellor"],
-        },
-      ],
+      rejectionJustification: "Justification",
     },
-    attachments,
+    ...(attachments ? { attachments } : {}),
   };
 
   const emailNotification: Notification = {
