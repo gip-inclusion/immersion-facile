@@ -67,7 +67,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
       };
     }
     this.#pushEmail(templatedEmail);
-    return { isOk: true };
+    return { isOk: true, messageIds: templatedEmail.recipients };
   }
 
   public async sendSms(sms: TemplatedSms): Promise<SendNotificationResult> {
@@ -92,7 +92,7 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     }
 
     this.#sentSms.push(sms);
-    return { isOk: true };
+    return { isOk: true, messageIds: [sms.recipientPhone] };
   }
 
   #pushEmail(templatedEmail: TemplatedEmail) {

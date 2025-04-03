@@ -1,3 +1,4 @@
+import { expectToEqual } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
@@ -24,7 +25,7 @@ describe("BrevoNotificationGateway manual", () => {
   });
 
   it("should send email correctly", async () => {
-    await notificationGateway.sendEmail({
+    const result = await notificationGateway.sendEmail({
       kind: "TEST_EMAIL",
       recipients: ["____TO____"], // Modify for testing
       sender: {
@@ -38,18 +39,28 @@ describe("BrevoNotificationGateway manual", () => {
       },
     });
 
+    expectToEqual(result, {
+      isOk: true,
+      messageIds: [expect.any(String)],
+    });
+
     // Please check emails has been received at recette@immersion-facile.beta.gouv.fr
     expect("reached").toBe("reached");
   });
 
   it("should send SMS correctly", async () => {
-    await notificationGateway.sendSms({
+    const result = await notificationGateway.sendSms({
       recipientPhone: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
       kind: "LastReminderForSignatories",
       params: {
         shortLink:
           "https://immersion-facile.beta.gouv.fr/api/to/gygr669PTEQBiTwfNycBl9nq8Pua3h5D9pv2",
       },
+    });
+
+    expectToEqual(result, {
+      isOk: true,
+      messageIds: [expect.anything()],
     });
 
     // Please check SMS has been received at VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER

@@ -41,22 +41,18 @@ export const sendTransactEmailRequestBodySchema: z.Schema<SendTransactEmailReque
     attachment: z.array(emailAttachmentSchema).optional(),
   });
 
-type SendTransactEmailResponseBody =
-  | {
-      messageId: string;
-    }
-  | {
-      messageIds: string[];
-    };
+export type SendTransactEmailResponseBody =
+  | { messageId: string | number }
+  | { messageIds: (string | number)[] };
 
 export const sendTransactEmailResponseSchema: z.Schema<SendTransactEmailResponseBody> =
   z
     .object({
-      messageId: z.string(),
+      messageId: z.string().or(z.number()),
     })
     .or(
       z.object({
-        messageIds: z.array(z.string()),
+        messageIds: z.array(z.string().or(z.number())),
       }),
     );
 
