@@ -53,13 +53,19 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const showTransferModal = verificationAction === "TRANSFER";
   const showRenewModal =
     verificationAction === "RENEW" && renewFeedback?.level !== "success";
-  const showJustificationModal = doesStatusNeedsJustification(
-    newStatusByVerificationAction[verificationAction],
-  );
-  const showValidatorModal = doesStatusNeedsValidators(
-    initialStatus,
-    newStatusByVerificationAction[verificationAction],
-  );
+  const showJustificationModal =
+    verificationAction !== "TRANSFER" &&
+    verificationAction !== "RENEW" &&
+    doesStatusNeedsJustification(
+      newStatusByVerificationAction[verificationAction],
+    );
+  const showValidatorModal =
+    verificationAction !== "TRANSFER" &&
+    verificationAction !== "RENEW" &&
+    doesStatusNeedsValidators(
+      initialStatus,
+      newStatusByVerificationAction[verificationAction],
+    );
 
   if (
     !showTransferModal &&
@@ -87,7 +93,10 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           showJustificationModal,
           showValidatorModal,
           showRenewModal,
-          newStatus: newStatusByVerificationAction[verificationAction],
+          newStatus:
+            verificationAction === "TRANSFER" || verificationAction === "RENEW"
+              ? null
+              : newStatusByVerificationAction[verificationAction],
         })
           .with(
             {
