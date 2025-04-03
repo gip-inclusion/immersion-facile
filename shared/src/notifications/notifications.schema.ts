@@ -48,7 +48,7 @@ const notificationStateSchema: z.Schema<NotificationState> = z.union([
   z.object({
     status: z.literal("accepted"),
     occurredAt: dateTimeIsoStringSchema,
-    // messageIds: z.array(z.string()),
+    messageIds: z.array(z.string().or(z.number())),
   }),
   notificationErroredSchema,
 ]);

@@ -15,6 +15,11 @@ import {
 export type BrevoNotificationGatewayRoutes =
   typeof brevoNotificationGatewayRoutes;
 
+const brevo400ErrorBodySchema = z.object({
+  code: z.string(),
+  message: z.string(),
+});
+
 export const brevoNotificationGatewayRoutes = defineRoutes({
   sendTransactEmail: defineRoute({
     method: "post",
@@ -23,6 +28,7 @@ export const brevoNotificationGatewayRoutes = defineRoutes({
     requestBodySchema: sendTransactEmailRequestBodySchema,
     responses: {
       201: sendTransactEmailResponseSchema,
+      400: brevo400ErrorBodySchema,
     },
   }),
   sendTransactSms: defineRoute({
@@ -32,6 +38,7 @@ export const brevoNotificationGatewayRoutes = defineRoutes({
     requestBodySchema: sendTransactSmsRequestBodySchema,
     responses: {
       201: sendTransactSmsResponseSchema,
+      400: brevo400ErrorBodySchema,
     },
   }),
   getAttachmentContent: defineRoute({

@@ -255,7 +255,8 @@ describe("SendNotification UseCase", () => {
               state: {
                 status: "accepted",
                 occurredAt: now.toISOString(),
-                // messageIds: [],
+                messageIds:
+                  alreadyErroredEmailNotif.templatedContent.recipients,
               },
             },
           ]);

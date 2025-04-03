@@ -39,7 +39,7 @@ export type NotificationState =
   | {
       status: "accepted";
       occurredAt: DateTimeIsoString;
-      // messageIds: string[]; // Brevo messageIds for now
+      messageIds: (string | number)[]; // Brevo messageIds for now
     }
   | NotificationErrored;
 

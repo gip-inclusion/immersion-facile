@@ -5,7 +5,10 @@ import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appCon
 import type { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
-import type { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas";
+import type {
+  SendTransactEmailRequestBody,
+  SendTransactEmailResponseBody,
+} from "./BrevoNotificationGateway.schemas";
 
 const sender = { name: "bob", email: "Machin@mail.com" };
 
@@ -23,11 +26,13 @@ describe("BrevoNotificationGateway unit", () => {
       sentEmails = [];
 
       fakeHttpClient = {
-        sendTransactEmail(email: any): HttpResponse<201, any> {
+        sendTransactEmail(
+          email: any,
+        ): HttpResponse<201, SendTransactEmailResponseBody> {
           sentEmails.push(email);
           return {
             status: 201,
-            body: "success",
+            body: { messageIds: ["some-id"] },
             headers: {},
           };
         },
@@ -331,11 +336,13 @@ describe("BrevoNotificationGateway unit", () => {
       sentEmails = [];
 
       fakeHttpClient = {
-        sendTransactEmail(email: any): HttpResponse<201, any> {
+        sendTransactEmail(
+          email: any,
+        ): HttpResponse<201, SendTransactEmailResponseBody> {
           sentEmails.push(email);
           return {
             status: 201,
-            body: "success",
+            body: { messageId: "some-id" },
             headers: {},
           };
         },
