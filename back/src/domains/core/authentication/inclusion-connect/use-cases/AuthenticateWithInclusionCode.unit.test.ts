@@ -323,7 +323,17 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
 
     describe("wrong paths", () => {
+      const accessToken = "inclusion-access-token";
+      const idToken: IdToken = "inclusion-connect-id-token";
+
       it("rejects the connection if no state match the provided one in DB", async () => {
+        inclusionConnectGateway.setAccessTokenResponse({
+          expire: 60,
+          payload: defaultExpectedIcIdTokenPayload,
+          accessToken,
+          idToken,
+        });
+
         const params: AuthenticateWithOAuthCodeParams = {
           code: "my-inclusion-code",
           state: "my-state",
@@ -346,9 +356,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           nonce: existingNonce,
         };
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
-
-        const accessToken = "inclusion-access-token";
-        const idToken: IdToken = "inclusion-connect-id-token";
 
         inclusionConnectGateway.setAccessTokenResponse({
           expire: 60,
