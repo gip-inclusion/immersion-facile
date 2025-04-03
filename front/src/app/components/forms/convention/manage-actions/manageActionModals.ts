@@ -13,7 +13,7 @@ const {
 } = createModal(createRejectModalParams);
 
 const createDraftModalParams = {
-  id: domElementIds.manageConvention.draftModal,
+  id: domElementIds.manageConvention.edit.requestEditModal,
   isOpenedByDefault: false,
 };
 const {

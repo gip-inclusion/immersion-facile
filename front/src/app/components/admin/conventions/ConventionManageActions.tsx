@@ -236,8 +236,7 @@ export const ConventionManageActions = ({
               onSubmit: createOnSubmitWithFeedbackKind,
             }).buttonProps,
 
-            id: domElementIds.manageConvention
-              .conventionValidationTransferButton,
+            id: domElementIds.manageConvention.edit.transferToAgencyButton,
           },
         ]
       : []),
@@ -252,7 +251,7 @@ export const ConventionManageActions = ({
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
       }).buttonProps,
-      id: domElementIds.manageConvention.conventionValidationRequestEditButton,
+      id: domElementIds.manageConvention.edit.requestEditButton,
     },
   ];
 
@@ -422,10 +421,7 @@ export const ConventionManageActions = ({
                     onSubmit: createOnSubmitWithFeedbackKind,
                   }).buttonProps}
                   iconId="fr-icon-edit-line"
-                  id={
-                    domElementIds.manageConvention
-                      .conventionValidationRequestEditButton
-                  }
+                  id={domElementIds.manageConvention.edit.requestEditButton}
                 />
 
                 <ModalWrapper
