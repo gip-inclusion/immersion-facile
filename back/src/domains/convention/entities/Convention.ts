@@ -158,7 +158,7 @@ export const throwIfNotAllowedForUser = async ({
   jwtPayload: ConventionRelatedJwtPayload;
   uow: UnitOfWork;
   agencyId: AgencyId;
-  convention: ConventionReadDto;
+  convention: ConventionDto;
 }): Promise<void> => {
   if ("role" in jwtPayload) {
     if (jwtPayload.role === "back-office") return;
@@ -183,7 +183,7 @@ export const throwIfNotAllowedForUser = async ({
 
     if (
       !isHashMatchPeAdvisorEmail({
-        convention,
+        beneficiary: convention.signatories.beneficiary,
         emailHash: jwtPayload.emailHash,
       }) &&
       !isSomeEmailMatchingEmailHash(
