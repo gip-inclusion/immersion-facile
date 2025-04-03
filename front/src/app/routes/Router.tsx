@@ -32,7 +32,7 @@ import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
 import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
-import { InclusionConnectedPrivateRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
+import { ConnectedPrivateRoute } from "src/app/routes/ConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import type { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
@@ -158,7 +158,7 @@ const getPageByRouteName: {
     establishmentDashboardTabsList.includes(
       route.params.tab as EstablishmentDashboardTab,
     ) ? (
-      <InclusionConnectedPrivateRoute
+      <ConnectedPrivateRoute
         route={route}
         inclusionConnectConnexionPageHeader={
           <PageHeader
@@ -168,7 +168,7 @@ const getPageByRouteName: {
         }
       >
         <EstablishmentDashboardPage route={route} />
-      </InclusionConnectedPrivateRoute>
+      </ConnectedPrivateRoute>
     ) : (
       <ErrorPage
         error={frontErrors.establishment.notFound({
@@ -195,14 +195,14 @@ const getPageByRouteName: {
   ),
   manageDiscussion: (route) => <DiscussionManagePage route={route} />,
   myProfile: (route) => (
-    <InclusionConnectedPrivateRoute
+    <ConnectedPrivateRoute
       route={route}
       inclusionConnectConnexionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
       }
     >
       <MyProfile route={route} />
-    </InclusionConnectedPrivateRoute>
+    </ConnectedPrivateRoute>
   ),
   myProfileAgencyRegistration: () => <RequestAgencyRegistrationPage />,
   openApiDoc: () => <OpenApiDocPage />,
