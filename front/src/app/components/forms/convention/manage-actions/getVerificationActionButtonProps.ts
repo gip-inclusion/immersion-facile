@@ -40,7 +40,7 @@ const allVerificationActions = [
   "TRANSFER",
   "RENEW",
 ] as const;
-type VerificationAction = (typeof allVerificationActions)[number];
+export type VerificationAction = (typeof allVerificationActions)[number];
 
 export const newStatusByVerificationAction = {
   ACCEPT_COUNSELLOR: "ACCEPTED_BY_COUNSELLOR",
