@@ -38,7 +38,7 @@ import {
 } from "shared";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
-import { useFeedbackEventsCallback } from "src/app/hooks/feedback.hooks";
+import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
@@ -76,8 +76,8 @@ export const DiscussionManageContent = ({
     inclusionConnectedJwt,
   );
   const dispatch = useDispatch();
-  useFeedbackEventsCallback(
-    ["dashboard-discussion-rejection"],
+  useFeedbackEventCallback(
+    "dashboard-discussion-rejection",
     "update.success",
     () => {
       if (inclusionConnectedJwt) {

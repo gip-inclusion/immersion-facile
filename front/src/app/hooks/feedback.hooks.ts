@@ -7,24 +7,19 @@ import type {
   Feedback,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
-export const useFeedbackEventsCallback = (
-  topic: FeedbackTopic[],
+export const useFeedbackEventCallback = (
+  topic: FeedbackTopic,
   event: ActionKindAndLevel,
   callback: () => void,
 ) => {
-  const feedbacks = useFeedbackTopics(topic);
+  const feedback = useFeedbackTopic(topic);
   const memoizedCallback = useCallback(callback, []);
   useEffect(() => {
-    if (!feedbacks) return;
-    if (
-      feedbacks.some(
-        (validFeedback) =>
-          event === `${validFeedback.on}.${validFeedback.level}`,
-      )
-    ) {
+    if (!feedback) return;
+    if (event === `${feedback.on}.${feedback.level}`) {
       memoizedCallback();
     }
-  }, [feedbacks, memoizedCallback, event]);
+  }, [feedback, memoizedCallback, event]);
 };
 
 export const useFeedbackTopics = (topics: FeedbackTopic[]): Feedback[] => {
