@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: discussion_exchanges
+    description: "Discussions enriched with the count of exchanges"
+    columns:
+      - name: id
+        description: "Primary key - UUID of the discussion"
+        tests:
+          - not_null
+          - unique
+      - name: siret
+        description: "SIRET number of the business"
+        tests:
+          - not_null
+      - name: contact_method
+        description: "Method of contact"
+      - name: created_at
+        description: "Timestamp when created"
+      - name: potential_beneficiary_first_name
+        description: "First name of potential beneficiary"
+      - name: potential_beneficiary_last_name
+        description: "Last name of potential beneficiary"
+      - name: potential_beneficiary_email
+        description: "Email of potential beneficiary"
+      - name: potential_beneficiary_phone
+        description: "Phone of potential beneficiary"
+      - name: potential_beneficiary_resume_link
+        description: "Link to beneficiary's resume"
+      - name: potential_beneficiary_has_working_experience
+        description: "Whether beneficiary has working experience"
+      - name: potential_beneficiary_experience_additional_information
+        description: "Additional information about experience"
+      - name: potential_beneficiary_date_preferences
+        description: "Date preferences"
+      - name: establishment_contact_email
+        description: "Email of establishment contact"
+      - name: establishment_contact_first_name
+        description: "First name of establishment contact"
+      - name: establishment_contact_last_name
+        description: "Last name of establishment contact"
+      - name: establishment_contact_phone
+        description: "Phone of establishment contact"
+      - name: establishment_contact_job
+        description: "Job title of establishment contact"
+      - name: establishment_contact_copy_emails
+        description: "CC email addresses"
+      - name: appellation_code
+        description: "Foreign key to public_appellations_data table"
+      - name: immersion_objective
+        description: "Objective of immersion"
+      - name: street_number_and_address
+        description: "Street address"
+      - name: postcode
+        description: "Postal code"
+      - name: department_code
+        description: "Department code"
+      - name: city
+        description: "City"
+      - name: business_name
+        description: "Name of the business"
+      - name: convention_id
+        description: "Foreign key to conventions table"
+      - name: status
+        description: "Current status"
+      - name: rejection_kind
+        description: "Type of rejection if applicable"
+      - name: rejection_reason
+        description: "Reason for rejection if applicable"
+      - name: acquisition_campaign
+        description: "Marketing campaign that led to the discussion"
+      - name: acquisition_keyword
+        description: "Marketing keyword that led to the discussion"
+      - name: number_of_exchanges
+        description: "Count of exchanges in the discussion"
+        tests:
+          - not_null
