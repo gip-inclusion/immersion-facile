@@ -2,16 +2,15 @@ import {
   type AbsoluteUrl,
   type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
-  type OAuthCode,
+  TWELVE_HOURS_IN_SECONDS,
   type User,
-  type WithSourcePage,
+  type UserId,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
   errors,
   frontRoutes,
   queryParamsAsString,
 } from "shared";
-import { notifyTeam } from "../../../../../utils/notifyTeam";
 import {
   type AgencyRightOfUser,
   removeAgencyRightsForUser,
@@ -24,7 +23,6 @@ import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
-import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload, OAuthGateway } from "../port/OAuthGateway";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
@@ -69,229 +67,154 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     { code, page, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
-    const existingOngoingOAuth =
-      await uow.ongoingOAuthRepository.findByStateAndProvider(
-        state,
-        "proConnect",
-      );
-    if (existingOngoingOAuth)
-      return this.#onOngoingOAuth(uow, { code, page }, existingOngoingOAuth);
-    throw errors.inclusionConnect.missingOAuth({
-      state,
-      identityProvider: "proConnect",
-    });
-  }
-
-  async #onOngoingOAuth(
-    uow: UnitOfWork,
-    { code, page }: WithSourcePage & { code: OAuthCode },
-    existingOngoingOAuth: OngoingOAuth,
-  ): Promise<ConnectedRedirectUrl> {
-    const { accessToken, payload, idToken } =
-      await this.#oAuthGateway.getAccessToken({
+    const [existingOngoingOAuth, accessToken] = await Promise.all([
+      uow.ongoingOAuthRepository.findByStateAndProvider(state, "proConnect"),
+      this.#oAuthGateway.getAccessToken({
         code,
         page,
+      }),
+    ]);
+
+    if (!existingOngoingOAuth)
+      throw errors.inclusionConnect.missingOAuth({
+        state,
+        identityProvider: "proConnect",
       });
 
-    if (payload.nonce !== existingOngoingOAuth.nonce)
+    if (accessToken.payload.nonce !== existingOngoingOAuth.nonce)
       throw errors.inclusionConnect.nonceMismatch();
 
-    const existingInclusionConnectedUser =
-      await uow.userRepository.findByExternalId(payload.sub);
-
-    const userWithSameEmail = await uow.userRepository.findByEmail(
-      payload.email,
-    );
-
-    const existingUser = await this.#makeExistingUser(
+    const newOrUpdatedUser = await this.#makeNewOrUpdatedUser(
       uow,
-      existingInclusionConnectedUser,
-      userWithSameEmail,
+      accessToken.payload,
     );
 
-    const authenticatedUser = this.#makeAuthenticatedUser(
-      this.#uuidGenerator.new(),
-      this.#timeGateway.now(),
-      payload,
-    );
-
-    const newOrUpdatedAuthenticatedUser: User = {
-      ...authenticatedUser,
-      ...(existingUser && {
-        id: existingUser.id,
-        createdAt: existingUser.createdAt,
+    await Promise.all([
+      uow.userRepository.save(newOrUpdatedUser),
+      uow.ongoingOAuthRepository.save({
+        ...existingOngoingOAuth,
+        userId: newOrUpdatedUser.id,
+        externalId: accessToken.payload.sub,
+        accessToken: accessToken.accessToken,
       }),
-    };
-
-    const ongoingOAuth: OngoingOAuth = {
-      ...existingOngoingOAuth,
-      userId: newOrUpdatedAuthenticatedUser.id,
-      externalId: payload.sub,
-      accessToken,
-    };
-
-    if (!newOrUpdatedAuthenticatedUser.externalId) {
-      notifyTeam({
-        rawContent: `Usecase AuthenticateWithInclusionCode. No ongoing_oauths found for externalId:
-          ${newOrUpdatedAuthenticatedUser.id}`,
-        isError: true,
-      });
-    }
-
-    await uow.userRepository.save(newOrUpdatedAuthenticatedUser);
-    await uow.ongoingOAuthRepository.save(ongoingOAuth);
-
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "UserAuthenticatedSuccessfully",
-        payload: {
-          userId: newOrUpdatedAuthenticatedUser.id,
-          provider: ongoingOAuth.provider,
-          codeSafir: payload.structure_pe ?? null,
-          triggeredBy: {
-            kind: "inclusion-connected",
-            userId: newOrUpdatedAuthenticatedUser.id,
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "UserAuthenticatedSuccessfully",
+          payload: {
+            userId: newOrUpdatedUser.id,
+            provider: existingOngoingOAuth.provider,
+            codeSafir: accessToken.payload.structure_pe ?? null,
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: newOrUpdatedUser.id,
+            },
           },
-        },
-      }),
-    );
-
-    const twelveHoursInSeconds = 12 * 60 * 60;
-
-    const token = this.#generateAuthenticatedUserJwt(
-      {
-        userId: newOrUpdatedAuthenticatedUser.id,
-        version: currentJwtVersions.inclusion,
-      },
-      twelveHoursInSeconds,
-    );
+        }),
+      ),
+    ]);
 
     return `${this.#immersionFacileBaseUrl}/${
       frontRoutes[page]
     }?${queryParamsAsString<AuthenticatedUserQueryParams>({
-      token,
-      firstName: newOrUpdatedAuthenticatedUser.firstName,
-      lastName: newOrUpdatedAuthenticatedUser.lastName,
-      email: newOrUpdatedAuthenticatedUser.email,
-      siret: payload.siret,
-      idToken,
+      token: this.#generateAuthenticatedUserJwt(
+        {
+          userId: newOrUpdatedUser.id,
+          version: currentJwtVersions.inclusion,
+        },
+        TWELVE_HOURS_IN_SECONDS,
+      ),
+      firstName: newOrUpdatedUser.firstName,
+      lastName: newOrUpdatedUser.lastName,
+      email: newOrUpdatedUser.email,
+      siret: accessToken.payload.siret,
+      idToken: accessToken.idToken,
     })}`;
   }
 
-  async #makeExistingUser(
+  async #makeNewOrUpdatedUser(
     uow: UnitOfWork,
-    existingInclusionConnectedUser: User | undefined,
-    userWithSameEmail: User | undefined,
-  ): Promise<User | undefined> {
-    const existingUser = existingInclusionConnectedUser ?? userWithSameEmail;
-    if (!existingUser) return undefined;
+    payload: GetAccessTokenPayload,
+  ): Promise<User> {
+    const [existingUserByExternalId, userWithSameEmail] = await Promise.all([
+      uow.userRepository.findByExternalId(payload.sub),
+      uow.userRepository.findByEmail(payload.email),
+    ]);
+
     const conflictingUserFound =
       userWithSameEmail &&
-      existingInclusionConnectedUser &&
-      userWithSameEmail.id !== existingInclusionConnectedUser.id;
-    if (conflictingUserFound) {
-      const conflictingUser = userWithSameEmail;
-      await this.#updateUserAgencyRights(
-        uow,
-        conflictingUser,
-        existingInclusionConnectedUser,
-      );
-      await uow.userRepository.delete(conflictingUser.id);
-      const user: User = {
-        createdAt: existingInclusionConnectedUser.createdAt,
-        externalId: existingInclusionConnectedUser.externalId,
-        id: existingInclusionConnectedUser.id,
-        email: conflictingUser.email,
-        firstName: conflictingUser.firstName,
-        lastName: conflictingUser.lastName,
-      };
-      return user;
-    }
-    return existingUser;
-  }
+      existingUserByExternalId &&
+      userWithSameEmail.id !== existingUserByExternalId.id;
 
-  #makeAuthenticatedUser(
-    userId: string,
-    createdAt: Date,
-    jwtPayload: GetAccessTokenPayload,
-  ): User {
+    if (conflictingUserFound) {
+      await this.resolveConflictingUsers(
+        uow,
+        existingUserByExternalId.id,
+        userWithSameEmail.id,
+      );
+    }
+
     return {
-      id: userId,
-      firstName: jwtPayload.firstName,
-      lastName: jwtPayload.lastName,
-      email: jwtPayload.email,
-      externalId: jwtPayload.sub,
-      createdAt: createdAt.toISOString(),
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email,
+      externalId: payload.sub,
+      id:
+        existingUserByExternalId?.id ||
+        userWithSameEmail?.id ||
+        this.#uuidGenerator.new(),
+      createdAt:
+        existingUserByExternalId?.createdAt ||
+        userWithSameEmail?.createdAt ||
+        this.#timeGateway.now().toISOString(),
     };
   }
 
-  async #updateUserAgencyRights(
+  private async resolveConflictingUsers(
     uow: UnitOfWork,
-    conflictingUser: User,
-    userToKeep: User,
+    userToKeepId: UserId,
+    userToDeleteId: UserId,
   ): Promise<void> {
-    const conflictingIcUser = await uow.userRepository.getById(
-      conflictingUser.id,
-    );
-    const userToKeepIcUser = await uow.userRepository.getById(userToKeep.id);
-    if (!conflictingIcUser || !userToKeepIcUser) return;
+    const [userToDeleteAgencyRights, userToKeepAgencyRights] =
+      await Promise.all([
+        uow.agencyRepository.getAgenciesRightsByUserId(userToDeleteId),
+        uow.agencyRepository.getAgenciesRightsByUserId(userToKeepId),
+      ]);
 
-    const conflictingUserAgencyRights =
-      await uow.agencyRepository.getAgenciesRightsByUserId(
-        conflictingIcUser.id,
+    const newAgenciesRightForUser = userToDeleteAgencyRights.reduce<
+      AgencyRightOfUser[]
+    >((acc, userToDeleteAgencyRight) => {
+      const existingUserToKeepAgencyRight = userToKeepAgencyRights.find(
+        (newAgencyRight) =>
+          newAgencyRight.agencyId === userToDeleteAgencyRight.agencyId,
       );
-    const userToKeepAgencyRights =
-      await uow.agencyRepository.getAgenciesRightsByUserId(userToKeepIcUser.id);
 
-    const newAgenciesRightForUser = this.#mergeAgencyRights(
-      conflictingUserAgencyRights,
-      userToKeepAgencyRights,
-    );
+      return [
+        ...acc,
+        {
+          agencyId: userToDeleteAgencyRight.agencyId,
+          isNotifiedByEmail:
+            existingUserToKeepAgencyRight?.isNotifiedByEmail ||
+            userToDeleteAgencyRight.isNotifiedByEmail,
+          roles: [
+            ...(existingUserToKeepAgencyRight?.roles || []),
+            ...userToDeleteAgencyRight.roles,
+          ],
+        },
+      ];
+    }, []);
 
     await Promise.all(
       newAgenciesRightForUser.map(async (agencyRightsForUser) =>
-        updateAgencyRightsForUser(
-          uow,
-          userToKeepIcUser.id,
-          agencyRightsForUser,
-        ),
+        updateAgencyRightsForUser(uow, userToKeepId, agencyRightsForUser),
       ),
     );
-    await Promise.all(
-      conflictingUserAgencyRights.map(async (agencyRightsForUser) =>
-        removeAgencyRightsForUser(
-          uow,
-          conflictingIcUser.id,
-          agencyRightsForUser,
-        ),
-      ),
-    );
-  }
 
-  #mergeAgencyRights(
-    oldAgencyRights: AgencyRightOfUser[],
-    newAgencyRights: AgencyRightOfUser[],
-  ): AgencyRightOfUser[] {
-    return oldAgencyRights.reduce<AgencyRightOfUser[]>(
-      (acc, oldAgencyRight) => {
-        const newAgencyRight = newAgencyRights.find(
-          (newAgencyRight) =>
-            newAgencyRight.agencyId === oldAgencyRight.agencyId,
-        );
-        return [
-          ...acc,
-          newAgencyRight
-            ? {
-                ...newAgencyRight,
-                isNotifiedByEmail:
-                  newAgencyRight.isNotifiedByEmail ||
-                  oldAgencyRight.isNotifiedByEmail,
-                roles: [...newAgencyRight.roles, ...oldAgencyRight.roles],
-              }
-            : oldAgencyRight,
-        ];
-      },
-      [],
+    await Promise.all(
+      userToDeleteAgencyRights.map(async (agencyRightsForUser) =>
+        removeAgencyRightsForUser(uow, userToDeleteId, agencyRightsForUser),
+      ),
     );
+
+    await uow.userRepository.delete(userToDeleteId);
   }
 }
