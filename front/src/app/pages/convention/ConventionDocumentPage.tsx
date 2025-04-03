@@ -549,7 +549,6 @@ export const ConventionDocumentPage = ({
                   ),
                 ),
                 withHours: true,
-                showGMT: true,
               })}
               )
             </li>
@@ -571,7 +570,6 @@ export const ConventionDocumentPage = ({
                     ),
                   ),
                   withHours: true,
-                  showGMT: true,
                 })}
                 )
               </li>
