@@ -1,9 +1,10 @@
 import { useCallback, useEffect } from "react";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import type {
   ActionKindAndLevel,
-  FeedbackTopic,
+  Feedback,
 } from "src/core-logic/domain/feedback/feedback.slice";
 
 export const useFeedbackEventCallback = (
@@ -21,7 +22,14 @@ export const useFeedbackEventCallback = (
   }, [feedback, memoizedCallback, event]);
 };
 
-export const useFeedbackTopic = (topic: FeedbackTopic) => {
+export const useFeedbackTopics = (topics: FeedbackTopic[]): Feedback[] => {
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  return feedbacks[topic];
+  return topics.map((t) => feedbacks[t]).filter((item) => !!item);
+};
+
+export const useFeedbackTopic = (
+  topic: FeedbackTopic,
+): Feedback | undefined => {
+  const feedbacks = useFeedbackTopics([topic]);
+  return feedbacks[0];
 };

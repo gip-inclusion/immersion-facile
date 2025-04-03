@@ -13,14 +13,13 @@ import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/adm
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import {
   type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-
 describe("UpdateUserOnAgency slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;

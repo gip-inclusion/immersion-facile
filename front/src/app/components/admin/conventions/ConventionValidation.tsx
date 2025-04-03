@@ -165,7 +165,10 @@ export const ConventionValidation = ({
             {signatoryToSendSignatureLink?.signatoryPhone}
           </p>
 
-          <Feedback topic="send-signature-link" className={fr.cx("fr-my-4w")} />
+          <Feedback
+            topics={["send-signature-link"]}
+            className={fr.cx("fr-my-4w")}
+          />
 
           <ButtonsGroup
             inlineLayoutWhen="always"

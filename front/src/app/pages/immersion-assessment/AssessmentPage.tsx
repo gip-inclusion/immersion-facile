@@ -12,6 +12,7 @@ import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import type { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
@@ -23,11 +24,15 @@ interface AssessmentPageProps {
 }
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
   const { role, applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
     );
-  const { convention, fetchConventionError, isLoading } = useConvention({
+  const { convention, isLoading } = useConvention({
     jwt: route.params.jwt,
     conventionId,
   });
@@ -38,7 +43,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={fetchConventionError}
+        errorMessage={conventionFormFeedback?.message}
         jwt={route.params.jwt}
       />
     );

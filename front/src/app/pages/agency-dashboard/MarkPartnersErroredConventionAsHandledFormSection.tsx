@@ -66,11 +66,13 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
                 ...conventionIdRegistration,
                 onChange: (event) => {
                   const conventionId = event.currentTarget.value;
+                  // TODO To replace with schema parse
                   if (conventionId.length >= 32) {
                     dispatch(
                       conventionSlice.actions.fetchConventionRequested({
                         conventionId: conventionId,
                         jwt,
+                        feedbackTopic: "unused",
                       }),
                     );
                   }
@@ -149,7 +151,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             document.body,
           )}
         </form>
-        <Feedback topic="partner-conventions" />
+        <Feedback topics={["partner-conventions"]} />
       </div>
     </section>
   );

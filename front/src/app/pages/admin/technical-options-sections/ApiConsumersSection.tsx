@@ -144,7 +144,7 @@ export const ApiConsumersSection = () => {
                   />
                 )}
                 {level === "success" && !lastCreatedToken && (
-                  <Feedback topic="api-consumer-global" />
+                  <Feedback topics={["api-consumer-global"]} />
                 )}
               </Fragment>
             )}

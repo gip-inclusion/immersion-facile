@@ -16,30 +16,24 @@ import {
   isConventionRenewed,
   toDisplayedDate,
 } from "shared";
-import { ConventionFeedbackNotification } from "src/app/components/forms/convention/ConventionFeedbackNotification";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
-import {
-  type ConventionFeedbackKind,
-  type ConventionSubmitFeedback,
-  conventionSlice,
-} from "src/core-logic/domain/convention/convention.slice";
 import { SignatureActions } from "./SignatureActions";
 
 type ConventionSignFormProperties = {
   jwt: string;
-  submitFeedback: ConventionSubmitFeedback;
   convention: ConventionReadDto;
 };
 
 export const ConventionSignForm = ({
   jwt,
-  submitFeedback,
   convention,
 }: ConventionSignFormProperties): JSX.Element => {
   const dispatch = useDispatch();
@@ -80,23 +74,24 @@ export const ConventionSignForm = ({
     }
 
     dispatch(
-      conventionSlice.actions.signConventionRequested({
+      conventionActionSlice.actions.signConventionRequested({
         conventionId: convention.id,
         jwt,
+        feedbackTopic: "convention-action-sign",
       }),
     );
   };
 
-  const onModificationRequired =
-    (feedbackKind: ConventionFeedbackKind) =>
-    (updateStatusParams: UpdateConventionStatusRequestDto) =>
-      dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          jwt,
-          feedbackKind,
-          updateStatusParams,
-        }),
-      );
+  const onModificationRequired = (
+    updateStatusParams: UpdateConventionStatusRequestDto,
+  ) =>
+    dispatch(
+      conventionActionSlice.actions.editConventionRequested({
+        jwt,
+        updateStatusParams,
+        feedbackTopic: "convention-action-edit",
+      }),
+    );
 
   if (alreadySigned) {
     return (
@@ -117,57 +112,58 @@ export const ConventionSignForm = ({
     );
   }
   return (
-    <FormProvider {...methods}>
-      <Alert
-        {...t.conventionReadyToBeSigned}
-        severity="info"
-        className={fr.cx("fr-mb-4w")}
-      />
-      {isConventionRenewed(convention) && (
-        <ConventionRenewedInformations renewed={convention.renewed} />
-      )}
-      <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
-      <form id={domElementIds.conventionToSign.form}>
-        {currentSignatory && (
-          <ConventionSummary
-            submittedAt={toDisplayedDate({
-              date: new Date(convention.dateSubmission),
-            })}
-            summary={makeConventionSections(convention)}
-            conventionId={convention.id}
-          />
-        )}
-
-        <ConventionFeedbackNotification
-          submitFeedback={submitFeedback}
-          signatories={methods.getValues().signatories}
+    <>
+      <Feedback topics={["convention-action-sign"]} />
+      <FormProvider {...methods}>
+        <Alert
+          {...t.conventionReadyToBeSigned}
+          severity="info"
+          className={fr.cx("fr-mb-4w")}
         />
-        {isModalClosedWithoutSignature && (
-          <Alert
-            {...t.conventionNeedToBeSign}
-            closable={true}
-            severity="warning"
-            small
-            className={fr.cx("fr-mb-5w")}
-          />
+        {isConventionRenewed(convention) && (
+          <ConventionRenewedInformations renewed={convention.renewed} />
         )}
-        {currentSignatory && (
-          <SignatureActions
-            internshipKind={convention.internshipKind}
-            signatory={currentSignatory}
-            onSubmitClick={methods.handleSubmit(onSignFormSubmit, (errors) => {
-              console.error(methods.getValues(), errors);
-            })}
-            convention={convention}
-            newStatus="DRAFT"
-            onModificationRequired={onModificationRequired(
-              "modificationsAskedFromSignatory",
-            )}
-            currentSignatoryRole={currentSignatory.role}
-            onCloseSignModalWithoutSignature={setIsModalClosedWithoutSignature}
-          />
-        )}
-      </form>
-    </FormProvider>
+        <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
+        <form id={domElementIds.conventionToSign.form}>
+          {currentSignatory && (
+            <ConventionSummary
+              submittedAt={toDisplayedDate({
+                date: new Date(convention.dateSubmission),
+              })}
+              summary={makeConventionSections(convention)}
+              conventionId={convention.id}
+            />
+          )}
+          {isModalClosedWithoutSignature && (
+            <Alert
+              {...t.conventionNeedToBeSign}
+              closable={true}
+              severity="warning"
+              small
+              className={fr.cx("fr-mb-5w")}
+            />
+          )}
+          {currentSignatory && (
+            <SignatureActions
+              internshipKind={convention.internshipKind}
+              signatory={currentSignatory}
+              onSubmitClick={methods.handleSubmit(
+                onSignFormSubmit,
+                (errors) => {
+                  console.error(methods.getValues(), errors);
+                },
+              )}
+              convention={convention}
+              newStatus="DRAFT"
+              onModificationRequired={onModificationRequired}
+              currentSignatoryRole={currentSignatory.role}
+              onCloseSignModalWithoutSignature={
+                setIsModalClosedWithoutSignature
+              }
+            />
+          )}
+        </form>
+      </FormProvider>
+    </>
   );
 };

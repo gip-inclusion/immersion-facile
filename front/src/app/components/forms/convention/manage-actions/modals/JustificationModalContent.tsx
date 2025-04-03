@@ -17,7 +17,7 @@ import {
   signatoryTitleByRole,
   updateConventionStatusRequestSchema,
 } from "shared";
-import type { ModalWrapperProps } from "src/app/components/forms/convention/VerificationActionButton";
+import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 
 export const JustificationModalContent = ({
@@ -185,7 +185,7 @@ const submitButtonIdByStatus: Record<
   ConventionStatusWithJustification,
   string
 > = {
-  DRAFT: domElementIds.manageConvention.edit.requestEditSubmitButton,
+  DRAFT: domElementIds.manageConvention.requestEditSubmitButton,
   REJECTED: domElementIds.manageConvention.rejectedModalSubmitButton,
   CANCELLED: domElementIds.manageConvention.cancelModalSubmitButton,
   DEPRECATED: domElementIds.manageConvention.deprecatedModalSubmitButton,
@@ -195,7 +195,7 @@ const cancelButtonIdByStatus: Record<
   ConventionStatusWithJustification,
   string
 > = {
-  DRAFT: domElementIds.manageConvention.edit.requestEditCancelButton,
+  DRAFT: domElementIds.manageConvention.requestEditCancelButton,
   REJECTED: domElementIds.manageConvention.rejectedModalCancelButton,
   CANCELLED: domElementIds.manageConvention.cancelModalCancelButton,
   DEPRECATED: domElementIds.manageConvention.deprecatedModalCancelButton,

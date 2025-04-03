@@ -34,12 +34,12 @@ export const EstablishmentLeadRegistrationRejectedPage = ({
 
   const { applicationId } =
     decodeJwtWithoutSignatureCheck<ConventionJwtPayload>(params.jwt);
-
   useEffect(() => {
     dispatch(
       conventionSlice.actions.fetchConventionRequested({
         jwt: params.jwt,
         conventionId: applicationId,
+        feedbackTopic: "unused",
       }),
     );
     dispatch(

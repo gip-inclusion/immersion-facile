@@ -1,15 +1,11 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import type { ReactNode } from "react";
-
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import type {
-  FeedbackLevel,
-  FeedbackTopic,
-} from "src/core-logic/domain/feedback/feedback.slice";
+import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import type { FeedbackLevel } from "src/core-logic/domain/feedback/feedback.slice";
 
 type FeedbackProps = {
-  topic: FeedbackTopic;
+  topics: FeedbackTopic[];
   render?: (props: {
     level: FeedbackLevel;
     title?: string;
@@ -21,38 +17,55 @@ type FeedbackProps = {
 };
 
 export const Feedback = ({
-  topic,
+  topics = [],
   render,
   closable,
   className,
 }: FeedbackProps) => {
-  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  const feedback = feedbacks[topic];
-  if (!feedback) return null;
+  const relevantFeedbacks = useFeedbackTopics(topics);
+
+  if (relevantFeedbacks.length === 0) return null;
+
   if (render) {
-    return render({
-      level: feedback.level,
-      title: feedback.title,
-      message: feedback.message,
-    });
+    return (
+      <>
+        {relevantFeedbacks.map((feedback) => (
+          <div key={feedback.message}>
+            {render({
+              level: feedback.level,
+              title: feedback.title,
+              message: feedback.message,
+            })}
+          </div>
+        ))}
+      </>
+    );
   }
 
-  return closable === true ? (
-    <Alert
-      severity={feedback.level}
-      title={feedback.title}
-      description={feedback.message}
-      small
-      closable={closable}
-      className={className}
-    />
-  ) : (
-    <Alert
-      severity={feedback.level}
-      title={feedback.title}
-      description={feedback.message}
-      small
-      className={className}
-    />
+  return (
+    <>
+      {relevantFeedbacks.map((feedback) =>
+        closable === true ? (
+          <Alert
+            key={feedback.message}
+            severity={feedback.level}
+            title={feedback.title}
+            description={feedback.message}
+            small
+            closable={closable}
+            className={className}
+          />
+        ) : (
+          <Alert
+            key={feedback.message}
+            severity={feedback.level}
+            title={feedback.title}
+            description={feedback.message}
+            small
+            className={className}
+          />
+        ),
+      )}
+    </>
   );
 };

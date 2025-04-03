@@ -12,9 +12,11 @@ import {
   errors,
   isSignatory,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
-import { P, match } from "ts-pattern";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";
 import { conventionSlice } from "../../../core-logic/domain/convention/convention.slice";
@@ -68,8 +70,12 @@ const ConventionSignPageContent = ({
   const dispatch = useDispatch();
   const { applicationId: conventionId } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt);
-  const { convention, fetchConventionError, submitFeedback, isLoading } =
-    useConvention({ jwt, conventionId });
+  const { convention, isLoading } = useConvention({ jwt, conventionId });
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
+
   useEffect(() => {
     dispatch(
       conventionSlice.actions.currentSignatoryRoleChanged(extractRole(jwt)),
@@ -88,27 +94,14 @@ const ConventionSignPageContent = ({
         hasConvention: convention !== null, // to avoid Type instantiation is excessively deep and possibly infinite error
         isLoading,
         fetchConventionError,
-        submitFeedback,
       })
-        .with(
-          {
-            hasConvention: false,
-            fetchConventionError: null,
-            isLoading: false,
-            submitFeedback: { kind: "idle" },
-          },
-          () => <Loader />,
-        )
         .with({ isLoading: true }, () => <Loader />)
-        .with(
-          { fetchConventionError: P.string },
-          ({ fetchConventionError }) => (
-            <ShowErrorOrRedirectToRenewMagicLink
-              errorMessage={fetchConventionError}
-              jwt={jwt}
-            />
-          ),
-        )
+        .with({ fetchConventionError: true }, () => (
+          <ShowErrorOrRedirectToRenewMagicLink
+            errorMessage={conventionFormFeedback?.message ?? ""}
+            jwt={jwt}
+          />
+        ))
         .with({ hasConvention: false }, () => (
           <Alert
             severity="error"
@@ -144,6 +137,7 @@ const ConventionSignPageContent = ({
             >
               {convention && (
                 <div className={fr.cx("fr-mb-4w")}>
+                  <Feedback topics={["convention-action-edit"]} closable />
                   {convention.status === "REJECTED" && (
                     <Alert
                       severity="error"
@@ -191,11 +185,7 @@ const ConventionSignPageContent = ({
                   {convention.status !== "DRAFT" &&
                     convention.status !== "REJECTED" &&
                     convention.status !== "DEPRECATED" && (
-                      <ConventionSignForm
-                        convention={convention}
-                        jwt={jwt}
-                        submitFeedback={submitFeedback}
-                      />
+                      <ConventionSignForm convention={convention} jwt={jwt} />
                     )}
                 </div>
               )}

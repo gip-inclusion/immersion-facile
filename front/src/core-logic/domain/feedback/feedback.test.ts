@@ -4,12 +4,11 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   type ActionKindAndLevel,
-  type FeedbackTopic,
-  feedbackMapping,
   getLevelAndActionKindFromActionKindAndLevel,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import { type FeedbackTopic, feedbacks } from "./feedback.content";
 
 describe("Feedbacks", () => {
   let store: ReduxStore;
@@ -83,9 +82,9 @@ describe("Feedbacks", () => {
     expectToEqual(feedbacksSelectors.feedbacks(store.getState())[topic], {
       on: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).actionKind,
       level: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).level,
-      title: feedbackMapping[topic][kindAndLevel]?.title,
+      title: feedbacks[topic][kindAndLevel]?.title,
       message:
         // biome-ignore lint/style/noNonNullAssertion:
-        errorMessageFromApi ?? feedbackMapping[topic][kindAndLevel]!.message,
+        errorMessageFromApi ?? feedbacks[topic][kindAndLevel]!.message,
     });
 });

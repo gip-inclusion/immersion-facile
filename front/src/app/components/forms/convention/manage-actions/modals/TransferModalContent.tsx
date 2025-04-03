@@ -21,7 +21,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 
-export const TransferConventionModalContent = ({
+export const TransferModalContent = ({
   onSubmit,
   closeModal,
   convention,
@@ -129,16 +129,14 @@ export const TransferConventionModalContent = ({
                 closeModal();
               },
               nativeButtonProps: {
-                id: domElementIds.manageConvention.edit
-                  .transferToAgencyCancelButton,
+                id: domElementIds.manageConvention.transferToAgencyCancelButton,
               },
               children: "Annuler et revenir en arrière",
             },
             {
               type: "submit",
               nativeButtonProps: {
-                id: domElementIds.manageConvention.edit
-                  .transferToAgencySubmitButton,
+                id: domElementIds.manageConvention.transferToAgencySubmitButton,
               },
               children: "Terminer",
             },

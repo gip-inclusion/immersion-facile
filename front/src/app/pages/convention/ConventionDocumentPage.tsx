@@ -26,6 +26,7 @@ import {
   toDisplayedDate,
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -109,7 +110,7 @@ export const ConventionDocumentPage = ({
 }: ConventionDocumentPageProps) => {
   const routeConventionId: ConventionId | undefined = route.params.conventionId;
   const { jwt, jwtPayload } = useJwt(route);
-  const { convention, fetchConventionError, isLoading } = useConvention({
+  const { convention, isLoading } = useConvention({
     jwt,
     conventionId: routeConventionId ?? jwtPayload.applicationId,
   });
@@ -118,6 +119,10 @@ export const ConventionDocumentPage = ({
   const canShowConvention = convention?.status === "ACCEPTED_BY_VALIDATOR";
   const dispatch = useDispatch();
   const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
 
   useEffect(() => {
     if (convention?.agencyId) {
@@ -130,7 +135,7 @@ export const ConventionDocumentPage = ({
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={fetchConventionError}
+        errorMessage={conventionFormFeedback?.message}
         jwt={jwt}
       />
     );

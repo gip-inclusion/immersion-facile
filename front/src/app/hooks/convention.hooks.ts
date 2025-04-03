@@ -14,19 +14,19 @@ import {
 
 export const useConvention = (payload: FetchConventionRequestedPayload) => {
   const convention = useAppSelector(conventionSelectors.convention);
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
-  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(conventionSlice.actions.fetchConventionRequested(payload));
-    return () => {
-      dispatch(conventionSlice.actions.clearFeedbackTriggered());
-    };
+    dispatch(
+      conventionSlice.actions.fetchConventionRequested({
+        ...payload,
+        feedbackTopic: "convention-form",
+      }),
+    );
   }, [dispatch]);
 
-  return { convention, submitFeedback, fetchConventionError, isLoading };
+  return { convention, isLoading };
 };
 
 export const useTutorIsEstablishmentRepresentative = () => {

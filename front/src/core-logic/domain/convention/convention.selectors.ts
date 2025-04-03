@@ -10,24 +10,12 @@ import type { RootState } from "src/core-logic/storeConfig/store";
 
 const conventionState = (state: RootState) => state.convention;
 
-const feedback = createSelector(conventionState, ({ feedback }) => feedback);
-
 const convention = createSelector(
   conventionState,
   ({ convention }) => convention,
 );
 
-const fetchError = createSelector(
-  conventionState,
-  ({ fetchError }) => fetchError,
-);
-
 const isLoading = createSelector(conventionState, ({ isLoading }) => isLoading);
-
-const isBroadcasting = createSelector(
-  conventionState,
-  ({ isBroadcasting }) => isBroadcasting,
-);
 
 const similarConventionIds = createSelector(
   conventionState,
@@ -81,8 +69,6 @@ const currentStep = createSelector(
 
 export const conventionSelectors = {
   convention,
-  fetchError,
-  feedback,
   signatoryData,
   isLoading,
   isMinor,
@@ -93,7 +79,6 @@ export const conventionSelectors = {
   showSummary,
   agencyDepartment,
   similarConventionIds,
-  isBroadcasting,
 };
 
 export const signatoryDataFromConvention = (

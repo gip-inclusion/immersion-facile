@@ -319,20 +319,19 @@ export const domElementIds = {
   },
 
   manageConvention: {
-    edit: {
-      actionsButton: "im-convention__edit-actions-button",
-      requestEditModal: "im-convention__request-edit-modal",
-      requestEditButton: "im-convention__open-request-edit-modal-button",
-      requestEditCancelButton: "im-convention__request-edit-cancel-button",
-      requestEditSubmitButton: "im-convention__request-edit-submit-button",
-      transferToAgencyModal: "im-convention__transfer-agency-modal",
-      transferToAgencyButton:
-        "im-convention__open-transfer-to-agency-modal-button",
-      transferToAgencyCancelButton:
-        "im-convention__transfer-to-agency-cancel-button",
-      transferToAgencySubmitButton:
-        "im-convention__transfer-to-agency-submit-button",
-    },
+    editActionsButton: "im-manage-convention__edit-actions-button",
+    requestEditModal: "im-manage-convention__request-edit-modal",
+    requestEditButton: "im-manage-convention__open-request-edit-modal-button",
+    requestEditCancelButton: "im-manage-convention__request-edit-cancel-button",
+    requestEditSubmitButton: "im-manage-convention__request-edit-submit-button",
+    transferToAgencyModal: "im-manage-convention__transfer-agency-modal",
+    transferToAgencyButton:
+      "im-manage-convention__open-transfer-to-agency-modal-button",
+    transferToAgencyCancelButton:
+      "im-manage-convention__transfer-to-agency-cancel-button",
+    transferToAgencySubmitButton:
+      "im-manage-convention__transfer-to-agency-submit-button",
+
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
@@ -364,8 +363,12 @@ export const domElementIds = {
     submitSignModalButton: "im-convention-validation__submit-sign-modal-button",
     submitRenewModalButton:
       "im-convention-validation__submit-renew-modal-button",
+    renewModalCancelButton:
+      "im-convention-validation__renew-modal-cancel-button",
     openRenewModalButton: "im-convention-validation__open-renew-modal-button",
     openDocumentButton: "im-convention-validation__open-document-button",
+    transferConventionModal:
+      "im-convention-validation__open-transfer-agency-button",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
   },

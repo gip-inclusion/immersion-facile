@@ -1,4 +1,3 @@
-import { addDays } from "date-fns";
 import {
   type Beneficiary,
   ConventionDtoBuilder,
@@ -6,7 +5,6 @@ import {
   type DashboardUrlAndName,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
-  ScheduleDtoBuilder,
   type SignatoryRole,
   expectObjectsToMatch,
   expectToEqual,
@@ -20,8 +18,6 @@ import {
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type ConventionState,
-  type ConventionSubmitFeedback,
-  type RenewConventionPayload,
   conventionSlice,
   initialConventionState,
 } from "./convention.slice";
@@ -61,6 +57,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -69,8 +66,17 @@ describe("Convention slice", () => {
       feedGatewayWithAddConventionSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "justSubmitted" },
       });
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "success",
+          message: "La convention a bien été créée",
+          on: "create",
+          title: "La convention a bien été créée",
+        },
+      );
       expect(store.getState().convention.convention?.status).toBe(
         "READY_TO_SIGN",
       );
@@ -94,11 +100,8 @@ describe("Convention slice", () => {
           convention: null,
           conventionStatusDashboardUrl: null,
           isLoading: false,
-          fetchError: null,
-          feedback: { kind: "idle" },
           currentSignatoryRole: null,
           similarConventionIds: [],
-          isBroadcasting: false,
         },
       }));
       const convention = new ConventionDtoBuilder().build();
@@ -108,6 +111,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -116,8 +120,16 @@ describe("Convention slice", () => {
       feedGatewayWithUpdateConventionSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "justSubmitted" },
       });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "success",
+          message: "La convention a bien été créée",
+          on: "create",
+          title: "La convention a bien été créée",
+        },
+      );
       expectUpdateConventionToHaveBeenCalled(1);
       expectAddConventionToHaveBeenCalled(0);
     });
@@ -130,6 +142,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -139,8 +152,16 @@ describe("Convention slice", () => {
       feedGatewayWithAddConventionError(new Error(errorMessage));
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "errored", errorMessage },
       });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "error",
+          message: errorMessage,
+          on: "create",
+          title: "Problème lors de la création de la convention",
+        },
+      );
     });
   });
 
@@ -156,6 +177,7 @@ describe("Convention slice", () => {
           dateStart: convention.dateStart,
           beneficiaryLastName: "Test",
           codeAppellation: "111222",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -182,6 +204,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -225,6 +248,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
 
@@ -272,6 +296,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -286,12 +311,12 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         convention: null,
-        fetchError: null,
       });
       store.dispatch(
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -299,45 +324,16 @@ describe("Convention slice", () => {
       expectConventionState({
         convention: null,
         isLoading: false,
-        fetchError: "I failed !",
       });
-    });
-
-    it("clears initial submit feedback kind if it was not idle when it started to fetch", () => {
-      expectConventionState({
-        isLoading: false,
-        convention: null,
-        fetchError: null,
-      });
-      ({ store } = createTestStore({
-        convention: {
-          formUi: {
-            preselectedAgencyId: null,
-            isMinor: false,
-            isTutorEstablishmentRepresentative: true,
-            hasCurrentEmployer: false,
-            currentStep: 1,
-            agencyDepartment: null,
-            showSummary: false,
-          },
-          feedback: { kind: "justSubmitted" },
-          isLoading: false,
-          convention: null,
-          conventionStatusDashboardUrl: null,
-          fetchError: null,
-          jwt: null,
-          currentSignatoryRole: null,
-          similarConventionIds: [],
-          isBroadcasting: false,
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "error",
+          message: "I failed !",
+          on: "fetch",
+          title: "Problème lors de la récupération de la convention",
         },
-      }));
-      store.dispatch(
-        conventionSlice.actions.fetchConventionRequested({
-          jwt: "my-jwt",
-          conventionId: "some-convention-id",
-        }),
       );
-      expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
     });
 
     describe("Convention formUi update based on convention data", () => {
@@ -363,6 +359,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -417,6 +414,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -465,6 +463,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -505,6 +504,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -547,6 +547,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -597,6 +598,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -650,14 +652,11 @@ describe("Convention slice", () => {
             showSummary: false,
           },
           jwt: null,
-          fetchError: null,
           isLoading: false,
-          feedback: { kind: "idle" },
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
           similarConventionIds: [],
-          isBroadcasting: false,
         },
       }));
       const signatoryData = conventionSelectors.signatoryData(store.getState());
@@ -699,14 +698,11 @@ describe("Convention slice", () => {
             showSummary: false,
           },
           jwt: null,
-          fetchError: null,
           isLoading: false,
-          feedback: { kind: "idle" },
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
           similarConventionIds: [],
-          isBroadcasting: false,
         },
       }));
 
@@ -719,268 +715,13 @@ describe("Convention slice", () => {
     });
   });
 
-  describe("Convention signature", () => {
-    it("signs the conventions with role from jwt", () => {
-      const jwt = "some-correct-jwt";
-      const agencyFields = {
-        agencyCounsellorEmails: [],
-        agencyDepartment: "75",
-        agencyKind: "mission-locale" as const,
-        agencyName: "Agence Mission Locale",
-        agencyRefersTo: undefined,
-        agencySiret: "11110000111155",
-        agencyValidatorEmails: [],
-      };
-      const convention: ConventionReadDto = {
-        ...agencyFields,
-        ...new ConventionDtoBuilder().notSigned().build(),
-      };
-
-      ({ store, dependencies } = createTestStore({
-        convention: {
-          ...initialConventionState,
-          convention,
-        },
-      }));
-      store.dispatch(
-        conventionSlice.actions.signConventionRequested({
-          conventionId: convention.id,
-          jwt,
-        }),
-      );
-
-      expectConventionState({
-        isLoading: true,
-      });
-      feedGatewayWithSignSuccess();
-      expectConventionState({
-        isLoading: false,
-        convention,
-      });
-
-      const signedConvention: ConventionReadDto = {
-        ...agencyFields,
-        ...new ConventionDtoBuilder(convention)
-          .signedByEstablishmentRepresentative(new Date().toISOString())
-          .build(),
-      };
-
-      feedGatewayWithConvention(signedConvention);
-
-      expectConventionState({
-        isLoading: false,
-        convention: signedConvention,
-      });
-    });
-
-    it("gets error message when signature fails", () => {
-      const jwt = "some-correct-jwt";
-      store.dispatch(
-        conventionSlice.actions.signConventionRequested({
-          conventionId: "id",
-          jwt,
-        }),
-      );
-      expectConventionState({
-        isLoading: true,
-      });
-      const errorMessage = "You are not allowed to sign";
-      feedGatewayWithSignError(new Error(errorMessage));
-      expectConventionState({
-        isLoading: false,
-        feedback: { kind: "errored", errorMessage },
-      });
-    });
-  });
-
-  describe("Convention status change", () => {
-    it("sends modification request with provided justification", () => {
-      const agencyFields = {
-        agencyCounsellorEmails: [],
-        agencyDepartment: "75",
-        agencyKind: "mission-locale" as const,
-        agencyName: "Agence Mission Locale",
-        agencyRefersTo: undefined,
-        agencySiret: "11110000111155",
-        agencyValidatorEmails: [],
-      };
-      const convention: ConventionReadDto = {
-        ...agencyFields,
-        ...new ConventionDtoBuilder().withStatus("IN_REVIEW").build(),
-      };
-
-      ({ store, dependencies } = createTestStore({
-        convention: {
-          ...initialConventionState,
-          convention,
-        },
-      }));
-
-      const jwt = "some-correct-jwt";
-      store.dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          updateStatusParams: {
-            status: "DRAFT",
-            statusJustification: "There is a mistake in my last name",
-            conventionId: convention.id,
-            modifierRole: "beneficiary",
-          },
-          feedbackKind: "modificationsAskedFromSignatory",
-          jwt,
-        }),
-      );
-      expectConventionState({
-        isLoading: true,
-      });
-      feedGatewayWithModificationSuccess();
-
-      expectConventionState({
-        isLoading: false,
-        feedback: { kind: "modificationsAskedFromSignatory" },
-        convention,
-      });
-
-      const updatedConvention: ConventionReadDto = {
-        ...convention,
-        status: "DRAFT",
-        statusJustification: "There is a mistake in my last name",
-      };
-
-      feedGatewayWithConvention(updatedConvention);
-
-      expectConventionState({
-        isLoading: false,
-        convention: updatedConvention,
-        feedback: { kind: "modificationsAskedFromSignatory" },
-      });
-    });
-
-    it("gets error message when modification fails", () => {
-      const jwt = "some-correct-jwt";
-      store.dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          updateStatusParams: {
-            status: "DRAFT",
-            statusJustification: "There is a mistake in my last name",
-            conventionId: "some-id",
-            modifierRole: "beneficiary",
-          },
-          feedbackKind: "modificationsAskedFromSignatory",
-          jwt,
-        }),
-      );
-      expectConventionState({
-        isLoading: true,
-      });
-      const errorMessage = "You are not allowed to ask for modifications";
-      feedGatewayWithModificationFailure(new Error(errorMessage));
-      expectConventionState({
-        isLoading: false,
-        feedback: { kind: "errored", errorMessage },
-      });
-    });
-
-    it("gets missing validation step feedback", () => {
-      const jwt = "some-correct-jwt";
-      store.dispatch(
-        conventionSlice.actions.statusChangeRequested({
-          updateStatusParams: {
-            status: "IN_REVIEW",
-            conventionId: "some-id",
-          },
-          feedbackKind: "markedAsValidated",
-          jwt,
-        }),
-      );
-
-      expectConventionState({
-        isLoading: true,
-      });
-
-      feedGatewayWithModificationFailure(
-        new Error(
-          `{\n "errors": "Cannot go to status 'ACCEPTED_BY_VALIDATOR' for convention 'convId'. Convention should be reviewed by counsellor"\n}`,
-        ),
-      );
-
-      expectConventionState({
-        isLoading: false,
-        feedback: { kind: "missingCounsellorValidationError" },
-      });
-    });
-  });
-
-  describe("Broadcast convention to partner", () => {
-    it("successfully trigger the broadcast, than needs to wait for a delay before broadcast is considered successfull", () => {
-      store.dispatch(
-        conventionSlice.actions.broadcastConventionToPartnerRequested({
-          conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
-          feedbackTopic: "broadcast-convention-again",
-        }),
-      );
-      expectConventionState({
-        isBroadcasting: true,
-      });
-
-      dependencies.conventionGateway.broadcastConventionAgainResult$.next(
-        undefined,
-      );
-
-      expectConventionState({
-        isBroadcasting: true,
-      });
-
-      fastForwardObservables();
-
-      expectConventionState({
-        isBroadcasting: false,
-      });
-
-      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-        "broadcast-convention-again": {
-          on: "create",
-          level: "success",
-          title: "La convention a bien été rediffusée",
-          message:
-            "La convention a bien été rediffusée au partenaire. Vous pouvez vous rapprocher du partenaire pour le vérifier.",
-        },
-      });
-    });
-
-    it("fails when triggering the broadcast", () => {
-      const errorMessageFromApi = "error occurred from api";
-      store.dispatch(
-        conventionSlice.actions.broadcastConventionToPartnerRequested({
-          conventionId: "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa",
-          feedbackTopic: "broadcast-convention-again",
-        }),
-      );
-      expectConventionState({
-        isBroadcasting: true,
-      });
-
-      dependencies.conventionGateway.broadcastConventionAgainResult$.error(
-        new Error(errorMessageFromApi),
-      );
-
-      expectConventionState({
-        isBroadcasting: false,
-      });
-      expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-        "broadcast-convention-again": {
-          on: "create",
-          level: "error",
-          title: "Problème rencontré lors de la rediffusion au partenaire",
-          message: errorMessageFromApi,
-        },
-      });
-    });
-  });
-
   it("gets the dashboard Url for convention status check", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
-      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
     );
     expectConventionState({ isLoading: true });
     const urlAndName: DashboardUrlAndName = {
@@ -994,16 +735,28 @@ describe("Convention slice", () => {
   it("stores the error when something goes wrong when fetching the dashboard Url for convention status check", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
-      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
     );
     expectConventionState({ isLoading: true });
     feedGatewayWithConventionStatusDashboardUrlError(new Error("Oops !"));
     expectConventionState({
-      feedback: {
-        kind: "errored",
-        errorMessage: "Oops !",
-      },
+      isLoading: false,
     });
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "convention-status-dashboard"
+      ],
+      {
+        level: "error",
+        message: "Oops !",
+        on: "fetch",
+        title:
+          "Problème lors de la récupération du tableau de bord de la convention",
+      },
+    );
   });
 
   it("stores the current signatory role", () => {
@@ -1013,33 +766,6 @@ describe("Convention slice", () => {
       conventionSlice.actions.currentSignatoryRoleChanged(newRole),
     );
     expectConventionState({ currentSignatoryRole: newRole });
-  });
-
-  it("changes the feedback to idle when asked", () => {
-    ({ store } = createTestStore({
-      convention: {
-        formUi: {
-          preselectedAgencyId: null,
-          isMinor: false,
-          isTutorEstablishmentRepresentative: true,
-          hasCurrentEmployer: false,
-          currentStep: 1,
-          agencyDepartment: null,
-          showSummary: false,
-        },
-        jwt: null,
-        convention: null,
-        conventionStatusDashboardUrl: null,
-        feedback: { kind: "modificationsAskedFromSignatory" },
-        isLoading: false,
-        fetchError: null,
-        currentSignatoryRole: null,
-        similarConventionIds: [],
-        isBroadcasting: false,
-      },
-    }));
-    store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
-    expectConventionState({ feedback: { kind: "idle" } });
   });
 
   it("changes the form current step when asked", () => {
@@ -1057,12 +783,9 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
-        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1089,12 +812,9 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
-        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1125,12 +845,9 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
-        isBroadcasting: false,
       },
     }));
     expectConventionState({
@@ -1202,12 +919,9 @@ describe("Convention slice", () => {
         jwt: null,
         convention,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "modificationsAskedFromSignatory" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
-        isBroadcasting: false,
       },
     }));
     expectConventionState({ convention });
@@ -1215,57 +929,6 @@ describe("Convention slice", () => {
     expectConventionState({
       convention: initialConventionState.convention,
       formUi: initialConventionState.formUi,
-    });
-  });
-
-  describe("Convention renewal", () => {
-    const renewedDateEnd = addDays(new Date(), 1);
-    const renewedDateStart = new Date();
-    const renewedConventionPayload: RenewConventionPayload = {
-      params: {
-        id: "22222222-1111-4111-1111-111111111111",
-        dateEnd: renewedDateEnd.toISOString(),
-        dateStart: renewedDateStart.toISOString(),
-        schedule: new ScheduleDtoBuilder()
-          .withReasonableScheduleInInterval({
-            start: renewedDateStart,
-            end: renewedDateEnd,
-          })
-          .build(),
-        renewed: {
-          from: "11111111-1111-4111-1111-111111111111",
-          justification: "My justification to renew this convention",
-        },
-      },
-      jwt: "my-jwt",
-    };
-
-    it("renews a convention", () => {
-      expectConventionState(initialConventionState);
-
-      store.dispatch(
-        conventionSlice.actions.renewConventionRequested(
-          renewedConventionPayload,
-        ),
-      );
-      expectIsLoadingToBe(true);
-      feedGatewayWithRenewedConventionSuccess();
-      expectIsLoadingToBe(false);
-      expectFeedbackToBe({ kind: "renewed" });
-    });
-
-    it("gets error feedback when gateway throws an error", () => {
-      const errorMessage = "Error renewing convention";
-      expectConventionState(initialConventionState);
-      store.dispatch(
-        conventionSlice.actions.renewConventionRequested(
-          renewedConventionPayload,
-        ),
-      );
-      expectIsLoadingToBe(true);
-      feedGatewayWithRenewedConventionError(new Error(errorMessage));
-      expectIsLoadingToBe(false);
-      expectFeedbackToBe({ kind: "errored", errorMessage });
     });
   });
 
@@ -1317,38 +980,8 @@ describe("Convention slice", () => {
     dependencies.conventionGateway.convention$.next(convention);
   };
 
-  const feedGatewayWithSignSuccess = () => {
-    dependencies.conventionGateway.conventionSignedResult$.next(undefined);
-  };
-
-  const feedGatewayWithSignError = (error: Error) => {
-    dependencies.conventionGateway.conventionSignedResult$.error(error);
-  };
-
-  const feedGatewayWithModificationSuccess = () => {
-    dependencies.conventionGateway.conventionModificationResult$.next(
-      undefined,
-    );
-  };
-
-  const feedGatewayWithModificationFailure = (error: Error) => {
-    dependencies.conventionGateway.conventionModificationResult$.error(error);
-  };
-
-  const feedGatewayWithRenewedConventionSuccess = () => {
-    dependencies.conventionGateway.conventionRenewalResult$.next(undefined);
-  };
-
-  const feedGatewayWithRenewedConventionError = (error: Error) => {
-    dependencies.conventionGateway.conventionRenewalResult$.error(error);
-  };
-
   const expectIsMinorToBe = (expected: boolean) => {
     expectToEqual(conventionSelectors.isMinor(store.getState()), expected);
-  };
-
-  const expectIsLoadingToBe = (expected: boolean) => {
-    expectToEqual(conventionSelectors.isLoading(store.getState()), expected);
   };
 
   const expectIsTutorEstablishmentRepresentativeToBe = (expected: boolean) => {
@@ -1357,10 +990,4 @@ describe("Convention slice", () => {
       expected,
     );
   };
-
-  const expectFeedbackToBe = (expected: ConventionSubmitFeedback) => {
-    expectToEqual(conventionSelectors.feedback(store.getState()), expected);
-  };
-
-  const fastForwardObservables = () => dependencies.scheduler.flush();
 });
