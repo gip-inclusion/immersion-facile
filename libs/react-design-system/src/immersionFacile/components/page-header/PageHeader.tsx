@@ -5,9 +5,10 @@ import Styles from "./PageHeader.styles";
 
 export type PageHeaderProps = {
   title: string;
+  illustration?: string;
   className?: string;
   children?: ReactNode;
-  classes?: Partial<Record<"root" | "inner" | "title", string>>;
+  classes?: Partial<Record<"root" | "description" | "inner" | "title", string>>;
   breadcrumbs?: ReactNode;
   badge?: ReactNode;
 };
@@ -16,11 +17,21 @@ export const PageHeader = ({
   title,
   className,
   children,
+  illustration,
   classes = {},
   breadcrumbs,
   badge,
 }: PageHeaderProps) => {
   const { cx } = useStyles();
+  const textContent = (
+    <>
+      {badge}
+      <h1 className={cx(children ? "" : "fr-my-auto", classes.title)}>
+        {title}
+      </h1>
+      {children}
+    </>
+  );
   return (
     <section
       className={cx(
@@ -35,11 +46,17 @@ export const PageHeader = ({
         <div className={cx(Styles.breadcrumbsWrapper)}>{breadcrumbs}</div>
       )}
       <div className={cx(fr.cx("fr-container", "fr-mt-8w"), classes.inner)}>
-        {badge}
-        <h1 className={cx(children ? "" : "fr-my-auto", classes.title)}>
-          {title}
-        </h1>
-        {children}
+        {illustration && (
+          <div className={fr.cx("fr-grid-row")}>
+            <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+              {textContent}
+            </div>
+            <div className={fr.cx("fr-col-12", "fr-col-lg-4", "fr-px-1w")}>
+              <img src={illustration} alt="" />
+            </div>
+          </div>
+        )}
+        {!illustration && textContent}
       </div>
     </section>
   );
