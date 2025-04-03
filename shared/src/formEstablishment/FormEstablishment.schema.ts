@@ -25,10 +25,10 @@ import type {
   ContactMethod,
   EstablishmentBatchReport,
   EstablishmentCSVRow,
-  EstablishmentFormUserRights,
   FormEstablishmentBatchDto,
   FormEstablishmentDto,
   FormEstablishmentSource,
+  FormEstablishmentUserRight,
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
@@ -46,37 +46,38 @@ export const contactMethodSchema = zEnumValidation(
   "Choisissez parmi les options proposées",
 );
 
-export const establishmentFormUserRightsSchema: z.Schema<EstablishmentFormUserRights> =
+export const establishmentFormUserRightSchema: z.Schema<FormEstablishmentUserRight> =
   z
-    .array(
-      z
-        .object({
-          role: z.literal("establishment-admin"),
-          email: emailSchema,
-          phone: phoneSchema,
-          job: zStringMinLength1,
-        })
-        .or(
-          z.object({
-            role: z.literal("establishment-contact"),
-            email: emailSchema,
-            phone: phoneSchema.optional(),
-            job: zStringMinLength1.optional(),
-          }),
-        ),
-    )
-    .refine(
-      (userRights) =>
-        userRights.filter((right) => right.role === "establishment-admin")
-          .length > 0,
-      "La structure accueillante nécéssite au moins un administrateur pour être valide.",
-    )
-    .refine(
-      (userRights) =>
-        uniq(userRights.map((right) => right.email)).length ===
-        userRights.length,
-      "La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+    .object({
+      role: z.literal("establishment-admin"),
+      email: emailSchema,
+      phone: phoneSchema,
+      job: zStringMinLength1,
+    })
+    .or(
+      z.object({
+        role: z.literal("establishment-contact"),
+        email: emailSchema,
+        phone: phoneSchema.optional(),
+        job: zStringMinLength1.optional(),
+      }),
     );
+
+export const establishmentFormUserRightsSchema: z.Schema<
+  FormEstablishmentUserRight[]
+> = z
+  .array(establishmentFormUserRightSchema)
+  .refine(
+    (userRights) =>
+      userRights.filter((right) => right.role === "establishment-admin")
+        .length > 0,
+    "La structure accueillante nécessite au moins un administrateur pour être valide.",
+  )
+  .refine(
+    (userRights) =>
+      uniq(userRights.map((right) => right.email)).length === userRights.length,
+    "La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+  );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
   "immersion-facile",

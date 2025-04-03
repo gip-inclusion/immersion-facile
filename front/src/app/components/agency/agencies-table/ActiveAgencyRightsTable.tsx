@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Table from "@codegouvfr/react-dsfr/Table";
 import type { ReactNode } from "react";
 import type { AgencyRight } from "shared";
-import { agencyRoleToDisplay } from "../AgencyUsers";
+import { userRoleToDisplay } from "../../../contents/userRoleToDisplay";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 import { AgencyLineAgencyName } from "./agency-line/AgencyLineAgencyName";
 import { AgencyLineCaracteristics } from "./agency-line/AgencyLineCaracteristics";
@@ -48,7 +48,7 @@ const makeAgencyRightLine =
     AgencyLineAgencyName({ agencyRight }),
     AgencyLineCaracteristics({ agencyRight }),
     AgencyLineAdminEmails({ agencyRight }),
-    agencyRight.roles.map((role) => agencyRoleToDisplay[role].label).join(", "),
+    agencyRight.roles.map((role) => userRoleToDisplay[role].label).join(", "),
     agencyRight.isNotifiedByEmail ? "Oui" : "Non",
     AgencyLineRightsCTAs({
       agencyRight,

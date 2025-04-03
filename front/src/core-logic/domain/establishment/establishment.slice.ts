@@ -129,9 +129,13 @@ export const establishmentSlice = createSlice({
     },
     updateEstablishmentSucceeded: (
       state,
-      _action: PayloadActionWithFeedbackTopic,
+      action: PayloadActionWithFeedbackTopic<{
+        establishmentUpdate: EstablishmentUpdatePayload;
+      }>,
     ) => {
       state.isLoading = false;
+      state.formEstablishment =
+        action.payload.establishmentUpdate.formEstablishment;
     },
     updateEstablishmentFailed: (
       state,

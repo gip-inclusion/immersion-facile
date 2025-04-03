@@ -339,6 +339,7 @@ export const createUseCases = (
           uuidGenerator,
           gateways.timeGateway,
           createNewEvent,
+          saveNotificationAndRelatedEvent,
         ),
       insertEstablishmentAggregateFromForm,
       addEstablishmentLead: new AddEstablishmentLead(
