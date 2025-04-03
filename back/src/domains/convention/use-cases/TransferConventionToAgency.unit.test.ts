@@ -779,7 +779,7 @@ describe("TransferConventionToAgency", () => {
       it("counsellor of an agency with refersTo can transfer convention to agency", async () => {
         const counsellorPayload = createConventionMagicLinkPayload({
           id: conventionId,
-          role: "back-office",
+          role: "counsellor",
           email: notConnectedUser.email,
           now: new Date(),
         });
@@ -789,10 +789,15 @@ describe("TransferConventionToAgency", () => {
           .withAgencyId(agencyWithRefersTo.id)
           .build();
         uow.conventionRepository.setConventions([conventionWithAgencyRefersTo]);
-        uow.userRepository.users = [];
+        uow.userRepository.users = [notConnectedUser];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(otherAgency, {}),
-          toAgencyWithRights(agencyWithRefersTo, {}),
+          toAgencyWithRights(agencyWithRefersTo, {
+            [notConnectedUser.id]: {
+              roles: ["counsellor"],
+              isNotifiedByEmail: false,
+            },
+          }),
         ];
 
         await usecase.execute(
@@ -820,7 +825,7 @@ describe("TransferConventionToAgency", () => {
               previousAgencyId: conventionWithAgencyRefersTo.agencyId,
               triggeredBy: {
                 kind: "convention-magic-link",
-                role: "back-office",
+                role: "counsellor",
               },
             },
           },
