@@ -7,7 +7,7 @@ import {
 
 describe("Date utils tests - toDateString", () => {
   it("should format a valid date", () => {
-    const date = parseISO("2021-01-01");
+    const date = parseISO("2021-01-01T00:00:00.000Z");
     expect(toDateString(date)).toBe("2021-01-01");
   });
 
