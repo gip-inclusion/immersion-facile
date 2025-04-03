@@ -1,13 +1,8 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import type { ReactNode } from "react";
-
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
-import type {
-  FeedbackLevel,
-  FeedbackTopic,
-  Feedback as FeedbackType,
-} from "src/core-logic/domain/feedback/feedback.slice";
+import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
+import type { FeedbackLevel } from "src/core-logic/domain/feedback/feedback.slice";
 
 type FeedbackProps = {
   topics: FeedbackTopic[];
@@ -21,30 +16,21 @@ type FeedbackProps = {
   className?: string;
 };
 
-type ValidFeedback = {
-  topic: FeedbackTopic;
-  feedback: FeedbackType;
-};
-
 export const Feedback = ({
   topics = [],
   render,
   closable,
   className,
 }: FeedbackProps) => {
-  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-
-  const relevantFeedbacks: ValidFeedback[] = topics
-    .map((t) => ({ topic: t, feedback: feedbacks[t] }))
-    .filter((item): item is ValidFeedback => !!item.feedback);
+  const relevantFeedbacks = useFeedbackTopics(topics);
 
   if (relevantFeedbacks.length === 0) return null;
 
   if (render) {
     return (
       <>
-        {relevantFeedbacks.map(({ topic, feedback }) => (
-          <div key={topic}>
+        {relevantFeedbacks.map((feedback) => (
+          <div key={feedback.message}>
             {render({
               level: feedback.level,
               title: feedback.title,
@@ -58,10 +44,10 @@ export const Feedback = ({
 
   return (
     <>
-      {relevantFeedbacks.map(({ topic, feedback }) =>
+      {relevantFeedbacks.map((feedback) =>
         closable === true ? (
           <Alert
-            key={topic}
+            key={feedback.message}
             severity={feedback.level}
             title={feedback.title}
             description={feedback.message}
@@ -71,7 +57,7 @@ export const Feedback = ({
           />
         ) : (
           <Alert
-            key={topic}
+            key={feedback.message}
             severity={feedback.level}
             title={feedback.title}
             description={feedback.message}

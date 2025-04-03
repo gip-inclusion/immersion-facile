@@ -1,13 +1,12 @@
 import { useEffect } from "react";
 import type { InternshipKind } from "shared";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 
 export const useMatomo = (internshipKind: InternshipKind) => {
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
   useEffect(() => {
-    if (submitFeedback.kind === "justSubmitted") {
+    if (conventionFormFeedback?.level === "success") {
       window._mtm.push({ event: "conventionSubmitSuccess", internshipKind });
     }
-  }, [submitFeedback.kind, internshipKind]);
+  }, [conventionFormFeedback?.level, internshipKind]);
 };

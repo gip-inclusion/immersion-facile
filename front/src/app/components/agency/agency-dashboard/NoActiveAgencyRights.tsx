@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { AgencyRight, InclusionConnectedUser } from "shared";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { OnGoingAgencyRightsTable } from "../agencies-table/OnGoingAgencyRightsTable";
 
 export function NoActiveAgencyRights({

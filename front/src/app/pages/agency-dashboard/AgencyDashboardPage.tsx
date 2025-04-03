@@ -11,12 +11,11 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import { AgencyDashboard } from "../../components/agency/agency-dashboard/AgencyDashboard";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
-
 export const AgencyDashboardPage = ({
   route,
 }: {
