@@ -54,10 +54,18 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
           state: {
             status: "accepted",
             occurredAt: this.timeGateway.now().toISOString(),
+            // messageIds: [],
           },
         });
       })
       .with({ isOk: false }, async ({ error }) => {
+        if (error.httpStatus >= 500) {
+          throw errors.generic.unsupportedStatus({
+            status: error.httpStatus,
+            body: error.message,
+          });
+        }
+
         const notificationState: NotificationErrored = {
           status: "errored",
           occurredAt: this.timeGateway.now().toISOString(),
@@ -86,11 +94,6 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
             }),
           );
         }
-
-        throw errors.generic.unsupportedStatus({
-          status: error.httpStatus,
-          body: error.message,
-        });
       })
       .exhaustive();
   }
