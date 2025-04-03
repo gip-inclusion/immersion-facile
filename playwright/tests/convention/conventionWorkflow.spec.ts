@@ -65,10 +65,10 @@ test.describe("Convention creation and modification workflow", () => {
         .getByRole("link")
         .click();
       await page
-        .locator(`#${domElementIds.manageConvention.edit.actionsButton}`)
+        .locator(`#${domElementIds.manageConvention.editActionsButton}`)
         .click();
       await page
-        .locator(`#${domElementIds.manageConvention.edit.requestEditButton}`)
+        .locator(`#${domElementIds.manageConvention.requestEditButton}`)
         .click();
 
       await page.selectOption(
@@ -77,13 +77,11 @@ test.describe("Convention creation and modification workflow", () => {
       );
       await page
         .locator(
-          `#${domElementIds.manageConvention.edit.requestEditModal} [name="statusJustification"]`,
+          `#${domElementIds.manageConvention.requestEditModal} [name="statusJustification"]`,
         )
         .fill("Justification");
       await page
-        .locator(
-          `#${domElementIds.manageConvention.edit.requestEditSubmitButton}`,
-        )
+        .locator(`#${domElementIds.manageConvention.requestEditSubmitButton}`)
         .click();
       await expect(page.locator(".fr-alert--success")).toBeVisible();
       await page.waitForTimeout(testConfig.timeForEventCrawler);

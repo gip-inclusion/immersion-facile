@@ -236,7 +236,7 @@ export const ConventionManageActions = ({
               onSubmit: createOnSubmitWithFeedbackKind,
             }).buttonProps,
 
-            id: domElementIds.manageConvention.edit.transferToAgencyButton,
+            id: domElementIds.manageConvention.transferToAgencyButton,
           },
         ]
       : []),
@@ -251,7 +251,7 @@ export const ConventionManageActions = ({
         currentSignatoryRoles: requesterRoles,
         onSubmit: createOnSubmitWithFeedbackKind,
       }).buttonProps,
-      id: domElementIds.manageConvention.edit.requestEditButton,
+      id: domElementIds.manageConvention.requestEditButton,
     },
   ];
 
@@ -378,7 +378,7 @@ export const ConventionManageActions = ({
                   priority={"secondary"}
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
-                  id={domElementIds.manageConvention.edit.actionsButton}
+                  id={domElementIds.manageConvention.editActionsButton}
                 />
                 <ModalWrapper
                   {...getVerificationActionProps({
@@ -421,7 +421,7 @@ export const ConventionManageActions = ({
                     onSubmit: createOnSubmitWithFeedbackKind,
                   }).buttonProps}
                   iconId="fr-icon-edit-line"
-                  id={domElementIds.manageConvention.edit.requestEditButton}
+                  id={domElementIds.manageConvention.requestEditButton}
                 />
 
                 <ModalWrapper
