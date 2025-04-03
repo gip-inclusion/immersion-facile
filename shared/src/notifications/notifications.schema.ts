@@ -40,12 +40,18 @@ export const notificationErroredSchema: z.Schema<NotificationErrored> =
     message: z.string(),
   });
 
-const notificationStateSchema: z.Schema<NotificationState> = z
-  .object({
-    status: z.enum(["to-be-send", "accepted"]),
+const notificationStateSchema: z.Schema<NotificationState> = z.union([
+  z.object({
+    status: z.literal("to-be-send"),
     occurredAt: dateTimeIsoStringSchema,
-  })
-  .or(notificationErroredSchema);
+  }),
+  z.object({
+    status: z.literal("accepted"),
+    occurredAt: dateTimeIsoStringSchema,
+    // messageIds: z.array(z.string()),
+  }),
+  notificationErroredSchema,
+]);
 
 const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,

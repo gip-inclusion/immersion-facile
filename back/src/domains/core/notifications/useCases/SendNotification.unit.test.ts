@@ -22,9 +22,11 @@ import {
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryNotificationGateway,
-  emailThatTriggerSendEmailError,
-  fakeHttpStatusErrorCode,
-  sendSmsErrorPhoneNumber,
+  emailThatTriggerSendEmailError400,
+  fakeHttpStatus400ErrorCode,
+  fakeHttpStatus555ErrorCode,
+  sendSmsError400PhoneNumber,
+  sendSmsError555PhoneNumber,
 } from "../adapters/InMemoryNotificationGateway";
 import { SendNotification } from "./SendNotification";
 
@@ -66,7 +68,7 @@ describe("SendNotification UseCase", () => {
     });
 
     describe("when error occurres in SMS or email sending", () => {
-      it("should return the error, store it in the notification (and not send any event)", async () => {
+      it("should throw if http status is 500 or higher", async () => {
         const id = "notif-sms-id";
 
         const now = new Date();
@@ -78,7 +80,7 @@ describe("SendNotification UseCase", () => {
           templatedContent: {
             kind: "FirstReminderForSignatories",
             params: { shortLink: "https://my-link.com" },
-            recipientPhone: `33${sendSmsErrorPhoneNumber.substring(1)}`,
+            recipientPhone: `33${sendSmsError555PhoneNumber.substring(1)}`,
           },
           createdAt: someDate,
           followedIds: { conventionId: "convention-123" },
@@ -87,20 +89,46 @@ describe("SendNotification UseCase", () => {
         uow.notificationRepository.notifications = [smsNotification];
 
         const errorMessage =
-          "fake Send SMS Error with phone number 33699999999.";
+          "fake Send SMS Error with phone number 33699000555.";
 
         await expectPromiseToFailWithError(
           sendNotification.execute({ id, kind: "sms" }),
           errors.generic.unsupportedStatus({
-            status: fakeHttpStatusErrorCode, // some fake status that happens on backend perhaps
+            status: fakeHttpStatus555ErrorCode,
             body: errorMessage,
           }),
         );
+      });
+
+      it("stores the error in the notification (and not send any event) when error is 4xx", async () => {
+        const id = "notif-sms-id";
+
+        const now = new Date();
+        timeGateway.setNextDate(now);
+
+        const smsNotification: SmsNotification = {
+          id,
+          kind: "sms",
+          templatedContent: {
+            kind: "FirstReminderForSignatories",
+            params: { shortLink: "https://my-link.com" },
+            recipientPhone: `33${sendSmsError400PhoneNumber.substring(1)}`,
+          },
+          createdAt: someDate,
+          followedIds: { conventionId: "convention-123" },
+        };
+
+        uow.notificationRepository.notifications = [smsNotification];
+
+        const errorMessage =
+          "fake Send SMS Error with phone number 33699000400.";
+
+        await sendNotification.execute({ id, kind: "sms" });
 
         const notificationState: NotificationErrored = {
           status: "errored",
           occurredAt: now.toISOString(),
-          httpStatus: fakeHttpStatusErrorCode,
+          httpStatus: fakeHttpStatus400ErrorCode,
           message: errorMessage,
         };
 
@@ -119,13 +147,13 @@ describe("SendNotification UseCase", () => {
           templatedContent: {
             kind: "DISCUSSION_EXCHANGE",
             params: {} as any,
-            recipients: [emailThatTriggerSendEmailError],
+            recipients: [emailThatTriggerSendEmailError400],
           },
           createdAt: someDate,
           followedIds: {},
         };
 
-        it("should dispatch an event when it was a discussion exchange notification failed to deliver", async () => {
+        it("should dispatch an event when it was a discussion exchange notification failed to deliver (with 4xx)", async () => {
           uow.notificationRepository.notifications = [emailNotification];
 
           const now = new Date();
@@ -134,21 +162,20 @@ describe("SendNotification UseCase", () => {
           const notificationState: NotificationErrored = {
             status: "errored",
             occurredAt: now.toISOString(),
-            httpStatus: fakeHttpStatusErrorCode,
-            message:
-              "fake Send Email Error with email email-that-triggers-send-email-error@mail.com",
+            httpStatus: fakeHttpStatus400ErrorCode,
+            message: `fake Send Email Error with email ${emailThatTriggerSendEmailError400}`,
           };
 
-          await expectPromiseToFailWithError(
-            sendNotification.execute({
-              id: emailNotification.id,
-              kind: "email",
-            }),
-            errors.generic.unsupportedStatus({
-              status: fakeHttpStatusErrorCode,
-              body: notificationState.message,
-            }),
-          );
+          await sendNotification.execute({
+            id: emailNotification.id,
+            kind: "email",
+          });
+          // await expectPromiseToFailWithError(
+          //   errors.generic.unsupportedStatus({
+          //     status: fakeHttpStatus400ErrorCode,
+          //     body: notificationState.message,
+          //   }),
+          // );
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
@@ -181,21 +208,14 @@ describe("SendNotification UseCase", () => {
           const notificationState: NotificationErrored = {
             status: "errored",
             occurredAt: now.toISOString(),
-            httpStatus: fakeHttpStatusErrorCode,
-            message:
-              "fake Send Email Error with email email-that-triggers-send-email-error@mail.com",
+            httpStatus: fakeHttpStatus400ErrorCode,
+            message: `fake Send Email Error with email ${emailThatTriggerSendEmailError400}`,
           };
 
-          await expectPromiseToFailWithError(
-            sendNotification.execute({
-              id: emailNotification.id,
-              kind: "email",
-            }),
-            errors.generic.unsupportedStatus({
-              status: fakeHttpStatusErrorCode,
-              body: notificationState.message,
-            }),
-          );
+          await sendNotification.execute({
+            id: emailNotification.id,
+            kind: "email",
+          });
 
           expectArraysToMatch(uow.notificationRepository.notifications, [
             { ...alreadyErroredEmailNotif, state: notificationState },
@@ -232,7 +252,11 @@ describe("SendNotification UseCase", () => {
           expectArraysToMatch(uow.notificationRepository.notifications, [
             {
               ...alreadyErroredEmailNotif,
-              state: { status: "accepted", occurredAt: now.toISOString() },
+              state: {
+                status: "accepted",
+                occurredAt: now.toISOString(),
+                // messageIds: [],
+              },
             },
           ]);
 
