@@ -33,8 +33,13 @@ export type FollowedIds = {
 
 export type NotificationState =
   | {
-      status: "to-be-send" | "accepted";
+      status: "to-be-send";
       occurredAt: DateTimeIsoString;
+    }
+  | {
+      status: "accepted";
+      occurredAt: DateTimeIsoString;
+      // messageIds: string[]; // Brevo messageIds for now
     }
   | NotificationErrored;
 
