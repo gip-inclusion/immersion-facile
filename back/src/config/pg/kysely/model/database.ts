@@ -539,7 +539,7 @@ interface UsersAdmins {
 
 type NotificationState = JSONColumnType<
   | {
-      status: "to-be-sent" | "accepted";
+      status: "to-be-send" | "accepted";
       occurredAt: DateTimeIsoString;
     }
   | {
