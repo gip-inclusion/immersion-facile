@@ -1,6 +1,8 @@
+import { type ResultAsync, errAsync, okAsync } from "neverthrow";
 import { prop } from "ramda";
 import {
   type DateString,
+  type HttpErrorResponseBody,
   type TemplatedEmail,
   type TemplatedSms,
   errors,
@@ -44,16 +46,21 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     return this.#sentSms;
   }
 
-  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+  public sendEmail(
+    templatedEmail: TemplatedEmail,
+  ): ResultAsync<void, HttpErrorResponseBody> {
     this.#pushEmail(templatedEmail);
+    return okAsync();
   }
 
-  public async sendSms(sms: TemplatedSms): Promise<void> {
+  public sendSms(sms: TemplatedSms): ResultAsync<void, HttpErrorResponseBody> {
     if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`)
-      throw errors.generic.fakeError(
-        `Send SMS Error with phone number ${sms.recipientPhone}.`,
-      );
+      return errAsync({
+        status: 555, // some fake status
+        message: `Send SMS Error with phone number ${sms.recipientPhone}.`,
+      });
     this.#sentSms.push(sms);
+    return okAsync();
   }
 
   #pushEmail(templatedEmail: TemplatedEmail) {

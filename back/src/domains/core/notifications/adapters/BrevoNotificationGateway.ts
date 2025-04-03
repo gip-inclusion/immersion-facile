@@ -8,6 +8,16 @@ import {
   defaultEmailFooter,
 } from "html-templates/src/components/email";
 import {
+  type Result,
+  ResultAsync,
+  err,
+  errAsync,
+  ok,
+  okAsync,
+} from "neverthrow";
+import {
+  type BadRequestError,
+  type HttpErrorResponseBody,
   type NotificationId,
   type TemplatedEmail,
   type TemplatedSms,
@@ -93,13 +103,13 @@ export class BrevoNotificationGateway implements NotificationGateway {
     return Buffer.from(await blob.arrayBuffer()).toString("base64");
   }
 
-  public async sendEmail(
+  public sendEmail(
     email: TemplatedEmail,
     notificationId?: NotificationId,
-  ) {
-    if (email.recipients.length === 0) {
-      throw errors.notification.missingRecipient({ notificationId });
-    }
+  ): ResultAsync<void, HttpErrorResponseBody | BadRequestError> {
+    if (email.recipients.length === 0)
+      return errAsync(errors.notification.missingRecipient({ notificationId }));
+
     const cc = this.#filterAllowListAndConvertToRecipients(email.cc);
 
     const emailData: SendTransactEmailRequestBody = {
@@ -120,68 +130,79 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: email.sender ?? this.config.defaultSender,
     };
 
-    if (emailData.to.length === 0) return;
+    if (emailData.to.length === 0) return okAsync();
 
-    await this.#sendTransacEmail(emailData);
+    return this.#sendTransacEmail(emailData);
   }
 
   public sendSms(
     { kind, params, recipientPhone }: TemplatedSms,
     notificationId?: NotificationId,
-  ): Promise<void> {
+  ) {
     logger.info({
       notificationId,
       message: "sendTransactSmsTotal",
     });
-
     return this.#sendTransacSms({
       content: smsTemplatesByName[kind].createContent(params as any),
       sender: "ImmerFacile",
       recipient: recipientPhone,
     })
-      .then((_response) =>
+      .andTee(() =>
         logger.info({
           notificationId,
           message: "sendTransactSmsSuccess",
         }),
       )
-      .catch((error) => {
+      .mapErr((error) => {
         logger.error({
           notificationId,
           message: "sendTransactSmsError",
         });
-        throw error;
+        return error;
       });
   }
 
-  async #sendTransacEmail(body: SendTransactEmailRequestBody) {
-    return this.#emailLimiter.schedule(async () => {
-      const response = await this.config.httpClient.sendTransactEmail({
-        headers: this.#brevoHeaders,
-        body,
-      });
-      if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      return response;
-    });
+  #sendTransacEmail(
+    body: SendTransactEmailRequestBody,
+  ): ResultAsync<void, HttpErrorResponseBody> {
+    return new ResultAsync(
+      this.#emailLimiter.schedule(
+        async (): Promise<Result<void, HttpErrorResponseBody>> => {
+          const response = await this.config.httpClient.sendTransactEmail({
+            headers: this.#brevoHeaders,
+            body,
+          });
+
+          if (response.status !== 201)
+            return err({
+              status: response.status,
+              message: JSON.stringify(response.body),
+            });
+
+          return ok();
+        },
+      ),
+    );
   }
 
-  #sendTransacSms(body: SendTransactSmsRequestBody) {
-    return this.#smslimiter.schedule(async () => {
-      const response = await this.config.httpClient.sendTransactSms({
-        headers: this.#brevoHeaders,
-        body,
-      });
-      if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
+  #sendTransacSms(
+    body: SendTransactSmsRequestBody,
+  ): ResultAsync<void, HttpErrorResponseBody> {
+    return new ResultAsync(
+      this.#smslimiter.schedule(async () => {
+        const response = await this.config.httpClient.sendTransactSms({
+          headers: this.#brevoHeaders,
+          body,
         });
-      return response;
-    });
+        if (response.status !== 201)
+          return err({
+            status: response.status,
+            message: JSON.stringify(response.body),
+          });
+        return ok();
+      }),
+    );
   }
 
   #filterAllowListAndConvertToRecipients(

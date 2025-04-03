@@ -1,5 +1,6 @@
-import { executeInSequence } from "shared";
+import { BadRequestError, errors, executeInSequence } from "shared";
 import { z } from "zod";
+import { unwrapOrThrow } from "../../../../utils/resultAsync";
 import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
@@ -48,15 +49,24 @@ export class SendNotificationInBatch extends TransactionalUseCase<
 
     await Promise.all([
       executeInSequence(smsNotifications, (notification) =>
-        this.notificationGateway.sendSms(
-          notification.templatedContent,
-          notification.id,
+        unwrapOrThrow(
+          this.notificationGateway.sendSms(
+            notification.templatedContent,
+            notification.id,
+          ),
         ),
       ),
       executeInSequence(emailNotifications, (notification) =>
-        this.notificationGateway.sendEmail(
-          notification.templatedContent,
-          notification.id,
+        unwrapOrThrow(
+          this.notificationGateway
+            .sendEmail(notification.templatedContent, notification.id)
+            .mapErr((error) => {
+              if (error instanceof BadRequestError) return error;
+              return errors.generic.unsupportedStatus({
+                status: error.status,
+                body: error.message,
+              });
+            }),
         ),
       ),
     ]);

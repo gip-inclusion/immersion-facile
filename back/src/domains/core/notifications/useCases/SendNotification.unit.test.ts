@@ -57,7 +57,10 @@ describe("SendNotification UseCase", () => {
 
       await expectPromiseToFailWithError(
         sendNotification.execute({ id, kind: "sms" }),
-        new Error("Send SMS Error with phone number 33699999999."),
+        errors.generic.unsupportedStatus({
+          status: 555,
+          body: "Send SMS Error with phone number 33699999999.",
+        }),
       );
     });
   });

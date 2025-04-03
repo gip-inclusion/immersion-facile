@@ -1,5 +1,8 @@
+import type { ResultAsync } from "neverthrow";
 import type {
+  BadRequestError,
   Flavor,
+  HttpErrorResponseBody,
   NotificationId,
   TemplatedEmail,
   TemplatedSms,
@@ -11,10 +14,10 @@ export interface NotificationGateway {
   sendEmail(
     templatedEmail: TemplatedEmail,
     notificationId?: NotificationId,
-  ): Promise<void>;
+  ): ResultAsync<void, HttpErrorResponseBody | BadRequestError>;
   sendSms(
     sendSmsParams: TemplatedSms,
     notificationId?: NotificationId,
-  ): Promise<void>;
+  ): ResultAsync<void, HttpErrorResponseBody>;
   getAttachmentContent(downloadToken: string): Promise<Base64 | null>;
 }

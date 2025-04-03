@@ -3,6 +3,7 @@ import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import type { HttpClient, HttpResponse } from "shared-routes";
 import { makeEmailAllowListPredicate } from "../../../../config/bootstrap/appConfig";
 import type { BrevoHeaders } from "../../../../utils/apiBrevoUrl";
+import { unwrapOrThrow } from "../../../../utils/resultAsync";
 import { BrevoNotificationGateway } from "./BrevoNotificationGateway";
 import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import type { SendTransactEmailRequestBody } from "./BrevoNotificationGateway.schemas";
@@ -66,7 +67,7 @@ describe("BrevoNotificationGateway unit", () => {
         });
 
       await expectPromiseToFailWithError(
-        triggerSendEmail(),
+        unwrapOrThrow(triggerSendEmail()),
         errors.notification.missingRecipient({ notificationId: undefined }),
       );
     });
