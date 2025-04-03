@@ -376,6 +376,10 @@ export const domElementIds = {
   unsubscribeEstablishmentLead: {},
 
   establishment: {
+    login: {
+      inclusionConnectButton:
+        "im-login-form__inclusion-connect-button--establishment",
+    },
     create: {
       form: "im-form-create-establishment",
       addressAutocomplete:

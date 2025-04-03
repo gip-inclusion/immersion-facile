@@ -8,7 +8,7 @@ import { distinguishAgencyRights } from "shared";
 import { NoActiveAgencyRights } from "src/app/components/agency/agency-dashboard/NoActiveAgencyRights";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { FrontAgencyDashboardRoute } from "src/app/routes/InclusionConnectedPrivateRoute";
+import type { FrontAgencyDashboardRoute } from "src/app/routes/ConnectedPrivateRoute";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";

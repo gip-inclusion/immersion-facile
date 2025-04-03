@@ -4,6 +4,7 @@ export const allowedStartOAuthLoginPages = [
   "agencyDashboard",
   "establishmentDashboard",
   "admin",
+  "establishment",
 ] as const;
 
 export const frontRoutes = {

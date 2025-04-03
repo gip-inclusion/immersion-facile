@@ -1,9 +1,9 @@
 import type { ReactElement } from "react";
 import { PageHeader } from "react-design-system";
 import {
+  ConnectedPrivateRoute,
   type FrontAdminRoute,
-  InclusionConnectedPrivateRoute,
-} from "src/app/routes/InclusionConnectedPrivateRoute";
+} from "src/app/routes/ConnectedPrivateRoute";
 
 type AdminPrivateRouteProps = {
   route: FrontAdminRoute;
@@ -14,7 +14,7 @@ export const AdminPrivateRoute = ({
   route,
   children,
 }: AdminPrivateRouteProps) => (
-  <InclusionConnectedPrivateRoute
+  <ConnectedPrivateRoute
     allowAdminOnly={true}
     route={route}
     inclusionConnectConnexionPageHeader={
@@ -22,5 +22,5 @@ export const AdminPrivateRoute = ({
     }
   >
     {children}
-  </InclusionConnectedPrivateRoute>
+  </ConnectedPrivateRoute>
 );

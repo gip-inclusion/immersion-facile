@@ -5,7 +5,7 @@ import Styles from "./LoginForm.styles";
 
 export type LoginFormSectionProps = {
   title: string;
-  description: string;
+  description: ReactNode;
   authComponent: ReactNode;
   index?: number;
 };
@@ -30,7 +30,7 @@ const LoginFormSection = ({
       )}
       <div>
         <h2 className={fr.cx("fr-h4")}>{title}</h2>
-        <p dangerouslySetInnerHTML={{ __html: description }} />
+        {description}
         {authComponent}
       </div>
     </>
