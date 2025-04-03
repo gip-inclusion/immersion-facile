@@ -114,8 +114,8 @@ importers:
         specifier: ^10.9.1
         version: 10.9.1(@types/node@20.17.16)(typescript@5.7.3)
       ts-pattern:
-        specifier: 4.2.2
-        version: 4.2.2
+        specifier: 5.7.0
+        version: 5.7.0
       uuid:
         specifier: ^8.3.2
         version: 8.3.2
@@ -382,8 +382,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       ts-pattern:
-        specifier: ^5.0.0
-        version: 5.0.0
+        specifier: ^5.7.0
+        version: 5.7.0
       tss-react:
         specifier: ^4.5.2
         version: 4.5.2(@emotion/react@11.10.5(@babel/core@7.20.12)(@types/react@18.3.18)(react@18.2.0))(react@18.2.0)
@@ -603,8 +603,8 @@ importers:
         specifier: ^12.1.3
         version: 12.1.3
       ts-pattern:
-        specifier: ^5.2.0
-        version: 5.2.0
+        specifier: ^5.7.0
+        version: 5.7.0
     devDependencies:
       '@babel/core':
         specifier: ^7.20.12
@@ -4699,6 +4699,11 @@ packages:
     peerDependencies:
       '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
 
+  babel-plugin-polyfill-regenerator@0.6.4:
+    resolution: {integrity: sha512-7gD3pRadPrbjhjLyxebmx/WrFYcuSjZ0XbdUujQMZ/fcE9oeewk2U/7PCvez84UeuK3oSjmPZ0Ch0dlupQvGzw==}
+    peerDependencies:
+      '@babel/core': ^7.4.0 || ^8.0.0-0 <8.0.0
+
   babel-preset-current-node-syntax@1.0.1:
     resolution: {integrity: sha512-M7LQ0bxarkxQoN+vz5aJPsLBn77n8QgTFmo8WK0/44auK2xlCXrYcUxHFxgU7qW5Yzw/CjmLRK2uJzaCd7LvqQ==}
     peerDependencies:
@@ -8743,14 +8748,8 @@ packages:
       '@swc/wasm':
         optional: true
 
-  ts-pattern@4.2.2:
-    resolution: {integrity: sha512-qzJMo2pbkUJWusRH5o8xR+xogn6RmvViyUgwBFTtRENLse470clCGjHDf6haWGZ1AOmk8XkEohUoBW8Uut6Scg==}
-
-  ts-pattern@5.0.0:
-    resolution: {integrity: sha512-FDTdTujq2GvMmrwYM0Om6pMilRAUKvBApEN+YniTQui/HGjFwaI6WAx9SepD+yDBf4q29JLf6yqGB8uvdzysEg==}
-
-  ts-pattern@5.2.0:
-    resolution: {integrity: sha512-aGaSpOlDcns7ZoeG/OMftWyQG1KqPVhgplhJxNCvyIXqWrumM5uIoOSarw/hmmi/T1PnuQ/uD8NaFHvLpHicDg==}
+  ts-pattern@5.7.0:
+    resolution: {integrity: sha512-0/FvIG4g3kNkYgbNwBBW5pZBkfpeYQnH+2AA3xmjkCAit/DSDPKmgwC3fKof4oYUq6gupClVOJlFl+939VRBMg==}
 
   ts-prune@0.10.3:
     resolution: {integrity: sha512-iS47YTbdIcvN8Nh/1BFyziyUqmjXz7GVzWu02RaZXqb+e/3Qe1B7IQ4860krOeCGUeJmterAlaM2FRH0Ue0hjw==}
@@ -19907,11 +19906,7 @@ snapshots:
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
-  ts-pattern@4.2.2: {}
-
-  ts-pattern@5.0.0: {}
-
-  ts-pattern@5.2.0: {}
+  ts-pattern@5.7.0: {}
 
   ts-prune@0.10.3:
     dependencies:
