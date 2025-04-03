@@ -699,10 +699,12 @@ sources:
             description: "TSVector for ROME label"
 
       - name: searches_made
-        description: "Search history"
+        description: "Records of searches performed in the application"
         columns:
           - name: id
-            description: "Primary key - UUID"
+            description: "Primary key - ID of the search"
+          - name: update_date
+            description: "Timestamp when the search was performed"
           - name: address
             description: "Search address"
           - name: api_consumer_name
@@ -725,8 +727,6 @@ sources:
             description: "Who can search"
           - name: sorted_by
             description: "Sort order"
-          - name: update_date
-            description: "Timestamp when updated"
           - name: voluntary_to_immersion
             description: "Whether voluntary to immersion"
           - name: acquisition_campaign

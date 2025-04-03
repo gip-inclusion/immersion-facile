@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: daily_searches
+    description: "Daily count of unique searches made since 2024-01-01"
+    columns:
+      - name: day
+        description: "Date of the search (truncated to day)"
+        tests:
+          - not_null
+      - name: number_of_searches
+        description: "Count of unique searches made on that day"
+        tests:
+          - not_null
