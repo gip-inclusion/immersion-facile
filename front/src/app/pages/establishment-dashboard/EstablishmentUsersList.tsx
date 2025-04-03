@@ -4,7 +4,6 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,9 +21,11 @@ import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutName
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { userRoleToDisplay } from "src/app/contents/userRoleToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 const establishmentUsersEditModal = createModal({
   id: "establishment-users-edit-modal",
@@ -43,62 +44,65 @@ export const EstablishmentUsersList = () => {
   const [editingUserRight, setEditingUserRight] =
     useState<FormEstablishmentUserRight | null>(null);
 
-  useIsModalOpen(establishmentUsersEditModal, {
-    onConceal: () => {
-      setEditingUserRight(null);
-    },
-  });
-  useIsModalOpen(establishmentUsersDeleteModal, {
-    onConceal: () => {
-      setEditingUserRight(null);
-    },
-  });
-
   if (!formEstablishment?.userRights) return null;
 
   const headers = ["Utilisateur", "Informations de contact", "Rôle", "Actions"];
 
-  const data = formEstablishment.userRights.map((userRight) => [
-    userRight.email,
-    <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
-      <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
-      <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
-    </Fragment>,
-    <Badge
-      key={`${userRight.email}-${userRight.role}`}
-      small
-      className={fr.cx(userRoleToDisplay[userRight.role].className, "fr-mr-1w")}
-    >
-      {userRoleToDisplay[userRight.role].label}
-    </Badge>,
-    <ButtonsGroup
-      key={`${userRight.email}-${userRight.role}`}
-      inlineLayoutWhen="always"
-      buttonsSize="small"
-      buttons={[
-        {
-          children: "Modifier",
-          onClick: () => {
-            setEditingUserRight(userRight);
-            establishmentUsersEditModal.open();
+  const data = formEstablishment.userRights.map((userRight) => {
+    const isLastAdmin =
+      userRight.role === "establishment-admin" &&
+      formEstablishment.userRights.filter(
+        (userRight) => userRight.role === "establishment-admin",
+      ).length === 1;
+    return [
+      userRight.email,
+      <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
+        <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
+        <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
+      </Fragment>,
+      <Badge
+        key={`${userRight.email}-${userRight.role}`}
+        small
+        className={fr.cx(
+          userRoleToDisplay[userRight.role].className,
+          "fr-mr-1w",
+        )}
+      >
+        {userRoleToDisplay[userRight.role].label}
+      </Badge>,
+      <ButtonsGroup
+        key={`${userRight.email}-${userRight.role}`}
+        inlineLayoutWhen="always"
+        buttonsSize="small"
+        buttons={[
+          {
+            children: "Modifier",
+            onClick: () => {
+              setEditingUserRight(userRight);
+              establishmentUsersEditModal.open();
+            },
+            priority: "secondary",
+            className: fr.cx("fr-mb-0"),
+            type: "button",
           },
-          priority: "secondary",
-          className: fr.cx("fr-mb-0"),
-          type: "button",
-        },
-        {
-          children: "Supprimer",
-          onClick: () => {
-            setEditingUserRight(userRight);
-            establishmentUsersDeleteModal.open();
+          {
+            children: "Supprimer",
+            onClick: () => {
+              setEditingUserRight(userRight);
+              establishmentUsersDeleteModal.open();
+            },
+            priority: "secondary",
+            className: fr.cx("fr-mb-0"),
+            type: "button",
+            disabled: isLastAdmin,
+            title: isLastAdmin
+              ? "Vous devez avoir au moins un administrateur pour votre établissement."
+              : undefined,
           },
-          priority: "secondary",
-          className: fr.cx("fr-mb-0"),
-          type: "button",
-        },
-      ]}
-    />,
-  ]);
+        ]}
+      />,
+    ];
+  });
   return (
     <div className="fr-mt-4w">
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
@@ -115,6 +119,7 @@ export const EstablishmentUsersList = () => {
             type="button"
             onClick={() => {
               establishmentUsersEditModal.open();
+              setEditingUserRight(null);
             }}
             id={
               domElementIds.establishmentDashboard.manageEstablishments
@@ -158,6 +163,7 @@ const EstablishmentUsersDeleteContent = ({
   alreadyExistingUserRight: FormEstablishmentUserRight | null;
 }) => {
   const dispatch = useDispatch();
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const token = useAppSelector(authSelectors.inclusionConnectToken);
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
@@ -178,6 +184,8 @@ const EstablishmentUsersDeleteContent = ({
         alreadyExistingUserRight,
       ),
     };
+    const isCurrentUserDeleted =
+      alreadyExistingUserRight.email === currentUser?.email;
     dispatch(
       establishmentSlice.actions.updateEstablishmentRequested({
         establishmentUpdate: {
@@ -188,6 +196,10 @@ const EstablishmentUsersDeleteContent = ({
       }),
     );
     establishmentUsersDeleteModal.close();
+    if (isCurrentUserDeleted) {
+      routes.establishmentDashboard().push();
+      window.location.reload();
+    }
   };
   return (
     <>
@@ -195,6 +207,14 @@ const EstablishmentUsersDeleteContent = ({
         Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
         <strong>{alreadyExistingUserRight?.email}</strong> ?
       </p>
+      {alreadyExistingUserRight?.email === currentUser?.email && (
+        <p>
+          <strong>
+            Attention, vous êtes en train de supprimer votre propre compte. Si
+            vous continuez, vous n'aurez plus accès à cette page.
+          </strong>
+        </p>
+      )}
       <ButtonsGroup
         alignment="right"
         inlineLayoutWhen="always"
