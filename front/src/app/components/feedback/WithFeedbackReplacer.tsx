@@ -2,13 +2,12 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   type FeedbackLevel,
-  type FeedbackTopic,
   feedbackSlice,
 } from "src/core-logic/domain/feedback/feedback.slice";
-
 type WithFeedbackReplacerProps = {
   topic: FeedbackTopic;
   renderFeedback?: (props: {

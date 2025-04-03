@@ -9,6 +9,7 @@ import {
   expiredMagicLinkErrorMessage,
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
@@ -29,6 +30,10 @@ export const ConventionManageContent = ({
   const inclusionConnectedRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
   const roles: Role[] = match({
     name: route.name,
     inclusionConnectedRoles,
@@ -51,8 +56,10 @@ export const ConventionManageContent = ({
     )
     .otherwise((): Role[] => []);
 
-  const { convention, fetchConventionError, submitFeedback, isLoading } =
-    useConvention({ jwt: jwtParams.jwt, conventionId });
+  const { convention, isLoading } = useConvention({
+    jwt: jwtParams.jwt,
+    conventionId,
+  });
 
   const dispatch = useDispatch();
 
@@ -64,8 +71,10 @@ export const ConventionManageContent = ({
   );
 
   if (fetchConventionError) {
-    if (!fetchConventionError.includes(expiredMagicLinkErrorMessage)) {
-      throw new Error(fetchConventionError);
+    if (
+      !conventionFormFeedback?.message.includes(expiredMagicLinkErrorMessage)
+    ) {
+      throw new Error(conventionFormFeedback?.message ?? "");
     }
     routes
       .renewConventionMagicLink({
@@ -87,7 +96,6 @@ export const ConventionManageContent = ({
         jwtParams={jwtParams}
         convention={convention}
         roles={roles}
-        submitFeedback={submitFeedback}
       />
       <NpsSection convention={convention} roles={roles} />
     </>

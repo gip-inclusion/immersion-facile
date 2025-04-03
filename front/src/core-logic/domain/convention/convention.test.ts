@@ -10,6 +10,7 @@ import {
   expectToEqual,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
+import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   type TestDependencies,
   createTestStore,
@@ -56,6 +57,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -64,8 +66,17 @@ describe("Convention slice", () => {
       feedGatewayWithAddConventionSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "justSubmitted" },
       });
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "success",
+          message: "La convention a bien été créée",
+          on: "create",
+          title: "La convention a bien été créée",
+        },
+      );
       expect(store.getState().convention.convention?.status).toBe(
         "READY_TO_SIGN",
       );
@@ -89,8 +100,6 @@ describe("Convention slice", () => {
           convention: null,
           conventionStatusDashboardUrl: null,
           isLoading: false,
-          fetchError: null,
-          feedback: { kind: "idle" },
           currentSignatoryRole: null,
           similarConventionIds: [],
         },
@@ -102,6 +111,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -110,8 +120,16 @@ describe("Convention slice", () => {
       feedGatewayWithUpdateConventionSuccess();
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "justSubmitted" },
       });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "success",
+          message: "La convention a bien été créée",
+          on: "create",
+          title: "La convention a bien été créée",
+        },
+      );
       expectUpdateConventionToHaveBeenCalled(1);
       expectAddConventionToHaveBeenCalled(0);
     });
@@ -124,6 +142,7 @@ describe("Convention slice", () => {
             ...convention,
             ...conventionReadDtoRemainingProps,
           },
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -133,8 +152,16 @@ describe("Convention slice", () => {
       feedGatewayWithAddConventionError(new Error(errorMessage));
       expectConventionState({
         isLoading: false,
-        feedback: { kind: "errored", errorMessage },
       });
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "error",
+          message: errorMessage,
+          on: "create",
+          title: "Problème lors de la création de la convention",
+        },
+      );
     });
   });
 
@@ -150,6 +177,7 @@ describe("Convention slice", () => {
           dateStart: convention.dateStart,
           beneficiaryLastName: "Test",
           codeAppellation: "111222",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({
@@ -176,6 +204,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -219,6 +248,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
 
@@ -266,6 +296,7 @@ describe("Convention slice", () => {
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -280,12 +311,12 @@ describe("Convention slice", () => {
       expectConventionState({
         isLoading: false,
         convention: null,
-        fetchError: null,
       });
       store.dispatch(
         conventionSlice.actions.fetchConventionRequested({
           jwt: "my-jwt",
           conventionId: "some-convention-id",
+          feedbackTopic: "convention-form",
         }),
       );
       expectConventionState({ isLoading: true });
@@ -293,44 +324,16 @@ describe("Convention slice", () => {
       expectConventionState({
         convention: null,
         isLoading: false,
-        fetchError: "I failed !",
       });
-    });
-
-    it("clears initial submit feedback kind if it was not idle when it started to fetch", () => {
-      expectConventionState({
-        isLoading: false,
-        convention: null,
-        fetchError: null,
-      });
-      ({ store } = createTestStore({
-        convention: {
-          formUi: {
-            preselectedAgencyId: null,
-            isMinor: false,
-            isTutorEstablishmentRepresentative: true,
-            hasCurrentEmployer: false,
-            currentStep: 1,
-            agencyDepartment: null,
-            showSummary: false,
-          },
-          feedback: { kind: "justSubmitted" },
-          isLoading: false,
-          convention: null,
-          conventionStatusDashboardUrl: null,
-          fetchError: null,
-          jwt: null,
-          currentSignatoryRole: null,
-          similarConventionIds: [],
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["convention-form"],
+        {
+          level: "error",
+          message: "I failed !",
+          on: "fetch",
+          title: "Problème lors de la récupération de la convention",
         },
-      }));
-      store.dispatch(
-        conventionSlice.actions.fetchConventionRequested({
-          jwt: "my-jwt",
-          conventionId: "some-convention-id",
-        }),
       );
-      expectConventionState({ isLoading: true, feedback: { kind: "idle" } });
     });
 
     describe("Convention formUi update based on convention data", () => {
@@ -356,6 +359,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -410,6 +414,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -458,6 +463,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -498,6 +504,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -540,6 +547,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -590,6 +598,7 @@ describe("Convention slice", () => {
             conventionSlice.actions.fetchConventionRequested({
               jwt: "my-jwt",
               conventionId: "some-convention-id",
+              feedbackTopic: "convention-form",
             }),
           );
           expectConventionState({ isLoading: true });
@@ -643,9 +652,7 @@ describe("Convention slice", () => {
             showSummary: false,
           },
           jwt: null,
-          fetchError: null,
           isLoading: false,
-          feedback: { kind: "idle" },
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: null,
@@ -691,9 +698,7 @@ describe("Convention slice", () => {
             showSummary: false,
           },
           jwt: null,
-          fetchError: null,
           isLoading: false,
-          feedback: { kind: "idle" },
           convention,
           conventionStatusDashboardUrl: null,
           currentSignatoryRole: "beneficiary",
@@ -713,7 +718,10 @@ describe("Convention slice", () => {
   it("gets the dashboard Url for convention status check", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
-      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
     );
     expectConventionState({ isLoading: true });
     const urlAndName: DashboardUrlAndName = {
@@ -727,16 +735,28 @@ describe("Convention slice", () => {
   it("stores the error when something goes wrong when fetching the dashboard Url for convention status check", () => {
     const jwt = "some-correct-jwt";
     store.dispatch(
-      conventionSlice.actions.conventionStatusDashboardRequested(jwt),
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
     );
     expectConventionState({ isLoading: true });
     feedGatewayWithConventionStatusDashboardUrlError(new Error("Oops !"));
     expectConventionState({
-      feedback: {
-        kind: "errored",
-        errorMessage: "Oops !",
-      },
+      isLoading: false,
     });
+    expectToEqual(
+      feedbacksSelectors.feedbacks(store.getState())[
+        "convention-status-dashboard"
+      ],
+      {
+        level: "error",
+        message: "Oops !",
+        on: "fetch",
+        title:
+          "Problème lors de la récupération du tableau de bord de la convention",
+      },
+    );
   });
 
   it("stores the current signatory role", () => {
@@ -746,32 +766,6 @@ describe("Convention slice", () => {
       conventionSlice.actions.currentSignatoryRoleChanged(newRole),
     );
     expectConventionState({ currentSignatoryRole: newRole });
-  });
-
-  it("changes the feedback to idle when asked", () => {
-    ({ store } = createTestStore({
-      convention: {
-        formUi: {
-          preselectedAgencyId: null,
-          isMinor: false,
-          isTutorEstablishmentRepresentative: true,
-          hasCurrentEmployer: false,
-          currentStep: 1,
-          agencyDepartment: null,
-          showSummary: false,
-        },
-        jwt: null,
-        convention: null,
-        conventionStatusDashboardUrl: null,
-        feedback: { kind: "justSubmitted" },
-        isLoading: false,
-        fetchError: null,
-        currentSignatoryRole: null,
-        similarConventionIds: [],
-      },
-    }));
-    store.dispatch(conventionSlice.actions.clearFeedbackTriggered());
-    expectConventionState({ feedback: { kind: "idle" } });
   });
 
   it("changes the form current step when asked", () => {
@@ -789,9 +783,7 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "idle" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
       },
@@ -820,9 +812,7 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "idle" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
       },
@@ -855,9 +845,7 @@ describe("Convention slice", () => {
         jwt: null,
         convention: null,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "idle" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
       },
@@ -931,9 +919,7 @@ describe("Convention slice", () => {
         jwt: null,
         convention,
         conventionStatusDashboardUrl: null,
-        feedback: { kind: "idle" },
         isLoading: false,
-        fetchError: null,
         currentSignatoryRole: null,
         similarConventionIds: [],
       },

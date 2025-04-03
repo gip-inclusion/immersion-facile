@@ -8,6 +8,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
@@ -15,7 +16,6 @@ import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatc
 import type {
   ActionKindAndLevel,
   Feedback,
-  FeedbackTopic,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
@@ -26,6 +26,41 @@ type FeedbackWithActionName = {
   title: Feedback["title"];
   message: Feedback["message"];
 };
+
+const topics = [
+  "api-consumer-global",
+  "dashboard-discussion",
+  "dashboard-discussion-rejection",
+  "broadcast-convention-again",
+  "partner-conventions",
+  "agency-user",
+  "api-consumer-names",
+  "dashboard-agency-register-user",
+  "auth-global",
+  "establishments-batch",
+  "user",
+  "agency-user-for-dashboard",
+  "search-result",
+  "form-establishment",
+  "siret-input",
+  "agency-for-dashboard",
+  "assessment",
+  "send-signature-link",
+  "transfer-convention-to-agency",
+  "convention-action-cancel",
+  "convention-action-deprecate",
+  "convention-action-reject",
+  "convention-action-edit",
+  "convention-action-accept-by-validator",
+  "convention-action-accept-by-counsellor",
+  "convention-action-sign",
+  "convention-action-renew",
+  "convention-status-dashboard",
+  "convention-form",
+  "unused",
+] as const;
+
+export type FeedbackTopic = (typeof topics)[number];
 
 export const feedbacks: Record<
   FeedbackTopic,
@@ -480,4 +515,32 @@ export const feedbacks: Record<
         "Une erreur est survenue lors du renouvellement de la convention",
     },
   },
+  "convention-status-dashboard": {
+    "fetch.error": {
+      action: conventionSlice.actions.conventionStatusDashboardFailed,
+      title:
+        "Problème lors de la récupération du tableau de bord de la convention",
+      message:
+        "Une erreur est survenue lors de la récupération du tableau de bord de la convention",
+    },
+  },
+  "convention-form": {
+    "create.success": {
+      action: conventionSlice.actions.saveConventionSucceeded,
+      title: "La convention a bien été créée",
+      message: "La convention a bien été créée",
+    },
+    "create.error": {
+      action: conventionSlice.actions.saveConventionFailed,
+      title: "Problème lors de la création de la convention",
+      message: "Une erreur est survenue lors de la création de la convention",
+    },
+    "fetch.error": {
+      action: conventionSlice.actions.fetchConventionFailed,
+      title: "Problème lors de la récupération de la convention",
+      message:
+        "Une erreur est survenue lors de la récupération de la convention",
+    },
+  },
+  unused: {},
 };

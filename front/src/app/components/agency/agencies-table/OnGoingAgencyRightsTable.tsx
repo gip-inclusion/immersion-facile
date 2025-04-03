@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import type { AgencyRight, UserId } from "shared";
 import { AgencyLineRightsCTAs } from "src/app/components/agency/agencies-table/agency-line/AgencyLineRightsCTAs";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
-import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { AgencyLineAdminEmails } from "./agency-line/AgencyLineAdminEmails";
 import { AgencyLineAgencyName } from "./agency-line/AgencyLineAgencyName";
 import { AgencyLineCaracteristics } from "./agency-line/AgencyLineCaracteristics";

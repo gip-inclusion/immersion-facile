@@ -4,12 +4,11 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
   type ActionKindAndLevel,
-  type FeedbackTopic,
   getLevelAndActionKindFromActionKindAndLevel,
 } from "src/core-logic/domain/feedback/feedback.slice";
 import { createTestStore } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-import { feedbacks } from "./feedback.content";
+import { type FeedbackTopic, feedbacks } from "./feedback.content";
 
 describe("Feedbacks", () => {
   let store: ReduxStore;

@@ -63,7 +63,6 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
     currentSignatoryRole,
     onCloseSignModalWithoutSignature,
   } = props;
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const { fieldName } = getSignatoryProcessedData(signatory);
   const { setValue } = useFormContext();
@@ -86,7 +85,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
       >
         <li>
           <SignButton
-            disabled={isLoading || submitFeedback.kind !== "idle"}
+            disabled={isLoading}
             onConfirmClick={(event: MouseEvent<HTMLButtonElement>) => {
               setValue(fieldName, new Date().toISOString(), {
                 shouldValidate: true,
@@ -105,7 +104,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
           <li>
             <Button
               priority="secondary"
-              disabled={isLoading || submitFeedback.kind !== "idle"}
+              disabled={isLoading}
               onClick={openRequestModificationModal}
               type="button"
               iconId="fr-icon-edit-fill"

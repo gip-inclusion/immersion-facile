@@ -334,7 +334,10 @@ describe("InclusionConnected", () => {
 
     beforeEach(() => {
       store.dispatch(
-        conventionSlice.actions.fetchConventionSucceeded(convention),
+        conventionSlice.actions.fetchConventionSucceeded({
+          convention,
+          feedbackTopic: "convention-form",
+        }),
       );
       store.dispatch(
         inclusionConnectedSlice.actions.currentUserFetchSucceeded(adminUser),

@@ -1,36 +1,9 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { keys } from "shared";
-import { feedbacks } from "src/core-logic/domain/feedback/feedback.content";
-
-const topics = [
-  "api-consumer-global",
-  "dashboard-discussion",
-  "dashboard-discussion-rejection",
-  "broadcast-convention-again",
-  "partner-conventions",
-  "agency-user",
-  "api-consumer-names",
-  "dashboard-agency-register-user",
-  "auth-global",
-  "establishments-batch",
-  "user",
-  "agency-user-for-dashboard",
-  "search-result",
-  "form-establishment",
-  "siret-input",
-  "agency-for-dashboard",
-  "assessment",
-  "send-signature-link",
-  "transfer-convention-to-agency",
-  "convention-action-cancel",
-  "convention-action-deprecate",
-  "convention-action-reject",
-  "convention-action-edit",
-  "convention-action-accept-by-validator",
-  "convention-action-accept-by-counsellor",
-  "convention-action-sign",
-  "convention-action-renew",
-] as const;
+import {
+  type FeedbackTopic,
+  feedbacks,
+} from "src/core-logic/domain/feedback/feedback.content";
 
 export type FeedbackLevel = "info" | "success" | "warning" | "error";
 
@@ -40,8 +13,6 @@ export type Feedback = {
   message: string;
   title?: string;
 };
-
-export type FeedbackTopic = (typeof topics)[number];
 
 export type Feedbacks = Partial<Record<FeedbackTopic, Feedback>>;
 

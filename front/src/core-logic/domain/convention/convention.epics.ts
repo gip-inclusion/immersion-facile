@@ -1,4 +1,5 @@
 import { concatMap, filter, map, switchMap } from "rxjs";
+import type { Observable } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -19,17 +20,26 @@ const saveConventionEpic: ConventionEpic = (
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.saveConventionRequested.match),
-    switchMap(({ payload }) => {
+    switchMap((action) => {
       const conventionState = state$.value.convention;
       const { jwt } = conventionState;
       const conventionGatewayAction$ = jwt
-        ? conventionGateway.updateConvention$(payload.convention, jwt)
-        : conventionGateway.createConvention$(payload);
+        ? conventionGateway.updateConvention$(action.payload.convention, jwt)
+        : conventionGateway.createConvention$(action.payload);
 
       return conventionGatewayAction$.pipe(
-        map(conventionSlice.actions.saveConventionSucceeded),
+        map(() =>
+          conventionSlice.actions.saveConventionSucceeded({
+            convention: action.payload.convention,
+            discussionId: action.payload.discussionId,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
         catchEpicError((error: Error) =>
-          conventionSlice.actions.saveConventionFailed(error.message),
+          conventionSlice.actions.saveConventionFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
         ),
       );
     }),
@@ -42,12 +52,21 @@ const getSimilarConventionsEpic: ConventionEpic = (
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.getSimilarConventionsRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway.getSimilarConventions$(payload),
-    ),
-    map(conventionSlice.actions.getSimilarConventionsSucceeded),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.getSimilarConventionsFailed(error.message),
+    switchMap((action) =>
+      conventionGateway.getSimilarConventions$(action.payload).pipe(
+        map((similarConventionIds) =>
+          conventionSlice.actions.getSimilarConventionsSucceeded({
+            similarConventionIds,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error: Error) =>
+          conventionSlice.actions.getSimilarConventionsFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
     ),
   );
 
@@ -77,28 +96,59 @@ const getConventionEpic: ConventionEpic = (
           action,
         ),
     ),
-    switchMap((action) => {
+    switchMap((action): Observable<ConventionAction> => {
       if ("updateStatusParams" in action.payload) {
-        return conventionGateway.retrieveFromToken$({
-          conventionId: action.payload.updateStatusParams.conventionId,
-          jwt: action.payload.jwt,
-        });
+        return conventionGateway
+          .retrieveFromToken$({
+            conventionId: action.payload.updateStatusParams.conventionId,
+            jwt: action.payload.jwt,
+          })
+          .pipe(
+            map((convention) =>
+              conventionSlice.actions.fetchConventionSucceeded({
+                convention,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
+            ),
+          );
       }
       if ("transferConventionToAgencyParams" in action.payload) {
-        return conventionGateway.retrieveFromToken$({
-          conventionId:
-            action.payload.transferConventionToAgencyParams.conventionId,
-          jwt: action.payload.jwt,
-        });
+        return conventionGateway
+          .retrieveFromToken$({
+            conventionId:
+              action.payload.transferConventionToAgencyParams.conventionId,
+            jwt: action.payload.jwt,
+          })
+          .pipe(
+            map((convention) =>
+              conventionSlice.actions.fetchConventionSucceeded({
+                convention,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
+            ),
+          );
       }
-      return conventionGateway.retrieveFromToken$(action.payload);
+      return conventionGateway
+        .retrieveFromToken$({
+          conventionId: action.payload.conventionId,
+          jwt: action.payload.jwt,
+        })
+        .pipe(
+          map((convention) =>
+            conventionSlice.actions.fetchConventionSucceeded({
+              convention,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error: Error) => {
+            return conventionSlice.actions.fetchConventionFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            });
+          }),
+        );
     }),
-    map((convention) => {
-      return conventionSlice.actions.fetchConventionSucceeded(convention);
-    }),
-    catchEpicError((error: Error) => {
-      return conventionSlice.actions.fetchConventionFailed(error.message);
-    }),
+    filter((action): action is ConventionAction => action !== undefined),
   );
 
 const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
@@ -106,18 +156,20 @@ const reflectFetchedConventionOnFormUi: ConventionEpic = (action$, state$) =>
     filter(conventionSlice.actions.fetchConventionSucceeded.match),
     concatMap((action) => [
       conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
-        action.payload
-          ? isEstablishmentTutorIsEstablishmentRepresentative(action.payload)
+        action.payload.convention
+          ? isEstablishmentTutorIsEstablishmentRepresentative(
+              action.payload.convention,
+            )
           : state$.value.convention.formUi.isTutorEstablishmentRepresentative,
       ),
       conventionSlice.actions.isMinorChanged(
-        action.payload
-          ? !!action.payload.signatories.beneficiaryRepresentative
+        action.payload.convention
+          ? !!action.payload.convention.signatories.beneficiaryRepresentative
           : state$.value.convention.formUi.isMinor,
       ),
       conventionSlice.actions.isCurrentEmployerChanged(
-        action.payload
-          ? !!action.payload.signatories.beneficiaryCurrentEmployer
+        action.payload.convention
+          ? !!action.payload.convention.signatories.beneficiaryCurrentEmployer
           : state$.value.convention.formUi.hasCurrentEmployer,
       ),
     ]),
@@ -130,14 +182,23 @@ const getConventionStatusDashboardUrl: ConventionEpic = (
 ) =>
   action$.pipe(
     filter(conventionSlice.actions.conventionStatusDashboardRequested.match),
-    switchMap(({ payload }) =>
-      conventionGateway.getConventionStatusDashboardUrl$(payload),
-    ),
-    map(({ url }) =>
-      conventionSlice.actions.conventionStatusDashboardSucceeded(url),
-    ),
-    catchEpicError((error: Error) =>
-      conventionSlice.actions.conventionStatusDashboardFailed(error.message),
+    switchMap((action) =>
+      conventionGateway
+        .getConventionStatusDashboardUrl$(action.payload.jwt)
+        .pipe(
+          map(({ url }) =>
+            conventionSlice.actions.conventionStatusDashboardSucceeded({
+              url,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error: Error) =>
+            conventionSlice.actions.conventionStatusDashboardFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
     ),
   );
 
