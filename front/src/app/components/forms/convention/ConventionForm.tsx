@@ -133,7 +133,6 @@ export const ConventionForm = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
-  const conventionSubmitFeedback = useAppSelector(conventionSelectors.feedback);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
 
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
@@ -254,9 +253,7 @@ export const ConventionForm = ({
     useState<EmailValidationErrorsState>({});
 
   const shouldSubmitButtonBeDisabled =
-    isLoading ||
-    (isSubmitted && conventionSubmitFeedback.kind === "justSubmitted") ||
-    keys(emailValidationErrors).length > 0;
+    isLoading || isSubmitted || keys(emailValidationErrors).length > 0;
 
   const {
     agencyId: agencyIdField,

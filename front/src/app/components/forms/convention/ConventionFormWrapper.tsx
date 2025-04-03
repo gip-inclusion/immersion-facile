@@ -17,6 +17,7 @@ import {
 } from "shared";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -26,6 +27,7 @@ import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/Sh
 import { routes, useRoute } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match } from "ts-pattern";
 import type { Route } from "type-route";
 
@@ -62,11 +64,14 @@ export const ConventionFormWrapper = ({
   const showSummary = useAppSelector(conventionSelectors.showSummary);
   const route = useRoute() as SupportedConventionRoutes;
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
-  const submitFeedback = useAppSelector(conventionSelectors.feedback);
-  const fetchConventionError = useAppSelector(conventionSelectors.fetchError);
   const dispatch = useDispatch();
-
-  const formSuccessfullySubmitted = submitFeedback.kind === "justSubmitted";
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
+  const formSuccessfullySubmitted =
+    conventionFormFeedback?.level === "success" &&
+    conventionFormFeedback.on === "create";
 
   useScrollToTop(formSuccessfullySubmitted);
 
@@ -94,12 +99,13 @@ export const ConventionFormWrapper = ({
         conventionSlice.actions.fetchConventionRequested({
           jwt: route.params.jwt,
           conventionId,
+          feedbackTopic: "unused",
         }),
       );
     }
 
     return () => {
-      dispatch(conventionSlice.actions.clearFeedbackTriggered());
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     };
   }, [dispatch, mode, route.params.jwt]);
 
@@ -161,7 +167,7 @@ export const ConventionFormWrapper = ({
           <>
             {route.params.jwt && fetchConventionError && (
               <ShowErrorOrRedirectToRenewMagicLink
-                errorMessage={fetchConventionError}
+                errorMessage={conventionFormFeedback?.message}
                 jwt={route.params.jwt}
               />
             )}
@@ -195,6 +201,7 @@ const ConventionSummarySection = () => {
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         dateStart: convention.dateStart,
         beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+        feedbackTopic: "convention-form",
       }),
     );
   }, []);
@@ -209,6 +216,7 @@ const ConventionSummarySection = () => {
           status: "READY_TO_SIGN",
         },
         discussionId: route.params.discussionId,
+        feedbackTopic: "convention-form",
       }),
     );
   };

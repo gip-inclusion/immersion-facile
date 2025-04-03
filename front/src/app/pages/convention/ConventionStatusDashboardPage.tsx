@@ -3,6 +3,7 @@ import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import type { routes } from "src/app/routes/routes";
@@ -29,32 +30,38 @@ export const ConventionStatusDashboardPage = ({
 const useConventionStatusDashboardUrl = (jwt: string) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(conventionSlice.actions.conventionStatusDashboardRequested(jwt));
+    dispatch(
+      conventionSlice.actions.conventionStatusDashboardRequested({
+        jwt,
+        feedbackTopic: "convention-status-dashboard",
+      }),
+    );
   }, [dispatch, jwt]);
 
   const conventionStatusDashboardUrl = useAppSelector(
     conventionSelectors.conventionStatusDashboardUrl,
   );
   const isLoading = useAppSelector(conventionSelectors.isLoading);
-  const feedback = useAppSelector(conventionSelectors.feedback);
 
   return {
     conventionStatusDashboardUrl,
     isLoading,
-    feedback,
   };
 };
 
 const ConventionStatusDashboard = ({ jwt }: { jwt: string }) => {
-  const { conventionStatusDashboardUrl, isLoading, feedback } =
+  const conventionStatusDashboardFeedback = useFeedbackTopic(
+    "convention-status-dashboard",
+  );
+  const { conventionStatusDashboardUrl, isLoading } =
     useConventionStatusDashboardUrl(jwt);
 
   if (isLoading) return <p>Chargement en cours...</p>;
 
-  if (feedback.kind === "errored")
+  if (conventionStatusDashboardFeedback?.level === "error")
     return (
       <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={feedback.errorMessage}
+        errorMessage={conventionStatusDashboardFeedback.message}
         jwt={jwt}
       />
     );

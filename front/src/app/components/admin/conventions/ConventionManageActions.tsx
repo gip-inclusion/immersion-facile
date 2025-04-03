@@ -28,12 +28,14 @@ import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { ModalWrapper } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { getVerificationActionProps } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import {
+  useFeedbackTopic,
+  useFeedbackTopics,
+} from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
-import type { ConventionSubmitFeedback } from "src/core-logic/domain/convention/convention.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export type JwtKindProps =
@@ -54,13 +56,11 @@ type ConventionManageActionsProps = {
   jwtParams: JwtKindProps;
   convention: ConventionReadDto;
   roles: Role[];
-  submitFeedback: ConventionSubmitFeedback;
 };
 
 export const ConventionManageActions = ({
   convention,
   roles,
-  submitFeedback,
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
@@ -69,6 +69,15 @@ export const ConventionManageActions = ({
   );
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
+  const conventionActionsFeedback = useFeedbackTopics([
+    "convention-action-accept-by-counsellor",
+    "convention-action-accept-by-validator",
+    "convention-action-reject",
+    "convention-action-deprecate",
+    "convention-action-cancel",
+    "convention-action-edit",
+    "convention-action-renew",
+  ]);
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
   >(null);
@@ -159,7 +168,7 @@ export const ConventionManageActions = ({
     }
   };
 
-  const disabled = submitFeedback.kind !== "idle";
+  const disabled = !!conventionActionsFeedback.length;
   const t = useConventionTexts(convention?.internshipKind ?? "immersion");
   const allowedToSignStatuses: ConventionStatus[] = [
     "READY_TO_SIGN",
