@@ -2,6 +2,7 @@ import { toPairs } from "ramda";
 import {
   type AgencyId,
   type AgencyWithUsersRights,
+  type Beneficiary,
   type ConventionDto,
   type ConventionReadDto,
   type Email,
@@ -86,12 +87,13 @@ export const isHashMatchConventionEmails = async ({
 };
 
 export const isHashMatchPeAdvisorEmail = ({
-  convention,
+  beneficiary,
   emailHash,
-}: { convention: ConventionReadDto; emailHash: EmailHash }) => {
-  const peAdvisorEmail =
-    convention.signatories.beneficiary.federatedIdentity?.payload?.advisor
-      .email;
+}: {
+  beneficiary: Beneficiary<"immersion" | "mini-stage-cci">;
+  emailHash: EmailHash;
+}) => {
+  const peAdvisorEmail = beneficiary.federatedIdentity?.payload?.advisor.email;
 
   return peAdvisorEmail
     ? isSomeEmailMatchingEmailHash([peAdvisorEmail], emailHash)

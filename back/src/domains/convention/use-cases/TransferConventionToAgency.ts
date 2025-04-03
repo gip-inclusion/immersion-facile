@@ -39,7 +39,7 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       jwtPayload,
     });
 
-    const convention = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
 

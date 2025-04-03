@@ -127,7 +127,7 @@ export class GetConvention extends TransactionalUseCase<
     uow: UnitOfWork;
   }): Promise<boolean> {
     const isEmailMatchingPeAdvisor = isHashMatchPeAdvisorEmail({
-      convention,
+      beneficiary: convention.signatories.beneficiary,
       emailHash,
     });
     if (isEmailMatchingPeAdvisor) return true;
