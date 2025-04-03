@@ -3,47 +3,9 @@ version: 2
 sources:
   - name: immersion
     description: "Immersion Facilitee application database"
-    database: "{{ env_var('DBT_DATABASE', 'immersion-db') }}" # This will use the DBT_DATABASE environment variable
-    schema: public # This should match the schema where your tables are located
+    database: "{{ env_var('DBT_DATABASE', 'immersion-db') }}"
+    schema: public
     tables:
-      - name: conventions
-        description: "Immersion applications/conventions data"
-        columns:
-          - name: id
-            description: "Primary key - UUID of the convention"
-          - name: created_at
-            description: "Timestamp when the convention was created"
-          - name: updated_at
-            description: "Timestamp when the convention was last updated"
-          - name: status
-            description: "Current status of the convention (convention_status_type)"
-          - name: agency_id
-            description: "Foreign key to agencies table"
-          - name: date_submission
-            description: "Timestamp when the convention was submitted"
-          - name: date_start
-            description: "Timestamp when the immersion starts"
-          - name: date_end
-            description: "Timestamp when the immersion ends"
-          - name: siret
-            description: "SIRET number of the business"
-          - name: business_name
-            description: "Name of the business"
-          - name: immersion_objective
-            description: "Objective of the immersion (convention_objective_type)"
-          - name: immersion_appellation
-            description: "Foreign key to public_appellations_data table"
-          - name: date_validation
-            description: "Timestamp when the convention was validated"
-          - name: internship_kind
-            description: "Type of internship"
-          - name: date_approval
-            description: "Timestamp when the convention was approved"
-          - name: acquisition_campaign
-            description: "Marketing campaign that led to the convention"
-          - name: acquisition_keyword
-            description: "Marketing keyword that led to the convention"
-
       - name: actors
         description: "People involved in conventions (beneficiaries, tutors, representatives)"
         columns:
@@ -59,6 +21,8 @@ sources:
             description: "Phone number of the actor"
           - name: signed_at
             description: "Timestamp when the actor signed the convention"
+          - name: extra_fields
+            description: "Additional fields in JSON format"
 
       - name: agencies
         description: "Agencies managing immersion applications"
@@ -67,28 +31,382 @@ sources:
             description: "Primary key - UUID of the agency"
           - name: name
             description: "Name of the agency"
+          - name: questionnaire_url
+            description: "URL for agency questionnaire"
+          - name: email_signature
+            description: "Email signature for the agency"
+          - name: legacy_address
+            description: "Legacy address information"
+          - name: position
+            description: "Position information"
+          - name: created_at
+            description: "Timestamp when the agency was created"
+          - name: updated_at
+            description: "Timestamp when the agency was last updated"
+          - name: status
+            description: "Current status of the agency"
           - name: kind
             description: "Type of agency"
+          - name: agency_siret
+            description: "SIRET number of the agency"
+          - name: code_safir
+            description: "SAFIR code of the agency"
+          - name: logo_url
+            description: "URL of the agency's logo"
+          - name: street_number_and_address
+            description: "Street address of the agency"
+          - name: post_code
+            description: "Postal code of the agency"
+          - name: city
+            description: "City where the agency is located"
           - name: department_code
             description: "Department code where the agency is located"
+          - name: covered_departments
+            description: "Departments covered by the agency"
+          - name: refers_to_agency_id
+            description: "Reference to another agency"
+          - name: rejection_justification
+            description: "Reason for rejection if applicable"
+          - name: phone_number
+            description: "Phone number of the agency"
+          - name: acquisition_campaign
+            description: "Marketing campaign that led to the agency"
+          - name: acquisition_keyword
+            description: "Marketing keyword that led to the agency"
 
-      - name: public_appellations_data
-        description: "Job appellations reference data"
+      - name: agency_groups
+        description: "Groups of agencies"
         columns:
-          - name: ogr_appellation
-            description: "Primary key - ID of the appellation"
-          - name: libelle_appellation_long
-            description: "Label of the job appellation"
-          - name: code_rome
-            description: "ROME code for the job category"
+          - name: id
+            description: "Primary key - ID of the agency group"
+          - name: siret
+            description: "SIRET number of the group"
+          - name: name
+            description: "Name of the group"
+          - name: email
+            description: "Email of the group"
+          - name: cc_emails
+            description: "CC email addresses"
+          - name: departments
+            description: "Departments covered by the group"
+          - name: kind
+            description: "Type of agency group"
+          - name: scope
+            description: "Scope of the agency group"
+          - name: code_safir
+            description: "SAFIR code of the group"
 
-      - name: public_romes_data
-        description: "ROME codes reference data"
+      - name: agency_groups__agencies
+        description: "Relationship between agency groups and agencies"
         columns:
-          - name: code_rome
-            description: "Primary key - ROME code"
-          - name: libelle_rome
-            description: "Label of the ROME code"
+          - name: agency_group_id
+            description: "Foreign key to agency_groups table"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+
+      - name: api_consumers
+        description: "API consumers information"
+        columns:
+          - name: id
+            description: "Primary key - UUID of the API consumer"
+          - name: name
+            description: "Name of the API consumer"
+          - name: description
+            description: "Description of the API consumer"
+          - name: created_at
+            description: "Timestamp when the consumer was created"
+          - name: expiration_date
+            description: "Expiration date of the consumer"
+          - name: contact_emails
+            description: "Contact email addresses"
+          - name: contact_first_name
+            description: "First name of the contact person"
+          - name: contact_last_name
+            description: "Last name of the contact person"
+          - name: contact_job
+            description: "Job title of the contact person"
+          - name: contact_phone
+            description: "Phone number of the contact person"
+          - name: rights
+            description: "Rights granted to the consumer"
+
+      - name: api_consumers_subscriptions
+        description: "API consumer subscriptions"
+        columns:
+          - name: id
+            description: "Primary key - UUID of the subscription"
+          - name: created_at
+            description: "Timestamp when the subscription was created"
+          - name: right_name
+            description: "Name of the right subscribed to"
+          - name: callback_url
+            description: "URL for callbacks"
+          - name: callback_headers
+            description: "Headers for callbacks"
+          - name: consumer_id
+            description: "Foreign key to api_consumers table"
+          - name: subscribed_event
+            description: "Event type subscribed to"
+
+      - name: broadcast_feedbacks
+        description: "Broadcast feedback information"
+        columns:
+          - name: id
+            description: "Primary key - ID of the feedback"
+          - name: consumer_id
+            description: "Foreign key to api_consumers table"
+          - name: consumer_name
+            description: "Name of the consumer"
+          - name: service_name
+            description: "Name of the service"
+          - name: subscriber_error_feedback
+            description: "Error feedback from subscriber"
+          - name: request_params
+            description: "Request parameters"
+          - name: occurred_at
+            description: "Timestamp when the feedback occurred"
+          - name: handled_by_agency
+            description: "Whether handled by agency"
+          - name: response
+            description: "Response data"
+
+      - name: conventions
+        description: "Immersion applications/conventions data"
+        columns:
+          - name: id
+            description: "Primary key - UUID of the convention"
+          - name: created_at
+            description: "Timestamp when the convention was created"
+          - name: updated_at
+            description: "Timestamp when the convention was last updated"
+          - name: status
+            description: "Current status of the convention"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+          - name: date_submission
+            description: "Timestamp when the convention was submitted"
+          - name: date_start
+            description: "Timestamp when the immersion starts"
+          - name: date_end
+            description: "Timestamp when the immersion ends"
+          - name: siret
+            description: "SIRET number of the business"
+          - name: business_name
+            description: "Name of the business"
+          - name: schedule
+            description: "Schedule information in JSON format"
+          - name: individual_protection
+            description: "Whether individual protection is required"
+          - name: sanitary_prevention
+            description: "Whether sanitary prevention is required"
+          - name: sanitary_prevention_description
+            description: "Description of sanitary prevention measures"
+          - name: immersion_address
+            description: "Address of the immersion"
+          - name: immersion_objective
+            description: "Objective of the immersion"
+          - name: immersion_activities
+            description: "Activities during immersion"
+          - name: immersion_skills
+            description: "Skills to be developed"
+          - name: work_conditions
+            description: "Work conditions"
+          - name: immersion_appellation
+            description: "Foreign key to public_appellations_data table"
+          - name: date_validation
+            description: "Timestamp when the convention was validated"
+          - name: internship_kind
+            description: "Type of internship"
+          - name: beneficiary_id
+            description: "Foreign key to actors table"
+          - name: establishment_tutor_id
+            description: "Foreign key to actors table"
+          - name: establishment_representative_id
+            description: "Foreign key to actors table"
+          - name: beneficiary_representative_id
+            description: "Foreign key to actors table"
+          - name: beneficiary_current_employer_id
+            description: "Foreign key to actors table"
+          - name: business_advantages
+            description: "Business advantages"
+          - name: status_justification
+            description: "Justification for status"
+          - name: validators
+            description: "Validators information"
+          - name: renewed_from
+            description: "Reference to renewed convention"
+          - name: renewed_justification
+            description: "Justification for renewal"
+          - name: date_approval
+            description: "Timestamp when the convention was approved"
+          - name: establishment_number_employees
+            description: "Number of employees range"
+          - name: individual_protection_description
+            description: "Description of individual protection"
+          - name: acquisition_campaign
+            description: "Marketing campaign that led to the convention"
+          - name: acquisition_keyword
+            description: "Marketing keyword that led to the convention"
+
+      - name: convention_external_ids
+        description: "External IDs for conventions"
+        columns:
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: external_id
+            description: "External ID"
+
+      - name: conventions_to_sync_with_pe
+        description: "Conventions to sync with PE"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: status
+            description: "Sync status"
+          - name: process_date
+            description: "Timestamp when processed"
+          - name: reason
+            description: "Reason for sync"
+
+      - name: delegation_contacts
+        description: "Delegation contacts information"
+        columns:
+          - name: province
+            description: "Province name"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: updated_at
+            description: "Timestamp when updated"
+          - name: email
+            description: "Email address"
+
+      - name: discussions
+        description: "Discussions between parties"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: siret
+            description: "SIRET number of the business"
+          - name: contact_method
+            description: "Method of contact"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: potential_beneficiary_first_name
+            description: "First name of potential beneficiary"
+          - name: potential_beneficiary_last_name
+            description: "Last name of potential beneficiary"
+          - name: potential_beneficiary_email
+            description: "Email of potential beneficiary"
+          - name: potential_beneficiary_phone
+            description: "Phone of potential beneficiary"
+          - name: potential_beneficiary_resume_link
+            description: "Link to beneficiary's resume"
+          - name: potential_beneficiary_has_working_experience
+            description: "Whether beneficiary has working experience"
+          - name: potential_beneficiary_experience_additional_information
+            description: "Additional information about experience"
+          - name: potential_beneficiary_date_preferences
+            description: "Date preferences"
+          - name: establishment_contact_email
+            description: "Email of establishment contact"
+          - name: establishment_contact_first_name
+            description: "First name of establishment contact"
+          - name: establishment_contact_last_name
+            description: "Last name of establishment contact"
+          - name: establishment_contact_phone
+            description: "Phone of establishment contact"
+          - name: establishment_contact_job
+            description: "Job title of establishment contact"
+          - name: establishment_contact_copy_emails
+            description: "CC email addresses"
+          - name: appellation_code
+            description: "Foreign key to public_appellations_data table"
+          - name: immersion_objective
+            description: "Objective of immersion"
+          - name: street_number_and_address
+            description: "Street address"
+          - name: postcode
+            description: "Postal code"
+          - name: department_code
+            description: "Department code"
+          - name: city
+            description: "City"
+          - name: business_name
+            description: "Name of the business"
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: status
+            description: "Current status"
+          - name: rejection_kind
+            description: "Type of rejection if applicable"
+          - name: rejection_reason
+            description: "Reason for rejection if applicable"
+          - name: acquisition_campaign
+            description: "Marketing campaign that led to the discussion"
+          - name: acquisition_keyword
+            description: "Marketing keyword that led to the discussion"
+
+      - name: exchanges
+        description: "Message exchanges"
+        columns:
+          - name: discussion_id
+            description: "Foreign key to discussions table"
+          - name: message
+            description: "Message content"
+          - name: sender
+            description: "Sender role"
+          - name: recipient
+            description: "Recipient role"
+          - name: sent_at
+            description: "Timestamp when sent"
+          - name: subject
+            description: "Message subject"
+          - name: id
+            description: "Primary key - ID"
+          - name: attachments
+            description: "Message attachments"
+
+      - name: feature_flags
+        description: "Feature flags configuration"
+        columns:
+          - name: flag_name
+            description: "Name of the feature flag"
+          - name: is_active
+            description: "Whether the flag is active"
+          - name: kind
+            description: "Type of feature flag"
+          - name: value
+            description: "Flag value"
+
+      - name: groups
+        description: "Groups information"
+        columns:
+          - name: slug
+            description: "URL slug"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: updated_at
+            description: "Timestamp when updated"
+          - name: name
+            description: "Name of the group"
+          - name: hero_header_title
+            description: "Hero header title"
+          - name: hero_header_description
+            description: "Hero header description"
+          - name: hero_header_logo_url
+            description: "URL of hero header logo"
+          - name: hero_header_background_color
+            description: "Background color of hero header"
+          - name: tint_color
+            description: "Tint color"
+
+      - name: groups__sirets
+        description: "Relationship between groups and SIRETs"
+        columns:
+          - name: group_slug
+            description: "Foreign key to groups table"
+          - name: siret
+            description: "SIRET number"
 
       - name: immersion_assessments
         description: "Assessments of completed immersions"
@@ -98,52 +416,414 @@ sources:
           - name: status
             description: "Status of the assessment"
           - name: number_of_hours_actually_made
-            description: "Number of hours actually completed in the immersion"
+            description: "Number of hours actually completed"
+          - name: last_day_of_presence
+            description: "Last day of presence"
           - name: number_of_missed_hours
-            description: "Number of hours missed during the immersion"
+            description: "Number of hours missed"
           - name: ended_with_a_job
-            description: "Whether the immersion led to employment"
+            description: "Whether ended with a job"
           - name: type_of_contract
-            description: "Type of contract if the immersion led to employment"
+            description: "Type of contract if applicable"
           - name: contract_start_date
-            description: "Start date of the contract if the immersion led to employment"
+            description: "Start date of contract if applicable"
+          - name: establishment_advices
+            description: "Advice from establishment"
+          - name: establishment_feedback
+            description: "Feedback from establishment"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: updated_at
+            description: "Timestamp when updated"
+
+      - name: immersion_offers
+        description: "Immersion offers"
+        columns:
+          - name: siret
+            description: "SIRET number of the business"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: update_date
+            description: "Timestamp when updated"
+          - name: score
+            description: "Score of the offer"
+          - name: appellation_code
+            description: "Foreign key to public_appellations_data table"
+
+      - name: marketing_establishment_contacts
+        description: "Marketing contacts for establishments"
+        columns:
+          - name: siret
+            description: "SIRET number of the business"
+          - name: email
+            description: "Email address"
+          - name: contact_history
+            description: "History of contacts"
+
+      - name: notifications_email
+        description: "Email notifications"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: email_kind
+            description: "Type of email"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: establishment_siret
+            description: "SIRET number of the business"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+          - name: params
+            description: "Notification parameters"
+          - name: reply_to_name
+            description: "Reply-to name"
+          - name: reply_to_email
+            description: "Reply-to email"
+          - name: sender_email
+            description: "Sender email"
+          - name: sender_name
+            description: "Sender name"
+
+      - name: notifications_email_attachments
+        description: "Email notification attachments"
+        columns:
+          - name: id
+            description: "Primary key - ID"
+          - name: notifications_email_id
+            description: "Foreign key to notifications_email table"
+          - name: attachment
+            description: "Attachment data"
+
+      - name: notifications_email_recipients
+        description: "Email notification recipients"
+        columns:
+          - name: notifications_email_id
+            description: "Foreign key to notifications_email table"
+          - name: email
+            description: "Recipient email"
+          - name: recipient_type
+            description: "Type of recipient (to/cc)"
+
+      - name: notifications_sms
+        description: "SMS notifications"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: sms_kind
+            description: "Type of SMS"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: recipient_phone
+            description: "Recipient phone number"
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: establishment_siret
+            description: "SIRET number of the business"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+          - name: params
+            description: "Notification parameters"
+
+      - name: nps
+        description: "Net Promoter Score data"
+        columns:
+          - name: id
+            description: "Primary key - ID"
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: role
+            description: "Role of respondent"
+          - name: score
+            description: "NPS score"
+          - name: would_have_done_without_if
+            description: "Whether would have done without"
+          - name: comments
+            description: "Comments"
+          - name: raw_result
+            description: "Raw result data"
+          - name: respondent_id
+            description: "ID of respondent"
+          - name: response_id
+            description: "ID of response"
+          - name: created_at
+            description: "Timestamp when created"
+
+      - name: outbox
+        description: "Outbox messages"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: occurred_at
+            description: "Timestamp when occurred"
+          - name: was_quarantined
+            description: "Whether was quarantined"
+          - name: topic
+            description: "Message topic"
+          - name: payload
+            description: "Message payload"
+          - name: status
+            description: "Message status"
+
+      - name: outbox_failures
+        description: "Outbox failures"
+        columns:
+          - name: id
+            description: "Primary key - ID"
+          - name: publication_id
+            description: "ID of publication"
+          - name: subscription_id
+            description: "ID of subscription"
+          - name: error_message
+            description: "Error message"
+
+      - name: outbox_publications
+        description: "Outbox publications"
+        columns:
+          - name: id
+            description: "Primary key - ID"
+          - name: event_id
+            description: "ID of event"
+          - name: published_at
+            description: "Timestamp when published"
+
+      - name: partners_pe_connect
+        description: "PE Connect partners"
+        columns:
+          - name: user_pe_external_id
+            description: "External ID of user"
+          - name: convention_id
+            description: "Foreign key to conventions table"
+          - name: firstname
+            description: "First name"
+          - name: lastname
+            description: "Last name"
+          - name: email
+            description: "Email address"
+          - name: type
+            description: "Type of partner"
+
+      - name: public_appellations_data
+        description: "Job appellations reference data"
+        columns:
+          - name: ogr_appellation
+            description: "Primary key - ID of the appellation"
+          - name: code_rome
+            description: "ROME code for the job category"
+          - name: legacy_code_rome_v3
+            description: "Legacy ROME code v3"
+          - name: libelle_appellation_long
+            description: "Long label of the appellation"
+          - name: libelle_appellation_court
+            description: "Short label of the appellation"
+          - name: libelle_appellation_long_tsvector
+            description: "TSVector for long label"
+          - name: libelle_appellation_long_without_special_char
+            description: "Long label without special characters"
+
+      - name: public_department_region
+        description: "Department and region reference data"
+        columns:
+          - name: department_code
+            description: "Department code"
+          - name: department_name
+            description: "Department name"
+          - name: region_name
+            description: "Region name"
+          - name: shape_backup
+            description: "Backup shape data"
+          - name: shape
+            description: "Shape data"
+
+      - name: public_naf_classes_2008_old
+        description: "Old NAF classes 2008 reference data"
+        columns:
+          - name: class_id
+            description: "Class ID"
+          - name: class_label
+            description: "Class label"
+          - name: group_id
+            description: "Group ID"
+          - name: group_label
+            description: "Group label"
+          - name: division_id
+            description: "Division ID"
+          - name: division_label
+            description: "Division label"
+          - name: section_id
+            description: "Section ID"
+          - name: section_label
+            description: "Section label"
+
+      - name: public_naf_rev2_niveaux
+        description: "NAF Rev2 levels reference data"
+        columns:
+          - name: code_sous_classe
+            description: "Sub-class code"
+          - name: code_classe
+            description: "Class code"
+          - name: code_groupe
+            description: "Group code"
+          - name: code_division
+            description: "Division code"
+          - name: code_section
+            description: "Section code"
+
+      - name: public_naf_rev2_sections
+        description: "NAF Rev2 sections reference data"
+        columns:
+          - name: code
+            description: "Section code"
+          - name: libelle
+            description: "Section label"
+
+      - name: public_naf_rev2_sous_classes
+        description: "NAF Rev2 sub-classes reference data"
+        columns:
+          - name: code
+            description: "Sub-class code"
+          - name: libelle
+            description: "Sub-class label"
+          - name: naf_code
+            description: "NAF code"
+
+      - name: public_romes_data
+        description: "ROME codes reference data"
+        columns:
+          - name: code_rome
+            description: "Primary key - ROME code"
+          - name: libelle_rome
+            description: "Label of the ROME code"
+          - name: libelle_rome_tsvector
+            description: "TSVector for ROME label"
+
+      - name: searches_made
+        description: "Search history"
+        columns:
+          - name: id
+            description: "Primary key - UUID"
+          - name: address
+            description: "Search address"
+          - name: api_consumer_name
+            description: "Name of API consumer"
+          - name: department_code
+            description: "Department code"
+          - name: distance
+            description: "Search distance"
+          - name: gps
+            description: "GPS coordinates"
+          - name: lat
+            description: "Latitude"
+          - name: lon
+            description: "Longitude"
+          - name: needstobesearched
+            description: "Whether needs to be searched"
+          - name: number_of_results
+            description: "Number of results"
+          - name: searchable_by
+            description: "Who can search"
+          - name: sorted_by
+            description: "Sort order"
+          - name: update_date
+            description: "Timestamp when updated"
+          - name: voluntary_to_immersion
+            description: "Whether voluntary to immersion"
+          - name: acquisition_campaign
+            description: "Marketing campaign that led to the search"
+          - name: acquisition_keyword
+            description: "Marketing keyword that led to the search"
+
+      - name: searches_made__appellation_code
+        description: "Relationship between searches and appellation codes"
+        columns:
+          - name: search_made_id
+            description: "Foreign key to searches_made table"
+          - name: appellation_code
+            description: "Appellation code"
+
+      - name: searches_made__naf_code
+        description: "Relationship between searches and NAF codes"
+        columns:
+          - name: search_made_id
+            description: "Foreign key to searches_made table"
+          - name: naf_code
+            description: "NAF code"
+
+      - name: short_links
+        description: "Short links"
+        columns:
+          - name: short_link_id
+            description: "Primary key - UUID"
+          - name: url
+            description: "Original URL"
+          - name: created_at
+            description: "Timestamp when created"
 
       - name: users
         description: "User accounts information"
         columns:
           - name: id
-            description: "Primary key"
-          - name: created_at
-            description: "Timestamp when the user was created"
+            description: "Primary key - UUID"
           - name: email
             description: "User's email address"
           - name: first_name
             description: "User's first name"
           - name: last_name
             description: "User's last name"
-
-      - name: sessions
-        description: "User session data"
-        columns:
-          - name: id
-            description: "Primary key"
-          - name: user_id
-            description: "Foreign key to users table"
-          - name: started_at
-            description: "Timestamp when the session started"
-          - name: ended_at
-            description: "Timestamp when the session ended"
-
-      - name: activities
-        description: "User activity events"
-        columns:
-          - name: id
-            description: "Primary key"
-          - name: user_id
-            description: "Foreign key to users table"
-          - name: session_id
-            description: "Foreign key to sessions table"
-          - name: activity_type
-            description: "Type of activity (login, search, etc.)"
           - name: created_at
-            description: "Timestamp when the activity occurred"
+            description: "Timestamp when created"
+          - name: updated_at
+            description: "Timestamp when updated"
+          - name: pro_connect_sub
+            description: "Pro Connect subscription"
+
+      - name: users__agencies
+        description: "Relationship between users and agencies"
+        columns:
+          - name: user_id
+            description: "Foreign key to users table"
+          - name: agency_id
+            description: "Foreign key to agencies table"
+          - name: roles
+            description: "User roles"
+          - name: is_notified_by_email
+            description: "Whether notified by email"
+
+      - name: users_admins
+        description: "Admin users"
+        columns:
+          - name: user_id
+            description: "Foreign key to users table"
+
+      - name: users_ongoing_oauths
+        description: "Ongoing OAuth sessions"
+        columns:
+          - name: state
+            description: "OAuth state"
+          - name: nonce
+            description: "OAuth nonce"
+          - name: provider
+            description: "OAuth provider"
+          - name: user_id
+            description: "Foreign key to users table"
+          - name: external_id
+            description: "External ID"
+          - name: access_token
+            description: "Access token"
+          - name: created_at
+            description: "Timestamp when created"
+          - name: updated_at
+            description: "Timestamp when updated"
+
+      - name: view_appellations_dto
+        description: "View for appellations DTO"
+        columns:
+          - name: appellation_code
+            description: "Appellation code"
+          - name: appellation_label
+            description: "Appellation label"
+          - name: rome_code
+            description: "ROME code"
+          - name: rome_label
+            description: "ROME label"
