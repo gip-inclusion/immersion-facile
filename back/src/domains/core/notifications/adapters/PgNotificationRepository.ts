@@ -25,7 +25,7 @@ import type {
 } from "../ports/NotificationRepository";
 
 const getDefaultNotificationState = (): NotificationState => ({
-  status: "to-be-sent",
+  status: "to-be-send",
   occurredAt: new Date().toISOString(),
 });
 
