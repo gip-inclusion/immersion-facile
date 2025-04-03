@@ -4,7 +4,7 @@ import {
   errors,
   exhaustiveCheck,
 } from "shared";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
@@ -58,14 +58,16 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
           },
         });
       })
-      .with({ isOk: false }, async ({ error }) => {
-        if (error.httpStatus >= 500) {
+      .with(
+        { isOk: false, error: { httpStatus: P.number.gte(500) } },
+        async ({ error }) => {
           throw errors.generic.unsupportedStatus({
             status: error.httpStatus,
             body: error.message,
           });
-        }
-
+        },
+      )
+      .with({ isOk: false }, async ({ error }) => {
         const notificationState: NotificationErrored = {
           status: "errored",
           occurredAt: this.timeGateway.now().toISOString(),
