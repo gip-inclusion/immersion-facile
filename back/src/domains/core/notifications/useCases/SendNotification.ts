@@ -47,14 +47,14 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
     const result = await this.#sendNotification(notification);
 
     await match(result)
-      .with({ isOk: true }, async () => {
+      .with({ isOk: true }, async ({ messageIds }) => {
         await uow.notificationRepository.updateState({
           notificationId: notification.id,
           notificationKind: notification.kind,
           state: {
             status: "accepted",
             occurredAt: this.timeGateway.now().toISOString(),
-            // messageIds: [],
+            messageIds,
           },
         });
       })

@@ -122,10 +122,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: email.sender ?? this.config.defaultSender,
     };
 
-    if (emailData.to.length === 0) return { isOk: true };
+    if (emailData.to.length === 0) return { isOk: true, messageIds: [] };
 
-    await this.#sendTransacEmail(emailData);
-    return { isOk: true };
+    return this.#sendTransacEmail(emailData);
   }
 
   public sendSms(
@@ -142,12 +141,13 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: "ImmerFacile",
       recipient: recipientPhone,
     })
-      .then((_response) =>
+      .then((response) => {
         logger.info({
           notificationId,
           message: "sendTransactSmsSuccess",
-        }),
-      )
+        });
+        return response;
+      })
       .catch((error) => {
         logger.error({
           notificationId,
@@ -157,7 +157,9 @@ export class BrevoNotificationGateway implements NotificationGateway {
       });
   }
 
-  async #sendTransacEmail(body: SendTransactEmailRequestBody) {
+  async #sendTransacEmail(
+    body: SendTransactEmailRequestBody,
+  ): Promise<SendNotificationResult> {
     return this.#emailLimiter.schedule(async () => {
       const response = await this.config.httpClient.sendTransactEmail({
         headers: this.#brevoHeaders,
@@ -173,11 +175,19 @@ export class BrevoNotificationGateway implements NotificationGateway {
           },
         };
 
-      return { isOk: true };
+      return {
+        isOk: true,
+        messageIds:
+          "messageIds" in response.body
+            ? response.body.messageIds
+            : [response.body.messageId],
+      };
     });
   }
 
-  #sendTransacSms(body: SendTransactSmsRequestBody) {
+  #sendTransacSms(
+    body: SendTransactSmsRequestBody,
+  ): Promise<SendNotificationResult> {
     return this.#smslimiter.schedule(async () => {
       const response = await this.config.httpClient.sendTransactSms({
         headers: this.#brevoHeaders,
@@ -193,7 +203,10 @@ export class BrevoNotificationGateway implements NotificationGateway {
           },
         };
 
-      return { isOk: true };
+      return {
+        isOk: true,
+        messageIds: [response.body.messageId],
+      };
     });
   }
 

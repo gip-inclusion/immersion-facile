@@ -208,6 +208,7 @@ describe("WarnSenderThatMessageCouldNotBeDelivered", () => {
           state: {
             status: "accepted",
             occurredAt,
+            messageIds: [],
           },
         },
       ];

@@ -8,7 +8,7 @@ import type {
 export type Base64 = Flavor<string, "Base64">;
 
 export type SendNotificationResult =
-  | { isOk: true }
+  | { isOk: true; messageIds: (string | number)[] }
   | { isOk: false; error: { message: string; httpStatus: number } };
 
 export interface NotificationGateway {
