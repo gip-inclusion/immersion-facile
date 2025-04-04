@@ -118,7 +118,11 @@ export const errors = {
       ),
     notAnError: () => new Error("Not an error class"),
     testError: (message: string) => new Error(message),
-    fakeError: (message: string) => new Error(message),
+    fakeError: (message: string, httpStatus?: number) => {
+      const error = new Error(message);
+      if (httpStatus) (error as any).httpStatus = httpStatus;
+      return error;
+    },
     unsupportedStatus: ({ body, status }: { status: number; body: any }) =>
       new Error(
         `Unsupported response status ${
@@ -820,6 +824,16 @@ export const errors = {
             : ""
         }`,
       ),
+    smsNotSupported: () =>
+      new Error(
+        "Le SMS n'est pas supporté pour la gestion de mail non envoyés.",
+      ),
+    doesNotNeedToBeWarned: (params: { notificationId: string }) =>
+      new BadRequestError(
+        `La notification ${params.notificationId} n'est pas en erreur, il n'est pas nécessaire de prévenir l'envoyeur.`,
+      ),
+    noSenderEmail: ({ notificationId }: { notificationId: string }) =>
+      new Error(`Missing sender email in notification ${notificationId}`),
   },
   dashboard: {
     establishmentConventionForbidden: () =>

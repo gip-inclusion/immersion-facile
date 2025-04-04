@@ -5,6 +5,7 @@ import {
   type Notification,
   type NotificationId,
   type NotificationKind,
+  type NotificationState,
   type NotificationsByKind,
   type SmsNotification,
   type TemplatedEmail,
@@ -22,6 +23,11 @@ import type {
   NotificationRepository,
   SmsNotificationFilters,
 } from "../ports/NotificationRepository";
+
+const getDefaultNotificationState = (): NotificationState => ({
+  status: "to-be-send",
+  occurredAt: new Date().toISOString(),
+});
 
 export class PgNotificationRepository implements NotificationRepository {
   constructor(
@@ -178,6 +184,34 @@ export class PgNotificationRepository implements NotificationRepository {
     ]);
   }
 
+  async updateState({
+    notificationId,
+    notificationKind,
+    state: newState,
+  }: {
+    notificationId: NotificationId;
+    notificationKind: NotificationKind;
+    state: NotificationState | undefined;
+  }) {
+    const state = newState ? JSON.stringify(newState) : null;
+
+    if (notificationKind === "email") {
+      await this.transaction
+        .updateTable("notifications_email")
+        .set({ state })
+        .where("id", "=", notificationId)
+        .execute();
+    }
+
+    if (notificationKind === "sms") {
+      await this.transaction
+        .updateTable("notifications_sms")
+        .set({ state })
+        .where("id", "=", notificationId)
+        .execute();
+    }
+  }
+
   async #getSmsNotificationById(
     id: NotificationId,
   ): Promise<SmsNotification | undefined> {
@@ -232,6 +266,9 @@ export class PgNotificationRepository implements NotificationRepository {
           establishment_siret: notification.followedIds.establishmentSiret,
           agency_id: notification.followedIds.agencyId,
           params: JSON.stringify(notification.templatedContent.params),
+          state: JSON.stringify(
+            notification.state ?? getDefaultNotificationState(),
+          ),
         })),
       )
       .execute();
@@ -285,7 +322,7 @@ export class PgNotificationRepository implements NotificationRepository {
       .insertInto("notifications_email")
       .values(
         notifications.map(
-          ({ id, createdAt, followedIds, templatedContent }) => ({
+          ({ id, createdAt, followedIds, templatedContent, state }) => ({
             id: id,
             created_at: createdAt,
             email_kind: templatedContent.kind,
@@ -297,6 +334,7 @@ export class PgNotificationRepository implements NotificationRepository {
             reply_to_email: templatedContent.replyTo?.email,
             sender_email: templatedContent.sender?.email,
             sender_name: templatedContent.sender?.name,
+            state: JSON.stringify(state ?? getDefaultNotificationState()),
           }),
         ),
       )
@@ -312,21 +350,27 @@ export class PgNotificationRepository implements NotificationRepository {
 }
 
 const getSmsNotificationBuilder = (transaction: KyselyDb) =>
-  transaction.selectFrom("notifications_sms").select(({ ref }) =>
+  transaction.selectFrom("notifications_sms").select((eb) =>
     jsonStripNulls(
       jsonBuildObject({
-        id: ref("id"),
+        id: eb.ref("id"),
         kind: sql<"sms">`'sms'`,
         createdAt: sql<string>`TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
         followedIds: jsonBuildObject({
-          conventionId: ref("convention_id"),
-          establishmentId: ref("establishment_siret"),
-          agencyId: ref("agency_id"),
+          conventionId: eb.ref("convention_id"),
+          establishmentId: eb.ref("establishment_siret"),
+          agencyId: eb.ref("agency_id"),
         }),
+        state: eb
+          .case()
+          .when("state", "is not", null)
+          .then(eb.ref("state"))
+          .else(null)
+          .end(),
         templatedContent: jsonBuildObject({
-          kind: ref("sms_kind"),
-          recipientPhone: ref("recipient_phone"),
-          params: ref("params"),
+          kind: eb.ref("sms_kind"),
+          recipientPhone: eb.ref("recipient_phone"),
+          params: eb.ref("params"),
         }).$castTo<TemplatedSms>(),
       }),
     ).as("notif"),
@@ -357,6 +401,12 @@ const getEmailsNotificationBuilder = (transaction: KyselyDb) =>
             establishmentId: ref("establishment_siret"),
             agencyId: ref("agency_id"),
           }),
+          state: eb
+            .case()
+            .when("state", "is not", null)
+            .then(eb.ref("state"))
+            .else(null)
+            .end(),
           templatedContent: jsonBuildObject({
             kind: ref("email_kind"),
             replyTo: eb

@@ -1,12 +1,10 @@
 import Bottleneck from "bottleneck";
 import {
   type GenerateHtmlOptions,
-  configureGenerateHtmlFromTemplate,
-} from "html-templates";
-import {
   cciCustomHtmlHeader,
+  configureGenerateHtmlFromTemplate,
   defaultEmailFooter,
-} from "html-templates/src/components/email";
+} from "html-templates";
 import {
   type NotificationId,
   type TemplatedEmail,
@@ -18,7 +16,11 @@ import {
 import type { HttpClient } from "shared-routes";
 import type { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";
 import { createLogger } from "../../../../utils/logger";
-import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type {
+  Base64,
+  NotificationGateway,
+  SendNotificationResult,
+} from "../ports/NotificationGateway";
 import type { BrevoNotificationGatewayRoutes } from "./BrevoNotificationGateway.routes";
 import type {
   RecipientOrSender,
@@ -96,7 +98,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
   public async sendEmail(
     email: TemplatedEmail,
     notificationId?: NotificationId,
-  ) {
+  ): Promise<SendNotificationResult> {
     if (email.recipients.length === 0) {
       throw errors.notification.missingRecipient({ notificationId });
     }
@@ -120,15 +122,15 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: email.sender ?? this.config.defaultSender,
     };
 
-    if (emailData.to.length === 0) return;
+    if (emailData.to.length === 0) return { isOk: true, messageIds: [] };
 
-    await this.#sendTransacEmail(emailData);
+    return this.#sendTransacEmail(emailData);
   }
 
   public sendSms(
     { kind, params, recipientPhone }: TemplatedSms,
     notificationId?: NotificationId,
-  ): Promise<void> {
+  ): Promise<SendNotificationResult> {
     logger.info({
       notificationId,
       message: "sendTransactSmsTotal",
@@ -139,48 +141,72 @@ export class BrevoNotificationGateway implements NotificationGateway {
       sender: "ImmerFacile",
       recipient: recipientPhone,
     })
-      .then((_response) =>
+      .then((response) => {
         logger.info({
           notificationId,
           message: "sendTransactSmsSuccess",
-        }),
-      )
+        });
+        return response;
+      })
       .catch((error) => {
         logger.error({
           notificationId,
           message: "sendTransactSmsError",
         });
-        throw error;
+        return error;
       });
   }
 
-  async #sendTransacEmail(body: SendTransactEmailRequestBody) {
+  async #sendTransacEmail(
+    body: SendTransactEmailRequestBody,
+  ): Promise<SendNotificationResult> {
     return this.#emailLimiter.schedule(async () => {
       const response = await this.config.httpClient.sendTransactEmail({
         headers: this.#brevoHeaders,
         body,
       });
+
       if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      return response;
+        return {
+          isOk: false,
+          error: {
+            message: JSON.stringify(response.body),
+            httpStatus: response.status,
+          },
+        };
+
+      return {
+        isOk: true,
+        messageIds:
+          "messageIds" in response.body
+            ? response.body.messageIds
+            : [response.body.messageId],
+      };
     });
   }
 
-  #sendTransacSms(body: SendTransactSmsRequestBody) {
+  #sendTransacSms(
+    body: SendTransactSmsRequestBody,
+  ): Promise<SendNotificationResult> {
     return this.#smslimiter.schedule(async () => {
       const response = await this.config.httpClient.sendTransactSms({
         headers: this.#brevoHeaders,
         body,
       });
+
       if (response.status !== 201)
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      return response;
+        return {
+          isOk: false,
+          error: {
+            message: JSON.stringify(response.body),
+            httpStatus: response.status,
+          },
+        };
+
+      return {
+        isOk: true,
+        messageIds: [response.body.messageId],
+      };
     });
   }
 

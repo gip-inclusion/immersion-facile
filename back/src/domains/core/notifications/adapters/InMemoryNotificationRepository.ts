@@ -7,6 +7,7 @@ import {
   type Notification,
   type NotificationId,
   type NotificationKind,
+  type NotificationState,
   type ShortLinkId,
   type Signatory,
   type SmsNotification,
@@ -15,6 +16,7 @@ import {
   displayEmergencyContactInfos,
   errors,
   expectToEqual,
+  replaceElementWhere,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeShortLinkUrl } from "../../short-link/ShortLink";
@@ -108,6 +110,26 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   public async saveBatch(notifications: Notification[]): Promise<void> {
     this.notifications.push(...notifications);
+  }
+
+  public async updateState(params: {
+    notificationId: NotificationId;
+    notificationKind: NotificationKind;
+    state: NotificationState | undefined;
+  }): Promise<void> {
+    const notification = this.notifications.find(
+      ({ id }) => id === params.notificationId,
+    );
+    if (!notification)
+      throw new Error(
+        `Notification ${params.notificationId} not found (In Memory Repository)`,
+      );
+
+    this.notifications = replaceElementWhere(
+      this.notifications,
+      { ...notification, state: params.state },
+      ({ id }) => id === params.notificationId,
+    );
   }
 }
 

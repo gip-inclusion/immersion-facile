@@ -1,6 +1,14 @@
-import { errors, exhaustiveCheck } from "shared";
+import {
+  type Notification,
+  type NotificationErrored,
+  errors,
+  exhaustiveCheck,
+} from "shared";
+import { P, match } from "ts-pattern";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../UseCase";
+import type { CreateNewEvent } from "../../events/ports/EventBus";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { WithNotificationIdAndKind } from "../helpers/Notification";
@@ -13,14 +21,14 @@ const withNotificationIdAndKind: z.Schema<WithNotificationIdAndKind> = z.object(
   },
 );
 
-// Careful, this use case is transactional,
-// but it should only do queries and NEVER write anything to the DB.
 export class SendNotification extends TransactionalUseCase<WithNotificationIdAndKind> {
   protected inputSchema = withNotificationIdAndKind;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     private readonly notificationGateway: NotificationGateway,
+    private readonly timeGateway: TimeGateway,
+    private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
@@ -36,6 +44,63 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
 
     if (!notification) throw errors.notification.notFound({ id, kind });
 
+    const result = await this.#sendNotification(notification);
+
+    await match(result)
+      .with({ isOk: true }, async ({ messageIds }) => {
+        await uow.notificationRepository.updateState({
+          notificationId: notification.id,
+          notificationKind: notification.kind,
+          state: {
+            status: "accepted",
+            occurredAt: this.timeGateway.now().toISOString(),
+            messageIds,
+          },
+        });
+      })
+      .with(
+        { isOk: false, error: { httpStatus: P.number.gte(500) } },
+        async ({ error }) => {
+          throw errors.generic.unsupportedStatus({
+            status: error.httpStatus,
+            body: error.message,
+          });
+        },
+      )
+      .with({ isOk: false }, async ({ error }) => {
+        const notificationState: NotificationErrored = {
+          status: "errored",
+          occurredAt: this.timeGateway.now().toISOString(),
+          httpStatus: error.httpStatus,
+          message: error.message,
+        };
+
+        await uow.notificationRepository.updateState({
+          notificationId: notification.id,
+          notificationKind: notification.kind,
+          state: notificationState,
+        });
+
+        if (
+          notification.templatedContent.kind === "DISCUSSION_EXCHANGE" &&
+          notification.state?.status !== "errored"
+        ) {
+          await uow.outboxRepository.save(
+            this.createNewEvent({
+              topic: "DiscussionExchangeDeliveryFailed",
+              payload: {
+                notificationId: notification.id,
+                notificationKind: notification.kind,
+                errored: notificationState,
+              },
+            }),
+          );
+        }
+      })
+      .exhaustive();
+  }
+
+  #sendNotification(notification: Notification) {
     switch (notification.kind) {
       case "email":
         return this.notificationGateway.sendEmail(

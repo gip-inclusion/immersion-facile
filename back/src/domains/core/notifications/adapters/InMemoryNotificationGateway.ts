@@ -7,9 +7,19 @@ import {
 } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
-import type { Base64, NotificationGateway } from "../ports/NotificationGateway";
+import type {
+  Base64,
+  NotificationGateway,
+  SendNotificationResult,
+} from "../ports/NotificationGateway";
 
-export const sendSmsErrorPhoneNumber = "0699999999";
+export const sendSmsError555PhoneNumber = "0699000555";
+export const sendSmsError400PhoneNumber = "0699000400";
+export const emailThatTriggerSendEmailError400 =
+  "email-that-triggers-send-email-error-400@mail.com";
+export const fakeHttpStatus555ErrorCode = 555;
+export const fakeHttpStatus400ErrorCode = 400;
+
 export class InMemoryNotificationGateway implements NotificationGateway {
   public attachmentsByLinks: Partial<Record<string, Base64>> = {
     default: "",
@@ -44,16 +54,45 @@ export class InMemoryNotificationGateway implements NotificationGateway {
     return this.#sentSms;
   }
 
-  public async sendEmail(templatedEmail: TemplatedEmail): Promise<void> {
+  public async sendEmail(
+    templatedEmail: TemplatedEmail,
+  ): Promise<SendNotificationResult> {
+    if (templatedEmail.recipients.includes(emailThatTriggerSendEmailError400)) {
+      return {
+        isOk: false,
+        error: {
+          message: `fake Send Email Error with email ${emailThatTriggerSendEmailError400}`,
+          httpStatus: fakeHttpStatus400ErrorCode,
+        },
+      };
+    }
     this.#pushEmail(templatedEmail);
+    return { isOk: true, messageIds: templatedEmail.recipients };
   }
 
-  public async sendSms(sms: TemplatedSms): Promise<void> {
-    if (sms.recipientPhone === `33${sendSmsErrorPhoneNumber.substring(1)}`)
-      throw errors.generic.fakeError(
-        `Send SMS Error with phone number ${sms.recipientPhone}.`,
-      );
+  public async sendSms(sms: TemplatedSms): Promise<SendNotificationResult> {
+    if (sms.recipientPhone === `33${sendSmsError555PhoneNumber.substring(1)}`) {
+      return {
+        isOk: false,
+        error: {
+          message: `fake Send SMS Error with phone number ${sms.recipientPhone}.`,
+          httpStatus: fakeHttpStatus555ErrorCode,
+        },
+      };
+    }
+
+    if (sms.recipientPhone === `33${sendSmsError400PhoneNumber.substring(1)}`) {
+      return {
+        isOk: false,
+        error: {
+          message: `fake Send SMS Error with phone number ${sms.recipientPhone}.`,
+          httpStatus: fakeHttpStatus400ErrorCode,
+        },
+      };
+    }
+
     this.#sentSms.push(sms);
+    return { isOk: true, messageIds: [sms.recipientPhone] };
   }
 
   #pushEmail(templatedEmail: TemplatedEmail) {

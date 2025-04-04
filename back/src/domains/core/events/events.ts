@@ -21,6 +21,7 @@ import {
 import { z } from "zod";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
+import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import type {
   ConventionReminderPayload,
@@ -124,6 +125,7 @@ export type DomainEvent =
   | GenericEvent<"NewEstablishmentAggregateInsertedFromForm", WithEstablishmentAggregate & WithTriggeredBy>
   | GenericEvent<"UpdatedEstablishmentAggregateInsertedFromForm", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
+  | GenericEvent<"DiscussionExchangeDeliveryFailed", WarnSenderThatMessageCouldNotBeDeliveredParams>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
