@@ -1,7 +1,6 @@
 import {
   addDays,
   addHours,
-  differenceInCalendarWeeks,
   differenceInDays,
   format,
   getDay,
@@ -19,6 +18,7 @@ import { arrayFromNumber } from "../utils";
 import {
   type DateString,
   convertLocaleDateToUtcTimezoneDate,
+  toDateWithoutHours,
 } from "../utils/date";
 import {
   type DailyScheduleDto,
@@ -341,14 +341,43 @@ export const selectedDaysFromComplexSchedule = (
       .map((day) => frenchDayMapping(day.date).frenchDay),
   ).sort();
 
+const getWeeksSpannedWithoutTimezone = (
+  startDate: Date,
+  endDate: Date,
+): number => {
+  const normalizedStart = new Date(
+    Date.UTC(
+      startDate.getUTCFullYear(),
+      startDate.getUTCMonth(),
+      startDate.getUTCDate(),
+    ),
+  );
+  const normalizedEnd = new Date(
+    Date.UTC(
+      endDate.getUTCFullYear(),
+      endDate.getUTCMonth(),
+      endDate.getUTCDate(),
+    ),
+  );
+
+  const startDayOfWeek = normalizedStart.getUTCDay();
+  const startMonday = new Date(normalizedStart);
+  startMonday.setUTCDate(startMonday.getUTCDate() - ((startDayOfWeek + 6) % 7));
+
+  const endDayOfWeek = normalizedEnd.getUTCDay();
+  const endMonday = new Date(normalizedEnd);
+  endMonday.setUTCDate(endMonday.getUTCDate() - ((endDayOfWeek + 6) % 7));
+
+  return differenceInDays(endMonday, startMonday) / 7;
+};
+
 export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
   { start: startDay, end: endDay }: DateIntervalDto,
 ): ImmersionTimeTable => {
   const differenceInCalendarWeeksBetweenDates =
-    differenceInCalendarWeeks(endDay, startDay, {
-      weekStartsOn: 1,
-    }) + 1;
+    getWeeksSpannedWithoutTimezone(startDay, endDay) + 1;
+
   return isValidInterval({
     start: startDay,
     end: endDay,
@@ -358,7 +387,7 @@ export const makeImmersionTimetable = (
           arrayFromNumber(weekdays.length).map((dayIndex) => {
             const mondayOfFirstWeek = subDays(
               startDay,
-              frenchDayMapping(startDay.toISOString()).frenchDay,
+              frenchDayMapping(toDateWithoutHours(startDay)).frenchDay,
             );
             const date = addHours(
               mondayOfFirstWeek,
