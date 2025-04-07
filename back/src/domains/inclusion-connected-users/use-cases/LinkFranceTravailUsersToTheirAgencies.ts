@@ -15,7 +15,9 @@ import {
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UserAuthenticatedPayload } from "../../core/events/events";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getUserWithRights } from "../helpers/userRights.helper";
 
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
@@ -26,7 +28,14 @@ const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
 
 export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<UserAuthenticatedPayload> {
   inputSchema = userAuthenticatedSchema;
-
+  #createNewEvent: CreateNewEvent;
+  constructor(
+    uowPerformer: UnitOfWorkPerformer,
+    createNewEvent: CreateNewEvent,
+  ) {
+    super(uowPerformer);
+    this.#createNewEvent = createNewEvent;
+  }
   protected async _execute(
     { userId, codeSafir }: UserAuthenticatedPayload,
     uow: UnitOfWork,
@@ -40,7 +49,12 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
       agencyWithSafir &&
       activeAgencyStatuses.includes(agencyWithSafir.status)
     )
-      return updateActiveAgencyWithSafir(uow, agencyWithSafir, userId);
+      return updateActiveAgencyWithSafir(
+        uow,
+        agencyWithSafir,
+        userId,
+        this.#createNewEvent,
+      );
 
     const groupWithSafir =
       await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
@@ -57,18 +71,33 @@ const isIcUserAlreadyHasValidRight = (
       agency.codeSafir === codeSafir && agencyRoleIsNotToReview(roles),
   );
 
-const updateActiveAgencyWithSafir = (
+const updateActiveAgencyWithSafir = async (
   uow: UnitOfWork,
   agencyWithSafir: AgencyWithUsersRights,
   userId: string,
-): Promise<void> =>
-  uow.agencyRepository.update({
-    id: agencyWithSafir.id,
-    usersRights: {
-      ...agencyWithSafir.usersRights,
-      [userId]: { roles: ["validator"], isNotifiedByEmail: false },
-    },
-  });
+  createNewEvent: CreateNewEvent,
+): Promise<void> => {
+  await Promise.all([
+    uow.agencyRepository.update({
+      id: agencyWithSafir.id,
+      usersRights: {
+        ...agencyWithSafir.usersRights,
+        [userId]: { roles: ["validator"], isNotifiedByEmail: false },
+      },
+    }),
+    uow.outboxRepository.save(
+      createNewEvent({
+        topic: "AgencyUpdated",
+        payload: {
+          agencyId: agencyWithSafir.id,
+          triggeredBy: {
+            kind: "crawler",
+          },
+        },
+      }),
+    ),
+  ]);
+};
 
 const updateAgenciesOfGroup = async (
   uow: UnitOfWork,

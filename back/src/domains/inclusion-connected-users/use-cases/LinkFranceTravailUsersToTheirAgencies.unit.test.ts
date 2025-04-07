@@ -5,13 +5,18 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import {
+  type CreateNewEvent,
+  makeCreateNewEvent,
+} from "../../core/events/ports/EventBus";
+import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { LinkFranceTravailUsersToTheirAgencies } from "./LinkFranceTravailUsersToTheirAgencies";
-
 const codeSafir = "546546645";
 const agencyGroupCodeSafir = "my-group-safir-code";
 const agency = new AgencyDtoBuilder().withCodeSafir(codeSafir).build();
@@ -42,13 +47,21 @@ const defaultUser: User = {
 };
 
 describe("LinkFranceTravailUsersToTheirAgencies", () => {
+  let createNewEvent: CreateNewEvent;
   let uow: InMemoryUnitOfWork;
   let linkFranceTravailUsersToTheirAgencies: LinkFranceTravailUsersToTheirAgencies;
 
   beforeEach(() => {
     uow = createInMemoryUow();
+    createNewEvent = makeCreateNewEvent({
+      timeGateway: new CustomTimeGateway(),
+      uuidGenerator: new TestUuidGenerator(),
+    });
     linkFranceTravailUsersToTheirAgencies =
-      new LinkFranceTravailUsersToTheirAgencies(new InMemoryUowPerformer(uow));
+      new LinkFranceTravailUsersToTheirAgencies(
+        new InMemoryUowPerformer(uow),
+        createNewEvent,
+      );
     uow.userRepository.users = [defaultUser];
     uow.agencyRepository.agencies = agenciesInRepo.map((agency) =>
       toAgencyWithRights(agency, {}),
@@ -86,6 +99,17 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         toAgencyWithRights(agency1InGroup),
         toAgencyWithRights(agency2InGroup),
         toAgencyWithRights(agency3InGroup),
+      ]);
+      expectToEqual(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: agency.id,
+            triggeredBy: {
+              kind: "crawler",
+            },
+          },
+        }),
       ]);
     });
 
@@ -154,6 +178,17 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
         toAgencyWithRights(agency1InGroup),
         toAgencyWithRights(agency2InGroup),
         toAgencyWithRights(agency3InGroup),
+      ]);
+      expectToEqual(uow.outboxRepository.events, [
+        createNewEvent({
+          topic: "AgencyUpdated",
+          payload: {
+            agencyId: agency.id,
+            triggeredBy: {
+              kind: "crawler",
+            },
+          },
+        }),
       ]);
     });
 
