@@ -1,4 +1,9 @@
-import { type ConventionId, type TallyForm, tallyFormSchema } from "shared";
+import {
+  type ConventionId,
+  type TallyForm,
+  removeSpaces,
+  tallyFormSchema,
+} from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
 import { createTransactionalUseCase } from "../../UseCase";
@@ -134,7 +139,7 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25
         siret &&
           `-----------
 Siret fourni : ${siret}
-Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${siret}
+Piloter l'entreprise (dont suppression): https://immersion-facile.beta.gouv.fr/pilotage-etablissement-admin?siret=${removeSpaces(siret)}
 `,
         isEstablishment &&
           `-----------
