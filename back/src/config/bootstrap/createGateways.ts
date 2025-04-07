@@ -148,6 +148,7 @@ export const createGateways = async (
     logInputCbOnSuccess?: LogInputCbOnSuccess;
   }) =>
     createFetchSharedClient(routes, fetch, {
+      timeout: config.externalAxiosTimeout,
       skipResponseValidation: true,
       onResponseSideEffect: logPartnerResponses({
         partnerName: partnerName,

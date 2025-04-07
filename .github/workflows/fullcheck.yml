@@ -158,6 +158,7 @@ jobs:
       SIRENE_INSEE_USERNAME: ${{ secrets.SIRENE_INSEE_USERNAME }}
       SIRENE_INSEE_PASSWORD: ${{ secrets.SIRENE_INSEE_PASSWORD }}
       EVENT_CRAWLER_PERIOD_MS: 600
+      EXTERNAL_AXIOS_TIMEOUT: 30000
     services:
       postgres:
         image: postgis/postgis:13-master
