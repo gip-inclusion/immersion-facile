@@ -35,16 +35,18 @@ const someDate = new Date("2023-01-01").toISOString();
 describe("SendNotification UseCase", () => {
   let notificationGateway: InMemoryNotificationGateway;
   let sendNotification: SendNotification;
-  let timeGateway: CustomTimeGateway;
   let createNewEvent: CreateNewEvent;
   let uow: InMemoryUnitOfWork;
+  const now = new Date();
 
   beforeEach(() => {
     notificationGateway = new InMemoryNotificationGateway();
     uow = createInMemoryUow();
     const uowPerformer = new InMemoryUowPerformer(uow);
     const uuidGenerator = new TestUuidGenerator();
-    timeGateway = new CustomTimeGateway();
+    const timeGateway = new CustomTimeGateway();
+    timeGateway.setNextDate(now);
+
     createNewEvent = makeCreateNewEvent({
       timeGateway: timeGateway,
       uuidGenerator: uuidGenerator,
@@ -70,9 +72,6 @@ describe("SendNotification UseCase", () => {
     describe("when error occurres in SMS or email sending", () => {
       it("should throw if http status is 500 or higher", async () => {
         const id = "notif-sms-id";
-
-        const now = new Date();
-        timeGateway.setNextDate(now);
 
         const smsNotification: SmsNotification = {
           id,
@@ -102,9 +101,6 @@ describe("SendNotification UseCase", () => {
 
       it("stores the error in the notification (and not send any event) when error is 4xx", async () => {
         const id = "notif-sms-id";
-
-        const now = new Date();
-        timeGateway.setNextDate(now);
 
         const smsNotification: SmsNotification = {
           id,
@@ -138,6 +134,7 @@ describe("SendNotification UseCase", () => {
             state: notificationState,
           },
         ]);
+        expectArraysToMatch(uow.outboxRepository.events, []);
       });
 
       describe("when the notification is a DISCUSSION_EXCHANGE", () => {
@@ -156,9 +153,6 @@ describe("SendNotification UseCase", () => {
         it("should dispatch an event when it was a discussion exchange notification failed to deliver (with 4xx)", async () => {
           uow.notificationRepository.notifications = [emailNotification];
 
-          const now = new Date();
-          timeGateway.setNextDate(now);
-
           const notificationState: NotificationErrored = {
             status: "errored",
             occurredAt: now.toISOString(),
@@ -170,12 +164,6 @@ describe("SendNotification UseCase", () => {
             id: emailNotification.id,
             kind: "email",
           });
-          // await expectPromiseToFailWithError(
-          //   errors.generic.unsupportedStatus({
-          //     status: fakeHttpStatus400ErrorCode,
-          //     body: notificationState.message,
-          //   }),
-          // );
 
           expectArraysToMatch(uow.outboxRepository.events, [
             {
@@ -201,9 +189,6 @@ describe("SendNotification UseCase", () => {
           };
 
           uow.notificationRepository.notifications = [alreadyErroredEmailNotif];
-
-          const now = new Date();
-          timeGateway.setNextDate(now);
 
           const notificationState: NotificationErrored = {
             status: "errored",
@@ -240,9 +225,6 @@ describe("SendNotification UseCase", () => {
           };
 
           uow.notificationRepository.notifications = [alreadyErroredEmailNotif];
-
-          const now = new Date();
-          timeGateway.setNextDate(now);
 
           await sendNotification.execute({
             id: emailNotification.id,
