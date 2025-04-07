@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import {
@@ -181,6 +182,7 @@ export class RealEventCrawler
               error,
               message: "RealEventCrawler.processNewEvents failed",
             });
+            Sentry.captureException(error);
           })
           .finally(() => processNewEvents());
       }, this.crawlingPeriodMs);
@@ -200,6 +202,7 @@ export class RealEventCrawler
               error,
               message: "RealEventCrawler.retryFailedEvents failed",
             });
+            Sentry.captureException(error);
           })
           .finally(() => retryFailedEvents());
       }, retryErrorsPeriodMs);
