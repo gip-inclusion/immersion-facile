@@ -11,7 +11,6 @@ import {
   type TemplatedEmail,
   type TemplatedSms,
   expectArraysToEqual,
-  expectObjectsToMatch,
   expectToEqual,
 } from "shared";
 import {
@@ -217,7 +216,7 @@ describe("PgNotificationRepository", () => {
         id,
         "email",
       );
-      expectObjectsToMatch(response, {
+      expectToEqual(response, {
         ...emailNotification,
         templatedContent: {
           ...emailNotification.templatedContent,
@@ -310,14 +309,11 @@ describe("PgNotificationRepository", () => {
         notificationKind: notification.kind,
         state: notificationState,
       });
-      const response = await pgNotificationRepository.getByIdAndKind(
-        notification.id,
-        "email",
-      );
-      expect(response).toBeDefined();
-      if (!response) throw new Error("response is undefined (unreachable)");
 
-      expectToEqual(response.state, notificationState);
+      expectToEqual(
+        await pgNotificationRepository.getByIdAndKind(notification.id, "email"),
+        { ...notification, state: notificationState },
+      );
 
       await pgNotificationRepository.updateState({
         notificationId: notification.id,
@@ -325,14 +321,10 @@ describe("PgNotificationRepository", () => {
         state: undefined,
       });
 
-      const response2 = await pgNotificationRepository.getByIdAndKind(
-        notification.id,
-        "email",
+      expectToEqual(
+        await pgNotificationRepository.getByIdAndKind(notification.id, "email"),
+        { ...notification, state: undefined },
       );
-      expect(response2).toBeDefined();
-      if (!response2) throw new Error("response2 is undefined (unreachable)");
-
-      expect(response2.state).toBeUndefined();
     });
   });
 
