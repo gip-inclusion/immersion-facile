@@ -17,6 +17,7 @@ import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import {
   inclusionConnectedUserSchema,
   userInListSchema,
+  userWithAgencyRightsSchema,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
@@ -81,7 +82,7 @@ export const adminRoutes = defineRoutes({
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: inclusionConnectedUserSchema,
+      200: userWithAgencyRightsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
@@ -105,7 +106,7 @@ export const adminRoutes = defineRoutes({
     queryParamsSchema: withUserFiltersSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.array(inclusionConnectedUserSchema),
+      200: z.array(userWithAgencyRightsSchema),
       401: httpErrorSchema,
     },
   }),

@@ -1,6 +1,6 @@
 import {
   AgencyDtoBuilder,
-  type InclusionConnectedUser,
+  type UserWithAgencyRights,
   errors,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -34,10 +34,8 @@ describe("CreateUserOnAgency", () => {
     email: "fake-email@mail.com",
     firstName: "fake-first-name",
     lastName: "fake-last-name",
-    externalId: null,
     createdAt: new Date().toISOString(),
     agencyRights: {},
-    dashboards: { agencies: {}, establishments: {} },
   };
 
   it("should create user successfully", () => {
@@ -62,7 +60,7 @@ describe("CreateUserOnAgency", () => {
       true,
     );
 
-    const icUser: InclusionConnectedUser = {
+    const icUser: UserWithAgencyRights = {
       ...userToCreate,
       agencyRights: [
         {

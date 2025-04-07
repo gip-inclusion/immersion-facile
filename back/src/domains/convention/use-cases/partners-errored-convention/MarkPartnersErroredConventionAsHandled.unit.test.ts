@@ -44,7 +44,7 @@ describe("mark partners errored convention as handled", () => {
     .withLastName("Doe")
     .withEmail("my-user@email.com")
     .withCreatedAt(new Date())
-    .withExternalId("icUser-external-id")
+    // .withProConnectInfos("icUser-external-id")
     .build();
 
   const agency = new AgencyDtoBuilder().build();

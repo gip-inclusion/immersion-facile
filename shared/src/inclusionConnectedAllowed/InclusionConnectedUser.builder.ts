@@ -3,6 +3,7 @@ import type { Email } from "../email/email.dto";
 import type {
   AgencyRight,
   InclusionConnectedUser,
+  ProConnectInfos,
   User,
   UserId,
   UserWithAdminRights,
@@ -14,16 +15,19 @@ const defaultUser: User = {
   email: "default.user@mail.com",
   firstName: "Default",
   lastName: "User",
-  externalId: null,
   createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
 };
 
+export const defaultProConnectInfos: ProConnectInfos = {
+  externalId: "default-external-id",
+  siret: "00000000001111",
+};
 const defaultInclusionConnectedUser: InclusionConnectedUser = {
   id: "default-inclusion-connect-user-id",
   email: "default.user@mail.com",
   firstName: "Default",
   lastName: "User",
-  externalId: "default-external-id",
+  proConnect: defaultProConnectInfos,
   createdAt: new Date("2024-04-28T12:00:00.000Z").toISOString(),
   agencyRights: [],
   dashboards: { agencies: {}, establishments: {} },
@@ -42,8 +46,8 @@ export class UserBuilder implements Builder<User> {
     return new UserBuilder({ ...this.#dto, id });
   }
 
-  withExternalId(externalId: string | null) {
-    return new UserBuilder({ ...this.#dto, externalId });
+  withProConnect(proConnect?: ProConnectInfos) {
+    return new UserBuilder({ ...this.#dto, proConnect });
   }
 
   withFirstName(firstName: string) {
@@ -103,8 +107,10 @@ export class InclusionConnectedUserBuilder
     });
   }
 
-  withExternalId(externalId: string): InclusionConnectedUserBuilder {
-    return new InclusionConnectedUserBuilder({ ...this.#dto, externalId });
+  withProConnectInfos(
+    proConnect: ProConnectInfos,
+  ): InclusionConnectedUserBuilder {
+    return new InclusionConnectedUserBuilder({ ...this.#dto, proConnect });
   }
 
   withId(id: UserId) {

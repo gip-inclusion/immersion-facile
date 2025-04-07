@@ -3,7 +3,6 @@ import {
   type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
   TWELVE_HOURS_IN_SECONDS,
-  type User,
   type UserId,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
@@ -24,6 +23,7 @@ import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 import type { GetAccessTokenPayload, OAuthGateway } from "../port/OAuthGateway";
+import type { UserOnRepository } from "../port/UserRepository";
 
 type ConnectedRedirectUrl = AbsoluteUrl;
 
@@ -126,7 +126,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: newOrUpdatedUser.firstName,
       lastName: newOrUpdatedUser.lastName,
       email: newOrUpdatedUser.email,
-      siret: accessToken.payload.siret,
       idToken: accessToken.idToken,
     })}`;
   }
@@ -134,7 +133,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   async #makeNewOrUpdatedUser(
     uow: UnitOfWork,
     payload: GetAccessTokenPayload,
-  ): Promise<User> {
+  ): Promise<UserOnRepository> {
     const [existingUserByExternalId, userWithSameEmail] = await Promise.all([
       uow.userRepository.findByExternalId(payload.sub),
       uow.userRepository.findByEmail(payload.email),
@@ -157,7 +156,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: payload.firstName,
       lastName: payload.lastName,
       email: payload.email,
-      externalId: payload.sub,
       id:
         existingUserByExternalId?.id ||
         userWithSameEmail?.id ||
@@ -166,6 +164,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         existingUserByExternalId?.createdAt ||
         userWithSameEmail?.createdAt ||
         this.#timeGateway.now().toISOString(),
+      proConnect: {
+        externalId: payload.sub,
+        siret: payload.siret,
+      },
     };
   }
 

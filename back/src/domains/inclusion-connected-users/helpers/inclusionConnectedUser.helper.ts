@@ -5,15 +5,15 @@ import {
   type AgencyRight,
   type AgencyWithUsersRights,
   type ConventionsEstablishmentDashboard,
+  type Email,
   type EstablishmentDashboards,
   type InclusionConnectedUser,
   type UserId,
-  type UserWithAgencyRights,
   type WithDashboards,
   agencyRoleIsNotToReview,
+  errors,
 } from "shared";
 import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -25,15 +25,18 @@ export const getIcUserByUserId = async (
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
 ): Promise<InclusionConnectedUser> => {
-  const userWithAdminAndAgencyRights = await getUserWithRights(uow, userId);
-
+  const { proConnect, ...rest } = await getUserWithRights(uow, userId);
+  if (!proConnect) throw errors.user.missingProConnectInfos(userId);
   return {
-    ...userWithAdminAndAgencyRights,
+    ...rest,
+    proConnect,
     ...(await withDashboards(
       uow,
-      userWithAdminAndAgencyRights,
       dashboardGateway,
       timeGateway,
+      rest.id,
+      rest.email,
+      rest.agencyRights,
     )),
   };
 };
@@ -70,15 +73,21 @@ export const getIcUsersByUserIds = async (
   );
 
   return Promise.all(
-    users.map<Promise<InclusionConnectedUser>>(async (user) => ({
-      ...user,
-      agencyRights: await makeAgencyRights(
-        userRightsByUser[user.id],
-        agenciesRelatedToUsersByAgencyId,
-        uow,
-      ),
-      dashboards: { agencies: {}, establishments: {} },
-    })),
+    users.map<Promise<InclusionConnectedUser>>(
+      async ({ proConnect, ...rest }) => {
+        if (!proConnect) throw errors.user.missingProConnectInfos(rest.id);
+        return {
+          ...rest,
+          proConnect,
+          agencyRights: await makeAgencyRights(
+            userRightsByUser[rest.id],
+            agenciesRelatedToUsersByAgencyId,
+            uow,
+          ),
+          dashboards: { agencies: {}, establishments: {} },
+        };
+      },
+    ),
   );
 };
 
@@ -110,17 +119,18 @@ const makeAgencyRights = (
 
 async function makeAgencyDashboards(
   uow: UnitOfWork,
-  user: UserWithAgencyRights,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  userId: UserId,
+  agencyRights: AgencyRight[],
 ) {
   const apiConsumers = await uow.apiConsumerRepository.getAll();
 
-  const agencyIdsWithEnoughPrivileges = user.agencyRights
+  const agencyIdsWithEnoughPrivileges = agencyRights
     .filter(({ roles }) => agencyRoleIsNotToReview(roles))
     .map(({ agency }) => agency.id);
 
-  const isSynchronisationEnableForAgency = user.agencyRights.some(
+  const isSynchronisationEnableForAgency = agencyRights.some(
     (agencyRight) =>
       agencyRight.agency.kind === "pole-emploi" ||
       apiConsumers.some(
@@ -138,7 +148,7 @@ async function makeAgencyDashboards(
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? {
           agencyDashboardUrl: await dashboardGateway.getAgencyUserUrl(
-            user.id,
+            userId,
             timeGateway.now(),
           ),
         }
@@ -147,7 +157,7 @@ async function makeAgencyDashboards(
       ? {
           erroredConventionsDashboardUrl: isSynchronisationEnableForAgency
             ? await dashboardGateway.getErroredConventionsDashboardUrl(
-                user.id,
+                userId,
                 timeGateway.now(),
               )
             : undefined,
@@ -158,23 +168,27 @@ async function makeAgencyDashboards(
 
 async function withDashboards(
   uow: UnitOfWork,
-  user: UserWithAgencyRights,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  userId: UserId,
+  email: Email,
+  agencyRights: AgencyRight[],
 ): Promise<WithDashboards> {
   return {
     dashboards: {
       agencies: await makeAgencyDashboards(
         uow,
-        user,
         dashboardGateway,
         timeGateway,
+        userId,
+        agencyRights,
       ),
       establishments: await makeEstablishmentDashboard(
         uow,
-        user,
         dashboardGateway,
         timeGateway,
+        userId,
+        email,
       ),
     },
   };
@@ -182,21 +196,24 @@ async function withDashboards(
 
 async function makeEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  userId: UserId,
+  email: Email,
 ): Promise<EstablishmentDashboards> {
   const conventions = await makeConventionEstablishmentDashboard(
     uow,
-    user,
     dashboardGateway,
     timeGateway,
+    userId,
+    email,
   );
   const discussions = await makeDiscussionsEstablishmentDashboard(
     uow,
-    user,
     dashboardGateway,
     timeGateway,
+    userId,
+    email,
   );
   return {
     ...(conventions ? { conventions } : {}),
@@ -206,26 +223,27 @@ async function makeEstablishmentDashboard(
 
 async function makeConventionEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  userId: UserId,
+  email: Email,
 ): Promise<ConventionsEstablishmentDashboard | undefined> {
   const hasConventionForEstablishmentRepresentative =
     (
       await uow.conventionRepository.getIdsByEstablishmentRepresentativeEmail(
-        user.email,
+        email,
       )
     ).length > 0;
 
   const hasConventionForEstablishmentTutor =
-    (await uow.conventionRepository.getIdsByEstablishmentTutorEmail(user.email))
+    (await uow.conventionRepository.getIdsByEstablishmentTutorEmail(email))
       .length > 0;
 
   return hasConventionForEstablishmentRepresentative ||
     hasConventionForEstablishmentTutor
     ? {
         url: await dashboardGateway.getEstablishmentConventionsDashboardUrl(
-          user.id,
+          userId,
           timeGateway.now(),
         ),
         role: hasConventionForEstablishmentRepresentative
@@ -237,16 +255,17 @@ async function makeConventionEstablishmentDashboard(
 
 async function makeDiscussionsEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  userId: UserId,
+  email: Email,
 ): Promise<AbsoluteUrl | undefined> {
   const hasDiscussion = await uow.discussionRepository.hasDiscussionMatching({
-    establishmentRepresentativeEmail: user.email,
+    establishmentRepresentativeEmail: email,
   });
   return hasDiscussion
     ? dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
-        user.id,
+        userId,
         timeGateway.now(),
       )
     : undefined;

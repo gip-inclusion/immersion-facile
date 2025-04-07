@@ -54,7 +54,6 @@ describe("rootApp epic", () => {
       provider: "connectedUser",
       token,
       idToken: "inclusion-connect-id-token",
-      siret: "12345678901234",
     });
 
     expect(store.getState().auth.federatedIdentityWithUser).toBeNull();

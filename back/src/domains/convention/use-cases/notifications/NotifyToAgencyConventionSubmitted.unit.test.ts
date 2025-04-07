@@ -36,7 +36,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     .withLastName("validatorLastName")
     .withEmail("validator@mail.com")
     .withCreatedAt(new Date())
-    .withExternalId("validator-external-id")
+    // .withExternalId("validator-external-id")
     .build();
 
   const councellor1 = new InclusionConnectedUserBuilder()
@@ -45,7 +45,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     .withLastName("councellor1LastName")
     .withEmail("councellor1@email.fr")
     .withCreatedAt(new Date())
-    .withExternalId("councellor1-external-id")
+    // .withExternalId("councellor1-external-id")
     .build();
 
   const councellor2 = new InclusionConnectedUserBuilder()
@@ -54,7 +54,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     .withLastName("councellor2LastName")
     .withEmail("councellor2@email.fr")
     .withCreatedAt(new Date())
-    .withExternalId("councellor2-external-id")
+    // .withExternalId("councellor2-external-id")
     .build();
 
   const agencyWithOnlyValidator = toAgencyWithRights(

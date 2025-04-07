@@ -14,7 +14,9 @@ export class InMemoryUserRepository implements UserRepository {
   public async findByExternalId(
     externalId: string,
   ): Promise<UserOnRepository | undefined> {
-    return this.users.find((user) => user.externalId === externalId);
+    return this.users.find(
+      (user) => user.proConnect?.externalId === externalId,
+    );
   }
 
   public async findByEmail(
@@ -43,13 +45,15 @@ export class InMemoryUserRepository implements UserRepository {
         .length > 1
     )
       throw errors.user.conflictByEmail({ userEmail: user.email });
+
+    const externalId = user.proConnect?.externalId;
     if (
-      user.externalId &&
+      externalId &&
       values(this.#usersById).filter(
-        ({ externalId }) => externalId === user.externalId,
+        ({ proConnect }) => proConnect?.externalId === externalId,
       ).length > 1
     )
-      throw errors.user.conflictByExternalId({ externalId: user.externalId });
+      throw errors.user.conflictByExternalId({ externalId });
   }
 
   public async delete(id: UserId): Promise<void> {

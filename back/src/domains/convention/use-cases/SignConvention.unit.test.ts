@@ -234,7 +234,6 @@ describe("Sign convention", () => {
         uow.conventionRepository.setConventions([convention]);
         const user = new InclusionConnectedUserBuilder()
           .withEmail(convention.signatories.establishmentRepresentative.email)
-          .withExternalId("billy-external-id")
           .buildUser();
         uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
         uow.userRepository.users = [user];

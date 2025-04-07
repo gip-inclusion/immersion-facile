@@ -12,6 +12,7 @@ import {
 } from "../../../unit-of-work/adapters/createInMemoryUow";
 import {
   InMemoryOAuthGateway,
+  fakeProConnectSiret,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
@@ -26,7 +27,10 @@ const user: User = {
   firstName: "User",
   lastName: "App",
   createdAt: new Date().toISOString(),
-  externalId: "user-external-id",
+  proConnect: {
+    externalId: "user-external-id",
+    siret: fakeProConnectSiret,
+  },
 };
 
 describe("GetInclusionConnectLogoutUrl", () => {
@@ -59,7 +63,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
         nonce: "some-nonce",
         provider: "proConnect",
         userId: user.id,
-        externalId: user.externalId ?? undefined,
+        externalId: user.proConnect?.externalId ?? undefined,
         accessToken: "fake-access-token",
       };
       uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];

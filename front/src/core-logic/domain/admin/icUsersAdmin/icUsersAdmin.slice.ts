@@ -3,12 +3,12 @@ import { filter } from "ramda";
 import type {
   AgencyId,
   AgencyRight,
-  InclusionConnectedUser,
   OmitFromExistingKeys,
   RejectIcUserRoleForAgencyParams,
   User,
   UserId,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithAgencyId,
   WithAgencyIdAndUserId,
   WithUserFilters,
@@ -17,7 +17,7 @@ import type { SubmitFeedBack } from "src/core-logic/domain/SubmitFeedback";
 import type { PayloadActionWithFeedbackTopic } from "../../feedback/feedback.slice";
 
 export type NormalizedInclusionConnectedUser = OmitFromExistingKeys<
-  InclusionConnectedUser,
+  UserWithAgencyRights,
   "agencyRights"
 > & {
   agencyRights: Record<AgencyId, AgencyRight>;

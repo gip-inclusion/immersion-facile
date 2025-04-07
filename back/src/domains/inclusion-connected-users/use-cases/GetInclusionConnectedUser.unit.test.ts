@@ -4,6 +4,7 @@ import {
   DiscussionBuilder,
   InclusionConnectedUserBuilder,
   allAgencyRoles,
+  defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -153,6 +154,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
           expectToEqual(inclusionConnectedUser, {
             ...notAdmin,
+            proConnect: defaultProConnectInfos,
             agencyRights: [
               {
                 agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
@@ -244,6 +246,7 @@ describe("GetUserAgencyDashboardUrl", () => {
 
       expectToEqual(user, {
         ...notAdmin,
+        proConnect: defaultProConnectInfos,
         agencyRights: [
           {
             agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
@@ -565,6 +568,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       );
       expectToEqual(fetchedUser, {
         ...notAdmin,
+        proConnect: defaultProConnectInfos,
         dashboards: {
           agencies: {},
           establishments: {},

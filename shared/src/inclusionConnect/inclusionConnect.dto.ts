@@ -27,7 +27,6 @@ export type WithSourcePage = {
 export type AuthenticatedUserQueryParams = {
   token: ConnectedUserJwt;
   idToken: string;
-  siret?: string; // remove optional when inclusion connect is removed
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =

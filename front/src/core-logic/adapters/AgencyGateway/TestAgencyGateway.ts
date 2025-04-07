@@ -6,17 +6,17 @@ import type {
   AgencyPublicDisplayDto,
   ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithAgencyId,
   WithAgencyIdAndUserId,
 } from "shared";
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+  public createUserForAgencyResponse$ = new Subject<UserWithAgencyRights>();
 
   public addAgencyResponse$ = new Subject<undefined>();
 
@@ -28,7 +28,7 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public fetchedAgency$ = new Subject<AgencyDto>();
 
-  public fetchedAgencyUsers$ = new Subject<InclusionConnectedUser[]>();
+  public fetchedAgencyUsers$ = new Subject<UserWithAgencyRights[]>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
@@ -45,7 +45,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     _params: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<UserWithAgencyRights> {
     return this.createUserForAgencyResponse$;
   }
 
@@ -59,7 +59,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public getAgencyUsers$(
     _agencyId: AgencyId,
     _token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<UserWithAgencyRights[]> {
     return this.fetchedAgencyUsers$;
   }
 

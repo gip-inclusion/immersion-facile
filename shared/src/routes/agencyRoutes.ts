@@ -14,7 +14,7 @@ import {
 import { agencyPublicDisplaySchema } from "../agency/publicAgency.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import { inclusionConnectedUserSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
+import { userWithAgencyRightsSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 
 export type AgencyRoutes = typeof agencyRoutes;
@@ -36,7 +36,7 @@ export const agencyRoutes = defineRoutes({
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: inclusionConnectedUserSchema,
+      200: userWithAgencyRightsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
@@ -66,7 +66,7 @@ export const agencyRoutes = defineRoutes({
     url: "/agencies/:agencyId/users",
 
     ...withAuthorizationHeaders,
-    responses: { 200: z.array(inclusionConnectedUserSchema) },
+    responses: { 200: z.array(userWithAgencyRightsSchema) },
   }),
   getImmersionFacileAgencyId: defineRoute({
     method: "get",

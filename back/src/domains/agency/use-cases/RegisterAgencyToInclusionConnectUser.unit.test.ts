@@ -24,7 +24,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     email: "john.doe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
-    externalId: "john-external-id",
+    // externalId: "john-external-id",
     createdAt: new Date().toISOString(),
   };
 

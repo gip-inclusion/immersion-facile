@@ -1,6 +1,6 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { filter } from "ramda";
-import type { AgencyDto, WithAgencyId } from "shared";
+import type { AgencyDto, AgencyId, AgencyRight, WithAgencyId } from "shared";
 import type { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -84,8 +84,17 @@ export const fetchAgencySlice = createSlice({
         if (!state.agencyUsers) return;
         if (!state.agencyUsers || state.agency?.id !== action.payload.agencyId)
           return;
-        const { id } = action.payload.icUser;
-        state.agencyUsers[id] = action.payload.icUser;
+
+        state.agencyUsers[action.payload.user.id] = {
+          ...action.payload.user,
+          agencyRights: action.payload.user.agencyRights.reduce(
+            (acc, agencyRight) => ({
+              ...acc,
+              [agencyRight.agency.id]: agencyRight,
+            }),
+            {} as Record<AgencyId, AgencyRight>,
+          ),
+        };
       },
     );
     builder.addCase(

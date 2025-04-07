@@ -48,13 +48,7 @@ const icUsersNeedingReview = createSelector(
           right.roles.includes("to-review"),
         ),
       )
-      .map(
-        ({
-          agencyRights: _1,
-          dashboards: { agencies: _2, establishments: _3 },
-          ...user
-        }) => user,
-      ),
+      .map(({ agencyRights: _1, ...user }) => user),
 );
 
 export const icUsersAdminSelectors = {

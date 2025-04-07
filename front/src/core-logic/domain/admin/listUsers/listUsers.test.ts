@@ -12,7 +12,10 @@ const someUser: UserInList = {
   email: "yolo@mail.com",
   firstName: "Yo",
   lastName: "Lo",
-  externalId: "external-123",
+  proConnect: {
+    externalId: "external-123",
+    siret: "00000000005555",
+  },
   createdAt: new Date().toISOString(),
   numberOfAgencies: 2,
 };

@@ -13,6 +13,7 @@ import type {
   SetFeatureFlagParam,
   UserInList,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -25,7 +26,7 @@ export class TestAdminGateway implements AdminGateway {
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
 
   public getAgencyUsersToReviewResponse$ = new Subject<
-    InclusionConnectedUser[]
+    UserWithAgencyRights[]
   >();
 
   public getAllApiConsumers$ = (_adminToken: ConnectedUserJwt) =>
@@ -48,7 +49,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
-  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+  public createUserForAgencyResponse$ = new Subject<UserWithAgencyRights>();
 
   public listUsersResponse$ = new Subject<UserInList[]>();
 
@@ -72,7 +73,7 @@ export class TestAdminGateway implements AdminGateway {
   public createUserForAgency$(
     _params: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<UserWithAgencyRights> {
     return this.createUserForAgencyResponse$;
   }
 
@@ -81,7 +82,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public getInclusionConnectedUsersToReview$(): Observable<
-    InclusionConnectedUser[]
+    UserWithAgencyRights[]
   > {
     return this.getAgencyUsersToReviewResponse$;
   }

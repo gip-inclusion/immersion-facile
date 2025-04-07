@@ -28,22 +28,18 @@ describe("PgAgencyRepository", () => {
   const counsellor1 = new InclusionConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000001")
     .withEmail("counsellor1@agency1.fr")
-    .withExternalId("11000000-0000-0000-0000-000000000001")
     .buildUser();
   const counsellor2 = new InclusionConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000002")
     .withEmail("counsellor2@agency1.fr")
-    .withExternalId("11000000-0000-0000-0000-000000000002")
     .buildUser();
   const validator1 = new InclusionConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000003")
     .withEmail("validator1@agency1.fr")
-    .withExternalId("11000000-0000-0000-0000-000000000003")
     .buildUser();
   const validator2 = new InclusionConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000004")
     .withEmail("validator2@agency1.fr")
-    .withExternalId("11000000-0000-0000-0000-000000000004")
     .buildUser();
 
   const agency1builder = AgencyDtoBuilder.create(
