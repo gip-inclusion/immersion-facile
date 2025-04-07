@@ -249,7 +249,7 @@ export const createUseCases = (
         gateways.timeGateway,
       ),
       linkFranceTravailUsersToTheirAgencies:
-        new LinkFranceTravailUsersToTheirAgencies(uowPerformer),
+        new LinkFranceTravailUsersToTheirAgencies(uowPerformer, createNewEvent),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,
         createNewEvent,
