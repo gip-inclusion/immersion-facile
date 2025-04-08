@@ -344,19 +344,23 @@ const getWeeksSpannedWithoutTimezone = (
   startDate: Date,
   endDate: Date,
 ): number => {
-  const startDayOfWeek = startDate.getUTCDay();
-  const normalizedStart = new Date(startDate);
-  const startMonday = normalizedStart.setUTCDate(
-    normalizedStart.getUTCDate() - ((startDayOfWeek + 6) % 7),
-  );
+  const normalizeToUTCMidnight = (date: Date): Date =>
+    new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
 
-  const endDayOfWeek = endDate.getUTCDay();
-  const normalizedEnd = new Date(endDate);
-  const endMonday = normalizedEnd.setUTCDate(
-    normalizedEnd.getUTCDate() - ((endDayOfWeek + 6) % 7),
-  );
+  const getUTCMonday = (date: Date): Date => {
+    const normalized = normalizeToUTCMidnight(date);
+    const day = normalized.getUTCDay();
+    const diffToMonday = (day + 6) % 7;
+    normalized.setUTCDate(normalized.getUTCDate() - diffToMonday);
+    return normalized;
+  };
 
-  return differenceInDays(endMonday, startMonday) / 7;
+  const startMonday = getUTCMonday(startDate);
+  const endMonday = getUTCMonday(endDate);
+
+  return Math.ceil(differenceInDays(endMonday, startMonday) / 7);
 };
 
 export const makeImmersionTimetable = (
