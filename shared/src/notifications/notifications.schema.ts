@@ -57,7 +57,7 @@ const notificationCommonSchema: z.Schema<NotificationCommonFields> = z.object({
   id: notificationIdSchema,
   createdAt: makeDateStringSchema(),
   followedIds: followedIdsSchema,
-  state: notificationStateSchema,
+  state: notificationStateSchema.optional(),
 });
 
 const emailNotificationSchema: z.Schema<EmailNotification> =
