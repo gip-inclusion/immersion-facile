@@ -131,8 +131,8 @@ describe("SuggestEditEstablishment", () => {
           sender: immersionFacileNoReplyEmailSender,
           params: {
             editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.editFormEstablishmentRoute
-            }?jwt=${generateFakeInclusionConnectJwt(
+              frontRoutes.establishmentDashboard
+            }/fiche-entreprise?jwt=${generateFakeInclusionConnectJwt(
               createInclusionConnectJwtPayload({
                 userId: admin1.id,
                 now: timeGateway.now(),
@@ -149,8 +149,8 @@ describe("SuggestEditEstablishment", () => {
           sender: immersionFacileNoReplyEmailSender,
           params: {
             editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.editFormEstablishmentRoute
-            }?jwt=${generateFakeInclusionConnectJwt(
+              frontRoutes.establishmentDashboard
+            }/fiche-entreprise?jwt=${generateFakeInclusionConnectJwt(
               createInclusionConnectJwtPayload({
                 userId: admin2.id,
                 now: timeGateway.now(),

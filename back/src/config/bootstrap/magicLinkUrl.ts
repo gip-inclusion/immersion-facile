@@ -1,6 +1,8 @@
+import { identity } from "ramda";
 import {
   type AbsoluteUrl,
   type CreateConventionMagicLinkPayloadProperties,
+  type EstablishmentDashboardTab,
   type InclusionConnectJwtPayload,
   type OmitFromExistingKeys,
   createConventionMagicLinkPayload,
@@ -18,8 +20,8 @@ export const generateEditFormEstablishmentUrl = (
   payload: InclusionConnectJwtPayload,
 ): AbsoluteUrl =>
   `${immersionFacileBaseUrl}/${
-    frontRoutes.editFormEstablishmentRoute
-  }?jwt=${generateInclusionConnectJwt(payload)}`;
+    frontRoutes.establishmentDashboard
+  }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?jwt=${generateInclusionConnectJwt(payload)}`;
 
 export type GenerateConventionMagicLinkUrl = ReturnType<
   typeof makeGenerateConventionMagicLinkUrl
