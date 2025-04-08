@@ -1,7 +1,8 @@
+import { identity } from "ramda";
 import {
   type AbsoluteUrl,
+  type EstablishmentDashboardTab,
   UserBuilder,
-  createInclusionConnectJwtPayload,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -72,10 +73,12 @@ describe("SuggestEditEstablishment", () => {
       .withEmail("copy@gmail.com")
       .build();
 
+    const siret = "12345678912345";
+
     const establishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
-          .withSiret("12345678912345")
+          .withSiret(siret)
           .withName("SAS FRANCE MERGUEZ DISTRIBUTION")
           .withLocations([
             {
@@ -131,14 +134,8 @@ describe("SuggestEditEstablishment", () => {
           sender: immersionFacileNoReplyEmailSender,
           params: {
             editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.editFormEstablishmentRoute
-            }?jwt=${generateFakeInclusionConnectJwt(
-              createInclusionConnectJwtPayload({
-                userId: admin1.id,
-                now: timeGateway.now(),
-                durationDays: 2,
-              }),
-            )}`,
+              frontRoutes.establishmentDashboard
+            }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
             businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },
@@ -149,14 +146,8 @@ describe("SuggestEditEstablishment", () => {
           sender: immersionFacileNoReplyEmailSender,
           params: {
             editFrontUrl: `${fakeBaseUrl}/${
-              frontRoutes.editFormEstablishmentRoute
-            }?jwt=${generateFakeInclusionConnectJwt(
-              createInclusionConnectJwtPayload({
-                userId: admin2.id,
-                now: timeGateway.now(),
-                durationDays: 2,
-              }),
-            )}`,
+              frontRoutes.establishmentDashboard
+            }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
             businessAddresses: ["24 rue des bouchers 67000 Strasbourg"],
             businessName: "SAS FRANCE MERGUEZ DISTRIBUTION",
           },

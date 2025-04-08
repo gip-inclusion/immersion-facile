@@ -1,13 +1,14 @@
+import { identity } from "ramda";
 import {
   type AbsoluteUrl,
+  type EstablishmentDashboardTab,
   type SiretDto,
   addressDtoToString,
-  createInclusionConnectJwtPayload,
   errors,
+  frontRoutes,
   immersionFacileNoReplyEmailSender,
   siretSchema,
 } from "shared";
-import { generateEditFormEstablishmentUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { GenerateInclusionConnectJwt } from "../../core/jwt";
@@ -68,15 +69,9 @@ export class SuggestEditEstablishment extends TransactionalUseCase<
             sender: immersionFacileNoReplyEmailSender,
             recipients: [user.email],
             params: {
-              editFrontUrl: generateEditFormEstablishmentUrl(
-                this.#immersionFacileBaseUrl,
-                this.#generateInclusionConnectJwt,
-                createInclusionConnectJwtPayload({
-                  userId: user.id,
-                  now: this.#timeGateway.now(),
-                  durationDays: 2,
-                }),
-              ),
+              editFrontUrl: `${this.#immersionFacileBaseUrl}/${
+                frontRoutes.establishmentDashboard
+              }/${identity<EstablishmentDashboardTab>("fiche-entreprise")}?siret=${siret}`,
               businessName: establishment.customizedName ?? establishment.name,
               businessAddresses: establishment.locations.map(
                 (addressAndPosition) =>
