@@ -715,7 +715,6 @@ export const domElementIds = {
     submitModificationrequestButton:
       "im-convention-to-sign__submit-modification-request-button",
   },
-  editFormEstablishmentRoute: {},
   error: {
     establishmentDashboardButton:
       "im-error-page__establishment-dashboard-button",

@@ -20,7 +20,6 @@ export const frontRoutes = {
   conventionMiniStageRoute: "demande-mini-stage",
   conventionStatusDashboard: "statut-convention",
   conventionToSign: "verifier-et-signer",
-  editFormEstablishmentRoute: "edition-etablissement",
   error: "error",
   establishment: "establishment",
   group: "groupe",
