@@ -117,16 +117,27 @@ export abstract class UseCase<
       logger as Logger,
     );
 
-    const result = await Sentry.startSpan({ name: useCaseName }, () =>
-      this._execute(validParams, jwtPayload),
-    );
-    const durationInSeconds = calculateDurationInSecondsFrom(startDate);
-    logger.info({
-      useCaseName,
-      durationInSeconds,
-    });
+    try {
+      const result = await Sentry.startSpan({ name: useCaseName }, () =>
+        this._execute(validParams, jwtPayload),
+      );
 
-    return result;
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+      logger.info({
+        useCaseName,
+        durationInSeconds,
+      });
+
+      return result;
+    } catch (error: any) {
+      const durationInSeconds = calculateDurationInSecondsFrom(startDate);
+      logger.error({
+        useCaseName,
+        durationInSeconds,
+        message: castError(error)?.message,
+      });
+      throw error;
+    }
   }
 }
 
