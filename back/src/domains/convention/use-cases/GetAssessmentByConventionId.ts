@@ -1,6 +1,6 @@
 import {
   type AssessmentDto,
-  type ConventionDomainPayload,
+  type ConventionRelatedJwtPayload,
   type LegacyAssessmentDto,
   type WithConventionId,
   errors,
@@ -18,7 +18,7 @@ export type GetAssessmentByConventionId = ReturnType<
 export const makeGetAssessmentByConventionId = createTransactionalUseCase<
   WithConventionId,
   AssessmentDto | LegacyAssessmentDto,
-  ConventionDomainPayload | undefined
+  ConventionRelatedJwtPayload | undefined
 >(
   {
     name: "GetAssessmentByConventionId",
@@ -30,22 +30,19 @@ export const makeGetAssessmentByConventionId = createTransactionalUseCase<
       uow,
       inputParams.conventionId,
     );
-
-    throwForbiddenIfNotAllowedForAssessments(
+    await throwForbiddenIfNotAllowedForAssessments(
       "GetAssessment",
       convention,
       await agencyWithRightToAgencyDto(uow, agency),
       currentUser,
+      uow,
     );
-
     const assessment = await uow.assessmentRepository.getByConventionId(
       inputParams.conventionId,
     );
-
     if (!assessment) {
       throw errors.assessment.notFound(inputParams.conventionId);
     }
-
     return toAssessmentDto(assessment);
   },
 );
