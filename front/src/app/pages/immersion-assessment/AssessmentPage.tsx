@@ -1,10 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
+import { intersection } from "ramda";
+import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { useDispatch } from "react-redux";
 import {
-  type AssessmentRole,
   type ConventionJwtPayload,
+  type Role,
   assessmentRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
 } from "shared";
@@ -13,8 +15,12 @@ import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentFo
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import type { routes } from "src/app/routes/routes";
+import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
@@ -24,21 +30,42 @@ interface AssessmentPageProps {
 }
 
 export const AssessmentPage = ({ route }: AssessmentPageProps) => {
+  const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const currentAssessment = useAppSelector(
+    assessmentSelectors.currentAssessment,
+  );
+  const inclusionConnectedRoles = useAppSelector(
+    inclusionConnectedSelectors.userRolesForFetchedConvention,
+  );
+  const isAdmin = useAppSelector(
+    inclusionConnectedSelectors.currentUser,
+  )?.isBackofficeAdmin;
+
+  const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
-  const { role, applicationId: conventionId } =
+  const conventionId = route.params.conventionId;
+
+  const { role: roleFromJwt } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
     );
-  const { convention, isLoading } = useConvention({
+  const roles: Role[] = inclusionConnectedRoles ?? [roleFromJwt];
+  const { convention, isLoading: isConventionLoading } = useConvention({
     jwt: route.params.jwt,
     conventionId,
   });
-  const canCreateAssessment = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
-  const hasRight = assessmentRoles.includes(role as AssessmentRole);
+  const isLoading = isConventionLoading || isAssessmentLoading;
+
+  const isConventionValidated = convention?.status === "ACCEPTED_BY_VALIDATOR";
+
+  const hasRight =
+    (assessmentRoles.length > 0 &&
+      intersection(assessmentRoles, roles).length > 0) ||
+    isAdmin;
 
   if (fetchConventionError)
     return (
@@ -48,10 +75,22 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
       />
     );
 
+  useEffect(() => {
+    if (convention) {
+      dispatch(
+        assessmentSlice.actions.getAssessmentRequested({
+          conventionId: convention.id,
+          jwt: route.params.jwt,
+          feedbackTopic: "assessment",
+        }),
+      );
+    }
+  }, [dispatch, convention, route.params.jwt]);
+
   return (
     <HeaderFooterLayout>
       {isLoading && <Loader />}
-      {!hasRight ? (
+      {hasRight === false ? (
         <Alert
           severity="error"
           title="Erreur"
@@ -74,17 +113,25 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                 />
               }
             >
-              {convention && !canCreateAssessment && (
+              {convention && !isConventionValidated && (
                 <Alert
                   severity="error"
                   title="Votre convention n'est pas prête à recevoir un bilan"
                   description="Seule une convention entièrement validée peut recevoir un bilan"
                 />
               )}
-              {convention && canCreateAssessment && (
+              {currentAssessment && (
+                <Alert
+                  severity="error"
+                  title="Erreur"
+                  description="Le bilan a déjà été rempli et ne peut être modifié."
+                />
+              )}
+              {convention && isConventionValidated && !currentAssessment && (
                 <AssessmentForm
                   convention={convention}
                   jwt={route.params.jwt}
+                  currentUserRoles={roles}
                 />
               )}
             </MainWrapper>

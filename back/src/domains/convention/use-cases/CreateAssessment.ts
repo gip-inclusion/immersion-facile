@@ -1,7 +1,7 @@
 import {
   type AssessmentDto,
-  type ConventionDomainPayload,
   type ConventionDto,
+  type ConventionRelatedJwtPayload,
   ForbiddenError,
   assessmentDtoSchema,
   errors,
@@ -9,6 +9,7 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { throwForbiddenIfNotAllowedForAssessments } from "../../../utils/assessment";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
@@ -23,7 +24,7 @@ export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
 export const makeCreateAssessment = createTransactionalUseCase<
   AssessmentDto,
   void,
-  ConventionDomainPayload | undefined,
+  ConventionRelatedJwtPayload | undefined,
   WithCreateNewEvent
 >(
   { name: "CreateAssessment", inputSchema: assessmentDtoSchema },
@@ -41,11 +42,12 @@ export const makeCreateAssessment = createTransactionalUseCase<
       assessment.conventionId,
     );
 
-    throwForbiddenIfNotAllowedForAssessments(
+    await throwForbiddenIfNotAllowedForAssessments(
       "CreateAssessment",
       convention,
       await agencyWithRightToAgencyDto(uow, agency),
       conventionJwtPayload,
+      uow,
     );
 
     const assessmentEntity = await createAssessmentEntityIfNotExist(
@@ -54,6 +56,16 @@ export const makeCreateAssessment = createTransactionalUseCase<
       assessment,
     );
 
+    const triggeredBy: TriggeredBy =
+      "role" in conventionJwtPayload
+        ? {
+            kind: "convention-magic-link",
+            role: conventionJwtPayload.role,
+          }
+        : {
+            kind: "inclusion-connected",
+            userId: conventionJwtPayload.userId,
+          };
     await Promise.all([
       uow.assessmentRepository.save(assessmentEntity),
       uow.outboxRepository.save(
@@ -61,10 +73,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
           topic: "AssessmentCreated",
           payload: {
             assessment: assessment,
-            triggeredBy: {
-              kind: "convention-magic-link",
-              role: conventionJwtPayload.role,
-            },
+            triggeredBy,
           },
         }),
       ),

@@ -331,6 +331,11 @@ export const domElementIds = {
       "im-manage-convention__transfer-to-agency-cancel-button",
     transferToAgencySubmitButton:
       "im-manage-convention__transfer-to-agency-submit-button",
+    abandonAssessmentButton: "im-manage-convention__abandon-assessment-button",
+    assessmentDocumentButton:
+      "im-manage-convention__assessment-document-button",
+    assessmentFullFillButton:
+      "im-manage-convention__assessment-full-fill-button",
 
     conventionValidationRejectButton: "im-convention-validation__reject-button",
     conventionValidationValidateButton:
