@@ -47,7 +47,15 @@ describe("CreateAssessment", () => {
     .withStatus("ACCEPTED_BY_VALIDATOR")
     .withAgencyId(agency.id)
     .build();
-
+  const userWithoutRoleOnConvention = new InclusionConnectedUserBuilder()
+    .withId("userWithoutRoleOnConvention")
+    .withEmail("userWithoutRoleOnConvention@email.com")
+    .buildUser();
+  const backOfficeAdmin = new InclusionConnectedUserBuilder()
+    .withId("backOfficeAdmin")
+    .withEmail("backOfficeAdmin@email.com")
+    .withIsAdmin(true)
+    .buildUser();
   const assessment: AssessmentDto = {
     conventionId: validatedConvention.id,
     status: "COMPLETED",
@@ -98,7 +106,12 @@ describe("CreateAssessment", () => {
         [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
       }),
     ];
-    uow.userRepository.users = [counsellor, validator];
+    uow.userRepository.users = [
+      counsellor,
+      validator,
+      userWithoutRoleOnConvention,
+      backOfficeAdmin,
+    ];
   });
 
   describe("wrong path", () => {
@@ -177,6 +190,19 @@ describe("CreateAssessment", () => {
       },
     );
 
+    it("throws forbidden if user doesnt have allowed assessment role on convention", async () => {
+      await expectPromiseToFailWithError(
+        createAssessment.execute(
+          assessment,
+
+          {
+            userId: userWithoutRoleOnConvention.id,
+          },
+        ),
+        errors.assessment.forbidden(),
+      );
+    });
+
     it.each(["counsellor", "validator"] satisfies Role[])(
       "throw forbidden if the jwt role is '%s' the user is not notified on agency rights",
       async (role) => {
@@ -234,6 +260,54 @@ describe("CreateAssessment", () => {
         ]);
       },
     );
+
+    it("should save the Assessment when user is validator on convention", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await createAssessment.execute(assessment, {
+        userId: validator.id,
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
+        },
+      ]);
+    });
+
+    it("should save the Assessment when user is counsellor on convention", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await createAssessment.execute(assessment, {
+        userId: counsellor.id,
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
+        },
+      ]);
+    });
+
+    it("should save the Assessment when user is back-office admin", async () => {
+      uow.conventionRepository.setConventions([validatedConvention]);
+
+      await createAssessment.execute(assessment, {
+        userId: backOfficeAdmin.id,
+      });
+
+      expectArraysToEqual(uow.assessmentRepository.assessments, [
+        {
+          ...assessment,
+          _entityName: "Assessment",
+          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
+        },
+      ]);
+    });
 
     it("should create an assessment with correct duration when partially completed", async () => {
       const convention = new ConventionDtoBuilder(validatedConvention)
