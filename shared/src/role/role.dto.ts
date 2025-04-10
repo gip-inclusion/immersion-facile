@@ -46,6 +46,7 @@ export const assessmentRoles = [
   "establishment-tutor",
   "validator",
   "counsellor",
+  "back-office",
 ] as const;
 
 export const getRequesterRole = (roles: Role[]): Role => {
