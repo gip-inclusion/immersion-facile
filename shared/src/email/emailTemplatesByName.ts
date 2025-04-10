@@ -1711,7 +1711,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         content: `
           Votre rôle sur Immersion Facilitée pour l'établissement <strong>${businessName}</strong> a été modifié par ${triggeredByUserFirstName} ${triggeredByUserLastName}.
           
-          <strong>Votre nouveau rôle :</strong> ${updatedRole}
+          <strong>Votre nouveau rôle :</strong> ${updatedRole === "establishment-admin" ? "Administrateur" : "Contact"}
           
           ${
             updatedRole
@@ -1735,7 +1735,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         triggeredByUserFirstName,
         triggeredByUserLastName,
       }) => ({
-        subject: `Droit ajouté pour ${businessName}`,
+        subject: `Votre accès ${businessName} sur Immersion Facilitée`,
         greetings: `Bonjour ${firstName && lastName ? `${firstName} ${lastName}` : ""},`,
         content: `
           Vous avez été ajouté(e) comme ${role === "establishment-admin" ? "administrateur" : "contact"} sur Immersion Facilitée pour l’établissement ${businessName} par ${triggeredByUserFirstName} ${triggeredByUserLastName}.
