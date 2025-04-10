@@ -1,3 +1,4 @@
+import { intersection } from "ramda";
 import {
   type AgencyDto,
   type AssessmentMode,
@@ -5,6 +6,7 @@ import {
   type ConventionRelatedJwtPayload,
   type Role,
   assessmentDtoSchema,
+  assessmentRoles,
   errors,
   getIcUserRoleForAccessingConvention,
   hasAllowedRoleOnAssessment,
@@ -12,6 +14,8 @@ import {
 } from "shared";
 import { z } from "zod";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
+import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import { getUserWithRights } from "../domains/inclusion-connected-users/helpers/userRights.helper";
 
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../domains/inclusion-connected-users/helpers/userRights.helper";
