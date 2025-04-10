@@ -83,7 +83,7 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
   },
   assessment: {
     label: "Bilan d'immersion",
-    route: routes.assessment({ jwt: "" }),
+    route: routes.assessment({ jwt: "", conventionId: "" }),
   },
   myProfile: {
     label: "Mon profil",

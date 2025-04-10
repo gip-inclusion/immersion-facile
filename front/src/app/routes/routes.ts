@@ -156,7 +156,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       `/${frontRoutes.conventionImmersionRoute}/confirmation/${conventionId}`,
   ),
   assessmentDocument: defineRoute(
-    { jwt: param.query.optional.string },
+    {
+      jwt: param.query.optional.string,
+      conventionId: param.query.string,
+    },
     () => `/${frontRoutes.assessmentDocument}`,
   ),
   conventionDocument: defineRoute(
@@ -246,7 +249,10 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     `/${frontRoutes.landingEstablishment}`,
   ]),
   assessment: defineRoute(
-    { jwt: param.query.string },
+    {
+      jwt: param.query.string,
+      conventionId: param.query.string,
+    },
     () => `/${frontRoutes.assessment}`,
   ),
   searchResult: defineRoute(
