@@ -1,40 +1,41 @@
 import { toPairs, uniq, values } from "ramda";
 import {
   type AbsoluteUrl,
+  type AgencyDashboards,
   type AgencyId,
   type AgencyRight,
   type AgencyWithUsersRights,
   type ConventionsEstablishmentDashboard,
   type EstablishmentDashboards,
   type InclusionConnectedUser,
+  type User,
   type UserId,
-  type UserWithAgencyRights,
+  type UserWithRights,
   type WithDashboards,
   agencyRoleIsNotToReview,
 } from "shared";
 import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "./userRights.helper";
 
-export const getIcUserByUserId = async (
-  uow: UnitOfWork,
-  userId: UserId,
-  dashboardGateway: DashboardGateway,
-  timeGateway: TimeGateway,
-): Promise<InclusionConnectedUser> => {
-  const userWithAdminAndAgencyRights = await getUserWithRights(uow, userId);
+export const getIcUserByUserId = async ({
+  uow,
+  userId,
+  dashboardGateway,
+  timeGateway,
+}: {
+  uow: UnitOfWork;
+  userId: UserId;
+  dashboardGateway: DashboardGateway;
+  timeGateway: TimeGateway;
+}): Promise<InclusionConnectedUser> => {
+  const user = await getUserWithRights(uow, userId);
 
   return {
-    ...userWithAdminAndAgencyRights,
-    ...(await withDashboards(
-      uow,
-      userWithAdminAndAgencyRights,
-      dashboardGateway,
-      timeGateway,
-    )),
+    ...user,
+    ...(await withDashboards({ uow, dashboardGateway, timeGateway, user })),
   };
 };
 
@@ -77,7 +78,8 @@ export const getIcUsersByUserIds = async (
         agenciesRelatedToUsersByAgencyId,
         uow,
       ),
-      dashboards: { agencies: {}, establishments: {} },
+      dashboards: { agencies: {}, establishments: {} }, /// ?????
+      // establishments: ???????
     })),
   );
 };
@@ -108,12 +110,17 @@ const makeAgencyRights = (
     }),
   );
 
-async function makeAgencyDashboards(
-  uow: UnitOfWork,
-  user: UserWithAgencyRights,
-  dashboardGateway: DashboardGateway,
-  timeGateway: TimeGateway,
-) {
+async function makeAgencyDashboards({
+  uow,
+  dashboardGateway,
+  timeGateway,
+  user,
+}: {
+  uow: UnitOfWork;
+  dashboardGateway: DashboardGateway;
+  timeGateway: TimeGateway;
+  user: UserWithRights;
+}): Promise<AgencyDashboards> {
   const apiConsumers = await uow.apiConsumerRepository.getAll();
 
   const agencyIdsWithEnoughPrivileges = user.agencyRights
@@ -156,47 +163,50 @@ async function makeAgencyDashboards(
   };
 }
 
-async function withDashboards(
-  uow: UnitOfWork,
-  user: UserWithAgencyRights,
-  dashboardGateway: DashboardGateway,
-  timeGateway: TimeGateway,
-): Promise<WithDashboards> {
-  return {
-    dashboards: {
-      agencies: await makeAgencyDashboards(
-        uow,
-        user,
-        dashboardGateway,
-        timeGateway,
-      ),
-      establishments: await makeEstablishmentDashboard(
-        uow,
-        user,
-        dashboardGateway,
-        timeGateway,
-      ),
-    },
-  };
-}
+const withDashboards = async ({
+  uow,
+  dashboardGateway,
+  timeGateway,
+  user,
+}: {
+  uow: UnitOfWork;
+  dashboardGateway: DashboardGateway;
+  timeGateway: TimeGateway;
+  user: UserWithRights;
+}): Promise<WithDashboards> => ({
+  dashboards: {
+    agencies: await makeAgencyDashboards({
+      uow,
+      dashboardGateway,
+      timeGateway,
+      user,
+    }),
+    establishments: await makeEstablishmentDashboard(
+      uow,
+      dashboardGateway,
+      timeGateway,
+      user,
+    ),
+  },
+});
 
 async function makeEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  user: User,
 ): Promise<EstablishmentDashboards> {
   const conventions = await makeConventionEstablishmentDashboard(
     uow,
-    user,
     dashboardGateway,
     timeGateway,
+    user,
   );
   const discussions = await makeDiscussionsEstablishmentDashboard(
     uow,
-    user,
     dashboardGateway,
     timeGateway,
+    user,
   );
   return {
     ...(conventions ? { conventions } : {}),
@@ -206,9 +216,9 @@ async function makeEstablishmentDashboard(
 
 async function makeConventionEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  user: User,
 ): Promise<ConventionsEstablishmentDashboard | undefined> {
   const hasConventionForEstablishmentRepresentative =
     (
@@ -237,9 +247,9 @@ async function makeConventionEstablishmentDashboard(
 
 async function makeDiscussionsEstablishmentDashboard(
   uow: UnitOfWork,
-  user: UserOnRepository,
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
+  user: User,
 ): Promise<AbsoluteUrl | undefined> {
   const hasDiscussion = await uow.discussionRepository.hasDiscussionMatching({
     establishmentRepresentativeEmail: user.email,

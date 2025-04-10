@@ -6,7 +6,6 @@ import {
   type AgencyRight,
   type InclusionConnectedUser,
   type RejectIcUserRoleForAgencyParams,
-  type User,
   type UserParamsForAgency,
   errors,
   expectToEqual,
@@ -66,37 +65,37 @@ const user2AgencyRights: Record<AgencyId, AgencyRight> = {
   [agency4.id]: agency4Right,
 };
 
-const user1Id = "user-id-1";
-const authUser1: User = {
-  id: user1Id,
+const authUser1: NormalizedInclusionConnectedUser = {
+  id: "user-id-1",
   email: "user-email",
   firstName: "user-first-name",
   lastName: "user-last-name",
-  externalId: "fake-user-external-id-1",
   createdAt: new Date().toISOString(),
+  agencyRights: user1AgencyRights,
+  dashboards: { agencies: {}, establishments: {} },
+  proConnect: {
+    externalId: "fake-user-external-id-1",
+    siret: "00000111112222",
+  },
 };
 
-const user2Id = "user-id-2";
-const authUser2: User = {
-  id: user2Id,
+const authUser2: NormalizedInclusionConnectedUser = {
+  id: "user-id-2",
   email: "user-email-2",
   firstName: "user-first-name-2",
   lastName: "user-last-name-2",
-  externalId: "fake-user-external-id-2",
   createdAt: new Date().toISOString(),
+  agencyRights: user2AgencyRights,
+  dashboards: { agencies: {}, establishments: {} },
+  proConnect: {
+    externalId: "fake-user-external-id-2",
+    siret: "00000000001234",
+  },
 };
 
 const testUserSet: NormalizedIcUserById = {
-  [user1Id]: {
-    ...authUser1,
-    agencyRights: user1AgencyRights,
-    dashboards: { agencies: {}, establishments: {} },
-  },
-  [user2Id]: {
-    ...authUser2,
-    agencyRights: user2AgencyRights,
-    dashboards: { agencies: {}, establishments: {} },
-  },
+  [authUser1.id]: authUser1,
+  [authUser2.id]: authUser2,
 };
 
 describe("Agency registration for authenticated users", () => {
@@ -174,13 +173,21 @@ describe("Agency registration for authenticated users", () => {
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
-          dashboards: { agencies: {}, establishments: {} },
         },
       ]);
       expectIsFetchingIcUsersNeedingReviewToBe(false);
       expectToEqual(
         icUsersAdminSelectors.icUsersNeedingReview(store.getState()),
-        [authUser1],
+        [
+          {
+            firstName: authUser1.firstName,
+            lastName: authUser1.lastName,
+            email: authUser1.email,
+            proConnect: authUser1.proConnect,
+            id: authUser1.id,
+            createdAt: authUser1.createdAt,
+          },
+        ],
       );
       expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
     });
@@ -203,18 +210,33 @@ describe("Agency registration for authenticated users", () => {
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
-          dashboards: { agencies: {}, establishments: {} },
         },
         {
           ...authUser2,
           agencyRights: [agency3Right, agency4Right],
-          dashboards: { agencies: {}, establishments: {} },
         },
       ]);
       expectIsFetchingIcUsersNeedingReviewToBe(false);
       expectToEqual(
         icUsersAdminSelectors.icUsersNeedingReview(store.getState()),
-        [authUser1, authUser2],
+        [
+          {
+            firstName: authUser1.firstName,
+            lastName: authUser1.lastName,
+            email: authUser1.email,
+            proConnect: authUser1.proConnect,
+            id: authUser1.id,
+            createdAt: authUser1.createdAt,
+          },
+          {
+            firstName: authUser2.firstName,
+            lastName: authUser2.lastName,
+            email: authUser2.email,
+            proConnect: authUser2.proConnect,
+            id: authUser2.id,
+            createdAt: authUser2.createdAt,
+          },
+        ],
       );
       expectFeedbackToEqual({ kind: "usersToReviewFetchSuccess" });
     });
@@ -245,7 +267,6 @@ describe("Agency registration for authenticated users", () => {
           [agency1Right.agency.id]: agency1Right,
           [agency2Right.agency.id]: agency2Right,
         },
-        dashboards: { agencies: {}, establishments: {} },
       };
       store.dispatch(
         icUsersAdminSlice.actions.fetchAgencyUsersRequested({
@@ -258,7 +279,6 @@ describe("Agency registration for authenticated users", () => {
         {
           ...authUser1,
           agencyRights: [agency1Right, agency2Right],
-          dashboards: { agencies: {}, establishments: {} },
         },
       ]);
       expectIsFetchingAgencyUsersToBe(false);
@@ -298,7 +318,7 @@ describe("Agency registration for authenticated users", () => {
 
       const payload: UserParamsForAgency = {
         agencyId: "agency-3",
-        userId: user2Id,
+        userId: authUser2.id,
         roles: ["validator"],
         isNotifiedByEmail: false,
         email: "email@email.fr",
@@ -367,7 +387,7 @@ describe("Agency registration for authenticated users", () => {
       const payload: RejectIcUserRoleForAgencyParams = {
         agencyId: agency3.id,
         justification: "osef",
-        userId: user2Id,
+        userId: authUser2.id,
       };
 
       store.dispatch(
@@ -418,7 +438,7 @@ describe("Agency registration for authenticated users", () => {
       ({ store, dependencies } = createTestStore({
         admin: prefilledAdminState,
       }));
-      const originalUser = testUserSet[user1Id];
+      const originalUser = testUserSet[authUser1.id];
       const updatedUser: NormalizedInclusionConnectedUser = {
         ...originalUser,
         email: "updated-email@email.fr",
@@ -482,7 +502,7 @@ describe("Agency registration for authenticated users", () => {
       ({ store, dependencies } = createTestStore({
         admin: prefilledAdminState,
       }));
-      const originalUser = testUserSet[user1Id];
+      const originalUser = testUserSet[authUser1.id];
       const errorMessage =
         "Une erreur est survenue lors de la mise à jour de l'utilisateur";
 
@@ -537,7 +557,7 @@ describe("Agency registration for authenticated users", () => {
 
       store.dispatch(
         icUsersAdminSlice.actions.updateUserOnAgencyRequested({
-          userId: user2Id,
+          userId: authUser2.id,
           agencyId: agency3.id,
           roles: ["validator"],
           feedbackTopic: "agency-user",
@@ -575,8 +595,8 @@ describe("Agency registration for authenticated users", () => {
         email: "fake-email@mail.com",
         firstName: "fake-first-name",
         lastName: "fake-last-name",
-        externalId: null,
         createdAt: new Date().toISOString(),
+        proConnect: null,
         agencyRights: {},
         dashboards: { agencies: {}, establishments: {} },
       };
@@ -642,7 +662,7 @@ describe("Agency registration for authenticated users", () => {
         email: "fake-email@mail.com",
         firstName: "fake-first-name",
         lastName: "fake-last-name",
-        externalId: null,
+        proConnect: null,
         createdAt: new Date().toISOString(),
         agencyRights: {},
         dashboards: { agencies: {}, establishments: {} },
@@ -694,7 +714,7 @@ describe("Agency registration for authenticated users", () => {
       ({ store, dependencies } = createTestStore({
         admin: prefilledAdminState,
       }));
-      const userToRemove = testUserSet[user1Id];
+      const userToRemove = testUserSet[authUser1.id];
 
       expectToEqual(
         store.getState().admin.inclusionConnectedUsersAdmin,
@@ -714,7 +734,7 @@ describe("Agency registration for authenticated users", () => {
 
       expectIsUpdatingUserAgencyToBe(false);
       expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
-        [user2Id]: testUserSet[user2Id],
+        [authUser2.id]: testUserSet[authUser2.id],
       });
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["agency-user"],
@@ -737,7 +757,7 @@ describe("Agency registration for authenticated users", () => {
       ({ store, dependencies } = createTestStore({
         admin: prefilledAdminState,
       }));
-      const userToRemove = testUserSet[user1Id];
+      const userToRemove = testUserSet[authUser1.id];
       const errorMessage =
         "Une erreur est survenue lors de la suppression du rattachement de l'utilisateur";
 

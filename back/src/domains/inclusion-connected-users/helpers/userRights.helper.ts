@@ -1,12 +1,12 @@
 import {
   type UserId,
+  type UserWithAdminRights,
   type UserWithRights,
   type WithEstablishmentData,
   type WithEstablishments,
   errors,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 
@@ -27,7 +27,7 @@ export const getUserWithRights = async (
 
 const withEstablishments = async (
   uow: UnitOfWork,
-  user: UserOnRepository,
+  user: UserWithAdminRights,
 ): Promise<WithEstablishments> => {
   const establishmentAggregates =
     await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(

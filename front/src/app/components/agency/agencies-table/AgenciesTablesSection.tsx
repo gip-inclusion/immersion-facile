@@ -78,7 +78,7 @@ export const AgenciesTablesSection = ({
                 roles: selectedAgencyRight.roles,
                 email: user.email,
                 isNotifiedByEmail: selectedAgencyRight.isNotifiedByEmail,
-                isIcUser: !!user.externalId,
+                isIcUser: !!user.proConnect,
               }}
               closeModal={() => manageUserModal.close()}
               agencyHasRefersTo={!!selectedAgencyRight.agency.refersToAgencyId}

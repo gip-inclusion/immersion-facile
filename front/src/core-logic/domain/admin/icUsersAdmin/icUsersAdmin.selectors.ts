@@ -51,7 +51,9 @@ const icUsersNeedingReview = createSelector(
       .map(
         ({
           agencyRights: _1,
-          dashboards: { agencies: _2, establishments: _3 },
+          dashboards: _2,
+          establishments: _3,
+          isBackofficeAdmin: _4,
           ...user
         }) => user,
       ),

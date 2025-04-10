@@ -8,6 +8,7 @@ import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 import { PgUserRepository } from "./PgUserRepository";
+import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 
 describe("PgOngoingOAuthRepository", () => {
   let pool: Pool;
@@ -44,7 +45,10 @@ describe("PgOngoingOAuthRepository", () => {
         firstName: "John",
         lastName: "Doe",
         email: "john.doe@mail.com",
-        externalId: "john-external-id",
+        proConnect: {
+          externalId: "john-external-id",
+          siret: fakeProConnectSiret,
+        },
         createdAt: new Date().toISOString(),
       };
       await pgUserRepository.save(user);
@@ -67,7 +71,7 @@ describe("PgOngoingOAuthRepository", () => {
       const updatedOngoingOAuth: OngoingOAuth = {
         ...ongoingOAuth,
         userId: user.id,
-        externalId: user.externalId ?? undefined,
+        externalId: user.proConnect?.externalId,
         accessToken: "some-token",
       };
       await pgOngoingOAuthRepository.save(updatedOngoingOAuth);

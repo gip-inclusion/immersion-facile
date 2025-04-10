@@ -14,6 +14,7 @@ import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   type AgencyRight,
   type InclusionConnectedUser,
+  type ProConnectInfos,
   type User,
   type UserId,
   type UserInList,
@@ -77,13 +78,18 @@ const dashboardsSchema: z.Schema<
   }),
 });
 
+const proConnectSchema: z.Schema<ProConnectInfos> = z.object({
+  externalId: zStringCanBeEmpty, // Si proConnecté et donc externalId fourni, alors pourquoi chaine vide?
+  siret: siretSchema,
+});
+
 const userSchema: z.Schema<User> = z.object({
   id: userIdSchema,
   email: emailSchema,
   createdAt: dateTimeIsoStringSchema,
   firstName: zStringCanBeEmpty,
   lastName: zStringCanBeEmpty,
-  externalId: zStringCanBeEmpty.or(z.null()),
+  proConnect: proConnectSchema.or(z.null()),
 });
 
 export const userInListSchema: z.Schema<UserInList> = userSchema.and(

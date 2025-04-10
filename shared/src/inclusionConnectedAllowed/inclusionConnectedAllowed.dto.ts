@@ -32,13 +32,18 @@ export type AgencyRight = {
 export type UserId = Flavor<string, "UserId">;
 export type ExternalId = Flavor<string, "ExternalId">;
 
+export type ProConnectInfos = {
+  externalId: ExternalId;
+  siret: SiretDto;
+};
+
 export type User = {
   id: UserId;
   email: Email;
   firstName: string;
   lastName: string;
-  externalId: ExternalId | null;
   createdAt: DateTimeIsoString;
+  proConnect: ProConnectInfos | null;
 };
 
 export type UserWithAdminRights = User & WithIsBackOfficeAdmin;

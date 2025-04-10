@@ -82,7 +82,7 @@ export const AgencyUsers = ({
       roles: agencyUser.agencyRights[agency.id].roles,
       email: agencyUser.email,
       isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-      isIcUser: !!agencyUser.externalId,
+      isIcUser: !!agencyUser.proConnect,
     });
     manageUserModal.open();
   };
@@ -95,7 +95,7 @@ export const AgencyUsers = ({
       roles: agencyUser.agencyRights[agency.id].roles,
       email: agencyUser.email,
       isNotifiedByEmail: agencyUser.agencyRights[agency.id].isNotifiedByEmail,
-      isIcUser: !!agencyUser.externalId,
+      isIcUser: !!agencyUser.proConnect,
     });
     removeUserModal.open();
   };

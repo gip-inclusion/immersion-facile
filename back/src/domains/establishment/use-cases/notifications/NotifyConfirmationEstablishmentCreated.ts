@@ -1,7 +1,11 @@
-import { type WithSiretDto, errors, withSiretSchema } from "shared";
+import {
+  type UserWithAdminRights,
+  type WithSiretDto,
+  errors,
+  withSiretSchema,
+} from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -62,7 +66,7 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
 const getFirstAdminUser = async (
   uow: UnitOfWork,
   establishment: EstablishmentAggregate,
-): Promise<UserOnRepository> => {
+): Promise<UserWithAdminRights> => {
   const firstAdmin = establishment.userRights.find(
     (user) => user.role === "establishment-admin",
   );
@@ -82,7 +86,7 @@ const getFirstAdminUser = async (
 const getEstablishmentContactUsers = async (
   uow: UnitOfWork,
   establishment: EstablishmentAggregate,
-): Promise<UserOnRepository[]> => {
+): Promise<UserWithAdminRights[]> => {
   const contactUserRights = establishment.userRights.filter(
     (user) => user.role === "establishment-contact",
   );

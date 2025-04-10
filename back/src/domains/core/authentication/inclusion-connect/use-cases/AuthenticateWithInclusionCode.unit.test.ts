@@ -2,8 +2,10 @@ import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
   type AuthenticateWithOAuthCodeParams,
+  type ExternalId,
   type IdToken,
-  type User,
+  type SiretDto,
+  type UserWithAdminRights,
   allowedStartOAuthLoginPages,
   errors,
   expectObjectInArrayToMatch,
@@ -39,23 +41,25 @@ describe("AuthenticateWithInclusionCode use case", () => {
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@inclusion.com",
+    siret: "12345678901234",
   };
 
   let uow: InMemoryUnitOfWork;
   let inclusionConnectGateway: InMemoryOAuthGateway;
   let uuidGenerator: TestUuidGenerator;
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
+  let timeGateway: CustomTimeGateway;
 
   describe("With OAuthGateway provider 'proConnect'", () => {
     beforeEach(() => {
       uow = createInMemoryUow();
       uuidGenerator = new TestUuidGenerator();
-      const timeGateway = new CustomTimeGateway();
       inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+      timeGateway = new CustomTimeGateway();
       authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
         new InMemoryUowPerformer(uow),
         makeCreateNewEvent({
-          timeGateway: new CustomTimeGateway(),
+          timeGateway: timeGateway,
           uuidGenerator,
         }),
         inclusionConnectGateway,
@@ -78,13 +82,17 @@ describe("AuthenticateWithInclusionCode use case", () => {
             page: "agencyDashboard",
           });
 
-          expectObjectInArrayToMatch(uow.userRepository.users, [
+          expectToEqual(uow.userRepository.users, [
             {
               id: userId,
               firstName: defaultExpectedIcIdTokenPayload.firstName,
               lastName: defaultExpectedIcIdTokenPayload.lastName,
               email: defaultExpectedIcIdTokenPayload.email,
-              externalId: defaultExpectedIcIdTokenPayload.sub,
+              proConnect: {
+                externalId: defaultExpectedIcIdTokenPayload.sub,
+                siret: defaultExpectedIcIdTokenPayload.siret,
+              },
+              createdAt: timeGateway.now().toISOString(),
             },
           ]);
         });
@@ -143,15 +151,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           const { alreadyExistingUser } =
             addAlreadyExistingAuthenticatedUserInRepo();
 
-          expectObjectInArrayToMatch(uow.userRepository.users, [
-            {
-              id: alreadyExistingUser.id,
-              email: alreadyExistingUser.email,
-              firstName: alreadyExistingUser.firstName,
-              lastName: alreadyExistingUser.lastName,
-              externalId: alreadyExistingUser.externalId,
-            },
-          ]);
+          expectToEqual(uow.userRepository.users, [alreadyExistingUser]);
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
@@ -159,13 +159,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
             page: "agencyDashboard",
           });
 
-          expectObjectInArrayToMatch(uow.userRepository.users, [
+          expectToEqual(uow.userRepository.users, [
             {
-              id: alreadyExistingUser.id,
+              ...alreadyExistingUser,
               email: defaultExpectedIcIdTokenPayload.email,
               firstName: defaultExpectedIcIdTokenPayload.firstName,
               lastName: defaultExpectedIcIdTokenPayload.lastName,
-              externalId: alreadyExistingUser.externalId,
             },
           ]);
         });
@@ -179,13 +178,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
               email: alreadyExistingUser.email,
             });
 
-          expectObjectInArrayToMatch(uow.userRepository.users, [
+          expectToEqual(uow.userRepository.users, [
             {
-              id: alreadyExistingUser.id,
-              email: alreadyExistingUser.email,
-              firstName: alreadyExistingUser.firstName,
-              lastName: alreadyExistingUser.lastName,
-              externalId: null,
+              ...alreadyExistingUser,
+              proConnect: null,
             },
           ]);
 
@@ -201,7 +197,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
               email: alreadyExistingUser.email,
               firstName: defaultExpectedIcIdTokenPayload.firstName,
               lastName: defaultExpectedIcIdTokenPayload.lastName,
-              externalId: defaultExpectedIcIdTokenPayload.sub,
+              proConnect: {
+                externalId: defaultExpectedIcIdTokenPayload.sub,
+                siret: defaultExpectedIcIdTokenPayload.siret,
+              },
             },
           ]);
         });
@@ -209,19 +208,22 @@ describe("AuthenticateWithInclusionCode use case", () => {
         it("when user change its email on inclusion connect", async () => {
           const externalId = uuid();
 
-          const initialUser: User = {
+          const initialUser: UserWithAdminRights = {
             id: uuid(),
             email: "initial@mail.com",
-            externalId,
+            proConnect: {
+              externalId,
+              siret: "0000",
+            },
             firstName: "Billy",
             lastName: "Idol",
             createdAt: new Date().toISOString(),
           };
 
-          const previousMigrationUserWithUpdatedEmail: User = {
+          const previousMigrationUserWithUpdatedEmail: UserWithAdminRights = {
             id: uuid(),
             email: "updated@mail.com",
-            externalId: null,
+            proConnect: null,
             firstName: "",
             lastName: "",
             createdAt: new Date().toISOString(),
@@ -257,12 +259,15 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
           uow.agencyRepository.agencies = [agency1, agency2];
 
-          const updatedUser: User = {
+          const updatedUser: UserWithAdminRights = {
             id: initialUser.id,
             email: previousMigrationUserWithUpdatedEmail.email,
             firstName: "Martine",
             lastName: "Duflot",
-            externalId,
+            proConnect: {
+              externalId,
+              siret: defaultExpectedIcIdTokenPayload.siret,
+            },
             createdAt: initialUser.createdAt,
           };
 
@@ -295,6 +300,47 @@ describe("AuthenticateWithInclusionCode use case", () => {
                   isNotifiedByEmail: true,
                   roles: ["counsellor"],
                 },
+              },
+            },
+          ]);
+        });
+
+        it("when user select another siret on ProConnect", async () => {
+          const externalId: ExternalId = "id";
+          const initialUser: UserWithAdminRights = {
+            id: uuid(),
+            email: "initial@mail.com",
+            proConnect: {
+              externalId,
+              siret: "00000000000000",
+            },
+            firstName: "Billy",
+            lastName: "Idol",
+            createdAt: new Date().toISOString(),
+          };
+
+          uow.userRepository.users = [initialUser];
+
+          const proConnectSiret: SiretDto = "55555666667777";
+
+          await authenticateWithInclusionCode.execute({
+            code: "my-inclusion-code",
+            state: makeSuccessfulAuthenticationConditions({
+              email: initialUser.email,
+              firstName: initialUser.firstName,
+              lastName: initialUser.lastName,
+              sub: initialUser.proConnect?.externalId,
+              siret: proConnectSiret,
+            }).initialOngoingOAuth.state,
+            page: "agencyDashboard",
+          });
+
+          expectToEqual(uow.userRepository.users, [
+            {
+              ...initialUser,
+              proConnect: {
+                externalId,
+                siret: proConnectSiret,
               },
             },
           ]);
@@ -414,15 +460,21 @@ describe("AuthenticateWithInclusionCode use case", () => {
       externalId?: string | null;
     } = {},
   ) => {
-    const alreadyExistingUser: User = {
+    const alreadyExistingUser: UserWithAdminRights = {
       id: "already-existing-id",
       email: "johnny-d@gmail.com",
       firstName: "Johnny",
       lastName: "Doe Existing",
-      externalId:
-        options.externalId !== undefined
-          ? options.externalId
-          : defaultExpectedIcIdTokenPayload.sub,
+      proConnect:
+        options.externalId !== null
+          ? {
+              externalId:
+                options.externalId !== undefined
+                  ? options.externalId
+                  : defaultExpectedIcIdTokenPayload.sub,
+              siret: defaultExpectedIcIdTokenPayload.siret,
+            }
+          : null,
       createdAt: new Date().toISOString(),
     };
     uow.userRepository.users = [alreadyExistingUser];

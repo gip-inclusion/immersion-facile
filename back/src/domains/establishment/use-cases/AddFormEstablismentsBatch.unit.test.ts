@@ -139,7 +139,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       {
         createdAt: "2021-09-01T10:10:00.000Z",
         email: "amil@mail.com",
-        externalId: null,
+        proConnect: null,
         firstName: "",
         id: "1",
         lastName: "",
@@ -147,7 +147,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       {
         createdAt: "2021-09-01T10:10:00.000Z",
         email: "copy1@mail.com",
-        externalId: null,
+        proConnect: null,
         firstName: "",
         id: "2",
         lastName: "",
@@ -155,7 +155,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
       {
         createdAt: "2021-09-01T10:10:00.000Z",
         email: "copy2@mail.com",
-        externalId: null,
+        proConnect: null,
         firstName: "",
         id: "3",
         lastName: "",

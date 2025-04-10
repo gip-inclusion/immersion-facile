@@ -725,7 +725,7 @@ describe("Update Establishment aggregate from form data", () => {
             firstName: "",
             lastName: "",
             createdAt: now.toISOString(),
-            externalId: null,
+            proConnect: null,
           },
         ]);
 

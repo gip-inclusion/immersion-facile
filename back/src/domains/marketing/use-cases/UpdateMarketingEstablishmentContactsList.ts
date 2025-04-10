@@ -160,7 +160,7 @@ const onEstablishment = async (
   );
   const user = await uow.userRepository.findByEmail(marketingContact.email);
 
-  const hasIcAccount = !!user?.externalId;
+  const hasIcAccount = !!user?.proConnect;
 
   const firstValidatedConvention = validatedConventions.at(0);
   const lastValidatedConvention = validatedConventions.at(-1);

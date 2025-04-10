@@ -1,5 +1,6 @@
 import {
   type User,
+  defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -26,7 +27,7 @@ const user: User = {
   firstName: "User",
   lastName: "App",
   createdAt: new Date().toISOString(),
-  externalId: "user-external-id",
+  proConnect: defaultProConnectInfos,
 };
 
 describe("GetInclusionConnectLogoutUrl", () => {
@@ -59,7 +60,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
         nonce: "some-nonce",
         provider: "proConnect",
         userId: user.id,
-        externalId: user.externalId ?? undefined,
+        externalId: user.proConnect?.externalId,
         accessToken: "fake-access-token",
       };
       uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];

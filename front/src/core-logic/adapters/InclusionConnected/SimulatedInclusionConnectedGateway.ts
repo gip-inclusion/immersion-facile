@@ -18,7 +18,10 @@ const simulatedUserConnected: InclusionConnectedUser = {
   id: "fake-user-id",
   agencyRights: [],
   dashboards: { agencies: {}, establishments: {} },
-  externalId: "fake-user-external-id",
+  proConnect: {
+    externalId: "fake-user-external-id",
+    siret: "00000000000000",
+  },
   createdAt: new Date().toISOString(),
   isBackofficeAdmin: true,
 };

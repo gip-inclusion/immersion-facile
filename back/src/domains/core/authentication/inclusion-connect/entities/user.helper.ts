@@ -33,9 +33,10 @@ const createUser = async (
     id: userId,
     email: userInfo.email,
     createdAt: createdAt.toISOString(),
-    externalId: null,
+    proConnect: null,
     firstName: userInfo.firstName ?? emptyName,
     lastName: userInfo.lastName ?? emptyName,
   });
+
   return userId;
 };

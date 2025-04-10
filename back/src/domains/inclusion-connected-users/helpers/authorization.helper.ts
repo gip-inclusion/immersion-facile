@@ -2,9 +2,9 @@ import {
   type AgencyId,
   type InclusionConnectDomainJwtPayload,
   type InclusionConnectedUser,
+  type UserWithAdminRights,
   errors,
 } from "shared";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const throwIfIcUserNotBackofficeAdmin = async (
@@ -17,7 +17,7 @@ export const throwIfIcUserNotBackofficeAdmin = async (
     throw errors.user.notBackOfficeAdmin({ userId: jwtPayload.userId });
 };
 
-export const throwIfNotAdmin = (user: UserOnRepository | undefined) => {
+export const throwIfNotAdmin = (user: UserWithAdminRights | undefined) => {
   if (!user) throw errors.user.unauthorized();
   if (!user.isBackofficeAdmin) throw errors.user.forbidden({ userId: user.id });
 };

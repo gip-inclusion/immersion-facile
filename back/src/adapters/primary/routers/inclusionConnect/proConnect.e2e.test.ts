@@ -15,7 +15,10 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { fakeProviderConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
+import {
+  fakeProConnectSiret,
+  fakeProviderConfig,
+} from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
@@ -104,6 +107,7 @@ describe("proConnect flow", () => {
             lastName: "jean",
             nonce,
             sub: "osef",
+            siret: fakeProConnectSiret,
           },
         });
         const response = await httpClient.afterLoginRedirection({

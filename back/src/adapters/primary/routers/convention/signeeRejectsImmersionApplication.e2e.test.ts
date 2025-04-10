@@ -5,6 +5,7 @@ import {
   type ConventionStatus,
   InclusionConnectedUserBuilder,
   type UpdateConventionStatusRequestDto,
+  type UserWithAdminRights,
   conventionMagicLinkRoutes,
   expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
@@ -15,7 +16,6 @@ import {
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { InMemoryConventionRepository } from "../../../../domains/convention/adapters/InMemoryConventionRepository";
-import type { UserOnRepository } from "../../../../domains/core/authentication/inclusion-connect/port/UserRepository";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
   type TestAppAndDeps,
@@ -78,7 +78,7 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
 const beneficiarySubmitsApplicationForTheFirstTime = async (
   { request, gateways, eventCrawler, inMemoryUow }: TestAppAndDeps,
   convention: ConventionDto,
-  validator: UserOnRepository,
+  validator: UserWithAdminRights,
 ) => {
   await request
     .post(unauthenticatedConventionRoutes.createConvention.url)

@@ -31,7 +31,12 @@ export const makeInclusionConnectAuthMiddleware = (
         return res.status(unauthorizedError.status).json(unauthorizedError);
 
       const currentIcUser = await uowPerformer.perform(async (uow) =>
-        getIcUserByUserId(uow, payload.userId, dashboardGateway, timeGateway),
+        getIcUserByUserId({
+          uow,
+          userId: payload.userId,
+          dashboardGateway,
+          timeGateway,
+        }),
       );
       if (!currentIcUser)
         throw errors.user.notFound({ userId: payload.userId });
