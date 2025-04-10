@@ -1,14 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import ProConnectButton from "@codegouvfr/react-dsfr/ProConnectButton";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 
 import { type ReactElement, type ReactNode, useEffect } from "react";
-import {
-  Loader,
-  MainWrapper,
-  OAuthButton,
-  PageHeader,
-} from "react-design-system";
+import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type AllowedStartOAuthLoginPage,
@@ -151,17 +147,13 @@ export const ConnectedPrivateRoute = ({
               <>
                 {pageContent.description}
                 <div className={fr.cx("fr-my-2w")}>
-                  <OAuthButton
-                    id={domElementIds[page].login.inclusionConnectButton}
-                    authenticationEndpoint={`${
-                      inclusionConnectImmersionRoutes.startInclusionConnectLogin
-                        .url
-                    }?${queryParamsAsString(
+                  <ProConnectButton
+                    id={domElementIds[page].login.connectButton}
+                    url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
                       inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
                         { page },
                       ),
                     )}`}
-                    provider={proConnectProvider.buttonProvider}
                   />
                 </div>
               </>
@@ -181,6 +173,7 @@ export const ConnectedPrivateRoute = ({
                     title={card.title}
                     desc={card.description}
                     imageUrl={card.illustration}
+                    imageAlt=""
                     imageSvg={false}
                   />
                 </div>
@@ -213,13 +206,6 @@ export const ConnectedPrivateRoute = ({
       <MainWrapper layout="default">{children}</MainWrapper>
     </HeaderFooterLayout>
   );
-};
-
-const proConnectProvider = {
-  name: "ProConnect",
-  buttonProvider: "pro-connect" as const,
-  baseline:
-    "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
 };
 
 const getPage = (

@@ -377,8 +377,7 @@ export const domElementIds = {
 
   establishment: {
     login: {
-      inclusionConnectButton:
-        "im-login-form__inclusion-connect-button--establishment",
+      connectButton: "im-login-form__inclusion-connect-button--establishment",
     },
     create: {
       form: "im-form-create-establishment",
@@ -612,7 +611,7 @@ export const domElementIds = {
         "im-technical-options__api-consumer-submit-button",
     },
     login: {
-      inclusionConnectButton: "im-login-form__inclusion-connect-button--admin",
+      connectButton: "im-login-form__inclusion-connect-button--admin",
     },
     agencyTab: {
       openManageUserModalButton:
@@ -722,7 +721,7 @@ export const domElementIds = {
 
   agencyDashboard: {
     login: {
-      inclusionConnectButton: "im-login-form__inclusion-connect-button--agency",
+      connectButton: "im-login-form__inclusion-connect-button--agency",
     },
     registerAgencies: {
       table: "im-register-agencies-table",
@@ -772,8 +771,7 @@ export const domElementIds = {
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     login: {
-      inclusionConnectButton:
-        "im-login-form__inclusion-connect-button--establishment",
+      connectButton: "im-login-form__inclusion-connect-button--establishment",
     },
     discussion: {
       activateDraftConvention:
