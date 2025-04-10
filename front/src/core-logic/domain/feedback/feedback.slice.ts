@@ -96,12 +96,12 @@ export const feedbackSlice = createSlice({
 
 const isActionWithFeedbackTopic =
   <T extends Record<string, any>>(actionType: string) =>
-    (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
-      "payload" in action &&
-      typeof action.payload === "object" &&
-      action.payload &&
-      "feedbackTopic" in action.payload &&
-      action.type === actionType;
+  (action: PayloadAction<T>): action is PayloadActionWithFeedbackTopic<T> =>
+    "payload" in action &&
+    typeof action.payload === "object" &&
+    action.payload &&
+    "feedbackTopic" in action.payload &&
+    action.type === actionType;
 
 export const getLevelAndActionKindFromActionKindAndLevel = (
   actionKindAndLevel: ActionKindAndLevel,

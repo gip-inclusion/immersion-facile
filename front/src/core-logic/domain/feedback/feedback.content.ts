@@ -57,6 +57,7 @@ const topics = [
   "convention-action-renew",
   "convention-status-dashboard",
   "convention-form",
+  "establishment-dashboard-users-rights",
   "unused",
 ] as const;
 
@@ -540,6 +541,19 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération de la convention",
       message:
         "Une erreur est survenue lors de la récupération de la convention",
+    },
+  },
+  "establishment-dashboard-users-rights": {
+    "update.success": {
+      action: establishmentSlice.actions.updateEstablishmentSucceeded,
+      title: "L'utilisateur a été mis à jour",
+      message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
+    },
+    "update.error": {
+      action: establishmentSlice.actions.updateEstablishmentFailed,
+      title: "Problème lors de la mise à jour de l'utilisateur",
+      message:
+        "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
   },
   unused: {},

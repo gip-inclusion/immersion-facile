@@ -77,6 +77,14 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       initialEstablishmentAggregate,
     );
 
+    if (triggeredBy.kind !== "inclusion-connected")
+      throw errors.user.unauthorized();
+    const triggeredByUser = await uow.userRepository.getById(
+      triggeredBy.userId,
+    );
+    if (!triggeredByUser)
+      throw errors.user.notFound({ userId: triggeredBy.userId });
+
     const establishmentAggregate = await makeEstablishmentAggregate({
       uow,
       timeGateway: this.#timeGateway,
@@ -101,16 +109,9 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       establishmentAggregate,
       initialEstablishmentAggregate,
     );
-    if (triggeredBy.kind !== "inclusion-connected")
-      throw errors.user.unauthorized();
-    const triggeredByUser = await uow.userRepository.getById(
-      triggeredBy.userId,
-    );
-    if (!triggeredByUser)
-      throw errors.user.notFound({ userId: triggeredBy.userId });
 
-    const userRightsAddedNotifications = userRightsAdded.map(
-      async (userRight) => {
+    const makeUserRightsAddedNotifications = () =>
+      userRightsAdded.map(async (userRight) => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
         return this.#saveNotificationAndRelatedEvent(uow, {
@@ -134,11 +135,10 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
             establishmentSiret: establishmentAggregate.establishment.siret,
           },
         });
-      },
-    );
+      });
 
-    const userRightsUpdatedNotifications = userRightsUpdated.map(
-      async (userRight) => {
+    const makeUserRightsUpdatedNotifications = () =>
+      userRightsUpdated.map(async (userRight) => {
         const user = await uow.userRepository.getById(userRight.userId);
         if (!user) throw errors.user.notFound({ userId: userRight.userId });
         return this.#saveNotificationAndRelatedEvent(uow, {
@@ -162,12 +162,11 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
             establishmentSiret: establishmentAggregate.establishment.siret,
           },
         });
-      },
-    );
+      });
 
     await Promise.all([
-      ...userRightsAddedNotifications,
-      ...userRightsUpdatedNotifications,
+      ...makeUserRightsAddedNotifications(),
+      ...makeUserRightsUpdatedNotifications(),
     ]);
 
     await uow.establishmentAggregateRepository.updateEstablishmentAggregate(

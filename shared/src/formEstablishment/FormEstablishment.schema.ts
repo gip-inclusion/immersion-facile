@@ -46,7 +46,7 @@ export const contactMethodSchema = zEnumValidation(
   "Choisissez parmi les options proposées",
 );
 
-export const establishmentFormUserRightSchema: z.Schema<FormEstablishmentUserRight> =
+export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRight> =
   z
     .object({
       role: z.literal("establishment-admin"),
@@ -63,10 +63,10 @@ export const establishmentFormUserRightSchema: z.Schema<FormEstablishmentUserRig
       }),
     );
 
-export const establishmentFormUserRightsSchema: z.Schema<
+export const formEstablishmentUserRightsSchema: z.Schema<
   FormEstablishmentUserRight[]
 > = z
-  .array(establishmentFormUserRightSchema)
+  .array(formEstablishmentUserRightSchema)
   .refine(
     (userRights) =>
       userRights.filter((right) => right.role === "establishment-admin")
@@ -117,7 +117,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
       .array(appellationDtoSchema)
       .min(1, localization.atLeastOneJob),
     contactMethod: contactMethodSchema,
-    userRights: establishmentFormUserRightsSchema,
+    userRights: formEstablishmentUserRightsSchema,
     maxContactsPerMonth: z
       .number({
         invalid_type_error:
