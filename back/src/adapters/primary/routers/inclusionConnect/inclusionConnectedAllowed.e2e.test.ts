@@ -6,6 +6,7 @@ import {
   InclusionConnectedUserBuilder,
   type User,
   currentJwtVersions,
+  defaultProConnectInfos,
   displayRouteName,
   errors,
   expectArraysToMatch,
@@ -38,7 +39,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     email: "joe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
-    externalId: "joe-external-id",
+    proConnect: defaultProConnectInfos,
     createdAt: new Date().toISOString(),
   };
 
@@ -295,7 +296,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        externalId: "joe-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
       const token = generateInclusionConnectJwt({
@@ -340,7 +341,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        externalId: "joe-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
       const convention = new ConventionDtoBuilder()
@@ -421,7 +422,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             provider: "proConnect",
             state,
             nonce: "fake-nonce",
-            externalId: agencyUser.externalId ?? undefined,
+            externalId: agencyUser.proConnect?.externalId,
           },
         ];
 
@@ -458,7 +459,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           email: "user@mail.com",
           firstName: "User",
           lastName: "Name",
-          externalId: "user-external-id",
+          proConnect: defaultProConnectInfos,
           createdAt: new Date().toISOString(),
         };
         const discussion = new DiscussionBuilder()

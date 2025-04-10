@@ -1,4 +1,8 @@
-import { AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  type InclusionConnectedUser,
+  expectToEqual,
+} from "shared";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -22,14 +26,14 @@ describe("RemoveUserFromAgency", () => {
     }));
   });
 
-  const userToRemove = {
+  const userToRemove: InclusionConnectedUser = {
     id: "fake-id",
     email: "fake-email@mail.com",
     firstName: "fake-first-name",
     lastName: "fake-last-name",
-    externalId: null,
     createdAt: new Date().toISOString(),
-    agencyRights: {},
+    proConnect: null,
+    agencyRights: [],
     dashboards: { agencies: {}, establishments: {} },
   };
 

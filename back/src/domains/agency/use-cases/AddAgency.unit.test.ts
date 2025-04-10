@@ -121,7 +121,7 @@ describe("AddAgency use case", () => {
         createdAt: timeGateway.now().toISOString(),
         firstName: emptyName,
         lastName: emptyName,
-        externalId: null,
+        proConnect: null,
       };
       const newCounsellor: User = {
         id: uuids[1],
@@ -129,7 +129,7 @@ describe("AddAgency use case", () => {
         createdAt: timeGateway.now().toISOString(),
         firstName: emptyName,
         lastName: emptyName,
-        externalId: null,
+        proConnect: null,
       };
 
       await addAgency.execute({
@@ -175,7 +175,7 @@ describe("AddAgency use case", () => {
         createdAt: timeGateway.now().toISOString(),
         firstName: emptyName,
         lastName: emptyName,
-        externalId: null,
+        proConnect: null,
       };
       const newCounsellor: User = {
         id: uuids[1],
@@ -183,7 +183,7 @@ describe("AddAgency use case", () => {
         createdAt: timeGateway.now().toISOString(),
         firstName: emptyName,
         lastName: emptyName,
-        externalId: null,
+        proConnect: null,
       };
 
       expectToEqual(uow.userRepository.users, [newValidator, newCounsellor]);
@@ -287,7 +287,7 @@ describe("AddAgency use case", () => {
         createdAt: timeGateway.now().toISOString(),
         firstName: emptyName,
         lastName: emptyName,
-        externalId: null,
+        proConnect: null,
       };
 
       expectToEqual(uow.userRepository.users, [

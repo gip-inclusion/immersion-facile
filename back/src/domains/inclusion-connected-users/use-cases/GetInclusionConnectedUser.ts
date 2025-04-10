@@ -46,14 +46,11 @@ export class GetInclusionConnectedUser extends TransactionalUseCase<
 
     const userIdToFetch = params.userId ?? currentIcUser.id;
 
-    const user = await uow.userRepository.getById(userIdToFetch);
-    if (!user) throw errors.user.notFound({ userId: userIdToFetch });
-
-    return getIcUserByUserId(
+    return getIcUserByUserId({
       uow,
-      user.id,
-      this.#dashboardGateway,
-      this.#timeGateway,
-    );
+      userId: userIdToFetch,
+      dashboardGateway: this.#dashboardGateway,
+      timeGateway: this.#timeGateway,
+    });
   }
 }

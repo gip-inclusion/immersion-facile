@@ -12,6 +12,7 @@ import {
   type User,
   conventionMagicLinkRoutes,
   currentJwtVersions,
+  defaultProConnectInfos,
   errors,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
@@ -352,7 +353,7 @@ describe("Magic link router", () => {
         email: "my-user@email.com",
         firstName: "John",
         lastName: "Doe",
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 
@@ -485,7 +486,7 @@ describe("Magic link router", () => {
         firstName: "",
         lastName: "",
         id: "1",
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 
@@ -531,7 +532,7 @@ describe("Magic link router", () => {
         firstName: "",
         lastName: "",
         id: "1",
-        externalId: "my-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 
@@ -582,7 +583,7 @@ describe("Magic link router", () => {
         firstName: "",
         lastName: "",
         id: "1",
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
       gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLink1"]);

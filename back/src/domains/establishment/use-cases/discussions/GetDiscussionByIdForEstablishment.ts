@@ -3,11 +3,11 @@ import {
   type DiscussionId,
   type DiscussionReadDto,
   type InclusionConnectDomainJwtPayload,
+  type User,
   discussionIdSchema,
   errors,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import type { UserOnRepository } from "../../../core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
@@ -79,7 +79,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
 
   async #hasUserRightToAccessDiscussion(
     uow: UnitOfWork,
-    user: UserOnRepository,
+    user: User,
     discussion: DiscussionDto,
   ): Promise<boolean> {
     if (

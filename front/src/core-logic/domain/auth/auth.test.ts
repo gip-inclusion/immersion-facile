@@ -32,7 +32,6 @@ const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
   firstName: "John",
   lastName: "Doe",
   idToken: "inclusion-connect-id-token",
-  siret: "12345678901234",
 };
 
 describe("Auth slice", () => {
@@ -158,7 +157,10 @@ describe("Auth slice", () => {
       lastName: inclusionConnectedFederatedIdentity.lastName,
       agencyRights: [],
       dashboards: { agencies: {}, establishments: {} },
-      externalId: "fake-user-external-id",
+      proConnect: {
+        externalId: "fake-user-external-id",
+        siret: "12345678901234",
+      },
       createdAt: new Date().toISOString(),
     };
     dependencies.inclusionConnectedGateway.currentUser$.next(icUser);

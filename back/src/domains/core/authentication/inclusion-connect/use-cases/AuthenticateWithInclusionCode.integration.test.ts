@@ -13,6 +13,7 @@ import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   InMemoryOAuthGateway,
+  fakeProConnectSiret,
   fakeProviderConfig,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
@@ -29,6 +30,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@inclusion.com",
+    siret: fakeProConnectSiret,
   };
 
   let pool: Pool;
@@ -99,7 +101,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
           firstName: defaultExpectedIcIdTokenPayload.firstName,
           lastName: defaultExpectedIcIdTokenPayload.lastName,
           email: defaultExpectedIcIdTokenPayload.email,
-          externalId: defaultExpectedIcIdTokenPayload.sub,
+          proConnect: {
+            externalId: defaultExpectedIcIdTokenPayload.sub,
+            siret: defaultExpectedIcIdTokenPayload.siret,
+          },
         },
       );
     });

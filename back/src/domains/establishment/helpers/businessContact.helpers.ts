@@ -1,5 +1,8 @@
-import { type EstablishmentFormUserRights, errors } from "shared";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+import {
+  type EstablishmentFormUserRights,
+  type UserWithAdminRights,
+  errors,
+} from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
   EstablishmentAdminRight,
@@ -54,8 +57,8 @@ export const getDiscussionContactsFromAggregate = async (
   uow: UnitOfWork,
   establishment: EstablishmentAggregate,
 ): Promise<{
-  otherUsers: UserOnRepository[];
-  firstAdminUser: UserOnRepository;
+  otherUsers: UserWithAdminRights[];
+  firstAdminUser: UserWithAdminRights;
   firstAdminRight: EstablishmentAdminRight;
 }> => {
   const firstAdminRight = establishment.userRights.find(

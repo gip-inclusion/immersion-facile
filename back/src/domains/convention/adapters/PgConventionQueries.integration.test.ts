@@ -18,6 +18,7 @@ import {
   InclusionConnectedUserBuilder,
   type Notification,
   type SiretDto,
+  type UserWithAdminRights,
   concatValidatorNames,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
@@ -33,7 +34,6 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import type { ConventionRepository } from "../ports/ConventionRepository";
@@ -931,7 +931,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
-    validatorUser: UserOnRepository;
+    validatorUser: UserWithAdminRights;
     withRefersToAgency?: AgencyDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;

@@ -7,11 +7,11 @@ import {
   type AgencyWithUsersRights,
   type Email,
   type UserId,
+  type UserWithAdminRights,
   errors,
   pipeWithValue,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import type { UserOnRepository } from "../domains/core/authentication/inclusion-connect/port/UserRepository";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const toAgencyWithRights = (
@@ -158,7 +158,7 @@ export const getAgencyAndAdminEmailsByAgencyId = async ({
     await uow.userRepository.getByIds(agencyAdminUserIds);
 
   const usersWithAdminRoleById = usersWithAgencyAdminRole.reduce<
-    Record<UserId, UserOnRepository>
+    Record<UserId, UserWithAdminRights>
   >((acc, user) => {
     acc[user.id] = user;
     return acc;

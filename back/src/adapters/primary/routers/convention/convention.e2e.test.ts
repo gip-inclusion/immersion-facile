@@ -18,6 +18,7 @@ import {
   conventionMagicLinkRoutes,
   createConventionMagicLinkPayload,
   currentJwtVersions,
+  defaultProConnectInfos,
   displayRouteName,
   errors,
   expectArraysToEqual,
@@ -59,7 +60,7 @@ describe("convention e2e", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    externalId: "john-external-id",
+    proConnect: defaultProConnectInfos,
     createdAt: new Date().toISOString(),
   };
   const convention = new ConventionDtoBuilder()

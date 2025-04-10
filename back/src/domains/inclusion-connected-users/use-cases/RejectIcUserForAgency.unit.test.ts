@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
+  type ProConnectInfos,
   type User,
   errors,
   expectPromiseToFailWithError,
@@ -19,13 +20,18 @@ import {
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { RejectIcUserForAgency } from "./RejectIcUserForAgency";
 
+const proConnect: ProConnectInfos = {
+  externalId: "john-external-id",
+  siret: "00000000007777",
+};
+
 const user: User = {
   id: "john-123",
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
-  externalId: "john-external-id",
   createdAt: new Date().toISOString(),
+  proConnect,
 };
 
 const adminBuilder = new InclusionConnectedUserBuilder()
@@ -64,6 +70,7 @@ describe("reject IcUser for agency", () => {
 
     const icUser: InclusionConnectedUser = {
       ...user,
+      proConnect,
       agencyRights: [
         {
           agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
@@ -108,6 +115,7 @@ describe("reject IcUser for agency", () => {
 
     const icUser: InclusionConnectedUser = {
       ...user,
+      proConnect,
       agencyRights: [
         {
           agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
@@ -139,6 +147,7 @@ describe("reject IcUser for agency", () => {
 
     const icUser: InclusionConnectedUser = {
       ...user,
+      proConnect,
       agencyRights: [
         {
           agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),

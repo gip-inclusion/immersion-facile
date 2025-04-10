@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   type AgencyGroup,
   type User,
+  defaultProConnectInfos,
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -36,7 +37,7 @@ const defaultUser: User = {
   id: "my-user-id",
   firstName: "John",
   lastName: "Doe",
-  externalId: "my-external-id",
+  proConnect: defaultProConnectInfos,
   email: "john.doe@inclusion.com",
   createdAt: new Date().toISOString(),
 };

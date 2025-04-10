@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   type User,
+  defaultProConnectInfos,
   errors,
   expectArraysToMatch,
   expectObjectsToMatch,
@@ -24,7 +25,7 @@ describe("RegisterAgencyToInclusionConnectUser use case", () => {
     email: "john.doe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
-    externalId: "john-external-id",
+    proConnect: defaultProConnectInfos,
     createdAt: new Date().toISOString(),
   };
 

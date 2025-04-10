@@ -6,24 +6,26 @@ import {
   type UserWithAdminRights,
   errors,
 } from "shared";
-import type { UserOnRepository, UserRepository } from "../port/UserRepository";
+import type { UserRepository } from "../port/UserRepository";
 
 export class InMemoryUserRepository implements UserRepository {
   #usersById: Record<string, UserWithAdminRights> = {};
 
   public async findByExternalId(
     externalId: string,
-  ): Promise<UserOnRepository | undefined> {
-    return this.users.find((user) => user.externalId === externalId);
+  ): Promise<UserWithAdminRights | undefined> {
+    return this.users.find(
+      (user) => user.proConnect?.externalId === externalId,
+    );
   }
 
   public async findByEmail(
     email: Email,
-  ): Promise<UserOnRepository | undefined> {
+  ): Promise<UserWithAdminRights | undefined> {
     return this.users.find((user) => user.email === email);
   }
 
-  public async getByIds(userIds: UserId[]): Promise<UserOnRepository[]> {
+  public async getByIds(userIds: UserId[]): Promise<UserWithAdminRights[]> {
     const users = this.users.filter((user) => userIds.includes(user.id));
 
     const missingUserIds = userIds.filter(
@@ -36,20 +38,22 @@ export class InMemoryUserRepository implements UserRepository {
     return users;
   }
 
-  public async save(user: UserOnRepository): Promise<void> {
+  public async save(user: UserWithAdminRights): Promise<void> {
     this.#usersById[user.id] = user;
     if (
       values(this.#usersById).filter(({ email }) => email === user.email)
         .length > 1
     )
       throw errors.user.conflictByEmail({ userEmail: user.email });
+
+    const externalId = user.proConnect?.externalId;
     if (
-      user.externalId &&
+      externalId &&
       values(this.#usersById).filter(
-        ({ externalId }) => externalId === user.externalId,
+        ({ proConnect }) => proConnect?.externalId === externalId,
       ).length > 1
     )
-      throw errors.user.conflictByExternalId({ externalId: user.externalId });
+      throw errors.user.conflictByExternalId({ externalId });
   }
 
   public async delete(id: UserId): Promise<void> {
@@ -60,12 +64,12 @@ export class InMemoryUserRepository implements UserRepository {
   }
 
   // for test purpose
-  public get users(): UserOnRepository[] {
+  public get users(): UserWithAdminRights[] {
     return values(this.#usersById);
   }
 
-  public set users(users: UserOnRepository[]) {
-    this.#usersById = users.reduce<Record<UserId, UserOnRepository>>(
+  public set users(users: UserWithAdminRights[]) {
+    this.#usersById = users.reduce<Record<UserId, UserWithAdminRights>>(
       (acc, user) => {
         if (keys(acc).includes(user.id))
           throw errors.user.conflictById({ userId: user.id });
@@ -78,11 +82,15 @@ export class InMemoryUserRepository implements UserRepository {
     );
   }
 
-  public async getById(userId: string): Promise<UserOnRepository | undefined> {
+  public async getById(
+    userId: string,
+  ): Promise<UserWithAdminRights | undefined> {
     return this.users.find((user) => user.id === userId);
   }
 
-  public async getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]> {
+  public async getUsers(
+    filters: GetUsersFilters,
+  ): Promise<UserWithAdminRights[]> {
     return this.users.filter((user) =>
       user.email.toLowerCase().includes(filters.emailContains.toLowerCase()),
     );

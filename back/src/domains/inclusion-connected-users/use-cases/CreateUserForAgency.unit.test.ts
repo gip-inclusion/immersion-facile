@@ -9,6 +9,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { fakeProConnectSiret } from "../../core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import { StubDashboardGateway } from "../../core/dashboard/adapters/StubDashboardGateway";
 import {
@@ -211,6 +212,7 @@ describe("CreateUserForAgency", () => {
         email: "new-user@email.fr",
       };
 
+      //TODO: ici un usecase de commande qui retourne de la data et en prime, le retour attendu n'est pas testé
       await createUserForAgency.execute(icUserForAgency, triggeredByUser);
 
       expectToEqual(uow.userRepository.users, [
@@ -221,7 +223,7 @@ describe("CreateUserForAgency", () => {
           createdAt: timeGateway.now().toISOString(),
           firstName: emptyName,
           lastName: emptyName,
-          externalId: null,
+          proConnect: null,
         },
       ]);
       expectToEqual(uow.agencyRepository.agencies, [
@@ -267,7 +269,10 @@ describe("CreateUserForAgency", () => {
         email: "user@email.fr",
         firstName: "John",
         lastName: "Doe",
-        externalId: null,
+        proConnect: {
+          externalId: "osef",
+          siret: fakeProConnectSiret,
+        },
         createdAt: timeGateway.now().toISOString(),
       };
       uow.userRepository.users = [validator, counsellor, icAgencyAdminUser];
@@ -336,8 +341,8 @@ describe("CreateUserForAgency", () => {
       email: "user@email.fr",
       firstName: "John",
       lastName: "Doe",
-      externalId: null,
       createdAt: timeGateway.now().toISOString(),
+      proConnect: null,
     };
     uow.userRepository.users = [validator, counsellor];
 

@@ -13,6 +13,7 @@ import {
   type Role,
   type UnauthorizedError,
   type UpdateConventionStatusRequestDto,
+  type UserWithAdminRights,
   allRoles,
   conventionStatuses,
   createConventionMagicLinkPayload,
@@ -22,7 +23,7 @@ import {
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import type { UserOnRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
+
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import type { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
 import type { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
@@ -53,69 +54,90 @@ type InclusionConnectedTestUser =
 
 const establishmentRepEmail: Email = "establishmentrep@email.com";
 
-const icUserWithRoleBackofficeAdmin: UserOnRepository = {
+const icUserWithRoleBackofficeAdmin: UserWithAdminRights = {
   email: "icUserWithRoleBackofficeAdmin@mail.com",
   id: "icUserWithRoleBackofficeAdmin",
   firstName: "icUserWithRoleBackofficeAdmin",
   lastName: "BackofficeAdmin",
-  externalId: "icUserWithRoleBackOfficeAdmin-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleBackOfficeAdmin-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
   isBackofficeAdmin: true,
 };
 
-const icUserWithRoleToReview: UserOnRepository = {
+const icUserWithRoleToReview: UserWithAdminRights = {
   email: "icUserWithRoleToReview@mail.com",
   firstName: "icUserWithRoleToReview",
   id: "icUserWithRoleToReview",
   lastName: "ToReview",
-  externalId: "icUserWithRoleToReview-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleToReview-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
-const icUserWithRoleCounsellor: UserOnRepository = {
+const icUserWithRoleCounsellor: UserWithAdminRights = {
   email: "icUserWithRoleCounsellor@mail.com",
   firstName: "icUserWithRoleCounsellor",
   id: "icUserWithRoleCounsellor",
   lastName: "Consellor",
-  externalId: "icUserWithRoleCounsellor-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleCounsellor-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
 
-const icUserWithRoleValidator: UserOnRepository = {
+const icUserWithRoleValidator: UserWithAdminRights = {
   email: "icUserWithRoleValidator@mail.com",
   firstName: "icUserWithRoleValidator",
   id: "icUserWithRoleValidator",
   lastName: "Validator",
-  externalId: "icUserWithRoleValidator-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleValidator-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
 
-const icUserWithRoleBackofficeAdminAndValidator: UserOnRepository = {
+const icUserWithRoleBackofficeAdminAndValidator: UserWithAdminRights = {
   email: "icUserWithRoleBackofficeAdminAndValidator@mail.com",
   firstName: "icUserWithRoleBackofficeAdminAndValidator",
   id: "icUserWithRoleBackofficeAdminAndValidator",
   lastName: "Validator",
-  externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
-const icUserWithRoleAgencyAdmin: UserOnRepository = {
+const icUserWithRoleAgencyAdmin: UserWithAdminRights = {
   email: "icUserWithRoleAgencyAdmin@mail.com",
   firstName: "icUserWithRoleAgencyAdmin",
   id: "icUserWithRoleAgencyAdmin",
   lastName: "Owner",
-  externalId: "icUserWithRoleAgencyAdmin-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleAgencyAdmin-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
-const icUserWithRoleEstablishmentRepresentative: UserOnRepository = {
+const icUserWithRoleEstablishmentRepresentative: UserWithAdminRights = {
   email: establishmentRepEmail,
   firstName: "icUserWithRoleEstablishmentRepresentativeFirstName",
   id: "icUserWithRoleEstablishmentRepresentative",
   lastName: "Owner",
-  externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
+  proConnect: {
+    externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
+    siret: "000001111122222",
+  },
   createdAt: new Date().toISOString(),
 };
 const makeUserIdMapInclusionConnectedUser: Record<
   InclusionConnectedTestUser,
-  UserOnRepository
+  UserWithAdminRights
 > = {
   icUserWithRoleBackofficeAdmin,
   icUserWithRoleToReview,

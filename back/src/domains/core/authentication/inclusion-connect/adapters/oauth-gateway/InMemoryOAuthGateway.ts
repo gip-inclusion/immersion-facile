@@ -1,4 +1,9 @@
-import { type AbsoluteUrl, errors, queryParamsAsString } from "shared";
+import {
+  type AbsoluteUrl,
+  type SiretDto,
+  errors,
+  queryParamsAsString,
+} from "shared";
 import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import type {
   GetAccessTokenParams,
@@ -7,6 +12,8 @@ import type {
   GetLogoutUrlParams,
   OAuthGateway,
 } from "../../port/OAuthGateway";
+
+export const fakeProConnectSiret: SiretDto = "00000000007788";
 
 export const fakeProviderConfig: OAuthConfig = {
   clientId: "my-client-id",

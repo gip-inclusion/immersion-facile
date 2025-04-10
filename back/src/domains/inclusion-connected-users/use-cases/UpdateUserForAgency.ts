@@ -4,15 +4,13 @@ import {
   type AgencyWithUsersRights,
   type Email,
   type InclusionConnectedUser,
+  type User,
   type UserParamsForAgency,
   errors,
   userParamsForAgencySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import type {
-  UserOnRepository,
-  UserRepository,
-} from "../../core/authentication/inclusion-connect/port/UserRepository";
+import type { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -117,21 +115,21 @@ export class UpdateUserForAgency extends TransactionalUseCase<
 }
 
 const rejectEmailModificationIfInclusionConnectedUser = (
-  user: UserOnRepository,
+  user: User,
   newEmail: Email,
 ): void => {
-  if (!newEmail || !user.externalId) return;
+  if (!newEmail || !user.proConnect) return;
   if (user.email !== newEmail) {
     throw errors.user.forbiddenToChangeEmailForUIcUser();
   }
 };
 
 const updateIfUserEmailChanged = async (
-  user: UserOnRepository,
+  user: User,
   newEmail: Email,
   userRepository: UserRepository,
 ): Promise<void> => {
-  if (user.email === newEmail || user.externalId) return;
+  if (user.email === newEmail || user.proConnect) return;
   await userRepository.updateEmail(user.id, newEmail);
 };
 

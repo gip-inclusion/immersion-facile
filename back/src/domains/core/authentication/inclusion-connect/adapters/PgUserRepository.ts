@@ -2,13 +2,15 @@ import { type SqlBool, sql } from "kysely";
 import {
   type Email,
   type GetUsersFilters,
+  type SiretDto,
   type User,
   type UserId,
+  type UserWithAdminRights,
   errors,
   isTruthy,
 } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
-import type { UserOnRepository, UserRepository } from "../port/UserRepository";
+import type { UserRepository } from "../port/UserRepository";
 
 type PersistenceAuthenticatedUser = {
   id: string;
@@ -16,6 +18,7 @@ type PersistenceAuthenticatedUser = {
   first_name: string;
   last_name: string;
   external_id: string | null;
+  siret: SiretDto | null;
   created_at: string;
   isBackofficeAdmin: SqlBool;
 };
@@ -24,7 +27,7 @@ export class PgUserRepository implements UserRepository {
   constructor(private transaction: KyselyDb) {}
 
   //For testing purpose
-  public async getAllUsers(): Promise<UserOnRepository[]> {
+  public async getAllUsers(): Promise<UserWithAdminRights[]> {
     const allUsers = await this.#getUserQueryBuilder().execute();
     return allUsers
       .map((userInDb) => this.#toAuthenticatedUser(userInDb))
@@ -37,14 +40,15 @@ export class PgUserRepository implements UserRepository {
       .where("id", "=", userId)
       .returning("id")
       .executeTakeFirst();
+
     if (!response)
       throw errors.user.notFound({
         userId,
       });
   }
 
-  public async save(user: UserOnRepository): Promise<void> {
-    const { id, email, firstName, lastName, externalId, createdAt } = user;
+  public async save(user: UserWithAdminRights): Promise<void> {
+    const { id, email, firstName, lastName, createdAt, proConnect } = user;
 
     const existingUser = await this.#findById(id);
 
@@ -56,7 +60,8 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          pro_connect_sub: externalId,
+          pro_connect_sub: proConnect?.externalId,
+          pro_connect_siret: proConnect?.siret,
           created_at: createdAt,
         })
         .execute();
@@ -67,7 +72,8 @@ export class PgUserRepository implements UserRepository {
       existingUser.firstName === firstName &&
       existingUser.lastName === lastName &&
       existingUser.email === email &&
-      existingUser.externalId === externalId
+      existingUser.proConnect?.externalId === proConnect?.externalId &&
+      existingUser.proConnect?.siret === proConnect?.siret
     )
       return;
 
@@ -77,7 +83,8 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        pro_connect_sub: externalId,
+        pro_connect_sub: proConnect?.externalId,
+        pro_connect_siret: proConnect?.siret,
         updated_at: sql`now()`,
       })
       .where("id", "=", id)
@@ -96,7 +103,9 @@ export class PgUserRepository implements UserRepository {
       .execute();
   }
 
-  public async getById(userId: string): Promise<UserOnRepository | undefined> {
+  public async getById(
+    userId: UserId,
+  ): Promise<UserWithAdminRights | undefined> {
     const user = await this.#getUserQueryBuilder()
       .where("id", "=", userId)
       .executeTakeFirst();
@@ -104,7 +113,7 @@ export class PgUserRepository implements UserRepository {
     return this.#toAuthenticatedUser(user);
   }
 
-  async getByIds(userIds: UserId[]): Promise<UserOnRepository[]> {
+  async getByIds(userIds: UserId[]): Promise<UserWithAdminRights[]> {
     if (!userIds.length) return [];
     const usersInDb = await this.#getUserQueryBuilder()
       .where("id", "in", userIds)
@@ -120,7 +129,9 @@ export class PgUserRepository implements UserRepository {
     return users;
   }
 
-  public async getUsers(filters: GetUsersFilters): Promise<UserOnRepository[]> {
+  public async getUsers(
+    filters: GetUsersFilters,
+  ): Promise<UserWithAdminRights[]> {
     if (filters.emailContains === "") return [];
     const usersInDb = await this.#getUserQueryBuilder()
       .where("users.email", "like", `%${filters.emailContains.toLowerCase()}%`)
@@ -132,7 +143,7 @@ export class PgUserRepository implements UserRepository {
 
   public async findByExternalId(
     externalId: string,
-  ): Promise<UserOnRepository | undefined> {
+  ): Promise<UserWithAdminRights | undefined> {
     const response = await this.#getUserQueryBuilder()
       .where("pro_connect_sub", "=", externalId)
       .executeTakeFirst();
@@ -146,7 +157,7 @@ export class PgUserRepository implements UserRepository {
     return this.#toAuthenticatedUser(response);
   }
 
-  async #findById(userId: UserId): Promise<UserOnRepository | undefined> {
+  async #findById(userId: UserId): Promise<UserWithAdminRights | undefined> {
     const response = await this.#getUserQueryBuilder()
       .where("id", "=", userId)
       .executeTakeFirst();
@@ -167,6 +178,7 @@ export class PgUserRepository implements UserRepository {
             "created_at",
           ),
         "pro_connect_sub as external_id",
+        "pro_connect_siret as siret",
         sql<SqlBool>`BOOL_OR(users_admins.user_id IS NOT NULL)`.as(
           "isBackofficeAdmin",
         ),
@@ -177,14 +189,20 @@ export class PgUserRepository implements UserRepository {
 
   #toAuthenticatedUser(
     raw?: PersistenceAuthenticatedUser,
-  ): UserOnRepository | undefined {
+  ): UserWithAdminRights | undefined {
     return (
       raw && {
         id: raw.id,
         email: raw.email,
         firstName: raw.first_name,
         lastName: raw.last_name,
-        externalId: raw.external_id,
+        proConnect:
+          raw.external_id && raw.siret
+            ? {
+                externalId: raw.external_id,
+                siret: raw.siret,
+              }
+            : null,
         ...(raw.isBackofficeAdmin === true ? { isBackofficeAdmin: true } : {}),
         createdAt: new Date(raw.created_at).toISOString(),
       }

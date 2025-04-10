@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
+  defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -44,7 +45,7 @@ describe("mark partners errored convention as handled", () => {
     .withLastName("Doe")
     .withEmail("my-user@email.com")
     .withCreatedAt(new Date())
-    .withExternalId("icUser-external-id")
+    .withProConnectInfos(defaultProConnectInfos)
     .build();
 
   const agency = new AgencyDtoBuilder().build();
