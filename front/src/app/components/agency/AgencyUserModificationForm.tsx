@@ -8,8 +8,8 @@ import { type ReactNode, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
   type UserParamsForAgency,
-  allAgencyRoles,
   domElementIds,
+  keys,
   toLowerCaseWithoutDiacritics,
   userParamsForAgencySchema,
 } from "shared";
@@ -17,7 +17,7 @@ import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/Ag
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { P, match } from "ts-pattern";
-import { userRoleToDisplay } from "../../contents/userRoleToDisplay";
+import { agencyRolesToDisplay } from "../../contents/userRolesToDisplay";
 
 export const AgencyUserModificationForm = ({
   agencyUser,
@@ -63,10 +63,12 @@ export const AgencyUserModificationForm = ({
     reset(agencyUser);
   }, [agencyUser, reset]);
 
-  const availableRoles = allAgencyRoles.filter((role) => role !== "to-review");
+  const availableRoles = keys(agencyRolesToDisplay).filter(
+    (role) => role !== "to-review",
+  );
   const checkboxOptions = availableRoles.map((availableRole) => {
     return {
-      label: userRoleToDisplay[availableRole].label,
+      label: agencyRolesToDisplay[availableRole].label,
       nativeInputProps: {
         name: register("roles").name,
         checked: values.roles.includes(availableRole),
@@ -79,7 +81,7 @@ export const AgencyUserModificationForm = ({
           });
         },
       },
-      hintText: userRoleToDisplay[availableRole].description,
+      hintText: agencyRolesToDisplay[availableRole].description,
     };
   });
 

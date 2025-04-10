@@ -19,7 +19,7 @@ import {
 } from "shared";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { userRoleToDisplay } from "src/app/contents/userRoleToDisplay";
+import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -281,8 +281,8 @@ const EstablishmentUsersEditForm = ({
         <RadioButtons
           legend="Rôle"
           options={establishmentsRoles.map((role) => ({
-            label: userRoleToDisplay[role].label,
-            hintText: userRoleToDisplay[role].description,
+            label: userRolesToDisplay[role].label,
+            hintText: userRolesToDisplay[role].description,
             nativeInputProps: {
               checked: values.role === role,
               value: role,
@@ -334,9 +334,12 @@ const EstablishmentUserRow = ({
     <Badge
       key={`${userRight.email}-${userRight.role}`}
       small
-      className={fr.cx(userRoleToDisplay[userRight.role].className, "fr-mr-1w")}
+      className={fr.cx(
+        userRolesToDisplay[userRight.role].className,
+        "fr-mr-1w",
+      )}
     >
-      {userRoleToDisplay[userRight.role].label}
+      {userRolesToDisplay[userRight.role].label}
     </Badge>,
     <ButtonsGroup
       key={`${userRight.email}-${userRight.role}`}

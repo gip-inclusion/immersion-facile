@@ -1,4 +1,4 @@
-import { type FrClassName, fr } from "@codegouvfr/react-dsfr";
+import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -32,12 +32,6 @@ type AgencyUsersProperties = {
   agency: AgencyDto;
   agencyUsersById: NormalizedIcUserById;
   routeName: AgencyOverviewRouteName;
-};
-
-export type AgencyDisplayedRoleAndClass = {
-  label: string;
-  className: FrClassName;
-  description: string;
 };
 
 export const AgencyUsers = ({

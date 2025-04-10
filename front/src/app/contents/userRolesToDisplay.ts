@@ -1,10 +1,12 @@
+import type { FrClassName } from "@codegouvfr/react-dsfr";
 import type { AgencyRole, EstablishmentRole } from "shared";
-import type { AgencyDisplayedRoleAndClass } from "src/app/components/agency/AgencyUsers";
 
-export const userRoleToDisplay: Record<
-  AgencyRole | EstablishmentRole,
-  AgencyDisplayedRoleAndClass
-> = {
+type UserRoleDisplay<T extends AgencyRole | EstablishmentRole> = Record<
+  T,
+  UserDisplayedRoleAndClass
+>;
+
+export const agencyRolesToDisplay: UserRoleDisplay<AgencyRole> = {
   "agency-admin": {
     label: "Administrateur",
     className: "fr-badge--green-emeraude",
@@ -33,6 +35,9 @@ export const userRoleToDisplay: Record<
     className: "fr-badge--blue-cumulus",
     description: "Peut consulter les conventions de l'agence.",
   },
+};
+
+export const establishmentRolesToDisplay: UserRoleDisplay<EstablishmentRole> = {
   "establishment-admin": {
     label: "Administrateur",
     className: "fr-badge--green-emeraude",
@@ -45,4 +50,17 @@ export const userRoleToDisplay: Record<
     description:
       "Le contact accède aux conventions et aux candidatures (lecture et réponse) de l’établissement.",
   },
+};
+
+type UserDisplayedRoleAndClass = {
+  label: string;
+  className: FrClassName;
+  description: string;
+};
+
+export const userRolesToDisplay: UserRoleDisplay<
+  AgencyRole | EstablishmentRole
+> = {
+  ...agencyRolesToDisplay,
+  ...establishmentRolesToDisplay,
 };
