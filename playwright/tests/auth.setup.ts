@@ -50,7 +50,7 @@ const loginWithIdentityProvider = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }
 
-  const authButton = await page.locator(`#${loginButtonId}`);
+  const authButton = await page.locator(`#${loginButtonId} .fr-btn`);
   await expect(authButton).toBeVisible();
 
   await authButton.click();
@@ -106,22 +106,21 @@ const buttonByRouteName = (
 
   return {
     agencyDashboard: {
-      loginButtonId: domElementIds.agencyDashboard.login.inclusionConnectButton,
+      loginButtonId: domElementIds.agencyDashboard.login.connectButton,
       navLink: domElementIds.header.navLinks.agency.dashboard,
       username,
       password,
       headerNavLink: "fr-header-main-navigation-button-3",
     },
     establishmentDashboard: {
-      loginButtonId:
-        domElementIds.establishmentDashboard.login.inclusionConnectButton,
+      loginButtonId: domElementIds.establishmentDashboard.login.connectButton,
       navLink: domElementIds.header.navLinks.establishment.dashboard,
       username,
       password,
       headerNavLink: "fr-header-main-navigation-button-2",
     },
     admin: {
-      loginButtonId: domElementIds.admin.login.inclusionConnectButton,
+      loginButtonId: domElementIds.admin.login.connectButton,
       navLink: domElementIds.header.navLinks.admin.backOffice,
       username: adminUsername,
       password: adminPassword,

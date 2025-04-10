@@ -18,7 +18,6 @@ export * from "./footer";
 export * from "./form-overlay";
 export * from "./hero-header";
 export * from "./nav-card";
-export * from "./oauth-button";
 export * from "./inputs";
 export * from "./label";
 export * from "./link";
