@@ -39,13 +39,13 @@ export const AssessmentDocumentPage = ({
   route,
 }: AssessmentDocumentPageProps) => {
   const dispatch = useDispatch();
-  const { jwt, jwtPayload } = useJwt(route);
-  const conventionId = jwtPayload.applicationId;
+  const { jwt } = useJwt(route);
+  const conventionId = route.params.conventionId;
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt,
-    conventionId: jwtPayload.applicationId,
+    conventionId,
   });
   const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
 
