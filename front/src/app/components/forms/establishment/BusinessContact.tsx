@@ -70,89 +70,95 @@ export const BusinessContact = ({
     (userRight) => userRight.role === "establishment-admin",
   );
   return (
-    <div className={fr.cx("fr-input-group")}>
-      <h2 className={fr.cx("fr-text--lead")}>
-        Qui répondra aux demandes des candidats ?
-      </h2>
+    <>
       {mode === "create" && (
-        <>
+        <div className={fr.cx("fr-input-group")}>
+          <h2 className={fr.cx("fr-text--lead")}>
+            Qui répondra aux demandes des candidats ?
+          </h2>
+          {mode === "create" && (
+            <>
+              <Input
+                label={"Prénom du référent"}
+                hintText={
+                  "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+                }
+                disabled
+                nativeInputProps={{
+                  value: federatedIdentity?.firstName,
+                  id: domElementIds.establishment[mode].businessContact
+                    .firstName,
+                }}
+              />
+              <Input
+                label={"Nom du référent"}
+                hintText={
+                  "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+                }
+                disabled
+                nativeInputProps={{
+                  value: federatedIdentity?.lastName,
+                  id: domElementIds.establishment[mode].businessContact
+                    .lastName,
+                }}
+              />
+            </>
+          )}
           <Input
-            label={"Prénom du référent"}
+            label={"Email du référent"}
             hintText={
               "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
             }
-            disabled
+            disabled={mode === "create"}
             nativeInputProps={{
-              value: federatedIdentity?.firstName,
-              id: domElementIds.establishment[mode].businessContact.firstName,
+              ...register("userRights.0.email"),
+              value: getValues("userRights.0.email"),
+              id: domElementIds.establishment[mode].businessContact.email,
             }}
           />
           <Input
-            label={"Nom du référent"}
-            hintText={
-              "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
-            }
-            disabled
+            label={formContents["userRights.0.job"].label}
+            hintText={formContents["userRights.0.job"].hintText}
             nativeInputProps={{
-              value: federatedIdentity?.lastName,
-              id: domElementIds.establishment[mode].businessContact.lastName,
+              ...formContents["userRights.0.job"],
+              ...register("userRights.0.job"),
+              defaultValue: getValues("userRights.0.job"),
+              id: domElementIds.establishment[mode].businessContact.job,
             }}
+            {...getFieldError("userRights.0.job")}
           />
-        </>
-      )}
-      <Input
-        label={"Email du référent"}
-        hintText={
-          "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
-        }
-        disabled={mode === "create"}
-        nativeInputProps={{
-          ...register("userRights.0.email"),
-          value: getValues("userRights.0.email"),
-          id: domElementIds.establishment[mode].businessContact.email,
-        }}
-      />
-      <Input
-        label={formContents["userRights.0.job"].label}
-        hintText={formContents["userRights.0.job"].hintText}
-        nativeInputProps={{
-          ...formContents["userRights.0.job"],
-          ...register("userRights.0.job"),
-          defaultValue: getValues("userRights.0.job"),
-          id: domElementIds.establishment[mode].businessContact.job,
-        }}
-        {...getFieldError("userRights.0.job")}
-      />
-      <Input
-        label={formContents["userRights.0.phone"].label}
-        hintText={formContents["userRights.0.phone"].hintText}
-        nativeInputProps={{
-          ...formContents["userRights.0.phone"],
-          ...register("userRights.0.phone"),
-          defaultValue: getValues("userRights.0.phone"),
-          id: domElementIds.establishment[mode].businessContact.phone,
-        }}
-        {...getFieldError("userRights.0.phone")}
-      />
+          <Input
+            label={formContents["userRights.0.phone"].label}
+            hintText={formContents["userRights.0.phone"].hintText}
+            nativeInputProps={{
+              ...formContents["userRights.0.phone"],
+              ...register("userRights.0.phone"),
+              defaultValue: getValues("userRights.0.phone"),
+              id: domElementIds.establishment[mode].businessContact.phone,
+            }}
+            {...getFieldError("userRights.0.phone")}
+          />
 
-      <MultipleEmailsInput
-        {...formContents.userRights}
-        valuesInList={establishmentContactsEmails}
-        initialValue={establishmentContactsEmails.join(", ")}
-        setValues={(newValues) => {
-          setValue("userRights", [
-            ...establishmentAdminsRights,
-            ...newValues.map(
-              (email) =>
-                ({
-                  email,
-                  role: "establishment-contact",
-                }) satisfies ContactFormEstablishmentUserRight,
-            ),
-          ]);
-        }}
-        validationSchema={emailSchema}
-      />
+          <MultipleEmailsInput
+            {...formContents.userRights}
+            valuesInList={establishmentContactsEmails}
+            initialValue={establishmentContactsEmails.join(", ")}
+            setValues={(newValues) => {
+              setValue("userRights", [
+                ...establishmentAdminsRights,
+                ...newValues.map(
+                  (email) =>
+                    ({
+                      email,
+                      role: "establishment-contact",
+                    }) satisfies ContactFormEstablishmentUserRight,
+                ),
+              ]);
+            }}
+            validationSchema={emailSchema}
+          />
+        </div>
+      )}
       <RadioButtons
         {...formContents.contactMethod}
         legend={formContents.contactMethod.label}
@@ -161,6 +167,6 @@ export const BusinessContact = ({
         options={preferredContactMethodOptions(register("contactMethod"))}
         {...getFieldError("contactMethod")}
       />
-    </div>
+    </>
   );
 };
