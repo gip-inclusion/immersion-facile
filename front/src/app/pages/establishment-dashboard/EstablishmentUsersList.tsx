@@ -8,14 +8,14 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type FormEstablishmentUserRight,
   domElementIds,
-  establishmentFormUserRightSchema,
   establishmentsRoles,
+  formEstablishmentUserRightSchema,
 } from "shared";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -48,58 +48,19 @@ export const EstablishmentUsersList = () => {
 
   const headers = ["Utilisateur", "Informations de contact", "Rôle", "Actions"];
 
-  const data = formEstablishment.userRights.map((userRight) => {
+  const data = formEstablishment.userRights.map((userRight, index) => {
     const isLastAdmin =
       userRight.role === "establishment-admin" &&
       formEstablishment.userRights.filter(
         (userRight) => userRight.role === "establishment-admin",
       ).length === 1;
     return [
-      userRight.email,
-      <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
-        <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
-        <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
-      </Fragment>,
-      <Badge
-        key={`${userRight.email}-${userRight.role}`}
-        small
-        className={fr.cx(
-          userRoleToDisplay[userRight.role].className,
-          "fr-mr-1w",
-        )}
-      >
-        {userRoleToDisplay[userRight.role].label}
-      </Badge>,
-      <ButtonsGroup
-        key={`${userRight.email}-${userRight.role}`}
-        inlineLayoutWhen="always"
-        buttonsSize="small"
-        buttons={[
-          {
-            children: "Modifier",
-            onClick: () => {
-              setEditingUserRight(userRight);
-              establishmentUsersEditModal.open();
-            },
-            priority: "secondary",
-            className: fr.cx("fr-mb-0"),
-            type: "button",
-          },
-          {
-            children: "Supprimer",
-            onClick: () => {
-              setEditingUserRight(userRight);
-              establishmentUsersDeleteModal.open();
-            },
-            priority: "secondary",
-            className: fr.cx("fr-mb-0"),
-            type: "button",
-            disabled: isLastAdmin,
-            title: isLastAdmin
-              ? "Vous devez avoir au moins un administrateur pour votre établissement."
-              : undefined,
-          },
-        ]}
+      <EstablishmentUserRow
+        key={userRight.email}
+        userRight={userRight}
+        isLastAdmin={isLastAdmin}
+        index={index}
+        setEditingUserRight={setEditingUserRight}
       />,
     ];
   });
@@ -131,7 +92,7 @@ export const EstablishmentUsersList = () => {
         </div>
       </div>
 
-      <Feedback topic={"establishment-dashboard-users-rights"} />
+      <Feedback topics={["establishment-dashboard-users-rights"]} />
 
       <Table
         fixed
@@ -255,7 +216,7 @@ const EstablishmentUsersEditForm = ({
   });
   const { register, handleSubmit, setValue, watch, reset } =
     useForm<FormEstablishmentUserRight>({
-      resolver: zodResolver(establishmentFormUserRightSchema),
+      resolver: zodResolver(formEstablishmentUserRightSchema),
       defaultValues: alreadyExistingUserRight ?? emptyValues.current,
     });
 
@@ -291,7 +252,7 @@ const EstablishmentUsersEditForm = ({
     <>
       {values.email && (
         <p>
-          Pour modifier le nom, prénom ou l’email, l'utilisateur doit passer par
+          Pour modifier le nom, prénom ou l'email, l'utilisateur doit passer par
           son compte ProConnect créé avec l'email :{" "}
           <strong>{values.email}</strong>
         </p>
@@ -351,4 +312,64 @@ const EstablishmentUsersEditForm = ({
       </form>
     </>
   );
+};
+
+const EstablishmentUserRow = ({
+  userRight,
+  isLastAdmin,
+  index,
+  setEditingUserRight,
+}: {
+  userRight: FormEstablishmentUserRight;
+  isLastAdmin: boolean;
+  index: number;
+  setEditingUserRight: (userRight: FormEstablishmentUserRight) => void;
+}): ReactNode => {
+  return [
+    userRight.email,
+    <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
+      <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
+      <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
+    </Fragment>,
+    <Badge
+      key={`${userRight.email}-${userRight.role}`}
+      small
+      className={fr.cx(userRoleToDisplay[userRight.role].className, "fr-mr-1w")}
+    >
+      {userRoleToDisplay[userRight.role].label}
+    </Badge>,
+    <ButtonsGroup
+      key={`${userRight.email}-${userRight.role}`}
+      inlineLayoutWhen="always"
+      buttonsSize="small"
+      buttons={[
+        {
+          children: "Modifier",
+          onClick: () => {
+            setEditingUserRight(userRight);
+            establishmentUsersEditModal.open();
+          },
+          priority: "secondary",
+          className: fr.cx("fr-mb-0"),
+          type: "button",
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
+        },
+        {
+          children: "Supprimer",
+          onClick: () => {
+            setEditingUserRight(userRight);
+            establishmentUsersDeleteModal.open();
+          },
+          priority: "secondary",
+          className: fr.cx("fr-mb-0"),
+          type: "button",
+          disabled: isLastAdmin,
+          title: isLastAdmin
+            ? "Vous devez avoir au moins un administrateur pour votre établissement."
+            : undefined,
+          id: `${domElementIds.establishmentDashboard.manageEstablishments.deleteUserButton}-${index}`,
+        },
+      ]}
+    />,
+  ];
 };

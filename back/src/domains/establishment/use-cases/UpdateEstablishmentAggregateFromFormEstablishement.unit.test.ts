@@ -662,6 +662,7 @@ describe("Update Establishment aggregate from form data", () => {
           [updatedEstablishmentAggregate],
         );
       });
+
       it("sends a notification to added and updated user & update formEstablishment and userRights on repository with a IC payload with user with establishment-admin rights", async () => {
         uow.userRepository.users = [inclusionConnectedUser];
         uuidGenerator.setNextUuids([
@@ -761,6 +762,7 @@ describe("Update Establishment aggregate from form data", () => {
           ],
         });
       });
+
       it("doesn't send any notification if userRight is not updated or deleted with a IC payload with user with establishment-admin rights", async () => {
         const establishmentContactUser = new UserBuilder()
           .withId("establishment-contact-user")

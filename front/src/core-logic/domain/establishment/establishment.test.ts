@@ -328,7 +328,10 @@ describe("Establishment", () => {
         undefined,
       );
       expectToEqual(establishmentSelectors.isLoading(store.getState()), false);
-
+      expectToEqual(
+        establishmentSelectors.formEstablishment(store.getState()),
+        editedEstablishment,
+      );
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
         "form-establishment": {
           on: "update",

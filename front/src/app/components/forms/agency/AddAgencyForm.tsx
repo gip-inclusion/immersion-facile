@@ -352,7 +352,7 @@ const AgencyForm = ({
 
                 <div className={fr.cx("fr-mt-4w")}>
                   <Button
-                    type="button"
+                    type="submit"
                     disabled={formState.isSubmitting}
                     nativeButtonProps={{
                       id: domElementIds.addAgency.submitButton,
