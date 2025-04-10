@@ -7,6 +7,7 @@ import {
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { fakeProConnectSiret } from "../../core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,
@@ -20,7 +21,10 @@ const johnBuilder = new InclusionConnectedUserBuilder()
   .withLastName("Lennon")
   .withEmail("john@mail.com")
   .withCreatedAt(new Date())
-  .withExternalId("john-external-id");
+  .withProConnectInfos({
+    externalId: "john-external-id",
+    siret: fakeProConnectSiret,
+  });
 
 const johnUser = johnBuilder.buildUser();
 const icJohn = johnBuilder.build();
@@ -31,7 +35,10 @@ const paulBuilder = new InclusionConnectedUserBuilder()
   .withLastName("McCartney")
   .withEmail("paul@mail.com")
   .withCreatedAt(new Date())
-  .withExternalId("paul-external-id");
+  .withProConnectInfos({
+    externalId: "paul-external-id",
+    siret: fakeProConnectSiret,
+  });
 
 const paulUser = paulBuilder.buildUser();
 const icPaul = paulBuilder.build();
@@ -42,14 +49,20 @@ const backOfficeUserBuilder = new InclusionConnectedUserBuilder()
   .withLastName("The Admin")
   .withEmail("jack.admin@mail.com")
   .withCreatedAt(new Date())
-  .withExternalId("jack-admin-external-id")
+  .withProConnectInfos({
+    externalId: "jack-admin-external-id",
+    siret: fakeProConnectSiret,
+  })
   .withIsAdmin(true);
 
 const backOfficeUser = backOfficeUserBuilder.buildUser();
 const icbackOffice = backOfficeUserBuilder.build();
 
 const notBackOfficeUserBuilder = new InclusionConnectedUserBuilder(icbackOffice)
-  .withExternalId("not-backoffice-admin")
+  .withProConnectInfos({
+    externalId: "not-backoffice-admin",
+    siret: fakeProConnectSiret,
+  })
   .withIsAdmin(false);
 const notBackOfficeUser = notBackOfficeUserBuilder.buildUser();
 const icNotBackOffice = notBackOfficeUserBuilder.build();
@@ -69,7 +82,10 @@ const agencyAdminUserBuilder = new InclusionConnectedUserBuilder()
   .withLastName("The agency Admin")
   .withEmail("jack.admin@mail.com")
   .withCreatedAt(new Date())
-  .withExternalId("jack-admin-external-id")
+  .withProConnectInfos({
+    externalId: "jack-admin-external-id",
+    siret: fakeProConnectSiret,
+  })
   .withAgencyRights([
     {
       agency: toAgencyDtoForAgencyUsersAndAdmins(agencyWithRefersTo, []),

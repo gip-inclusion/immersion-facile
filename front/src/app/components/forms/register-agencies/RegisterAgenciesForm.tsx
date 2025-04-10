@@ -28,10 +28,8 @@ import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnecte
 
 export const RegisterAgenciesForm = ({
   currentUser,
-  initialSiret,
 }: {
   currentUser: InclusionConnectedUser;
-  initialSiret?: SiretDto;
 }) => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<SiretDto | undefined>(undefined);
@@ -54,8 +52,8 @@ export const RegisterAgenciesForm = ({
     );
   };
 
-  if (inputValue === undefined && initialSiret) {
-    setInputValue(initialSiret);
+  if (inputValue === undefined && currentUser.proConnect) {
+    setInputValue(currentUser.proConnect.siret);
   }
 
   return (

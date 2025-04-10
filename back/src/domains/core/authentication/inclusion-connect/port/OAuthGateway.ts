@@ -3,6 +3,7 @@ import type {
   Email,
   ExternalId,
   IdToken,
+  SiretDto,
   WithIdToken,
   WithSourcePage,
 } from "shared";
@@ -19,7 +20,7 @@ export type GetAccessTokenPayload = {
   lastName: string;
   email: Email;
   structure_pe?: string;
-  siret?: string; // remove optional when inclusion connect is removed
+  siret: SiretDto;
 };
 
 export type GetAccessTokenResult = {

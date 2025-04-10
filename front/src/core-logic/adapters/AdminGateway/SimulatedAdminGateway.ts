@@ -97,7 +97,10 @@ export class SimulatedAdminGateway implements AdminGateway {
           lastName: "Sanfamille",
           agencyRights: [],
           dashboards: { agencies: {}, establishments: {} },
-          externalId: "fake-user-external-id-2",
+          proConnect: {
+            externalId: "fake-user-external-id-2",
+            siret: "00000000001234",
+          },
           createdAt: new Date().toISOString(),
         });
   }
@@ -126,7 +129,10 @@ export class SimulatedAdminGateway implements AdminGateway {
         lastName: "Bon",
         agencyRights: simulatedAgencyRights,
         dashboards: { agencies: {}, establishments: {} },
-        externalId: "fake-user-external-id-1",
+        proConnect: {
+          externalId: "fake-user-external-id-1",
+          siret: "00000000002222",
+        },
         createdAt: new Date().toISOString(),
       },
       {
@@ -136,7 +142,10 @@ export class SimulatedAdminGateway implements AdminGateway {
         lastName: "Sanfamille",
         agencyRights: [],
         dashboards: { agencies: {}, establishments: {} },
-        externalId: "fake-user-external-id-2",
+        proConnect: {
+          externalId: "fake-user-external-id-2",
+          siret: "00000000001111",
+        },
         createdAt: new Date().toISOString(),
       },
       {
@@ -158,7 +167,10 @@ export class SimulatedAdminGateway implements AdminGateway {
           },
         ],
         dashboards: { agencies: {}, establishments: {} },
-        externalId: "fake-user-in-error-external-id",
+        proConnect: {
+          externalId: "fake-user-in-error-external-id",
+          siret: "00000000003333",
+        },
         createdAt: new Date().toISOString(),
       },
     ] satisfies InclusionConnectedUser[]);
@@ -248,18 +260,24 @@ const simulatedUsers: UserInList[] = [
     email: "jerome@mail.com",
     firstName: "Jerome",
     lastName: "Yolo",
-    externalId: "external-id-1",
     createdAt: new Date().toISOString(),
     numberOfAgencies: 10,
+    proConnect: {
+      externalId: "external-id-1",
+      siret: "00000000001111",
+    },
   },
   {
     id: "fake-user-id-2",
     email: "john@mail.com",
     firstName: "john",
     lastName: "Lala",
-    externalId: "external-id-1",
     createdAt: new Date().toISOString(),
     numberOfAgencies: 3,
+    proConnect: {
+      externalId: "external-id-2",
+      siret: "00000000002222",
+    },
   },
 ];
 

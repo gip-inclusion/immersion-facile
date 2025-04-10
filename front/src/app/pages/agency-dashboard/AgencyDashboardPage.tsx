@@ -27,19 +27,18 @@ export const AgencyDashboardPage = ({
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
   );
-  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   const feedbackTopic: FeedbackTopic = "dashboard-agency-register-user";
 
   useEffect(() => {
-    if (federatedIdentity && federatedIdentity.provider === "connectedUser")
+    if (currentUser?.proConnect)
       dispatch(
         agenciesSlice.actions.fetchAgencyOptionsRequested({
-          siret: federatedIdentity.siret,
+          siret: currentUser.proConnect.siret,
           status: ["active", "from-api-PE"],
         }),
       );
-  }, [dispatch, federatedIdentity]);
+  }, [dispatch, currentUser]);
 
   return (
     <>
@@ -65,12 +64,11 @@ export const AgencyDashboardPage = ({
               );
             return (
               <>
-                {federatedIdentity &&
-                federatedIdentity.provider === "connectedUser" ? (
+                {currentUser.proConnect ? (
                   <strong className={fr.cx("fr-mt-4w", "fr-text--lead")}>
                     Bonjour {currentUser.firstName} {currentUser.lastName}, vous
-                    avez sélectionné le SIRET {federatedIdentity.siret} lors de
-                    la création de votre compte sur ProConnect
+                    avez sélectionné le SIRET {currentUser.proConnect.siret}{" "}
+                    lors de la création de votre compte sur ProConnect
                   </strong>
                 ) : (
                   <p>
@@ -81,13 +79,7 @@ export const AgencyDashboardPage = ({
                   </p>
                 )}
 
-                <RegisterAgenciesForm
-                  currentUser={currentUser}
-                  {...(federatedIdentity &&
-                  federatedIdentity.provider === "connectedUser"
-                    ? { initialSiret: federatedIdentity.siret }
-                    : {})}
-                />
+                <RegisterAgenciesForm currentUser={currentUser} />
               </>
             );
           },

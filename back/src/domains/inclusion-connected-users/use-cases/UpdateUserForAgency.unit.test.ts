@@ -171,7 +171,7 @@ describe("UpdateUserForAgency", () => {
         ...notAdminUser,
         id: "user-to-update",
         isBackofficeAdmin: false,
-        externalId: null,
+        proConnect: null,
       };
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
@@ -212,7 +212,7 @@ describe("UpdateUserForAgency", () => {
         email: "user-to-update@mail.fr",
         id: "user-to-update",
         isBackofficeAdmin: false,
-        externalId: null,
+        proConnect: null,
       };
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
@@ -297,7 +297,7 @@ describe("UpdateUserForAgency", () => {
     it("backoffice-admin can update the user email for a non ic user", async () => {
       const nonIcUser: User = {
         ...notAdminUser,
-        externalId: null,
+        proConnect: null,
       };
       uow.userRepository.users = [nonIcUser];
       uow.agencyRepository.agencies = [
@@ -324,7 +324,7 @@ describe("UpdateUserForAgency", () => {
     it("agency-admin can update the user email for a non ic user", async () => {
       const nonIcUser: User = {
         ...notAdminUser,
-        externalId: null,
+        proConnect: null,
       };
       uow.userRepository.users = [nonIcUser, agencyAdminUser];
       uow.agencyRepository.agencies = [
@@ -643,7 +643,7 @@ describe("UpdateUserForAgency", () => {
           id: "user1",
           email: "user1@email.com",
           createdAt: timeGateway.now().toISOString(),
-          externalId: null,
+          proConnect: null,
           lastName: "",
           firstName: "",
         };
@@ -684,7 +684,7 @@ describe("UpdateUserForAgency", () => {
         id: "user",
         email: "user1@email.com",
         createdAt: new Date().toISOString(),
-        externalId: null,
+        proConnect: null,
         lastName: "",
         firstName: "",
       };
@@ -692,7 +692,7 @@ describe("UpdateUserForAgency", () => {
         id: "validator-notified",
         email: "validator@email.com",
         createdAt: new Date().toISOString(),
-        externalId: null,
+        proConnect: null,
         lastName: "",
         firstName: "",
       };
@@ -731,7 +731,7 @@ describe("UpdateUserForAgency", () => {
             id: "counsellor-not-notified",
             email: "counsellor@email.com",
             createdAt: timeGateway.now().toISOString(),
-            externalId: null,
+            proConnect: null,
             lastName: "",
             firstName: "",
           };
@@ -770,7 +770,7 @@ describe("UpdateUserForAgency", () => {
             id: "counsellor-not-notified",
             email: "counsellor@email.com",
             createdAt: timeGateway.now().toISOString(),
-            externalId: null,
+            proConnect: null,
             lastName: "",
             firstName: "",
           };
@@ -846,7 +846,7 @@ describe("UpdateUserForAgency", () => {
             id: "counsellor-not-notified",
             email: "counsellor@email.com",
             createdAt: timeGateway.now().toISOString(),
-            externalId: null,
+            proConnect: null,
             lastName: "",
             firstName: "",
           };
@@ -888,7 +888,7 @@ describe("UpdateUserForAgency", () => {
         id: "user1",
         email: "user1@email.com",
         createdAt: timeGateway.now().toISOString(),
-        externalId: null,
+        proConnect: null,
         lastName: "",
         firstName: "",
       };
@@ -896,7 +896,7 @@ describe("UpdateUserForAgency", () => {
         id: "user2",
         email: "user2@email.com",
         createdAt: timeGateway.now().toISOString(),
-        externalId: null,
+        proConnect: null,
         lastName: "",
         firstName: "",
       };
@@ -1013,7 +1013,7 @@ describe("UpdateUserForAgency", () => {
     it("backoffice-admin can update isNotifiedByEmail for another user", async () => {
       const nonIcUser: User = {
         ...notAdminUser,
-        externalId: null,
+        proConnect: null,
       };
       uow.userRepository.users = [nonIcUser, icAdmin];
       uow.agencyRepository.agencies = [
@@ -1045,7 +1045,7 @@ describe("UpdateUserForAgency", () => {
     it("agency-admin can update isNotifiedByEmail for another user", async () => {
       const nonIcUser: User = {
         ...notAdminUser,
-        externalId: null,
+        proConnect: null,
       };
       uow.userRepository.users = [nonIcUser, agencyAdminUser];
       uow.agencyRepository.agencies = [

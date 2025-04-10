@@ -95,7 +95,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
       },
     ],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-external-id-1",
+    proConnect: {
+      externalId: "fake-user-external-id-1",
+      siret: "00000000001111",
+    },
     createdAt: new Date().toISOString(),
   },
   {
@@ -105,7 +108,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
     lastName: "Sanfamille",
     agencyRights: [],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-external-id-2",
+    proConnect: {
+      externalId: "fake-user-external-id-2",
+      siret: "00000000002222",
+    },
     createdAt: new Date().toISOString(),
   },
   {
@@ -121,7 +127,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
       },
     ],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-in-error-external-id",
+    proConnect: {
+      externalId: "fake-user-in-error-external-id",
+      siret: "00000000006666",
+    },
     createdAt: new Date().toISOString(),
   },
 ];
@@ -163,7 +172,10 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           lastName: "Sanfamille",
           agencyRights: [],
           dashboards: { agencies: {}, establishments: {} },
-          externalId: "fake-user-external-id-2",
+          proConnect: {
+            externalId: "fake-user-external-id-2",
+            siret: "00000000002222",
+          },
           createdAt: new Date().toISOString(),
         });
   }

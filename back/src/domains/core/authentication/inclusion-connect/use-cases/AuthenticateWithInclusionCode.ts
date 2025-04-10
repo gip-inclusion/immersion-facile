@@ -3,8 +3,8 @@ import {
   type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
   TWELVE_HOURS_IN_SECONDS,
-  type User,
   type UserId,
+  type UserWithAdminRights,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
   errors,
@@ -126,7 +126,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: newOrUpdatedUser.firstName,
       lastName: newOrUpdatedUser.lastName,
       email: newOrUpdatedUser.email,
-      siret: accessToken.payload.siret,
       idToken: accessToken.idToken,
     })}`;
   }
@@ -134,7 +133,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   async #makeNewOrUpdatedUser(
     uow: UnitOfWork,
     payload: GetAccessTokenPayload,
-  ): Promise<User> {
+  ): Promise<UserWithAdminRights> {
     const [existingUserByExternalId, userWithSameEmail] = await Promise.all([
       uow.userRepository.findByExternalId(payload.sub),
       uow.userRepository.findByEmail(payload.email),
@@ -157,7 +156,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       firstName: payload.firstName,
       lastName: payload.lastName,
       email: payload.email,
-      externalId: payload.sub,
+      proConnect: {
+        externalId: payload.sub,
+        siret: payload.siret,
+      },
       id:
         existingUserByExternalId?.id ||
         userWithSameEmail?.id ||

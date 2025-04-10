@@ -15,6 +15,7 @@ import {
   adminRoutes,
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
+  defaultProConnectInfos,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
@@ -400,7 +401,7 @@ describe("Admin router", () => {
       email: "john@mail.com",
       firstName: "John",
       lastName: "Doe",
-      externalId: "john-external-id",
+      proConnect: defaultProConnectInfos,
       createdAt: new Date().toISOString(),
     };
 
@@ -468,7 +469,7 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 
@@ -557,7 +558,7 @@ describe("Admin router", () => {
           },
         ],
         dashboards: { agencies: {}, establishments: {} },
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 
@@ -596,7 +597,7 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        externalId: "john-external-id",
+        proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
 

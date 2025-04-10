@@ -13,6 +13,7 @@ import {
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import { PgUserRepository } from "./PgUserRepository";
+import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 
 describe("PgAuthenticatedUserRepository", () => {
   const userExternalId = "my-external-id";
@@ -22,7 +23,10 @@ describe("PgAuthenticatedUserRepository", () => {
     lastName: "Doe",
     firstName: "John",
     id: "11111111-1111-1111-1111-111111111111",
-    externalId: userExternalId,
+    proConnect: {
+      externalId: userExternalId,
+      siret: fakeProConnectSiret,
+    },
     createdAt: createdAt,
   };
 
@@ -31,7 +35,10 @@ describe("PgAuthenticatedUserRepository", () => {
     firstName: "John",
     lastName: "Doe",
     email: "john.doe@mail.com",
-    externalId: "john-external-id",
+    proConnect: {
+      externalId: "john-external-id",
+      siret: fakeProConnectSiret,
+    },
     createdAt: new Date().toISOString(),
   };
 
@@ -40,7 +47,10 @@ describe("PgAuthenticatedUserRepository", () => {
     firstName: "Jane",
     lastName: "Da",
     email: "jane.da@mail.com",
-    externalId: "jane-external-id",
+    proConnect: {
+      externalId: "jane-external-id",
+      siret: fakeProConnectSiret,
+    },
     createdAt: new Date().toISOString(),
   };
 
@@ -78,7 +88,10 @@ describe("PgAuthenticatedUserRepository", () => {
           email: "updated-mail@mail.com",
           lastName: "Dodo",
           firstName: "Johnny",
-          externalId: userExternalId,
+          proConnect: {
+            externalId: userExternalId,
+            siret: fakeProConnectSiret,
+          },
           createdAt,
         };
         await userRepository.save(updatedUser);
@@ -93,7 +106,6 @@ describe("PgAuthenticatedUserRepository", () => {
           ...user,
           firstName: "",
           lastName: "",
-          externalId: null,
         };
         await userRepository.save(userNotIcConnected);
         expectToEqual(await userRepository.getAllUsers(), [userNotIcConnected]);
@@ -220,16 +232,15 @@ describe("PgAuthenticatedUserRepository", () => {
           ...user,
           firstName: "",
           lastName: "",
-          externalId: null,
+          proConnect: null,
         };
 
         await insertUser(db, user1, true);
         await insertUser(db, user2, false);
         await insertUser(db, userNotIcConnected, false);
 
-        const users = await userRepository.getUsers({ emailContains: "j" });
-        expectToEqual(users, [
-          { ...user2, externalId: null },
+        expectToEqual(await userRepository.getUsers({ emailContains: "j" }), [
+          { ...user2, proConnect: null },
           userNotIcConnected,
           user1,
         ]);
@@ -267,13 +278,9 @@ describe("PgAuthenticatedUserRepository", () => {
 
 const insertUser = async (
   db: KyselyDb,
-  { id, email, firstName, lastName, externalId, createdAt }: User,
+  { id, email, firstName, lastName, proConnect, createdAt }: User,
   isProConnected: boolean,
 ) => {
-  const proConnectProvider = isProConnected
-    ? { pro_connect_sub: externalId }
-    : {};
-
   await db
     .insertInto("users")
     .values({
@@ -282,7 +289,12 @@ const insertUser = async (
       first_name: firstName,
       last_name: lastName,
       created_at: createdAt,
-      ...proConnectProvider,
+      ...(isProConnected
+        ? {
+            pro_connect_sub: proConnect?.externalId,
+            pro_connect_siret: proConnect?.siret,
+          }
+        : {}),
     })
     .execute();
 };

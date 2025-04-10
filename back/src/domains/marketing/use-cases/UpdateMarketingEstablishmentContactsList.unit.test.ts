@@ -3,6 +3,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   UserBuilder,
+  defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -286,7 +287,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
 
     it("Update has ic user property when establishment in repo", async () => {
       uow.userRepository.users = [
-        new UserBuilder(userMarketingContact).withExternalId("id").build(),
+        new UserBuilder(userMarketingContact)
+          .withProConnectInfos(defaultProConnectInfos)
+          .build(),
       ];
 
       await updateMarketingEstablishmentContactList.execute({

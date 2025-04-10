@@ -95,7 +95,6 @@ export const ConnectedPrivateRoute = ({
       firstName = "",
       lastName = "",
       idToken = "",
-      siret = "",
     } = route.params;
 
     if (token) {
@@ -108,7 +107,6 @@ export const ConnectedPrivateRoute = ({
             lastName,
             firstName,
             idToken,
-            siret,
           },
           feedbackTopic: "auth-global",
         }),

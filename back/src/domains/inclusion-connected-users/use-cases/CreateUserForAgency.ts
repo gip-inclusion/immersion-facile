@@ -6,6 +6,7 @@ import {
   errors,
   userParamsForAgencySchema,
 } from "shared";
+import { getAgencyRightByUserId } from "../../../utils/agency";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
@@ -13,7 +14,6 @@ import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
-import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
@@ -44,7 +44,11 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
         role: "validator",
       });
 
-    const user = await getUserIdAndCreateIfMissing(uow, inputParams, deps);
+    const user = await getUserByEmailAndCreateIfMissing(
+      uow,
+      deps.timeGateway,
+      inputParams,
+    );
 
     const isUserAlreadyLinkedToAgency = keys(agency.usersRights).some(
       (id) => id === user.id,
@@ -77,31 +81,30 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       ),
     ]);
 
-    return getIcUserByUserId(
-      uow,
-      user.id,
-      deps.dashboardGateway,
-      deps.timeGateway,
-    );
+    return {
+      ...user,
+      agencyRights: await getAgencyRightByUserId(uow, user.id),
+      dashboards: { agencies: {}, establishments: {} },
+    };
   },
 );
 
-const getUserIdAndCreateIfMissing = async (
+const getUserByEmailAndCreateIfMissing = async (
   uow: UnitOfWork,
+  timeGateway: TimeGateway,
   inputParams: UserParamsForAgency,
-  deps: { timeGateway: TimeGateway; createNewEvent: CreateNewEvent },
-): Promise<User> => {
-  const existingUser = await uow.userRepository.findByEmail(inputParams.email);
-  if (existingUser) return existingUser;
-
-  const newUser: User = {
-    id: inputParams.userId,
+): Promise<User> =>
+  (await uow.userRepository.findByEmail(inputParams.email)) ||
+  (await saveAndProvideNewUser(uow, {
+    id: inputParams.userId, //Cet id provient du front. Comment le front le génère? Pourquoi on le gènere pas dans le back vu qu'on check l'existance par email?
     email: inputParams.email,
-    createdAt: deps.timeGateway.now().toISOString(),
+    createdAt: timeGateway.now().toISOString(),
     firstName: emptyName,
     lastName: emptyName,
-    externalId: null,
-  };
+    proConnect: null,
+  }));
+
+const saveAndProvideNewUser = async (uow: UnitOfWork, newUser: User) => {
   await uow.userRepository.save(newUser);
   return newUser;
 };

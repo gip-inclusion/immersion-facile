@@ -46,7 +46,10 @@ const user1: NormalizedInclusionConnectedUser = {
     },
   },
   dashboards: { agencies: {}, establishments: {} },
-  externalId: "fake-user-external-id-1",
+  proConnect: {
+    externalId: "fake-user-external-id-1",
+    siret: "00000000001111",
+  },
   createdAt: new Date().toISOString(),
 };
 
@@ -63,7 +66,10 @@ const user2: NormalizedInclusionConnectedUser = {
     },
   },
   dashboards: { agencies: {}, establishments: {} },
-  externalId: "fake-user-in-error-external-id",
+  proConnect: {
+    externalId: "fake-user-in-error-external-id",
+    siret: "00000000000000",
+  },
   createdAt: new Date().toISOString(),
 };
 
@@ -313,7 +319,7 @@ describe("fetchAgency", () => {
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          externalId: null,
+          proConnect: null,
           createdAt: new Date().toISOString(),
           agencyRights: {
             [agencyDto.id]: agencyRight,
@@ -377,17 +383,12 @@ describe("fetchAgency", () => {
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          externalId: null,
+          proConnect: null,
           createdAt: new Date().toISOString(),
           agencyRights: {
             [agencyDto.id]: agencyRight,
           },
           dashboards: { agencies: {}, establishments: {} },
-        };
-
-        const icUser: InclusionConnectedUser = {
-          ...userToCreate,
-          agencyRights: [agencyRight],
         };
 
         store.dispatch(
@@ -401,6 +402,11 @@ describe("fetchAgency", () => {
             feedbackTopic: "agency-user-for-dashboard",
           }),
         );
+
+        const icUser: InclusionConnectedUser = {
+          ...userToCreate,
+          agencyRights: [agencyRight],
+        };
 
         dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
 

@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   type User,
+  defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
 } from "shared";
@@ -26,7 +27,7 @@ const user: User = {
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
-  externalId: "john-external-id",
+  proConnect: defaultProConnectInfos,
   createdAt: new Date().toISOString(),
 };
 
