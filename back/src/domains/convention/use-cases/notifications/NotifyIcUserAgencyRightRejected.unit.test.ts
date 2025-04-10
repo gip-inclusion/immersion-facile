@@ -26,7 +26,7 @@ const user: User = {
   email: "john@mail.com",
   firstName: "John",
   lastName: "Lennon",
-  externalId: "john-external-id",
+  // externalId: "john-external-id",
   createdAt: new Date().toISOString(),
 };
 

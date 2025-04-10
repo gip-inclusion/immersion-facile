@@ -3,9 +3,11 @@ import {
   type InclusionConnectedUser,
   type User,
   type UserParamsForAgency,
+  type UserWithAgencyRights,
   errors,
   userParamsForAgencySchema,
 } from "shared";
+import { getAgencyRightByUserId } from "../../../utils/agency";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
@@ -13,13 +15,12 @@ import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
-import { getIcUserByUserId } from "../helpers/inclusionConnectedUser.helper";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
 export const makeCreateUserForAgency = createTransactionalUseCase<
   UserParamsForAgency,
-  InclusionConnectedUser,
+  UserWithAgencyRights,
   InclusionConnectedUser,
   {
     timeGateway: TimeGateway;
@@ -77,12 +78,10 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       ),
     ]);
 
-    return getIcUserByUserId(
-      uow,
-      user.id,
-      deps.dashboardGateway,
-      deps.timeGateway,
-    );
+    return {
+      ...user,
+      agencyRights: await getAgencyRightByUserId(uow, user.id),
+    };
   },
 );
 
@@ -100,7 +99,6 @@ const getUserIdAndCreateIfMissing = async (
     createdAt: deps.timeGateway.now().toISOString(),
     firstName: emptyName,
     lastName: emptyName,
-    externalId: null,
   };
   await uow.userRepository.save(newUser);
   return newUser;

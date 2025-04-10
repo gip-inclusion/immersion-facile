@@ -15,6 +15,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
+import { fakeProConnectSiret } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -34,7 +35,9 @@ describe("Delete establishment", () => {
     userId: backofficeAdminUser.id,
   };
 
-  const user = new UserBuilder().build();
+  const user = new UserBuilder()
+    .withProConnect({ externalId: "osef", siret: fakeProConnectSiret })
+    .build();
 
   const establishmentAggregate = new EstablishmentAggregateBuilder()
     .withUserRights([

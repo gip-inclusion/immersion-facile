@@ -18,7 +18,10 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { fakeProviderConfig } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
+import {
+  fakeProConnectSiret,
+  fakeProviderConfig,
+} from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { UuidGenerator } from "../../../../domains/core/uuid-generator/ports/UuidGenerator";
@@ -119,6 +122,7 @@ describe("inclusion connection flow", () => {
             lastName: "jean",
             nonce,
             sub: "osef",
+            siret: fakeProConnectSiret,
           },
         });
         const response = await httpClient.afterLoginRedirection({
@@ -170,6 +174,7 @@ describe("inclusion connection flow", () => {
           lastName: "jean",
           nonce,
           structure_pe: codeSafir,
+          siret: fakeProConnectSiret,
           sub,
         },
       });

@@ -4,9 +4,9 @@ import { map, switchMap } from "rxjs/operators";
 import type {
   AgencyId,
   AgencyRight,
-  InclusionConnectedUser,
   RejectIcUserRoleForAgencyParams,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithUserFilters,
 } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
@@ -223,7 +223,7 @@ const fetchInclusionConnectedUserOnAgencyUpdateEpic: AppEpic<
   );
 
 export const normalizeUsers = (
-  users: InclusionConnectedUser[],
+  users: UserWithAgencyRights[],
 ): NormalizedIcUserById =>
   users.reduce(
     (acc, user) => ({

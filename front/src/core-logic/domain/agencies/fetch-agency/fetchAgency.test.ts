@@ -3,7 +3,7 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyRight,
-  type InclusionConnectedUser,
+  type UserWithAgencyRights,
   expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
@@ -45,8 +45,10 @@ const user1: NormalizedInclusionConnectedUser = {
       roles: ["agency-admin"],
     },
   },
-  dashboards: { agencies: {}, establishments: {} },
-  externalId: "fake-user-external-id-1",
+  proConnect: {
+    externalId: "fake-user-external-id-1",
+    siret: "00000000001111",
+  },
   createdAt: new Date().toISOString(),
 };
 
@@ -62,8 +64,10 @@ const user2: NormalizedInclusionConnectedUser = {
       roles: ["agency-admin"],
     },
   },
-  dashboards: { agencies: {}, establishments: {} },
-  externalId: "fake-user-in-error-external-id",
+  proConnect: {
+    externalId: "fake-user-in-error-external-id",
+    siret: "00000000000000",
+  },
   createdAt: new Date().toISOString(),
 };
 
@@ -313,15 +317,17 @@ describe("fetchAgency", () => {
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          externalId: null,
+          proConnect: {
+            externalId: "osef",
+            siret: "osef",
+          },
           createdAt: new Date().toISOString(),
           agencyRights: {
             [agencyDto.id]: agencyRight,
           },
-          dashboards: { agencies: {}, establishments: {} },
         };
 
-        const icUser: InclusionConnectedUser = {
+        const icUser: UserWithAgencyRights = {
           ...userToCreate,
           agencyRights: [agencyRight],
         };
@@ -377,15 +383,17 @@ describe("fetchAgency", () => {
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
           lastName: "fake-last-name",
-          externalId: null,
+          proConnect: {
+            externalId: "osef",
+            siret: "osef",
+          },
           createdAt: new Date().toISOString(),
           agencyRights: {
             [agencyDto.id]: agencyRight,
           },
-          dashboards: { agencies: {}, establishments: {} },
         };
 
-        const icUser: InclusionConnectedUser = {
+        const icUser: UserWithAgencyRights = {
           ...userToCreate,
           agencyRights: [agencyRight],
         };

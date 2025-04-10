@@ -35,7 +35,7 @@ describe("Get Convention", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    externalId: "john-external-id",
+    // externalId: "john-external-id",
     createdAt: new Date().toISOString(),
   };
   const establishmentRep: User = {
@@ -43,7 +43,7 @@ describe("Get Convention", () => {
     email: "estabrep@mail.com",
     firstName: "John",
     lastName: "Doe",
-    externalId: "john-external-id",
+    // externalId: "john-external-id",
     createdAt: new Date().toISOString(),
   };
   const tutor: User = {
@@ -51,7 +51,7 @@ describe("Get Convention", () => {
     email: "tutor@email.com",
     firstName: "John",
     lastName: "Doe",
-    externalId: "john-tutor-external-id",
+    // externalId: "john-tutor-external-id",
     createdAt: new Date().toISOString(),
   };
 

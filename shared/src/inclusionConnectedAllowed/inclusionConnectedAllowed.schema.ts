@@ -17,6 +17,7 @@ import {
   type User,
   type UserId,
   type UserInList,
+  type UserWithAgencyRights,
   type WithAgencyDashboards,
   type WithDiscussionId,
   type WithEstablishmentDashboards,
@@ -77,13 +78,18 @@ const dashboardsSchema: z.Schema<
   }),
 });
 
+const proConnectSchema = z.object({
+  externalId: zStringCanBeEmpty, // Si proConnecté et donc externalId fourni, alors pourquoi chaine vide?
+  siret: siretSchema,
+});
+
 const userSchema: z.Schema<User> = z.object({
   id: userIdSchema,
   email: emailSchema,
   createdAt: dateTimeIsoStringSchema,
   firstName: zStringCanBeEmpty,
   lastName: zStringCanBeEmpty,
-  externalId: zStringCanBeEmpty.or(z.null()),
+  proConnect: proConnectSchema.optional(),
 });
 
 export const userInListSchema: z.Schema<UserInList> = userSchema.and(
@@ -92,8 +98,11 @@ export const userInListSchema: z.Schema<UserInList> = userSchema.and(
   }),
 );
 
+export const userWithAgencyRightsSchema: z.Schema<UserWithAgencyRights> =
+  userSchema.and(z.object({ agencyRights: z.array(agencyRightSchema) }));
+
 export const inclusionConnectedUserSchema: z.Schema<InclusionConnectedUser> =
-  userSchema.and(
+  userSchema.and(z.object({ proConnect: proConnectSchema })).and(
     z.object({
       agencyRights: z.array(agencyRightSchema),
       dashboards: dashboardsSchema,

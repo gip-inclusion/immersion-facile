@@ -4,6 +4,7 @@ import {
   DiscussionBuilder,
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
+  type ProConnectInfos,
   type User,
   currentJwtVersions,
   displayRouteName,
@@ -22,6 +23,7 @@ import type { SuperTest, Test } from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { Gateways } from "../../../../config/bootstrap/createGateways";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { fakeProConnectSiret } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
@@ -33,12 +35,16 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 describe("InclusionConnectedAllowedRoutes", () => {
   const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
   const agencyForUsers = toAgencyDtoForAgencyUsersAndAdmins(agency, []);
+  const proConnectInfos: ProConnectInfos = {
+    externalId: "joe-external-id",
+    siret: fakeProConnectSiret,
+  };
   const agencyUser: User = {
     id: "123",
     email: "joe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
-    externalId: "joe-external-id",
+    proConnect: proConnectInfos,
     createdAt: new Date().toISOString(),
   };
 
@@ -97,6 +103,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       expectHttpResponseToEqual(response, {
         body: {
           ...agencyUser,
+          proConnect: proConnectInfos,
           dashboards: {
             agencies: {
               agencyDashboardUrl: `http://stubAgencyUserDashboard/${
@@ -295,8 +302,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        externalId: "joe-external-id",
         createdAt: new Date().toISOString(),
+        proConnect: proConnectInfos,
       };
       const token = generateInclusionConnectJwt({
         userId: user.id,
@@ -340,8 +347,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
         email: "joe@mail.com",
         firstName: "Joe",
         lastName: "Doe",
-        externalId: "joe-external-id",
         createdAt: new Date().toISOString(),
+        proConnect: proConnectInfos,
       };
       const convention = new ConventionDtoBuilder()
         .withId(conventionId)
@@ -421,7 +428,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             provider: "proConnect",
             state,
             nonce: "fake-nonce",
-            externalId: agencyUser.externalId ?? undefined,
+            externalId: agencyUser.proConnect?.externalId ?? undefined,
           },
         ];
 
@@ -458,8 +465,8 @@ describe("InclusionConnectedAllowedRoutes", () => {
           email: "user@mail.com",
           firstName: "User",
           lastName: "Name",
-          externalId: "user-external-id",
           createdAt: new Date().toISOString(),
+          proConnect: proConnectInfos,
         };
         const discussion = new DiscussionBuilder()
           .withEstablishmentContact(user)

@@ -27,7 +27,6 @@ describe("RemoveUserFromAgency", () => {
     email: "fake-email@mail.com",
     firstName: "fake-first-name",
     lastName: "fake-last-name",
-    externalId: null,
     createdAt: new Date().toISOString(),
     agencyRights: {},
     dashboards: { agencies: {}, establishments: {} },

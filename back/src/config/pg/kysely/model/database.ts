@@ -5,6 +5,7 @@ import type {
   DateTimeIsoString,
   DiscussionStatus,
   Email,
+  SiretDto,
 } from "shared";
 import type { SubscriberErrorFeedback } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
 import type {
@@ -345,6 +346,7 @@ interface Users {
   created_at: Generated<string>;
   updated_at: Generated<Timestamp>;
   pro_connect_sub: string | null;
+  pro_connect_siret: SiretDto | null;
 }
 
 interface OngoingOauths {

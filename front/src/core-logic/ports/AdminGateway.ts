@@ -15,6 +15,7 @@ import type {
   UserId,
   UserInList,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
@@ -28,7 +29,7 @@ export interface AdminGateway {
   createUserForAgency$(
     params: UserParamsForAgency,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser>;
+  ): Observable<UserWithAgencyRights>;
 
   getDashboardUrl$: (
     params: GetDashboardParams,
@@ -37,7 +38,7 @@ export interface AdminGateway {
   getInclusionConnectedUsersToReview$: (
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ) => Observable<InclusionConnectedUser[]>;
+  ) => Observable<UserWithAgencyRights[]>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
     adminToken: ConnectedUserJwt,

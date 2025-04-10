@@ -1,8 +1,10 @@
 import type {
   AgencyId,
   Email,
+  ExternalId,
   GetUsersFilters,
   InclusionConnectedUser,
+  SiretDto,
   User,
   UserId,
   WithAgencyRole,
@@ -20,7 +22,10 @@ export type InclusionConnectedUserWithoutRights = Omit<
   "agencyRights"
 >;
 
-export type UserOnRepository = User & WithIsBackOfficeAdmin;
+export type UserOnRepository = User &
+  WithIsBackOfficeAdmin & {
+    proConnect?: { siret: SiretDto; externalId: ExternalId };
+  };
 
 export interface UserRepository {
   save(user: UserOnRepository): Promise<void>;

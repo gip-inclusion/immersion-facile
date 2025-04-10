@@ -37,9 +37,8 @@ export type User = {
   email: Email;
   firstName: string;
   lastName: string;
-  externalId: ExternalId | null;
   createdAt: DateTimeIsoString;
-};
+} & Partial<WithProConnectInfos>;
 
 export type UserWithAdminRights = User & WithIsBackOfficeAdmin;
 
@@ -102,7 +101,18 @@ export type UserWithRights = UserWithAgencyRights &
   WithEstablishments &
   WithIsBackOfficeAdmin;
 
-export type InclusionConnectedUser = UserWithRights & WithDashboards;
+export type ProConnectInfos = {
+  externalId: ExternalId;
+  siret: SiretDto;
+};
+
+type WithProConnectInfos = {
+  proConnect: ProConnectInfos;
+};
+
+export type InclusionConnectedUser = UserWithRights &
+  WithDashboards &
+  WithProConnectInfos;
 
 export type WithOptionalUserId = {
   userId?: UserId;

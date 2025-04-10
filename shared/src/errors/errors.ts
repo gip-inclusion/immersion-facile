@@ -675,6 +675,10 @@ export const errors = {
       ),
     missingPreviousJwtPublicKey: () =>
       new Error("No deprecated JWT private key provided"),
+    missingProConnectInfos: (userId: UserId) =>
+      new BadRequestError(
+        `L'utilisateur '${userId}' n'a pas d'informations ProConnect.`,
+      ),
     notEnoughRightOnAgency: ({
       userId,
       agencyId,

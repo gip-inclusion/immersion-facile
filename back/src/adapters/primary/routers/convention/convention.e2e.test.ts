@@ -34,6 +34,7 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { match } from "ts-pattern";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { fakeProConnectSiret } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   type GenerateConventionJwt,
@@ -59,7 +60,10 @@ describe("convention e2e", () => {
     email: "my-user@email.com",
     firstName: "John",
     lastName: "Doe",
-    externalId: "john-external-id",
+    proConnect: {
+      externalId: "john-external-id",
+      siret: fakeProConnectSiret,
+    },
     createdAt: new Date().toISOString(),
   };
   const convention = new ConventionDtoBuilder()

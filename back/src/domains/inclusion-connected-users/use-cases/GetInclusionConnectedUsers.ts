@@ -1,5 +1,6 @@
 import {
   type InclusionConnectedUser,
+  type UserWithAgencyRights,
   type WithUserFilters,
   isWithAgencyId,
   withUserFiltersSchema,
@@ -14,7 +15,7 @@ import { getIcUsersByUserIds } from "../helpers/inclusionConnectedUser.helper";
 
 export class GetInclusionConnectedUsers extends TransactionalUseCase<
   WithUserFilters,
-  InclusionConnectedUser[],
+  UserWithAgencyRights[],
   InclusionConnectedUser
 > {
   protected inputSchema = withUserFiltersSchema;

@@ -400,8 +400,8 @@ describe("Admin router", () => {
       email: "john@mail.com",
       firstName: "John",
       lastName: "Doe",
-      externalId: "john-external-id",
       createdAt: new Date().toISOString(),
+      // externalId: "john-external-id",
     };
 
     it("201 - Updates role of user from 'to-review' to 'counsellor' with notification for given agency", async () => {
@@ -468,8 +468,8 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        externalId: "john-external-id",
         createdAt: new Date().toISOString(),
+        // externalId: "john-external-id",
       };
 
       inMemoryUow.userRepository.users = [
@@ -557,8 +557,11 @@ describe("Admin router", () => {
           },
         ],
         dashboards: { agencies: {}, establishments: {} },
-        externalId: "john-external-id",
         createdAt: new Date().toISOString(),
+        proConnect: {
+          externalId: "john-external-id",
+          siret: "00000000008888",
+        },
       };
 
       const updatedRole: AgencyRole = "counsellor";
@@ -596,7 +599,6 @@ describe("Admin router", () => {
         email: "john@mail.com",
         firstName: "John",
         lastName: "Doe",
-        externalId: "john-external-id",
         createdAt: new Date().toISOString(),
       };
 

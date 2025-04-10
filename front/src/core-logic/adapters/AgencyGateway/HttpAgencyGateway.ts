@@ -7,10 +7,10 @@ import type {
   AgencyRoutes,
   ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
+  UserWithAgencyRights,
   WithAgencyId,
   WithAgencyIdAndUserId,
 } from "shared";
@@ -41,7 +41,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     params: UserParamsForAgency,
     token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<UserWithAgencyRights> {
     return from(
       this.httpClient
         .createUserForAgency({
@@ -96,7 +96,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   getAgencyUsers$(
     agencyId: AgencyId,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<UserWithAgencyRights[]> {
     return from(
       this.httpClient
         .getAgencyUsersByAgencyId({

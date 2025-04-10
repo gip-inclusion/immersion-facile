@@ -15,6 +15,7 @@ import {
   type UserId,
   type UserInList,
   type UserParamsForAgency,
+  type UserWithAgencyRights,
   type WithAgencyIdAndUserId,
   type WithUserFilters,
   createApiConsumerParamsFromApiConsumer,
@@ -56,7 +57,7 @@ export class HttpAdminGateway implements AdminGateway {
   public createUserForAgency$(
     params: UserParamsForAgency,
     token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<UserWithAgencyRights> {
     return from(
       this.httpClient
         .createUserForAgency({
@@ -120,7 +121,7 @@ export class HttpAdminGateway implements AdminGateway {
   public getInclusionConnectedUsersToReview$(
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<UserWithAgencyRights[]> {
     return from(
       this.httpClient
         .getInclusionConnectedUsers({

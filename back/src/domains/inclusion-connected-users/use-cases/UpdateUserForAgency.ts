@@ -120,7 +120,7 @@ const rejectEmailModificationIfInclusionConnectedUser = (
   user: UserOnRepository,
   newEmail: Email,
 ): void => {
-  if (!newEmail || !user.externalId) return;
+  if (!newEmail || !user.proConnect?.externalId) return;
   if (user.email !== newEmail) {
     throw errors.user.forbiddenToChangeEmailForUIcUser();
   }
@@ -131,7 +131,7 @@ const updateIfUserEmailChanged = async (
   newEmail: Email,
   userRepository: UserRepository,
 ): Promise<void> => {
-  if (user.email === newEmail || user.externalId) return;
+  if (user.email === newEmail || user.proConnect?.externalId) return;
   await userRepository.updateEmail(user.id, newEmail);
 };
 

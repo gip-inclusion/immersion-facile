@@ -28,18 +28,19 @@ const createUserOnAgencyEpic: CreateUserOnAgencyEpic = (
       agencyGateway
         .createUserForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
-          map((user) =>
+          map((userWithAgencyRights) =>
             createUserOnAgencySlice.actions.createUserOnAgencySucceeded({
-              icUser: {
-                ...user,
-                agencyRights: user.agencyRights.reduce(
-                  (agenciesAcc, agencyRight) => ({
-                    ...agenciesAcc,
-                    [agencyRight.agency.id]: agencyRight,
-                  }),
-                  {},
-                ),
-              },
+              // icUser: {
+              //   ...user,
+              //   agencyRights: user.agencyRights.reduce(
+              //     (agenciesAcc, agencyRight) => ({
+              //       ...agenciesAcc,
+              //       [agencyRight.agency.id]: agencyRight,
+              //     }),
+              //     {},
+              //   ),
+              // },
+              user: userWithAgencyRights,
               agencyId: action.payload.agencyId,
               feedbackTopic: action.payload.feedbackTopic,
             }),

@@ -41,7 +41,7 @@ const defaultUser: User = {
   id: "my-user-id",
   firstName: "John",
   lastName: "Doe",
-  externalId: "my-external-id",
+  // externalId: "my-external-id",
   email: "john.doe@inclusion.com",
   createdAt: new Date().toISOString(),
 };

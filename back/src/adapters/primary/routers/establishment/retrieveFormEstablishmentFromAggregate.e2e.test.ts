@@ -18,6 +18,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
+import { fakeProConnectSiret } from "../../../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -46,6 +47,10 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
   const establishmentAdmin = new UserBuilder()
     .withEmail("boss@mail.com")
     .withId("estab.admin")
+    .withProConnect({
+      externalId: "osef",
+      siret: fakeProConnectSiret,
+    })
     .build();
   const establishmentContact = new UserBuilder()
     .withEmail("contact@mail.com")

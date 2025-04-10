@@ -12,6 +12,7 @@ import {
   type ListAgencyOptionsRequestDto,
   type UpdateAgencyStatusParams,
   type UserParamsForAgency,
+  type UserWithAgencyRights,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
   errors,
@@ -95,7 +96,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
       },
     ],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-external-id-1",
+    proConnect: {
+      externalId: "fake-user-external-id-1",
+      siret: "1",
+    },
     createdAt: new Date().toISOString(),
   },
   {
@@ -105,7 +109,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
     lastName: "Sanfamille",
     agencyRights: [],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-external-id-2",
+    proConnect: {
+      externalId: "fake-user-external-id-2",
+      siret: "2",
+    },
     createdAt: new Date().toISOString(),
   },
   {
@@ -121,7 +128,10 @@ const simulatedUsers: InclusionConnectedUser[] = [
       },
     ],
     dashboards: { agencies: {}, establishments: {} },
-    externalId: "fake-user-in-error-external-id",
+    proConnect: {
+      externalId: "fake-user-in-error-external-id",
+      siret: "666",
+    },
     createdAt: new Date().toISOString(),
   },
 ];
@@ -153,7 +163,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     { agencyId }: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<UserWithAgencyRights> {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of({
@@ -163,7 +173,10 @@ export class SimulatedAgencyGateway implements AgencyGateway {
           lastName: "Sanfamille",
           agencyRights: [],
           dashboards: { agencies: {}, establishments: {} },
-          externalId: "fake-user-external-id-2",
+          proConnect: {
+            externalId: "fake-user-external-id-2",
+            siret: "00000000002222",
+          },
           createdAt: new Date().toISOString(),
         });
   }
@@ -194,7 +207,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
   getAgencyUsers$(
     agencyId: AgencyId,
     _token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<UserWithAgencyRights[]> {
     return of(
       simulatedUsers.filter((user) =>
         user.agencyRights.some(

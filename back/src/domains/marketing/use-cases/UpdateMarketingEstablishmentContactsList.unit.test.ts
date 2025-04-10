@@ -286,7 +286,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
 
     it("Update has ic user property when establishment in repo", async () => {
       uow.userRepository.users = [
-        new UserBuilder(userMarketingContact).withExternalId("id").build(),
+        new UserBuilder(userMarketingContact)
+          .withProConnect({ externalId: "id", siret: "00000000007777" })
+          .build(),
       ];
 
       await updateMarketingEstablishmentContactList.execute({

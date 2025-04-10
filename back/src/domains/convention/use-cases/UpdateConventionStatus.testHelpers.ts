@@ -58,7 +58,7 @@ const icUserWithRoleBackofficeAdmin: UserOnRepository = {
   id: "icUserWithRoleBackofficeAdmin",
   firstName: "icUserWithRoleBackofficeAdmin",
   lastName: "BackofficeAdmin",
-  externalId: "icUserWithRoleBackOfficeAdmin-external-id",
+  // externalId: "icUserWithRoleBackOfficeAdmin-external-id",
   createdAt: new Date().toISOString(),
   isBackofficeAdmin: true,
 };
@@ -68,7 +68,7 @@ const icUserWithRoleToReview: UserOnRepository = {
   firstName: "icUserWithRoleToReview",
   id: "icUserWithRoleToReview",
   lastName: "ToReview",
-  externalId: "icUserWithRoleToReview-external-id",
+  // externalId: "icUserWithRoleToReview-external-id",
   createdAt: new Date().toISOString(),
 };
 const icUserWithRoleCounsellor: UserOnRepository = {
@@ -76,7 +76,7 @@ const icUserWithRoleCounsellor: UserOnRepository = {
   firstName: "icUserWithRoleCounsellor",
   id: "icUserWithRoleCounsellor",
   lastName: "Consellor",
-  externalId: "icUserWithRoleCounsellor-external-id",
+  // externalId: "icUserWithRoleCounsellor-external-id",
   createdAt: new Date().toISOString(),
 };
 
@@ -85,7 +85,7 @@ const icUserWithRoleValidator: UserOnRepository = {
   firstName: "icUserWithRoleValidator",
   id: "icUserWithRoleValidator",
   lastName: "Validator",
-  externalId: "icUserWithRoleValidator-external-id",
+  // externalId: "icUserWithRoleValidator-external-id",
   createdAt: new Date().toISOString(),
 };
 
@@ -94,7 +94,7 @@ const icUserWithRoleBackofficeAdminAndValidator: UserOnRepository = {
   firstName: "icUserWithRoleBackofficeAdminAndValidator",
   id: "icUserWithRoleBackofficeAdminAndValidator",
   lastName: "Validator",
-  externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
+  // externalId: "icUserWithRoleBackofficeAdminAndValidator-external-id",
   createdAt: new Date().toISOString(),
 };
 const icUserWithRoleAgencyAdmin: UserOnRepository = {
@@ -102,7 +102,7 @@ const icUserWithRoleAgencyAdmin: UserOnRepository = {
   firstName: "icUserWithRoleAgencyAdmin",
   id: "icUserWithRoleAgencyAdmin",
   lastName: "Owner",
-  externalId: "icUserWithRoleAgencyAdmin-external-id",
+  // externalId: "icUserWithRoleAgencyAdmin-external-id",
   createdAt: new Date().toISOString(),
 };
 const icUserWithRoleEstablishmentRepresentative: UserOnRepository = {
@@ -110,7 +110,7 @@ const icUserWithRoleEstablishmentRepresentative: UserOnRepository = {
   firstName: "icUserWithRoleEstablishmentRepresentativeFirstName",
   id: "icUserWithRoleEstablishmentRepresentative",
   lastName: "Owner",
-  externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
+  // externalId: "icUserWithRoleEstablishmentRepresentative-external-id",
   createdAt: new Date().toISOString(),
 };
 const makeUserIdMapInclusionConnectedUser: Record<

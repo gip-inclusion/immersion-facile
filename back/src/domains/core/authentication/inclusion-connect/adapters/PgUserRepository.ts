@@ -2,6 +2,7 @@ import { type SqlBool, sql } from "kysely";
 import {
   type Email,
   type GetUsersFilters,
+  type SiretDto,
   type User,
   type UserId,
   errors,
@@ -16,6 +17,7 @@ type PersistenceAuthenticatedUser = {
   first_name: string;
   last_name: string;
   external_id: string | null;
+  siret: SiretDto | null;
   created_at: string;
   isBackofficeAdmin: SqlBool;
 };
@@ -44,7 +46,7 @@ export class PgUserRepository implements UserRepository {
   }
 
   public async save(user: UserOnRepository): Promise<void> {
-    const { id, email, firstName, lastName, externalId, createdAt } = user;
+    const { id, email, firstName, lastName, createdAt, proConnect } = user;
 
     const existingUser = await this.#findById(id);
 
@@ -56,7 +58,7 @@ export class PgUserRepository implements UserRepository {
           email,
           first_name: firstName,
           last_name: lastName,
-          pro_connect_sub: externalId,
+          pro_connect_sub: proConnect?.externalId,
           created_at: createdAt,
         })
         .execute();
@@ -67,7 +69,7 @@ export class PgUserRepository implements UserRepository {
       existingUser.firstName === firstName &&
       existingUser.lastName === lastName &&
       existingUser.email === email &&
-      existingUser.externalId === externalId
+      existingUser.proConnect?.externalId === proConnect?.externalId
     )
       return;
 
@@ -77,7 +79,7 @@ export class PgUserRepository implements UserRepository {
         first_name: firstName,
         last_name: lastName,
         email,
-        pro_connect_sub: externalId,
+        pro_connect_sub: proConnect?.externalId,
         updated_at: sql`now()`,
       })
       .where("id", "=", id)
@@ -167,6 +169,7 @@ export class PgUserRepository implements UserRepository {
             "created_at",
           ),
         "pro_connect_sub as external_id",
+        "pro_connect_siret as siret",
         sql<SqlBool>`BOOL_OR(users_admins.user_id IS NOT NULL)`.as(
           "isBackofficeAdmin",
         ),
@@ -184,7 +187,14 @@ export class PgUserRepository implements UserRepository {
         email: raw.email,
         firstName: raw.first_name,
         lastName: raw.last_name,
-        externalId: raw.external_id,
+        ...(raw.external_id && raw.siret
+          ? {
+              proConnect: {
+                externalId: raw.external_id,
+                siret: raw.siret,
+              },
+            }
+          : {}),
         ...(raw.isBackofficeAdmin === true ? { isBackofficeAdmin: true } : {}),
         createdAt: new Date(raw.created_at).toISOString(),
       }
