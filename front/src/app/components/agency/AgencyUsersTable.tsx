@@ -6,8 +6,8 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
+import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { userRoleToDisplay } from "../../contents/userRoleToDisplay";
 
 type AgencyUsersTableProps = {
   agencyUsers: NormalizedInclusionConnectedUser[];
@@ -53,9 +53,12 @@ export const AgencyUsersTable = ({
             <Badge
               key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-${role}`}
               small
-              className={fr.cx(userRoleToDisplay[role].className, "fr-mr-1w")}
+              className={fr.cx(
+                agencyRolesToDisplay[role].className,
+                "fr-mr-1w",
+              )}
             >
-              {userRoleToDisplay[role].label}
+              {agencyRolesToDisplay[role].label}
             </Badge>
           );
         }),
