@@ -8,7 +8,7 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
-import { Fragment, type ReactNode, useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -16,6 +16,7 @@ import {
   domElementIds,
   establishmentsRoles,
   formEstablishmentUserRightSchema,
+  localization,
 } from "shared";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -54,15 +55,12 @@ export const EstablishmentUsersList = () => {
       formEstablishment.userRights.filter(
         (userRight) => userRight.role === "establishment-admin",
       ).length === 1;
-    return [
-      <EstablishmentUserRow
-        key={userRight.email}
-        userRight={userRight}
-        isLastAdmin={isLastAdmin}
-        index={index}
-        setEditingUserRight={setEditingUserRight}
-      />,
-    ];
+    return getEstablishmentUserRow({
+      userRight,
+      isLastAdmin,
+      index,
+      setEditingUserRight,
+    });
   });
   return (
     <div className="fr-mt-4w">
@@ -214,17 +212,30 @@ const EstablishmentUsersEditForm = ({
     job: "",
     role: undefined,
   });
-  const { register, handleSubmit, setValue, watch, reset } =
-    useForm<FormEstablishmentUserRight>({
-      resolver: zodResolver(formEstablishmentUserRightSchema),
-      defaultValues: alreadyExistingUserRight ?? emptyValues.current,
-    });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<FormEstablishmentUserRight>({
+    resolver: zodResolver(formEstablishmentUserRightSchema),
+    defaultValues: alreadyExistingUserRight ?? emptyValues.current,
+  });
 
   const mergeUserRights = (
     userRights: FormEstablishmentUserRight[],
     userRightToMerge: FormEstablishmentUserRight,
-  ) =>
-    uniqBy((userRight) => userRight.email, [userRightToMerge, ...userRights]);
+  ) => {
+    const userRightsWithoutPreviousOne = userRights.filter(
+      (userRight) => userRight.email !== userRightToMerge.email,
+    );
+    return uniqBy(
+      (userRight) => userRight.email,
+      [userRightToMerge, ...userRightsWithoutPreviousOne],
+    );
+  };
 
   const onSubmit = (data: FormEstablishmentUserRight) => {
     const updatedFormEstablishment = {
@@ -267,16 +278,24 @@ const EstablishmentUsersEditForm = ({
           />
         )}
         <Input
-          label="Téléphone"
+          label="Téléphone *"
           nativeInputProps={{
             ...register("phone"),
           }}
+          {...(errors.phone && {
+            state: "error",
+            errorMessage: localization.required,
+          })}
         />
         <Input
-          label="Fonction"
+          label="Fonction *"
           nativeInputProps={{
             ...register("job"),
           }}
+          {...(errors.job && {
+            state: "error",
+            errorMessage: localization.required,
+          })}
         />
         <RadioButtons
           legend="Rôle"
@@ -314,7 +333,7 @@ const EstablishmentUsersEditForm = ({
   );
 };
 
-const EstablishmentUserRow = ({
+const getEstablishmentUserRow = ({
   userRight,
   isLastAdmin,
   index,
@@ -324,55 +343,50 @@ const EstablishmentUserRow = ({
   isLastAdmin: boolean;
   index: number;
   setEditingUserRight: (userRight: FormEstablishmentUserRight) => void;
-}): ReactNode => {
-  return [
-    userRight.email,
-    <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
-      <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
-      <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
-    </Fragment>,
-    <Badge
-      key={`${userRight.email}-${userRight.role}`}
-      small
-      className={fr.cx(
-        userRolesToDisplay[userRight.role].className,
-        "fr-mr-1w",
-      )}
-    >
-      {userRolesToDisplay[userRight.role].label}
-    </Badge>,
-    <ButtonsGroup
-      key={`${userRight.email}-${userRight.role}`}
-      inlineLayoutWhen="always"
-      buttonsSize="small"
-      buttons={[
-        {
-          children: "Modifier",
-          onClick: () => {
-            setEditingUserRight(userRight);
-            establishmentUsersEditModal.open();
-          },
-          priority: "secondary",
-          className: fr.cx("fr-mb-0"),
-          type: "button",
-          id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
+}) => [
+  userRight.email,
+  <Fragment key={`${userRight.email}-${userRight.phone}-${userRight.job}`}>
+    <p className={fr.cx("fr-text--bold", "fr-text--sm")}>{userRight.job}</p>
+    <p className={fr.cx("fr-text--sm")}>{userRight.phone}</p>
+  </Fragment>,
+  <Badge
+    key={`${userRight.email}-${userRight.role}`}
+    small
+    className={fr.cx(userRolesToDisplay[userRight.role].className, "fr-mr-1w")}
+  >
+    {userRolesToDisplay[userRight.role].label}
+  </Badge>,
+  <ButtonsGroup
+    key={`${userRight.email}-${userRight.role}`}
+    inlineLayoutWhen="always"
+    buttonsSize="small"
+    buttons={[
+      {
+        children: "Modifier",
+        onClick: () => {
+          setEditingUserRight(userRight);
+          establishmentUsersEditModal.open();
         },
-        {
-          children: "Supprimer",
-          onClick: () => {
-            setEditingUserRight(userRight);
-            establishmentUsersDeleteModal.open();
-          },
-          priority: "secondary",
-          className: fr.cx("fr-mb-0"),
-          type: "button",
-          disabled: isLastAdmin,
-          title: isLastAdmin
-            ? "Vous devez avoir au moins un administrateur pour votre établissement."
-            : undefined,
-          id: `${domElementIds.establishmentDashboard.manageEstablishments.deleteUserButton}-${index}`,
+        priority: "secondary",
+        className: fr.cx("fr-mb-0"),
+        type: "button",
+        id: `${domElementIds.establishmentDashboard.manageEstablishments.editUserButton}-${index}`,
+      },
+      {
+        children: "Supprimer",
+        onClick: () => {
+          setEditingUserRight(userRight);
+          establishmentUsersDeleteModal.open();
         },
-      ]}
-    />,
-  ];
-};
+        priority: "secondary",
+        className: fr.cx("fr-mb-0"),
+        type: "button",
+        disabled: isLastAdmin,
+        title: isLastAdmin
+          ? "Vous devez avoir au moins un administrateur pour votre établissement."
+          : undefined,
+        id: `${domElementIds.establishmentDashboard.manageEstablishments.deleteUserButton}-${index}`,
+      },
+    ]}
+  />,
+];
