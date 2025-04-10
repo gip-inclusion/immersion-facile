@@ -13,7 +13,6 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
-  Loader,
 } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -25,6 +24,7 @@ import {
   type ConventionReadDto,
   type DotNestedKeys,
   type InternshipKind,
+  type Role,
   type WithEndedWithAJob,
   type WithEstablishmentComments,
   assessmentDtoSchema,
@@ -35,21 +35,21 @@ import {
   toDisplayedDate,
   typeOfContracts,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";
 
 type AssessmentFormProperties = {
   convention: ConventionReadDto;
   jwt: string;
+  currentUserRoles: Role[];
 };
 
 type FormAssessmentDto =
@@ -84,14 +84,11 @@ const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
 export const AssessmentForm = ({
   convention,
   jwt,
+  currentUserRoles,
 }: AssessmentFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
 
-  const isLoading = useAppSelector(assessmentSelectors.isLoading);
-  const currentAssessment = useAppSelector(
-    assessmentSelectors.currentAssessment,
-  );
   const initialValues: FormAssessmentDto = {
     conventionId: convention.id,
     establishmentFeedback: "",
@@ -131,81 +128,63 @@ export const AssessmentForm = ({
   };
   useScrollToTop(currentStep);
 
-  useEffect(() => {
-    dispatch(
-      assessmentSlice.actions.getAssessmentRequested({
-        conventionId: convention.id,
-        jwt,
-        feedbackTopic: "assessment",
-      }),
-    );
-  }, [dispatch, convention.id, jwt]);
-
   return (
     <>
-      {isLoading && <Loader />}
-      {currentAssessment && (
-        // @TODO: remove this when really use feedback slice for assessment
-        <Alert
-          severity="error"
-          title="Erreur"
-          description="Le bilan a déjà été rempli et ne peut être modifié."
-        />
-      )}
-      {!currentAssessment && (
-        <WithFeedbackReplacer
-          topic="assessment"
-          renderFeedback={() => (
+      <WithFeedbackReplacer
+        topic="assessment"
+        renderFeedback={({ level }) =>
+          level === "success" ? (
             <AssessmentSuccessMessage
               firstName={convention.signatories.beneficiary.firstName}
               lastName={convention.signatories.beneficiary.lastName}
+              currentUserRoles={currentUserRoles}
             />
-          )}
-        >
-          <>
-            <ImmersionDescription convention={convention} />
-            <FormProvider {...methods}>
-              <div className={fr.cx("fr-grid-row")}>
-                <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
-                  <Stepper
-                    currentStep={currentStep}
-                    stepCount={keys(steps).length}
-                    title={steps[currentStep].title}
-                    nextTitle={steps[currentStep].nextTitle}
-                  />
-                </div>
+          ) : (
+            <Feedback topics={["assessment"]} />
+          )
+        }
+      >
+        <>
+          <ImmersionDescription convention={convention} />
+          <FormProvider {...methods}>
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
+                <Stepper
+                  currentStep={currentStep}
+                  stepCount={keys(steps).length}
+                  title={steps[currentStep].title}
+                  nextTitle={steps[currentStep].nextTitle}
+                />
               </div>
+            </div>
 
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                id={domElementIds.assessment.form}
-                data-matomo-name={domElementIds.assessment.form}
-              >
-                {match(currentStep)
-                  .with(1, () => (
-                    <AssessmentStatusSection
-                      convention={convention}
-                      onStepChange={onStepChange}
-                    />
-                  ))
-                  .with(2, () => (
-                    <AssessmentContractSection onStepChange={onStepChange} />
-                  ))
-                  .with(3, () => (
-                    <AssessmentCommentsSection
-                      onStepChange={onStepChange}
-                      jobTitle={
-                        convention.immersionAppellation.appellationLabel
-                      }
-                      objective={convention.immersionObjective}
-                    />
-                  ))
-                  .exhaustive()}
-              </form>
-            </FormProvider>
-          </>
-        </WithFeedbackReplacer>
-      )}
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              id={domElementIds.assessment.form}
+              data-matomo-name={domElementIds.assessment.form}
+            >
+              {match(currentStep)
+                .with(1, () => (
+                  <AssessmentStatusSection
+                    convention={convention}
+                    onStepChange={onStepChange}
+                  />
+                ))
+                .with(2, () => (
+                  <AssessmentContractSection onStepChange={onStepChange} />
+                ))
+                .with(3, () => (
+                  <AssessmentCommentsSection
+                    onStepChange={onStepChange}
+                    jobTitle={convention.immersionAppellation.appellationLabel}
+                    objective={convention.immersionObjective}
+                  />
+                ))
+                .exhaustive()}
+            </form>
+          </FormProvider>
+        </>
+      </WithFeedbackReplacer>
     </>
   );
 };
@@ -606,9 +585,11 @@ const AssessmentCommentsSection = ({
 const AssessmentSuccessMessage = ({
   firstName,
   lastName,
+  currentUserRoles,
 }: {
   firstName: string;
   lastName: string;
+  currentUserRoles: Role[];
 }) => (
   <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
     <div
@@ -616,25 +597,39 @@ const AssessmentSuccessMessage = ({
       id={domElementIds.assessment.successMessage}
     >
       <h2>Merci d'avoir rempli le bilan !</h2>
+
       <p>
         Nous vous remercions d'avoir utilisé Immersion Facilitée pour
         accompagner {firstName} {lastName} dans son immersion. Votre implication
         contribue à améliorer notre site et à enrichir le dossier du candidat.
       </p>
-      <h3>Que faire ensuite ?</h3>
-      <p>
-        Maintenez à jour votre fiche entreprise afin de continuer à recevoir des
-        immersions.
-      </p>
-      <p>À bientôt sur Immersion Facilitée !</p>
-      <Button
-        priority="primary"
-        onClick={() => {
-          routes.establishmentDashboard().push();
-        }}
-      >
-        Accéder à ma fiche entreprise
-      </Button>
+      {currentUserRoles.includes("establishment-tutor") ? (
+        <>
+          <h3>Que faire ensuite ?</h3>
+          <p>
+            Maintenez à jour votre fiche entreprise afin de continuer à recevoir
+            des immersions.
+          </p>
+          <p>À bientôt sur Immersion Facilitée !</p>{" "}
+          <Button
+            priority="primary"
+            onClick={() => {
+              routes.establishmentDashboard().push();
+            }}
+          >
+            Accéder à ma fiche entreprise
+          </Button>
+        </>
+      ) : (
+        <Button
+          priority="primary"
+          onClick={() => {
+            routes.agencyDashboard().push();
+          }}
+        >
+          Accéder à mon espace prescripteur
+        </Button>
+      )}
     </div>
     <div
       className={fr.cx(
