@@ -558,7 +558,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -627,7 +627,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -690,7 +690,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -721,7 +721,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           ? toDisplayedDate({
               date: new Date(signedAt),
               withHours: true,
-              showGMT: true,
             })
           : "DATE INVALIDE"
       }.
@@ -802,7 +801,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -855,7 +854,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -1298,11 +1297,11 @@ Tél : ${beneficiaryPhone}`,
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
         isStringDate(dateStart)
-          ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateStart) })
           : "DATE INVALIDE"
       } au ${
         isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateEnd) })
           : "DATE INVALIDE"
       } a été annulée par ${agencyName}.
       
@@ -1354,12 +1353,11 @@ Tél : ${beneficiaryPhone}`,
         isStringDate(dateStart)
           ? toDisplayedDate({
               date: new Date(dateStart),
-              withHours: true,
             })
           : "DATE INVALIDE"
       } au ${
         isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateEnd) })
           : "DATE INVALIDE"
       } dans l'entreprise ${businessName} est supprimée.
       

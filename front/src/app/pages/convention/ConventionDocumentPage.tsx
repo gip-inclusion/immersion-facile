@@ -548,13 +548,10 @@ export const ConventionDocumentPage = ({
               </strong>{" "}
               (signé le{" "}
               {toDisplayedDate({
-                date: convertLocaleDateToUtcTimezoneDate(
-                  new Date(
-                    throwOnMissingSignDate("beneficiary", beneficiary.signedAt),
-                  ),
+                date: new Date(
+                  throwOnMissingSignDate("beneficiary", beneficiary.signedAt),
                 ),
                 withHours: true,
-                showGMT: true,
               })}
               )
             </li>
@@ -576,7 +573,6 @@ export const ConventionDocumentPage = ({
                     ),
                   ),
                   withHours: true,
-                  showGMT: true,
                 })}
                 )
               </li>

@@ -1,7 +1,6 @@
 import {
   addDays,
   addHours,
-  differenceInCalendarWeeks,
   differenceInDays,
   format,
   getDay,
@@ -155,7 +154,7 @@ export const frenchDayMapping = (
   originalDate: string,
 ): UniversalDayMappingToFrenchCalendar => {
   const date = parseISO(originalDate);
-  const universalDay = getDay(date);
+  const universalDay = date.getUTCDay();
   const mapping = dayOfWeekMapping.find(
     (value) => value.universalDay === universalDay,
   );
@@ -341,14 +340,36 @@ export const selectedDaysFromComplexSchedule = (
       .map((day) => frenchDayMapping(day.date).frenchDay),
   ).sort();
 
+const getWeeksSpannedWithoutTimezone = (
+  startDate: Date,
+  endDate: Date,
+): number => {
+  const normalizeToUTCMidnight = (date: Date): Date =>
+    new Date(
+      Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
+    );
+
+  const getUTCMonday = (date: Date): Date => {
+    const normalized = normalizeToUTCMidnight(date);
+    const day = normalized.getUTCDay();
+    const diffToMonday = (day + 6) % 7;
+    normalized.setUTCDate(normalized.getUTCDate() - diffToMonday);
+    return normalized;
+  };
+
+  const startMonday = getUTCMonday(startDate);
+  const endMonday = getUTCMonday(endDate);
+
+  return Math.ceil(differenceInDays(endMonday, startMonday) / 7);
+};
+
 export const makeImmersionTimetable = (
   complexSchedule: DailyScheduleDto[],
   { start: startDay, end: endDay }: DateIntervalDto,
 ): ImmersionTimeTable => {
   const differenceInCalendarWeeksBetweenDates =
-    differenceInCalendarWeeks(endDay, startDay, {
-      weekStartsOn: 1,
-    }) + 1;
+    getWeeksSpannedWithoutTimezone(startDay, endDay) + 1;
+
   return isValidInterval({
     start: startDay,
     end: endDay,
@@ -369,9 +390,9 @@ export const makeImmersionTimetable = (
                 parseISO(dailyScheduleItem.date),
               );
               return (
-                schedule.getDate() === date.getDate() &&
-                schedule.getMonth() === date.getMonth() &&
-                schedule.getFullYear() === date.getFullYear()
+                schedule.getUTCDate() === date.getUTCDate() &&
+                schedule.getUTCMonth() === date.getUTCMonth() &&
+                schedule.getUTCFullYear() === date.getUTCFullYear()
               );
             });
             return {
