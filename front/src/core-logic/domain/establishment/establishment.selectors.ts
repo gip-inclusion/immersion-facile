@@ -18,8 +18,14 @@ const formEstablishment = createSelector(
   (establishment) => establishment.formEstablishment,
 );
 
+const establishmentNameAndAdmins = createSelector(
+  establishmentState,
+  (establishment) => establishment.establishmentNameAndAdmins,
+);
+
 export const establishmentSelectors = {
   formEstablishment,
   isLoading,
   isReadyForRedirection,
+  establishmentNameAndAdmins,
 };
