@@ -1,4 +1,5 @@
 import { filter, map, of, switchMap, tap } from "rxjs";
+import { errors } from "shared";
 import {
   type SiretAndJwtPayload,
   defaultFormEstablishmentValue,
@@ -76,6 +77,47 @@ const fetchEstablishmentEpic: AppEpic<EstablishmentAction> = (
         ),
       );
     }),
+  );
+
+const fetchEstablishmentNameAndAdminEpic: AppEpic<EstablishmentAction> = (
+  action$,
+  _state$,
+  { establishmentGateway },
+) =>
+  action$.pipe(
+    filter(
+      establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested.match,
+    ),
+    switchMap((action) =>
+      establishmentGateway
+        .getEstablishmentNameAndAdmins$(
+          action.payload.siret,
+          action.payload.jwt,
+        )
+        .pipe(
+          map((establishmentNameAndAdmins) =>
+            establishmentSlice.actions.fetchEstablishmentNameAndAdminSucceded({
+              establishmentNameAndAdmins,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            error.message ===
+            errors.establishment.notFound({ siret: action.payload.siret })
+              .message
+              ? establishmentSlice.actions.fetchEstablishmentNameAndAdminSucceded(
+                  {
+                    establishmentNameAndAdmins: "establishmentNotFound",
+                    feedbackTopic: action.payload.feedbackTopic,
+                  },
+                )
+              : establishmentSlice.actions.fetchEstablishmentFailed({
+                  errorMessage: error.message,
+                  feedbackTopic: action.payload.feedbackTopic,
+                }),
+          ),
+        ),
+    ),
   );
 
 const createFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
@@ -169,6 +211,7 @@ const deleteFormEstablishmentEpic: AppEpic<EstablishmentAction> = (
 export const establishmentEpics = [
   redirectToEstablishmentFormPageEpic,
   fetchEstablishmentEpic,
+  fetchEstablishmentNameAndAdminEpic,
   createFormEstablishmentEpic,
   editFormEstablishmentEpic,
   deleteFormEstablishmentEpic,

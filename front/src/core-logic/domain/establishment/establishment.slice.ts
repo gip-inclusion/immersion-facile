@@ -1,6 +1,7 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   type ConnectedUserJwt,
+  type EstablishmentNameAndAdmins,
   type FormEstablishmentDto,
   type SiretDto,
   defaultMaxContactsPerMonth,
@@ -57,12 +58,17 @@ export type EstablishmentState = {
   isLoading: boolean;
   isReadyForRedirection: boolean;
   formEstablishment: FormEstablishmentDto;
+  establishmentNameAndAdmins:
+    | EstablishmentNameAndAdmins
+    | null
+    | "establishmentNotFound";
 };
 
 const initialState: EstablishmentState = {
   isLoading: false,
   isReadyForRedirection: false,
   formEstablishment: defaultFormEstablishmentValue(),
+  establishmentNameAndAdmins: null,
 };
 
 export const establishmentSlice = createSlice({
@@ -159,6 +165,32 @@ export const establishmentSlice = createSlice({
       state.isLoading = false;
     },
     deleteEstablishmentFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+
+    fetchEstablishmentNameAndAdminsRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<SiretAndJwtPayload>,
+    ) => {
+      state.isLoading = true;
+      state.establishmentNameAndAdmins = null;
+    },
+    fetchEstablishmentNameAndAdminSucceded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        establishmentNameAndAdmins:
+          | EstablishmentNameAndAdmins
+          | "establishmentNotFound";
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.establishmentNameAndAdmins =
+        action.payload.establishmentNameAndAdmins;
+    },
+    fetchEstablishmentNameAndAdminsFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
