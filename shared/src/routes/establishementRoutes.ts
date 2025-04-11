@@ -55,9 +55,9 @@ export const establishmentRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  getEstablishmentAdmins: defineRoute({
+  getEstablishmentNameAndAdmins: defineRoute({
     method: "get",
-    url: "/establishments/:siret/admins",
+    url: "/establishments/:siret/nameAndAdmins",
     ...withAuthorizationHeaders,
     responses: {
       200: establishmentNameAndAdminsSchema,
