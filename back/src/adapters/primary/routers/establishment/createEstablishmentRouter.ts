@@ -50,6 +50,17 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
       ),
   );
 
+  establishmentSharedRouter.getEstablishmentNameAndAdmins(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getEstablishmentNameAndAdmins.execute(
+          { formEstablishment: req.body },
+          req.payloads?.inclusion,
+        ),
+      ),
+  );
+
   establishmentSharedRouter.updateFormEstablishment(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
