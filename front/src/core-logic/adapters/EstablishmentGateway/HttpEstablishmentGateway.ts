@@ -102,7 +102,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
   ): Observable<EstablishmentNameAndAdmins> {
     return from(
       this.httpClient
-        .getEstablishmentAdmins({
+        .getEstablishmentNameAndAdmins({
           urlParams: { siret },
           headers: { authorization: jwt },
         })
