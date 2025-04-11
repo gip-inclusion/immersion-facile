@@ -2,7 +2,9 @@ import {
   type ConnectedUserJwt,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
+  type SiretDto,
   type SiretEstablishmentDto,
+  errors,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -22,24 +24,24 @@ import {
   establishmentSlice,
 } from "./establishment.slice";
 
-const establishmentWithoutAddressFromSiretFetched: SiretEstablishmentDto = {
-  siret: "11110000111100",
-  businessName: "Existing open business on Sirene Corp.",
-  businessAddress: "",
-  isOpen: true,
-  numberEmployeesRange: "",
-};
-const establishmentWithAddressFromSiretFetched: SiretEstablishmentDto = {
-  siret: "11110000111100",
-  businessName: "Existing open business on Sirene Corp.",
-  businessAddress: "102 rue du fake, 75001 Paris",
-  isOpen: true,
-  numberEmployeesRange: "10-19",
-};
-
-const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
-
 describe("Establishment", () => {
+  const establishmentWithoutAddressFromSiretFetched: SiretEstablishmentDto = {
+    siret: "11110000111100",
+    businessName: "Existing open business on Sirene Corp.",
+    businessAddress: "",
+    isOpen: true,
+    numberEmployeesRange: "",
+  };
+  const establishmentWithAddressFromSiretFetched: SiretEstablishmentDto = {
+    siret: "11110000111100",
+    businessName: "Existing open business on Sirene Corp.",
+    businessAddress: "102 rue du fake, 75001 Paris",
+    isOpen: true,
+    numberEmployeesRange: "10-19",
+  };
+
+  const formEstablishment = FormEstablishmentDtoBuilder.valid().build();
+
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -74,6 +76,7 @@ describe("Establishment", () => {
         isLoading: false,
         isReadyForRedirection: true,
         formEstablishment: defaultFormEstablishmentValue(),
+        establishmentNameAndAdmins: null,
       },
     }));
     store.dispatch(
@@ -97,6 +100,7 @@ describe("Establishment", () => {
         isLoading: false,
         isReadyForRedirection: true,
         formEstablishment: defaultFormEstablishmentValue(),
+        establishmentNameAndAdmins: null,
       },
     }));
     store.dispatch(
@@ -217,6 +221,7 @@ describe("Establishment", () => {
         isLoading: true,
         isReadyForRedirection: false,
         formEstablishment,
+        establishmentNameAndAdmins: null,
       };
       ({ store, dependencies } = createTestStore({
         establishment: initialEstablishmentState,
@@ -488,10 +493,93 @@ describe("Establishment", () => {
     });
   });
 
+  describe("establishment admins fetch", () => {
+    const siret: SiretDto = "12345123451234";
+    const jwt: ConnectedUserJwt = "jwt";
+
+    it("fetches establishment admins successfully", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested({
+          siret,
+          jwt,
+          feedbackTopic: "form-establishment",
+        }),
+      );
+      expectEstablishmentStateToMatch({
+        isLoading: true,
+        establishmentNameAndAdmins: null,
+      });
+
+      const expectedResponse = {
+        name: "Truc Corp",
+        adminEmails: ["admin1@corp.com", "admin2@corp.com"],
+      };
+      dependencies.establishmentGateway.establishmentAdmins$.next(
+        expectedResponse,
+      );
+
+      expectEstablishmentStateToMatch({
+        isLoading: false,
+        establishmentNameAndAdmins: expectedResponse,
+      });
+    });
+
+    it("fetches establishment admins - establishment not found", () => {
+      expectStoreToMatchInitialState();
+
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested({
+          siret,
+          jwt,
+          feedbackTopic: "form-establishment",
+        }),
+      );
+      expectEstablishmentStateToMatch({
+        isLoading: true,
+        establishmentNameAndAdmins: null,
+      });
+
+      dependencies.establishmentGateway.establishmentAdmins$.error(
+        errors.establishment.notFound({ siret: "12345123451234" }),
+      );
+
+      expectEstablishmentStateToMatch({
+        isLoading: false,
+        establishmentNameAndAdmins: "establishmentNotFound",
+      });
+    });
+
+    it("fetches establishment admins failed", () => {
+      expectStoreToMatchInitialState();
+      store.dispatch(
+        establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested({
+          siret,
+          jwt,
+          feedbackTopic: "form-establishment",
+        }),
+      );
+      expectEstablishmentStateToMatch({
+        isLoading: true,
+        establishmentNameAndAdmins: null,
+      });
+
+      dependencies.establishmentGateway.establishmentAdmins$.error(
+        new Error("Failed"),
+      );
+
+      expectEstablishmentStateToMatch({
+        isLoading: false,
+        establishmentNameAndAdmins: null,
+      });
+    });
+  });
+
   const expectStoreToMatchInitialState = () =>
     expectEstablishmentStateToMatch({
       isLoading: false,
       formEstablishment: defaultFormEstablishmentValue(),
+      establishmentNameAndAdmins: null,
     });
   const expectEstablishmentStateToMatch = (
     expected: Partial<EstablishmentState>,
