@@ -1,9 +1,11 @@
 import { type Observable, from } from "rxjs";
-import type {
-  ConnectedUserJwt,
-  EstablishmentRoutes,
-  FormEstablishmentDto,
-  SiretDto,
+import {
+  type ConnectedUserJwt,
+  type EstablishmentNameAndAdmins,
+  type EstablishmentRoutes,
+  type FormEstablishmentDto,
+  type SiretDto,
+  errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
@@ -88,6 +90,27 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             })
             .with({ status: 403 }, (response) => {
               throw new Error(response.body.message);
+            })
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getEstablishmentNameAndAdmins$(
+    siret: SiretDto,
+    jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentNameAndAdmins> {
+    return from(
+      this.httpClient
+        .getEstablishmentNameAndAdmins({
+          urlParams: { siret },
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 404 }, () => {
+              throw errors.establishment.notFound({ siret });
             })
             .otherwise(otherwiseThrow),
         ),

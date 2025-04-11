@@ -1,5 +1,10 @@
 import { type Observable, delay, of } from "rxjs";
-import type { ConnectedUserJwt, FormEstablishmentDto, SiretDto } from "shared";
+import type {
+  ConnectedUserJwt,
+  EstablishmentNameAndAdmins,
+  FormEstablishmentDto,
+  SiretDto,
+} from "shared";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
@@ -7,6 +12,24 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
     private establishments: FormEstablishmentDto[],
     private delay = 250,
   ) {}
+
+  getEstablishmentNameAndAdmins$(
+    siret: SiretDto,
+    _jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentNameAndAdmins> {
+    const establishment = this.establishments.find(
+      (establishment) => establishment.siret === siret,
+    );
+    if (establishment)
+      return of({
+        name:
+          establishment.businessNameCustomized || establishment.businessName,
+        adminEmails: establishment.userRights
+          .filter((right) => right.role === "establishment-admin")
+          .map(({ email }) => email),
+      }).pipe(delay(this.delay));
+    throw new Error(`Establishment with siret ${siret} not found.`);
+  }
 
   public addFormEstablishment$(
     establishment: FormEstablishmentDto,
