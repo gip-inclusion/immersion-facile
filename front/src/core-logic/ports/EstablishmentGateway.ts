@@ -1,5 +1,10 @@
 import type { Observable } from "rxjs";
-import type { ConnectedUserJwt, FormEstablishmentDto, SiretDto } from "shared";
+import type {
+  ConnectedUserJwt,
+  EstablishmentNameAndAdmins,
+  FormEstablishmentDto,
+  SiretDto,
+} from "shared";
 
 export interface EstablishmentGateway {
   deleteEstablishment$(
@@ -18,4 +23,8 @@ export interface EstablishmentGateway {
     establishment: FormEstablishmentDto,
     jwt: ConnectedUserJwt,
   ): Observable<void>;
+  getEstablishmentNameAndAdmins$(
+    siret: SiretDto,
+    jwt: ConnectedUserJwt,
+  ): Observable<EstablishmentNameAndAdmins>;
 }
