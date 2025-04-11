@@ -1035,7 +1035,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         content: `
       Bonne nouvelle ! 
 
-      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né le ${
+      La demande faite par ${beneficiaryFirstName} ${beneficiaryLastName} (né(e) le ${
         isStringDate(beneficiaryBirthdate)
           ? toDisplayedDate({ date: new Date(beneficiaryBirthdate) })
           : "Date invalide"
