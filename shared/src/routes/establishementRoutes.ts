@@ -1,11 +1,13 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
+import { establishmentNameAndAdminsSchema } from "../establishment/establishment";
 import { formEstablishmentSchema } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
 import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 
 export type EstablishmentRoutes = typeof establishmentRoutes;
+
 export const establishmentRoutes = defineRoutes({
   addFormEstablishment: defineRoute({
     method: "post",
@@ -50,6 +52,15 @@ export const establishmentRoutes = defineRoutes({
       400: httpErrorSchema,
       401: httpErrorSchema,
       403: renewMagicLinkResponseSchema,
+      404: httpErrorSchema,
+    },
+  }),
+  getEstablishmentNameAndAdmins: defineRoute({
+    method: "get",
+    url: "/establishments/:siret/nameAndAdmins",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: establishmentNameAndAdminsSchema,
       404: httpErrorSchema,
     },
   }),

@@ -148,3 +148,4 @@ export * from "./utils/string";
 export * from "./utils/toDotNotation";
 export * from "./zodUtils";
 export * from "./durations";
+export * from "./establishment/establishment";
