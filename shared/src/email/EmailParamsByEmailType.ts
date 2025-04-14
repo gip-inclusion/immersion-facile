@@ -429,7 +429,7 @@ export type EmailParamsByEmailType = {
     additionalDetails: string;
     conventionFormUrl: string;
   };
-  SIGNATORY_LAST_REMINDER: {
+  SIGNATORY_REMINDER: {
     actorFirstName: string;
     actorLastName: string;
     businessName: string;

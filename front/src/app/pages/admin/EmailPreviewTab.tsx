@@ -636,7 +636,7 @@ export const defaultEmailValueByEmailKind: {
     additionalDetails: "ADDITIONAL_DETAILS",
     conventionFormUrl: "CONVENTION_FORM_URL",
   },
-  SIGNATORY_LAST_REMINDER: {
+  SIGNATORY_REMINDER: {
     actorFirstName: "ACTOR_FIRSTNAME",
     actorLastName: "ACTOR_LASTNAME",
     beneficiaryFirstName: "BENEFICIARY_FIRSTNAME",

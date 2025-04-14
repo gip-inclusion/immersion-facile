@@ -183,7 +183,7 @@ const sendSms = async ({
     },
     templatedContent: {
       recipientPhone: signatoryPhone,
-      kind: "LastReminderForSignatories",
+      kind: "ReminderForSignatories",
       params: { shortLink: shortLink },
     },
   });
@@ -203,7 +203,7 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
   signatoryRole: SignatoryRole;
 }) => {
   const lastSms = await notificationRepository.getLastSmsNotificationByFilter({
-    smsKind: "LastReminderForSignatories",
+    smsKind: "ReminderForSignatories",
     conventionId,
     recipientPhoneNumber: signatoryPhoneNumber,
   });

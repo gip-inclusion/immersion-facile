@@ -77,7 +77,7 @@ describe("SendNotification UseCase", () => {
           id,
           kind: "sms",
           templatedContent: {
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: { shortLink: "https://my-link.com" },
             recipientPhone: `33${sendSmsError555PhoneNumber.substring(1)}`,
           },
@@ -106,7 +106,7 @@ describe("SendNotification UseCase", () => {
           id,
           kind: "sms",
           templatedContent: {
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: { shortLink: "https://my-link.com" },
             recipientPhone: `33${sendSmsError400PhoneNumber.substring(1)}`,
           },
@@ -303,7 +303,7 @@ describe("SendNotification UseCase", () => {
 
   it("should send an SMS", async () => {
     const sms: TemplatedSms = {
-      kind: "LastReminderForSignatories",
+      kind: "ReminderForSignatories",
       params: { shortLink: "https://my-link.com" },
       recipientPhone: "33612345678",
     };

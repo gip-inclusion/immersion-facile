@@ -109,7 +109,7 @@ const emailNotifications: EmailNotification[] = [
 ];
 
 const sms: TemplatedSms = {
-  kind: "LastReminderForSignatories",
+  kind: "ReminderForSignatories",
   recipientPhone: "33610101010",
   params: { shortLink: "https://short.link" },
 };
@@ -452,7 +452,7 @@ describe("PgNotificationRepository", () => {
           id: "77777777-7777-4000-7777-777777777777",
           createdAt: subHours(new Date(), 4).toISOString(),
           templatedContent: {
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             recipientPhone: "33610101010",
             params: { shortLink: "https://short.com" },
           },
@@ -535,7 +535,7 @@ describe("PgNotificationRepository", () => {
   });
 
   describe("getLastSmsNotificationByFilter", () => {
-    const smsKind = "LastReminderForSignatories";
+    const smsKind = "ReminderForSignatories";
     const recipientPhone = "+33610101010";
     const conventionId: ConventionId = "88888888-4444-4000-4444-111111111111";
 

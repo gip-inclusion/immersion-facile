@@ -16,7 +16,7 @@ type GenericTemplatedSms<
 type WithShortLink = { shortLink: AbsoluteUrl };
 
 type SmsParamsBySmsType = {
-  LastReminderForSignatories: WithShortLink;
+  ReminderForSignatories: WithShortLink;
   HelloWorld: {
     testMessage: string;
   };
@@ -38,7 +38,7 @@ const createSmsTemplates = (
 
 export type SmsTemplateByName = typeof smsTemplatesByName;
 export const smsTemplatesByName = createSmsTemplates({
-  LastReminderForSignatories: {
+  ReminderForSignatories: {
     createContent: ({ shortLink }) =>
       `Urgent Immersion Facilitée, veuillez signer la convention ${shortLink}`,
   },

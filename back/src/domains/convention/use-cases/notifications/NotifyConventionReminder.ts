@@ -44,7 +44,7 @@ type EmailWithRole = {
 
 type SignatoriesReminderKind = ExtractFromExisting<
   ReminderKind,
-  "LastReminderForSignatories"
+  "ReminderForSignatories"
 >;
 
 type AgenciesReminderKind = ExtractFromExisting<
@@ -94,7 +94,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       await uow.conventionQueries.getConventionById(conventionId);
     if (!conventionRead) throw errors.convention.notFound({ conventionId });
 
-    if (reminderKind === "LastReminderForSignatories")
+    if (reminderKind === "ReminderForSignatories")
       return this.#onSignatoriesReminder(reminderKind, conventionRead, uow);
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
@@ -125,7 +125,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     });
 
     return {
-      kind: "SIGNATORY_LAST_REMINDER",
+      kind: "SIGNATORY_REMINDER",
       recipients: [email],
       params: {
         actorFirstName: firstName,

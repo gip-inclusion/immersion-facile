@@ -84,10 +84,7 @@ export class ConventionsReminder extends TransactionalUseCase<
 
     const events = [
       ...conventionsForLastSignatoryReminder.map(({ id }) =>
-        this.#makeConventionReminderRequiredEvent(
-          id,
-          "LastReminderForSignatories",
-        ),
+        this.#makeConventionReminderRequiredEvent(id, "ReminderForSignatories"),
       ),
       ...conventionsForAgencyReminders.flatMap((c) =>
         this.#makeAgencyReminders(c),

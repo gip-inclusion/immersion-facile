@@ -50,7 +50,7 @@ describe("notifications slice", () => {
           kind: "sms",
           followedIds: {},
           templatedContent: {
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             recipientPhone: "060011002200",
             params: { shortLink: "http://my-url" },
           },
@@ -100,7 +100,7 @@ describe("notifications slice", () => {
           kind: "sms",
           followedIds: {},
           templatedContent: {
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             recipientPhone: "060011002200",
             params: { shortLink: "http://my-url" },
           },
