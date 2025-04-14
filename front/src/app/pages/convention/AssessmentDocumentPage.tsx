@@ -41,10 +41,12 @@ export const AssessmentDocumentPage = ({
   route,
 }: AssessmentDocumentPageProps) => {
   const dispatch = useDispatch();
-  const { jwt } = useJwt(route);
-  const conventionId = route.params.conventionId;
+  const { jwt, jwtPayload } = useJwt(route);
+
+  const conventionId = jwtPayload.applicationId ?? route.params.conventionId;
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
+
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt,
     conventionId,
@@ -72,7 +74,7 @@ export const AssessmentDocumentPage = ({
 
   if (isConventionLoading || isAssessmentLoading || isPdfLoading)
     return <Loader />;
-  if (!convention) return <p>Pas de convention correspondante trouvée</p>;
+
   if (fetchConventionError)
     return (
       <ShowErrorOrRedirectToRenewMagicLink
@@ -80,6 +82,7 @@ export const AssessmentDocumentPage = ({
         jwt={jwt}
       />
     );
+  if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
 
   const isAssessmentLegacy = isLegacyAssessment(assessment);
