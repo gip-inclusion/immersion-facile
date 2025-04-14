@@ -17,6 +17,10 @@
       "size": "M"
     },
     {
+      "command": "30 06 * * * pnpm back run trigger-sending-assessment-needed-notifications",
+      "size": "M"
+    },
+    {
       "command": "15 07 * * * pnpm back run trigger-convention-reminder",
       "size": "M"
     },
@@ -26,10 +30,6 @@
     },
     {
       "command": "30 08 * * * pnpm back run trigger-contact-request-reminder-7d",
-      "size": "M"
-    },
-    {
-      "command": "49 20 * * * pnpm back run trigger-sending-assessment-needed-notifications",
       "size": "M"
     },
     {
