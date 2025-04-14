@@ -18,15 +18,11 @@ export const dateRegExp = /\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])/;
 // HH:MM 24-hour with leading 0
 export const timeHHmmRegExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
-const toUTCDateWithoutHours = (date: Date): string => {
-  return date.toISOString().split("T")[0];
-};
-
 export const toDateString = (date: Date): string => {
   if (Number.isNaN(date.getTime())) {
     throw new Error("Invalid time value");
   }
-  return toUTCDateWithoutHours(date);
+  return date.toISOString().split("T")[0];
 };
 
 const isWinterClockHours = (date: Date): boolean => {
@@ -51,7 +47,7 @@ export const toDisplayedDate = ({
 }:
   | { date: Date; withHours?: false }
   | { date: Date; withHours?: true }): string => {
-  const [year, month, day] = toUTCDateWithoutHours(date).split("-");
+  const [year, month, day] = toDateString(date).split("-");
 
   if (withHours) {
     const parisOffset = isWinterClockHours(date) ? 1 : 2;
