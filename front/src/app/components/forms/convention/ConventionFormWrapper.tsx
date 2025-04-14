@@ -220,7 +220,7 @@ const ConventionSummarySection = () => {
       }),
     );
   };
-
+  console.log("convention", convention);
   return (
     <article>
       {

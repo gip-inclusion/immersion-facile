@@ -75,6 +75,7 @@ export const ScheduleSection = () => {
         start: new Date(values.dateStart),
         end: new Date(values.dateEnd),
       };
+      console.log("newDates", newDates);
       const inputValueAsDate = new Date(inputValue);
 
       if (inputName === "dateStart") {

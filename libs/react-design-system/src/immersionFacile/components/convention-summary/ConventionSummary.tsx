@@ -236,6 +236,7 @@ const SubSection = ({
                             fr.cx("fr-text--sm", "fr-m-0"),
                             conventionSummaryStyles.subsectionValue,
                           )}
+                          id={`${conventionSummaryStyles.subsectionValue}-${field.key}`}
                         >
                           {field.value}
                           {field.copyButton}

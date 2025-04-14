@@ -178,4 +178,12 @@ test.describe("Convention creation and modification workflow", () => {
       });
     });
   });
+
+  test.use({
+    timezoneId: "America/Martinique"
+  });
+  test("creates a new convention on a client in Martinique", async ({ page }) => {
+    conventionSubmitted = await submitBasicConventionForm(page);
+    await page.waitForTimeout(testConfig.timeForEventCrawler);
+  });
 });
