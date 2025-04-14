@@ -46,7 +46,11 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
-  const conventionId = route.params.conventionId;
+  const { applicationId } =
+    decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+      route.params.jwt,
+    );
+  const conventionId = applicationId ?? route.params.conventionId;
 
   const { role: roleFromJwt } =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
