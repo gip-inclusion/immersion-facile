@@ -10,7 +10,7 @@ import {
   MAX_PRESENCE_DAYS_RELEASE_DATE,
   type Weekday,
   maxPresenceDaysByInternshipKind,
-  toDateString,
+  toDateUTCString,
 } from "..";
 import {
   calculateNumberOfWorkedDays,
@@ -755,7 +755,7 @@ describe("conventionDtoSchema", () => {
           expectConventionDtoToBeValid(
             new ConventionDtoBuilder(convention42h)
               .withDateSubmission(
-                toDateString(
+                toDateUTCString(
                   subDays(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE, 1),
                 ),
               )
@@ -768,7 +768,7 @@ describe("conventionDtoSchema", () => {
             conventionSchema,
             new ConventionDtoBuilder(convention42h)
               .withDateSubmission(
-                toDateString(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE),
+                toDateUTCString(CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE),
               )
               .build(),
             ["La durée maximale hebdomadaire pour un mini-stage est de 35h"],

@@ -20,7 +20,7 @@ import {
   keys,
   mergeObjectsExceptFalsyValues,
   reasonableSchedule,
-  toDateString,
+  toDateUTCString,
 } from "shared";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
@@ -54,7 +54,7 @@ export const getConventionInitialValuesFromUrl = ({
     ...conventionPresentationFromParams(params),
     id: uuidV4(),
     status: "DRAFT",
-    dateSubmission: toDateString(startOfToday()),
+    dateSubmission: toDateUTCString(startOfToday()),
     internshipKind,
   };
 
@@ -392,8 +392,8 @@ const scheduleFromParams = (
   params: ConventionParamsInUrl,
 ): Pick<ConventionDto, "dateStart" | "dateEnd" | "schedule"> => {
   const dateStart =
-    params.dateStart ?? toDateString(addDays(startOfToday(), 2));
-  const dateEnd = params.dateEnd ?? toDateString(addDays(startOfToday(), 3));
+    params.dateStart ?? toDateUTCString(addDays(startOfToday(), 2));
+  const dateEnd = params.dateEnd ?? toDateUTCString(addDays(startOfToday(), 3));
   return {
     dateStart,
     dateEnd,
