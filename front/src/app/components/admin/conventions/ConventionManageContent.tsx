@@ -30,7 +30,7 @@ export const ConventionManageContent = ({
   const inclusionConnectedRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
-  const userRolesIsLoading = useAppSelector(
+  const userRolesAreLoading = useAppSelector(
     inclusionConnectedSelectors.isLoading,
   );
   const conventionFormFeedback = useFeedbackTopic("convention-form");
@@ -87,7 +87,7 @@ export const ConventionManageContent = ({
       .replace();
   }
 
-  if (isLoading || userRolesIsLoading) return <Loader />;
+  if (isLoading || userRolesAreLoading) return <Loader />;
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!roles.length)
     return <p>Vous n'êtes pas autorisé à accéder à cette convention</p>;
