@@ -428,7 +428,7 @@ export const isStringImmersionObjective = (
   keys(labelsForImmersionObjective).includes(objective as ImmersionObjective);
 
 export const reminderKinds = [
-  "LastReminderForSignatories",
+  "ReminderForSignatories",
   "FirstReminderForAgency",
   "LastReminderForAgency",
 ] as const;

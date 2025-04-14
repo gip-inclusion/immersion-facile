@@ -374,7 +374,7 @@ describe("Send signature link", () => {
           templatedContent: {
             recipientPhone:
               convention.signatories.establishmentRepresentative.phone,
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: {
               shortLink: makeShortLinkUrl(config, "shortLink"),
             },
@@ -519,7 +519,7 @@ describe("Send signature link", () => {
             templatedContent: {
               recipientPhone:
                 convention.signatories.establishmentRepresentative.phone,
-              kind: "LastReminderForSignatories",
+              kind: "ReminderForSignatories",
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkId),
               },
@@ -560,7 +560,7 @@ describe("Send signature link", () => {
           templatedContent: {
             recipientPhone:
               convention.signatories.establishmentRepresentative.phone,
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: {
               shortLink: makeShortLinkUrl(config, shortLinkId),
             },
@@ -609,7 +609,7 @@ describe("Send signature link", () => {
             templatedContent: {
               recipientPhone:
                 convention.signatories.establishmentRepresentative.phone,
-              kind: "LastReminderForSignatories",
+              kind: "ReminderForSignatories",
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkId),
               },
@@ -676,7 +676,7 @@ describe("Send signature link", () => {
           templatedContent: {
             recipientPhone:
               conventionWithCustomPhoneNumer.signatories.beneficiary.phone,
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: {
               shortLink: makeShortLinkUrl(config, shortLinkId),
             },
@@ -700,7 +700,7 @@ describe("Send signature link", () => {
         templatedContent: {
           recipientPhone:
             convention.signatories.establishmentRepresentative.phone,
-          kind: "LastReminderForSignatories",
+          kind: "ReminderForSignatories",
           params: {
             shortLink: makeShortLinkUrl(config, shortLinkId),
           },
@@ -743,7 +743,7 @@ describe("Send signature link", () => {
           templatedContent: {
             recipientPhone:
               convention.signatories.establishmentRepresentative.phone,
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: {
               shortLink: makeShortLinkUrl(config, shortLinkId),
             },

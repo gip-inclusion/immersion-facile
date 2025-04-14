@@ -51,7 +51,7 @@ describe("BrevoNotificationGateway manual", () => {
   it("should send SMS correctly", async () => {
     const result = await notificationGateway.sendSms({
       recipientPhone: "VALID_INTERNATIONAL_FRENCH_MOBILE_PHONE_NUMBER", // Like 33611223344
-      kind: "LastReminderForSignatories",
+      kind: "ReminderForSignatories",
       params: {
         shortLink:
           "https://immersion-facile.beta.gouv.fr/api/to/gygr669PTEQBiTwfNycBl9nq8Pua3h5D9pv2",
@@ -80,7 +80,7 @@ describe("BrevoNotificationGateway manual", () => {
         phones.map((phone, index) =>
           notificationGateway.sendSms({
             recipientPhone: phone,
-            kind: "LastReminderForSignatories",
+            kind: "ReminderForSignatories",
             params: {
               shortLink: `https://test-sms-${index + 1}`,
             },

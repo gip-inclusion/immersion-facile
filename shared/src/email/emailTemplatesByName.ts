@@ -861,7 +861,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyLogoUrl,
       }),
     },
-    SIGNATORY_LAST_REMINDER: {
+    SIGNATORY_REMINDER: {
       niceName: "Convention - Dernier rappel de signature",
       tags: ["relance signatures manquantes"],
       createEmailVariables: ({

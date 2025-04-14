@@ -108,7 +108,7 @@ describe("ConventionReminder use case", () => {
   });
 
   describe("Send 'ConventionReminderRequired' event", () => {
-    it(`with kind 'LastReminderForSignatories'
+    it(`with kind 'ReminderForSignatories'
         when there is a convention that is below 2 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
       const { startDate, startDateDifference } = prepareDates(now, 2);
@@ -133,7 +133,7 @@ describe("ConventionReminder use case", () => {
           id: eventIds[index],
           topic,
           payload: {
-            reminderKind: "LastReminderForSignatories",
+            reminderKind: "ReminderForSignatories",
             conventionId: convention.id,
           },
         }));
@@ -187,7 +187,7 @@ describe("ConventionReminder use case", () => {
       expectToEqual(uow.conventionRepository.conventions, conventions);
     });
 
-    it(`with kind 'LastReminderForSignatories' and 'LastReminderForAgency'
+    it(`with kind 'ReminderForSignatories' and 'LastReminderForAgency'
         when there is a convention that is below 1 open days before interships start depending on conventions statuses.`, async () => {
       // Arrange
       const { startDate, startDateDifference } = prepareDates(now, 1);
@@ -217,7 +217,7 @@ describe("ConventionReminder use case", () => {
           id: eventIds[0],
           topic,
           payload: {
-            reminderKind: "LastReminderForSignatories",
+            reminderKind: "ReminderForSignatories",
             conventionId: conventionsNeeds48[0].id,
           },
         },
@@ -225,7 +225,7 @@ describe("ConventionReminder use case", () => {
           id: eventIds[1],
           topic,
           payload: {
-            reminderKind: "LastReminderForSignatories",
+            reminderKind: "ReminderForSignatories",
             conventionId: conventionsNeeds48[1].id,
           },
         },

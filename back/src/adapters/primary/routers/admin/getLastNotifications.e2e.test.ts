@@ -107,7 +107,7 @@ describe("Get last notification route", () => {
         createdAt: dateNow.toISOString(),
         kind: "sms",
         templatedContent: {
-          kind: "LastReminderForSignatories",
+          kind: "ReminderForSignatories",
           params: {
             shortLink: "https://my-short-link.com",
           },
