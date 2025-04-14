@@ -701,7 +701,6 @@ export const errors = {
         `La convention a été synchronisée le ${toDisplayedDate({
           date: params.lastBroadcastDate,
           withHours: true,
-          showGMT: true,
         })}. Merci d'essayer à nouveau dans ${params.formattedWaitingTime}.`,
       ),
   },
