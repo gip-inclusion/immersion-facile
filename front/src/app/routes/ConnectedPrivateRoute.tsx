@@ -57,15 +57,15 @@ export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>;
 
-type InclusionConnectPrivateRoute =
+type ConnectPrivateRoute =
   | FrontAdminRoute
   | FrontAgencyDashboardRoute
   | Route<typeof routes.formEstablishment>
   | Route<typeof routes.establishmentDashboard>
   | Route<typeof routes.myProfile>;
 
-type InclusionConnectedPrivateRouteProps = {
-  route: InclusionConnectPrivateRoute;
+type ConnectedPrivateRouteProps = {
+  route: ConnectPrivateRoute;
   children: ReactElement;
   inclusionConnectConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
@@ -75,7 +75,7 @@ export const ConnectedPrivateRoute = ({
   route,
   children,
   allowAdminOnly,
-}: InclusionConnectedPrivateRouteProps) => {
+}: ConnectedPrivateRouteProps) => {
   const dispatch = useDispatch();
   const isInclusionConnected = useAppSelector(
     authSelectors.isInclusionConnected,
@@ -145,7 +145,9 @@ export const ConnectedPrivateRoute = ({
               illustration={pageContent.illustration}
             >
               <>
-                {pageContent.description}
+                <p className={fr.cx("fr-text--lead")}>
+                  {pageContent.description}
+                </p>
                 <div className={fr.cx("fr-my-2w")}>
                   <ProConnectButton
                     id={domElementIds[page].login.connectButton}
@@ -159,9 +161,9 @@ export const ConnectedPrivateRoute = ({
               </>
             </PageHeader>
           }
-          vSpacing={6}
+          vSpacing={2}
         >
-          <section>
+          <section className={fr.cx("fr-mb-8w")}>
             <h2 className={fr.cx("fr-h3")}>{pageContent.cardsTitle}</h2>
             <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
               {pageContent.cards?.map((card) => (
@@ -208,9 +210,7 @@ export const ConnectedPrivateRoute = ({
   );
 };
 
-const getPage = (
-  route: InclusionConnectPrivateRoute,
-): AllowedStartOAuthLoginPage => {
+const getPage = (route: ConnectPrivateRoute): AllowedStartOAuthLoginPage => {
   if (route.name === "establishmentDashboard") return "establishmentDashboard";
   if (route.name === "agencyDashboardMain") return "agencyDashboard";
   if (route.name === "formEstablishment") return "establishment";
@@ -237,11 +237,11 @@ const pageContentByRoute: Record<
   establishment: {
     title: "Proposer une immersion",
     description: (
-      <p>
+      <>
         <strong>Un compte unique</strong> pour publier et mettre à jour vos
         offres d’immersion. Vous pourrez aussi suivre et gérez toutes les
         candidatures reçues en un seul endroit.
-      </p>
+      </>
     ),
     cardsTitle: "Tous les avantages du compte entreprise",
     illustration: loginIllustration,
@@ -273,10 +273,10 @@ const pageContentByRoute: Record<
   establishmentDashboard: {
     title: "Mon espace entreprise",
     description: (
-      <p>
+      <>
         <strong>Un compte unique</strong> pour accéder à vos candidatures, vos
         conventions et vos offres d’immersions.
-      </p>
+      </>
     ),
     cardsTitle: "Tous les avantages du compte entreprise",
     illustration: loginIllustration,

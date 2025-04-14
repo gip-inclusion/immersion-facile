@@ -48,10 +48,19 @@ export const PageHeader = ({
       <div className={cx(fr.cx("fr-container", "fr-mt-8w"), classes.inner)}>
         {illustration && (
           <div className={fr.cx("fr-grid-row")}>
-            <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
+            <div className={fr.cx("fr-col-12", "fr-col-lg-7")}>
               {textContent}
             </div>
-            <div className={fr.cx("fr-col-12", "fr-col-lg-4", "fr-px-1w")}>
+            <div
+              className={fr.cx(
+                "fr-col-12",
+                "fr-col-lg-4",
+                "fr-ml-auto",
+                "fr-px-1w",
+                "fr-hidden",
+                "fr-unhidden-lg",
+              )}
+            >
               <img src={illustration} alt="" />
             </div>
           </div>
