@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { establishmentRoutes, formCompletionRoutes } from "shared";
+import { errors, establishmentRoutes, formCompletionRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
@@ -48,6 +48,19 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
           req.payloads?.inclusion,
         ),
       ),
+  );
+
+  establishmentSharedRouter.getEstablishmentNameAndAdmins(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getEstablishmentNameAndAdmins.execute(
+          { siret: req.params.siret },
+          currentUser,
+        );
+      }),
   );
 
   establishmentSharedRouter.updateFormEstablishment(
