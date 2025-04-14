@@ -159,7 +159,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   assessmentDocument: defineRoute(
     {
       jwt: param.query.optional.string,
-      conventionId: param.query.string,
+      conventionId: param.query.optional.string,
     },
     () => `/${frontRoutes.assessmentDocument}`,
   ),
@@ -252,7 +252,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   assessment: defineRoute(
     {
       jwt: param.query.string,
-      conventionId: param.query.string,
+      conventionId: param.query.optional.string,
     },
     () => `/${frontRoutes.assessment}`,
   ),
