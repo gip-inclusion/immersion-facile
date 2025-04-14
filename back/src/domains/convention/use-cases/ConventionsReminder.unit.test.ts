@@ -1,9 +1,4 @@
-import {
-  addBusinessDays,
-  addDays,
-  differenceInBusinessDays,
-  subDays,
-} from "date-fns";
+import { addBusinessDays, differenceInBusinessDays, subDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyId,
@@ -113,92 +108,6 @@ describe("ConventionReminder use case", () => {
   });
 
   describe("Send 'ConventionReminderRequired' event", () => {
-    it("When conventions exists, not fully signed which where submitted exactly 2 days before", async () => {
-      const dateStart = addDays(now, 10).toISOString();
-
-      const convention1 = new ConventionDtoBuilder()
-        .withId("1")
-        .withStatus("PARTIALLY_SIGNED")
-        .withDateSubmission(subDays(now, 1).toISOString())
-        .withDateStart(dateStart)
-        .build();
-
-      const convention2 = new ConventionDtoBuilder()
-        .withId("2")
-        .withStatus("READY_TO_SIGN")
-        .withDateSubmission(subDays(now, 3).toISOString())
-        .withDateStart(dateStart)
-        .build();
-
-      const conventionNeedsReminder = new ConventionDtoBuilder()
-        .withId("3")
-        .withStatus("READY_TO_SIGN")
-        .withDateSubmission(subDays(now, 2).toISOString())
-        .withDateStart(dateStart)
-        .build();
-
-      uow.conventionRepository.setConventions([
-        convention1,
-        convention2,
-        conventionNeedsReminder,
-      ]);
-      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-      const summary = await conventionsReminder.execute();
-      expectToEqual(summary, {
-        success: 1,
-        failures: [],
-      });
-      expectObjectInArrayToMatch(uow.outboxRepository.events, [
-        {
-          topic,
-          payload: {
-            reminderKind: "FirstReminderForSignatories",
-            conventionId: conventionNeedsReminder.id,
-          },
-        },
-      ]);
-    });
-
-    it(`with kind 'FirstReminderForSignatories'
-        when there is a convention that is not fully signed and was published exactly 2 days before`, async () => {
-      // Arrange
-      const { startDateDifference, startDate } = prepareDates(now, 4);
-      expect(startDateDifference > 3).toBeTruthy();
-      const dateSubmission = subDays(now, 2);
-
-      const conventions = makeOneConventionOfEachStatuses({
-        withDateStart: startDate,
-        withDateSubmission: dateSubmission,
-        agencyId: agency.id,
-      });
-      uow.conventionRepository.setConventions(conventions);
-      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-      // Act
-      const summary = await conventionsReminder.execute();
-
-      //Assert
-      const conventionsForSignatories = conventions.filter((convention) =>
-        needSignatureStatuses.includes(convention.status),
-      );
-      const expectedEvents: Partial<DomainEvent>[] =
-        conventionsForSignatories.map(({ id }, index) => ({
-          id: eventIds[index],
-          topic,
-          payload: {
-            reminderKind: "FirstReminderForSignatories",
-            conventionId: id,
-          },
-        }));
-      expectToEqual(summary, {
-        success: expectedEvents.length,
-        failures: [],
-      });
-      expectObjectInArrayToMatch(uow.outboxRepository.events, expectedEvents);
-      expectToEqual(uow.conventionRepository.conventions, conventions);
-    });
-
     it(`with kind 'LastReminderForSignatories'
         when there is a convention that is below 2 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
@@ -236,7 +145,7 @@ describe("ConventionReminder use case", () => {
       expectToEqual(uow.conventionRepository.conventions, conventions);
     });
 
-    it(`with kind 'FirstReminderForAgency' and 'FirstReminderForSignatories'
+    it(`with kind 'FirstReminderForAgency'
         when there is a convention that is between 3 and 2 open days before interships start depending of convention statuses.`, async () => {
       // Arrange
       const { startDate, startDateDifference } = prepareDates(now, 3);
@@ -266,22 +175,6 @@ describe("ConventionReminder use case", () => {
           payload: {
             reminderKind: "FirstReminderForAgency",
             conventionId: supportedConventions[2].id,
-          },
-        },
-        {
-          id: eventIds[1],
-          topic,
-          payload: {
-            reminderKind: "FirstReminderForSignatories",
-            conventionId: supportedConventions[0].id,
-          },
-        },
-        {
-          id: eventIds[2],
-          topic,
-          payload: {
-            reminderKind: "FirstReminderForSignatories",
-            conventionId: supportedConventions[1].id,
           },
         },
       ];
