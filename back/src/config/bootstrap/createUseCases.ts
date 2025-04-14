@@ -106,6 +106,7 @@ import { makeAssessmentReminder } from "../../domains/establishment/use-cases/As
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
+import { makeGetEstablishmentNameAndAdmins } from "../../domains/establishment/use-cases/GetEstablishmentNameAndAdmins";
 import { makeGetExternalSearchResult } from "../../domains/establishment/use-cases/GetExternalSearchResult";
 import { GetOffersByGroupSlug } from "../../domains/establishment/use-cases/GetGroupBySlug";
 import { GetSearchResultBySearchQuery } from "../../domains/establishment/use-cases/GetSearchResultBySearchQuery";
@@ -701,6 +702,9 @@ export const createUseCases = (
       uowPerformer,
     }),
     getEstablishmentStats: makeGetEstablishmentStats({
+      uowPerformer,
+    }),
+    getEstablishmentNameAndAdmins: makeGetEstablishmentNameAndAdmins({
       uowPerformer,
     }),
     rejectDiscussionAndSendNotification:
