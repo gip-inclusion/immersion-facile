@@ -1,4 +1,4 @@
-import { addBusinessDays, differenceInBusinessDays, subDays } from "date-fns";
+import { addBusinessDays, differenceInBusinessDays } from "date-fns";
 import {
   type ConventionDto,
   type ConventionId,
@@ -62,35 +62,25 @@ export class ConventionsReminder extends TransactionalUseCase<
     uow: UnitOfWork,
   ): Promise<ConventionsReminderSummary> {
     const now = this.#timeGateway.now();
-    const [
-      conventionsForLastSignatoryReminder,
-      conventionsForAgencyReminders,
-      conventionsForFirstSignatoryReminder,
-    ] = await Promise.all([
-      uow.conventionQueries.getConventions({
-        filters: {
-          startDateGreater: now,
-          startDateLessOrEqual: addBusinessDays(now, TWO_DAYS),
-          withStatuses: signatoryStatuses,
-        },
-        sortBy: "dateStart",
-      }),
-      uow.conventionQueries.getConventions({
-        filters: {
-          startDateGreater: now,
-          startDateLessOrEqual: addBusinessDays(now, THREE_DAYS),
-          withStatuses: agencyStatuses,
-        },
-        sortBy: "dateStart",
-      }),
-      uow.conventionQueries.getConventions({
-        filters: {
-          dateSubmissionEqual: subDays(now, TWO_DAYS),
-          withStatuses: [...signatoryStatuses],
-        },
-        sortBy: "dateStart",
-      }),
-    ]);
+    const [conventionsForLastSignatoryReminder, conventionsForAgencyReminders] =
+      await Promise.all([
+        uow.conventionQueries.getConventions({
+          filters: {
+            startDateGreater: now,
+            startDateLessOrEqual: addBusinessDays(now, TWO_DAYS),
+            withStatuses: signatoryStatuses,
+          },
+          sortBy: "dateStart",
+        }),
+        uow.conventionQueries.getConventions({
+          filters: {
+            startDateGreater: now,
+            startDateLessOrEqual: addBusinessDays(now, THREE_DAYS),
+            withStatuses: agencyStatuses,
+          },
+          sortBy: "dateStart",
+        }),
+      ]);
 
     const events = [
       ...conventionsForLastSignatoryReminder.map(({ id }) =>
@@ -101,12 +91,6 @@ export class ConventionsReminder extends TransactionalUseCase<
       ),
       ...conventionsForAgencyReminders.flatMap((c) =>
         this.#makeAgencyReminders(c),
-      ),
-      ...conventionsForFirstSignatoryReminder.map(({ id }) =>
-        this.#makeConventionReminderRequiredEvent(
-          id,
-          "FirstReminderForSignatories",
-        ),
       ),
     ];
 

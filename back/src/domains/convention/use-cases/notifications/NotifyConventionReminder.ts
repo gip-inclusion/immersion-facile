@@ -44,7 +44,7 @@ type EmailWithRole = {
 
 type SignatoriesReminderKind = ExtractFromExisting<
   ReminderKind,
-  "FirstReminderForSignatories" | "LastReminderForSignatories"
+  "LastReminderForSignatories"
 >;
 
 type AgenciesReminderKind = ExtractFromExisting<
@@ -94,10 +94,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       await uow.conventionQueries.getConventionById(conventionId);
     if (!conventionRead) throw errors.convention.notFound({ conventionId });
 
-    if (
-      reminderKind === "FirstReminderForSignatories" ||
-      reminderKind === "LastReminderForSignatories"
-    )
+    if (reminderKind === "LastReminderForSignatories")
       return this.#onSignatoriesReminder(reminderKind, conventionRead, uow);
 
     const agency = await uow.agencyRepository.getById(conventionRead.agencyId);
@@ -113,10 +110,6 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     { role, email, firstName, lastName }: GenericActor<Role>,
     convention: ConventionDto,
     uow: UnitOfWork,
-    kind: Extract<
-      ReminderKind,
-      "FirstReminderForSignatories" | "LastReminderForSignatories"
-    >,
   ): Promise<TemplatedEmail> {
     const makeShortMagicLink = prepareMagicShortLinkMaker({
       config: this.#config,
@@ -132,10 +125,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     });
 
     return {
-      kind:
-        kind === "FirstReminderForSignatories"
-          ? "SIGNATORY_FIRST_REMINDER"
-          : "SIGNATORY_LAST_REMINDER",
+      kind: "SIGNATORY_LAST_REMINDER",
       recipients: [email],
       params: {
         actorFirstName: firstName,
@@ -227,7 +217,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
 
     const templatedEmails: TemplatedEmail[] = await Promise.all(
       emailActors.map((actor) =>
-        this.#makeSignatoryReminderEmail(actor, conventionRead, uow, kind),
+        this.#makeSignatoryReminderEmail(actor, conventionRead, uow),
       ),
     );
 

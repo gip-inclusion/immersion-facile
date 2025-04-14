@@ -861,44 +861,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyLogoUrl,
       }),
     },
-    SIGNATORY_FIRST_REMINDER: {
-      niceName: "Convention - Premier rappel de signature",
-      tags: ["relance signatures manquantes"],
-      createEmailVariables: ({
-        actorFirstName,
-        actorLastName,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        magicLinkUrl,
-        signatoriesSummary,
-      }) => ({
-        subject:
-          "RAPPEL - La demande de convention d'immersion faite il y a deux jours n'est pas complètement signée",
-        greetings: greetingsWithConventionId(
-          conventionId,
-          `${actorFirstName} ${actorLastName}`,
-        ),
-        content: `
-      Certains signataires n'ont pas encore signé la demande de convention d'immersion en milieu professionnel pour ${beneficiaryFirstName} ${beneficiaryLastName}.
-      
-      Voici, à date, l'état des signatures :
-      ${signatoriesSummary}
-
-      <strong>Sans toutes les signatures, la convention ne peut être établie et l'établissement ${businessName} ne pourra pas accueillir en immersion ${beneficiaryFirstName} ${beneficiaryLastName}.</strong>
-
-      Nous vous remercions de confirmer au plus vite cette demande.`,
-        buttons: magicLinkUrl && [
-          {
-            label: "Ouvrir la demande de convention",
-            url: `${magicLinkUrl}`,
-          },
-        ],
-        subContent: `Bonne journée,
-      L'équipe Immersion Facilitée`,
-      }),
-    },
     SIGNATORY_LAST_REMINDER: {
       niceName: "Convention - Dernier rappel de signature",
       tags: ["relance signatures manquantes"],

@@ -429,16 +429,6 @@ export type EmailParamsByEmailType = {
     additionalDetails: string;
     conventionFormUrl: string;
   };
-  SIGNATORY_FIRST_REMINDER: {
-    actorFirstName: string;
-    actorLastName: string;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    conventionId: ConventionId;
-    magicLinkUrl: AbsoluteUrl | undefined;
-    signatoriesSummary: string;
-  };
   SIGNATORY_LAST_REMINDER: {
     actorFirstName: string;
     actorLastName: string;
