@@ -721,7 +721,6 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           ? toDisplayedDate({
               date: new Date(signedAt),
               withHours: true,
-              showGMT: true,
             })
           : "DATE INVALIDE"
       }.
@@ -1260,11 +1259,11 @@ Tél : ${beneficiaryPhone}`,
           : "de mini stage"
       } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}, qui devait se dérouler du ${
         isStringDate(dateStart)
-          ? toDisplayedDate({ date: new Date(dateStart), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateStart) })
           : "DATE INVALIDE"
       } au ${
         isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateEnd) })
           : "DATE INVALIDE"
       } a été annulée par ${agencyName}.
       
@@ -1316,12 +1315,11 @@ Tél : ${beneficiaryPhone}`,
         isStringDate(dateStart)
           ? toDisplayedDate({
               date: new Date(dateStart),
-              withHours: true,
             })
           : "DATE INVALIDE"
       } au ${
         isStringDate(dateEnd)
-          ? toDisplayedDate({ date: new Date(dateEnd), withHours: true })
+          ? toDisplayedDate({ date: new Date(dateEnd) })
           : "DATE INVALIDE"
       } dans l'entreprise ${businessName} est supprimée.
       

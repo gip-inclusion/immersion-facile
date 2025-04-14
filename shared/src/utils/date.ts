@@ -31,13 +31,16 @@ export const toDateString = (date: Date): string => {
 export const toDisplayedDate = ({
   date,
   withHours = false,
-  showGMT,
 }:
-  | { date: Date; withHours?: false; showGMT?: false }
-  | { date: Date; withHours?: true; showGMT?: boolean }): string =>
-  `${format(date, withHours ? "dd/MM/yyyy 'à' HH'h'mm" : "dd/MM/yyyy")}${
-    showGMT ? " (heure de Paris GMT+1)" : ""
-  }`;
+  | { date: Date; withHours?: false }
+  | { date: Date; withHours?: true }): string => {
+  if (withHours) {
+    return `${format(date, "dd/MM/yyyy 'à' HH'h'mm '(heure de Paris GMT+1)'")}`;
+  }
+
+  const [year, month, day] = date.toISOString().split("T")[0].split("-");
+  return `${day}/${month}/${year}`;
+};
 
 export const isStringDate = (string: string) => isValid(new Date(string));
 
