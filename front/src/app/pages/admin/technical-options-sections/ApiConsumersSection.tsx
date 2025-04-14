@@ -14,7 +14,7 @@ import {
   type ApiConsumer,
   type ApiConsumerJwt,
   domElementIds,
-  toDateString,
+  toDateUTCString,
   toDisplayedDate,
 } from "shared";
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
@@ -70,8 +70,8 @@ export const ApiConsumersSection = () => {
   const onEditButtonClick = (apiConsumer: ApiConsumer) => {
     setCurrentApiConsumerToEdit({
       ...apiConsumer,
-      expirationDate: toDateString(new Date(apiConsumer.expirationDate)),
-      createdAt: toDateString(new Date(apiConsumer.createdAt)),
+      expirationDate: toDateUTCString(new Date(apiConsumer.expirationDate)),
+      createdAt: toDateUTCString(new Date(apiConsumer.createdAt)),
     });
     apiConsumerModal.open();
   };
@@ -237,8 +237,8 @@ const defaultApiConsumerValues = (id: string): ApiConsumer => ({
       subscriptions: [],
     },
   },
-  createdAt: toDateString(new Date()),
-  expirationDate: toDateString(addYears(new Date(), 1)),
+  createdAt: toDateUTCString(new Date()),
+  expirationDate: toDateUTCString(addYears(new Date(), 1)),
 });
 
 const apiConsumerModal = createModal({

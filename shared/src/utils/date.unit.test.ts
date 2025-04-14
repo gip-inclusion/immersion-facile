@@ -1,19 +1,19 @@
 import { parseISO } from "date-fns";
 import {
   hoursValueToHoursDisplayed,
-  toDateString,
+  toDateUTCString,
   toDisplayedDate,
 } from "./date";
 
-describe("Date utils tests - toDateString", () => {
+describe("Date utils tests - toDateUTCString", () => {
   it("should format a valid date", () => {
     const date = parseISO("2021-01-01T00:00:00.000Z");
-    expect(toDateString(date)).toBe("2021-01-01");
+    expect(toDateUTCString(date)).toBe("2021-01-01");
   });
 
   it("can't format an empty string", () => {
     const date = parseISO("");
-    expect(() => toDateString(date)).toThrow("Invalid time value");
+    expect(() => toDateUTCString(date)).toThrow("Invalid time value");
   });
 });
 

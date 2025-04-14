@@ -14,7 +14,7 @@ import {
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
-  toDateString,
+  toDateUTCString,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {
@@ -128,12 +128,12 @@ export const ScheduleSection = () => {
 
   useEffect(() => {
     setDateStartInputValue(
-      toDateString(
+      toDateUTCString(
         convertLocaleDateToUtcTimezoneDate(new Date(values.dateStart)),
       ),
     );
     setDateEndInputValue(
-      toDateString(
+      toDateUTCString(
         convertLocaleDateToUtcTimezoneDate(new Date(values.dateEnd)),
       ),
     );
@@ -149,7 +149,7 @@ export const ScheduleSection = () => {
             severity="info"
             className={fr.cx("fr-mb-4w")}
             title="Période et durée de stage"
-            description="La présente convention est signée pour la durée de la période d’observation en milieu professionnel, qui ne peut dépasser 5 jours sur une période de vacances scolaires fixée annuellement par le Ministère de l’éducation nationale. La durée de la présence hebdomadaire des jeunes en milieu professionnel ne peut excéder 30 heures pour les jeunes de moins de 15 ans et 35 heures pour les jeunes de 15 ans et plus, répartis sur 5 jours maximum. Plusieurs stages sont possibles pour un même jeune pendant l’année, sous réserve d’observer des métiers différents et de ne pas dépasser la moitié de chaque période de vacances scolaires."
+            description="La présente convention est signée pour la durée de la période d'observation en milieu professionnel, qui ne peut dépasser 5 jours sur une période de vacances scolaires fixée annuellement par le Ministère de l'éducation nationale. La durée de la présence hebdomadaire des jeunes en milieu professionnel ne peut excéder 30 heures pour les jeunes de moins de 15 ans et 35 heures pour les jeunes de 15 ans et plus, répartis sur 5 jours maximum. Plusieurs stages sont possibles pour un même jeune pendant l'année, sous réserve d'observer des métiers différents et de ne pas dépasser la moitié de chaque période de vacances scolaires."
           />
 
           <Alert
@@ -161,8 +161,8 @@ export const ScheduleSection = () => {
                 Afin de préparer au mieux les conditions de réalisation du
                 stage,{" "}
                 <strong>
-                  les signataires de la conventions s’engagent à avoir une
-                  couverture d’assurance
+                  les signataires de la conventions s'engagent à avoir une
+                  couverture d'assurance
                 </strong>{" "}
                 suffisante tant pour les dommages pouvant être occasionnés par
                 le jeune que pour les risques auxquels il peut être exposé.
@@ -186,7 +186,7 @@ export const ScheduleSection = () => {
             }
           },
           onBlur: onDateInputBlur,
-          min: toDateString(new Date("2022-01-01")),
+          min: toDateUTCString(new Date("2022-01-01")),
         }}
         {...getFieldError("dateStart")}
       />
@@ -205,7 +205,7 @@ export const ScheduleSection = () => {
             }
           },
           onBlur: onDateInputBlur,
-          max: toDateString(new Date(dateMax)),
+          max: toDateUTCString(new Date(dateMax)),
         }}
         {...getFieldError("dateEnd")}
       />

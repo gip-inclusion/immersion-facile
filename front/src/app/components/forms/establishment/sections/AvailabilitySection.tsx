@@ -9,7 +9,7 @@ import {
   type FormEstablishmentDto,
   domElementIds,
   immersionFacileContactEmail,
-  toDateString,
+  toDateUTCString,
   toDisplayedDate,
 } from "shared";
 import { richBooleanSelectOptions } from "src/app/contents/forms/common/values";
@@ -54,7 +54,7 @@ export const AvailabilitySection = ({
 
   const currentValueFormatted =
     currentNextAvailabilityDate &&
-    toDateString(new Date(currentNextAvailabilityDate));
+    toDateUTCString(new Date(currentNextAvailabilityDate));
 
   const isStepMode = currentStep !== null;
 
@@ -119,7 +119,7 @@ export const AvailabilitySection = ({
             },
             onChange: () => {},
             type: "date",
-            min: toDateString(new Date()),
+            min: toDateUTCString(new Date()),
           }}
           {...getFieldError("nextAvailabilityDate")}
         />
