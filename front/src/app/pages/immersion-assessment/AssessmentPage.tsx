@@ -1,14 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { intersection } from "ramda";
 import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
   type Role,
-  assessmentRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  hasAllowedRoleOnAssessment,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";
@@ -38,9 +37,6 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const inclusionConnectedRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
-  const isAdmin = useAppSelector(
-    inclusionConnectedSelectors.currentUser,
-  )?.isBackofficeAdmin;
 
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
   const fetchConventionError =
@@ -56,7 +52,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
     );
-  const roles: Role[] = inclusionConnectedRoles ?? [roleFromJwt];
+  const roles: Role[] = roleFromJwt ? [roleFromJwt] : inclusionConnectedRoles;
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt: route.params.jwt,
     conventionId,
@@ -65,11 +61,6 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const isLoading = isConventionLoading || isAssessmentLoading;
 
   const isConventionValidated = convention?.status === "ACCEPTED_BY_VALIDATOR";
-
-  const hasRight =
-    (assessmentRoles.length > 0 &&
-      intersection(assessmentRoles, roles).length > 0) ||
-    isAdmin;
 
   if (fetchConventionError)
     return (
@@ -94,7 +85,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   return (
     <HeaderFooterLayout>
       {isLoading && <Loader />}
-      {hasRight === false ? (
+      {!hasAllowedRoleOnAssessment(roles, "CreateAssessment") ? (
         <Alert
           severity="error"
           title="Erreur"

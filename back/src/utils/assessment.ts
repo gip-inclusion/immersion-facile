@@ -1,13 +1,13 @@
-import { intersection } from "ramda";
 import {
   type AgencyDto,
+  type AssessmentMode,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   type Role,
   assessmentDtoSchema,
-  assessmentRoles,
   errors,
   getIcUserRoleForAccessingConvention,
+  hasAllowedRoleOnAssessment,
   isSomeEmailMatchingEmailHash,
   legacyAssessmentDtoSchema,
 } from "shared";
@@ -16,7 +16,6 @@ import type { AssessmentEntity } from "../domains/convention/entities/Assessment
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../domains/inclusion-connected-users/helpers/userRights.helper";
 
-type AssessmentMode = "CreateAssessment" | "GetAssessment";
 export const throwForbiddenIfNotAllowedForAssessments = async (
   mode: AssessmentMode,
   convention: ConventionDto,
@@ -35,20 +34,18 @@ export const throwForbiddenIfNotAllowedForAssessments = async (
 
     if (emailsOrError instanceof Error) throw emailsOrError;
     if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
-      throw errors.assessment.forbidden();
+      throw errors.assessment.forbidden(mode);
   }
+
   if ("userId" in jwtPayload) {
     const user = await getUserWithRights(uow, jwtPayload.userId);
-    if (user.isBackofficeAdmin) return;
+    if (user.isBackofficeAdmin && mode === "GetAssessment") return;
     const userRolesOnConvention = getIcUserRoleForAccessingConvention(
       convention,
       user,
     );
-    if (
-      userRolesOnConvention.length === 0 ||
-      intersection(userRolesOnConvention, assessmentRoles).length === 0
-    )
-      throw errors.assessment.forbidden();
+    if (!hasAllowedRoleOnAssessment(userRolesOnConvention, mode))
+      throw errors.assessment.forbidden(mode);
   }
 };
 
@@ -65,20 +62,20 @@ const assessmentEmailsByRole = (
   agency: AgencyDto,
   mode: AssessmentMode,
 ): Record<Role, string[] | Error> => ({
-  "back-office": errors.assessment.forbidden(),
-  "to-review": errors.assessment.forbidden(),
-  "agency-viewer": errors.assessment.forbidden(),
+  "back-office": errors.assessment.forbidden(mode),
+  "to-review": errors.assessment.forbidden(mode),
+  "agency-viewer": errors.assessment.forbidden(mode),
   beneficiary:
     mode === "GetAssessment"
       ? [convention.signatories.beneficiary.email]
-      : errors.assessment.forbidden(),
-  "beneficiary-current-employer": errors.assessment.forbidden(),
-  "beneficiary-representative": errors.assessment.forbidden(),
-  "agency-admin": errors.assessment.forbidden(),
+      : errors.assessment.forbidden(mode),
+  "beneficiary-current-employer": errors.assessment.forbidden(mode),
+  "beneficiary-representative": errors.assessment.forbidden(mode),
+  "agency-admin": errors.assessment.forbidden(mode),
   "establishment-representative":
     mode === "GetAssessment"
       ? [convention.signatories.establishmentRepresentative.email]
-      : errors.assessment.forbidden(),
+      : errors.assessment.forbidden(mode),
   "establishment-tutor": [convention.establishmentTutor.email],
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,

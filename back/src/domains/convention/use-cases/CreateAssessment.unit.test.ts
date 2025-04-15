@@ -185,7 +185,7 @@ describe("CreateAssessment", () => {
             )[role],
             role,
           }),
-          errors.assessment.forbidden(),
+          errors.assessment.forbidden("CreateAssessment"),
         );
       },
     );
@@ -199,7 +199,7 @@ describe("CreateAssessment", () => {
             userId: userWithoutRoleOnConvention.id,
           },
         ),
-        errors.assessment.forbidden(),
+        errors.assessment.forbidden("CreateAssessment"),
       );
     });
 
@@ -228,7 +228,7 @@ describe("CreateAssessment", () => {
             )[role],
             role,
           }),
-          errors.assessment.forbidden(),
+          errors.assessment.forbidden("CreateAssessment"),
         );
       },
     );
@@ -282,22 +282,6 @@ describe("CreateAssessment", () => {
 
       await createAssessment.execute(assessment, {
         userId: counsellor.id,
-      });
-
-      expectArraysToEqual(uow.assessmentRepository.assessments, [
-        {
-          ...assessment,
-          _entityName: "Assessment",
-          numberOfHoursActuallyMade: validatedConvention.schedule.totalHours,
-        },
-      ]);
-    });
-
-    it("should save the Assessment when user is back-office admin", async () => {
-      uow.conventionRepository.setConventions([validatedConvention]);
-
-      await createAssessment.execute(assessment, {
-        userId: backOfficeAdmin.id,
       });
 
       expectArraysToEqual(uow.assessmentRepository.assessments, [

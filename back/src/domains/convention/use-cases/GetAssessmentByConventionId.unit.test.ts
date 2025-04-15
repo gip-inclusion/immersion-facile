@@ -134,7 +134,7 @@ describe("GetAssessmentByConventionId", () => {
               role,
             },
           ),
-          errors.assessment.forbidden(),
+          errors.assessment.forbidden("GetAssessment"),
         );
       },
     );
@@ -149,7 +149,7 @@ describe("GetAssessmentByConventionId", () => {
             userId: userWithoutRoleOnConvention.id,
           },
         ),
-        errors.assessment.forbidden(),
+        errors.assessment.forbidden("GetAssessment"),
       );
     });
 
@@ -182,7 +182,7 @@ describe("GetAssessmentByConventionId", () => {
               role,
             },
           ),
-          errors.assessment.forbidden(),
+          errors.assessment.forbidden("GetAssessment"),
         );
       },
     );

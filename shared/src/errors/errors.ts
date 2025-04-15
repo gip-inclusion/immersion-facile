@@ -5,6 +5,7 @@ import type {
   ApiConsumerRightName,
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
+import type { AssessmentMode } from "../assessment/assessment.dto";
 import type {
   ConventionDto,
   ConventionId,
@@ -151,9 +152,11 @@ export const errors = {
       new NotFoundError(
         `Il n'y a pas de bilan pour la convention ${conventionId}.`,
       ),
-    forbidden: () =>
+    forbidden: (mode: AssessmentMode) =>
       new ForbiddenError(
-        "Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs notifiés par email de l'agence prescriptrice peuvent récupérer ou créer le bilan.",
+        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs notifiés par email de l'agence prescriptrice peuvent ${
+          mode === "GetAssessment" ? "récupérer" : "créer"
+        } le bilan.`,
       ),
     conventionIdMismatch: () =>
       new ForbiddenError(
