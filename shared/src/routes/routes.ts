@@ -37,6 +37,7 @@ export const frontRoutes = {
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   profile: "mon-profil",
   search: "recherche",
+  searchForStudent: "recherche-scolaire",
   searchDiagoriente: "recherche-diagoriente",
   standard: "pages",
   unsubscribeEstablishmentLead: "desinscription-prospect",

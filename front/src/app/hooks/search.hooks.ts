@@ -20,7 +20,9 @@ export const encodedSearchUriParams = [
   "place",
 ] satisfies (keyof SearchPageParams)[];
 
-type SearchRoute = Route<typeof routes.search>;
+export type SearchRoute = Route<
+  typeof routes.search | typeof routes.searchForStudent
+>;
 
 const filterUrlsParamsAndUpdateUrl = ({
   values,
@@ -62,6 +64,8 @@ export const useSearch = ({ name }: SearchRoute) => {
       dispatch(
         searchSlice.actions.searchRequested({
           ...rest,
+          establishmentSearchableBy:
+            name === "searchForStudent" ? "students" : "jobSeekers",
           appellationCodes: appellations?.map(
             (appellation) => appellation.appellationCode,
           ),
