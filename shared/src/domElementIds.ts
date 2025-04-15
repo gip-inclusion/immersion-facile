@@ -826,4 +826,5 @@ export const domElementIds = {
       "im-convention-form__initiate-dont-know-category-button",
   },
   beneficiaryDashboard: {},
+  searchForStudent: {},
 } satisfies DomElementIds;

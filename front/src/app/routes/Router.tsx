@@ -211,6 +211,9 @@ const getPageByRouteName: {
   search: (route) => (
     <SearchPage route={route} useNaturalLanguageForAppellations />
   ),
+  searchForStudent: (route) => (
+    <SearchPage route={route} useNaturalLanguageForAppellations />
+  ),
   standard: (route) =>
     standardPageSlugs.includes(route.params.pagePath as StandardPageSlugs) ? (
       <StandardLayout route={route} />
