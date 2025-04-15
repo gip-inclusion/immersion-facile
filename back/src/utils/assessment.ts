@@ -1,4 +1,3 @@
-import { intersection } from "ramda";
 import {
   type AgencyDto,
   type AssessmentMode,
@@ -6,7 +5,6 @@ import {
   type ConventionRelatedJwtPayload,
   type Role,
   assessmentDtoSchema,
-  assessmentRoles,
   errors,
   getIcUserRoleForAccessingConvention,
   hasAllowedRoleOnAssessment,
