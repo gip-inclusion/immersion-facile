@@ -19,6 +19,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   hasAllowedRole,
+  hasAllowedRoleOnAssessment,
   isConventionRenewed,
   isConventionValidated,
   userHasEnoughRightsOnConvention,
@@ -67,9 +68,6 @@ export const ConventionManageActions = ({
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const icUserRoles = useAppSelector(
-    inclusionConnectedSelectors.userRolesForFetchedConvention,
-  );
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
@@ -195,7 +193,7 @@ export const ConventionManageActions = ({
     "PARTIALLY_SIGNED",
   ];
   const shouldShowSignatureAction =
-    icUserRoles.includes("establishment-representative") &&
+    roles.includes("establishment-representative") &&
     !convention.signatories.establishmentRepresentative.signedAt &&
     jwtParams.kind !== "backoffice" &&
     allowedToSignStatuses.includes(convention.status);
@@ -208,7 +206,8 @@ export const ConventionManageActions = ({
   const canAssessmentBeFilled =
     convention.status === "ACCEPTED_BY_VALIDATOR" &&
     isBefore(new Date(convention.dateStart), new Date()) &&
-    !assessment;
+    !assessment &&
+    hasAllowedRoleOnAssessment(roles, "CreateAssessment");
 
   const shouldShowAssessmentAnbandonAction =
     canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
@@ -216,7 +215,8 @@ export const ConventionManageActions = ({
   const shouldShowAssessmentFullFillAction =
     canAssessmentBeFilled && !isConventionEndingInOneDayOrMore;
 
-  const shouldShowAssessmentDocumentAction = !!assessment;
+  const shouldShowAssessmentDocumentAction =
+    !!assessment && hasAllowedRoleOnAssessment(roles, "GetAssessment");
 
   const requesterRoles = roles.filter(
     (role): role is ExcludeFromExisting<Role, "agency-admin"> =>
@@ -236,12 +236,6 @@ export const ConventionManageActions = ({
         "validator",
         "back-office",
       ]).length > 0 &&
-      allowedToTransferStatuses.includes(convention.status)
-    )
-      return true;
-    if (
-      intersection(icUserRoles, ["agency-admin", "counsellor", "validator"])
-        .length > 0 &&
       allowedToTransferStatuses.includes(convention.status)
     )
       return true;
