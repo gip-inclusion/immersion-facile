@@ -32,9 +32,12 @@ import { SearchInfoSection } from "src/app/components/search/SearchInfoSection";
 import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { encodedSearchUriParams, useSearch } from "src/app/hooks/search.hooks";
+import {
+  type SearchRoute,
+  encodedSearchUriParams,
+  useSearch,
+} from "src/app/hooks/search.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import type { routes } from "src/app/routes/routes";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
@@ -44,7 +47,6 @@ import {
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";
-import type { Route } from "type-route";
 import "./SearchPage.scss";
 import Styles from "./SearchPage.styles";
 
@@ -73,7 +75,7 @@ export const SearchPage = ({
   route,
   useNaturalLanguageForAppellations,
 }: {
-  route: Route<typeof routes.search>;
+  route: SearchRoute;
   useNaturalLanguageForAppellations?: boolean;
 }) => {
   const { cx } = useStyles();
@@ -331,7 +333,10 @@ export const SearchPage = ({
                   <Button
                     type="submit"
                     nativeButtonProps={{
-                      id: domElementIds.search.searchSubmitButton,
+                      id:
+                        route.name === "search"
+                          ? domElementIds.search.searchSubmitButton
+                          : domElementIds.search.searchStudentSubmitButton,
                     }}
                     disabled={!canSubmitSearch(formValues)}
                   >

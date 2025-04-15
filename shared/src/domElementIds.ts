@@ -164,6 +164,7 @@ export const domElementIds = {
     distanceSelect: "im-search-page__distance-dropdown",
     sortFilter: "im-search-page__sort-filter-select",
     searchSubmitButton: "im-search__submit-search",
+    searchStudentSubmitButton: "im-search__submit-search-for-students",
     searchSortOptionBase: "im-search__search-sort-option-",
     lbbSearchResultButton: "im-search-result__lbb-contact-button",
     searchResultButton: "im-search-result__contact-button",
@@ -834,4 +835,5 @@ export const domElementIds = {
       "im-convention-form__initiate-dont-know-category-button",
   },
   beneficiaryDashboard: {},
+  searchForStudent: {},
 } satisfies DomElementIds;
