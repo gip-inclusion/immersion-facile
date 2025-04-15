@@ -50,7 +50,13 @@ export const allowedRolesToCreateAssessment = [
   "establishment-tutor",
   "validator",
   "counsellor",
+] as const;
+
+export const allowedRolesToAccessAssessment = [
+  ...allowedRolesToCreateAssessment,
   "back-office",
+  "establishment-representative",
+  "beneficiary",
 ] as const;
 
 export const allowedRolesToAccessAssessment = [
