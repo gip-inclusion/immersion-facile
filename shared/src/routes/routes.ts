@@ -28,6 +28,7 @@ export const frontRoutes = {
   homeEstablishments: "accueil-entreprises",
   assessment: "bilan-immersion",
   offer: "offre",
+  offerForStudent: "offre-scolaire",
   offerExternal: "tentez-votre-chance",
   landingEstablishment: "accueil-etablissement",
   magicLinkRenewal: "refraichir-lien",

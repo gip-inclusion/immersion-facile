@@ -8,15 +8,18 @@ import {
   useStyleUtils,
 } from "react-design-system";
 import {
+  type AppellationCode,
   type SearchResultDto,
   domElementIds,
   isSuperEstablishment,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import type { SearchRoute } from "src/app/hooks/search.hooks";
 import { routes } from "src/app/routes/routes";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
+import type { Link } from "type-route";
 import { SearchResult } from "./SearchResult";
 
 type ResultsPerPageOptions = (typeof resultsPerPageOptions)[number];
@@ -31,7 +34,9 @@ export const SearchListResults = ({
   showDistance,
   currentPage,
   setCurrentPageValue,
+  route,
 }: {
+  route: SearchRoute;
   showDistance: boolean;
   currentPage: number;
   setCurrentPageValue: (newPageValue: number) => void;
@@ -144,20 +149,11 @@ export const SearchListResults = ({
                         </SearchResultIllustration>
                       }
                       showDistance={showDistance}
-                      linkProps={
-                        searchResult.voluntaryToImmersion
-                          ? routes.searchResult({
-                              appellationCode: appellationCode ?? "",
-                              siret: searchResult.siret,
-                              ...(searchResult.locationId
-                                ? { location: searchResult.locationId }
-                                : {}),
-                            }).link
-                          : routes.searchResultExternal({
-                              siret: searchResult.siret,
-                              appellationCode: appellationCode ?? "",
-                            }).link
-                      }
+                      linkProps={makeOfferLink(
+                        route,
+                        searchResult,
+                        appellationCode,
+                      )}
                     />
                   </div>
                 );
@@ -221,4 +217,27 @@ export const SearchListResults = ({
       </div>
     </div>
   );
+};
+
+const makeOfferLink = (
+  route: SearchRoute,
+  { siret, locationId, voluntaryToImmersion }: SearchResultDto,
+  appellationCode?: AppellationCode,
+): Link => {
+  const definedAppellationCode: AppellationCode = appellationCode ?? "";
+  if (!voluntaryToImmersion)
+    return routes.searchResultExternal({
+      siret,
+      appellationCode: definedAppellationCode,
+    }).link;
+
+  const searchParams = {
+    appellationCode: definedAppellationCode,
+    siret,
+    ...(locationId ? { location: locationId } : {}),
+  };
+
+  return route.name === "search"
+    ? routes.searchResult(searchParams).link
+    : routes.searchResultForStudent(searchParams).link;
 };
