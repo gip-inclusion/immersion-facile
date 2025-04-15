@@ -188,6 +188,7 @@ const getPageByRouteName: {
   homeEstablishments: () => <HomePage type="establishment" />,
   assessment: (route) => <AssessmentPage route={route} />,
   searchResult: () => <SearchResultPage />,
+  searchResultForStudent: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage isExternal />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionConnectedUser: (route) => (

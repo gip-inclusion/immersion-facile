@@ -827,4 +827,5 @@ export const domElementIds = {
   },
   beneficiaryDashboard: {},
   searchForStudent: {},
+  offerForStudent: {},
 } satisfies DomElementIds;

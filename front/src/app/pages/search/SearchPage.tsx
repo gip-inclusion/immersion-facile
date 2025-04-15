@@ -688,6 +688,7 @@ export const SearchPage = ({
                     </div>
                   </div>
                   <SearchListResults
+                    route={route}
                     currentPage={formValues.currentPage}
                     showDistance={areValidGeoParams(searchMade)}
                     setCurrentPageValue={(newPageValue: number) => {

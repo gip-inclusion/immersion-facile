@@ -98,7 +98,9 @@ export const SearchResultPage = ({
   isExternal?: boolean;
 }) => {
   const route = useRoute() as Route<
-    typeof routes.searchResult | typeof routes.searchResultExternal
+    | typeof routes.searchResult
+    | typeof routes.searchResultExternal
+    | typeof routes.searchResultForStudent
   >;
   const currentSearchResult = useAppSelector(
     searchSelectors.currentSearchResult,
