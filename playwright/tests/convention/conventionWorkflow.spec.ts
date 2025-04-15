@@ -12,6 +12,8 @@ import {
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,
+  tomorrowDateDisplayed,
+  updatedEndDateDisplayed,
 } from "../../utils/convention";
 
 test.describe.configure({ mode: "serial" });
@@ -50,7 +52,7 @@ test.describe("Convention creation and modification workflow", () => {
     test("signs convention for first signatory and validator requires modification", async ({
       page,
     }) => {
-      await signConvention(page, magicLinks, 0);
+      await signConvention(page, magicLinks, 0, tomorrowDateDisplayed);
       await goToAdminTab(page, "adminNotifications");
       const emailWrapper = await openEmailInAdmin(
         page,
@@ -126,22 +128,49 @@ test.describe("Convention creation and modification workflow", () => {
       });
 
       test("signs convention for signatory 1", async ({ page }) => {
-        await signConvention(page, signatoriesMagicLinks, 0);
+        await signConvention(
+          page,
+          signatoriesMagicLinks,
+          0,
+          updatedEndDateDisplayed,
+        );
       });
 
       test("signs convention for signatory 2", async ({ page }) => {
-        await signConvention(page, signatoriesMagicLinks, 1);
+        await signConvention(
+          page,
+          signatoriesMagicLinks,
+          1,
+          updatedEndDateDisplayed,
+        );
       });
-
       test("signs convention for signatory 3", async ({ page }) => {
-        await signConvention(page, signatoriesMagicLinks, 2);
+        await signConvention(
+          page,
+          signatoriesMagicLinks,
+          2,
+          updatedEndDateDisplayed,
+        );
       });
-
-      test("signs convention for signatory 4", async ({ page }) => {
-        await signConvention(page, signatoriesMagicLinks, 3);
-        await page.waitForTimeout(testConfig.timeForEventCrawler);
+      test.describe("last signatory signs convention from Martinique", () => {
+        test.use({
+          timezoneId: "America/Martinique",
+        });
+        test("signs convention for signatory 4", async ({ page }) => {
+          await signConvention(
+            page,
+            signatoriesMagicLinks,
+            3,
+            updatedEndDateDisplayed,
+          );
+        });
       });
+    });
 
+    test.describe("Convention validation", () => {
+      test.use({
+        timezoneId: "Europe/Paris",
+      });
       test("reviews and validate convention", async ({ page }) => {
         await page.goto("/");
         await goToAdminTab(page, "adminNotifications");
@@ -177,5 +206,16 @@ test.describe("Convention creation and modification workflow", () => {
         await expect(page.locator(".fr-alert--success")).toBeVisible();
       });
     });
+  });
+});
+
+test.describe("Convention creation and modification workflow in Martinique", () => {
+  test.use({
+    timezoneId: "America/Martinique",
+  });
+  test("creates a new convention on a client in Martinique", async ({
+    page,
+  }) => {
+    await submitBasicConventionForm(page);
   });
 });

@@ -15,11 +15,39 @@ import {
   phoneRegexp,
 } from "./utils";
 
-let currentStep = 1;
-
 export type ConventionSubmitted = {
   agencyId: AgencyId;
 };
+
+const beneficiaryBirthdate = faker.date
+  .birthdate({
+    min: 1910,
+    max: 2005,
+  })
+  .toISOString()
+  .split("T")[0];
+
+const beneficiaryBirthdateDisplayed = format(
+  new Date(beneficiaryBirthdate),
+  "dd/MM/yyyy",
+);
+
+const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
+const getTomorrowDate = () =>
+  format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
+
+const currentDate = getCurrentDate();
+const currentDateDisplayed = format(new Date(currentDate), "dd/MM/yyyy");
+const tomorrowDate = getTomorrowDate();
+export const tomorrowDateDisplayed = format(
+  new Date(tomorrowDate),
+  "dd/MM/yyyy",
+);
+const updatedEndDate = format(addBusinessDays(new Date(), 3), "yyyy-MM-dd");
+export const updatedEndDateDisplayed = format(
+  new Date(updatedEndDate),
+  "dd/MM/yyyy",
+);
 
 export const submitBasicConventionForm = async (
   page: Page,
@@ -52,7 +80,7 @@ export const submitBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
     agencyId,
   );
-  await openNextSection(page); // Open Beneficiary section
+  await openConventionAccordionSection(page, 1); // Open Beneficiary section
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.firstName}`,
     faker.person.firstName(),
@@ -71,15 +99,9 @@ export const submitBasicConventionForm = async (
   );
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.beneficiarySection.birthdate}`,
-    faker.date
-      .birthdate({
-        min: 1910,
-        max: 2005,
-      })
-      .toISOString()
-      .split("T")[0],
+    beneficiaryBirthdate,
   );
-  await openNextSection(page); // Open Establishment section
+  await openConventionAccordionSection(page, 2); // Open Establishment section
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.siret}`,
     getRandomSiret(),
@@ -104,25 +126,39 @@ export const submitBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.establishmentTutorSection.job}`,
     faker.person.jobType(),
   );
-  await openNextSection(page); // Open place / hour section
+  await openConventionAccordionSection(page, 3); // Open place / hour section
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
-    getCurrentDate(),
+    currentDate,
   );
+  await page.focus(
+    `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+  );
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.dateStart}`,
+    ),
+  ).toHaveValue(currentDate);
   await page.fill(
     `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
-    getTomorrowDate(),
+    tomorrowDate,
   );
   await page.click(
     `#${domElementIds.conventionImmersionRoute.conventionSection.addHoursButton}`,
   );
+
   await fillAutocomplete({
     page,
     locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
     value: getRandomizedData("addressQueries"),
   });
 
-  await openNextSection(page); // Open immersion details section
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+    ),
+  ).toHaveValue(tomorrowDate);
+  await openConventionAccordionSection(page, 4); // Open immersion details section
 
   await page.click(
     `[for="${domElementIds.conventionImmersionRoute.conventionSection.individualProtection}-0"]`,
@@ -142,7 +178,7 @@ export const submitBasicConventionForm = async (
     `#${domElementIds.conventionImmersionRoute.conventionSection.immersionActivities}`,
     faker.word.words(8),
   );
-  await confirmCreateConventionFormSubmit(page);
+  await confirmCreateConventionFormSubmit(page, tomorrowDateDisplayed);
 
   return {
     agencyId,
@@ -153,6 +189,7 @@ export const signConvention = async (
   page: Page,
   magicLinks: string[],
   signatoryIndex: number,
+  dateEndDisplayed: string,
 ) => {
   console.info(
     "Signing convention with magic link ==>",
@@ -161,6 +198,8 @@ export const signConvention = async (
 
   await page.goto(magicLinks[signatoryIndex]);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
+
+  await checkConventionSummary(page, dateEndDisplayed);
 
   await expectLocatorToBeVisibleAndEnabled(
     await page.locator(
@@ -290,7 +329,13 @@ export const submitEditConventionForm = async (
     .locator(
       `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
     )
-    .fill(format(addBusinessDays(new Date(), 3), "yyyy-MM-dd"));
+    .fill(updatedEndDate);
+
+  await expect(
+    page.locator(
+      `#${domElementIds.conventionImmersionRoute.conventionSection.dateEnd}`,
+    ),
+  ).toHaveValue(updatedEndDate);
 
   await page
     .locator(".schedule-picker__day-circle")
@@ -340,10 +385,10 @@ export const openConventionAccordionSection = async (
     .click();
 };
 
-export const confirmCreateConventionFormSubmit = async (page: Page) => {
-  await page.click(
-    `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
-  );
+export const checkConventionSummary = async (
+  page: Page,
+  dateEndDisplayed: string,
+) => {
   await expectElementToBeVisible(page, ".im-convention-summary__section");
   await expect(
     await page
@@ -359,26 +404,38 @@ export const confirmCreateConventionFormSubmit = async (page: Page) => {
       })
       .getByText("Représentant de l'entreprise"),
   ).toBeVisible();
+  await expect(
+    await page
+      .locator("#im-convention-summary__subsection__value-beneficiaryBirthdate")
+      .textContent(),
+  ).toContain(beneficiaryBirthdateDisplayed);
+  await expect(
+    await page
+      .locator("#im-convention-summary__subsection__value-dateStart")
+      .textContent(),
+  ).toContain(currentDateDisplayed);
+  await expect(
+    await page
+      .locator("#im-convention-summary__subsection__value-dateEnd")
+      .textContent(),
+  ).toContain(dateEndDisplayed);
+};
+export const confirmCreateConventionFormSubmit = async (
+  page: Page,
+  dateEndDisplayed: string,
+) => {
+  await page.click(
+    `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
+  );
+  await checkConventionSummary(page, dateEndDisplayed);
+
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
   await expectElementToBeVisible(page, ".im-submit-confirmation-section");
 };
 
-const getCurrentDate = () => format(new Date(), "yyyy-MM-dd");
-const getTomorrowDate = () =>
-  format(addBusinessDays(new Date(), 1), "yyyy-MM-dd");
-
 const getRandomSiret = () =>
   ["722 003 936 02320", "44229377500031", "130 005 481 00010"][
     Math.floor(Math.random() * 3)
   ];
-
-const openNextSection = async (page: Page) => {
-  await page
-    .locator(".fr-accordion")
-    .nth(currentStep)
-    .locator(".fr-accordion__btn")
-    .click();
-  currentStep++;
-};

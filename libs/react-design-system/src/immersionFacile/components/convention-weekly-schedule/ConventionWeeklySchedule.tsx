@@ -61,7 +61,18 @@ export const ConventionWeeklySchedule = ({
           </div>
           {week.period?.start && week.period?.end && (
             <div className={fr.cx("fr-text--xs", "fr-m-0")}>
-              Du {week.period.start} au {week.period.end}
+              Du{" "}
+              <span
+                id={`${conventionSummaryStyles.subsectionValue}-schedule-start-date`}
+              >
+                {week.period.start}
+              </span>{" "}
+              au{" "}
+              <span
+                id={`${conventionSummaryStyles.subsectionValue}-schedule-end-date`}
+              >
+                {week.period.end}
+              </span>
             </div>
           )}
           <div aria-hidden="true" className={fr.cx("fr-text--xs", "fr-m-0")}>
@@ -79,13 +90,14 @@ export const ConventionWeeklySchedule = ({
               paddingInlineStart: "0",
             }}
           >
-            {week.schedule.map((daySchedule) => (
+            {week.schedule.map((daySchedule, index) => (
               <li
                 key={daySchedule}
                 className={cx(
                   fr.cx("fr-text--sm"),
                   conventionSummaryStyles.subsectionScheduleDay,
                 )}
+                id={`${conventionSummaryStyles.subsectionValue}-schedule-day-${index}`}
               >
                 {daySchedule}
               </li>
