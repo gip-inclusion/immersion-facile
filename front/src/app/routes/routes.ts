@@ -268,6 +268,19 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     },
     () => `/${frontRoutes.offer}`,
   ),
+  searchResultForStudent: defineRoute(
+    {
+      appellationCode: param.query.ofType(appellationStringSerializer),
+      siret: param.query.string,
+      location: param.query.optional.string,
+      contactFirstName: param.query.optional.string,
+      contactLastName: param.query.optional.string,
+      contactEmail: param.query.optional.string,
+      contactPhone: param.query.optional.string,
+      contactMessage: param.query.optional.string,
+    },
+    () => `/${frontRoutes.offerForStudent}`,
+  ),
   searchResultExternal: defineRoute(
     {
       siret: param.query.string,
