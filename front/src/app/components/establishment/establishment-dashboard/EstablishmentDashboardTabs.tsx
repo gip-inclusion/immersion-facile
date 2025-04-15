@@ -5,6 +5,7 @@ import type {
   EstablishmentDashboardTab,
   InclusionConnectedUser,
 } from "shared";
+import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
@@ -63,6 +64,7 @@ const makeEstablishmentDashboardTabs = (
     tabId: "conventions",
     content: (
       <>
+        <InitiateConventionButton />
         <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
         {conventions ? (
           <MetabaseView

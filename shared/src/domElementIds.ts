@@ -770,6 +770,10 @@ export const domElementIds = {
   offerExternal: {},
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
+    initiateConventionModal:
+      "im-manage-establishment__initiate-convention-modal",
+    initiateConventionModalButton:
+      "im-manage-establishment__initiate-convention-modal-button",
     login: {
       connectButton: "im-login-form__inclusion-connect-button--establishment",
     },
