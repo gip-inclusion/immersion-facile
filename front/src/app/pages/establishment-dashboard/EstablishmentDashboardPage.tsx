@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { type ReactNode, useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { EstablishmentDashboardTabs } from "src/app/components/establishment/establishment-dashboard/EstablishmentDashboardtabs";
+import { EstablishmentDashboardTabs } from "src/app/components/establishment/establishment-dashboard/EstablishmentDashboardTabs";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -48,8 +48,15 @@ export const EstablishmentDashboardPage = ({
 
             const proConnectSiret = currentUser.proConnect?.siret;
 
+            const isEstablishmentNameAndAdminsRequired =
+              proConnectSiret &&
+              !currentUser.establishments?.some(
+                (establishment) => establishment.siret === proConnectSiret,
+              ) &&
+              !currentUser.dashboards.establishments.conventions;
+
             useEffect(() => {
-              if (proConnectSiret)
+              if (isEstablishmentNameAndAdminsRequired)
                 dispatch(
                   establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested(
                     {
@@ -59,14 +66,14 @@ export const EstablishmentDashboardPage = ({
                     },
                   ),
                 );
-            }, [proConnectSiret]);
+            }, [
+              proConnectSiret,
+              isEstablishmentNameAndAdminsRequired,
+              inclusionConnectedJwt,
+            ]);
 
             const isDashboardAccessNotAllowed =
-              proConnectSiret &&
-              !currentUser.establishments?.some(
-                (establishment) => establishment.siret === proConnectSiret,
-              ) &&
-              !currentUser.dashboards.establishments.conventions &&
+              isEstablishmentNameAndAdminsRequired &&
               establishmentNameAndAdmins !== null &&
               establishmentNameAndAdmins !== "establishmentNotFound";
 

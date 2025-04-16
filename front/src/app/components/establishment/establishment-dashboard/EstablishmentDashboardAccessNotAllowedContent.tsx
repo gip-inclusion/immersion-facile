@@ -16,10 +16,8 @@ export const EstablishmentDashboardAccessNotAllowedContent = ({
   establishmentNameAndAdmins,
   siret,
 }: EstablishmentDashboardAccessNotAllowedContentProps): ReactNode => (
-  <div className={fr.cx("fr-grid-row")}>
-    <div
-      className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-2", "fr-pr-2w")}
-    >
+  <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+    <div className={fr.cx("fr-hidden", "fr-unhidden-lg", "fr-col-2")}>
       <div>
         <img src={commonIllustrations.reachData} alt="attention" />
       </div>
