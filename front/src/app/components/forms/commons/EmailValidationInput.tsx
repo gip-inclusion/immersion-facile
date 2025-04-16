@@ -75,6 +75,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
 
   return (
     <Input
+      {...stateRelated}
       {...props}
       nativeInputProps={{
         ...props.nativeInputProps,
@@ -82,7 +83,6 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
         onChange,
         type: "email",
       }}
-      {...stateRelated}
     />
   );
 };
