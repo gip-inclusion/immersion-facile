@@ -78,7 +78,7 @@ const dashboardsSchema: z.Schema<
   }),
 });
 
-const proConnectSchema: z.Schema<ProConnectInfos> = z.object({
+const proConnectInfoSchema: z.Schema<ProConnectInfos> = z.object({
   externalId: zStringCanBeEmpty, // Si proConnecté et donc externalId fourni, alors pourquoi chaine vide?
   siret: siretSchema,
 });
@@ -89,7 +89,7 @@ const userSchema: z.Schema<User> = z.object({
   createdAt: dateTimeIsoStringSchema,
   firstName: zStringCanBeEmpty,
   lastName: zStringCanBeEmpty,
-  proConnect: proConnectSchema.or(z.null()),
+  proConnect: proConnectInfoSchema.or(z.null()),
 });
 
 export const userInListSchema: z.Schema<UserInList> = userSchema.and(
