@@ -156,9 +156,8 @@ const makeSignatoriesSubsections = (
               ) && signatoriesSubsectionButtonProps
                 ? signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
-                    convention.signatories.establishmentRepresentative.phone,
-                    !!convention.signatories.establishmentRepresentative
-                      .signedAt,
+                    convention.signatories.beneficiaryRepresentative.phone,
+                    !!convention.signatories.beneficiaryRepresentative.signedAt,
                   )
                 : undefined,
           },
