@@ -4,7 +4,22 @@ import { z } from "zod";
 import type { Phone } from "./sms/smsTemplateByName";
 import { zStringMinLength1 } from "./zodUtils";
 
-const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];
+const domComSupportedCountryCodes: CountryCode[] = [
+  "GF",
+  "YT",
+  "GP",
+  "MQ",
+  "RE",
+  "WF",
+  "PM",
+  "NC",
+  "PF",
+];
+
+const supportedCountryCode: CountryCode[] = [
+  ...domComSupportedCountryCodes,
+  "FR",
+];
 
 export const phoneSchema = zStringMinLength1.transform((phone, ctx) => {
   const countryCode = supportedCountryCode.find((countryCode) =>
@@ -22,9 +37,5 @@ export const phoneSchema = zStringMinLength1.transform((phone, ctx) => {
 });
 
 export const isValidMobilePhone = (phoneNumber: Phone) => {
-  // console.log(
-  //   "parsePhoneNumber(phoneNumber).getType() ====>",
-  //   parsePhoneNumber(phoneNumber).getType(),
-  // );
   return parsePhoneNumber(phoneNumber).getType() === "MOBILE";
 };
