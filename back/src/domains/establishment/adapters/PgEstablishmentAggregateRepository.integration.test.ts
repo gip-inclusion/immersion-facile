@@ -2210,7 +2210,7 @@ describe("PgEstablishmentAggregateRepository", () => {
     const establishmentIsNotSearchableAndMaxContactPerMonth8 =
       createEstablishmentAggregateWithMaxContactPerMonth(8);
 
-    const discussionAfterSinceDate = new DiscussionBuilder()
+    const discussionAfterSinceOneMonthDate = new DiscussionBuilder()
       .withSiret(
         establishmentIsNotSearchableAndMaxContactPerMonth2.establishment.siret,
       )
@@ -2225,7 +2225,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       .withCreatedAt(addMilliseconds(sinceOneWeekAgo, 1))
       .build();
 
-    const discussionAtSinceDate = new DiscussionBuilder()
+    const discussionAtOneMonthSinceDate = new DiscussionBuilder()
       .withSiret(
         establishmentIsNotSearchableAndMaxContactPerMonth2.establishment.siret,
       )
@@ -2304,7 +2304,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           establishmentIsNotSearchableAndMaxContactPerMonth1,
         );
 
-        await pgDiscussionRepository.insert(discussionAtSinceDate);
+        await pgDiscussionRepository.insert(discussionAtOneMonthSinceDate);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
@@ -2419,7 +2419,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentIsNotSearchableAndMaxContactPerMonth0,
         );
-        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+        await pgDiscussionRepository.insert(discussionAfterSinceOneMonthDate);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
           now,
