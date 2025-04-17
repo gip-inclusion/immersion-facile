@@ -1,5 +1,10 @@
 import { intersection } from "ramda";
-import type { AssessmentMode, Signatories } from "..";
+import {
+  type AssessmentMode,
+  type ConventionDto,
+  type Signatories,
+  isEstablishmentTutorIsEstablishmentRepresentative,
+} from "..";
 import {
   type AgencyModifierRole,
   type Role,
@@ -34,10 +39,16 @@ export const agencyModifierTitleByRole: Record<AgencyModifierRole, string> = {
 export const hasAllowedRoleOnAssessment = (
   userRolesOnConvention: Role[],
   mode: AssessmentMode,
+  convention: ConventionDto,
 ): boolean => {
   const hasAllowedRoleToCreateAssessment =
-    intersection(allowedRolesToCreateAssessment, userRolesOnConvention).length >
-    0;
+    isEstablishmentTutorIsEstablishmentRepresentative(convention)
+      ? intersection(
+          [...allowedRolesToCreateAssessment, "establishment-representative"],
+          userRolesOnConvention,
+        ).length > 0
+      : intersection(allowedRolesToCreateAssessment, userRolesOnConvention)
+          .length > 0;
   const hasAllowedRoleToAccessAssessment =
     intersection(allowedRolesToAccessAssessment, userRolesOnConvention).length >
     0;

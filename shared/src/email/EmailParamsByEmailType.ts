@@ -466,6 +466,7 @@ export type EmailParamsByEmailType = {
     immersionAppellationLabel: string;
     internshipKind: InternshipKind;
     magicLink: string;
+    assessmentMagicLink: string | undefined;
     validatorName: string;
   };
   TEST_EMAIL: {

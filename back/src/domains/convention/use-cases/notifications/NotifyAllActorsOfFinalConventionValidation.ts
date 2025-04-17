@@ -12,6 +12,7 @@ import {
   displayEmergencyContactInfos,
   errors,
   frontRoutes,
+  isEstablishmentTutorIsEstablishmentRepresentative,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -20,7 +21,7 @@ import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -140,10 +141,15 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           ? { sub: this.#config.backofficeUsername }
           : {}),
       };
+    const shouldHaveAssessmentMagicLink =
+      (isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
+        role === "establishment-representative") ||
+      (!isEstablishmentTutorIsEstablishmentRepresentative(convention) &&
+        role === "establishment-tutor");
 
     const { beneficiary, beneficiaryRepresentative } = convention.signatories;
 
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: this.#config,
       conventionMagicLinkPayload,
       generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
@@ -175,6 +181,12 @@ export class NotifyAllActorsOfFinalConventionValidation extends TransactionalUse
           targetRoute: frontRoutes.conventionDocument,
           lifetime: "long",
         }),
+        assessmentMagicLink: shouldHaveAssessmentMagicLink
+          ? await makeShortMagicLink({
+              targetRoute: frontRoutes.assessment,
+              lifetime: "long",
+            })
+          : undefined,
         validatorName: convention.validators?.agencyValidator
           ? concatValidatorNames(convention.validators?.agencyValidator)
           : "",
