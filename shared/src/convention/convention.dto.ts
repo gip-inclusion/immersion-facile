@@ -145,10 +145,11 @@ export const reviewedConventionStatuses: ConventionStatus[] = [
 export type ConventionId = Flavor<string, "ConventionId">;
 export type ConventionExternalId = Flavor<string, "ConventionExternalId">;
 
+export const discoverObjective = "Découvrir un métier ou un secteur d'activité";
 export const conventionObjectiveOptions = [
   "Confirmer un projet professionnel",
-  "Découvrir un métier ou un secteur d'activité",
   "Initier une démarche de recrutement",
+  discoverObjective,
 ] as const;
 
 export type ImmersionObjective = (typeof conventionObjectiveOptions)[number];
