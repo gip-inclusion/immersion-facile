@@ -207,7 +207,7 @@ export const ConventionManageActions = ({
     convention.status === "ACCEPTED_BY_VALIDATOR" &&
     isBefore(new Date(convention.dateStart), new Date()) &&
     !assessment &&
-    hasAllowedRoleOnAssessment(roles, "CreateAssessment");
+    hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention);
 
   const shouldShowAssessmentAnbandonAction =
     canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
@@ -216,7 +216,8 @@ export const ConventionManageActions = ({
     canAssessmentBeFilled && !isConventionEndingInOneDayOrMore;
 
   const shouldShowAssessmentDocumentAction =
-    !!assessment && hasAllowedRoleOnAssessment(roles, "GetAssessment");
+    !!assessment &&
+    hasAllowedRoleOnAssessment(roles, "GetAssessment", convention);
 
   const requesterRoles = roles.filter(
     (role): role is ExcludeFromExisting<Role, "agency-admin"> =>

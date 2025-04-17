@@ -85,7 +85,8 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   return (
     <HeaderFooterLayout>
       {isLoading && <Loader />}
-      {!hasAllowedRoleOnAssessment(roles, "CreateAssessment") ? (
+      {convention &&
+      !hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention) ? (
         <Alert
           severity="error"
           title="Erreur"

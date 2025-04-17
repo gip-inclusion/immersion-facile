@@ -2,9 +2,10 @@ import {
   AgencyDtoBuilder,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
-  type ConventionDto,
   ConventionDtoBuilder,
   type EmailNotification,
+  type EstablishmentRepresentative,
+  type EstablishmentTutor,
   InclusionConnectedUserBuilder,
   type Role,
   type ShortLinkId,
@@ -16,7 +17,7 @@ import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
-import { expectEmailFinalValidationConfirmationMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
+import { expectEmailFinalValidationConfirmationParamsMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
   type WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
@@ -47,6 +48,23 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     .withEmail("myValidator@mail.com")
     .build();
 
+  const establishmentRepresentative: EstablishmentRepresentative = {
+    role: "establishment-representative",
+    email: establishmentRepresentativeEmail,
+    phone: "+33665565432",
+    firstName: "Joe",
+    lastName: "le directeur",
+  };
+
+  const establishmentTutor: EstablishmentTutor = {
+    role: "establishment-tutor",
+    email: establishmentTutorEmail,
+    phone: "+33665565434",
+    firstName: "Jean",
+    lastName: "le tuteur",
+    job: "Directeur",
+  };
+
   const beneficiaryRepresentative: BeneficiaryRepresentative = {
     role: "beneficiary-representative",
     email: beneficiaryRepresentativeEmail,
@@ -65,13 +83,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     businessSiret: "01234567891234",
     businessAddress: "Rue des Bouchers 67065 Strasbourg",
   };
-  const validConvention: ConventionDto = new ConventionDtoBuilder()
-    .withEstablishmentTutorEmail(establishmentRepresentativeEmail)
-    .withEstablishmentRepresentativeEmail(establishmentRepresentativeEmail)
-    .build();
+
+  const validConventionWithSameTutorAndRepresentativ =
+    new ConventionDtoBuilder()
+      .withEstablishmentRepresentative(establishmentRepresentative)
+      .withEstablishmentTutor({
+        ...establishmentRepresentative,
+        role: "establishment-tutor",
+        job: "tuteur",
+      })
+      .build();
 
   const defaultAgency = AgencyDtoBuilder.create(
-    validConvention.agencyId,
+    validConventionWithSameTutorAndRepresentativ.agencyId,
   ).build();
 
   let uow: InMemoryUnitOfWork;
@@ -85,7 +109,6 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     shortLinkIdGenerator = new DeterministShortLinkIdGeneratorGateway();
-
     notifyAllActorsOfFinalConventionValidation =
       new NotifyAllActorsOfFinalConventionValidation(
         new InMemoryUowPerformer(uow),
@@ -106,44 +129,59 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   });
 
   describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
-    it("Notify Default actors: beneficiary, establishement tutor, agency counsellor, agency validator that convention is validate.", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-        ];
+    it("Notify Default actors: beneficiary, establishment representative, agency counsellor, agency validator that convention is validate.", async () => {
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
+
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConvention,
+        convention: validConventionWithSameTutorAndRepresentativ,
       });
 
       const expectedShorlinks = actors.reduce(
-        (a, actor) => ({
-          ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+        (acc, actor) => ({
+          ...acc,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: validConventionWithSameTutorAndRepresentativ.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -151,6 +189,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
@@ -171,54 +222,70 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(4);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConvention,
+          validConventionWithSameTutorAndRepresentativ,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });
 
     it("With beneficiary current employer", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "beneficiary-current-employer",
-            email: beneficiaryCurrentEmployerEmail,
-            shortlinkId: "shortLinkId_3",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-        ];
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
+        {
+          role: "beneficiary-current-employer",
+          email: beneficiaryCurrentEmployerEmail,
+          conventionShortlinkId: "conventionShortlinkId_3",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
-        validConvention,
+        validConventionWithSameTutorAndRepresentativ,
       )
         .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
@@ -229,8 +296,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: validConventionWithSameTutorAndRepresentativ.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -238,6 +305,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
@@ -258,54 +338,70 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(5);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
           conventionWithBeneficiaryCurrentEmployer,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });
 
     it("With beneficiary representative", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "beneficiary-representative",
-            email: beneficiaryRepresentativeEmail,
-            shortlinkId: "shortLinkId_2",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-        ];
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
+        {
+          role: "beneficiary-representative",
+          email: beneficiaryRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_2",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
-        validConvention,
+        validConventionWithSameTutorAndRepresentativ,
       )
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
@@ -316,8 +412,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: validConventionWithSameTutorAndRepresentativ.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -325,6 +421,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
@@ -345,54 +454,70 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(5);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
           conventionWithBeneficiaryCurrentEmployer,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });
 
     it("With different establishment tutor and establishment representative", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "establishment-tutor",
-            email: establishmentTutorEmail,
-            shortlinkId: "shortLinkId_2",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-        ];
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-tutor",
+          email: establishmentTutorEmail,
+          conventionShortlinkId: "conventionShortlinkId_2",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       const conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative =
-        new ConventionDtoBuilder(validConvention)
-          .withEstablishmentTutorEmail(establishmentTutorEmail)
+        new ConventionDtoBuilder(validConventionWithSameTutorAndRepresentativ)
+          .withEstablishmentTutor(establishmentTutor)
           .build();
 
       await notifyAllActorsOfFinalConventionValidation.execute({
@@ -403,8 +528,8 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -412,6 +537,19 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
@@ -432,46 +570,58 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(5);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
           conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });
 
     it("With PeConnect Federated identity: beneficiary, establishment representative, agency counsellor & validator, and dedicated advisor", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-          {
-            role: "validator",
-            email: peAdvisorEmail,
-            shortlinkId: "shortLinkId_2",
-          },
-        ];
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: peAdvisorEmail,
+          conventionShortlinkId: "conventionShortlinkId_2",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
       const userFtExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
         _entityName: "ConventionFranceTravailAdvisor",
@@ -482,26 +632,30 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           type: "CAPEMPLOI",
         },
         peExternalId: userFtExternalId,
-        conventionId: validConvention.id,
+        conventionId: validConventionWithSameTutorAndRepresentativ.id,
       };
 
       uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConvention,
+        convention: validConventionWithSameTutorAndRepresentativ,
       });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: validConventionWithSameTutorAndRepresentativ.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -509,10 +663,22 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
-
       expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
@@ -529,66 +695,81 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(5);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConvention,
+          validConventionWithSameTutorAndRepresentativ,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });
 
     it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
-      const actors: { role: Role; email: string; shortlinkId: ShortLinkId }[] =
-        [
-          {
-            role: "beneficiary",
-            email: validConvention.signatories.beneficiary.email,
-            shortlinkId: "shortLinkId_0",
-          },
-          {
-            role: "establishment-representative",
-            email: establishmentRepresentativeEmail,
-            shortlinkId: "shortLinkId_1",
-          },
-          {
-            role: "counsellor",
-            email: counsellor.email,
-            shortlinkId: "shortLinkId_5",
-          },
-          {
-            role: "validator",
-            email: validator.email,
-            shortlinkId: "shortLinkId_6",
-          },
-        ];
+      const actors: {
+        role: Role;
+        email: string;
+        conventionShortlinkId: ShortLinkId;
+        assessmentCreationLinkId: ShortLinkId | undefined;
+      }[] = [
+        {
+          role: "beneficiary",
+          email:
+            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
+              .email,
+          conventionShortlinkId: "conventionShortlinkId_0",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "establishment-representative",
+          email: establishmentRepresentativeEmail,
+          conventionShortlinkId: "conventionShortlinkId_1",
+          assessmentCreationLinkId: "assessmentCreationLinkId_1",
+        },
+        {
+          role: "counsellor",
+          email: counsellor.email,
+          conventionShortlinkId: "conventionShortlinkId_5",
+          assessmentCreationLinkId: undefined,
+        },
+        {
+          role: "validator",
+          email: validator.email,
+          conventionShortlinkId: "conventionShortlinkId_6",
+          assessmentCreationLinkId: undefined,
+        },
+      ];
       const userFtExternalId = "i-am-an-external-id";
       const userConventionAdvisor: ConventionFtUserAdvisorEntity = {
         _entityName: "ConventionFranceTravailAdvisor",
         advisor: undefined,
         peExternalId: userFtExternalId,
-        conventionId: validConvention.id,
+        conventionId: validConventionWithSameTutorAndRepresentativ.id,
       };
 
       uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
         [userConventionAdvisor],
       );
 
-      const shortlinkIds = actors.map((truc) => truc.shortlinkId);
+      const shortlinkIds = actors.flatMap((actor) => {
+        return actor.assessmentCreationLinkId
+          ? [actor.conventionShortlinkId, actor.assessmentCreationLinkId]
+          : [actor.conventionShortlinkId];
+      });
 
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConvention,
+        convention: validConventionWithSameTutorAndRepresentativ,
       });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
-          [actor.shortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConvention.id,
+          [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
+            id: validConventionWithSameTutorAndRepresentativ.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -596,10 +777,22 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
             targetRoute: frontRoutes.conventionDocument,
             lifetime: "long",
           }),
+          ...(actor.assessmentCreationLinkId
+            ? {
+                [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
+                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  role: actor.role,
+                  email: actor.email,
+                  now: timeGateway.now(),
+                  exp: timeGateway.now().getTime() + 1000 * 60 * 60 * 24 * 365,
+                  targetRoute: frontRoutes.assessment,
+                  lifetime: "long",
+                }),
+              }
+            : {}),
         }),
         {},
       );
-
       expectToEqual(uow.shortLinkQuery.getShortLinks(), expectedShorlinks);
 
       const emailNotifications =
@@ -616,13 +809,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       expect(emailNotifications).toHaveLength(4);
 
       actors.forEach((actor, index) => {
-        expectEmailFinalValidationConfirmationMatchingConvention(
+        expectEmailFinalValidationConfirmationParamsMatchingConvention(
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConvention,
+          validConventionWithSameTutorAndRepresentativ,
           config,
-          actor.shortlinkId,
+          actor.conventionShortlinkId,
+          actor.assessmentCreationLinkId,
         );
       });
     });

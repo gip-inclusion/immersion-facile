@@ -8,6 +8,7 @@ import {
   errors,
   getIcUserRoleForAccessingConvention,
   hasAllowedRoleOnAssessment,
+  isEstablishmentTutorIsEstablishmentRepresentative,
   isSomeEmailMatchingEmailHash,
   legacyAssessmentDtoSchema,
 } from "shared";
@@ -44,7 +45,7 @@ export const throwForbiddenIfNotAllowedForAssessments = async (
       convention,
       user,
     );
-    if (!hasAllowedRoleOnAssessment(userRolesOnConvention, mode))
+    if (!hasAllowedRoleOnAssessment(userRolesOnConvention, mode, convention))
       throw errors.assessment.forbidden(mode);
   }
 };
@@ -73,7 +74,9 @@ const assessmentEmailsByRole = (
   "beneficiary-representative": errors.assessment.forbidden(mode),
   "agency-admin": errors.assessment.forbidden(mode),
   "establishment-representative":
-    mode === "GetAssessment"
+    mode === "GetAssessment" ||
+    (mode === "CreateAssessment" &&
+      isEstablishmentTutorIsEstablishmentRepresentative(convention))
       ? [convention.signatories.establishmentRepresentative.email]
       : errors.assessment.forbidden(mode),
   "establishment-tutor": [convention.establishmentTutor.email],

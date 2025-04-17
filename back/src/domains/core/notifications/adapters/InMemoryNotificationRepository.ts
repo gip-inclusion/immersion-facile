@@ -196,13 +196,14 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
     });
   };
 
-export const expectEmailFinalValidationConfirmationMatchingConvention = (
+export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
   recipients: string[],
   templatedEmails: TemplatedEmail,
   agency: AgencyDto,
   convention: ConventionDto,
   config: AppConfig,
   conventionToSignLinkId: ShortLinkId,
+  assessmentShortlink: ShortLinkId | undefined,
 ) =>
   expectToEqual(templatedEmails, {
     kind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
@@ -226,6 +227,9 @@ export const expectEmailFinalValidationConfirmationMatchingConvention = (
       }),
       agencyLogoUrl: agency.logoUrl ?? undefined,
       magicLink: makeShortLinkUrl(config, conventionToSignLinkId),
+      assessmentMagicLink: assessmentShortlink
+        ? makeShortLinkUrl(config, assessmentShortlink)
+        : undefined,
       validatorName: convention.validators?.agencyValidator
         ? concatValidatorNames(convention.validators?.agencyValidator)
         : "",

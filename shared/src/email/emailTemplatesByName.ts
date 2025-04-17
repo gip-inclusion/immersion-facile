@@ -1025,6 +1025,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         immersionAppellationLabel,
         internshipKind,
         magicLink,
+        assessmentMagicLink,
         validatorName,
       }) => ({
         subject:
@@ -1069,6 +1070,14 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
           ? `Si la situation l'impose, le contact d'urgence de ${beneficiaryFirstName} ${beneficiaryLastName} : ${emergencyContactInfos}`
           : ""
       }`,
+        highlight: assessmentMagicLink
+          ? {
+              content: `
+              Un imprévu ?
+
+              Si l’immersion ne peut pas aller à son terme (abandon, arrêt anticipé, etc.), merci de nous le signaler dès que possible en <a href="${assessmentMagicLink}">déclarant un abandon</a> , pour assurer un bon suivi.`,
+            }
+          : undefined,
         agencyLogoUrl,
       }),
     },
