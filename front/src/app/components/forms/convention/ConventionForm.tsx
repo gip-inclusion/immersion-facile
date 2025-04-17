@@ -189,7 +189,7 @@ export const ConventionForm = ({
     reset,
   } = methods;
 
-  const { errors, submitCount, isSubmitted } = formState;
+  const { errors, submitCount } = formState;
 
   const conventionValues = getValues();
 
@@ -253,7 +253,7 @@ export const ConventionForm = ({
     useState<EmailValidationErrorsState>({});
 
   const shouldSubmitButtonBeDisabled =
-    isLoading || isSubmitted || keys(emailValidationErrors).length > 0;
+    isLoading || keys(emailValidationErrors).length > 0;
 
   const {
     agencyId: agencyIdField,
