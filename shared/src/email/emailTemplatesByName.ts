@@ -1729,59 +1729,49 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
     CONTACT_BY_EMAIL_REQUEST: {
       niceName: "Établissement - Mise en relation par mail",
       tags: ["mise en relation mail"],
-      createEmailVariables: ({
-        appellationLabel,
-        contactFirstName,
-        contactLastName,
-        potentialBeneficiaryFirstName,
-        potentialBeneficiaryLastName,
-        potentialBeneficiaryPhone,
-        businessAddress,
-        immersionObjective,
-        businessName,
-        potentialBeneficiaryResumeLink,
-        potentialBeneficiaryDatePreferences,
-        potentialBeneficiaryExperienceAdditionalInformation,
-        potentialBeneficiaryHasWorkingExperience,
-        domain,
-        discussionId,
-      }) => ({
-        subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
-        greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
-        content: `Un candidat souhaite faire une immersion dans votre entreprise ${businessName} (${businessAddress}).
+      createEmailVariables: (params) => ({
+        subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
+        greetings: `Bonjour ${params.contactFirstName} ${params.contactLastName},`,
+        content: `Un candidat souhaite faire une immersion dans votre entreprise ${params.businessName} (${params.businessAddress}).
 
 Immersion souhaitée :
 
-    • Métier : ${appellationLabel}.
-    • Dates d’immersion envisagées : ${potentialBeneficiaryDatePreferences}.
+    • Métier : ${params.appellationLabel}.
+    • Dates d’immersion envisagées : ${params.potentialBeneficiaryDatePreferences}.
     • ${
-      immersionObjective
-        ? `But de l'immersion : ${labelsForImmersionObjective[immersionObjective]}.`
+      params.immersionObjective
+        ? `But de l'immersion : ${labelsForImmersionObjective[params.immersionObjective]}.`
         : ""
     }
 
 Profil du candidat :
 
-    • Expérience professionnelle : ${
-      potentialBeneficiaryHasWorkingExperience
-        ? "j’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
-        : "je n’ai jamais travaillé"
+    ${
+      params.kind === "IF" && params.potentialBeneficiaryHasWorkingExperience
+        ? "• Expérience professionnelle : J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat"
+        : "• Expérience professionnelle : je n’ai jamais travaillé"
     }.
     ${
-      potentialBeneficiaryExperienceAdditionalInformation
-        ? `• Informations supplémentaires sur l'expérience du candidat : ${potentialBeneficiaryExperienceAdditionalInformation}.`
+      params.kind === "IF" &&
+      params.potentialBeneficiaryExperienceAdditionalInformation
+        ? `• Informations supplémentaires sur l'expérience du candidat : ${params.potentialBeneficiaryExperienceAdditionalInformation}.`
         : ""
     }
     ${
-      potentialBeneficiaryResumeLink
-        ? `• CV du candidat : ${potentialBeneficiaryResumeLink}.`
+      params.kind === "1_ELEVE_1_STAGE" && params.levelOfEducation
+        ? `• Je suis en ${params.levelOfEducation}.`
+        : ""
+    }
+    ${
+      params.kind === "IF" && params.potentialBeneficiaryResumeLink
+        ? `• CV du candidat : ${params.potentialBeneficiaryResumeLink}.`
         : ""
     }`,
         buttons: [
           {
             label: "Répondre au candidat via mon espace",
             target: "_blank",
-            url: `https://${domain}/${frontRoutes.establishmentDashboard}/discussions?discussionId=${discussionId}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+            url: `https://${params.domain}/${frontRoutes.establishmentDashboard}/discussions?discussionId=${params.discussionId}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
           },
         ],
         highlight: {
@@ -1790,12 +1780,11 @@ Profil du candidat :
 
           - répondre directement à cet email, il lui sera transmis (vous pouvez également utiliser le bouton ci-dessus)
 
-          - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${potentialBeneficiaryPhone}`,
+          - en cas d'absence de réponse par email, vous pouvez essayer de le contacter par tel : ${params.potentialBeneficiaryPhone}`,
         },
         subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
         Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
-        
-        Vous pouvez préparer votre échange grâce à notre <a href="https://immersion-facile.beta.gouv.fr/aide/article/etudier-une-demande-dimmersion-professionnelle-1ehkehm/">page d'aide</a>.
+
         ${defaultSignature("immersion")}`,
       }),
     },

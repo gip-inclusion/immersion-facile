@@ -1,38 +1,112 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { LocationId } from "../address/address.dto";
-import type { ImmersionObjective } from "../convention/convention.dto";
+import type {
+  ImmersionObjective,
+  LevelOfEducation,
+  discoverObjective,
+} from "../convention/convention.dto";
 import type { DiscussionId } from "../discussion/discussion.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type {
+  ContactMethod,
+  DiscussionKind,
+} from "../formEstablishment/FormEstablishment.dto";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 
-export type ContactInformations<T extends ContactMethod> = {
+export const contactLevelsOfEducation = [
+  "3ème",
+  "2nde",
+] as const satisfies Extract<LevelOfEducation, "3ème" | "2nde">[];
+
+export type ContactLevelOfEducation = (typeof contactLevelsOfEducation)[number];
+
+export const labelsForContactLevelOfEducation: Record<
+  ContactLevelOfEducation,
+  string
+> = {
+  "3ème": "Troisième",
+  "2nde": "Seconde",
+};
+
+export type ContactInformations<
+  T extends ContactMethod,
+  D extends DiscussionKind,
+> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;
   potentialBeneficiaryLastName: string;
   potentialBeneficiaryEmail: string;
   contactMode: T;
+  kind: D;
   locationId: LocationId;
-} & WithAcquisition;
+} & WithAcquisition &
+  (D extends "1_ELEVE_1_STAGE"
+    ? { levelOfEducation: ContactLevelOfEducation }
+    : // biome-ignore lint/complexity/noBannedTypes: we need {} here
+      {});
 
-export type ContactEstablishmentByMailDto = ContactInformations<"EMAIL"> & {
+type ContactEstablishmentByMailCommon = {
   potentialBeneficiaryPhone: string;
-  immersionObjective: ImmersionObjective | null;
-  potentialBeneficiaryResumeLink?: string;
   datePreferences: string;
-  hasWorkingExperience: boolean;
-  experienceAdditionalInformation?: string;
 };
 
-export type ContactEstablishmentInPersonDto = ContactInformations<"IN_PERSON">;
+export type ContactEstablishmentByMailIFDto = ContactInformations<
+  "EMAIL",
+  "IF"
+> &
+  ContactEstablishmentByMailCommon & {
+    immersionObjective: ImmersionObjective | null;
+    hasWorkingExperience: boolean;
+    experienceAdditionalInformation?: string;
+    potentialBeneficiaryResumeLink?: string;
+  };
 
-export type ContactEstablishmentByPhoneDto = ContactInformations<"PHONE">;
+export type ContactEstablishmentByMail1Eleve1StageDto = ContactInformations<
+  "EMAIL",
+  "1_ELEVE_1_STAGE"
+> &
+  ContactEstablishmentByMailCommon & {
+    immersionObjective: Extract<ImmersionObjective, typeof discoverObjective>;
+  };
+
+type ContactEstablishmentInPersonIfDto = ContactInformations<"IN_PERSON", "IF">;
+type ContactEstablishmentInPerson1Eleve1StageDto = ContactInformations<
+  "IN_PERSON",
+  "1_ELEVE_1_STAGE"
+>;
+type ContactEstablishmentByPhoneIfDto = ContactInformations<"PHONE", "IF">;
+type ContactEstablishmentByPhone1Eleve1StageDto = ContactInformations<
+  "PHONE",
+  "1_ELEVE_1_STAGE"
+>;
+
+export type ContactEstablishmentByMailDto =
+  | ContactEstablishmentByMailIFDto
+  | ContactEstablishmentByMail1Eleve1StageDto;
+
+export type ContactEstablishmentInPersonDto =
+  | ContactEstablishmentInPersonIfDto
+  | ContactEstablishmentInPerson1Eleve1StageDto;
+
+export type ContactEstablishmentByPhoneDto =
+  | ContactEstablishmentByPhoneIfDto
+  | ContactEstablishmentByPhone1Eleve1StageDto;
 
 export type ContactEstablishmentRequestDto =
   | ContactEstablishmentByPhoneDto
   | ContactEstablishmentInPersonDto
   | ContactEstablishmentByMailDto;
+
+export type ContactEstablishment1Eleve1StageDto =
+  | ContactEstablishmentByMail1Eleve1StageDto
+  | ContactEstablishmentByPhone1Eleve1StageDto
+  | ContactEstablishmentInPerson1Eleve1StageDto;
+
+export type ContactEstablishmentIFDto =
+  | ContactEstablishmentByMailIFDto
+  | ContactEstablishmentByPhoneIfDto
+  | ContactEstablishmentInPersonIfDto;
 
 export type ContactEstablishmentEventPayload = {
   discussionId: DiscussionId;

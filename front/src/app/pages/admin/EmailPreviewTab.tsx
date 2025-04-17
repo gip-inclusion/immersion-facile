@@ -363,6 +363,7 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryHasWorkingExperience: true,
     domain: "immersion-facile.beta.gouv.fr",
     discussionId: "fake-discussion-id",
+    kind: "IF",
   },
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
     businessName: "BUSINESS_NAME",

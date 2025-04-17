@@ -48,6 +48,7 @@ describe("Contact establishment public v2 e2e", () => {
       immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "+33654783402",
       locationId: establishment.locations[0].id,
+      kind: "IF",
     };
 
     let gateways: InMemoryGateways;

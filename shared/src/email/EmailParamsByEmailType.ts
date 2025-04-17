@@ -3,6 +3,7 @@ import type {
   AssessmentDtoCompleted,
   AssessmentDtoPartiallyCompleted,
 } from "../assessment/assessment.dto";
+import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
 import type {
   ConventionId,
   ImmersionObjective,
@@ -172,16 +173,24 @@ export type EmailParamsByEmailType = {
     appellationLabel: string;
     immersionObjective: ImmersionObjective | undefined;
     replyToEmail: Email;
-    potentialBeneficiaryResumeLink?: string;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryPhone: string;
-    potentialBeneficiaryDatePreferences?: string;
-    potentialBeneficiaryHasWorkingExperience?: boolean;
-    potentialBeneficiaryExperienceAdditionalInformation?: string;
+    potentialBeneficiaryDatePreferences: string;
     domain: string;
     discussionId: string;
-  };
+  } & (
+    | {
+        kind: "IF";
+        potentialBeneficiaryHasWorkingExperience: boolean;
+        potentialBeneficiaryExperienceAdditionalInformation?: string;
+        potentialBeneficiaryResumeLink?: string;
+      }
+    | {
+        kind: "1_ELEVE_1_STAGE";
+        levelOfEducation: ContactLevelOfEducation;
+      }
+  );
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
     beneficiaryFullName: string;
     businessName: string;
