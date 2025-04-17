@@ -12,7 +12,7 @@ import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstra
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -122,7 +122,7 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
   }) {
     await Promise.all(
       recipients.map(async (email) => {
-        const makeMagicShortLink = prepareMagicShortLinkMaker({
+        const makeMagicShortLink = prepareConventionMagicShortLinkMaker({
           conventionMagicLinkPayload: {
             id: convention.id,
             role,

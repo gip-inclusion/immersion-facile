@@ -31,7 +31,7 @@ import type {
   NotificationContentAndFollowedIds,
   SaveNotificationsBatchAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -118,7 +118,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       "FirstReminderForSignatories" | "LastReminderForSignatories"
     >,
   ): Promise<TemplatedEmail> {
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
@@ -267,7 +267,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
     kind: SignatoriesReminderKind,
   ): Promise<TemplatedSms> {
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
@@ -299,7 +299,7 @@ export class NotifyConventionReminder extends TransactionalUseCase<
     uow: UnitOfWork,
     kind: AgenciesReminderKind,
   ): Promise<NotificationContentAndFollowedIds> {
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: this.#config,
       conventionMagicLinkPayload: {
         id: convention.id,
