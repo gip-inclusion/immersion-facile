@@ -19,7 +19,7 @@ import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/conven
 import { makeEmailHash } from "../../../utils/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -106,7 +106,7 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       if (!emailHash || makeEmailHash(email) === emailHash) {
         foundHit = true;
 
-        const makeMagicShortLink = prepareMagicShortLinkMaker({
+        const makeMagicShortLink = prepareConventionMagicShortLinkMaker({
           conventionMagicLinkPayload: {
             id: conventionId,
             role,
