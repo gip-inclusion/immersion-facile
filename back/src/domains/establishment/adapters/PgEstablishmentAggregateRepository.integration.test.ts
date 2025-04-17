@@ -2182,7 +2182,9 @@ describe("PgEstablishmentAggregateRepository", () => {
   });
 
   describe("markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth", () => {
-    const since = subDays(new Date(), 7);
+    const now = new Date();
+    const sinceOneWeekAgo = subDays(now, 7);
+    const sinceOneMonthAgo = subDays(now, 30);
 
     const establishmentNotSearchable = new EstablishmentAggregateBuilder()
       .withUserRights([osefUserRight])
@@ -2213,7 +2215,14 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentIsNotSearchableAndMaxContactPerMonth2.establishment.siret,
       )
       .withId(uuid())
-      .withCreatedAt(addMilliseconds(since, 1))
+      .withCreatedAt(addMilliseconds(sinceOneMonthAgo, 1))
+      .build();
+    const discussionAfterSinceAWeekDate = new DiscussionBuilder()
+      .withSiret(
+        establishmentIsNotSearchableAndMaxContactPerMonth2.establishment.siret,
+      )
+      .withId(uuid())
+      .withCreatedAt(addMilliseconds(sinceOneWeekAgo, 1))
       .build();
 
     const discussionAtSinceDate = new DiscussionBuilder()
@@ -2221,7 +2230,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         establishmentIsNotSearchableAndMaxContactPerMonth2.establishment.siret,
       )
       .withId(uuid())
-      .withCreatedAt(since)
+      .withCreatedAt(sinceOneMonthAgo)
       .build();
 
     describe("update", () => {
@@ -2240,13 +2249,13 @@ describe("PgEstablishmentAggregateRepository", () => {
               .siret,
           )
           .withId(uuid())
-          .withCreatedAt(addMilliseconds(since, 1))
+          .withCreatedAt(addMilliseconds(sinceOneMonthAgo, 1))
           .build();
 
         await pgDiscussionRepository.insert(discussionForEstablishment8);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         // The establishment should be made searchable again because 1 < Math.ceil(8/4) = 2
@@ -2272,7 +2281,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
@@ -2298,7 +2307,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgDiscussionRepository.insert(discussionAtSinceDate);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
@@ -2306,6 +2315,75 @@ describe("PgEstablishmentAggregateRepository", () => {
           [
             new EstablishmentAggregateBuilder(
               establishmentIsNotSearchableAndMaxContactPerMonth1,
+            )
+              .withIsMaxDiscussionsForPeriodReached(false)
+              .withFitForDisabledWorkers(false)
+              .build(),
+          ],
+        );
+      });
+      it(`update is searchable for establishments that: 
+        - are not searchable
+        - have maxContactsPerMonth at 8
+        - have 4 discussion since date (2 first week, 2 second week)`, async () => {
+        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+          establishmentIsNotSearchableAndMaxContactPerMonth8,
+        );
+
+        const sinceFourWeeksAgo = subDays(new Date(), 28);
+        const sinceThreeWeeksAgo = subDays(new Date(), 21);
+        // Create a discussion for the establishment with maxContactsPerMonth=8
+        const discussion1ForEstablishment8 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth8.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(sinceFourWeeksAgo, 1))
+          .build();
+
+        const discussion2ForEstablishment8 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth8.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(sinceFourWeeksAgo, 10))
+          .build();
+
+        const discussion3ForEstablishment8 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth8.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(sinceThreeWeeksAgo, 1))
+          .build();
+
+        const discussion4ForEstablishment8 = new DiscussionBuilder()
+          .withSiret(
+            establishmentIsNotSearchableAndMaxContactPerMonth8.establishment
+              .siret,
+          )
+          .withId(uuid())
+          .withCreatedAt(addMilliseconds(sinceThreeWeeksAgo, 10))
+          .build();
+
+        await pgDiscussionRepository.insert(discussion1ForEstablishment8);
+        await pgDiscussionRepository.insert(discussion2ForEstablishment8);
+        await pgDiscussionRepository.insert(discussion3ForEstablishment8);
+        await pgDiscussionRepository.insert(discussion4ForEstablishment8);
+
+        await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
+          now,
+        );
+
+        // The establishment should be made searchable again because 1 < Math.ceil(8/4) = 2
+        expectToEqual(
+          await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
+          [
+            new EstablishmentAggregateBuilder(
+              establishmentIsNotSearchableAndMaxContactPerMonth8,
             )
               .withIsMaxDiscussionsForPeriodReached(false)
               .withFitForDisabledWorkers(false)
@@ -2325,7 +2403,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         );
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
@@ -2344,7 +2422,7 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgDiscussionRepository.insert(discussionAfterSinceDate);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
@@ -2360,10 +2438,10 @@ describe("PgEstablishmentAggregateRepository", () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentIsNotSearchableAndMaxContactPerMonth1,
         );
-        await pgDiscussionRepository.insert(discussionAfterSinceDate);
+        await pgDiscussionRepository.insert(discussionAfterSinceAWeekDate);
 
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
@@ -2375,7 +2453,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       it(`do not update is searchable for establishments that: 
           - are not searchable
           - have maxContactsPerMonth at 4
-          - have 1 discussion since date (which is under monthly max but at weekly max)`, async () => {
+          - have 1 discussion since a week (which is under monthly max but at weekly max)`, async () => {
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
           establishmentIsNotSearchableAndMaxContactPerMonth4,
         );
@@ -2386,13 +2464,12 @@ describe("PgEstablishmentAggregateRepository", () => {
               .siret,
           )
           .withId(uuid())
-          .withCreatedAt(addMilliseconds(since, 1))
+          .withCreatedAt(addMilliseconds(sinceOneWeekAgo, 1))
           .build();
 
         await pgDiscussionRepository.insert(discussionForEstablishment4);
-
         await pgEstablishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-          since,
+          now,
         );
 
         expectToEqual(
