@@ -1,3 +1,4 @@
+import { subDays } from "date-fns";
 import { sql } from "kysely";
 import { jsonArrayFrom } from "kysely/helpers/postgres";
 import { equals, pick } from "ramda";
@@ -271,8 +272,10 @@ export class PgEstablishmentAggregateRepository
   }
 
   public async markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-    since: Date,
+    now: Date,
   ): Promise<number> {
+    const sinceOneMonthAgo = subDays(now, 30);
+    const sinceOneWeekAgo = subDays(now, 7);
     const result = await this.transaction
       .updateTable("establishments")
       .set({ is_max_discussions_for_period_reached: false })
@@ -285,11 +288,21 @@ export class PgEstablishmentAggregateRepository
           .leftJoin("discussions", "establishments.siret", "discussions.siret")
           .where("is_max_discussions_for_period_reached", "=", true)
           .where("max_contacts_per_month", ">", 0)
-          .where("discussions.created_at", ">", since)
+          .where("discussions.created_at", ">", sinceOneMonthAgo)
+          .groupBy("establishments.siret")
+          .having(sql<any>`COUNT(*) >= establishments.max_contacts_per_month`),
+      )
+      .where("siret", "not in", (eb) =>
+        eb
+          .selectFrom("establishments")
+          .select("establishments.siret")
+          .leftJoin("discussions", "establishments.siret", "discussions.siret")
+          .where("is_max_discussions_for_period_reached", "=", true)
+          .where("max_contacts_per_month", ">", 0)
+          .where("discussions.created_at", ">", sinceOneWeekAgo)
           .groupBy("establishments.siret")
           .having(
-            sql<any>`COUNT(*) >= establishments.max_contacts_per_month 
-            OR COUNT(*) >= CEIL(establishments.max_contacts_per_month / 4)`,
+            sql<any>`COUNT(*) >= CEIL(establishments.max_contacts_per_month / 4)`,
           ),
       )
       .returning("siret")

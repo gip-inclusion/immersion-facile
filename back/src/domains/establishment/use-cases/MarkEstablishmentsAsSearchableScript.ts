@@ -1,5 +1,3 @@
-import subDays from "date-fns/subDays";
-import { normalizedMonthInDays } from "shared";
 import { z } from "zod";
 import { UseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -26,9 +24,8 @@ export class MarkEstablishmentsAsSearchableScript extends UseCase<
   }
 
   protected async _execute(): Promise<number> {
-    const since = subDays(this.#timeGateway.now(), normalizedMonthInDays);
     return this.#establishmentAggregateRepository.markEstablishmentAsSearchableWhenRecentDiscussionAreUnderMaxContactPerMonth(
-      since,
+      this.#timeGateway.now(),
     );
   }
 }
