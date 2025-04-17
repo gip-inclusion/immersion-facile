@@ -15,7 +15,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { ConventionRequiresModificationPayload } from "../../../core/events/eventPayload.dto";
 import { conventionRequiresModificationPayloadSchema } from "../../../core/events/eventPayload.schema";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -96,7 +96,7 @@ export class NotifyActorThatConventionNeedsModifications extends TransactionalUs
           : {}),
       };
 
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: this.config,
       conventionMagicLinkPayload,
       generateConventionMagicLinkUrl: this.generateConventionMagicLinkUrl,
