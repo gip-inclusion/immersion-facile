@@ -1,5 +1,5 @@
 import { P, match } from "ts-pattern";
-import type { WithDiscussionId } from "..";
+import type { ContactLevelOfEducation, WithDiscussionId } from "..";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
@@ -7,7 +7,10 @@ import type {
   ConventionId,
   ImmersionObjective,
 } from "../convention/convention.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type {
+  ContactMethod,
+  DiscussionKind,
+} from "../formEstablishment/FormEstablishment.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
@@ -24,16 +27,21 @@ export const isExchangeRole = includesTypeGuard(exchangeRoles);
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 
-export type DiscussionPotentialBeneficiary = {
+export type DiscussionPotentialBeneficiary<T extends DiscussionKind, K extends ContactMethod> = {
   email: string;
   firstName: string;
   lastName: string;
   phone?: string;
-  resumeLink?: string;
-  hasWorkingExperience?: boolean;
-  experienceAdditionalInformation?: string;
-  datePreferences?: string;
-};
+} & (T extends "1_ELEVE_1_STAGE"
+  ? { levelOfEducation: ContactLevelOfEducation }
+  : {
+      hasWorkingExperience: boolean;
+      experienceAdditionalInformation?: string;
+    })
+    & (K extends "EMAIL" ? {
+      resumeLink?: string;
+      datePreferences?: string;
+    });
 
 export type DiscussionEstablishmentContact = {
   email: string;
@@ -45,7 +53,7 @@ export type DiscussionEstablishmentContact = {
   contactMethod: ContactMethod;
 };
 
-type DiscussionDtoBase = {
+type DiscussionDtoBase<T extends DiscussionKind> = {
   id: DiscussionId;
   createdAt: DateString;
   siret: SiretDto;
@@ -53,8 +61,9 @@ type DiscussionDtoBase = {
   immersionObjective: ImmersionObjective | null;
   address: AddressDto;
   exchanges: Exchange[];
-  potentialBeneficiary: DiscussionPotentialBeneficiary;
+  potentialBeneficiary: DiscussionPotentialBeneficiary<T>;
   conventionId?: ConventionId;
+  discussionKind: T;
 } & DiscussionStatusWithRejection;
 
 export type DiscussionStatus = DiscussionDto["status"];
@@ -90,12 +99,18 @@ export type DiscussionPending = {
   status: "PENDING";
 };
 
-export type DiscussionDto = DiscussionDtoBase & {
+export type DiscussionDto = (
+  | DiscussionDtoBase<"IF">
+  | DiscussionDtoBase<"1_ELEVE_1_STAGE">
+) & {
   establishmentContact: DiscussionEstablishmentContact;
   appellationCode: AppellationCode;
 } & WithAcquisition;
 
-export type DiscussionReadDto = DiscussionDtoBase & {
+export type DiscussionReadDto = (
+  | DiscussionDtoBase<"IF">
+  | DiscussionDtoBase<"1_ELEVE_1_STAGE">
+) & {
   appellation: AppellationAndRomeDto;
   establishmentContact: OmitFromExistingKeys<
     DiscussionEstablishmentContact,
@@ -171,6 +186,7 @@ const defaultDiscussion: DiscussionDto = {
     },
   ],
   status: "PENDING",
+  discussionKind: "IF",
 };
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {
@@ -192,18 +208,6 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     return {
       ...rest,
       appellation: appellation,
-      potentialBeneficiary: {
-        firstName: this.discussion.potentialBeneficiary.firstName,
-        lastName: this.discussion.potentialBeneficiary.lastName,
-        resumeLink: this.discussion.potentialBeneficiary.resumeLink,
-        email: this.discussion.potentialBeneficiary.email,
-        phone: this.discussion.potentialBeneficiary.phone,
-        hasWorkingExperience:
-          this.discussion.potentialBeneficiary.hasWorkingExperience,
-        experienceAdditionalInformation:
-          this.discussion.potentialBeneficiary.experienceAdditionalInformation,
-        datePreferences: this.discussion.potentialBeneficiary.datePreferences,
-      },
       establishmentContact: {
         firstName: this.discussion.establishmentContact.firstName,
         lastName: this.discussion.establishmentContact.lastName,
@@ -276,15 +280,29 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withPotentialBeneficiary(
-    potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
+    potentialBeneficiary: Partial<DiscussionPotentialBeneficiary<"IF"> | DiscussionPotentialBeneficiary<"1_ELEVE_1_STAGE">>,
   ) {
-    return new DiscussionBuilder({
-      ...this.discussion,
-      potentialBeneficiary: {
-        ...this.discussion.potentialBeneficiary,
-        ...potentialBeneficiary,
-      },
-    });
+    if (this.discussion.discussionKind === "1_ELEVE_1_STAGE" && "levelOfEducation" in potentialBeneficiary) {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          ...potentialBeneficiary,
+        },
+      });
+    }
+
+    if (this.discussion.discussionKind === "IF" && "hasWorkingExperience" in potentialBeneficiary) {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          ...potentialBeneficiary,
+        },
+      });
+    }
+
+    throw new Error("Invalid potentialBeneficiary");
   }
 
   public withSiret(siret: SiretDto) {
