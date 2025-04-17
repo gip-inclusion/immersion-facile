@@ -201,18 +201,27 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
               replyToEmail: contactRequest.potentialBeneficiaryEmail,
               potentialBeneficiaryDatePreferences:
                 contactRequest.datePreferences,
-              potentialBeneficiaryExperienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-              potentialBeneficiaryHasWorkingExperience:
-                contactRequest.hasWorkingExperience,
               domain: this.#domain,
               discussionId: discussionId,
+              ...(contactRequest.discussionKind === "IF"
+                ? {
+                    discussionKind: contactRequest.discussionKind,
+                    potentialBeneficiaryExperienceAdditionalInformation:
+                      contactRequest.experienceAdditionalInformation,
+                    potentialBeneficiaryHasWorkingExperience:
+                      contactRequest.hasWorkingExperience,
+                  }
+                : {
+                    discussionKind: contactRequest.discussionKind,
+                    levelOfEducation: contactRequest.levelOfEducation,
+                  }),
             },
             { showContentParts: true },
           )
         : null;
     return {
       id: discussionId,
+      discussionKind: contactRequest.discussionKind,
       appellationCode: contactRequest.appellationCode,
       siret: contactRequest.siret,
       businessName:
@@ -228,11 +237,10 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         firstName: contactRequest.potentialBeneficiaryFirstName,
         lastName: contactRequest.potentialBeneficiaryLastName,
         email: contactRequest.potentialBeneficiaryEmail,
-        ...(contactRequest.contactMode === "EMAIL"
-          ? { hasWorkingExperience: contactRequest.hasWorkingExperience }
-          : {}),
-        ...(contactRequest.contactMode === "EMAIL"
+        ...(contactRequest.contactMode === "EMAIL" &&
+        contactRequest.discussionKind === "IF"
           ? {
+              hasWorkingExperience: contactRequest.hasWorkingExperience,
               experienceAdditionalInformation:
                 contactRequest.experienceAdditionalInformation,
             }
@@ -249,6 +257,10 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         resumeLink:
           contactRequest.contactMode === "EMAIL"
             ? contactRequest.potentialBeneficiaryResumeLink
+            : undefined,
+        levelOfEducation:
+          contactRequest.discussionKind === "1_ELEVE_1_STAGE"
+            ? contactRequest.levelOfEducation
             : undefined,
       },
       establishmentContact: {

@@ -96,13 +96,22 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
             potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
             businessAddress: addressDtoToString(discussion.address),
             potentialBeneficiaryDatePreferences:
-              discussion.potentialBeneficiary.datePreferences,
-            potentialBeneficiaryExperienceAdditionalInformation:
-              discussion.potentialBeneficiary.experienceAdditionalInformation,
-            potentialBeneficiaryHasWorkingExperience:
-              discussion.potentialBeneficiary.hasWorkingExperience,
+              discussion.potentialBeneficiary.datePreferences ??
+              "Non communiqué",
             domain: this.#domain,
             discussionId: discussion.id,
+            ...(discussion.discussionKind === "IF"
+              ? {
+                  discussionKind: discussion.discussionKind,
+                  potentialBeneficiaryHasWorkingExperience:
+                    discussion.potentialBeneficiary.hasWorkingExperience ?? false,
+                  potentialBeneficiaryExperienceAdditionalInformation:
+                    discussion.potentialBeneficiary.experienceAdditionalInformation,
+                }
+              : {
+                  discussionKind: discussion.discussionKind,
+                  levelOfEducation: discussion.potentialBeneficiary.levelOfEducation
+                }),
           },
         };
         if (payload.isLegacy) {

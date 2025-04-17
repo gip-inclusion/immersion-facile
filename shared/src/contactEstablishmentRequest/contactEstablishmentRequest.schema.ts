@@ -3,6 +3,7 @@ import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   type ImmersionObjective,
   conventionObjectiveOptions,
+  discoverObjective,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
 import { phoneSchema } from "../phone.schema";
@@ -16,21 +17,23 @@ import {
   zUuidLike,
 } from "../zodUtils";
 import type {
+  ContactEstablishmentByMail1Eleve1StageDto,
   ContactEstablishmentByMailDto,
+  ContactEstablishmentByMailIFDto,
   ContactEstablishmentByPhoneDto,
   ContactEstablishmentEventPayload,
   ContactEstablishmentInPersonDto,
   ContactEstablishmentRequestDto,
 } from "./contactEstablishmentRequest.dto";
 
-const commonFields = {
+const contactInformationsCommonSchema = z.object({
   appellationCode: appellationCodeSchema,
   siret: siretSchema,
   potentialBeneficiaryFirstName: zStringMinLength1,
   potentialBeneficiaryLastName: zStringMinLength1,
   potentialBeneficiaryEmail: emailSchema,
   locationId: zUuidLike,
-};
+});
 
 export const preferEmailContactSchema = z.literal("EMAIL");
 export const preferPhoneContactSchema = z.literal("PHONE");
@@ -41,41 +44,77 @@ const immersionObjectiveSchema = zEnumValidation<ImmersionObjective>(
   localization.invalidImmersionObjective,
 );
 
-export const contactEstablishmentByMailFormSchema: z.Schema<ContactEstablishmentByMailDto> =
-  z.object({
-    ...commonFields,
-    contactMode: preferEmailContactSchema,
-    potentialBeneficiaryPhone: phoneSchema,
-    immersionObjective: immersionObjectiveSchema,
-    potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
-    datePreferences: zStringMinLength1,
-    hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zStringMinLength1.optional(),
-  });
+const contactEstablishmentByMailCommonSchema =
+  contactInformationsCommonSchema.and(
+    z.object({
+      potentialBeneficiaryPhone: phoneSchema,
+      potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
+      datePreferences: zStringMinLength1,
+      contactMode: preferEmailContactSchema,
+    }),
+  );
+
+const contactEstablishmentByMailIFSchema: z.Schema<ContactEstablishmentByMailIFDto> =
+  contactEstablishmentByMailCommonSchema.and(
+    z.object({
+      discussionKind: z.literal("IF"),
+      immersionObjective: immersionObjectiveSchema,
+      hasWorkingExperience: z.boolean(),
+      experienceAdditionalInformation: zStringMinLength1.optional(),
+    }),
+  );
+
+const contactEstablishmentByMail1Eleve1StageSchema: z.Schema<ContactEstablishmentByMail1Eleve1StageDto> =
+  contactEstablishmentByMailCommonSchema.and(
+    z.object({
+      discussionKind: z.literal("1_ELEVE_1_STAGE"),
+      immersionObjective: z.literal(discoverObjective),
+      levelOfEducation: z.enum(["3ème", "2nde"]),
+    }),
+  );
 
 export const contactEstablishmentByMailSchema: z.Schema<ContactEstablishmentByMailDto> =
-  z.object({
-    ...commonFields,
-    contactMode: preferEmailContactSchema,
-    potentialBeneficiaryPhone: phoneSchema,
-    immersionObjective: immersionObjectiveSchema.nullable(),
-    potentialBeneficiaryResumeLink: zStringCanBeEmpty.optional(),
-    datePreferences: zStringMinLength1,
-    hasWorkingExperience: z.boolean(),
-    experienceAdditionalInformation: zStringMinLength1.optional(),
-  });
+  contactEstablishmentByMailIFSchema.or(
+    contactEstablishmentByMail1Eleve1StageSchema,
+  );
 
 export const contactEstablishmentByPhoneSchema: z.Schema<ContactEstablishmentByPhoneDto> =
-  z.object({
-    ...commonFields,
-    contactMode: preferPhoneContactSchema,
-  });
+  contactInformationsCommonSchema
+    .and(
+      z.object({
+        contactMode: preferPhoneContactSchema,
+      }),
+    )
+    .and(
+      z.discriminatedUnion("discussionKind", [
+        z.object({
+          discussionKind: z.literal("IF"),
+        }),
+        z.object({
+          discussionKind: z.literal("1_ELEVE_1_STAGE"),
+          levelOfEducation: z.enum(["3ème", "2nde"]),
+        }),
+      ]),
+    );
 
 export const contactEstablishmentInPersonSchema: z.Schema<ContactEstablishmentInPersonDto> =
-  z.object({
-    ...commonFields,
-    contactMode: preferInPersonContactSchema,
-  });
+  contactInformationsCommonSchema
+    .and(
+      z.object({
+        contactMode: preferInPersonContactSchema,
+      }),
+    )
+    .and(
+      z.discriminatedUnion("discussionKind", [
+        z.object({
+          discussionKind: z.literal("IF"),
+        }),
+        z.object({
+          discussionKind: z.literal("1_ELEVE_1_STAGE"),
+          levelOfEducation: z.enum(["3ème", "2nde"]),
+        }),
+      ]),
+    );
 
 export const contactEstablishmentRequestSchema: z.Schema<ContactEstablishmentRequestDto> =
   z

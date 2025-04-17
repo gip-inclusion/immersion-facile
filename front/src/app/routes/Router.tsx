@@ -188,6 +188,7 @@ const getPageByRouteName: {
   homeEstablishments: () => <HomePage type="establishment" />,
   assessment: (route) => <AssessmentPage route={route} />,
   searchResult: () => <SearchResultPage />,
+  searchResultForStudent: () => <SearchResultPage />,
   searchResultExternal: () => <SearchResultPage isExternal />,
   manageConvention: (route) => <ConventionManagePage route={route} />,
   manageConventionConnectedUser: (route) => (
@@ -209,6 +210,9 @@ const getPageByRouteName: {
   manageEstablishmentAdmin: () => <ManageEstablishmentAdminPage />,
   renewConventionMagicLink: (route) => <RenewExpiredLinkPage route={route} />,
   search: (route) => (
+    <SearchPage route={route} useNaturalLanguageForAppellations />
+  ),
+  searchForStudent: (route) => (
     <SearchPage route={route} useNaturalLanguageForAppellations />
   ),
   standard: (route) =>

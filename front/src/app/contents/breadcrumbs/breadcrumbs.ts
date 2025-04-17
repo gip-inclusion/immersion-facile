@@ -51,6 +51,10 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
         label: "Recherche",
         route: routes.search(),
       },
+      searchForStudent: {
+        label: "Recherche scolaire",
+        route: routes.searchForStudent(),
+      },
       beneficiaryDashboard: {
         label: "Tableau de bord",
         route: routes.beneficiaryDashboard(),

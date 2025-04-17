@@ -16,13 +16,17 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import {
   type AppellationDto,
+  type ContactEstablishmentByMail1Eleve1StageDto,
   type ContactEstablishmentByMailDto,
+  type ContactEstablishmentByMailIFDto,
   type ImmersionObjective,
   type OmitFromExistingKeys,
-  contactEstablishmentByMailFormSchema,
+  contactEstablishmentByMailSchema,
   conventionObjectiveOptions,
+  discoverObjective,
   domElementIds,
   labelsForImmersionObjective,
+  levelsOfEducation,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
@@ -46,7 +50,8 @@ type ContactByEmailProps = {
 
 export const inputsLabelsByKey: Record<
   keyof OmitFromExistingKeys<
-    ContactEstablishmentByMailDto,
+    ContactEstablishmentByMailIFDto & ContactEstablishmentByMail1Eleve1StageDto,
+    | "discussionKind"
     | "siret"
     | "contactMode"
     | "locationId"
@@ -63,6 +68,7 @@ export const inputsLabelsByKey: Record<
   potentialBeneficiaryEmail: "Email *",
   potentialBeneficiaryPhone: "Téléphone *",
   potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
+  levelOfEducation: "Je suis en classe de ... *",
   hasWorkingExperience: "Expérience professionnelle",
   experienceAdditionalInformation:
     "Détaillez en quelques lignes vos expériences et compétences *",
@@ -73,7 +79,9 @@ export const ContactByEmail = ({
   onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<typeof routes.searchResult>;
+  const route = useRoute() as Route<
+    typeof routes.searchResult | typeof routes.searchResultForStudent
+  >;
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
@@ -91,26 +99,35 @@ export const ContactByEmail = ({
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
     () => ({
+      contactMode: "EMAIL",
       siret: route.params.siret,
       appellationCode: getDefaultAppellationCode(
         appellations,
         route.params.appellationCode,
       ),
-      contactMode: "EMAIL",
-      datePreferences: "",
-      hasWorkingExperience: false,
       potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
-      immersionObjective: null,
-      potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
       locationId: route.params.location ?? "",
+      potentialBeneficiaryResumeLink: "",
+      datePreferences: "",
       ...acquisitionParams,
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
-      experienceAdditionalInformation: undefined,
+      ...(route.name === "searchResult"
+        ? {
+            immersionObjective: null,
+            discussionKind: "IF",
+            hasWorkingExperience: false,
+            experienceAdditionalInformation: undefined,
+          }
+        : {
+            immersionObjective: discoverObjective,
+            discussionKind: "1_ELEVE_1_STAGE",
+            levelOfEducation: "3ème",
+          }),
     }),
     [
       appellations,
@@ -127,7 +144,7 @@ export const ContactByEmail = ({
   }));
 
   const methods = useForm<ContactEstablishmentByMailDto>({
-    resolver: zodResolver(contactEstablishmentByMailFormSchema),
+    resolver: zodResolver(contactEstablishmentByMailSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -155,6 +172,7 @@ export const ContactByEmail = ({
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
+
   return (
     <FormProvider {...methods}>
       <form
@@ -247,6 +265,18 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("appellationCode")}
           />
+          {route.name === "searchResultForStudent" && (
+            <Select
+              label={inputsLabelsByKey.levelOfEducation}
+              options={levelsOfEducation
+                .filter((level) => level === "3ème" || level === "2nde")
+                .map((level: string) => ({ label: level, value: level }))}
+              nativeSelectProps={{
+                ...register("levelOfEducation"),
+              }}
+              {...getFieldError("levelOfEducation")}
+            />
+          )}
           <Input
             label={inputsLabelsByKey.datePreferences}
             hintText={
@@ -292,7 +322,7 @@ export const ContactByEmail = ({
               },
             ]}
           />
-          {hasWorkingExperienceValue && (
+          {route.name === "searchResult" && hasWorkingExperienceValue && (
             <Input
               label={inputsLabelsByKey.experienceAdditionalInformation}
               hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."

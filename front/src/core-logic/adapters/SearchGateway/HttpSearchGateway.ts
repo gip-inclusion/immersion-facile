@@ -85,10 +85,7 @@ export class HttpSearchGateway implements SearchGateway {
     return from(
       this.httpClient
         .search({
-          queryParams: {
-            ...searchParams,
-            establishmentSearchableBy: "jobSeekers",
-          },
+          queryParams: searchParams,
         })
         .then((result) =>
           match(result)

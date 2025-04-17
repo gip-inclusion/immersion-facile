@@ -10,7 +10,9 @@ import {
   type ContactEstablishmentByPhoneDto,
   contactEstablishmentByPhoneSchema,
   domElementIds,
+  levelsOfEducation,
 } from "shared";
+import { inputsLabelsByKey } from "src/app/components/immersion-offer/ContactByEmail";
 import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
 import {
@@ -34,7 +36,9 @@ export const ContactByPhone = ({
   onSubmitSuccess,
 }: ContactByPhoneProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<typeof routes.searchResult>;
+  const route = useRoute() as Route<
+    typeof routes.searchResult | typeof routes.searchResultForStudent
+  >;
   const {
     getTranscientDataForScope,
     setTranscientDataForScope,
@@ -45,12 +49,12 @@ export const ContactByPhone = ({
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues: ContactEstablishmentByPhoneDto = useMemo(
     () => ({
+      contactMode: "PHONE",
       siret: route.params.siret,
       appellationCode: getDefaultAppellationCode(
         appellations,
         route.params.appellationCode,
       ),
-      contactMode: "PHONE",
       potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
@@ -59,6 +63,14 @@ export const ContactByPhone = ({
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
+      ...(route.name === "searchResult"
+        ? {
+            discussionKind: "IF",
+          }
+        : {
+            discussionKind: "1_ELEVE_1_STAGE",
+            levelOfEducation: "3ème",
+          }),
     }),
     [
       route.params,
@@ -133,9 +145,27 @@ export const ContactByPhone = ({
           Ces informations sont personnelles et confidentielles. Elles ne
           peuvent pas être communiquées à d’autres personnes. Merci !
         </p>
+        <Input
+          label={inputsLabelsByKey.email}
+          nativeInputProps={{
+            ...register("potentialBeneficiaryEmail"),
+            type: "email",
+          }}
+          {...getFieldError("potentialBeneficiaryEmail")}
+        />
+        <Input
+          label={inputsLabelsByKey.firstName}
+          nativeInputProps={register("potentialBeneficiaryFirstName")}
+          {...getFieldError("potentialBeneficiaryFirstName")}
+        />
+        <Input
+          label={inputsLabelsByKey.lastName}
+          nativeInputProps={register("potentialBeneficiaryLastName")}
+          {...getFieldError("potentialBeneficiaryLastName")}
+        />
         {appellations.length > 1 && (
           <Select
-            label={"Métier sur lequel porte la demande d'immersion *"}
+            label={inputsLabelsByKey.appellationCode}
             options={appellationListOfOptions}
             placeholder={"Sélectionnez un métier"}
             nativeSelectProps={{
@@ -144,24 +174,18 @@ export const ContactByPhone = ({
             {...getFieldError("appellationCode")}
           />
         )}
-        <Input
-          label="Votre email *"
-          nativeInputProps={{
-            ...register("potentialBeneficiaryEmail"),
-            type: "email",
-          }}
-          {...getFieldError("potentialBeneficiaryEmail")}
-        />
-        <Input
-          label="Votre prénom *"
-          nativeInputProps={register("potentialBeneficiaryFirstName")}
-          {...getFieldError("potentialBeneficiaryFirstName")}
-        />
-        <Input
-          label="Votre nom *"
-          nativeInputProps={register("potentialBeneficiaryLastName")}
-          {...getFieldError("potentialBeneficiaryLastName")}
-        />
+        {route.name === "searchResultForStudent" && (
+          <Select
+            label={inputsLabelsByKey.levelOfEducation}
+            options={levelsOfEducation
+              .filter((level) => level === "3ème" || level === "2nde")
+              .map((level: string) => ({ label: level, value: level }))}
+            nativeSelectProps={{
+              ...register("levelOfEducation"),
+            }}
+            {...getFieldError("levelOfEducation")}
+          />
+        )}
 
         <Button
           priority="secondary"
