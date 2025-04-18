@@ -78,7 +78,7 @@ export const AssessmentDocumentPage = ({
         printButtonLabel={"Imprimer le bilan"}
         title={`Bilan ${
           convention.internshipKind === "immersion"
-            ? "de l'Immersion Professionelle"
+            ? "de l'immersion professionnelle"
             : "du mini-stage"
         } au sein de ${convention.businessName}`}
         customActions={[
@@ -277,7 +277,7 @@ export const AssessmentDocumentPage = ({
           <p>
             Ce document a été rédigé dans le cadre{" "}
             {convention.internshipKind === "immersion"
-              ? "de l'immersion professionelle réalisée"
+              ? "de l'immersion professionnelle réalisée"
               : "du mini-stage réalisé"}{" "}
             par {convention.signatories.beneficiary.firstName}{" "}
             {convention.signatories.beneficiary.lastName} chez{" "}
