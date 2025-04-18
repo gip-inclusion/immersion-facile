@@ -29,7 +29,6 @@ export const EstablishmentDashboardTabs = ({
     makeEstablishmentDashboardTabs(currentUser, route),
     route.params.tab,
   );
-
   return (
     <Tabs
       tabs={tabs}
@@ -108,7 +107,10 @@ const makeEstablishmentDashboardTabs = (
       </>
     ),
   },
-  ...(establishments
+  ...(establishments &&
+  establishments?.filter(
+    (establishment) => establishment.role === "establishment-admin",
+  ).length > 0
     ? [
         {
           label: "Fiche établissement",

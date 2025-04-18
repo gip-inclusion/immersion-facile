@@ -119,7 +119,21 @@ export const InitiateConventionButton = () => {
       establishment.appellations.length === 1 &&
       values.appellation === undefined
     ) {
-      setValue("appellation", establishment.appellations[0].appellationCode);
+      setValue("appellation", establishment.appellations[0].appellationCode, {
+        shouldValidate: true,
+      });
+    }
+  }, [isEstablishmentDefault, establishment, values, setValue]);
+
+  useEffect(() => {
+    if (
+      !isEstablishmentDefault &&
+      establishment.businessAddresses.length === 1 &&
+      values.location === undefined
+    ) {
+      setValue("location", establishment.businessAddresses[0].rawAddress, {
+        shouldValidate: true,
+      });
     }
   }, [isEstablishmentDefault, establishment, values, setValue]);
 
@@ -150,20 +164,18 @@ export const InitiateConventionButton = () => {
           souhaitez initier la convention.
           <form onSubmit={handleSubmit(onSubmit)} ref={formRef}>
             <Select
-              label={"Établissement"}
+              label={"Établissement *"}
               className={fr.cx("fr-mt-2w")}
-              placeholder="Mes établissements"
+              placeholder="Sélectionnez un établissement"
               disabled={
                 currentUser.establishments &&
                 currentUser.establishments.length === 1
               }
               options={
-                currentUser.establishments
-                  ? currentUser.establishments.map((establishment) => ({
-                      value: establishment.siret,
-                      label: establishment.businessName,
-                    }))
-                  : []
+                currentUser?.establishments?.map((establishment) => ({
+                  value: establishment.siret,
+                  label: establishment.businessName,
+                })) ?? []
               }
               nativeSelectProps={{
                 ...register("siret"),
@@ -177,20 +189,25 @@ export const InitiateConventionButton = () => {
                       feedbackTopic: "unused",
                     }),
                   );
+                  setValue("siret", event.currentTarget.value, {
+                    shouldValidate: true,
+                  });
                 },
               }}
               state={errors.siret ? "error" : "default"}
               stateRelatedMessage={errors.siret?.message}
             />
             <Select
-              label={"Métier"}
+              label={"Métier *"}
+              placeholder="Sélectionnez un métier"
               className={fr.cx("fr-mt-2w")}
               disabled={
-                !establishment || establishment.appellations.length === 1
+                isEstablishmentDefault ||
+                establishment.appellations.length === 1
               }
               options={
-                establishment
-                  ? establishment.appellations.map((appellation) => ({
+                !isEstablishmentDefault
+                  ? establishment?.appellations.map((appellation) => ({
                       value: appellation.appellationCode,
                       label: appellation.appellationLabel,
                     }))
@@ -207,10 +224,12 @@ export const InitiateConventionButton = () => {
               stateRelatedMessage={errors.appellation?.message}
             />
             <Select
-              label={"Lieu d'immersion"}
+              label={"Lieu d'immersion *"}
+              placeholder="Sélectionnez un lieu d'immersion"
               className={fr.cx("fr-mt-2w")}
               disabled={
-                !establishment || establishment.businessAddresses.length === 1
+                isEstablishmentDefault ||
+                establishment.businessAddresses.length === 1
               }
               options={
                 establishment?.businessAddresses.map((location) => ({
