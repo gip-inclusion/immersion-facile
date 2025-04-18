@@ -1,3 +1,4 @@
+import { subHours } from "date-fns";
 import { CompiledQuery } from "kysely";
 import type { Pool } from "pg";
 import {
@@ -286,6 +287,58 @@ describe("PgOutboxRepository", () => {
           { id: event1.id, status: "in-process" },
           { id: event2.id, status: "never-published" },
           { id: event3.id, status: "in-process" },
+        ],
+      );
+    });
+  });
+
+  describe("markOldInProcessEventsAsToRepublish", () => {
+    const oneHourAgo = subHours(timeGateway.now(), 1);
+
+    it("works even if there is no events to mark", async () => {
+      await outboxRepository.markOldInProcessEventsAsToRepublish({
+        eventsBeforeDate: oneHourAgo,
+      });
+      const storedEventRows = await getAllEventsStored();
+      expect(storedEventRows).toEqual([]);
+    });
+
+    it("marks in-process events older than an hour as to republish", async () => {
+      const convention = new ConventionDtoBuilder().build();
+      uuidGenerator.setNextUuids([
+        "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa",
+        "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
+        "cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc",
+      ]);
+      const oldEvent = createNewEvent({
+        topic: "ConventionSubmittedByBeneficiary",
+        status: "in-process",
+        occurredAt: subHours(timeGateway.now(), 2).toISOString(),
+        payload: { convention, triggeredBy: null },
+      });
+      const newEvent = createNewEvent({
+        topic: "ApiConsumerSaved",
+        status: "in-process",
+        payload: {
+          consumerId: "consumerId",
+          triggeredBy: { kind: "inclusion-connected", userId: "Bob" },
+        },
+      });
+      await storeInOutbox([oldEvent, newEvent]);
+
+      await outboxRepository.markOldInProcessEventsAsToRepublish({
+        eventsBeforeDate: oneHourAgo,
+      });
+
+      const storedEventRows = await getAllEventsStored();
+      expectArraysToEqualIgnoringOrder(
+        storedEventRows.map(({ status, id }) => ({
+          id,
+          status,
+        })),
+        [
+          { id: oldEvent.id, status: "to-republish" },
+          { id: newEvent.id, status: "in-process" },
         ],
       );
     });

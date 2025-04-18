@@ -35,4 +35,20 @@ export class InMemoryOutboxRepository implements OutboxRepository {
       };
     });
   }
+
+  public async markOldInProcessEventsAsToRepublish({
+    eventsBeforeDate,
+  }: { eventsBeforeDate: Date }): Promise<void> {
+    const oldInProcessEvents = this.events.filter(
+      (event) =>
+        event.status === "in-process" &&
+        new Date(event.occurredAt) < eventsBeforeDate,
+    );
+    oldInProcessEvents.forEach((event) => {
+      this._events[event.id] = {
+        ...event,
+        status: "to-republish",
+      };
+    });
+  }
 }

@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { subHours } from "date-fns";
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import {
@@ -6,6 +7,7 @@ import {
   createLogger,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { DomainEvent, EventStatus } from "../events";
 import type { EventBus } from "../ports/EventBus";
@@ -21,24 +23,9 @@ export type TypeOfEvent = "unpublished" | "failed";
 
 export class BasicEventCrawler implements EventCrawler {
   constructor(
-    private uowPerformer: UnitOfWorkPerformer,
-    private readonly eventBus: EventBus,
+    protected uowPerformer: UnitOfWorkPerformer,
+    protected readonly eventBus: EventBus,
   ) {}
-
-  protected async notifyDiscordOnTooManyOutboxWithStatus({
-    status,
-    limit,
-  }: { status: EventStatus; limit: number }) {
-    const count = await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.countAllEvents({ status }),
-    );
-    if (count <= limit) return;
-    const params: LoggerParamsWithMessage = {
-      message: `${status} outbox ${count} exceeds ${limit}`,
-    };
-    logger.error(params);
-    notifyErrorObjectToTeam(params);
-  }
 
   public async processNewEvents(): Promise<void> {
     const getEventsStartDate = new Date();
@@ -160,6 +147,7 @@ export class RealEventCrawler
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     eventBus: EventBus,
+    private readonly timeGateway: TimeGateway,
     private readonly crawlingPeriodMs: number = 10_000,
   ) {
     super(uowPerformer, eventBus);
@@ -170,10 +158,6 @@ export class RealEventCrawler
       message: `RealEventCrawler.startCrawler: processing events at regular intervals (every ${this.crawlingPeriodMs}ms)`,
     });
 
-    // old version :
-    // setInterval(async () => {
-    //   await this.processNewEvents();
-    // }, this.crawlingPeriodMs);
     const processNewEvents = () =>
       setTimeout(() => {
         this.processNewEvents()
@@ -188,11 +172,6 @@ export class RealEventCrawler
       }, this.crawlingPeriodMs);
 
     processNewEvents();
-
-    // old version :
-    // setInterval(async () => {
-    //   await this.retryFailedEvents();
-    // }, retryErrorsPeriodMs);
 
     const retryFailedEvents = () =>
       setTimeout(() => {
@@ -209,23 +188,49 @@ export class RealEventCrawler
 
     retryFailedEvents();
 
+    this.#markOldInProcessEventsAsToRepublish();
     this.#checkForOutboxCount();
+  }
+
+  #markOldInProcessEventsAsToRepublish() {
+    const oneHourAgo = subHours(this.timeGateway.now(), 1);
+
+    return this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.markOldInProcessEventsAsToRepublish({
+        eventsBeforeDate: oneHourAgo,
+      }),
+    );
   }
 
   #checkForOutboxCount() {
     setTimeout(
       () =>
         Promise.all([
-          this.notifyDiscordOnTooManyOutboxWithStatus({
+          this.#notifyDiscordOnTooManyOutboxWithStatus({
             status: "never-published",
             limit: neverPublishedOutboxLimit,
           }),
-          this.notifyDiscordOnTooManyOutboxWithStatus({
+          this.#notifyDiscordOnTooManyOutboxWithStatus({
             status: "in-process",
             limit: crawlerMaxBatchSize,
           }),
         ]).finally(() => this.#checkForOutboxCount()),
       5 * 60 * 1000, //5 min
     );
+  }
+
+  async #notifyDiscordOnTooManyOutboxWithStatus({
+    status,
+    limit,
+  }: { status: EventStatus; limit: number }) {
+    const count = await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.countAllEvents({ status }),
+    );
+    if (count <= limit) return;
+    const params: LoggerParamsWithMessage = {
+      message: `${status} outbox ${count} exceeds ${limit}`,
+    };
+    logger.error(params);
+    notifyErrorObjectToTeam(params);
   }
 }
