@@ -14,7 +14,7 @@ import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -97,7 +97,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
         beneficiaryLastName: convention.signatories.beneficiary.lastName,
         businessName: convention.businessName,
         conventionId: convention.id,
-        conventionSignShortlink: await prepareMagicShortLinkMaker({
+        conventionSignShortlink: await prepareConventionMagicShortLinkMaker({
           conventionMagicLinkPayload: {
             id: convention.id,
             role: signatory.role,

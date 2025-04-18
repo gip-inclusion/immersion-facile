@@ -15,7 +15,7 @@ import type { TransferConventionToAgencyPayload } from "../../../core/events/eve
 import { transferConventionToAgencyPayloadSchema } from "../../../core/events/eventPayload.schema";
 
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -148,7 +148,7 @@ const sendAgencyEmails = (
 ) => {
   return agencyRecipientsRoleAndEmail.map(async (emailAndRole) => {
     const { role, email } = emailAndRole;
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: deps.config,
       conventionMagicLinkPayload: {
         id: convention.id,
@@ -209,7 +209,7 @@ const sendSignatoriesEmail = (
 ) => {
   return signatoriesRecipientsRoleAndEmail.map(async (emailAndRole) => {
     const { role, email } = emailAndRole;
-    const makeShortMagicLink = prepareMagicShortLinkMaker({
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
       config: deps.config,
       conventionMagicLinkPayload: {
         id: convention.id,

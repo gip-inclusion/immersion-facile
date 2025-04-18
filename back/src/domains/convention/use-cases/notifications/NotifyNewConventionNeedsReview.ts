@@ -15,7 +15,7 @@ import { createLogger } from "../../../../utils/logger";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { FtConnectImmersionAdvisorDto } from "../../../core/authentication/ft-connect/dto/FtConnectAdvisor.dto";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -90,7 +90,7 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
 
     const emails: TemplatedEmail[] = await Promise.all(
       recipients.map(async (recipient) => {
-        const makeShortMagicLink = prepareMagicShortLinkMaker({
+        const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
           config: this.#config,
           conventionMagicLinkPayload: {
             id: convention.id,

@@ -677,6 +677,7 @@ export const defaultEmailValueByEmailKind: {
     immersionAppellationLabel: "IMMERSION_APPELLATION_LABEL",
     internshipKind: "immersion",
     magicLink: "MAGIC_LINK",
+    assessmentMagicLink: "ASSESSMENT_MAGIC_LINK",
     validatorName: "VALIDATOR_NAME",
   },
   ESTABLISHMENT_USER_RIGHTS_UPDATED: {

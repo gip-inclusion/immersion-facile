@@ -28,7 +28,7 @@ type ProvidesShortLinkProperties = {
   longLink: AbsoluteUrl;
 };
 
-export const prepareMagicShortLinkMaker =
+export const prepareConventionMagicShortLinkMaker =
   ({
     conventionMagicLinkPayload,
     uow,
@@ -60,10 +60,9 @@ export const makeShortLink = async ({
   config,
   longLink,
 }: ProvidesShortLinkProperties): Promise<AbsoluteUrl> => {
-  const conventionSignShortLinkId: ShortLinkId =
-    shortLinkIdGeneratorGateway.generate();
+  const shortlinkId: ShortLinkId = shortLinkIdGeneratorGateway.generate();
 
-  await uow.shortLinkRepository.save(conventionSignShortLinkId, longLink);
+  await uow.shortLinkRepository.save(shortlinkId, longLink);
 
-  return makeShortLinkUrl(config, conventionSignShortLinkId);
+  return makeShortLinkUrl(config, shortlinkId);
 };

@@ -19,7 +19,7 @@ import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/m
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
-import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -160,7 +160,7 @@ const sendSms = async ({
   signatoryPhone: string;
   userId: UserId | undefined;
 }) => {
-  const makeShortMagicLink = prepareMagicShortLinkMaker({
+  const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
     config,
     conventionMagicLinkPayload: conventionMagicLinkPayload,
     generateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
