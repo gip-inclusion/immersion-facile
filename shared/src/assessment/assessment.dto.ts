@@ -64,6 +64,8 @@ export type DateRange = {
   to: Date;
 };
 
+export type AssessmentMode = "CreateAssessment" | "GetAssessment";
+
 export type LegacyAssessmentDto = {
   status: "FINISHED" | "ABANDONED";
   conventionId: ConventionId;

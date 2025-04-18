@@ -1,5 +1,12 @@
-import type { Signatories } from "..";
-import type { AgencyModifierRole, SignatoryRole } from "./role.dto";
+import { intersection } from "ramda";
+import type { AssessmentMode, Signatories } from "..";
+import {
+  type AgencyModifierRole,
+  type Role,
+  type SignatoryRole,
+  allowedRolesToAccessAssessment,
+  allowedRolesToCreateAssessment,
+} from "./role.dto";
 
 export const signatoryTitleByRole: Record<SignatoryRole, string> = {
   beneficiary: "bénéficiaire",
@@ -22,4 +29,22 @@ export const conventionSignatoryRoleBySignatoryKey: Record<
 export const agencyModifierTitleByRole: Record<AgencyModifierRole, string> = {
   counsellor: "conseiller",
   validator: "valideur",
+};
+
+export const hasAllowedRoleOnAssessment = (
+  userRolesOnConvention: Role[],
+  mode: AssessmentMode,
+): boolean => {
+  const hasAllowedRoleToCreateAssessment =
+    intersection(allowedRolesToCreateAssessment, userRolesOnConvention).length >
+    0;
+  const hasAllowedRoleToAccessAssessment =
+    intersection(allowedRolesToAccessAssessment, userRolesOnConvention).length >
+    0;
+
+  return (
+    userRolesOnConvention.length > 0 &&
+    ((mode === "CreateAssessment" && hasAllowedRoleToCreateAssessment) ||
+      (mode === "GetAssessment" && hasAllowedRoleToAccessAssessment))
+  );
 };

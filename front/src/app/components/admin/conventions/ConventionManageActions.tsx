@@ -1,8 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { addDays, isAfter, isBefore } from "date-fns";
 import { intersection } from "ramda";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ButtonWithSubMenu } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -18,6 +19,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   hasAllowedRole,
+  hasAllowedRoleOnAssessment,
   isConventionRenewed,
   isConventionValidated,
   userHasEnoughRightsOnConvention,
@@ -35,6 +37,8 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
+import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
@@ -64,10 +68,8 @@ export const ConventionManageActions = ({
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const icUserRoles = useAppSelector(
-    inclusionConnectedSelectors.userRolesForFetchedConvention,
-  );
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const conventionActionsFeedback = useFeedbackTopics([
     "convention-action-accept-by-counsellor",
@@ -78,6 +80,17 @@ export const ConventionManageActions = ({
     "convention-action-edit",
     "convention-action-renew",
   ]);
+
+  useEffect(() => {
+    dispatch(
+      assessmentSlice.actions.getAssessmentRequested({
+        conventionId: convention.id,
+        jwt: jwtParams.jwt,
+        feedbackTopic: "assessment",
+      }),
+    );
+  }, [dispatch, convention.id, jwtParams.jwt]);
+
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
     string | null
   >(null);
@@ -180,10 +193,30 @@ export const ConventionManageActions = ({
     "PARTIALLY_SIGNED",
   ];
   const shouldShowSignatureAction =
-    icUserRoles.includes("establishment-representative") &&
+    roles.includes("establishment-representative") &&
     !convention.signatories.establishmentRepresentative.signedAt &&
     jwtParams.kind !== "backoffice" &&
     allowedToSignStatuses.includes(convention.status);
+
+  const isConventionEndingInOneDayOrMore = isAfter(
+    new Date(convention.dateEnd),
+    addDays(new Date(), 1),
+  );
+
+  const canAssessmentBeFilled =
+    convention.status === "ACCEPTED_BY_VALIDATOR" &&
+    isBefore(new Date(convention.dateStart), new Date()) &&
+    !assessment &&
+    hasAllowedRoleOnAssessment(roles, "CreateAssessment");
+
+  const shouldShowAssessmentAnbandonAction =
+    canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
+
+  const shouldShowAssessmentFullFillAction =
+    canAssessmentBeFilled && !isConventionEndingInOneDayOrMore;
+
+  const shouldShowAssessmentDocumentAction =
+    !!assessment && hasAllowedRoleOnAssessment(roles, "GetAssessment");
 
   const requesterRoles = roles.filter(
     (role): role is ExcludeFromExisting<Role, "agency-admin"> =>
@@ -206,12 +239,6 @@ export const ConventionManageActions = ({
       allowedToTransferStatuses.includes(convention.status)
     )
       return true;
-    if (
-      intersection(icUserRoles, ["agency-admin", "counsellor", "validator"])
-        .length > 0 &&
-      allowedToTransferStatuses.includes(convention.status)
-    )
-      return true;
 
     if (
       currentUser?.isBackofficeAdmin &&
@@ -221,7 +248,7 @@ export const ConventionManageActions = ({
     return false;
   };
 
-  const navItems = [
+  const modificationItems = [
     ...(shouldShowTransferButton()
       ? [
           {
@@ -369,12 +396,12 @@ export const ConventionManageActions = ({
 
         {isAllowedConventionTransition(convention, "DRAFT", roles) && (
           <>
-            {navItems.length > 1 && (
+            {modificationItems.length > 1 && (
               <>
                 <ButtonWithSubMenu
                   buttonLabel={t.verification.modifyConvention}
                   openedTop={true}
-                  navItems={navItems}
+                  navItems={modificationItems}
                   priority={"secondary"}
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
@@ -407,7 +434,7 @@ export const ConventionManageActions = ({
                 />
               </>
             )}
-            {navItems.length === 1 && (
+            {modificationItems.length === 1 && (
               <>
                 <Button
                   {...getVerificationActionProps({
@@ -547,24 +574,67 @@ export const ConventionManageActions = ({
 
         {isAllowedConventionTransition(convention, "CANCELLED", roles) && (
           <>
-            <Button
-              {...getVerificationActionProps({
-                initialStatus: convention.status,
-                children: t.verification.markAsCancelled,
-                modalTitle: t.verification.markAsCancelled,
-                verificationAction: "CANCEL",
-                convention,
-                disabled:
-                  disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
+            {shouldShowAssessmentAnbandonAction ? (
+              <ButtonWithSubMenu
+                buttonLabel={t.verification.markAsCancelled}
+                openedTop={true}
+                navItems={[
+                  {
+                    ...getVerificationActionProps({
+                      initialStatus: convention.status,
+                      children: t.verification.markAsCancelled,
+                      modalTitle: t.verification.markAsCancelled,
+                      verificationAction: "CANCEL",
+                      convention,
+                      disabled:
+                        disabled ||
+                        convention.status !== "ACCEPTED_BY_VALIDATOR",
 
-                currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind,
-              }).buttonProps}
-              iconId="fr-icon-close-circle-line"
-              id={
-                domElementIds.manageConvention.conventionValidationCancelButton
-              }
-            />
+                      currentSignatoryRoles: requesterRoles,
+                      onSubmit: createOnSubmitWithFeedbackKind,
+                    }).buttonProps,
+                    id: domElementIds.manageConvention
+                      .conventionValidationCancelButton,
+                    iconId: "fr-icon-close-circle-line",
+                  },
+                  {
+                    linkProps: {
+                      href: routes.assessment({
+                        jwt: jwtParams.jwt,
+                        conventionId: convention.id,
+                      }).href,
+                    },
+                    children: "Déclarer un abandon",
+                    id: domElementIds.manageConvention.abandonAssessmentButton,
+                  },
+                ]}
+                priority={"secondary"}
+                buttonIconId="fr-icon-arrow-down-s-line"
+                iconPosition="right"
+                id={domElementIds.manageConvention.editActionsButton}
+              />
+            ) : (
+              <Button
+                {...getVerificationActionProps({
+                  initialStatus: convention.status,
+                  children: t.verification.markAsCancelled,
+                  modalTitle: t.verification.markAsCancelled,
+                  verificationAction: "CANCEL",
+                  convention,
+                  disabled:
+                    disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
+
+                  currentSignatoryRoles: requesterRoles,
+                  onSubmit: createOnSubmitWithFeedbackKind,
+                }).buttonProps}
+                iconId="fr-icon-close-circle-line"
+                id={
+                  domElementIds.manageConvention
+                    .conventionValidationCancelButton
+                }
+              />
+            )}
+
             <ModalWrapper
               {...getVerificationActionProps({
                 initialStatus: convention.status,
@@ -579,6 +649,38 @@ export const ConventionManageActions = ({
                 onSubmit: createOnSubmitWithFeedbackKind,
               }).modalWrapperProps}
             />
+
+            {shouldShowAssessmentDocumentAction && (
+              <Button
+                id={domElementIds.manageConvention.assessmentDocumentButton}
+                iconId="fr-icon-file-text-line"
+                priority="secondary"
+                linkProps={{
+                  href: routes.assessmentDocument({
+                    jwt: jwtParams.jwt,
+                    conventionId: convention.id,
+                  }).href,
+                }}
+              >
+                Consulter le bilan
+              </Button>
+            )}
+            {shouldShowAssessmentFullFillAction && (
+              <Button
+                id={domElementIds.manageConvention.assessmentFullFillButton}
+                iconId="fr-icon-file-text-line"
+                priority="secondary"
+                linkProps={{
+                  href: routes.assessment({
+                    jwt: jwtParams.jwt,
+                    conventionId: convention.id,
+                  }).href,
+                }}
+              >
+                Compléter le bilan
+              </Button>
+            )}
+
             <Button
               iconId="fr-icon-file-pdf-line"
               className={fr.cx("fr-m-1w")}

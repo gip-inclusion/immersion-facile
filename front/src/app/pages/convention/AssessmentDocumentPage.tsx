@@ -14,9 +14,11 @@ import {
   toDisplayedDate,
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
 import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import type { routes } from "src/app/routes/routes";
 import { escapeHtml } from "src/app/utils/sanitize";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
@@ -40,13 +42,19 @@ export const AssessmentDocumentPage = ({
 }: AssessmentDocumentPageProps) => {
   const dispatch = useDispatch();
   const { jwt, jwtPayload } = useJwt(route);
-  const conventionId = jwtPayload.applicationId;
+
+  const conventionId = jwtPayload.applicationId ?? route.params.conventionId;
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
+
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt,
-    conventionId: jwtPayload.applicationId,
+    conventionId,
   });
+  const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const fetchConventionError =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "fetch";
   const { isPdfLoading, generateAndDownloadPdf } = usePdfGenerator();
 
   const logos = [
@@ -66,6 +74,14 @@ export const AssessmentDocumentPage = ({
 
   if (isConventionLoading || isAssessmentLoading || isPdfLoading)
     return <Loader />;
+
+  if (fetchConventionError)
+    return (
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={conventionFormFeedback?.message}
+        jwt={jwt}
+      />
+    );
   if (!convention) return <p>Pas de convention correspondante trouvée</p>;
   if (!assessment) return <p>Pas de bilan correspondant trouvé</p>;
 
