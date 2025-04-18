@@ -155,10 +155,6 @@ export class RealEventCrawler
       message: `RealEventCrawler.startCrawler: processing events at regular intervals (every ${this.crawlingPeriodMs}ms)`,
     });
 
-    // old version :
-    // setInterval(async () => {
-    //   await this.processNewEvents();
-    // }, this.crawlingPeriodMs);
     const processNewEvents = () =>
       setTimeout(() => {
         this.processNewEvents()
@@ -173,11 +169,6 @@ export class RealEventCrawler
       }, this.crawlingPeriodMs);
 
     processNewEvents();
-
-    // old version :
-    // setInterval(async () => {
-    //   await this.retryFailedEvents();
-    // }, retryErrorsPeriodMs);
 
     const retryFailedEvents = () =>
       setTimeout(() => {
