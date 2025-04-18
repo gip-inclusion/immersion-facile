@@ -161,7 +161,7 @@ describe("Contact establishment public v2 e2e", () => {
         message:
           "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /contact-establishment",
         issues: [
-          "appellationCode : Required",
+          "appellationCode : Obligatoire",
           "siret : Obligatoire",
           'contactMode : Invalid literal value, expected "PHONE"',
           'contactMode : Invalid literal value, expected "IN_PERSON"',

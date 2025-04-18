@@ -1,6 +1,6 @@
 // Details: https://www.pole-emploi.fr/employeur/vos-recrutements/le-rome-et-les-fiches-metiers.html
 import { z } from "zod";
-import { zStringMinLength1 } from "../zodUtils";
+import { localization, zStringMinLength1 } from "../zodUtils";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
@@ -16,7 +16,9 @@ export const codeRomeSchema: z.Schema<RomeCode> = z
 
 const codeAppellationRegex = /^\d{5}\d?$/; // 5 or 6 digits
 export const appellationCodeSchema: z.Schema<AppellationCode> = z
-  .string()
+  .string({
+    required_error: localization.required,
+  })
   .regex(codeAppellationRegex, "Code appellation incorrect");
 
 export const appellationCodeSchemaOptional: z.Schema<
