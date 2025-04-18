@@ -21,24 +21,9 @@ export type TypeOfEvent = "unpublished" | "failed";
 
 export class BasicEventCrawler implements EventCrawler {
   constructor(
-    private uowPerformer: UnitOfWorkPerformer,
-    private readonly eventBus: EventBus,
+    protected uowPerformer: UnitOfWorkPerformer,
+    protected readonly eventBus: EventBus,
   ) {}
-
-  protected async notifyDiscordOnTooManyOutboxWithStatus({
-    status,
-    limit,
-  }: { status: EventStatus; limit: number }) {
-    const count = await this.uowPerformer.perform((uow) =>
-      uow.outboxRepository.countAllEvents({ status }),
-    );
-    if (count <= limit) return;
-    const params: LoggerParamsWithMessage = {
-      message: `${status} outbox ${count} exceeds ${limit}`,
-    };
-    logger.error(params);
-    notifyErrorObjectToTeam(params);
-  }
 
   public async processNewEvents(): Promise<void> {
     const getEventsStartDate = new Date();
@@ -227,5 +212,20 @@ export class RealEventCrawler
         ]).finally(() => this.#checkForOutboxCount()),
       5 * 60 * 1000, //5 min
     );
+  }
+
+  async #notifyDiscordOnTooManyOutboxWithStatus({
+    status,
+    limit,
+  }: { status: EventStatus; limit: number }) {
+    const count = await this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.countAllEvents({ status }),
+    );
+    if (count <= limit) return;
+    const params: LoggerParamsWithMessage = {
+      message: `${status} outbox ${count} exceeds ${limit}`,
+    };
+    logger.error(params);
+    notifyErrorObjectToTeam(params);
   }
 }
