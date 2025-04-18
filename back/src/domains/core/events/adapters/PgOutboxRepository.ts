@@ -55,6 +55,17 @@ export class PgOutboxRepository implements OutboxRepository {
         .execute();
   }
 
+  public async markOldInProcessEventsAsToRepublish({
+    eventsBeforeDate,
+  }: { eventsBeforeDate: Date }): Promise<void> {
+    await this.transaction
+      .updateTable("outbox")
+      .set({ status: "to-republish" })
+      .where("status", "=", "in-process")
+      .where("occurred_at", "<", eventsBeforeDate)
+      .execute();
+  }
+
   public async save(event: DomainEvent): Promise<void> {
     const eventInDb =
       await this.#storeEventInOutboxOrRecoverItIfAlreadyThere(event);

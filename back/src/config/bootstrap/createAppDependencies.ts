@@ -103,7 +103,12 @@ export const createAppDependencies = async (config: AppConfig) => {
     generateApiConsumerJwt,
     generateInclusionConnectJwt,
     eventBus,
-    eventCrawler: createEventCrawler(config, uowPerformer, eventBus),
+    eventCrawler: createEventCrawler(
+      config,
+      uowPerformer,
+      eventBus,
+      gateways.timeGateway,
+    ),
     uuidGenerator,
     inMemoryUow,
     uowPerformer,
