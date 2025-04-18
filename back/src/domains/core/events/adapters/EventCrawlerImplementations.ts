@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import { subHours } from "date-fns";
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import {
@@ -6,6 +7,7 @@ import {
   createLogger,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
+import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { DomainEvent, EventStatus } from "../events";
 import type { EventBus } from "../ports/EventBus";
@@ -145,6 +147,7 @@ export class RealEventCrawler
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     eventBus: EventBus,
+    private readonly timeGateway: TimeGateway,
     private readonly crawlingPeriodMs: number = 10_000,
   ) {
     super(uowPerformer, eventBus);
@@ -185,18 +188,29 @@ export class RealEventCrawler
 
     retryFailedEvents();
 
+    this.#markOldInProcessEventsAsToRepublish();
     this.#checkForOutboxCount();
+  }
+
+  #markOldInProcessEventsAsToRepublish() {
+    const twoHoursAgo = subHours(this.timeGateway.now(), 2);
+
+    return this.uowPerformer.perform((uow) =>
+      uow.outboxRepository.markOldInProcessEventsAsToRepublish({
+        eventsBeforeDate: twoHoursAgo,
+      }),
+    );
   }
 
   #checkForOutboxCount() {
     setTimeout(
       () =>
         Promise.all([
-          this.notifyDiscordOnTooManyOutboxWithStatus({
+          this.#notifyDiscordOnTooManyOutboxWithStatus({
             status: "never-published",
             limit: neverPublishedOutboxLimit,
           }),
-          this.notifyDiscordOnTooManyOutboxWithStatus({
+          this.#notifyDiscordOnTooManyOutboxWithStatus({
             status: "in-process",
             limit: crawlerMaxBatchSize,
           }),
