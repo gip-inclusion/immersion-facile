@@ -70,7 +70,8 @@ export const RSAutocomplete = <T,>({
         classNames={{
           input: () => fr.cx("fr-input", { "fr-input--error": hasError }),
           menu: () => cx(fr.cx("fr-menu", "fr-p-0", "fr-m-0"), Styles.menu),
-          menuList: () => cx(fr.cx("fr-menu__list"), Styles.menuList),
+          menuList: () =>
+            cx(fr.cx("fr-menu__list", "fr-mb-0"), Styles.menuList),
           option: () => cx(fr.cx("fr-nav__link")),
         }}
         components={{
