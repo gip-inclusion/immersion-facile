@@ -6,6 +6,9 @@ on:
       tag:
         type: string
         required: true
+    secrets:
+      SCALINGO_API_TOKEN:
+        required: true
 
 jobs:
   deploy-dbt:
