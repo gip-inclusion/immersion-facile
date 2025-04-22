@@ -38,7 +38,7 @@ export const EditionSiretRelatedInputs = ({
         nativeInputProps={{
           id: formContents.businessName.id,
           ...register("businessName"),
-          readOnly: true,
+          disabled: true,
         }}
       />
       <Input
