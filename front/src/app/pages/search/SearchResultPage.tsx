@@ -228,7 +228,7 @@ export const SearchResultPage = ({
                 }
               />
               <h1 className={fr.cx("fr-mb-4w", "fr-mt-2w")}>
-                {currentSearchResult.name}
+                {currentSearchResult.customizedName ?? currentSearchResult.name}
               </h1>
               <div className={fr.cx("fr-grid-row")}>
                 <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
