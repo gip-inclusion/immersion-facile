@@ -62,6 +62,7 @@ export class PgOutboxRepository implements OutboxRepository {
       .updateTable("outbox")
       .set({ status: "to-republish" })
       .where("status", "=", "in-process")
+      .where("was_quarantined", "=", false)
       .where("occurred_at", "<", eventsBeforeDate)
       .execute();
   }

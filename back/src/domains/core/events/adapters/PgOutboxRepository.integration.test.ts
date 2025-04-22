@@ -303,6 +303,44 @@ describe("PgOutboxRepository", () => {
       expect(storedEventRows).toEqual([]);
     });
 
+    it("do not update quanrantined events", async () => {
+      const convention = new ConventionDtoBuilder().build();
+      uuidGenerator.setNextUuids([
+        "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa",
+        "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb",
+        "cccccc99-9c0c-cccc-cc6d-6cc9cd38cccc",
+      ]);
+      const eventQuarantined = createNewEvent({
+        topic: "ConventionSubmittedByBeneficiary",
+        status: "in-process",
+        wasQuarantined: true,
+        occurredAt: subHours(timeGateway.now(), 2).toISOString(),
+        payload: { convention, triggeredBy: null },
+      });
+      const event = createNewEvent({
+        topic: "ConventionSubmittedByBeneficiary",
+        status: "in-process",
+        occurredAt: subHours(timeGateway.now(), 2).toISOString(),
+        payload: { convention, triggeredBy: null },
+      });
+      await storeInOutbox([eventQuarantined, event]);
+
+      await outboxRepository.markOldInProcessEventsAsToRepublish({
+        eventsBeforeDate: oneHourAgo,
+      });
+      const storedEventRows = await getAllEventsStored();
+      expectArraysToEqualIgnoringOrder(
+        storedEventRows.map(({ status, id }) => ({
+          id,
+          status,
+        })),
+        [
+          { id: eventQuarantined.id, status: "in-process" },
+          { id: event.id, status: "to-republish" },
+        ],
+      );
+    });
+
     it("marks in-process events older than an hour as to republish", async () => {
       const convention = new ConventionDtoBuilder().build();
       uuidGenerator.setNextUuids([
