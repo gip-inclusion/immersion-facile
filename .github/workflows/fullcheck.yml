@@ -98,8 +98,10 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
+      - name: Install bun
+        run: npm install -g bun@1.2.10  # do NOT use pnpm here, for bun, it will FAIL
       - name: Run migrations
-        run: NODE_ENV=test DATABASE_URL=$TEST_DATABASE_URL pnpm back db:up
+        run: NODE_ENV=test DATABASE_URL=$TEST_DATABASE_URL pnpm back db:up:bun
       - name: Run integration tests
         run: |
           echo $TEST_DATABASE_URL
@@ -186,10 +188,12 @@ jobs:
           cache: "pnpm"
       - name: Install dependencies
         run: pnpm install
+      - name: Install bun
+        run: npm install -g bun@1.2.10 # do NOT use pnpm here, for bun, it will FAIL
       - name: Run migrations
-        run: pnpm back db:up
+        run: pnpm back db:up:bun
       - name: Run seed
-        run: pnpm back db:seed
+        run: pnpm back db:seed:bun
       - name: Start the backend
         run: pnpm back dev &
       - name: Start the frontend
