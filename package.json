@@ -42,7 +42,7 @@
     "typescript": "^5.7.3"
   },
   "engines": {
-    "node": "^20.15.0"
+    "node": "^22.14.0"
   },
   "packageManager": "pnpm@10.9.0"
 }
