@@ -33,6 +33,12 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 
 describe("NotifyAllActorsOfFinalApplicationValidation", () => {
+  type ActorForNotification = {
+    role: Role;
+    email: string;
+    conventionShortlinkId: ShortLinkId;
+    assessmentCreationLinkId: ShortLinkId | undefined;
+  };
   const establishmentTutorEmail = "establishment-tutor@mail.com";
   const establishmentRepresentativeEmail =
     "establishment-representativ@gmail.com";
@@ -84,7 +90,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     businessAddress: "Rue des Bouchers 67065 Strasbourg",
   };
 
-  const validConventionWithSameTutorAndRepresentativ =
+  const validConventionWithSameTutorAndRepresentative =
     new ConventionDtoBuilder()
       .withEstablishmentRepresentative(establishmentRepresentative)
       .withEstablishmentTutor({
@@ -95,7 +101,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       .build();
 
   const defaultAgency = AgencyDtoBuilder.create(
-    validConventionWithSameTutorAndRepresentativ.agencyId,
+    validConventionWithSameTutorAndRepresentative.agencyId,
   ).build();
 
   let uow: InMemoryUnitOfWork;
@@ -129,18 +135,13 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   });
 
   describe("NotifyAllActorsOfFinalApplicationValidation sends confirmation email to all actors", () => {
-    it("Notify Default actors: beneficiary, establishment representative, agency counsellor, agency validator that convention is validate.", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+    it("Notify Default actors: beneficiary, establishment representative, agency counsellor, agency validator that convention is validated.", async () => {
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -174,14 +175,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConventionWithSameTutorAndRepresentativ,
+        convention: validConventionWithSameTutorAndRepresentative,
       });
 
       const expectedShorlinks = actors.reduce(
         (acc, actor) => ({
           ...acc,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentativ.id,
+            id: validConventionWithSameTutorAndRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -192,7 +193,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           ...(actor.assessmentCreationLinkId
             ? {
                 [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  id: validConventionWithSameTutorAndRepresentative.id,
                   role: actor.role,
                   email: actor.email,
                   now: timeGateway.now(),
@@ -226,7 +227,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConventionWithSameTutorAndRepresentativ,
+          validConventionWithSameTutorAndRepresentative,
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
@@ -235,17 +236,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     });
 
     it("With beneficiary current employer", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -276,7 +272,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       ];
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
-        validConventionWithSameTutorAndRepresentativ,
+        validConventionWithSameTutorAndRepresentative,
       )
         .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
@@ -297,7 +293,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentativ.id,
+            id: validConventionWithSameTutorAndRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -308,7 +304,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           ...(actor.assessmentCreationLinkId
             ? {
                 [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  id: validConventionWithSameTutorAndRepresentative.id,
                   role: actor.role,
                   email: actor.email,
                   now: timeGateway.now(),
@@ -351,17 +347,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     });
 
     it("With beneficiary representative", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -392,7 +383,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       ];
 
       const conventionWithBeneficiaryCurrentEmployer = new ConventionDtoBuilder(
-        validConventionWithSameTutorAndRepresentativ,
+        validConventionWithSameTutorAndRepresentative,
       )
         .withBeneficiaryRepresentative(beneficiaryRepresentative)
         .build();
@@ -413,7 +404,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentativ.id,
+            id: validConventionWithSameTutorAndRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -424,7 +415,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           ...(actor.assessmentCreationLinkId
             ? {
                 [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  id: validConventionWithSameTutorAndRepresentative.id,
                   role: actor.role,
                   email: actor.email,
                   now: timeGateway.now(),
@@ -467,17 +458,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     });
 
     it("With different establishment tutor and establishment representative", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -516,7 +502,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       const conventionWithDifferentEstablishmentTutorAndEstablishmentRepresentative =
-        new ConventionDtoBuilder(validConventionWithSameTutorAndRepresentativ)
+        new ConventionDtoBuilder(validConventionWithSameTutorAndRepresentative)
           .withEstablishmentTutor(establishmentTutor)
           .build();
 
@@ -583,17 +569,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     });
 
     it("With PeConnect Federated identity: beneficiary, establishment representative, agency counsellor & validator, and dedicated advisor", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -632,7 +613,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           type: "CAPEMPLOI",
         },
         peExternalId: userFtExternalId,
-        conventionId: validConventionWithSameTutorAndRepresentativ.id,
+        conventionId: validConventionWithSameTutorAndRepresentative.id,
       };
 
       uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
@@ -648,14 +629,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConventionWithSameTutorAndRepresentativ,
+        convention: validConventionWithSameTutorAndRepresentative,
       });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentativ.id,
+            id: validConventionWithSameTutorAndRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -666,7 +647,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           ...(actor.assessmentCreationLinkId
             ? {
                 [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  id: validConventionWithSameTutorAndRepresentative.id,
                   role: actor.role,
                   email: actor.email,
                   now: timeGateway.now(),
@@ -699,7 +680,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConventionWithSameTutorAndRepresentativ,
+          validConventionWithSameTutorAndRepresentative,
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
@@ -708,17 +689,12 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
     });
 
     it("With PeConnect Federated identity: beneficiary, establishment tutor, agency counsellor & validator, and no advisor", async () => {
-      const actors: {
-        role: Role;
-        email: string;
-        conventionShortlinkId: ShortLinkId;
-        assessmentCreationLinkId: ShortLinkId | undefined;
-      }[] = [
+      const actors: ActorForNotification[] = [
         {
           role: "beneficiary",
           email:
-            validConventionWithSameTutorAndRepresentativ.signatories.beneficiary
-              .email,
+            validConventionWithSameTutorAndRepresentative.signatories
+              .beneficiary.email,
           conventionShortlinkId: "conventionShortlinkId_0",
           assessmentCreationLinkId: undefined,
         },
@@ -746,7 +722,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
         _entityName: "ConventionFranceTravailAdvisor",
         advisor: undefined,
         peExternalId: userFtExternalId,
-        conventionId: validConventionWithSameTutorAndRepresentativ.id,
+        conventionId: validConventionWithSameTutorAndRepresentative.id,
       };
 
       uow.conventionFranceTravailAdvisorRepository.setConventionFranceTravailUsersAdvisor(
@@ -762,14 +738,14 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
       shortLinkIdGenerator.addMoreShortLinkIds(shortlinkIds);
 
       await notifyAllActorsOfFinalConventionValidation.execute({
-        convention: validConventionWithSameTutorAndRepresentativ,
+        convention: validConventionWithSameTutorAndRepresentative,
       });
 
       const expectedShorlinks = actors.reduce(
         (a, actor) => ({
           ...a,
           [actor.conventionShortlinkId]: fakeGenerateMagicLinkUrlFn({
-            id: validConventionWithSameTutorAndRepresentativ.id,
+            id: validConventionWithSameTutorAndRepresentative.id,
             role: actor.role,
             email: actor.email,
             now: timeGateway.now(),
@@ -780,7 +756,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           ...(actor.assessmentCreationLinkId
             ? {
                 [actor.assessmentCreationLinkId]: fakeGenerateMagicLinkUrlFn({
-                  id: validConventionWithSameTutorAndRepresentativ.id,
+                  id: validConventionWithSameTutorAndRepresentative.id,
                   role: actor.role,
                   email: actor.email,
                   now: timeGateway.now(),
@@ -813,7 +789,7 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
           [actor.email],
           emailNotifications[index].templatedContent,
           defaultAgency,
-          validConventionWithSameTutorAndRepresentativ,
+          validConventionWithSameTutorAndRepresentative,
           config,
           actor.conventionShortlinkId,
           actor.assessmentCreationLinkId,
