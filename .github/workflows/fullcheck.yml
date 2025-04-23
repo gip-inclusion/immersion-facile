@@ -207,6 +207,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [ 1, 2, 3, 4, 5, 6 ]
+        shardTotal: [ 6 ]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
@@ -257,10 +262,10 @@ jobs:
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
         run: |
-          pnpm playwright test:ci
+          pnpm playwright test:ci --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shardIndex }}
           path: ./playwright/playwright-report/
           retention-days: 30
