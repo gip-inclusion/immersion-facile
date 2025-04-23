@@ -3,6 +3,7 @@ import {
   type AgencyRight,
   type ConnectedUserJwt,
   type WithDashboards,
+  activeAgencyStatuses,
   domElementIds,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
@@ -70,13 +71,17 @@ const rawAgencyDashboardTabs = ({
     .filter((agencyRight) => agencyRight.roles.includes("agency-admin"))
     .map((agencyRightWithAdminRole) => agencyRightWithAdminRole.agency);
 
+  const agenciesWithActiveStatus = activeAgencyRights
+    .filter(({ agency }) => activeAgencyStatuses.includes(agency.status))
+    .map((agencyRight) => agencyRight.agency);
+
   return [
     ...(dashboards.agencies.agencyDashboardUrl
       ? [
           {
             tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
             label: "Tableau de bord",
-            content: ConventionTabContent(dashboards, activeAgencyRights),
+            content: ConventionTabContent(dashboards, agenciesWithActiveStatus),
           },
         ]
       : []),
