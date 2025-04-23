@@ -34,7 +34,7 @@ on:
 
 jobs:
   validation:
-    name: ""
+    name: "Validations"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -51,8 +51,25 @@ jobs:
         with:
           node-version: "22.14.0"
           cache: "pnpm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node_modules_cache_id
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-pnpm-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-node-modules-
+
+      - name: Cache Playwright Browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: ${{matrix.command}}
         run: ${{matrix.command}}
@@ -96,8 +113,17 @@ jobs:
         with:
           node-version: "22.14.0"
           cache: "pnpm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node_modules_cache_id
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-pnpm-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-node-modules-
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --prefer-offline --filter=!playwright
       - name: Install bun
         run: npm install -g bun@1.2.10  # do NOT use pnpm here, for bun, it will FAIL
       - name: Run migrations
@@ -186,14 +212,23 @@ jobs:
         with:
           node-version: "22.14.0"
           cache: "pnpm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node_modules_cache_id
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-pnpm-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-node-modules-
+
       - name: Cache Playwright Browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+          restore-keys: ${{ runner.os }}-playwright-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prefer-offline
       - name: Install bun
@@ -207,7 +242,7 @@ jobs:
       - name: Start the frontend
         run: pnpm front dev &
       - name: Wait for the backend to be ready
-        run: sleep 5
+        run: npx --yes wait-on tcp:localhost:1234 -t 10000
       - name: Ping backend
         run: curl -X GET http://localhost:3000/api
       - name: Run playwright tests
