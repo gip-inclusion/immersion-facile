@@ -11,11 +11,11 @@ import {
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  makeEmailHash,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeHashByRolesForTest } from "../../../utils/emailHash";
+import { makeEmailHash } from "../../../utils/jwt";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,

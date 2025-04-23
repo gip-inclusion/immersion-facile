@@ -3,7 +3,6 @@ import {
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
   conventionMagicLinkRoutes,
-  createConventionMagicLinkPayload,
   expectHttpResponseToEqual,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -11,6 +10,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 
 const conventionId = "my-Convention-id";
 const beneficiaryEmail = "joe@lebenef.fr";

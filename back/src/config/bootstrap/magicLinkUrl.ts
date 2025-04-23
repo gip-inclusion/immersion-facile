@@ -3,13 +3,13 @@ import {
   type CreateConventionMagicLinkPayloadProperties,
   type InclusionConnectJwtPayload,
   type OmitFromExistingKeys,
-  createConventionMagicLinkPayload,
   frontRoutes,
 } from "shared";
 import type {
   GenerateConventionJwt,
   GenerateInclusionConnectJwt,
 } from "../../domains/core/jwt";
+import { createConventionMagicLinkPayload } from "../../utils/jwt";
 import type { AppConfig } from "./appConfig";
 
 export const generateEditFormEstablishmentUrl = (

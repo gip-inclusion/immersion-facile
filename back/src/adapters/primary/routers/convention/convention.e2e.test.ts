@@ -16,7 +16,6 @@ import {
   type WithAuthorizationHeader,
   authenticatedConventionRoutes,
   conventionMagicLinkRoutes,
-  createConventionMagicLinkPayload,
   currentJwtVersions,
   defaultProConnectInfos,
   displayRouteName,
@@ -27,7 +26,6 @@ import {
   expectToEqual,
   expiredMagicLinkErrorMessage,
   frontRoutes,
-  makeEmailHash,
   technicalRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
@@ -50,6 +48,10 @@ import {
   buildTestApp,
 } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
+import {
+  createConventionMagicLinkPayload,
+  makeEmailHash,
+} from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("convention e2e", () => {

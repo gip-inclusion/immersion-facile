@@ -9,9 +9,9 @@ import {
   establishmentsRoles,
   expectPromiseToFailWithError,
   expectToEqual,
-  makeEmailHash,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeEmailHash } from "../../../utils/jwt";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,
