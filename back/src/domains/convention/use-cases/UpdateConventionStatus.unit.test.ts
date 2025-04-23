@@ -3,7 +3,6 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   InclusionConnectedUserBuilder,
-  createConventionMagicLinkPayload,
   errors,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
@@ -11,6 +10,7 @@ import {
   validSignatoryRoles,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";

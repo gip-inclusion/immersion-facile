@@ -15,11 +15,11 @@ import {
   type SignatoryRole,
   agencyModifierRoles,
   errors,
-  isSomeEmailMatchingEmailHash,
   isValidMobilePhone,
   statusTransitionConfigs,
 } from "shared";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
+import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 

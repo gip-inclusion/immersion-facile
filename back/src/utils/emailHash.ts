@@ -10,12 +10,11 @@ import {
   type Role,
   type UserWithAdminRights,
   errors,
-  isSomeEmailMatchingEmailHash,
-  makeEmailHash,
 } from "shared";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";
 import { conventionEmailsByRole } from "./convention";
+import { isSomeEmailMatchingEmailHash, makeEmailHash } from "./jwt";
 
 export const isHashMatchNotNotifiedCounsellorOrValidator = async ({
   role,

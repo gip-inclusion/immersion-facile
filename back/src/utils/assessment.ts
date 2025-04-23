@@ -5,11 +5,11 @@ import {
   type Role,
   assessmentDtoSchema,
   errors,
-  isSomeEmailMatchingEmailHash,
   legacyAssessmentDtoSchema,
 } from "shared";
 import { z } from "zod";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
+import { isSomeEmailMatchingEmailHash } from "./jwt";
 
 type AssessmentMode = "CreateAssessment" | "GetAssessment";
 export const throwForbiddenIfNotAllowedForAssessments = (

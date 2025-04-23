@@ -2,11 +2,11 @@ import { subDays } from "date-fns";
 import {
   ConventionDtoBuilder,
   type ConventionJwtPayload,
-  createConventionMagicLinkPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {

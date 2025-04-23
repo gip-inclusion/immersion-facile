@@ -9,13 +9,13 @@ import {
   UserBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
-  createConventionMagicLinkPayload,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
   type SaveNotificationAndRelatedEvent,

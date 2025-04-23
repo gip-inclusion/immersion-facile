@@ -3,7 +3,6 @@ import {
   ConventionDtoBuilder,
   type ConventionJwt,
   type EstablishmentLeadRoutes,
-  createConventionMagicLinkPayload,
   displayRouteName,
   errors,
   establishmentLeadRoutes,
@@ -23,6 +22,7 @@ import type { GenerateConventionJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import { buildTestApp } from "../../../../utils/buildTestApp";
+import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 
 const convention = new ConventionDtoBuilder().build();
 const alreadySavedLead: EstablishmentLead = {

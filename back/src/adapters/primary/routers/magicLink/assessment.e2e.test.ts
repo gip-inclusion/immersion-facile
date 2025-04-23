@@ -7,7 +7,6 @@ import {
   InclusionConnectedUserBuilder,
   type LegacyAssessmentDto,
   conventionMagicLinkRoutes,
-  createConventionMagicLinkPayload,
   displayRouteName,
   errors,
   expectArraysToMatch,
@@ -24,6 +23,7 @@ import {
   type InMemoryGateways,
   buildTestApp,
 } from "../../../../utils/buildTestApp";
+import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Assessment routes", () => {

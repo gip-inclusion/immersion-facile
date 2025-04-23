@@ -11,7 +11,6 @@ import {
   InclusionConnectedUserBuilder,
   UserBuilder,
   conventionStatusesWithoutJustificationNorValidator,
-  createConventionMagicLinkPayload,
   errors,
   expectArraysToMatch,
   expectObjectInArrayToMatch,
@@ -19,6 +18,7 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,

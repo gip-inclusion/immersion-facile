@@ -16,13 +16,13 @@ import {
   type UserWithAdminRights,
   allRoles,
   conventionStatuses,
-  createConventionMagicLinkPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import type { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";

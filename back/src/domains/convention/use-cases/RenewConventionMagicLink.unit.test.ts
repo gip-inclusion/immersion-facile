@@ -7,7 +7,6 @@ import {
   type ConventionId,
   type RenewMagicLinkRequestDto,
   type Role,
-  createConventionMagicLinkPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -16,6 +15,7 @@ import {
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import type { WithTriggeredBy } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";

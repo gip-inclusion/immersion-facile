@@ -9,7 +9,6 @@ import {
   type Role,
   errors,
   frontRoutes,
-  makeEmailHash,
   renewMagicLinkRequestSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -17,6 +16,7 @@ import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
+import { makeEmailHash } from "../../../utils/jwt";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { prepareMagicShortLinkMaker } from "../../core/short-link/ShortLink";
