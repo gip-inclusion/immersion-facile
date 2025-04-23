@@ -59,13 +59,6 @@ export const allowedRolesToAccessAssessment = [
   "beneficiary",
 ] as const;
 
-export const allowedRolesToAccessAssessment = [
-  ...allowedRolesToCreateAssessment,
-  "back-office",
-  "establishment-representative",
-  "beneficiary",
-] as const;
-
 export const getRequesterRole = (roles: Role[]): Role => {
   if (roles.includes("back-office")) return "back-office";
   if (roles.includes("validator")) return "validator";
