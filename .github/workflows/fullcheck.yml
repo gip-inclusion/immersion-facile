@@ -34,7 +34,7 @@ on:
 
 jobs:
   validation:
-    name: "Validations"
+    name: ""
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -69,7 +69,11 @@ jobs:
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
+      - name: Install Playwright browsers if not cached
+        if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
+        run: pnpm playwright install --with-deps chromium
 
       - name: ${{matrix.command}}
         run: ${{matrix.command}}
@@ -123,7 +127,8 @@ jobs:
           restore-keys: ${{ runner.os }}-pnpm-node-modules-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline --filter=!playwright
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts --filter=!playwright
+
       - name: Install bun
         run: npm install -g bun@1.2.10  # do NOT use pnpm here, for bun, it will FAIL
       - name: Run migrations
@@ -230,7 +235,12 @@ jobs:
           restore-keys: ${{ runner.os }}-playwright-
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --prefer-offline
+        run: pnpm install --frozen-lockfile --prefer-offline --ignore-scripts
+
+      - name: Install Playwright browsers if not cached
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm playwright install --with-deps chromium
+
       - name: Install bun
         run: npm install -g bun@1.2.10 # do NOT use pnpm here, for bun, it will FAIL
       - name: Run migrations
