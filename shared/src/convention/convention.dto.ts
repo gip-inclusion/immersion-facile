@@ -422,7 +422,7 @@ export type FindSimilarConventionsResponseDto = {
 export const labelsForImmersionObjective: Record<ImmersionObjective, string> = {
   "Confirmer un projet professionnel": "Je compte me former à ce métier",
   "Découvrir un métier ou un secteur d'activité":
-    "J'en suis au premier stade de ma réorientation et je veux en savoir plus sur ce métier",
+    "J'en suis au premier stade de mon orientation et je veux en savoir plus sur ce métier",
   "Initier une démarche de recrutement": "Je suis à la recherche d'un emploi",
 };
 
