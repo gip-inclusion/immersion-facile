@@ -14,6 +14,7 @@
     "db:up": "pnpm db:migrate up",
     "deadcode": "ts-prune --ignore 'src/config/pg/migrations'",
     "dev": "NODE_ENV=local ts-node-dev src/scripts/startServer.ts",
+    "dev:no-typecheck": "NODE_ENV=local ts-node-dev --transpile-only src/scripts/startServer.ts",
     "free-quarantined-form-establishments-with-correct-siret": "ts-node src/scripts/freeQuarantinedFormEstablishmentsWithCorrectSiret.ts",
     "fullcheck": "pnpm -w fullcheck --filter=back",
     "generate-api-key": "ts-node src/scripts/generateApiKey.ts",
