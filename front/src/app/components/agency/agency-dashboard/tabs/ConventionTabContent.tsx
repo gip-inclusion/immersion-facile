@@ -7,7 +7,6 @@ import { createPortal } from "react-dom";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
-  type AgencyRight,
   type WithAgencyDashboards,
   type WithEstablishmentDashboards,
   domElementIds,
@@ -24,7 +23,7 @@ const selectAgencyToInitiateConventionModal = createModal({
 });
 export const ConventionTabContent = (
   dashboards: WithAgencyDashboards & WithEstablishmentDashboards,
-  activeAgencyRights: AgencyRight[],
+  activeAgencies: AgencyDtoForAgencyUsersAndAdmins[],
 ) => {
   const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
 
@@ -53,8 +52,8 @@ export const ConventionTabContent = (
   };
 
   const onInitiateConventionButtonClick = () => {
-    if (activeAgencyRights.length === 1 && activeAgencyRights[0].agency) {
-      redirectToConventionPage(activeAgencyRights[0].agency);
+    if (activeAgencies.length === 1) {
+      redirectToConventionPage(activeAgencies[0]);
     } else {
       selectAgencyToInitiateConventionModal.open();
     }
@@ -94,12 +93,12 @@ export const ConventionTabContent = (
               disabled: !selectedAgency,
               onClick: () => {
                 if (selectedAgency) {
-                  const foundAgencyRight = activeAgencyRights.find(
-                    ({ agency }) => agency.id === selectedAgency,
+                  const foundAgency = activeAgencies.find(
+                    (agency) => agency.id === selectedAgency,
                   );
 
-                  if (foundAgencyRight) {
-                    redirectToConventionPage(foundAgencyRight.agency);
+                  if (foundAgency) {
+                    redirectToConventionPage(foundAgency);
                   }
                 }
               },
@@ -113,7 +112,7 @@ export const ConventionTabContent = (
             label={"Organisme"}
             className={fr.cx("fr-mt-2w")}
             options={[
-              ...activeAgencyRights.map(({ agency }) => ({
+              ...activeAgencies.map((agency) => ({
                 value: agency.id,
                 label: `${agency.name}`,
               })),
