@@ -1,8 +1,7 @@
-import {
-  type AbsoluteUrl,
-  type CreateConventionMagicLinkPayloadProperties,
-  type OmitFromExistingKeys,
-  frontRoutes,
+import type {
+  AbsoluteUrl,
+  CreateConventionMagicLinkPayloadProperties,
+  OmitFromExistingKeys,
 } from "shared";
 import type { GenerateConventionJwt } from "../../domains/core/jwt";
 import { createConventionMagicLinkPayload } from "../../utils/jwt";
