@@ -17,13 +17,19 @@ import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../domains/inclusion-connected-users/helpers/userRights.helper";
 import { isSomeEmailMatchingEmailHash } from "./jwt";
 
-export const throwForbiddenIfNotAllowedForAssessments = async (
-  mode: AssessmentMode,
-  convention: ConventionDto,
-  agency: AgencyDto,
-  jwtPayload: ConventionRelatedJwtPayload,
-  uow: UnitOfWork,
-) => {
+export const throwForbiddenIfNotAllowedForAssessments = async ({
+  mode,
+  convention,
+  agency,
+  jwtPayload,
+  uow,
+}: {
+  mode: AssessmentMode;
+  convention: ConventionDto;
+  agency: AgencyDto;
+  jwtPayload: ConventionRelatedJwtPayload;
+  uow: UnitOfWork;
+}) => {
   if ("role" in jwtPayload) {
     const { emailHash, applicationId, role } = jwtPayload;
     if (convention.id !== applicationId)

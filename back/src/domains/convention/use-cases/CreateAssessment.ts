@@ -42,13 +42,13 @@ export const makeCreateAssessment = createTransactionalUseCase<
       assessment.conventionId,
     );
 
-    await throwForbiddenIfNotAllowedForAssessments(
-      "CreateAssessment",
+    await throwForbiddenIfNotAllowedForAssessments({
+      mode: "CreateAssessment",
       convention,
-      await agencyWithRightToAgencyDto(uow, agency),
-      conventionJwtPayload,
+      agency: await agencyWithRightToAgencyDto(uow, agency),
+      jwtPayload: conventionJwtPayload,
       uow,
-    );
+    });
 
     const assessmentEntity = await createAssessmentEntityIfNotExist(
       uow,

@@ -30,13 +30,13 @@ export const makeGetAssessmentByConventionId = createTransactionalUseCase<
       uow,
       inputParams.conventionId,
     );
-    await throwForbiddenIfNotAllowedForAssessments(
-      "GetAssessment",
+    await throwForbiddenIfNotAllowedForAssessments({
+      mode: "GetAssessment",
       convention,
-      await agencyWithRightToAgencyDto(uow, agency),
-      currentUser,
+      agency: await agencyWithRightToAgencyDto(uow, agency),
+      jwtPayload: currentUser,
       uow,
-    );
+    });
     const assessment = await uow.assessmentRepository.getByConventionId(
       inputParams.conventionId,
     );
