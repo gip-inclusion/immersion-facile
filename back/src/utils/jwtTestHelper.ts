@@ -1,4 +1,5 @@
 import {
+  type AbsoluteUrl,
   type CreateConventionMagicLinkPayloadProperties,
   filterNotFalsy,
 } from "shared";
@@ -17,12 +18,23 @@ export const fakeGenerateMagicLinkUrlFn: GenerateConventionMagicLinkUrl = ({
   role,
   targetRoute,
   lifetime = "short",
+  extraQueryParams = {},
 }: CreateConventionMagicLinkPayloadProperties & {
+  extraQueryParams?: Record<string, string>;
   targetRoute: string;
   lifetime?: "short" | "long";
 }) => {
   const fakeJwt = [id, role, now.toISOString(), email, iat, version, lifetime]
     .filter(filterNotFalsy)
     .join("/");
-  return `http://fake-magic-link/${targetRoute}/${fakeJwt}`;
+
+  const queryParams = Object.entries(extraQueryParams).map(
+    ([key, value]) => `${key}=${value}`,
+  );
+  return [
+    "http://fake-magic-link",
+    targetRoute,
+    fakeJwt,
+    ...(queryParams.length ? [queryParams.join("&")] : []),
+  ].join("/") as AbsoluteUrl;
 };

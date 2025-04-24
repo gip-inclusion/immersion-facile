@@ -16,11 +16,13 @@ export const makeGenerateConventionMagicLinkUrl =
   ({
     targetRoute,
     lifetime = "short",
+    extraQueryParams = {},
     ...jwtPayload
   }: OmitFromExistingKeys<
     CreateConventionMagicLinkPayloadProperties,
     "durationDays"
   > & {
+    extraQueryParams?: Record<string, string>;
     targetRoute: string;
     lifetime?: "short" | "long";
   }): AbsoluteUrl => {
@@ -34,5 +36,10 @@ export const makeGenerateConventionMagicLinkUrl =
       }),
     );
 
-    return `${config.immersionFacileBaseUrl}/${targetRoute}?jwt=${jwt}`;
+    const queryParams = new URLSearchParams({
+      ...extraQueryParams,
+      jwt,
+    });
+
+    return `${config.immersionFacileBaseUrl}/${targetRoute}?${queryParams}`;
   };

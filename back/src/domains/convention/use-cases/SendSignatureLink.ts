@@ -171,6 +171,7 @@ const sendSms = async ({
   const shortLink = await makeShortMagicLink({
     targetRoute: frontRoutes.conventionToSign,
     lifetime: "short",
+    extraQueryParams: { mtm_source: "sms-signature-link" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {
