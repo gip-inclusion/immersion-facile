@@ -88,14 +88,28 @@ export class PgConventionQueries implements ConventionQueries {
     finishingRange: DateRange,
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
-    const daysBeforeFinishing = 2;
-    const daysAfterFinishing = 2;
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.status", "in", validatedConventionStatuses)
-      .where(
-        sql`conventions.date_end`,
-        "<=",
-        finishingRange.to.toISOString().split("T")[0],
+      .where((eb) =>
+        eb.or([
+          eb.between(
+            sql`conventions.date_end`,
+            finishingRange.from.toISOString().split("T")[0],
+            finishingRange.to.toISOString().split("T")[0],
+          ),
+          eb.and([
+            eb.between(
+              sql`conventions.updated_at`,
+              finishingRange.from.toISOString().split("T")[0],
+              finishingRange.to.toISOString().split("T")[0],
+            ),
+            eb(
+              sql`conventions.date_end`,
+              "<=",
+              finishingRange.to.toISOString().split("T")[0],
+            ),
+          ]),
+        ]),
       )
       .where(({ selectFrom, not, exists }) =>
         not(
@@ -103,20 +117,6 @@ export class PgConventionQueries implements ConventionQueries {
             selectFrom("notifications_email")
               .select("notifications_email.convention_id")
               .where("notifications_email.email_kind", "=", assessmentEmailKind)
-              .where(
-                sql`notifications_email.created_at`,
-                ">=",
-                subDays(finishingRange.from, daysBeforeFinishing)
-                  .toISOString()
-                  .split("T")[0],
-              )
-              .where(
-                sql`notifications_email.created_at`,
-                "<=",
-                addDays(finishingRange.to, daysAfterFinishing)
-                  .toISOString()
-                  .split("T")[0],
-              )
               .whereRef(
                 "conventions.id",
                 "=",
@@ -126,44 +126,22 @@ export class PgConventionQueries implements ConventionQueries {
         ),
       )
       .where((eb) =>
-        eb.or([
-          eb(
-            sql`conventions.date_end`,
-            ">=",
-            finishingRange.from.toISOString().split("T")[0],
-          ),
-          eb.exists(
-            eb
-              .selectFrom("notifications_email")
-              .select("notifications_email.convention_id")
-              .where(
-                "notifications_email.email_kind",
-                "=",
-                "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-              )
-              .where(
-                sql`notifications_email.created_at`,
-                ">=",
-                subDays(finishingRange.from, daysBeforeFinishing)
-                  .toISOString()
-                  .split("T")[0],
-              )
-              .where(
-                sql`notifications_email.created_at`,
-                "<=",
-                addDays(finishingRange.to, daysAfterFinishing)
-                  .toISOString()
-                  .split("T")[0],
-              )
-              .whereRef(
-                "conventions.id",
-                "=",
-                "notifications_email.convention_id",
-              ),
-          ),
-        ]),
+        eb.exists(
+          eb
+            .selectFrom("notifications_email")
+            .select("notifications_email.convention_id")
+            .where(
+              "notifications_email.email_kind",
+              "=",
+              "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+            )
+            .whereRef(
+              "conventions.id",
+              "=",
+              "notifications_email.convention_id",
+            ),
+        ),
       )
-      .orderBy("conventions.date_start", "desc")
       .execute();
 
     return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto));
