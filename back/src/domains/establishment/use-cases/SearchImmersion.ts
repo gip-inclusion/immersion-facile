@@ -1,10 +1,8 @@
-import { prop, propEq } from "ramda";
 import {
   type ApiConsumer,
   type AppellationCode,
   type SearchQueryParamsDto,
   type SearchResultDto,
-  type SiretDto,
   type WithNafCodes,
   errors,
   searchParamsSchema,
@@ -15,7 +13,6 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { GeoParams, SearchMade } from "../entities/SearchMadeEntity";
-import type { SearchImmersionResult } from "../ports/EstablishmentAggregateRepository";
 import type { LaBonneBoiteGateway } from "../ports/LaBonneBoiteGateway";
 
 export class SearchImmersion extends TransactionalUseCase<
@@ -96,31 +93,33 @@ export class SearchImmersion extends TransactionalUseCase<
           : lbbSearchResults.length,
     });
 
-    const isDeletedBySiret =
-      await uow.deletedEstablishmentRepository.areSiretsDeleted(
-        lbbSearchResults.map((result) => result.siret),
-      );
-
     const searchResultsInRepo =
       voluntaryToImmersion !== false && repositorySearchResults.length > 0
         ? repositorySearchResults.map(({ isSearchable: _, ...rest }) => rest)
         : [];
 
-    const lbbAllowedResults = lbbSearchResults
-      .filter(isSiretAlreadyInStoredResults(searchResultsInRepo))
-      .filter(isEstablishmentNotDeleted(isDeletedBySiret));
+    const lbbSirets = lbbSearchResults.map(({ siret }) => siret);
 
-    return [...searchResultsInRepo, ...lbbAllowedResults]
-      .filter(isSiretIsNotInNotSearchableResults(repositorySearchResults))
-      .filter(
-        isSearchResultAvailable(
-          repositorySearchResults,
-          this.timeGateway.now(),
-        ),
-      )
-      .sort((a, b) =>
-        sortedBy === "score" ? b.establishmentScore - a.establishmentScore : 0,
+    const lbbSiretsAlreadySavedInRepo =
+      await uow.establishmentAggregateRepository.getSiretsInRepoFromSiretList(
+        lbbSirets,
       );
+
+    const isSiretDeletedBySiret =
+      await uow.deletedEstablishmentRepository.areSiretsDeleted(lbbSirets);
+
+    const lbbAllowedResults = lbbSearchResults
+      .filter(
+        (lbbSearchResult) =>
+          !lbbSiretsAlreadySavedInRepo.includes(lbbSearchResult.siret),
+      )
+      .filter(
+        (lbbSearchResult) => !isSiretDeletedBySiret[lbbSearchResult.siret],
+      );
+
+    return [...searchResultsInRepo, ...lbbAllowedResults].sort((a, b) =>
+      sortedBy === "score" ? b.establishmentScore - a.establishmentScore : 0,
+    );
   }
 
   async #searchOnLbb({
@@ -165,33 +164,3 @@ const shouldFetchLBB = (
   !!appellationCodes &&
   appellationCodes.length > 0 &&
   voluntaryToImmersion !== true;
-
-const isSiretAlreadyInStoredResults =
-  (searchImmersionQueryResults: SearchResultDto[]) =>
-  <T extends { siret: SiretDto }>({ siret }: T) =>
-    !searchImmersionQueryResults.map(prop("siret")).includes(siret);
-
-const isSiretIsNotInNotSearchableResults =
-  (searchImmersionQueryResults: SearchImmersionResult[]) =>
-  <T extends { siret: SiretDto }>({ siret }: T) =>
-    !searchImmersionQueryResults
-      .filter(propEq(false, "isSearchable"))
-      .map(prop("siret"))
-      .includes(siret);
-
-const isSearchResultAvailable =
-  (searchImmersionQueryResults: SearchImmersionResult[], now: Date) =>
-  <T extends { siret: SiretDto }>({ siret }: T) =>
-    !searchImmersionQueryResults
-      .filter((searchResult) =>
-        searchResult.nextAvailabilityDate
-          ? new Date(searchResult.nextAvailabilityDate) > now
-          : false,
-      )
-      .map(prop("siret"))
-      .includes(siret);
-
-const isEstablishmentNotDeleted =
-  (deletedSirets: Record<SiretDto, boolean>) =>
-  <T extends { siret: SiretDto }>({ siret }: T) =>
-    !deletedSirets[siret];

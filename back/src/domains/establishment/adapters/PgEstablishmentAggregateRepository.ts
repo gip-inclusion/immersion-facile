@@ -316,6 +316,11 @@ export class PgEstablishmentAggregateRepository
     maxResults,
     fitForDisabledWorkers,
   }: SearchImmersionParams): Promise<RepositorySearchImmertionResult[]> {
+    // exclure
+    // - entreprises non cherchables
+    // - entreprises pas dispo
+    // - entreprises qui ne sont pas supprimées
+    // (query à)
     const results = await searchImmersionResultsQuery(this.transaction, {
       limit:
         maxResults && maxResults < MAX_RESULTS_HARD_LIMIT
@@ -431,6 +436,19 @@ export class PgEstablishmentAggregateRepository
         .where("siret", "=", siret)
         .execute();
     }
+  }
+
+  public async getSiretsInRepoFromSiretList(
+    sirets: SiretDto[],
+  ): Promise<SiretDto[]> {
+    if (sirets.length === 0) return [];
+    const results = await this.transaction
+      .selectFrom("establishments")
+      .select("siret")
+      .where("siret", "in", sirets)
+      .execute();
+
+    return results.map(({ siret }) => siret);
   }
 
   async #updateEstablishmentEntity(
@@ -770,7 +788,14 @@ const searchImmersionResultsQuery = (
               qb
                 .selectFrom("establishments")
                 .select(["siret", "score", "update_date"])
-                .where("is_open", "=", true),
+                .where("is_open", "=", true)
+                .where("is_max_discussions_for_period_reached", "is", false)
+                .where((eb) =>
+                  eb.or([
+                    eb("next_availability_date", "<=", new Date()),
+                    eb("next_availability_date", "is", null),
+                  ]),
+                ),
               (qb) =>
                 nafCodes?.length
                   ? qb.where("establishments.naf_code", "in", nafCodes)

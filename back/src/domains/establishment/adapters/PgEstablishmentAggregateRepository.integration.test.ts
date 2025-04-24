@@ -1,4 +1,4 @@
-import { addMilliseconds, subDays } from "date-fns";
+import { addDays, addMilliseconds, subDays } from "date-fns";
 import type { Pool } from "pg";
 import {
   DiscussionBuilder,
@@ -8,7 +8,9 @@ import {
   type SearchResultDto,
   UserBuilder,
   type WithAcquisition,
+  arrayFromNumber,
   errors,
+  expectArraysToEqual,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -185,6 +187,96 @@ describe("PgEstablishmentAggregateRepository", () => {
               }),
             ],
           );
+        });
+        it("should always return the same number of results regardless of the sortedBy parameter", async () => {
+          await kyselyDb.deleteFrom("establishments__users").execute();
+          await kyselyDb.deleteFrom("immersion_offers").execute();
+          await kyselyDb.deleteFrom("discussions").execute();
+          await kyselyDb.deleteFrom("establishments_location_infos").execute();
+          await kyselyDb
+            .deleteFrom("establishments_location_positions")
+            .execute();
+          await kyselyDb.deleteFrom("establishments").execute();
+
+          const INDEX_OF_UNSEARCHABLE_ESTABLISHMENT = 2;
+          const INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT = 3;
+          const establishmentAggregatesByDateAndScoreDescending: EstablishmentAggregate[] =
+            arrayFromNumber(10).map((i) => ({
+              ...searchableByAllEstablishment,
+              establishment: {
+                ...searchableByAllEstablishment.establishment,
+                siret: `9999999999999${i}`,
+                updatedAt: addDays(new Date(), -i),
+                isMaxDiscussionsForPeriodReached:
+                  i === INDEX_OF_UNSEARCHABLE_ESTABLISHMENT,
+                score: 10 - i,
+                nextAvailabilityDate:
+                  i === INDEX_OF_CURRENTLY_UNAVAILABLE_ESTABLISHMENT
+                    ? addDays(new Date(), i).toISOString()
+                    : undefined,
+                locations: [
+                  {
+                    ...searchableByAllEstablishment.establishment.locations[0],
+                    id: uuid(),
+                  },
+                ],
+              },
+            }));
+          const displayedResults = [0, 1, 4, 5, 6];
+
+          const expectedResults = displayedResults.map((i) =>
+            makeExpectedSearchResult({
+              establishment: establishmentAggregatesByDateAndScoreDescending[i],
+              withOffers:
+                establishmentAggregatesByDateAndScoreDescending[i].offers,
+              withLocationAndDistance: {
+                ...establishmentAggregatesByDateAndScoreDescending[i]
+                  .establishment.locations[0],
+                distance: 0,
+              },
+              nafLabel: "Activités des agences de travail temporaire",
+            }),
+          );
+
+          await Promise.all(
+            establishmentAggregatesByDateAndScoreDescending.map(
+              (establishmentAggregate) =>
+                pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+                  establishmentAggregate,
+                ),
+            ),
+          );
+
+          const sortedByDateResults =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                ...searchMadeDistanceWithoutRome,
+                sortedBy: "date",
+              },
+              maxResults: 5,
+            });
+
+          expectArraysToEqual(sortedByDateResults, expectedResults);
+
+          const sortedByScoreResults =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                ...searchMadeDistanceWithoutRome,
+                sortedBy: "score",
+              },
+              maxResults: 5,
+            });
+          expectArraysToEqual(sortedByScoreResults, expectedResults);
+
+          const sortedByDistanceResults =
+            await pgEstablishmentAggregateRepository.searchImmersionResults({
+              searchMade: {
+                ...searchMadeDistanceWithoutRome,
+                sortedBy: "distance",
+              },
+              maxResults: 5,
+            });
+          expectArraysToEqual(sortedByDistanceResults, expectedResults);
         });
       });
 
@@ -828,36 +920,6 @@ describe("PgEstablishmentAggregateRepository", () => {
           [
             makeExpectedSearchResult({
               establishment: openEstablishment,
-              withLocationAndDistance: {
-                ...locationOfSearchPosition,
-                distance: 0,
-              },
-              withOffers: [cartographeImmersionOffer],
-              nafLabel: "Activités des agences de travail temporaire",
-            }),
-          ],
-        );
-      });
-
-      it("provide also non searchable establishments (so that usecase can prevent LBB results to be shown)", async () => {
-        const establishment = new EstablishmentAggregateBuilder()
-          .withOffers([cartographeImmersionOffer])
-          .withLocations([locationOfSearchPosition])
-          .withUserRights([osefUserRight])
-          .withIsMaxDiscussionsForPeriodReached(true)
-          .build();
-
-        await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          establishment,
-        );
-
-        expectToEqual(
-          await pgEstablishmentAggregateRepository.searchImmersionResults({
-            searchMade: cartographeSearchMade,
-          }),
-          [
-            makeExpectedSearchResult({
-              establishment,
               withLocationAndDistance: {
                 ...locationOfSearchPosition,
                 distance: 0,
@@ -2479,6 +2541,64 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
     });
   });
+  describe("getSiretsInRepoFromSiretList", () => {
+    const existingSirets = [
+      "00000000000001",
+      "00000000000002",
+      "00000000000003",
+    ];
+    const notExistingSirets = [
+      "00000000000004",
+      "00000000000005",
+      "00000000000006",
+    ];
+
+    beforeEach(async () => {
+      await Promise.all(
+        existingSirets.map((siret) =>
+          pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
+            new EstablishmentAggregateBuilder()
+              .withEstablishmentSiret(siret)
+              .withUserRights([osefUserRight])
+              .withLocations([
+                {
+                  ...locationOfSearchPosition,
+                  id: uuid(),
+                },
+              ])
+              .build(),
+          ),
+        ),
+      );
+    });
+    it("returns the sirets in the repo", async () => {
+      expectArraysToEqualIgnoringOrder(
+        await pgEstablishmentAggregateRepository.getSiretsInRepoFromSiretList([
+          existingSirets[0],
+          ...notExistingSirets,
+          existingSirets[1],
+          existingSirets[2],
+        ]),
+        existingSirets,
+      );
+    });
+    it("returns an empty array if the sirets are not in the repo", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getSiretsInRepoFromSiretList(
+          notExistingSirets,
+        ),
+        [],
+      );
+    });
+    it("returns an empty array if an empty array is provided", async () => {
+      expectToEqual(
+        await pgEstablishmentAggregateRepository.getSiretsInRepoFromSiretList(
+          [],
+        ),
+        [],
+      );
+    });
+  });
 });
 
 const toReadableSearchResult = ({
@@ -2593,7 +2713,7 @@ const establishmentWithOfferA1101_far = new EstablishmentAggregateBuilder()
   .build();
 
 const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000001")
+  .withEstablishmentSiret("00000000000010")
   .withSearchableBy({ jobSeekers: true, students: true })
   .withOffers([cartographeImmersionOffer])
   .withLocations([
@@ -2602,7 +2722,7 @@ const searchableByAllEstablishment = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .build();
 const searchableByStudentsEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000002")
+  .withEstablishmentSiret("00000000000011")
   .withSearchableBy({ jobSeekers: false, students: true })
   .withOffers([cartographeImmersionOffer])
   .withLocations([
@@ -2611,7 +2731,7 @@ const searchableByStudentsEstablishment = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .build();
 const searchableByJobSeekerEstablishment = new EstablishmentAggregateBuilder()
-  .withEstablishmentSiret("00000000000003")
+  .withEstablishmentSiret("00000000000012")
   .withSearchableBy({ jobSeekers: true, students: false })
   .withOffers([cartographeImmersionOffer])
   .withLocations([
@@ -2651,8 +2771,13 @@ const establishmentCuvisteAtChaniersAndLaRochelle =
 const establishment0145Z_A = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000010")
-  .withLocations([bassompierreSaintesLocation])
+  .withEstablishmentSiret("00000000000020")
+  .withLocations([
+    {
+      ...bassompierreSaintesLocation,
+      id: uuid(),
+    },
+  ])
   .withEstablishmentNaf({
     code: "0145Z",
     nomenclature: "Élevage d'ovins et de caprins",
@@ -2661,8 +2786,13 @@ const establishment0145Z_A = new EstablishmentAggregateBuilder()
 const establishment0145Z_B = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000011")
-  .withLocations([portHubleChaniersLocation])
+  .withEstablishmentSiret("00000000000021")
+  .withLocations([
+    {
+      ...portHubleChaniersLocation,
+      id: uuid(),
+    },
+  ])
   .withEstablishmentNaf({
     code: "0145Z",
     nomenclature: "Élevage d'ovins et de caprins",
@@ -2672,8 +2802,13 @@ const establishment0145Z_B = new EstablishmentAggregateBuilder()
 const establishment4741Z = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000020")
-  .withLocations([veauxLocation])
+  .withEstablishmentSiret("00000000000022")
+  .withLocations([
+    {
+      ...veauxLocation,
+      id: uuid(),
+    },
+  ])
   .withEstablishmentNaf({
     code: "4741Z",
     nomenclature:
@@ -2684,8 +2819,13 @@ const establishment4741Z = new EstablishmentAggregateBuilder()
 const establishment9900Z = new EstablishmentAggregateBuilder()
   .withUserRights([osefUserRight])
   .withOffers([cuvisteOffer])
-  .withEstablishmentSiret("00000000000030")
-  .withLocations([tourDeLaChaineLaRochelleLocation])
+  .withEstablishmentSiret("00000000000023")
+  .withLocations([
+    {
+      ...tourDeLaChaineLaRochelleLocation,
+      id: uuid(),
+    },
+  ])
   .withEstablishmentNaf({
     code: "9900Z",
     nomenclature: "Activités des organisations et organismes extraterritoriaux",

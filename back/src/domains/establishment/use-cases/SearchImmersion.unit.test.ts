@@ -1,4 +1,3 @@
-import { addDays } from "date-fns";
 import {
   type ApiConsumer,
   type AppellationAndRomeDto,
@@ -850,28 +849,29 @@ describe("SearchImmersionUseCase", () => {
     });
   });
 
-  describe("No result when a company is one internal & LBB results and the company is not searchable", () => {
-    const notSearchableEstablishment = new EstablishmentAggregateBuilder(
+  describe("When a company is in repository & in LBB results", () => {
+    const notInRepoEstablishmentSiret = "11111111111111";
+    const displayableEstablishment = new EstablishmentAggregateBuilder(
       establishment,
     )
-      .withIsMaxDiscussionsForPeriodReached(true)
+      .withOffers([secretariatOffer])
       .build();
 
     beforeEach(() => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
-        notSearchableEstablishment,
+        displayableEstablishment,
       ];
 
       laBonneBoiteGateway.setNextResults([
         new LaBonneBoiteCompanyDtoBuilder()
-          .withSiret(notSearchableEstablishment.establishment.siret)
+          .withSiret(displayableEstablishment.establishment.siret)
           .withRome(secretariatOffer.romeCode)
           .build(),
       ]);
     });
 
-    it("should only record number of internal search results", async () => {
-      await searchImmersionUseCase.execute({
+    it("returns only a displayable establishment from repository, not from LBB", async () => {
+      const response = await searchImmersionUseCase.execute({
         ...searchInMetzParams,
         appellationCodes: [secretariatOffer.appellationCode],
         sortedBy: "distance",
@@ -888,35 +888,31 @@ describe("SearchImmersionUseCase", () => {
           numberOfResults: 1,
         },
       ]);
+      expectToEqual(response, [
+        establishmentAggregateToSearchResultByRomeForFirstLocation(
+          displayableEstablishment,
+          secretariatOffer.romeCode,
+          606885,
+        ),
+      ]);
     });
 
-    it("Without voluntary to immersion", async () => {
+    it("returns LBB result if establishment not in repo", async () => {
+      const lbbResultNotInRepo = new LaBonneBoiteCompanyDtoBuilder()
+        .withSiret(notInRepoEstablishmentSiret)
+        .withRome(boulangerOffer.romeCode)
+        .build();
+      laBonneBoiteGateway.setNextResults([lbbResultNotInRepo]);
       const response = await searchImmersionUseCase.execute({
         ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
+        appellationCodes: [boulangerOffer.appellationCode],
         sortedBy: "distance",
       });
-      expectToEqual(response, []);
-    });
-
-    it("With voluntary to immersion false", async () => {
-      const response = await searchImmersionUseCase.execute({
-        ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
-        sortedBy: "distance",
-        voluntaryToImmersion: false,
-      });
-      expectToEqual(response, []);
-    });
-
-    it("With voluntary to immersion true", async () => {
-      const response = await searchImmersionUseCase.execute({
-        ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
-        sortedBy: "distance",
-        voluntaryToImmersion: true,
-      });
-      expectToEqual(response, []);
+      expectToEqual(response, [
+        lbbToSearchResult(lbbResultNotInRepo, boulangerOffer, {
+          distance_m: 23649,
+        }),
+      ]);
     });
   });
 
@@ -940,60 +936,6 @@ describe("SearchImmersionUseCase", () => {
       laBonneBoiteGateway.setNextResults([
         new LaBonneBoiteCompanyDtoBuilder()
           .withSiret(notSearchableEstablishment.establishment.siret)
-          .withRome(secretariatOffer.romeCode)
-          .build(),
-      ]);
-    });
-
-    it("Without voluntary to immersion", async () => {
-      const response = await searchImmersionUseCase.execute({
-        ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
-        sortedBy: "distance",
-      });
-      expectToEqual(response, []);
-    });
-
-    it("With voluntary to immersion false", async () => {
-      const response = await searchImmersionUseCase.execute({
-        ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
-        sortedBy: "distance",
-        voluntaryToImmersion: false,
-      });
-      expectToEqual(response, []);
-    });
-
-    it("With voluntary to immersion true", async () => {
-      const response = await searchImmersionUseCase.execute({
-        ...searchInMetzParams,
-        appellationCodes: [secretariatOffer.appellationCode],
-        sortedBy: "distance",
-        voluntaryToImmersion: true,
-      });
-      expectToEqual(response, []);
-    });
-  });
-
-  describe("No result when establishment aggregate next availability is after now", () => {
-    const establishmentWithNextAvailabilityDate =
-      new EstablishmentAggregateBuilder(establishment)
-        .withEstablishmentNextAvailabilityDate(addDays(now, 1))
-        .withMaxContactsPerMonth(10)
-        .withIsMaxDiscussionsForPeriodReached(false)
-        .build();
-
-    beforeEach(() => {
-      uow.establishmentAggregateRepository.establishmentAggregates = [
-        establishmentWithNextAvailabilityDate,
-      ];
-      uow.deletedEstablishmentRepository.deletedEstablishments = [];
-
-      timeGateway.setNextDate(now);
-
-      laBonneBoiteGateway.setNextResults([
-        new LaBonneBoiteCompanyDtoBuilder()
-          .withSiret(establishmentWithNextAvailabilityDate.establishment.siret)
           .withRome(secretariatOffer.romeCode)
           .build(),
       ]);

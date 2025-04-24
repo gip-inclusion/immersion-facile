@@ -78,6 +78,7 @@ export interface EstablishmentAggregateRepository {
     checkDate: Date,
     maxResults: number,
   ): Promise<SiretDto[]>;
+  getSiretsInRepoFromSiretList(sirets: SiretDto[]): Promise<SiretDto[]>;
 }
 
 export type ValuesToUpdateFromInseeApi = Partial<
