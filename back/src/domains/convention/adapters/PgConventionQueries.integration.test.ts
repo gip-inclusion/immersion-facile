@@ -703,7 +703,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
   });
 
-  describe("PG implementation of method getAllConventionsForThoseEndingThatDidntReceivedAssessmentLink", () => {
+  describe("PG implementation of method getAllConventionsForThoseEndingThatDidntGoThrough", () => {
     const agency = AgencyDtoBuilder.create().build();
     const dateStart = new Date("2022-05-10").toISOString();
     const dateEnd14 = new Date("2022-05-14").toISOString();
@@ -881,13 +881,15 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR today", async () => {
-      const today = new Date("2022-05-20T12:43:11");
-      const tomorrow = new Date("2022-05-21T12:43:11");
+      await db.deleteFrom("notifications_email_recipients").execute();
+      await db.deleteFrom("notifications_email").execute();
+      await db.deleteFrom("conventions").execute();
+      const today = new Date();
       const pastConvention = new ConventionDtoBuilder()
         .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
         .validated()
-        .withDateStart(dateStart)
-        .withDateEnd(dateEnd15)
+        .withDateStart(subDays(today, 15).toISOString())
+        .withDateEnd(subDays(today, 10).toISOString())
         .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
@@ -899,13 +901,17 @@ describe("Pg implementation of ConventionQueries", () => {
         emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       });
       await conventionRepo.save(pastConvention);
+      await conventionRepo.update({
+        ...pastConvention,
+        status: "ACCEPTED_BY_VALIDATOR",
+      });
       await notificationRepo.save(pastConventionNotification);
 
       const queryResults =
         await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
           {
-            from: tomorrow,
-            to: addHours(tomorrow, 24),
+            from: today,
+            to: addDays(today, 1),
           },
           "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         );
