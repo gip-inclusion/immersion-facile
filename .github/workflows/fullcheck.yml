@@ -73,7 +73,7 @@ jobs:
 
       - name: Install Playwright browsers if not cached
         if: ${{ matrix.command == 'pnpm typecheck' && steps.playwright-cache.outputs.cache-hit != 'true' }}
-        run: pnpm playwright install --with-deps chromium
+        run: pnpm playwright install
 
       - name: ${{matrix.command}}
         run: ${{matrix.command}}
@@ -239,7 +239,7 @@ jobs:
 
       - name: Install Playwright browsers if not cached
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm playwright install --with-deps chromium
+        run: pnpm playwright install
 
       - name: Install bun
         run: npm install -g bun@1.2.10 # do NOT use pnpm here, for bun, it will FAIL
