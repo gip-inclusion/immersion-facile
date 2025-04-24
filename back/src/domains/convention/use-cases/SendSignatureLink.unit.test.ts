@@ -12,6 +12,8 @@ import {
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
+  expectToEqual,
+  frontRoutes,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -503,6 +505,17 @@ describe("Send signature link", () => {
           },
           connectedUserPayload,
         );
+
+        expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+          [shortLinkId]: fakeGenerateMagicLinkUrlFn({
+            id: convention.id,
+            role: convention.signatories.establishmentRepresentative.role,
+            email: convention.signatories.establishmentRepresentative.email,
+            now: timeGateway.now(),
+            targetRoute: frontRoutes.conventionToSign,
+            extraQueryParams: { mtm_source: "sms-signature-link" },
+          }),
+        });
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [
           { topic: "NotificationAdded" },

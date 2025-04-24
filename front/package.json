@@ -8,6 +8,7 @@
     "setup-env-vars-build": "chmod +x ./env.sh && ./env.sh ./dist/env-config.js",
     "dev-in-memory": "VITE_GATEWAY=IN_MEMORY pnpm setup-env-vars && vite",
     "dev": "export $(cat .env | grep 'VITE_' | xargs) && pnpm setup-env-vars && vite",
+    "dev:no-typecheck": "export $(cat .env | grep 'VITE_' | xargs) && pnpm setup-env-vars && vite",
     "make-styles": "scss-to-ts update",
     "build-scalingo": "rm -rf scalingo/dist && vite build && mv dist scalingo/dist && cp env.sh scalingo/dist && tar -czf front-build.tar.gz scalingo",
     "build": "vite build && export $(cat .env | grep 'VITE_' | xargs) && pnpm setup-env-vars-build",

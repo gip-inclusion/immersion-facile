@@ -3,6 +3,8 @@ import {
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
+  expectToEqual,
+  frontRoutes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -33,6 +35,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
   let shortLinkGenerator: DeterministShortLinkIdGeneratorGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let uow: InMemoryUnitOfWork;
+  let timeGateway: CustomTimeGateway;
 
   beforeEach(() => {
     config = new AppConfigBuilder({}).build();
@@ -40,7 +43,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
 
     uow = createInMemoryUow();
     const uuidGenerator = new UuidV4Generator();
-    const timeGateway = new CustomTimeGateway(new Date());
+    timeGateway = new CustomTimeGateway(new Date());
     useCase =
       new NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification(
         new InMemoryUowPerformer(uow),
@@ -74,6 +77,29 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
+
+      expectToEqual(uow.shortLinkQuery.getShortLinks(), {
+        [shortLinks[0]]: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: convention.signatories.beneficiary.role,
+          email: convention.signatories.beneficiary.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          extraQueryParams: {
+            mtm_source: "email-signature-link-after-modification",
+          },
+        }),
+        [shortLinks[1]]: fakeGenerateMagicLinkUrlFn({
+          id: convention.id,
+          role: convention.signatories.establishmentRepresentative.role,
+          email: convention.signatories.establishmentRepresentative.email,
+          now: timeGateway.now(),
+          targetRoute: frontRoutes.conventionToSign,
+          extraQueryParams: {
+            mtm_source: "email-signature-link-after-modification",
+          },
+        }),
+      });
 
       expectSavedNotificationsAndEvents({
         emails: [

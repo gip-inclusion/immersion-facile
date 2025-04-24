@@ -145,6 +145,9 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
         conventionSignShortlink: await makeMagicShortLink({
           targetRoute: frontRoutes.conventionToSign,
           lifetime: "short",
+          extraQueryParams: {
+            mtm_source: "email-signature-link",
+          },
         }),
         businessName,
         agencyLogoUrl: agency.logoUrl ?? undefined,

@@ -39,7 +39,9 @@ export const prepareConventionMagicShortLinkMaker =
   async ({
     targetRoute,
     lifetime,
+    extraQueryParams,
   }: {
+    extraQueryParams?: Record<string, string>;
     targetRoute: string;
     lifetime: "short" | "long";
   }): Promise<AbsoluteUrl> =>
@@ -51,6 +53,7 @@ export const prepareConventionMagicShortLinkMaker =
         ...conventionMagicLinkPayload,
         targetRoute,
         lifetime,
+        extraQueryParams,
       }),
     });
 

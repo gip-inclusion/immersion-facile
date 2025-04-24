@@ -16,6 +16,9 @@
     "dev": {
       "outputs": []
     },
+    "dev:no-typecheck": {
+      "outputs": []
+    },
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "outputs": []

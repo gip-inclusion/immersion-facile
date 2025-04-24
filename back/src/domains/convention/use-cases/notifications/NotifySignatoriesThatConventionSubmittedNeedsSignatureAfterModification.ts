@@ -108,7 +108,13 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
           config: this.#config,
           generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
           shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
-        })({ targetRoute: frontRoutes.conventionToSign, lifetime: "short" }),
+        })({
+          targetRoute: frontRoutes.conventionToSign,
+          lifetime: "short",
+          extraQueryParams: {
+            mtm_source: "email-signature-link-after-modification",
+          },
+        }),
         justification: convention.statusJustification ?? NO_JUSTIFICATION,
         signatoryFirstName: signatory.firstName,
         signatoryLastName: signatory.lastName,
