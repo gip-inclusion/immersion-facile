@@ -2,6 +2,7 @@
 
 .im-search-filter {
   position: relative;
+
   &__submenu {
     position: absolute;
     background: var(--background-overlap-grey);
@@ -11,10 +12,14 @@
     max-width: 30rem;
     top: 120%;
     left: 0;
+
     @include for-screen-min($bp-md) {
       width: 50vw;
       max-width: 30rem;
     }
   }
-  
+
+  .fr-tag {
+    text-align: left;
+  }
 }

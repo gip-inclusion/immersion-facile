@@ -244,6 +244,14 @@ export class InMemoryEstablishmentAggregateRepository
       },
     );
   }
+
+  public async getSiretsInRepoFromSiretList(
+    sirets: SiretDto[],
+  ): Promise<SiretDto[]> {
+    return this.#establishmentAggregates
+      .filter((aggregate) => sirets.includes(aggregate.establishment.siret))
+      .map(({ establishment }) => establishment.siret);
+  }
 }
 
 const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation =

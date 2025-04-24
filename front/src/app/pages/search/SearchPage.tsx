@@ -17,6 +17,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type LatLonDistance,
+  type SearchResultDto,
   type SearchSortedBy,
   type ValueOf,
   domElementIds,
@@ -53,7 +54,7 @@ const radiusOptions = ["1", "2", "5", "10", "20", "50", "100"].map(
     value: distance,
   }),
 );
-const nafLabelMaxLength = 40;
+const nafLabelMaxLength = 30;
 
 const getSearchRouteParam = (
   currentKey: keyof SearchPageParams,
@@ -140,13 +141,27 @@ export const SearchPage = ({
     lat !== 0 &&
     lon !== 0;
 
-  const getSearchResultsSummary = (resultsNumber: number) => {
-    const plural = resultsNumber > 1 ? "s" : "";
-    return (
-      <>
-        <strong>{resultsNumber}</strong> résultat{plural} trouvé{plural}
-      </>
+  const getSearchResultsData = (
+    results: SearchResultDto[],
+  ): {
+    internalResultsNumber: number;
+    externalResultsNumber: number;
+    pluralInternalResults: string;
+    pluralExternalResults: string;
+  } => {
+    const externalResults = results.filter(
+      (result) =>
+        result.urlOfPartner !== undefined && result.urlOfPartner !== "",
     );
+    const internalResultsNumber = results.length - externalResults.length;
+    const pluralInternalResults = internalResultsNumber > 1 ? "s" : "";
+    const pluralExternalResults = externalResults.length > 1 ? "s" : "";
+    return {
+      internalResultsNumber,
+      externalResultsNumber: externalResults.length,
+      pluralInternalResults,
+      pluralExternalResults,
+    };
   };
 
   const setTempValuesAsFormValues = (values: Partial<SearchPageParams>) => {
@@ -214,6 +229,7 @@ export const SearchPage = ({
       ? [...appellationDisplayed, ...nafDisplayed].join(" - ")
       : "Tous les métiers";
   };
+  const searchResultsData = getSearchResultsData(searchResults);
   return (
     <HeaderFooterLayout>
       <MainWrapper vSpacing={0} layout="fullscreen">
@@ -661,7 +677,11 @@ export const SearchPage = ({
                       {searchStatus === "ok" && (
                         <>
                           <h2 className={fr.cx("fr-h5", "fr-mb-0")}>
-                            {getSearchResultsSummary(searchResults.length)}
+                            <strong>
+                              {searchResultsData.internalResultsNumber}
+                            </strong>{" "}
+                            résultat{searchResultsData.pluralInternalResults}{" "}
+                            trouvé{searchResultsData.pluralInternalResults}
                           </h2>
                           {routeParams.appellations &&
                             routeParams.appellations.length > 0 && (
@@ -681,6 +701,31 @@ export const SearchPage = ({
                                 </a>
                               </span>
                             )}
+                          {searchResultsData.externalResultsNumber > 0 && (
+                            <p
+                              className={fr.cx(
+                                "fr-mt-0",
+                                "fr-mb-0",
+                                "fr-text--xs",
+                              )}
+                            >
+                              enrichi{searchResultsData.pluralExternalResults}{" "}
+                              par{" "}
+                              <strong>
+                                {searchResultsData.externalResultsNumber}{" "}
+                                résultat
+                                {searchResultsData.pluralExternalResults}
+                              </strong>{" "}
+                              provenant de{" "}
+                              <a
+                                href="https://labonneboite.francetravail.fr/?mtm_campain=immersion-facilitée-recherche-immersion"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                LaBonneBoite
+                              </a>
+                            </p>
+                          )}
                         </>
                       )}
                     </div>
