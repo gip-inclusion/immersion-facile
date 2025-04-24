@@ -72,7 +72,7 @@ const notifySlack = async (rawContent: string, isError: boolean) => {
     });
 };
 
-const getSlackChannelName = (envType: Environment, isError: boolean) => {
+export const getSlackChannelName = (envType: Environment, isError: boolean) => {
   switch (envType) {
     case "production":
       return isError ? "#if-prod-errors" : "#if-prod-notifications";

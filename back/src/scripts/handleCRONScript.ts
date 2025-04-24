@@ -2,7 +2,7 @@ import type { captureCheckIn } from "@sentry/node";
 import { calculateDurationInSecondsFrom, pipeWithValue, slugify } from "shared";
 import type { AppConfig } from "../config/bootstrap/appConfig";
 import { type OpacifiedLogger, createLogger } from "../utils/logger";
-import { notifyTeam } from "../utils/notifyTeam";
+import { getSlackChannelName, notifyTeam } from "../utils/notifyTeam";
 import { configureSentry } from "./configureSentry";
 
 const camelToKebab = (str: string) =>
@@ -72,7 +72,10 @@ export const handleCRONScript = async <
           duration: (Date.now() - startTime) / 1000,
         });
       }
-      await onScriptError(contextParams)(error);
+      await onScriptError({
+        ...contextParams,
+        slackErrorChannelName: getSlackChannelName(config.envType, true),
+      })(error);
     }
   } finally {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -120,7 +123,13 @@ const onScriptSuccess =
   };
 
 const onScriptError =
-  ({ start, context, logger, name }: ScriptContextParams) =>
+  ({
+    start,
+    context,
+    logger,
+    name,
+    slackErrorChannelName,
+  }: ScriptContextParams & { slackErrorChannelName: string }) =>
   async (error: any): Promise<void> => {
     const durationInSeconds = calculateDurationInSecondsFrom(start);
     const reportTitle = `❌ Failure at ${new Date().toISOString()} - ${context} - ${
@@ -141,4 +150,12 @@ const onScriptError =
     ].join("\n");
 
     await notifyTeam({ rawContent: report, isError: true });
+    await notifyTeam({
+      rawContent: [
+        reportTitle,
+        `Script [${name}]`,
+        `See error channel ${slackErrorChannelName} for more details`,
+      ].join("\n"),
+      isError: false,
+    });
   };
