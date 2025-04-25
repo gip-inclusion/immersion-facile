@@ -1,8 +1,10 @@
 import type { ColumnType, Generated, JSONColumnType } from "kysely";
 import type {
   AbsoluteUrl,
+  ContactLevelOfEducation,
   ConventionId,
   DateTimeIsoString,
+  DiscussionKind,
   DiscussionStatus,
   Email,
   SiretDto,
@@ -111,6 +113,7 @@ interface Discussions extends WithAcquisition {
   id: string;
   siret: string;
   contact_method: string;
+  kind: DiscussionKind;
   created_at: Timestamp;
   potential_beneficiary_first_name: string;
   potential_beneficiary_last_name: string;
@@ -120,6 +123,7 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_has_working_experience: boolean | null;
   potential_beneficiary_experience_additional_information: string | null;
   potential_beneficiary_date_preferences: string | null;
+  potential_beneficiary_level_of_education: ContactLevelOfEducation | null;
   establishment_contact_email: string;
   establishment_contact_first_name: string;
   establishment_contact_last_name: string;

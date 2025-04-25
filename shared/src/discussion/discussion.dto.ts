@@ -622,6 +622,26 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     );
   }
 
+  public withPotentialBeneficiaryHasWorkingExperience(
+    hasWorkingExperience?: boolean,
+  ) {
+    if (
+      this.discussion.contactMode === "EMAIL" &&
+      this.discussion.kind === "IF"
+    ) {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          hasWorkingExperience,
+        },
+      } as DiscussionDto);
+    }
+    throw new Error(
+      `Invalid potentialBeneficiary with hasWorkingExperience ${hasWorkingExperience} for contactMode ${this.discussion.contactMode} and discussionKind ${this.discussion.kind}`,
+    );
+  }
+
   public withSiret(siret: SiretDto) {
     return new DiscussionBuilder({
       ...this.discussion,

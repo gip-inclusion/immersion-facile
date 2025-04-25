@@ -6,7 +6,6 @@ import {
   type DiscussionDto,
   type Exchange,
   UserBuilder,
-  type WithAcquisition,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
@@ -27,22 +26,22 @@ import type { HasDiscussionMatchingParams } from "../ports/DiscussionRepository"
 import { PgDiscussionRepository } from "./PgDiscussionRepository";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 
-const styliste: AppellationAndRomeDto = {
-  romeCode: "B1805",
-  romeLabel: "Stylisme",
-  appellationCode: "19540",
-  appellationLabel: "Styliste",
-};
-
-const offer = new OfferEntityBuilder()
-  .withRomeCode(styliste.romeCode)
-  .withAppellationCode(styliste.appellationCode)
-  .withAppellationLabel(styliste.appellationLabel)
-  .build();
-
-const date = new Date("2023-07-07");
-
 describe("PgDiscussionRepository", () => {
+  const styliste: AppellationAndRomeDto = {
+    romeCode: "B1805",
+    romeLabel: "Stylisme",
+    appellationCode: "19540",
+    appellationLabel: "Styliste",
+  };
+
+  const offer = new OfferEntityBuilder()
+    .withRomeCode(styliste.romeCode)
+    .withAppellationCode(styliste.appellationCode)
+    .withAppellationLabel(styliste.appellationLabel)
+    .build();
+
+  const date = new Date("2023-07-07");
+
   let pool: Pool;
   let pgDiscussionRepository: PgDiscussionRepository;
   let establishmentAggregateRepo: PgEstablishmentAggregateRepository;
@@ -78,6 +77,7 @@ describe("PgDiscussionRepository", () => {
           .withId(uuid())
           .withCreatedAt(new Date("2024-01-01"))
           .withSiret("00000000000001")
+          .withPotentialBeneficiaryHasWorkingExperience(false)
           .build();
         const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
           .withId(uuid())
@@ -649,139 +649,171 @@ describe("PgDiscussionRepository", () => {
   });
 
   describe("insert/update/getById", () => {
-    it("insert with acquisitionCampaign and acquisitionKeyword", async () => {
-      const acquisitionParams = {
-        acquisitionCampaign: "campagne",
-        acquisitionKeyword: "mot-clé",
-      } satisfies WithAcquisition;
-      const siret = "01234567891011";
-      const discussion = new DiscussionBuilder()
-        .withSiret(siret)
-        .withCreatedAt(new Date("2023-07-07"))
-        .withAcquisition(acquisitionParams)
-        .build();
-
-      await pgDiscussionRepository.insert(discussion);
-
-      expectToEqual(
-        await db
-          .selectFrom("discussions")
-          .select(["acquisition_campaign", "acquisition_keyword"])
-          .executeTakeFirst(),
+    describe("insert", () => {
+      const tests: { discussion: DiscussionDto; title: string }[] = [
         {
-          acquisition_campaign: acquisitionParams.acquisitionCampaign,
-          acquisition_keyword: acquisitionParams.acquisitionKeyword,
+          title: "insert with no hasWorkingExperience",
+          discussion: new DiscussionBuilder()
+            .withPotentialBeneficiaryHasWorkingExperience(false)
+            .build(),
         },
-      );
+        {
+          title: "insert with acquisitionCampaign and acquisitionKeyword",
+          discussion: new DiscussionBuilder()
+            .withAcquisition({
+              acquisitionCampaign: "campagne",
+              acquisitionKeyword: "mot-clé",
+            })
+            .build(),
+        },
+        {
+          title: "insert with status and conventionId",
+          discussion: new DiscussionBuilder()
+            .withStatus("ACCEPTED")
+            .withConventionId("some-convention-id")
+            .build(),
+        },
+        {
+          title: "insert with kind IF and contact mode EMAIL",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("IF")
+            .withContactMethod("EMAIL")
+            .build(),
+        },
+        {
+          title: "insert with kind IF and contact mode PHONE",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("IF")
+            .withContactMethod("PHONE")
+            .build(),
+        },
+        {
+          title: "insert with kind IF and contact mode IN_PERSON",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("IF")
+            .withContactMethod("IN_PERSON")
+            .build(),
+        },
+        {
+          title: "insert with kind 1_ELEVE_1_STAGE and contact mode EMAIL",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("1_ELEVE_1_STAGE")
+            .withContactMethod("EMAIL")
+            .build(),
+        },
+        {
+          title: "insert with kind 1_ELEVE_1_STAGE and contact mode PHONE",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("1_ELEVE_1_STAGE")
+            .withContactMethod("PHONE")
+            .build(),
+        },
+        {
+          title: "insert with kind 1_ELEVE_1_STAGE and contact mode IN_PERSON",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("1_ELEVE_1_STAGE")
+            .withContactMethod("IN_PERSON")
+            .build(),
+        },
+      ];
+      it.each(tests)("$title", async ({ discussion }) => {
+        await pgDiscussionRepository.insert(discussion);
+
+        expectToEqual(
+          await pgDiscussionRepository.getById(discussion.id),
+          discussion,
+        );
+      });
     });
 
-    it("insert with status and conventionId", async () => {
-      const siret = "01234567891011";
-      const discussion = new DiscussionBuilder()
-        .withSiret(siret)
-        .withCreatedAt(new Date("2023-07-07"))
-        .withStatus("ACCEPTED")
-        .withConventionId("some-convention-id")
-        .build();
+    describe("update", () => {
+      it("update with status REJECTED and conventionId", async () => {
+        const siret = "01234567891011";
+        const discussion = new DiscussionBuilder()
+          .withSiret(siret)
+          .withCreatedAt(new Date("2023-07-07"))
+          .withStatus("PENDING")
+          .build();
 
-      await pgDiscussionRepository.insert(discussion);
+        await pgDiscussionRepository.insert(discussion);
 
-      expectToEqual(
-        await db
-          .selectFrom("discussions")
-          .select(["status", "convention_id"])
-          .executeTakeFirst(),
-        {
-          status: "ACCEPTED",
-          convention_id: "some-convention-id",
-        },
-      );
+        const updatedDiscussion = new DiscussionBuilder(discussion)
+          .withStatus("REJECTED", "UNABLE_TO_HELP")
+          .withConventionId("some-other-convention-id")
+          .build();
+
+        await pgDiscussionRepository.update(updatedDiscussion);
+
+        expectToEqual(
+          await db
+            .selectFrom("discussions")
+            .select(["status", "convention_id"])
+            .executeTakeFirst(),
+          {
+            status: "REJECTED",
+            convention_id: "some-other-convention-id",
+          },
+        );
+      });
+
+      it("update with status REJECTED with reason", async () => {
+        const siret = "01234567891011";
+        const discussion = new DiscussionBuilder()
+          .withSiret(siret)
+          .withCreatedAt(new Date("2023-07-07"))
+          .withStatus("PENDING")
+          .build();
+
+        await pgDiscussionRepository.insert(discussion);
+
+        const updatedDiscussion = new DiscussionBuilder(discussion)
+          .withStatus("REJECTED", "OTHER", "my custom reason")
+          .build();
+
+        await pgDiscussionRepository.update(updatedDiscussion);
+
+        expectToEqual(
+          await db
+            .selectFrom("discussions")
+            .select(["status", "rejection_reason"])
+            .executeTakeFirst(),
+          {
+            status: "REJECTED",
+            rejection_reason: "my custom reason",
+          },
+        );
+      });
+
+      it("update with status ACCEPTED", async () => {
+        const siret = "01234567891011";
+        const discussion = new DiscussionBuilder()
+          .withSiret(siret)
+          .withCreatedAt(new Date("2023-07-07"))
+          .withStatus("PENDING")
+          .build();
+
+        await pgDiscussionRepository.insert(discussion);
+
+        const updatedDiscussion = new DiscussionBuilder(discussion)
+          .withStatus("ACCEPTED")
+          .build();
+
+        await pgDiscussionRepository.update(updatedDiscussion);
+
+        expectToEqual(
+          await db
+            .selectFrom("discussions")
+            .select(["status"])
+            .executeTakeFirst(),
+          {
+            status: "ACCEPTED",
+          },
+        );
+      });
     });
+  });
 
-    it("update with status REJECTED and conventionId", async () => {
-      const siret = "01234567891011";
-      const discussion = new DiscussionBuilder()
-        .withSiret(siret)
-        .withCreatedAt(new Date("2023-07-07"))
-        .withStatus("PENDING")
-        .build();
-
-      await pgDiscussionRepository.insert(discussion);
-
-      const updatedDiscussion = new DiscussionBuilder(discussion)
-        .withStatus("REJECTED", "UNABLE_TO_HELP")
-        .withConventionId("some-other-convention-id")
-        .build();
-
-      await pgDiscussionRepository.update(updatedDiscussion);
-
-      expectToEqual(
-        await db
-          .selectFrom("discussions")
-          .select(["status", "convention_id"])
-          .executeTakeFirst(),
-        {
-          status: "REJECTED",
-          convention_id: "some-other-convention-id",
-        },
-      );
-    });
-
-    it("update with status REJECTED with reason", async () => {
-      const siret = "01234567891011";
-      const discussion = new DiscussionBuilder()
-        .withSiret(siret)
-        .withCreatedAt(new Date("2023-07-07"))
-        .withStatus("PENDING")
-        .build();
-
-      await pgDiscussionRepository.insert(discussion);
-
-      const updatedDiscussion = new DiscussionBuilder(discussion)
-        .withStatus("REJECTED", "OTHER", "my custom reason")
-        .build();
-
-      await pgDiscussionRepository.update(updatedDiscussion);
-
-      expectToEqual(
-        await db
-          .selectFrom("discussions")
-          .select(["status", "rejection_reason"])
-          .executeTakeFirst(),
-        {
-          status: "REJECTED",
-          rejection_reason: "my custom reason",
-        },
-      );
-    });
-
-    it("update with status ACCEPTED", async () => {
-      const siret = "01234567891011";
-      const discussion = new DiscussionBuilder()
-        .withSiret(siret)
-        .withCreatedAt(new Date("2023-07-07"))
-        .withStatus("PENDING")
-        .build();
-
-      await pgDiscussionRepository.insert(discussion);
-
-      const updatedDiscussion = new DiscussionBuilder(discussion)
-        .withStatus("ACCEPTED")
-        .build();
-
-      await pgDiscussionRepository.update(updatedDiscussion);
-
-      expectToEqual(
-        await db
-          .selectFrom("discussions")
-          .select(["status"])
-          .executeTakeFirst(),
-        {
-          status: "ACCEPTED",
-        },
-      );
-    });
-
+  describe("deleteOldMessages", () => {
     it("Deletes messages from old discussions", async () => {
       const siret = "12212222333344";
       const since = new Date("2023-03-05");
