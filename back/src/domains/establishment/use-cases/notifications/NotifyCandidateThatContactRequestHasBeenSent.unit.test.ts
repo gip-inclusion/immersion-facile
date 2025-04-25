@@ -58,9 +58,11 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
 
   it("sends an email to the beneficiary when contact method is EMAIL", async () => {
     const discussion = new DiscussionBuilder()
-      .withEstablishmentContact({ contactMethod: "EMAIL" })
+      .withContactMethod("EMAIL")
       .build();
+
     uow.discussionRepository.discussions = [discussion];
+
     await notifyCandidateThatContactRequestHasBeenSent.execute({
       siret: discussion.siret,
       discussionId: discussion.id,
@@ -83,8 +85,9 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
     "does not sends an email when contact method is %s",
     async (contactMethod) => {
       const discussion = new DiscussionBuilder()
-        .withEstablishmentContact({ contactMethod })
+        .withContactMethod(contactMethod)
         .build();
+
       uow.discussionRepository.discussions = [discussion];
 
       await notifyCandidateThatContactRequestHasBeenSent.execute({
