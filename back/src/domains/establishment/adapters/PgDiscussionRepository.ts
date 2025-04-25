@@ -2,12 +2,14 @@ import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
 import {
+  type CommonDiscussionDto,
   type ContactMethod,
   type DiscussionDto,
   type DiscussionId,
   type DiscussionStatus,
   type DiscussionStatusWithRejection,
   type Exchange,
+  type PotentialBeneficiaryCommonProps,
   type RejectionKind,
   type SiretDto,
   errors,
@@ -58,179 +60,21 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
-    const pgResult = await this.#makeDiscussionQueryBuilder(
-      {
-        filters: {},
-        limit: 1,
-      },
-      discussionId,
-    ).executeTakeFirst();
-    return pgResult
-      ? this.#makeDiscussionDtoFromPgDiscussion(pgResult.discussion)
-      : undefined;
+    const results = await executeGetDiscussion(this.transaction, {
+      filters: {},
+      limit: 1,
+      id: discussionId,
+    });
+
+    return makeDiscussionDtoFromPgDiscussion(results).at(0);
   }
 
   public async getDiscussions(
     params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
-    const results = await this.#makeDiscussionQueryBuilder(params).execute();
-    return results.map(({ discussion }) =>
-      this.#makeDiscussionDtoFromPgDiscussion(discussion),
+    return executeGetDiscussion(this.transaction, params).then((results) =>
+      makeDiscussionDtoFromPgDiscussion(results),
     );
-  }
-
-  #makeDiscussionDtoFromPgDiscussion(discussion: PgDiscussion): DiscussionDto {
-    return (
-      discussion && {
-        ...discussion,
-        createdAt: new Date(discussion.createdAt).toISOString(),
-        immersionObjective: discussion.immersionObjective ?? null,
-        exchanges: discussion.exchanges
-          ? discussion.exchanges.map((exchange) => ({
-              ...exchange,
-              sentAt: new Date(exchange.sentAt).toISOString(),
-            }))
-          : [],
-        ...makeDiscussionStatusAndRejection(discussion),
-      }
-    );
-  }
-
-  #makeDiscussionQueryBuilder(
-    {
-      filters: {
-        createdSince,
-        answeredByEstablishment,
-        createdBetween,
-        sirets,
-        status,
-      },
-      limit,
-    }: GetDiscussionsParams,
-    id?: DiscussionId,
-  ) {
-    return this.transaction
-      .selectFrom("discussions as d")
-      .innerJoin(
-        (qb) =>
-          pipeWithValue(
-            qb.selectFrom("discussions").select("discussions.id"),
-            (qb) => (status ? qb.where("discussions.status", "=", status) : qb),
-            (qb) => (id ? qb.where("discussions.id", "=", id) : qb),
-            (qb) => {
-              if (!sirets) return qb;
-              if (sirets.length === 0) throw errors.discussion.badSiretFilter();
-              return qb.where(
-                "discussions.siret",
-                "=",
-                sql<SiretDto>`ANY(${sirets})`,
-              );
-            },
-            (qb) =>
-              createdSince
-                ? qb.where("discussions.created_at", ">=", createdSince)
-                : qb,
-            (qb) =>
-              createdBetween
-                ? qb.where((qb) =>
-                    qb.between(
-                      qb.ref("discussions.created_at"),
-                      createdBetween.from,
-                      createdBetween.to,
-                    ),
-                  )
-                : qb,
-            (qb) =>
-              answeredByEstablishment !== undefined
-                ? qb.where(({ not, exists, selectFrom, lit }) => {
-                    const existSubQuery = exists(
-                      selectFrom("exchanges")
-                        .select(lit(1).as("one"))
-                        .whereRef(
-                          "exchanges.discussion_id",
-                          "=",
-                          "discussions.id",
-                        )
-                        .where("exchanges.sender", "=", "establishment"),
-                    );
-                    return answeredByEstablishment
-                      ? existSubQuery
-                      : not(existSubQuery);
-                  })
-                : qb,
-          )
-            .limit(limit)
-            .as("filtered_discussions"),
-        (join) => join.onRef("d.id", "=", "filtered_discussions.id"),
-      )
-      .leftJoin("exchanges as e", "d.id", "e.discussion_id")
-      .groupBy(["d.id", "d.created_at", "d.siret"])
-      .orderBy("d.created_at", "desc")
-      .orderBy("d.siret", "asc")
-      .select(({ ref, fn }) =>
-        jsonStripNulls(
-          jsonBuildObject({
-            id: ref("d.id"),
-            createdAt: ref("d.created_at"),
-            siret: ref("d.siret"),
-            businessName: ref("d.business_name"),
-            appellationCode: sql<string>`CAST(${ref(
-              "appellation_code",
-            )} AS text)`,
-            immersionObjective: ref("d.immersion_objective"),
-            potentialBeneficiary: jsonBuildObject({
-              firstName: ref("d.potential_beneficiary_first_name"),
-              lastName: ref("d.potential_beneficiary_last_name"),
-              email: ref("d.potential_beneficiary_email"),
-              phone: ref("d.potential_beneficiary_phone"),
-              resumeLink: ref("d.potential_beneficiary_resume_link"),
-              hasWorkingExperience: ref(
-                "potential_beneficiary_has_working_experience",
-              ),
-              experienceAdditionalInformation: ref(
-                "potential_beneficiary_experience_additional_information",
-              ),
-              datePreferences: ref("d.potential_beneficiary_date_preferences"),
-            }),
-            establishmentContact: jsonBuildObject({
-              contactMethod: sql<ContactMethod>`${ref("d.contact_method")}`,
-              firstName: ref("d.establishment_contact_first_name"),
-              lastName: ref("d.establishment_contact_last_name"),
-              email: ref("d.establishment_contact_email"),
-              phone: ref("d.establishment_contact_phone"),
-              job: ref("d.establishment_contact_job"),
-              copyEmails: sql<string[]>`${ref(
-                "establishment_contact_copy_emails",
-              )}`,
-            }),
-            address: jsonBuildObject({
-              streetNumberAndAddress: ref("d.street_number_and_address"),
-              postcode: ref("d.postcode"),
-              departmentCode: ref("d.department_code"),
-              city: ref("d.city"),
-            }),
-            exchanges: fn
-              .jsonAgg(
-                sql`
-                  JSON_BUILD_OBJECT(
-                    'subject', e.subject,
-                    'message', e.message,
-                    'recipient', e.recipient,
-                    'sender', e.sender,
-                    'sentAt', e.sent_at,
-                    'attachments', e.attachments
-                  )
-                  ORDER BY e.sent_at
-                `.$castTo<Exchange>(),
-              )
-              .filterWhere("e.id", "is not", null),
-            conventionId: ref("d.convention_id"),
-            status: sql<DiscussionStatus>`${ref("d.status")}`,
-            rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
-            rejectionReason: ref("d.rejection_reason"),
-          }),
-        ).as("discussion"),
-      );
   }
 
   public async hasDiscussionMatching(
@@ -345,52 +189,184 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
 const discussionToPg = (
   discussion: DiscussionDto,
-): InsertObject<Database, "discussions"> => {
-  return {
-    id: discussion.id,
-    appellation_code: +discussion.appellationCode,
-    business_name: discussion.businessName,
-    city: discussion.address.city,
-    created_at: discussion.createdAt,
-    department_code: discussion.address.departmentCode,
-    establishment_contact_copy_emails: JSON.stringify(
-      discussion.establishmentContact.copyEmails,
-    ),
-    establishment_contact_email: discussion.establishmentContact.email,
-    establishment_contact_first_name: discussion.establishmentContact.firstName,
-    establishment_contact_job: discussion.establishmentContact.job,
-    establishment_contact_last_name: discussion.establishmentContact.lastName,
-    establishment_contact_phone: discussion.establishmentContact.phone,
-    immersion_objective: discussion.immersionObjective,
-    postcode: discussion.address.postcode,
-    potential_beneficiary_email: discussion.potentialBeneficiary.email,
-    potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
-    potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
-    potential_beneficiary_resume_link:
-      discussion.potentialBeneficiary.resumeLink,
-    potential_beneficiary_experience_additional_information:
-      discussion.potentialBeneficiary.experienceAdditionalInformation,
-    potential_beneficiary_has_working_experience:
-      discussion.potentialBeneficiary.hasWorkingExperience,
-    potential_beneficiary_date_preferences:
-      discussion.potentialBeneficiary.datePreferences,
-    street_number_and_address: discussion.address.streetNumberAndAddress,
-    siret: discussion.siret,
-    contact_method: discussion.establishmentContact.contactMethod,
-    potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
-    acquisition_campaign: discussion.acquisitionCampaign,
-    acquisition_keyword: discussion.acquisitionKeyword,
-    convention_id: discussion.conventionId,
-    ...discussionStatusWithRejectionToPg(
-      makeDiscussionStatusAndRejection(discussion),
-    ),
-  };
-};
+): InsertObject<Database, "discussions"> => ({
+  id: discussion.id,
+  appellation_code: +discussion.appellationCode,
+  business_name: discussion.businessName,
+  city: discussion.address.city,
+  created_at: discussion.createdAt,
+  department_code: discussion.address.departmentCode,
+  establishment_contact_copy_emails: JSON.stringify(
+    discussion.establishmentContact.copyEmails,
+  ),
+  establishment_contact_email: discussion.establishmentContact.email,
+  establishment_contact_first_name: discussion.establishmentContact.firstName,
+  establishment_contact_job: discussion.establishmentContact.job,
+  establishment_contact_last_name: discussion.establishmentContact.lastName,
+  establishment_contact_phone: discussion.establishmentContact.phone,
+  postcode: discussion.address.postcode,
+  potential_beneficiary_email: discussion.potentialBeneficiary.email,
+  potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
+  kind: discussion.kind,
+  ...(discussion.contactMethod === "EMAIL"
+    ? {
+        immersion_objective: discussion.potentialBeneficiary.immersionObjective,
+        potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
+        potential_beneficiary_date_preferences:
+          discussion.potentialBeneficiary.datePreferences,
+        ...(discussion.kind === "IF"
+          ? {
+              potential_beneficiary_resume_link:
+                discussion.potentialBeneficiary.resumeLink,
+              potential_beneficiary_experience_additional_information:
+                discussion.potentialBeneficiary.experienceAdditionalInformation,
+              potential_beneficiary_has_working_experience:
+                discussion.potentialBeneficiary.hasWorkingExperience,
+            }
+          : {}),
+      }
+    : {}),
+  potential_beneficiary_level_of_education:
+    discussion.kind === "1_ELEVE_1_STAGE"
+      ? discussion.potentialBeneficiary.levelOfEducation
+      : null,
+  street_number_and_address: discussion.address.streetNumberAndAddress,
+  siret: discussion.siret,
+  contact_method: discussion.contactMethod,
+  potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
+  acquisition_campaign: discussion.acquisitionCampaign,
+  acquisition_keyword: discussion.acquisitionKeyword,
+  convention_id: discussion.conventionId,
+  ...discussionStatusWithRejectionToPg(
+    makeDiscussionStatusAndRejection(discussion),
+  ),
+});
+
+const makeDiscussionDtoFromPgDiscussion = (
+  results: GetDiscussionResults,
+): DiscussionDto[] =>
+  results.map(({ discussion }): DiscussionDto => {
+    const common: CommonDiscussionDto = {
+      address: discussion.address,
+      appellationCode: discussion.appellationCode,
+      businessName: discussion.businessName,
+      createdAt: new Date(discussion.createdAt).toISOString(),
+      establishmentContact: discussion.establishmentContact,
+      exchanges: discussion.exchanges.map(({ sentAt, ...rest }) => ({
+        ...rest,
+        sentAt: new Date(sentAt).toISOString(),
+      })),
+      siret: discussion.siret,
+      acquisitionCampaign: discussion.acquisition_campaign,
+      acquisitionKeyword: discussion.acquisition_keyword,
+      conventionId: discussion.conventionId,
+      id: discussion.id,
+      ...(discussion.status === "REJECTED"
+        ? {
+            status: "REJECTED",
+            ...(discussion.rejectionKind === "OTHER"
+              ? {
+                  rejectionKind: "OTHER",
+                  rejectionReason: discussion.rejectionReason ?? "",
+                }
+              : {
+                  rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
+                }),
+          }
+        : {
+            status: discussion.status,
+          }),
+    };
+
+    const commonPotentialBeneficiary: PotentialBeneficiaryCommonProps = {
+      firstName: discussion.potentialBeneficiary.firstName,
+      lastName: discussion.potentialBeneficiary.lastName,
+      email: discussion.potentialBeneficiary.email,
+    };
+
+    if (discussion.contactMethod === "EMAIL") {
+      const phone = discussion.potentialBeneficiary.phone;
+      const datePreferences = discussion.potentialBeneficiary.datePreferences;
+
+      if (!phone) throw new Error("Missing phone for email discussion");
+      if (!datePreferences)
+        throw new Error("Missing datePreferences for email discussion");
+
+      if (discussion.kind === "IF") {
+        const hasWorkingExperience =
+          discussion.potentialBeneficiary.hasWorkingExperience;
+        if (hasWorkingExperience === undefined)
+          throw new Error("Missing hasWorkingExperience for email discussion");
+        return {
+          ...common,
+          contactMethod: discussion.contactMethod,
+          kind: discussion.kind,
+          potentialBeneficiary: {
+            ...commonPotentialBeneficiary,
+            phone,
+            immersionObjective: discussion.immersionObjective ?? null,
+            datePreferences,
+            hasWorkingExperience,
+            resumeLink: discussion.potentialBeneficiary.resumeLink,
+            experienceAdditionalInformation:
+              discussion.potentialBeneficiary.experienceAdditionalInformation,
+          },
+        };
+      }
+
+      if (
+        discussion.immersionObjective !==
+        "Découvrir un métier ou un secteur d'activité"
+      )
+        throw new Error(
+          `Invalid immersion objective for discussion kind ${discussion.kind}`,
+        );
+      if (!discussion.potentialBeneficiary.levelOfEducation)
+        throw new Error(
+          `Missing level of education  for discussion kind ${discussion.kind}`,
+        );
+      return {
+        ...common,
+        contactMethod: discussion.contactMethod,
+        kind: discussion.kind,
+        potentialBeneficiary: {
+          ...commonPotentialBeneficiary,
+          phone,
+          immersionObjective: discussion.immersionObjective,
+          datePreferences,
+          levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
+        },
+      };
+    }
+    if (discussion.kind === "1_ELEVE_1_STAGE") {
+      if (!discussion.potentialBeneficiary.levelOfEducation)
+        throw new Error(
+          `Missing level of education for discussion kind ${discussion.kind}`,
+        );
+
+      return {
+        ...common,
+        contactMethod: discussion.contactMethod,
+        kind: discussion.kind,
+        potentialBeneficiary: {
+          ...commonPotentialBeneficiary,
+          levelOfEducation: discussion.potentialBeneficiary.levelOfEducation,
+        },
+      };
+    }
+
+    return {
+      ...common,
+      contactMethod: discussion.contactMethod,
+      kind: discussion.kind,
+      potentialBeneficiary: commonPotentialBeneficiary,
+    };
+  });
 
 const makeDiscussionStatusAndRejection = (
-  discussion: DiscussionDto | PgDiscussion,
-): DiscussionStatusWithRejection => {
-  return discussion.status === "REJECTED"
+  discussion: DiscussionStatusWithRejection,
+): DiscussionStatusWithRejection =>
+  discussion.status === "REJECTED"
     ? {
         status: "REJECTED",
         ...(discussion.rejectionKind === "OTHER"
@@ -405,7 +381,6 @@ const makeDiscussionStatusAndRejection = (
     : {
         status: discussion.status,
       };
-};
 
 const discussionStatusWithRejectionToPg = (
   discussionStatusWithRejection: DiscussionStatusWithRejection,
@@ -435,41 +410,145 @@ const discussionStatusWithRejectionToPg = (
   };
 };
 
-type PgDiscussion = {
-  id: string;
-  createdAt: Date;
-  siret: string;
-  businessName: string;
-  appellationCode: string;
-  immersionObjective:
-    | "Confirmer un projet professionnel"
-    | "Découvrir un métier ou un secteur d'activité"
-    | "Initier une démarche de recrutement"
-    | undefined;
-  potentialBeneficiary: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string | undefined;
-    resumeLink: string | undefined;
-  };
-  establishmentContact: {
-    contactMethod: "EMAIL" | "PHONE" | "IN_PERSON";
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    job: string;
-    copyEmails: string[];
-  };
-  address: {
-    streetNumberAndAddress: string;
-    postcode: string;
-    departmentCode: string;
-    city: string;
-  };
-  exchanges: Exchange[] | undefined;
-  status: DiscussionStatus;
-  rejectionKind: Exclude<RejectionKind, null> | undefined;
-  rejectionReason: string | undefined;
-};
+type GetDiscussionResults = Awaited<ReturnType<typeof executeGetDiscussion>>;
+const executeGetDiscussion = (
+  transaction: KyselyDb,
+  {
+    filters: {
+      createdSince,
+      answeredByEstablishment,
+      createdBetween,
+      sirets,
+      status,
+    },
+    id,
+    limit,
+  }: GetDiscussionsParams & { id?: DiscussionId },
+) =>
+  transaction
+    .selectFrom("discussions as d")
+    .innerJoin(
+      (qb) =>
+        pipeWithValue(
+          qb.selectFrom("discussions").select("discussions.id"),
+          (qb) => (status ? qb.where("discussions.status", "=", status) : qb),
+          (qb) => (id ? qb.where("discussions.id", "=", id) : qb),
+          (qb) => {
+            if (!sirets) return qb;
+            if (sirets.length === 0) throw errors.discussion.badSiretFilter();
+            return qb.where(
+              "discussions.siret",
+              "=",
+              sql<SiretDto>`ANY(${sirets})`,
+            );
+          },
+          (qb) =>
+            createdSince
+              ? qb.where("discussions.created_at", ">=", createdSince)
+              : qb,
+          (qb) =>
+            createdBetween
+              ? qb.where((qb) =>
+                  qb.between(
+                    qb.ref("discussions.created_at"),
+                    createdBetween.from,
+                    createdBetween.to,
+                  ),
+                )
+              : qb,
+          (qb) =>
+            answeredByEstablishment !== undefined
+              ? qb.where(({ not, exists, selectFrom, lit }) => {
+                  const existSubQuery = exists(
+                    selectFrom("exchanges")
+                      .select(lit(1).as("one"))
+                      .whereRef(
+                        "exchanges.discussion_id",
+                        "=",
+                        "discussions.id",
+                      )
+                      .where("exchanges.sender", "=", "establishment"),
+                  );
+                  return answeredByEstablishment
+                    ? existSubQuery
+                    : not(existSubQuery);
+                })
+              : qb,
+        )
+          .limit(limit)
+          .as("filtered_discussions"),
+      (join) => join.onRef("d.id", "=", "filtered_discussions.id"),
+    )
+    .leftJoin("exchanges as e", "d.id", "e.discussion_id")
+    .groupBy(["d.id", "d.created_at", "d.siret"])
+    .orderBy("d.created_at", "desc")
+    .orderBy("d.siret", "asc")
+    .select(({ ref, fn }) =>
+      jsonStripNulls(
+        jsonBuildObject({
+          id: ref("d.id"),
+          createdAt: ref("d.created_at"),
+          siret: ref("d.siret"),
+          businessName: ref("d.business_name"),
+          appellationCode: sql<string>`CAST(${ref(
+            "appellation_code",
+          )} AS text)`,
+          immersionObjective: ref("d.immersion_objective"),
+          contactMethod: sql<ContactMethod>`${ref("d.contact_method")}`,
+          potentialBeneficiary: jsonBuildObject({
+            firstName: ref("d.potential_beneficiary_first_name"),
+            lastName: ref("d.potential_beneficiary_last_name"),
+            email: ref("d.potential_beneficiary_email"),
+            phone: ref("d.potential_beneficiary_phone"),
+            resumeLink: ref("d.potential_beneficiary_resume_link"),
+            hasWorkingExperience: ref(
+              "potential_beneficiary_has_working_experience",
+            ),
+            experienceAdditionalInformation: ref(
+              "potential_beneficiary_experience_additional_information",
+            ),
+            datePreferences: ref("d.potential_beneficiary_date_preferences"),
+            levelOfEducation: ref("d.potential_beneficiary_level_of_education"),
+          }),
+          establishmentContact: jsonBuildObject({
+            firstName: ref("d.establishment_contact_first_name"),
+            lastName: ref("d.establishment_contact_last_name"),
+            email: ref("d.establishment_contact_email"),
+            phone: ref("d.establishment_contact_phone"),
+            job: ref("d.establishment_contact_job"),
+            copyEmails: sql<string[]>`${ref(
+              "establishment_contact_copy_emails",
+            )}`,
+          }),
+          address: jsonBuildObject({
+            streetNumberAndAddress: ref("d.street_number_and_address"),
+            postcode: ref("d.postcode"),
+            departmentCode: ref("d.department_code"),
+            city: ref("d.city"),
+          }),
+          exchanges: fn
+            .jsonAgg(
+              sql`
+                JSON_BUILD_OBJECT(
+                  'subject', e.subject,
+                  'message', e.message,
+                  'recipient', e.recipient,
+                  'sender', e.sender,
+                  'sentAt', e.sent_at,
+                  'attachments', e.attachments
+                )
+                ORDER BY e.sent_at
+              `.$castTo<Exchange>(),
+            )
+            .filterWhere("e.id", "is not", null),
+          conventionId: ref("d.convention_id"),
+          status: sql<DiscussionStatus>`${ref("d.status")}`,
+          rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
+          rejectionReason: ref("d.rejection_reason"),
+          acquisition_campaign: ref("d.acquisition_campaign"),
+          acquisition_keyword: ref("d.acquisition_keyword"),
+          kind: ref("d.kind"),
+        }),
+      ).as("discussion"),
+    )
+    .execute();
