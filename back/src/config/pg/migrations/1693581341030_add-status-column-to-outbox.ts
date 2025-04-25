@@ -11,6 +11,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "published",
     "failed-but-will-retry",
     "failed-to-many-times",
+    "in-process",
   ]);
 
   pgm.addColumn(outboxTable, {
