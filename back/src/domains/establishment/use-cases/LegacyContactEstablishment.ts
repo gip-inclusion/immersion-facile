@@ -2,6 +2,7 @@ import subDays from "date-fns/subDays";
 import {
   type DiscussionDto,
   type LegacyContactEstablishmentRequestDto,
+  type PotentialBeneficiaryCommonProps,
   errors,
   legacyContactEstablishmentRequestSchema,
   normalizedMonthInDays,
@@ -164,6 +165,18 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       });
     }
 
+    if (
+      contactRequest.contactMode !== establishment.establishment.contactMethod
+    ) {
+      throw new Error("Mode de contact invalide.");
+    }
+
+    const potentialBeneficiary: PotentialBeneficiaryCommonProps = {
+      firstName: contactRequest.potentialBeneficiaryFirstName,
+      lastName: contactRequest.potentialBeneficiaryLastName,
+      email: contactRequest.potentialBeneficiaryEmail,
+    };
+
     return {
       id: this.#uuidGenerator.new(),
       appellationCode: contactRequest.appellationCode,
@@ -172,26 +185,25 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
         establishment.establishment.customizedName ??
         establishment.establishment.name,
       createdAt: now.toISOString(),
-      immersionObjective:
-        contactRequest.contactMode === "EMAIL"
-          ? contactRequest.immersionObjective
-          : null,
       address: matchingAddress.address,
-      potentialBeneficiary: {
-        firstName: contactRequest.potentialBeneficiaryFirstName,
-        lastName: contactRequest.potentialBeneficiaryLastName,
-        email: contactRequest.potentialBeneficiaryEmail,
-        phone:
-          contactRequest.contactMode === "EMAIL"
-            ? contactRequest.potentialBeneficiaryPhone
-            : undefined,
-        resumeLink:
-          contactRequest.contactMode === "EMAIL"
-            ? contactRequest.potentialBeneficiaryResumeLink
-            : undefined,
-      },
+      kind: "IF",
+      ...(contactRequest.contactMode === "EMAIL"
+        ? {
+            contactMethod: contactRequest.contactMode,
+            potentialBeneficiary: {
+              ...potentialBeneficiary,
+              phone: contactRequest.potentialBeneficiaryPhone,
+              immersionObjective: contactRequest.immersionObjective,
+              datePreferences: "",
+              hasWorkingExperience: false,
+              resumeLink: contactRequest.potentialBeneficiaryResumeLink,
+            },
+          }
+        : {
+            contactMethod: contactRequest.contactMode,
+            potentialBeneficiary,
+          }),
       establishmentContact: {
-        contactMethod: establishment.establishment.contactMethod,
         copyEmails: otherUsers.map((user) => user.email),
         job: firstAdminRight.job,
         phone: firstAdminRight.phone,
