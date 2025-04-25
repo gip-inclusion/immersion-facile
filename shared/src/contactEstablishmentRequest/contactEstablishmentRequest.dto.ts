@@ -5,11 +5,11 @@ import type {
   LevelOfEducation,
   discoverObjective,
 } from "../convention/convention.dto";
-import type { DiscussionId } from "../discussion/discussion.dto";
 import type {
-  ContactMethod,
+  DiscussionId,
   DiscussionKind,
-} from "../formEstablishment/FormEstablishment.dto";
+} from "../discussion/discussion.dto";
+import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 

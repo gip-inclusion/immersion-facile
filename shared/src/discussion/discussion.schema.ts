@@ -1,30 +1,38 @@
 import { z } from "zod";
 import { addressSchema } from "../address/address.schema";
 import {
+  preferEmailContactSchema,
+  preferInPersonContactSchema,
+  preferPhoneContactSchema,
+} from "../contactEstablishmentRequest/contactEstablishmentRequest.schema";
+import { discoverObjective } from "../convention/convention.dto";
+import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
-import { contactMethodSchema } from "../formEstablishment/FormEstablishment.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
+import type { OmitFromExistingKeys } from "../utils";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
-import {
-  type Attachment,
-  type DiscussionAccepted,
-  type DiscussionId,
-  type DiscussionPending,
-  type DiscussionReadDto,
-  type DiscussionRejected,
-  type DiscussionStatusWithRejection,
-  type Exchange,
-  type ExchangeRole,
-  type WithDiscussionRejection,
-  exchangeRoles,
+import type {
+  Attachment,
+  DiscussionAccepted,
+  DiscussionId,
+  DiscussionPending,
+  DiscussionReadDto,
+  DiscussionRejected,
+  DiscussionStatusWithRejection,
+  Exchange,
+  ExchangeRole,
+  PotentialBeneficiaryCommonProps,
+  WithDiscussionRejection,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
+
+export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 
 const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
@@ -33,7 +41,7 @@ const attachementSchema: z.Schema<Attachment> = z.object({
   link: z.string(),
 });
 
-const exchangeSchema: z.Schema<Exchange> = z.object({
+export const exchangeSchema: z.Schema<Exchange> = z.object({
   subject: zStringMinLength1,
   message: zStringMinLength1,
   sender: exchangeRoleSchema,
@@ -41,6 +49,7 @@ const exchangeSchema: z.Schema<Exchange> = z.object({
   sentAt: makeDateStringSchema(),
   attachments: z.array(attachementSchema),
 });
+export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
 export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
   z.union([
@@ -69,32 +78,88 @@ const discussionStatusSchema: z.Schema<DiscussionStatusWithRejection> = z.union(
   [discussionRejectedSchema, discussionNotRejectedSchema],
 );
 
-export const discussionReadSchema: z.Schema<DiscussionReadDto> = z
+const potentialBeneficiaryCommonSchema = z.object({
+  firstName: zStringMinLength1,
+  lastName: zStringMinLength1,
+  email: zStringCanBeEmpty,
+}) satisfies z.Schema<PotentialBeneficiaryCommonProps>;
+
+export const commonDiscussionReadSchema: z.Schema<
+  OmitFromExistingKeys<
+    DiscussionReadDto,
+    "kind" | "contactMethod" | "potentialBeneficiary"
+  >
+> = z
   .object({
     id: discussionIdSchema,
     createdAt: makeDateStringSchema(),
     siret: siretSchema,
     businessName: zStringMinLength1,
     appellation: appellationDtoSchema,
-    immersionObjective: immersionObjectiveSchema.or(z.null()),
     address: addressSchema,
-    potentialBeneficiary: z.object({
-      firstName: zStringMinLength1,
-      lastName: zStringMinLength1,
-      resumeLink: zStringCanBeEmpty.optional(),
-      phone: phoneSchema.optional(),
-      email: zStringCanBeEmpty,
-      hasWorkingExperience: z.boolean().optional(),
-      experienceAdditionalInformation: zStringMinLength1.optional(),
-      datePreferences: zStringMinLength1.optional(),
-    }),
     establishmentContact: z.object({
       firstName: zStringMinLength1,
       lastName: zStringMinLength1,
       job: zStringMinLength1,
-      contactMethod: contactMethodSchema,
     }),
-    exchanges: z.array(exchangeSchema),
+    exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
   .and(discussionStatusSchema);
+
+const discussionKindIfSchema = z.literal("IF");
+const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");
+
+const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"]);
+
+export const discussionReadSchema: z.Schema<DiscussionReadDto> =
+  commonDiscussionReadSchema.and(
+    z.union([
+      z.object({
+        contactMethod: preferEmailContactSchema,
+        kind: discussionKindIfSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+          phone: phoneSchema,
+          datePreferences: zStringMinLength1,
+          immersionObjective: immersionObjectiveSchema.or(z.null()),
+          resumeLink: zStringCanBeEmpty.optional(),
+          hasWorkingExperience: z.boolean(),
+          experienceAdditionalInformation: zStringMinLength1.optional(),
+        }),
+      }),
+      z.object({
+        contactMethod: preferEmailContactSchema,
+        kind: discussionKind1Eleve1StageSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+          phone: phoneSchema,
+          datePreferences: zStringMinLength1,
+          immersionObjective: z.literal(discoverObjective),
+          levelOfEducation: discussionLevelOfEducationSchema,
+        }),
+      }),
+      z.object({
+        contactMethod: preferInPersonContactSchema,
+        kind: discussionKindIfSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema,
+      }),
+      z.object({
+        contactMethod: preferInPersonContactSchema,
+        kind: discussionKind1Eleve1StageSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+          levelOfEducation: z.enum(["3ème", "2nde"]),
+        }),
+      }),
+      z.object({
+        contactMethod: preferPhoneContactSchema,
+        kind: discussionKindIfSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema,
+      }),
+      z.object({
+        contactMethod: preferPhoneContactSchema,
+        kind: discussionKind1Eleve1StageSchema,
+        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+          levelOfEducation: z.enum(["3ème", "2nde"]),
+        }),
+      }),
+    ]),
+  );

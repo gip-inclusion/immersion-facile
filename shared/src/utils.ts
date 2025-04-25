@@ -198,3 +198,6 @@ export const castError = (error: unknown): Error =>
 type Filter = <T>(predicate: (element: T) => boolean) => (array: T[]) => T[];
 
 export const filter: Filter = (predicate) => (array) => array.filter(predicate);
+
+// biome-ignore lint/complexity/noBannedTypes: <explanation>
+export type EmptyObject = {};
