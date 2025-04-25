@@ -1,6 +1,7 @@
 import { ascend, prop, sort } from "ramda";
 import {
   type ContactEstablishmentEventPayload,
+  type Email,
   type TemplatedEmail,
   addressDtoToString,
   contactEstablishmentEventPayloadSchema,
@@ -13,6 +14,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { makeContactByEmailRequestParams } from "../../helpers/contactRequest";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
   protected inputSchema = contactEstablishmentEventPayloadSchema;
@@ -49,64 +51,87 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       establishmentSiret: discussion.siret,
     };
 
-    const { establishmentContact, potentialBeneficiary } = discussion;
+    if (discussion.contactMethod !== "EMAIL") {
+      const recipients = [discussion.potentialBeneficiary.email];
+      const params = {
+        businessName: discussion.businessName,
+        contactFirstName: discussion.establishmentContact.firstName,
+        contactLastName: discussion.establishmentContact.lastName,
+        potentialBeneficiaryFirstName:
+          discussion.potentialBeneficiary.firstName,
+        potentialBeneficiaryLastName: discussion.potentialBeneficiary.lastName,
+      };
 
-    switch (establishmentContact.contactMethod) {
-      case "EMAIL": {
-        const appellationAndRomeDtos =
-          await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-            [discussion.appellationCode],
-          );
-        const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
+      await this.#saveNotificationAndRelatedEvent(uow, {
+        kind: "email",
+        templatedContent:
+          discussion.contactMethod === "IN_PERSON"
+            ? {
+                sender: immersionFacileNoReplyEmailSender,
+                recipients,
+                kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
+                params: {
+                  ...params,
+                  businessAddress: addressDtoToString(discussion.address),
+                },
+              }
+            : {
+                sender: immersionFacileNoReplyEmailSender,
+                recipients,
+                kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
+                params: {
+                  ...params,
+                  contactPhone: discussion.establishmentContact.phone,
+                },
+              },
+        followedIds,
+      });
 
-        if (!appellationLabel)
-          throw errors.discussion.missingAppellationLabel({
-            appellationCode: discussion.appellationCode,
-          });
+      return;
+    }
 
-        const cc = establishmentContact.copyEmails.filter(
-          (email) => email !== establishmentContact.email,
-        );
+    const appellationAndRomeDtos =
+      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+        [discussion.appellationCode],
+      );
+    const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
 
-        const opaqueEmail = createOpaqueEmail(
-          payload.discussionId,
-          "potentialBeneficiary",
-          this.#replyDomain,
-        );
-        let templatedContent: TemplatedEmail = {
-          kind: "CONTACT_BY_EMAIL_REQUEST",
-          recipients: [establishmentContact.email],
-          sender: immersionFacileNoReplyEmailSender,
-          replyTo: {
-            email: opaqueEmail,
-            name: `${potentialBeneficiary.firstName} ${potentialBeneficiary.lastName} - via Immersion Facilitée`,
-          },
-          cc,
-          params: {
-            replyToEmail: opaqueEmail,
-            businessName: discussion.businessName,
-            contactFirstName: establishmentContact.firstName,
-            contactLastName: establishmentContact.lastName,
-            appellationLabel,
-            potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
-            potentialBeneficiaryLastName: potentialBeneficiary.lastName,
-            immersionObjective: discussion.immersionObjective ?? undefined,
-            potentialBeneficiaryPhone:
-              potentialBeneficiary.phone ?? "pas de téléphone fourni",
-            potentialBeneficiaryResumeLink: potentialBeneficiary.resumeLink,
-            businessAddress: addressDtoToString(discussion.address),
-            potentialBeneficiaryDatePreferences:
-              discussion.potentialBeneficiary.datePreferences,
-            potentialBeneficiaryExperienceAdditionalInformation:
-              discussion.potentialBeneficiary.experienceAdditionalInformation,
-            potentialBeneficiaryHasWorkingExperience:
-              discussion.potentialBeneficiary.hasWorkingExperience,
-            domain: this.#domain,
-            discussionId: discussion.id,
-          },
-        };
-        if (payload.isLegacy) {
-          templatedContent = {
+    if (!appellationLabel)
+      throw errors.discussion.missingAppellationLabel({
+        appellationCode: discussion.appellationCode,
+      });
+
+    const opaqueEmail: Email = createOpaqueEmail(
+      payload.discussionId,
+      "potentialBeneficiary",
+      this.#replyDomain,
+    );
+
+    const templatedContent: TemplatedEmail = {
+      sender: immersionFacileNoReplyEmailSender,
+      recipients: [discussion.establishmentContact.email],
+      replyTo: {
+        email: opaqueEmail,
+        name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
+      },
+      cc: discussion.establishmentContact.copyEmails.filter(
+        (email) => email !== discussion.establishmentContact.email,
+      ),
+      kind: "CONTACT_BY_EMAIL_REQUEST",
+      params: {
+        ...(await makeContactByEmailRequestParams({
+          uow,
+          discussion,
+          domain: this.#domain,
+        })),
+        replyToEmail: opaqueEmail,
+      },
+    };
+
+    await this.#saveNotificationAndRelatedEvent(uow, {
+      kind: "email",
+      templatedContent: payload.isLegacy
+        ? {
             ...templatedContent,
             kind: "CONTACT_BY_EMAIL_REQUEST_LEGACY",
             params: {
@@ -114,56 +139,9 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
               message: sort(ascend(prop("sentAt")), discussion.exchanges)[0]
                 .message,
             },
-          };
-        }
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent,
-          followedIds,
-        });
-
-        break;
-      }
-      case "PHONE": {
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
-            recipients: [potentialBeneficiary.email],
-            sender: immersionFacileNoReplyEmailSender,
-            params: {
-              businessName: discussion.businessName,
-              contactFirstName: establishmentContact.firstName,
-              contactLastName: establishmentContact.lastName,
-              contactPhone: establishmentContact.phone,
-              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
-              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
-            },
-          },
-          followedIds,
-        });
-        break;
-      }
-      case "IN_PERSON": {
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          kind: "email",
-          templatedContent: {
-            kind: "CONTACT_IN_PERSON_INSTRUCTIONS",
-            recipients: [potentialBeneficiary.email],
-            sender: immersionFacileNoReplyEmailSender,
-            params: {
-              businessName: discussion.businessName,
-              contactFirstName: establishmentContact.firstName,
-              contactLastName: establishmentContact.lastName,
-              businessAddress: addressDtoToString(discussion.address),
-              potentialBeneficiaryFirstName: potentialBeneficiary.firstName,
-              potentialBeneficiaryLastName: potentialBeneficiary.lastName,
-            },
-          },
-          followedIds,
-        });
-        break;
-      }
-    }
+          }
+        : templatedContent,
+      followedIds,
+    });
   }
 }
