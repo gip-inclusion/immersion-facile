@@ -21,20 +21,22 @@ const supportedCountryCode: CountryCode[] = [
   "FR",
 ];
 
-export const phoneSchema = zStringMinLength1.transform((phone, ctx) => {
-  const countryCode = supportedCountryCode.find((countryCode) =>
-    isValidPhoneNumber(phone, countryCode),
-  );
+export const phoneSchema: z.Schema<Phone> = zStringMinLength1.transform(
+  (phone, ctx) => {
+    const countryCode = supportedCountryCode.find((countryCode) =>
+      isValidPhoneNumber(phone, countryCode),
+    );
 
-  if (!countryCode) {
-    ctx.addIssue({
-      message: `Le numéro de téléphone '${phone}' n'est pas valide.`,
-      code: "custom",
-    });
-    return z.NEVER;
-  }
-  return parsePhoneNumber(phone, countryCode).format("E.164");
-});
+    if (!countryCode) {
+      ctx.addIssue({
+        message: `Le numéro de téléphone '${phone}' n'est pas valide.`,
+        code: "custom",
+      });
+      return z.NEVER;
+    }
+    return parsePhoneNumber(phone, countryCode).format("E.164");
+  },
+);
 
 export const isValidMobilePhone = (phoneNumber: Phone) => {
   return parsePhoneNumber(phoneNumber).getType() === "MOBILE";

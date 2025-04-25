@@ -20,7 +20,6 @@ export type ImmersionContactInEstablishmentId = Flavor<
 
 const contactMethods = ["EMAIL", "PHONE", "IN_PERSON"] as const;
 export type ContactMethod = (typeof contactMethods)[number];
-export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 export const isContactMethod = includesTypeGuard(contactMethods);
 
 type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {

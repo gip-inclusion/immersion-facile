@@ -118,9 +118,9 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
       .withEstablishmentContact({
         email: "recette+playwright@immersion-facile.beta.gouv.fr",
       })
-      .withPotentialBeneficiary({
-        resumeLink: "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
-      })
+      .withPotentialBeneficiaryResumeLink(
+        "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
+      )
       .withExchanges([
         {
           sender: "potentialBeneficiary",

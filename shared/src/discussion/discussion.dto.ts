@@ -1,5 +1,12 @@
 import { P, match } from "ts-pattern";
-import type { WithDiscussionId } from "..";
+import {
+  type ContactLevelOfEducation,
+  type Email,
+  type Phone,
+  type WithDiscussionId,
+  discoverObjective,
+  exchangeRoles,
+} from "..";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
@@ -15,25 +22,62 @@ import type {
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
-import type { OmitFromExistingKeys } from "../utils";
+import type { EmptyObject, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 
-export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export type ExchangeRole = (typeof exchangeRoles)[number];
 export const isExchangeRole = includesTypeGuard(exchangeRoles);
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 
-export type DiscussionPotentialBeneficiary = {
+export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
+
+type WithContactByEmailProps<
+  D extends DiscussionKind,
+  C extends ContactMethod,
+> = C extends "EMAIL"
+  ? {
+      datePreferences: string;
+      phone: Phone;
+      immersionObjective: D extends "1_ELEVE_1_STAGE"
+        ? Extract<ImmersionObjective, typeof discoverObjective>
+        : ImmersionObjective | null;
+    }
+  : EmptyObject;
+
+type WithContactByEmailAndIFProps<
+  D extends DiscussionKind,
+  C extends ContactMethod,
+> = D extends "IF"
+  ? C extends "EMAIL"
+    ? {
+        hasWorkingExperience: boolean;
+        resumeLink?: string;
+        experienceAdditionalInformation?: string;
+      }
+    : EmptyObject
+  : EmptyObject;
+
+type With1Eleve1StageProps<D extends DiscussionKind> =
+  D extends "1_ELEVE_1_STAGE"
+    ? {
+        levelOfEducation: ContactLevelOfEducation;
+      }
+    : EmptyObject;
+
+export type PotentialBeneficiaryCommonProps = {
   email: string;
   firstName: string;
   lastName: string;
-  phone?: string;
-  resumeLink?: string;
-  hasWorkingExperience?: boolean;
-  experienceAdditionalInformation?: string;
-  datePreferences?: string;
 };
+
+export type DiscussionPotentialBeneficiary<
+  D extends DiscussionKind,
+  C extends ContactMethod,
+> = PotentialBeneficiaryCommonProps &
+  WithContactByEmailProps<D, C> &
+  WithContactByEmailAndIFProps<D, C> &
+  With1Eleve1StageProps<D>;
 
 export type DiscussionEstablishmentContact = {
   email: string;
@@ -42,20 +86,34 @@ export type DiscussionEstablishmentContact = {
   lastName: string;
   phone: string;
   job: string;
-  contactMethod: ContactMethod;
 };
 
-type DiscussionDtoBase = {
-  id: DiscussionId;
-  createdAt: DateString;
-  siret: SiretDto;
-  businessName: string;
-  immersionObjective: ImmersionObjective | null;
+export type CommonDiscussionDto = {
   address: AddressDto;
-  exchanges: Exchange[];
-  potentialBeneficiary: DiscussionPotentialBeneficiary;
+  appellationCode: AppellationCode;
+  businessName: string;
   conventionId?: ConventionId;
-} & DiscussionStatusWithRejection;
+  createdAt: DateString;
+  establishmentContact: DiscussionEstablishmentContact;
+  exchanges: Exchange[];
+  id: DiscussionId;
+  siret: SiretDto;
+} & DiscussionStatusWithRejection &
+  WithAcquisition;
+
+type SpecificDiscussionDto<
+  C extends ContactMethod,
+  D extends DiscussionKind,
+> = {
+  contactMethod: C;
+  kind: D;
+  potentialBeneficiary: DiscussionPotentialBeneficiary<D, C>;
+};
+
+type GenericDiscussionDto<
+  D extends DiscussionKind,
+  C extends ContactMethod,
+> = CommonDiscussionDto & SpecificDiscussionDto<C, D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = DiscussionRejected["rejectionKind"];
@@ -90,18 +148,54 @@ export type DiscussionPending = {
   status: "PENDING";
 };
 
-export type DiscussionDto = DiscussionDtoBase & {
-  establishmentContact: DiscussionEstablishmentContact;
-  appellationCode: AppellationCode;
-} & WithAcquisition;
+export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
 
-export type DiscussionReadDto = DiscussionDtoBase & {
+export type DiscussionDtoIF =
+  | GenericDiscussionDto<"IF", "EMAIL">
+  | GenericDiscussionDto<"IF", "IN_PERSON">
+  | GenericDiscussionDto<"IF", "PHONE">;
+
+export type DiscussionDto1Eleve1Stage =
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "EMAIL">
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "IN_PERSON">
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "PHONE">;
+
+export type DiscussionDtoEmail =
+  | GenericDiscussionDto<"IF", "EMAIL">
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "EMAIL">;
+
+export type DiscussionDtoPhone =
+  | GenericDiscussionDto<"IF", "PHONE">
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "PHONE">;
+
+export type DiscussionDtoInPerson =
+  | GenericDiscussionDto<"IF", "IN_PERSON">
+  | GenericDiscussionDto<"1_ELEVE_1_STAGE", "IN_PERSON">;
+
+export type GenericDiscussionReadDto<
+  D extends DiscussionKind,
+  C extends ContactMethod,
+> = OmitFromExistingKeys<
+  GenericDiscussionDto<D, C>,
+  | "establishmentContact"
+  | "appellationCode"
+  | "acquisitionCampaign"
+  | "acquisitionKeyword"
+> & {
   appellation: AppellationAndRomeDto;
   establishmentContact: OmitFromExistingKeys<
     DiscussionEstablishmentContact,
     "email" | "copyEmails" | "phone"
   >;
 };
+
+export type DiscussionReadDto =
+  | GenericDiscussionReadDto<"IF", "EMAIL">
+  | GenericDiscussionReadDto<"IF", "IN_PERSON">
+  | GenericDiscussionReadDto<"IF", "PHONE">
+  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "EMAIL">
+  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "IN_PERSON">
+  | GenericDiscussionReadDto<"1_ELEVE_1_STAGE", "PHONE">;
 
 export type Attachment = {
   name: string;
@@ -128,12 +222,11 @@ export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
 
 const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
 
-const defaultDiscussion: DiscussionDto = {
+const defaultDiscussion = {
   id: "9f6dad2c-6f02-11ec-90d6-0242ac120003",
   appellationCode: "11704",
   siret: "12345671234567",
   createdAt,
-  immersionObjective: "Confirmer un projet professionnel",
   businessName: "My default business name",
   address: {
     streetNumberAndAddress: "1 rue de la Paix",
@@ -150,9 +243,9 @@ const defaultDiscussion: DiscussionDto = {
     hasWorkingExperience: true,
     experienceAdditionalInformation: "my super experience",
     datePreferences: "my fake date preferences",
+    immersionObjective: "Confirmer un projet professionnel",
   },
   establishmentContact: {
-    contactMethod: "EMAIL",
     email: "estab@mail.com",
     copyEmails: ["copy@yolo.com"],
     firstName: "estab",
@@ -165,13 +258,15 @@ const defaultDiscussion: DiscussionDto = {
       subject: "Sujet de discussion",
       sentAt: createdAt,
       sender: "potentialBeneficiary",
-      message: "default message",
       recipient: "establishment",
+      message: "default message",
       attachments: [],
-    },
+    } satisfies Exchange,
   ],
   status: "PENDING",
-};
+  kind: "IF",
+  contactMethod: "EMAIL",
+} satisfies DiscussionDtoEmail;
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {
   romeCode: "M1808",
@@ -192,23 +287,10 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     return {
       ...rest,
       appellation: appellation,
-      potentialBeneficiary: {
-        firstName: this.discussion.potentialBeneficiary.firstName,
-        lastName: this.discussion.potentialBeneficiary.lastName,
-        resumeLink: this.discussion.potentialBeneficiary.resumeLink,
-        email: this.discussion.potentialBeneficiary.email,
-        phone: this.discussion.potentialBeneficiary.phone,
-        hasWorkingExperience:
-          this.discussion.potentialBeneficiary.hasWorkingExperience,
-        experienceAdditionalInformation:
-          this.discussion.potentialBeneficiary.experienceAdditionalInformation,
-        datePreferences: this.discussion.potentialBeneficiary.datePreferences,
-      },
       establishmentContact: {
         firstName: this.discussion.establishmentContact.firstName,
         lastName: this.discussion.establishmentContact.lastName,
         job: this.discussion.establishmentContact.job,
-        contactMethod: this.discussion.establishmentContact.contactMethod,
       },
     };
   }
@@ -245,6 +327,186 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     });
   }
 
+  public withContactMethod(contactMethod: ContactMethod) {
+    const { potentialBeneficiary, ...rest } = this.discussion;
+    if (contactMethod === "EMAIL") {
+      return new DiscussionBuilder(
+        (rest.kind === "IF"
+          ? {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                ...defaultDiscussion.potentialBeneficiary,
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                immersionObjective:
+                  defaultDiscussion.potentialBeneficiary.immersionObjective,
+              },
+            }
+          : {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+                datePreferences:
+                  defaultDiscussion.potentialBeneficiary.datePreferences,
+                phone: defaultDiscussion.potentialBeneficiary.phone,
+                immersionObjective:
+                  "Découvrir un métier ou un secteur d'activité",
+              },
+            }) satisfies DiscussionDtoEmail,
+      );
+    }
+
+    if (contactMethod === "PHONE") {
+      return new DiscussionBuilder(
+        rest.kind === "IF"
+          ? {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+              },
+            }
+          : {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+              },
+            },
+      );
+    }
+
+    if (contactMethod === "IN_PERSON") {
+      return new DiscussionBuilder(
+        (rest.kind === "IF"
+          ? {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+              },
+            }
+          : {
+              ...rest,
+              contactMethod,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+              },
+            }) satisfies DiscussionDtoInPerson,
+      );
+    }
+
+    throw new Error(
+      `Invalid contact method ${contactMethod} for discussion kind ${this.discussion.kind}`,
+    );
+  }
+
+  public withDiscussionKind(discussionKind: DiscussionKind) {
+    const { potentialBeneficiary, ...rest } = this.discussion;
+    if (rest.contactMethod === "EMAIL") {
+      return new DiscussionBuilder(
+        (discussionKind === "IF"
+          ? {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                ...defaultDiscussion.potentialBeneficiary,
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                immersionObjective:
+                  defaultDiscussion.potentialBeneficiary.immersionObjective,
+              },
+            }
+          : {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+                datePreferences:
+                  defaultDiscussion.potentialBeneficiary.datePreferences,
+                phone: defaultDiscussion.potentialBeneficiary.phone,
+                immersionObjective:
+                  "Découvrir un métier ou un secteur d'activité",
+              },
+            }) satisfies DiscussionDtoEmail,
+      );
+    }
+
+    if (rest.contactMethod === "PHONE") {
+      return new DiscussionBuilder(
+        discussionKind === "IF"
+          ? {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+              },
+            }
+          : {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+              },
+            },
+      );
+    }
+
+    if (rest.contactMethod === "IN_PERSON") {
+      return new DiscussionBuilder(
+        (discussionKind === "IF"
+          ? {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+              },
+            }
+          : {
+              ...rest,
+              kind: discussionKind,
+              potentialBeneficiary: {
+                email: potentialBeneficiary.email,
+                firstName: potentialBeneficiary.firstName,
+                lastName: potentialBeneficiary.lastName,
+                levelOfEducation: "2nde",
+              },
+            }) satisfies DiscussionDtoInPerson,
+      );
+    }
+
+    throw new Error(
+      `Invalid discussion kind ${discussionKind} for contact method ${this.discussion.contactMethod}`,
+    );
+  }
+
   public withEstablishmentContact(
     establishmentContact: Partial<DiscussionEstablishmentContact>,
   ) {
@@ -269,22 +531,95 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withImmersionObjective(immersionObjective: ImmersionObjective | null) {
-    return new DiscussionBuilder({
-      ...this.discussion,
-      immersionObjective,
-    });
+    if (this.discussion.contactMethod === "EMAIL") {
+      if (
+        this.discussion.kind === "1_ELEVE_1_STAGE" &&
+        immersionObjective === discoverObjective
+      ) {
+        return new DiscussionBuilder({
+          ...this.discussion,
+          potentialBeneficiary: {
+            ...this.discussion.potentialBeneficiary,
+            immersionObjective,
+          },
+        });
+      }
+      if (this.discussion.kind === "IF") {
+        return new DiscussionBuilder({
+          ...this.discussion,
+          potentialBeneficiary: {
+            ...this.discussion.potentialBeneficiary,
+            immersionObjective,
+          },
+        });
+      }
+    }
+
+    throw new Error(`Invalid immersion objective for ${this.discussion.kind}`);
   }
 
-  public withPotentialBeneficiary(
-    potentialBeneficiary: Partial<DiscussionPotentialBeneficiary>,
-  ) {
+  public withPotentialBeneficiaryEmail(email: Email) {
     return new DiscussionBuilder({
       ...this.discussion,
       potentialBeneficiary: {
         ...this.discussion.potentialBeneficiary,
-        ...potentialBeneficiary,
+        email,
       },
-    });
+    } as DiscussionDto);
+  }
+
+  public withPotentialBeneficiaryFirstname(firstName: string) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      potentialBeneficiary: {
+        ...this.discussion.potentialBeneficiary,
+        firstName,
+      },
+    } as DiscussionDto);
+  }
+
+  public withPotentialBeneficiaryLastName(lastName: string) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      potentialBeneficiary: {
+        ...this.discussion.potentialBeneficiary,
+        lastName,
+      },
+    } as DiscussionDto);
+  }
+
+  public withPotentialBeneficiaryPhone(phone: string) {
+    if (this.discussion.contactMethod !== "EMAIL") {
+      throw new Error(
+        `Invalid potentialBeneficiary with phone ${phone} for contactMethod ${this.discussion.contactMethod}`,
+      );
+    }
+
+    return new DiscussionBuilder({
+      ...this.discussion,
+      potentialBeneficiary: {
+        ...this.discussion.potentialBeneficiary,
+        phone,
+      },
+    } as DiscussionDto);
+  }
+
+  public withPotentialBeneficiaryResumeLink(resumeLink?: string) {
+    if (
+      this.discussion.contactMethod === "EMAIL" &&
+      this.discussion.kind === "IF"
+    ) {
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          resumeLink,
+        },
+      } as DiscussionDto);
+    }
+    throw new Error(
+      `Invalid potentialBeneficiary with resumeLink ${resumeLink} for contactMethod ${this.discussion.contactMethod} and discussionKind ${this.discussion.kind}`,
+    );
   }
 
   public withSiret(siret: SiretDto) {
