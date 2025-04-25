@@ -3,6 +3,7 @@ import {
   type ContactMethod,
   DiscussionBuilder,
   type DiscussionDto,
+  type DiscussionKind,
   type TemplatedEmail,
   cartographeAppellationAndRome,
   createOpaqueEmail,
@@ -42,36 +43,41 @@ describe("ContactRequestReminder", () => {
     discussionWith7DaysSinceBeneficiaryExchange,
     discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
     discussionWith8DaysSinceBeneficiaryExchange,
+    discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
   ] = (
     [
-      { date: subDays(now, 2), contactMethod: "EMAIL" },
-      { date: subDays(now, 3), contactMethod: "EMAIL" },
-      { date: subDays(now, 3), contactMethod: "PHONE" },
-      { date: subDays(now, 4), contactMethod: "EMAIL" },
-      { date: subDays(now, 6), contactMethod: "EMAIL" },
-      { date: subDays(now, 7), contactMethod: "EMAIL" },
-      { date: subDays(now, 7), contactMethod: "PHONE" },
-      { date: subDays(now, 8), contactMethod: "EMAIL" },
+      { date: subDays(now, 2), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 3), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 3), contactMethod: "PHONE", kind: "IF" },
+      { date: subDays(now, 4), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 6), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 7), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 7), contactMethod: "PHONE", kind: "IF" },
+      { date: subDays(now, 8), contactMethod: "EMAIL", kind: "IF" },
+      {
+        date: subDays(now, 3),
+        contactMethod: "EMAIL",
+        kind: "1_ELEVE_1_STAGE",
+      },
     ] satisfies {
       date: Date;
       contactMethod: ContactMethod;
+      kind: DiscussionKind;
     }[]
-  ).map(({ date, contactMethod }, index) =>
-    new DiscussionBuilder()
+  ).map(({ date, contactMethod }, index) => {
+    const builder = new DiscussionBuilder()
       .withId(uuid())
       .withEstablishmentContact({
-        contactMethod,
         email: `test-${index}@email.com`,
         firstName: `test-${index}`,
         lastName: `test-${index}`,
         phone: "0677889944",
       })
-      .withPotentialBeneficiary({
-        email: `benef-${index}@email.com`,
-        firstName: `mike-${index}`,
-        lastName: `portnoy-${index}`,
-        phone: "0677889944",
-      })
+      .withContactMethod(contactMethod)
+      .withPotentialBeneficiaryEmail(`benef-${index}@email.com`)
+      .withPotentialBeneficiaryFirstname(`mike-${index}`)
+      .withPotentialBeneficiaryLastName(`portnoy-${index}`)
+
       .withExchanges([
         {
           sender: "potentialBeneficiary",
@@ -82,9 +88,11 @@ describe("ContactRequestReminder", () => {
           attachments: [],
         },
       ])
-      .withCreatedAt(date)
-      .build(),
-  );
+      .withCreatedAt(date);
+    if (contactMethod === "EMAIL")
+      builder.withPotentialBeneficiaryPhone("0677889944");
+    return builder.build();
+  });
 
   let contactRequestReminder: ContactRequestReminder;
   let uow: InMemoryUnitOfWork;
@@ -93,7 +101,7 @@ describe("ContactRequestReminder", () => {
   beforeEach(() => {
     timeGateway = new CustomTimeGateway(now);
     const uuidGenerator = new TestUuidGenerator();
-    uuidGenerator.setNextUuids(["1", "2"]);
+    uuidGenerator.setNextUuids(["1", "2", "3", "4"]);
 
     uow = createInMemoryUow();
     contactRequestReminder = makeContactRequestReminder({
@@ -269,6 +277,7 @@ describe("ContactRequestReminder", () => {
         discussionWith7DaysSinceBeneficiaryExchange,
         discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
         discussionWith8DaysSinceBeneficiaryExchange,
+        discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
       ];
     });
 
@@ -278,7 +287,7 @@ describe("ContactRequestReminder", () => {
         undefined,
       );
 
-      expectToEqual(reminderQty, { numberOfNotifications: 2 });
+      expectToEqual(reminderQty, { numberOfNotifications: 3 });
       expectSavedNotificationsAndEvents({
         emails: [
           makeEstablishmentContactRequestReminder(
@@ -288,6 +297,11 @@ describe("ContactRequestReminder", () => {
           ),
           makeEstablishmentContactRequestReminder(
             discussionWith4DaysSinceBeneficiaryExchange,
+            domain,
+            "3days",
+          ),
+          makeEstablishmentContactRequestReminder(
+            discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
             domain,
             "3days",
           ),
