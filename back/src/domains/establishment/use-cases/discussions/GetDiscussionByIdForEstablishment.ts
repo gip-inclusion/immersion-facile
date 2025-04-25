@@ -42,7 +42,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     discussion: DiscussionDto,
     uow: UnitOfWork,
   ): Promise<DiscussionReadDto> {
-    const { appellationCode, ...rest } = discussion;
+    const { appellationCode, establishmentContact: _, ...rest } = discussion;
 
     const appellation = (
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
@@ -56,23 +56,10 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     return {
       ...rest,
       appellation,
-      potentialBeneficiary: {
-        firstName: discussion.potentialBeneficiary.firstName,
-        lastName: discussion.potentialBeneficiary.lastName,
-        resumeLink: discussion.potentialBeneficiary.resumeLink,
-        email: discussion.potentialBeneficiary.email,
-        phone: discussion.potentialBeneficiary.phone,
-        hasWorkingExperience:
-          discussion.potentialBeneficiary.hasWorkingExperience,
-        experienceAdditionalInformation:
-          discussion.potentialBeneficiary.experienceAdditionalInformation,
-        datePreferences: discussion.potentialBeneficiary.datePreferences,
-      },
       establishmentContact: {
         firstName: discussion.establishmentContact.firstName,
         lastName: discussion.establishmentContact.lastName,
         job: discussion.establishmentContact.job,
-        contactMethod: discussion.establishmentContact.contactMethod,
       },
     };
   }

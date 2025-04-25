@@ -157,6 +157,50 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
   });
 
   describe("Right paths", () => {
+    describe("Discussion with kinds and methods", () => {
+      it.each([
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("IF")
+          .withContactMethod("EMAIL")
+          .build(),
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("IF")
+          .withContactMethod("IN_PERSON")
+          .build(),
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("IF")
+          .withContactMethod("PHONE")
+          .build(),
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("1_ELEVE_1_STAGE")
+          .withContactMethod("EMAIL")
+          .build(),
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("1_ELEVE_1_STAGE")
+          .withContactMethod("IN_PERSON")
+          .build(),
+        new DiscussionBuilder(discussionWithUserEmailInContact)
+          .withDiscussionKind("1_ELEVE_1_STAGE")
+          .withContactMethod("PHONE")
+          .build(),
+      ])(
+        "Gets discussion with kind $kind and contact method $contactMethod based on establishment contact email",
+        async (discussion) => {
+          uow.discussionRepository.discussions = [discussion];
+
+          expectToEqual(
+            await getDiscussionByIdForEstablishment.execute(
+              discussionWithUserEmailInContact.id,
+              {
+                userId: user.id,
+              },
+            ),
+            new DiscussionBuilder(discussion).buildRead(),
+          );
+        },
+      );
+    });
+
     describe("email matching on discussion", () => {
       it("Gets the matching discussion based on establishment contact email", async () => {
         expectToEqual(
@@ -169,6 +213,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           new DiscussionBuilder(discussionWithUserEmailInContact).buildRead(),
         );
       });
+
       it("Gets the matching discussion based on establishment copy emails", async () => {
         const userOnCopyEmailsDiscussion = new DiscussionBuilder()
           .withEstablishmentContact({ copyEmails: [user.email] })
@@ -187,6 +232,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
           new DiscussionBuilder(userOnCopyEmailsDiscussion).buildRead(),
         );
       });
+
       it("Gets the matching discussion based on establishment copy emails and contact email", async () => {
         const userBothOnCopyEmailsAndContactEmailDiscussion =
           new DiscussionBuilder()
