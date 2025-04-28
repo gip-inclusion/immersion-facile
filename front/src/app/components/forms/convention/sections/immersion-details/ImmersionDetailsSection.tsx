@@ -145,10 +145,7 @@ export const ImmersionDetailsSection = () => {
           }))}
       />
 
-      <ConventionFormProfession
-        {...formContents.immersionAppellation}
-        initialFieldValue={values.immersionAppellation}
-      />
+      <ConventionFormProfession {...formContents.immersionAppellation} />
       <Input
         label={formContents.workConditions.label}
         hintText={formContents.workConditions.hintText}

@@ -53,14 +53,14 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
   describe(`${siretGatewayThroughBack.constructor.name} - manual`, () => {
     it("isSiretAlreadyInSaved - returns false if establishment with siret is in DB", async () => {
       const isSaved = await firstValueFrom(
-        siretGatewayThroughBack.isSiretAlreadySaved("40400000000404"),
+        siretGatewayThroughBack.isSiretAlreadySaved$("40400000000404"),
       );
       expect(isSaved).toBe(false);
     });
 
     it("gets siret when all is good", async () => {
       const response = await firstValueFrom(
-        siretGatewayThroughBack.getSiretInfo("12345678901234"),
+        siretGatewayThroughBack.getSiretInfo$("12345678901234"),
       );
       expectToEqual(response, {
         businessAddress: "20 AVENUE DE SEGUR 75007 PARIS 7",
@@ -109,7 +109,7 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
       siret: string,
       expectedInfoError: GetSiretInfoError,
     ) =>
-      firstValueFrom(siretGatewayThroughBack.getSiretInfo(siret)).then(
+      firstValueFrom(siretGatewayThroughBack.getSiretInfo$(siret)).then(
         (result) => {
           expect(result).toBe(expectedInfoError);
         },
@@ -120,7 +120,7 @@ siretGatewaysThroughBack.forEach((siretGatewayThroughBack) => {
       expectedInfoError: GetSiretInfoError,
     ) =>
       firstValueFrom(
-        siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved(siret),
+        siretGatewayThroughBack.getSiretInfoIfNotAlreadySaved$(siret),
       ).then((result) => {
         expect(result).toBe(expectedInfoError);
       });

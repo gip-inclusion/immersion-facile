@@ -49,23 +49,19 @@ const dependencies =
 
 // these are exported for usages in component, we should try to have less and less (logic should go in redux)
 const {
-  addressGateway,
   conventionGateway,
   searchGateway,
   localDeviceRepository,
   sessionDeviceRepository,
   technicalGateway,
-  formCompletionGateway,
 } = dependencies;
 
 export const outOfReduxDependencies = {
-  addressGateway,
   conventionGateway,
   searchGateway,
   localDeviceRepository,
   sessionDeviceRepository,
   technicalGateway,
-  formCompletionGateway,
 };
 
 export const store = createStore({

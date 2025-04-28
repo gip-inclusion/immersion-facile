@@ -59,9 +59,11 @@ export const MultipleAppellationInput = ({
                   locator={`multipleAppellation-${index}`}
                   disabled={disabled}
                   label={"Rechercher un métier *"}
-                  initialValue={currentAppellations[index]}
-                  onAppellationSelected={(selectedAppellation) => {
-                    onAppellationAdd(selectedAppellation, index);
+                  onAppellationSelected={(selectedAppellationMatch) => {
+                    onAppellationAdd(
+                      selectedAppellationMatch.appellation,
+                      index,
+                    );
                   }}
                   onAppellationClear={() => {
                     onAppellationDelete(index);

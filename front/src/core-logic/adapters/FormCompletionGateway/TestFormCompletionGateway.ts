@@ -1,10 +1,5 @@
 import { BehaviorSubject, type Observable, Subject, delay, of } from "rxjs";
-import {
-  type AppellationMatchDto,
-  type GetSiretInfo,
-  type RomeDto,
-  sleep,
-} from "shared";
+import type { AppellationMatchDto, GetSiretInfo, RomeDto } from "shared";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 
 export class TestFormCompletionGateway implements FormCompletionGateway {
@@ -15,6 +10,8 @@ export class TestFormCompletionGateway implements FormCompletionGateway {
   public isSiretInDb$ = new Subject<boolean>();
 
   public siretInfo$ = new Subject<GetSiretInfo>();
+
+  public appellationDtoMatching$ = new Subject<AppellationMatchDto[]>();
 
   readonly #romeDtos$: Subject<RomeDto[]>;
 
@@ -27,64 +24,10 @@ export class TestFormCompletionGateway implements FormCompletionGateway {
       : new Subject<RomeDto[]>();
   }
 
-  public async getAppellationDtoMatching(
-    searchText: string,
-  ): Promise<AppellationMatchDto[]> {
-    await sleep(700);
-    if (searchText === "givemeanemptylistplease") return [];
-    if (searchText === "givemeanerrorplease")
-      throw new Error("418 I'm a teapot");
-    return [
-      {
-        appellation: {
-          appellationLabel:
-            "Agent(e) chargé(e) protection, sauvegarde patrimoine naturel",
-          romeCode: "A1204",
-          romeLabel: "Agent",
-          appellationCode: "11204",
-        },
-        matchRanges: [{ startIndexInclusive: 9, endIndexExclusive: 13 }],
-      },
-      {
-        appellation: {
-          romeCode: "A1111",
-          appellationCode: "11111",
-          romeLabel: "Boulangerie",
-          appellationLabel: "Boulanger - boulangère",
-        },
-        matchRanges: [
-          { startIndexInclusive: 0, endIndexExclusive: 3 },
-          { startIndexInclusive: 5, endIndexExclusive: 8 },
-        ],
-      },
-      {
-        appellation: {
-          romeCode: "B2222",
-          appellationCode: "22222",
-          romeLabel: "Boucherie",
-          appellationLabel: "Boucher - Bouchère",
-        },
-        matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 3 }],
-      },
-      {
-        appellation: {
-          romeCode: "C3333",
-          appellationCode: "33333",
-          romeLabel: "Menuiserie",
-          appellationLabel: "Menuisier - Menuisière",
-        },
-        matchRanges: [],
-      },
-      {
-        appellation: {
-          romeCode: "D4444",
-          appellationCode: "44444",
-          romeLabel: "Vente",
-          appellationLabel: "Veudeuse - Veudeur",
-        },
-        matchRanges: [{ startIndexInclusive: 0, endIndexExclusive: 7 }],
-      },
-    ];
+  public getAppellationDtoMatching$(
+    _searchText: string,
+  ): Observable<AppellationMatchDto[]> {
+    return this.appellationDtoMatching$;
   }
 
   public getRomeDtoMatching(searchText: string): Observable<RomeDto[]> {
@@ -97,17 +40,17 @@ export class TestFormCompletionGateway implements FormCompletionGateway {
       : this.#romeDtos$;
   }
 
-  public getSiretInfo(): Observable<GetSiretInfo> {
+  public getSiretInfo$(): Observable<GetSiretInfo> {
     this.getSiretInfoCallCount++;
     return this.siretInfo$;
   }
 
-  public getSiretInfoIfNotAlreadySaved(): Observable<GetSiretInfo> {
+  public getSiretInfoIfNotAlreadySaved$(): Observable<GetSiretInfo> {
     this.getSiretInfoIfNotAlreadySavedCallCount++;
     return this.siretInfo$;
   }
 
-  public isSiretAlreadySaved(): Observable<boolean> {
+  public isSiretAlreadySaved$(): Observable<boolean> {
     return this.isSiretInDb$;
   }
 

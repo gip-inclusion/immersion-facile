@@ -1,4 +1,11 @@
-import { BehaviorSubject, type Observable, Subject, delay, of } from "rxjs";
+import {
+  BehaviorSubject,
+  type Observable,
+  Subject,
+  delay,
+  from,
+  of,
+} from "rxjs";
 import {
   type AppellationMatchDto,
   type GetSiretInfo,
@@ -31,6 +38,12 @@ export class SimulatedFormCompletionGateway implements FormCompletionGateway {
     this.#romeDtos$ = seedRomeDtos
       ? new BehaviorSubject(seedRomeDtos)
       : new Subject<RomeDto[]>();
+  }
+
+  public getAppellationDtoMatching$(
+    searchText: string,
+  ): Observable<AppellationMatchDto[]> {
+    return from(this.getAppellationDtoMatching(searchText));
   }
 
   public async getAppellationDtoMatching(
@@ -103,20 +116,20 @@ export class SimulatedFormCompletionGateway implements FormCompletionGateway {
       : this.#romeDtos$;
   }
 
-  public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
+  public getSiretInfo$(siret: SiretDto): Observable<GetSiretInfo> {
     const response$ = of(this.#simulatedResponse(siret));
     return this.simulatedLatency
       ? response$.pipe(delay(this.simulatedLatency))
       : response$;
   }
 
-  public getSiretInfoIfNotAlreadySaved(
+  public getSiretInfoIfNotAlreadySaved$(
     siret: SiretDto,
   ): Observable<GetSiretInfo> {
-    return this.getSiretInfo(siret);
+    return this.getSiretInfo$(siret);
   }
 
-  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+  public isSiretAlreadySaved$(siret: SiretDto): Observable<boolean> {
     const response = this.#simulatedResponse(siret);
     const response$ = of(
       response === "Establishment with this siret is already in our DB",
