@@ -20,7 +20,10 @@ export const CreationSiretRelatedInputs = () => {
     isFetchingSiret,
     siretErrorToDisplay,
     updateSiret,
-  } = useSiretFetcher({ shouldFetchEvenIfAlreadySaved: false });
+  } = useSiretFetcher({
+    shouldFetchEvenIfAlreadySaved: false,
+    addressAutocompleteLocator: "establishmentAddress",
+  });
   const {
     setValue,
     register,

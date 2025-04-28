@@ -18,10 +18,11 @@ type SiretEpic = AppEpic<SiretAction>;
 const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
   action$.pipe(
     filter(siretSlice.actions.setShouldFetchEvenIfAlreadySaved.match),
-    map(() =>
+    map((action) =>
       siretSlice.actions.siretModified({
         siret: state$.value.siret.currentSiret,
         feedbackTopic: "siret-input",
+        addressAutocompleteLocator: action.payload.addressAutocompleteLocator,
       }),
     ),
   );
@@ -63,6 +64,8 @@ const getSiretEpic: SiretEpic = (
             : siretSlice.actions.siretInfoSucceeded({
                 siretEstablishment: siretResult,
                 feedbackTopic: action.payload.feedbackTopic,
+                addressAutocompleteLocator:
+                  action.payload.addressAutocompleteLocator,
               });
         }),
         catchEpicError((error) =>

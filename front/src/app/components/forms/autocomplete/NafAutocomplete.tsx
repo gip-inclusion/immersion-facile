@@ -11,7 +11,8 @@ import { nafSlice } from "src/core-logic/domain/naf/naf.slice";
 
 export type NafAutocompleteProps = RSAutocompleteComponentProps<
   "naf",
-  NafSectionSuggestion
+  NafSectionSuggestion,
+  "searchNaf"
 > & {
   initialValue?: NafSectionSuggestion;
 };

@@ -43,10 +43,7 @@ import {
   makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
-import {
-  AddressAutocomplete,
-  addressStringToFakeAddressAndPosition,
-} from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   AgencySelector,
   departmentOptions,
@@ -136,7 +133,6 @@ export const ConventionForm = ({
   const isLoading = useAppSelector(conventionSelectors.isLoading);
 
   const isFetchingSiret = useAppSelector(siretSelectors.isFetching);
-  const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
   const establishmentNumberEmployeesRange = useAppSelector(
     siretSelectors.establishmentInfos,
   )?.numberEmployeesRange;
@@ -162,7 +158,10 @@ export const ConventionForm = ({
       ),
     },
   }).current;
-  useExistingSiret(initialValues.siret);
+  useExistingSiret({
+    siret: initialValues.siret,
+    addressAutocompleteLocator: "conventionImmersionAddress",
+  });
 
   const reduxFormUiReady =
     useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
@@ -369,14 +368,6 @@ export const ConventionForm = ({
     }
   }, [fetchedConvention, reset]);
 
-  const getBusinessAddressInitialValue = () => {
-    const businessAddress =
-      conventionValues.immersionAddress ?? establishmentInfos?.businessAddress;
-    return businessAddress
-      ? addressStringToFakeAddressAndPosition(businessAddress)
-      : undefined;
-  };
-
   return (
     <FormProvider {...methods}>
       {conventionIsLoading && <Loader />}
@@ -497,12 +488,12 @@ export const ConventionForm = ({
                   >
                     <AddressAutocomplete
                       {...formContents.immersionAddress}
-                      initialValue={getBusinessAddressInitialValue()}
                       selectProps={{
                         inputId:
                           domElementIds.conventionImmersionRoute
                             .conventionSection.immersionAddress,
                       }}
+                      locator="conventionImmersionAddress"
                       onAddressSelected={(addressAndPosition) => {
                         setValue(
                           "immersionAddress",

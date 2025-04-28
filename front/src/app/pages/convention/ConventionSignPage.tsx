@@ -82,7 +82,10 @@ const ConventionSignPageContent = ({
     );
   }, [jwt, dispatch]);
 
-  useExistingSiret(convention?.siret);
+  useExistingSiret({
+    siret: convention?.siret,
+    addressAutocompleteLocator: "conventionImmersionAddress",
+  });
 
   const t = useConventionTexts(
     convention ? convention.internshipKind : "immersion",

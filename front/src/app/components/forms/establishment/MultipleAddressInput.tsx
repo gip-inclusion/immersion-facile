@@ -1,10 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import type { AddressDto, FormEstablishmentAddress } from "shared";
-import {
-  AddressAutocomplete,
-  addressStringToFakeAddressAndPosition,
-} from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { useStyles } from "tss-react/dsfr";
 
 type MultipleAddressInputProps = {
@@ -48,15 +45,11 @@ export const MultipleAddressInput = ({
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AddressAutocomplete
                 disabled={disabled}
+                locator={`multipleAddress-${index}`}
                 label={"Rechercher un lieu *"}
                 selectProps={{
                   inputId: `${id}-${index}`,
                 }}
-                initialValue={
-                  address.rawAddress
-                    ? addressStringToFakeAddressAndPosition(address.rawAddress)
-                    : undefined
-                }
                 onAddressSelected={(addressAndPosition) => {
                   onAddressAdded(addressAndPosition.address, index);
                 }}

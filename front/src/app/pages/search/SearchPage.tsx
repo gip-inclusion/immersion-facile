@@ -253,6 +253,7 @@ export const SearchPage = ({
               >
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                   <AppellationAutocomplete
+                    locator="searchAppellation"
                     label={appellationInputLabel}
                     initialValue={
                       formValues.appellations
@@ -276,6 +277,7 @@ export const SearchPage = ({
                 </div>
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                   <PlaceAutocomplete
+                    locator="searchPlace"
                     label={placeInputLabel}
                     initialInputValue={place}
                     onPlaceSelected={(lookupSearchResult) => {
@@ -389,6 +391,7 @@ export const SearchPage = ({
                   content: (
                     <>
                       <AppellationAutocomplete
+                        locator="searchAppellation"
                         className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
                         initialValue={
@@ -428,6 +431,7 @@ export const SearchPage = ({
                         </p>
                       )}
                       <NafAutocomplete
+                        locator="searchNaf"
                         label="Et / ou un secteur d'activité"
                         onNafSelected={(nafSectionSuggestion) => {
                           setTempValue({
@@ -489,6 +493,7 @@ export const SearchPage = ({
                   content: (
                     <>
                       <PlaceAutocomplete
+                        locator="searchPlace"
                         label={placeInputLabel}
                         onPlaceSelected={(lookupSearchResult) => {
                           if (!lookupSearchResult) return;

@@ -13,7 +13,8 @@ import { outOfReduxDependencies } from "src/config/dependencies";
 
 export type AppellationAutocompleteProps = RSAutocompleteComponentProps<
   "appellation",
-  AppellationAndRomeDto
+  AppellationAndRomeDto,
+  "searchAppellation" | "conventionProfession" | `multipleAppellation-${number}`
 > & {
   useNaturalLanguage?: boolean;
   initialValue?: AppellationAndRomeDto;

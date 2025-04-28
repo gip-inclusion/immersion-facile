@@ -33,7 +33,16 @@ export const fillAutocomplete = async ({
   value: string;
   endpoint?: string;
 }) => {
-  await page.locator(locator).fill(value);
+  const controlWrapper = page.locator(".im-select__control", {
+    has: page.locator(locator),
+  });
+  const clearButton = controlWrapper.locator(".im-select__clear-indicator");
+  if (await clearButton.isVisible()) {
+    await clearButton.click();
+  }
+  await page.locator(locator).pressSequentially(value, {
+    delay: 50,
+  });
   if (endpoint) {
     await page.waitForResponse(`**${endpoint}**`);
   }
@@ -41,12 +50,10 @@ export const fillAutocomplete = async ({
   await listbox.waitFor();
   const listboxId = await listbox.getAttribute("aria-controls");
   await expect(listboxId).not.toBeNull();
-  const firstOption = page
-    .locator(
-      `#${listboxId} > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
-    )
-    .first();
-  await firstOption.waitFor();
+  const options = await page.locator(
+    `#${listboxId} > div:not(.im-select__menu-notice--loading, .im-select__menu-notice--no-options)`,
+  );
+  const firstOption = await options.first();
   await expect(firstOption).toBeVisible();
   await firstOption.click();
 };
