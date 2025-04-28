@@ -80,6 +80,7 @@ import {
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
   type RenewMagicLinkResponse,
+  SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   type SendSignatureLinkRequestDto,
   type Signatories,
   type TransferConventionToAgencyRequestDto,
@@ -331,6 +332,7 @@ export const conventionSchema: z.Schema<ConventionDto> = conventionCommonSchema
     );
 
     addIssuesIfDuplicateSignatoriesEmails(convention, addIssue);
+    addIssuesIfDuplicateSignatoriesPhoneNumbers(convention, addIssue);
     addIssueIfDuplicateEmailsBetweenSignatoriesAndTutor(convention, addIssue);
 
     if (convention.internshipKind === "mini-stage-cci") {
@@ -535,6 +537,12 @@ export const markPartnersErroredConventionAsHandledRequestSchema: z.Schema<MarkP
 export const isConventionOld = (dateEnd: DateString) =>
   new Date(dateEnd).getTime() <= DATE_CONSIDERED_OLD.getTime();
 
+const isConventionBeforeDistinctSignatoriesPhoneNumbersReleaseDate = (
+  conventionSubimissionDate: DateString,
+) =>
+  new Date(conventionSubimissionDate).getTime() <=
+  SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE.getTime();
+
 const addIssuesIfDuplicateSignatoriesEmails = (
   convention: ConventionDto,
   addIssue: (message: string, path: string) => void,
@@ -555,6 +563,38 @@ const addIssuesIfDuplicateSignatoriesEmails = (
       addIssue(
         localization.signatoriesDistinctEmails,
         getConventionFieldName(`signatories.${signatory.key}.email`),
+      );
+  });
+};
+
+const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
+  convention: ConventionDto,
+  addIssue: (message: string, path: string) => void,
+) => {
+  if (
+    isConventionBeforeDistinctSignatoriesPhoneNumbersReleaseDate(
+      convention.dateSubmission,
+    )
+  )
+    return;
+  const signatoriesWithPhoneNumber = Object.entries(convention.signatories)
+    .filter(([_, value]) => !!value)
+    .map(([key, value]) => ({
+      key: key as keyof Signatories,
+      phoneNumber: value.phone,
+    }));
+  signatoriesWithPhoneNumber.forEach((signatory) => {
+    if (
+      signatoriesWithPhoneNumber
+        .filter((otherSignatory) => otherSignatory.key !== signatory.key)
+        .some(
+          (otherSignatory) =>
+            otherSignatory.phoneNumber === signatory.phoneNumber,
+        )
+    )
+      addIssue(
+        localization.signatoriesDistinctPhoneNumbers,
+        getConventionFieldName(`signatories.${signatory.key}.phone`),
       );
   });
 };
