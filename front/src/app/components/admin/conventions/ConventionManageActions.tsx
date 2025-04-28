@@ -573,49 +573,72 @@ export const ConventionManageActions = ({
           </>
         )}
 
-        {isAllowedConventionTransition(convention, "CANCELLED", roles) && (
-          <>
-            {shouldShowAssessmentAnbandonAction ? (
-              <ButtonWithSubMenu
-                buttonLabel={t.verification.markAsCancelled}
-                openedTop={true}
-                navItems={[
-                  {
-                    ...getVerificationActionProps({
-                      initialStatus: convention.status,
-                      children: t.verification.markAsCancelled,
-                      modalTitle: t.verification.markAsCancelled,
-                      verificationAction: "CANCEL",
-                      convention,
-                      disabled:
-                        disabled ||
-                        convention.status !== "ACCEPTED_BY_VALIDATOR",
+        {isAllowedConventionTransition(convention, "CANCELLED", roles) &&
+          !assessment && (
+            <>
+              {shouldShowAssessmentAnbandonAction ? (
+                <ButtonWithSubMenu
+                  buttonLabel={t.verification.markAsCancelled}
+                  openedTop={true}
+                  navItems={[
+                    {
+                      ...getVerificationActionProps({
+                        initialStatus: convention.status,
+                        children: t.verification.markAsCancelled,
+                        modalTitle: t.verification.markAsCancelled,
+                        verificationAction: "CANCEL",
+                        convention,
+                        disabled:
+                          disabled ||
+                          convention.status !== "ACCEPTED_BY_VALIDATOR",
 
-                      currentSignatoryRoles: requesterRoles,
-                      onSubmit: createOnSubmitWithFeedbackKind,
-                    }).buttonProps,
-                    id: domElementIds.manageConvention
-                      .conventionValidationCancelButton,
-                    iconId: "fr-icon-close-circle-line",
-                  },
-                  {
-                    linkProps: {
-                      href: routes.assessment({
-                        jwt: jwtParams.jwt,
-                        conventionId: convention.id,
-                      }).href,
+                        currentSignatoryRoles: requesterRoles,
+                        onSubmit: createOnSubmitWithFeedbackKind,
+                      }).buttonProps,
+                      id: domElementIds.manageConvention
+                        .conventionValidationCancelButton,
+                      iconId: "fr-icon-close-circle-line",
                     },
-                    children: "Déclarer un abandon",
-                    id: domElementIds.manageConvention.abandonAssessmentButton,
-                  },
-                ]}
-                priority={"secondary"}
-                buttonIconId="fr-icon-arrow-down-s-line"
-                iconPosition="right"
-                id={domElementIds.manageConvention.editActionsButton}
-              />
-            ) : (
-              <Button
+                    {
+                      linkProps: {
+                        href: routes.assessment({
+                          jwt: jwtParams.jwt,
+                          conventionId: convention.id,
+                        }).href,
+                      },
+                      children: "Déclarer un abandon",
+                      id: domElementIds.manageConvention
+                        .abandonAssessmentButton,
+                    },
+                  ]}
+                  priority={"secondary"}
+                  buttonIconId="fr-icon-arrow-down-s-line"
+                  iconPosition="right"
+                  id={domElementIds.manageConvention.editActionsButton}
+                />
+              ) : (
+                <Button
+                  {...getVerificationActionProps({
+                    initialStatus: convention.status,
+                    children: t.verification.markAsCancelled,
+                    modalTitle: t.verification.markAsCancelled,
+                    verificationAction: "CANCEL",
+                    convention,
+                    disabled:
+                      disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
+
+                    currentSignatoryRoles: requesterRoles,
+                    onSubmit: createOnSubmitWithFeedbackKind,
+                  }).buttonProps}
+                  iconId="fr-icon-close-circle-line"
+                  id={
+                    domElementIds.manageConvention
+                      .conventionValidationCancelButton
+                  }
+                />
+              )}
+
+              <ModalWrapper
                 {...getVerificationActionProps({
                   initialStatus: convention.status,
                   children: t.verification.markAsCancelled,
@@ -627,30 +650,13 @@ export const ConventionManageActions = ({
 
                   currentSignatoryRoles: requesterRoles,
                   onSubmit: createOnSubmitWithFeedbackKind,
-                }).buttonProps}
-                iconId="fr-icon-close-circle-line"
-                id={
-                  domElementIds.manageConvention
-                    .conventionValidationCancelButton
-                }
+                }).modalWrapperProps}
               />
-            )}
+            </>
+          )}
 
-            <ModalWrapper
-              {...getVerificationActionProps({
-                initialStatus: convention.status,
-                children: t.verification.markAsCancelled,
-                modalTitle: t.verification.markAsCancelled,
-                verificationAction: "CANCEL",
-                convention,
-                disabled:
-                  disabled || convention.status !== "ACCEPTED_BY_VALIDATOR",
-
-                currentSignatoryRoles: requesterRoles,
-                onSubmit: createOnSubmitWithFeedbackKind,
-              }).modalWrapperProps}
-            />
-
+        {
+          <>
             {shouldShowAssessmentDocumentAction && (
               <Button
                 id={domElementIds.manageConvention.assessmentDocumentButton}
@@ -704,7 +710,7 @@ export const ConventionManageActions = ({
               Voir la convention
             </Button>
           </>
-        )}
+        }
 
         {isConventionValidated(convention) &&
           !isConventionRenewed(convention) &&
