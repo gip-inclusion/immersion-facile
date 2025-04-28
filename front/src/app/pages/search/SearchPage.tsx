@@ -255,13 +255,8 @@ export const SearchPage = ({
                   <AppellationAutocomplete
                     locator="searchAppellation"
                     label={appellationInputLabel}
-                    initialValue={
-                      formValues.appellations
-                        ? formValues.appellations[0]
-                        : undefined
-                    }
-                    onAppellationSelected={(newAppellationAndRome) => {
-                      setValue("appellations", [newAppellationAndRome]);
+                    onAppellationSelected={(appellationMatch) => {
+                      setValue("appellations", [appellationMatch.appellation]);
                     }}
                     onAppellationClear={() => {
                       setValue("appellations", undefined);
@@ -272,7 +267,6 @@ export const SearchPage = ({
                         ? "Ex : Boulanger, faire du pain, etc"
                         : "Ex : Boulanger, styliste, etc",
                     }}
-                    useNaturalLanguage={useNaturalLanguageForAppellations}
                   />
                 </div>
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
@@ -394,15 +388,10 @@ export const SearchPage = ({
                         locator="searchAppellation"
                         className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
-                        initialValue={
-                          route.params.appellations
-                            ? route.params.appellations[0]
-                            : undefined
-                        }
-                        onAppellationSelected={(newAppellationAndRome) => {
+                        onAppellationSelected={(appellationMatch) => {
                           setTempValue({
                             ...tempValue,
-                            appellations: [newAppellationAndRome],
+                            appellations: [appellationMatch.appellation],
                           });
                         }}
                         onAppellationClear={() => {
@@ -417,7 +406,6 @@ export const SearchPage = ({
                             ? "Ex : Boulanger, faire du pain, etc"
                             : "Ex : Boulanger, styliste, etc",
                         }}
-                        useNaturalLanguage={useNaturalLanguageForAppellations}
                       />
                       {tempValue.appellations?.length && (
                         <p className={fr.cx("fr-hint-text", "fr-mt-2w")}>

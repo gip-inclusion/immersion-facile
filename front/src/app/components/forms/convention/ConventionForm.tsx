@@ -98,6 +98,7 @@ import {
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
+import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
 import { ShareConventionLink } from "./ShareConventionLink";
 
@@ -365,8 +366,15 @@ export const ConventionForm = ({
   useEffect(() => {
     if (fetchedConvention) {
       reset(fetchedConvention);
+      dispatch(
+        siretSlice.actions.siretModified({
+          siret: fetchedConvention.siret,
+          addressAutocompleteLocator: "conventionImmersionAddress",
+          feedbackTopic: "siret-input",
+        }),
+      );
     }
-  }, [fetchedConvention, reset]);
+  }, [fetchedConvention, reset, dispatch]);
 
   return (
     <FormProvider {...methods}>

@@ -14,14 +14,12 @@ type ConventionFormProfessionProps = {
   label: string;
   hintText?: ReactNode;
   disabled?: boolean;
-  initialFieldValue: AppellationAndRomeDto;
 };
 
 export const ConventionFormProfession = ({
   label,
   hintText,
   disabled,
-  initialFieldValue,
 }: ConventionFormProfessionProps) => {
   const {
     setValue,
@@ -51,22 +49,27 @@ export const ConventionFormProfession = ({
         <AppellationAutocomplete
           locator="conventionProfession"
           label={label}
-          initialValue={initialFieldValue}
           selectProps={{
             inputId:
               domElementIds.conventionImmersionRoute.conventionSection
                 .immersionAppellation,
           }}
-          onAppellationSelected={(appellation) => {
-            setValue("immersionAppellation.romeCode", appellation.romeCode);
-            setValue("immersionAppellation.romeLabel", appellation.romeLabel);
+          onAppellationSelected={(appellationMatch) => {
+            setValue(
+              "immersionAppellation.romeCode",
+              appellationMatch.appellation.romeCode,
+            );
+            setValue(
+              "immersionAppellation.romeLabel",
+              appellationMatch.appellation.romeLabel,
+            );
             setValue(
               "immersionAppellation.appellationCode",
-              appellation.appellationCode,
+              appellationMatch.appellation.appellationCode,
             );
             setValue(
               "immersionAppellation.appellationLabel",
-              appellation.appellationLabel,
+              appellationMatch.appellation.appellationLabel,
             );
           }}
           hintText={hintText}

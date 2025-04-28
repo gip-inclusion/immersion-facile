@@ -18,6 +18,13 @@ import { P, match } from "ts-pattern";
 export class HttpFormCompletionGateway implements FormCompletionGateway {
   constructor(private readonly httpClient: HttpClient<FormCompletionRoutes>) {}
 
+  public getAppellationDtoMatching$(
+    searchText: string,
+    useNaturalLanguage: boolean,
+  ): Observable<AppellationMatchDto[]> {
+    return from(this.getAppellationDtoMatching(searchText, useNaturalLanguage));
+  }
+
   public getAppellationDtoMatching(
     searchText: string,
     useNaturalLanguage: boolean,
@@ -36,7 +43,7 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
       );
   }
 
-  public getSiretInfo(siret: SiretDto): Observable<GetSiretInfo> {
+  public getSiretInfo$(siret: SiretDto): Observable<GetSiretInfo> {
     return from(
       this.httpClient
         .getSiretInfo({ urlParams: { siret } })
@@ -44,7 +51,7 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
     );
   }
 
-  public getSiretInfoIfNotAlreadySaved(
+  public getSiretInfoIfNotAlreadySaved$(
     siret: SiretDto,
   ): Observable<GetSiretInfo> {
     return from(
@@ -54,7 +61,7 @@ export class HttpFormCompletionGateway implements FormCompletionGateway {
     );
   }
 
-  public isSiretAlreadySaved(siret: SiretDto): Observable<boolean> {
+  public isSiretAlreadySaved$(siret: SiretDto): Observable<boolean> {
     return from(
       this.httpClient
         .isSiretAlreadySaved({ urlParams: { siret } })

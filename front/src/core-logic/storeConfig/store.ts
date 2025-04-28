@@ -56,6 +56,8 @@ import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { agenciesEpics } from "../domain/agencies/agencies.epics";
 import { agenciesSlice } from "../domain/agencies/agencies.slice";
+import { appellationEpics } from "../domain/appellation/appellation.epics";
+import { appellationSlice } from "../domain/appellation/appellation.slice";
 import { authEpics } from "../domain/auth/auth.epics";
 import { conventionEpics } from "../domain/convention/convention.epics";
 import { conventionSlice } from "../domain/convention/convention.slice";
@@ -76,34 +78,35 @@ const allEpics: AppEpic<any>[] = [
   ...agenciesAdminEpics,
   ...agenciesEpics,
   ...apiConsumerEpics,
+  ...appellationEpics,
   ...assessmentEpics,
   ...authEpics,
+  ...conventionActionEpics,
   ...conventionEpics,
+  ...createUserOnAgencyEpics,
   ...dashboardUrlsEpics,
   ...discussionEpics,
   ...establishmentBatchEpics,
   ...establishmentEpics,
   ...establishmentLeadEpics,
   ...featureFlagEpics,
+  ...fetchAgencyEpics,
+  ...fetchUserEpics,
+  ...geocodingEpics,
   ...geosearchEpics,
   ...icUsersAdminEpics,
   ...inclusionConnectedEpics,
+  ...listUsersEpics,
+  ...nafEpics,
   ...notificationsEpics,
   ...partnersErroredConventionEpics,
+  ...removeUserFromAgencyEpics,
   ...rootAppEpics,
   ...searchEpics,
-  ...siretEpics,
-  ...listUsersEpics,
-  ...fetchUserEpics,
-  ...updateUserOnAgencyEpics,
-  ...fetchAgencyEpics,
-  ...updateAgencyEpics,
-  ...createUserOnAgencyEpics,
-  ...removeUserFromAgencyEpics,
-  ...nafEpics,
   ...sendSignatureLinkEpics,
-  ...conventionActionEpics,
-  ...geocodingEpics,
+  ...siretEpics,
+  ...updateAgencyEpics,
+  ...updateUserOnAgencyEpics,
 ];
 
 const appReducer = combineReducers({
@@ -125,6 +128,7 @@ const appReducer = combineReducers({
   }),
   [agencyAdminSlice.name]: agencyAdminSlice.reducer,
   [agenciesSlice.name]: agenciesSlice.reducer,
+  [appellationSlice.name]: appellationSlice.reducer,
   [assessmentSlice.name]: assessmentSlice.reducer,
   [authSlice.name]: authSlice.reducer,
   [conventionSlice.name]: conventionSlice.reducer,
