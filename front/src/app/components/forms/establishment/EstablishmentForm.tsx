@@ -170,11 +170,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const formValues = getValues();
   const debouncedFormValues = useDebounce(formValues);
 
-  useInitialSiret(
-    (isEstablishmentCreation || isEstablishmentDashboard) && route.params.siret
-      ? route.params.siret
-      : "",
-  );
+  useInitialSiret({
+    siret:
+      (isEstablishmentCreation || isEstablishmentDashboard) &&
+      route.params.siret
+        ? route.params.siret
+        : "",
+    addressAutocompleteLocator: "multipleAddress-0",
+  });
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 
   useEffect(() => {

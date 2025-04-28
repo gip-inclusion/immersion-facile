@@ -64,6 +64,8 @@ import { discussionSlice } from "../domain/discussion/discussion.slice";
 import { establishmentSlice } from "../domain/establishment/establishment.slice";
 import { establishmentBatchEpics } from "../domain/establishmentBatch/establishmentBatch.epics";
 import { establishmentBatchSlice } from "../domain/establishmentBatch/establishmentBatch.slice";
+import { geocodingEpics } from "../domain/geocoding/geocoding.epics";
+import { geocodingSlice } from "../domain/geocoding/geocoding.slice";
 import { geosearchEpics } from "../domain/geosearch/geosearch.epics";
 import { geosearchSlice } from "../domain/geosearch/geosearch.slice";
 import { partnersErroredConventionEpics } from "../domain/partnersErroredConvention/partnersErroredConvention.epics";
@@ -101,6 +103,7 @@ const allEpics: AppEpic<any>[] = [
   ...nafEpics,
   ...sendSignatureLinkEpics,
   ...conventionActionEpics,
+  ...geocodingEpics,
 ];
 
 const appReducer = combineReducers({
@@ -131,6 +134,7 @@ const appReducer = combineReducers({
   [establishmentSlice.name]: establishmentSlice.reducer,
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
+  [geocodingSlice.name]: geocodingSlice.reducer,
   [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,

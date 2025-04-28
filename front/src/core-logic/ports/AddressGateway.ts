@@ -7,6 +7,6 @@ import type {
 } from "shared";
 
 export interface AddressGateway {
-  lookupStreetAddress(lookup: LookupAddress): Promise<AddressAndPosition[]>;
+  lookupStreetAddress$(lookup: LookupAddress): Observable<AddressAndPosition[]>;
   lookupLocation$(query: LookupLocationInput): Observable<LookupSearchResult[]>;
 }

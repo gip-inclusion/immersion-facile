@@ -5,6 +5,7 @@ import type {
   SiretEstablishmentDto,
 } from "shared";
 import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
 import type { ActionOfSlice } from "src/core-logic/storeConfig/redux.helpers";
 
 export type InvalidSiretError = "SIRET must be 14 digits";
@@ -31,13 +32,20 @@ export const siretSlice = createSlice({
   reducers: {
     setShouldFetchEvenIfAlreadySaved: (
       state,
-      action: PayloadAction<boolean>,
+      action: PayloadAction<{
+        shouldFetchEvenIfAlreadySaved: boolean;
+        addressAutocompleteLocator: AddressAutocompleteLocator;
+      }>,
     ) => {
-      state.shouldFetchEvenIfAlreadySaved = action.payload;
+      state.shouldFetchEvenIfAlreadySaved =
+        action.payload.shouldFetchEvenIfAlreadySaved;
     },
     siretModified: (
       state,
-      action: PayloadActionWithFeedbackTopic<{ siret: SiretDto }>,
+      action: PayloadActionWithFeedbackTopic<{
+        siret: SiretDto;
+        addressAutocompleteLocator: AddressAutocompleteLocator;
+      }>,
     ) => {
       state.currentSiret = action.payload.siret;
       state.establishment = null;
@@ -48,7 +56,10 @@ export const siretSlice = createSlice({
     },
     siretInfoRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<{ siret: SiretDto }>,
+      _action: PayloadActionWithFeedbackTopic<{
+        siret: SiretDto;
+        addressAutocompleteLocator: AddressAutocompleteLocator;
+      }>,
     ) => {
       state.isSearching = true;
     },
@@ -56,6 +67,7 @@ export const siretSlice = createSlice({
       state,
       action: PayloadActionWithFeedbackTopic<{
         siretEstablishment: SiretEstablishmentDto;
+        addressAutocompleteLocator: AddressAutocompleteLocator;
       }>,
     ) => {
       state.isSearching = false;

@@ -2,6 +2,7 @@ import { type Observable, from } from "rxjs";
 import type {
   AddressAndPosition,
   AddressRoutes,
+  LookupAddress,
   LookupLocationInput,
   LookupSearchResult,
 } from "shared";
@@ -22,8 +23,14 @@ export class HttpAddressGateway implements AddressGateway {
     return from(this.#lookupLocation(query));
   }
 
-  public async lookupStreetAddress(
-    lookup: string,
+  public lookupStreetAddress$(
+    lookup: LookupAddress,
+  ): Observable<AddressAndPosition[]> {
+    return from(this.#lookupStreetAddress(lookup));
+  }
+
+  async #lookupStreetAddress(
+    lookup: LookupAddress,
   ): Promise<AddressAndPosition[]> {
     const response = await this.httpClient.lookupStreetAddress({
       queryParams: {

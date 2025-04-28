@@ -21,6 +21,7 @@ export const EditAgency = () => {
       </h5>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
+          locator="agencyAdminAutocomplete"
           label="Je sélectionne une agence (nom ou SIRET)"
           selectProps={{
             inputId: "agency-autocomplete",

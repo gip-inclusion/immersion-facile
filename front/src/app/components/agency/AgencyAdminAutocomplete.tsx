@@ -40,7 +40,8 @@ export const useAgencyAdminAutocomplete = () => {
 
 export type AgencyAdminAutocompleteProps = RSAutocompleteComponentProps<
   "agency",
-  AgencyOption
+  AgencyOption,
+  "agencyAdminAutocomplete"
 > & {
   initialValue?: AgencyOption;
 };
@@ -48,6 +49,7 @@ export type AgencyAdminAutocompleteProps = RSAutocompleteComponentProps<
 export const AgencyAdminAutocomplete = ({
   label,
   className,
+  locator,
 }: AgencyAdminAutocompleteProps): JSX.Element => {
   // TODO Mutualiser juste l'autocomplete avec les conventions ? Ou passer le selecteur en param du composant
   const {
@@ -69,6 +71,7 @@ export const AgencyAdminAutocomplete = ({
 
   return (
     <RSAutocomplete
+      locator={locator}
       label={label}
       selectProps={{
         options: sortedAgencyOptions.map((option) => ({

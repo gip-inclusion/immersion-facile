@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
+import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 
@@ -34,10 +35,12 @@ export const useSiretRelatedField = <K extends keyof SiretEstablishmentDto>(
 
 type SiretFetcherOptions = {
   shouldFetchEvenIfAlreadySaved: boolean;
+  addressAutocompleteLocator: AddressAutocompleteLocator;
 };
 
 export const useSiretFetcher = ({
   shouldFetchEvenIfAlreadySaved,
+  addressAutocompleteLocator,
 }: SiretFetcherOptions) => {
   const currentSiret = useAppSelector(siretSelectors.currentSiret);
   const establishmentInfos = useAppSelector(siretSelectors.establishmentInfos);
@@ -55,9 +58,10 @@ export const useSiretFetcher = ({
     if (shouldFetchEvenIfAlreadySaved !== storeShouldFetchEvenIfAlreadySaved)
       // TODO: what should shouldFetchEvenIfAlreadySaved do?
       dispatch(
-        siretSlice.actions.setShouldFetchEvenIfAlreadySaved(
+        siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
           shouldFetchEvenIfAlreadySaved,
-        ),
+          addressAutocompleteLocator,
+        }),
       );
     return () => {
       if (
@@ -69,6 +73,7 @@ export const useSiretFetcher = ({
   }, [
     storeShouldFetchEvenIfAlreadySaved,
     shouldFetchEvenIfAlreadySaved,
+    addressAutocompleteLocator,
     dispatch,
   ]);
 
@@ -83,13 +88,20 @@ export const useSiretFetcher = ({
         siretSlice.actions.siretModified({
           feedbackTopic: "siret-input",
           siret: newSiret,
+          addressAutocompleteLocator,
         }),
       );
     },
   };
 };
 
-export const useInitialSiret = (siret?: string) => {
+export const useInitialSiret = ({
+  siret,
+  addressAutocompleteLocator,
+}: {
+  siret?: string;
+  addressAutocompleteLocator: AddressAutocompleteLocator;
+}) => {
   const currentSiret = useAppSelector(siretSelectors.currentSiret);
   const dispatch = useDispatch();
 
@@ -99,13 +111,20 @@ export const useInitialSiret = (siret?: string) => {
         siretSlice.actions.siretModified({
           siret,
           feedbackTopic: "siret-input",
+          addressAutocompleteLocator,
         }),
       );
     }
-  }, [siret, currentSiret, dispatch]);
+  }, [siret, currentSiret, addressAutocompleteLocator, dispatch]);
 };
 
-export const useExistingSiret = (siret?: SiretDto | null) => {
+export const useExistingSiret = ({
+  siret,
+  addressAutocompleteLocator,
+}: {
+  siret?: SiretDto | null;
+  addressAutocompleteLocator: AddressAutocompleteLocator;
+}) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -114,15 +133,21 @@ export const useExistingSiret = (siret?: SiretDto | null) => {
         siretSlice.actions.siretModified({
           feedbackTopic: "siret-input",
           siret: siret,
+          addressAutocompleteLocator,
         }),
       );
     }
-  }, [siret, dispatch]);
+  }, [siret, dispatch, addressAutocompleteLocator]);
 };
 
-export const useEstablishmentSiret = () => {
+export const useEstablishmentSiret = ({
+  addressAutocompleteLocator,
+}: {
+  addressAutocompleteLocator: AddressAutocompleteLocator;
+}) => {
   const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,
+    addressAutocompleteLocator,
   });
   const isSiretAlreadySaved = useAppSelector(
     siretSelectors.isSiretAlreadySaved,

@@ -11,7 +11,7 @@ import Styles from "./RSAutocomplete.styles";
 
 export type OptionType<T> = { value: T; label: string };
 
-export type RSAutocompleteProps<T> = InputProps.Common &
+export type RSAutocompleteProps<T, L> = InputProps.Common &
   InputProps.RegularInput & {
     selectProps?: SelectProps<
       OptionType<T>,
@@ -21,6 +21,7 @@ export type RSAutocompleteProps<T> = InputProps.Common &
       isDebouncing?: boolean;
     };
     initialInputValue?: string;
+    locator: L;
   };
 
 type Capitalize<T extends string> = T extends `${infer First}${infer Rest}`
@@ -30,20 +31,21 @@ type Capitalize<T extends string> = T extends `${infer First}${infer Rest}`
 export type RSAutocompleteComponentProps<
   K extends string,
   T,
-> = RSAutocompleteProps<T> &
+  L,
+> = RSAutocompleteProps<T, L> &
   Record<`on${Capitalize<K>}Selected`, (value: T) => void> &
   Record<`on${Capitalize<K>}Clear`, () => void>;
 
 export const prefix = "im-select";
 
-export const RSAutocomplete = <T,>({
+export const RSAutocomplete = <T, L>({
   state,
   stateRelatedMessage,
   label,
   hintText,
   className,
   selectProps,
-}: RSAutocompleteProps<T>) => {
+}: RSAutocompleteProps<T, L>) => {
   const hasError = state === "error";
   const { cx } = useStyles();
   const CustomizedOption = selectProps?.components?.Option;

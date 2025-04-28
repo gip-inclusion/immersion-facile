@@ -9,10 +9,7 @@ import {
   domElementIds,
   emailSchema,
 } from "shared";
-import {
-  AddressAutocomplete,
-  addressStringToFakeAddressAndPosition,
-} from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import { MultipleEmailsInput } from "src/app/components/forms/commons/MultipleEmailsInput";
 import { RadioGroup } from "src/app/components/forms/commons/RadioGroup";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
@@ -49,6 +46,7 @@ export const AgencyFormCommonFields = ({
     establishmentInfos,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
+    addressAutocompleteLocator: "agencyAddress",
   });
 
   const formValues = getValues();
@@ -68,14 +66,6 @@ export const AgencyFormCommonFields = ({
       setValue("name", establishmentInfos.businessName);
     }
   }, [establishmentInfos, isFetchingSiret, setValue]);
-  const valueFromStore = establishmentInfos
-    ? {
-        label: establishmentInfos.businessAddress,
-        value: addressStringToFakeAddressAndPosition(
-          establishmentInfos.businessAddress,
-        ),
-      }
-    : undefined;
   const onAddressSelected = (addressAndPosition: AddressAndPosition) => {
     setValue("address", addressAndPosition.address);
     setValue("position", addressAndPosition.position);
@@ -117,19 +107,12 @@ export const AgencyFormCommonFields = ({
         disabled={disableAgencyName}
       />
       <AddressAutocomplete
+        locator="agencyAddress"
         {...formContents.address}
         selectProps={{
           inputId: domElementIds.addAgency.addressAutocomplete,
           inputValue: establishmentInfos?.businessAddress,
         }}
-        initialValue={
-          formHasAddressValues(formValues)
-            ? {
-                address: formValues.address,
-                position: formValues.position,
-              }
-            : valueFromStore?.value
-        }
         onAddressSelected={onAddressSelected}
         onAddressClear={() => {
           setValue("address", {
@@ -215,13 +198,4 @@ const numberOfStepsOptions: { label: string; value: ValidationSteps }[] = [
 const descriptionByValidationSteps: Record<ValidationSteps, ReactNode> = {
   validatorsOnly: formAgencyFieldsLabels.counsellorEmails.hintText,
   counsellorsAndValidators: formAgencyFieldsLabels.validatorEmails.hintText,
-};
-
-const formHasAddressValues = (formValues: CreateAgencyDto) => {
-  return (
-    formValues.address &&
-    formValues.position &&
-    formValues.position.lat !== 0 &&
-    formValues.position.lon !== 0
-  );
 };

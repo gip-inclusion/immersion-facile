@@ -121,13 +121,21 @@ describe("Siret validation and fetching", () => {
       });
       expectShouldFetchEvenIfAlreadySavedToBe(true);
       store.dispatch(
-        siretSlice.actions.setShouldFetchEvenIfAlreadySaved(false),
+        siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
+          shouldFetchEvenIfAlreadySaved: false,
+          addressAutocompleteLocator: "conventionImmersionAddress",
+        }),
       );
       expectShouldFetchEvenIfAlreadySavedToBe(false);
       expectSiretErrorToBe(null);
       expectEstablishmentToEqual(null);
       expectCurrentSiretToBe("10002000300040");
-      store.dispatch(siretSlice.actions.setShouldFetchEvenIfAlreadySaved(true));
+      store.dispatch(
+        siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
+          shouldFetchEvenIfAlreadySaved: true,
+          addressAutocompleteLocator: "conventionImmersionAddress",
+        }),
+      );
       expectShouldFetchEvenIfAlreadySavedToBe(true);
       expectIsSearchingToBe(true);
     });
@@ -153,6 +161,7 @@ describe("Siret validation and fetching", () => {
       siretSlice.actions.siretModified({
         siret,
         feedbackTopic: "siret-input",
+        addressAutocompleteLocator: "conventionImmersionAddress",
       }),
     );
 

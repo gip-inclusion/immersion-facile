@@ -56,6 +56,7 @@ export const MultipleAppellationInput = ({
             >
               <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
                 <AppellationAutocomplete
+                  locator={`multipleAppellation-${index}`}
                   disabled={disabled}
                   label={"Rechercher un métier *"}
                   initialValue={currentAppellations[index]}

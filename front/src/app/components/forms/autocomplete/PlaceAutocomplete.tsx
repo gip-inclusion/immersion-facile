@@ -11,7 +11,8 @@ import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice"
 
 export type PlaceAutocompleteProps = RSAutocompleteComponentProps<
   "place",
-  LookupSearchResult
+  LookupSearchResult,
+  "searchPlace"
 >;
 
 export const PlaceAutocomplete = ({
