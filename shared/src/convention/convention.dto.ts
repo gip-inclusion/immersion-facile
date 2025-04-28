@@ -130,6 +130,9 @@ export const CCI_WEEKLY_MAX_PERMITTED_HOURS_RELEASE_DATE = new Date(
 );
 
 export const MAX_PRESENCE_DAYS_RELEASE_DATE = new Date("2025-03-27");
+export const SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE = new Date(
+  "2025-04-30",
+);
 
 export const validatedConventionStatuses: ConventionStatus[] = [
   "ACCEPTED_BY_VALIDATOR",

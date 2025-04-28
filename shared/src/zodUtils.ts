@@ -58,6 +58,8 @@ export const localization = {
   required: "Obligatoire",
   signatoriesDistinctEmails:
     "Les emails des signataires doivent être différents.",
+  signatoriesDistinctPhoneNumbers:
+    "Les numéros de téléphone des signataires doivent être différents.",
   invalidAppellations: "Les métiers renseignés sont invalides.",
 };
 
