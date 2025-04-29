@@ -127,7 +127,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
     );
   }
 
-  public async notifyOnConventionUpdated(
+  public async notifyOnConventionUpdatedLegacy(
     ftConvention: FranceTravailConvention,
   ): Promise<FranceTravailBroadcastResponse> {
     logger.info({

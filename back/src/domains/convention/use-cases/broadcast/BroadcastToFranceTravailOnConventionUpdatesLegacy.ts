@@ -30,7 +30,7 @@ const conventionObjectiveToObjectifDeImmersion: Record<
   "Initier une démarche de recrutement": 3,
 };
 
-export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUseCase<WithConventionDto> {
+export class BroadcastToFranceTravailOnConventionUpdatesLegacy extends TransactionalUseCase<WithConventionDto> {
   protected inputSchema = withConventionSchema;
 
   constructor(
@@ -118,9 +118,10 @@ export class BroadcastToFranceTravailOnConventionUpdates extends TransactionalUs
       fonctionTuteur: convention.establishmentTutor.job,
     };
 
-    const response = await this.franceTravailGateway.notifyOnConventionUpdated(
-      franceTravailConvention,
-    );
+    const response =
+      await this.franceTravailGateway.notifyOnConventionUpdatedLegacy(
+        franceTravailConvention,
+      );
 
     if (this.options.resyncMode)
       await uow.conventionsToSyncRepository.save({

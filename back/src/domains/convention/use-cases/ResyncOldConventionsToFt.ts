@@ -6,7 +6,7 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
-import { BroadcastToFranceTravailOnConventionUpdates } from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
+import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 
 type ResyncOldConventionToFtReport = {
   success: number;
@@ -20,7 +20,7 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
 > {
   protected override inputSchema = z.void();
 
-  readonly #broadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
+  readonly #broadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdatesLegacy;
 
   #report: ResyncOldConventionToFtReport = {
     errors: {},
@@ -40,7 +40,7 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
   ) {
     super(uowPerform);
     this.#broadcastToFTUsecase =
-      new BroadcastToFranceTravailOnConventionUpdates(
+      new BroadcastToFranceTravailOnConventionUpdatesLegacy(
         uowPerform,
         franceTravailGateway,
         timeGateway,

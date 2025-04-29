@@ -20,7 +20,7 @@ import {
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryFranceTravailGateway } from "../../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import type { AgencyKindForFt } from "../../ports/FranceTravailGateway";
-import { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
+import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 
 describe("Broadcasts events to France Travail", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
@@ -31,7 +31,7 @@ describe("Broadcasts events to France Travail", () => {
   let franceTravailGateWay: InMemoryFranceTravailGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
+  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdatesLegacy;
 
   const agencySIAE = toAgencyWithRights(
     new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
@@ -57,7 +57,7 @@ describe("Broadcasts events to France Travail", () => {
     franceTravailGateWay = new InMemoryFranceTravailGateway();
     timeGateway = new CustomTimeGateway();
     broadcastToFranceTravailOnConventionUpdates =
-      new BroadcastToFranceTravailOnConventionUpdates(
+      new BroadcastToFranceTravailOnConventionUpdatesLegacy(
         new InMemoryUowPerformer(uow),
         franceTravailGateWay,
         timeGateway,
