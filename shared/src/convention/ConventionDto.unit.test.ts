@@ -157,6 +157,39 @@ describe("conventionDtoSchema", () => {
       );
     });
 
+    it("rejects equal beneficiary and establishment representative phone numbers", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        new ConventionDtoBuilder()
+          .withDateSubmission("2025-05-25")
+          .withBeneficiaryPhone("+33632342426")
+          .withEstablishmentRepresentativePhone("+33632342426")
+          .build(),
+        [
+          "Les numéros de téléphone des signataires doivent être différents.",
+          "Les numéros de téléphone des signataires doivent être différents.",
+        ],
+      );
+    });
+
+    it("rejects equal beneficiary and beneficiary representative phone numbers", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        new ConventionDtoBuilder()
+          .withDateSubmission("2025-05-25")
+          .withBeneficiaryPhone("+33632342426")
+          .withBeneficiaryRepresentative({
+            ...beneficiaryRepresentative,
+            phone: "+33632342426",
+          })
+          .build(),
+        [
+          "Les numéros de téléphone des signataires doivent être différents.",
+          "Les numéros de téléphone des signataires doivent être différents.",
+        ],
+      );
+    });
+
     it("rejects equal beneficiary current employer and other signatories", () => {
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryCurrentEmployer(currentEmployer)
