@@ -1,12 +1,15 @@
 import { groupBy, isNil, map, prop, reject, values } from "ramda";
 import { pipeWithValue } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../../utils/logger";
 import type { DomainEvent } from "../events";
 import type { OutboxQueries } from "../ports/OutboxQueries";
 import {
   type StoredEventRow,
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
+
+const logger = createLogger(__filename);
 
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private transaction: KyselyDb) {}
@@ -30,7 +33,23 @@ export class PgOutboxQueries implements OutboxQueries {
       .limit(params.limit)
       .execute();
 
-    return convertRowsToDomainEvents(results as StoredEventRow[]);
+    const events = convertRowsToDomainEvents(results as StoredEventRow[]);
+
+    const numberOfEventsAgregated = events.length;
+    const numberOfEventsBeforeAggregation = results.length;
+
+    if (numberOfEventsAgregated !== numberOfEventsBeforeAggregation) {
+      logger.debug({
+        events,
+        crawlerInfo: {
+          typeOfEvents: "unpublished",
+          numberOfEvents: numberOfEventsAgregated,
+          numberOfEventsBeforeAggregation,
+        },
+      });
+    }
+
+    return events;
   }
 
   #getEventsQueryBuilder() {
