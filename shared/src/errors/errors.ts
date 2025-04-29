@@ -256,6 +256,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de passer du statut de convention "${currentStatus}" à "${targetStatus}".`,
       ),
+    notAllowedToCancelConventionWithAssessment: () =>
+      new BadRequestError(
+        "Impossible d'annuler cette convention car le bilan a été complété.",
+      ),
     sendSignatureLinkNotAllowedForStatus: ({
       status,
     }: {

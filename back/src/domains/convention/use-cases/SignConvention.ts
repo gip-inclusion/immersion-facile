@@ -83,6 +83,7 @@ export class SignConvention extends TransactionalUseCase<
       roles: [role],
       targetStatus: signedConvention.status,
       conventionRead: initialConventionRead,
+      hasAssessment: false,
     });
 
     const signedId = await uow.conventionRepository.update(signedConvention);

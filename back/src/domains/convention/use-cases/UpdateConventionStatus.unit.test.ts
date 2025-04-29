@@ -782,6 +782,37 @@ describe("UpdateConventionStatus", () => {
       ],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
+
+    it("fails when trying to cancel a convention with an assessment", async () => {
+      const {
+        updateConventionStatusUseCase,
+        conventionRepository,
+        timeGateway,
+      } = await setupInitialState({
+        initialStatus: "ACCEPTED_BY_VALIDATOR",
+        conventionId: conventionWithAgencyOneStepValidationId,
+        hasAssessment: true,
+      });
+
+      await expectPromiseToFailWithError(
+        executeUpdateConventionStatusUseCase({
+          jwtPayload: createConventionMagicLinkPayload({
+            id: conventionWithAgencyOneStepValidationId,
+            email: "test@test.fr",
+            role: "validator",
+            now: timeGateway.now(),
+          }),
+          updateStatusParams: {
+            status: "CANCELLED",
+            conventionId: conventionWithAgencyOneStepValidationId,
+            statusJustification: "Cancelled justification",
+          },
+          updateConventionStatusUseCase,
+          conventionRepository,
+        }),
+        errors.convention.notAllowedToCancelConventionWithAssessment(),
+      );
+    });
   });
 
   describe("* -> DEPRECATED transition", () => {

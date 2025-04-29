@@ -115,10 +115,15 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         ? [roleOrUser.roleInPayload]
         : await this.#rolesFromUser(roleOrUser.userWithRights, conventionRead);
 
+    const assessment = await uow.assessmentRepository.getByConventionId(
+      conventionRead.id,
+    );
+
     throwIfTransitionNotAllowed({
       roles,
       targetStatus: params.status,
       conventionRead,
+      hasAssessment: !!assessment,
     });
 
     const conventionUpdatedAt = this.timeGateway.now().toISOString();

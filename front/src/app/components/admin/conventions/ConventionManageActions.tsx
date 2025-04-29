@@ -209,7 +209,7 @@ export const ConventionManageActions = ({
     !assessment &&
     hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention);
 
-  const shouldShowAssessmentAnbandonAction =
+  const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
 
   const shouldShowAssessmentFullFillAction =
@@ -576,7 +576,7 @@ export const ConventionManageActions = ({
         {isAllowedConventionTransition(convention, "CANCELLED", roles) &&
           !assessment && (
             <>
-              {shouldShowAssessmentAnbandonAction ? (
+              {shouldShowAssessmentAbandonAction ? (
                 <ButtonWithSubMenu
                   buttonLabel={t.verification.markAsCancelled}
                   openedTop={true}
