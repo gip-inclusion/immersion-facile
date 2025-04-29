@@ -117,12 +117,11 @@ describe("HttpFranceTravailGateway", () => {
         noRetries,
       );
 
-      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
-        {
+      const response =
+        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
           ...ftConvention,
           ...fields,
-        },
-      );
+        });
 
       if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
         throw errors.generic.testError(
@@ -171,12 +170,11 @@ describe("HttpFranceTravailGateway", () => {
         noRetries,
       );
 
-      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
-        {
+      const response =
+        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
           ...ftConvention,
           ...fields,
-        },
-      );
+        });
 
       if (!isBroadcastResponseOk(expected))
         throw errors.generic.testError("Should not occurs");
@@ -226,7 +224,7 @@ describe("HttpFranceTravailGateway", () => {
       .timeout();
 
     const response =
-      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
+      await franceTravailGateway.notifyOnConventionUpdatedLegacy(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw errors.generic.testError("PE broadcast OK must not occurs");
@@ -279,7 +277,7 @@ describe("HttpFranceTravailGateway", () => {
       .reply(204, { message: "yolo" });
 
     const response =
-      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
+      await franceTravailGateway.notifyOnConventionUpdatedLegacy(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw errors.generic.testError(
