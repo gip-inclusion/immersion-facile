@@ -9,7 +9,7 @@ const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";
 
 const unrelevantDataKeysForContactScope: (keyof ContactEstablishmentByMailDto)[] =
-  ["locationId", "appellationCode", "contactMode", "siret"] as const;
+  ["locationId", "appellationCode", "contactMode", "siret", "kind"] as const;
 
 export type ContactTranscientData = OmitFromExistingKeys<
   ContactEstablishmentByMailDto,
