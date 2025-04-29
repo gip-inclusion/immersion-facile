@@ -94,9 +94,12 @@ export const isBroadcastResponseOk = (
   [200, 201, 204].includes(response.status);
 
 export interface FranceTravailGateway {
-  notifyOnConventionUpdated: (
+  notifyOnConventionUpdatedLegacy: (
     franceTravailConvention: FranceTravailConvention,
   ) => Promise<FranceTravailBroadcastResponse>;
+  // notifyOnConventionUpdated: (
+  //   params: BroadcastConventionParams,
+  // ) => Promise<FranceTravailBroadcastResponse>;
 
   getAccessToken: (scope: string) => Promise<AccessTokenResponse>;
 }

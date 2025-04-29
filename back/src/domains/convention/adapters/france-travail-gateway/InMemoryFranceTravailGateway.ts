@@ -23,7 +23,7 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
     };
   }
 
-  public async notifyOnConventionUpdated(
+  public async notifyOnConventionUpdatedLegacy(
     convention: FranceTravailConvention,
   ): Promise<FranceTravailBroadcastResponse> {
     if (convention.statut === "DEMANDE_OBSOLETE") {
