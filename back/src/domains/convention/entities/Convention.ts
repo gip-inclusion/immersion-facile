@@ -27,10 +27,12 @@ export const throwIfTransitionNotAllowed = ({
   targetStatus,
   roles,
   conventionRead,
+  hasAssessment,
 }: {
   targetStatus: ConventionStatus;
   roles: Role[];
   conventionRead: ConventionReadDto;
+  hasAssessment: boolean;
 }) => {
   const config = statusTransitionConfigs[targetStatus];
 
@@ -51,6 +53,9 @@ export const throwIfTransitionNotAllowed = ({
       currentStatus: conventionRead.status,
       targetStatus,
     });
+
+  if (targetStatus === "CANCELLED" && hasAssessment)
+    throw errors.convention.notAllowedToCancelConventionWithAssessment();
 
   if (config.refine) {
     const { isError, errorMessage } = config.refine(conventionRead);

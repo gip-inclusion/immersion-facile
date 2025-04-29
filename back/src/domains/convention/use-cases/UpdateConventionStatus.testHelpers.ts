@@ -214,6 +214,7 @@ type SetupInitialStateParams = {
   initialStatus: ConventionStatus;
   conventionId: ConventionId;
   alreadySigned?: boolean;
+  hasAssessment?: boolean;
 };
 export const conventionWithAgencyOneStepValidationId: ConventionId =
   "add5c20e-6dd2-45af-affe-927358005251";
@@ -224,6 +225,7 @@ export const setupInitialState = ({
   initialStatus,
   alreadySigned = true,
   conventionId,
+  hasAssessment = false,
 }: SetupInitialStateParams) => {
   const conventionBuilder = new ConventionDtoBuilder()
     .withId(conventionWithAgencyOneStepValidationId)
@@ -259,6 +261,7 @@ export const setupInitialState = ({
   const conventionRepository = uow.conventionRepository;
   const agencyRepository = uow.agencyRepository;
   const outboxRepository = uow.outboxRepository;
+  const assessmentRepository = uow.assessmentRepository;
   const timeGateway = new CustomTimeGateway();
   const createNewEvent = makeCreateNewEvent({
     timeGateway,
@@ -277,6 +280,19 @@ export const setupInitialState = ({
   ];
   conventionRepository.setConventions(values(conventionsToTest));
   uow.userRepository.users = values(makeUserIdMapInclusionConnectedUser);
+  if (hasAssessment) {
+    assessmentRepository.setAssessments([
+      {
+        conventionId,
+        status: "COMPLETED",
+        endedWithAJob: false,
+        establishmentFeedback: "osef",
+        numberOfHoursActuallyMade: 35,
+        establishmentAdvices: "pas de conseil",
+        _entityName: "Assessment",
+      },
+    ]);
+  }
 
   return {
     originalConvention: conventionsToTest[conventionId],
