@@ -1,8 +1,15 @@
 import subDays from "date-fns/subDays";
 import { configureGenerateHtmlFromTemplate } from "html-templates";
 import {
+  type CommonDiscussionDto,
+  type ContactEstablishmentByMailDto,
+  type ContactEstablishmentByPhoneDto,
+  type ContactEstablishmentInPersonDto,
   type ContactEstablishmentRequestDto,
   type DiscussionDto,
+  type DiscussionDtoEmail,
+  type DiscussionDtoInPerson,
+  type DiscussionDtoPhone,
   contactEstablishmentRequestSchema,
   emailTemplatesByName,
   errors,
@@ -15,7 +22,9 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
+import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import { getDiscussionContactsFromAggregate } from "../helpers/businessContact.helpers";
+import { makeContactByEmailRequestParams } from "../helpers/contactRequest";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
   protected inputSchema = contactEstablishmentRequestSchema;
@@ -121,7 +130,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     await this.#markEstablishmentAsNotSearchableIfLimitReached({
       uow,
       establishmentAggregate,
-      contactRequest,
       now,
     });
 
@@ -151,6 +159,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
   }): Promise<DiscussionDto> {
     const { otherUsers, firstAdminRight, firstAdminUser } =
       await getDiscussionContactsFromAggregate(uow, establishment);
+
     const matchingAddress = establishment.establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -160,99 +169,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         locationId: contactRequest.locationId,
       });
 
-    const appellationAndRomeDtos =
-      await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
-        [contactRequest.appellationCode],
-      );
-    const appellationLabel = appellationAndRomeDtos[0]?.appellationLabel;
-
-    if (!appellationLabel)
-      throw errors.discussion.missingAppellationLabel({
-        appellationCode: contactRequest.appellationCode,
-      });
-
-    const discussionId = this.#uuidGenerator.new();
-
-    const emailContent =
-      contactRequest.contactMode === "EMAIL"
-        ? configureGenerateHtmlFromTemplate(emailTemplatesByName, {
-            header: undefined,
-            footer: undefined,
-          })(
-            "CONTACT_BY_EMAIL_REQUEST",
-            {
-              appellationLabel,
-              businessName:
-                establishment.establishment.customizedName ??
-                establishment.establishment.name,
-              contactFirstName: firstAdminUser.firstName,
-              contactLastName: firstAdminUser.lastName,
-              potentialBeneficiaryFirstName:
-                contactRequest.potentialBeneficiaryFirstName,
-              potentialBeneficiaryLastName:
-                contactRequest.potentialBeneficiaryLastName,
-              immersionObjective:
-                contactRequest.immersionObjective ?? undefined,
-              potentialBeneficiaryPhone:
-                contactRequest.potentialBeneficiaryPhone,
-              potentialBeneficiaryResumeLink:
-                contactRequest.potentialBeneficiaryResumeLink,
-              businessAddress: `${matchingAddress.address.streetNumberAndAddress} ${matchingAddress.address.postcode} ${matchingAddress.address.city}`,
-              replyToEmail: contactRequest.potentialBeneficiaryEmail,
-              potentialBeneficiaryDatePreferences:
-                contactRequest.datePreferences,
-              potentialBeneficiaryExperienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-              potentialBeneficiaryHasWorkingExperience:
-                contactRequest.hasWorkingExperience,
-              domain: this.#domain,
-              discussionId: discussionId,
-            },
-            { showContentParts: true },
-          )
-        : null;
-    return {
-      id: discussionId,
-      appellationCode: contactRequest.appellationCode,
+    const common: CommonDiscussionDto = {
+      id: this.#uuidGenerator.new(),
       siret: contactRequest.siret,
       businessName:
         establishment.establishment.customizedName ??
         establishment.establishment.name,
       createdAt: now.toISOString(),
-      immersionObjective:
-        contactRequest.contactMode === "EMAIL"
-          ? contactRequest.immersionObjective
-          : null,
-      address: matchingAddress.address,
-      potentialBeneficiary: {
-        firstName: contactRequest.potentialBeneficiaryFirstName,
-        lastName: contactRequest.potentialBeneficiaryLastName,
-        email: contactRequest.potentialBeneficiaryEmail,
-        ...(contactRequest.contactMode === "EMAIL"
-          ? { hasWorkingExperience: contactRequest.hasWorkingExperience }
-          : {}),
-        ...(contactRequest.contactMode === "EMAIL"
-          ? {
-              experienceAdditionalInformation:
-                contactRequest.experienceAdditionalInformation,
-            }
-          : {}),
-        ...(contactRequest.contactMode === "EMAIL"
-          ? {
-              datePreferences: contactRequest.datePreferences,
-            }
-          : {}),
-        phone:
-          contactRequest.contactMode === "EMAIL"
-            ? contactRequest.potentialBeneficiaryPhone
-            : undefined,
-        resumeLink:
-          contactRequest.contactMode === "EMAIL"
-            ? contactRequest.potentialBeneficiaryResumeLink
-            : undefined,
-      },
       establishmentContact: {
-        contactMethod: contactRequest.contactMode,
         email: firstAdminUser.email,
         firstName: firstAdminUser.firstName,
         lastName: firstAdminUser.lastName,
@@ -260,56 +184,54 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         job: firstAdminRight.job,
         copyEmails: otherUsers.map((user) => user.email),
       },
-      exchanges:
-        contactRequest.contactMode === "EMAIL" &&
-        emailContent &&
-        emailContent.contentParts
-          ? [
-              {
-                subject: emailContent.subject,
-                sentAt: now.toISOString(),
-                message: `${emailContent.contentParts.greetings}
-                  ${emailContent.contentParts.content}
-                  ${emailContent.contentParts.subContent}`,
-                recipient: "establishment",
-                sender: "potentialBeneficiary",
-                attachments: [],
-              },
-            ]
-          : [],
+      appellationCode: contactRequest.appellationCode,
+      address: matchingAddress.address,
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
+      exchanges: [],
       status: "PENDING",
     };
+
+    if (contactRequest.contactMode === "EMAIL") {
+      return makeDiscussionDtoEmail({
+        contactRequest,
+        domain: this.#domain,
+        common: common,
+        now,
+        uow,
+      });
+    }
+
+    if (contactRequest.contactMode === "PHONE")
+      return makeDiscussionDtoPhone({
+        common,
+        contactRequest,
+      });
+
+    return makeDiscussionDtoInPerson({
+      common,
+      contactRequest,
+    });
   }
 
   async #markEstablishmentAsNotSearchableIfLimitReached({
     uow,
     establishmentAggregate,
-    contactRequest,
     now,
   }: {
     uow: UnitOfWork;
     establishmentAggregate: EstablishmentAggregate;
-    contactRequest: ContactEstablishmentRequestDto;
     now: Date;
   }) {
-    const maxContactsPerMonth =
-      establishmentAggregate.establishment.maxContactsPerMonth;
-
-    const wasMaxForMonthReached = await this.#wasMaxForMonthReached({
-      uow,
-      siret: contactRequest.siret,
-      maxContactsPerMonth: maxContactsPerMonth,
-      now,
-    });
-
     if (
-      wasMaxForMonthReached ||
+      (await this.#wasMaxForMonthReached({
+        uow,
+        establishment: establishmentAggregate.establishment,
+        now,
+      })) ||
       (await this.#wasMaxForWeekReached({
         uow,
-        siret: contactRequest.siret,
-        maxContactsPerMonth,
+        establishment: establishmentAggregate.establishment,
         now,
       }))
     ) {
@@ -330,42 +252,176 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
   async #wasMaxForMonthReached({
     uow,
-    siret,
-    maxContactsPerMonth,
+    establishment,
     now,
   }: {
     uow: UnitOfWork;
-    siret: string;
-    maxContactsPerMonth: number;
+    establishment: EstablishmentEntity;
     now: Date;
   }): Promise<boolean> {
     const oneMonthAgo = subDays(now, normalizedMonthInDays);
     const numberOfDiscussionsOfPastMonth =
       await uow.discussionRepository.countDiscussionsForSiretSince(
-        siret,
+        establishment.siret,
         oneMonthAgo,
       );
-    return maxContactsPerMonth <= numberOfDiscussionsOfPastMonth;
+
+    return establishment.maxContactsPerMonth <= numberOfDiscussionsOfPastMonth;
   }
 
   async #wasMaxForWeekReached({
     uow,
-    siret,
-    maxContactsPerMonth,
+    establishment,
     now,
   }: {
     uow: UnitOfWork;
-    siret: string;
-    maxContactsPerMonth: number;
+    establishment: EstablishmentEntity;
     now: Date;
   }): Promise<boolean> {
     const oneWeekAgo = subDays(now, 7);
     const numberOfDiscussionsOfPastWeek =
       await uow.discussionRepository.countDiscussionsForSiretSince(
-        siret,
+        establishment.siret,
         oneWeekAgo,
       );
-    const maxContactsPerWeek = Math.ceil(maxContactsPerMonth / 4);
+    const maxContactsPerWeek = Math.ceil(establishment.maxContactsPerMonth / 4);
+
     return maxContactsPerWeek <= numberOfDiscussionsOfPastWeek;
   }
 }
+
+const makeDiscussionDtoEmail = async ({
+  common,
+  contactRequest,
+  now,
+  domain,
+  uow,
+}: {
+  common: CommonDiscussionDto;
+  contactRequest: ContactEstablishmentByMailDto;
+  domain: string;
+  uow: UnitOfWork;
+  now: Date;
+}): Promise<DiscussionDtoEmail> => {
+  const discussion: DiscussionDtoEmail = {
+    ...common,
+    contactMethod: contactRequest.contactMode,
+    ...(contactRequest.kind === "IF"
+      ? {
+          kind: contactRequest.kind,
+          potentialBeneficiary: {
+            firstName: contactRequest.potentialBeneficiaryFirstName,
+            lastName: contactRequest.potentialBeneficiaryLastName,
+            email: contactRequest.potentialBeneficiaryEmail,
+            hasWorkingExperience: contactRequest.hasWorkingExperience,
+            experienceAdditionalInformation:
+              contactRequest.experienceAdditionalInformation,
+            datePreferences: contactRequest.datePreferences,
+            phone: contactRequest.potentialBeneficiaryPhone,
+            resumeLink: contactRequest.potentialBeneficiaryResumeLink,
+            immersionObjective: contactRequest.immersionObjective,
+          },
+        }
+      : {
+          kind: contactRequest.kind,
+          potentialBeneficiary: {
+            firstName: contactRequest.potentialBeneficiaryFirstName,
+            lastName: contactRequest.potentialBeneficiaryLastName,
+            email: contactRequest.potentialBeneficiaryEmail,
+            datePreferences: contactRequest.datePreferences,
+            phone: contactRequest.potentialBeneficiaryPhone,
+            levelOfEducation: contactRequest.levelOfEducation,
+            immersionObjective: contactRequest.immersionObjective,
+          },
+        }),
+  };
+
+  const emailContent = configureGenerateHtmlFromTemplate(emailTemplatesByName, {
+    header: undefined,
+    footer: undefined,
+  })(
+    "CONTACT_BY_EMAIL_REQUEST",
+    await makeContactByEmailRequestParams({
+      uow,
+      discussion,
+      domain,
+    }),
+    { showContentParts: true },
+  );
+
+  if (!emailContent.contentParts) throw new Error("Missing content parts");
+
+  return {
+    ...discussion,
+    exchanges: [
+      {
+        subject: emailContent.subject,
+        sentAt: now.toISOString(),
+        message: `${emailContent.contentParts.greetings}
+              ${emailContent.contentParts.content}
+              ${emailContent.contentParts.subContent}`,
+        recipient: "establishment",
+        sender: "potentialBeneficiary",
+        attachments: [],
+      },
+    ],
+  };
+};
+
+const makeDiscussionDtoInPerson = ({
+  common,
+  contactRequest,
+}: {
+  common: CommonDiscussionDto;
+  contactRequest: ContactEstablishmentInPersonDto;
+}): DiscussionDtoInPerson => ({
+  ...common,
+  contactMethod: contactRequest.contactMode,
+  ...(contactRequest.kind === "IF"
+    ? {
+        kind: contactRequest.kind,
+        potentialBeneficiary: {
+          firstName: contactRequest.potentialBeneficiaryFirstName,
+          lastName: contactRequest.potentialBeneficiaryLastName,
+          email: contactRequest.potentialBeneficiaryEmail,
+        },
+      }
+    : {
+        kind: contactRequest.kind,
+        potentialBeneficiary: {
+          firstName: contactRequest.potentialBeneficiaryFirstName,
+          lastName: contactRequest.potentialBeneficiaryLastName,
+          email: contactRequest.potentialBeneficiaryEmail,
+          levelOfEducation: contactRequest.levelOfEducation,
+        },
+      }),
+});
+
+const makeDiscussionDtoPhone = ({
+  common,
+  contactRequest,
+}: {
+  common: CommonDiscussionDto;
+  contactRequest: ContactEstablishmentByPhoneDto;
+}): DiscussionDtoPhone => ({
+  ...common,
+  contactMethod: contactRequest.contactMode,
+  ...(contactRequest.kind === "IF"
+    ? {
+        kind: contactRequest.kind,
+        potentialBeneficiary: {
+          firstName: contactRequest.potentialBeneficiaryFirstName,
+          lastName: contactRequest.potentialBeneficiaryLastName,
+          email: contactRequest.potentialBeneficiaryEmail,
+        },
+      }
+    : {
+        kind: contactRequest.kind,
+        potentialBeneficiary: {
+          firstName: contactRequest.potentialBeneficiaryFirstName,
+          lastName: contactRequest.potentialBeneficiaryLastName,
+          email: contactRequest.potentialBeneficiaryEmail,
+          levelOfEducation: contactRequest.levelOfEducation,
+        },
+      }),
+});

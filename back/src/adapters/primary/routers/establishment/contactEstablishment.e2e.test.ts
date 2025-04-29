@@ -39,6 +39,7 @@ describe("Contact establishment public v2 e2e", () => {
       appellationCode: "19540",
       siret,
       contactMode: "EMAIL",
+      kind: "IF",
       potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
       potentialBeneficiaryLastName: "potential_beneficiary_last_name",
       potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
@@ -48,7 +49,6 @@ describe("Contact establishment public v2 e2e", () => {
       immersionObjective: "Confirmer un projet professionnel",
       potentialBeneficiaryPhone: "+33654783402",
       locationId: establishment.locations[0].id,
-      kind: "IF",
     };
 
     let gateways: InMemoryGateways;
@@ -164,6 +164,9 @@ describe("Contact establishment public v2 e2e", () => {
         issues: [
           "appellationCode : Obligatoire",
           "siret : Obligatoire",
+          'kind : Invalid literal value, expected "1_ELEVE_1_STAGE"',
+          'immersionObjective : Invalid literal value, expected "Découvrir un métier ou un secteur d\'activité"',
+          "levelOfEducation : Required",
           'contactMode : Invalid literal value, expected "PHONE"',
           'contactMode : Invalid literal value, expected "IN_PERSON"',
         ],
