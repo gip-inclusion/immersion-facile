@@ -3,17 +3,20 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { type RefObject, useEffect, useState } from "react";
 import { FormOverlay } from "react-design-system";
 import {
+  type DiscussionKind,
   type ImmersionObjective,
   isStringImmersionObjective,
   keys,
   labelsForImmersionObjective,
 } from "shared";
-import { inputsLabelsByKey } from "src/app/components/immersion-offer/ContactByEmail";
 import {
   type ContactTranscientData,
   type TranscientData,
   useTranscientDataFromStorage,
 } from "src/app/components/immersion-offer/useTranscientDataFromStorage";
+import { type routes, useRoute } from "src/app/routes/routes";
+import type { Route } from "type-route";
+import { makeContactInputsLabelsByKey } from "./contactUtils";
 
 const transcientPreferencesModal = createModal({
   id: "transcient-preferences-modal",
@@ -43,6 +46,9 @@ type TranscientPreferencesDisplayProps = TranscientPreferencesDisplayBaseProps &
 export const TranscientPreferencesDisplay = (
   props: TranscientPreferencesDisplayProps,
 ) => {
+  const route = useRoute() as Route<
+    typeof routes.searchResult | typeof routes.searchResultForStudent
+  >;
   const { scope, onPreferencesChange, mode } = props;
   const {
     getTranscientDataForScope,
@@ -85,7 +91,12 @@ export const TranscientPreferencesDisplay = (
         remplir ce formulaire :
       </p>
       {transcientDataForScope?.value && (
-        <ul>{renderTranscientKeyValues(transcientDataForScope.value)}</ul>
+        <ul>
+          {renderTranscientKeyValues(
+            transcientDataForScope.value,
+            route.name === "searchResult" ? "IF" : "1_ELEVE_1_STAGE",
+          )}
+        </ul>
       )}
 
       <p>Voulez-vous utiliser ces données ?</p>
@@ -133,9 +144,12 @@ export const TranscientPreferencesDisplay = (
   );
 };
 
-const renderTranscientKeyValues = (data: ContactTranscientData) => {
+const renderTranscientKeyValues = (
+  data: ContactTranscientData,
+  kind: DiscussionKind,
+) => {
   return keys(data).map((key) => {
-    const label = inputsLabelsByKey[key];
+    const label = makeContactInputsLabelsByKey(kind)[key];
     const value = data[key];
     return value ? (
       <li key={key}>

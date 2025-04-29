@@ -9,24 +9,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type ElementRef,
   type ReactNode,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
+  type AppellationCode,
   type AppellationDto,
   type ContactEstablishmentByMailDto,
+  type ContactLevelOfEducation,
   type ImmersionObjective,
-  type OmitFromExistingKeys,
-  contactEstablishmentByMailFormSchema,
+  contactEstablishmentByMailSchema,
+  contactLevelsOfEducation,
   conventionObjectiveOptions,
+  discoverObjective,
   domElementIds,
+  labelsForContactLevelOfEducation,
   labelsForImmersionObjective,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
-import { getDefaultAppellationCode } from "src/app/components/immersion-offer/contactUtils";
+import {
+  getDefaultAppellationCode,
+  makeContactInputsLabelsByKey,
+} from "src/app/components/immersion-offer/contactUtils";
 import {
   transcientExpirationTimeInMinutes,
   useTranscientDataFromStorage,
@@ -44,36 +52,18 @@ type ContactByEmailProps = {
   onSubmitSuccess: () => void;
 };
 
-export const inputsLabelsByKey: Record<
-  keyof OmitFromExistingKeys<
-    ContactEstablishmentByMailDto,
-    | "siret"
-    | "contactMode"
-    | "locationId"
-    | "acquisitionCampaign"
-    | "acquisitionKeyword"
-  >,
-  string
-> = {
-  immersionObjective: "But de l'immersion *",
-  appellationCode: "Métier sur lequel porte la demande d'immersion *",
-  datePreferences: "Dates d'immersion envisagées *",
-  potentialBeneficiaryFirstName: "Prénom *",
-  potentialBeneficiaryLastName: "Nom *",
-  potentialBeneficiaryEmail: "Email *",
-  potentialBeneficiaryPhone: "Téléphone *",
-  potentialBeneficiaryResumeLink: "Page LinkedIn ou CV en ligne (optionnel)",
-  hasWorkingExperience: "Expérience professionnelle",
-  experienceAdditionalInformation:
-    "Détaillez en quelques lignes vos expériences et compétences *",
-};
-
 export const ContactByEmail = ({
   appellations,
   onSubmitSuccess,
 }: ContactByEmailProps) => {
   const { activeError, setActiveErrorKind } = useContactEstablishmentError();
-  const route = useRoute() as Route<typeof routes.searchResult>;
+  const route = useRoute() as Route<
+    typeof routes.searchResult | typeof routes.searchResultForStudent
+  >;
+
+  const inputsLabelsByKey = makeContactInputsLabelsByKey(
+    route.name === "searchResult" ? "IF" : "1_ELEVE_1_STAGE",
+  );
 
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
@@ -91,18 +81,16 @@ export const ContactByEmail = ({
   const acquisitionParams = useGetAcquisitionParams();
   const initialValues = useMemo<ContactEstablishmentByMailDto>(
     () => ({
+      contactMode: "EMAIL",
       siret: route.params.siret,
       appellationCode: getDefaultAppellationCode(
         appellations,
         route.params.appellationCode,
       ),
-      contactMode: "EMAIL",
       datePreferences: "",
-      hasWorkingExperience: false,
       potentialBeneficiaryFirstName: route.params.contactFirstName ?? "",
       potentialBeneficiaryLastName: route.params.contactLastName ?? "",
       potentialBeneficiaryEmail: route.params.contactEmail ?? "",
-      immersionObjective: null,
       potentialBeneficiaryResumeLink: "",
       potentialBeneficiaryPhone: route.params.contactPhone ?? "",
       locationId: route.params.location ?? "",
@@ -110,7 +98,18 @@ export const ContactByEmail = ({
       ...(preferUseTranscientData && transcientDataForScope?.value
         ? { ...transcientDataForScope.value }
         : {}),
-      experienceAdditionalInformation: undefined,
+      ...(route.name === "searchResult"
+        ? {
+            kind: "IF",
+            immersionObjective: null,
+            hasWorkingExperience: false,
+            experienceAdditionalInformation: undefined,
+          }
+        : {
+            kind: "1_ELEVE_1_STAGE",
+            immersionObjective: discoverObjective,
+            levelOfEducation: "3ème",
+          }),
     }),
     [
       appellations,
@@ -121,13 +120,8 @@ export const ContactByEmail = ({
     ],
   );
 
-  const appellationListOfOptions = appellations.map((appellation) => ({
-    value: appellation.appellationCode,
-    label: appellation.appellationLabel,
-  }));
-
   const methods = useForm<ContactEstablishmentByMailDto>({
-    resolver: zodResolver(contactEstablishmentByMailFormSchema),
+    resolver: zodResolver(contactEstablishmentByMailSchema),
     mode: "onTouched",
     defaultValues: initialValues,
   });
@@ -142,6 +136,14 @@ export const ContactByEmail = ({
     watch,
   } = methods;
 
+  const contactLevelOfEducation = watch("levelOfEducation");
+
+  useEffect(() => {
+    if (contactLevelOfEducation === "2nde") {
+      setValue("datePreferences", "Du 16 au 27 juin");
+    }
+  }, [contactLevelOfEducation, setValue]);
+
   const hasWorkingExperienceValue = watch("hasWorkingExperience");
 
   const getFieldError = makeFieldError(formState);
@@ -155,6 +157,7 @@ export const ContactByEmail = ({
     if (errorKind) return setActiveErrorKind(errorKind);
     onSubmitSuccess();
   };
+
   return (
     <FormProvider {...methods}>
       <form
@@ -223,30 +226,45 @@ export const ContactByEmail = ({
             }}
             {...getFieldError("potentialBeneficiaryPhone")}
           />
-
-          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>Votre immersion</h2>
+          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
+            {route.name === "searchResult" ? "Votre immersion" : "Votre stage"}
+          </h2>
           <p className={fr.cx("fr-hint-text")}>
             Donnez un maximum d’informations à l’entreprise pour qu’elle sache
             si elle est en capacité de vous accueillir.
           </p>
-          <Select
-            label={inputsLabelsByKey.immersionObjective}
-            options={immersionObjectiveListOfOptions}
-            placeholder={"But de l'immersion"}
-            nativeSelectProps={{
-              ...register("immersionObjective"),
-            }}
-            {...getFieldError("immersionObjective")}
-          />
+
+          {route.name === "searchResult" && (
+            <Select
+              label={inputsLabelsByKey.immersionObjective}
+              options={immersionObjectiveListOfOptions}
+              placeholder={"But de l'immersion"}
+              nativeSelectProps={{
+                ...register("immersionObjective"),
+              }}
+              {...getFieldError("immersionObjective")}
+            />
+          )}
+
           <Select
             disabled={appellations.length === 1}
             label={inputsLabelsByKey.appellationCode}
-            options={appellationListOfOptions}
+            options={appellationListOfOptions(appellations)}
             nativeSelectProps={{
               ...register("appellationCode"),
             }}
             {...getFieldError("appellationCode")}
           />
+          {route.name === "searchResultForStudent" && (
+            <Select
+              label={inputsLabelsByKey.levelOfEducation}
+              options={contactLevelsOfEducationsListOfOptions}
+              nativeSelectProps={{
+                ...register("levelOfEducation"),
+              }}
+              {...getFieldError("levelOfEducation")}
+            />
+          )}
           <Input
             label={inputsLabelsByKey.datePreferences}
             hintText={
@@ -258,60 +276,61 @@ export const ContactByEmail = ({
             {...getFieldError("datePreferences")}
           />
 
-          <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
-            Vos expériences et compétences
-          </h2>
-          <p className={fr.cx("fr-hint-text")}>
-            N’hésitez pas à détailler vos compétences, cela augmentera vos
-            chances de recevoir une réponse positive de l’entreprise.
-          </p>
-
-          <RadioButtons
-            options={[
-              {
-                label: "Je n'ai jamais travaillé",
-                nativeInputProps: {
-                  value: 0,
-                  checked: hasWorkingExperienceValue === false,
-                  onChange: () => {
-                    setValue("hasWorkingExperience", false);
-                    setValue("experienceAdditionalInformation", undefined);
+          {route.name === "searchResult" && (
+            <>
+              <h2 className={fr.cx("fr-h6", "fr-mt-3w")}>
+                Vos expériences et compétences
+              </h2>
+              <p className={fr.cx("fr-hint-text")}>
+                N’hésitez pas à détailler vos compétences, cela augmentera vos
+                chances de recevoir une réponse positive de l’entreprise.
+              </p>
+              <RadioButtons
+                options={[
+                  {
+                    label: "Je n'ai jamais travaillé",
+                    nativeInputProps: {
+                      value: 0,
+                      checked: hasWorkingExperienceValue === false,
+                      onChange: () => {
+                        setValue("hasWorkingExperience", false);
+                        setValue("experienceAdditionalInformation", undefined);
+                      },
+                    },
                   },
-                },
-              },
-              {
-                label:
-                  "J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat",
-                nativeInputProps: {
-                  value: 1,
-                  checked: hasWorkingExperienceValue === true,
-                  onChange: () => {
-                    setValue("hasWorkingExperience", true);
+                  {
+                    label:
+                      "J’ai déjà une ou plusieurs expériences professionnelles, ou de bénévolat",
+                    nativeInputProps: {
+                      value: 1,
+                      checked: hasWorkingExperienceValue === true,
+                      onChange: () => {
+                        setValue("hasWorkingExperience", true);
+                      },
+                    },
                   },
-                },
-              },
-            ]}
-          />
-          {hasWorkingExperienceValue && (
-            <Input
-              label={inputsLabelsByKey.experienceAdditionalInformation}
-              hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
-              nativeTextAreaProps={{
-                ...register("experienceAdditionalInformation"),
-              }}
-              {...getFieldError("experienceAdditionalInformation")}
-              textArea
-            />
+                ]}
+              />
+              {hasWorkingExperienceValue && (
+                <Input
+                  label={inputsLabelsByKey.experienceAdditionalInformation}
+                  hintText="Exemple : “travail en équipe”, “mise en rayon”, “babysitting”, etc."
+                  nativeTextAreaProps={{
+                    ...register("experienceAdditionalInformation"),
+                  }}
+                  {...getFieldError("experienceAdditionalInformation")}
+                  textArea
+                />
+              )}
+              <Input
+                label={inputsLabelsByKey.potentialBeneficiaryResumeLink}
+                nativeInputProps={{
+                  ...register("potentialBeneficiaryResumeLink"),
+                }}
+                {...getFieldError("potentialBeneficiaryResumeLink")}
+              />
+            </>
           )}
-
-          <Input
-            label={inputsLabelsByKey.potentialBeneficiaryResumeLink}
-            nativeInputProps={{
-              ...register("potentialBeneficiaryResumeLink"),
-            }}
-            {...getFieldError("potentialBeneficiaryResumeLink")}
-          />
-
           <ButtonsGroup
             className={fr.cx()}
             alignment="right"
@@ -355,4 +374,18 @@ const immersionObjectiveListOfOptions: SelectProps.Option<ImmersionObjective>[] 
   conventionObjectiveOptions.map((immersionObjective) => ({
     value: immersionObjective,
     label: labelsForImmersionObjective[immersionObjective],
+  }));
+
+const contactLevelsOfEducationsListOfOptions: SelectProps.Option<ContactLevelOfEducation>[] =
+  contactLevelsOfEducation.map((contactLevelOfEducation) => ({
+    label: labelsForContactLevelOfEducation[contactLevelOfEducation],
+    value: contactLevelOfEducation,
+  }));
+
+const appellationListOfOptions = (
+  appellations: AppellationDto[],
+): SelectProps.Option<AppellationCode>[] =>
+  appellations.map((appellation) => ({
+    value: appellation.appellationCode,
+    label: appellation.appellationLabel,
   }));
