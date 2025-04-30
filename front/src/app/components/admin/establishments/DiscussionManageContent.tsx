@@ -230,18 +230,21 @@ const DiscussionDetails = ({
           >
             {statusBadge.label}
           </p>
-          {discussion.immersionObjective}
+          {discussion.contactMethod === "EMAIL" &&
+            discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}
-          {discussion.potentialBeneficiary.resumeLink && (
-            <a
-              href={discussion.potentialBeneficiary.resumeLink}
-              title={"CV du candidat"}
-              target="_blank"
-              rel="noreferrer"
-            >
-              CV
-            </a>
-          )}
+          {discussion.contactMethod === "EMAIL" &&
+            discussion.kind === "IF" &&
+            discussion.potentialBeneficiary.resumeLink && (
+              <a
+                href={discussion.potentialBeneficiary.resumeLink}
+                title={"CV du candidat"}
+                target="_blank"
+                rel="noreferrer"
+              >
+                CV
+              </a>
+            )}
         </DiscussionMeta>
         <ButtonsGroup
           inlineLayoutWhen="always"
@@ -355,7 +358,10 @@ const makeConventionFromDiscussion = ({
       firstName: discussion.potentialBeneficiary.firstName,
       lastName: discussion.potentialBeneficiary.lastName,
       email: discussion.potentialBeneficiary.email,
-      phone: discussion.potentialBeneficiary.phone ?? "",
+      phone:
+        discussion.contactMethod === "EMAIL"
+          ? discussion.potentialBeneficiary.phone
+          : "",
     },
     establishmentRepresentative: {
       ...initialConvention.signatories.establishmentRepresentative,
@@ -372,7 +378,11 @@ const makeConventionFromDiscussion = ({
     phone: "",
     role: "establishment-tutor",
   },
-  immersionObjective: discussion.immersionObjective ?? undefined,
+  immersionObjective:
+    discussion.contactMethod === "EMAIL" &&
+    discussion.potentialBeneficiary.immersionObjective
+      ? discussion.potentialBeneficiary.immersionObjective
+      : undefined,
   siret: discussion.siret,
   businessName: discussion.businessName,
   immersionAppellation: discussion.appellation,
