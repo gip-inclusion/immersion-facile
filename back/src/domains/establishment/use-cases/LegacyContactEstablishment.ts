@@ -168,7 +168,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     if (
       contactRequest.contactMode !== establishment.establishment.contactMode
     ) {
-      throw new Error("Mode de contact invalide.");
+      throw errors.discussion.badContactMode();
     }
 
     const potentialBeneficiary: PotentialBeneficiaryCommonProps = {

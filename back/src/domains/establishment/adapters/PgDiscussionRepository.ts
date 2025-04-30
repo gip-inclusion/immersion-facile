@@ -288,15 +288,15 @@ const makeDiscussionDtoFromPgDiscussion = (
       const phone = discussion.potentialBeneficiary.phone;
       const datePreferences = discussion.potentialBeneficiary.datePreferences;
 
-      if (!phone) throw new Error("Missing phone for email discussion");
+      if (!phone) throw errors.discussion.missingPhone(discussion.id);
       if (!datePreferences)
-        throw new Error("Missing datePreferences for email discussion");
+        throw errors.discussion.missingDatePreferences(discussion.id);
 
       if (discussion.kind === "IF") {
         const hasWorkingExperience =
           discussion.potentialBeneficiary.hasWorkingExperience;
         if (hasWorkingExperience === undefined)
-          throw new Error("Missing hasWorkingExperience for email discussion");
+          throw errors.discussion.missingHasWorkingExperience(discussion.id);
         return {
           ...common,
           contactMode: discussion.contactMode,
@@ -318,13 +318,16 @@ const makeDiscussionDtoFromPgDiscussion = (
         discussion.immersionObjective !==
         "Découvrir un métier ou un secteur d'activité"
       )
-        throw new Error(
-          `Invalid immersion objective for discussion kind ${discussion.kind}`,
+        throw errors.discussion.badImmersionObjective(
+          discussion.id,
+          discussion.kind,
+          discussion.immersionObjective,
         );
       if (!discussion.potentialBeneficiary.levelOfEducation)
-        throw new Error(
-          `Missing level of education  for discussion kind ${discussion.kind}`,
-        );
+        throw errors.discussion.missingLevelOfEducation({
+          id: discussion.id,
+          kind: discussion.kind,
+        });
       return {
         ...common,
         contactMode: discussion.contactMode,

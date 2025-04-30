@@ -349,7 +349,8 @@ const makeDiscussionDtoEmail = async ({
     { showContentParts: true },
   );
 
-  if (!emailContent.contentParts) throw new Error("Missing content parts");
+  if (!emailContent.contentParts)
+    throw errors.email.missingContentParts("CONTACT_BY_EMAIL_REQUEST");
 
   return {
     ...discussion,
