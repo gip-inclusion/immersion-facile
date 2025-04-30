@@ -88,7 +88,7 @@ export const makeEstablishmentAggregate = async ({
       nextAvailabilityDate: formEstablishment.nextAvailabilityDate,
       searchableBy: formEstablishment.searchableBy,
       score,
-      contactMethod: formEstablishment.contactMethod,
+      contactMode: formEstablishment.contactMode,
     },
     userRights: updatedUserRights,
     offers: formEstablishment.appellations.map(

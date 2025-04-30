@@ -1,6 +1,6 @@
 import type {
   AbsoluteUrl,
-  ContactMethod,
+  ContactMode,
   DateTimeIsoString,
   EstablishmentSearchableBy,
   FormEstablishmentSource,
@@ -36,5 +36,5 @@ export type EstablishmentEntity = {
   voluntaryToImmersion: boolean;
   website?: AbsoluteUrl | "";
   score: number;
-  contactMethod: ContactMethod;
+  contactMode: ContactMode;
 } & WithAcquisition;

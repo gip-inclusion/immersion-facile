@@ -57,12 +57,12 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       );
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    if (contactMode !== establishmentAggregate.establishment.contactMethod)
+    if (contactMode !== establishmentAggregate.establishment.contactMode)
       throw errors.establishment.contactRequestContactModeMismatch({
         siret,
-        contactMethods: {
+        contactModes: {
           inParams: contactMode,
-          inRepo: establishmentAggregate.establishment.contactMethod,
+          inRepo: establishmentAggregate.establishment.contactMode,
         },
       });
 
@@ -166,7 +166,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     }
 
     if (
-      contactRequest.contactMode !== establishment.establishment.contactMethod
+      contactRequest.contactMode !== establishment.establishment.contactMode
     ) {
       throw new Error("Mode de contact invalide.");
     }
@@ -189,7 +189,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       kind: "IF",
       ...(contactRequest.contactMode === "EMAIL"
         ? {
-            contactMethod: contactRequest.contactMode,
+            contactMode: contactRequest.contactMode,
             potentialBeneficiary: {
               ...potentialBeneficiary,
               phone: contactRequest.potentialBeneficiaryPhone,
@@ -200,7 +200,7 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
             },
           }
         : {
-            contactMethod: contactRequest.contactMode,
+            contactMode: contactRequest.contactMode,
             potentialBeneficiary,
           }),
       establishmentContact: {

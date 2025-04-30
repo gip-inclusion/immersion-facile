@@ -87,7 +87,7 @@ const potentialBeneficiaryCommonSchema = z.object({
 export const commonDiscussionReadSchema: z.Schema<
   OmitFromExistingKeys<
     DiscussionReadDto,
-    "kind" | "contactMethod" | "potentialBeneficiary"
+    "kind" | "contactMode" | "potentialBeneficiary"
   >
 > = z
   .object({
@@ -116,7 +116,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
   commonDiscussionReadSchema.and(
     z.union([
       z.object({
-        contactMethod: preferEmailContactSchema,
+        contactMode: preferEmailContactSchema,
         kind: discussionKindIfSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
           phone: phoneSchema,
@@ -128,7 +128,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
         }),
       }),
       z.object({
-        contactMethod: preferEmailContactSchema,
+        contactMode: preferEmailContactSchema,
         kind: discussionKind1Eleve1StageSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
           phone: phoneSchema,
@@ -138,24 +138,24 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
         }),
       }),
       z.object({
-        contactMethod: preferInPersonContactSchema,
+        contactMode: preferInPersonContactSchema,
         kind: discussionKindIfSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema,
       }),
       z.object({
-        contactMethod: preferInPersonContactSchema,
+        contactMode: preferInPersonContactSchema,
         kind: discussionKind1Eleve1StageSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
           levelOfEducation: z.enum(["3ème", "2nde"]),
         }),
       }),
       z.object({
-        contactMethod: preferPhoneContactSchema,
+        contactMode: preferPhoneContactSchema,
         kind: discussionKindIfSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema,
       }),
       z.object({
-        contactMethod: preferPhoneContactSchema,
+        contactMode: preferPhoneContactSchema,
         kind: discussionKind1Eleve1StageSchema,
         potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
           levelOfEducation: z.enum(["3ème", "2nde"]),

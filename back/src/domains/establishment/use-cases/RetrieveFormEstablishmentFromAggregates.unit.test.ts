@@ -245,7 +245,7 @@ const makeExpectedFormEstablishment = ({
       email: establishmentContact.email,
     },
   ],
-  contactMethod: establishmentAggregate.establishment.contactMethod,
+  contactMode: establishmentAggregate.establishment.contactMode,
   website: establishmentAggregate.establishment.website,
   additionalInformation:
     establishmentAggregate.establishment.additionalInformation,

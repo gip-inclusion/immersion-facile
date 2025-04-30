@@ -29,7 +29,7 @@ describe("Contact establishment public v2 e2e", () => {
     const siret = "11112222333344";
 
     const establishment = new EstablishmentEntityBuilder()
-      .withContactMethod("EMAIL")
+      .withContactMode("EMAIL")
       .withSiret(siret)
       .build();
 

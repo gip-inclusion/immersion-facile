@@ -47,7 +47,7 @@ export const makeContactRequestReminder = createTransactionalUseCase<
 
     const maybeNotifications = await Promise.all(
       discussions
-        .filter((discussion) => discussion.contactMethod === "EMAIL")
+        .filter(({ contactMode }) => contactMode === "EMAIL")
         .map((discussion) =>
           makeNotification({ uow, discussion, mode, domain: deps.domain }),
         ),

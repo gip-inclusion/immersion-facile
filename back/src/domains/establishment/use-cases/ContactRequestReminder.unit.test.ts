@@ -1,6 +1,6 @@
 import { subDays } from "date-fns";
 import {
-  type ContactMethod,
+  type ContactMode,
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionKind,
@@ -37,34 +37,34 @@ describe("ContactRequestReminder", () => {
   const [
     discussionWith2DaysSinceBeneficiaryExchange,
     discussionWith3DaysSinceBeneficiaryExchange,
-    discussionWith3DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+    discussionWith3DaysSinceBeneficiaryExchangeWithContactModePhone,
     discussionWith4DaysSinceBeneficiaryExchange,
     discussionWith6DaysSinceBeneficiaryExchange,
     discussionWith7DaysSinceBeneficiaryExchange,
-    discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+    discussionWith7DaysSinceBeneficiaryExchangeWithContactModePhone,
     discussionWith8DaysSinceBeneficiaryExchange,
     discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
   ] = (
     [
-      { date: subDays(now, 2), contactMethod: "EMAIL", kind: "IF" },
-      { date: subDays(now, 3), contactMethod: "EMAIL", kind: "IF" },
-      { date: subDays(now, 3), contactMethod: "PHONE", kind: "IF" },
-      { date: subDays(now, 4), contactMethod: "EMAIL", kind: "IF" },
-      { date: subDays(now, 6), contactMethod: "EMAIL", kind: "IF" },
-      { date: subDays(now, 7), contactMethod: "EMAIL", kind: "IF" },
-      { date: subDays(now, 7), contactMethod: "PHONE", kind: "IF" },
-      { date: subDays(now, 8), contactMethod: "EMAIL", kind: "IF" },
+      { date: subDays(now, 2), contactMode: "EMAIL", kind: "IF" },
+      { date: subDays(now, 3), contactMode: "EMAIL", kind: "IF" },
+      { date: subDays(now, 3), contactMode: "PHONE", kind: "IF" },
+      { date: subDays(now, 4), contactMode: "EMAIL", kind: "IF" },
+      { date: subDays(now, 6), contactMode: "EMAIL", kind: "IF" },
+      { date: subDays(now, 7), contactMode: "EMAIL", kind: "IF" },
+      { date: subDays(now, 7), contactMode: "PHONE", kind: "IF" },
+      { date: subDays(now, 8), contactMode: "EMAIL", kind: "IF" },
       {
         date: subDays(now, 3),
-        contactMethod: "EMAIL",
+        contactMode: "EMAIL",
         kind: "1_ELEVE_1_STAGE",
       },
     ] satisfies {
       date: Date;
-      contactMethod: ContactMethod;
+      contactMode: ContactMode;
       kind: DiscussionKind;
     }[]
-  ).map(({ date, contactMethod }, index) => {
+  ).map(({ date, contactMode }, index) => {
     const builder = new DiscussionBuilder()
       .withId(uuid())
       .withEstablishmentContact({
@@ -73,7 +73,7 @@ describe("ContactRequestReminder", () => {
         lastName: `test-${index}`,
         phone: "0677889944",
       })
-      .withContactMethod(contactMethod)
+      .withContactMode(contactMode)
       .withPotentialBeneficiaryEmail(`benef-${index}@email.com`)
       .withPotentialBeneficiaryFirstname(`mike-${index}`)
       .withPotentialBeneficiaryLastName(`portnoy-${index}`)
@@ -89,7 +89,7 @@ describe("ContactRequestReminder", () => {
         },
       ])
       .withCreatedAt(date);
-    if (contactMethod === "EMAIL")
+    if (contactMode === "EMAIL")
       builder.withPotentialBeneficiaryPhone("0677889944");
     return builder.build();
   });
@@ -271,11 +271,11 @@ describe("ContactRequestReminder", () => {
       uow.discussionRepository.discussions = [
         discussionWith2DaysSinceBeneficiaryExchange,
         discussionWith3DaysSinceBeneficiaryExchange,
-        discussionWith3DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+        discussionWith3DaysSinceBeneficiaryExchangeWithContactModePhone,
         discussionWith4DaysSinceBeneficiaryExchange,
         discussionWith6DaysSinceBeneficiaryExchange,
         discussionWith7DaysSinceBeneficiaryExchange,
-        discussionWith7DaysSinceBeneficiaryExchangeWithContactMethodPhone,
+        discussionWith7DaysSinceBeneficiaryExchangeWithContactModePhone,
         discussionWith8DaysSinceBeneficiaryExchange,
         discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
       ];

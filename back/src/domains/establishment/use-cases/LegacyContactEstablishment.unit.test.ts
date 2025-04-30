@@ -110,7 +110,7 @@ describe("LegacyContactEstablishment", () => {
         new EstablishmentEntityBuilder()
           .withSiret(siret)
           .withLocations([location])
-          .withContactMethod("EMAIL")
+          .withContactMode("EMAIL")
           .build(),
       )
       .withUserRights(establishmentRights)
@@ -184,7 +184,7 @@ describe("LegacyContactEstablishment", () => {
           new EstablishmentEntityBuilder()
             .withSiret(siret)
             .withLocations([location])
-            .withContactMethod("PHONE")
+            .withContactMode("PHONE")
             .build(),
         )
         .withUserRights(establishmentRights)
@@ -232,7 +232,7 @@ describe("LegacyContactEstablishment", () => {
             new EstablishmentEntityBuilder()
               .withSiret(siret)
               .withLocations([location])
-              .withContactMethod("IN_PERSON")
+              .withContactMode("IN_PERSON")
               .build(),
           )
           .withUserRights(establishmentRights)
@@ -297,7 +297,7 @@ describe("LegacyContactEstablishment", () => {
           address:
             establishmentAggregateWithEmailContact.establishment.locations[0]
               .address,
-          contactMethod: "EMAIL",
+          contactMode: "EMAIL",
           kind: "IF",
           potentialBeneficiary: {
             firstName: validEmailRequest.potentialBeneficiaryFirstName,
@@ -362,7 +362,7 @@ describe("LegacyContactEstablishment", () => {
           siret,
           businessName: "Entreprise 1",
           address: establishment.locations[0].address,
-          contactMethod: "EMAIL",
+          contactMode: "EMAIL",
           kind: "IF",
           potentialBeneficiary: {
             firstName: "Antoine",
@@ -402,7 +402,7 @@ describe("LegacyContactEstablishment", () => {
           siret,
           businessName: "Entreprise 2",
           address: establishment.locations[0].address,
-          contactMethod: "EMAIL",
+          contactMode: "EMAIL",
           kind: "IF",
           potentialBeneficiary: {
             firstName: "Antoine",
@@ -507,7 +507,7 @@ describe("LegacyContactEstablishment", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(siret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .build(),
         )
         .withUserRights(establishmentRights)
@@ -524,9 +524,9 @@ describe("LegacyContactEstablishment", () => {
         }),
         errors.establishment.contactRequestContactModeMismatch({
           siret: establishment.establishment.siret,
-          contactMethods: {
+          contactModes: {
             inParams: "IN_PERSON",
-            inRepo: establishment.establishment.contactMethod,
+            inRepo: establishment.establishment.contactMode,
           },
         }),
       );
@@ -548,7 +548,7 @@ describe("LegacyContactEstablishment", () => {
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withSiret(siret)
-              .withContactMethod("PHONE")
+              .withContactMode("PHONE")
               .build(),
           )
           .withUserRights(establishmentRights)

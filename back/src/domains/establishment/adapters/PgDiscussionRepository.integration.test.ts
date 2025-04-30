@@ -677,42 +677,42 @@ describe("PgDiscussionRepository", () => {
           title: "insert with kind IF and contact mode EMAIL",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .build(),
         },
         {
           title: "insert with kind IF and contact mode PHONE",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
-            .withContactMethod("PHONE")
+            .withContactMode("PHONE")
             .build(),
         },
         {
           title: "insert with kind IF and contact mode IN_PERSON",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
-            .withContactMethod("IN_PERSON")
+            .withContactMode("IN_PERSON")
             .build(),
         },
         {
           title: "insert with kind 1_ELEVE_1_STAGE and contact mode EMAIL",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("1_ELEVE_1_STAGE")
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .build(),
         },
         {
           title: "insert with kind 1_ELEVE_1_STAGE and contact mode PHONE",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("1_ELEVE_1_STAGE")
-            .withContactMethod("PHONE")
+            .withContactMode("PHONE")
             .build(),
         },
         {
           title: "insert with kind 1_ELEVE_1_STAGE and contact mode IN_PERSON",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("1_ELEVE_1_STAGE")
-            .withContactMethod("IN_PERSON")
+            .withContactMode("IN_PERSON")
             .build(),
         },
       ];

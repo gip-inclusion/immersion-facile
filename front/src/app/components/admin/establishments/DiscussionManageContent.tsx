@@ -230,10 +230,10 @@ const DiscussionDetails = ({
           >
             {statusBadge.label}
           </p>
-          {discussion.contactMethod === "EMAIL" &&
+          {discussion.contactMode === "EMAIL" &&
             discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}
-          {discussion.contactMethod === "EMAIL" &&
+          {discussion.contactMode === "EMAIL" &&
             discussion.kind === "IF" &&
             discussion.potentialBeneficiary.resumeLink && (
               <a
@@ -359,7 +359,7 @@ const makeConventionFromDiscussion = ({
       lastName: discussion.potentialBeneficiary.lastName,
       email: discussion.potentialBeneficiary.email,
       phone:
-        discussion.contactMethod === "EMAIL"
+        discussion.contactMode === "EMAIL"
           ? discussion.potentialBeneficiary.phone
           : "",
     },
@@ -379,7 +379,7 @@ const makeConventionFromDiscussion = ({
     role: "establishment-tutor",
   },
   immersionObjective:
-    discussion.contactMethod === "EMAIL" &&
+    discussion.contactMode === "EMAIL" &&
     discussion.potentialBeneficiary.immersionObjective
       ? discussion.potentialBeneficiary.immersionObjective
       : undefined,

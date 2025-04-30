@@ -135,12 +135,11 @@ describe("POST contact-establishment public V2 route", () => {
   });
 
   it("rejects invalid requests with mismatching contact Mode with error code 400", async () => {
-    const testEstablishmentContactMethod = "PHONE";
     const establishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
           .withSiret(contactEstablishment.siret)
-          .withContactMethod(testEstablishmentContactMethod)
+          .withContactMode("PHONE")
           .withLocations([TEST_LOCATION])
           .withNumberOfEmployeeRange("10-19")
           .build(),
@@ -173,9 +172,9 @@ describe("POST contact-establishment public V2 route", () => {
     expectToEqual(body, {
       status: 400,
       message: errors.establishment.contactRequestContactModeMismatch({
-        contactMethods: {
+        contactModes: {
           inParams: contactEstablishment.contactMode,
-          inRepo: establishmentAggregate.establishment.contactMethod,
+          inRepo: establishmentAggregate.establishment.contactMode,
         },
         siret: contactEstablishment.siret,
       }).message,
@@ -190,7 +189,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
@@ -235,7 +234,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),
@@ -283,7 +282,7 @@ describe("POST contact-establishment public V2 route", () => {
         .withEstablishment(
           new EstablishmentEntityBuilder()
             .withSiret(contactEstablishment.siret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withLocations([TEST_LOCATION])
             .withNumberOfEmployeeRange("10-19")
             .build(),

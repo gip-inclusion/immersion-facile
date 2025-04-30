@@ -81,7 +81,7 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
         uow,
         establishmentAggregate.userRights,
       ),
-      contactMethod: establishmentAggregate.establishment.contactMethod,
+      contactMode: establishmentAggregate.establishment.contactMode,
       maxContactsPerMonth:
         establishmentAggregate.establishment.maxContactsPerMonth,
       nextAvailabilityDate:

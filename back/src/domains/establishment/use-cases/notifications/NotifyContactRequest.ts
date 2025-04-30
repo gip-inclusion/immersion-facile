@@ -51,7 +51,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       establishmentSiret: discussion.siret,
     };
 
-    if (discussion.contactMethod !== "EMAIL") {
+    if (discussion.contactMode !== "EMAIL") {
       const recipients = [discussion.potentialBeneficiary.email];
       const params = {
         businessName: discussion.businessName,
@@ -65,7 +65,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       await this.#saveNotificationAndRelatedEvent(uow, {
         kind: "email",
         templatedContent:
-          discussion.contactMethod === "IN_PERSON"
+          discussion.contactMode === "IN_PERSON"
             ? {
                 sender: immersionFacileNoReplyEmailSender,
                 recipients,

@@ -5,7 +5,7 @@ import type { AddressAndPosition } from "../address/address.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type {
-  ContactMethod,
+  ContactMode,
   EstablishmentCSVRow,
   EstablishmentSearchableBy,
   FormEstablishmentAddress,
@@ -99,7 +99,7 @@ export const defaultValidFormEstablishment: FormEstablishmentDto = {
       email: "copy2@mail.com",
     },
   ],
-  contactMethod: "EMAIL",
+  contactMode: "EMAIL",
   naf: { code: "7201A", nomenclature: "nomenclature code 7201A" },
   businessName: "Ma super entreprise",
   businessNameCustomized: "Ma belle enseigne du quartier",
@@ -152,7 +152,7 @@ export const fullyUpdatedFormEstablishment: FormEstablishmentDto = {
       email: "updated-copy-email@test.com",
     },
   ],
-  contactMethod: "PHONE",
+  contactMode: "PHONE",
   naf: { code: "8054B", nomenclature: "nomenclature code B" },
   businessName: "Edited Business Name",
   siret: "01234567890123",
@@ -193,7 +193,7 @@ const emptyFormEstablishment: FormEstablishmentDto = {
   ],
   naf: { code: "", nomenclature: "" },
 
-  contactMethod: "EMAIL",
+  contactMode: "EMAIL",
   userRights: [],
   businessName: "",
   siret: "",
@@ -284,10 +284,10 @@ export class FormEstablishmentDtoBuilder
     });
   }
 
-  public withContactMethod(contactMethod: ContactMethod) {
+  public withContactMode(contactMode: ContactMode) {
     return new FormEstablishmentDtoBuilder({
       ...this.#dto,
-      contactMethod,
+      contactMode,
     });
   }
 
@@ -358,7 +358,7 @@ const formEstablishmentToEstablishmentCsvRow = (
     throw new Error("first user right must be admin");
   return {
     businessAddress: establishment.businessAddresses[0].rawAddress,
-    contactMethod: establishment.contactMethod,
+    contactMode: establishment.contactMode,
     naf_code: establishment.naf?.code ?? "",
     businessName: establishment.businessName,
     businessNameCustomized: establishment.businessNameCustomized ?? "",

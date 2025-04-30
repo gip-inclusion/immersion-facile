@@ -4,32 +4,32 @@ import { discussionReadSchema } from "./discussion.schema";
 
 describe("Discussion schema", () => {
   const discussionEmailIF = new DiscussionBuilder()
-    .withContactMethod("EMAIL")
+    .withContactMode("EMAIL")
     .withDiscussionKind("IF")
     .build();
 
   const discussionEmail1E1S = new DiscussionBuilder()
-    .withContactMethod("EMAIL")
+    .withContactMode("EMAIL")
     .withDiscussionKind("1_ELEVE_1_STAGE")
     .build();
 
   const discussionPhoneIF = new DiscussionBuilder()
-    .withContactMethod("PHONE")
+    .withContactMode("PHONE")
     .withDiscussionKind("IF")
     .build();
 
   const discussionPhone1E1S = new DiscussionBuilder()
-    .withContactMethod("PHONE")
+    .withContactMode("PHONE")
     .withDiscussionKind("1_ELEVE_1_STAGE")
     .build();
 
   const discussionInPersonIF = new DiscussionBuilder()
-    .withContactMethod("IN_PERSON")
+    .withContactMode("IN_PERSON")
     .withDiscussionKind("IF")
     .build();
 
   const discussionInPerson1E1S = new DiscussionBuilder()
-    .withContactMethod("IN_PERSON")
+    .withContactMode("IN_PERSON")
     .withDiscussionKind("1_ELEVE_1_STAGE")
     .build();
 

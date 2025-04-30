@@ -40,7 +40,7 @@ export const defaultFormEstablishmentValue = (
   businessAddresses: [],
   appellations: [emptyAppellationAndRome],
   userRights: [],
-  contactMethod: "EMAIL",
+  contactMode: "EMAIL",
   website: "",
   additionalInformation: "",
   maxContactsPerMonth: defaultMaxContactsPerMonth,

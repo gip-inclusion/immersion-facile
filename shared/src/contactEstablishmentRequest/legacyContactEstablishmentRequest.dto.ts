@@ -1,11 +1,11 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { LocationId } from "../address/address.dto";
 import type { ImmersionObjective } from "../convention/convention.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 
-type LegacyContactInformations<T extends ContactMethod> = {
+type LegacyContactInformations<T extends ContactMode> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;

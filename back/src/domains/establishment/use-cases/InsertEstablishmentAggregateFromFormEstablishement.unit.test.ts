@@ -513,7 +513,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           .withSiret(validFormEstablishmentWithSiret.siret)
           .withName(validFormEstablishmentWithSiret.businessName)
           .withSearchableBy(validFormEstablishmentWithSiret.searchableBy)
-          .withContactMethod(validFormEstablishmentWithSiret.contactMethod)
+          .withContactMode(validFormEstablishmentWithSiret.contactMode)
           .withCustomizedName(
             validFormEstablishmentWithSiret.businessNameCustomized,
           )
@@ -623,7 +623,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             .withSiret(formEstablishment.siret)
             .withName(formEstablishment.businessName)
             .withSearchableBy(formEstablishment.searchableBy)
-            .withContactMethod(formEstablishment.contactMethod)
+            .withContactMode(formEstablishment.contactMode)
             .withCustomizedName(formEstablishment.businessNameCustomized)
             .withFitForDisabledWorkers(formEstablishment.fitForDisabledWorkers)
             .withMaxContactsPerMonth(formEstablishment.maxContactsPerMonth)
@@ -747,7 +747,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 .withSiret(form.siret)
                 .withName(form.businessName)
                 .withSearchableBy(form.searchableBy)
-                .withContactMethod(form.contactMethod)
+                .withContactMode(form.contactMode)
                 .withCustomizedName(form.businessNameCustomized)
                 .withFitForDisabledWorkers(form.fitForDisabledWorkers)
                 .withMaxContactsPerMonth(form.maxContactsPerMonth)

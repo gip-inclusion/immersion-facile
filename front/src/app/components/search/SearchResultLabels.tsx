@@ -1,12 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
-import type { ContactMethod } from "shared";
+import type { ContactMode } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 type ImmersionOfferLabelsProps = {
   voluntaryToImmersion?: boolean;
   fitForDisabledWorkers?: boolean;
-  contactMode?: ContactMethod;
+  contactMode?: ContactMode;
   className?: string;
 };
 

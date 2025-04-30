@@ -24,13 +24,13 @@ describe("form contents utils", () => {
           type: "too_small",
           ref: undefined,
         },
-        contactMethod: {
+        contactMode: {
           message:
             "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
           type: "invalid_enum_value",
           ref: {
             type: "radio",
-            name: "businessContact.contactMethod",
+            name: "businessContact.contactMode",
           },
         },
         email: {
@@ -53,7 +53,7 @@ describe("form contents utils", () => {
         firstName: "Obligatoire",
         job: "Obligatoire",
         phone: "Obligatoire",
-        contactMethod:
+        contactMode:
           "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
         email: "Veuillez saisir une adresse e-mail valide",
         address: {

@@ -83,7 +83,7 @@ describe("ContactEstablishment", () => {
 
   const establishmentEmailWithSiret = new EstablishmentEntityBuilder()
     .withSiret("11112222333344")
-    .withContactMethod("EMAIL")
+    .withContactMode("EMAIL")
     .withLocations([location])
     .build();
 
@@ -181,7 +181,7 @@ describe("ContactEstablishment", () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder(establishmentEmailWithSiret)
-              .withContactMethod("PHONE")
+              .withContactMode("PHONE")
               .build(),
           )
           .withOffers([immersionOffer])
@@ -216,7 +216,7 @@ describe("ContactEstablishment", () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder(establishmentEmailWithSiret)
-              .withContactMethod("IN_PERSON")
+              .withContactMode("IN_PERSON")
               .build(),
           )
           .withOffers([immersionOffer])
@@ -275,7 +275,7 @@ describe("ContactEstablishment", () => {
       });
 
       describe("with discussion kind IF", () => {
-        it("and contact method EMAIL", async () => {
+        it("and contact mode EMAIL", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             establishmentAggregateWithEmail,
           ];
@@ -285,7 +285,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "EMAIL",
+              contactMode: "EMAIL",
               kind: "IF",
               potentialBeneficiary: {
                 firstName: validEmailRequest.potentialBeneficiaryFirstName,
@@ -329,10 +329,10 @@ describe("ContactEstablishment", () => {
           ]);
         });
 
-        it("and contact method PHONE", async () => {
+        it("and contact mode PHONE", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
-              .withContactMethod("PHONE")
+              .withContactMode("PHONE")
               .build(),
           ];
 
@@ -341,7 +341,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "PHONE",
+              contactMode: "PHONE",
               kind: "IF",
               potentialBeneficiary: {
                 firstName: validEmailRequest.potentialBeneficiaryFirstName,
@@ -352,10 +352,10 @@ describe("ContactEstablishment", () => {
           ]);
         });
 
-        it("and contact method IN_PERSON", async () => {
+        it("and contact mode IN_PERSON", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
-              .withContactMethod("IN_PERSON")
+              .withContactMode("IN_PERSON")
               .build(),
           ];
 
@@ -367,7 +367,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "IN_PERSON",
+              contactMode: "IN_PERSON",
               kind: "IF",
               potentialBeneficiary: {
                 firstName: validEmailRequest.potentialBeneficiaryFirstName,
@@ -380,7 +380,7 @@ describe("ContactEstablishment", () => {
       });
 
       describe("with discussion kind 1_ELEVE_1_STAGE", () => {
-        it("and contact method EMAIL", async () => {
+        it("and contact mode EMAIL", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             establishmentAggregateWithEmail,
           ];
@@ -398,7 +398,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "EMAIL",
+              contactMode: "EMAIL",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
                 firstName: valid1J1SEmailRequest.potentialBeneficiaryFirstName,
@@ -439,10 +439,10 @@ describe("ContactEstablishment", () => {
           ]);
         });
 
-        it("and contact method PHONE", async () => {
+        it("and contact mode PHONE", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
-              .withContactMethod("PHONE")
+              .withContactMode("PHONE")
               .build(),
           ];
 
@@ -457,7 +457,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "PHONE",
+              contactMode: "PHONE",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
                 firstName: validPhone1E1SRequest.potentialBeneficiaryFirstName,
@@ -469,10 +469,10 @@ describe("ContactEstablishment", () => {
           ]);
         });
 
-        it("and contact method IN_PERSON", async () => {
+        it("and contact mode IN_PERSON", async () => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             new EstablishmentAggregateBuilder(establishmentAggregateWithEmail)
-              .withContactMethod("IN_PERSON")
+              .withContactMode("IN_PERSON")
               .build(),
           ];
 
@@ -489,7 +489,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              contactMethod: "IN_PERSON",
+              contactMode: "IN_PERSON",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
                 firstName:
@@ -688,7 +688,7 @@ describe("ContactEstablishment", () => {
       const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder(establishmentEmailWithSiret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .build(),
         )
         .withOffers([immersionOffer])
@@ -708,9 +708,9 @@ describe("ContactEstablishment", () => {
         contactEstablishment.execute(params),
         errors.establishment.contactRequestContactModeMismatch({
           siret: establishment.establishment.siret,
-          contactMethods: {
+          contactModes: {
             inParams: params.contactMode,
-            inRepo: establishment.establishment.contactMethod,
+            inRepo: establishment.establishment.contactMode,
           },
         }),
       );
@@ -731,7 +731,7 @@ describe("ContactEstablishment", () => {
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder(establishmentEmailWithSiret)
-              .withContactMethod("PHONE")
+              .withContactMode("PHONE")
               .build(),
           )
           .withUserRights(userRights)

@@ -1,13 +1,13 @@
 import type {
   AppellationCode,
-  ContactMethod,
+  ContactMode,
   ImmersionObjective,
   LegacyContactEstablishmentRequestDto,
   LocationId,
   SiretDto,
 } from "shared";
 
-type ContactInformationPublicV2<T extends ContactMethod> = {
+type ContactInformationPublicV2<T extends ContactMode> = {
   appellationCode: AppellationCode;
   siret: SiretDto;
   potentialBeneficiaryFirstName: string;

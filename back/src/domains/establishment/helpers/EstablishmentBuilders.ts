@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
   type Builder,
-  type ContactMethod,
+  type ContactMode,
   type EstablishmentSearchableBy,
   type FormEstablishmentSource,
   type Location,
@@ -50,7 +50,7 @@ const validEstablishmentEntityV2: EstablishmentEntity = {
   nafDto: { code: defaultNafCode, nomenclature: "NAFRev2" },
   numberEmployeesRange: "10-19",
   updatedAt: new Date("2024-08-10"),
-  contactMethod: "EMAIL",
+  contactMode: "EMAIL",
   isOpen: true,
   isMaxDiscussionsForPeriodReached: false,
   maxContactsPerMonth: defaultMaxContactsPerMonth,
@@ -86,8 +86,8 @@ export class EstablishmentEntityBuilder
     return new EstablishmentEntityBuilder({ ...this.entity, createdAt });
   }
 
-  public withContactMethod(contactMethod: ContactMethod) {
-    return new EstablishmentEntityBuilder({ ...this.entity, contactMethod });
+  public withContactMode(contactMode: ContactMode) {
+    return new EstablishmentEntityBuilder({ ...this.entity, contactMode });
   }
 
   public withCustomizedName(customizedName?: string) {
@@ -257,13 +257,13 @@ export class EstablishmentAggregateBuilder
     });
   }
 
-  public withContactMethod(contactMethod: ContactMethod) {
+  public withContactMode(contactMode: ContactMode) {
     return new EstablishmentAggregateBuilder({
       ...this.aggregate,
       establishment: new EstablishmentEntityBuilder(
         this.aggregate.establishment,
       )
-        .withContactMethod(contactMethod)
+        .withContactMode(contactMode)
         .build(),
     });
   }

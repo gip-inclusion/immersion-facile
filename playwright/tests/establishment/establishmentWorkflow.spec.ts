@@ -45,7 +45,7 @@ test.skip("Establishment creation and modification workflow", () => {
         testEstablishments[retryIndex];
       return FormEstablishmentDtoBuilder.valid()
         .withSiret(siret)
-        .withContactMethod("PHONE")
+        .withContactMode("PHONE")
         .withBusinessName(businessName)
         .withUserRights([
           {
@@ -86,7 +86,7 @@ test.skip("Establishment creation and modification workflow", () => {
             "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
         },
       ])
-      .withContactMethod("PHONE")
+      .withContactMode("PHONE")
       .withSearchableBy({
         students: false,
         jobSeekers: true,

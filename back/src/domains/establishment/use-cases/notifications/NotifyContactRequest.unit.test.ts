@@ -67,14 +67,14 @@ describe("NotifyContactRequest", () => {
   });
 
   describe("Right paths", () => {
-    describe("Contact method email", () => {
+    describe("Contact mode email", () => {
       it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
         "Sends ContactByEmailRequest email with kind %s to establishment ",
         async (kind) => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
             .withSiret(siret)
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withDiscussionKind(kind)
             .withEstablishmentContact({
               email: allowedContactEmail,
@@ -168,14 +168,14 @@ describe("NotifyContactRequest", () => {
       );
     });
 
-    describe("Contact method phone", () => {
+    describe("Contact mode phone", () => {
       it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
         "Sends ContactByPhoneRequest email with kind %s to potential beneficiary",
         async () => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
             .withSiret(siret)
-            .withContactMethod("PHONE")
+            .withContactMode("PHONE")
             .withEstablishmentContact({
               email: allowedContactEmail,
               copyEmails: [allowedCopyEmail],
@@ -215,14 +215,14 @@ describe("NotifyContactRequest", () => {
       );
     });
 
-    describe("Contact method in person", () => {
+    describe("Contact mode in person", () => {
       it.each(["1_ELEVE_1_STAGE", "IF"] satisfies DiscussionKind[])(
         "Sends ContactInPersonRequest email with kind %s to potential beneficiary",
         async () => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
             .withSiret(siret)
-            .withContactMethod("IN_PERSON")
+            .withContactMode("IN_PERSON")
             .withEstablishmentContact({
               email: allowedContactEmail,
               copyEmails: [allowedCopyEmail],
@@ -282,7 +282,7 @@ describe("NotifyContactRequest", () => {
       const discussion = new DiscussionBuilder()
         .withId(discussionId)
         .withSiret(siret)
-        .withContactMethod("EMAIL")
+        .withContactMode("EMAIL")
         .withEstablishmentContact({
           email: allowedContactEmail,
           copyEmails: [allowedCopyEmail],

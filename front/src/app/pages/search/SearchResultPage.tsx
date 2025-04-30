@@ -14,7 +14,7 @@ import { Helmet } from "react-helmet-async";
 import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
-  type ContactMethod,
+  type ContactMode,
   type SearchResultDto,
   getMapsLink,
   makeAppellationInformationUrl,
@@ -37,8 +37,8 @@ import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {} from "ts-pattern";
 import type { Route } from "type-route";
 
-const getFeedBackMessage = (contactMethod?: ContactMethod) => {
-  switch (contactMethod) {
+const getFeedBackMessage = (contactMode?: ContactMode) => {
+  switch (contactMode) {
     case "EMAIL":
       return "L'entreprise a été contactée avec succès.";
     case "PHONE":

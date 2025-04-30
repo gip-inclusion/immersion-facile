@@ -30,7 +30,7 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent =
           discussionId: inputParams.discussionId,
         });
 
-      if (discussion.contactMethod !== "EMAIL") return;
+      if (discussion.contactMode !== "EMAIL") return;
 
       await saveNotificationAndRelatedEvent(uow, {
         kind: "email",

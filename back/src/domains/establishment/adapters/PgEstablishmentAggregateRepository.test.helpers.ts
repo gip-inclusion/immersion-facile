@@ -29,7 +29,7 @@ export const makeExpectedSearchResult = ({
       appellationLabel,
     })),
     establishmentScore: establishmentAggregate.establishment.score,
-    contactMode: establishmentAggregate.establishment.contactMethod,
+    contactMode: establishmentAggregate.establishment.contactMode,
     customizedName: establishmentAggregate.establishment.customizedName,
     distance_m: withLocationAndDistance.distance,
     fitForDisabledWorkers:

@@ -3,7 +3,7 @@ import { sql } from "kysely";
 import { keys } from "ramda";
 import {
   type CommonDiscussionDto,
-  type ContactMethod,
+  type ContactMode,
   type DiscussionDto,
   type DiscussionId,
   type DiscussionStatus,
@@ -208,7 +208,7 @@ const discussionToPg = (
   potential_beneficiary_email: discussion.potentialBeneficiary.email,
   potential_beneficiary_last_name: discussion.potentialBeneficiary.lastName,
   kind: discussion.kind,
-  ...(discussion.contactMethod === "EMAIL"
+  ...(discussion.contactMode === "EMAIL"
     ? {
         immersion_objective: discussion.potentialBeneficiary.immersionObjective,
         potential_beneficiary_phone: discussion.potentialBeneficiary.phone,
@@ -232,7 +232,7 @@ const discussionToPg = (
       : null,
   street_number_and_address: discussion.address.streetNumberAndAddress,
   siret: discussion.siret,
-  contact_method: discussion.contactMethod,
+  contact_method: discussion.contactMode,
   potential_beneficiary_first_name: discussion.potentialBeneficiary.firstName,
   acquisition_campaign: discussion.acquisitionCampaign,
   acquisition_keyword: discussion.acquisitionKeyword,
@@ -284,7 +284,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       email: discussion.potentialBeneficiary.email,
     };
 
-    if (discussion.contactMethod === "EMAIL") {
+    if (discussion.contactMode === "EMAIL") {
       const phone = discussion.potentialBeneficiary.phone;
       const datePreferences = discussion.potentialBeneficiary.datePreferences;
 
@@ -299,7 +299,7 @@ const makeDiscussionDtoFromPgDiscussion = (
           throw new Error("Missing hasWorkingExperience for email discussion");
         return {
           ...common,
-          contactMethod: discussion.contactMethod,
+          contactMode: discussion.contactMode,
           kind: discussion.kind,
           potentialBeneficiary: {
             ...commonPotentialBeneficiary,
@@ -327,7 +327,7 @@ const makeDiscussionDtoFromPgDiscussion = (
         );
       return {
         ...common,
-        contactMethod: discussion.contactMethod,
+        contactMode: discussion.contactMode,
         kind: discussion.kind,
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
@@ -346,7 +346,7 @@ const makeDiscussionDtoFromPgDiscussion = (
 
       return {
         ...common,
-        contactMethod: discussion.contactMethod,
+        contactMode: discussion.contactMode,
         kind: discussion.kind,
         potentialBeneficiary: {
           ...commonPotentialBeneficiary,
@@ -357,7 +357,7 @@ const makeDiscussionDtoFromPgDiscussion = (
 
     return {
       ...common,
-      contactMethod: discussion.contactMethod,
+      contactMode: discussion.contactMode,
       kind: discussion.kind,
       potentialBeneficiary: commonPotentialBeneficiary,
     };
@@ -494,7 +494,7 @@ const executeGetDiscussion = (
             "appellation_code",
           )} AS text)`,
           immersionObjective: ref("d.immersion_objective"),
-          contactMethod: sql<ContactMethod>`${ref("d.contact_method")}`,
+          contactMode: sql<ContactMode>`${ref("d.contact_method")}`,
           potentialBeneficiary: jsonBuildObject({
             firstName: ref("d.potential_beneficiary_first_name"),
             lastName: ref("d.potential_beneficiary_last_name"),

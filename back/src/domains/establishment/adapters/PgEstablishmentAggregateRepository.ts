@@ -478,7 +478,7 @@ export class PgEstablishmentAggregateRepository
         source_provider: establishment.sourceProvider,
         update_date: updatedAt,
         website: establishment.website ?? null,
-        contact_mode: establishment.contactMethod,
+        contact_mode: establishment.contactMode,
       })
       .where("siret", "=", establishment.siret)
       .execute();
@@ -520,7 +520,7 @@ export class PgEstablishmentAggregateRepository
           aggregate.establishment.searchableBy.jobSeekers,
         acquisition_keyword: aggregate.establishment.acquisitionKeyword,
         acquisition_campaign: aggregate.establishment.acquisitionCampaign,
-        contact_mode: aggregate.establishment.contactMethod,
+        contact_mode: aggregate.establishment.contactMode,
       })
       .execute();
   }
@@ -1038,7 +1038,7 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
             siret: ref("e.siret"),
             name: ref("e.name"),
             customizedName: ref("e.customized_name"),
-            contactMethod: ref("e.contact_mode"),
+            contactMode: ref("e.contact_mode"),
             website: ref("e.website"),
             additionalInformation: ref("e.additional_information"),
             locations: jsonArrayFrom(

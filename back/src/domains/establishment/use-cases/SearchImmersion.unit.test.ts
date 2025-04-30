@@ -60,7 +60,7 @@ const establishment = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
-      .withContactMethod("EMAIL")
+      .withContactMode("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("https://www.website.com")
       .build(),
@@ -79,7 +79,7 @@ const establishmentAcceptingOnlyStudent = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
-      .withContactMethod("EMAIL")
+      .withContactMode("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("https://www.website.com")
       .withSearchableBy({ students: true, jobSeekers: false })
@@ -98,7 +98,7 @@ const establishmentAcceptingOnlyJobSeeker = new EstablishmentAggregateBuilder()
         code: "naf code",
         nomenclature: "naf nomenclature",
       })
-      .withContactMethod("EMAIL")
+      .withContactMode("EMAIL")
       .withNumberOfEmployeeRange("20-49")
       .withWebsite("https://www.website.com")
       .withSearchableBy({ students: false, jobSeekers: true })
