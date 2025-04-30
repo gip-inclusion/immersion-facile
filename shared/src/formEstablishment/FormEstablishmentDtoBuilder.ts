@@ -2,6 +2,7 @@ import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
+import { errors } from "../errors/errors";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type {
@@ -355,7 +356,7 @@ const formEstablishmentToEstablishmentCsvRow = (
     userRight10,
   ] = establishment.userRights;
   if (userRight1.role !== "establishment-admin")
-    throw new Error("first user right must be admin");
+    throw errors.establishmentCsv.firstUserMustBeAdmin(userRight1.email);
   return {
     businessAddress: establishment.businessAddresses[0].rawAddress,
     contactMode: establishment.contactMode,

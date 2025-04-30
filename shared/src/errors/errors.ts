@@ -10,9 +10,15 @@ import type {
   ConventionDto,
   ConventionId,
   ConventionStatus,
+  ImmersionObjective,
   ReminderKind,
 } from "../convention/convention.dto";
-import type { DiscussionId, RejectionKind } from "../discussion/discussion.dto";
+import type {
+  DiscussionId,
+  DiscussionKind,
+  RejectionKind,
+} from "../discussion/discussion.dto";
+import type { EmailParamsByEmailType } from "../email/EmailParamsByEmailType";
 import type { Email } from "../email/email.dto";
 import type { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import type { StoredFileId } from "../file/file.dto";
@@ -52,6 +58,12 @@ import {
 } from "./httpErrors";
 
 export const errors = {
+  email: {
+    missingContentParts: (kind: keyof EmailParamsByEmailType) =>
+      new BadRequestError(
+        `Erreur de construction de modèle d'email - Pas de contenu pour le modèle '${kind}'`,
+      ),
+  },
   pdfGenerator: {
     makeFailed: ({
       body,
@@ -494,6 +506,10 @@ export const errors = {
         `Les informations de marketing d'entreprise avec le siret '${siret}' ne sont pas trouvés.`,
       ),
   },
+  establishmentCsv: {
+    firstUserMustBeAdmin: (email: string) =>
+      new Error(`Le premier utilisateur ${email} doit être admin`),
+  },
   address: {
     queryToShort: ({ minLength }: { minLength: number }) =>
       new BadRequestError(
@@ -722,6 +738,23 @@ export const errors = {
       ),
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
       new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
+    missingHasWorkingExperience: (id: DiscussionId) =>
+      new Error(
+        `Propriété hasWorkingExperience manquante pour la discussion de type email '${id}'.`,
+      ),
+    missingPhone: (id: DiscussionId) =>
+      `Propriété phone manquante pour la discussion de type email '${id}'.`,
+    missingDatePreferences: (id: DiscussionId) =>
+      new Error(
+        `Propriété datePreferences manquante pour la discussion de type email '${id}'.`,
+      ),
+    missingLevelOfEducation: ({
+      id,
+      kind,
+    }: { id: DiscussionId; kind: DiscussionKind }) =>
+      new Error(
+        `Propriété levelOfEducation manquante pour la discussion de type ${kind} '${id}'.`,
+      ),
     missingAppellationLabel: ({
       appellationCode,
     }: {
@@ -751,6 +784,15 @@ export const errors = {
     }) =>
       new ForbiddenError(
         `L'utilisateur '${userId}' n'a pas accès à la discussion '${discussionId}'.`,
+      ),
+    badContactMode: () => new Error("Mode de contact invalide."),
+    badImmersionObjective: (
+      discussionId: DiscussionId,
+      discussionKind: DiscussionKind,
+      discussionObjective?: ImmersionObjective,
+    ) =>
+      new Error(
+        `L'objectif d'immersion ${discussionObjective} est non supportée pour la discussion ${discussionId} de type ${discussionKind}`,
       ),
     badEmailFormat: ({ email }: { email: Email }) =>
       new BadRequestError(`L'email n'a pas le bon format '${email}'.`),
