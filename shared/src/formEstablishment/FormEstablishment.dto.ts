@@ -18,9 +18,9 @@ export type ImmersionContactInEstablishmentId = Flavor<
   "ImmersionContactInEstablishmentId"
 >;
 
-const contactMethods = ["EMAIL", "PHONE", "IN_PERSON"] as const;
-export type ContactMethod = (typeof contactMethods)[number];
-export const isContactMethod = includesTypeGuard(contactMethods);
+const contactModes = ["EMAIL", "PHONE", "IN_PERSON"] as const;
+export type ContactMode = (typeof contactModes)[number];
+export const isContactMode = includesTypeGuard(contactModes);
 
 type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
   email: Email;
@@ -78,7 +78,7 @@ export type FormEstablishmentDto = {
   userRights: FormEstablishmentUserRight[];
   businessName: string;
   businessNameCustomized?: string;
-  contactMethod: ContactMethod;
+  contactMode: ContactMode;
   fitForDisabledWorkers: boolean;
   isEngagedEnterprise?: boolean;
   maxContactsPerMonth: number;
@@ -104,7 +104,7 @@ export type EstablishmentCSVRow = {
   businessAddress: string;
   naf_code: string;
   appellations_code: string;
-  contactMethod: ContactMethod;
+  contactMode: ContactMode;
   isEngagedEnterprise: CSVBoolean;
   isSearchable?: CSVBoolean;
   website: CSVOptionalString;

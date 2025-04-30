@@ -94,7 +94,7 @@ const establishmentAggregate1 = new EstablishmentAggregateBuilder()
   .withEstablishment(
     new EstablishmentEntityBuilder()
       .withSiret("11112222333344")
-      .withContactMethod("EMAIL")
+      .withContactMode("EMAIL")
       .withScore(score20)
       .build(),
   )

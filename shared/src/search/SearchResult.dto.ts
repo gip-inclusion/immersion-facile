@@ -1,5 +1,5 @@
 import type { AddressDto, LocationId } from "../address/address.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type {
   AppellationDto,
@@ -23,7 +23,7 @@ export type SearchResultDto = {
   locationId: LocationId | null;
   position: GeoPositionDto;
   address: AddressDto;
-  contactMode?: ContactMethod;
+  contactMode?: ContactMode;
   distance_m?: number;
   numberOfEmployeeRange?: string;
   website?: string;

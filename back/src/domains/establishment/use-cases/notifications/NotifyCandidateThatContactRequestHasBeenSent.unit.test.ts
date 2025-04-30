@@ -56,10 +56,8 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
     );
   });
 
-  it("sends an email to the beneficiary when contact method is EMAIL", async () => {
-    const discussion = new DiscussionBuilder()
-      .withContactMethod("EMAIL")
-      .build();
+  it("sends an email to the beneficiary when contact mode is EMAIL", async () => {
+    const discussion = new DiscussionBuilder().withContactMode("EMAIL").build();
 
     uow.discussionRepository.discussions = [discussion];
 
@@ -82,10 +80,10 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
   });
 
   it.each(["PHONE", "IN_PERSON"] as const)(
-    "does not sends an email when contact method is %s",
-    async (contactMethod) => {
+    "does not sends an email when contact mode is %s",
+    async (contactMode) => {
       const discussion = new DiscussionBuilder()
-        .withContactMethod(contactMethod)
+        .withContactMode(contactMode)
         .build();
 
       uow.discussionRepository.discussions = [discussion];

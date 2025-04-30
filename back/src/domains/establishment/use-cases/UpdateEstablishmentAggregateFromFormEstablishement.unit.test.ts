@@ -422,7 +422,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withSiret(existingFormEstablishment.siret)
           .withName(existingFormEstablishment.businessName)
           .withSearchableBy(existingFormEstablishment.searchableBy)
-          .withContactMethod(existingFormEstablishment.contactMethod)
+          .withContactMode(existingFormEstablishment.contactMode)
           .withCustomizedName(existingFormEstablishment.businessNameCustomized)
           .withFitForDisabledWorkers(
             existingFormEstablishment.fitForDisabledWorkers,
@@ -486,7 +486,7 @@ describe("Update Establishment aggregate from form data", () => {
           .withSiret(updatedFormEstablishment.siret)
           .withName(updatedFormEstablishment.businessName)
           .withSearchableBy(updatedFormEstablishment.searchableBy)
-          .withContactMethod(updatedFormEstablishment.contactMethod)
+          .withContactMode(updatedFormEstablishment.contactMode)
           .withCustomizedName(updatedFormEstablishment.businessNameCustomized)
           .withFitForDisabledWorkers(
             updatedFormEstablishment.fitForDisabledWorkers,

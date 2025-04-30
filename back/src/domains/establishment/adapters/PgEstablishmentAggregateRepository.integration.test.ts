@@ -1627,8 +1627,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               establishmentWithOfferA1101_AtPosition.establishment
                 .numberEmployeesRange,
             contactMode:
-              establishmentWithOfferA1101_AtPosition.establishment
-                .contactMethod,
+              establishmentWithOfferA1101_AtPosition.establishment.contactMode,
             distance_m: undefined,
             address:
               establishmentWithOfferA1101_AtPosition.establishment.locations[0]
@@ -1747,7 +1746,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       it("adds a new row in contact table with contact referencing the establishment siret", async () => {
         const establishment = new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(siret1)
-          .withContactMethod("EMAIL")
+          .withContactMode("EMAIL")
           .withUserRights([osefUserRight])
           .build();
 
@@ -1902,11 +1901,11 @@ describe("PgEstablishmentAggregateRepository", () => {
         },
         {
           originalEstablishment: new EstablishmentAggregateBuilder()
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withUserRights([osefUserRight])
             .build(),
           updatedEstablishment: new EstablishmentAggregateBuilder()
-            .withContactMethod("IN_PERSON")
+            .withContactMode("IN_PERSON")
             .withUserRights([osefUserRight])
             .withEstablishmentUpdatedAt(updatedAt)
             .build(),
@@ -1918,7 +1917,7 @@ describe("PgEstablishmentAggregateRepository", () => {
               new EstablishmentEntityBuilder()
                 .withAdditionalInformation("my additionnal info")
                 .withCustomizedName("my customize name")
-                .withContactMethod("EMAIL")
+                .withContactMode("EMAIL")
                 .withFitForDisabledWorkers(true)
                 .withIsCommited(true)
                 .withLastInseeCheck(new Date())
@@ -1939,7 +1938,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                   .withCustomizedName("my customize name")
                   .withFitForDisabledWorkers(true)
                   .withIsCommited(true)
-                  .withContactMethod("IN_PERSON")
+                  .withContactMode("IN_PERSON")
                   .withLastInseeCheck(new Date())
                   .withNextAvailabilityDate(new Date())
                   .withMaxContactsPerMonth(5)

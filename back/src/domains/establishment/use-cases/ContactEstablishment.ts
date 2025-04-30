@@ -70,12 +70,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
       );
     if (!establishmentAggregate) throw errors.establishment.notFound({ siret });
 
-    if (contactMode !== establishmentAggregate.establishment.contactMethod)
+    if (contactMode !== establishmentAggregate.establishment.contactMode)
       throw errors.establishment.contactRequestContactModeMismatch({
         siret,
-        contactMethods: {
+        contactModes: {
           inParams: contactMode,
-          inRepo: establishmentAggregate.establishment.contactMethod,
+          inRepo: establishmentAggregate.establishment.contactMode,
         },
       });
 
@@ -305,7 +305,7 @@ const makeDiscussionDtoEmail = async ({
 }): Promise<DiscussionDtoEmail> => {
   const discussion: DiscussionDtoEmail = {
     ...common,
-    contactMethod: contactRequest.contactMode,
+    contactMode: contactRequest.contactMode,
     ...(contactRequest.kind === "IF"
       ? {
           kind: contactRequest.kind,
@@ -376,7 +376,7 @@ const makeDiscussionDtoInPerson = ({
   contactRequest: ContactEstablishmentInPersonDto;
 }): DiscussionDtoInPerson => ({
   ...common,
-  contactMethod: contactRequest.contactMode,
+  contactMode: contactRequest.contactMode,
   ...(contactRequest.kind === "IF"
     ? {
         kind: contactRequest.kind,
@@ -405,7 +405,7 @@ const makeDiscussionDtoPhone = ({
   contactRequest: ContactEstablishmentByPhoneDto;
 }): DiscussionDtoPhone => ({
   ...common,
-  contactMethod: contactRequest.contactMode,
+  contactMode: contactRequest.contactMode,
   ...(contactRequest.kind === "IF"
     ? {
         kind: contactRequest.kind,

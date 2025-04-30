@@ -110,7 +110,7 @@ const step3 = async (
   );
 
   await page
-    .locator(`[for='${domElementIds.establishment.create.contactMethod}-0']`)
+    .locator(`[for='${domElementIds.establishment.create.contactMode}-0']`)
     .click();
 
   await goToNextStep(page, 3, "create");

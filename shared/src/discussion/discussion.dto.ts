@@ -14,7 +14,7 @@ import type {
   ConventionId,
   ImmersionObjective,
 } from "../convention/convention.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
@@ -34,7 +34,7 @@ export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 
 type WithContactByEmailProps<
   D extends DiscussionKind,
-  C extends ContactMethod,
+  C extends ContactMode,
 > = C extends "EMAIL"
   ? {
       datePreferences: string;
@@ -47,7 +47,7 @@ type WithContactByEmailProps<
 
 type WithContactByEmailAndIFProps<
   D extends DiscussionKind,
-  C extends ContactMethod,
+  C extends ContactMode,
 > = D extends "IF"
   ? C extends "EMAIL"
     ? {
@@ -73,7 +73,7 @@ export type PotentialBeneficiaryCommonProps = {
 
 export type DiscussionPotentialBeneficiary<
   D extends DiscussionKind,
-  C extends ContactMethod,
+  C extends ContactMode,
 > = PotentialBeneficiaryCommonProps &
   WithContactByEmailProps<D, C> &
   WithContactByEmailAndIFProps<D, C> &
@@ -101,18 +101,15 @@ export type CommonDiscussionDto = {
 } & DiscussionStatusWithRejection &
   WithAcquisition;
 
-type SpecificDiscussionDto<
-  C extends ContactMethod,
-  D extends DiscussionKind,
-> = {
-  contactMethod: C;
+type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
+  contactMode: C;
   kind: D;
   potentialBeneficiary: DiscussionPotentialBeneficiary<D, C>;
 };
 
 type GenericDiscussionDto<
   D extends DiscussionKind,
-  C extends ContactMethod,
+  C extends ContactMode,
 > = CommonDiscussionDto & SpecificDiscussionDto<C, D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
@@ -174,7 +171,7 @@ export type DiscussionDtoInPerson =
 
 export type GenericDiscussionReadDto<
   D extends DiscussionKind,
-  C extends ContactMethod,
+  C extends ContactMode,
 > = OmitFromExistingKeys<
   GenericDiscussionDto<D, C>,
   | "establishmentContact"
@@ -265,7 +262,7 @@ const defaultDiscussion = {
   ],
   status: "PENDING",
   kind: "IF",
-  contactMethod: "EMAIL",
+  contactMode: "EMAIL",
 } satisfies DiscussionDtoEmail;
 
 export const cartographeAppellationAndRome: AppellationAndRomeDto = {
@@ -327,14 +324,14 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     });
   }
 
-  public withContactMethod(contactMethod: ContactMethod) {
+  public withContactMode(contactMode: ContactMode) {
     const { potentialBeneficiary, ...rest } = this.discussion;
-    if (contactMethod === "EMAIL") {
+    if (contactMode === "EMAIL") {
       return new DiscussionBuilder(
         (rest.kind === "IF"
           ? {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 ...defaultDiscussion.potentialBeneficiary,
                 email: potentialBeneficiary.email,
@@ -346,7 +343,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
             }
           : {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 email: potentialBeneficiary.email,
                 firstName: potentialBeneficiary.firstName,
@@ -362,12 +359,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       );
     }
 
-    if (contactMethod === "PHONE") {
+    if (contactMode === "PHONE") {
       return new DiscussionBuilder(
         rest.kind === "IF"
           ? {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 email: potentialBeneficiary.email,
                 firstName: potentialBeneficiary.firstName,
@@ -376,7 +373,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
             }
           : {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 email: potentialBeneficiary.email,
                 firstName: potentialBeneficiary.firstName,
@@ -387,12 +384,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       );
     }
 
-    if (contactMethod === "IN_PERSON") {
+    if (contactMode === "IN_PERSON") {
       return new DiscussionBuilder(
         (rest.kind === "IF"
           ? {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 email: potentialBeneficiary.email,
                 firstName: potentialBeneficiary.firstName,
@@ -401,7 +398,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
             }
           : {
               ...rest,
-              contactMethod,
+              contactMode,
               potentialBeneficiary: {
                 email: potentialBeneficiary.email,
                 firstName: potentialBeneficiary.firstName,
@@ -413,13 +410,13 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     }
 
     throw new Error(
-      `Invalid contact method ${contactMethod} for discussion kind ${this.discussion.kind}`,
+      `Invalid contact mode ${contactMode} for discussion kind ${this.discussion.kind}`,
     );
   }
 
   public withDiscussionKind(discussionKind: DiscussionKind) {
     const { potentialBeneficiary, ...rest } = this.discussion;
-    if (rest.contactMethod === "EMAIL") {
+    if (rest.contactMode === "EMAIL") {
       return new DiscussionBuilder(
         (discussionKind === "IF"
           ? {
@@ -452,7 +449,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       );
     }
 
-    if (rest.contactMethod === "PHONE") {
+    if (rest.contactMode === "PHONE") {
       return new DiscussionBuilder(
         discussionKind === "IF"
           ? {
@@ -477,7 +474,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       );
     }
 
-    if (rest.contactMethod === "IN_PERSON") {
+    if (rest.contactMode === "IN_PERSON") {
       return new DiscussionBuilder(
         (discussionKind === "IF"
           ? {
@@ -503,7 +500,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     }
 
     throw new Error(
-      `Invalid discussion kind ${discussionKind} for contact method ${this.discussion.contactMethod}`,
+      `Invalid discussion kind ${discussionKind} for contact mode ${this.discussion.contactMode}`,
     );
   }
 
@@ -531,7 +528,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withImmersionObjective(immersionObjective: ImmersionObjective | null) {
-    if (this.discussion.contactMethod === "EMAIL") {
+    if (this.discussion.contactMode === "EMAIL") {
       if (
         this.discussion.kind === "1_ELEVE_1_STAGE" &&
         immersionObjective === discoverObjective
@@ -589,9 +586,9 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   }
 
   public withPotentialBeneficiaryPhone(phone: string) {
-    if (this.discussion.contactMethod !== "EMAIL") {
+    if (this.discussion.contactMode !== "EMAIL") {
       throw new Error(
-        `Invalid potentialBeneficiary with phone ${phone} for contactMethod ${this.discussion.contactMethod}`,
+        `Invalid potentialBeneficiary with phone ${phone} for contactMode ${this.discussion.contactMode}`,
       );
     }
 
@@ -606,7 +603,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
 
   public withPotentialBeneficiaryResumeLink(resumeLink?: string) {
     if (
-      this.discussion.contactMethod === "EMAIL" &&
+      this.discussion.contactMode === "EMAIL" &&
       this.discussion.kind === "IF"
     ) {
       return new DiscussionBuilder({
@@ -618,7 +615,7 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
       } as DiscussionDto);
     }
     throw new Error(
-      `Invalid potentialBeneficiary with resumeLink ${resumeLink} for contactMethod ${this.discussion.contactMethod} and discussionKind ${this.discussion.kind}`,
+      `Invalid potentialBeneficiary with resumeLink ${resumeLink} for contactMode ${this.discussion.contactMode} and discussionKind ${this.discussion.kind}`,
     );
   }
 

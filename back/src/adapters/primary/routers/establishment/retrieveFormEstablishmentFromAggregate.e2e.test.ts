@@ -165,7 +165,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             email: establishmentContact.email,
           },
         ],
-        contactMethod: establishmentAggregate.establishment.contactMethod,
+        contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: {
           jobSeekers: true,
           students: false,
@@ -231,7 +231,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             email: establishmentContact.email,
           },
         ],
-        contactMethod: establishmentAggregate.establishment.contactMethod,
+        contactMode: establishmentAggregate.establishment.contactMode,
         searchableBy: establishmentAggregate.establishment.searchableBy,
       },
       status: 200,

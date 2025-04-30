@@ -17,7 +17,7 @@ import type { Email } from "../email/email.dto";
 import type { FtExternalId } from "../federatedIdentities/federatedIdentity.dto";
 import type { StoredFileId } from "../file/file.dto";
 import type { FileValidationError } from "../file/file.validators";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GroupSlug } from "../group/group.dto";
 import type {
   IdentityProvider,
@@ -441,13 +441,13 @@ export const errors = {
       ),
     contactRequestContactModeMismatch: ({
       siret,
-      contactMethods,
+      contactModes,
     }: {
       siret: SiretDto;
-      contactMethods: { inParams: ContactMethod; inRepo: ContactMethod };
+      contactModes: { inParams: ContactMode; inRepo: ContactMode };
     }) =>
       new BadRequestError(
-        `Incohérence sur le mode de mise en contact. '${contactMethods.inParams}' dans les params. '${contactMethods.inRepo}' dans le contact d'entreprise '${siret}'.`,
+        `Incohérence sur le mode de mise en contact. '${contactModes.inParams}' dans les params. '${contactModes.inRepo}' dans le contact d'entreprise '${siret}'.`,
       ),
     offerMissing: ({
       siret,

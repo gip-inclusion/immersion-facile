@@ -119,7 +119,7 @@ export const candidateEstablishmentMapper = (
         ),
         students: csvBooleanToBoolean(establishmentRow.searchableByStudents),
       },
-      contactMethod: establishmentRow.contactMethod,
+      contactMode: establishmentRow.contactMode,
     };
 
     formEstablishmentSchema.parse(mappedEstablishment);

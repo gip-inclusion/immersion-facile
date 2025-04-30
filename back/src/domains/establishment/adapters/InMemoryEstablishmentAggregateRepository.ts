@@ -286,7 +286,7 @@ const buildSearchImmersionResultDtoForOneEstablishmentAndOneRomeAndFirstLocation
         })),
       siret: establishmentAgg.establishment.siret,
       voluntaryToImmersion: establishmentAgg.establishment.voluntaryToImmersion,
-      contactMode: establishmentAgg.establishment.contactMethod,
+      contactMode: establishmentAgg.establishment.contactMode,
       numberOfEmployeeRange:
         establishmentAgg.establishment.numberEmployeesRange,
       website: establishmentAgg.establishment?.website,
@@ -329,7 +329,7 @@ export const establishmentAggregateToSearchResultByRomeForFirstLocation = (
   position: establishmentAggregate.establishment.locations[0].position,
   address: establishmentAggregate.establishment.locations[0].address,
   locationId: establishmentAggregate.establishment.locations[0].id,
-  contactMode: establishmentAggregate.establishment.contactMethod,
+  contactMode: establishmentAggregate.establishment.contactMode,
   distance_m,
   romeLabel: TEST_ROME_LABEL,
   website: establishmentAggregate.establishment.website,

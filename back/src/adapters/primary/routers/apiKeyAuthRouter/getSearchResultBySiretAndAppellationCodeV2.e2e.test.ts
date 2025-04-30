@@ -70,7 +70,7 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
             .withSiret(immersionOfferSiret)
             .withScore(15)
             .withLocations([TEST_LOCATION])
-            .withContactMethod("EMAIL")
+            .withContactMode("EMAIL")
             .withNumberOfEmployeeRange("10-19")
             .build(),
         )

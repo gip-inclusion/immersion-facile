@@ -9,7 +9,7 @@ import type {
   DiscussionId,
   DiscussionKind,
 } from "../discussion/discussion.dto";
-import type { ContactMethod } from "../formEstablishment/FormEstablishment.dto";
+import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 
@@ -29,7 +29,7 @@ export const labelsForContactLevelOfEducation: Record<
 };
 
 export type ContactInformations<
-  T extends ContactMethod,
+  T extends ContactMode,
   D extends DiscussionKind,
 > = {
   appellationCode: AppellationCode;

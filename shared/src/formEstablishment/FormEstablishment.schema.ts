@@ -22,7 +22,7 @@ import {
 } from "../zodUtils";
 import type {
   CSVBoolean,
-  ContactMethod,
+  ContactMode,
   EstablishmentBatchReport,
   EstablishmentCSVRow,
   FormEstablishmentBatchDto,
@@ -36,13 +36,13 @@ import type {
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
 
-const validContactMethods: NotEmptyArray<ContactMethod> = [
+const validContactModes: NotEmptyArray<ContactMode> = [
   "EMAIL",
   "PHONE",
   "IN_PERSON",
 ];
-export const contactMethodSchema = zEnumValidation(
-  validContactMethods,
+export const contactModeSchema = zEnumValidation(
+  validContactModes,
   "Choisissez parmi les options proposées",
 );
 
@@ -116,7 +116,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     appellations: z
       .array(appellationDtoSchema)
       .min(1, localization.atLeastOneJob),
-    contactMethod: contactMethodSchema,
+    contactMode: contactModeSchema,
     userRights: formEstablishmentUserRightsSchema,
     maxContactsPerMonth: z
       .number({
@@ -172,7 +172,7 @@ export const establishmentCSVRowSchema: z.Schema<EstablishmentCSVRow> =
     naf_code: zStringMinLength1,
     appellations_code: zStringMinLength1,
     isEngagedEnterprise: csvBooleanSchema,
-    contactMethod: contactMethodSchema,
+    contactMode: contactModeSchema,
     isSearchable: csvBooleanSchema,
     website: zStringCanBeEmpty,
     additionalInformation: zStringCanBeEmpty,

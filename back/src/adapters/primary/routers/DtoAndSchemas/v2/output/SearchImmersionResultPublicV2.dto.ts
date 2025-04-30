@@ -1,7 +1,7 @@
 import type {
   AddressDto,
   AppellationDto,
-  ContactMethod,
+  ContactMode,
   GeoPositionDto,
   LocationId,
   RomeCode,
@@ -21,7 +21,7 @@ export type SearchImmersionResultPublicV2 = {
   voluntaryToImmersion: boolean;
   position: GeoPositionDto;
   address: AddressDto;
-  contactMode?: ContactMethod;
+  contactMode?: ContactMode;
   distance_m?: number;
   numberOfEmployeeRange?: string;
   website?: string;

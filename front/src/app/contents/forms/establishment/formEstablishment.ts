@@ -88,10 +88,10 @@ export const formEstablishmentFieldsLabels = (
     label: "Autres emails susceptibles de répondre aux demandes",
     id: domElementIds.establishment[mode].businessContact.copyEmails,
   },
-  contactMethod: {
+  contactMode: {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
     required: true,
-    id: domElementIds.establishment[mode].contactMethod,
+    id: domElementIds.establishment[mode].contactMode,
   },
   isEngagedEnterprise: {
     label:

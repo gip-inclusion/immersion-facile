@@ -161,30 +161,30 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
       it.each([
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("IF")
-          .withContactMethod("EMAIL")
+          .withContactMode("EMAIL")
           .build(),
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("IF")
-          .withContactMethod("IN_PERSON")
+          .withContactMode("IN_PERSON")
           .build(),
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("IF")
-          .withContactMethod("PHONE")
+          .withContactMode("PHONE")
           .build(),
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMethod("EMAIL")
+          .withContactMode("EMAIL")
           .build(),
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMethod("IN_PERSON")
+          .withContactMode("IN_PERSON")
           .build(),
         new DiscussionBuilder(discussionWithUserEmailInContact)
           .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMethod("PHONE")
+          .withContactMode("PHONE")
           .build(),
       ])(
-        "Gets discussion with kind $kind and contact method $contactMethod based on establishment contact email",
+        "Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email",
         async (discussion) => {
           uow.discussionRepository.discussions = [discussion];
 

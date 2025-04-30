@@ -68,13 +68,13 @@ describe("toDotNotation utils", () => {
           type: "too_small",
           ref: {},
         },
-        contactMethod: {
+        contactMode: {
           message:
             "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
           type: "invalid_enum_value",
           ref: {
             type: "radio",
-            name: "businessContact.contactMethod",
+            name: "businessContact.contactMode",
           },
         },
         email: {
@@ -94,11 +94,11 @@ describe("toDotNotation utils", () => {
       "businessContact.job.type": "too_small",
       "businessContact.phone.message": "Obligatoire",
       "businessContact.phone.type": "too_small",
-      "businessContact.contactMethod.message":
+      "businessContact.contactMode.message":
         "Invalid enum value. Expected 'EMAIL' | 'PHONE' | 'IN_PERSON'",
-      "businessContact.contactMethod.type": "invalid_enum_value",
-      "businessContact.contactMethod.ref.type": "radio",
-      "businessContact.contactMethod.ref.name": "businessContact.contactMethod",
+      "businessContact.contactMode.type": "invalid_enum_value",
+      "businessContact.contactMode.ref.type": "radio",
+      "businessContact.contactMode.ref.name": "businessContact.contactMode",
       "businessContact.email.message":
         "Veuillez saisir une adresse e-mail valide",
       "businessContact.email.type": "invalid_string",

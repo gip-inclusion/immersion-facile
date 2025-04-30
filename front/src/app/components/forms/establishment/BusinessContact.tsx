@@ -21,7 +21,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { Mode } from "./EstablishmentForm";
 
-const preferredContactMethodOptions = (
+const preferredContactModeOptions = (
   register: UseFormRegisterReturn<string>,
 ): RadioButtonsProps["options"] => [
   {
@@ -160,12 +160,12 @@ export const BusinessContact = ({
         </div>
       )}
       <RadioButtons
-        {...formContents.contactMethod}
-        legend={formContents.contactMethod.label}
-        hintText={formContents.contactMethod.hintText}
-        {...register("contactMethod")}
-        options={preferredContactMethodOptions(register("contactMethod"))}
-        {...getFieldError("contactMethod")}
+        {...formContents.contactMode}
+        legend={formContents.contactMode.label}
+        hintText={formContents.contactMode.hintText}
+        {...register("contactMode")}
+        options={preferredContactModeOptions(register("contactMode"))}
+        {...getFieldError("contactMode")}
       />
     </>
   );

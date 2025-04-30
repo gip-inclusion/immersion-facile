@@ -148,7 +148,7 @@ const step3BusinessContact = async (
   );
 
   await page
-    .locator(`[for='${domElementIds.establishment.edit.contactMethod}-1']`)
+    .locator(`[for='${domElementIds.establishment.edit.contactMode}-1']`)
     .click();
 
   // await goToNextStep(page, 3, "edit");

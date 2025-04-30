@@ -163,7 +163,7 @@ const checkEstablishment = async (
   ).toContain(copyEmails.join(", "));
 
   await expect(
-    await page.locator(`#${domElementIds.establishment.admin.contactMethod}-1`),
+    await page.locator(`#${domElementIds.establishment.admin.contactMode}-1`),
   ).toBeChecked();
 
   await expect(
