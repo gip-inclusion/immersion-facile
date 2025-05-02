@@ -62,14 +62,6 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
 
   const isConventionValidated = convention?.status === "ACCEPTED_BY_VALIDATOR";
 
-  if (fetchConventionError)
-    return (
-      <ShowErrorOrRedirectToRenewMagicLink
-        errorMessage={conventionFormFeedback?.message}
-        jwt={route.params.jwt}
-      />
-    );
-
   useEffect(() => {
     if (convention) {
       dispatch(
@@ -81,6 +73,14 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
       );
     }
   }, [dispatch, convention, route.params.jwt]);
+
+  if (fetchConventionError)
+    return (
+      <ShowErrorOrRedirectToRenewMagicLink
+        errorMessage={conventionFormFeedback?.message}
+        jwt={route.params.jwt}
+      />
+    );
 
   return (
     <HeaderFooterLayout>
