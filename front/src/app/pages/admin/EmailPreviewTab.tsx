@@ -368,12 +368,14 @@ export const defaultEmailValueByEmailKind: {
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
     businessName: "BUSINESS_NAME",
     beneficiaryFullName: "BENEFICIARY_FULL_NAME",
+    kind: "IF",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: "BUSINESS_NAME",
     contactFirstName: "CONTACT_FIRST_NAME",
     contactLastName: "CONTACT_LAST_NAME",
     contactPhone: "CONTACT_PHONE",
+    kind: "IF",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
   },
@@ -382,6 +384,7 @@ export const defaultEmailValueByEmailKind: {
     contactFirstName: "CONTACT_FIRST_NAME",
     contactLastName: "CONTACT_LAST_NAME",
     businessAddress: "BUSINESS_ADDRESS",
+    kind: "IF",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
   },

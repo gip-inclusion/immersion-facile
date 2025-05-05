@@ -203,6 +203,7 @@ describe("NotifyContactRequest", () => {
                   contactFirstName: discussion.establishmentContact.firstName,
                   contactLastName: discussion.establishmentContact.lastName,
                   contactPhone: discussion.establishmentContact.phone,
+                  kind: discussion.kind,
                   potentialBeneficiaryFirstName:
                     discussion.potentialBeneficiary.firstName,
                   potentialBeneficiaryLastName:
@@ -250,6 +251,7 @@ describe("NotifyContactRequest", () => {
                   contactFirstName: discussion.establishmentContact.firstName,
                   contactLastName: discussion.establishmentContact.lastName,
                   businessAddress: addressDtoToString(discussion.address),
+                  kind: discussion.kind,
                   potentialBeneficiaryFirstName:
                     discussion.potentialBeneficiary.firstName,
                   potentialBeneficiaryLastName:

@@ -558,7 +558,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -627,7 +627,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -690,7 +690,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -801,7 +801,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -854,7 +854,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -1791,12 +1791,12 @@ Profil du candidat :
     CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
       niceName: "Candidat - Confirmation de la demande de contact",
       tags: [""],
-      createEmailVariables: ({ beneficiaryFullName, businessName }) => ({
+      createEmailVariables: ({ kind, beneficiaryFullName, businessName }) => ({
         subject: ` Immersion Facilitée - Confirmation de l’envoi de votre candidature auprès de ${businessName}`,
         greetings: `Bonjour ${beneficiaryFullName},`,
-        content: `<strong>Nous vous confirmons que votre candidature pour une immersion professionnelle a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
+        content: `<strong>Nous vous confirmons que votre candidature pour ${kind === "IF" ? "une immersion professionnelle" : "un stage"} a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
 
-          Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre immersion.
+          Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre ${kind === "IF" ? "immersion" : "stage"}.
           
           <strong>Comment maximiser vos chances ?</strong>
           • Si l'entreprise ne répond pas sous <strong>15 jours</strong>, appelez-la directement.
@@ -1876,13 +1876,14 @@ Profil du candidat :
         contactFirstName,
         contactLastName,
         contactPhone,
+        kind,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
       }) => ({
-        subject: `Coordonnées téléphoniques pour faire votre demande d'immersion`,
+        subject: `Coordonnées téléphoniques pour faire votre demande ${kind === "IF" ? "d'immersion" : "de stage"}`,
         greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
         content: `
-      Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
+      Vous avez manifesté de l’intérêt pour réaliser ${kind === "IF" ? "une immersion professionnelle" : "un stage"} au sein de l’entreprise ${businessName}.
       Cette entreprise a souhaité être contactée par téléphone.
 
       Voici ses coordonnées :
@@ -1892,7 +1893,7 @@ Profil du candidat :
       Ces informations sont personnelles et confidentielles. Elles ne peuvent pas être communiquées à d’autres personnes. 
       Merci !
 
-      ${advices}
+      ${kind === "IF" ? advices : ""}
       `,
       }),
     },
@@ -1904,13 +1905,13 @@ Profil du candidat :
         businessName,
         contactFirstName,
         contactLastName,
+        kind,
         potentialBeneficiaryFirstName,
         potentialBeneficiaryLastName,
       }) => ({
-        subject:
-          "Coordonnées de l'entreprise pour faire votre demande d'immersion",
+        subject: `Coordonnées de l'entreprise pour faire votre demande ${kind === "IF" ? "d'immersion" : "de stage"}`,
         greetings: `Bonjour ${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName},`,
-        content: `Vous avez manifesté de l’intérêt pour réaliser une immersion professionnelle au sein de l’entreprise ${businessName}.
+        content: `Vous avez manifesté de l’intérêt pour réaliser ${kind === "IF" ? "une immersion professionnelle" : "un stage"} au sein de l’entreprise ${businessName}.
 
     Cette entreprise souhaite que vous vous rendiez sur place pour présenter votre demande. 
 

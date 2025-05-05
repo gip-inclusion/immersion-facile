@@ -73,6 +73,7 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
           params: {
             businessName: discussion.businessName,
             beneficiaryFullName: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+            kind: discussion.kind,
           },
         },
       ],
