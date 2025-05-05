@@ -161,7 +161,7 @@ export const ConventionForm = ({
   }).current;
   useExistingSiret({
     siret: initialValues.siret,
-    addressAutocompleteLocator: "conventionImmersionAddress",
+    addressAutocompleteLocator: "convention-immersion-address",
   });
 
   const reduxFormUiReady =
@@ -369,7 +369,7 @@ export const ConventionForm = ({
       dispatch(
         siretSlice.actions.siretModified({
           siret: fetchedConvention.siret,
-          addressAutocompleteLocator: "conventionImmersionAddress",
+          addressAutocompleteLocator: "convention-immersion-address",
           feedbackTopic: "siret-input",
         }),
       );
@@ -501,7 +501,7 @@ export const ConventionForm = ({
                           domElementIds.conventionImmersionRoute
                             .conventionSection.immersionAddress,
                       }}
-                      locator="conventionImmersionAddress"
+                      locator="convention-immersion-address"
                       onAddressSelected={(addressAndPosition) => {
                         setValue(
                           "immersionAddress",

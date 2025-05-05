@@ -47,7 +47,7 @@ export const ConventionFormProfession = ({
     <>
       <div className={fr.cx("fr-input-group")}>
         <AppellationAutocomplete
-          locator="conventionProfession"
+          locator="convention-profession"
           label={label}
           selectProps={{
             inputId:

@@ -84,7 +84,7 @@ const ConventionSignPageContent = ({
 
   useExistingSiret({
     siret: convention?.siret,
-    addressAutocompleteLocator: "conventionImmersionAddress",
+    addressAutocompleteLocator: "convention-immersion-address",
   });
 
   const t = useConventionTexts(

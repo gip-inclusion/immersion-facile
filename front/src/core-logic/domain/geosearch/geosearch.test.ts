@@ -4,7 +4,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
+import { makeGeosearchLocatorSelector } from "src/core-logic/domain/geosearch/geosearch.selectors";
 import {
   type TestDependencies,
   createTestStore,
@@ -15,29 +15,34 @@ import { geosearchSlice } from "./geosearch.slice";
 describe("Geosearch epic", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
-
+  const locator = "search-form-place";
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   it("should reset the value and suggestions when the query has been emptied", () => {
     store.dispatch(
-      geosearchSlice.actions.suggestionHasBeenSelected({
-        label: "Paris",
-        position: {
-          lat: 48.8566,
-          lon: 2.3522,
+      geosearchSlice.actions.selectSuggestionRequested({
+        locator,
+        item: {
+          label: "Paris",
+          position: {
+            lat: 48.8566,
+            lon: 2.3522,
+          },
         },
       }),
     );
-    store.dispatch(geosearchSlice.actions.queryWasEmptied());
-    expect(store.getState().geosearch.value).toBeNull();
-    expect(store.getState().geosearch.suggestions).toEqual([]);
+    store.dispatch(geosearchSlice.actions.emptyQueryRequested({ locator }));
+    expect(store.getState().geosearch.data[locator]?.value).toBeNull();
+    expect(store.getState().geosearch.data[locator]?.suggestions).toEqual([]);
   });
 
   it("should update the searched query and reset the state", () => {
     const query = "foi";
-    store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    store.dispatch(
+      geosearchSlice.actions.changeQueryRequested({ locator, lookup: query }),
+    );
     expectDebouncingToBe(true);
     dependencies.scheduler.flush();
     expectDebouncingToBe(false);
@@ -47,7 +52,9 @@ describe("Geosearch epic", () => {
 
   it("shouldn't update the searched query if threshold is not reached", () => {
     const query = "fo";
-    store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    store.dispatch(
+      geosearchSlice.actions.changeQueryRequested({ locator, lookup: query }),
+    );
     expectDebouncingToBe(true);
     dependencies.scheduler.flush();
     expectLoadingToBe(false);
@@ -65,7 +72,9 @@ describe("Geosearch epic", () => {
         },
       },
     ];
-    store.dispatch(geosearchSlice.actions.queryHasChanged(query));
+    store.dispatch(
+      geosearchSlice.actions.changeQueryRequested({ locator, lookup: query }),
+    );
     expectDebouncingToBe(true);
     dependencies.scheduler.flush();
     expectDebouncingToBe(false);
@@ -86,14 +95,22 @@ describe("Geosearch epic", () => {
       },
     };
     store.dispatch(
-      geosearchSlice.actions.suggestionHasBeenSelected(lookupSearchResult),
+      geosearchSlice.actions.selectSuggestionRequested({
+        locator,
+        item: lookupSearchResult,
+      }),
     );
     expectSelectedSuggestionToBe(lookupSearchResult);
   });
 
   it("should throw an error if something goes wrong and returns error feedback", () => {
     const errorMessage = "Error trying to get location";
-    store.dispatch(geosearchSlice.actions.suggestionsHaveBeenRequested("bord"));
+    store.dispatch(
+      geosearchSlice.actions.fetchSuggestionsRequested({
+        locator,
+        lookup: "bord",
+      }),
+    );
     dependencies.addressGateway.lookupLocationResults$.error(
       new Error(errorMessage),
     );
@@ -101,21 +118,34 @@ describe("Geosearch epic", () => {
   });
 
   const expectQueryToBe = (expected: string) => {
-    expectToEqual(geosearchSelectors.query(store.getState()), expected);
+    expectToEqual(
+      makeGeosearchLocatorSelector(locator)(store.getState())?.query,
+      expected,
+    );
   };
   const expectLoadingToBe = (expected: boolean) => {
-    expectToEqual(geosearchSelectors.isLoading(store.getState()), expected);
+    expectToEqual(
+      makeGeosearchLocatorSelector(locator)(store.getState())?.isLoading,
+      expected,
+    );
   };
   const expectDebouncingToBe = (expected: boolean) => {
-    expectToEqual(geosearchSelectors.isDebouncing(store.getState()), expected);
+    expectToEqual(
+      makeGeosearchLocatorSelector(locator)(store.getState())?.isDebouncing,
+      expected,
+    );
   };
   const expectSuggestionsToBe = (expected: LookupSearchResult[]) => {
     expectArraysToEqual(
-      geosearchSelectors.suggestions(store.getState()),
+      makeGeosearchLocatorSelector(locator)?.(store.getState())?.suggestions ??
+        [],
       expected,
     );
   };
   const expectSelectedSuggestionToBe = (expected: LookupSearchResult) => {
-    expectObjectsToMatch(geosearchSelectors.value(store.getState()), expected);
+    expectObjectsToMatch(
+      makeGeosearchLocatorSelector(locator)(store.getState())?.value,
+      expected,
+    );
   };
 });

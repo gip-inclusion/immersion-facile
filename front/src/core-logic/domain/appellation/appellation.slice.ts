@@ -1,78 +1,126 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { AppellationMatchDto } from "shared";
+import {
+  type AutocompleteState,
+  type PayloadActionWithLocator,
+  initialAutocompleteItem,
+} from "src/core-logic/domain/autocomplete.utils";
 
 export type AppellationAutocompleteLocator =
-  | "searchAppellation"
-  | "conventionProfession"
-  | `multipleAppellation-${number}`;
+  | "search-form-appellation"
+  | "convention-profession"
+  | `multiple-appellation-${number}`;
 
-type AppellationState = {
-  suggestions: AppellationMatchDto[];
-  values: Partial<
-    Record<AppellationAutocompleteLocator, AppellationMatchDto>
-  > | null;
-  query: string;
-  isLoading: boolean;
-  isDebouncing: boolean;
+const initialState: AutocompleteState<
+  AppellationAutocompleteLocator,
+  AppellationMatchDto
+> = {
+  data: {},
 };
-
-const initialState: AppellationState = {
-  suggestions: [],
-  query: "",
-  values: null,
-  isLoading: false,
-  isDebouncing: false,
-};
-
-type PayloadActionWithLocator<Payload> = PayloadAction<
-  Payload & { locator: AppellationAutocompleteLocator }
->;
 
 export const appellationSlice = createSlice({
   name: "appellation",
   initialState,
   reducers: {
-    queryWasEmptied: (_state) => initialState,
-    queryHasChanged: (
+    emptyQueryRequested: (
+      _state,
+      action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
+    ) => ({
+      ...initialState,
+      data: {
+        ...initialState.data,
+        [action.payload.locator]: {
+          ...initialAutocompleteItem,
+        },
+      },
+    }),
+    changeQueryRequested: (
       state,
-      _action: PayloadActionWithLocator<{ lookupAppellation: string }>,
+      action: PayloadActionWithLocator<
+        AppellationAutocompleteLocator,
+        { lookup: string }
+      >,
     ) => {
-      state.suggestions = [];
-      state.isDebouncing = true;
+      const { locator } = action.payload;
+      state.data[locator] = {
+        ...initialAutocompleteItem,
+        isDebouncing: true,
+      };
     },
-    suggestionsHaveBeenRequested: (
+    fetchSuggestionsRequested: (
       state,
-      action: PayloadActionWithLocator<{
-        lookupAppellation: string;
-      }>,
+      action: PayloadActionWithLocator<
+        AppellationAutocompleteLocator,
+        { lookup: string }
+      >,
     ) => {
-      state.query = action.payload.lookupAppellation;
-      state.isLoading = true;
-      state.isDebouncing = false;
+      const { locator } = action.payload;
+      state.data[locator] = {
+        ...initialAutocompleteItem,
+        ...state.data[locator],
+        query: action.payload.lookup,
+        isLoading: true,
+        isDebouncing: false,
+      };
     },
-    suggestionsSuccessfullyFetched: (
+    fetchSuggestionsSucceeded: (
       state,
-      action: PayloadActionWithLocator<{
-        suggestions: AppellationMatchDto[];
-      }>,
+      action: PayloadActionWithLocator<
+        AppellationAutocompleteLocator,
+        {
+          suggestions: AppellationMatchDto[];
+        }
+      >,
     ) => {
-      state.suggestions = action.payload.suggestions;
-      state.isLoading = false;
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...initialAutocompleteItem,
+            ...state.data[locator],
+            isLoading: false,
+            suggestions: action.payload.suggestions,
+          },
+        },
+      };
     },
-    suggestionsFailed: (state, _action) => {
-      state.isLoading = false;
-    },
-    suggestionHasBeenSelected: (
+    fetchSuggestionsFailed: (
       state,
-      action: PayloadAction<{
-        appellationMatch: AppellationMatchDto;
-        appellationAutocompleteLocator: AppellationAutocompleteLocator;
-      }>,
+      action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
     ) => {
-      state.values = {
-        ...state.values,
-        [action.payload.appellationAutocompleteLocator]:
-          action.payload.appellationMatch,
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...state.data[locator],
+            isLoading: false,
+          },
+        },
+      };
+    },
+    selectSuggestionRequested: (
+      state,
+      action: PayloadActionWithLocator<
+        AppellationAutocompleteLocator,
+        {
+          item: AppellationMatchDto;
+        }
+      >,
+    ) => {
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...state.data[locator],
+            value: action.payload.item,
+          },
+        },
       };
     },
   },

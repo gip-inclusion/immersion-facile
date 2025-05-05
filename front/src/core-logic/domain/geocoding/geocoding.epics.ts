@@ -24,21 +24,21 @@ const geocodingQueryEpic: AppEpic<GeocodingAction> = (
   { scheduler },
 ) =>
   action$.pipe(
-    filter(geocodingSlice.actions.queryHasChanged.match),
+    filter(geocodingSlice.actions.changeQueryRequested.match),
     map((action) => ({
       ...action,
       payload: {
         ...action.payload,
-        lookupAddress: action.payload.lookupAddress.trim(),
+        lookup: action.payload.lookup.trim(),
       },
     })),
-    filter((action) => action.payload.lookupAddress.length >= queryMinLength),
+    filter((action) => action.payload.lookup.length >= queryMinLength),
     debounceTime(debounceDuration, scheduler),
     distinctUntilChanged(),
     map((action) =>
-      geocodingSlice.actions.suggestionsHaveBeenRequested({
+      geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.locator,
-        lookupAddress: action.payload.lookupAddress,
+        lookup: action.payload.lookup,
         selectFirstSuggestion: false,
       }),
     ),
@@ -50,21 +50,21 @@ const geocodingRequestEpic: AppEpic<GeocodingAction> = (
   { addressGateway },
 ) =>
   action$.pipe(
-    filter(geocodingSlice.actions.suggestionsHaveBeenRequested.match),
+    filter(geocodingSlice.actions.fetchSuggestionsRequested.match),
     switchMap((action) => {
-      return addressGateway
-        .lookupStreetAddress$(action.payload.lookupAddress)
-        .pipe(
-          map((suggestions) => ({
-            suggestions,
-            selectFirstSuggestion: action.payload.selectFirstSuggestion,
+      return addressGateway.lookupStreetAddress$(action.payload.lookup).pipe(
+        map((suggestions) => ({
+          suggestions,
+          selectFirstSuggestion: action.payload.selectFirstSuggestion,
+          locator: action.payload.locator,
+        })),
+        map(geocodingSlice.actions.fetchSuggestionsSucceeded),
+        catchEpicError(() =>
+          geocodingSlice.actions.fetchSuggestionsFailed({
             locator: action.payload.locator,
-          })),
-          map(geocodingSlice.actions.suggestionsSuccessfullyFetched),
-          catchEpicError((error) =>
-            geocodingSlice.actions.suggestionsFailed(error.message),
-          ),
-        );
+          }),
+        ),
+      );
     }),
   );
 
@@ -72,9 +72,9 @@ const geocodingFromSiretInfoEpic: AppEpic<GeocodingAction> = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretInfoSucceeded.match),
     map((action) =>
-      geocodingSlice.actions.suggestionsHaveBeenRequested({
+      geocodingSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.addressAutocompleteLocator,
-        lookupAddress: action.payload.siretEstablishment.businessAddress,
+        lookup: action.payload.siretEstablishment.businessAddress,
         selectFirstSuggestion: true,
       }),
     ),

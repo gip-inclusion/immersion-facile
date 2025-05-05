@@ -6,7 +6,7 @@ import {
 import { useDispatch } from "react-redux";
 import type { AppellationMatchDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { appellationSelectors } from "src/core-logic/domain/appellation/appellation.selectors";
+import { makeAppellationLocatorSelector } from "src/core-logic/domain/appellation/appellation.selectors";
 import {
   type AppellationAutocompleteLocator,
   appellationSlice,
@@ -21,17 +21,18 @@ export type AppellationAutocompleteProps = RSAutocompleteComponentProps<
 const useAppellationAutocomplete = (
   locator: AppellationAutocompleteLocator,
 ) => {
-  const value = useAppSelector(appellationSelectors.values);
-  const options = useAppSelector(appellationSelectors.suggestions).map(
-    (suggestion) => ({
-      value: suggestion,
-      label: suggestion.appellation.appellationLabel,
-    }),
+  const appellationLocatorSelector = useAppSelector(
+    makeAppellationLocatorSelector(locator),
   );
-  const isSearching = useAppSelector(appellationSelectors.isLoading);
-  const isDebouncing = useAppSelector(appellationSelectors.isDebouncing);
+  const options = appellationLocatorSelector?.suggestions.map((suggestion) => ({
+    value: suggestion,
+    label: suggestion.appellation.appellationLabel,
+  }));
+  const value = appellationLocatorSelector?.value;
+  const isSearching = appellationLocatorSelector?.isLoading;
+  const isDebouncing = appellationLocatorSelector?.isDebouncing;
   return {
-    value: value?.[locator],
+    value,
     options,
     isSearching,
     isDebouncing,
@@ -68,27 +69,33 @@ export const AppellationAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            appellationSlice.actions.queryWasEmptied();
+            appellationSlice.actions.emptyQueryRequested({
+              locator: props.locator,
+            });
             onAppellationClear();
           }
           if (searchResult && actionMeta.action === "select-option") {
             onAppellationSelected(searchResult.value);
             dispatch(
-              appellationSlice.actions.suggestionHasBeenSelected({
-                appellationMatch: searchResult.value,
-                appellationAutocompleteLocator: props.locator,
+              appellationSlice.actions.selectSuggestionRequested({
+                item: searchResult.value,
+                locator: props.locator,
               }),
             );
-            dispatch(appellationSlice.actions.queryWasEmptied());
+            dispatch(
+              appellationSlice.actions.emptyQueryRequested({
+                locator: props.locator,
+              }),
+            );
           }
         },
         options,
         onInputChange: (newQuery) => {
           setSearchTerm(newQuery);
           dispatch(
-            appellationSlice.actions.queryHasChanged({
+            appellationSlice.actions.changeQueryRequested({
               locator: props.locator,
-              lookupAppellation: newQuery,
+              lookup: newQuery,
             }),
           );
         },

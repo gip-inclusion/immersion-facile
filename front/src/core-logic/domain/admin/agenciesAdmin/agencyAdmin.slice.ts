@@ -18,8 +18,6 @@ export interface AgencyAdminState {
   agencyNeedingReviewOptions: AgencyOption[];
   agency: AgencyDto | null;
   agencyNeedingReview: AgencyDto | null;
-  // inclusionConnectedUsersNeedingReview: NormalizedInclusionConnectedUserById;
-  // selectedUserId: AuthenticatedUserId | null;
 
   isSearching: boolean;
   isFetchingAgenciesNeedingReview: boolean;

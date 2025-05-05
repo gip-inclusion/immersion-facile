@@ -4,7 +4,7 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { geocodingSelectors } from "src/core-logic/domain/geocoding/geocoding.selectors";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
   type TestDependencies,
@@ -16,15 +16,15 @@ import { geocodingSlice } from "./geocoding.slice";
 describe("Geocoding epic", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
-
+  const locator = "convention-immersion-address";
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   it("should reset the value and suggestions when the query has been emptied", () => {
     store.dispatch(
-      geocodingSlice.actions.suggestionHasBeenSelected({
-        addressAndPosition: {
+      geocodingSlice.actions.selectSuggestionRequested({
+        item: {
           address: {
             city: "Paris",
             departmentCode: "75",
@@ -36,20 +36,20 @@ describe("Geocoding epic", () => {
             lon: 2.3522,
           },
         },
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        locator,
       }),
     );
-    store.dispatch(geocodingSlice.actions.queryWasEmptied());
-    expect(store.getState().geocoding.values).toBeNull();
-    expect(store.getState().geocoding.suggestions).toEqual([]);
+    store.dispatch(geocodingSlice.actions.emptyQueryRequested({ locator }));
+    expect(store.getState().geocoding.data[locator]?.value).toBeNull();
+    expect(store.getState().geocoding.data[locator]?.suggestions).toEqual([]);
   });
 
   it("should update the searched query and reset the state", () => {
     const query = "foi";
     store.dispatch(
-      geocodingSlice.actions.queryHasChanged({
-        locator: "conventionImmersionAddress",
-        lookupAddress: query,
+      geocodingSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -62,9 +62,9 @@ describe("Geocoding epic", () => {
   it("shouldn't update the searched query if threshold is not reached", () => {
     const query = "fo";
     store.dispatch(
-      geocodingSlice.actions.queryHasChanged({
-        locator: "conventionImmersionAddress",
-        lookupAddress: query,
+      geocodingSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -90,9 +90,9 @@ describe("Geocoding epic", () => {
       },
     ];
     store.dispatch(
-      geocodingSlice.actions.queryHasChanged({
-        locator: "conventionImmersionAddress",
-        lookupAddress: query,
+      geocodingSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -120,9 +120,9 @@ describe("Geocoding epic", () => {
       },
     };
     store.dispatch(
-      geocodingSlice.actions.suggestionHasBeenSelected({
-        addressAndPosition,
-        addressAutocompleteLocator: "conventionImmersionAddress",
+      geocodingSlice.actions.selectSuggestionRequested({
+        item: addressAndPosition,
+        locator,
       }),
     );
     expectSelectedSuggestionToBe(addressAndPosition);
@@ -131,9 +131,9 @@ describe("Geocoding epic", () => {
   it("should throw an error if something goes wrong and returns error feedback", () => {
     const errorMessage = "Error trying to get location";
     store.dispatch(
-      geocodingSlice.actions.suggestionsHaveBeenRequested({
-        locator: "conventionImmersionAddress",
-        lookupAddress: "bord",
+      geocodingSlice.actions.fetchSuggestionsRequested({
+        locator,
+        lookup: "bord",
         selectFirstSuggestion: false,
       }),
     );
@@ -159,9 +159,9 @@ describe("Geocoding epic", () => {
       },
     ];
     store.dispatch(
-      geocodingSlice.actions.suggestionsHaveBeenRequested({
-        locator: "conventionImmersionAddress",
-        lookupAddress: "bord",
+      geocodingSlice.actions.fetchSuggestionsRequested({
+        locator,
+        lookup: "bord",
         selectFirstSuggestion: true,
       }),
     );
@@ -197,7 +197,7 @@ describe("Geocoding epic", () => {
           siret: "12345678901234",
         },
         feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        addressAutocompleteLocator: locator,
       }),
     );
     dependencies.addressGateway.lookupStreetAddressResults$.next(
@@ -208,23 +208,34 @@ describe("Geocoding epic", () => {
   });
 
   const expectQueryToBe = (expected: string) => {
-    expectToEqual(geocodingSelectors.query(store.getState()), expected);
+    expectToEqual(
+      makeGeocodingLocatorSelector(locator)(store.getState())?.query,
+      expected,
+    );
   };
   const expectLoadingToBe = (expected: boolean) => {
-    expectToEqual(geocodingSelectors.isLoading(store.getState()), expected);
+    expectToEqual(
+      makeGeocodingLocatorSelector(locator)(store.getState())?.isLoading,
+      expected,
+    );
   };
   const expectDebouncingToBe = (expected: boolean) => {
-    expectToEqual(geocodingSelectors.isDebouncing(store.getState()), expected);
+    expectToEqual(
+      makeGeocodingLocatorSelector(locator)(store.getState())?.isDebouncing,
+      expected,
+    );
   };
   const expectSuggestionsToBe = (expected: AddressAndPosition[]) => {
     expectArraysToEqual(
-      geocodingSelectors.suggestions(store.getState()),
+      makeGeocodingLocatorSelector(locator)?.(store.getState())?.suggestions ??
+        [],
       expected,
     );
   };
   const expectSelectedSuggestionToBe = (expected: AddressAndPosition) => {
-    expectObjectsToMatch(geocodingSelectors.value(store.getState()), {
-      conventionImmersionAddress: expected,
-    });
+    expectObjectsToMatch(
+      makeGeocodingLocatorSelector(locator)(store.getState())?.value,
+      expected,
+    );
   };
 });

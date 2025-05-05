@@ -65,7 +65,7 @@ describe("Establishment", () => {
           siret: "123",
         } as SiretEstablishmentDto,
         feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        addressAutocompleteLocator: "convention-immersion-address",
       }),
     );
     expectNavigationToEstablishmentFormPageToHaveBeenTriggered(null);
@@ -84,7 +84,7 @@ describe("Establishment", () => {
       siretSlice.actions.siretModified({
         siret: "10002000300040",
         feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        addressAutocompleteLocator: "convention-immersion-address",
       }),
     );
     dependencies.formCompletionGateway.siretInfo$.next(
@@ -109,7 +109,7 @@ describe("Establishment", () => {
       siretSlice.actions.siretModified({
         siret: "10002000300040",
         feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        addressAutocompleteLocator: "convention-immersion-address",
       }),
     );
     dependencies.formCompletionGateway.siretInfo$.next(

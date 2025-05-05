@@ -17,6 +17,7 @@ immersion-facile.code-workspace
 dev-dist
 coverage
 
+.cursor/rules
 bi/.venv/
 bi/__pycache__/
 bi/**/*.py[cod]

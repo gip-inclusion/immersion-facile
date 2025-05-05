@@ -6,13 +6,16 @@ import {
 import { useDispatch } from "react-redux";
 import type { LookupSearchResult } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { geosearchSelectors } from "src/core-logic/domain/geosearch/geosearch.selectors";
-import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
+import { makeGeosearchLocatorSelector } from "src/core-logic/domain/geosearch/geosearch.selectors";
+import {
+  type GeosearchLocator,
+  geosearchSlice,
+} from "src/core-logic/domain/geosearch/geosearch.slice";
 
 export type PlaceAutocompleteProps = RSAutocompleteComponentProps<
   "place",
   LookupSearchResult,
-  "searchPlace"
+  GeosearchLocator
 >;
 
 export const PlaceAutocomplete = ({
@@ -21,12 +24,14 @@ export const PlaceAutocomplete = ({
   ...props
 }: PlaceAutocompleteProps) => {
   const dispatch = useDispatch();
-
+  const geosearchLocatorSelector = useAppSelector(
+    makeGeosearchLocatorSelector(props.locator),
+  );
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const isSearching: boolean = useAppSelector(geosearchSelectors.isLoading);
-  const isDebouncing: boolean = useAppSelector(geosearchSelectors.isDebouncing);
-  const searchSuggestions = useAppSelector(geosearchSelectors.suggestions);
-  const options = searchSuggestions.map((suggestion) => ({
+  const isSearching = geosearchLocatorSelector?.isLoading;
+  const isDebouncing = geosearchLocatorSelector?.isDebouncing;
+  const searchSuggestions = geosearchLocatorSelector?.suggestions;
+  const options = searchSuggestions?.map((suggestion) => ({
     value: suggestion,
     label: suggestion.label,
   }));
@@ -45,23 +50,35 @@ export const PlaceAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            geosearchSlice.actions.queryWasEmptied();
+            geosearchSlice.actions.emptyQueryRequested({
+              locator: props.locator,
+            });
             onPlaceClear();
           }
           if (searchResult && actionMeta.action === "select-option") {
             onPlaceSelected(searchResult.value);
             dispatch(
-              geosearchSlice.actions.suggestionHasBeenSelected(
-                searchResult.value,
-              ),
+              geosearchSlice.actions.selectSuggestionRequested({
+                item: searchResult.value,
+                locator: props.locator,
+              }),
             );
-            dispatch(geosearchSlice.actions.queryWasEmptied());
+            dispatch(
+              geosearchSlice.actions.emptyQueryRequested({
+                locator: props.locator,
+              }),
+            );
           }
         },
         options,
         onInputChange: (value) => {
           setSearchTerm(value);
-          dispatch(geosearchSlice.actions.queryHasChanged(value));
+          dispatch(
+            geosearchSlice.actions.changeQueryRequested({
+              locator: props.locator,
+              lookup: value,
+            }),
+          );
         },
       }}
     />
