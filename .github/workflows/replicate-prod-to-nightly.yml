@@ -22,24 +22,24 @@ jobs:
       - name: Dump the remote database data and restore it to the local database.
         run: >-
           scalingo --region osc-secnum-fr1 --app if-prod-nightly-db run --size XL bash -c "
-                echo '> activate Scalingo CLI, PG then login' &&
+                echo "> $(date) - activate Scalingo CLI, PG then login" &&
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
                   scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
-                echo '> Getting PG Addon ID' &&
+                echo "> $(date) - Getting PG Addon ID" &&
                   ADDON_ID_LINE=\$(scalingo --region osc-secnum-fr1 --app if-prod-back addons | grep 'PostgreSQL') &&
                   regex='PostgreSQL \| (.*) \| postgresql' &&
                   [[ \$ADDON_ID_LINE =~ \$regex ]] &&
-                echo '> Downloading last DB backup' &&
+                echo "> $(date) - Downloading last DB backup" &&
                   scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\${BASH_REMATCH[1]} backups-download --output=dump.tar.gz &&
                   tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
-                echo '> Create a Table of content for restore, ignore postgis related schemas and tables:' &&
+                echo "> $(date) - Create a Table of content for restore, ignore postgis related schemas and tables:" &&
                   pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology > list.txt &&
-                echo '> Dropping data and schema owned by current user' &&
+                echo "> $(date) - Dropping data and schema owned by current user" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'DROP OWNED BY CURRENT_USER CASCADE;' &&
-                echo '> Add Postgis extension if not exists' &&
+                echo "> $(date) - Add Postgis extension if not exists" &&
                   psql \$SCALINGO_POSTGRESQL_URL -c 'CREATE EXTENSION IF NOT EXISTS postgis;' &&
-                echo '> Start pg_restore' &&\
+                echo "> $(date) - Start pg_restore" &&\
                   pg_restore\
                     --jobs=8\
                     --disable-triggers\
@@ -50,5 +50,5 @@ jobs:
                     --no-comments\
                     --exit-on-error\
                     --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
-                echo '> Finished restoring schema' &&
+                echo "> $(date) - Finished restoring schema" &&
                   exit 0"
