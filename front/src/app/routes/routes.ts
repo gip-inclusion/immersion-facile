@@ -266,7 +266,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       contactPhone: param.query.optional.string,
       contactMessage: param.query.optional.string,
     },
-    () => `/${frontRoutes.offer}`,
+    () => `/${frontRoutes.searchResult}`,
   ),
   searchResultForStudent: defineRoute(
     {
@@ -279,14 +279,14 @@ export const { RouteProvider, useRoute, routes } = createRouter({
       contactPhone: param.query.optional.string,
       contactMessage: param.query.optional.string,
     },
-    () => `/${frontRoutes.offerForStudent}`,
+    () => `/${frontRoutes.searchResultForStudent}`,
   ),
   searchResultExternal: defineRoute(
     {
       siret: param.query.string,
       appellationCode: param.query.ofType(appellationStringSerializer),
     },
-    () => `/${frontRoutes.offerExternal}`,
+    () => `/${frontRoutes.searchResultExternal}`,
   ),
   manageConvention: defineRoute(
     { jwt: param.query.string },

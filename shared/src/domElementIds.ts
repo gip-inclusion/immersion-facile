@@ -156,30 +156,61 @@ export const domElementIds = {
   },
 
   search: {
-    searchForm: "im-search-page__search-form",
-    placeAutocompleteInput: "im-search-page__address-autocomplete",
-    resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
     appellationAutocomplete: "im-search-page__appellation-autocomplete",
-    nafAutocomplete: "im-search-page__naf-autocomplete",
-    distanceSelect: "im-search-page__distance-dropdown",
-    sortFilter: "im-search-page__sort-filter-select",
-    searchSubmitButton: "im-search__submit-search",
-    searchStudentSubmitButton: "im-search__submit-search-for-students",
-    searchSortOptionBase: "im-search__search-sort-option-",
-    lbbSearchResultButton: "im-search-result__lbb-contact-button",
-    searchResultButton: "im-search-result__contact-button",
-    contactByMailButton: "im-contact-establishment__contact-email-button",
-    contactByMailCancelButton:
-      "im-contact-establishment__contact-email-cancel-button",
-    contactByPhoneButton: "im-contact-establishment__contact-phone-button",
-    contactInPersonButton: "im-contact-establishment__contact-in-person-button",
     appellationFilterTag: "im-search-page__appellation-filter-tag",
-    locationFilterTag: "im-search-page__location-filter-tag",
+    distanceSelect: "im-search-page__distance-dropdown",
     fitForDisableWorkersFilterTag:
       "im-search-page__fit-for-disabled-workers-filter-tag",
+    lbbSearchResultButton: "im-search-result__lbb-contact-button",
+    locationFilterTag: "im-search-page__location-filter-tag",
+    nafAutocomplete: "im-search-page__naf-autocomplete",
+    placeAutocompleteInput: "im-search-page__address-autocomplete",
+    resultPerPageDropdown: "im-search-page__results-per-page-dropdown",
+    searchForm: "im-search-page__search-form",
+    searchResultButton: "im-search-result__contact-button",
+    searchSortOptionBase: "im-search__search-sort-option-",
+    searchSubmitButton: "im-search__submit-search",
+    sortFilter: "im-search-page__sort-filter-select",
     sortFilterTag: "im-search-page__sort-filter-tag",
     sortRadioButtons: "im-search-page__sort-radio-buttons",
   },
+  searchForStudent: {
+    appellationAutocomplete:
+      "im-search-page__appellation-autocomplete--students",
+    appellationFilterTag: "im-search-page__appellation-filter-tag--students",
+    distanceSelect: "im-search-page__distance-dropdown",
+    fitForDisableWorkersFilterTag:
+      "im-search-page__fit-for-disabled-workers-filter-tag--students",
+    lbbSearchResultButton: "im-search-result__lbb-contact-button--student",
+    locationFilterTag: "im-search-page__location-filter-tag--students",
+    nafAutocomplete: "im-search-page__naf-autocomplete--students",
+    placeAutocompleteInput: "im-search-page__address-autocomplete--students",
+    searchForm: "im-search-page__search-form--student",
+    searchResultButton: "im-search-result__contact-button--student",
+    searchSubmitButton: "im-search__submit-search-for-students",
+    sortFilterTag: "im-search-page__sort-filter-tag--students",
+    sortRadioButtons: "im-search-page__sort-radio-buttons--students",
+  },
+  searchResult: {
+    contactByMailButton: "im-contact-establishment__contact-email-button",
+    contactByMailForm: "im-contact-form--email",
+    contactByPhoneButton: "im-contact-establishment__contact-phone-button",
+    contactByPhoneForm: "im-contact-form--phone",
+    contactInPersonButton: "im-contact-establishment__contact-in-person-button",
+    contactInPersonForm: "im-contact-form--in-person",
+  },
+  searchResultForStudent: {
+    contactByMailButton:
+      "im-contact-establishment__contact-email-button--student",
+    contactByMailForm: "im-contact-form--email-student",
+    contactByPhoneButton:
+      "im-contact-establishment__contact-phone-button--student",
+    contactByPhoneForm: "im-contact-form--phone-student",
+    contactInPersonButton:
+      "im-contact-establishment__contact-in-person-button--student",
+    contactInPersonForm: "im-contact-form--in-person-student",
+  },
+  searchResultExternal: {},
   addAgency: {
     form: "im-form-add-agency",
     uploadLogoInput: "im-form-add-agency__file-upload-logo",
@@ -770,8 +801,6 @@ export const domElementIds = {
       "im-errored-convention-handled-confirmation-modal",
   },
   manageDiscussion: {},
-  offer: {},
-  offerExternal: {},
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     initiateConventionModal:
@@ -834,6 +863,4 @@ export const domElementIds = {
       "im-convention-form__initiate-dont-know-category-button",
   },
   beneficiaryDashboard: {},
-  searchForStudent: {},
-  offerForStudent: {},
 } satisfies DomElementIds;
