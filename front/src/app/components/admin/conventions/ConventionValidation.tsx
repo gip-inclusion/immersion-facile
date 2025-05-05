@@ -27,6 +27,7 @@ import type { JwtKindProps } from "src/app/components/admin/conventions/Conventi
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendSignatureLinkSelectors } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.selectors";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
@@ -143,6 +144,7 @@ export const ConventionValidation = ({
         <ConventionRenewedInformations renewed={convention.renewed} />
       )}
       <ConventionSummary
+        illustration={commonIllustrations.documentsAdministratifs}
         submittedAt={toDisplayedDate({
           date: new Date(convention.dateSubmission),
         })}

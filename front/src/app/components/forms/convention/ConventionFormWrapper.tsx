@@ -25,6 +25,7 @@ import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/Conv
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes, useRoute } from "src/app/routes/routes";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
@@ -229,6 +230,7 @@ const ConventionSummarySection = () => {
       }
       {convention && (
         <ConventionSummary
+          illustration={commonIllustrations.documentsAdministratifs}
           submittedAt={toDisplayedDate({
             date: new Date(convention.dateSubmission),
           })}
