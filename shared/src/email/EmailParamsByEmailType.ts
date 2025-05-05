@@ -10,6 +10,7 @@ import type {
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
+import type { DiscussionKind } from "../discussion/discussion.dto";
 import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -192,6 +193,7 @@ export type EmailParamsByEmailType = {
       }
   );
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
+    kind: DiscussionKind;
     beneficiaryFullName: string;
     businessName: string;
   };
@@ -214,6 +216,7 @@ export type EmailParamsByEmailType = {
     contactFirstName: string;
     contactLastName: string;
     contactPhone: string;
+    kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
   };
@@ -222,6 +225,7 @@ export type EmailParamsByEmailType = {
     contactFirstName: string;
     contactLastName: string;
     businessAddress: string;
+    kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
   };

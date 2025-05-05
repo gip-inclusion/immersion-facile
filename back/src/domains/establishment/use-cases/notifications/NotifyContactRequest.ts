@@ -57,6 +57,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         businessName: discussion.businessName,
         contactFirstName: discussion.establishmentContact.firstName,
         contactLastName: discussion.establishmentContact.lastName,
+        kind: discussion.kind,
         potentialBeneficiaryFirstName:
           discussion.potentialBeneficiary.firstName,
         potentialBeneficiaryLastName: discussion.potentialBeneficiary.lastName,

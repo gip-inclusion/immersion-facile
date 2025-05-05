@@ -738,7 +738,7 @@ export const createUseCases = (
       uowPerformer,
       deps: { crispApi: gateways.crispGateway },
     }),
-    notifyBeneficiaryThatContactRequestHasBeenSent:
+    notifyCandidateThatContactRequestHasBeenSent:
       makeNotifyCandidateThatContactRequestHasBeenSent({
         uowPerformer,
         deps: { saveNotificationAndRelatedEvent },

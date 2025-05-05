@@ -38,6 +38,7 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent =
           kind: "CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION",
           recipients: [discussion.potentialBeneficiary.email],
           params: {
+            kind: discussion.kind,
             businessName: discussion.businessName,
             beneficiaryFullName: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
           },
