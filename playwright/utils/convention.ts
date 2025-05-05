@@ -3,6 +3,7 @@ import { type Page, expect } from "@playwright/test";
 import { addBusinessDays, format } from "date-fns";
 import {
   type AgencyId,
+  addressRoutes,
   domElementIds,
   frontRoutes,
   technicalRoutes,
@@ -151,6 +152,7 @@ export const submitBasicConventionForm = async (
     page,
     locator: `#${domElementIds.conventionImmersionRoute.conventionSection.immersionAddress}`,
     value: getRandomizedData("addressQueries"),
+    endpoint: addressRoutes.lookupStreetAddress.url,
   });
 
   await expect(
