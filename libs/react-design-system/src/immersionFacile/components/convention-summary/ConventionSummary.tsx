@@ -10,6 +10,7 @@ export type ConventionSummaryProperties = {
   conventionId?: string;
   submittedAt: string;
   summary: ConventionSummarySection[];
+  illustration: string;
 };
 
 export type ConventionSummarySection = {
@@ -45,6 +46,7 @@ export const ConventionSummary = ({
   conventionId,
   submittedAt,
   summary,
+  illustration,
 }: ConventionSummaryProperties) => {
   const { cx } = useStyles();
 
@@ -69,7 +71,7 @@ export const ConventionSummary = ({
           )}
         >
           <img
-            src="https://immersion.cellar-c2.services.clever-cloud.com/document_administratif"
+            src={illustration}
             alt=""
             className={fr.cx("fr-col-12", "fr-col-md-1")}
           />

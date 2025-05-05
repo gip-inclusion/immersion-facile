@@ -20,13 +20,13 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
 import { SignatureActions } from "./SignatureActions";
-
 type ConventionSignFormProperties = {
   jwt: string;
   convention: ConventionReadDto;
@@ -102,6 +102,7 @@ export const ConventionSignForm = ({
           className={fr.cx("fr-mb-5v")}
         />
         <ConventionSummary
+          illustration={commonIllustrations.documentsAdministratifs}
           submittedAt={toDisplayedDate({
             date: new Date(convention.dateSubmission),
           })}
@@ -127,6 +128,7 @@ export const ConventionSignForm = ({
         <form id={domElementIds.conventionToSign.form}>
           {currentSignatory && (
             <ConventionSummary
+              illustration={commonIllustrations.documentsAdministratifs}
               submittedAt={toDisplayedDate({
                 date: new Date(convention.dateSubmission),
               })}
