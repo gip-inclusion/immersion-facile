@@ -8,6 +8,7 @@ import type {
 const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";
 
+// TODO: fix circular reference to avoid ContactTranscientData empty object
 const unrelevantDataKeysForContactScope: (keyof ContactEstablishmentByMailDto)[] =
   ["locationId", "appellationCode", "contactMode", "siret", "kind"] as const;
 
