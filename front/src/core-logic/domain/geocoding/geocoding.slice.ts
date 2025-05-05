@@ -1,91 +1,146 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { AddressAndPosition, LookupAddress } from "shared";
+import {
+  type AutocompleteState,
+  type PayloadActionWithLocator,
+  initialAutocompleteItem,
+} from "src/core-logic/domain/autocomplete.utils";
 
-type MultipleAddressAutocompleteLocator = `multipleAddress-${number}`;
+type MultipleAddressAutocompleteLocator = `multiple-address-${number}`;
 
 export type AddressAutocompleteLocator =
-  | "conventionImmersionAddress"
-  | "conventionBeneficiaryAddress"
-  | "conventionBeneficiaryCurrentEmployerAddress"
-  | "agencyAddress"
-  | "createEstablishmentAddress"
+  | "convention-immersion-address"
+  | "convention-beneficiary-address"
+  | "convention-beneficiary-current-employer-address"
+  | "agency-address"
+  | "create-establishment-address"
   | MultipleAddressAutocompleteLocator;
 
-type GeocodingState = {
-  suggestions: AddressAndPosition[];
-  values: Partial<
-    Record<AddressAutocompleteLocator, AddressAndPosition>
-  > | null;
-  query: string;
-  isLoading: boolean;
-  isDebouncing: boolean;
+const initialState: AutocompleteState<
+  AddressAutocompleteLocator,
+  AddressAndPosition
+> = {
+  data: {},
 };
-
-const initialState: GeocodingState = {
-  suggestions: [],
-  query: "",
-  values: null,
-  isLoading: false,
-  isDebouncing: false,
-};
-
-type PayloadActionWithLocator<Payload> = PayloadAction<
-  Payload & { locator: AddressAutocompleteLocator }
->;
 
 export const geocodingSlice = createSlice({
   name: "geocoding",
   initialState,
   reducers: {
-    queryWasEmptied: (_state) => initialState,
-    queryHasChanged: (
+    emptyQueryRequested: (
+      _state,
+      action: PayloadActionWithLocator<AddressAutocompleteLocator>,
+    ) => ({
+      ...initialState,
+      data: {
+        ...initialState.data,
+        [action.payload.locator]: {
+          ...initialAutocompleteItem,
+        },
+      },
+    }),
+    changeQueryRequested: (
       state,
-      _action: PayloadActionWithLocator<{ lookupAddress: LookupAddress }>,
+      action: PayloadActionWithLocator<
+        AddressAutocompleteLocator,
+        {
+          lookup: LookupAddress;
+        }
+      >,
     ) => {
-      state.suggestions = [];
-      state.isDebouncing = true;
+      const { locator } = action.payload;
+      state.data[locator] = {
+        ...initialAutocompleteItem,
+        isDebouncing: true,
+      };
     },
-    suggestionsHaveBeenRequested: (
+    fetchSuggestionsRequested: (
       state,
-      action: PayloadActionWithLocator<{
-        lookupAddress: LookupAddress;
-        selectFirstSuggestion: boolean;
-      }>,
+      action: PayloadActionWithLocator<
+        AddressAutocompleteLocator,
+        {
+          lookup: LookupAddress;
+          selectFirstSuggestion: boolean;
+        }
+      >,
     ) => {
-      state.query = action.payload.lookupAddress;
-      state.isLoading = true;
-      state.isDebouncing = false;
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...initialAutocompleteItem,
+            ...state.data[locator],
+            query: action.payload.lookup,
+            isLoading: true,
+            isDebouncing: false,
+          },
+        },
+      };
     },
-    suggestionsSuccessfullyFetched: (
+    fetchSuggestionsSucceeded: (
       state,
-      action: PayloadActionWithLocator<{
-        suggestions: AddressAndPosition[];
-        selectFirstSuggestion: boolean;
-      }>,
+      action: PayloadActionWithLocator<
+        AddressAutocompleteLocator,
+        {
+          suggestions: AddressAndPosition[];
+          selectFirstSuggestion: boolean;
+        }
+      >,
     ) => {
-      state.suggestions = action.payload.suggestions;
-      state.isLoading = false;
-      if (action.payload.selectFirstSuggestion) {
-        state.values = {
-          ...state.values,
-          [action.payload.locator]: action.payload.suggestions[0],
-        };
-      }
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...initialAutocompleteItem,
+            ...state.data[locator],
+            isLoading: false,
+            suggestions: action.payload.suggestions,
+            value: action.payload.selectFirstSuggestion
+              ? action.payload.suggestions[0]
+              : null,
+          },
+        },
+      };
     },
-    suggestionsFailed: (state, _action) => {
-      state.isLoading = false;
-    },
-    suggestionHasBeenSelected: (
+    fetchSuggestionsFailed: (
       state,
-      action: PayloadAction<{
-        addressAndPosition: AddressAndPosition;
-        addressAutocompleteLocator: AddressAutocompleteLocator;
-      }>,
+      action: PayloadActionWithLocator<AddressAutocompleteLocator>,
     ) => {
-      state.values = {
-        ...state.values,
-        [action.payload.addressAutocompleteLocator]:
-          action.payload.addressAndPosition,
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...initialAutocompleteItem,
+            ...state.data[locator],
+            isLoading: false,
+          },
+        },
+      };
+    },
+    selectSuggestionRequested: (
+      state,
+      action: PayloadActionWithLocator<
+        AddressAutocompleteLocator,
+        { item: AddressAndPosition }
+      >,
+    ) => {
+      const { locator } = action.payload;
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: {
+            ...initialAutocompleteItem,
+            ...state.data[locator],
+            value: action.payload.item,
+          },
+        },
       };
     },
   },

@@ -123,7 +123,7 @@ describe("Siret validation and fetching", () => {
       store.dispatch(
         siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
           shouldFetchEvenIfAlreadySaved: false,
-          addressAutocompleteLocator: "conventionImmersionAddress",
+          addressAutocompleteLocator: "convention-immersion-address",
         }),
       );
       expectShouldFetchEvenIfAlreadySavedToBe(false);
@@ -133,7 +133,7 @@ describe("Siret validation and fetching", () => {
       store.dispatch(
         siretSlice.actions.setShouldFetchEvenIfAlreadySaved({
           shouldFetchEvenIfAlreadySaved: true,
-          addressAutocompleteLocator: "conventionImmersionAddress",
+          addressAutocompleteLocator: "convention-immersion-address",
         }),
       );
       expectShouldFetchEvenIfAlreadySavedToBe(true);
@@ -161,7 +161,7 @@ describe("Siret validation and fetching", () => {
       siretSlice.actions.siretModified({
         siret,
         feedbackTopic: "siret-input",
-        addressAutocompleteLocator: "conventionImmersionAddress",
+        addressAutocompleteLocator: "convention-immersion-address",
       }),
     );
 

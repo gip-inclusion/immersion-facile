@@ -176,7 +176,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       route.params.siret
         ? route.params.siret
         : "",
-    addressAutocompleteLocator: "multipleAddress-0",
+    addressAutocompleteLocator: "multiple-address-0",
   });
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 

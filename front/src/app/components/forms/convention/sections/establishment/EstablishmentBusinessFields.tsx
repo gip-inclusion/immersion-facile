@@ -21,7 +21,7 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
     isFetchingSiret,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
-    addressAutocompleteLocator: "conventionImmersionAddress",
+    addressAutocompleteLocator: "convention-immersion-address",
   });
   const convention = useAppSelector(conventionSelectors.convention);
   const { getValues, register, control, setValue } =

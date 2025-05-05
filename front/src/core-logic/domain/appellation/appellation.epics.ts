@@ -23,23 +23,21 @@ const appellationQueryEpic: AppEpic<AppellationAction> = (
   { scheduler },
 ) =>
   action$.pipe(
-    filter(appellationSlice.actions.queryHasChanged.match),
+    filter(appellationSlice.actions.changeQueryRequested.match),
     map((action) => ({
       ...action,
       payload: {
         ...action.payload,
-        lookupAppellation: action.payload.lookupAppellation.trim(),
+        lookup: action.payload.lookup.trim(),
       },
     })),
-    filter(
-      (action) => action.payload.lookupAppellation.length >= queryMinLength,
-    ),
+    filter((action) => action.payload.lookup.length >= queryMinLength),
     debounceTime(debounceDuration, scheduler),
     distinctUntilChanged(),
     map((action) =>
-      appellationSlice.actions.suggestionsHaveBeenRequested({
+      appellationSlice.actions.fetchSuggestionsRequested({
         locator: action.payload.locator,
-        lookupAppellation: action.payload.lookupAppellation,
+        lookup: action.payload.lookup,
       }),
     ),
   );
@@ -50,18 +48,20 @@ const appellationRequestEpic: AppEpic<AppellationAction> = (
   { formCompletionGateway },
 ) =>
   action$.pipe(
-    filter(appellationSlice.actions.suggestionsHaveBeenRequested.match),
+    filter(appellationSlice.actions.fetchSuggestionsRequested.match),
     switchMap((action) => {
       return formCompletionGateway
-        .getAppellationDtoMatching$(action.payload.lookupAppellation, true)
+        .getAppellationDtoMatching$(action.payload.lookup, true)
         .pipe(
           map((suggestions) => ({
             suggestions,
             locator: action.payload.locator,
           })),
-          map(appellationSlice.actions.suggestionsSuccessfullyFetched),
-          catchEpicError((error) =>
-            appellationSlice.actions.suggestionsFailed(error.message),
+          map(appellationSlice.actions.fetchSuggestionsSucceeded),
+          catchEpicError(() =>
+            appellationSlice.actions.fetchSuggestionsFailed({
+              locator: action.payload.locator,
+            }),
           ),
         );
     }),

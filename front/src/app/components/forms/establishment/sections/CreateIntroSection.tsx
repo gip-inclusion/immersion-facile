@@ -17,7 +17,7 @@ export const CreateIntroSection = ({
 }) => {
   const { siretRawError, currentSiret } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,
-    addressAutocompleteLocator: "createEstablishmentAddress",
+    addressAutocompleteLocator: "create-establishment-address",
   });
 
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);

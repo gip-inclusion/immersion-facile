@@ -22,7 +22,7 @@ export const CreationSiretRelatedInputs = () => {
     updateSiret,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: false,
-    addressAutocompleteLocator: "createEstablishmentAddress",
+    addressAutocompleteLocator: "create-establishment-address",
   });
   const {
     setValue,

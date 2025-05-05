@@ -45,7 +45,7 @@ export const MultipleAddressInput = ({
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AddressAutocomplete
                 disabled={disabled}
-                locator={`multipleAddress-${index}`}
+                locator={`multiple-address-${index}`}
                 label={"Rechercher un lieu *"}
                 selectProps={{
                   inputId: `${id}-${index}`,

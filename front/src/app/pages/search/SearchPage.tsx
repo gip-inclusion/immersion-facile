@@ -193,7 +193,11 @@ export const SearchPage = ({
   useEffect(() => {
     return () => {
       dispatch(searchSlice.actions.clearSearchStatusRequested());
-      dispatch(geosearchSlice.actions.queryWasEmptied());
+      dispatch(
+        geosearchSlice.actions.emptyQueryRequested({
+          locator: "search-form-place",
+        }),
+      );
     };
   }, [dispatch]);
 
@@ -253,7 +257,7 @@ export const SearchPage = ({
               >
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                   <AppellationAutocomplete
-                    locator="searchAppellation"
+                    locator="search-form-appellation"
                     label={appellationInputLabel}
                     onAppellationSelected={(appellationMatch) => {
                       setValue("appellations", [appellationMatch.appellation]);
@@ -271,7 +275,7 @@ export const SearchPage = ({
                 </div>
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                   <PlaceAutocomplete
-                    locator="searchPlace"
+                    locator="search-form-place"
                     label={placeInputLabel}
                     initialInputValue={place}
                     onPlaceSelected={(lookupSearchResult) => {
@@ -385,7 +389,7 @@ export const SearchPage = ({
                   content: (
                     <>
                       <AppellationAutocomplete
-                        locator="searchAppellation"
+                        locator="search-form-appellation"
                         className={fr.cx("fr-mb-2w")}
                         label={appellationInputLabel}
                         onAppellationSelected={(appellationMatch) => {
@@ -481,7 +485,7 @@ export const SearchPage = ({
                   content: (
                     <>
                       <PlaceAutocomplete
-                        locator="searchPlace"
+                        locator="search-form-place"
                         label={placeInputLabel}
                         onPlaceSelected={(lookupSearchResult) => {
                           if (!lookupSearchResult) return;

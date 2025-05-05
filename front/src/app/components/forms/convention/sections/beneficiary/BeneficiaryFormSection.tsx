@@ -238,7 +238,7 @@ export const BeneficiaryFormSection = ({
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
-            locator="conventionBeneficiaryAddress"
+            locator="convention-beneficiary-address"
             {...formContents["signatories.beneficiary.address"]}
             initialInputValue={
               values.signatories.beneficiary.address &&

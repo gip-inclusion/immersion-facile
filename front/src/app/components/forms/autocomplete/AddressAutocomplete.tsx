@@ -6,7 +6,7 @@ import {
 import { useDispatch } from "react-redux";
 import { type AddressAndPosition, addressDtoToString } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { geocodingSelectors } from "src/core-logic/domain/geocoding/geocoding.selectors";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import {
   type AddressAutocompleteLocator,
   geocodingSlice,
@@ -19,17 +19,18 @@ export type AddressAutocompleteProps = RSAutocompleteComponentProps<
 >;
 
 const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
-  const value = useAppSelector(geocodingSelectors.value);
-  const options = useAppSelector(geocodingSelectors.suggestions).map(
-    (suggestion) => ({
-      value: suggestion,
-      label: addressDtoToString(suggestion.address),
-    }),
+  const geocodingLocatorSelector = useAppSelector(
+    makeGeocodingLocatorSelector(locator),
   );
-  const isSearching = useAppSelector(geocodingSelectors.isLoading);
-  const isDebouncing = useAppSelector(geocodingSelectors.isDebouncing);
+  const options = geocodingLocatorSelector?.suggestions.map((suggestion) => ({
+    value: suggestion,
+    label: addressDtoToString(suggestion.address),
+  }));
+  const value = geocodingLocatorSelector?.value;
+  const isSearching = geocodingLocatorSelector?.isLoading;
+  const isDebouncing = geocodingLocatorSelector?.isDebouncing;
   return {
-    value: value?.[locator],
+    value,
     options,
     isSearching,
     isDebouncing,
@@ -58,7 +59,7 @@ export const AddressAutocomplete = ({
         placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
         value: value
           ? {
-              label: addressDtoToString(value.address),
+              label: addressDtoToString(value?.address),
               value: value,
             }
           : undefined,
@@ -67,27 +68,33 @@ export const AddressAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            geocodingSlice.actions.queryWasEmptied();
+            geocodingSlice.actions.emptyQueryRequested({
+              locator: props.locator,
+            });
             onAddressClear();
           }
           if (searchResult && actionMeta.action === "select-option") {
             onAddressSelected(searchResult.value);
             dispatch(
-              geocodingSlice.actions.suggestionHasBeenSelected({
-                addressAndPosition: searchResult.value,
-                addressAutocompleteLocator: props.locator,
+              geocodingSlice.actions.selectSuggestionRequested({
+                item: searchResult.value,
+                locator: props.locator,
               }),
             );
-            dispatch(geocodingSlice.actions.queryWasEmptied());
+            dispatch(
+              geocodingSlice.actions.emptyQueryRequested({
+                locator: props.locator,
+              }),
+            );
           }
         },
         options,
         onInputChange: (newQuery) => {
           setSearchTerm(newQuery);
           dispatch(
-            geocodingSlice.actions.queryHasChanged({
+            geocodingSlice.actions.changeQueryRequested({
               locator: props.locator,
-              lookupAddress: newQuery,
+              lookup: newQuery,
             }),
           );
         },

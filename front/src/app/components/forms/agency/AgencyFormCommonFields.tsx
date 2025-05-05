@@ -46,7 +46,7 @@ export const AgencyFormCommonFields = ({
     establishmentInfos,
   } = useSiretFetcher({
     shouldFetchEvenIfAlreadySaved: true,
-    addressAutocompleteLocator: "agencyAddress",
+    addressAutocompleteLocator: "agency-address",
   });
 
   const formValues = getValues();
@@ -107,7 +107,7 @@ export const AgencyFormCommonFields = ({
         disabled={disableAgencyName}
       />
       <AddressAutocomplete
-        locator="agencyAddress"
+        locator="agency-address"
         {...formContents.address}
         selectProps={{
           inputId: domElementIds.addAgency.addressAutocomplete,

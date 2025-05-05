@@ -5,26 +5,30 @@ import {
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
-import { appellationSelectors } from "src/core-logic/domain/appellation/appellation.selectors";
+import { makeAppellationLocatorSelector } from "src/core-logic/domain/appellation/appellation.selectors";
 import {
   type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-import { appellationSlice } from "./appellation.slice";
+import {
+  type AppellationAutocompleteLocator,
+  appellationSlice,
+} from "./appellation.slice";
 
 describe("Appellation epic", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
-
+  const locator: AppellationAutocompleteLocator = "search-form-appellation";
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
 
   it("should reset the value and suggestions when the query has been emptied", () => {
     store.dispatch(
-      appellationSlice.actions.suggestionHasBeenSelected({
-        appellationMatch: {
+      appellationSlice.actions.selectSuggestionRequested({
+        locator,
+        item: {
           appellation: {
             appellationCode: "12345",
             appellationLabel: "Test Appellation",
@@ -38,20 +42,19 @@ describe("Appellation epic", () => {
             },
           ],
         },
-        appellationAutocompleteLocator: "searchAppellation",
       }),
     );
-    store.dispatch(appellationSlice.actions.queryWasEmptied());
-    expect(store.getState().appellation.values).toBeNull();
-    expect(store.getState().appellation.suggestions).toEqual([]);
+    store.dispatch(appellationSlice.actions.emptyQueryRequested({ locator }));
+    expect(store.getState().appellation.data[locator]?.value).toBeNull();
+    expect(store.getState().appellation.data[locator]?.suggestions).toEqual([]);
   });
 
   it("should update the searched query and reset the state", () => {
     const query = "test";
     store.dispatch(
-      appellationSlice.actions.queryHasChanged({
-        locator: "searchAppellation",
-        lookupAppellation: query,
+      appellationSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -64,9 +67,9 @@ describe("Appellation epic", () => {
   it("shouldn't update the searched query if threshold is not reached", () => {
     const query = "te";
     store.dispatch(
-      appellationSlice.actions.queryHasChanged({
-        locator: "searchAppellation",
-        lookupAppellation: query,
+      appellationSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -94,9 +97,9 @@ describe("Appellation epic", () => {
       },
     ];
     store.dispatch(
-      appellationSlice.actions.queryHasChanged({
-        locator: "searchAppellation",
-        lookupAppellation: query,
+      appellationSlice.actions.changeQueryRequested({
+        locator,
+        lookup: query,
       }),
     );
     expectDebouncingToBe(true);
@@ -129,9 +132,9 @@ describe("Appellation epic", () => {
       ],
     };
     store.dispatch(
-      appellationSlice.actions.suggestionHasBeenSelected({
-        appellationMatch: expected,
-        appellationAutocompleteLocator: "searchAppellation",
+      appellationSlice.actions.selectSuggestionRequested({
+        locator,
+        item: expected,
       }),
     );
     expectSelectedSuggestionToBe(expected);
@@ -140,9 +143,9 @@ describe("Appellation epic", () => {
   it("should throw an error if something goes wrong and returns error feedback", () => {
     const errorMessage = "Error trying to get appellation";
     store.dispatch(
-      appellationSlice.actions.suggestionsHaveBeenRequested({
-        locator: "searchAppellation",
-        lookupAppellation: "test",
+      appellationSlice.actions.fetchSuggestionsRequested({
+        locator,
+        lookup: "test",
       }),
     );
     dependencies.formCompletionGateway.appellationDtoMatching$.error(
@@ -152,26 +155,34 @@ describe("Appellation epic", () => {
   });
 
   const expectQueryToBe = (expected: string) => {
-    expectToEqual(appellationSelectors.query(store.getState()), expected);
+    expectToEqual(
+      makeAppellationLocatorSelector(locator)(store.getState())?.query,
+      expected,
+    );
   };
   const expectLoadingToBe = (expected: boolean) => {
-    expectToEqual(appellationSelectors.isLoading(store.getState()), expected);
+    expectToEqual(
+      makeAppellationLocatorSelector(locator)(store.getState())?.isLoading,
+      expected,
+    );
   };
   const expectDebouncingToBe = (expected: boolean) => {
     expectToEqual(
-      appellationSelectors.isDebouncing(store.getState()),
+      makeAppellationLocatorSelector(locator)(store.getState())?.isDebouncing,
       expected,
     );
   };
   const expectSuggestionsToBe = (expected: AppellationMatchDto[]) => {
     expectArraysToEqual(
-      appellationSelectors.suggestions(store.getState()),
+      makeAppellationLocatorSelector(locator)(store.getState())?.suggestions ??
+        [],
       expected,
     );
   };
   const expectSelectedSuggestionToBe = (expected: AppellationMatchDto) => {
-    expectObjectsToMatch(appellationSelectors.values(store.getState()), {
-      searchAppellation: expected,
-    });
+    expectObjectsToMatch(
+      makeAppellationLocatorSelector(locator)(store.getState())?.value,
+      expected,
+    );
   };
 });

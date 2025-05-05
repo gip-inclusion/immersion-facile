@@ -23,13 +23,22 @@ const geosearchQueryEpic: AppEpic<GeosearchAction> = (
   { scheduler },
 ) =>
   action$.pipe(
-    filter(geosearchSlice.actions.queryHasChanged.match),
-    map((action) => ({ ...action, payload: action.payload.trim() })),
-    filter((action) => action.payload.length >= queryMinLength),
+    filter(geosearchSlice.actions.changeQueryRequested.match),
+    map((action) => ({
+      ...action,
+      payload: {
+        lookup: action.payload.lookup.trim(),
+        locator: action.payload.locator,
+      },
+    })),
+    filter((action) => action.payload.lookup.length >= queryMinLength),
     debounceTime(debounceDuration, scheduler),
     distinctUntilChanged(),
     map((action) =>
-      geosearchSlice.actions.suggestionsHaveBeenRequested(action.payload),
+      geosearchSlice.actions.fetchSuggestionsRequested({
+        locator: action.payload.locator,
+        lookup: action.payload.lookup,
+      }),
     ),
   );
 
@@ -39,11 +48,21 @@ const geosearchRequestEpic: AppEpic<GeosearchAction> = (
   { addressGateway },
 ) =>
   action$.pipe(
-    filter(geosearchSlice.actions.suggestionsHaveBeenRequested.match),
-    switchMap((action) => addressGateway.lookupLocation$(action.payload)),
-    map(geosearchSlice.actions.suggestionsSuccessfullyFetched),
-    catchEpicError((error) =>
-      geosearchSlice.actions.suggestionsFailed(error.message),
+    filter(geosearchSlice.actions.fetchSuggestionsRequested.match),
+    switchMap((action) =>
+      addressGateway.lookupLocation$(action.payload.lookup).pipe(
+        map((results) =>
+          geosearchSlice.actions.fetchSuggestionsSucceeded({
+            locator: action.payload.locator,
+            suggestions: results,
+          }),
+        ),
+        catchEpicError(() =>
+          geosearchSlice.actions.fetchSuggestionsFailed({
+            locator: action.payload.locator,
+          }),
+        ),
+      ),
     ),
   );
 
