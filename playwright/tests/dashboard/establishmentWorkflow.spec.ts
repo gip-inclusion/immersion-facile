@@ -5,6 +5,7 @@ import {
   goToDashboard,
   goToEstablishmentDashboardTab,
 } from "../../utils/dashboard";
+import { expectLocatorToBeVisibleAndEnabled } from "../../utils/utils";
 
 test.describe.configure({ mode: "serial" });
 
@@ -48,7 +49,7 @@ test.describe("Establishment dashboard workflow", () => {
 
 const goToDiscussion = async (page: Page, discussionId: string) => {
   await goToDashboard(page, "establishment");
-  await expect(page.locator(".fr-tabs__list")).toBeVisible();
+  await expectLocatorToBeVisibleAndEnabled(page.locator(".fr-tabs__list"));
   await goToEstablishmentDashboardTab(page, "discussions");
   await expect(
     page.locator(
