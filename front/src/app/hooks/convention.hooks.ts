@@ -65,5 +65,6 @@ export const useTutorIsEstablishmentRepresentative = () => {
     phone,
     convention,
     setValue,
+    getValues,
   ]);
 };

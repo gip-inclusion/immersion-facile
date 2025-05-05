@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionReadDto,
   type DateString,
@@ -98,19 +99,17 @@ export const BeneficiaryFormSection = ({
   }, [userFieldsAreFilled, connectedUser, setValue]);
 
   useEffect(() => {
-    const initialValues = values.signatories.beneficiaryCurrentEmployer;
-    setValue(
-      "signatories.beneficiaryCurrentEmployer",
-      hasCurrentEmployer && initialValues
-        ? {
-            ...initialValues,
-            role: "beneficiary-current-employer",
-          }
-        : undefined,
-    );
+    if (
+      hasBeneficiaryCurrentEmployerData(
+        values.signatories.beneficiaryCurrentEmployer,
+      ) &&
+      !hasCurrentEmployer
+    ) {
+      dispatch(conventionSlice.actions.isCurrentEmployerChanged(true));
+    }
   }, [
     hasCurrentEmployer,
-    setValue,
+    dispatch,
     values.signatories.beneficiaryCurrentEmployer,
   ]);
 
@@ -131,7 +130,7 @@ export const BeneficiaryFormSection = ({
         );
       }
 
-      if (!newIsMinor) {
+      if (!newIsMinor && !isMinorOrProtected) {
         setValue("signatories.beneficiaryRepresentative", undefined);
       }
       setIsMinorAccordingToAge(newIsMinor);
@@ -400,10 +399,25 @@ export const BeneficiaryFormSection = ({
                 checked:
                   Boolean(option.nativeInputProps.value) === hasCurrentEmployer,
                 onChange: () => {
+                  const value = Boolean(option.nativeInputProps.value);
                   dispatch(
-                    conventionSlice.actions.isCurrentEmployerChanged(
-                      Boolean(option.nativeInputProps.value),
-                    ),
+                    conventionSlice.actions.isCurrentEmployerChanged(value),
+                  );
+                  setValue(
+                    "signatories.beneficiaryCurrentEmployer",
+                    value
+                      ? {
+                          firstName: "",
+                          lastName: "",
+                          phone: "",
+                          email: "",
+                          businessName: "",
+                          businessSiret: "",
+                          job: "",
+                          businessAddress: "",
+                          role: "beneficiary-current-employer",
+                        }
+                      : undefined,
                   );
                 },
               },
@@ -431,5 +445,21 @@ const hasBeneficiaryRepresentativeData = (
       beneficiaryRepresentative.lastName ||
       beneficiaryRepresentative.phone ||
       beneficiaryRepresentative.email)
+  );
+};
+
+const hasBeneficiaryCurrentEmployerData = (
+  beneficiaryCurrentEmployer: BeneficiaryCurrentEmployer | undefined,
+): beneficiaryCurrentEmployer is BeneficiaryCurrentEmployer => {
+  return !!(
+    beneficiaryCurrentEmployer &&
+    (beneficiaryCurrentEmployer.firstName ||
+      beneficiaryCurrentEmployer.lastName ||
+      beneficiaryCurrentEmployer.phone ||
+      beneficiaryCurrentEmployer.email ||
+      beneficiaryCurrentEmployer.businessName ||
+      beneficiaryCurrentEmployer.businessSiret ||
+      beneficiaryCurrentEmployer.job ||
+      beneficiaryCurrentEmployer.businessAddress)
   );
 };
