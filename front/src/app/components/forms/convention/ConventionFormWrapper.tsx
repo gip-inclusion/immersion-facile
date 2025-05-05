@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionId,
   type ConventionJwtPayload,
-  type ExcludeFromExisting,
   type InternshipKind,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
@@ -77,19 +76,6 @@ export const ConventionFormWrapper = ({
   useScrollToTop(formSuccessfullySubmitted);
 
   useEffect(() => {
-    if (
-      creationFormModes.includes(
-        mode as ExcludeFromExisting<ConventionFormMode, "edit">,
-      )
-    ) {
-      dispatch(conventionSlice.actions.clearFetchedConvention());
-      dispatch(
-        conventionSlice.actions.showSummaryChangeRequested({
-          showSummary: false,
-        }),
-      );
-    }
-
     if (mode === "edit" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId: conventionId } =
@@ -109,6 +95,18 @@ export const ConventionFormWrapper = ({
       dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     };
   }, [dispatch, mode, route.params.jwt]);
+
+  useEffect(
+    () => () => {
+      dispatch(conventionSlice.actions.clearFetchedConvention());
+      dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: false,
+        }),
+      );
+    },
+    [dispatch],
+  );
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
