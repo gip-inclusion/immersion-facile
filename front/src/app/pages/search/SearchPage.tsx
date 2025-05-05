@@ -255,7 +255,7 @@ export const SearchPage = ({
                   Styles.form,
                   Styles.formV2,
                 )}
-                id={domElementIds.search.searchForm}
+                id={domElementIds[route.name].searchForm}
               >
                 <div className={cx(fr.cx("fr-col-12", "fr-col-lg-4"))}>
                   <AppellationAutocomplete
@@ -268,7 +268,8 @@ export const SearchPage = ({
                       setValue("appellations", undefined);
                     }}
                     selectProps={{
-                      inputId: domElementIds.search.appellationAutocomplete,
+                      inputId:
+                        domElementIds[route.name].appellationAutocomplete,
                       placeholder: useNaturalLanguageForAppellations
                         ? "Ex : Boulanger, faire du pain, etc"
                         : "Ex : Boulanger, styliste, etc",
@@ -290,7 +291,7 @@ export const SearchPage = ({
                       }
                     }}
                     selectProps={{
-                      inputId: domElementIds.search.placeAutocompleteInput,
+                      inputId: domElementIds[route.name].placeAutocompleteInput,
                     }}
                     onPlaceClear={() => {
                       setValue("latitude", initialValues.latitude);
@@ -314,7 +315,7 @@ export const SearchPage = ({
                         !lat || !lon
                           ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
                           : undefined,
-                      id: domElementIds.search.distanceSelect,
+                      id: domElementIds[route.name].distanceSelect,
                       value: `${distanceKm === undefined ? "" : distanceKm}`,
                       onChange: (event) => {
                         const value = Number.parseInt(
@@ -333,10 +334,7 @@ export const SearchPage = ({
                   <Button
                     type="submit"
                     nativeButtonProps={{
-                      id:
-                        route.name === "search"
-                          ? domElementIds.search.searchSubmitButton
-                          : domElementIds.search.searchStudentSubmitButton,
+                      id: domElementIds[route.name].searchSubmitButton,
                     }}
                     disabled={!canSubmitSearch(formValues)}
                   >
@@ -375,12 +373,12 @@ export const SearchPage = ({
                 fr.cx("fr-container", "fr-mb-6w"),
                 Styles.searchFilters,
               )}
-              id={domElementIds.search.searchForm}
+              id={domElementIds[route.name].searchForm}
             >
               <SearchFilter
                 defaultValue="Tous les métiers"
                 iconId="fr-icon-briefcase-fill"
-                id={domElementIds.search.appellationFilterTag}
+                id={domElementIds[route.name].appellationFilterTag}
                 values={[displayAppellationsOrNaf()]}
                 onReset={() => {
                   const updatedValues = {
@@ -410,7 +408,8 @@ export const SearchPage = ({
                           });
                         }}
                         selectProps={{
-                          inputId: domElementIds.search.appellationAutocomplete,
+                          inputId:
+                            domElementIds[route.name].appellationAutocomplete,
                           placeholder: useNaturalLanguageForAppellations
                             ? "Ex : Boulanger, faire du pain, etc"
                             : "Ex : Boulanger, styliste, etc",
@@ -445,7 +444,7 @@ export const SearchPage = ({
                           });
                         }}
                         selectProps={{
-                          inputId: domElementIds.search.nafAutocomplete,
+                          inputId: domElementIds[route.name].nafAutocomplete,
                         }}
                         className={fr.cx("fr-mt-2w")}
                         initialValue={
@@ -463,7 +462,7 @@ export const SearchPage = ({
               />
               <SearchFilter
                 defaultValue="France entière"
-                id={domElementIds.search.locationFilterTag}
+                id={domElementIds[route.name].locationFilterTag}
                 iconId="fr-icon-map-pin-2-fill"
                 values={place ? [`${place} (${distanceKm}km)`] : []}
                 onReset={() => {
@@ -533,7 +532,8 @@ export const SearchPage = ({
                         className={fr.cx("fr-mt-2w")}
                         initialInputValue={place}
                         selectProps={{
-                          inputId: domElementIds.search.placeAutocompleteInput,
+                          inputId:
+                            domElementIds[route.name].placeAutocompleteInput,
                         }}
                       />
 
@@ -547,7 +547,7 @@ export const SearchPage = ({
                             !tempValue.latitude || !tempValue.longitude
                               ? "Pour sélectionner une distance, vous devez d'abord définir une ville."
                               : undefined,
-                          id: domElementIds.search.distanceSelect,
+                          id: domElementIds[route.name].distanceSelect,
                           value: `${tempValue.distanceKm || ""}`,
                           onChange: (event) => {
                             const value = Number.parseInt(
@@ -573,7 +573,7 @@ export const SearchPage = ({
               <SearchFilter
                 defaultValue="Toutes les entreprises"
                 iconId="fr-icon-equalizer-fill"
-                id={domElementIds.search.fitForDisableWorkersFilterTag}
+                id={domElementIds[route.name].fitForDisableWorkersFilterTag}
                 values={
                   formValues.fitForDisabledWorkers
                     ? ["Acceptant les personnes en situation de handicap"]
@@ -616,7 +616,7 @@ export const SearchPage = ({
               <SearchFilter
                 defaultValue="Trier par pertinence"
                 iconId="fr-icon-arrow-down-line"
-                id={domElementIds.search.sortFilterTag}
+                id={domElementIds[route.name].sortFilterTag}
                 values={
                   formValues.sortedBy
                     ? [sortedByOptionsLabel[formValues.sortedBy]]
@@ -626,7 +626,7 @@ export const SearchPage = ({
                   title: "Ordre d’affichage",
                   content: (
                     <RadioButtons
-                      id={domElementIds.search.sortRadioButtons}
+                      id={domElementIds[route.name].sortRadioButtons}
                       options={filteredSortOptions.map((option) => ({
                         ...option,
                         nativeInputProps: {

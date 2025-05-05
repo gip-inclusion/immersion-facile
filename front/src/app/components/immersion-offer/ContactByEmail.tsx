@@ -117,6 +117,7 @@ export const ContactByEmail = ({
       preferUseTranscientData,
       transcientDataForScope,
       acquisitionParams,
+      route.name,
     ],
   );
 
@@ -162,7 +163,8 @@ export const ContactByEmail = ({
     <FormProvider {...methods}>
       <form
         onSubmit={handleSubmit(onFormValid, console.error)}
-        id={"im-contact-form--email"}
+        id={domElementIds[route.name].contactByMailForm}
+        data-matomo-name={domElementIds[route.name].contactByMailForm}
         ref={formRef}
       >
         <TranscientPreferencesDisplay
@@ -344,7 +346,7 @@ export const ContactByEmail = ({
                   activeError.isActive ||
                   invalidEmailMessage !== null,
                 nativeButtonProps: {
-                  id: domElementIds.search.contactByMailButton,
+                  id: domElementIds[route.name].contactByMailButton,
                 },
                 children: "Envoyer",
               },
