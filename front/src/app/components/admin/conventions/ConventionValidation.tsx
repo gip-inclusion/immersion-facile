@@ -136,7 +136,7 @@ export const ConventionValidation = ({
       >
         {labelAndSeverityByStatus[status].label}
       </Badge>
-      <h3>{title}</h3>
+      <h1 className={fr.cx("fr-h3")}>{title}</h1>
       {convention.statusJustification && (
         <p>Justification : {convention.statusJustification}</p>
       )}

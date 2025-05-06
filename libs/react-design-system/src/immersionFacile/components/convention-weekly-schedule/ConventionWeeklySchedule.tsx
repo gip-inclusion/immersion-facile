@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 
 import { useStyles } from "tss-react/dsfr";
+import { convertFrenchDateToIsoDate } from "../convention-summary";
 import { conventionSummaryStyles } from "../convention-summary/ConventionSummary.styles";
 
 type WeeklySchedule = {
@@ -51,28 +52,36 @@ export const ConventionWeeklySchedule = ({
           )}
           key={week.period.start}
         >
-          <div
+          <h4
             className={cx(
               fr.cx("fr-col-6", "fr-m-0", "fr-text--sm"),
               conventionSummaryStyles.subsectionScheduleWeek,
             )}
           >
             Semaine {index + 1}
-          </div>
+          </h4>
           {week.period?.start && week.period?.end && (
-            <div className={fr.cx("fr-text--xs", "fr-m-0")}>
+            <div
+              className={fr.cx("fr-text--xs", "fr-m-0")}
+              itemScope
+              itemType="https://schema.org/Event"
+            >
               Du{" "}
-              <span
+              <time
                 id={`${conventionSummaryStyles.subsectionValue}-schedule-start-date`}
+                itemProp="startDate"
+                dateTime={convertFrenchDateToIsoDate(week.period.start)}
               >
                 {week.period.start}
-              </span>{" "}
+              </time>{" "}
               au{" "}
-              <span
+              <time
                 id={`${conventionSummaryStyles.subsectionValue}-schedule-end-date`}
+                itemProp="endDate"
+                dateTime={convertFrenchDateToIsoDate(week.period.end)}
               >
                 {week.period.end}
-              </span>
+              </time>
             </div>
           )}
           <div aria-hidden="true" className={fr.cx("fr-text--xs", "fr-m-0")}>

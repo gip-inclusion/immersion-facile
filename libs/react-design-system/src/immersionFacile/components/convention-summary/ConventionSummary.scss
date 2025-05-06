@@ -34,6 +34,14 @@
       align-items: center;
 
       &__main {
+
+        dl,
+        dt,
+        dd {
+          display: inline;
+          padding-inline-start: 0;
+        }
+
         @include for-screen-min($bp-md) {
           padding-left: 20px;
           justify-content: space-between;
@@ -49,6 +57,12 @@
 
   &__subsection {
     border-top: 1px solid var(--grey-900-175);
+
+    dl,
+    dt,
+    dd {
+      padding-inline-start: 0;
+    }
 
     &--highlighted {
       border-top: none;
