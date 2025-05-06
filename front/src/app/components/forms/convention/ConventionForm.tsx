@@ -37,13 +37,13 @@ import {
   domElementIds,
   hasBeneficiaryCurrentEmployer,
   isBeneficiaryMinor,
+  isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isFtConnectIdentity,
   keys,
   makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   AgencySelector,
   departmentOptions,
@@ -72,6 +72,7 @@ import {
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errors as errorMessage } from "shared";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   type ConventionFormMode,
   type SupportedConventionRoutes,
@@ -90,6 +91,7 @@ import { useRoute } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
+import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -97,6 +99,7 @@ import {
   type NumberOfSteps,
   conventionSlice,
 } from "src/core-logic/domain/convention/convention.slice";
+import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -366,16 +369,64 @@ export const ConventionForm = ({
   useEffect(() => {
     if (fetchedConvention) {
       reset(fetchedConvention);
+    }
+  }, [fetchedConvention, reset]);
+
+  useEffect(() => {
+    if (defaultValues.siret) {
       dispatch(
         siretSlice.actions.siretModified({
-          siret: fetchedConvention.siret,
+          siret: defaultValues.siret,
           addressAutocompleteLocator: "convention-immersion-address",
           feedbackTopic: "siret-input",
         }),
       );
     }
-  }, [fetchedConvention, reset, dispatch]);
-
+    if (defaultValues.immersionAppellation) {
+      dispatch(
+        appellationSlice.actions.selectSuggestionRequested({
+          item: {
+            appellation: {
+              appellationCode:
+                defaultValues.immersionAppellation.appellationCode,
+              appellationLabel:
+                defaultValues.immersionAppellation.appellationLabel,
+              romeCode: defaultValues.immersionAppellation.romeCode,
+              romeLabel: defaultValues.immersionAppellation.romeLabel,
+            },
+            matchRanges: [],
+          },
+          locator: "convention-profession",
+        }),
+      );
+    }
+    if (defaultValues.signatories.beneficiaryCurrentEmployer) {
+      dispatch(
+        geocodingSlice.actions.fetchSuggestionsRequested({
+          lookup:
+            defaultValues.signatories.beneficiaryCurrentEmployer
+              .businessAddress,
+          selectFirstSuggestion: true,
+          locator: "convention-beneficiary-current-employer-address",
+        }),
+      );
+    }
+    if (
+      defaultValues.internshipKind === "mini-stage-cci" &&
+      isBeneficiaryStudent(defaultValues.signatories.beneficiary) &&
+      defaultValues.signatories.beneficiary.address
+    ) {
+      dispatch(
+        geocodingSlice.actions.selectSuggestionRequested({
+          item: {
+            address: defaultValues.signatories.beneficiary.address,
+            position: { lat: 0, lon: 0 },
+          },
+          locator: "convention-beneficiary-address",
+        }),
+      );
+    }
+  }, [defaultValues, dispatch]);
   return (
     <FormProvider {...methods}>
       {conventionIsLoading && <Loader />}
