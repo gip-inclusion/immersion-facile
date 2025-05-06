@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { AddressAndPosition, LookupAddress } from "shared";
+import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
   type AutocompleteState,
   type PayloadActionWithLocator,
@@ -143,5 +144,20 @@ export const geocodingSlice = createSlice({
         },
       };
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(agencyAdminSlice.actions.setAgency, (state, action) => {
+      if (!action.payload) return;
+      state.data["agency-address"] = {
+        ...initialAutocompleteItem,
+        value: {
+          address: action.payload.address,
+          position: {
+            lat: action.payload.position.lat,
+            lon: action.payload.position.lon,
+          },
+        },
+      };
+    });
   },
 });
