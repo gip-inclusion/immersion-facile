@@ -3,7 +3,7 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  switchMap,
+  mergeMap,
 } from "rxjs";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
@@ -44,15 +44,15 @@ const geocodingQueryEpic: AppEpic<GeocodingAction> = (
     ),
   );
 
-const geocodingRequestEpic: AppEpic<GeocodingAction> = (
+export const geocodingRequestEpic: AppEpic<GeocodingAction> = (
   action$,
   _,
   { addressGateway },
 ) =>
   action$.pipe(
     filter(geocodingSlice.actions.fetchSuggestionsRequested.match),
-    switchMap((action) => {
-      return addressGateway.lookupStreetAddress$(action.payload.lookup).pipe(
+    mergeMap((action) =>
+      addressGateway.lookupStreetAddress$(action.payload.lookup).pipe(
         map((suggestions) => ({
           suggestions,
           selectFirstSuggestion: action.payload.selectFirstSuggestion,
@@ -64,8 +64,8 @@ const geocodingRequestEpic: AppEpic<GeocodingAction> = (
             locator: action.payload.locator,
           }),
         ),
-      );
-    }),
+      ),
+    ),
   );
 
 const geocodingFromSiretInfoEpic: AppEpic<GeocodingAction> = (action$) =>

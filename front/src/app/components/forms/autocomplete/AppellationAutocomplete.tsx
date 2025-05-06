@@ -24,10 +24,12 @@ const useAppellationAutocomplete = (
   const appellationLocatorSelector = useAppSelector(
     makeAppellationLocatorSelector(locator),
   );
-  const options = appellationLocatorSelector?.suggestions.map((suggestion) => ({
-    value: suggestion,
-    label: suggestion.appellation.appellationLabel,
-  }));
+  const options = appellationLocatorSelector?.suggestions
+    ? appellationLocatorSelector.suggestions.map((suggestion) => ({
+        value: suggestion,
+        label: suggestion.appellation.appellationLabel,
+      }))
+    : [];
   const value = appellationLocatorSelector?.value;
   const isSearching = appellationLocatorSelector?.isLoading;
   const isDebouncing = appellationLocatorSelector?.isDebouncing;
@@ -53,11 +55,11 @@ export const AppellationAutocomplete = ({
       {...props}
       selectProps={{
         isDebouncing,
-        inputId: props.selectProps?.inputId ?? "im-select__input--place",
+        inputId: props.selectProps?.inputId ?? "im-select__input--appellation",
         isLoading: isSearching,
-        loadingMessage: () => <>Recherche de d'adresse en cours... 🔎</>,
+        loadingMessage: () => <>Recherche de métiers en cours... 🔎</>,
         inputValue: searchTerm,
-        placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
+        placeholder: "Ex : Boulanger, styliste, etc.",
         value: value
           ? {
               label: value.appellation.appellationLabel,
