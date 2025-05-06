@@ -24,12 +24,12 @@ const useAppellationAutocomplete = (
   const appellationLocatorSelector = useAppSelector(
     makeAppellationLocatorSelector(locator),
   );
-  const options = appellationLocatorSelector?.suggestions
-    ? appellationLocatorSelector.suggestions.map((suggestion) => ({
-        value: suggestion,
-        label: suggestion.appellation.appellationLabel,
-      }))
-    : [];
+  const options = (appellationLocatorSelector?.suggestions ?? []).map(
+    (suggestion) => ({
+      value: suggestion,
+      label: suggestion.appellation.appellationLabel,
+    }),
+  );
   const value = appellationLocatorSelector?.value;
   const isSearching = appellationLocatorSelector?.isLoading;
   const isDebouncing = appellationLocatorSelector?.isDebouncing;
