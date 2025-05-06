@@ -31,12 +31,10 @@ export const PlaceAutocomplete = ({
   const isSearching = geosearchLocatorSelector?.isLoading;
   const isDebouncing = geosearchLocatorSelector?.isDebouncing;
   const searchSuggestions = geosearchLocatorSelector?.suggestions;
-  const options = searchSuggestions
-    ? searchSuggestions.map((suggestion) => ({
-        value: suggestion,
-        label: suggestion.label,
-      }))
-    : [];
+  const options = (searchSuggestions ?? []).map((suggestion) => ({
+    value: suggestion,
+    label: suggestion.label,
+  }));
   return (
     <RSAutocomplete
       {...props}

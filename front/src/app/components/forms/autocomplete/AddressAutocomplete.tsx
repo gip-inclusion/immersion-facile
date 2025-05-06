@@ -22,12 +22,12 @@ const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
   const geocodingLocatorSelector = useAppSelector(
     makeGeocodingLocatorSelector(locator),
   );
-  const options = geocodingLocatorSelector?.suggestions
-    ? geocodingLocatorSelector.suggestions.map((suggestion) => ({
-        value: suggestion,
-        label: addressDtoToString(suggestion.address),
-      }))
-    : [];
+  const options = (geocodingLocatorSelector?.suggestions ?? []).map(
+    (suggestion) => ({
+      value: suggestion,
+      label: addressDtoToString(suggestion.address),
+    }),
+  );
   const value = geocodingLocatorSelector?.value;
   const isSearching = geocodingLocatorSelector?.isLoading;
   const isDebouncing = geocodingLocatorSelector?.isDebouncing;

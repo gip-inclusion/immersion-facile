@@ -382,6 +382,7 @@ export const ConventionForm = ({
         }),
       );
     }
+
     if (defaultValues.immersionAppellation) {
       dispatch(
         appellationSlice.actions.selectSuggestionRequested({
@@ -400,6 +401,7 @@ export const ConventionForm = ({
         }),
       );
     }
+
     if (defaultValues.signatories.beneficiaryCurrentEmployer) {
       dispatch(
         geocodingSlice.actions.fetchSuggestionsRequested({
@@ -411,6 +413,7 @@ export const ConventionForm = ({
         }),
       );
     }
+
     if (
       defaultValues.internshipKind === "mini-stage-cci" &&
       isBeneficiaryStudent(defaultValues.signatories.beneficiary) &&
