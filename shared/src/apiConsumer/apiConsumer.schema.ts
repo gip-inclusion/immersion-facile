@@ -124,7 +124,7 @@ const commonApiConsumerShape = {
   name: stringWithMaxLength255,
   contact: apiConsumerContactSchema,
   rights: writeApiConsumerRightsSchema,
-  description: z.string().optional(),
+  description: z.string().max(255).optional(),
   expirationDate: makeDateStringSchema(),
 };
 
