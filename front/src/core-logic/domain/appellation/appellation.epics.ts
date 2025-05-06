@@ -3,7 +3,7 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  switchMap,
+  mergeMap,
 } from "rxjs";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -49,7 +49,7 @@ const appellationRequestEpic: AppEpic<AppellationAction> = (
 ) =>
   action$.pipe(
     filter(appellationSlice.actions.fetchSuggestionsRequested.match),
-    switchMap((action) => {
+    mergeMap((action) => {
       return formCompletionGateway
         .getAppellationDtoMatching$(action.payload.lookup, true)
         .pipe(

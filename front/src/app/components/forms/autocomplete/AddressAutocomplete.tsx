@@ -22,10 +22,12 @@ const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
   const geocodingLocatorSelector = useAppSelector(
     makeGeocodingLocatorSelector(locator),
   );
-  const options = geocodingLocatorSelector?.suggestions.map((suggestion) => ({
-    value: suggestion,
-    label: addressDtoToString(suggestion.address),
-  }));
+  const options = geocodingLocatorSelector?.suggestions
+    ? geocodingLocatorSelector.suggestions.map((suggestion) => ({
+        value: suggestion,
+        label: addressDtoToString(suggestion.address),
+      }))
+    : [];
   const value = geocodingLocatorSelector?.value;
   const isSearching = geocodingLocatorSelector?.isLoading;
   const isDebouncing = geocodingLocatorSelector?.isDebouncing;
@@ -52,9 +54,9 @@ export const AddressAutocomplete = ({
       {...props}
       selectProps={{
         isDebouncing,
-        inputId: props.selectProps?.inputId ?? "im-select__input--place",
+        inputId: props.selectProps?.inputId ?? "im-select__input--address",
         isLoading: isSearching,
-        loadingMessage: () => <>Recherche de d'adresse en cours... 🔎</>,
+        loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
         inputValue: searchTerm,
         placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
         value: value

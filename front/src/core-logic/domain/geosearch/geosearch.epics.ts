@@ -3,7 +3,7 @@ import {
   distinctUntilChanged,
   filter,
   map,
-  switchMap,
+  mergeMap,
 } from "rxjs";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -49,7 +49,7 @@ const geosearchRequestEpic: AppEpic<GeosearchAction> = (
 ) =>
   action$.pipe(
     filter(geosearchSlice.actions.fetchSuggestionsRequested.match),
-    switchMap((action) =>
+    mergeMap((action) =>
       addressGateway.lookupLocation$(action.payload.lookup).pipe(
         map((results) =>
           geosearchSlice.actions.fetchSuggestionsSucceeded({
