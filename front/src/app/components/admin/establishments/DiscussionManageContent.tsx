@@ -176,8 +176,8 @@ const DiscussionDetails = ({
     },
   ];
   if (discussion.status === "PENDING") {
-    candidateContactButtons.push(
-      {
+    if (discussion.kind === "IF") {
+      candidateContactButtons.push({
         id: domElementIds.establishmentDashboard.discussion
           .activateDraftConvention,
         priority: "tertiary",
@@ -186,16 +186,16 @@ const DiscussionDetails = ({
           target: "_blank",
         },
         children: "Pré-remplir la convention pour cette mise en relation",
-      },
-      {
-        id: domElementIds.establishmentDashboard.discussion
-          .rejectApplicationOpenModal,
-        priority: "secondary",
-        type: "button",
-        onClick: () => openRejectApplicationModal(),
-        children: "Refuser la candidature",
-      },
-    );
+      });
+    }
+    candidateContactButtons.push({
+      id: domElementIds.establishmentDashboard.discussion
+        .rejectApplicationOpenModal,
+      priority: "secondary",
+      type: "button",
+      onClick: () => openRejectApplicationModal(),
+      children: "Refuser la candidature",
+    });
   }
 
   return (
