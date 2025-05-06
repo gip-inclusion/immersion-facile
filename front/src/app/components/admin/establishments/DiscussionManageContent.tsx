@@ -330,9 +330,7 @@ const DiscussionDetails = ({
       ))}
 
       {createPortal(
-        <RejectApplicationModal title="Refuser la candidature">
-          <RejectApplicationForm discussion={discussion} />
-        </RejectApplicationModal>,
+        <RejectApplicationFormModal discussion={discussion} />,
         document.body,
       )}
     </>
@@ -397,7 +395,7 @@ const makeConventionFromDiscussion = ({
   immersionAddress: addressDtoToString(discussion.address),
 });
 
-const RejectApplicationForm = ({
+const RejectApplicationFormModal = ({
   discussion,
 }: {
   discussion: DiscussionReadDto;
@@ -437,7 +435,34 @@ const RejectApplicationForm = ({
       discussion,
     );
     return (
-      <>
+      <RejectApplicationModal
+        title="Refuser la candidature"
+        buttons={[
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationCancelButton,
+            priority: "secondary",
+            children: "Annuler",
+            type: "button",
+            onClick: () => setRejectParams(null),
+          },
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationSubmitButton,
+            priority: "primary",
+            children: "Rejeter la candidature et notifier le candidat",
+            onClick: () =>
+              dispatch(
+                discussionSlice.actions.updateDiscussionStatusRequested({
+                  status: "REJECTED",
+                  feedbackTopic: "dashboard-discussion-rejection",
+                  ...rejectParams,
+                  jwt: inclusionConnectedJwt,
+                }),
+              ),
+          },
+        ]}
+      >
         <p>
           Voici l'email qui sera envoyé au candidat si vous rejetez sa
           candidature :
@@ -454,84 +479,57 @@ const RejectApplicationForm = ({
             />
           }
         />
-        <ButtonsGroup
-          buttons={[
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .rejectApplicationCancelButton,
-              priority: "secondary",
-              children: "Annuler",
-              type: "button",
-              onClick: () => setRejectParams(null),
-            },
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .rejectApplicationSubmitButton,
-              priority: "primary",
-              children: "Rejeter la candidature et notifier le candidat",
-              onClick: () =>
-                dispatch(
-                  discussionSlice.actions.updateDiscussionStatusRequested({
-                    status: "REJECTED",
-                    feedbackTopic: "dashboard-discussion-rejection",
-                    ...rejectParams,
-                    jwt: inclusionConnectedJwt,
-                  }),
-                ),
-            },
-          ]}
-          inlineLayoutWhen="always"
-        />
-      </>
+      </RejectApplicationModal>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit((values) =>
-        setRejectParams({ ...values, discussionId: discussion.id }),
-      )}
-    >
-      <Select
-        label="Pour quel motif souhaitez-vous refuser cette candidature ?"
-        nativeSelectProps={{
+    <RejectApplicationModal
+      title="Refuser la candidature"
+      buttons={[
+        {
           id: domElementIds.establishmentDashboard.discussion
-            .rejectApplicationJustificationKindInput,
-          ...register("rejectionKind"),
-        }}
-        options={rejectionKindOptions}
-        {...getFieldError("rejectionKind")}
-      />
-      {watchedFormValues.rejectionKind === "OTHER" && (
-        <Input
-          textArea
-          label="Précisez"
-          nativeTextAreaProps={{
+            .rejectApplicationCancelButton,
+          priority: "secondary",
+          children: "Annuler",
+          type: "button",
+        },
+        {
+          id: domElementIds.establishmentDashboard.discussion
+            .rejectApplicationSubmitPreviewButton,
+          priority: "primary",
+          children: "Prévisualiser et envoyer",
+        },
+      ]}
+    >
+      <form
+        onSubmit={handleSubmit((values) =>
+          setRejectParams({ ...values, discussionId: discussion.id }),
+        )}
+      >
+        <Select
+          label="Pour quel motif souhaitez-vous refuser cette candidature ?"
+          nativeSelectProps={{
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationJustificationReasonInput,
-            ...register("rejectionReason"),
+              .rejectApplicationJustificationKindInput,
+            ...register("rejectionKind"),
           }}
-          {...getFieldError("rejectionReason")}
+          options={rejectionKindOptions}
+          {...getFieldError("rejectionKind")}
         />
-      )}
-      <ButtonsGroup
-        buttons={[
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationCancelButton,
-            priority: "secondary",
-            children: "Annuler",
-            type: "button",
-          },
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitPreviewButton,
-            priority: "primary",
-            children: "Prévisualiser et envoyer",
-          },
-        ]}
-        inlineLayoutWhen="always"
-      />
-    </form>
+        {watchedFormValues.rejectionKind === "OTHER" && (
+          <Input
+            textArea
+            label="Précisez"
+            nativeTextAreaProps={{
+              id: domElementIds.establishmentDashboard.discussion
+                .rejectApplicationJustificationReasonInput,
+              ...register("rejectionReason"),
+            }}
+            {...getFieldError("rejectionReason")}
+          />
+        )}
+      </form>
+    </RejectApplicationModal>
   );
 };
