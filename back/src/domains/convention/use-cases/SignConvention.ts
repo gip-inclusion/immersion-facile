@@ -1,17 +1,9 @@
 import {
   type ConventionDomainPayload,
-  type ConventionDto,
   type ConventionStatus,
-  ForbiddenError,
   type InclusionConnectDomainJwtPayload,
-  NotFoundError,
-  type Role,
-  type SignatoryRole,
-  type UserWithRights,
   type WithConventionId,
   type WithConventionIdLegacy,
-  allSignatoryRoles,
-  signConventionDtoWithRole,
   withConventionIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -20,8 +12,7 @@ import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
-import { throwIfTransitionNotAllowed } from "../entities/Convention";
+import { signConvention } from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Partial<
   Record<ConventionStatus, DomainTopic>
@@ -29,9 +20,6 @@ const domainTopicByTargetStatusMap: Partial<
   PARTIALLY_SIGNED: "ConventionPartiallySigned",
   IN_REVIEW: "ConventionFullySigned",
 };
-
-const isAllowedToSign = (role: Role): role is SignatoryRole =>
-  allSignatoryRoles.includes(role as SignatoryRole);
 
 export class SignConvention extends TransactionalUseCase<
   WithConventionId,
@@ -59,35 +47,12 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    const initialConventionRead =
-      await uow.conventionQueries.getConventionById(conventionId);
-    if (!initialConventionRead) throw new NotFoundError(conventionId);
-
-    const { role, userWithRights } = await this.#getRoleAndIcUser(
-      jwtPayload,
+    const { role, userWithRights, signedConvention } = await signConvention({
       uow,
-      initialConventionRead,
-    );
-
-    if (!isAllowedToSign(role))
-      throw new ForbiddenError(
-        "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
-      );
-
-    const signedConvention = signConventionDtoWithRole(
-      initialConventionRead,
-      role,
-      this.#timeGateway.now().toISOString(),
-    );
-    throwIfTransitionNotAllowed({
-      roles: [role],
-      targetStatus: signedConvention.status,
-      conventionRead: initialConventionRead,
-      hasAssessment: false,
+      conventionId,
+      jwtPayload,
+      now: this.#timeGateway.now().toISOString(),
     });
-
-    const signedId = await uow.conventionRepository.update(signedConvention);
-    if (!signedId) throw new NotFoundError(signedId);
 
     const domainTopic = domainTopicByTargetStatusMap[signedConvention.status];
     if (domainTopic) {
@@ -103,29 +68,6 @@ export class SignConvention extends TransactionalUseCase<
       await uow.outboxRepository.save(event);
     }
 
-    return { id: signedId };
-  }
-
-  async #getRoleAndIcUser(
-    jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
-    uow: UnitOfWork,
-    initialConvention: ConventionDto,
-  ): Promise<{ role: Role; userWithRights: UserWithRights | undefined }> {
-    if ("role" in jwtPayload)
-      return { role: jwtPayload.role, userWithRights: undefined };
-
-    const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-
-    if (
-      userWithRights.email !==
-      initialConvention.signatories.establishmentRepresentative.email
-    )
-      throw new ForbiddenError(
-        `User '${userWithRights.id}' is not the establishment representative for convention '${initialConvention.id}'`,
-      );
-    return {
-      role: initialConvention.signatories.establishmentRepresentative.role,
-      userWithRights,
-    };
+    return { id: signedConvention.id };
   }
 }

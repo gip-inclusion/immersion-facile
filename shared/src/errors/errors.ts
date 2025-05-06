@@ -260,6 +260,10 @@ export const errors = {
       new BadRequestError(
         "Impossible d'annuler cette convention car le bilan a été complété.",
       ),
+    roleNotAllowedToSign: ({ role }: { role: Role }) =>
+      new ForbiddenError(
+        `Seules les roles bénéficaires, employeur du bénéficaire, représentant légal ou le réprésentant de l'établissement d'accueil ont la possibilitée de signer. Le role fourni était : ${role}`,
+      ),
     sendSignatureLinkNotAllowedForStatus: ({
       status,
     }: {

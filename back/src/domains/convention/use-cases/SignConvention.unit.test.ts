@@ -16,7 +16,7 @@ import {
   expectToEqual,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
+import { ForbiddenError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import type { DomainEvent } from "../../core/events/events";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -88,7 +88,7 @@ describe("Sign convention", () => {
             emailHash: "toto",
           },
         ),
-        new NotFoundError(conventionId),
+        errors.convention.notFound({ conventionId }),
       );
     });
 
@@ -110,9 +110,7 @@ describe("Sign convention", () => {
                 emailHash: "toto",
               },
             ),
-            new ForbiddenError(
-              "Only Beneficiary, his current employer, his legal representative or the establishment representative are allowed to sign convention",
-            ),
+            errors.convention.roleNotAllowedToSign({ role }),
           );
         },
       );
