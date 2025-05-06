@@ -81,17 +81,29 @@ export const ConventionSummary = ({
               conventionSummaryStyles.sectionHeaderMain,
             )}
           >
-            <div className={fr.cx("fr-col-12", "fr-col-md-8")}>
-              <h4 className={fr.cx("fr-mb-0")}>Convention</h4>
+            <div
+              className={fr.cx("fr-col-12", "fr-col-md-8")}
+              itemScope
+              itemType="https://schema.org/Thing"
+            >
+              <h2 className={fr.cx("fr-mb-0", "fr-h4")}>Convention</h2>
               <div className={fr.cx("fr-text--xs", "fr-mb-2v")}>
-                Date de soumission : {submittedAt}
-              </div>
-              <div>
-                <span className={cx(conventionSummaryStyles.sectionId)}>
-                  ID :{" "}
+                <span>
+                  Date de soumission :{" "}
+                  <time
+                    itemProp="dateSubmitted"
+                    dateTime={convertFrenchDateToIsoDate(submittedAt)}
+                  >
+                    {submittedAt}
+                  </time>
                 </span>
-                {conventionId}
               </div>
+              <dl>
+                <dt className={cx(conventionSummaryStyles.sectionId)}>ID : </dt>
+                <dd itemProp="identifier" content={conventionId}>
+                  {conventionId}
+                </dd>
+              </dl>
             </div>
             <CopyButton
               label="Copier l'ID de convention"
@@ -111,9 +123,9 @@ export const ConventionSummary = ({
           )}
           key={section.title}
         >
-          <h4 className={fr.cx("fr-mt-3v", "fr-mb-2v", "fr-mb-0")}>
+          <h2 className={fr.cx("fr-mt-3v", "fr-mb-2v", "fr-mb-0", "fr-h4")}>
             {section.title}
-          </h4>
+          </h2>
           <div className={fr.cx("fr-grid-row")}>
             {section.subSections.map((subSection, index) => {
               return (
@@ -193,7 +205,9 @@ const SubSection = ({
               )}
             >
               {subSection.header?.title && (
-                <h6 className={fr.cx("fr-mb-2v")}>{subSection.header.title}</h6>
+                <h3 className={fr.cx("fr-mb-2v", "fr-h6")}>
+                  {subSection.header.title}
+                </h3>
               )}
               {subSection.header?.badge && (
                 <div className={fr.cx("fr-col-12", "fr-mb-2w")}>
@@ -229,11 +243,11 @@ const SubSection = ({
                     key={field.key}
                   >
                     {"label" in field && (
-                      <div>
-                        <div className={fr.cx("fr-text--xs", "fr-m-0")}>
+                      <dl>
+                        <dt className={fr.cx("fr-text--xs", "fr-m-0")}>
                           {field.label}
-                        </div>
-                        <div
+                        </dt>
+                        <dd
                           className={cx(
                             fr.cx("fr-text--sm", "fr-m-0"),
                             conventionSummaryStyles.subsectionValue,
@@ -242,8 +256,8 @@ const SubSection = ({
                         >
                           {field.value}
                           {field.copyButton}
-                        </div>
-                      </div>
+                        </dd>
+                      </dl>
                     )}
                   </div>
                 );
@@ -279,4 +293,11 @@ const shouldDisplayVerticalSeparator = (
 ) => {
   if (isFullWidthDisplay || isNextSubsectionFullWidth) return false;
   return index % 2 === 0;
+};
+
+export const convertFrenchDateToIsoDate = (date: string) => {
+  const splittedDate = date.split("/");
+  return new Date(
+    `${splittedDate[2]}-${splittedDate[1]}-${splittedDate[0]}T00:00`,
+  ).toISOString();
 };
