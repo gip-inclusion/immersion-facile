@@ -16,6 +16,7 @@ import {
   agencyAdminInitialState,
   agencyAdminSlice,
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import {
   type TestDependencies,
   createTestStore,
@@ -429,6 +430,37 @@ describe("agencyAdmin", () => {
       agency: null,
       agencyNeedingReview: null,
     });
+  });
+
+  it("populates address when agency is selected", () => {
+    const agencyDto = new AgencyDtoBuilder()
+      .withAddress({
+        streetNumberAndAddress: "123 Main St",
+        postcode: "12345",
+        departmentCode: "CA",
+        city: "Los Angeles",
+      })
+      .build();
+
+    store.dispatch(agencyAdminSlice.actions.setAgency(agencyDto));
+    expectAgencyAdminStateToMatch({
+      agency: agencyDto,
+    });
+    expectToEqual(
+      makeGeocodingLocatorSelector("agency-address")(store.getState())?.value,
+      {
+        address: {
+          streetNumberAndAddress: "123 Main St",
+          postcode: "12345",
+          departmentCode: "CA",
+          city: "Los Angeles",
+        },
+        position: {
+          lat: 48.866667,
+          lon: 2.333333,
+        },
+      },
+    );
   });
 
   const expectAgencyAdminStateToMatch = (params: Partial<AgencyAdminState>) => {
