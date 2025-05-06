@@ -103,7 +103,7 @@ jobs:
   deploy-dbt:
     name: Deploy DBT
     needs:
-      - deploy-prod
+      - deploy-staging
     uses: ./.github/workflows/deploy-dbt.yml
     with:
       environment: prod
