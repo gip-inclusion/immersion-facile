@@ -4,18 +4,25 @@ import {
   type AgencyId,
   type AgencyWithUsersRights,
   type ApiConsumer,
+  type ConventionDomainPayload,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
+  type DateTimeIsoString,
   ForbiddenError,
+  type InclusionConnectDomainJwtPayload,
   type Role,
   type Signatories,
   type SignatoryRole,
+  type UserWithRights,
+  type WithConventionId,
   agencyModifierRoles,
+  allSignatoryRoles,
   errors,
   isValidMobilePhone,
+  signConventionDtoWithRole,
   statusTransitionConfigs,
 } from "shared";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
@@ -282,4 +289,77 @@ export const throwErrorIfPhoneNumberNotValid = ({
       conventionId: convention.id,
       signatoryRole,
     });
+};
+
+const getRoleAndIcUser = async (
+  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+  uow: UnitOfWork,
+  initialConvention: ConventionDto,
+): Promise<{ role: Role; userWithRights: UserWithRights | undefined }> => {
+  if ("role" in jwtPayload)
+    return { role: jwtPayload.role, userWithRights: undefined };
+
+  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+  if (
+    userWithRights.email !==
+    initialConvention.signatories.establishmentRepresentative.email
+  )
+    throw new ForbiddenError(
+      `User '${userWithRights.id}' is not the establishment representative for convention '${initialConvention.id}'`,
+    );
+
+  return {
+    role: initialConvention.signatories.establishmentRepresentative.role,
+    userWithRights,
+  };
+};
+
+const isAllowedToSign = (role: Role): role is SignatoryRole =>
+  allSignatoryRoles.includes(role as SignatoryRole);
+
+export const signConvention = async ({
+  uow,
+  conventionId,
+  jwtPayload,
+  now,
+}: WithConventionId & {
+  uow: UnitOfWork;
+  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload;
+  now: DateTimeIsoString;
+}) => {
+  const initialConventionRead =
+    await uow.conventionQueries.getConventionById(conventionId);
+  if (!initialConventionRead)
+    throw errors.convention.notFound({ conventionId });
+
+  const { role, userWithRights } = await getRoleAndIcUser(
+    jwtPayload,
+    uow,
+    initialConventionRead,
+  );
+
+  if (!isAllowedToSign(role))
+    throw errors.convention.roleNotAllowedToSign({ role });
+
+  const signedConvention = signConventionDtoWithRole(
+    initialConventionRead,
+    role,
+    now,
+  );
+  throwIfTransitionNotAllowed({
+    roles: [role],
+    targetStatus: signedConvention.status,
+    conventionRead: initialConventionRead,
+    hasAssessment: false,
+  });
+  const signedId = await uow.conventionRepository.update(signedConvention);
+  if (!signedId)
+    throw errors.convention.notFound({ conventionId: signedConvention.id });
+
+  return {
+    role,
+    userWithRights,
+    signedConvention,
+  };
 };
