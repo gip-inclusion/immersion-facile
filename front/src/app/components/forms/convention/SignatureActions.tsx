@@ -1,77 +1,47 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { type ModalProps, createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import {
-  type Dispatch,
-  Fragment,
-  type MouseEvent,
-  type MouseEventHandler,
-  type SetStateAction,
-  useState,
+
+import type {
+  Dispatch,
+  MouseEvent,
+  MouseEventHandler,
+  SetStateAction,
 } from "react";
-import { createPortal } from "react-dom";
 import { useFormContext } from "react-hook-form";
 
 import {
   type ConventionDto,
-  type ConventionStatusWithJustification,
   type InternshipKind,
-  type Role,
   type Signatory,
-  type UpdateConventionStatusRequestDto,
   domElementIds,
   getSignatoryProcessedData,
   isConventionRenewed,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
-import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { routes } from "src/app/routes/routes";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { JustificationModalContent } from "./manage-actions/modals/JustificationModalContent";
 
 type SignatureActionsProperties = {
   signatory: Signatory;
+  jwt: string;
   internshipKind: InternshipKind;
   onSubmitClick: MouseEventHandler<HTMLButtonElement>;
-  onModificationRequired: (params: UpdateConventionStatusRequestDto) => void;
   convention: ConventionDto;
-  newStatus: ConventionStatusWithJustification;
-  currentSignatoryRole: Role;
   onCloseSignModalWithoutSignature: Dispatch<SetStateAction<boolean>>;
 };
 
-const requestModificationModalParams = {
-  isOpenedByDefault: false,
-  id: "requestModification",
-};
-
-const {
-  Component: RequestModificationModal,
-  open: openRequestModificationModal,
-  close: closeRequestModificationModal,
-} = createModal(requestModificationModalParams);
-
 export const SignatureActions = (props: SignatureActionsProperties) => {
   const {
-    onModificationRequired,
     onSubmitClick,
     signatory,
     internshipKind,
     convention,
-    newStatus,
-    currentSignatoryRole,
     onCloseSignModalWithoutSignature,
   } = props;
   const isLoading = useAppSelector(conventionSelectors.isLoading);
   const { fieldName } = getSignatoryProcessedData(signatory);
   const { setValue } = useFormContext();
-  const t = useConventionTexts(internshipKind);
-  const [modalProps, setModalProps] = useState<ModalProps>({
-    title: t.verification.modifyConventionTitle,
-    children: null,
-  });
-  const isModalOpen = useIsModalOpen(requestModificationModalParams);
 
   return (
     <>
@@ -103,43 +73,21 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
         {!isConventionRenewed(convention) && (
           <li>
             <Button
+              id={domElementIds.conventionToSign.modificationButton}
               priority="secondary"
-              disabled={isLoading}
-              onClick={openRequestModificationModal}
-              type="button"
               iconId="fr-icon-edit-fill"
               iconPosition="left"
-              nativeButtonProps={{
-                id: domElementIds.conventionToSign
-                  .openRequestModificationModalButton,
-              }}
+              linkProps={
+                routes.conventionImmersion({
+                  jwt: props.jwt,
+                }).link
+              }
             >
-              Annuler les signatures et demander une modification
+              Modifier
             </Button>
           </li>
         )}
       </ul>
-
-      {createPortal(
-        <RequestModificationModal title={modalProps.title}>
-          <Fragment key={`${requestModificationModalParams.id}-${isModalOpen}`}>
-            <JustificationModalContent
-              onSubmit={onModificationRequired}
-              closeModal={closeRequestModificationModal}
-              newStatus={newStatus}
-              convention={convention}
-              currentSignatoryRoles={[currentSignatoryRole]}
-              onModalPropsChange={(newProps) => {
-                setModalProps({
-                  ...modalProps,
-                  ...newProps,
-                });
-              }}
-            />
-          </Fragment>
-        </RequestModificationModal>,
-        document.body,
-      )}
     </>
   );
 };
