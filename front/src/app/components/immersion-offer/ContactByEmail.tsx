@@ -141,7 +141,7 @@ export const ContactByEmail = ({
 
   useEffect(() => {
     if (contactLevelOfEducation === "2nde") {
-      setValue("datePreferences", "Du 16 au 27 juin");
+      setValue("datePreferences", "Du 16 au 27 juin 2025");
     }
   }, [contactLevelOfEducation, setValue]);
 
