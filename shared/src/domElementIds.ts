@@ -710,10 +710,7 @@ export const domElementIds = {
     form: "im-convention-to-sign-form",
     submitButton: "im-convention-to-sign__submit-button",
     openSignModalButton: "im-convention-to-sign__open-sign-modal-button",
-    openRequestModificationModalButton:
-      "im-convention-to-sign__open-modification-modal-button",
-    submitModificationrequestButton:
-      "im-convention-to-sign__submit-modification-request-button",
+    modificationButton: "im-convention-to-sign__modification-button",
   },
   error: {
     establishmentDashboardButton:

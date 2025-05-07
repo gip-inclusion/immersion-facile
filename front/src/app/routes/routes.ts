@@ -180,6 +180,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     {
       jwt: param.query.optional.string,
       skipIntro: param.query.optional.boolean,
+      conventionId: param.query.optional.string,
       ...conventionParams,
     },
     () => `/${frontRoutes.conventionImmersionRoute}`,
@@ -189,7 +190,11 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     (params) => `/${frontRoutes.conventionImmersionRoute}/${params.consumer}`,
   ),
   conventionMiniStage: defineRoute(
-    { jwt: param.query.optional.string, ...conventionValuesFromUrl },
+    {
+      jwt: param.query.optional.string,
+      conventionId: param.query.optional.string,
+      ...conventionValuesFromUrl,
+    },
     () => `/${frontRoutes.conventionMiniStageRoute}`,
   ),
   conventionStatusDashboard: defineRoute(
