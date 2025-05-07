@@ -64,13 +64,13 @@ export const conventionSlice = createSlice({
   reducers: {
     showSummaryChangeRequested: (
       state,
-      action: PayloadAction<{
-        showSummary: boolean;
-        convention?: ConventionReadDto;
-      }>,
+      action: PayloadAction<
+        | { showSummary: true; convention: ConventionReadDto }
+        | { showSummary: false }
+      >,
     ) => {
       state.formUi.showSummary = action.payload.showSummary;
-      if (action.payload.convention) {
+      if (action.payload.showSummary) {
         state.convention = action.payload.convention;
       }
     },
@@ -193,11 +193,9 @@ export const conventionSlice = createSlice({
 
     // Get similar conventions
     getSimilarConventionsRequested: (
-      state,
+      _state,
       _action: PayloadActionWithFeedbackTopic<FindSimilarConventionsParams>,
-    ) => {
-      state.isLoading = true;
-    },
+    ) => {},
 
     getSimilarConventionsSucceeded: (
       state,
@@ -207,7 +205,6 @@ export const conventionSlice = createSlice({
         similarConventionIds: ConventionId[];
       }>,
     ) => {
-      state.isLoading = false;
       state.similarConventionIds = payload.similarConventionIds;
     },
     getSimilarConventionsFailed: (

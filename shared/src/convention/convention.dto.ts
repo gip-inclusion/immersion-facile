@@ -84,6 +84,12 @@ export const conventionStatusesWithJustificationWithModifierRole = [
   "DRAFT",
 ] as const;
 
+export const conventionStatusesAllowedForModification: ConventionStatus[] = [
+  "IN_REVIEW",
+  "PARTIALLY_SIGNED",
+  "READY_TO_SIGN",
+] as const;
+
 export type ConventionStatusWithJustification =
   (typeof conventionStatusesWithJustification)[number];
 export const conventionStatusesWithJustification = [
