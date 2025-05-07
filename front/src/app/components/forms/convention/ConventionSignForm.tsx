@@ -11,7 +11,6 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   type ConventionReadDto,
-  type UpdateConventionStatusRequestDto,
   domElementIds,
   isConventionRenewed,
   toDisplayedDate,
@@ -82,17 +81,6 @@ export const ConventionSignForm = ({
     );
   };
 
-  const onModificationRequired = (
-    updateStatusParams: UpdateConventionStatusRequestDto,
-  ) =>
-    dispatch(
-      conventionActionSlice.actions.editConventionRequested({
-        jwt,
-        updateStatusParams,
-        feedbackTopic: "convention-action-edit",
-      }),
-    );
-
   if (alreadySigned) {
     return (
       <>
@@ -155,10 +143,8 @@ export const ConventionSignForm = ({
                   console.error(methods.getValues(), errors);
                 },
               )}
+              jwt={jwt}
               convention={convention}
-              newStatus="DRAFT"
-              onModificationRequired={onModificationRequired}
-              currentSignatoryRole={currentSignatory.role}
               onCloseSignModalWithoutSignature={
                 setIsModalClosedWithoutSignature
               }

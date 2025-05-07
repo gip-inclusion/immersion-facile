@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
+import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { addDays, isAfter, isBefore } from "date-fns";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
@@ -250,7 +250,7 @@ export const ConventionManageActions = ({
     return false;
   };
 
-  const modificationItems = [
+  const modificationItems: (ButtonProps & { id: string })[] = [
     ...(shouldShowTransferButton()
       ? [
           {
@@ -270,18 +270,28 @@ export const ConventionManageActions = ({
         ]
       : []),
     {
-      ...getVerificationActionProps({
-        initialStatus: convention.status,
-        children: t.verification.modifyConventionOtherInformations,
-        modalTitle: t.verification.modifyConvention,
-        verificationAction: "REQUEST_EDIT",
-        convention,
-        disabled,
-        currentSignatoryRoles: requesterRoles,
-        onSubmit: createOnSubmitWithFeedbackKind,
-      }).buttonProps,
-      id: domElementIds.manageConvention.requestEditButton,
+      id: domElementIds.manageConvention.editLink,
+      priority: "secondary",
+      children: t.verification.modifyConventionOtherInformations,
+      linkProps: routes.conventionImmersion({
+        conventionId: convention.id,
+        jwt: jwtParams.jwt,
+        skipIntro: true,
+      }).link,
     },
+
+    //   ...getVerificationActionProps({
+    //     initialStatus: convention.status,
+    //     children: t.verification.modifyConventionOtherInformations,
+    //     modalTitle: t.verification.modifyConvention,
+    //     verificationAction: "REQUEST_EDIT",
+    //     convention,
+    //     disabled,
+    //     currentSignatoryRoles: requesterRoles,
+    //     onSubmit: createOnSubmitWithFeedbackKind,
+    //   }).buttonProps,
+    //   id: domElementIds.manageConvention.requestEditButton,
+    // },
   ];
 
   return (
@@ -396,7 +406,7 @@ export const ConventionManageActions = ({
           </>
         )}
 
-        {isAllowedConventionTransition(convention, "DRAFT", roles) && (
+        {isAllowedConventionTransition(convention, "READY_TO_SIGN", roles) && (
           <>
             {modificationItems.length > 1 && (
               <>
@@ -408,18 +418,6 @@ export const ConventionManageActions = ({
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
                   id={domElementIds.manageConvention.editActionsButton}
-                />
-                <ModalWrapper
-                  {...getVerificationActionProps({
-                    initialStatus: convention.status,
-                    children: t.verification.modifyConventionOtherInformations,
-                    modalTitle: t.verification.modifyConvention,
-                    verificationAction: "REQUEST_EDIT",
-                    convention,
-                    disabled,
-                    currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind,
-                  }).modalWrapperProps}
                 />
 
                 <ModalWrapper
@@ -437,35 +435,19 @@ export const ConventionManageActions = ({
               </>
             )}
             {modificationItems.length === 1 && (
-              <>
-                <Button
-                  {...getVerificationActionProps({
-                    initialStatus: convention.status,
-                    children: t.verification.modifyConvention,
-                    modalTitle: t.verification.modifyConvention,
-                    verificationAction: "REQUEST_EDIT",
-                    convention,
-                    disabled,
-                    currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind,
-                  }).buttonProps}
-                  iconId="fr-icon-edit-line"
-                  id={domElementIds.manageConvention.requestEditButton}
-                />
-
-                <ModalWrapper
-                  {...getVerificationActionProps({
-                    initialStatus: convention.status,
-                    children: t.verification.modifyConventionOtherInformations,
-                    modalTitle: t.verification.modifyConvention,
-                    verificationAction: "REQUEST_EDIT",
-                    convention,
-                    disabled,
-                    currentSignatoryRoles: requesterRoles,
-                    onSubmit: createOnSubmitWithFeedbackKind,
-                  }).modalWrapperProps}
-                />
-              </>
+              <Button
+                id={domElementIds.manageConvention.editLink}
+                priority="secondary"
+                linkProps={
+                  routes.conventionImmersion({
+                    conventionId: convention.id,
+                    jwt: jwtParams.jwt,
+                    skipIntro: true,
+                  }).link
+                }
+              >
+                {t.verification.modifyConventionOtherInformations}
+              </Button>
             )}
           </>
         )}
@@ -615,7 +597,7 @@ export const ConventionManageActions = ({
                   priority={"secondary"}
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
-                  id={domElementIds.manageConvention.editActionsButton}
+                  id={domElementIds.manageConvention.assessmentFullFillButton}
                 />
               ) : (
                 <Button
