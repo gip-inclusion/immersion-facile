@@ -242,7 +242,11 @@ export const SearchPage = ({
         {shouldShowInitialScreen ? (
           <>
             <PageHeader
-              title="Trouver une immersion"
+              title={
+                route.name === "search"
+                  ? "Trouver une immersion"
+                  : "Trouver un stage"
+              }
               breadcrumbs={<Breadcrumbs />}
             >
               <p>Dans une entreprise ou une administration publique</p>
