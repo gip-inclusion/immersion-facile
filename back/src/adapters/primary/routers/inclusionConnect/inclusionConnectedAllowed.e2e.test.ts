@@ -25,7 +25,7 @@ import type { Gateways } from "../../../../config/bootstrap/createGateways";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
-import { broadcastToFtServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtLegacyServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -353,7 +353,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       ];
       inMemoryUow.conventionRepository.setConventions([convention]);
       await inMemoryUow.broadcastFeedbacksRepository.save({
-        serviceName: broadcastToFtServiceName,
+        serviceName: broadcastToFtLegacyServiceName,
         consumerName: "France Travail",
         consumerId: null,
         subscriberErrorFeedback: { message: "Some message" },
@@ -376,7 +376,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         inMemoryUow.broadcastFeedbacksRepository.broadcastFeedbacks,
         [
           {
-            serviceName: broadcastToFtServiceName,
+            serviceName: broadcastToFtLegacyServiceName,
             consumerName: "France Travail",
             consumerId: null,
             subscriberErrorFeedback: {

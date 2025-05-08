@@ -225,7 +225,8 @@ describe("Add Convention Notifications, then checks the mails are sent (trigerre
     await processEventsForEmailToBeSent(eventCrawler);
 
     expect(inMemoryUow.notificationRepository.notifications).toHaveLength(3);
-    const ftNotification = gateways.franceTravailGateway.notifications[0];
+    const ftNotification =
+      gateways.franceTravailGateway.legacyBroadcastConventionCalls[0];
     expect(ftNotification.id).toBe(externalId);
     expectToEqual(ftNotification.statut, "DEMANDE_A_SIGNER");
     expect(ftNotification.originalId).toBe(convention.id);
