@@ -51,6 +51,8 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+      enableStandardFormatBroadcastToFranceTravail:
+        makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -72,6 +74,8 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+      enableStandardFormatBroadcastToFranceTravail:
+        makeBooleanFeatureFlag(false),
     });
   });
 
@@ -93,6 +97,8 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+      enableStandardFormatBroadcastToFranceTravail:
+        makeBooleanFeatureFlag(false),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -133,6 +139,8 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+      enableStandardFormatBroadcastToFranceTravail:
+        makeBooleanFeatureFlag(false),
     });
   });
 });

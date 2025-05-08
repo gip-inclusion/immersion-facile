@@ -24,6 +24,7 @@ export const defaultFlags: FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
