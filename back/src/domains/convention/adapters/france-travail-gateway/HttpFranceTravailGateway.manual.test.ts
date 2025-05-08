@@ -220,7 +220,7 @@ describe("HttpFranceTravailGateway", () => {
         `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastConvention.url)
+      .onPost(routes.broadcastLegacyConvention.url)
       .timeout();
 
     const response =
@@ -273,7 +273,7 @@ describe("HttpFranceTravailGateway", () => {
         `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastConvention.url)
+      .onPost(routes.broadcastLegacyConvention.url)
       .reply(204, { message: "yolo" });
 
     const response =

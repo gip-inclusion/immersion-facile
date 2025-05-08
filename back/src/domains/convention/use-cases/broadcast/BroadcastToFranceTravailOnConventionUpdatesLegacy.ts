@@ -1,19 +1,17 @@
 import {
-  type AgencyDto,
-  type AgencyKind,
-  type ConventionDto,
-  type FeatureFlags,
   type ImmersionObjective,
   type WithConventionDto,
-  errors,
   withConventionSchema,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
-import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import {
+  getLinkedAgencies,
+  shouldBroadcastToFranceTravail,
+} from "../../entities/Convention";
 import {
   type FranceTravailConvention,
   type FranceTravailGateway,
@@ -133,7 +131,7 @@ export class BroadcastToFranceTravailOnConventionUpdatesLegacy extends Transacti
     await uow.broadcastFeedbacksRepository.save({
       consumerId: null,
       consumerName: "France Travail",
-      serviceName: broadcastToFtServiceName,
+      serviceName: broadcastToFtLegacyServiceName,
       requestParams: {
         conventionId: convention.id,
         conventionStatus: convention.status,
@@ -147,68 +145,3 @@ export class BroadcastToFranceTravailOnConventionUpdatesLegacy extends Transacti
     });
   }
 }
-
-const getLinkedAgencies = async (
-  uow: UnitOfWork,
-  convention: ConventionDto,
-): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
-  const agencyWithRights = await uow.agencyRepository.getById(
-    convention.agencyId,
-  );
-  if (!agencyWithRights)
-    throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-  if (!agency.refersToAgencyId) return { agency, refersToAgency: null };
-
-  const refersToAgency = await uow.agencyRepository.getById(
-    agency.refersToAgencyId,
-  );
-
-  if (!refersToAgency)
-    throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
-
-  return {
-    agency,
-    refersToAgency: await agencyWithRightToAgencyDto(uow, refersToAgency),
-  };
-};
-
-const shouldBroadcastToFranceTravail = ({
-  agency,
-  featureFlags,
-  refersToAgency,
-}: {
-  agency: AgencyDto;
-  refersToAgency: AgencyDto | null;
-  featureFlags: FeatureFlags;
-}): boolean => {
-  const isBroadcastToFranceTravailAllowedForKind = (agencyKind: AgencyKind) => {
-    if (agency.kind === agencyKind) return true;
-    if (refersToAgency && refersToAgency.kind === "pole-emploi") return true;
-    return false;
-  };
-
-  if (isBroadcastToFranceTravailAllowedForKind("pole-emploi")) return true;
-
-  if (
-    featureFlags.enableBroadcastOfMissionLocaleToFT.isActive &&
-    isBroadcastToFranceTravailAllowedForKind("mission-locale")
-  )
-    return true;
-
-  if (
-    featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
-    isBroadcastToFranceTravailAllowedForKind("conseil-departemental")
-  )
-    return true;
-
-  if (
-    featureFlags.enableBroadcastOfCapEmploiToFT.isActive &&
-    isBroadcastToFranceTravailAllowedForKind("cap-emploi")
-  )
-    return true;
-
-  return false;
-};
