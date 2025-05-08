@@ -1,6 +1,7 @@
 import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod";
+import type { AccessTokenResponse } from "../../../../config/bootstrap/appConfig";
 import type { FranceTravailConvention } from "../../ports/FranceTravailGateway";
 
 export const getFtTestPrefix = (ftApiUrl: AbsoluteUrl) =>
@@ -12,10 +13,40 @@ export type FrancetTravailRoutes = ReturnType<typeof createFranceTravailRoutes>;
 
 const franceTravailConventionSchema: z.Schema<FranceTravailConvention> =
   z.any();
-export const createFranceTravailRoutes = (ftApiUrl: AbsoluteUrl) => {
+
+const ftAuthError = z.object({
+  error: z.string(),
+  error_description: z.string(),
+});
+
+const ftAccessTokenResponseSchema: z.Schema<AccessTokenResponse> = z.object({
+  access_token: z.string(),
+  expires_in: z.number(),
+  scope: z.string(),
+  token_type: z.string(),
+});
+
+export const createFranceTravailRoutes = ({
+  ftApiUrl,
+  ftEnterpriseUrl,
+}: { ftApiUrl: AbsoluteUrl; ftEnterpriseUrl: AbsoluteUrl }) => {
   const ftTestPrefix = getFtTestPrefix(ftApiUrl);
 
   return defineRoutes({
+    getAccessToken: defineRoute({
+      method: "post",
+      url: `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+      headersSchema: z.object({
+        "Content-Type": z.literal("application/x-www-form-urlencoded"),
+      }),
+      requestBodySchema: z.string(),
+      responses: {
+        [200]: ftAccessTokenResponseSchema,
+        [400]: ftAuthError,
+        [429]: z.any(),
+        [503]: z.any(),
+      },
+    }),
     broadcastConvention: defineRoute({
       method: "post",
       url: `${ftApiUrl}/partenaire/${ftTestPrefix}immersion-pro/v2/demandes-immersion`,

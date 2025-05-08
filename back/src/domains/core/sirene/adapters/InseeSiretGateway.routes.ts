@@ -13,7 +13,7 @@ const inseeErrorSchema = z.object({
   }),
 });
 
-const getAccessTokenError = z.object({
+const errorInGetAccessTokenError = z.object({
   error: z.string(),
   error_description: z.string(),
 });
@@ -30,8 +30,8 @@ export const makeInseeExternalRoutes = (endpoint: AbsoluteUrl) =>
       requestBodySchema: z.string(),
       responses: {
         [200]: z.any(),
-        [400]: getAccessTokenError,
-        [401]: getAccessTokenError,
+        [400]: errorInGetAccessTokenError,
+        [401]: errorInGetAccessTokenError,
       },
     }),
     getEstablishmentUpdatedBetween: defineRoute({

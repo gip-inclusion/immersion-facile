@@ -1,11 +1,11 @@
 import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
-import { errors, expectToEqual } from "shared";
+import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
-  type AccessTokenConfig,
   type AccessTokenResponse,
   AppConfig,
+  type FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
 import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
@@ -20,6 +20,58 @@ import { createFranceTravailRoutes } from "./FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "./HttpFranceTravailGateway";
 
 describe("HttpFranceTravailGateway", () => {
+  describe("getAccessToken", () => {
+    it("fails when client is not allowed", async () => {
+      const httpFranceTravailGateway = new HttpFranceTravailGateway(
+        createFtAxiosSharedClient(config),
+        createCachingGateway(),
+        config.ftApiUrl,
+        {
+          ...config.franceTravailAccessTokenConfig,
+          clientSecret: "wrong-secret",
+        },
+        noRetries,
+      );
+      await expectPromiseToFailWithError(
+        httpFranceTravailGateway.getAccessToken("api_referentielagencesv1"),
+        new Error("[FT access token]: Client authentication failed"),
+      );
+    });
+
+    it("fails when scope is not valid", async () => {
+      const httpFranceTravailGateway = new HttpFranceTravailGateway(
+        createFtAxiosSharedClient(config),
+        cachingGateway,
+        config.ftApiUrl,
+        config.franceTravailAccessTokenConfig,
+        noRetries,
+      );
+      await expectPromiseToFailWithError(
+        httpFranceTravailGateway.getAccessToken("whatever"),
+        new Error("[FT access token]: Invalid scope"),
+      );
+    });
+
+    it("gets the token when all is good", async () => {
+      const httpFranceTravailGateway = new HttpFranceTravailGateway(
+        createFtAxiosSharedClient(config),
+        cachingGateway,
+        config.ftApiUrl,
+        config.franceTravailAccessTokenConfig,
+        noRetries,
+      );
+      const result = await httpFranceTravailGateway.getAccessToken(
+        "api_referentielagencesv1",
+      );
+      expectToEqual(result, {
+        access_token: expect.any(String),
+        expires_in: expect.any(Number),
+        scope: "api_referentielagencesv1",
+        token_type: "Bearer",
+      });
+    });
+  });
+
   it.each([
     {
       testMessage: "the email exists in PE but the dateNaissance is wrong",
@@ -73,7 +125,9 @@ describe("HttpFranceTravailGateway", () => {
       );
 
       if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
-        throw errors.generic.testError("Should not occurs");
+        throw errors.generic.testError(
+          `Should not occurs : response status was ${response.status}`,
+        );
 
       const { status, subscriberErrorFeedback } = response;
       expectToEqual(status, expected.status);
@@ -94,7 +148,7 @@ describe("HttpFranceTravailGateway", () => {
         dateNaissance: "1994-10-22T00:00:00",
         peConnectId: undefined,
       },
-      expected: { status: 200, body: { success: true } }, // careful, if id is new, it will be 201
+      expected: { status: 200, body: "" }, // careful, if id is new, it will be 201
     },
     {
       testMessage: "data is not known but there is a peConnectId",
@@ -104,10 +158,7 @@ describe("HttpFranceTravailGateway", () => {
         dateNaissance: "2000-10-22T00:00:00",
         peConnectId: "aaaa66c2-42c0-4359-bf5d-137faaaaaaaa",
       },
-      expected: {
-        status: 200,
-        body: { success: true },
-      },
+      expected: { status: 200, body: "" },
     },
   ] satisfies TestCase[])(
     "Should have status $expected.status when $testMessage",
@@ -136,7 +187,7 @@ describe("HttpFranceTravailGateway", () => {
   it("error feedback axios timeout", async () => {
     const ftApiUrl = "https://fake-ft.fr";
     const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
-    const routes = createFranceTravailRoutes(ftApiUrl);
+    const routes = createFranceTravailRoutes({ ftApiUrl, ftEnterpriseUrl });
 
     const httpClient = createAxiosSharedClient(routes, axios, {
       skipResponseValidation: true,
@@ -147,7 +198,7 @@ describe("HttpFranceTravailGateway", () => {
       "expires_in",
     );
 
-    const accessTokenConfig: AccessTokenConfig = {
+    const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
       ftApiUrl,
       ftAuthCandidatUrl: "https://",
@@ -187,9 +238,9 @@ describe("HttpFranceTravailGateway", () => {
   });
 
   it("error feedback on bad response code", async () => {
-    const peApiUrl = "https://fake-ft.fr";
-    const peEnterpriseUrl = "https://fake-ft-enterprise.fr";
-    const routes = createFranceTravailRoutes(peApiUrl);
+    const ftApiUrl = "https://fake-ft.fr";
+    const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
+    const routes = createFranceTravailRoutes({ ftApiUrl, ftEnterpriseUrl });
 
     const httpClient = createAxiosSharedClient(routes, axios, {
       skipResponseValidation: true,
@@ -200,11 +251,11 @@ describe("HttpFranceTravailGateway", () => {
       "expires_in",
     );
 
-    const accessTokenConfig: AccessTokenConfig = {
+    const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      ftApiUrl: peApiUrl,
+      ftApiUrl: ftApiUrl,
       ftAuthCandidatUrl: "https://",
-      ftEnterpriseUrl: peEnterpriseUrl,
+      ftEnterpriseUrl: ftEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
@@ -212,7 +263,7 @@ describe("HttpFranceTravailGateway", () => {
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
-      peApiUrl,
+      ftApiUrl,
       accessTokenConfig,
       noRetries,
     );
@@ -221,7 +272,7 @@ describe("HttpFranceTravailGateway", () => {
 
     mock
       .onPost(
-        `${peEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+        `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
       .onPost(routes.broadcastConvention.url)
@@ -231,7 +282,9 @@ describe("HttpFranceTravailGateway", () => {
       await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
 
     if (isBroadcastResponseOk(response))
-      throw errors.generic.testError("PE broadcast OK must not occurs");
+      throw errors.generic.testError(
+        `PE broadcast OK must not occurs, response status was : ${response.status}`,
+      );
 
     const { status, subscriberErrorFeedback } = response;
     expectToEqual(status, 500);
@@ -244,10 +297,12 @@ describe("HttpFranceTravailGateway", () => {
 });
 
 const config = AppConfig.createFromEnv();
-const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
-  new RealTimeGateway(),
-  "expires_in",
-);
+const createCachingGateway = () =>
+  new InMemoryCachingGateway<AccessTokenResponse>(
+    new RealTimeGateway(),
+    "expires_in",
+  );
+const cachingGateway = createCachingGateway();
 
 const ftConvention: FranceTravailConvention = {
   activitesObservees: "Tenir une conversation client",

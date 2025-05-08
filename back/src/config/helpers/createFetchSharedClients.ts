@@ -3,6 +3,9 @@ import { createFranceTravailRoutes } from "../../domains/convention/adapters/fra
 import type { AppConfig } from "../bootstrap/appConfig";
 
 export const createFtFetchSharedClient = (config: AppConfig) => {
-  const franceTravailRoutes = createFranceTravailRoutes(config.ftApiUrl);
+  const franceTravailRoutes = createFranceTravailRoutes({
+    ftApiUrl: config.ftApiUrl,
+    ftEnterpriseUrl: config.ftEnterpriseUrl,
+  });
   return createFetchSharedClient(franceTravailRoutes, fetch);
 };

@@ -17,7 +17,7 @@ import type { DomainTopic } from "../../domains/core/events/events";
 import type { S3Params } from "../../domains/core/file-storage/adapters/S3DocumentGateway";
 import type { CrispConfig } from "../../domains/core/support/adapters/HttpCrispGateway";
 
-export type AccessTokenConfig = {
+export type FTAccessTokenConfig = {
   immersionFacileBaseUrl: AbsoluteUrl;
   ftApiUrl: AbsoluteUrl;
   ftAuthCandidatUrl: AbsoluteUrl;
@@ -37,6 +37,8 @@ export type InseeAccessTokenConfig = {
 export type AccessTokenResponse = {
   access_token: string;
   expires_in: number;
+  scope: string;
+  token_type: string;
 };
 
 export type OAuthConfig = {
@@ -457,7 +459,7 @@ export class AppConfig {
     return this.#throwIfNotDefinedOrDefault("DATABASE_URL");
   }
 
-  public get franceTravailAccessTokenConfig(): AccessTokenConfig {
+  public get franceTravailAccessTokenConfig(): FTAccessTokenConfig {
     return {
       immersionFacileBaseUrl: this.immersionFacileBaseUrl,
       ftApiUrl: this.ftApiUrl,

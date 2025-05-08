@@ -172,7 +172,7 @@ export const createGateways = async (
     createAxiosSharedClient(routes, axiosInstance, {
       skipResponseValidation: true,
       onResponseSideEffect: logPartnerResponses({
-        partnerName: partnerName,
+        partnerName,
         logInputCbOnSuccess,
       }),
     });
@@ -187,7 +187,14 @@ export const createGateways = async (
       ? new HttpFranceTravailGateway(
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.franceTravailApi,
-            routes: createFranceTravailRoutes(config.ftApiUrl),
+            routes: createFranceTravailRoutes({
+              ftApiUrl: config.ftApiUrl,
+              ftEnterpriseUrl: config.ftEnterpriseUrl,
+            }),
+            axiosInstance: axios.create({
+              timeout: config.externalAxiosTimeout,
+              validateStatus: () => true,
+            }),
           }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,

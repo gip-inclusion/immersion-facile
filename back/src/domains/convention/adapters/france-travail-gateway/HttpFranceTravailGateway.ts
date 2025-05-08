@@ -1,17 +1,12 @@
 import querystring from "node:querystring";
 import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
-import { secondsToMilliseconds } from "date-fns";
 import { type AbsoluteUrl, castError, errors } from "shared";
-import type { HttpClient } from "shared-routes";
+import type { HttpClient, HttpResponse } from "shared-routes";
 import type {
-  AccessTokenConfig,
   AccessTokenResponse,
+  FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
-import {
-  createAxiosInstance,
-  isRetryableError,
-} from "../../../../utils/axiosUtils";
 import {
   type LoggerParamsWithMessage,
   createLogger,
@@ -67,7 +62,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
 
   readonly #caching: InMemoryCachingGateway<AccessTokenResponse>;
 
-  readonly #accessTokenConfig: AccessTokenConfig;
+  readonly #accessTokenConfig: FTAccessTokenConfig;
 
   readonly #retryStrategy: RetryStrategy;
 
@@ -75,7 +70,7 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
     httpClient: HttpClient<FrancetTravailRoutes>,
     caching: InMemoryCachingGateway<AccessTokenResponse>,
     ftApiUrl: AbsoluteUrl,
-    accessTokenConfig: AccessTokenConfig,
+    accessTokenConfig: FTAccessTokenConfig,
     retryStrategy: RetryStrategy,
     isDev = false,
   ) {
@@ -90,34 +85,42 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
   public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return this.#caching.caching(scope, () =>
       this.#retryStrategy.apply(() =>
-        this.#commonlimiter.schedule(() =>
-          createAxiosInstance(logger)
-            .post(
-              `${this.#accessTokenConfig.ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
-              querystring.stringify({
-                grant_type: "client_credentials",
-                client_id: this.#accessTokenConfig.clientId,
-                client_secret: this.#accessTokenConfig.clientSecret,
-                scope,
-              }),
-              {
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                timeout: secondsToMilliseconds(10),
-              },
-            )
-            .then((response) => response.data)
-            .catch((error) => {
-              logger.error({
-                error,
-                message: "Raw error getting access token",
-              });
-              if (isRetryableError(logger, error))
-                throw new RetryableError(error);
-              throw error;
+        this.#commonlimiter.schedule(async () => {
+          const response = await this.#httpClient.getAccessToken({
+            body: querystring.stringify({
+              grant_type: "client_credentials",
+              client_id: this.#accessTokenConfig.clientId,
+              client_secret: this.#accessTokenConfig.clientSecret,
+              scope,
             }),
-        ),
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          });
+
+          if (response.status === 200) return response.body;
+
+          const ftAccessTokenRelated = "[FT access token]";
+
+          if (response.body.error.includes("invalid_client"))
+            throw new Error(
+              `${ftAccessTokenRelated}: Client authentication failed`,
+            );
+
+          if (response.body.error.includes("invalid_grant"))
+            throw new Error(
+              `${ftAccessTokenRelated}: The provided access grant is invalid, expired, or revoked.`,
+            );
+
+          if (response.body.error.includes("invalid_scope"))
+            throw new Error(`${ftAccessTokenRelated}: Invalid scope`);
+
+          const error = new Error(JSON.stringify(response.body, null, 2));
+
+          if (isRetryable(response)) throw new RetryableError(error);
+
+          throw error;
+        }),
       ),
     );
   }
@@ -292,6 +295,9 @@ const stripAxiosResponse = (
   error: AxiosError,
 ): Partial<Pick<AxiosResponse, "status" | "headers" | "data">> => ({
   status: error.response?.status,
-  headers: error.response?.headers,
   data: error.response?.data,
 });
+
+const isRetryable = (httpResponse: HttpResponse<number, unknown>) => {
+  return httpResponse.status === 429 || httpResponse.status === 503;
+};
