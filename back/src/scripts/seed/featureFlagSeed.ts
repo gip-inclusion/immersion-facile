@@ -27,6 +27,7 @@ export const featureFlagsSeed = async (uow: UnitOfWork) => {
     enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
     enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+    enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   };
 
   await uow.featureFlagRepository.insertAll(featureFlags);
