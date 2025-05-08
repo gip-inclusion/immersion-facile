@@ -32,11 +32,8 @@ export const makeBroadcastToFranceTravailOnConventionUpdates =
       name: "BroadcastToFranceTravailOnConventionUpdates",
       inputSchema: broadcastConventionParamsSchema,
     },
-    async ({
-      inputParams: { convention, eventType, assessment },
-      uow,
-      deps,
-    }) => {
+    async ({ inputParams, uow, deps }) => {
+      const { convention } = inputParams;
       const { agency, refersToAgency } = await getLinkedAgencies(
         uow,
         convention,
@@ -60,11 +57,7 @@ export const makeBroadcastToFranceTravailOnConventionUpdates =
           : undefined;
 
       const response =
-        await deps.franceTravailGateway.notifyOnConventionUpdated({
-          convention,
-          eventType,
-          assessment,
-        });
+        await deps.franceTravailGateway.notifyOnConventionUpdated(inputParams);
 
       if (deps.options.resyncMode)
         await uow.conventionsToSyncRepository.save({

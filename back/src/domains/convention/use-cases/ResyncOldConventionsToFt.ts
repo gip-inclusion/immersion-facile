@@ -6,7 +6,10 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
-import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
+import {
+  type BroadcastToFranceTravailOnConventionUpdatesLegacy,
+  makeBroadcastToFranceTravailOnConventionUpdatesLegacy,
+} from "./broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 
 type ResyncOldConventionToFtReport = {
   success: number;
@@ -40,12 +43,14 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
   ) {
     super(uowPerform);
     this.#broadcastToFTUsecase =
-      new BroadcastToFranceTravailOnConventionUpdatesLegacy(
-        uowPerform,
-        franceTravailGateway,
-        timeGateway,
-        { resyncMode: true },
-      );
+      makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
+        uowPerformer: uowPerform,
+        deps: {
+          franceTravailGateway,
+          timeGateway,
+          options: { resyncMode: true },
+        },
+      });
 
     this.#timeGateway = timeGateway;
     this.#limit = limit;
