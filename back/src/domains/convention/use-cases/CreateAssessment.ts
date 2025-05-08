@@ -72,6 +72,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
         deps.createNewEvent({
           topic: "AssessmentCreated",
           payload: {
+            convention,
             assessment: assessment,
             triggeredBy,
           },

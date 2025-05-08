@@ -140,7 +140,7 @@ export type DomainEvent =
   | GenericEvent<"AgencyRejected", WithAgencyId & WithTriggeredBy>
 
   // IMMERSION ASSESSMENT related
-  | GenericEvent<"AssessmentCreated", WithAssessmentDto & WithTriggeredBy>
+  | GenericEvent<"AssessmentCreated", WithConventionDto & WithAssessmentDto & WithTriggeredBy>
   | GenericEvent<"EmailWithLinkToCreateAssessmentSent", WithConventionIdLegacy>
   | GenericEvent<"BeneficiaryAssessmentEmailSent", WithConventionIdLegacy>
 
