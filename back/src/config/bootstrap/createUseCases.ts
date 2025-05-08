@@ -37,7 +37,9 @@ import { makeTransferConventionToAgency } from "../../domains/convention/use-cas
 import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConvention";
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
+import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
+import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
@@ -187,6 +189,24 @@ export const createUseCases = (
     createNewEvent,
     gateways.siret,
   );
+
+  const broadcastToFranceTravailOnConventionUpdates =
+    makeBroadcastToFranceTravailOnConventionUpdates({
+      uowPerformer,
+      deps: {
+        franceTravailGateway: gateways.franceTravailGateway,
+        timeGateway: gateways.timeGateway,
+        options: { resyncMode: false },
+      },
+    });
+
+  const broadcastToFranceTravailOnConventionUpdatesLegacy =
+    new BroadcastToFranceTravailOnConventionUpdatesLegacy(
+      uowPerformer,
+      gateways.franceTravailGateway,
+      gateways.timeGateway,
+      { resyncMode: false },
+    );
 
   return {
     ...instantiatedUseCasesFromClasses({
@@ -535,13 +555,6 @@ export const createUseCases = (
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      broadcastToFranceTravailOnConventionUpdates:
-        new BroadcastToFranceTravailOnConventionUpdatesLegacy(
-          uowPerformer,
-          gateways.franceTravailGateway,
-          gateways.timeGateway,
-          { resyncMode: false },
-        ),
       broadcastToPartnersOnConventionUpdates:
         new BroadcastToPartnersOnConventionUpdates(
           uowPerformer,
@@ -617,6 +630,22 @@ export const createUseCases = (
             await uow.conventionQueries.findSimilarConventions(params),
         })),
     }),
+
+    broadcastToFranceTravailOnConventionUpdates:
+      makeBroadcastToFranceTravailOrchestrator({
+        uowPerformer,
+        broadcastToFranceTravailOnConventionUpdates,
+        broadcastToFranceTravailOnConventionUpdatesLegacy,
+        eventType: "CONVENTION_UPDATED",
+      }),
+
+    broadcastToFranceTravailOnAssessmentCreated:
+      makeBroadcastToFranceTravailOrchestrator({
+        uowPerformer,
+        broadcastToFranceTravailOnConventionUpdates,
+        broadcastToFranceTravailOnConventionUpdatesLegacy,
+        eventType: "CONVENTION_UPDATED",
+      }),
 
     assessmentReminder: makeAssessmentReminder({
       uowPerformer,

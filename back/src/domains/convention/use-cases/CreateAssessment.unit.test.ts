@@ -337,6 +337,7 @@ describe("CreateAssessment", () => {
         {
           topic: "AssessmentCreated",
           payload: {
+            convention: validatedConvention,
             assessment,
             triggeredBy: {
               kind: "convention-magic-link",
