@@ -1,10 +1,13 @@
-import type { AssessmentDto, ConventionDto } from "shared";
+import { type AssessmentDto, type ConventionDto, errors } from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import type { BroadcastConventionParams } from "./broadcastConventionParams";
 
+export type BroadcastToFranceTravailOrchestrator = ReturnType<
+  typeof makeBroadcastToFranceTravailOrchestrator
+>;
 export const makeBroadcastToFranceTravailOrchestrator = ({
   uowPerformer,
   broadcastToFranceTravailOnConventionUpdatesLegacy,
@@ -26,11 +29,25 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
         uow.featureFlagRepository.getAll(),
       );
 
-      if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive)
+      if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive) {
+        if (eventType === "ASSESSMENT_CREATED") {
+          if (!params.assessment)
+            throw errors.assessment.missingAssessment({
+              conventionId: params.convention.id,
+            });
+
+          return broadcastToFranceTravailOnConventionUpdates.execute({
+            eventType: "ASSESSMENT_CREATED",
+            convention: params.convention,
+            assessment: params.assessment,
+          });
+        }
+
         return broadcastToFranceTravailOnConventionUpdates.execute({
-          eventType,
-          ...params,
+          eventType: "CONVENTION_UPDATED",
+          convention: params.convention,
         });
+      }
 
       if (eventType === "CONVENTION_UPDATED") {
         return broadcastToFranceTravailOnConventionUpdatesLegacy.execute({

@@ -185,6 +185,10 @@ export const errors = {
       new ForbiddenError(
         "Il y a un décalage d'identifiant de convention dans les données envoyées.",
       ),
+    missingAssessment: ({ conventionId }: { conventionId: ConventionId }) =>
+      new BadRequestError(
+        `Il manque le bilan dans les paramêtres pour la convention ${conventionId}`,
+      ),
   },
   inclusionConnect: {
     missingOAuth: ({
