@@ -188,8 +188,8 @@ describe("HttpFranceTravailGateway", () => {
     const ftApiUrl = "https://fake-ft.fr";
     const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
     const routes = createFranceTravailRoutes({ ftApiUrl, ftEnterpriseUrl });
-
-    const httpClient = createAxiosSharedClient(routes, axios, {
+    const axiosInstance = axios.create({ validateStatus: () => true });
+    const httpClient = createAxiosSharedClient(routes, axiosInstance, {
       skipResponseValidation: true,
     });
 
@@ -215,7 +215,7 @@ describe("HttpFranceTravailGateway", () => {
       noRetries,
     );
 
-    const mock = new MockAdapter(axios);
+    const mock = new MockAdapter(axiosInstance);
 
     mock
       .onPost(

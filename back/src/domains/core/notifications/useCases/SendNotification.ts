@@ -64,6 +64,7 @@ export class SendNotification extends TransactionalUseCase<WithNotificationIdAnd
           throw errors.generic.unsupportedStatus({
             status: error.httpStatus,
             body: error.message,
+            serviceName: "Brevo",
           });
         },
       )

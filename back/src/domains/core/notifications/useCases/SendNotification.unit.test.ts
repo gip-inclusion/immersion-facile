@@ -95,6 +95,7 @@ describe("SendNotification UseCase", () => {
           errors.generic.unsupportedStatus({
             status: fakeHttpStatus555ErrorCode,
             body: errorMessage,
+            serviceName: "Brevo",
           }),
         );
       });
