@@ -18,6 +18,8 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
     return {
       access_token: `fake_access_token_for_scope_${scope}`,
       expires_in: 600,
+      scope,
+      token_type: "Bearer",
     };
   }
 

@@ -6,10 +6,14 @@ import { InMemoryCachingGateway } from "./InMemoryCachingGateway";
 const testResponse1: AccessTokenResponse = {
   access_token: "token1",
   expires_in: minutesToSeconds(10),
+  scope: "scope1",
+  token_type: "Bearer",
 };
 const testResponse2: AccessTokenResponse = {
   access_token: "token2",
   expires_in: minutesToSeconds(10),
+  scope: "scope2",
+  token_type: "Bearer",
 };
 
 describe("InMemoryCachingGateway with GetAccessTokenResponse", () => {
