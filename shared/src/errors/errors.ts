@@ -136,11 +136,15 @@ export const errors = {
       if (httpStatus) (error as any).httpStatus = httpStatus;
       return error;
     },
-    unsupportedStatus: ({ body, status }: { status: number; body: any }) =>
+    unsupportedStatus: ({
+      body,
+      status,
+      serviceName,
+    }: { status: number; body: any; serviceName: string }) =>
       new Error(
-        `Unsupported response status ${
+        `Unsupported response status form ${serviceName} : ${
           status
-        } with body '${JSON.stringify(body)}'`,
+        } with body '${JSON.stringify(body, null, 2)}'`,
       ),
   },
   file: {

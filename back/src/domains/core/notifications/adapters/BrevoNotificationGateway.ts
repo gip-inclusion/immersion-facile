@@ -86,6 +86,7 @@ export class BrevoNotificationGateway implements NotificationGateway {
       throw errors.generic.unsupportedStatus({
         body: JSON.stringify(response.body, null, 2),
         status: response.status,
+        serviceName: "Brevo (getAttachementContent)",
       });
     if (!(response.body instanceof Blob)) {
       return null;

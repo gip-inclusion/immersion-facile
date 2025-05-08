@@ -126,7 +126,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
           })
           .then(({ status, body }) => {
             if (status !== 200)
-              throw errors.generic.unsupportedStatus({ body, status });
+              throw errors.generic.unsupportedStatus({
+                body,
+                status,
+                serviceName: "Diagoriente",
+              });
 
             return body;
           }),

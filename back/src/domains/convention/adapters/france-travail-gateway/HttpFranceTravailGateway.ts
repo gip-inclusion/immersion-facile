@@ -1,7 +1,6 @@
 import querystring from "node:querystring";
-import axios, { type AxiosError, type AxiosResponse } from "axios";
 import Bottleneck from "bottleneck";
-import { type AbsoluteUrl, castError, errors } from "shared";
+import type { AbsoluteUrl, ConventionId } from "shared";
 import type { HttpClient, HttpResponse } from "shared-routes";
 import type {
   AccessTokenResponse,
@@ -11,10 +10,7 @@ import {
   type LoggerParamsWithMessage,
   createLogger,
 } from "../../../../utils/logger";
-import {
-  notifyErrorObjectToTeam,
-  notifyTeam,
-} from "../../../../utils/notifyTeam";
+import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
   type RetryStrategy,
@@ -144,135 +140,14 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
       };
     }
 
+    const conventionParams: HandleConventionParams = {
+      conventionId: ftConvention.originalId,
+      ftConventionId: ftConvention.id,
+    };
+
     return this.#postFranceTravailConvention(ftConvention)
-      .then((response): FranceTravailBroadcastResponse => {
-        logger.info({
-          message: "FtBroadcast",
-          franceTravailGatewayStatus: "success",
-          sharedRouteResponse: response,
-          ftConnect: {
-            ftId: ftConvention.id,
-            originalId: ftConvention.originalId,
-          },
-        });
-
-        if ([200, 201, 204].includes(response.status))
-          return {
-            status: response.status,
-            body: response.body,
-          };
-
-        throw errors.generic.unsupportedStatus({
-          body: response.body,
-          status: response.status,
-        });
-      })
-      .catch((err): FranceTravailBroadcastResponse => {
-        const error = castError(err);
-        if (!axios.isAxiosError(error)) {
-          logger.error({
-            message: "FtBroadcast - notAxiosError",
-            franceTravailGatewayStatus: "error",
-            error,
-            ftConnect: {
-              ftId: ftConvention.id,
-              originalId: ftConvention.originalId,
-            },
-          });
-
-          notifyTeam({
-            rawContent: `HttpFranceTravailGateway notAxiosError ${
-              ftConvention.originalId
-            }: ${JSON.stringify(error)}`,
-            isError: true,
-          });
-
-          return {
-            status: 500,
-            subscriberErrorFeedback: {
-              message: `Not an axios error: ${error.message}`,
-              error,
-            },
-            body: undefined,
-          };
-        }
-
-        if (!error.response) {
-          logger.error({
-            message: "FtBroadcast - noResponseInAxiosError",
-            franceTravailGatewayStatus: "error",
-            error,
-            ftConnect: {
-              ftId: ftConvention.id,
-              originalId: ftConvention.originalId,
-            },
-          });
-
-          notifyTeam({
-            rawContent: `HttpFranceTravailGateway noResponseInAxiosError ${
-              ftConvention.originalId
-            }: ${JSON.stringify(error)}`,
-            isError: true,
-          });
-
-          return {
-            status: 500,
-            subscriberErrorFeedback: {
-              message: error.message,
-              error,
-            },
-            body: undefined,
-          };
-        }
-
-        const message = !error.response.data?.message
-          ? "missing message"
-          : JSON.stringify(error.response.data?.message);
-
-        const axiosResponse = stripAxiosResponse(error);
-
-        if (error.response.status === 404) {
-          logger.error({
-            message: `FtBroadcast - notFoundOrMismatch - ${message}`,
-            franceTravailGatewayStatus: "error",
-            axiosResponse,
-            ftConnect: {
-              ftId: ftConvention.id,
-              originalId: ftConvention.originalId,
-            },
-          });
-          return {
-            status: 404,
-            subscriberErrorFeedback: {
-              message,
-              error,
-            },
-            body: error.response.data,
-          };
-        }
-
-        const errorObject: LoggerParamsWithMessage = {
-          message: "FtBroadcast",
-          franceTravailGatewayStatus: "error",
-          error,
-          axiosResponse,
-          ftConnect: {
-            ftId: ftConvention.id,
-            originalId: ftConvention.originalId,
-          },
-        };
-        logger.error(errorObject);
-        notifyErrorObjectToTeam(errorObject);
-
-        return {
-          status: error.response.status,
-          subscriberErrorFeedback: {
-            error,
-            message,
-          },
-          body: error.response.data,
-        };
-      });
+      .then(handleFtResponse(conventionParams))
+      .catch(handleError(conventionParams));
   }
 
   async #postFranceTravailConvention(ftConvention: FranceTravailConvention) {
@@ -291,12 +166,101 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
   }
 }
 
-const stripAxiosResponse = (
-  error: AxiosError,
-): Partial<Pick<AxiosResponse, "status" | "headers" | "data">> => ({
-  status: error.response?.status,
-  data: error.response?.data,
-});
+type HandleConventionParams = {
+  conventionId: ConventionId;
+  ftConventionId?: string;
+};
+
+type BroadcastConventionHttpResponse = Awaited<
+  ReturnType<HttpClient<FrancetTravailRoutes>["broadcastConvention"]>
+>;
+
+const handleFtResponse =
+  ({ conventionId, ftConventionId }: HandleConventionParams) =>
+  (
+    response: BroadcastConventionHttpResponse,
+  ): FranceTravailBroadcastResponse => {
+    if (response.status === 400 || response.status === 404) {
+      logger.error({
+        message: "FtBroadcast - handled error",
+        franceTravailGatewayStatus: "error",
+        error: new Error(JSON.stringify(response.body, null, 2)),
+        ftConnect: {
+          ftId: ftConventionId,
+          originalId: conventionId,
+        },
+      });
+      return {
+        status: response.status,
+        subscriberErrorFeedback: { message: response.body.message },
+        body: response.body,
+      };
+    }
+
+    if ([200, 201, 204].includes(response.status)) {
+      logger.info({
+        message: "FtBroadcast",
+        franceTravailGatewayStatus: "success",
+        sharedRouteResponse: response,
+        ftConnect: {
+          ftId: ftConventionId,
+          originalId: conventionId,
+        },
+      });
+
+      return {
+        status: response.status,
+        body: response.body,
+      };
+    }
+
+    const errorObject: LoggerParamsWithMessage = {
+      message: "FtBroadcast - unhandled status",
+      franceTravailGatewayStatus: "error",
+      error: new Error(JSON.stringify(response.body, null, 2)),
+      ftConnect: {
+        ftId: ftConventionId,
+        originalId: conventionId,
+      },
+    };
+
+    logger.error(errorObject);
+    notifyErrorObjectToTeam(errorObject);
+
+    return {
+      status: response.status ?? 500,
+      subscriberErrorFeedback: {
+        message: JSON.stringify(response.body, null, 2),
+      },
+      body: response.body,
+    };
+  };
+
+const handleError =
+  ({ conventionId, ftConventionId }: HandleConventionParams) =>
+  (error: any): FranceTravailBroadcastResponse => {
+    const errorObject: LoggerParamsWithMessage = {
+      message: `FtBroadcast - unexpected error - ${error?.message}`,
+      franceTravailGatewayStatus: "error",
+      error,
+      ftConnect: {
+        ftId: ftConventionId,
+        originalId: conventionId,
+      },
+    };
+
+    logger.error(errorObject);
+    notifyErrorObjectToTeam(errorObject);
+
+    return {
+      status: 500,
+      subscriberErrorFeedback: {
+        message: error.message,
+        error,
+      },
+      body: undefined,
+    };
+  };
 
 const isRetryable = (httpResponse: HttpResponse<number, unknown>) => {
   return httpResponse.status === 429 || httpResponse.status === 503;

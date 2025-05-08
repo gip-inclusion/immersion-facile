@@ -14,6 +14,12 @@ export type FrancetTravailRoutes = ReturnType<typeof createFranceTravailRoutes>;
 const franceTravailConventionSchema: z.Schema<FranceTravailConvention> =
   z.any();
 
+const ftBusinessError = z.object({
+  codeErreur: z.string().optional(),
+  codeHttp: z.number(),
+  message: z.string(),
+});
+
 const ftAuthError = z.object({
   error: z.string(),
   error_description: z.string(),
@@ -56,6 +62,8 @@ export const createFranceTravailRoutes = ({
         200: z.any(),
         201: z.any(),
         204: z.any(),
+        400: ftBusinessError,
+        404: ftBusinessError,
       },
     }),
   });
