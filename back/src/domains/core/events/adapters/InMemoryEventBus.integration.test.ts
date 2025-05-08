@@ -1,6 +1,10 @@
 import { CompiledQuery } from "kysely";
 import type { Pool } from "pg";
-import { expectObjectsToMatch, expectToEqual } from "shared";
+import {
+  ConventionDtoBuilder,
+  expectObjectsToMatch,
+  expectToEqual,
+} from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -18,13 +22,16 @@ import {
   storedEventRowsToDomainEvent,
 } from "./PgOutboxRepository";
 
+const someConvention = new ConventionDtoBuilder().validated().build();
+
 const domainEvt: DomainEvent = {
   id: "11111111-1111-4111-1111-111111111111",
   topic: "AssessmentCreated",
   payload: {
+    convention: someConvention,
     assessment: {
       status: "COMPLETED",
-      conventionId: "a convention id",
+      conventionId: someConvention.id,
       endedWithAJob: false,
       establishmentFeedback: "osef",
       establishmentAdvices: "osef",

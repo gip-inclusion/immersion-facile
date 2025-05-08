@@ -1,44 +1,42 @@
-import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import type { AssessmentDto, ConventionDto } from "shared";
+import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import type { FranceTravailGateway } from "../../ports/FranceTravailGateway";
-import { makeBroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
-import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
+import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
+import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import type { BroadcastConventionParams } from "./broadcastConventionParams";
 
 export const makeBroadcastToFranceTravailOrchestrator = ({
   uowPerformer,
-  ...deps
+  broadcastToFranceTravailOnConventionUpdatesLegacy,
+  broadcastToFranceTravailOnConventionUpdates,
+  eventType,
 }: {
   uowPerformer: UnitOfWorkPerformer;
-  franceTravailGateway: FranceTravailGateway;
-  timeGateway: TimeGateway;
-  options: { resyncMode: boolean };
-}) => {
-  const broadcastToFranceTravailOnConventionUpdates =
-    makeBroadcastToFranceTravailOnConventionUpdates({
-      uowPerformer,
-      deps,
-    });
+  eventType: BroadcastConventionParams["eventType"];
+  broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
+  broadcastToFranceTravailOnConventionUpdatesLegacy: BroadcastToFranceTravailOnConventionUpdatesLegacy;
+}): InstantiatedUseCase<{
+  convention: ConventionDto;
+  assessment?: AssessmentDto;
+}> => {
+  return {
+    useCaseName: "BroadcastToFranceTravailOrchestrator",
+    execute: async (params) => {
+      const featureFlags = await uowPerformer.perform(async (uow) =>
+        uow.featureFlagRepository.getAll(),
+      );
 
-  const broadcastToFranceTravailOnConventionUpdatesLegacy =
-    new BroadcastToFranceTravailOnConventionUpdatesLegacy(
-      uowPerformer,
-      deps.franceTravailGateway,
-      deps.timeGateway,
-      deps.options,
-    );
+      if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive)
+        return broadcastToFranceTravailOnConventionUpdates.execute({
+          eventType,
+          ...params,
+        });
 
-  return async (params: BroadcastConventionParams) => {
-    const featureFlags = await uowPerformer.perform(async (uow) =>
-      uow.featureFlagRepository.getAll(),
-    );
-    if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive)
-      return broadcastToFranceTravailOnConventionUpdates.execute(params);
-
-    if (params.eventType === "CONVENTION_UPDATED") {
-      return broadcastToFranceTravailOnConventionUpdatesLegacy.execute({
-        convention: params.convention,
-      });
-    }
+      if (eventType === "CONVENTION_UPDATED") {
+        return broadcastToFranceTravailOnConventionUpdatesLegacy.execute({
+          convention: params.convention,
+        });
+      }
+    },
   };
 };
