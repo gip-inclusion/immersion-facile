@@ -5,14 +5,23 @@ import type {
   FranceTravailConvention,
   FranceTravailGateway,
 } from "../../ports/FranceTravailGateway";
+import type { BroadcastConventionParams } from "../../use-cases/broadcast/broadcastConventionParams";
 
 export class InMemoryFranceTravailGateway implements FranceTravailGateway {
+  #nextLegacyResponse: FranceTravailBroadcastResponse = {
+    status: 200,
+    body: { success: true },
+  };
+
   #nextResponse: FranceTravailBroadcastResponse = {
     status: 200,
     body: { success: true },
   };
 
-  constructor(public notifications: FranceTravailConvention[] = []) {}
+  constructor(
+    public legacyBroadcastConventionCalls: FranceTravailConvention[] = [],
+    public broadcastParamsCalls: BroadcastConventionParams[] = [],
+  ) {}
 
   public async getAccessToken(scope: string): Promise<AccessTokenResponse> {
     return {
@@ -29,11 +38,22 @@ export class InMemoryFranceTravailGateway implements FranceTravailGateway {
     if (convention.statut === "DEMANDE_OBSOLETE") {
       throw errors.generic.fakeError("fake axios error");
     }
-    this.notifications.push(convention);
+    this.legacyBroadcastConventionCalls.push(convention);
+    return this.#nextLegacyResponse;
+  }
+
+  public async notifyOnConventionUpdated(
+    params: BroadcastConventionParams,
+  ): Promise<FranceTravailBroadcastResponse> {
+    this.broadcastParamsCalls.push(params);
     return this.#nextResponse;
   }
 
   //For testing purpose
+
+  public setNextLegacyResponse(response: FranceTravailBroadcastResponse) {
+    this.#nextLegacyResponse = response;
+  }
 
   public setNextResponse(response: FranceTravailBroadcastResponse) {
     this.#nextResponse = response;

@@ -2,6 +2,7 @@ import { intersection, toPairs, uniq } from "ramda";
 import {
   type AgencyDto,
   type AgencyId,
+  type AgencyKind,
   type AgencyWithUsersRights,
   type ApiConsumer,
   type ConventionDomainPayload,
@@ -11,6 +12,7 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type DateTimeIsoString,
+  type FeatureFlags,
   ForbiddenError,
   type InclusionConnectDomainJwtPayload,
   type Role,
@@ -25,6 +27,7 @@ import {
   signConventionDtoWithRole,
   statusTransitionConfigs,
 } from "shared";
+import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -289,6 +292,71 @@ export const throwErrorIfPhoneNumberNotValid = ({
       conventionId: convention.id,
       signatoryRole,
     });
+};
+
+export const getLinkedAgencies = async (
+  uow: UnitOfWork,
+  convention: ConventionDto,
+): Promise<{ agency: AgencyDto; refersToAgency: AgencyDto | null }> => {
+  const agencyWithRights = await uow.agencyRepository.getById(
+    convention.agencyId,
+  );
+  if (!agencyWithRights)
+    throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+  if (!agency.refersToAgencyId) return { agency, refersToAgency: null };
+
+  const refersToAgency = await uow.agencyRepository.getById(
+    agency.refersToAgencyId,
+  );
+
+  if (!refersToAgency)
+    throw errors.agency.notFound({ agencyId: agency.refersToAgencyId });
+
+  return {
+    agency,
+    refersToAgency: await agencyWithRightToAgencyDto(uow, refersToAgency),
+  };
+};
+
+export const shouldBroadcastToFranceTravail = ({
+  agency,
+  featureFlags,
+  refersToAgency,
+}: {
+  agency: AgencyDto;
+  refersToAgency: AgencyDto | null;
+  featureFlags: FeatureFlags;
+}): boolean => {
+  const isBroadcastToFranceTravailAllowedForKind = (agencyKind: AgencyKind) => {
+    if (agency.kind === agencyKind) return true;
+    if (refersToAgency && refersToAgency.kind === "pole-emploi") return true;
+    return false;
+  };
+
+  if (isBroadcastToFranceTravailAllowedForKind("pole-emploi")) return true;
+
+  if (
+    featureFlags.enableBroadcastOfMissionLocaleToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("mission-locale")
+  )
+    return true;
+
+  if (
+    featureFlags.enableBroadcastOfConseilDepartementalToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("conseil-departemental")
+  )
+    return true;
+
+  if (
+    featureFlags.enableBroadcastOfCapEmploiToFT.isActive &&
+    isBroadcastToFranceTravailAllowedForKind("cap-emploi")
+  )
+    return true;
+
+  return false;
 };
 
 const getRoleAndIcUser = async (
