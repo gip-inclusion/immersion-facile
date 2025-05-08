@@ -32,10 +32,13 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
     const featureFlags = await uowPerformer.perform(async (uow) =>
       uow.featureFlagRepository.getAll(),
     );
-    return featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive
-      ? broadcastToFranceTravailOnConventionUpdates.execute(params)
-      : broadcastToFranceTravailOnConventionUpdatesLegacy.execute({
-          convention: params.convention,
-        });
+    if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive)
+      return broadcastToFranceTravailOnConventionUpdates.execute(params);
+
+    if (params.eventType === "CONVENTION_UPDATED") {
+      return broadcastToFranceTravailOnConventionUpdatesLegacy.execute({
+        convention: params.convention,
+      });
+    }
   };
 };
