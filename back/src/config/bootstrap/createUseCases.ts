@@ -38,7 +38,7 @@ import { UpdateConvention } from "../../domains/convention/use-cases/UpdateConve
 import { UpdateConventionStatus } from "../../domains/convention/use-cases/UpdateConventionStatus";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
-import { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
+import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
 import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
@@ -201,12 +201,14 @@ export const createUseCases = (
     });
 
   const broadcastToFranceTravailOnConventionUpdatesLegacy =
-    new BroadcastToFranceTravailOnConventionUpdatesLegacy(
+    makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
       uowPerformer,
-      gateways.franceTravailGateway,
-      gateways.timeGateway,
-      { resyncMode: false },
-    );
+      deps: {
+        franceTravailGateway: gateways.franceTravailGateway,
+        timeGateway: gateways.timeGateway,
+        options: { resyncMode: false },
+      },
+    });
 
   return {
     ...instantiatedUseCasesFromClasses({
@@ -644,7 +646,7 @@ export const createUseCases = (
         uowPerformer,
         broadcastToFranceTravailOnConventionUpdates,
         broadcastToFranceTravailOnConventionUpdatesLegacy,
-        eventType: "CONVENTION_UPDATED",
+        eventType: "ASSESSMENT_CREATED",
       }),
 
     assessmentReminder: makeAssessmentReminder({
