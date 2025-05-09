@@ -1,6 +1,6 @@
 import querystring from "node:querystring";
 import Bottleneck from "bottleneck";
-import type { AbsoluteUrl, ConventionId } from "shared";
+import { type AbsoluteUrl, type ConventionId, errors } from "shared";
 import type { HttpClient, HttpResponse } from "shared-routes";
 import type {
   AccessTokenResponse,
@@ -96,20 +96,26 @@ export class HttpFranceTravailGateway implements FranceTravailGateway {
 
           if (response.status === 200) return response.body;
 
-          const ftAccessTokenRelated = "[FT access token]";
+          const ftAccessTokenRelated = "FranceTravailGateway.getAccessToken";
 
           if (response.body.error.includes("invalid_client"))
-            throw new Error(
-              `${ftAccessTokenRelated}: Client authentication failed`,
-            );
+            throw errors.partner.failure({
+              serviceName: ftAccessTokenRelated,
+              message: "Client authentication failed",
+            });
 
           if (response.body.error.includes("invalid_grant"))
-            throw new Error(
-              `${ftAccessTokenRelated}: The provided access grant is invalid, expired, or revoked.`,
-            );
+            throw errors.partner.failure({
+              serviceName: ftAccessTokenRelated,
+              message:
+                "The provided access grant is invalid, expired, or revoked.",
+            });
 
           if (response.body.error.includes("invalid_scope"))
-            throw new Error(`${ftAccessTokenRelated}: Invalid scope`);
+            throw errors.partner.failure({
+              serviceName: ftAccessTokenRelated,
+              message: "Invalid scope",
+            });
 
           const error = new Error(JSON.stringify(response.body, null, 2));
 
