@@ -7,6 +7,10 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { FranceTravailGateway } from "../ports/FranceTravailGateway";
 import {
+  type BroadcastToFranceTravailOnConventionUpdates,
+  makeBroadcastToFranceTravailOnConventionUpdates,
+} from "./broadcast/BroadcastToFranceTravailOnConventionUpdates";
+import {
   type BroadcastToFranceTravailOnConventionUpdatesLegacy,
   makeBroadcastToFranceTravailOnConventionUpdatesLegacy,
 } from "./broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
@@ -23,7 +27,8 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
 > {
   protected override inputSchema = z.void();
 
-  readonly #broadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdatesLegacy;
+  readonly #legacyBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdatesLegacy;
+  readonly #standardBroadcastToFTUsecase: BroadcastToFranceTravailOnConventionUpdates;
 
   #report: ResyncOldConventionToFtReport = {
     errors: {},
@@ -42,8 +47,17 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     limit: number,
   ) {
     super(uowPerform);
-    this.#broadcastToFTUsecase =
+    this.#legacyBroadcastToFTUsecase =
       makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
+        uowPerformer: uowPerform,
+        deps: {
+          franceTravailGateway,
+          timeGateway,
+          options: { resyncMode: true },
+        },
+      });
+    this.#standardBroadcastToFTUsecase =
+      makeBroadcastToFranceTravailOnConventionUpdates({
         uowPerformer: uowPerform,
         deps: {
           franceTravailGateway,
@@ -76,7 +90,13 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     conventionToSyncId: ConventionId,
   ) {
     try {
-      await this.#resync(uow, conventionToSyncId);
+      const { enableStandardFormatBroadcastToFranceTravail } =
+        await uow.featureFlagRepository.getAll();
+      await this.#resync({
+        uow: uow,
+        conventionToSyncId: conventionToSyncId,
+        isLegacy: !enableStandardFormatBroadcastToFranceTravail.isActive,
+      });
       const updatedConventionToSync =
         await uow.conventionsToSyncRepository.getById(conventionToSyncId);
 
@@ -119,16 +139,26 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     }
   }
 
-  async #resync(
-    uow: UnitOfWork,
-    conventionToSyncId: ConventionId,
-  ): Promise<void> {
+  async #resync({
+    uow,
+    conventionToSyncId,
+    isLegacy,
+  }: {
+    uow: UnitOfWork;
+    conventionToSyncId: ConventionId;
+    isLegacy: boolean;
+  }): Promise<void> {
     const convention =
       await uow.conventionRepository.getById(conventionToSyncId);
     if (!convention)
       throw errors.convention.notFound({
         conventionId: conventionToSyncId,
       });
-    return this.#broadcastToFTUsecase.execute({ convention });
+    return isLegacy
+      ? this.#legacyBroadcastToFTUsecase.execute({ convention })
+      : this.#standardBroadcastToFTUsecase.execute({
+          eventType: "CONVENTION_UPDATED",
+          convention,
+        });
   }
 }
