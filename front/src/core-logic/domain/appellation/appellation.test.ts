@@ -20,6 +20,8 @@ describe("Appellation epic", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
   const locator: AppellationAutocompleteLocator = "search-form-appellation";
+  const anotherLocator: AppellationAutocompleteLocator =
+    "convention-profession";
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
@@ -113,6 +115,54 @@ describe("Appellation epic", () => {
     );
     expectLoadingToBe(false);
     expectSuggestionsToBe(expectedSuggestions);
+  });
+
+  it("should keep selected suggestion in store when selecting another suggestion", () => {
+    const previouslySelectedSuggestion: AppellationMatchDto = {
+      appellation: {
+        appellationCode: "12345",
+        appellationLabel: "Test Appellation",
+        romeCode: "A1234",
+        romeLabel: "Test Rome",
+      },
+      matchRanges: [
+        {
+          endIndexExclusive: 10,
+          startIndexInclusive: 0,
+        },
+      ],
+    };
+    store.dispatch(
+      appellationSlice.actions.selectSuggestionRequested({
+        item: previouslySelectedSuggestion,
+        locator,
+      }),
+    );
+    const newSelectedSuggestion: AppellationMatchDto = {
+      appellation: {
+        appellationCode: "12345",
+        appellationLabel: "Test Appellation",
+        romeCode: "A1234",
+        romeLabel: "Test Rome",
+      },
+      matchRanges: [
+        {
+          endIndexExclusive: 10,
+          startIndexInclusive: 0,
+        },
+      ],
+    };
+    store.dispatch(
+      appellationSlice.actions.selectSuggestionRequested({
+        item: newSelectedSuggestion,
+        locator: anotherLocator,
+      }),
+    );
+    expectSelectedSuggestionToBe(previouslySelectedSuggestion);
+    expectToEqual(
+      makeAppellationLocatorSelector(anotherLocator)(store.getState())?.value,
+      newSelectedSuggestion,
+    );
   });
 
   it("should update selected suggestion in store", () => {

@@ -11,12 +11,17 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
-import { geocodingSlice } from "./geocoding.slice";
+import {
+  type AddressAutocompleteLocator,
+  geocodingSlice,
+} from "./geocoding.slice";
 
 describe("Geocoding epic", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
-  const locator = "convention-immersion-address";
+  const locator: AddressAutocompleteLocator = "convention-immersion-address";
+  const anotherLocator: AddressAutocompleteLocator =
+    "convention-beneficiary-address";
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
   });
@@ -128,6 +133,50 @@ describe("Geocoding epic", () => {
       }),
     );
     expectSelectedSuggestionToBe(addressAndPosition);
+  });
+
+  it("should keep selected suggestion in store when selecting another suggestion", () => {
+    const previouslySelectedSuggestion: AddressAndPosition = {
+      address: {
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75000",
+        streetNumberAndAddress: "123 Rue de la Paix",
+      },
+      position: {
+        lat: 49.6548,
+        lon: 2.65498,
+      },
+    };
+    store.dispatch(
+      geocodingSlice.actions.selectSuggestionRequested({
+        item: previouslySelectedSuggestion,
+        locator,
+      }),
+    );
+    const newSelectedSuggestion: AddressAndPosition = {
+      address: {
+        city: "Paris",
+        departmentCode: "75",
+        postcode: "75000",
+        streetNumberAndAddress: "123 Rue de la Paix",
+      },
+      position: {
+        lat: 49.6548,
+        lon: 2.65498,
+      },
+    };
+    store.dispatch(
+      geocodingSlice.actions.selectSuggestionRequested({
+        item: newSelectedSuggestion,
+        locator: anotherLocator,
+      }),
+    );
+    expectSelectedSuggestionToBe(previouslySelectedSuggestion);
+    expectToEqual(
+      makeGeocodingLocatorSelector(anotherLocator)(store.getState())?.value,
+      newSelectedSuggestion,
+    );
   });
 
   it("should throw an error if something goes wrong and returns error feedback", () => {
