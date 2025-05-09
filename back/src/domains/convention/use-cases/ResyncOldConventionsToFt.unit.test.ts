@@ -106,34 +106,91 @@ describe("ResyncOldConventionsToPe use case", () => {
       });
     });
 
-    it("broadcast one convention to pe", async () => {
-      uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
-      uow.conventionRepository.setConventions([conventionToSync1]);
-      uow.conventionsToSyncRepository.setForTesting([
-        {
-          id: conventionToSync1.id,
-          status: "TO_PROCESS",
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+    describe("when feature to standard format for convention broadcast is OFF", () => {
+      it("broadcast one convention to pe, using legacy format", async () => {
+        uow.featureFlagRepository.featureFlags = {
+          ...uow.featureFlagRepository.featureFlags,
+          enableStandardFormatBroadcastToFranceTravail: {
+            kind: "boolean",
+            isActive: false,
+          },
+        };
+        uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
+        uow.conventionRepository.setConventions([conventionToSync1]);
+        uow.conventionsToSyncRepository.setForTesting([
+          {
+            id: conventionToSync1.id,
+            status: "TO_PROCESS",
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
 
-      const report = await useCase.execute();
+        const report = await useCase.execute();
 
-      expectToEqual(uow.conventionRepository.conventions, [conventionToSync1]);
-      expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
-        {
-          id: conventionToSync1.id,
-          status: "SUCCESS",
-          processDate: timeGateway.now(),
-        },
-      ]);
-      expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
-        conventionToConventionNotification(conventionToSync1, agencyPE),
-      ]);
-      expectToEqual(report, {
-        success: [conventionToSync1.id].length,
-        skips: {},
-        errors: {},
+        expectToEqual(uow.conventionRepository.conventions, [
+          conventionToSync1,
+        ]);
+        expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+          {
+            id: conventionToSync1.id,
+            status: "SUCCESS",
+            processDate: timeGateway.now(),
+          },
+        ]);
+        expectToEqual(ftGateway.legacyBroadcastConventionCalls, [
+          conventionToConventionNotification(conventionToSync1, agencyPE),
+        ]);
+        expectToEqual(report, {
+          success: [conventionToSync1.id].length,
+          skips: {},
+          errors: {},
+        });
+      });
+
+      describe("when feature to standard format for convention broadcast is OFF", () => {
+        it("broadcast one convention to pe, using standard format", async () => {
+          uow.agencyRepository.agencies = [toAgencyWithRights(agencyPE)];
+          uow.featureFlagRepository.featureFlags = {
+            ...uow.featureFlagRepository.featureFlags,
+            enableStandardFormatBroadcastToFranceTravail: {
+              kind: "boolean",
+              isActive: true,
+            },
+          };
+          uow.conventionRepository.setConventions([conventionToSync1]);
+          uow.conventionsToSyncRepository.setForTesting([
+            {
+              id: conventionToSync1.id,
+              status: "TO_PROCESS",
+            },
+          ]);
+          expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+
+          const report = await useCase.execute();
+
+          expectToEqual(uow.conventionRepository.conventions, [
+            conventionToSync1,
+          ]);
+          expectToEqual(uow.conventionsToSyncRepository.conventionsToSync, [
+            {
+              id: conventionToSync1.id,
+              status: "SUCCESS",
+              processDate: timeGateway.now(),
+            },
+          ]);
+          expectToEqual(ftGateway.legacyBroadcastConventionCalls, []);
+          expectToEqual(ftGateway.broadcastParamsCalls, [
+            {
+              eventType: "CONVENTION_UPDATED",
+              convention: conventionToSync1,
+            },
+          ]);
+          expectToEqual(report, {
+            success: [conventionToSync1.id].length,
+            skips: {},
+            errors: {},
+          });
+        });
       });
     });
 
