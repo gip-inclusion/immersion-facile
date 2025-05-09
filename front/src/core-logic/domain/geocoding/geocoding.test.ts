@@ -21,7 +21,7 @@ describe("Geocoding epic", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("should reset the value and suggestions when the query has been emptied", () => {
+  it("should reset the value and suggestions when the field is cleared", () => {
     store.dispatch(
       geocodingSlice.actions.selectSuggestionRequested({
         item: {
@@ -39,7 +39,9 @@ describe("Geocoding epic", () => {
         locator,
       }),
     );
-    store.dispatch(geocodingSlice.actions.emptyQueryRequested({ locator }));
+    store.dispatch(
+      geocodingSlice.actions.clearLocatorDataRequested({ locator }),
+    );
     expect(store.getState().geocoding.data[locator]?.value).toBeNull();
     expect(store.getState().geocoding.data[locator]?.suggestions).toEqual([]);
   });

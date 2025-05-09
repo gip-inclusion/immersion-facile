@@ -20,7 +20,7 @@ describe("Geosearch epic", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("should reset the value and suggestions when the query has been emptied", () => {
+  it("should reset the value and suggestions when the field is cleared", () => {
     store.dispatch(
       geosearchSlice.actions.selectSuggestionRequested({
         locator,
@@ -33,7 +33,9 @@ describe("Geosearch epic", () => {
         },
       }),
     );
-    store.dispatch(geosearchSlice.actions.emptyQueryRequested({ locator }));
+    store.dispatch(
+      geosearchSlice.actions.clearLocatorDataRequested({ locator }),
+    );
     expect(store.getState().geosearch.data[locator]?.value).toBeNull();
     expect(store.getState().geosearch.data[locator]?.suggestions).toEqual([]);
   });

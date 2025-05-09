@@ -38,9 +38,11 @@ import {
   getUrlParameters,
 } from "src/app/utils/url.utils";
 import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
+import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
@@ -266,6 +268,30 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     });
   }, [defaultFormValues, reset, mode, initialFormEstablishment]);
 
+  useEffect(() => {
+    if (!isEstablishmentCreation) {
+      initialFormEstablishment.businessAddresses.map((address, index) => {
+        dispatch(
+          geocodingSlice.actions.fetchSuggestionsRequested({
+            locator: `multiple-address-${index}`,
+            lookup: address.rawAddress,
+            selectFirstSuggestion: true,
+          }),
+        );
+      });
+      initialFormEstablishment.appellations.map((appellation, index) => {
+        dispatch(
+          appellationSlice.actions.selectSuggestionRequested({
+            locator: `multiple-appellation-${index}`,
+            item: {
+              appellation,
+              matchRanges: [],
+            },
+          }),
+        );
+      });
+    }
+  }, [isEstablishmentCreation, initialFormEstablishment, dispatch]);
   useEffect(() => {
     if (isEstablishmentCreation) {
       const filteredParams = filterParamsForRoute({
