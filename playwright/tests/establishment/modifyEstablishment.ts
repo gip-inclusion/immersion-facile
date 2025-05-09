@@ -1,7 +1,6 @@
 import { type Page, expect } from "@playwright/test";
 import {
   type FormEstablishmentDto,
-  type FormEstablishmentUserRight,
   addressRoutes,
   domElementIds,
 } from "shared";
@@ -12,7 +11,6 @@ import {
 } from "../../utils/dashboard";
 import {
   type PlaywrightTestCallback,
-  expectLocatorToBeVisibleAndEnabled,
   fillAutocomplete,
 } from "../../utils/utils";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
@@ -66,10 +64,13 @@ const editEstablishmentInEstablishmentDashboard = async (
   const userRights = updatedEstablishment.userRights;
   if (!userRights)
     throw new Error("Missing user rights for updatedEstablishmentInfos");
-
+  const adminEmail = await page
+    .locator("#establishment-users-table tr:first-of-type td:first-of-type")
+    .textContent();
+  await expect(adminEmail).toBe(userRights[0].email);
   await step1Availability(page, updatedEstablishment);
   await step2SearchableBy(page);
-  await step3BusinessContact(page, userRights);
+  await step3BusinessContact(page);
   await step4AImmersionOffer(page, updatedEstablishment);
   await step4BConfirm(page);
 };
@@ -113,40 +114,7 @@ const step2SearchableBy = async (page: Page) => {
     .click();
 };
 
-const step3BusinessContact = async (
-  page: Page,
-  userRights: FormEstablishmentUserRight[],
-): Promise<void> => {
-  const firstAdmin = userRights.find(
-    (right) => right.role === "establishment-admin",
-  );
-
-  if (!firstAdmin)
-    throw new Error("No establishment admin provided on updated form");
-  const contactEmails = userRights
-    .filter((right) => right.role === "establishment-contact")
-    .map(({ email }) => email);
-
-  const adminEmailLocator = page.locator(
-    `#${domElementIds.establishment.edit.businessContact.email}`,
-  );
-  await expectLocatorToBeVisibleAndEnabled(adminEmailLocator);
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.job}`,
-    firstAdmin.job,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.phone}`,
-    firstAdmin.phone,
-  );
-
-  await page.fill(
-    `#${domElementIds.establishment.edit.businessContact.copyEmails}`,
-    contactEmails.join(","),
-  );
-
+const step3BusinessContact = async (page: Page): Promise<void> => {
   await page
     .locator(`[for='${domElementIds.establishment.edit.contactMode}-1']`)
     .click();

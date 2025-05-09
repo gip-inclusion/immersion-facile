@@ -12,7 +12,7 @@ export const seedUsers = {
     .withId("e9dce090-f45e-46ce-9c58-4fbbb3e494ba")
     .withProConnectInfos({
       externalId: "e9dce090-f45e-46ce-9c58-4fbbb3e494ba",
-      siret: "00000000009999",
+      siret: "13003013300016",
     })
     .build(),
   adminUser: new InclusionConnectedUserBuilder()
@@ -24,7 +24,7 @@ export const seedUsers = {
     .withId("7f5cfde7-80b3-4ea1-bf3e-1711d0876161")
     .withProConnectInfos({
       externalId: "7f5cfde7-80b3-4ea1-bf3e-1711d0876161",
-      siret: "00000000009999",
+      siret: "13003013300016",
     })
     .build(),
   franceMerguezUser: new UserBuilder()
@@ -52,6 +52,7 @@ export const userSeed = async (db: KyselyDb) => {
         first_name: user.firstName,
         last_name: user.lastName,
         pro_connect_sub: user.proConnect?.externalId,
+        pro_connect_siret: user.proConnect?.siret,
         created_at: user.createdAt,
       })),
     )

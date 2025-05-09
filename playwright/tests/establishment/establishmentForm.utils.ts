@@ -5,7 +5,7 @@ export type MakeFormEstablishmentFromRetryNumber = (
   retryIndex: number,
 ) => FormEstablishmentDto;
 
-export const checkAvailibilityButtons = async (
+export const checkAvailabilityButtons = async (
   page: Page,
   mode: "edit" | "admin",
   expectedAvailability: "Oui" | "Non",

@@ -1,14 +1,13 @@
 import { type Page, expect } from "@playwright/test";
 import {
   type FormEstablishmentDto,
-  addressRoutes,
   domElementIds,
   toDisplayedDate,
 } from "shared";
 import type { PlaywrightTestCallback } from "../../utils/utils";
 import {
   type MakeFormEstablishmentFromRetryNumber,
-  checkAvailibilityButtons,
+  checkAvailabilityButtons,
 } from "./establishmentForm.utils";
 import {
   goToManageEstablishmentThroughEstablishmentDashboard,
@@ -38,7 +37,7 @@ export const checkAvailabilityThoughBackOfficeAdmin =
       page,
       updatedEstablishment.siret,
     );
-    await checkAvailibilityButtons(page, "admin", "Oui");
+    await checkAvailabilityButtons(page, "admin", "Oui");
   };
 
 export const checkAvailabilityThoughEstablishmentDashboard =
@@ -51,7 +50,7 @@ export const checkAvailabilityThoughEstablishmentDashboard =
       page,
       updatedEstablishment,
     );
-    await checkAvailibilityButtons(page, "edit", "Non");
+    await checkAvailabilityButtons(page, "edit", "Non");
   };
 
 export const deleteEstablishmentInBackOfficeAdmin = async (
@@ -67,16 +66,13 @@ const checkEstablishment = async (
   page: Page,
   updatedEstablishmentInfos: FormEstablishmentDto,
 ): Promise<void> => {
-  await page.waitForResponse(`**${addressRoutes.lookupStreetAddress.url}**`);
-
+  await page.waitForTimeout(1000);
+  await expect(await page.locator(".im-loader")).toBeHidden();
   const adminRight = updatedEstablishmentInfos.userRights.find(
     (right) => right.role === "establishment-admin",
   );
   if (!adminRight)
     throw new Error("Missing business contact for updatedEstablishmentInfos");
-  const copyEmails = updatedEstablishmentInfos.userRights
-    .filter(({ role }) => role === "establishment-contact")
-    .map(({ email }) => email);
 
   const nextAvailabilityDate = updatedEstablishmentInfos.nextAvailabilityDate;
   if (!nextAvailabilityDate)
@@ -143,34 +139,16 @@ const checkEstablishment = async (
   ).toBeChecked();
 
   await expect(
-    await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.job}`)
-      .inputValue(),
-  ).toBe(adminRight.job);
-
-  await expect(
-    await page
-      .locator(`#${domElementIds.establishment.admin.businessContact.phone}`)
-      .inputValue(),
-  ).toContain(adminRight.phone.substring(1));
-
-  await expect(
-    await page
-      .locator(
-        `#${domElementIds.establishment.admin.businessContact.copyEmails}`,
-      )
-      .inputValue(),
-  ).toContain(copyEmails.join(", "));
-
-  await expect(
     await page.locator(`#${domElementIds.establishment.admin.contactMode}-1`),
   ).toBeChecked();
 
   await expect(
     (
       await page
-        .locator(`#${domElementIds.establishment.admin.businessAddresses}-0`)
-        .inputValue()
+        .locator(
+          `#${domElementIds.establishment.admin.businessAddresses}-0-wrapper .im-select__single-value`,
+        )
+        .innerText()
     ).toLowerCase(),
   ).toContain(businessAddress.rawAddress.toLowerCase());
 
