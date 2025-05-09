@@ -10,6 +10,8 @@ export const goToEstablishmentDashboardTab = async (
   page: Page,
   tab: EstablishmentDashboardTab,
 ) => {
+  await page.waitForTimeout(2000);
+  await page.waitForSelector(".fr-tabs__list li");
   const tabLocator = await page
     .locator(".fr-tabs__list li")
     .nth(getTabIndexByTabName(establishmentDashboardTabsList, tab))

@@ -19,7 +19,7 @@ import {
 } from "./modifyEstablishment";
 import { searchEstablishmentAndExpectResultToHaveLength } from "./searchEstablishment";
 
-test.skip("Establishment creation and modification workflow", () => {
+test.describe("Establishment creation and modification workflow", () => {
   test.describe.configure({ mode: "serial" });
   const testEstablishments = [
     {
@@ -70,15 +70,17 @@ test.skip("Establishment creation and modification workflow", () => {
     new FormEstablishmentDtoBuilder(
       makeInitialEstablishmentInformations(retryIndex),
     )
-      .withBusinessNameCustomized(faker.company.name())
-      .withAdditionalInformation(faker.lorem.sentence())
-      .withMaxContactsPerMonth(faker.number.int({ min: 5, max: 7 }))
+      .withBusinessNameCustomized("Successfully updated establishment")
+      .withAdditionalInformation(
+        "Successfully updated establishment description",
+      )
+      .withMaxContactsPerMonth(7)
       .withUserRights([
         {
           role: "establishment-admin",
           email: testConfig.proConnect.username,
-          job: faker.person.jobType(),
-          phone: faker.helpers.fromRegExp(phoneRegexp),
+          job: "Successfully updated job",
+          phone: "0165754860",
         },
         {
           role: "establishment-contact",
@@ -98,7 +100,7 @@ test.skip("Establishment creation and modification workflow", () => {
           rawAddress: "6 rue de la chaîne 86000 Poitiers",
         },
       ])
-      .withWebsite(`https://${faker.internet.domainName()}`)
+      .withWebsite("https://new.website.com")
       .withFitForDisabledWorkers(true)
       .withIsEngagedEnterprise(true)
       .build();

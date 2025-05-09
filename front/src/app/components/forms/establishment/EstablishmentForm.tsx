@@ -140,6 +140,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
   );
   const acquisitionParams = useGetAcquisitionParams();
+
   const siretFromFederatedIdentity =
     !initialFormEstablishment.siret && currentUser?.proConnect
       ? currentUser.proConnect.siret
