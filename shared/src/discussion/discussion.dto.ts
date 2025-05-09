@@ -51,7 +51,10 @@ type WithContactByEmailAndIFProps<
 > = D extends "IF"
   ? C extends "EMAIL"
     ? {
-        hasWorkingExperience: boolean;
+        // hasWorkingExperience
+        // undefined uniquement pour la retro compat des anciennes discussions
+        // non exploité dans le form
+        hasWorkingExperience?: boolean;
         resumeLink?: string;
         experienceAdditionalInformation?: string;
       }

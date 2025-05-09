@@ -183,7 +183,7 @@ export type EmailParamsByEmailType = {
   } & (
     | {
         kind: "IF";
-        potentialBeneficiaryHasWorkingExperience: boolean;
+        potentialBeneficiaryHasWorkingExperience?: boolean;
         potentialBeneficiaryExperienceAdditionalInformation?: string;
         potentialBeneficiaryResumeLink?: string;
       }

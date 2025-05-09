@@ -418,7 +418,7 @@ describe("ContactEstablishment", () => {
 <table width="600">
   <tr>
     <td>
-      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : Styliste.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : J'en suis au premier stade de mon orientation et je veux en savoir plus sur ce métier.<br/><br/>Profil du candidat :<br/><br/>• Expérience professionnelle : je n’ai jamais travaillé.<br/><br/>• Je suis en 2nde.</p>
+      <p>Un candidat souhaite faire une immersion dans votre entreprise Company inside repository (24 rue des bouchers 67000 Strasbourg).<br/><br/>Immersion souhaitée :<br/><br/>• Métier : Styliste.<br/>• Dates d’immersion envisagées : fake date preferences.<br/>• But de l'immersion : J'en suis au premier stade de mon orientation et je veux en savoir plus sur ce métier.<br/><br/>Profil du candidat :<br/><br/><br/><br/>• Je suis en 2nde.</p>
     </td>
   </tr>
 </table>
