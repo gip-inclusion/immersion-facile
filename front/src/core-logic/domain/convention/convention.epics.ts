@@ -1,6 +1,7 @@
 import { concatMap, filter, map, switchMap } from "rxjs";
 import type { Observable } from "rxjs";
 import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
+import type { ConventionReadDto } from "shared";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -42,6 +43,30 @@ const saveConventionEpic: ConventionEpic = (
           }),
         ),
       );
+    }),
+  );
+
+const showSummaryChangedEpic: ConventionEpic = (action$) =>
+  action$.pipe(
+    filter(conventionSlice.actions.showSummaryChangeRequested.match),
+    filter(
+      (
+        action,
+      ): action is {
+        type: string;
+        payload: { showSummary: true; convention: ConventionReadDto };
+      } => action.payload.showSummary,
+    ),
+    map((action) => {
+      const { convention } = action.payload;
+      return conventionSlice.actions.getSimilarConventionsRequested({
+        codeAppellation: convention.immersionAppellation.appellationCode,
+        siret: convention.siret,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        dateStart: convention.dateStart,
+        beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
+        feedbackTopic: "convention-form",
+      });
     }),
   );
 
@@ -208,4 +233,5 @@ export const conventionEpics = [
   reflectFetchedConventionOnFormUi,
   getConventionStatusDashboardUrl,
   getSimilarConventionsEpic,
+  showSummaryChangedEpic,
 ];
