@@ -13,7 +13,6 @@ import {
   type WithConventionIdLegacy,
   backOfficeEmail,
   errors,
-  getRequesterRole,
   reviewedConventionStatuses,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
@@ -206,32 +205,11 @@ export class UpdateConventionStatus extends TransactionalUseCase<
               userId: roleOrUser.userWithRights.id,
             };
 
-      const event =
-        params.status === "DRAFT"
-          ? this.#createRequireModificationEvent(
-              params.modifierRole === "validator" ||
-                params.modifierRole === "counsellor"
-                ? {
-                    requesterRole: getRequesterRole(roles),
-                    convention: updatedConvention,
-                    justification: params.statusJustification,
-                    modifierRole: params.modifierRole,
-                    agencyActorEmail: await this.#getAgencyActorEmail(
-                      uow,
-                      payload,
-                      conventionRead,
-                    ),
-                    triggeredBy,
-                  }
-                : {
-                    requesterRole: getRequesterRole(roles),
-                    convention: updatedConvention,
-                    justification: params.statusJustification,
-                    modifierRole: params.modifierRole,
-                    triggeredBy,
-                  },
-            )
-          : this.#createEvent(updatedConvention, domainTopic, triggeredBy);
+      const event = this.#createEvent(
+        updatedConvention,
+        domainTopic,
+        triggeredBy,
+      );
 
       await uow.outboxRepository.save({
         ...event,
