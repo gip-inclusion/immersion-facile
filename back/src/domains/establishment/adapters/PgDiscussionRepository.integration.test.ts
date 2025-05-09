@@ -646,6 +646,15 @@ describe("PgDiscussionRepository", () => {
         true,
       );
     });
+
+    it("when there is no discussion", async () => {
+      expectToEqual(
+        await pgDiscussionRepository.hasDiscussionMatching({
+          establishmentRepresentativeEmail: "searchedEmail@email.com",
+        }),
+        false,
+      );
+    });
   });
 
   describe("insert/update/getById", () => {
@@ -674,6 +683,15 @@ describe("PgDiscussionRepository", () => {
             .build(),
         },
         {
+          title:
+            "insert with kind IF and contact mode EMAIL and with hasWorkingExperience 'non communiqué' (old discussions)",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("IF")
+            .withContactMode("EMAIL")
+            .withPotentialBeneficiaryHasWorkingExperience(undefined)
+            .build(),
+        },
+        {
           title: "insert with kind IF and contact mode EMAIL",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
@@ -685,6 +703,7 @@ describe("PgDiscussionRepository", () => {
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
             .withContactMode("PHONE")
+            .withExchanges([])
             .build(),
         },
         {
@@ -692,6 +711,7 @@ describe("PgDiscussionRepository", () => {
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")
             .withContactMode("IN_PERSON")
+            .withExchanges([])
             .build(),
         },
         {
@@ -706,6 +726,7 @@ describe("PgDiscussionRepository", () => {
           discussion: new DiscussionBuilder()
             .withDiscussionKind("1_ELEVE_1_STAGE")
             .withContactMode("PHONE")
+            .withExchanges([])
             .build(),
         },
         {
@@ -713,6 +734,7 @@ describe("PgDiscussionRepository", () => {
           discussion: new DiscussionBuilder()
             .withDiscussionKind("1_ELEVE_1_STAGE")
             .withContactMode("IN_PERSON")
+            .withExchanges([])
             .build(),
         },
       ];
@@ -811,6 +833,10 @@ describe("PgDiscussionRepository", () => {
         );
       });
     });
+
+    it("getById undefined when there is no discussion", async () => {
+      expectToEqual(await pgDiscussionRepository.getById(uuid()), undefined);
+    });
   });
 
   describe("deleteOldMessages", () => {
@@ -901,39 +927,38 @@ describe("PgDiscussionRepository", () => {
   });
 
   describe("countDiscussionsForSiretSince", () => {
-    it("right path", async () => {
-      const siret = "11112222333344";
-      const since = new Date("2023-03-05");
+    const establishmentAggregate = new EstablishmentAggregateBuilder()
+      .withEstablishmentSiret("11112222333344")
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          userId: user.id,
+          job: "",
+          phone: "",
+        },
+      ])
+      .withOffers([offer])
+      .build();
 
+    beforeEach(async () => {
       await establishmentAggregateRepo.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(siret)
-          .withUserRights([
-            {
-              role: "establishment-admin",
-              userId: user.id,
-              job: "",
-              phone: "",
-            },
-          ])
-          .withOffers([offer])
-          .build(),
+        establishmentAggregate,
       );
 
       const discussion1 = new DiscussionBuilder()
-        .withSiret(siret)
+        .withSiret(establishmentAggregate.establishment.siret)
         .withId("bbbbbd2c-6f02-11ec-90d6-0242ac120003")
         .withCreatedAt(new Date("2023-03-05"))
         .build();
 
       const discussion2 = new DiscussionBuilder()
-        .withSiret(siret)
+        .withSiret(establishmentAggregate.establishment.siret)
         .withId("cccccd2c-6f02-11ec-90d6-0242ac120003")
         .withCreatedAt(new Date("2023-03-07"))
         .build();
 
       const discussionToOld = new DiscussionBuilder()
-        .withSiret(siret)
+        .withSiret(establishmentAggregate.establishment.siret)
         .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
         .withCreatedAt(new Date("2023-03-04"))
         .build();
@@ -943,13 +968,26 @@ describe("PgDiscussionRepository", () => {
         pgDiscussionRepository.insert(discussion2),
         pgDiscussionRepository.insert(discussionToOld),
       ]);
+    });
 
-      const numberOfDiscussions =
+    it("right path with 2", async () => {
+      expectToEqual(
         await pgDiscussionRepository.countDiscussionsForSiretSince(
-          siret,
-          since,
-        );
-      expect(numberOfDiscussions).toBe(2);
+          establishmentAggregate.establishment.siret,
+          new Date("2023-03-05"),
+        ),
+        2,
+      );
+    });
+
+    it("right path with 0", async () => {
+      expectToEqual(
+        await pgDiscussionRepository.countDiscussionsForSiretSince(
+          establishmentAggregate.establishment.siret,
+          new Date("2023-03-08"),
+        ),
+        0,
+      );
     });
   });
 });

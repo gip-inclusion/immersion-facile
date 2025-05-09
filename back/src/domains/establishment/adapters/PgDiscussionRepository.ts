@@ -221,7 +221,10 @@ const discussionToPg = (
               potential_beneficiary_experience_additional_information:
                 discussion.potentialBeneficiary.experienceAdditionalInformation,
               potential_beneficiary_has_working_experience:
-                discussion.potentialBeneficiary.hasWorkingExperience,
+                discussion.potentialBeneficiary.hasWorkingExperience ===
+                undefined
+                  ? null
+                  : discussion.potentialBeneficiary.hasWorkingExperience,
             }
           : {}),
       }
@@ -252,7 +255,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       businessName: discussion.businessName,
       createdAt: new Date(discussion.createdAt).toISOString(),
       establishmentContact: discussion.establishmentContact,
-      exchanges: discussion.exchanges.map(({ sentAt, ...rest }) => ({
+      exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
         ...rest,
         sentAt: new Date(sentAt).toISOString(),
       })),
@@ -293,10 +296,6 @@ const makeDiscussionDtoFromPgDiscussion = (
         throw errors.discussion.missingDatePreferences(discussion.id);
 
       if (discussion.kind === "IF") {
-        const hasWorkingExperience =
-          discussion.potentialBeneficiary.hasWorkingExperience;
-        if (hasWorkingExperience === undefined)
-          throw errors.discussion.missingHasWorkingExperience(discussion.id);
         return {
           ...common,
           contactMode: discussion.contactMode,
@@ -306,7 +305,8 @@ const makeDiscussionDtoFromPgDiscussion = (
             phone,
             immersionObjective: discussion.immersionObjective ?? null,
             datePreferences,
-            hasWorkingExperience,
+            hasWorkingExperience:
+              discussion.potentialBeneficiary.hasWorkingExperience,
             resumeLink: discussion.potentialBeneficiary.resumeLink,
             experienceAdditionalInformation:
               discussion.potentialBeneficiary.experienceAdditionalInformation,
@@ -543,7 +543,9 @@ const executeGetDiscussion = (
                 ORDER BY e.sent_at
               `.$castTo<Exchange>(),
             )
-            .filterWhere("e.id", "is not", null),
+            .filterWhere("e.id", "is not", null)
+            // TODO: le cast ne change pas le typage - trouver un moyen d'avoir l'optional[] dans le typage kysely naturel
+            .$castTo<Exchange[] | undefined>(),
           conventionId: ref("d.convention_id"),
           status: sql<DiscussionStatus>`${ref("d.status")}`,
           rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
