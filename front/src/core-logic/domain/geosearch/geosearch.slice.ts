@@ -16,15 +16,27 @@ export const geosearchSlice = createSlice({
   name: "geosearch",
   initialState,
   reducers: {
-    emptyQueryRequested: (
-      _state,
+    clearLocatorDataRequested: (
+      state,
       action: PayloadActionWithLocator<GeosearchLocator>,
     ) => ({
       ...initialState,
       data: {
-        ...initialState.data,
+        ...state.data,
+        [action.payload.locator]: initialAutocompleteItem,
+      },
+    }),
+    emptyQueryRequested: (
+      state,
+      action: PayloadActionWithLocator<GeosearchLocator>,
+    ) => ({
+      ...initialState,
+      data: {
+        ...state.data,
         [action.payload.locator]: {
           ...initialAutocompleteItem,
+          ...state.data[action.payload.locator],
+          query: "",
         },
       },
     }),
@@ -40,6 +52,7 @@ export const geosearchSlice = createSlice({
       const { locator } = action.payload;
       state.data[locator] = {
         ...initialAutocompleteItem,
+        ...state.data[locator],
         isDebouncing: true,
       };
     },

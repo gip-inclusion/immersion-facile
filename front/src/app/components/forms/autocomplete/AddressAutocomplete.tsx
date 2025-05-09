@@ -70,7 +70,7 @@ export const AddressAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            geocodingSlice.actions.emptyQueryRequested({
+            geocodingSlice.actions.clearLocatorDataRequested({
               locator: props.locator,
             });
             onAddressClear();

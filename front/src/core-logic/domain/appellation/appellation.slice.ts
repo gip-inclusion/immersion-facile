@@ -22,15 +22,27 @@ export const appellationSlice = createSlice({
   name: "appellation",
   initialState,
   reducers: {
-    emptyQueryRequested: (
-      _state,
+    clearLocatorDataRequested: (
+      state,
       action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
     ) => ({
       ...initialState,
       data: {
-        ...initialState.data,
+        ...state.data,
+        [action.payload.locator]: initialAutocompleteItem,
+      },
+    }),
+    emptyQueryRequested: (
+      state,
+      action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
+    ) => ({
+      ...initialState,
+      data: {
+        ...state.data,
         [action.payload.locator]: {
           ...initialAutocompleteItem,
+          ...state.data[action.payload.locator],
+          query: "",
         },
       },
     }),
@@ -44,6 +56,7 @@ export const appellationSlice = createSlice({
       const { locator } = action.payload;
       state.data[locator] = {
         ...initialAutocompleteItem,
+        ...state.data[locator],
         isDebouncing: true,
       };
     },

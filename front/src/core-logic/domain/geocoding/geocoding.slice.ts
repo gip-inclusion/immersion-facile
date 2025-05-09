@@ -28,15 +28,27 @@ export const geocodingSlice = createSlice({
   name: "geocoding",
   initialState,
   reducers: {
-    emptyQueryRequested: (
-      _state,
+    clearLocatorDataRequested: (
+      state,
       action: PayloadActionWithLocator<AddressAutocompleteLocator>,
     ) => ({
       ...initialState,
       data: {
-        ...initialState.data,
+        ...state.data,
+        [action.payload.locator]: initialAutocompleteItem,
+      },
+    }),
+    emptyQueryRequested: (
+      state,
+      action: PayloadActionWithLocator<AddressAutocompleteLocator>,
+    ) => ({
+      ...initialState,
+      data: {
+        ...state.data,
         [action.payload.locator]: {
           ...initialAutocompleteItem,
+          ...state.data[action.payload.locator],
+          query: "",
         },
       },
     }),
@@ -52,6 +64,7 @@ export const geocodingSlice = createSlice({
       const { locator } = action.payload;
       state.data[locator] = {
         ...initialAutocompleteItem,
+        ...state.data[locator],
         isDebouncing: true,
       };
     },
@@ -100,9 +113,9 @@ export const geocodingSlice = createSlice({
             ...state.data[locator],
             isLoading: false,
             suggestions: action.payload.suggestions,
-            value: action.payload.selectFirstSuggestion
-              ? action.payload.suggestions[0]
-              : null,
+            ...(action.payload.selectFirstSuggestion
+              ? { value: action.payload.suggestions[0] }
+              : {}),
           },
         },
       };

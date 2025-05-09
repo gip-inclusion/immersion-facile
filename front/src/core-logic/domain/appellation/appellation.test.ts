@@ -24,7 +24,7 @@ describe("Appellation epic", () => {
     ({ store, dependencies } = createTestStore());
   });
 
-  it("should reset the value and suggestions when the query has been emptied", () => {
+  it("should reset the value and suggestions when the field is cleared", () => {
     store.dispatch(
       appellationSlice.actions.selectSuggestionRequested({
         locator,
@@ -44,7 +44,9 @@ describe("Appellation epic", () => {
         },
       }),
     );
-    store.dispatch(appellationSlice.actions.emptyQueryRequested({ locator }));
+    store.dispatch(
+      appellationSlice.actions.clearLocatorDataRequested({ locator }),
+    );
     expect(store.getState().appellation.data[locator]?.value).toBeNull();
     expect(store.getState().appellation.data[locator]?.suggestions).toEqual([]);
   });
