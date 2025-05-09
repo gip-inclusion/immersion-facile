@@ -123,7 +123,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
           datePreferences: zStringMinLength1,
           immersionObjective: immersionObjectiveSchema.or(z.null()),
           resumeLink: zStringCanBeEmpty.optional(),
-          hasWorkingExperience: z.boolean(),
+          hasWorkingExperience: z.boolean().optional(),
           experienceAdditionalInformation: zStringMinLength1.optional(),
         }),
       }),
