@@ -22,8 +22,25 @@ export const statusTransitionConfigs: Record<
   StatusTransitionConfig
 > = {
   READY_TO_SIGN: {
-    validInitialStatuses: ["DRAFT"],
-    validRoles: validSignatoryRoles,
+    validInitialStatuses: [
+      "READY_TO_SIGN",
+      "PARTIALLY_SIGNED",
+      "IN_REVIEW",
+      "ACCEPTED_BY_COUNSELLOR",
+    ],
+    validRoles: [
+      "counsellor",
+      "validator",
+      "back-office",
+      ...validSignatoryRoles,
+    ],
+    refine: (conventionRead) => {
+      const renewedKey: keyof ConventionReadDto = "renewed";
+      return {
+        isError: renewedKey in conventionRead,
+        errorMessage: "Cannot edit a renewed convention",
+      };
+    },
   },
 
   PARTIALLY_SIGNED: {

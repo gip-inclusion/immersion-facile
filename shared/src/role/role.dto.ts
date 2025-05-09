@@ -44,6 +44,7 @@ export const agencyModifierRoles = ["counsellor", "validator"] as const;
 export const allModifierRoles = [
   ...allSignatoryRoles,
   ...agencyModifierRoles,
+  "back-office",
 ] as const;
 
 export const allowedRolesToCreateAssessment = [
