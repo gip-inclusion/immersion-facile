@@ -80,6 +80,13 @@ export const errors = {
         `[requestId : ${requestId}, conventionId : ${conventionId}] Pdf generation failed with status ${status} - ${body}`,
       ),
   },
+  partner: {
+    failure: ({
+      serviceName,
+      message,
+    }: { serviceName: string; message: string }) =>
+      `[${serviceName}] : ${message}`,
+  },
   event: {
     saveNewPublicationFailed: (eventId: string) =>
       new Error(`saveNewPublication of event ${eventId} failed`),
