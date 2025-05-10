@@ -1,6 +1,7 @@
 import type { AgencyKind, ConventionStatus, DateString } from "shared";
 import type { AccessTokenResponse } from "../../../config/bootstrap/appConfig";
 import type { SubscriberErrorFeedback } from "../../core/api-consumer/ports/SubscribersGateway";
+import type { BroadcastConventionParams } from "../use-cases/broadcast/broadcastConventionParams";
 
 // This is an interface contract with France Travail (conventions broadcast).
 // ! Beware of NOT breaking contract ! !
@@ -94,8 +95,11 @@ export const isBroadcastResponseOk = (
   [200, 201, 204].includes(response.status);
 
 export interface FranceTravailGateway {
-  notifyOnConventionUpdated: (
+  notifyOnConventionUpdatedLegacy: (
     franceTravailConvention: FranceTravailConvention,
+  ) => Promise<FranceTravailBroadcastResponse>;
+  notifyOnConventionUpdated: (
+    params: BroadcastConventionParams,
   ) => Promise<FranceTravailBroadcastResponse>;
 
   getAccessToken: (scope: string) => Promise<AccessTokenResponse>;

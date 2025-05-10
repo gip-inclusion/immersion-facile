@@ -123,6 +123,10 @@ const labelsByFeatureFlag: Record<
     title: "Recherche par pertinence",
     enableLabel: "Activer la recherche par pertinence (scoring)",
   },
+  enableStandardFormatBroadcastToFranceTravail: {
+    title: "Diffusion des conventions à France Travail au format standard",
+    enableLabel: "Activer la diffusion des conventions au format standard à FT",
+  },
   enableBroadcastOfMissionLocaleToFT: {
     title: "Diffusion des conventions à France Travail",
     enableLabel: "Activer les Missions Locales",

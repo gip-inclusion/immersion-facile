@@ -31,8 +31,11 @@ export type BroadcastFeedback = {
 export const broadcastToPartnersServiceName =
   "BroadcastToPartnersOnConventionUpdates";
 
+export const broadcastToFtLegacyServiceName =
+  "FranceTravailGateway.notifyOnConventionUpdatedLegacy";
+
 export const broadcastToFtServiceName =
-  "FranceTravailGateway.notifyOnConventionUpdated";
+  "FranceTravailGateway.notifyOnConventionUpdatedOrAssessmentCreated";
 
 export interface BroadcastFeedbacksRepository {
   save: (broadcastFeedback: BroadcastFeedback) => Promise<void>;

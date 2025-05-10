@@ -22,6 +22,7 @@ const defaultFlagsInFront: FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
 };
 
 export const makeStubFeatureFlags = (

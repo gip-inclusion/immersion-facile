@@ -64,4 +64,5 @@ export const featureFlagsSchema: z.Schema<FeatureFlags> = z.object({
   enableBroadcastOfConseilDepartementalToFT: featureFlagBooleanSchema,
   enableBroadcastOfCapEmploiToFT: featureFlagBooleanSchema,
   enableBroadcastOfMissionLocaleToFT: featureFlagBooleanSchema,
+  enableStandardFormatBroadcastToFranceTravail: featureFlagBooleanSchema,
 });
