@@ -1,5 +1,6 @@
 import { expectToEqual } from "../test.helpers";
-import { DiscussionBuilder, type DiscussionReadDto } from "./discussion.dto";
+import { DiscussionBuilder } from "./DiscussionBuilder";
+import type { DiscussionReadDto } from "./discussion.dto";
 import {
   discussionReadSchema,
   makeExchangeEmailSchema,
