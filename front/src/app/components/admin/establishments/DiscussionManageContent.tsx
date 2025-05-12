@@ -33,10 +33,10 @@ import {
   createOpaqueEmail,
   discussionRejectionSchema,
   domElementIds,
+  getDiscussionVisualStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
-import { getDiscussionVisualStatus } from "shared/src/discussion/dicussion.helpers";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
