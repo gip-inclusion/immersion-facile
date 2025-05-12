@@ -1,14 +1,13 @@
 import { subDays } from "date-fns";
 import { expectToEqual } from "../test.helpers";
 import { DiscussionBuilder } from "./DiscussionBuilder";
-import { getDiscussionVisualStatus } from "./dicussion.helpers";
 import type {
-  DiscussionDto,
   DiscussionReadDto,
   DiscussionVisualStatus,
   Exchange,
   ExchangeRole,
 } from "./discussion.dto";
+import { getDiscussionVisualStatus } from "./discussion.helpers";
 import {
   discussionReadSchema,
   makeExchangeEmailSchema,
@@ -18,7 +17,7 @@ describe("Discussions", () => {
   describe("getDiscussionVisualStatus", () => {
     type TestCase = {
       message: string;
-      discussion: DiscussionDto;
+      discussion: DiscussionReadDto;
       expectedVisualStatus: DiscussionVisualStatus;
     };
 
@@ -43,12 +42,12 @@ describe("Discussions", () => {
       {
         message: "status is REJECTED",
         expectedVisualStatus: "rejected",
-        discussion: new DiscussionBuilder().withStatus("REJECTED").build(),
+        discussion: new DiscussionBuilder().withStatus("REJECTED").buildRead(),
       },
       {
         message: "status is ACCEPTED",
         expectedVisualStatus: "accepted",
-        discussion: new DiscussionBuilder().withStatus("ACCEPTED").build(),
+        discussion: new DiscussionBuilder().withStatus("ACCEPTED").buildRead(),
       },
       {
         message: "candidate has sent the first message without being answered",
@@ -61,7 +60,7 @@ describe("Discussions", () => {
               sender: "potentialBeneficiary",
             }),
           ])
-          .build(),
+          .buildRead(),
       },
       {
         message:
@@ -83,7 +82,7 @@ describe("Discussions", () => {
               sender: "potentialBeneficiary",
             }),
           ])
-          .build(),
+          .buildRead(),
       },
       {
         message: "last message is sent by establishment",
@@ -100,7 +99,7 @@ describe("Discussions", () => {
               sender: "establishment",
             }),
           ])
-          .build(),
+          .buildRead(),
       },
       {
         message:
@@ -114,7 +113,7 @@ describe("Discussions", () => {
               sender: "potentialBeneficiary",
             }),
           ])
-          .build(),
+          .buildRead(),
       },
     ];
 
