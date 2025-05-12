@@ -5,7 +5,6 @@ import {
   type AgencyId,
   type AgencyRight,
   type AgencyWithUsersRights,
-  type ConventionsEstablishmentDashboard,
   type EstablishmentDashboards,
   type InclusionConnectedUser,
   type User,
@@ -144,7 +143,7 @@ async function makeAgencyDashboards({
   return {
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? {
-          agencyDashboardUrl: await dashboardGateway.getAgencyUserUrl(
+          agencyDashboardUrl: dashboardGateway.getAgencyUserUrl(
             user.id,
             timeGateway.now(),
           ),
@@ -153,7 +152,7 @@ async function makeAgencyDashboards({
     ...(agencyIdsWithEnoughPrivileges.length > 0
       ? {
           erroredConventionsDashboardUrl: isSynchronisationEnableForAgency
-            ? await dashboardGateway.getErroredConventionsDashboardUrl(
+            ? dashboardGateway.getErroredConventionsDashboardUrl(
                 user.id,
                 timeGateway.now(),
               )
@@ -196,64 +195,91 @@ async function makeEstablishmentDashboard(
   timeGateway: TimeGateway,
   user: User,
 ): Promise<EstablishmentDashboards> {
-  const conventions = await makeConventionEstablishmentDashboard(
-    uow,
-    dashboardGateway,
-    timeGateway,
+  const establishmentAggregates =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregatesByFilters(
+      {
+        userId: user.id,
+      },
+    );
+  const userIsLinkedToAtLeastOneEstablishment =
+    establishmentAggregates.length > 0;
+  const conventions = await makeConventionEstablishmentDashboard({
+    uow: uow,
+    dashboardGateway: dashboardGateway,
+    timeGateway: timeGateway,
     user,
-  );
-  const discussions = await makeDiscussionsEstablishmentDashboard(
-    uow,
-    dashboardGateway,
-    timeGateway,
-    user,
-  );
+    userIsLinkedToAtLeastOneEstablishment,
+  });
+  const discussions = await makeDiscussionsEstablishmentDashboard({
+    uow: uow,
+    dashboardGateway: dashboardGateway,
+    timeGateway: timeGateway,
+    user: user,
+    userIsLinkedToAtLeastOneEstablishment,
+  });
   return {
     ...(conventions ? { conventions } : {}),
     ...(discussions ? { discussions } : {}),
   };
 }
 
-async function makeConventionEstablishmentDashboard(
-  uow: UnitOfWork,
-  dashboardGateway: DashboardGateway,
-  timeGateway: TimeGateway,
-  user: User,
-): Promise<ConventionsEstablishmentDashboard | undefined> {
+type MakeEstablishmentDashboardParams = {
+  uow: UnitOfWork;
+  dashboardGateway: DashboardGateway;
+  timeGateway: TimeGateway;
+  user: User;
+  userIsLinkedToAtLeastOneEstablishment: boolean;
+};
+
+async function makeConventionEstablishmentDashboard({
+  uow,
+  dashboardGateway,
+  timeGateway,
+  user,
+  userIsLinkedToAtLeastOneEstablishment,
+}: MakeEstablishmentDashboardParams): Promise<AbsoluteUrl | undefined> {
+  const getConventionDashboard = () =>
+    dashboardGateway.getEstablishmentConventionsDashboardUrl(
+      user.id,
+      timeGateway.now(),
+    );
+
+  if (userIsLinkedToAtLeastOneEstablishment) return getConventionDashboard();
+
   const hasConventionForEstablishmentRepresentative =
     (
       await uow.conventionRepository.getIdsByEstablishmentRepresentativeEmail(
         user.email,
       )
     ).length > 0;
+  if (hasConventionForEstablishmentRepresentative)
+    return getConventionDashboard();
 
   const hasConventionForEstablishmentTutor =
     (await uow.conventionRepository.getIdsByEstablishmentTutorEmail(user.email))
       .length > 0;
+  if (hasConventionForEstablishmentTutor) return getConventionDashboard();
 
-  return hasConventionForEstablishmentRepresentative ||
-    hasConventionForEstablishmentTutor
-    ? {
-        url: await dashboardGateway.getEstablishmentConventionsDashboardUrl(
-          user.id,
-          timeGateway.now(),
-        ),
-        role: hasConventionForEstablishmentRepresentative
-          ? "establishment-representative"
-          : "establishment-tutor",
-      }
-    : undefined;
+  return;
 }
 
-async function makeDiscussionsEstablishmentDashboard(
-  uow: UnitOfWork,
-  dashboardGateway: DashboardGateway,
-  timeGateway: TimeGateway,
-  user: User,
-): Promise<AbsoluteUrl | undefined> {
+async function makeDiscussionsEstablishmentDashboard({
+  uow,
+  dashboardGateway,
+  timeGateway,
+  user,
+  userIsLinkedToAtLeastOneEstablishment,
+}: MakeEstablishmentDashboardParams): Promise<AbsoluteUrl | undefined> {
+  if (userIsLinkedToAtLeastOneEstablishment)
+    return dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
+      user.id,
+      timeGateway.now(),
+    );
+
   const hasDiscussion = await uow.discussionRepository.hasDiscussionMatching({
     establishmentRepresentativeEmail: user.email,
   });
+
   return hasDiscussion
     ? dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
         user.id,

@@ -6,10 +6,7 @@ import type {
 import type { DiscussionId } from "../discussion/discussion.dto";
 import type { Email } from "../email/email.dto";
 import type { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
-import type {
-  ConventionEstablishmentRole,
-  EstablishmentRole,
-} from "../role/role.dto";
+import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
 import type { DateTimeIsoString } from "../utils/date";
@@ -67,16 +64,12 @@ export type WithEstablishments = {
   establishments?: WithEstablishmentData[];
 };
 
-export type ConventionsEstablishmentDashboard = {
-  url: AbsoluteUrl;
-  role: ConventionEstablishmentRole;
-};
 export type WithDiscussionId = {
   discussionId: DiscussionId;
 };
 
 export type EstablishmentDashboards = {
-  conventions?: ConventionsEstablishmentDashboard;
+  conventions?: AbsoluteUrl;
   discussions?: AbsoluteUrl;
 };
 

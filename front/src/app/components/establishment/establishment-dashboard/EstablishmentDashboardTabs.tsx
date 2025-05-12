@@ -1,10 +1,6 @@
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
-import type {
-  ConventionEstablishmentRole,
-  EstablishmentDashboardTab,
-  InclusionConnectedUser,
-} from "shared";
+import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
@@ -67,19 +63,12 @@ const makeEstablishmentDashboardTabs = (
         <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
         {conventions ? (
           <MetabaseView
-            title={`Tableau des conventions en cours
-              pour le ${currentUserRoleToDisplay(
-                conventions.role,
-              )} ${firstName} ${lastName}`}
+            title={"Tableau des conventions en cours"}
             subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
-            url={conventions.url}
+            url={conventions}
           />
         ) : (
-          <p>
-            {" "}
-            Nous n'avons pas trouvé de convention où vous êtes référencés en
-            tant que responsable ou tuteur d'entreprise.
-          </p>
+          <p> Aucune convention trouvée pour votre compte</p>
         )}
       </>
     ),
@@ -127,11 +116,6 @@ const makeEstablishmentDashboardTabs = (
       ]
     : []),
 ];
-
-const currentUserRoleToDisplay = (role: ConventionEstablishmentRole) =>
-  role === "establishment-representative"
-    ? "responsable d'entreprise"
-    : "tuteur de l'entreprise";
 
 const getDashboardTabs = (
   rawTabs: DashboardTab[],

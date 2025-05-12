@@ -302,12 +302,9 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(result.dashboards, {
             agencies: {},
             establishments: {
-              conventions: {
-                url: `http://stubEstablishmentConventionsDashboardUrl/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
-                role: "establishment-representative",
-              },
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                notAdmin.id
+              }/${timeGateway.now()}`,
             },
           });
         });
@@ -328,12 +325,9 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(result.dashboards, {
             agencies: {},
             establishments: {
-              conventions: {
-                role: "establishment-tutor",
-                url: `http://stubEstablishmentConventionsDashboardUrl/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
-              },
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                notAdmin.id
+              }/${timeGateway.now()}`,
             },
           });
         });
@@ -355,17 +349,14 @@ describe("GetUserAgencyDashboardUrl", () => {
           expectToEqual(result.dashboards, {
             agencies: {},
             establishments: {
-              conventions: {
-                url: `http://stubEstablishmentConventionsDashboardUrl/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
-                role: "establishment-representative",
-              },
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                notAdmin.id
+              }/${timeGateway.now()}`,
             },
           });
         });
 
-        it("do not retrieve dashboard when IC user is not establishement tutor or respresentative in any conventions", async () => {
+        it("do NOT retrieve dashboard when user is not establishment tutor or respresentative in any conventions nor has any role in the establishment", async () => {
           uow.userRepository.users = [notAdmin];
 
           const result = await getInclusionConnectedUser.execute(
@@ -432,7 +423,7 @@ describe("GetUserAgencyDashboardUrl", () => {
           });
         });
 
-        it("do not retrieve dashboard when IC user is not establishment contact in any discussion", async () => {
+        it("do NOT retrieve dashboard when user is not establishment contact in any discussion, nor has any role in the establishment", async () => {
           uow.userRepository.users = [notAdmin];
 
           const result = await getInclusionConnectedUser.execute(
@@ -448,7 +439,7 @@ describe("GetUserAgencyDashboardUrl", () => {
       });
 
       describe("establishments", () => {
-        it("retrieve establishments when IC user is establishement rep in at least one establishment", async () => {
+        it("retrieve establishments and discussions and conventions dashboards when IC user is establishement rep in at least one establishment", async () => {
           uow.userRepository.users = [notAdmin, anotherUser];
 
           const establishmentUserRightsForFirstEstablishment: EstablishmentUserRight[] =
@@ -522,6 +513,18 @@ describe("GetUserAgencyDashboardUrl", () => {
               admins: [],
             },
           ]);
+
+          expectToEqual(result.dashboards, {
+            agencies: {},
+            establishments: {
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                notAdmin.id
+              }/${timeGateway.now()}`,
+              discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
+                notAdmin.id
+              }/${timeGateway.now()}`,
+            },
+          });
         });
 
         it("do not retrieve establishment when IC user is not establishment representative in at least one establishment", async () => {
