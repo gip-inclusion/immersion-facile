@@ -149,3 +149,7 @@ export * from "./utils/toDotNotation";
 export * from "./zodUtils";
 export * from "./durations";
 export * from "./establishment/establishment";
+export { DiscussionBuilder } from "./discussion/DiscussionBuilder";
+export { cartographeAppellationAndRome } from "./discussion/DiscussionBuilder";
+export { defaultDiscussion } from "./discussion/DiscussionBuilder";
+export { createdAt } from "./discussion/DiscussionBuilder";
