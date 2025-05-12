@@ -230,3 +230,11 @@ export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
       }
     | { rejectionKind: Exclude<RejectionKind, "OTHER"> }
   );
+
+export type DiscussionVisualStatus =
+  | "accepted"
+  | "rejected"
+  | "new"
+  | "needs-answer"
+  | "needs-urgent-answer"
+  | "answered";
