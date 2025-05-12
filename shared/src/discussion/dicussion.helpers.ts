@@ -1,12 +1,15 @@
 import { subDays } from "date-fns";
 import { sort } from "ramda";
 import { match } from "ts-pattern";
-import type { DiscussionDto, DiscussionVisualStatus } from "./discussion.dto";
+import type {
+  DiscussionReadDto,
+  DiscussionVisualStatus,
+} from "./discussion.dto";
 
 export const getDiscussionVisualStatus = ({
   discussion,
   now,
-}: { discussion: DiscussionDto; now: Date }): DiscussionVisualStatus => {
+}: { discussion: DiscussionReadDto; now: Date }): DiscussionVisualStatus => {
   return match(discussion.status)
     .with("REJECTED", (): DiscussionVisualStatus => "rejected")
     .with("ACCEPTED", (): DiscussionVisualStatus => "accepted")
