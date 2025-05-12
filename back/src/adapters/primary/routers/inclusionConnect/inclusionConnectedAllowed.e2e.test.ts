@@ -108,12 +108,9 @@ describe("InclusionConnectedAllowedRoutes", () => {
               }/${gateways.timeGateway.now()}`,
             },
             establishments: {
-              conventions: {
-                url: `http://stubEstablishmentConventionsDashboardUrl/${
-                  agencyUser.id
-                }/${gateways.timeGateway.now()}`,
-                role: "establishment-representative",
-              },
+              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                agencyUser.id
+              }/${gateways.timeGateway.now()}`,
             },
           },
           agencyRights: [
