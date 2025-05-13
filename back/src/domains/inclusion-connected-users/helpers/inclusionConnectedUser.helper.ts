@@ -201,21 +201,20 @@ async function makeEstablishmentDashboard(
         userId: user.id,
       },
     );
-  const userIsLinkedToAtLeastOneEstablishment =
-    establishmentAggregates.length > 0;
+  const userHasEstablishmentRights = establishmentAggregates.length > 0;
   const conventions = await makeConventionEstablishmentDashboard({
     uow: uow,
     dashboardGateway: dashboardGateway,
     timeGateway: timeGateway,
     user,
-    userIsLinkedToAtLeastOneEstablishment,
+    userHasEstablishmentRights,
   });
   const discussions = await makeDiscussionsEstablishmentDashboard({
     uow: uow,
     dashboardGateway: dashboardGateway,
     timeGateway: timeGateway,
     user: user,
-    userIsLinkedToAtLeastOneEstablishment,
+    userHasEstablishmentRights,
   });
   return {
     ...(conventions ? { conventions } : {}),
@@ -228,7 +227,7 @@ type MakeEstablishmentDashboardParams = {
   dashboardGateway: DashboardGateway;
   timeGateway: TimeGateway;
   user: User;
-  userIsLinkedToAtLeastOneEstablishment: boolean;
+  userHasEstablishmentRights: boolean;
 };
 
 async function makeConventionEstablishmentDashboard({
@@ -236,15 +235,15 @@ async function makeConventionEstablishmentDashboard({
   dashboardGateway,
   timeGateway,
   user,
-  userIsLinkedToAtLeastOneEstablishment,
+  userHasEstablishmentRights,
 }: MakeEstablishmentDashboardParams): Promise<AbsoluteUrl | undefined> {
-  const getConventionDashboard = () =>
+  const conventionDashboardUrl =
     dashboardGateway.getEstablishmentConventionsDashboardUrl(
       user.id,
       timeGateway.now(),
     );
 
-  if (userIsLinkedToAtLeastOneEstablishment) return getConventionDashboard();
+  if (userHasEstablishmentRights) return conventionDashboardUrl;
 
   const hasConventionForEstablishmentRepresentative =
     (
@@ -253,12 +252,12 @@ async function makeConventionEstablishmentDashboard({
       )
     ).length > 0;
   if (hasConventionForEstablishmentRepresentative)
-    return getConventionDashboard();
+    return conventionDashboardUrl;
 
   const hasConventionForEstablishmentTutor =
     (await uow.conventionRepository.getIdsByEstablishmentTutorEmail(user.email))
       .length > 0;
-  if (hasConventionForEstablishmentTutor) return getConventionDashboard();
+  if (hasConventionForEstablishmentTutor) return conventionDashboardUrl;
 
   return;
 }
@@ -268,22 +267,19 @@ async function makeDiscussionsEstablishmentDashboard({
   dashboardGateway,
   timeGateway,
   user,
-  userIsLinkedToAtLeastOneEstablishment,
+  userHasEstablishmentRights,
 }: MakeEstablishmentDashboardParams): Promise<AbsoluteUrl | undefined> {
-  if (userIsLinkedToAtLeastOneEstablishment)
-    return dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
+  const discussionsDashboardUrl =
+    dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
       user.id,
       timeGateway.now(),
     );
+
+  if (userHasEstablishmentRights) return discussionsDashboardUrl;
 
   const hasDiscussion = await uow.discussionRepository.hasDiscussionMatching({
     establishmentRepresentativeEmail: user.email,
   });
 
-  return hasDiscussion
-    ? dashboardGateway.getEstablishmentDiscussionsDashboardUrl(
-        user.id,
-        timeGateway.now(),
-      )
-    : undefined;
+  return hasDiscussion ? discussionsDashboardUrl : undefined;
 }

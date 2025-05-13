@@ -488,41 +488,47 @@ describe("GetUserAgencyDashboardUrl", () => {
             icNotAdmin,
           );
 
-          expectToEqual(result.establishments, [
-            {
-              siret: establishmentAggregate1.establishment.siret,
-              businessName: establishmentAggregate1.establishment.name,
-              role: "establishment-admin",
-              admins: [
-                {
-                  email: notAdmin.email,
-                  firstName: notAdmin.firstName,
-                  lastName: notAdmin.lastName,
-                },
-                {
-                  email: anotherUser.email,
-                  firstName: anotherUser.firstName,
-                  lastName: anotherUser.lastName,
-                },
-              ],
-            },
-            {
-              siret: establishmentAggregate2.establishment.siret,
-              businessName: establishmentAggregate2.establishment.name,
-              role: "establishment-contact",
-              admins: [],
-            },
-          ]);
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-              discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
+          expectToEqual(result, {
+            ...icNotAdmin,
+            establishments: [
+              {
+                siret: establishmentAggregate1.establishment.siret,
+                businessName:
+                  establishmentAggregate1.establishment.customizedName ??
+                  establishmentAggregate1.establishment.name,
+                role: "establishment-admin",
+                admins: [
+                  {
+                    email: notAdmin.email,
+                    firstName: notAdmin.firstName,
+                    lastName: notAdmin.lastName,
+                  },
+                  {
+                    email: anotherUser.email,
+                    firstName: anotherUser.firstName,
+                    lastName: anotherUser.lastName,
+                  },
+                ],
+              },
+              {
+                siret: establishmentAggregate2.establishment.siret,
+                businessName:
+                  establishmentAggregate2.establishment.customizedName ??
+                  establishmentAggregate2.establishment.name,
+                role: "establishment-contact",
+                admins: [],
+              },
+            ],
+            dashboards: {
+              agencies: {},
+              establishments: {
+                conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                  notAdmin.id
+                }/${timeGateway.now()}`,
+                discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
+                  notAdmin.id
+                }/${timeGateway.now()}`,
+              },
             },
           });
         });
