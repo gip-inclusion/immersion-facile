@@ -14,7 +14,7 @@ import {
   paginationQueryParamsSchema,
 } from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
-import { allModifierRoles, allRoles } from "../role/role.dto";
+import { allRoles } from "../role/role.dto";
 import { signatoryRoleSchema } from "../role/role.schema";
 import {
   appellationCodeSchema,
@@ -86,8 +86,7 @@ import {
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionRequestDto,
   type UpdateConventionStatusRequestDto,
-  type UpdateConventionStatusWithJustificationWithModifierRole,
-  type UpdateConventionStatusWithJustificationWithoutModifierRole,
+  type UpdateConventionStatusWithJustification,
   type UpdateConventionStatusWithValidator,
   type UpdateConventionStatusWithoutJustification,
   type WithConventionDto,
@@ -95,8 +94,7 @@ import {
   type WithConventionIdLegacy,
   conventionObjectiveOptions,
   conventionStatuses,
-  conventionStatusesWithJustificationWithModifierRole,
-  conventionStatusesWithJustificationWithoutModifierRole,
+  conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   conventionStatusesWithoutJustificationNorValidator,
   getExactAge,
@@ -122,8 +120,6 @@ export const conventionIdSchema: z.ZodSchema<ConventionId> = z
   .uuid(localization.invalidUuid);
 
 const roleSchema = z.enum(allRoles);
-
-const modifierRoleSchema = z.enum(allModifierRoles);
 
 const actorSchema = z.object({
   role: roleSchema,
@@ -240,7 +236,6 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     dateValidation: makeDateStringSchema(
       localization.invalidValidationFormatDate,
     ).optional(),
-    updatedAt: makeDateStringSchema().optional(),
     dateApproval: makeDateStringSchema(
       localization.invalidApprovalFormatDate,
     ).optional(),
@@ -434,19 +429,11 @@ export const updateConventionStatusWithoutJustificationSchema: z.Schema<UpdateCo
     conventionId: conventionIdSchema,
   });
 
-export const updateConventionStatusWithJustificationWithoutModifierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithoutModifierRole> =
+export const updateConventionStatusWithJustificationSchema: z.Schema<UpdateConventionStatusWithJustification> =
   z.object({
-    status: z.enum(conventionStatusesWithJustificationWithoutModifierRole),
+    status: z.enum(conventionStatusesWithJustification),
     statusJustification: justificationSchema,
     conventionId: conventionIdSchema,
-  });
-
-export const updateConventionStatusWithJustificationWithModifierRoleSchema: z.Schema<UpdateConventionStatusWithJustificationWithModifierRole> =
-  z.object({
-    status: z.enum(conventionStatusesWithJustificationWithModifierRole),
-    statusJustification: justificationSchema,
-    conventionId: conventionIdSchema,
-    modifierRole: modifierRoleSchema,
   });
 
 export type WithValidatorInfo = OmitFromExistingKeys<
@@ -469,10 +456,9 @@ const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatus
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([
-    updateConventionStatusWithJustificationWithoutModifierRoleSchema,
+    updateConventionStatusWithJustificationSchema,
     updateConventionStatusWithValidatorSchema,
     updateConventionStatusWithoutJustificationSchema,
-    updateConventionStatusWithJustificationWithModifierRoleSchema,
   ]);
 
 export const renewConventionParamsSchema: z.Schema<RenewConventionParams> = z

@@ -229,18 +229,6 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
   };
-  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    conventionId: ConventionId;
-    internshipKind: InternshipKind;
-    justification: string;
-    magicLink: string;
-    signature: string;
-    requesterName: string;
-  };
   CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
     previousAgencyName: string;
     justification: string;

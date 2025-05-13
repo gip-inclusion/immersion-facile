@@ -84,37 +84,13 @@ export const statusTransitionConfigs: Record<
     validInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     validRoles: ["validator", "back-office", "counsellor"],
   },
-  // This enables the "require modifications" flow. The agents can put the request
-  // back in the draft state for the beneficiary to modify the request and reapply.
-  // Also enables the company/beneficiary to request modifications and revoke signatures
-  DRAFT: {
-    validInitialStatuses: [
-      "READY_TO_SIGN",
-      "PARTIALLY_SIGNED",
-      "IN_REVIEW",
-      "ACCEPTED_BY_COUNSELLOR",
-    ],
-    validRoles: [
-      "counsellor",
-      "validator",
-      "back-office",
-      ...validSignatoryRoles,
-    ],
-    refine: (conventionRead) => {
-      const renewedKey: keyof ConventionReadDto = "renewed";
-      return {
-        isError: renewedKey in conventionRead,
-        errorMessage: "Cannot edit a renewed convention",
-      };
-    },
-  },
+
   DEPRECATED: {
     validInitialStatuses: [
       "ACCEPTED_BY_COUNSELLOR",
       "IN_REVIEW",
       "PARTIALLY_SIGNED",
       "READY_TO_SIGN",
-      "DRAFT",
     ],
     validRoles: ["counsellor", "validator", "back-office"],
   },

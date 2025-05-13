@@ -158,17 +158,6 @@ const ConventionSignPageContent = ({
                       }
                     />
                   )}
-                  {convention.status === "DRAFT" && (
-                    <Alert
-                      severity="info"
-                      title={t.sign.needsModification.title}
-                      description={
-                        <p className={fr.cx("fr-mt-1w")}>
-                          {t.sign.needsModification.detail}
-                        </p>
-                      }
-                    />
-                  )}
                   {convention.status === "DEPRECATED" && (
                     <Alert
                       severity="error"
@@ -188,8 +177,7 @@ const ConventionSignPageContent = ({
                       }
                     />
                   )}
-                  {convention.status !== "DRAFT" &&
-                    convention.status !== "REJECTED" &&
+                  {convention.status !== "REJECTED" &&
                     convention.status !== "DEPRECATED" && (
                       <ConventionSignForm convention={convention} jwt={jwt} />
                     )}

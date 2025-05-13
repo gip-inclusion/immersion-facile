@@ -65,7 +65,6 @@ const createConventionSelection = <
         dateSubmission: sql<DateString>`date_to_iso(conventions.date_submission)`,
         dateStart: sql<DateString>`date_to_iso(conventions.date_start)`,
         dateEnd: sql<DateString>`date_to_iso(conventions.date_end)`,
-        updatedAt: sql<DateString>`date_to_iso(conventions.updated_at)`,
         signatories: jsonBuildObject({
           beneficiary: jsonBuildObject({
             role: sql`'beneficiary'`,

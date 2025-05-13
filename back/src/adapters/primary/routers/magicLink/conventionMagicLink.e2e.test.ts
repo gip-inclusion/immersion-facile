@@ -39,7 +39,9 @@ describe("Magic link router", () => {
     version: 1,
   };
 
-  const conventionBuilder = new ConventionDtoBuilder().withStatus("DRAFT");
+  const conventionBuilder = new ConventionDtoBuilder().withStatus(
+    "READY_TO_SIGN",
+  );
 
   const backofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
     .withId("backoffice-admin-user")
@@ -79,7 +81,7 @@ describe("Magic link router", () => {
   });
 
   describe("POST /auth/demande-immersion/:conventionId", () => {
-    describe("when beneficiary asks for modification", () => {
+    describe("when beneficiary modification", () => {
       it("can update the convention", async () => {
         const updatedConvention = conventionBuilder
           .withStatus("READY_TO_SIGN")
@@ -90,9 +92,17 @@ describe("Magic link router", () => {
           {
             ...updatedConvention,
             immersionActivities: "pas grand chose",
-            status: "DRAFT",
+            status: "READY_TO_SIGN",
           },
         ]);
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(
+            AgencyDtoBuilder.create(updatedConvention.agencyId)
+              .withName("TEST-name")
+              .withSignature("TEST-signature")
+              .build(),
+          ),
+        ];
 
         const backOfficeJwt = generateConventionJwt({
           ...payloadMeta,
@@ -115,7 +125,7 @@ describe("Magic link router", () => {
     });
 
     describe("User is not allowed", () => {
-      it("throws when user is not admin", async () => {
+      it("throws when user is not admin and have no rights on the agency", async () => {
         const updatedConvention = conventionBuilder
           .withBeneficiaryFirstName("Merguez")
           .withStatus("READY_TO_SIGN")
@@ -143,8 +153,10 @@ describe("Magic link router", () => {
           status: 403,
           body: {
             status: 403,
-            message: errors.user.notBackOfficeAdmin({ userId: notAdminUser.id })
-              .message,
+            message: errors.user.notEnoughRightOnAgency({
+              userId: notAdminUser.id,
+              agencyId: updatedConvention.agencyId,
+            }).message,
           },
         });
       });
@@ -156,6 +168,7 @@ describe("Magic link router", () => {
           .withBeneficiaryFirstName("Merguez")
           .withStatus("READY_TO_SIGN")
           .withStatusJustification("Justif")
+          .notSigned()
           .build();
 
         const backOfficeJwt = generateInclusionConnectJwt(
@@ -446,7 +459,7 @@ describe("Magic link router", () => {
       expectToEqual(response.body, {
         status: 400,
         message:
-          "This convention cannot be renewed, as it has status : 'DRAFT'",
+          "This convention cannot be renewed, as it has status : 'READY_TO_SIGN'",
       });
       expectToEqual(response.status, 400);
     });

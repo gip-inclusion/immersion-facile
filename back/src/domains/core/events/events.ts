@@ -26,7 +26,6 @@ import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../estab
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import type {
   ConventionReminderPayload,
-  ConventionRequiresModificationPayload,
   TransferConventionToAgencyPayload,
 } from "./eventPayload.dto";
 
@@ -116,7 +115,6 @@ export type DomainEvent =
   // UNHAPPY PATHS
   | GenericEvent<"ConventionRejected", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
-  | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
 
