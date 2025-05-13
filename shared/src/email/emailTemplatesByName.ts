@@ -46,7 +46,7 @@ export const emailTemplatesByName =
         
         Afin de clôturer cette étape, vous pouvez :
         
-        1. <a href= "mailto:${establishmentContactEmail}" target="_blank">Relancer directement l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan en ligne.
+        1. <a href="mailto:${establishmentContactEmail}" target="_blank">Relancer directement l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan en ligne.
         2. Les contacter par téléphone pour les accompagner dans la saisie du bilan.
         `,
         buttons: [
@@ -78,7 +78,7 @@ export const emailTemplatesByName =
         content: `
         Malgré une première relance, le bilan de l’immersion de ${beneficiaryFirstName} ${beneficiaryLastName} chez ${businessName} reste incomplet.
         
-        1. <a href= "mailto:${establishmentContactEmail}" target="_blank">Relancer l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan.
+        1. <a href="mailto:${establishmentContactEmail}" target="_blank">Relancer l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan.
         2. Les contacter par téléphone et les accompagner pour le compléter ensemble.
         `,
         buttons: [
@@ -558,7 +558,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -627,7 +627,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       `,
         subContent: defaultSignature("immersion"),
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -690,7 +690,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -801,7 +801,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       ${defaultSignature("immersion")}
       `,
         attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
         ],
         agencyLogoUrl,
       }),
@@ -854,7 +854,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         attachmentUrls:
           internshipKind === "immersion"
             ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-generale-immersionfacilitee2024.pdf",
+                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
               ]
             : undefined,
         agencyLogoUrl,
@@ -1378,7 +1378,7 @@ Tél : ${beneficiaryPhone}`,
         greetings: "Bonjour,",
         content: `Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée. 
         Afin de finaliser le référencement de votre structure ${agencyName}, 
-        envoyez-nous votre convention de délégation au format pdf à l'adresse : <a href= "mailto:${immersionFacileDelegationEmail}" target="_blank">${immersionFacileDelegationEmail}</a> 
+        envoyez-nous votre convention de délégation au format pdf à l'adresse : <a href="mailto:${immersionFacileDelegationEmail}" target="_blank">${immersionFacileDelegationEmail}</a> 
         `,
         agencyLogoUrl,
         highlight: {
@@ -1406,7 +1406,7 @@ Tél : ${beneficiaryPhone}`,
         content: `
         Vous recevez cet email suite à votre demande de référencement sur le site Immersion Facilitée.
         Afin de référencer votre structure ${agencyName} située dans la région ${agencyProvince}, vous devez demander une convention de délégation par email au prescripteur de droit dont votre structure dépend.
-        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href= "mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
+        Votre structure dépend de la DR ${agencyProvince}, contactez-les par email  : <a href="mailto:${delegationProviderMail}" target="_blank">${delegationProviderMail}</a>
       `,
         highlight: {
           content:
