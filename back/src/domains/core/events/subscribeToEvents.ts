@@ -51,8 +51,15 @@ const getUseCasesByTopics = (
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
+
   ConventionSubmittedAfterModification: [
     useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
+    useCases.broadcastToFranceTravailOnConventionUpdates,
+    useCases.broadcastToPartnersOnConventionUpdates,
+  ],
+  ConventionModifiedAndSigned: [
+    useCases.notifySignatoriesThatConventionSubmittedNeedsSignatureAfterNotification,
+    useCases.notifyLastSigneeThatConventionHasBeenSigned,
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
