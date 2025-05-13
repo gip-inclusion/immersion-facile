@@ -145,11 +145,13 @@ export const ConventionDocumentPage = ({
   if (!agencyInfo) return <p>Pas d'agence correspondante trouvée</p>;
 
   if (!canShowConvention) {
-    throw frontErrors.convention.cancelled({
-      conventionId: convention.id,
-      justificationStatus: convention.statusJustification,
-      agencyName: convention.agencyName,
-    });
+    if (convention.status === "CANCELLED") {
+      throw frontErrors.convention.cancelled({
+        conventionId: convention.id,
+        justificationStatus: convention.statusJustification,
+        agencyName: convention.agencyName,
+      });
+    }
   }
 
   const {
