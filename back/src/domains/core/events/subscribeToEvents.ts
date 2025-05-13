@@ -121,6 +121,7 @@ const getUseCasesByTopics = (
     extractSiretFromArg(useCases.updateMarketingEstablishmentContactList),
     extractSiretFromArg(useCases.markEstablishmentLeadAsRegistrationAccepted),
   ],
+  EstablishmentDeleted: [],
   // Establishment lead related
   EstablishmentLeadReminderSent: [],
 

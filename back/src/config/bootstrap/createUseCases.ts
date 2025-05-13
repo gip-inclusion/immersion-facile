@@ -366,6 +366,7 @@ export const createUseCases = (
         uowPerformer,
         gateways.timeGateway,
         saveNotificationAndRelatedEvent,
+        createNewEvent,
       ),
       contactEstablishment: new ContactEstablishment(
         uowPerformer,
