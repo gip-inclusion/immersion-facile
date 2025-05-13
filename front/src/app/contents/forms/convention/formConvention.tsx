@@ -560,6 +560,10 @@ const fieldsToExclude = {
     label: "",
     id: "",
   },
+  updatedAt: {
+    label: "",
+    id: "",
+  },
   "signatories.establishmentRepresentative.signedAt": {
     label: "",
     hintText: undefined,
