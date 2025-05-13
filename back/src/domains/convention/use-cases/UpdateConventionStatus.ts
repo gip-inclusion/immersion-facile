@@ -17,12 +17,7 @@ import {
 } from "shared";
 import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
 import { TransactionalUseCase } from "../../core/UseCase";
-import type { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
-import type {
-  DomainTopic,
-  TriggeredBy,
-  WithTriggeredBy,
-} from "../../core/events/events";
+import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -41,7 +36,6 @@ const domainTopicByTargetStatusMap: Record<
   ACCEPTED_BY_VALIDATOR: "ConventionAcceptedByValidator",
   REJECTED: "ConventionRejected",
   CANCELLED: "ConventionCancelled",
-  DRAFT: "ConventionRequiresModification",
   DEPRECATED: "ConventionDeprecated",
 };
 
@@ -105,7 +99,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
     const statusJustification =
       params.status === "CANCELLED" ||
       params.status === "REJECTED" ||
-      params.status === "DRAFT" ||
       params.status === "DEPRECATED"
         ? params.statusJustification
         : undefined;
@@ -156,9 +149,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             },
           }
         : {}),
-      // ...(params.status === "DRAFT"
-      //   ? { signatories: clearSignatories(conventionRead) }
-      //   : {}),
     };
 
     const updatedId = await uow.conventionRepository.update(updatedConvention);
@@ -265,15 +255,6 @@ export class UpdateConventionStatus extends TransactionalUseCase<
         convention: updatedConventionDto,
         triggeredBy,
       },
-    });
-  }
-
-  #createRequireModificationEvent(
-    payload: ConventionRequiresModificationPayload & WithTriggeredBy,
-  ) {
-    return this.createNewEvent({
-      topic: "ConventionRequiresModification",
-      payload,
     });
   }
 

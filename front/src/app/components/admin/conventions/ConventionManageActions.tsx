@@ -169,15 +169,6 @@ export const ConventionManageActions = ({
           }),
         );
       }
-      if (params.status === "DRAFT") {
-        dispatch(
-          conventionActionSlice.actions.editConventionRequested({
-            jwt: jwtParams.jwt,
-            feedbackTopic: "convention-action-edit",
-            updateStatusParams: params,
-          }),
-        );
-      }
     }
   };
 

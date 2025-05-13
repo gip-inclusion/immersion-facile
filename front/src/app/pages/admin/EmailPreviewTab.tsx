@@ -388,18 +388,6 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",
   },
-  CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
-    agencyLogoUrl: defaultEmailPreviewUrl,
-    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
-    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
-    businessName: "BUSINESS_NAME",
-    conventionId: "CONVENTION_ID",
-    justification: "REASON",
-    internshipKind: "immersion",
-    magicLink: "MAGIC_LINK",
-    signature: "SIGNATURE",
-    requesterName: "REQUESTER_FIRST_NAME REQUESTER_LAST_NAME",
-  },
   CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
     conventionId: "CONVENTION_ID",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",

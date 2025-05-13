@@ -41,7 +41,6 @@ import { makeBroadcastToFranceTravailOnConventionUpdates } from "../../domains/c
 import { makeBroadcastToFranceTravailOnConventionUpdatesLegacy } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import { makeBroadcastToFranceTravailOrchestrator } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOrchestrator";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
-import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -519,15 +518,6 @@ export const createUseCases = (
         new NotifyAllActorsThatConventionIsDeprecated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-        ),
-      notifyActorThatConventionNeedsModifications:
-        new NotifyActorThatConventionNeedsModifications(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
-          gateways.timeGateway,
-          gateways.shortLinkGenerator,
-          config,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(
         uowPerformer,

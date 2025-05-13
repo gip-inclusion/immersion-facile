@@ -17,9 +17,6 @@ export const conventionStatusToFranceTravailStatus: Record<
   ACCEPTED_BY_COUNSELLOR: "DEMANDE_ELIGIBLE",
   ACCEPTED_BY_VALIDATOR: "DEMANDE_VALIDÉE",
 
-  // si demande de modifications
-  DRAFT: "BROUILLON",
-
   // si rejeté
   REJECTED: "REJETÉ",
   CANCELLED: "DEMANDE_ANNULEE",

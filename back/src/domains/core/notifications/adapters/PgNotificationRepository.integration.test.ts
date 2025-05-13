@@ -364,7 +364,7 @@ describe("PgNotificationRepository", () => {
           id: "11111111-1111-4444-1111-111111111111",
           kind: "email",
           templatedContent: {
-            kind: "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
+            kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
             recipients: ["bob@mail.com"],
             sender: {
               email: "fake-email@email.com",
@@ -372,16 +372,15 @@ describe("PgNotificationRepository", () => {
             },
             cc: [],
             params: {
-              agencyLogoUrl: "https://my-logo.com",
               beneficiaryFirstName: "Bob",
               beneficiaryLastName: "L'éponge",
-              businessName: "Essuie-tout",
+              beneficiaryEmail: "bob@mail.com",
               conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
-              requesterName: "Yolo",
+              beneficiaryPhone: "0606060606",
+              previousAgencyName: "Agence du Grand Est",
               internshipKind: "immersion",
               justification: "Justification",
               magicLink: "https://magic-link.com",
-              signature: "Signature",
             },
           },
         };

@@ -26,7 +26,6 @@ import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 
 import { InMemoryOutboxQueries } from "../../core/events/adapters/InMemoryOutboxQueries";
 import type { InMemoryOutboxRepository } from "../../core/events/adapters/InMemoryOutboxRepository";
-import type { ConventionRequiresModificationPayload } from "../../core/events/eventPayload.dto";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import {
   type NarrowEvent,
@@ -205,7 +204,6 @@ type ConventionDomainTopic = ExtractFromDomainTopics<
   | "ConventionAcceptedByCounsellor"
   | "ConventionAcceptedByValidator"
   | "ConventionRejected"
-  | "ConventionRequiresModification"
   | "ConventionCancelled"
   | "ConventionDeprecated"
 > | null; // null is used to indicate that no domain event should be sent
@@ -444,53 +442,7 @@ const makeTestAcceptsStatusUpdate =
 
     expectToEqual(storedConvention, expectedConvention);
 
-    if (expectedDomainTopic === "ConventionRequiresModification") {
-      if (updateStatusParams.status !== "DRAFT")
-        throw errors.generic.testError(
-          `Expected domain topic ${expectedDomainTopic} not supported with convention status ${updateStatusParams.status}`,
-        );
-      const roles = defineRolesForTest(
-        testAcceptNewStatusParams,
-        expectedConvention,
-      );
-
-      if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
-        throw errors.generic.testError(
-          `Roles '${roles}' not supported according to ${JSON.stringify(
-            testAcceptNewStatusParams,
-          )}`,
-        );
-      }
-
-      const payload: ConventionRequiresModificationPayload =
-        updateStatusParams.modifierRole === "validator" ||
-        updateStatusParams.modifierRole === "counsellor"
-          ? {
-              convention: expectedConvention,
-              justification: updateStatusParams.statusJustification,
-              requesterRole: roles[0],
-              modifierRole: updateStatusParams.modifierRole,
-              agencyActorEmail: "agency-actor@gmail.com",
-            }
-          : {
-              convention: expectedConvention,
-              justification: updateStatusParams.statusJustification,
-              requesterRole: roles[0],
-              modifierRole: updateStatusParams.modifierRole,
-            };
-
-      await expectNewEvent(
-        expectedDomainTopic,
-        {
-          topic: "ConventionRequiresModification",
-          payload: {
-            ...payload,
-            triggeredBy,
-          },
-        },
-        outboxRepository,
-      );
-    } else if (expectedDomainTopic) {
+    if (expectedDomainTopic) {
       await expectNewEvent(
         expectedDomainTopic,
         {
@@ -726,38 +678,6 @@ export const acceptStatusTransitionTests = ({
         }),
     );
   });
-};
-
-const defineRolesForTest = (
-  testAcceptNewStatusParams: TestAcceptNewStatusParams,
-  expectedConvention: ConventionDto,
-): Role[] => {
-  if ("role" in testAcceptNewStatusParams)
-    return [testAcceptNewStatusParams.role];
-
-  if (
-    testAcceptNewStatusParams.userId ===
-    "icUserWithRoleEstablishmentRepresentative"
-  )
-    return ["establishment-representative"];
-
-  if (testAcceptNewStatusParams.userId === "icUserWithRoleBackofficeAdmin")
-    return ["back-office"];
-
-  const roles =
-    [agencyWithCounsellorEmails, agencyWithoutCounsellorEmail].find(
-      (agency) => agency.id === expectedConvention.agencyId,
-    )?.usersRights[testAcceptNewStatusParams.userId]?.roles ?? [];
-
-  if (agencyRolesEmptyOrContainsToReviewOrAgencyAdmin(roles)) {
-    throw errors.generic.testError(
-      `Roles '${roles}' not supported according to ${JSON.stringify(
-        testAcceptNewStatusParams,
-      )}`,
-    );
-  }
-
-  return roles;
 };
 
 export const agencyRolesEmptyOrContainsToReviewOrAgencyAdmin = (

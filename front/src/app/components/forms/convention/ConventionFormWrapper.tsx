@@ -328,9 +328,6 @@ const ConventionSummarySection = ({
   const getFieldError = makeFieldError(formState);
 
   const onConfirmSubmit = () => {
-    console.log("convention ====>", convention);
-    console.log("convention.agencyName ====>", convention.agencyName);
-
     dispatch(
       conventionSlice.actions.saveConventionRequested({
         convention: {

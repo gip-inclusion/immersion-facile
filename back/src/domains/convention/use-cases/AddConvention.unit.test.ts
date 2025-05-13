@@ -123,13 +123,6 @@ describe("Add Convention", () => {
 
   describe("Status validation", () => {
     // This might be nice for "backing up" entered data, but not implemented in front end as of Dec 16, 2021
-    it("allows applications submitted as DRAFT", async () => {
-      expect(
-        await addConvention.execute({ convention: validConvention }),
-      ).toEqual({
-        id: validConvention.id,
-      });
-    });
 
     it("allows applications submitted as READY_TO_SIGN", async () => {
       expect(
@@ -144,9 +137,9 @@ describe("Add Convention", () => {
       });
     });
 
-    it("rejects applications if the status is not DRAFT or READY_TO_SIGN", async () => {
+    it("rejects applications if the status is not READY_TO_SIGN", async () => {
       for (const status of conventionStatuses) {
-        if (status === "DRAFT" || status === "READY_TO_SIGN") {
+        if (status === "READY_TO_SIGN") {
           continue;
         }
         await expectPromiseToFailWithError(

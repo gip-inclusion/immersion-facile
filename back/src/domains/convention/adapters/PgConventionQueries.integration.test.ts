@@ -233,7 +233,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "cci",
         agencySiret: "11112222000055",
         conventionStartDate: new Date("2021-01-15").toISOString(),
-        conventionStatus: "DRAFT",
+        conventionStatus: "READY_TO_SIGN",
         validatorUser: validator,
       });
       await insertAgencyAndConvention({
@@ -355,18 +355,18 @@ describe("Pg implementation of ConventionQueries", () => {
       .withDateStart(new Date("2023-03-27").toISOString())
       .withDateEnd(new Date("2023-03-28").toISOString())
       .withSchedule(reasonableSchedule)
-      .withStatus("READY_TO_SIGN")
+      .withStatus("CANCELLED")
       .withAgencyId(agencyId)
       .build();
 
-    const conventionDraftAndDateStart20230330 = new ConventionDtoBuilder()
+    const conventionReadyToSignAndDateStart20230330 = new ConventionDtoBuilder()
       .withSiret(siret3)
       .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aa02")
       .withDateSubmission(new Date("2023-03-05").toISOString())
       .withDateStart(new Date("2023-03-30").toISOString())
       .withDateEnd(new Date("2023-03-31").toISOString())
       .withSchedule(reasonableSchedule)
-      .withStatus("DRAFT")
+      .withStatus("READY_TO_SIGN")
       .withAgencyId(agencyId)
       .build();
 
@@ -406,7 +406,7 @@ describe("Pg implementation of ConventionQueries", () => {
       await Promise.all(
         [
           conventionCancelledAndDateStart20230327,
-          conventionDraftAndDateStart20230330,
+          conventionReadyToSignAndDateStart20230330,
           firstValidatedConvention,
           secondValidatedConvention,
         ].map((params) => conventionRepository.save(params)),
@@ -442,7 +442,7 @@ describe("Pg implementation of ConventionQueries", () => {
       });
 
       // Assert
-      expectToEqual(resultAll, [conventionCancelledAndDateStart20230327]);
+      expectToEqual(resultAll, [conventionReadyToSignAndDateStart20230330]);
     });
 
     it(`getConventionsByFilters with filters :
@@ -463,7 +463,7 @@ describe("Pg implementation of ConventionQueries", () => {
       expectToEqual(resultAll, [
         secondValidatedConvention,
         firstValidatedConvention,
-        conventionDraftAndDateStart20230330,
+        conventionReadyToSignAndDateStart20230330,
         conventionCancelledAndDateStart20230327,
       ]);
     });
@@ -567,7 +567,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const matchingBirthDate = new Date("1992-01-01").toISOString();
     const matchingBeneficiaryLastname = "M'GOMA";
     const matchingDateStart = new Date("2021-01-09").toISOString();
-    const someMatchingStatus = "DRAFT";
+    const someMatchingStatus = "READY_TO_SIGN";
     const conventionMatchingIdA: ConventionId =
       "aaaa1111-1111-4111-1111-11111111aaaa";
     const conventionMatchingIdB: ConventionId =
@@ -929,7 +929,7 @@ describe("Pg implementation of ConventionQueries", () => {
     agencySiret,
     withRefersToAgency,
     conventionStartDate = DATE_START,
-    conventionStatus = "DRAFT",
+    conventionStatus = "READY_TO_SIGN",
     validatorUser,
   }: {
     conventionId: ConventionId;
@@ -1080,7 +1080,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withId("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
       .withAgencyId(agencyId)
       .withBeneficiaryEmail("beneficiary@convention-a.com")
-      .withStatus("DRAFT")
+      .withStatus("READY_TO_SIGN")
       .withDateStart(new Date("2023-01-15").toISOString())
       .withDateEnd(new Date("2023-01-20").toISOString())
       .withDateSubmission(new Date("2023-01-10").toISOString())
@@ -1116,7 +1116,7 @@ describe("Pg implementation of ConventionQueries", () => {
     const conventionD = new ConventionDtoBuilder()
       .withId("dddddddd-dddd-dddd-dddd-dddddddddddd")
       .withAgencyId(differentAgencyId)
-      .withStatus("DRAFT")
+      .withStatus("READY_TO_SIGN")
       .withDateStart(new Date("2023-04-15").toISOString())
       .withDateEnd(new Date("2023-04-20").toISOString())
       .withDateSubmission(new Date("2023-04-10").toISOString())
@@ -1180,7 +1180,7 @@ describe("Pg implementation of ConventionQueries", () => {
         await conventionQueries.getPaginatedConventionsForAgencyUser({
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
-          filters: { statuses: ["DRAFT"] },
+          filters: { statuses: ["READY_TO_SIGN"] },
           sortBy: "dateSubmission",
         });
 
@@ -1266,7 +1266,7 @@ describe("Pg implementation of ConventionQueries", () => {
           agencyUserId: validator.id,
           pagination: { page: 1, perPage: 10 },
           filters: {
-            statuses: ["DRAFT", "IN_REVIEW"],
+            statuses: ["READY_TO_SIGN", "IN_REVIEW"],
             dateSubmission: {
               from: "2023-01-01",
               to: "2023-02-15",

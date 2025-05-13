@@ -33,7 +33,6 @@ export type VerificationActionProps = {
 const allVerificationActions = [
   "ACCEPT_COUNSELLOR",
   "ACCEPT_VALIDATOR",
-  "REQUEST_EDIT",
   "REJECT",
   "CANCEL",
   "DEPRECATE",
@@ -45,7 +44,6 @@ export type VerificationAction = (typeof allVerificationActions)[number];
 export const newStatusByVerificationAction = {
   ACCEPT_COUNSELLOR: "ACCEPTED_BY_COUNSELLOR",
   ACCEPT_VALIDATOR: "ACCEPTED_BY_VALIDATOR",
-  REQUEST_EDIT: "DRAFT",
   REJECT: "REJECTED",
   CANCEL: "CANCELLED",
   DEPRECATE: "DEPRECATED",

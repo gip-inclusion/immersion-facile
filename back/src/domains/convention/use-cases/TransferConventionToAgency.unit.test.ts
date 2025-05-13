@@ -106,7 +106,6 @@ describe("TransferConventionToAgency", () => {
 
   describe("Wrong paths", () => {
     it.each([
-      "DRAFT",
       "REJECTED",
       "CANCELLLED",
       "DEPRECATED",
