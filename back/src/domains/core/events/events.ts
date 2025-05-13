@@ -107,6 +107,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionSubmittedAfterModification", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionPartiallySigned", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionFullySigned", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionModifiedAndSigned", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionAcceptedByCounsellor", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionAcceptedByValidator", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
