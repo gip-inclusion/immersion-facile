@@ -240,6 +240,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     dateValidation: makeDateStringSchema(
       localization.invalidValidationFormatDate,
     ).optional(),
+    updatedAt: makeDateStringSchema().optional(),
     dateApproval: makeDateStringSchema(
       localization.invalidApprovalFormatDate,
     ).optional(),

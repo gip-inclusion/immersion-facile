@@ -190,6 +190,7 @@ export type ConventionCommon = {
   establishmentNumberEmployeesRange?: NumberEmployeesRange;
   establishmentTutor: EstablishmentTutor;
   validators?: ConventionValidatorInputNames;
+  updatedAt?: DateString;
 } & Partial<WithRenewed> &
   WithAcquisition;
 
