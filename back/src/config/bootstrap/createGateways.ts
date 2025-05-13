@@ -301,6 +301,12 @@ export const createGateways = async (
         httpClient: createFetchHttpClientForExternalAPIs({
           partnerName: partnerNames.brevoNotifications,
           routes: brevoNotificationGatewayRoutes,
+          logInputCbOnSuccess: (input) => {
+            logger.info({
+              message: `DEBUG BREVO ${JSON.stringify(input)}`,
+            });
+            return input;
+          },
         }),
         blackListedEmailDomains: config.emailDomainBlackList,
         defaultSender: immersionFacileNoReplyEmailSender,
