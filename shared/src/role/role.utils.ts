@@ -61,6 +61,11 @@ export const hasAllowedRoleOnAssessment = (
   );
 };
 
+export const isModifierRole = (
+  role: Role,
+): role is (typeof allModifierRoles)[number] =>
+  allModifierRoles.includes(role as (typeof allModifierRoles)[number]);
+
 export const hasAllowedRolesToEditConvention = (
   userRolesOnConvention: Role[],
 ): boolean => {
