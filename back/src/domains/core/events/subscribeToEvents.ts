@@ -94,11 +94,7 @@ const getUseCasesByTopics = (
   ],
 
   // Edge cases for immersion application.
-  ConventionRequiresModification: [
-    useCases.notifyActorThatConventionNeedsModifications,
-    useCases.broadcastToPartnersOnConventionUpdates,
-    useCases.broadcastToFranceTravailOnConventionUpdates,
-  ],
+
   ConventionRejected: [
     useCases.notifyAllActorsThatConventionIsRejected,
     useCases.broadcastToFranceTravailOnConventionUpdates,

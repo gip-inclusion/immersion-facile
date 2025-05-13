@@ -122,7 +122,6 @@ export const validateBeneficiaryAddressAndParse = (
 };
 
 const statusesAllowedWithoutSign: ConventionStatus[] = [
-  "DRAFT",
   "READY_TO_SIGN",
   "PARTIALLY_SIGNED",
   "REJECTED",

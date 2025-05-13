@@ -445,7 +445,9 @@ describe("PgConventionRepository", () => {
 
     await conventionRepository.save(conventionBuilder.build());
 
-    const updatedConvention = conventionBuilder.withStatus("DRAFT").notSigned();
+    const updatedConvention = conventionBuilder
+      .withStatus("READY_TO_SIGN")
+      .notSigned();
 
     await conventionRepository.update(updatedConvention.build());
 
@@ -888,17 +890,17 @@ describe("PgConventionRepository", () => {
         updatedConvention,
       );
 
-      const conventionBackToDraft: ConventionDto = {
+      const conventionBackToReadyToSign: ConventionDto = {
         ...updatedConvention,
-        status: "DRAFT",
+        status: "READY_TO_SIGN",
         dateApproval: undefined,
       };
 
-      await conventionRepository.update(conventionBackToDraft);
+      await conventionRepository.update(conventionBackToReadyToSign);
 
       expectToEqual(
         await conventionRepository.getById(conventionId),
-        conventionBackToDraft,
+        conventionBackToReadyToSign,
       );
     });
   });
@@ -960,11 +962,6 @@ describe("PgConventionRepository", () => {
         .withStatus("READY_TO_SIGN")
         .build();
 
-      const convention10ToMarkAsDeprecated = conventionBuilderWithDateInRange
-        .withId("10101111-1111-4111-1111-111111111010")
-        .withStatus("DRAFT")
-        .build();
-
       await Promise.all([
         conventionRepository.save(convention1ToMarkAsDeprecated),
         conventionRepository.save(convention2ToKeepAsIs),
@@ -975,7 +972,6 @@ describe("PgConventionRepository", () => {
         conventionRepository.save(convention7ToMarkAsDeprecated),
         conventionRepository.save(convention8ToMarkAsDeprecated),
         conventionRepository.save(convention9ToMarkAsDeprecated),
-        conventionRepository.save(convention10ToMarkAsDeprecated),
       ]);
 
       const numberOfUpdatedConventions =
@@ -983,16 +979,12 @@ describe("PgConventionRepository", () => {
           dateSince,
         );
 
-      expectToEqual(numberOfUpdatedConventions, 5);
+      expectToEqual(numberOfUpdatedConventions, 4);
 
       await expectConventionInRepoToBeDeprecated(convention1ToMarkAsDeprecated);
       await expectConventionInRepoToBeDeprecated(convention7ToMarkAsDeprecated);
       await expectConventionInRepoToBeDeprecated(convention8ToMarkAsDeprecated);
       await expectConventionInRepoToBeDeprecated(convention9ToMarkAsDeprecated);
-      await expectConventionInRepoToBeDeprecated(
-        convention10ToMarkAsDeprecated,
-      );
-
       await expectConventionInRepoToEqual(convention2ToKeepAsIs);
       await expectConventionInRepoToEqual(convention3ToKeepAsIs);
       await expectConventionInRepoToEqual(convention4ToKeepAsIs);

@@ -249,7 +249,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
       it("Update convention related properties without contact infos if conventions were found and establishment in repo", async () => {
         const notValidatedConvention = new ConventionDtoBuilder()
           .withId(uuid())
-          .withStatus("DRAFT")
+          .withStatus("READY_TO_SIGN")
           .withSiret(establishment.establishment.siret)
           .withAgencyId(agency.id)
           .withoutDateValidation()

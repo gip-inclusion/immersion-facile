@@ -209,20 +209,20 @@ describe("RenewConvention", () => {
     });
 
     it("throws an error when convention is not ACCEPTED_BY_VALIDATOR", async () => {
-      const existingDraftConvention = new ConventionDtoBuilder().build();
+      const existingNotValidatedConvention = new ConventionDtoBuilder().build();
 
-      uow.conventionRepository.setConventions([existingDraftConvention]);
+      uow.conventionRepository.setConventions([existingNotValidatedConvention]);
 
       await expectPromiseToFailWithError(
         renewConvention.execute(
           renewConventionParams,
           createJwtPayload({
             role: "validator",
-            conventionId: existingDraftConvention.id,
+            conventionId: existingNotValidatedConvention.id,
           }),
         ),
         new BadRequestError(
-          `This convention cannot be renewed, as it has status : '${existingDraftConvention.status}'`,
+          `This convention cannot be renewed, as it has status : '${existingNotValidatedConvention.status}'`,
         ),
       );
     });

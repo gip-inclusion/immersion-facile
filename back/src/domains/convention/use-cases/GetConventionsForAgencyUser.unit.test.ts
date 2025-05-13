@@ -23,7 +23,7 @@ describe("GetConventionsForAgencyUser", () => {
   const conventions = Array.from({ length: 30 }, (_, i) =>
     new ConventionDtoBuilder()
       .withId(`convention-id-${i + 1}`)
-      .withStatus(i % 2 === 0 ? "ACCEPTED_BY_VALIDATOR" : "DRAFT")
+      .withStatus(i % 2 === 0 ? "ACCEPTED_BY_VALIDATOR" : "READY_TO_SIGN")
       .build(),
   );
 

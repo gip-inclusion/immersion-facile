@@ -5,7 +5,6 @@ import {
   InclusionConnectedUserBuilder,
   errors,
   expectObjectInArrayToMatch,
-  expectObjectsToMatch,
   expectPromiseToFailWithError,
   validSignatoryRoles,
 } from "shared";
@@ -14,10 +13,7 @@ import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import {
-  type InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateConventionStatus } from "./UpdateConventionStatus";
 import {
@@ -30,406 +26,6 @@ import {
 } from "./UpdateConventionStatus.testHelpers";
 
 describe("UpdateConventionStatus", () => {
-  describe("* -> DRAFT transition", () => {
-    acceptStatusTransitionTests({
-      updateStatusParams: {
-        status: "DRAFT",
-        statusJustification: "test justification",
-        conventionId: conventionWithAgencyOneStepValidationId,
-        modifierRole: "beneficiary",
-      },
-      expectedDomainTopic: "ConventionRequiresModification",
-      updatedFields: {
-        statusJustification: "test justification",
-        establishmentRepresentativeSignedAt: undefined,
-        beneficiarySignedAt: undefined,
-      },
-      allowedMagicLinkRoles: [
-        "beneficiary",
-        "establishment-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-        "counsellor",
-        "validator",
-        "back-office",
-      ],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleEstablishmentRepresentative",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-      ],
-      allowedInitialStatuses: [
-        "READY_TO_SIGN",
-        "PARTIALLY_SIGNED",
-        "IN_REVIEW",
-        "ACCEPTED_BY_COUNSELLOR",
-      ],
-    });
-
-    acceptStatusTransitionTests({
-      updateStatusParams: {
-        status: "DRAFT",
-        statusJustification: "test justification",
-        conventionId: conventionWithAgencyTwoStepsValidationId,
-        modifierRole: "beneficiary",
-      },
-      expectedDomainTopic: "ConventionRequiresModification",
-      updatedFields: {
-        statusJustification: "test justification",
-        establishmentRepresentativeSignedAt: undefined,
-        beneficiarySignedAt: undefined,
-      },
-      allowedMagicLinkRoles: [
-        "beneficiary",
-        "establishment-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-        "counsellor",
-        "validator",
-        "back-office",
-      ],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleValidator",
-        "icUserWithRoleEstablishmentRepresentative",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-      ],
-      allowedInitialStatuses: [
-        "READY_TO_SIGN",
-        "PARTIALLY_SIGNED",
-        "IN_REVIEW",
-        "ACCEPTED_BY_COUNSELLOR",
-      ],
-    });
-
-    rejectStatusTransitionTests({
-      updateStatusParams: {
-        status: "DRAFT",
-        statusJustification: "test justification",
-        conventionId: conventionWithAgencyOneStepValidationId,
-        modifierRole: "beneficiary",
-      },
-      allowedMagicLinkRoles: [
-        "beneficiary",
-        "establishment-representative",
-        "beneficiary-representative",
-        "beneficiary-current-employer",
-        "counsellor",
-        "validator",
-        "back-office",
-      ],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleValidator",
-        "icUserWithRoleEstablishmentRepresentative",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-      ],
-      allowedInitialStatuses: [
-        "READY_TO_SIGN",
-        "PARTIALLY_SIGNED",
-        "IN_REVIEW",
-        "ACCEPTED_BY_COUNSELLOR",
-      ],
-    });
-
-    describe("standalone tests", () => {
-      let uow: InMemoryUnitOfWork;
-      let updateConventionStatusUseCase: UpdateConventionStatus;
-
-      beforeEach(() => {
-        ({ uow, updateConventionStatusUseCase } =
-          prepareUseCaseForStandAloneTests());
-      });
-
-      it("Accept from role establishment-representative when convention is requested to be modified for the second time", async () => {
-        const validator = new InclusionConnectedUserBuilder()
-          .withId("validator")
-          .withEmail("validator@email.com")
-          .build();
-        const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {
-          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
-        });
-
-        const initialConvention = new ConventionDtoBuilder()
-          .withId(conventionWithAgencyOneStepValidationId)
-          .withStatus("READY_TO_SIGN")
-          .withEstablishmentRepresentativeEmail("establishmentrep@email.com")
-          .withAgencyId(agency.id)
-          .withInternshipKind("mini-stage-cci")
-          .withBeneficiaryRepresentative({
-            role: "beneficiary-representative",
-            email: "benef-representative@mail.com",
-            firstName: "Bruce",
-            lastName: "Wayne",
-            phone: "#33112233445",
-            signedAt: undefined,
-          })
-          .build();
-
-        const establishmentRepresentativeJwtPayload =
-          createConventionMagicLinkPayload({
-            id: conventionWithAgencyOneStepValidationId,
-            role: "establishment-representative",
-            email: "establishment-representative@mail.com",
-            now: new Date(),
-          });
-
-        await uow.agencyRepository.insert(agency);
-        await uow.conventionRepository.save(initialConvention);
-        uow.userRepository.users = [validator];
-
-        await updateConventionStatusUseCase.execute(
-          {
-            status: "DRAFT",
-            statusJustification: "first modification",
-            modifierRole: "establishment-representative",
-            conventionId: conventionWithAgencyOneStepValidationId,
-          },
-          establishmentRepresentativeJwtPayload,
-        );
-
-        const updatedConventionAfterFirstModificationRequest =
-          await uow.conventionRepository.getById(initialConvention.id);
-
-        const signedConvention = new ConventionDtoBuilder(
-          updatedConventionAfterFirstModificationRequest,
-        )
-          .withBeneficiarySignedAt(new Date())
-          .withBeneficiaryRepresentativeSignedAt(new Date())
-          .withStatus("PARTIALLY_SIGNED")
-          .build();
-        await uow.conventionRepository.update(signedConvention);
-
-        await updateConventionStatusUseCase.execute(
-          {
-            status: "DRAFT",
-            statusJustification: "second modification",
-            modifierRole: "establishment-representative",
-            conventionId: conventionWithAgencyOneStepValidationId,
-          },
-          establishmentRepresentativeJwtPayload,
-        );
-
-        const updatedConventionAfterSecondModificationRequest =
-          await uow.conventionRepository.getById(initialConvention.id);
-
-        expect(
-          updatedConventionAfterSecondModificationRequest.signatories
-            .beneficiary.signedAt,
-        ).toBeUndefined();
-      });
-
-      it("removes date approval when going to status DRAFT", async () => {
-        const user = new InclusionConnectedUserBuilder()
-          .withEmail("validator@mail.com")
-          .buildUser();
-        const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {
-          [user.id]: { roles: ["validator"], isNotifiedByEmail: true },
-        });
-        const dateApproval = new Date("2024-04-29").toISOString();
-        const convention = new ConventionDtoBuilder()
-          .withStatus("IN_REVIEW")
-          .withAgencyId(agency.id)
-          .withDateApproval(dateApproval)
-          .build();
-
-        uow.userRepository.users = [user];
-        await uow.agencyRepository.insert(agency);
-        uow.conventionRepository.setConventions([convention]);
-
-        const validatorJwtPayload = createConventionMagicLinkPayload({
-          id: convention.id,
-          role: "validator",
-          email: user.email,
-          now: new Date(),
-        });
-
-        await updateConventionStatusUseCase.execute(
-          {
-            status: "DRAFT",
-            statusJustification: "Ca va pas",
-            conventionId: convention.id,
-            modifierRole: "validator",
-          },
-          validatorJwtPayload,
-        );
-
-        expectObjectInArrayToMatch(uow.conventionRepository.conventions, [
-          {
-            status: "DRAFT",
-            dateApproval: undefined,
-          },
-        ]);
-      });
-    });
-
-    it("ConventionRequiresModification event only has the role of the user that requested the change", async () => {
-      const uow = createInMemoryUow();
-
-      const timeGateway = new CustomTimeGateway();
-
-      const createNewEvent = makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new TestUuidGenerator(),
-      });
-
-      const conventionRepository = uow.conventionRepository;
-      const agencyRepository = uow.agencyRepository;
-      const uowPerformer = new InMemoryUowPerformer(uow);
-      const updateConventionStatus = new UpdateConventionStatus(
-        uowPerformer,
-        createNewEvent,
-        timeGateway,
-      );
-
-      const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
-      const requesterRole = "beneficiary";
-
-      const conventionBuilder = new ConventionDtoBuilder()
-        .withStatus("READY_TO_SIGN")
-        .withId(conventionId)
-        .build();
-      const agency = new AgencyDtoBuilder().build();
-
-      await conventionRepository.save(conventionBuilder);
-      agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-      await updateConventionStatus.execute(
-        {
-          status: "DRAFT",
-          statusJustification: "because",
-          conventionId,
-          modifierRole: "beneficiary",
-        },
-        { applicationId: conventionId, role: requesterRole, emailHash: "" },
-      );
-
-      const convention = await conventionRepository.getById(conventionId);
-
-      expect(uow.outboxRepository.events).toHaveLength(1);
-
-      expectObjectsToMatch(
-        uow.outboxRepository.events[0],
-        createNewEvent({
-          topic: "ConventionRequiresModification",
-          payload: {
-            convention,
-            justification: "because",
-            requesterRole,
-            modifierRole: "beneficiary",
-            triggeredBy: {
-              kind: "convention-magic-link",
-              role: requesterRole,
-            },
-          },
-        }),
-      );
-    });
-
-    it("Throw when no agency was found", async () => {
-      const uow = createInMemoryUow();
-
-      const timeGateway = new CustomTimeGateway();
-
-      const createNewEvent = makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new TestUuidGenerator(),
-      });
-
-      const conventionRepository = uow.conventionRepository;
-      const uowPerformer = new InMemoryUowPerformer(uow);
-      const updateConventionStatus = new UpdateConventionStatus(
-        uowPerformer,
-        createNewEvent,
-        timeGateway,
-      );
-
-      const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
-      const requesterRole = "counsellor";
-
-      const agency = new AgencyDtoBuilder().build();
-
-      const conventionBuilder = new ConventionDtoBuilder()
-        .withStatus("READY_TO_SIGN")
-        .withId(conventionId)
-        .withAgencyId(agency.id)
-        .build();
-
-      await conventionRepository.save(conventionBuilder);
-
-      await expectPromiseToFailWithError(
-        updateConventionStatus.execute(
-          {
-            status: "DRAFT",
-            statusJustification: "because",
-            conventionId,
-            modifierRole: "counsellor",
-          },
-          {
-            applicationId: conventionId,
-            role: requesterRole,
-            emailHash: "osef",
-          },
-        ),
-        errors.agency.notFound({ agencyId: agency.id }),
-      );
-    });
-
-    it("Throw when modifier role is counsellor or validator and that no mail adress were found", async () => {
-      const uow = createInMemoryUow();
-
-      const timeGateway = new CustomTimeGateway();
-
-      const createNewEvent = makeCreateNewEvent({
-        timeGateway,
-        uuidGenerator: new TestUuidGenerator(),
-      });
-
-      const conventionRepository = uow.conventionRepository;
-      const uowPerformer = new InMemoryUowPerformer(uow);
-      const updateConventionStatus = new UpdateConventionStatus(
-        uowPerformer,
-        createNewEvent,
-        timeGateway,
-      );
-
-      const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
-      const requesterRole = "counsellor";
-
-      const agency = new AgencyDtoBuilder().build();
-
-      uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
-
-      const conventionBuilder = new ConventionDtoBuilder()
-        .withStatus("READY_TO_SIGN")
-        .withId(conventionId)
-        .withAgencyId(agency.id)
-        .build();
-
-      await conventionRepository.save(conventionBuilder);
-
-      await expectPromiseToFailWithError(
-        updateConventionStatus.execute(
-          {
-            status: "DRAFT",
-            statusJustification: "because",
-            conventionId,
-            modifierRole: "counsellor",
-          },
-          {
-            applicationId: conventionId,
-            role: requesterRole,
-            emailHash: "osef",
-          },
-        ),
-        errors.agency.emailNotFound({ agencyId: agency.id }),
-      );
-    });
-  });
-
   describe("* -> READY_TO_SIGN transition", () => {
     acceptStatusTransitionTests({
       updateStatusParams: {
@@ -437,22 +33,49 @@ describe("UpdateConventionStatus", () => {
         conventionId: conventionWithAgencyOneStepValidationId,
       },
       expectedDomainTopic: null,
-      allowedMagicLinkRoles: validSignatoryRoles,
+      allowedMagicLinkRoles: [
+        ...validSignatoryRoles,
+        "back-office",
+        "validator",
+        "counsellor",
+      ],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleEstablishmentRepresentative",
+        "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
+        "icUserWithRoleValidator",
       ],
-      allowedInitialStatuses: ["DRAFT"],
+      allowedInitialStatuses: [
+        "READY_TO_SIGN",
+        "PARTIALLY_SIGNED",
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+      ],
     });
     rejectStatusTransitionTests({
       updateStatusParams: {
         status: "READY_TO_SIGN",
         conventionId: conventionWithAgencyOneStepValidationId,
       },
-      allowedMagicLinkRoles: validSignatoryRoles,
+      allowedMagicLinkRoles: [
+        ...validSignatoryRoles,
+        "back-office",
+        "validator",
+        "counsellor",
+      ],
       allowedInclusionConnectedUsers: [
         "icUserWithRoleEstablishmentRepresentative",
+        "icUserWithRoleBackofficeAdmin",
+        "icUserWithRoleBackofficeAdminAndValidator",
+        "icUserWithRoleCounsellor",
+        "icUserWithRoleValidator",
       ],
-      allowedInitialStatuses: ["DRAFT"],
+      allowedInitialStatuses: [
+        "READY_TO_SIGN",
+        "PARTIALLY_SIGNED",
+        "IN_REVIEW",
+        "ACCEPTED_BY_COUNSELLOR",
+      ],
     });
   });
 
@@ -836,7 +459,6 @@ describe("UpdateConventionStatus", () => {
         "READY_TO_SIGN",
         "IN_REVIEW",
         "ACCEPTED_BY_COUNSELLOR",
-        "DRAFT",
       ],
     });
   });

@@ -12,16 +12,6 @@ const {
   close: closeRejectModal,
 } = createModal(createRejectModalParams);
 
-const createDraftModalParams = {
-  id: domElementIds.manageConvention.requestEditModal,
-  isOpenedByDefault: false,
-};
-const {
-  Component: DraftModal,
-  open: openDraftModal,
-  close: closeDraftModal,
-} = createModal(createDraftModalParams);
-
 const createCancelModalParams = {
   id: domElementIds.manageConvention.cancelModal,
   isOpenedByDefault: false,
@@ -75,12 +65,6 @@ const {
 
 export const modalByAction = (verificationAction: VerificationAction) => {
   const modals = {
-    REQUEST_EDIT: {
-      modal: DraftModal,
-      openModal: openDraftModal,
-      closeModal: closeDraftModal,
-      createModalParams: createDraftModalParams,
-    },
     REJECT: {
       modal: RejectModal,
       openModal: openRejectModal,

@@ -28,7 +28,7 @@ export const EstablishmentBusinessFields = (): JSX.Element => {
     useFormContext<ConventionDto>();
   const values = getValues();
   const isSiretFetcherEnabled =
-    values.status === "DRAFT" && values.immersionAddress === "";
+    values.status === "READY_TO_SIGN" && values.immersionAddress === "";
 
   const isSiretFetcherDisabled = !isSiretFetcherEnabled;
 

@@ -24,10 +24,6 @@ import {
 import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 
-const CONVENTION_DRAFT_TEST = new ConventionDtoBuilder()
-  .withStatus("DRAFT")
-  .build();
-
 const CONVENTION_VALIDATED_TEST = new ConventionDtoBuilder()
   .withStatus("ACCEPTED_BY_VALIDATOR")
   .build();
@@ -65,7 +61,6 @@ export class InMemoryConventionGateway implements ConventionGateway {
   #agencies: { [id: string]: AgencyOption } = {};
 
   #conventions: { [id: string]: ConventionDto } = {
-    [CONVENTION_DRAFT_TEST.id]: CONVENTION_DRAFT_TEST,
     [CONVENTION_VALIDATED_TEST.id]: CONVENTION_VALIDATED_TEST,
   };
 

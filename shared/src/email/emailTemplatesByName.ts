@@ -1028,49 +1028,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyLogoUrl,
       }),
     },
-    CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
-      niceName: "Convention - Demande de modification",
-      tags: ["demande de modifications"],
-      createEmailVariables: ({
-        agencyLogoUrl,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        internshipKind,
-        justification,
-        magicLink,
-        signature,
-        requesterName,
-      }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
-            : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
-        greetings: greetingsWithConventionId(conventionId),
-        content: `Une demande de modification vous a été adressé par ${requesterName} concernant la demande ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
-         
-         <strong>Les raisons sont&nbsp;:</strong>
-        ${justification}`,
-        buttons: [
-          {
-            url: magicLink,
-            label: "Modifier votre demande",
-          },
-        ],
-        subContent: `
-      Après avoir corrigé votre demande, il faudra de nouveau que tous les acteurs de la convention confirment leur accord. 
-      
-      Pensez à surveiller votre boite mail et à consulter vos spams si vous ne recevez pas le mail de demande de confirmation.      
-      
-      Bien cordialement,      
-      ${signature}
-      `,
-        agencyLogoUrl,
-      }),
-    },
+
     CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
       niceName: "Convention - Changement prescripteur pour agence",
       tags: ["changement prescripteur demande d'immersion pour prescripteur"],
