@@ -1123,21 +1123,24 @@ Tél : ${beneficiaryPhone}`,
         }
         de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée.
         
-        <strong>Les raisons sont&nbsp;:</strong>
+        <strong>Les modifications sont&nbsp;:</strong>
         ${reason}
         
-        Votre signature sur la première demande de convention a donc été annulée.
-        
-        Action attendue : cliquez sur le bouton ci-dessous, puis vérifiez dans l’écran qui s’ouvre si ce qui a été modifié vous convient :
-        - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant).
-        - Si la modification ne vous convient pas, vous pouvez relancer des modifications (cliquez sur le bouton "Annuler les signatures et demander une modification").`,
+        Votre signature sur la première demande de convention a donc été annulée.`,
         buttons: [
           {
             url: conventionSignShortlink,
-            label: "Relire et signer la demande de convention",
+            label: "Signer ou modifier la demande",
           },
         ],
-        subContent: defaultSignature(internshipKind),
+        highlight: {
+          content: `Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu la validation de votre conseiller ! Vous n'auriez pas de couverture en cas d'accident.`,
+        },
+        subContent: `
+        La décision de votre conseiller vous sera transmise par mail.
+
+        ${defaultSignature(internshipKind)}
+        `,
         agencyLogoUrl,
       }),
     },
