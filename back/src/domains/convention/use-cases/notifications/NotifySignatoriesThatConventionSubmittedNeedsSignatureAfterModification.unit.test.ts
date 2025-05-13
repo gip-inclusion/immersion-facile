@@ -73,7 +73,10 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       const convention = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
         .withStatusJustification(justification)
+        .withBeneficiarySignedAt(undefined)
+        .withEstablishmentRepresentativeSignedAt(undefined)
         .build();
+
       uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
@@ -148,6 +151,8 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     it("Convention without justification", async () => {
       const convention = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
+        .withBeneficiarySignedAt(undefined)
+        .withEstablishmentRepresentativeSignedAt(undefined)
         .build();
       uow.conventionRepository.setConventions([convention]);
 
@@ -202,12 +207,15 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
       const convention = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
         .withStatusJustification(justification)
+        .withBeneficiarySignedAt(undefined)
+        .withEstablishmentRepresentativeSignedAt(undefined)
         .withBeneficiaryRepresentative({
           firstName: "benef rep first name",
           lastName: "benef rep last name",
           email: "benefrep@email.com",
           phone: "0600558877",
           role: "beneficiary-representative",
+          signedAt: undefined,
         })
         .withBeneficiaryCurrentEmployer({
           firstName: "benef cur emp first name",
@@ -219,6 +227,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           businessSiret: "77884455998877",
           job: "Lanceur de guezmer",
           role: "beneficiary-current-employer",
+          signedAt: undefined,
         })
         .build();
       uow.conventionRepository.setConventions([convention]);
@@ -303,6 +312,113 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[3]),
+              internshipKind: convention.internshipKind,
+              justification,
+              signatoryFirstName:
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryCurrentEmployer!.firstName,
+
+              signatoryLastName:
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryCurrentEmployer!.lastName,
+            },
+          },
+        ],
+      });
+    });
+    it("send notification only to signatories that didn't sign yet", async () => {
+      const justification = "justif";
+      const convention = new ConventionDtoBuilder()
+        .withAgencyId(agency.id)
+        .withStatusJustification(justification)
+        .withBeneficiarySignedAt(new Date())
+        .withEstablishmentRepresentativeSignedAt(undefined)
+        .withBeneficiaryRepresentative({
+          firstName: "benef rep first name",
+          lastName: "benef rep last name",
+          email: "benefrep@email.com",
+          phone: "0600558877",
+          role: "beneficiary-representative",
+          signedAt: undefined,
+        })
+        .withBeneficiaryCurrentEmployer({
+          firstName: "benef cur emp first name",
+          lastName: "benef cur emp last name",
+          email: "benefcuremp@email.com",
+          phone: "0600777777",
+          businessAddress: "13 rue de la soif, 60666 Quimper",
+          businessName: "Merguez Corp",
+          businessSiret: "77884455998877",
+          job: "Lanceur de guezmer",
+          role: "beneficiary-current-employer",
+          signedAt: undefined,
+        })
+        .build();
+      uow.conventionRepository.setConventions([convention]);
+
+      await useCase.execute({ convention });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
+            recipients: [
+              convention.signatories.establishmentRepresentative.email,
+            ],
+            params: {
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              conventionId: convention.id,
+              conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
+              internshipKind: convention.internshipKind,
+              justification,
+              signatoryFirstName:
+                convention.signatories.establishmentRepresentative.firstName,
+              signatoryLastName:
+                convention.signatories.establishmentRepresentative.lastName,
+            },
+          },
+          {
+            kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
+            recipients: [
+              // biome-ignore lint/style/noNonNullAssertion:
+              convention.signatories.beneficiaryRepresentative!.email,
+            ],
+            params: {
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              conventionId: convention.id,
+              conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
+              internshipKind: convention.internshipKind,
+              justification,
+              signatoryFirstName:
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryRepresentative!.firstName,
+              signatoryLastName:
+                // biome-ignore lint/style/noNonNullAssertion:
+                convention.signatories.beneficiaryRepresentative!.lastName,
+            },
+          },
+          {
+            kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
+            recipients: [
+              // biome-ignore lint/style/noNonNullAssertion:
+              convention.signatories.beneficiaryCurrentEmployer!.email,
+            ],
+            params: {
+              agencyLogoUrl: agency.logoUrl ?? undefined,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              businessName: convention.businessName,
+              conventionId: convention.id,
+              conventionSignShortlink: makeShortLinkUrl(config, shortLinks[2]),
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
