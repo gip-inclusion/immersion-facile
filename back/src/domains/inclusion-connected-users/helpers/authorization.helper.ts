@@ -1,21 +1,10 @@
 import {
   type AgencyId,
-  type InclusionConnectDomainJwtPayload,
+  // type InclusionConnectDomainJwtPayload,
   type InclusionConnectedUser,
   type UserWithAdminRights,
   errors,
 } from "shared";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-
-export const throwIfIcUserNotBackofficeAdmin = async (
-  uow: UnitOfWork,
-  jwtPayload: InclusionConnectDomainJwtPayload,
-) => {
-  const user = await uow.userRepository.getById(jwtPayload.userId);
-  if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
-  if (!user.isBackofficeAdmin)
-    throw errors.user.notBackOfficeAdmin({ userId: jwtPayload.userId });
-};
 
 export const throwIfNotAdmin = (user: UserWithAdminRights | undefined) => {
   if (!user) throw errors.user.unauthorized();

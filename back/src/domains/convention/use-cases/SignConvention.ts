@@ -1,25 +1,20 @@
 import {
   type ConventionDomainPayload,
-  type ConventionStatus,
   type InclusionConnectDomainJwtPayload,
   type WithConventionId,
   type WithConventionIdLegacy,
+  errors,
   withConventionIdSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
-import type { DomainTopic } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { signConvention } from "../entities/Convention";
-
-const domainTopicByTargetStatusMap: Partial<
-  Record<ConventionStatus, DomainTopic>
-> = {
-  PARTIALLY_SIGNED: "ConventionPartiallySigned",
-  IN_REVIEW: "ConventionFullySigned",
-};
+import {
+  domainTopicByTargetStatusMap,
+  signConvention,
+} from "../entities/Convention";
 
 export class SignConvention extends TransactionalUseCase<
   WithConventionId,
@@ -47,9 +42,13 @@ export class SignConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
+    const convention =
+      await uow.conventionQueries.getConventionById(conventionId);
+    if (!convention) throw errors.convention.notFound({ conventionId });
+
     const { role, userWithRights, signedConvention } = await signConvention({
       uow,
-      conventionId,
+      convention,
       jwtPayload,
       now: this.#timeGateway.now().toISOString(),
     });

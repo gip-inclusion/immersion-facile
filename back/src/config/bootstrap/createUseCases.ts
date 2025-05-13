@@ -310,7 +310,11 @@ export const createUseCases = (
           config.immersionFacileBaseUrl,
         ),
 
-      updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
+      updateConvention: new UpdateConvention(
+        uowPerformer,
+        createNewEvent,
+        gateways.timeGateway,
+      ),
       updateConventionStatus: new UpdateConventionStatus(
         uowPerformer,
         createNewEvent,

@@ -1,12 +1,10 @@
 import {
   type AgencyId,
   type ConventionDto,
-  type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type DateString,
   type Role,
-  type Signatories,
   type UpdateConventionStatusRequestDto,
   type UserId,
   type UserWithRights,
@@ -48,29 +46,6 @@ const domainTopicByTargetStatusMap: Record<
 };
 
 type UpdateConventionStatusSupportedJwtPayload = ConventionRelatedJwtPayload;
-
-const clearSignatories = (convention: ConventionReadDto): Signatories => {
-  return {
-    beneficiary: {
-      ...convention.signatories.beneficiary,
-      signedAt: undefined,
-    },
-    beneficiaryCurrentEmployer: convention.signatories
-      .beneficiaryCurrentEmployer && {
-      ...convention.signatories.beneficiaryCurrentEmployer,
-      signedAt: undefined,
-    },
-    establishmentRepresentative: {
-      ...convention.signatories.establishmentRepresentative,
-      signedAt: undefined,
-    },
-    beneficiaryRepresentative: convention.signatories
-      .beneficiaryRepresentative && {
-      ...convention.signatories.beneficiaryRepresentative,
-      signedAt: undefined,
-    },
-  };
-};
 
 export class UpdateConventionStatus extends TransactionalUseCase<
   UpdateConventionStatusRequestDto,
@@ -181,9 +156,9 @@ export class UpdateConventionStatus extends TransactionalUseCase<
             },
           }
         : {}),
-      ...(params.status === "DRAFT"
-        ? { signatories: clearSignatories(conventionRead) }
-        : {}),
+      // ...(params.status === "DRAFT"
+      //   ? { signatories: clearSignatories(conventionRead) }
+      //   : {}),
     };
 
     const updatedId = await uow.conventionRepository.update(updatedConvention);
