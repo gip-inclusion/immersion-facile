@@ -7,6 +7,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -33,6 +34,7 @@ export class DeleteEstablishment extends TransactionalUseCase<
     uowPerformer: UnitOfWorkPerformer,
     private timeGateway: TimeGateway,
     private readonly saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    private readonly createNewEvent: CreateNewEvent,
   ) {
     super(uowPerformer);
   }
@@ -76,6 +78,15 @@ export class DeleteEstablishment extends TransactionalUseCase<
       .filter(({ role }) => role === "establishment-contact")
       .map(({ userId }) => userId);
 
+    const deletedEstablishmentEvent = this.createNewEvent({
+      topic: "EstablishmentDeleted",
+      payload: {
+        siret,
+        triggeredBy: { kind: "inclusion-connected", userId: currentUser.id },
+      },
+    });
+
+    await uow.outboxRepository.save(deletedEstablishmentEvent);
     await this.saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {

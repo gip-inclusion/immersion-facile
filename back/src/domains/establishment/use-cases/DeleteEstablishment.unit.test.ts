@@ -4,6 +4,7 @@ import {
   UserBuilder,
   addressDtoToString,
   errors,
+  expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
@@ -11,6 +12,7 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -75,14 +77,21 @@ describe("Delete Establishment", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: TimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let uuidGenerator: TestUuidGenerator;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
+    uuidGenerator = new TestUuidGenerator();
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
     deleteEstablishment = new DeleteEstablishment(
       new InMemoryUowPerformer(uow),
       timeGateway,
-      makeSaveNotificationAndRelatedEvent(new TestUuidGenerator(), timeGateway),
+      makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
+      createNewEvent,
     );
     uow.userRepository.users = [
       backofficeAdminUser,
@@ -122,7 +131,8 @@ describe("Delete Establishment", () => {
   });
 
   describe("Right paths", () => {
-    it("Establishment aggregate are deleted, establishment group with siret have siret removed", async () => {
+    it("Establishment aggregate are deleted, establishment group with siret have siret removed, and event is created", async () => {
+      uuidGenerator.setNextUuids(["uuid1", "uuid2"]);
       uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
       ];
@@ -163,6 +173,23 @@ describe("Delete Establishment", () => {
           deletedAt: timeGateway.now(),
         },
       ]);
+
+      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      const deletedEstablishmentEvent = uow.outboxRepository.events.find(
+        (event) => event.topic === "EstablishmentDeleted",
+      )!;
+
+      expectObjectsToMatch(deletedEstablishmentEvent, {
+        topic: "EstablishmentDeleted",
+        payload: {
+          siret: establishmentAggregate.establishment.siret,
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: backofficeAdminUser.id,
+          },
+        },
+      });
+
       expectSavedNotificationsAndEvents({
         emails: [
           {
