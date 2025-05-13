@@ -208,7 +208,8 @@ export const ConventionManageActions = ({
     isBefore(new Date(convention.dateStart), new Date()) &&
     !assessment &&
     hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention);
-
+  const shouldShowConventionDocumentButton =
+    convention.status === "ACCEPTED_BY_VALIDATOR";
   const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
 
@@ -688,27 +689,29 @@ export const ConventionManageActions = ({
               </Button>
             )}
 
-            <Button
-              iconId="fr-icon-file-pdf-line"
-              className={fr.cx("fr-m-1w")}
-              priority="secondary"
-              onClick={() => {
-                const payload = decodeMagicLinkJwtWithoutSignatureCheck(
-                  jwtParams.jwt,
-                );
-                const isConventionMagicLinkJwt =
-                  "role" in payload && payload.role !== "back-office";
-                return routes
-                  .conventionDocument({
-                    jwt: isConventionMagicLinkJwt ? jwtParams.jwt : undefined,
-                    conventionId: convention.id,
-                  })
-                  .push();
-              }}
-              id={domElementIds.manageConvention.openDocumentButton}
-            >
-              Voir la convention
-            </Button>
+            {shouldShowConventionDocumentButton && (
+              <Button
+                iconId="fr-icon-file-pdf-line"
+                className={fr.cx("fr-m-1w")}
+                priority="secondary"
+                onClick={() => {
+                  const payload = decodeMagicLinkJwtWithoutSignatureCheck(
+                    jwtParams.jwt,
+                  );
+                  const isConventionMagicLinkJwt =
+                    "role" in payload && payload.role !== "back-office";
+                  return routes
+                    .conventionDocument({
+                      jwt: isConventionMagicLinkJwt ? jwtParams.jwt : undefined,
+                      conventionId: convention.id,
+                    })
+                    .push();
+                }}
+                id={domElementIds.manageConvention.openDocumentButton}
+              >
+                Voir la convention
+              </Button>
+            )}
           </>
         }
 
