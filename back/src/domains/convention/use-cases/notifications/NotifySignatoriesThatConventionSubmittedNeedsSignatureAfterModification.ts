@@ -63,6 +63,7 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
     await Promise.all(
       values(conventionReadDto.signatories)
         .filter(filterNotFalsy)
+        .filter((signatory) => !signatory.signedAt)
         .map(async (signatory) =>
           this.#saveNotificationAndRelatedEvent(uow, {
             kind: "email",
