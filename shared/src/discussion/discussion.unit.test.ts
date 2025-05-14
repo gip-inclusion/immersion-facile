@@ -115,6 +115,27 @@ describe("Discussions", () => {
           ])
           .buildRead(),
       },
+      {
+        message: "discussion contact method is recent and not email",
+        expectedVisualStatus: "new",
+        discussion: new DiscussionBuilder()
+          .withCreatedAt(subDays(now, 14))
+          .withStatus("PENDING")
+          .withContactMode("PHONE")
+          .withExchanges([])
+          .buildRead(),
+      },
+      {
+        message:
+          "discussion contact method is older than 15 days and not email",
+        expectedVisualStatus: "needs-urgent-answer",
+        discussion: new DiscussionBuilder()
+          .withCreatedAt(subDays(now, 15))
+          .withStatus("PENDING")
+          .withContactMode("PHONE")
+          .withExchanges([])
+          .buildRead(),
+      },
     ];
 
     it.each(testCases)(
