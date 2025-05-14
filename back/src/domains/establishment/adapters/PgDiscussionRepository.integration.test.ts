@@ -699,6 +699,15 @@ describe("PgDiscussionRepository", () => {
             .build(),
         },
         {
+          title:
+            "insert with kind IF and contact mode EMAIL and empty datePreference",
+          discussion: new DiscussionBuilder()
+            .withDiscussionKind("IF")
+            .withContactMode("EMAIL")
+            .withDatePreference("")
+            .build(),
+        },
+        {
           title: "insert with kind IF and contact mode PHONE",
           discussion: new DiscussionBuilder()
             .withDiscussionKind("IF")

@@ -291,8 +291,9 @@ const makeDiscussionDtoFromPgDiscussion = (
       const phone = discussion.potentialBeneficiary.phone;
       const datePreferences = discussion.potentialBeneficiary.datePreferences;
 
-      if (!phone) throw errors.discussion.missingPhone(discussion.id);
-      if (!datePreferences)
+      if (phone === undefined)
+        throw errors.discussion.missingPhone(discussion.id);
+      if (datePreferences === undefined)
         throw errors.discussion.missingDatePreferences(discussion.id);
 
       if (discussion.kind === "IF") {
