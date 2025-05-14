@@ -17,6 +17,7 @@ import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createTransactionalUseCase } from "../../core/UseCase";
+import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
@@ -55,6 +56,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     timeGateway: TimeGateway;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     config: AppConfig;
+    createNewEvent: CreateNewEvent;
   }
 >(
   {
@@ -128,6 +130,27 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       convention,
       ...deps,
     });
+
+    const event = deps.createNewEvent({
+      topic: "ConventionSignatureLinkManuallySent",
+      payload: {
+        convention,
+        recipientRole: signatory.role,
+        transport: "sms",
+        triggeredBy:
+          "userId" in jwtPayload
+            ? {
+                kind: "inclusion-connected",
+                userId: jwtPayload.userId,
+              }
+            : {
+                kind: "convention-magic-link",
+                role: jwtPayload.role,
+              },
+      },
+    });
+
+    await uow.outboxRepository.save(event);
   },
 );
 

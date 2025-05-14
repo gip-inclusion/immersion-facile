@@ -7,6 +7,7 @@ import {
   type IdentityProvider,
   type RejectIcUserRoleForAgencyParams,
   type Role,
+  type SignatoryRole,
   type UserId,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
@@ -116,6 +117,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionCancelled", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionRequiresModification", ConventionRequiresModificationPayload & WithTriggeredBy>
   | GenericEvent<"ConventionDeprecated", WithConventionDto & WithTriggeredBy>
+  | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
 
   // MAGIC LINK RENEWAL
   | GenericEvent<"MagicLinkRenewalRequested", RenewMagicLinkPayload & WithTriggeredBy>

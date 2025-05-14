@@ -752,6 +752,7 @@ export const createUseCases = (
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
         shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        createNewEvent,
       },
     }),
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
