@@ -29,7 +29,9 @@ export const WithFeedbackReplacer = ({
 
   useEffect(() => {
     return () => {
-      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+      if (feedback) {
+        dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+      }
     };
   }, [dispatch]);
 
