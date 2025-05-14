@@ -100,7 +100,8 @@ export const ConventionFormWrapper = ({
     conventionFormFeedback.on === "fetch";
   const formSuccessfullySubmitted =
     conventionFormFeedback?.level === "success" &&
-    conventionFormFeedback.on === "create";
+    (conventionFormFeedback.on === "create" ||
+      conventionFormFeedback.on === "update");
 
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
     inclusionConnectedRoles,
@@ -165,18 +166,17 @@ export const ConventionFormWrapper = ({
     }
   }, [dispatch, route.params.jwt, inclusionConnectedRoles]);
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    return () => {
       dispatch(conventionSlice.actions.clearFetchedConvention());
       dispatch(
         conventionSlice.actions.showSummaryChangeRequested({
           showSummary: false,
         }),
       );
-      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
-    },
-    [dispatch],
-  );
+    };
+  }, [dispatch]);
 
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
@@ -256,13 +256,72 @@ export const ConventionFormWrapper = ({
             shouldRedirectToError: false,
           },
           () => {
-            fetchedConvention &&
+            if (!fetchedConvention) return null;
+
+            if (
+              mode === "create-from-scratch" ||
+              mode === "create-from-shared"
+            ) {
               routes
                 .conventionConfirmation({
                   conventionId: fetchedConvention.id,
                 })
                 .push();
-            return null;
+            }
+
+            if (mode === "edit") {
+              const userIsSignatory = userRolesOnConvention.some((role) =>
+                isSignatory(role),
+              );
+              if (userIsSignatory && route.params.jwt) {
+                const { applicationId } =
+                  decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+                    route.params.jwt,
+                  );
+                if (applicationId) {
+                  routes
+                    .conventionToSign({
+                      jwt: route.params.jwt,
+                    })
+                    .push();
+                } else {
+                  routes
+                    .manageConventionConnectedUser({
+                      conventionId: fetchedConvention.id,
+                    })
+                    .push();
+                }
+              }
+              if (userRolesOnConvention.includes("back-office")) {
+                routes
+                  .adminConventionDetail({ conventionId: fetchedConvention.id })
+                  .push();
+              }
+
+              if (
+                intersection(userRolesOnConvention, agencyModifierRoles)
+                  .length > 0 &&
+                route.params.jwt
+              ) {
+                const { applicationId } =
+                  decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+                    route.params.jwt,
+                  );
+                if (applicationId) {
+                  routes
+                    .manageConvention({
+                      jwt: route.params.jwt,
+                    })
+                    .push();
+                } else {
+                  routes
+                    .manageConventionConnectedUser({
+                      conventionId: fetchedConvention.id,
+                    })
+                    .push();
+                }
+              }
+            }
           },
         )
         .with({ shouldRedirectToError: true }, () => (
@@ -275,7 +334,6 @@ export const ConventionFormWrapper = ({
             )}
           </>
         ))
-
         .exhaustive()}
     </div>
   );
@@ -284,7 +342,6 @@ export const ConventionFormWrapper = ({
 const ConventionSummarySection = ({
   mode,
   internshipKind,
-  userRolesOnConvention,
   conventionId,
 }: {
   mode: ConventionFormMode;
@@ -339,43 +396,6 @@ const ConventionSummarySection = ({
         feedbackTopic: "convention-form",
       }),
     );
-    if (mode === "edit" && conventionSuccessfullySubmitted) {
-      const userIsSignatory = userRolesOnConvention.some((role) =>
-        isSignatory(role),
-      );
-      if (userIsSignatory && route.params.jwt) {
-        routes
-          .conventionToSign({
-            jwt: route.params.jwt,
-          })
-          .push();
-      }
-      if (
-        intersection(userRolesOnConvention, agencyModifierRoles).length > 0 &&
-        route.params.jwt
-      ) {
-        const { applicationId } =
-          decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-            route.params.jwt,
-          );
-        if (applicationId) {
-          routes
-            .manageConvention({
-              jwt: route.params.jwt,
-            })
-            .push();
-        } else {
-          routes
-            .manageConventionConnectedUser({
-              conventionId: convention.id,
-            })
-            .push();
-        }
-      }
-      if (userRolesOnConvention.includes("back-office")) {
-        routes.adminConventionDetail({ conventionId: convention.id }).push();
-      }
-    }
   };
 
   return (

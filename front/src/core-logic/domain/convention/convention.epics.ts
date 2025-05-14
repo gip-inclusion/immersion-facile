@@ -30,17 +30,28 @@ const saveConventionEpic: ConventionEpic = (
 
       return conventionGatewayAction$.pipe(
         map(() =>
-          conventionSlice.actions.saveConventionSucceeded({
-            convention: action.payload.convention,
-            discussionId: action.payload.discussionId,
-            feedbackTopic: action.payload.feedbackTopic,
-          }),
+          jwt
+            ? conventionSlice.actions.updateConventionSucceeded({
+                convention: action.payload.convention,
+                discussionId: action.payload.discussionId,
+                feedbackTopic: action.payload.feedbackTopic,
+              })
+            : conventionSlice.actions.createConventionSucceeded({
+                convention: action.payload.convention,
+                discussionId: action.payload.discussionId,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
         ),
         catchEpicError((error: Error) =>
-          conventionSlice.actions.saveConventionFailed({
-            errorMessage: error.message,
-            feedbackTopic: action.payload.feedbackTopic,
-          }),
+          jwt
+            ? conventionSlice.actions.updateConventionFailed({
+                errorMessage: error.message,
+                feedbackTopic: action.payload.feedbackTopic,
+              })
+            : conventionSlice.actions.createConventionFailed({
+                errorMessage: error.message,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
         ),
       );
     }),

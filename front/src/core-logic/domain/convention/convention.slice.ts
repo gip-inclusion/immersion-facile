@@ -91,7 +91,7 @@ export const conventionSlice = createSlice({
       state.isLoading = true;
       state.convention = action.payload.convention;
     },
-    saveConventionSucceeded: (
+    updateConventionSucceeded: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
         convention: ConventionReadDto;
@@ -100,7 +100,22 @@ export const conventionSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-    saveConventionFailed: (
+    updateConventionFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    createConventionSucceeded: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        convention: ConventionReadDto;
+        discussionId?: DiscussionId;
+      }>,
+    ) => {
+      state.isLoading = false;
+    },
+    createConventionFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
