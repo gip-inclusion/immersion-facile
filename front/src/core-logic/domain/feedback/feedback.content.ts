@@ -527,14 +527,26 @@ export const feedbacks: Record<
   },
   "convention-form": {
     "create.success": {
-      action: conventionSlice.actions.saveConventionSucceeded,
+      action: conventionSlice.actions.createConventionSucceeded,
       title: "La convention a bien été créée",
       message: "La convention a bien été créée",
     },
     "create.error": {
-      action: conventionSlice.actions.saveConventionFailed,
+      action: conventionSlice.actions.createConventionFailed,
       title: "Problème lors de la création de la convention",
       message: "Une erreur est survenue lors de la création de la convention",
+    },
+    "update.success": {
+      action: conventionSlice.actions.updateConventionSucceeded,
+      title: "La convention a bien été mise à jour",
+      message:
+        "Les signataires ont reçu un email leur demandant de signer la version modifiée.",
+    },
+    "update.error": {
+      action: conventionSlice.actions.updateConventionFailed,
+      title: "Problème lors de la mise à jour de la convention",
+      message:
+        "Une erreur est survenue lors de la mise à jour de la convention",
     },
     "fetch.error": {
       action: conventionSlice.actions.fetchConventionFailed,

@@ -125,9 +125,9 @@ describe("Convention slice", () => {
         feedbacksSelectors.feedbacks(store.getState())["convention-form"],
         {
           level: "success",
-          message: "La convention a bien été créée",
-          on: "create",
-          title: "La convention a bien été créée",
+          message: "La convention a bien été mise à jour",
+          on: "update",
+          title: "La convention a bien été mise à jour",
         },
       );
       expectUpdateConventionToHaveBeenCalled(1);
