@@ -4,12 +4,14 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type FeatureFlags,
+  errors,
   expectObjectsToMatch,
+  expectPromiseToFailWithError,
   expectToEqual,
   reasonableSchedule,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { broadcastToFtServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
+import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -19,11 +21,11 @@ import {
 import { InMemoryFranceTravailGateway } from "../../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import type { AgencyKindForFt } from "../../ports/FranceTravailGateway";
 import {
-  type BroadcastToFranceTravailOnConventionUpdates,
-  makeBroadcastToFranceTravailOnConventionUpdates,
-} from "./BroadcastToFranceTravailOnConventionUpdates";
+  type BroadcastToFranceTravailOnConventionUpdatesLegacy,
+  makeBroadcastToFranceTravailOnConventionUpdatesLegacy,
+} from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 
-describe("Broadcasts events to France Travail", () => {
+describe("Broadcasts events to France Travail (LEGACY Version)", () => {
   const peAgencyWithoutCounsellorsAndValidators = new AgencyDtoBuilder()
     .withId("some-pe-agency")
     .withKind("pole-emploi")
@@ -32,7 +34,7 @@ describe("Broadcasts events to France Travail", () => {
   let franceTravailGateway: InMemoryFranceTravailGateway;
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdates;
+  let broadcastToFranceTravailOnConventionUpdates: BroadcastToFranceTravailOnConventionUpdatesLegacy;
 
   const agencySIAE = toAgencyWithRights(
     new AgencyDtoBuilder(peAgencyWithoutCounsellorsAndValidators)
@@ -58,7 +60,7 @@ describe("Broadcasts events to France Travail", () => {
     franceTravailGateway = new InMemoryFranceTravailGateway();
     timeGateway = new CustomTimeGateway();
     broadcastToFranceTravailOnConventionUpdates =
-      makeBroadcastToFranceTravailOnConventionUpdates({
+      makeBroadcastToFranceTravailOnConventionUpdatesLegacy({
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           franceTravailGateway,
@@ -66,7 +68,6 @@ describe("Broadcasts events to France Travail", () => {
           options: { resyncMode: false },
         },
       });
-
     uow.agencyRepository.agencies = [
       toAgencyWithRights(peAgencyWithoutCounsellorsAndValidators),
     ];
@@ -76,11 +77,10 @@ describe("Broadcasts events to France Travail", () => {
     uow.agencyRepository.agencies = [agencySIAE];
 
     await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
       convention: conventionLinkedToSIAE,
     });
 
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+    expect(franceTravailGateway.legacyBroadcastConventionCalls).toHaveLength(0);
   });
 
   it("Conventions without federated id are still sent, with their externalId", async () => {
@@ -90,20 +90,22 @@ describe("Broadcasts events to France Travail", () => {
     };
 
     await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
       convention: conventionLinkedToFTWithoutFederatedIdentity,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectObjectsToMatch(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention: conventionLinkedToFTWithoutFederatedIdentity,
-    });
+    expect(franceTravailGateway.legacyBroadcastConventionCalls).toHaveLength(1);
+    expectObjectsToMatch(
+      franceTravailGateway.legacyBroadcastConventionCalls[0],
+      {
+        originalId: conventionLinkedToFTWithoutFederatedIdentity.id,
+        id: externalId,
+      },
+    );
   });
 
   it("If Pe returns a 404 error, we store the error in a repo", async () => {
-    franceTravailGateway.setNextResponse({
+    franceTravailGateway.setNextLegacyResponse({
       status: 404,
       subscriberErrorFeedback: { message: "Ops, something is bad" },
       body: "not found",
@@ -113,17 +115,16 @@ describe("Broadcasts events to France Travail", () => {
 
     // Act
     await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
       convention: conventionLinkedToFTWithoutFederatedIdentity,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
+    expect(franceTravailGateway.legacyBroadcastConventionCalls).toHaveLength(1);
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
       {
         consumerId: null,
         consumerName: "France Travail",
-        serviceName: broadcastToFtServiceName,
+        serviceName: broadcastToFtLegacyServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
           conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
@@ -148,7 +149,6 @@ describe("Broadcasts events to France Travail", () => {
 
     // Act
     await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
       convention: conventionLinkedToFTWithoutFederatedIdentity,
     });
 
@@ -157,7 +157,7 @@ describe("Broadcasts events to France Travail", () => {
       {
         consumerId: null,
         consumerName: "France Travail",
-        serviceName: broadcastToFtServiceName,
+        serviceName: broadcastToFtLegacyServiceName,
         requestParams: {
           conventionId: conventionLinkedToFTWithoutFederatedIdentity.id,
           conventionStatus: conventionLinkedToFTWithoutFederatedIdentity.status,
@@ -203,17 +203,38 @@ describe("Broadcasts events to France Travail", () => {
       .build();
 
     // Act
-    await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
-      convention,
-    });
+    await broadcastToFranceTravailOnConventionUpdates.execute({ convention });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention,
-    });
+    expect(franceTravailGateway.legacyBroadcastConventionCalls).toHaveLength(1);
+    expectObjectsToMatch(
+      franceTravailGateway.legacyBroadcastConventionCalls[0],
+      {
+        id: externalId,
+        peConnectId: "some-id",
+        originalId: immersionConventionId,
+        objectifDeImmersion: 3,
+        dureeImmersion: 21,
+        dateDebut: "2021-05-12T00:00:00.000Z",
+        dateFin: "2021-05-14T00:30:00.000Z",
+        dateNaissance: "2000-10-05T00:00:00.000Z",
+        statut: "DEMANDE_VALIDÉE",
+        codeAppellation: "011111",
+      },
+    );
+  });
+
+  it("if an axios error happens", async () => {
+    const convention = new ConventionDtoBuilder()
+      .withStatus("DEPRECATED")
+      .withAgencyId(peAgencyWithoutCounsellorsAndValidators.id)
+      .withoutFederatedIdentity()
+      .build();
+
+    await expectPromiseToFailWithError(
+      broadcastToFranceTravailOnConventionUpdates.execute({ convention }),
+      errors.generic.fakeError("fake axios error"),
+    );
   });
 
   it("broadcast to pole-emploi when convention is from an agency RefersTo", async () => {
@@ -257,16 +278,25 @@ describe("Broadcasts events to France Travail", () => {
     };
 
     await broadcastToFranceTravailOnConventionUpdates.execute({
-      eventType: "CONVENTION_UPDATED",
       convention: conventionLinkedToAgencyReferingToOther,
     });
 
     // Assert
-    expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-    expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
-      eventType: "CONVENTION_UPDATED",
-      convention: conventionLinkedToAgencyReferingToOther,
-    });
+    expect(franceTravailGateway.legacyBroadcastConventionCalls).toHaveLength(1);
+    expectObjectsToMatch(
+      franceTravailGateway.legacyBroadcastConventionCalls[0],
+      {
+        id: externalId,
+        originalId: conventionLinkedToAgencyReferingToOther.id,
+        objectifDeImmersion: 3,
+        dureeImmersion: 21,
+        dateDebut: "2021-05-12T00:00:00.000Z",
+        dateFin: "2021-05-14T00:30:00.000Z",
+        dateNaissance: "2000-10-05T00:00:00.000Z",
+        statut: "DEMANDE_VALIDÉE",
+        codeAppellation: "011111",
+      },
+    );
   });
 
   describe("sends also other type of Convention when corresponding feature flag is activated", () => {
@@ -336,15 +366,19 @@ describe("Broadcasts events to France Travail", () => {
             ...featureFlag,
           };
           await broadcastToFranceTravailOnConventionUpdates.execute({
-            eventType: "CONVENTION_UPDATED",
             convention,
           });
 
-          expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(1);
-          expectToEqual(franceTravailGateway.broadcastParamsCalls[0], {
-            eventType: "CONVENTION_UPDATED",
-            convention,
-          });
+          expect(
+            franceTravailGateway.legacyBroadcastConventionCalls,
+          ).toHaveLength(1);
+          expectObjectsToMatch(
+            franceTravailGateway.legacyBroadcastConventionCalls[0],
+            {
+              siret: convention.siret,
+              typeAgence: agencyKind,
+            },
+          );
         });
 
         it(`do not broadcast to france travail when convention is from an agency RefersTo (and the refered agency is ${agencyKind})`, async () => {
@@ -376,12 +410,13 @@ describe("Broadcasts events to France Travail", () => {
           };
 
           await broadcastToFranceTravailOnConventionUpdates.execute({
-            eventType: "CONVENTION_UPDATED",
             convention: conventionLinkedToAgencyReferingToOther,
           });
 
           // Assert
-          expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+          expect(
+            franceTravailGateway.legacyBroadcastConventionCalls,
+          ).toHaveLength(0);
         });
       },
     );
@@ -420,11 +455,12 @@ describe("Broadcasts events to France Travail", () => {
           };
 
           await broadcastToFranceTravailOnConventionUpdates.execute({
-            eventType: "CONVENTION_UPDATED",
             convention: convention,
           });
 
-          expect(franceTravailGateway.broadcastParamsCalls).toHaveLength(0);
+          expect(
+            franceTravailGateway.legacyBroadcastConventionCalls,
+          ).toHaveLength(0);
         });
       },
     );

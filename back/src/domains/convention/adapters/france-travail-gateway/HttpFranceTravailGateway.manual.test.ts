@@ -117,12 +117,11 @@ describe("HttpFranceTravailGateway", () => {
         noRetries,
       );
 
-      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
-        {
+      const response =
+        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
           ...ftConvention,
           ...fields,
-        },
-      );
+        });
 
       if (isBroadcastResponseOk(response) || isBroadcastResponseOk(expected))
         throw errors.generic.testError(
@@ -171,12 +170,11 @@ describe("HttpFranceTravailGateway", () => {
         noRetries,
       );
 
-      const response = await httpFranceTravailGateway.notifyOnConventionUpdated(
-        {
+      const response =
+        await httpFranceTravailGateway.notifyOnConventionUpdatedLegacy({
           ...ftConvention,
           ...fields,
-        },
-      );
+        });
 
       if (!isBroadcastResponseOk(expected))
         throw errors.generic.testError("Should not occurs");
@@ -222,11 +220,11 @@ describe("HttpFranceTravailGateway", () => {
         `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastConvention.url)
+      .onPost(routes.broadcastLegacyConvention.url)
       .timeout();
 
     const response =
-      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
+      await franceTravailGateway.notifyOnConventionUpdatedLegacy(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw errors.generic.testError("PE broadcast OK must not occurs");
@@ -275,11 +273,11 @@ describe("HttpFranceTravailGateway", () => {
         `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastConvention.url)
+      .onPost(routes.broadcastLegacyConvention.url)
       .reply(204, { message: "yolo" });
 
     const response =
-      await franceTravailGateway.notifyOnConventionUpdated(ftConvention);
+      await franceTravailGateway.notifyOnConventionUpdatedLegacy(ftConvention);
 
     if (isBroadcastResponseOk(response))
       throw errors.generic.testError(

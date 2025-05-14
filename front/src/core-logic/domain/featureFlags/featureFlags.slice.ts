@@ -28,6 +28,7 @@ const initialState: FeatureFlagsState = {
   enableBroadcastOfConseilDepartementalToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
+  enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   isLoading: true,
 };
 
