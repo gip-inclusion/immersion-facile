@@ -102,6 +102,23 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     };
   }
 
+  public withDatePreference(datePreferences: string) {
+    if (
+      this.discussion.kind === "IF" &&
+      this.discussion.contactMode === "EMAIL"
+    )
+      return new DiscussionBuilder({
+        ...this.discussion,
+        potentialBeneficiary: {
+          ...this.discussion.potentialBeneficiary,
+          datePreferences,
+        },
+      });
+    throw new Error(
+      `datePreference is not allowed for discussion kind ${this.discussion.kind} and contactMode ${this.discussion.contactMode}.`,
+    );
+  }
+
   public build() {
     return this.discussion;
   }
