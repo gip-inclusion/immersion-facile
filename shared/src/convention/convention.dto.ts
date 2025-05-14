@@ -163,6 +163,7 @@ export type ConventionCommon = {
   dateEnd: DateString;
   dateValidation?: DateString; // undefined until the convention is validated
   dateApproval?: DateString; // undefined until the convention is accepted by counsellor
+  updatedAt?: DateString;
   siret: SiretDto;
   businessName: string;
   schedule: ScheduleDto;

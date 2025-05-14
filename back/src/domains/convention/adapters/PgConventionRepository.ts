@@ -7,6 +7,7 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionId,
+  type DateString,
   type Email,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
@@ -114,7 +115,10 @@ export class PgConventionRepository implements ConventionRepository {
     return result.map(({ id }) => id);
   }
 
-  public async save(convention: ConventionDto): Promise<void> {
+  public async save(
+    convention: ConventionDto,
+    now?: DateString,
+  ): Promise<void> {
     const alreadyExistingConvention = await this.getById(convention.id);
     if (alreadyExistingConvention)
       throw errors.convention.conflict({ conventionId: convention.id });
@@ -211,12 +215,14 @@ export class PgConventionRepository implements ConventionRepository {
         acquisition_keyword: convention.acquisitionKeyword,
         establishment_number_employees:
           convention.establishmentNumberEmployeesRange,
+        updated_at: now ?? sql`now()`,
       })
       .execute();
   }
 
   public async update(
     convention: ConventionDto,
+    now?: DateString,
   ): Promise<ConventionId | undefined> {
     const {
       signatories: {
@@ -257,6 +263,7 @@ export class PgConventionRepository implements ConventionRepository {
         }),
       beneficiary_current_employer_id: beneficiaryCurrentEmployerId,
       beneficiary_representative_id: beneficiaryRepresentativeId,
+      now,
     });
 
     return convention.id;
@@ -561,12 +568,14 @@ export class PgConventionRepository implements ConventionRepository {
     establishment_representative_id,
     beneficiary_current_employer_id,
     beneficiary_representative_id,
+    now,
   }: {
     convention: ConventionDto;
     establishment_tutor_id: number;
     establishment_representative_id: number;
     beneficiary_current_employer_id: number | null;
     beneficiary_representative_id: number | null;
+    now?: DateString;
   }) {
     await this.transaction
       .updateTable("conventions")
@@ -594,7 +603,7 @@ export class PgConventionRepository implements ConventionRepository {
         immersion_skills: convention.immersionSkills,
         work_conditions: convention.workConditions,
         status_justification: convention.statusJustification,
-        updated_at: sql`now()`,
+        updated_at: now ?? sql`now()`,
         establishment_tutor_id,
         establishment_representative_id,
         beneficiary_current_employer_id,

@@ -19,6 +19,7 @@ import {
   type Role,
   agencyModifierRoles,
   conventionStatusesAllowedForModification,
+  conventionUpdateConflictMessage,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
@@ -103,6 +104,11 @@ export const ConventionFormWrapper = ({
     (conventionFormFeedback.on === "create" ||
       conventionFormFeedback.on === "update");
 
+  const hasConventionUpdateConflict =
+    conventionFormFeedback?.level === "error" &&
+    conventionFormFeedback.on === "update" &&
+    conventionFormFeedback.message === conventionUpdateConflictMessage;
+
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
     inclusionConnectedRoles,
   );
@@ -178,6 +184,13 @@ export const ConventionFormWrapper = ({
     };
   }, [dispatch]);
 
+  const routeToRedirectTo = getRouteToRedirectAfterSubmit({
+    mode,
+    userRolesOnConvention,
+    route,
+    fetchedConvention,
+  });
+
   return (
     <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
       {match({
@@ -199,8 +212,26 @@ export const ConventionFormWrapper = ({
           ),
         isLoading,
         fetchedConvention,
+        hasConventionUpdateConflict,
       })
         .with({ isLoading: true }, () => <Loader />)
+        .with({ hasConventionUpdateConflict: true }, () => (
+          <section className={fr.cx("fr-col-12")}>
+            <Alert
+              severity="error"
+              title="Attention ! Vos modifications n'ont pas été prises en compte"
+              description={conventionUpdateConflictMessage}
+            />
+            {routeToRedirectTo && (
+              <Button
+                linkProps={routeToRedirectTo.link}
+                className={fr.cx("fr-mt-4w")}
+              >
+                Retourner sur la convention
+              </Button>
+            )}
+          </section>
+        ))
         .with(
           {
             conventionCantBeEdited: true,
@@ -269,59 +300,7 @@ export const ConventionFormWrapper = ({
                 .push();
             }
 
-            if (mode === "edit") {
-              const userIsSignatory = userRolesOnConvention.some((role) =>
-                isSignatory(role),
-              );
-              if (userIsSignatory && route.params.jwt) {
-                const { applicationId } =
-                  decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-                    route.params.jwt,
-                  );
-                if (applicationId) {
-                  routes
-                    .conventionToSign({
-                      jwt: route.params.jwt,
-                    })
-                    .push();
-                } else {
-                  routes
-                    .manageConventionConnectedUser({
-                      conventionId: fetchedConvention.id,
-                    })
-                    .push();
-                }
-              }
-              if (userRolesOnConvention.includes("back-office")) {
-                routes
-                  .adminConventionDetail({ conventionId: fetchedConvention.id })
-                  .push();
-              }
-
-              if (
-                intersection(userRolesOnConvention, agencyModifierRoles)
-                  .length > 0 &&
-                route.params.jwt
-              ) {
-                const { applicationId } =
-                  decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-                    route.params.jwt,
-                  );
-                if (applicationId) {
-                  routes
-                    .manageConvention({
-                      jwt: route.params.jwt,
-                    })
-                    .push();
-                } else {
-                  routes
-                    .manageConventionConnectedUser({
-                      conventionId: fetchedConvention.id,
-                    })
-                    .push();
-                }
-              }
-            }
+            if (routeToRedirectTo) routeToRedirectTo.push();
           },
         )
         .with({ shouldRedirectToError: true }, () => (
@@ -590,3 +569,55 @@ const DuplicateConventionAlert = (props: {
     }
   />
 );
+
+const getRouteToRedirectAfterSubmit = ({
+  mode,
+  userRolesOnConvention,
+  route,
+  fetchedConvention,
+}: {
+  mode: ConventionFormMode;
+  userRolesOnConvention: Role[];
+  route: SupportedConventionRoutes;
+  fetchedConvention: { id: string } | null;
+}) => {
+  if (!fetchedConvention) return undefined;
+  if (mode === "edit") {
+    const userIsSignatory = userRolesOnConvention.some((role) =>
+      isSignatory(role),
+    );
+    if (userIsSignatory && route.params.jwt) {
+      const { applicationId } =
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+          route.params.jwt,
+        );
+      if (applicationId) {
+        return routes.conventionToSign({ jwt: route.params.jwt });
+      }
+      return routes.manageConventionConnectedUser({
+        conventionId: fetchedConvention.id,
+      });
+    }
+    if (userRolesOnConvention.includes("back-office")) {
+      return routes.adminConventionDetail({
+        conventionId: fetchedConvention.id,
+      });
+    }
+    if (
+      intersection(userRolesOnConvention, agencyModifierRoles).length > 0 &&
+      route.params.jwt
+    ) {
+      const { applicationId } =
+        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+          route.params.jwt,
+        );
+      if (applicationId) {
+        return routes.manageConvention({ jwt: route.params.jwt });
+      }
+      return routes.manageConventionConnectedUser({
+        conventionId: fetchedConvention.id,
+      });
+    }
+  }
+  return undefined;
+};

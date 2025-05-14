@@ -57,6 +57,9 @@ import {
   UnavailableApiError,
 } from "./httpErrors";
 
+export const conventionUpdateConflictMessage =
+  "Quelqu’un d’autre a modifié la demande en même temps que vous. Veuillez la relire puis la signer ou la modifier.";
+
 export const errors = {
   email: {
     missingContentParts: (kind: keyof EmailParamsByEmailType) =>
@@ -227,9 +230,7 @@ export const errors = {
         `Vous n'avez pas les droits nécessaires pour modifier la convention '${id}'. Seul les signataires ainsi que les conseillers liés a cette convention peuvent la modifier.`,
       ),
     conventionGotUpdatedWhileUpdating: () =>
-      new BadRequestError(
-        "Quelqu’un d’autre a modifié la demande en même temps que vous. Veuillez la relire puis la signer ou la modifier.",
-      ),
+      new BadRequestError(conventionUpdateConflictMessage),
     missingFTAdvisor: ({ ftExternalId }: { ftExternalId: FtExternalId }) =>
       new NotFoundError(
         `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,
