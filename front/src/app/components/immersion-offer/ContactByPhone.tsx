@@ -154,7 +154,7 @@ export const ContactByPhone = ({
           peuvent pas être communiquées à d’autres personnes. Merci !
         </p>
         <Input
-          label={inputsLabelsByKey.email}
+          label={inputsLabelsByKey.potentialBeneficiaryEmail}
           nativeInputProps={{
             ...register("potentialBeneficiaryEmail"),
             type: "email",
@@ -162,12 +162,12 @@ export const ContactByPhone = ({
           {...getFieldError("potentialBeneficiaryEmail")}
         />
         <Input
-          label={inputsLabelsByKey.firstName}
+          label={inputsLabelsByKey.potentialBeneficiaryFirstName}
           nativeInputProps={register("potentialBeneficiaryFirstName")}
           {...getFieldError("potentialBeneficiaryFirstName")}
         />
         <Input
-          label={inputsLabelsByKey.lastName}
+          label={inputsLabelsByKey.potentialBeneficiaryLastName}
           nativeInputProps={register("potentialBeneficiaryLastName")}
           {...getFieldError("potentialBeneficiaryLastName")}
         />
