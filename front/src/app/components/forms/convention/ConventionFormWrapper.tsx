@@ -280,31 +280,26 @@ const ConventionSummarySection = () => {
       {createPortal(
         <ConfirmDuplicateConventionModal
           title={"Confirmer la création de cette convention"}
+          buttons={[
+            {
+              children: "Annuler",
+              onClick: closeConfirmDuplicateConventionModal,
+              priority: "secondary",
+            },
+            {
+              children: "Valider (au risque de créer un doublon)",
+              onClick: () => {
+                onConfirmSubmit();
+                closeConfirmDuplicateConventionModal();
+              },
+              nativeButtonProps: {
+                disabled: isLoading,
+              },
+            },
+          ]}
         >
           <DuplicateConventionAlert
             similarConventionIds={similarConventionIds}
-          />
-          <ButtonsGroup
-            className={fr.cx("fr-mt-4w")}
-            inlineLayoutWhen="sm and up"
-            alignment="center"
-            buttons={[
-              {
-                children: "Annuler",
-                onClick: closeConfirmDuplicateConventionModal,
-                priority: "secondary",
-              },
-              {
-                children: "Valider (au risque de créer un doublon)",
-                onClick: () => {
-                  onConfirmSubmit();
-                  closeConfirmDuplicateConventionModal();
-                },
-                nativeButtonProps: {
-                  disabled: isLoading,
-                },
-              },
-            ]}
           />
         </ConfirmDuplicateConventionModal>,
         document.body,
