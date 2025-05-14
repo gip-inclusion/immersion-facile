@@ -10,6 +10,7 @@ import { isStringDate, toDisplayedDate } from "../utils/date";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
+import { emailAttachements } from "./emailAttachements";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>
@@ -557,9 +558,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         `,
         attachmentUrls:
           internshipKind === "immersion"
-            ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo-beneficiaire-immersionfacilitée2024.pdf",
-              ]
+            ? [emailAttachements.memoBeneficiary]
             : undefined,
         agencyLogoUrl,
       }),
@@ -626,9 +625,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
 
       `,
         subContent: defaultSignature("immersion"),
-        attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-        ],
+        attachmentUrls: [emailAttachements.memoAgencyGeneral],
         agencyLogoUrl,
       }),
     },
@@ -689,9 +686,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         subContent: defaultSignature(internshipKind),
         attachmentUrls:
           internshipKind === "immersion"
-            ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-              ]
+            ? [emailAttachements.memoAgencyGeneral]
             : undefined,
         agencyLogoUrl,
       }),
@@ -800,9 +795,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
 
       ${defaultSignature("immersion")}
       `,
-        attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-        ],
+        attachmentUrls: [emailAttachements.memoAgencyGeneral],
         agencyLogoUrl,
       }),
     },
@@ -853,9 +846,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         subContent: defaultSignature(internshipKind),
         attachmentUrls:
           internshipKind === "immersion"
-            ? [
-                "https://immersion.cellar-c2.services.clever-cloud.com/Fiche-memo-prescripteur-générale-immersionfacilitée2024.pdf",
-              ]
+            ? [emailAttachements.memoAgencyGeneral]
             : undefined,
         agencyLogoUrl,
       }),
@@ -1483,9 +1474,7 @@ Tél : ${beneficiaryPhone}`,
         ],
         agencyLogoUrl,
         subContent: defaultSignature("immersion"),
-        attachmentUrls: [
-          "https://immersion.cellar-c2.services.clever-cloud.com/Fiche memo prescripteur-Role-des-prescripteurs-et-couverture-des risques-immersionfacilitee2024.pdf",
-        ],
+        attachmentUrls: [emailAttachements.memoAgencyRolesAndRisks],
       }),
     },
     AGENCY_WITH_REFERS_TO_ACTIVATED: {
