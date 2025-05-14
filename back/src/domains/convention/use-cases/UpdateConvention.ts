@@ -69,10 +69,9 @@ export class UpdateConvention extends TransactionalUseCase<
         status: conventionFromRepo.status,
       });
 
-    //TODO handle already updated convention
-    // if (convention.updatedAt !== conventionFromRepo.updatedAt) {
-    //   throw errors.convention.conventionGotUpdatedWhileUpdating();
-    // }
+    if (convention.updatedAt !== conventionFromRepo.updatedAt) {
+      throw errors.convention.conventionGotUpdatedWhileUpdating();
+    }
     const userRolesOnConvention =
       await extractUserRolesOnConventionFromJwtPayload(
         jwtPayload,

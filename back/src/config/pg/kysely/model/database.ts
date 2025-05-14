@@ -233,7 +233,7 @@ interface ConventionExternalIds {
 interface Conventions extends WithAcquisition {
   id: ConventionId;
   created_at: Generated<Timestamp>;
-  updated_at: Generated<Timestamp>;
+  updated_at: Timestamp;
   status: ConventionStatusType;
   agency_id: string;
   date_submission: Timestamp;

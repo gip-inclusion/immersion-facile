@@ -230,6 +230,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     status: z.enum(conventionStatuses),
     statusJustification: z.string().optional(),
     agencyId: agencyIdSchema,
+    updatedAt: makeDateStringSchema().optional(),
     dateSubmission: makeDateStringSchema(),
     dateStart: makeDateStringSchema(localization.invalidDateStart),
     dateEnd: makeDateStringSchema(localization.invalidDateEnd),

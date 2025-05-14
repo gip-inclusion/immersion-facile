@@ -16,6 +16,7 @@ import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";
 
+const anyConventionUpdatedAt = new Date("2022-05-20T12:43:11").toISOString();
 const siret1 = "12345678901234";
 const siret2 = "12345671234567";
 const conventionId1 = "a99eaca1-ee70-4c90-b3f4-777777777777";
@@ -30,6 +31,7 @@ const convention1 = new ConventionDtoBuilder()
   .withAgencyId(agencyId)
   .withSiret(siret1)
   .withStatus("ACCEPTED_BY_VALIDATOR")
+  .withUpdatedAt(anyConventionUpdatedAt)
   .build();
 
 const convention2 = new ConventionDtoBuilder()
@@ -37,6 +39,7 @@ const convention2 = new ConventionDtoBuilder()
   .withAgencyId(agencyId)
   .withSiret(siret2)
   .withStatus("ACCEPTED_BY_VALIDATOR")
+  .withUpdatedAt(anyConventionUpdatedAt)
   .build();
 
 const convention3 = new ConventionDtoBuilder()
@@ -131,9 +134,9 @@ describe("PgEstablishmentLeadQueries", () => {
         }),
       );
       await Promise.all([
-        conventionRepository.save(convention1),
-        conventionRepository.save(convention2),
-        conventionRepository.save(convention3),
+        conventionRepository.save(convention1, anyConventionUpdatedAt),
+        conventionRepository.save(convention2, anyConventionUpdatedAt),
+        conventionRepository.save(convention3, anyConventionUpdatedAt),
         establishmentLeadRepository.save(establishmentLead1),
         establishmentLeadRepository.save(establishmentLead2),
       ]);
@@ -168,8 +171,8 @@ describe("PgEstablishmentLeadQueries", () => {
         }),
       );
       await Promise.all([
-        conventionRepository.save(convention1),
-        conventionRepository.save(convention2),
+        conventionRepository.save(convention1, anyConventionUpdatedAt),
+        conventionRepository.save(convention2, anyConventionUpdatedAt),
         establishmentLeadRepository.save(establishmentLead1),
         establishmentLeadRepository.save(establishmentLeadForConvention2),
       ]);

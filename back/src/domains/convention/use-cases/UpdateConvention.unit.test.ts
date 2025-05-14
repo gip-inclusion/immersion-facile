@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyRole,
@@ -299,34 +300,31 @@ describe("Update Convention", () => {
         );
       },
     );
-    //TODO uncomment this test when we handle already updated convention in usecase
-    // it("throws if convention already updated when user try to update it", async () => {
-    //   uow.conventionRepository.setConventions([convention]);
+    it("throws if convention already updated when user try to update it", async () => {
+      const updatedAt = "2025-01-01";
+      const firstUpdatedConvention = new ConventionDtoBuilder(convention)
+        .withStatus("READY_TO_SIGN")
+        .withStatusJustification("first-justification")
+        .withUpdatedAt(addDays(new Date(updatedAt), 1).toISOString())
+        .build();
+      uow.conventionRepository.setConventions([firstUpdatedConvention]);
 
-    //   const firstUpdatedConvention = new ConventionDtoBuilder(convention)
-    //     .withStatus("READY_TO_SIGN")
-    //     .withEstablishmentRepresentativeEmail("new@email.fr")
-    //     .withStatusJustification("first-justification")
-    //     .build();
+      const conventionToUpdate = new ConventionDtoBuilder(
+        firstUpdatedConvention,
+      )
+        .withStatus("READY_TO_SIGN")
+        .withStatusJustification("new-justification")
+        .withUpdatedAt(updatedAt)
+        .build();
 
-    //   await updateConvention.execute(
-    //     { convention: firstUpdatedConvention },
-    //     { userId: backofficeAdminUser.id },
-    //   );
-
-    //   const conventionToUpdate = new ConventionDtoBuilder(convention)
-    //     .withStatus("READY_TO_SIGN")
-    //     .withBeneficiaryEmail("new@email.fr")
-    //     .withStatusJustification("justif")
-    //     .build();
-    //   await expectPromiseToFailWithError(
-    //     updateConvention.execute(
-    //       { convention: conventionToUpdate },
-    //       { userId: backofficeAdminUser.id },
-    //     ),
-    //     errors.convention.conventionGotUpdatedWhileUpdating(),
-    //   );
-    // });
+      await expectPromiseToFailWithError(
+        updateConvention.execute(
+          { convention: conventionToUpdate },
+          { userId: backofficeAdminUser.id },
+        ),
+        errors.convention.conventionGotUpdatedWhileUpdating(),
+      );
+    });
   });
 
   describe("Right path", () => {
