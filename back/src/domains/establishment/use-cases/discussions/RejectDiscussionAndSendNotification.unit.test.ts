@@ -230,9 +230,11 @@ describe("RejectDiscussionAndSendNotification", () => {
                 kind: "DISCUSSION_EXCHANGE",
                 sender: immersionFacileNoReplyEmailSender,
                 params: { subject, htmlContent },
-                recipients: [`${discussion.id}_b@reply-domain`],
+                recipients: [
+                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
+                ],
                 replyTo: {
-                  email: `${discussion.id}_e@reply-domain`,
+                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
                   name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
                 },
               },
@@ -286,9 +288,11 @@ describe("RejectDiscussionAndSendNotification", () => {
                 kind: "DISCUSSION_EXCHANGE",
                 sender: immersionFacileNoReplyEmailSender,
                 params: { subject, htmlContent },
-                recipients: [`${discussion.id}_b@reply-domain`],
+                recipients: [
+                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
+                ],
                 replyTo: {
-                  email: `${discussion.id}_e@reply-domain`,
+                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
                   name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
                 },
               },
@@ -349,9 +353,11 @@ describe("RejectDiscussionAndSendNotification", () => {
                 kind: "DISCUSSION_EXCHANGE",
                 sender: immersionFacileNoReplyEmailSender,
                 params: { subject, htmlContent },
-                recipients: [`${discussion.id}_b@reply-domain`],
+                recipients: [
+                  `${discussionWithEmailInCopy.potentialBeneficiary.firstName}_${discussionWithEmailInCopy.potentialBeneficiary.lastName}__${discussionWithEmailInCopy.id}_b@reply-domain`,
+                ],
                 replyTo: {
-                  email: `${discussionWithEmailInCopy.id}_e@reply-domain`,
+                  email: `${discussionWithEmailInCopy.establishmentContact.firstName}_${discussionWithEmailInCopy.establishmentContact.lastName}__${discussionWithEmailInCopy.id}_e@reply-domain`,
                   name: `${discussionWithEmailInCopy.establishmentContact.firstName} ${discussionWithEmailInCopy.establishmentContact.lastName} - ${discussionWithEmailInCopy.businessName}`,
                 },
               },
@@ -428,9 +434,11 @@ describe("RejectDiscussionAndSendNotification", () => {
                 kind: "DISCUSSION_EXCHANGE",
                 sender: immersionFacileNoReplyEmailSender,
                 params: { subject, htmlContent },
-                recipients: [`${discussion.id}_b@reply-domain`],
+                recipients: [
+                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
+                ],
                 replyTo: {
-                  email: `${discussionWithoutUserEmail.id}_e@reply-domain`,
+                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
                   name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
                 },
               },
@@ -498,9 +506,11 @@ describe("RejectDiscussionAndSendNotification", () => {
                 kind: "DISCUSSION_EXCHANGE",
                 sender: immersionFacileNoReplyEmailSender,
                 params: { subject, htmlContent },
-                recipients: [`${discussion.id}_b@reply-domain`],
+                recipients: [
+                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
+                ],
                 replyTo: {
-                  email: `${discussionWithoutUserEmail.id}_e@reply-domain`,
+                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
                   name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
                 },
               },

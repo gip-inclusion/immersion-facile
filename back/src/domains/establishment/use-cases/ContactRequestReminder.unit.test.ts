@@ -339,11 +339,15 @@ const makeEstablishmentContactRequestReminder = (
   domain: string,
   mode: ContactRequestReminderMode,
 ): TemplatedEmail => {
-  const replyEmail = createOpaqueEmail(
-    discussion.id,
-    "potentialBeneficiary",
-    `reply.${domain}`,
-  );
+  const replyEmail = createOpaqueEmail({
+    discussionId: discussion.id,
+    recipient: {
+      kind: "potentialBeneficiary",
+      firstname: discussion.potentialBeneficiary.firstName,
+      lastname: discussion.potentialBeneficiary.lastName,
+    },
+    replyDomain: `reply.${domain}`,
+  });
   return {
     kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
     params: {

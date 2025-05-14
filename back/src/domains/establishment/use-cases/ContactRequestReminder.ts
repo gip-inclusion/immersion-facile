@@ -83,11 +83,15 @@ const makeNotification = async ({
       [discussion.appellationCode],
     );
   const appellation = appellations.at(0);
-  const replyTo = createOpaqueEmail(
-    discussion.id,
-    "potentialBeneficiary",
-    `reply.${domain}`,
-  );
+  const replyTo = createOpaqueEmail({
+    discussionId: discussion.id,
+    recipient: {
+      kind: "potentialBeneficiary",
+      firstname: discussion.potentialBeneficiary.firstName,
+      lastname: discussion.potentialBeneficiary.lastName,
+    },
+    replyDomain: `reply.${domain}`,
+  });
   return appellation
     ? ({
         followedIds: { establishmentSiret: discussion.siret },

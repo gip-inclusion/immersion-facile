@@ -102,11 +102,15 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         appellationCode: discussion.appellationCode,
       });
 
-    const opaqueEmail: Email = createOpaqueEmail(
-      payload.discussionId,
-      "potentialBeneficiary",
-      this.#replyDomain,
-    );
+    const opaqueEmail: Email = createOpaqueEmail({
+      discussionId: payload.discussionId,
+      recipient: {
+        kind: "potentialBeneficiary",
+        firstname: discussion.potentialBeneficiary.firstName,
+        lastname: discussion.potentialBeneficiary.lastName,
+      },
+      replyDomain: this.#replyDomain,
+    });
 
     const templatedContent: TemplatedEmail = {
       sender: immersionFacileNoReplyEmailSender,
