@@ -23,7 +23,7 @@ import { useDispatch } from "react-redux";
 import {
   type DiscussionId,
   type DiscussionReadDto,
-  type DiscussionStatus,
+  type DiscussionVisualStatus,
   type Email,
   type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
@@ -33,6 +33,7 @@ import {
   createOpaqueEmail,
   discussionRejectionSchema,
   domElementIds,
+  getDiscussionVisualStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
@@ -136,27 +137,40 @@ const DiscussionDetails = ({
   });
 
   const statusBadgeData: Record<
-    DiscussionStatus,
+    DiscussionVisualStatus,
     {
-      severity: "new" | "error" | "success";
+      severity: "new" | "info" | "error" | "warning" | "success" | undefined;
       label: string;
     }
   > = {
-    ACCEPTED: {
-      severity: "success",
-      label: "Candidature acceptée",
+    new: {
+      severity: "info",
+      label: "Nouveau",
     },
-    REJECTED: {
+    "needs-answer": {
+      severity: "warning",
+      label: "En cours - à répondre",
+    },
+    "needs-urgent-answer": {
       severity: "error",
-      label: "Candidature rejetée",
+      label: "En cours - Urgent",
     },
-    PENDING: {
+    answered: {
       severity: "new",
-      label: "Candidature en cours",
+      label: "En cours - répondu",
+    },
+    accepted: {
+      severity: "success",
+      label: "Acceptée",
+    },
+    rejected: {
+      severity: undefined,
+      label: "Refusée",
     },
   };
 
-  const statusBadge = statusBadgeData[discussion.status];
+  const statusBadge =
+    statusBadgeData[getDiscussionVisualStatus({ discussion, now: new Date() })];
   const candidateContactButtons: [ButtonProps, ...ButtonProps[]] = [
     {
       id: domElementIds.establishmentDashboard.discussion
@@ -226,7 +240,10 @@ const DiscussionDetails = ({
           <p
             key="status-badge"
             id={domElementIds.establishmentDashboard.discussion.statusBadge}
-            className={fr.cx("fr-badge", `fr-badge--${statusBadge.severity}`)}
+            className={fr.cx(
+              "fr-badge",
+              statusBadge.severity && `fr-badge--${statusBadge.severity}`,
+            )}
           >
             {statusBadge.label}
           </p>

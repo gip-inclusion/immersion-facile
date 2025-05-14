@@ -149,3 +149,5 @@ export * from "./utils/toDotNotation";
 export * from "./zodUtils";
 export * from "./durations";
 export * from "./establishment/establishment";
+export * from "./discussion/DiscussionBuilder";
+export * from "./discussion/discussion.helpers";
