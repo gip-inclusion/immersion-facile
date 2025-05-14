@@ -19,6 +19,7 @@ import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
   type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
@@ -105,10 +106,12 @@ describe("Send signature link", () => {
     timeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+    const uuidGenerator = new UuidV4Generator();
     saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      new UuidV4Generator(),
+      uuidGenerator,
       timeGateway,
     );
+    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
 
     usecase = makeSendSignatureLink({
       uowPerformer: new InMemoryUowPerformer(uow),
@@ -118,6 +121,7 @@ describe("Send signature link", () => {
         timeGateway,
         shortLinkIdGeneratorGateway,
         config,
+        createNewEvent,
       },
     });
   });
@@ -519,6 +523,18 @@ describe("Send signature link", () => {
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [
           { topic: "NotificationAdded" },
+          {
+            topic: "ConventionSignatureLinkManuallySent",
+            payload: {
+              convention,
+              recipientRole: "establishment-representative",
+              transport: "sms",
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: connectedUser.id,
+              },
+            },
+          },
         ]);
         expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
           {
@@ -560,6 +576,7 @@ describe("Send signature link", () => {
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         { topic: "NotificationAdded" },
+        { topic: "ConventionSignatureLinkManuallySent" },
       ]);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         {
@@ -609,6 +626,18 @@ describe("Send signature link", () => {
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [
           { topic: "NotificationAdded" },
+          {
+            topic: "ConventionSignatureLinkManuallySent",
+            payload: {
+              convention,
+              recipientRole: "establishment-representative",
+              transport: "sms",
+              triggeredBy: {
+                kind: "convention-magic-link",
+                role,
+              },
+            },
+          },
         ]);
         expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
           {
@@ -676,6 +705,7 @@ describe("Send signature link", () => {
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         { topic: "NotificationAdded" },
+        { topic: "ConventionSignatureLinkManuallySent" },
       ]);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         {
@@ -742,6 +772,7 @@ describe("Send signature link", () => {
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
         { topic: "NotificationAdded" },
+        { topic: "ConventionSignatureLinkManuallySent" },
       ]);
       expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
         pastSmsNotification,

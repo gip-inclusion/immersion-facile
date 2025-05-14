@@ -107,6 +107,7 @@ const getUseCasesByTopics = (
     useCases.broadcastToFranceTravailOnConventionUpdates,
     useCases.broadcastToPartnersOnConventionUpdates,
   ],
+  ConventionSignatureLinkManuallySent: [],
   ConventionReminderRequired: [useCases.notifyConventionReminder],
 
   // Establishment form related
