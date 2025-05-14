@@ -14,6 +14,7 @@ import {
   type ConventionReadDto,
   type ConventionStatus,
   DATE_START,
+  type DateString,
   type EmailNotification,
   InclusionConnectedUserBuilder,
   type Notification,
@@ -45,6 +46,7 @@ describe("Pg implementation of ConventionQueries", () => {
   const conventionIdB: ConventionId = "bbbbbc99-9c0b-1bbb-bb6d-6bb9bd38bbbb";
   const agencyIdA: AgencyId = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
   const agencyIdB: AgencyId = "bbbbbbbb-aaaa-aaaa-aaaa-aaaaaaaaaaaa";
+  const anyConventionUpdatedAt = new Date("2022-05-20T12:43:11").toISOString();
 
   const createNotification = ({
     id,
@@ -176,6 +178,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyDepartment: "75",
         agencyKind: "autre",
         agencySiret: "11112222000033",
+        conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
       });
 
@@ -201,6 +204,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencyKind: "autre",
         agencySiret: "11112222000033",
         withRefersToAgency: referringAgency,
+        conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
       });
 
@@ -223,6 +227,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencySiret: "11112222000044",
         conventionStartDate: new Date("2021-01-10").toISOString(),
         conventionStatus: "IN_REVIEW",
+        conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
       });
       cciConvention = await insertAgencyAndConvention({
@@ -234,6 +239,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencySiret: "11112222000055",
         conventionStartDate: new Date("2021-01-15").toISOString(),
         conventionStatus: "READY_TO_SIGN",
+        conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
       });
       await insertAgencyAndConvention({
@@ -245,6 +251,7 @@ describe("Pg implementation of ConventionQueries", () => {
         agencySiret: "11112222000066",
         conventionStartDate: new Date("2021-01-12").toISOString(),
         conventionStatus: "IN_REVIEW",
+        conventionUpdatedAt: anyConventionUpdatedAt,
         validatorUser: validator,
       });
     });
@@ -357,6 +364,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withStatus("CANCELLED")
       .withAgencyId(agencyId)
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const conventionReadyToSignAndDateStart20230330 = new ConventionDtoBuilder()
@@ -368,6 +376,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withStatus("READY_TO_SIGN")
       .withAgencyId(agencyId)
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const firstValidatedConvention = new ConventionDtoBuilder()
@@ -381,6 +390,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .validated()
       .withDateValidation(new Date("2024-06-25").toISOString())
       .withAgencyId(agencyId)
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const secondValidatedConvention = new ConventionDtoBuilder()
@@ -394,6 +404,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .validated()
       .withDateValidation(new Date("2024-06-29").toISOString())
       .withAgencyId(agencyId)
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     beforeEach(async () => {
@@ -409,7 +420,9 @@ describe("Pg implementation of ConventionQueries", () => {
           conventionReadyToSignAndDateStart20230330,
           firstValidatedConvention,
           secondValidatedConvention,
-        ].map((params) => conventionRepository.save(params)),
+        ].map((params) =>
+          conventionRepository.save(params, anyConventionUpdatedAt),
+        ),
       );
     });
 
@@ -714,6 +727,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withDateStart(dateStart)
       .withDateEnd(dateEnd14)
       .withSchedule(reasonableSchedule)
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail =
@@ -723,6 +737,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withDateStart(dateStart)
         .withDateEnd(dateEnd15)
         .withSchedule(reasonableSchedule)
+        .withUpdatedAt(anyConventionUpdatedAt)
         .build();
 
     const validatedImmersionEndingThe15th = new ConventionDtoBuilder()
@@ -733,6 +748,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withSchedule(reasonableSchedule)
       .withEstablishmentTutorFirstName("Romain")
       .withEstablishmentTutorLastName("Grandjean")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const ongoingImmersionEndingThe15th = new ConventionDtoBuilder()
@@ -741,6 +757,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withDateEnd(dateEnd15)
       .withSchedule(reasonableSchedule)
       .withStatus("IN_REVIEW")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const assessmentNotification: Notification = createNotification({
@@ -801,7 +818,7 @@ describe("Pg implementation of ConventionQueries", () => {
           validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
           validatedImmersionEndingThe15th,
           ongoingImmersionEndingThe15th,
-        ].map((params) => conventionRepo.save(params)),
+        ].map((params) => conventionRepo.save(params, anyConventionUpdatedAt)),
       );
       await notificationRepo.saveBatch([
         assessmentNotification,
@@ -838,6 +855,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
+        .withUpdatedAt(anyConventionUpdatedAt)
         .build();
       const futureConventionNotification: Notification = createNotification({
         id: "77770000-0000-4777-7773-000077770000",
@@ -853,6 +871,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
+        .withUpdatedAt(anyConventionUpdatedAt)
         .build();
       const pastConventionNotification: Notification = createNotification({
         id: "77770000-0000-4777-7777-000077770005",
@@ -860,8 +879,8 @@ describe("Pg implementation of ConventionQueries", () => {
         convention: pastConvention,
         emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       });
-      await conventionRepo.save(pastConvention);
-      await conventionRepo.save(futureConvention);
+      await conventionRepo.save(pastConvention, anyConventionUpdatedAt);
+      await conventionRepo.save(futureConvention, anyConventionUpdatedAt);
       await notificationRepo.save(pastConventionNotification);
       await notificationRepo.save(futureConventionNotification);
 
@@ -875,6 +894,7 @@ describe("Pg implementation of ConventionQueries", () => {
         );
 
       expectArraysToEqualIgnoringOrder(queryResults, [
+        validatedImmersionEndingThe14th,
         validatedImmersionEndingThe15th,
         pastConvention,
       ]);
@@ -893,6 +913,7 @@ describe("Pg implementation of ConventionQueries", () => {
         .withSchedule(reasonableSchedule)
         .withEstablishmentTutorFirstName("Romain")
         .withEstablishmentTutorLastName("Grandjean")
+        .withUpdatedAt(anyConventionUpdatedAt)
         .build();
       const pastConventionNotification: Notification = createNotification({
         id: "77770000-0000-4777-7777-000077770005",
@@ -900,11 +921,14 @@ describe("Pg implementation of ConventionQueries", () => {
         convention: pastConvention,
         emailKind: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
       });
-      await conventionRepo.save(pastConvention);
-      await conventionRepo.update({
-        ...pastConvention,
-        status: "ACCEPTED_BY_VALIDATOR",
-      });
+      await conventionRepo.save(pastConvention, anyConventionUpdatedAt);
+      await conventionRepo.update(
+        {
+          ...pastConvention,
+          status: "ACCEPTED_BY_VALIDATOR",
+        },
+        today.toISOString(),
+      );
       await notificationRepo.save(pastConventionNotification);
 
       const queryResults =
@@ -916,7 +940,9 @@ describe("Pg implementation of ConventionQueries", () => {
           "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
         );
 
-      expectArraysToEqualIgnoringOrder(queryResults, [pastConvention]);
+      expectArraysToEqualIgnoringOrder(queryResults, [
+        { ...pastConvention, updatedAt: today.toISOString() },
+      ]);
     });
   });
 
@@ -930,6 +956,7 @@ describe("Pg implementation of ConventionQueries", () => {
     withRefersToAgency,
     conventionStartDate = DATE_START,
     conventionStatus = "READY_TO_SIGN",
+    conventionUpdatedAt,
     validatorUser,
   }: {
     conventionId: ConventionId;
@@ -938,10 +965,11 @@ describe("Pg implementation of ConventionQueries", () => {
     agencyDepartment: string;
     agencyKind: AgencyKind;
     agencySiret: SiretDto;
-    validatorUser: UserWithAdminRights;
     withRefersToAgency?: AgencyDto;
     conventionStartDate?: string;
     conventionStatus?: ConventionStatus;
+    conventionUpdatedAt: DateString;
+    validatorUser: UserWithAdminRights;
   }): Promise<ConventionReadDto> => {
     const convention = new ConventionDtoBuilder()
       .withAgencyId(agencyId)
@@ -1028,7 +1056,7 @@ describe("Pg implementation of ConventionQueries", () => {
       }),
     );
 
-    await conventionRepository.save(convention);
+    await conventionRepository.save(convention, conventionUpdatedAt);
 
     return {
       ...convention,
@@ -1043,6 +1071,7 @@ describe("Pg implementation of ConventionQueries", () => {
       },
       agencyValidatorEmails: [validatorUser.email],
       agencyCounsellorEmails: [],
+      updatedAt: conventionUpdatedAt,
     } satisfies ConventionReadDto;
   };
 
@@ -1087,6 +1116,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("John")
       .withBeneficiaryLastName("Doe")
       .withBusinessName("Business A")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const conventionB = new ConventionDtoBuilder()
@@ -1099,6 +1129,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("Jane")
       .withBeneficiaryLastName("Smith")
       .withBusinessName("Business B")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const conventionC = new ConventionDtoBuilder()
@@ -1111,6 +1142,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("Alice")
       .withBeneficiaryLastName("Johnson")
       .withBusinessName("Business C")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     const conventionD = new ConventionDtoBuilder()
@@ -1123,6 +1155,7 @@ describe("Pg implementation of ConventionQueries", () => {
       .withBeneficiaryFirstName("Bob")
       .withBeneficiaryLastName("Brown")
       .withBusinessName("Business D")
+      .withUpdatedAt(anyConventionUpdatedAt)
       .build();
 
     beforeEach(async () => {
@@ -1145,10 +1178,10 @@ describe("Pg implementation of ConventionQueries", () => {
       );
 
       await Promise.all([
-        conventionRepository.save(conventionA),
-        conventionRepository.save(conventionB),
-        conventionRepository.save(conventionC),
-        conventionRepository.save(conventionD),
+        conventionRepository.save(conventionA, anyConventionUpdatedAt),
+        conventionRepository.save(conventionB, anyConventionUpdatedAt),
+        conventionRepository.save(conventionC, anyConventionUpdatedAt),
+        conventionRepository.save(conventionD, anyConventionUpdatedAt),
       ]);
     });
 

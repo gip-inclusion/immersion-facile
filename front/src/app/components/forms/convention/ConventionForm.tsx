@@ -624,6 +624,7 @@ export const ConventionForm = ({
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
+                    conventionSchema.parse(conventionValues);
                     console.error(conventionValues, errors);
                   })}
                 >
