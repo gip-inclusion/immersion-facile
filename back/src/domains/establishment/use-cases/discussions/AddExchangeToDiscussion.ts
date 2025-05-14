@@ -2,8 +2,6 @@ import { renderContent } from "html-templates/src/components/email";
 import {
   type BrevoEmailItem,
   type BrevoInboundBody,
-  type DiscussionId,
-  type ExchangeRole,
   brevoInboundBodySchema,
   errors,
   immersionFacileContactEmail,
@@ -12,6 +10,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { getDiscussionParamsFromEmail } from "./discussion.utils";
 
 const defaultSubject = "Sans objet";
 
@@ -42,32 +41,14 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
     );
   }
 
-  #getDiscussionParamsFromEmail(
-    email: BrevoEmailItem,
-  ): [DiscussionId, ExchangeRole] {
-    const recipient = email.To.find((recipent) => {
-      const regex = new RegExp(`.*_.*@${this.#replyDomain}$`);
-      return recipent.Address?.match(regex);
-    });
-    if (!recipient)
-      throw errors.discussion.badEmailFormat({
-        email: email.To.map((recipient) => recipient.Address).join(", "),
-      });
-
-    const [id, rawKind] = recipient.Address.split("@")[0].split("_");
-    if (!["e", "b"].includes(rawKind))
-      throw errors.discussion.badRecipientKindFormat({ kind: rawKind });
-
-    const kind = rawKind === "e" ? "establishment" : "potentialBeneficiary";
-    return [id, kind];
-  }
-
   async #processBrevoItem(
     uow: UnitOfWork,
     item: BrevoEmailItem,
   ): Promise<void> {
-    const [discussionId, recipientKind] =
-      this.#getDiscussionParamsFromEmail(item);
+    const [discussionId, recipientKind] = getDiscussionParamsFromEmail(
+      item,
+      this.#replyDomain,
+    );
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
 
