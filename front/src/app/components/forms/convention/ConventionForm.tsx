@@ -437,17 +437,13 @@ export const ConventionForm = ({
         form={
           <>
             <div className={cx("fr-text")}>{t.intro.welcome}</div>
-            <Alert
-              severity="info"
-              small
-              description={
-                route.params.jwt
-                  ? t.intro.conventionModificationNotification(
-                      conventionValues.statusJustification,
-                    )
-                  : t.intro.conventionCreationNotification
-              }
-            />
+            {mode !== "edit" && (
+              <Alert
+                severity="info"
+                small
+                description={t.intro.conventionCreationNotification}
+              />
+            )}
 
             <p className={fr.cx("fr-text--xs", "fr-mt-3w")}>
               Tous les champs marqués d'une astérisque (*) sont obligatoires.
