@@ -111,7 +111,7 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.id}_e@reply.my-domain.com`,
+              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
               name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
@@ -176,7 +176,7 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.id}_e@reply.my-domain.com`,
+              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
               name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
@@ -241,7 +241,7 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.id}_e@reply.my-domain.com`,
+              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
               name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
