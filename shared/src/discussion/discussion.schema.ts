@@ -34,6 +34,14 @@ export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 
+export const makeExchangeEmailSchema: (
+  replyDomain: string,
+) => z.Schema<string> = (replyDomain) =>
+  z
+    .string()
+    .email()
+    .regex(new RegExp(`[^_]+_[^_]+__([^_]+)_([eb])@${replyDomain}$`));
+
 const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
 const attachementSchema: z.Schema<Attachment> = z.object({
