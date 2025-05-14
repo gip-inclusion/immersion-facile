@@ -151,7 +151,7 @@ export const ContactInPerson = ({
         </p>
         <p className={"fr-my-2w"}>Merci !</p>
         <Input
-          label={inputsLabelsByKey.email}
+          label={inputsLabelsByKey.potentialBeneficiaryEmail}
           nativeInputProps={{
             ...register("potentialBeneficiaryEmail"),
             type: "email",
@@ -159,12 +159,12 @@ export const ContactInPerson = ({
           {...getFieldError("potentialBeneficiaryEmail")}
         />
         <Input
-          label={inputsLabelsByKey.firstName}
+          label={inputsLabelsByKey.potentialBeneficiaryFirstName}
           nativeInputProps={register("potentialBeneficiaryFirstName")}
           {...getFieldError("potentialBeneficiaryFirstName")}
         />
         <Input
-          label={inputsLabelsByKey.lastName}
+          label={inputsLabelsByKey.potentialBeneficiaryLastName}
           nativeInputProps={register("potentialBeneficiaryLastName")}
           {...getFieldError("potentialBeneficiaryLastName")}
         />

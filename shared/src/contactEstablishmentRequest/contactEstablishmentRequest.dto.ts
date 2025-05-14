@@ -76,7 +76,7 @@ type ContactEstablishmentInPerson1Eleve1StageDto = ContactInformations<
   "1_ELEVE_1_STAGE"
 >;
 type ContactEstablishmentByPhoneIfDto = ContactInformations<"PHONE", "IF">;
-type ContactEstablishmentByPhone1Eleve1StageDto = ContactInformations<
+export type ContactEstablishmentByPhone1Eleve1StageDto = ContactInformations<
   "PHONE",
   "1_ELEVE_1_STAGE"
 >;
