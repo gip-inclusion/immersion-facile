@@ -163,11 +163,15 @@ const DiscussionDetails = ({
         .replyToCandidateByEmail,
       priority: "primary",
       linkProps: {
-        href: `mailto:${createOpaqueEmail(
-          discussion.id,
-          "potentialBeneficiary",
-          `reply.${window.location.hostname}`,
-        )}?subject=${encodeURI(
+        href: `mailto:${createOpaqueEmail({
+          discussionId: discussion.id,
+          recipient: {
+            kind: "potentialBeneficiary",
+            firstname: discussion.potentialBeneficiary.firstName,
+            lastname: discussion.potentialBeneficiary.lastName,
+          },
+          replyDomain: `reply.${window.location.hostname}`,
+        })}?subject=${encodeURI(
           `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
         )}`,
         target: "_blank",
@@ -260,11 +264,15 @@ const DiscussionDetails = ({
                 utilisez-la directement depuis votre boîte mail.
               </p>
               <CopyButton
-                textToCopy={createOpaqueEmail(
-                  discussion.id,
-                  "potentialBeneficiary",
-                  `reply.${window.location.hostname}`,
-                )}
+                textToCopy={createOpaqueEmail({
+                  discussionId: discussion.id,
+                  recipient: {
+                    kind: "potentialBeneficiary",
+                    firstname: discussion.potentialBeneficiary.firstName,
+                    lastname: discussion.potentialBeneficiary.lastName,
+                  },
+                  replyDomain: `reply.${window.location.hostname}`,
+                })}
                 id={
                   domElementIds.establishmentDashboard.discussion
                     .copyEmailButton

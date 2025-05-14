@@ -105,11 +105,21 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
             ? discussion.establishmentContact.copyEmails
             : [],
         replyTo: {
-          email: createOpaqueEmail(
-            discussion.id,
-            lastExchange.sender,
-            this.#replyDomain,
-          ),
+          email: createOpaqueEmail({
+            discussionId: discussion.id,
+            recipient: {
+              kind: lastExchange.sender,
+              firstname:
+                lastExchange.sender === "establishment"
+                  ? discussion.establishmentContact.firstName
+                  : discussion.potentialBeneficiary.firstName,
+              lastname:
+                lastExchange.sender === "establishment"
+                  ? discussion.establishmentContact.lastName
+                  : discussion.potentialBeneficiary.lastName,
+            },
+            replyDomain: this.#replyDomain,
+          }),
           name:
             lastExchange.sender === "establishment"
               ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
