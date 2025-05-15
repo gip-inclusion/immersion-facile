@@ -379,6 +379,9 @@ const ConventionSummarySection = ({
 
   return (
     <article>
+      <p className={fr.cx("fr-m-0", "fr-mb-2w")}>
+        {t.intro.conventionSummaryDescription}
+      </p>
       <ConventionSummary
         illustration={commonIllustrations.documentsAdministratifs}
         submittedAt={toDisplayedDate({
