@@ -32,6 +32,20 @@ export type DiscussionId = Flavor<string, "DiscussionId">;
 
 export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 
+export type DiscussionEmailParams = {
+  firstname: string;
+  lastname: string;
+  discussionId: DiscussionId;
+  rawRecipientKind: string;
+};
+
+export type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
+  DiscussionEmailParams,
+  "rawRecipientKind"
+> & {
+  recipientKind: ExchangeRole;
+};
+
 type WithContactByEmailProps<
   D extends DiscussionKind,
   C extends ContactMode,
