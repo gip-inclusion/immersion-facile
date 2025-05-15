@@ -132,6 +132,12 @@ export const ConventionForm = ({
   const route = useRoute() as SupportedConventionRoutes;
 
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
+  const fetchedConventionWithUpdatedStatus = fetchedConvention
+    ? useRef<ConventionReadDto>({
+        ...fetchedConvention,
+        status: "READY_TO_SIGN",
+      }).current
+    : null;
 
   const currentStep = useAppSelector(conventionSelectors.currentStep);
   const isLoading = useAppSelector(conventionSelectors.isLoading);
@@ -173,7 +179,7 @@ export const ConventionForm = ({
     mode as ExcludeFromExisting<ConventionFormMode, "edit">,
   )
     ? initialValues
-    : fetchedConvention || initialValues;
+    : fetchedConventionWithUpdatedStatus || initialValues;
 
   const methods = useForm<Required<ConventionPresentation>>({
     defaultValues,
@@ -367,10 +373,10 @@ export const ConventionForm = ({
 
   //TODO: à placer dans ConventionFormFields ????
   useEffect(() => {
-    if (fetchedConvention) {
-      reset(fetchedConvention);
+    if (fetchedConventionWithUpdatedStatus) {
+      reset(fetchedConventionWithUpdatedStatus);
     }
-  }, [fetchedConvention, reset]);
+  }, [fetchedConventionWithUpdatedStatus, reset]);
 
   useEffect(() => {
     if (defaultValues.siret) {
