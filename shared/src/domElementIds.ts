@@ -255,6 +255,8 @@ export const domElementIds = {
     submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
     confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",
     summaryEditButton: "im-convention-form__summary-edit-button",
+    statusJustificationTextarea:
+      "im-convention-form__status-justification-textarea",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
@@ -380,7 +382,6 @@ export const domElementIds = {
     deprecatedModalSubmitButton: "im-deprecated-modal__submit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
-    modifierRoleSelect: "im-validator-modal__modifier-role-select",
     rejectedModal: "im-rejected-modal",
     deprecatedModal: "im-deprecate-modal",
     validatorModal: "im-validator-modal",

@@ -413,6 +413,8 @@ const ConventionSummarySection = ({
               hintText="Votre message sera envoyé aux autres signataires"
               nativeTextAreaProps={{
                 ...register("statusJustification"),
+                id: domElementIds.conventionImmersionRoute
+                  .statusJustificationTextarea,
               }}
               {...getFieldError("statusJustification")}
             />

@@ -8,6 +8,7 @@ import {
   frontRoutes,
   technicalRoutes,
 } from "shared";
+import { getMagicLinkFromEmail, goToAdminTab } from "./admin";
 import { getRandomizedData } from "./data";
 import {
   expectElementToBeVisible,
@@ -193,11 +194,6 @@ export const signConvention = async (
   signatoryIndex: number,
   dateEndDisplayed: string,
 ) => {
-  console.info(
-    "Signing convention with magic link ==>",
-    magicLinks[signatoryIndex],
-  );
-
   await page.goto(magicLinks[signatoryIndex]);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
 
@@ -218,12 +214,56 @@ export const signConvention = async (
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };
 
+export const allSignatoriesSignConvention = async ({
+  page,
+  signatoriesCount,
+  expectedConventionEndDate,
+}: {
+  page: Page;
+  signatoriesCount: number;
+  expectedConventionEndDate: string;
+}) => {
+  const signatoriesMagicLinks: string[] = [];
+  await page.goto("/");
+  await goToAdminTab(page, "adminNotifications");
+  for (let index = 0; index < signatoriesCount; index++) {
+    const href = await getMagicLinkFromEmail({
+      page,
+      emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+      elementIndex: index,
+      label: "conventionSignShortlink",
+    });
+    if (href) {
+      signatoriesMagicLinks.push(href);
+    }
+  }
+
+  await signConvention(
+    page,
+    signatoriesMagicLinks,
+    0,
+    expectedConventionEndDate,
+  );
+
+  await signConvention(
+    page,
+    signatoriesMagicLinks,
+    1,
+    expectedConventionEndDate,
+  );
+
+  await signConvention(
+    page,
+    signatoriesMagicLinks,
+    2,
+    expectedConventionEndDate,
+  );
+};
+
 export const submitEditConventionForm = async (
   page: Page,
-  magicLink: string,
   conventionSubmitted: ConventionSubmitted | void,
 ) => {
-  await page.goto(magicLink);
   const agencyIdSelect = page.locator(
     `#${domElementIds.conventionImmersionRoute.conventionSection.agencyId}`,
   );
@@ -370,10 +410,17 @@ export const submitEditConventionForm = async (
       .getByText("Employeur actuel"),
   ).toBeVisible();
 
+  await page.fill(
+    `#${domElementIds.conventionImmersionRoute.statusJustificationTextarea}`,
+    "justification de la modification",
+  );
+
   await page.click(
     `#${domElementIds.conventionImmersionRoute.confirmSubmitFormButton}`,
   );
-  await expectElementToBeVisible(page, ".im-submit-confirmation-section");
+
+  await expectElementToBeVisible(page, ".fr-alert--success");
+  await expect(page.locator(".fr-alert--error").first()).not.toBeVisible();
 };
 
 export const openConventionAccordionSection = async (
@@ -422,6 +469,7 @@ export const checkConventionSummary = async (
       .textContent(),
   ).toContain(dateEndDisplayed);
 };
+
 export const confirmCreateConventionFormSubmit = async (
   page: Page,
   dateEndDisplayed: string,
