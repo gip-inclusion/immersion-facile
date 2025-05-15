@@ -6,6 +6,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { ZodError } from "zod";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -73,8 +74,8 @@ describe("AddExchangeToDiscussion", () => {
 
     it("saves the new exchange in the discussion with attachment ref", async () => {
       const brevoResponse = createBrevoResponse([
-        `${discussion1.id}_b@${replyDomain}`,
-        `${discussion2.id}_e@${replyDomain}`,
+        `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
+        `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
       ]);
       await addExchangeToDiscussion.execute(brevoResponse);
 
@@ -138,8 +139,8 @@ describe("AddExchangeToDiscussion", () => {
     it("saves the new exchange in the discussion with attachment ref and with a default subject if not provided", async () => {
       const brevoResponse = createBrevoResponse(
         [
-          `${discussion1.id}_b@${replyDomain}`,
-          `${discussion2.id}_e@${replyDomain}`,
+          `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
+          `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
         ],
         "",
       );
@@ -208,14 +209,24 @@ describe("AddExchangeToDiscussion", () => {
       const email = "gerard@reply-dev.immersion-facile.beta.gouv.fr";
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(createBrevoResponse([email])),
-        errors.discussion.badEmailFormat({ email }),
+        new ZodError([
+          {
+            validation: "regex",
+            code: "invalid_string",
+            message:
+              "invalide - valeur fournie : gerard@reply-dev.immersion-facile.beta.gouv.fr",
+            path: [],
+          },
+        ]),
       );
     });
 
     it("throws an error if the email does not have the right recipient kind", async () => {
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(
-          createBrevoResponse([`iozeuroiu897654654_bob@${replyDomain}`]),
+          createBrevoResponse([
+            `firstname_lastname__discussionId_bob@${replyDomain}`,
+          ]),
         ),
         errors.discussion.badRecipientKindFormat({ kind: "bob" }),
       );
@@ -223,9 +234,8 @@ describe("AddExchangeToDiscussion", () => {
 
     it("throws an error if the discussion does not exist", async () => {
       const discussionId = "my-discussion-id";
-      const brevoResponse = createBrevoResponse([
-        `${discussionId}_e@${replyDomain}`,
-      ]);
+      const email = `firstname_lastname__${discussionId}_e@${replyDomain}`;
+      const brevoResponse = createBrevoResponse([email]);
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(brevoResponse),
         errors.discussion.notFound({ discussionId }),

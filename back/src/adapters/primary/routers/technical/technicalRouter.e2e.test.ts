@@ -380,7 +380,7 @@ const correctBrevoResponse: BrevoInboundBody = {
       To: [
         {
           Name: null,
-          Address: `${discussionId}_b@reply.${domain}`,
+          Address: `firstname1_lastname1__${discussionId}_b@reply.${domain}`,
         },
       ],
       Cc: [
