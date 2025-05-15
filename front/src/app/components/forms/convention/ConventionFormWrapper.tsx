@@ -14,7 +14,6 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionId,
   type ConventionJwtPayload,
-  type ExcludeFromExisting,
   type InternshipKind,
   type Role,
   agencyModifierRoles,
@@ -116,19 +115,6 @@ export const ConventionFormWrapper = ({
   useScrollToTop(formSuccessfullySubmitted);
 
   useEffect(() => {
-    if (
-      creationFormModes.includes(
-        mode as ExcludeFromExisting<ConventionFormMode, "edit">,
-      )
-    ) {
-      dispatch(conventionSlice.actions.clearFetchedConvention());
-      dispatch(
-        conventionSlice.actions.showSummaryChangeRequested({
-          showSummary: false,
-        }),
-      );
-    }
-
     if (mode === "edit" && route.params.jwt) {
       dispatch(conventionSlice.actions.jwtProvided(route.params.jwt));
       const { applicationId } =
