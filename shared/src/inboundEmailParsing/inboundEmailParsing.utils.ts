@@ -1,11 +1,21 @@
 import type { DiscussionId, ExchangeRole } from "../discussion/discussion.dto";
 
-export const createOpaqueEmail = (
-  discussionId: DiscussionId,
-  recipientKind: ExchangeRole,
-  replyDomain: string,
-) => {
-  const recipientLetter = recipientKind === "establishment" ? "e" : "b";
+type OpaqueEmailParams = {
+  discussionId: DiscussionId;
+  replyDomain: string;
+  recipient: {
+    kind: ExchangeRole;
+    firstname: string;
+    lastname: string;
+  };
+};
 
-  return `${discussionId}_${recipientLetter}@${replyDomain}`;
+export const createOpaqueEmail = ({
+  discussionId,
+  replyDomain,
+  recipient,
+}: OpaqueEmailParams) => {
+  const recipientLetter = recipient.kind === "establishment" ? "e" : "b";
+
+  return `${recipient.firstname}_${recipient.lastname}__${discussionId}_${recipientLetter}@${replyDomain}`;
 };

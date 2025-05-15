@@ -1,6 +1,9 @@
 import { expectToEqual } from "../test.helpers";
 import { DiscussionBuilder, type DiscussionReadDto } from "./discussion.dto";
-import { discussionReadSchema } from "./discussion.schema";
+import {
+  discussionReadSchema,
+  makeExchangeEmailSchema,
+} from "./discussion.schema";
 
 describe("Discussion schema", () => {
   const discussionEmailIF = new DiscussionBuilder()
@@ -61,4 +64,32 @@ describe("Discussion schema", () => {
       expectToEqual(discussionReadSchema.parse(discussionRead), discussionRead);
     },
   );
+});
+describe("makeExchangeEmailSchema", () => {
+  it("should parse the email", () => {
+    const email = "firstname_lastname__discussionId_e@reply.domain.com";
+    const result = makeExchangeEmailSchema("reply.domain.com").parse(email);
+    expectToEqual(result, {
+      firstname: "firstname",
+      lastname: "lastname",
+      discussionId: "discussionId",
+      rawRecipientKind: "e",
+    });
+  });
+  it("should parse the email even if recipient kind is not known", () => {
+    const email = "firstname_lastname__discussionId_bob@reply.domain.com";
+    const result = makeExchangeEmailSchema("reply.domain.com").parse(email);
+    expectToEqual(result, {
+      firstname: "firstname",
+      lastname: "lastname",
+      discussionId: "discussionId",
+      rawRecipientKind: "bob",
+    });
+  });
+  it("should throw an error if the email is not valid", () => {
+    const email = "john_doe_discussionId_bob@reply.domain.com";
+    expect(() =>
+      makeExchangeEmailSchema("reply.domain.com").parse(email),
+    ).toThrow();
+  });
 });

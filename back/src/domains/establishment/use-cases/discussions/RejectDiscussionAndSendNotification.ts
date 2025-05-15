@@ -109,18 +109,26 @@ export const makeRejectDiscussionAndSendNotification =
           sender: immersionFacileNoReplyEmailSender,
           params: { htmlContent, subject },
           recipients: [
-            createOpaqueEmail(
-              discussion.id,
-              "potentialBeneficiary",
-              deps.replyDomain,
-            ),
+            createOpaqueEmail({
+              discussionId: discussion.id,
+              recipient: {
+                kind: "potentialBeneficiary",
+                firstname: discussion.potentialBeneficiary.firstName,
+                lastname: discussion.potentialBeneficiary.lastName,
+              },
+              replyDomain: deps.replyDomain,
+            }),
           ],
           replyTo: {
-            email: createOpaqueEmail(
-              discussion.id,
-              "establishment",
-              deps.replyDomain,
-            ),
+            email: createOpaqueEmail({
+              discussionId: discussion.id,
+              recipient: {
+                kind: "establishment",
+                firstname: discussion.establishmentContact.firstName,
+                lastname: discussion.establishmentContact.lastName,
+              },
+              replyDomain: deps.replyDomain,
+            }),
             name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
           },
         },

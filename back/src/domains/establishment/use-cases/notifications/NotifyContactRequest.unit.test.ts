@@ -94,7 +94,7 @@ describe("NotifyContactRequest", () => {
 
           const { establishmentContact } = discussion;
 
-          const expectedReplyToEmail = "discussion-id_b@reply.reply.domain.com";
+          const expectedReplyToEmail = `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply.reply.domain.com`;
 
           expectSavedNotificationsAndEvents({
             emails: [
