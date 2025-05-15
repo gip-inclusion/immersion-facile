@@ -45,7 +45,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
     uow: UnitOfWork,
     item: BrevoEmailItem,
   ): Promise<void> {
-    const [discussionId, recipientKind] = getDiscussionParamsFromEmail(
+    const { discussionId, recipientKind } = getDiscussionParamsFromEmail(
       item,
       this.#replyDomain,
     );
