@@ -3,12 +3,13 @@ import test, { expect } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import {
-  getMagicLinkInEmailWrapper,
+  getMagicLinkFromEmail,
+  getMagicLinkLocatorFromEmail,
   goToAdminTab,
-  openEmailInAdmin,
 } from "../../utils/admin";
 import {
   type ConventionSubmitted,
+  allSignatoriesSignConvention,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,
@@ -19,7 +20,6 @@ import {
 test.describe.configure({ mode: "serial" });
 
 test.describe("Convention creation and modification workflow", () => {
-  const magicLinks: string[] = [];
   let conventionSubmitted: ConventionSubmitted | void;
 
   test("creates a new convention", async ({ page }) => {
@@ -29,129 +29,37 @@ test.describe("Convention creation and modification workflow", () => {
 
   test.describe("Convention admin get notifications magic links", () => {
     test.use({ storageState: testConfig.adminAuthFile });
-    test("get signatories magicLink urls from email", async ({ page }) => {
-      const maxEmails = 2;
-      await page.goto("/");
-      await goToAdminTab(page, "adminNotifications");
-      for (let index = 0; index < maxEmails; index++) {
-        const emailWrapper = await openEmailInAdmin(
-          page,
-          "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-          index,
-        );
-        const href = await getMagicLinkInEmailWrapper(
-          emailWrapper,
-          "conventionSignShortlink",
-        );
-        if (href) {
-          magicLinks.push(href);
-        }
-      }
-      await expect(magicLinks.length).toBe(maxEmails);
-    });
-    test("signs convention for first signatory and validator requires modification", async ({
-      page,
-    }) => {
-      await signConvention(page, magicLinks, 0, tomorrowDateDisplayed);
-      await goToAdminTab(page, "adminNotifications");
-      const emailWrapper = await openEmailInAdmin(
-        page,
-        "NEW_CONVENTION_AGENCY_NOTIFICATION",
-        0,
-      );
-      await emailWrapper
-        .locator("li")
-        .filter({
-          hasText: "magicLink",
-        })
-        .getByRole("link")
-        .click();
-      await page
-        .locator(`#${domElementIds.manageConvention.editActionsButton}`)
-        .click();
-      await page
-        .locator(`#${domElementIds.manageConvention.requestEditButton}`)
-        .click();
 
-      await page.selectOption(
-        `#${domElementIds.manageConvention.modifierRoleSelect}`,
-        "beneficiary",
-      );
-      await page
-        .locator(
-          `#${domElementIds.manageConvention.requestEditModal} [name="statusJustification"]`,
-        )
-        .fill("Justification");
-      await page
-        .locator(`#${domElementIds.manageConvention.requestEditSubmitButton}`)
-        .click();
-      await expect(page.locator(".fr-alert--success")).toBeVisible();
-      await page.waitForTimeout(testConfig.timeForEventCrawler);
-    });
-    test("signatory edit the convention and re-submit it", async ({ page }) => {
-      await page.goto("/");
-      await goToAdminTab(page, "adminNotifications");
-      const emailWrapper = await openEmailInAdmin(
-        page,
-        "CONVENTION_MODIFICATION_REQUEST_NOTIFICATION",
-        0,
-      );
-      const href = await getMagicLinkInEmailWrapper(emailWrapper);
-      expect(href).not.toBe(null);
-
-      if (!href) return;
-
-      await page.goto(href);
-      await submitEditConventionForm(page, href, conventionSubmitted);
-    });
-    test.describe("signs convention for signatories", () => {
+    test.describe("convention signatures", () => {
+      const signatoriesCount = 2;
       const signatoriesMagicLinks: string[] = [];
-      const signatories = 4;
 
       test("get signatories magicLink urls from email", async ({ page }) => {
         await page.goto("/");
-        for (let index = 0; index < signatories; index++) {
-          const emailWrapper = await openEmailInAdmin(
+        await goToAdminTab(page, "adminNotifications");
+        for (let index = 0; index < signatoriesCount; index++) {
+          const href = await getMagicLinkFromEmail({
             page,
-            "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
-            index,
-          );
-          const href = await getMagicLinkInEmailWrapper(
-            emailWrapper,
-            "conventionSignShortlink",
-          );
+            emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
+            elementIndex: index,
+            label: "conventionSignShortlink",
+          });
           if (href) {
             signatoriesMagicLinks.push(href);
           }
         }
-        await expect(signatoriesMagicLinks.length).toBe(signatories);
+        await expect(signatoriesMagicLinks.length).toBe(signatoriesCount);
       });
 
-      test("signs convention for signatory 1", async ({ page }) => {
+      test("signatory signs the convention", async ({ page }) => {
         await signConvention(
           page,
           signatoriesMagicLinks,
           0,
-          updatedEndDateDisplayed,
+          tomorrowDateDisplayed,
         );
       });
 
-      test("signs convention for signatory 2", async ({ page }) => {
-        await signConvention(
-          page,
-          signatoriesMagicLinks,
-          1,
-          updatedEndDateDisplayed,
-        );
-      });
-      test("signs convention for signatory 3", async ({ page }) => {
-        await signConvention(
-          page,
-          signatoriesMagicLinks,
-          2,
-          updatedEndDateDisplayed,
-        );
-      });
       test.describe("last signatory signs convention from Martinique", () => {
         test.use({
           timezoneId: "America/Martinique",
@@ -160,28 +68,114 @@ test.describe("Convention creation and modification workflow", () => {
           await signConvention(
             page,
             signatoriesMagicLinks,
-            3,
-            updatedEndDateDisplayed,
+            1,
+            tomorrowDateDisplayed,
           );
         });
       });
     });
 
-    test.describe("Convention validation", () => {
+    test.describe("convention modification", () => {
       test.use({
         timezoneId: "Europe/Paris",
       });
-      test("reviews and validate convention", async ({ page }) => {
+
+      test("by validator", async ({ page }) => {
+        await page.goto("/");
+        const validatorMagicLinkLocator = await getMagicLinkLocatorFromEmail({
+          page,
+          emailType: "NEW_CONVENTION_AGENCY_NOTIFICATION",
+          elementIndex: 0,
+        });
+        await validatorMagicLinkLocator.click();
+
+        await page
+          .locator(`#${domElementIds.manageConvention.editActionsButton}`)
+          .click();
+        await page
+          .locator(`#${domElementIds.manageConvention.editLink}`)
+          .click();
+
+        await expect(
+          page.locator(
+            `#${domElementIds.conventionImmersionRoute.form({
+              internshipKind: "immersion",
+              mode: "edit",
+            })}`,
+          ),
+        ).toBeVisible();
+
+        await submitEditConventionForm(page, conventionSubmitted);
+      });
+
+      test("then by signatory (his submission also signs the convention", async ({
+        page,
+      }) => {
         await page.goto("/");
         await goToAdminTab(page, "adminNotifications");
-        const emailWrapper = await openEmailInAdmin(
+
+        const magicLinkLocator = await getMagicLinkLocatorFromEmail({
           page,
-          "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
-          0,
+          emailType:
+            "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
+          elementIndex: 0,
+          label: "conventionSignShortlink",
+        });
+        await magicLinkLocator.click();
+
+        await page
+          .locator(`#${domElementIds.conventionToSign.modificationButton}`)
+          .click();
+        await expect(
+          page.locator(
+            `#${domElementIds.conventionImmersionRoute.form({
+              internshipKind: "immersion",
+              mode: "edit",
+            })}`,
+          ),
+        ).toBeVisible();
+
+        await page
+          .locator(
+            `#${domElementIds.conventionImmersionRoute.submitFormButton}`,
+          )
+          .click();
+
+        await page.fill(
+          `#${domElementIds.conventionImmersionRoute.statusJustificationTextarea}`,
+          "justification de la modification",
         );
-        const href = await getMagicLinkInEmailWrapper(emailWrapper);
+
+        await page.click(
+          `#${domElementIds.conventionToSign.openSignModalButton}`,
+        );
+
+        await page.click(`#${domElementIds.conventionToSign.submitButton}`);
+        await expect(page.locator(".fr-alert--success")).toBeVisible();
+      });
+    });
+
+    test.describe("convention signatures after modification", () => {
+      test("all other signatories sign the convention", async ({ page }) => {
+        await allSignatoriesSignConvention({
+          page,
+          signatoriesCount: 4,
+          expectedConventionEndDate: updatedEndDateDisplayed,
+        });
+      });
+    });
+
+    test.describe("convention validation", () => {
+      test("reviews and validate convention", async ({ page }) => {
+        await page.goto("/");
+        const href = await getMagicLinkFromEmail({
+          page,
+          emailType: "NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION",
+          elementIndex: 0,
+        });
         expect(href).not.toBe(null);
-        if (!href) return;
+        if (!href)
+          throw new Error("Convention validation magic link not found");
         await page.goto(href);
         await page
           .locator(
