@@ -125,9 +125,10 @@ describe("Convention slice", () => {
         feedbacksSelectors.feedbacks(store.getState())["convention-form"],
         {
           level: "success",
-          message: "La convention a bien été mise à jour",
-          on: "update",
           title: "La convention a bien été mise à jour",
+          on: "update",
+          message:
+            "Les signataires ont reçu un email leur demandant de signer la version modifiée.",
         },
       );
       expectUpdateConventionToHaveBeenCalled(1);
