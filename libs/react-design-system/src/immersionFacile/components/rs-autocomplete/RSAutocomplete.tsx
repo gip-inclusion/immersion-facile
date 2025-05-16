@@ -22,6 +22,7 @@ export type RSAutocompleteProps<T, L> = InputProps.Common &
     };
     initialInputValue?: string;
     locator: L;
+    multiple?: boolean;
   };
 
 type Capitalize<T extends string> = T extends `${infer First}${infer Rest}`

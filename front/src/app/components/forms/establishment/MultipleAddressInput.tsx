@@ -44,6 +44,7 @@ export const MultipleAddressInput = ({
           >
             <div className={fr.cx("fr-col", "fr-mt-2w")}>
               <AddressAutocomplete
+                multiple
                 disabled={disabled}
                 locator={`multiple-address-${index}`}
                 label={"Rechercher un lieu *"}

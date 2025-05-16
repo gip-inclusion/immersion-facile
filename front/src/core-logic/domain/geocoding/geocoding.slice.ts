@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { keys } from "ramda";
 import type { AddressAndPosition, LookupAddress } from "shared";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
+  type AutocompleteItem,
   type AutocompleteState,
   type PayloadActionWithLocator,
   initialAutocompleteItem,
 } from "src/core-logic/domain/autocomplete.utils";
 
-type MultipleAddressAutocompleteLocator = `multiple-address-${number}`;
+export type MultipleAddressAutocompleteLocator = `multiple-address-${number}`;
 
 export type AddressAutocompleteLocator =
   | "convention-immersion-address"
@@ -30,14 +32,77 @@ export const geocodingSlice = createSlice({
   reducers: {
     clearLocatorDataRequested: (
       state,
-      action: PayloadActionWithLocator<AddressAutocompleteLocator>,
-    ) => ({
-      ...initialState,
-      data: {
-        ...state.data,
-        [action.payload.locator]: initialAutocompleteItem,
-      },
-    }),
+      action: PayloadActionWithLocator<
+        AddressAutocompleteLocator,
+        { multiple?: boolean }
+      >,
+    ) => {
+      const { locator, multiple } = action.payload;
+      if (multiple) {
+        const multipleLocators = keys(state.data)
+          .filter((key): key is MultipleAddressAutocompleteLocator =>
+            key.startsWith("multiple-address-"),
+          )
+          .sort((a, b) => {
+            const aIndex = getMultipleAddressLocatorIndex(a);
+            const bIndex = getMultipleAddressLocatorIndex(b);
+            return aIndex - bIndex;
+          });
+
+        const maxIndex = multipleLocators.length - 2; // 1 because 0 based index + 1 for the locator we're removing
+        const newMultipleData = multipleLocators.reduce(
+          (acc, key) => {
+            if (key === locator) return acc;
+
+            const currentIndex = getMultipleAddressLocatorIndex(key);
+            const newIndex =
+              currentIndex >
+              getMultipleAddressLocatorIndex(
+                locator as MultipleAddressAutocompleteLocator,
+              )
+                ? currentIndex - 1
+                : currentIndex;
+            if (newIndex <= maxIndex) {
+              const nextKey =
+                `multiple-address-${newIndex}` as MultipleAddressAutocompleteLocator;
+              const value = state.data[key];
+              if (value) acc[nextKey] = value;
+            }
+            return acc;
+          },
+          {} as Record<
+            MultipleAddressAutocompleteLocator,
+            AutocompleteItem<AddressAndPosition>
+          >,
+        );
+        const nonMultipleData = keys(state.data).reduce(
+          (acc, key) => {
+            if (!key.startsWith("multiple-address-")) {
+              const value = state.data[key];
+              if (value) acc[key] = value;
+            }
+            return acc;
+          },
+          {} as Record<string, AutocompleteItem<AddressAndPosition>>,
+        );
+
+        return {
+          ...state,
+          data: {
+            ...nonMultipleData,
+            ...newMultipleData,
+          },
+        };
+      }
+
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: initialAutocompleteItem,
+        },
+      };
+    },
     emptyQueryRequested: (
       state,
       action: PayloadActionWithLocator<AddressAutocompleteLocator>,
@@ -174,3 +239,9 @@ export const geocodingSlice = createSlice({
     });
   },
 });
+
+const getMultipleAddressLocatorIndex = (
+  locator: MultipleAddressAutocompleteLocator,
+): number => {
+  return Number.parseInt(locator.substring(locator.lastIndexOf("-") + 1));
+};

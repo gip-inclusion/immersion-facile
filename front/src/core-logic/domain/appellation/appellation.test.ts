@@ -7,12 +7,17 @@ import {
 } from "shared";
 import { makeAppellationLocatorSelector } from "src/core-logic/domain/appellation/appellation.selectors";
 import {
+  type AutocompleteItem,
+  initialAutocompleteItem,
+} from "src/core-logic/domain/autocomplete.utils";
+import {
   type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type AppellationAutocompleteLocator,
+  type MultipleAppellationAutocompleteLocator,
   appellationSlice,
 } from "./appellation.slice";
 
@@ -51,6 +56,134 @@ describe("Appellation epic", () => {
     );
     expect(store.getState().appellation.data[locator]?.value).toBeNull();
     expect(store.getState().appellation.data[locator]?.suggestions).toEqual([]);
+  });
+
+  const multipleAppellationData: Record<
+    MultipleAppellationAutocompleteLocator,
+    AutocompleteItem<AppellationMatchDto>
+  > = {
+    "multiple-appellation-0": {
+      ...initialAutocompleteItem,
+      value: {
+        appellation: {
+          appellationCode: "12345",
+          appellationLabel: "Test Appellation 1",
+          romeCode: "A1111",
+          romeLabel: "Test Rome 1",
+        },
+        matchRanges: [
+          {
+            endIndexExclusive: 10,
+            startIndexInclusive: 0,
+          },
+        ],
+      },
+    },
+    "multiple-appellation-1": {
+      ...initialAutocompleteItem,
+      value: {
+        appellation: {
+          appellationCode: "12345",
+          appellationLabel: "Test Appellation 2",
+          romeCode: "A2222",
+          romeLabel: "Test Rome 2",
+        },
+        matchRanges: [
+          {
+            endIndexExclusive: 10,
+            startIndexInclusive: 0,
+          },
+        ],
+      },
+    },
+    "multiple-appellation-2": {
+      ...initialAutocompleteItem,
+      value: {
+        appellation: {
+          appellationCode: "12345",
+          appellationLabel: "Test Appellation 3",
+          romeCode: "A3333",
+          romeLabel: "Test Rome 3",
+        },
+        matchRanges: [
+          {
+            endIndexExclusive: 10,
+            startIndexInclusive: 0,
+          },
+        ],
+      },
+    },
+    "multiple-appellation-3": {
+      ...initialAutocompleteItem,
+      value: {
+        appellation: {
+          appellationCode: "12345",
+          appellationLabel: "Test Appellation 4",
+          romeCode: "A4444",
+          romeLabel: "Test Rome 4",
+        },
+        matchRanges: [
+          {
+            endIndexExclusive: 10,
+            startIndexInclusive: 0,
+          },
+        ],
+      },
+    },
+  };
+  const expectedData1: Record<
+    MultipleAppellationAutocompleteLocator,
+    AutocompleteItem<AppellationMatchDto>
+  > = {
+    "multiple-appellation-0": multipleAppellationData["multiple-appellation-0"],
+    "multiple-appellation-1": multipleAppellationData["multiple-appellation-2"],
+    "multiple-appellation-2": multipleAppellationData["multiple-appellation-3"],
+  };
+  const expectedData2: Record<
+    MultipleAppellationAutocompleteLocator,
+    AutocompleteItem<AppellationMatchDto>
+  > = {
+    "multiple-appellation-0": multipleAppellationData["multiple-appellation-1"],
+    "multiple-appellation-1": multipleAppellationData["multiple-appellation-2"],
+    "multiple-appellation-2": multipleAppellationData["multiple-appellation-3"],
+  };
+  const expectedData3: Record<
+    MultipleAppellationAutocompleteLocator,
+    AutocompleteItem<AppellationMatchDto>
+  > = {
+    "multiple-appellation-0": multipleAppellationData["multiple-appellation-0"],
+    "multiple-appellation-1": multipleAppellationData["multiple-appellation-1"],
+    "multiple-appellation-2": multipleAppellationData["multiple-appellation-2"],
+  };
+  it.each([
+    {
+      description: "removing a middle element (locator1)",
+      locatorToRemove: "multiple-appellation-1",
+      expectedData: expectedData1,
+    },
+    {
+      description: "removing the first element (locator0)",
+      locatorToRemove: "multiple-appellation-0",
+      expectedData: expectedData2,
+    },
+    {
+      description: "removing the last element (locator3)",
+      locatorToRemove: "multiple-appellation-3",
+      expectedData: expectedData3,
+    },
+  ])("should handle $description", ({ locatorToRemove, expectedData }) => {
+    const { store } = createTestStore({
+      appellation: { data: multipleAppellationData },
+    });
+
+    store.dispatch(
+      appellationSlice.actions.clearLocatorDataRequested({
+        locator: locatorToRemove as MultipleAppellationAutocompleteLocator,
+        multiple: true,
+      }),
+    );
+
+    expectToEqual(store.getState().appellation.data, expectedData);
   });
 
   it("should update the searched query and reset the state", () => {
