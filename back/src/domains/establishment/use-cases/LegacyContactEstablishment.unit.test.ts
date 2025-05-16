@@ -306,7 +306,7 @@ describe("LegacyContactEstablishment", () => {
             phone: validEmailRequest.potentialBeneficiaryPhone,
             resumeLink: validEmailRequest.potentialBeneficiaryResumeLink,
             hasWorkingExperience: false,
-            datePreferences: "",
+            datePreferences: "Dates d’immersion envisagées non renseignées",
             immersionObjective: "Confirmer un projet professionnel",
           },
           establishmentContact: {
