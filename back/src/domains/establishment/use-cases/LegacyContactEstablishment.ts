@@ -120,6 +120,14 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
       now,
     });
 
+    if (
+      discussion.contactMode === "EMAIL" &&
+      !discussion.potentialBeneficiary.datePreferences
+    ) {
+      discussion.potentialBeneficiary.datePreferences =
+        "Dates d’immersion envisagées non renseignées";
+    }
+
     await uow.discussionRepository.insert(discussion);
 
     await this.#markEstablishmentAsNotSearchableIfLimitReached({
