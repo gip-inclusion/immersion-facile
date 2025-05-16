@@ -44,6 +44,7 @@ const useAppellationAutocomplete = (
 export const AppellationAutocomplete = ({
   onAppellationClear,
   onAppellationSelected,
+  multiple,
   ...props
 }: AppellationAutocompleteProps) => {
   const dispatch = useDispatch();
@@ -71,9 +72,12 @@ export const AppellationAutocomplete = ({
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            appellationSlice.actions.emptyQueryRequested({
-              locator: props.locator,
-            });
+            dispatch(
+              appellationSlice.actions.clearLocatorDataRequested({
+                locator: props.locator,
+                multiple,
+              }),
+            );
             onAppellationClear();
           }
           if (searchResult && actionMeta.action === "select-option") {

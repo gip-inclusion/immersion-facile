@@ -42,6 +42,7 @@ const useAddressAutocomplete = (locator: AddressAutocompleteLocator) => {
 export const AddressAutocomplete = ({
   onAddressClear,
   onAddressSelected,
+  multiple,
   ...props
 }: AddressAutocompleteProps) => {
   const dispatch = useDispatch();
@@ -59,20 +60,24 @@ export const AddressAutocomplete = ({
         loadingMessage: () => <>Recherche d'adresses en cours... 🔎</>,
         inputValue: searchTerm,
         placeholder: "Ex : 123 Rue de la Paix 75001 Paris",
-        value: value
-          ? {
-              label: addressDtoToString(value?.address),
-              value: value,
-            }
-          : undefined,
+        value:
+          value && !Array.isArray(value)
+            ? {
+                label: addressDtoToString(value?.address),
+                value: value,
+              }
+            : undefined,
         onChange: (searchResult, actionMeta) => {
           if (
             actionMeta.action === "clear" ||
             actionMeta.action === "remove-value"
           ) {
-            geocodingSlice.actions.clearLocatorDataRequested({
-              locator: props.locator,
-            });
+            dispatch(
+              geocodingSlice.actions.clearLocatorDataRequested({
+                locator: props.locator,
+                multiple,
+              }),
+            );
             onAddressClear();
           }
           if (searchResult && actionMeta.action === "select-option") {

@@ -1,15 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { keys } from "ramda";
 import type { AppellationMatchDto } from "shared";
 import {
+  type AutocompleteItem,
   type AutocompleteState,
   type PayloadActionWithLocator,
   initialAutocompleteItem,
 } from "src/core-logic/domain/autocomplete.utils";
 
+export type MultipleAppellationAutocompleteLocator =
+  `multiple-appellation-${number}`;
+
 export type AppellationAutocompleteLocator =
   | "search-form-appellation"
   | "convention-profession"
-  | `multiple-appellation-${number}`;
+  | MultipleAppellationAutocompleteLocator;
 
 const initialState: AutocompleteState<
   AppellationAutocompleteLocator,
@@ -24,14 +29,77 @@ export const appellationSlice = createSlice({
   reducers: {
     clearLocatorDataRequested: (
       state,
-      action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
-    ) => ({
-      ...initialState,
-      data: {
-        ...state.data,
-        [action.payload.locator]: initialAutocompleteItem,
-      },
-    }),
+      action: PayloadActionWithLocator<
+        AppellationAutocompleteLocator,
+        { multiple?: boolean }
+      >,
+    ) => {
+      const { locator, multiple } = action.payload;
+      if (multiple) {
+        const multipleLocators = keys(state.data)
+          .filter((key): key is MultipleAppellationAutocompleteLocator =>
+            key.startsWith("multiple-appellation-"),
+          )
+          .sort((a, b) => {
+            const aIndex = getMultipleAppellationLocatorIndex(a);
+            const bIndex = getMultipleAppellationLocatorIndex(b);
+            return aIndex - bIndex;
+          });
+
+        const maxIndex = multipleLocators.length - 2; // 1 because 0 based index + 1 for the locator we're removing
+        const newMultipleData = multipleLocators.reduce(
+          (acc, key) => {
+            if (key === locator) return acc;
+
+            const currentIndex = getMultipleAppellationLocatorIndex(key);
+            const newIndex =
+              currentIndex >
+              getMultipleAppellationLocatorIndex(
+                locator as MultipleAppellationAutocompleteLocator,
+              )
+                ? currentIndex - 1
+                : currentIndex;
+            if (newIndex <= maxIndex) {
+              const nextKey =
+                `multiple-appellation-${newIndex}` as MultipleAppellationAutocompleteLocator;
+              const value = state.data[key];
+              if (value) acc[nextKey] = value;
+            }
+            return acc;
+          },
+          {} as Record<
+            MultipleAppellationAutocompleteLocator,
+            AutocompleteItem<AppellationMatchDto>
+          >,
+        );
+        const nonMultipleData = keys(state.data).reduce(
+          (acc, key) => {
+            if (!key.startsWith("multiple-appellation-")) {
+              const value = state.data[key];
+              if (value) acc[key] = value;
+            }
+            return acc;
+          },
+          {} as Record<string, AutocompleteItem<AppellationMatchDto>>,
+        );
+
+        return {
+          ...state,
+          data: {
+            ...nonMultipleData,
+            ...newMultipleData,
+          },
+        };
+      }
+
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          [locator]: initialAutocompleteItem,
+        },
+      };
+    },
     emptyQueryRequested: (
       state,
       action: PayloadActionWithLocator<AppellationAutocompleteLocator>,
@@ -138,3 +206,9 @@ export const appellationSlice = createSlice({
     },
   },
 });
+
+const getMultipleAppellationLocatorIndex = (
+  locator: MultipleAppellationAutocompleteLocator,
+): number => {
+  return Number.parseInt(locator.substring(locator.lastIndexOf("-") + 1));
+};

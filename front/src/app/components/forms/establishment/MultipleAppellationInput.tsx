@@ -58,6 +58,7 @@ export const MultipleAppellationInput = ({
                 <AppellationAutocomplete
                   locator={`multiple-appellation-${index}`}
                   disabled={disabled}
+                  multiple
                   label={"Rechercher un métier *"}
                   onAppellationSelected={(selectedAppellationMatch) => {
                     onAppellationAdd(
