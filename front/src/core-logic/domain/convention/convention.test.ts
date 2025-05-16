@@ -125,9 +125,10 @@ describe("Convention slice", () => {
         feedbacksSelectors.feedbacks(store.getState())["convention-form"],
         {
           level: "success",
-          message: "La convention a bien été créée",
-          on: "create",
-          title: "La convention a bien été créée",
+          title: "La convention a bien été mise à jour",
+          on: "update",
+          message:
+            "Les signataires ont reçu un email leur demandant de signer la version modifiée.",
         },
       );
       expectUpdateConventionToHaveBeenCalled(1);
@@ -180,16 +181,41 @@ describe("Convention slice", () => {
           feedbackTopic: "convention-form",
         }),
       );
-      expectConventionState({
-        isLoading: true,
-      });
+
       dependencies.conventionGateway.getSimilarConventionsResult$.next([]);
-      expectConventionState({
-        isLoading: false,
-      });
+
       expectToEqual(
         conventionSelectors.similarConventionIds(store.getState()),
         [],
+      );
+    });
+
+    it("get similar conventions when showSummarychangeRequested is true", () => {
+      const convention = new ConventionDtoBuilder()
+        .withStatus("READY_TO_SIGN")
+        .build();
+
+      store.dispatch(
+        conventionSlice.actions.showSummaryChangeRequested({
+          showSummary: true,
+          convention: {
+            ...convention,
+            agencyName: "agency",
+            agencyDepartment: "75",
+            agencyKind: "pole-emploi",
+            agencySiret: "11112222000033",
+            agencyCounsellorEmails: [],
+            agencyValidatorEmails: ["validator@mail.com"],
+          },
+        }),
+      );
+      dependencies.conventionGateway.getSimilarConventionsResult$.next([
+        "fake-convention-id",
+      ]);
+
+      expectToEqual(
+        conventionSelectors.similarConventionIds(store.getState()),
+        ["fake-convention-id"],
       );
     });
   });

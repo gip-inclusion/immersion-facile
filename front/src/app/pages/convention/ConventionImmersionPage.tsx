@@ -100,11 +100,7 @@ export const ConventionImmersionPage = ({
             <PageHeader
               title={getPageHeaderTitle(jwt, showSummary)}
               breadcrumbs={<Breadcrumbs />}
-            >
-              <p className={fr.cx("fr-m-0")}>
-                {t.intro.conventionSummaryDescription}
-              </p>
-            </PageHeader>
+            />
           )
         }
       >

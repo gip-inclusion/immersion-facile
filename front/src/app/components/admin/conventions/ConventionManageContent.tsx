@@ -8,6 +8,7 @@ import {
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredMagicLinkErrorMessage,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -94,6 +95,7 @@ export const ConventionManageContent = ({
 
   return (
     <>
+      <Feedback topics={["convention-form"]} className="fr-mb-4w" />
       <ConventionValidation convention={convention} jwtParams={jwtParams} />
       <ConventionManageActions
         jwtParams={jwtParams}

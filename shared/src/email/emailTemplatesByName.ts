@@ -1033,49 +1033,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         agencyLogoUrl,
       }),
     },
-    CONVENTION_MODIFICATION_REQUEST_NOTIFICATION: {
-      niceName: "Convention - Demande de modification",
-      tags: ["demande de modifications"],
-      createEmailVariables: ({
-        agencyLogoUrl,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        internshipKind,
-        justification,
-        magicLink,
-        signature,
-        requesterName,
-      }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Pour action : veuillez modifier cette demande d'immersion professionnelle"
-            : "Pour action : mini Stage - veuillez modifier cette demande de mini stage",
-        greetings: greetingsWithConventionId(conventionId),
-        content: `Une demande de modification vous a été adressé par ${requesterName} concernant la demande ${
-          internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-        } de ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName}.
-         
-         <strong>Les raisons sont&nbsp;:</strong>
-        ${justification}`,
-        buttons: [
-          {
-            url: magicLink,
-            label: "Modifier votre demande",
-          },
-        ],
-        subContent: `
-      Après avoir corrigé votre demande, il faudra de nouveau que tous les acteurs de la convention confirment leur accord. 
-      
-      Pensez à surveiller votre boite mail et à consulter vos spams si vous ne recevez pas le mail de demande de confirmation.      
-      
-      Bien cordialement,      
-      ${signature}
-      `,
-        agencyLogoUrl,
-      }),
-    },
+
     CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION: {
       niceName: "Convention - Changement prescripteur pour agence",
       tags: ["changement prescripteur demande d'immersion pour prescripteur"],
@@ -1170,21 +1128,24 @@ Tél : ${beneficiaryPhone}`,
         }
         de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée.
         
-        <strong>Les raisons sont&nbsp;:</strong>
+        <strong>Les modifications sont&nbsp;:</strong>
         ${reason}
         
-        Votre signature sur la première demande de convention a donc été annulée.
-        
-        Action attendue : cliquez sur le bouton ci-dessous, puis vérifiez dans l’écran qui s’ouvre si ce qui a été modifié vous convient :
-        - Si c'est la cas, confirmez votre accord en signant de nouveau cette demande (cliquez sur “Signer” puis “Je termine la signature” sur l’écran suivant).
-        - Si la modification ne vous convient pas, vous pouvez relancer des modifications (cliquez sur le bouton "Annuler les signatures et demander une modification").`,
+        Votre signature sur la première demande de convention a donc été annulée.`,
         buttons: [
           {
             url: conventionSignShortlink,
-            label: "Relire et signer la demande de convention",
+            label: "Signer ou modifier la demande",
           },
         ],
-        subContent: defaultSignature(internshipKind),
+        highlight: {
+          content: `Attention, ne démarrez pas votre immersion tant que vous n'avez pas reçu la validation de votre conseiller ! Vous n'auriez pas de couverture en cas d'accident.`,
+        },
+        subContent: `
+        La décision de votre conseiller vous sera transmise par mail.
+
+        ${defaultSignature(internshipKind)}
+        `,
         agencyLogoUrl,
       }),
     },

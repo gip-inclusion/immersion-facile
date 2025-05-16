@@ -38,10 +38,7 @@ export class AddConvention extends TransactionalUseCase<
   ): Promise<WithConventionIdLegacy> {
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
-    if (
-      convention.status !== "DRAFT" &&
-      convention.status !== minimalValidStatus
-    ) {
+    if (convention.status !== minimalValidStatus) {
       throw errors.convention.forbiddenStatus({
         status: convention.status,
       });

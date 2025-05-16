@@ -36,6 +36,7 @@ export const VALID_EMAILS = [
   "validator@mail.com",
 ];
 export const DATE_SUBMISSION = new Date("2024-10-04").toISOString();
+export const DATE_UPDATED = new Date("2024-10-04").toISOString();
 export const DATE_START = new Date("2024-10-08").toISOString();
 export const DATE_END = new Date("2024-10-17").toISOString();
 export const DATE_SIGNATURE = new Date("2024-10-04").toISOString();
@@ -81,12 +82,13 @@ const establishmentRepresentative: EstablishmentRepresentative = {
 
 const validConvention: ConventionDto = {
   id: DEMANDE_IMMERSION_ID,
-  status: "DRAFT",
+  status: "READY_TO_SIGN",
   agencyId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   immersionAddress: "169 boulevard de la villette, 75010 Paris",
   dateSubmission: DATE_SUBMISSION,
   dateStart: DATE_START,
   dateEnd: DATE_END,
+  updatedAt: DATE_UPDATED,
   businessName: "Beta.gouv.fr",
   siret: "12345678901234",
   schedule: reasonableSchedule({
@@ -706,6 +708,10 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
       ...this.dto,
       statusJustification,
     });
+  }
+
+  public withUpdatedAt(updatedAt: DateString): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({ ...this.dto, updatedAt });
   }
 
   public withValidator(

@@ -39,7 +39,6 @@ import { UpdateConventionStatus } from "../../domains/convention/use-cases/Updat
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
 import { BroadcastToFranceTravailOnConventionUpdates } from "../../domains/convention/use-cases/broadcast/BroadcastToFranceTravailOnConventionUpdates";
 import { DeliverRenewedMagicLink } from "../../domains/convention/use-cases/notifications/DeliverRenewedMagicLink";
-import { NotifyActorThatConventionNeedsModifications } from "../../domains/convention/use-cases/notifications/NotifyActorThatConventionNeedsModifications";
 import { NotifyAgencyDelegationContact } from "../../domains/convention/use-cases/notifications/NotifyAgencyDelegationContact";
 import { NotifyAgencyThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyAgencyThatAssessmentIsCreated";
 import { NotifyAllActorsOfFinalConventionValidation } from "../../domains/convention/use-cases/notifications/NotifyAllActorsOfFinalConventionValidation";
@@ -288,7 +287,11 @@ export const createUseCases = (
           config.immersionFacileBaseUrl,
         ),
 
-      updateConvention: new UpdateConvention(uowPerformer, createNewEvent),
+      updateConvention: new UpdateConvention(
+        uowPerformer,
+        createNewEvent,
+        gateways.timeGateway,
+      ),
       updateConventionStatus: new UpdateConventionStatus(
         uowPerformer,
         createNewEvent,
@@ -493,15 +496,6 @@ export const createUseCases = (
         new NotifyAllActorsThatConventionIsDeprecated(
           uowPerformer,
           saveNotificationAndRelatedEvent,
-        ),
-      notifyActorThatConventionNeedsModifications:
-        new NotifyActorThatConventionNeedsModifications(
-          uowPerformer,
-          saveNotificationAndRelatedEvent,
-          generateConventionMagicLinkUrl,
-          gateways.timeGateway,
-          gateways.shortLinkGenerator,
-          config,
         ),
       deliverRenewedMagicLink: new DeliverRenewedMagicLink(
         uowPerformer,

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
-import { goToAdminTab, openEmailInAdmin } from "../../utils/admin";
+import { getMagicLinkLocatorFromEmail, goToAdminTab } from "../../utils/admin";
 
 test.describe.configure({ mode: "serial" });
 
@@ -11,17 +11,15 @@ test.describe("Assessment workflow", () => {
   test("Can add an assessment", async ({ page }) => {
     await page.goto("/");
     await goToAdminTab(page, "adminNotifications");
-    const emailWrapper = await openEmailInAdmin(
+
+    const magicLinkLocator = await getMagicLinkLocatorFromEmail({
       page,
-      "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-    );
-    await emailWrapper
-      .locator("li")
-      .filter({
-        hasText: "assessmentCreationLink",
-      })
-      .locator("a")
-      .click();
+      emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      elementIndex: 0,
+      label: "assessmentCreationLink",
+    });
+    await magicLinkLocator.click();
+
     await expect(
       await page.locator(`#${domElementIds.assessment.statusInput}`),
     ).toBeVisible();
@@ -68,18 +66,12 @@ test.describe("Assessment workflow", () => {
     page,
   }) => {
     await page.goto("/");
-    await goToAdminTab(page, "adminNotifications");
-    const emailWrapper = await openEmailInAdmin(
+    const magicLink = await getMagicLinkLocatorFromEmail({
       page,
-      "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-    );
-    await emailWrapper
-      .locator("li")
-      .filter({
-        hasText: "assessmentCreationLink",
-      })
-      .locator("a")
-      .click();
+      emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      label: "assessmentCreationLink",
+    });
+    await magicLink.click();
     await expect(await page.locator(".fr-alert--error")).toBeVisible();
   });
 });

@@ -16,10 +16,6 @@ export const labelAndSeverityByStatus: Record<
     label: "❌ Convention annulée",
     color: "fr-badge--error",
   },
-  DRAFT: {
-    label: "📄 Brouillon",
-    color: "fr-badge--info",
-  },
   IN_REVIEW: {
     label: "📄 Demande à étudier",
     color: "fr-badge--purple-glycine",

@@ -57,6 +57,9 @@ import {
   UnavailableApiError,
 } from "./httpErrors";
 
+export const conventionUpdateConflictMessage =
+  "Quelqu’un d’autre a modifié la demande en même temps que vous. Veuillez la relire puis la signer ou la modifier.";
+
 export const errors = {
   email: {
     missingContentParts: (kind: keyof EmailParamsByEmailType) =>
@@ -211,12 +214,19 @@ export const errors = {
       new ForbiddenError(
         `Convention ${id} with modifications should have status READY_TO_SIGN`,
       ),
-    updateBadStatusInRepo: ({ id }: { id: ConventionId }) =>
+    updateBadStatusInRepo: ({
+      id,
+      status,
+    }: { id: ConventionId; status: ConventionStatus }) =>
       new BadRequestError(
-        `Convention ${id} cannot be modified as it has status PARTIALLY_SIGNED`,
+        `Convention ${id} cannot be modified as it has status ${status}`,
       ),
     updateForbidden: ({ id }: { id: ConventionId }) =>
-      new ForbiddenError(`User is not allowed to update convention ${id}`),
+      new ForbiddenError(
+        `Vous n'avez pas les droits nécessaires pour modifier la convention '${id}'. Seul les signataires ainsi que les conseillers liés a cette convention peuvent la modifier.`,
+      ),
+    conventionGotUpdatedWhileUpdating: () =>
+      new BadRequestError(conventionUpdateConflictMessage),
     missingFTAdvisor: ({ ftExternalId }: { ftExternalId: FtExternalId }) =>
       new NotFoundError(
         `Il n'y a pas de conseiller France Travail attaché à l'identifiant OAuth ftExternalId '${ftExternalId}'.`,

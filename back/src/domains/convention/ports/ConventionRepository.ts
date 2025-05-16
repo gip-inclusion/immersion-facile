@@ -1,4 +1,4 @@
-import type { ConventionDto, ConventionId, Email } from "shared";
+import type { ConventionDto, ConventionId, DateString, Email } from "shared";
 
 export interface ConventionRepository {
   getIdsByEstablishmentRepresentativeEmail(
@@ -6,9 +6,12 @@ export interface ConventionRepository {
   ): Promise<ConventionId[]>;
   getIdsByEstablishmentTutorEmail(email: Email): Promise<ConventionId[]>;
   getIdsValidatedByEndDateAround: (endDate: Date) => Promise<ConventionId[]>;
-  save: (conventionDto: ConventionDto) => Promise<void>;
+  save: (conventionDto: ConventionDto, now?: DateString) => Promise<void>;
   getById: (id: ConventionId) => Promise<ConventionDto | undefined>;
-  update: (conventionDto: ConventionDto) => Promise<ConventionId | undefined>;
+  update: (
+    conventionDto: ConventionDto,
+    now?: DateString,
+  ) => Promise<ConventionId | undefined>;
   deprecateConventionsWithoutDefinitiveStatusEndedSince: (
     endedSince: Date,
   ) => Promise<number>;

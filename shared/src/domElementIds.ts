@@ -255,6 +255,8 @@ export const domElementIds = {
     submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
     confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",
     summaryEditButton: "im-convention-form__summary-edit-button",
+    statusJustificationTextarea:
+      "im-convention-form__status-justification-textarea",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
@@ -352,10 +354,7 @@ export const domElementIds = {
 
   manageConvention: {
     editActionsButton: "im-manage-convention__edit-actions-button",
-    requestEditModal: "im-manage-convention__request-edit-modal",
-    requestEditButton: "im-manage-convention__open-request-edit-modal-button",
-    requestEditCancelButton: "im-manage-convention__request-edit-cancel-button",
-    requestEditSubmitButton: "im-manage-convention__request-edit-submit-button",
+    editLink: "im-manage-convention__edit-link",
     transferToAgencyModal: "im-manage-convention__transfer-agency-modal",
     transferToAgencyButton:
       "im-manage-convention__open-transfer-to-agency-modal-button",
@@ -383,7 +382,6 @@ export const domElementIds = {
     deprecatedModalSubmitButton: "im-deprecated-modal__submit-button",
     validatorModalCancelButton: "im-validator-modal__cancel-button",
     validatorModalSubmitButton: "im-validator-modal__submit-button",
-    modifierRoleSelect: "im-validator-modal__modifier-role-select",
     rejectedModal: "im-rejected-modal",
     deprecatedModal: "im-deprecate-modal",
     validatorModal: "im-validator-modal",
@@ -741,10 +739,7 @@ export const domElementIds = {
     form: "im-convention-to-sign-form",
     submitButton: "im-convention-to-sign__submit-button",
     openSignModalButton: "im-convention-to-sign__open-sign-modal-button",
-    openRequestModificationModalButton:
-      "im-convention-to-sign__open-modification-modal-button",
-    submitModificationrequestButton:
-      "im-convention-to-sign__submit-modification-request-button",
+    modificationButton: "im-convention-to-sign__modification-button",
   },
   error: {
     establishmentDashboardButton:
