@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Badge from "@codegouvfr/react-dsfr/Badge";
+import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
@@ -139,7 +139,7 @@ const DiscussionDetails = ({
   const statusBadgeData: Record<
     DiscussionVisualStatus,
     {
-      severity: "new" | "info" | "error" | "warning" | "success" | undefined;
+      severity: BadgeProps["severity"];
       label: string;
     }
   > = {
