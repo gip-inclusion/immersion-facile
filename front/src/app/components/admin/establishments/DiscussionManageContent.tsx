@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
 import { useEffect, useState } from "react";
 import {
+  ButtonWithSubMenu,
   CopyButton,
   DiscussionMeta,
   ExchangeMessage,
@@ -123,10 +124,17 @@ export const DiscussionManageContent = ({
     .exhaustive();
 };
 
-const DiscussionDetails = ({
+type DiscussionDetailsProps = {
+  discussion: DiscussionReadDto;
+  userEmail: string;
+};
+
+type ButtonPropsWithId = ButtonProps & { id: string };
+
+const getDiscussionButtons = ({
   discussion,
   userEmail,
-}: { discussion: DiscussionReadDto; userEmail: Email }): JSX.Element => {
+}: DiscussionDetailsProps): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   const draftConvention = makeConventionFromDiscussion({
     initialConvention: getConventionInitialValuesFromUrl({
       route: routes.conventionImmersion(),
@@ -136,6 +144,59 @@ const DiscussionDetails = ({
     userEmail,
   });
 
+  return [
+    {
+      id: domElementIds.establishmentDashboard.discussion
+        .replyToCandidateByEmail,
+      priority: "primary",
+      linkProps: {
+        href: `mailto:${createOpaqueEmail({
+          discussionId: discussion.id,
+          recipient: {
+            kind: "potentialBeneficiary",
+            firstname: discussion.potentialBeneficiary.firstName,
+            lastname: discussion.potentialBeneficiary.lastName,
+          },
+          replyDomain: `reply.${window.location.hostname}`,
+        })}?subject=${encodeURI(
+          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
+        )}`,
+        target: "_blank",
+      },
+      children: "Répondre au candidat",
+    } satisfies ButtonProps,
+    ...(discussion.status === "PENDING" && discussion.kind === "IF"
+      ? [
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .activateDraftConvention,
+            priority: "tertiary",
+            linkProps: {
+              href: makeDraftConventionLink(draftConvention, discussion.id)
+                .href,
+              target: "_blank",
+            },
+            children: "Pré-remplir la convention pour cette mise en relation",
+          } satisfies ButtonProps,
+        ]
+      : []),
+    ...(discussion.status === "PENDING"
+      ? [
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationOpenModal,
+            priority: "secondary",
+            type: "button",
+            onClick: () => openRejectApplicationModal(),
+            children: "Refuser la candidature",
+          } satisfies ButtonProps,
+        ]
+      : []),
+  ];
+};
+
+const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
+  const { discussion } = props;
   const statusBadgeData: Record<
     DiscussionDisplayStatus,
     {
@@ -173,50 +234,6 @@ const DiscussionDetails = ({
     statusBadgeData[
       getDiscussionDisplayStatus({ discussion, now: new Date() })
     ];
-  const candidateContactButtons: [ButtonProps, ...ButtonProps[]] = [
-    {
-      id: domElementIds.establishmentDashboard.discussion
-        .replyToCandidateByEmail,
-      priority: "primary",
-      linkProps: {
-        href: `mailto:${createOpaqueEmail({
-          discussionId: discussion.id,
-          recipient: {
-            kind: "potentialBeneficiary",
-            firstname: discussion.potentialBeneficiary.firstName,
-            lastname: discussion.potentialBeneficiary.lastName,
-          },
-          replyDomain: `reply.${window.location.hostname}`,
-        })}?subject=${encodeURI(
-          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
-        )}`,
-        target: "_blank",
-      },
-      children: "Répondre au candidat",
-    },
-  ];
-  if (discussion.status === "PENDING") {
-    if (discussion.kind === "IF") {
-      candidateContactButtons.push({
-        id: domElementIds.establishmentDashboard.discussion
-          .activateDraftConvention,
-        priority: "tertiary",
-        linkProps: {
-          href: makeDraftConventionLink(draftConvention, discussion.id).href,
-          target: "_blank",
-        },
-        children: "Pré-remplir la convention pour cette mise en relation",
-      });
-    }
-    candidateContactButtons.push({
-      id: domElementIds.establishmentDashboard.discussion
-        .rejectApplicationOpenModal,
-      priority: "secondary",
-      type: "button",
-      onClick: () => openRejectApplicationModal(),
-      children: "Refuser la candidature",
-    });
-  }
 
   return (
     <>
@@ -238,10 +255,23 @@ const DiscussionDetails = ({
         >
           Retour
         </Button>
-        <h1>
-          Discussion avec {discussion.potentialBeneficiary.firstName}{" "}
-          {discussion.potentialBeneficiary.lastName}
-        </h1>
+        <div
+          className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
+        >
+          <div className={fr.cx("fr-col-12", "fr-col-lg")}>
+            <h1>
+              Discussion avec {discussion.potentialBeneficiary.firstName}{" "}
+              {discussion.potentialBeneficiary.lastName}
+            </h1>
+          </div>
+          <ButtonWithSubMenu
+            buttonLabel={"Gérer la candidature"}
+            buttonIconId="fr-icon-arrow-down-s-line"
+            iconPosition="right"
+            navItems={getDiscussionButtons(props)}
+            className={fr.cx("fr-ml-md-auto")}
+          />
+        </div>
         <DiscussionMeta>
           <p
             key="status-badge"
@@ -269,19 +299,15 @@ const DiscussionDetails = ({
               </a>
             )}
         </DiscussionMeta>
-        <ButtonsGroup
-          inlineLayoutWhen="always"
-          buttonsSize="small"
-          buttons={candidateContactButtons}
-        />
         <div className={fr.cx("fr-grid-row")}>
           <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
             <Highlight className={fr.cx("fr-ml-0", "fr-pt-2w", "fr-pb-1w")}>
-              <p className={fr.cx("fr-text--sm", "fr-mb-2w")}>
+              <span className={fr.cx("fr-text--sm", "fr-mb-2w")}>
                 Vous ne parvenez pas à répondre au candidat ? Copiez dans votre
                 presse papier l'adresse email sécurisée de cette discussion et
                 utilisez-la directement depuis votre boîte mail.
-              </p>
+              </span>
+              <br />
               <CopyButton
                 textToCopy={createOpaqueEmail({
                   discussionId: discussion.id,
