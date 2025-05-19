@@ -234,6 +234,16 @@ describe("makeExchangeEmailSchema", () => {
       rawRecipientKind: "bob",
     });
   });
+
+  it("should handle the old email format", () => {
+    const email = "discussionId_e@reply.domain.com";
+    const result = makeExchangeEmailSchema("reply.domain.com").parse(email);
+    expectToEqual(result, {
+      discussionId: "discussionId",
+      rawRecipientKind: "e",
+    });
+  });
+
   it("should throw an error if the email is not valid", () => {
     const email = "john_doe_discussionId_bob@reply.domain.com";
     expect(() =>
