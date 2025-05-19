@@ -6,7 +6,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { ZodError } from "zod";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -209,15 +208,7 @@ describe("AddExchangeToDiscussion", () => {
       const email = "gerard@reply-dev.immersion-facile.beta.gouv.fr";
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute(createBrevoResponse([email])),
-        new ZodError([
-          {
-            validation: "regex",
-            code: "invalid_string",
-            message:
-              "invalide - valeur fournie : gerard@reply-dev.immersion-facile.beta.gouv.fr",
-            path: [],
-          },
-        ]),
+        errors.discussion.badEmailFormat({ email }),
       );
     });
 
