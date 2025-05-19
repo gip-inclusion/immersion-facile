@@ -284,6 +284,7 @@ describe("RenewConventionMagicLink use case", () => {
             "verifier-et-signer",
             "pilotage-convention",
             "bilan-immersion",
+            "bilan-document",
           ],
         }),
       );
