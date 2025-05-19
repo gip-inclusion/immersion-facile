@@ -141,10 +141,9 @@ export const emailTemplatesByName =
         assessmentCreationLink,
         internshipKind,
       }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Comment s'est déroulée l'immersion ?"
-            : "Mini Stage - Comment s'est déroulé le mini stage ?",
+        subject: `Pour action : complétez le bilan ${
+          internshipKind === "immersion" ? "de l'immersion" : "du mini stage"
+        } de ${beneficiaryFirstName} ${beneficiaryLastName}`,
         greetings: greetingsWithConventionId(
           conventionId,
           establishmentTutorName,
@@ -163,11 +162,7 @@ export const emailTemplatesByName =
       } s'est bien déroulée jusqu'à sa date de fin prévue ?`,
         buttons: [
           {
-            label: `Evaluer ${
-              internshipKind === "immersion"
-                ? "cette immersion"
-                : "ce mini stage"
-            }`,
+            label: "Compléter le bilan",
             url: assessmentCreationLink,
           },
         ],
