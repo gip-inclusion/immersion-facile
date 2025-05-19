@@ -251,6 +251,76 @@ describe("SendExchangeToRecipient", () => {
         ],
       });
     });
+
+    it("sends email even if firstname or lastname has special caracters usually not supported in emails", async () => {
+      const lastExchange: Exchange = {
+        subject: "My subject - discussion 1",
+        message: "My response",
+        sender: "potentialBeneficiary",
+        sentAt: new Date().toISOString(),
+        recipient: "establishment",
+        attachments: [],
+      };
+
+      const discussion = new DiscussionBuilder()
+        .withAppellationCode("20567")
+        .withPotentialBeneficiaryFirstname("É ric")
+        .withPotentialBeneficiaryLastName("el Ah&é$truc")
+        .withId(uuid())
+        .withExchanges([
+          {
+            subject: "My subject - discussion 1",
+            message: "Hello",
+            sender: "potentialBeneficiary",
+            sentAt: addHours(timeGateway.now(), -2).toISOString(),
+            recipient: "establishment",
+            attachments: [],
+          },
+          {
+            sender: "establishment",
+            recipient: "potentialBeneficiary",
+            sentAt: "2023-06-28T08:06:52.000Z",
+            message: "message",
+            subject: "subject",
+            attachments: [{ link: notABlobLink, name: "VCard" }],
+          },
+          {
+            subject: "My subject - discussion 1",
+            message: "My response",
+            sender: "potentialBeneficiary",
+            sentAt: new Date().toISOString(),
+            recipient: "establishment",
+            attachments: [],
+          },
+        ])
+        .build();
+
+      uow.discussionRepository.discussions = [discussion];
+
+      await useCase.execute({
+        discussionId: discussion.id,
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [
+          {
+            kind: "DISCUSSION_EXCHANGE",
+            params: {
+              htmlContent: expect.any(String),
+              subject: lastExchange.subject,
+            },
+            recipients: [discussion.establishmentContact.email],
+            replyTo: {
+              email: `e-ric_el-ah-e-truc__${discussion.id}_b@reply.my-domain.com`,
+              name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+            },
+            sender: immersionFacileNoReplyEmailSender,
+            cc: discussion.establishmentContact.copyEmails,
+            attachments: [],
+          },
+        ],
+      });
+    });
   });
 
   describe("wrong paths", () => {

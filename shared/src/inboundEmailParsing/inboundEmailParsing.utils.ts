@@ -1,4 +1,5 @@
 import type { DiscussionId, ExchangeRole } from "../discussion/discussion.dto";
+import { slugify } from "../utils/string";
 
 type OpaqueEmailParams = {
   discussionId: DiscussionId;
@@ -16,6 +17,8 @@ export const createOpaqueEmail = ({
   recipient,
 }: OpaqueEmailParams) => {
   const recipientLetter = recipient.kind === "establishment" ? "e" : "b";
+  const firstname = slugify(recipient.firstname);
+  const lastname = slugify(recipient.lastname);
 
-  return `${recipient.firstname}_${recipient.lastname}__${discussionId}_${recipientLetter}@${replyDomain}`;
+  return `${firstname}_${lastname}__${discussionId}_${recipientLetter}@${replyDomain}`;
 };
