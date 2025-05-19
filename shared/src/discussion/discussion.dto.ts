@@ -29,18 +29,23 @@ export type DiscussionId = Flavor<string, "DiscussionId">;
 
 export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 
-export type DiscussionEmailParams = {
-  firstname: string;
-  lastname: string;
+export type LegacyDiscussionEmailParams = {
   discussionId: DiscussionId;
   rawRecipientKind: string;
 };
 
+export type DiscussionEmailParams = LegacyDiscussionEmailParams & {
+  firstname: string;
+  lastname: string;
+};
+
 export type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
   DiscussionEmailParams,
-  "rawRecipientKind"
+  "rawRecipientKind" | "firstname" | "lastname"
 > & {
   recipientKind: ExchangeRole;
+  firstname?: string;
+  lastname?: string;
 };
 
 type WithContactByEmailProps<

@@ -1,6 +1,8 @@
 import {
   type BrevoEmailItem,
+  type DiscussionEmailParams,
   type DiscussionEmailParamsWithRecipientKind,
+  type LegacyDiscussionEmailParams,
   errors,
   makeExchangeEmailSchema,
 } from "shared";
@@ -30,8 +32,7 @@ export const getDiscussionParamsFromEmail = (
       email: email.To.map((recipient) => recipient.Address).join(", "),
     });
 
-  const { discussionId, rawRecipientKind, firstname, lastname } =
-    recipientEmailParams;
+  const { discussionId, rawRecipientKind } = recipientEmailParams;
 
   if (!["e", "b"].includes(rawRecipientKind))
     throw errors.discussion.badRecipientKindFormat({ kind: rawRecipientKind });
@@ -41,8 +42,20 @@ export const getDiscussionParamsFromEmail = (
 
   return {
     discussionId,
-    firstname,
-    lastname,
     recipientKind,
+    ...(hasDiscussionParamsFirstnameAndLastname(recipientEmailParams)
+      ? {
+          firstname: recipientEmailParams.firstname,
+          lastname: recipientEmailParams.lastname,
+        }
+      : {}),
   };
+};
+
+const hasDiscussionParamsFirstnameAndLastname = (
+  recipientEmailParams: DiscussionEmailParams | LegacyDiscussionEmailParams,
+): recipientEmailParams is DiscussionEmailParams => {
+  return (
+    "firstname" in recipientEmailParams && "lastname" in recipientEmailParams
+  );
 };

@@ -27,6 +27,7 @@ import type {
   DiscussionStatusWithRejection,
   Exchange,
   ExchangeRole,
+  LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
   WithDiscussionRejection,
 } from "./discussion.dto";
@@ -38,9 +39,17 @@ export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export const makeExchangeEmailRegex = (replyDomain: string) =>
   new RegExp(`[^_]+_[^_]+__([^_]+)_([^@]+)@${replyDomain}$`);
 
+export const makeLegacyExchangeEmailRegex = (replyDomain: string) =>
+  new RegExp(`^[^_]+_[^_]+@${replyDomain}$`);
+
 export const makeExchangeEmailSchema = (
   replyDomain: string,
-): z.ZodEffects<z.ZodString, DiscussionEmailParams, string> =>
+): z.ZodUnion<
+  [
+    z.ZodEffects<z.ZodString, DiscussionEmailParams, string>,
+    z.ZodEffects<z.ZodString, LegacyDiscussionEmailParams, string>,
+  ]
+> =>
   z
     .string()
     .email()
@@ -55,7 +64,20 @@ export const makeExchangeEmailSchema = (
         discussionId: id satisfies DiscussionId,
         rawRecipientKind,
       };
-    });
+    })
+    .or(
+      z
+        .string()
+        .email()
+        .regex(makeLegacyExchangeEmailRegex(replyDomain))
+        .transform((email) => {
+          const [id, rawRecipientKind] = email.split("@")[0].split("_");
+          return {
+            discussionId: id satisfies DiscussionId,
+            rawRecipientKind,
+          };
+        }),
+    );
 
 const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
