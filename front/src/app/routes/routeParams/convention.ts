@@ -54,7 +54,7 @@ export const getConventionInitialValuesFromUrl = ({
     ...conventionPresentationFromParams(params),
     id: uuidV4(),
     status: "DRAFT",
-    dateSubmission: toDateUTCString(startOfToday()),
+    dateSubmission: toDateUTCString(new Date()),
     internshipKind,
   };
 
