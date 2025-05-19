@@ -2,23 +2,23 @@ import { subDays } from "date-fns";
 import { expectToEqual } from "../test.helpers";
 import { DiscussionBuilder } from "./DiscussionBuilder";
 import type {
+  DiscussionDisplayStatus,
   DiscussionReadDto,
-  DiscussionVisualStatus,
   Exchange,
   ExchangeRole,
 } from "./discussion.dto";
-import { getDiscussionVisualStatus } from "./discussion.helpers";
+import { getDiscussionDisplayStatus } from "./discussion.helpers";
 import {
   discussionReadSchema,
   makeExchangeEmailSchema,
 } from "./discussion.schema";
 
 describe("Discussions", () => {
-  describe("getDiscussionVisualStatus", () => {
+  describe("getDiscussionDisplayStatus", () => {
     type TestCase = {
       message: string;
       discussion: DiscussionReadDto;
-      expectedVisualStatus: DiscussionVisualStatus;
+      expectedDisplayStatus: DiscussionDisplayStatus;
     };
 
     const createExchange = ({
@@ -41,17 +41,17 @@ describe("Discussions", () => {
     const testCases: TestCase[] = [
       {
         message: "status is REJECTED",
-        expectedVisualStatus: "rejected",
+        expectedDisplayStatus: "rejected",
         discussion: new DiscussionBuilder().withStatus("REJECTED").buildRead(),
       },
       {
         message: "status is ACCEPTED",
-        expectedVisualStatus: "accepted",
+        expectedDisplayStatus: "accepted",
         discussion: new DiscussionBuilder().withStatus("ACCEPTED").buildRead(),
       },
       {
         message: "candidate has sent the first message without being answered",
-        expectedVisualStatus: "new",
+        expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
           .withStatus("PENDING")
           .withExchanges([
@@ -65,7 +65,7 @@ describe("Discussions", () => {
       {
         message:
           "candidate has sent the last message without being answered (but it is not the first message)",
-        expectedVisualStatus: "needs-answer",
+        expectedDisplayStatus: "needs-answer",
         discussion: new DiscussionBuilder()
           .withStatus("PENDING")
           .withExchanges([
@@ -86,7 +86,7 @@ describe("Discussions", () => {
       },
       {
         message: "last message is sent by establishment",
-        expectedVisualStatus: "answered",
+        expectedDisplayStatus: "answered",
         discussion: new DiscussionBuilder()
           .withStatus("PENDING")
           .withExchanges([
@@ -104,7 +104,7 @@ describe("Discussions", () => {
       {
         message:
           "last message is from beneficiary and has had no answer for more than 15 days",
-        expectedVisualStatus: "needs-urgent-answer",
+        expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
           .withStatus("PENDING")
           .withExchanges([
@@ -117,7 +117,7 @@ describe("Discussions", () => {
       },
       {
         message: "discussion contact method is recent and not email",
-        expectedVisualStatus: "new",
+        expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 14))
           .withStatus("PENDING")
@@ -128,7 +128,7 @@ describe("Discussions", () => {
       {
         message:
           "discussion contact method is older than 15 days and not email",
-        expectedVisualStatus: "needs-urgent-answer",
+        expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 15))
           .withStatus("PENDING")
@@ -139,11 +139,11 @@ describe("Discussions", () => {
     ];
 
     it.each(testCases)(
-      "returns $expectedVisualStatus when $message",
-      ({ discussion, expectedVisualStatus }) => {
+      "returns $expectedDisplayStatus when $message",
+      ({ discussion, expectedDisplayStatus }) => {
         expectToEqual(
-          getDiscussionVisualStatus({ discussion, now }),
-          expectedVisualStatus,
+          getDiscussionDisplayStatus({ discussion, now }),
+          expectedDisplayStatus,
         );
       },
     );

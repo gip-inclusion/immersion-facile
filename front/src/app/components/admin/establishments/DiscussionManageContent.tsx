@@ -21,9 +21,9 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type DiscussionDisplayStatus,
   type DiscussionId,
   type DiscussionReadDto,
-  type DiscussionVisualStatus,
   type Email,
   type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
@@ -33,7 +33,7 @@ import {
   createOpaqueEmail,
   discussionRejectionSchema,
   domElementIds,
-  getDiscussionVisualStatus,
+  getDiscussionDisplayStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
@@ -137,7 +137,7 @@ const DiscussionDetails = ({
   });
 
   const statusBadgeData: Record<
-    DiscussionVisualStatus,
+    DiscussionDisplayStatus,
     {
       severity: BadgeProps["severity"];
       label: string;
@@ -170,7 +170,9 @@ const DiscussionDetails = ({
   };
 
   const statusBadge =
-    statusBadgeData[getDiscussionVisualStatus({ discussion, now: new Date() })];
+    statusBadgeData[
+      getDiscussionDisplayStatus({ discussion, now: new Date() })
+    ];
   const candidateContactButtons: [ButtonProps, ...ButtonProps[]] = [
     {
       id: domElementIds.establishmentDashboard.discussion
