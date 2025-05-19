@@ -12,9 +12,17 @@ export const getDiscussionParamsFromEmail = (
   const recipientEmailParams = email.To.filter(
     (brevoRecipient) => !!brevoRecipient.Address,
   )
-    .map((brevoRecipient) =>
-      makeExchangeEmailSchema(replyDomain).parse(brevoRecipient.Address),
-    )
+    .map((brevoRecipient) => {
+      const validatedEmail = makeExchangeEmailSchema(replyDomain).safeParse(
+        brevoRecipient.Address,
+      );
+      if (!validatedEmail.success)
+        throw errors.discussion.badEmailFormat({
+          email: brevoRecipient.Address,
+        });
+
+      return validatedEmail.data;
+    })
     .at(0);
 
   if (!recipientEmailParams)

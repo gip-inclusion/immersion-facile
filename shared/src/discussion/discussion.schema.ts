@@ -19,6 +19,7 @@ import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import type {
   Attachment,
   DiscussionAccepted,
+  DiscussionEmailParams,
   DiscussionId,
   DiscussionPending,
   DiscussionReadDto,
@@ -37,7 +38,9 @@ export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export const makeExchangeEmailRegex = (replyDomain: string) =>
   new RegExp(`[^_]+_[^_]+__([^_]+)_([^@]+)@${replyDomain}$`);
 
-export const makeExchangeEmailSchema = (replyDomain: string) =>
+export const makeExchangeEmailSchema = (
+  replyDomain: string,
+): z.ZodEffects<z.ZodString, DiscussionEmailParams, string> =>
   z
     .string()
     .email()
