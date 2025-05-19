@@ -39,7 +39,7 @@ test.describe("Establishment dashboard workflow", () => {
         `#${domElementIds.establishmentDashboard.discussion.statusBadge}`,
       );
       await expect(badgeLocator).toBeVisible();
-      await expect(badgeLocator).toHaveClass("fr-badge fr-badge--error");
+      await expect(badgeLocator).toHaveClass("fr-badge");
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(3);
