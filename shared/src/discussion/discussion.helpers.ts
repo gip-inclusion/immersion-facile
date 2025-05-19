@@ -3,22 +3,22 @@ import { sort } from "ramda";
 import { match } from "ts-pattern";
 import type { DateString } from "../utils/date";
 import type {
+  DiscussionDisplayStatus,
   DiscussionReadDto,
-  DiscussionVisualStatus,
   Exchange,
 } from "./discussion.dto";
 
 const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
   new Date(from) <= subDays(now, 15);
 
-export const getDiscussionVisualStatus = ({
+export const getDiscussionDisplayStatus = ({
   discussion,
   now,
-}: { discussion: DiscussionReadDto; now: Date }): DiscussionVisualStatus => {
+}: { discussion: DiscussionReadDto; now: Date }): DiscussionDisplayStatus => {
   return match(discussion.status)
-    .with("REJECTED", (): DiscussionVisualStatus => "rejected")
-    .with("ACCEPTED", (): DiscussionVisualStatus => "accepted")
-    .with("PENDING", (): DiscussionVisualStatus => {
+    .with("REJECTED", (): DiscussionDisplayStatus => "rejected")
+    .with("ACCEPTED", (): DiscussionDisplayStatus => "accepted")
+    .with("PENDING", (): DiscussionDisplayStatus => {
       const orderedExchanges = sort(
         (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
         discussion.exchanges,
