@@ -1,3 +1,4 @@
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { type RefObject, useEffect, useState } from "react";
@@ -84,6 +85,36 @@ export const TranscientPreferencesDisplay = (
     return () => clearTimeout(timeout);
   }, [shouldOpenDisplay, mode]);
 
+  const buttons: [ButtonProps, ...ButtonProps[]] = [
+    {
+      type: "button",
+      children: "Oui",
+      id: "transcient-preferences-modal-yes",
+      onClick: () => {
+        savePreferences(true);
+      },
+    },
+    {
+      type: "button",
+      priority: "secondary",
+      children: "Pas cette fois",
+      id: "transcient-preferences-modal-no",
+      onClick: () => {
+        savePreferences(false);
+      },
+    },
+    {
+      type: "button",
+      priority: "secondary",
+      children: "Non, ce n'est pas moi",
+      id: "transcient-preferences-modal-clear",
+      onClick: () => {
+        savePreferences(false);
+        clearTranscientDataForScope();
+      },
+    },
+  ];
+
   const jsxContent = (
     <>
       <p>
@@ -98,48 +129,20 @@ export const TranscientPreferencesDisplay = (
           )}
         </ul>
       )}
-
       <p>Voulez-vous utiliser ces données ?</p>
-      <ButtonsGroup
-        buttons={[
-          {
-            type: "button",
-            children: "Oui",
-            id: "transcient-preferences-modal-yes",
-            onClick: () => {
-              savePreferences(true);
-            },
-          },
-          {
-            type: "button",
-            priority: "secondary",
-            children: "Pas cette fois",
-            id: "transcient-preferences-modal-no",
-            onClick: () => {
-              savePreferences(false);
-            },
-          },
-          {
-            type: "button",
-            priority: "secondary",
-            children: "Non, ce n'est pas moi",
-            id: "transcient-preferences-modal-clear",
-            onClick: () => {
-              savePreferences(false);
-              clearTranscientDataForScope();
-            },
-          },
-        ]}
-      />
     </>
   );
   return mode === "modal" ? (
-    <transcientPreferencesModal.Component title="Préremplir le formulaire">
+    <transcientPreferencesModal.Component
+      title="Préremplir le formulaire"
+      buttons={buttons}
+    >
       {jsxContent}
     </transcientPreferencesModal.Component>
   ) : (
     <FormOverlay isVisible={displayIsVisible} parentRef={props.parentRef}>
       {jsxContent}
+      <ButtonsGroup buttons={buttons} />
     </FormOverlay>
   );
 };

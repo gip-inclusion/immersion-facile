@@ -1,6 +1,15 @@
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import { type Dispatch, Fragment, type SetStateAction, useState } from "react";
+import {
+  type Dispatch,
+  type ForwardedRef,
+  Fragment,
+  type SetStateAction,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
+import type { SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
 import {
   type ConventionDto,
   type ConventionStatus,
@@ -33,6 +42,43 @@ export type ModalWrapperProps = {
   onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
     SetStateAction<string | null>
   >;
+};
+
+export type ModalContentRef = {
+  submitForm: () => void;
+  submitButtonLabel: string;
+  cancelButtonLabel: string;
+  submitButtonId: string;
+  cancelButtonId: string;
+};
+
+export const useExposeFormModalContentRef = <T extends object>(
+  ref: ForwardedRef<ModalContentRef>,
+  {
+    handleSubmit,
+    onFormSubmit,
+    submitButtonLabel,
+    cancelButtonLabel,
+    submitButtonId,
+    cancelButtonId,
+  }: {
+    handleSubmit: UseFormHandleSubmit<T>;
+    onFormSubmit: SubmitHandler<T>;
+    submitButtonLabel: string;
+    cancelButtonLabel: string;
+    submitButtonId: string;
+    cancelButtonId: string;
+  },
+) => {
+  useImperativeHandle(ref, () => ({
+    submitForm: () => {
+      handleSubmit(onFormSubmit)();
+    },
+    submitButtonLabel,
+    cancelButtonLabel,
+    submitButtonId,
+    cancelButtonId,
+  }));
 };
 
 export const ModalWrapper = (props: ModalWrapperProps) => {
@@ -83,8 +129,28 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     });
   };
 
+  const modalContentRef = useRef<ModalContentRef>(null);
+  const modal = modalContentRef.current;
   return createPortal(
-    <Modal title={modalProps.title}>
+    <Modal
+      title={modalProps.title}
+      buttons={[
+        {
+          type: "button",
+          priority: "secondary",
+          onClick: closeModal,
+          children: modal?.cancelButtonLabel,
+          id: modal?.cancelButtonId,
+        },
+        {
+          type: "submit",
+          priority: "primary",
+          onClick: modal?.submitForm,
+          children: modal?.submitButtonLabel,
+          id: modal?.submitButtonId,
+        },
+      ]}
+    >
       <Fragment
         key={`${modalObject.createModalParams.id}-${isModalOpen.toString()}`}
       >
@@ -107,6 +173,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             },
             () => (
               <TransferModalContent
+                ref={modalContentRef}
                 onSubmit={onSubmit}
                 closeModal={closeModal}
                 convention={convention}
@@ -123,6 +190,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             },
             ({ newStatus }) => (
               <JustificationModalContent
+                ref={modalContentRef}
                 onSubmit={onSubmit}
                 closeModal={closeModal}
                 newStatus={newStatus}
@@ -142,6 +210,7 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
             },
             ({ newStatus }) => (
               <ValidatorModalContent
+                ref={modalContentRef}
                 onSubmit={onSubmit}
                 closeModal={closeModal}
                 newStatus={newStatus}

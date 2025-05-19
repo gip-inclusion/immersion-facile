@@ -2,6 +2,7 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Dispatch, SetStateAction } from "react";
+import { forwardRef } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
@@ -11,93 +12,115 @@ import {
   domElementIds,
   withValidatorInfoSchema,
 } from "shared";
+import {
+  type ModalContentRef,
+  useExposeFormModalContentRef,
+} from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 
-export const ValidatorModalContent = ({
-  onSubmit,
-  closeModal,
-  newStatus,
-  conventionId,
-  onCloseValidatorModalWithoutValidatorInfo,
-}: {
-  onSubmit: (params: UpdateConventionStatusRequestDto) => void;
-  closeModal: () => void;
-  newStatus: ConventionStatusWithValidator;
-  conventionId: ConventionId;
-  onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
-    SetStateAction<string | null>
-  >;
-}) => {
-  const { register, handleSubmit } = useForm<WithValidatorInfo>({
-    resolver: zodResolver(withValidatorInfoSchema),
-    mode: "onTouched",
-  });
-  const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
-    firstname,
-    lastname,
-  }) => {
-    onSubmit({ status: newStatus, conventionId, firstname, lastname });
-    closeModal();
-  };
-  return (
-    <>
-      <form onSubmit={handleSubmit(onFormSubmit)}>
-        <Input
-          label={
-            newStatus === "ACCEPTED_BY_VALIDATOR"
-              ? "Nom de la personne qui valide la demande *"
-              : "Nom de la personne qui pré-valide la demande *"
-          }
-          nativeInputProps={{
-            ...register("lastname"),
-            required: true,
-            id: domElementIds.manageConvention.validatorModalLastNameInput,
-          }}
-        />
-        <Input
-          label={
-            newStatus === "ACCEPTED_BY_VALIDATOR"
-              ? "Prénom de la personne qui valide la demande *"
-              : "Prénom de la personne qui pré-valide la demande *"
-          }
-          nativeInputProps={{
-            ...register("firstname"),
-            required: true,
-            id: domElementIds.manageConvention.validatorModalFirstNameInput,
-          }}
-        />
-        <ButtonsGroup
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              onClick: () => {
-                if (onCloseValidatorModalWithoutValidatorInfo) {
-                  onCloseValidatorModalWithoutValidatorInfo(
-                    warningMessagesByConventionStatus[newStatus],
-                  );
-                }
-                closeModal();
+export const ValidatorModalContent = forwardRef<
+  ModalContentRef,
+  {
+    onSubmit: (params: UpdateConventionStatusRequestDto) => void;
+    closeModal: () => void;
+    newStatus: ConventionStatusWithValidator;
+    conventionId: ConventionId;
+    onCloseValidatorModalWithoutValidatorInfo?: Dispatch<
+      SetStateAction<string | null>
+    >;
+  }
+>(
+  (
+    {
+      onSubmit,
+      closeModal,
+      newStatus,
+      conventionId,
+      onCloseValidatorModalWithoutValidatorInfo,
+    },
+    ref,
+  ) => {
+    const { register, handleSubmit } = useForm<WithValidatorInfo>({
+      resolver: zodResolver(withValidatorInfoSchema),
+      mode: "onTouched",
+    });
+    const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
+      firstname,
+      lastname,
+    }) => {
+      onSubmit({ status: newStatus, conventionId, firstname, lastname });
+      closeModal();
+    };
+
+    useExposeFormModalContentRef(ref, {
+      handleSubmit,
+      onFormSubmit,
+      submitButtonLabel: "Terminer",
+      cancelButtonLabel: "Annuler et revenir en arrière",
+      submitButtonId: domElementIds.manageConvention.validatorModalSubmitButton,
+      cancelButtonId: domElementIds.manageConvention.validatorModalCancelButton,
+    });
+
+    return (
+      <>
+        <form onSubmit={handleSubmit(onFormSubmit)}>
+          <Input
+            label={
+              newStatus === "ACCEPTED_BY_VALIDATOR"
+                ? "Nom de la personne qui valide la demande *"
+                : "Nom de la personne qui pré-valide la demande *"
+            }
+            nativeInputProps={{
+              ...register("lastname"),
+              required: true,
+              id: domElementIds.manageConvention.validatorModalLastNameInput,
+            }}
+          />
+          <Input
+            label={
+              newStatus === "ACCEPTED_BY_VALIDATOR"
+                ? "Prénom de la personne qui valide la demande *"
+                : "Prénom de la personne qui pré-valide la demande *"
+            }
+            nativeInputProps={{
+              ...register("firstname"),
+              required: true,
+              id: domElementIds.manageConvention.validatorModalFirstNameInput,
+            }}
+          />
+          <ButtonsGroup
+            alignment="center"
+            inlineLayoutWhen="always"
+            buttons={[
+              {
+                type: "button",
+                priority: "secondary",
+                onClick: () => {
+                  if (onCloseValidatorModalWithoutValidatorInfo) {
+                    onCloseValidatorModalWithoutValidatorInfo(
+                      warningMessagesByConventionStatus[newStatus],
+                    );
+                  }
+                  closeModal();
+                },
+                nativeButtonProps: {
+                  id: domElementIds.manageConvention.validatorModalCancelButton,
+                },
+                children: "Annuler et revenir en arrière",
               },
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.validatorModalCancelButton,
+              {
+                type: "submit",
+                nativeButtonProps: {
+                  id: domElementIds.manageConvention.validatorModalSubmitButton,
+                },
+                children: "Terminer",
               },
-              children: "Annuler et revenir en arrière",
-            },
-            {
-              type: "submit",
-              nativeButtonProps: {
-                id: domElementIds.manageConvention.validatorModalSubmitButton,
-              },
-              children: "Terminer",
-            },
-          ]}
-        />
-      </form>
-    </>
-  );
-};
+            ]}
+          />
+        </form>
+      </>
+    );
+  },
+);
 
 const warningMessagesByConventionStatus: Record<
   ConventionStatusWithValidator,

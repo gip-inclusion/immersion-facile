@@ -8,7 +8,7 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, forwardRef, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -20,6 +20,10 @@ import {
 } from "shared";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import { Feedback } from "src/app/components/feedback/Feedback";
+import {
+  type ModalContentRef,
+  useExposeFormModalContentRef,
+} from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
@@ -62,6 +66,44 @@ export const EstablishmentUsersList = () => {
       setEditingUserRight,
     });
   });
+  const editModalContentRef = useRef<ModalContentRef>(null);
+
+  const dispatch = useDispatch();
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const token = useAppSelector(authSelectors.inclusionConnectToken);
+  const handleSubmit = editModalContentRef.current?.submitForm;
+  const removeUserRight = (
+    userRights: FormEstablishmentUserRight[],
+    userRightToRemove: FormEstablishmentUserRight,
+  ) =>
+    userRights.filter(
+      (userRight) => userRight.email !== userRightToRemove.email,
+    );
+  const onDeleteConfirm = () => {
+    if (!editingUserRight) return;
+    const updatedFormEstablishment = {
+      ...formEstablishment,
+      userRights: removeUserRight(
+        formEstablishment.userRights,
+        editingUserRight,
+      ),
+    };
+    const isCurrentUserDeleted = editingUserRight.email === currentUser?.email;
+    dispatch(
+      establishmentSlice.actions.updateEstablishmentRequested({
+        establishmentUpdate: {
+          formEstablishment: updatedFormEstablishment,
+          jwt: token ?? "",
+        },
+        feedbackTopic: "establishment-dashboard-users-rights",
+      }),
+    );
+    establishmentUsersDeleteModal.close();
+    if (isCurrentUserDeleted) {
+      routes.establishmentDashboard().push();
+      window.location.reload();
+    }
+  };
   return (
     <div className="fr-mt-4w">
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
@@ -102,81 +144,27 @@ export const EstablishmentUsersList = () => {
         title={
           editingUserRight ? "Modifier l'utilisateur" : "Ajouter un utilisateur"
         }
+        buttons={[
+          {
+            children: "Annuler",
+            onClick: establishmentUsersEditModal.close,
+            priority: "secondary",
+            type: "button",
+          },
+          {
+            children: "Enregistrer",
+            onClick: handleSubmit,
+            type: "submit",
+          },
+        ]}
       >
         <EstablishmentUsersEditForm
+          ref={editModalContentRef}
           alreadyExistingUserRight={editingUserRight}
         />
       </establishmentUsersEditModal.Component>
-      <establishmentUsersDeleteModal.Component title="Supprimer l'utilisateur">
-        <EstablishmentUsersDeleteContent
-          alreadyExistingUserRight={editingUserRight}
-        />
-      </establishmentUsersDeleteModal.Component>
-    </div>
-  );
-};
-
-const EstablishmentUsersDeleteContent = ({
-  alreadyExistingUserRight,
-}: {
-  alreadyExistingUserRight: FormEstablishmentUserRight | null;
-}) => {
-  const dispatch = useDispatch();
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const token = useAppSelector(authSelectors.inclusionConnectToken);
-  const formEstablishment = useAppSelector(
-    establishmentSelectors.formEstablishment,
-  );
-  const removeUserRight = (
-    userRights: FormEstablishmentUserRight[],
-    userRightToRemove: FormEstablishmentUserRight,
-  ) =>
-    userRights.filter(
-      (userRight) => userRight.email !== userRightToRemove.email,
-    );
-  const onDeleteConfirm = () => {
-    if (!alreadyExistingUserRight) return;
-    const updatedFormEstablishment = {
-      ...formEstablishment,
-      userRights: removeUserRight(
-        formEstablishment.userRights,
-        alreadyExistingUserRight,
-      ),
-    };
-    const isCurrentUserDeleted =
-      alreadyExistingUserRight.email === currentUser?.email;
-    dispatch(
-      establishmentSlice.actions.updateEstablishmentRequested({
-        establishmentUpdate: {
-          formEstablishment: updatedFormEstablishment,
-          jwt: token ?? "",
-        },
-        feedbackTopic: "establishment-dashboard-users-rights",
-      }),
-    );
-    establishmentUsersDeleteModal.close();
-    if (isCurrentUserDeleted) {
-      routes.establishmentDashboard().push();
-      window.location.reload();
-    }
-  };
-  return (
-    <>
-      <p>
-        Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
-        <strong>{alreadyExistingUserRight?.email}</strong> ?
-      </p>
-      {alreadyExistingUserRight?.email === currentUser?.email && (
-        <p>
-          <strong>
-            Attention, vous êtes en train de supprimer votre propre compte. Si
-            vous continuez, vous n'aurez plus accès à cette page.
-          </strong>
-        </p>
-      )}
-      <ButtonsGroup
-        alignment="right"
-        inlineLayoutWhen="always"
+      <establishmentUsersDeleteModal.Component
+        title="Supprimer l'utilisateur"
         buttons={[
           {
             children: "Annuler",
@@ -191,16 +179,30 @@ const EstablishmentUsersDeleteContent = ({
             onClick: onDeleteConfirm,
           },
         ]}
-      />
-    </>
+      >
+        <p>
+          Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
+          <strong>{editingUserRight?.email}</strong> ?
+        </p>
+        {editingUserRight?.email === currentUser?.email && (
+          <p>
+            <strong>
+              Attention, vous êtes en train de supprimer votre propre compte. Si
+              vous continuez, vous n'aurez plus accès à cette page.
+            </strong>
+          </p>
+        )}
+      </establishmentUsersDeleteModal.Component>
+    </div>
   );
 };
 
-const EstablishmentUsersEditForm = ({
-  alreadyExistingUserRight,
-}: {
-  alreadyExistingUserRight: FormEstablishmentUserRight | null;
-}) => {
+const EstablishmentUsersEditForm = forwardRef<
+  ModalContentRef,
+  {
+    alreadyExistingUserRight: FormEstablishmentUserRight | null;
+  }
+>(({ alreadyExistingUserRight }, ref) => {
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
@@ -254,6 +256,16 @@ const EstablishmentUsersEditForm = ({
     establishmentUsersEditModal.close();
   };
 
+  useExposeFormModalContentRef(ref, {
+    handleSubmit,
+    onFormSubmit: onSubmit,
+    submitButtonLabel: "Enregistrer",
+    cancelButtonLabel: "Annuler",
+    submitButtonId:
+      domElementIds.establishmentDashboard.manageEstablishments.addUserButton,
+    cancelButtonId:
+      domElementIds.establishmentDashboard.manageEstablishments.addUserButton,
+  });
   useEffect(() => {
     reset(alreadyExistingUserRight ?? emptyValues.current);
   }, [alreadyExistingUserRight, reset]);
@@ -311,27 +323,10 @@ const EstablishmentUsersEditForm = ({
             },
           }))}
         />
-        <ButtonsGroup
-          alignment="right"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              children: "Annuler",
-              onClick: establishmentUsersEditModal.close,
-              priority: "secondary",
-              type: "button",
-            },
-            {
-              children: "Enregistrer",
-              onClick: handleSubmit(onSubmit),
-              type: "submit",
-            },
-          ]}
-        />
       </form>
     </>
   );
-};
+});
 
 const getEstablishmentUserRow = ({
   userRight,

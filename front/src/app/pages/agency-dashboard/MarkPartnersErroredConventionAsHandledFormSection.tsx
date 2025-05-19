@@ -1,12 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { createPortal } from "react-dom";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type ConnectedUserJwt,
@@ -102,37 +101,40 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
             disabled={!methods.formState.isValid}
           />
           {createPortal(
-            <erroredConventionHandledConfirmationModal.Component title="Confirmation de saisie">
+            <erroredConventionHandledConfirmationModal.Component
+              title="Confirmation de saisie"
+              buttons={[
+                {
+                  id: "admin-agency-to-review-reject-confirm-button",
+                  children: "Oui (Marquer la convention comme traitée)",
+                  priority: "primary",
+                  type: "button",
+                  onClick: () => {
+                    dispatch(
+                      partnersErroredConventionSlice.actions.markAsHandledRequested(
+                        {
+                          jwt,
+                          markAsHandledParams: {
+                            conventionId: methods.watch("conventionId"),
+                          },
+                          feedbackTopic: "partner-conventions",
+                        },
+                      ),
+                    );
+                  },
+                },
+                {
+                  children: "Non (Ne pas marquer la convention comme traitée)",
+                  priority: "secondary",
+                  onClick: () =>
+                    erroredConventionHandledConfirmationModal.close(),
+                },
+              ]}
+            >
               <p>
                 Vous allez marquer une convention comme traitée l'avez vous
                 saisie manuellement ?
               </p>
-              <FormProvider {...methods}>
-                <form>
-                  <ButtonsGroup
-                    className={fr.cx("fr-mt-4w", "fr-mb-2w")}
-                    buttonsEquisized
-                    alignment="center"
-                    inlineLayoutWhen="always"
-                    buttons={[
-                      {
-                        id: "admin-agency-to-review-reject-confirm-button",
-                        children: "Oui (Marquer la convention comme traitée)",
-                        priority: "primary",
-                        type: "submit",
-                      },
-                      {
-                        children:
-                          "Non (Ne pas marquer la convention comme traitée)",
-                        priority: "secondary",
-                        onClick: () =>
-                          erroredConventionHandledConfirmationModal.close(),
-                      },
-                    ]}
-                  />
-                </form>
-              </FormProvider>
-
               {isPeUser && (
                 <p>
                   Si nécessaire, vous pouvez retrouver les instructions

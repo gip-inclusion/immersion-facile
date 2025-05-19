@@ -8,6 +8,7 @@ import {
   type MouseEvent,
   type MouseEventHandler,
   type SetStateAction,
+  useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
@@ -25,6 +26,7 @@ import {
   isConventionRenewed,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
+import type { ModalContentRef } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -72,7 +74,7 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
     children: null,
   });
   const isModalOpen = useIsModalOpen(requestModificationModalParams);
-
+  const justificationModalContentRef = useRef<ModalContentRef>(null);
   return (
     <>
       <ul
@@ -121,9 +123,28 @@ export const SignatureActions = (props: SignatureActionsProperties) => {
       </ul>
 
       {createPortal(
-        <RequestModificationModal title={modalProps.title}>
+        <RequestModificationModal
+          title={modalProps.title}
+          buttons={[
+            {
+              type: "button",
+              priority: "secondary",
+              onClick: closeRequestModificationModal,
+              children: justificationModalContentRef.current?.cancelButtonLabel,
+              id: justificationModalContentRef.current?.cancelButtonId,
+            },
+            {
+              type: "submit",
+              priority: "primary",
+              onClick: justificationModalContentRef.current?.submitForm,
+              children: justificationModalContentRef.current?.submitButtonLabel,
+              id: justificationModalContentRef.current?.submitButtonId,
+            },
+          ]}
+        >
           <Fragment key={`${requestModificationModalParams.id}-${isModalOpen}`}>
             <JustificationModalContent
+              ref={justificationModalContentRef}
               onSubmit={onModificationRequired}
               closeModal={closeRequestModificationModal}
               newStatus={newStatus}
