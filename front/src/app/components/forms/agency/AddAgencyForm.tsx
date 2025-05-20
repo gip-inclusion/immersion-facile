@@ -142,7 +142,6 @@ const AgencyForm = ({
   );
   const formContents = getFormFields();
   const acquisitionParams = useGetAcquisitionParams();
-
   const formInitialValues = useMemo(
     () => ({
       ...initialValues(uuidV4()),
@@ -164,9 +163,6 @@ const AgencyForm = ({
   const isLoading = useAppSelector(agenciesSelectors.isLoading);
   const feedback = useAppSelector(agenciesSelectors.feedback);
 
-  useEffect(() => {
-    reset(formInitialValues);
-  }, [reset, formInitialValues]);
   const [hasDelegation, setHasDelegation] = useState<boolean | null>(null);
   const selectedKind = watch("kind");
   const sortedAgencyOptions = agencyListOfOptions.sort((a, b) => {
@@ -186,6 +182,10 @@ const AgencyForm = ({
       ),
     [dispatch],
   );
+
+  useEffect(() => {
+    reset(formInitialValues);
+  }, [reset, formInitialValues]);
 
   return (
     <FormProvider {...methods}>
