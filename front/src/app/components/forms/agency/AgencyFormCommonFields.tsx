@@ -1,7 +1,8 @@
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   type AddressAndPosition,
   type AddressDto,
@@ -17,7 +18,10 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
+import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
+import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 
 type AgencyFormCommonFieldsProps = {
   addressInitialValue?: AddressDto;
@@ -35,7 +39,11 @@ export const AgencyFormCommonFields = ({
 }: AgencyFormCommonFieldsProps) => {
   const { getValues, setValue, register, formState, watch } =
     useFormContext<CreateAgencyDto>();
+  const agencyAddress = useAppSelector(
+    makeGeocodingLocatorSelector("agency-address"),
+  );
 
+  const dispatch = useDispatch();
   const formContents = getFormContents(formAgencyFieldsLabels).getFormFields();
   const getFieldError = makeFieldError(formState);
 
@@ -61,16 +69,36 @@ export const AgencyFormCommonFields = ({
     formValues.counsellorEmails.length > 0;
   if (shouldResetCounsellorEmails) setValue("counsellorEmails", []);
 
+  const onAddressSelected = useCallback(
+    (addressAndPosition: AddressAndPosition) => {
+      setValue("address", addressAndPosition.address);
+      setValue("position", addressAndPosition.position);
+      setValue("coveredDepartments", [
+        addressAndPosition.address.departmentCode,
+      ]);
+    },
+    [setValue],
+  );
+
   useEffect(() => {
     if (!isFetchingSiret && establishmentInfos) {
       setValue("name", establishmentInfos.businessName);
+      dispatch(
+        geocodingSlice.actions.fetchSuggestionsRequested({
+          locator: "agency-address",
+          lookup: establishmentInfos.businessAddress,
+          selectFirstSuggestion: true,
+        }),
+      );
     }
-  }, [establishmentInfos, isFetchingSiret, setValue]);
-  const onAddressSelected = (addressAndPosition: AddressAndPosition) => {
-    setValue("address", addressAndPosition.address);
-    setValue("position", addressAndPosition.position);
-    setValue("coveredDepartments", [addressAndPosition.address.departmentCode]);
-  };
+  }, [establishmentInfos, isFetchingSiret, setValue, dispatch]);
+
+  useEffect(() => {
+    if (agencyAddress?.value) {
+      onAddressSelected(agencyAddress.value);
+    }
+  }, [agencyAddress, onAddressSelected]);
+
   return (
     <>
       <Input

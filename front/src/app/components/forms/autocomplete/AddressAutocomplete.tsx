@@ -50,6 +50,7 @@ export const AddressAutocomplete = ({
   const { value, options, isSearching, isDebouncing } = useAddressAutocomplete(
     props.locator,
   );
+
   return (
     <RSAutocomplete
       {...props}
@@ -64,7 +65,7 @@ export const AddressAutocomplete = ({
           value && !Array.isArray(value)
             ? {
                 label: addressDtoToString(value?.address),
-                value: value,
+                value,
               }
             : undefined,
         onChange: (searchResult, actionMeta) => {
