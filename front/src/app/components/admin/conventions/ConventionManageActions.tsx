@@ -1,10 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { addDays, isAfter, isBefore } from "date-fns";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import { ButtonWithSubMenu } from "react-design-system";
+import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   type ConnectedUserJwt,
@@ -16,8 +18,11 @@ import {
   type Role,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
+  allowedRolesToCreateAssessment,
+  conventionEstablishmentsRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  establishmentsRoles,
   hasAllowedRole,
   hasAllowedRoleOnAssessment,
   isConventionRenewed,
@@ -196,15 +201,20 @@ export const ConventionManageActions = ({
   const canAssessmentBeFilled =
     convention.status === "ACCEPTED_BY_VALIDATOR" &&
     isBefore(new Date(convention.dateStart), new Date()) &&
-    !assessment &&
-    hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention);
+    !assessment;
   const shouldShowConventionDocumentButton =
     convention.status === "ACCEPTED_BY_VALIDATOR";
   const shouldShowAssessmentAbandonAction =
     canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
 
   const shouldShowAssessmentFullFillAction =
-    canAssessmentBeFilled && !isConventionEndingInOneDayOrMore;
+    canAssessmentBeFilled &&
+    !isConventionEndingInOneDayOrMore &&
+    intersection(roles, [
+      ...allowedRolesToCreateAssessment,
+      ...establishmentsRoles,
+      ...conventionEstablishmentsRoles,
+    ]).length > 0;
 
   const shouldShowAssessmentDocumentAction =
     !!assessment &&
@@ -535,7 +545,12 @@ export const ConventionManageActions = ({
         {isAllowedConventionTransition(convention, "CANCELLED", roles) &&
           !assessment && (
             <>
-              {shouldShowAssessmentAbandonAction ? (
+              {shouldShowAssessmentAbandonAction &&
+              hasAllowedRoleOnAssessment(
+                roles,
+                "CreateAssessment",
+                convention,
+              ) ? (
                 <ButtonWithSubMenu
                   buttonLabel={t.verification.markAsCancelled}
                   openedTop={true}
@@ -631,20 +646,47 @@ export const ConventionManageActions = ({
                 Consulter le bilan
               </Button>
             )}
+
+            {shouldShowAssessmentAbandonAction &&
+              intersection(roles, [
+                ...establishmentsRoles,
+                ...conventionEstablishmentsRoles,
+              ]).length > 0 && (
+                <FillAssessmentButton
+                  id={domElementIds.manageConvention.assessmentFullFillButton}
+                  label="Déclarer un abandon"
+                  modalTitle="Déclarer un abandon"
+                  modalMessage="Seule la personne désignée comme tuteur ou tutrice dans la convention peut déclarer un abandon. N'hésitez pas à transmettre l'information au bon interlocuteur."
+                  roles={roles}
+                  convention={convention}
+                  onClick={() =>
+                    routes
+                      .assessment({
+                        jwt: jwtParams.jwt,
+                        conventionId: convention.id,
+                      })
+                      .push()
+                  }
+                />
+              )}
+
             {shouldShowAssessmentFullFillAction && (
-              <Button
-                id={domElementIds.manageConvention.assessmentFullFillButton}
-                iconId="fr-icon-file-text-line"
-                priority="secondary"
-                linkProps={{
-                  href: routes.assessment({
-                    jwt: jwtParams.jwt,
-                    conventionId: convention.id,
-                  }).href,
-                }}
-              >
-                Compléter le bilan
-              </Button>
+              <FillAssessmentButton
+                id={domElementIds.manageConvention.assessmentDocumentButton}
+                label="Compléter le bilan"
+                modalTitle="Compléter le bilan"
+                modalMessage="Seule la personne désignée comme tuteur ou tutrice dans la convention peut remplir le bilan d'immersion. N'hésitez pas à transmettre l'information au bon interlocuteur."
+                roles={roles}
+                convention={convention}
+                onClick={() =>
+                  routes
+                    .assessment({
+                      jwt: jwtParams.jwt,
+                      conventionId: convention.id,
+                    })
+                    .push()
+                }
+              />
             )}
 
             {shouldShowConventionDocumentButton && (
@@ -737,5 +779,65 @@ export const ConventionManageActions = ({
           ]) && <BroadcastAgainButton conventionId={convention.id} />}
       </div>
     </div>
+  );
+};
+
+const notEnoughRightToFillAssessmentModal = createModal({
+  isOpenedByDefault: false,
+  id: "im-not-enough-right-to-fill-assessment-modal",
+});
+
+type FillAssessmentButtonProps = {
+  id: string;
+  label: string;
+  modalTitle: string;
+  modalMessage: string;
+  roles: Role[];
+  convention: ConventionReadDto;
+  onClick?: () => void;
+};
+
+const FillAssessmentButton = ({
+  id,
+  label,
+  modalTitle,
+  modalMessage,
+  roles,
+  convention,
+  onClick,
+}: FillAssessmentButtonProps) => {
+  const handleClick = () => {
+    if (!hasAllowedRoleOnAssessment(roles, "CreateAssessment", convention)) {
+      notEnoughRightToFillAssessmentModal.open();
+    } else {
+      onClick?.();
+    }
+  };
+
+  return (
+    <>
+      <Button
+        id={id}
+        iconId="fr-icon-file-text-line"
+        priority="secondary"
+        onClick={handleClick}
+      >
+        {label}
+      </Button>
+      {createPortal(
+        <notEnoughRightToFillAssessmentModal.Component
+          title={modalTitle}
+          buttons={[
+            {
+              doClosesModal: true,
+              children: "J'ai compris",
+            },
+          ]}
+        >
+          {modalMessage}
+        </notEnoughRightToFillAssessmentModal.Component>,
+        document.body,
+      )}
+    </>
   );
 };
