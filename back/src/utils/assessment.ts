@@ -89,4 +89,6 @@ const assessmentEmailsByRole = (
   "establishment-tutor": [convention.establishmentTutor.email],
   counsellor: agency.counsellorEmails,
   validator: agency.validatorEmails,
+  "establishment-admin": errors.assessment.forbidden(mode),
+  "establishment-contact": errors.assessment.forbidden(mode),
 });
