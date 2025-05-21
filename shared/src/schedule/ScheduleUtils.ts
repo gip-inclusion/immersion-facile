@@ -93,28 +93,42 @@ export const prettyPrintSchedule = (
 export const makeWeeklySchedule = (
   schedule: ScheduleDto,
   interval: DateIntervalDto,
-): WeeklySchedule =>
-  makeImmersionTimetable(schedule.complexSchedule, interval)
-    .filter((weekSchedule) => !!weekSchedule)
-    .map((weekSchedule) => {
-      const weekStart = weekSchedule[0]?.date;
-      const weekEnd = weekSchedule[weekSchedule.length - 1]?.date;
-      if (!weekStart || !weekEnd)
-        throw new Error("Error: schedule should have a weekStart and weekEnd");
-      return {
-        weeklyHours: calculateWeeklyHours(weekSchedule),
-        period: {
-          start: new Date(weekStart),
-          end: new Date(weekEnd),
-        },
-        schedule: weekSchedule.map(
+): WeeklySchedule => {
+  const immersionTimetable = makeImmersionTimetable(
+    schedule.complexSchedule,
+    interval,
+  ).filter((weekSchedule) => !!weekSchedule);
+
+  return immersionTimetable.map((weekSchedule, weekIndex) => {
+    const isStartingWeek = weekIndex === 0;
+    const isEndingWeek = weekIndex === immersionTimetable.length - 1;
+    const weekStart = weekSchedule[0]?.date;
+    const weekEnd = weekSchedule[weekSchedule.length - 1]?.date;
+    if (!weekStart || !weekEnd)
+      throw new Error("Error: schedule should have a weekStart and weekEnd");
+    const weeklyHours = calculateWeeklyHours(weekSchedule);
+
+    return {
+      weeklyHours,
+      period: {
+        start: isStartingWeek ? interval.start : new Date(weekStart),
+        end: isEndingWeek ? interval.end : new Date(weekEnd),
+      },
+      schedule: weekSchedule
+        .filter(
+          (daySchedule) =>
+            new Date(daySchedule.date) >= interval.start &&
+            new Date(daySchedule.date) <= interval.end,
+        )
+        .map(
           (daySchedule) =>
             `${
               frenchDayMapping(daySchedule.date).frenchDayName
             } : ${prettyPrintDaySchedule(daySchedule.timePeriods)}`,
         ),
-      };
-    });
+    };
+  });
+};
 
 const reasonableTimePeriods: TimePeriodsDto = [
   {

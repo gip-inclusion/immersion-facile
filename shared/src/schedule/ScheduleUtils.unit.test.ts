@@ -1,7 +1,7 @@
 import { ZodError, z } from "zod";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { conventionSchema } from "../convention/convention.schema";
-import { expectToEqual } from "../test.helpers";
+import { expectArraysToEqual, expectToEqual } from "../test.helpers";
 import { localization } from "../zodUtils";
 import type {
   DateIntervalDto,
@@ -18,6 +18,7 @@ import {
   isSundayInSchedule,
   makeDailySchedule,
   makeImmersionTimetable,
+  makeWeeklySchedule,
   prettyPrintSchedule,
   reasonableSchedule,
   selectedDaysFromComplexSchedule,
@@ -1116,6 +1117,235 @@ jeudi : 09:00-12:45, 13:15-17:00`,
           ],
         ],
       );
+    });
+  });
+
+  describe("makeWeeklySchedule", () => {
+    it("should make a weekly schedule on one week that starts a monday", () => {
+      const interval = {
+        start: new Date("2025-05-19"), //lundi
+        end: new Date("2025-05-21"), //mercredi
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withComplexSchedule([
+          makeDailySchedule(new Date("2025-05-19"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-20"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-21"), []),
+        ])
+        .build();
+
+      const weeklySchedule = makeWeeklySchedule(schedule, interval);
+
+      expectArraysToEqual(weeklySchedule, [
+        {
+          period: {
+            start: new Date("2025-05-19T00:00:00.000Z"),
+            end: new Date("2025-05-21T00:00:00.000Z"),
+          },
+          schedule: [
+            "lundi : 01:00-02:00",
+            "mardi : 01:00-02:00",
+            "mercredi : libre",
+          ],
+          weeklyHours: 2,
+        },
+      ]);
+    });
+
+    it("should make a weekly schedule on one week that starts a wednesday", () => {
+      const interval = {
+        start: new Date("2025-05-21"), //mercredi
+        end: new Date("2025-05-24"), //samedi
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withComplexSchedule([
+          makeDailySchedule(new Date("2025-05-21"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-22"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-23"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-24"), []),
+        ])
+        .build();
+
+      const weeklySchedule = makeWeeklySchedule(schedule, interval);
+
+      expectArraysToEqual(weeklySchedule, [
+        {
+          period: {
+            start: new Date("2025-05-21T00:00:00.000Z"),
+            end: new Date("2025-05-24T00:00:00.000Z"),
+          },
+          schedule: [
+            "mercredi : 01:00-02:00",
+            "jeudi : 01:00-02:00",
+            "vendredi : 01:00-02:00",
+            "samedi : libre",
+          ],
+          weeklyHours: 3,
+        },
+      ]);
+    });
+
+    it("should make a weekly schedule on two weeks", () => {
+      const interval = {
+        start: new Date("2025-05-21"), //mercredi
+        end: new Date("2025-05-31"), //samedi
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withComplexSchedule([
+          makeDailySchedule(new Date("2025-05-21"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-22"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-23"), []),
+          makeDailySchedule(new Date("2025-05-24"), []),
+          makeDailySchedule(new Date("2025-05-25"), []),
+          makeDailySchedule(new Date("2025-05-26"), []),
+          makeDailySchedule(new Date("2025-05-27"), []),
+          makeDailySchedule(new Date("2025-05-28"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-29"), []),
+          makeDailySchedule(new Date("2025-05-30"), []),
+          makeDailySchedule(new Date("2025-05-31"), []),
+        ])
+        .build();
+
+      const weeklySchedule = makeWeeklySchedule(schedule, interval);
+
+      expectArraysToEqual(weeklySchedule, [
+        {
+          period: {
+            start: new Date("2025-05-21T00:00:00.000Z"),
+            end: new Date("2025-05-25T00:00:00.000Z"),
+          },
+          schedule: [
+            "mercredi : 01:00-02:00",
+            "jeudi : 01:00-02:00",
+            "vendredi : libre",
+            "samedi : libre",
+            "dimanche : libre",
+          ],
+          weeklyHours: 2,
+        },
+        {
+          period: {
+            end: new Date("2025-05-31T00:00:00.000Z"),
+            start: new Date("2025-05-26T00:00:00.000Z"),
+          },
+          schedule: [
+            "lundi : libre",
+            "mardi : libre",
+            "mercredi : 01:00-02:00",
+            "jeudi : libre",
+            "vendredi : libre",
+            "samedi : libre",
+          ],
+          weeklyHours: 1,
+        },
+      ]);
+    });
+
+    it("should make a weekly schedule on three weeks", () => {
+      const interval = {
+        start: new Date("2025-05-21"), //mercredi
+        end: new Date("2025-06-07"), //samedi
+      };
+      const schedule = new ScheduleDtoBuilder()
+        .withDateInterval(interval)
+        .withComplexSchedule([
+          makeDailySchedule(new Date("2025-05-21"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-22"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-23"), []),
+          makeDailySchedule(new Date("2025-05-24"), []),
+          makeDailySchedule(new Date("2025-05-25"), []),
+          makeDailySchedule(new Date("2025-05-26"), []),
+          makeDailySchedule(new Date("2025-05-27"), []),
+          makeDailySchedule(new Date("2025-05-28"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-05-29"), []),
+          makeDailySchedule(new Date("2025-05-30"), []),
+          makeDailySchedule(new Date("2025-05-31"), []),
+          makeDailySchedule(new Date("2025-06-01"), []),
+          makeDailySchedule(new Date("2025-06-02"), []),
+          makeDailySchedule(new Date("2025-06-03"), []),
+          makeDailySchedule(new Date("2025-06-04"), []),
+          makeDailySchedule(new Date("2025-06-05"), [
+            { start: "01:00", end: "02:00" },
+          ]),
+          makeDailySchedule(new Date("2025-06-06"), []),
+          makeDailySchedule(new Date("2025-06-07"), []),
+        ])
+        .build();
+
+      const weeklySchedule = makeWeeklySchedule(schedule, interval);
+
+      expectArraysToEqual(weeklySchedule, [
+        {
+          period: {
+            start: new Date("2025-05-21T00:00:00.000Z"),
+            end: new Date("2025-05-25T00:00:00.000Z"),
+          },
+          schedule: [
+            "mercredi : 01:00-02:00",
+            "jeudi : 01:00-02:00",
+            "vendredi : libre",
+            "samedi : libre",
+            "dimanche : libre",
+          ],
+          weeklyHours: 2,
+        },
+        {
+          period: {
+            start: new Date("2025-05-26T00:00:00.000Z"),
+            end: new Date("2025-06-01T00:00:00.000Z"),
+          },
+          schedule: [
+            "lundi : libre",
+            "mardi : libre",
+            "mercredi : 01:00-02:00",
+            "jeudi : libre",
+            "vendredi : libre",
+            "samedi : libre",
+            "dimanche : libre",
+          ],
+          weeklyHours: 1,
+        },
+        {
+          period: {
+            end: new Date("2025-06-07T00:00:00.000Z"),
+            start: new Date("2025-06-02T00:00:00.000Z"),
+          },
+          schedule: [
+            "lundi : libre",
+            "mardi : libre",
+            "mercredi : libre",
+            "jeudi : 01:00-02:00",
+            "vendredi : libre",
+            "samedi : libre",
+          ],
+          weeklyHours: 1,
+        },
+      ]);
     });
   });
 });
