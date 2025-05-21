@@ -1,5 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
 import ProConnectButton from "@codegouvfr/react-dsfr/ProConnectButton";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 
@@ -143,19 +145,31 @@ export const ConnectedPrivateRoute = ({
               illustration={pageContent.illustration}
             >
               <>
-                <p className={fr.cx("fr-text--lead")}>
-                  {pageContent.description}
-                </p>
-                <div className={fr.cx("fr-my-2w")}>
-                  <ProConnectButton
-                    id={domElementIds[page].login.connectButton}
-                    url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
-                      inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-                        { page },
-                      ),
-                    )}`}
-                  />
-                </div>
+                <section>
+                  <p className={fr.cx("fr-text--lead")}>
+                    {pageContent.description}
+                  </p>
+                  <div className={fr.cx("fr-my-2w")}>
+                    <ProConnectButton
+                      id={domElementIds[page].login.connectButton}
+                      url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
+                        inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
+                          { page },
+                        ),
+                      )}`}
+                    />
+                  </div>
+                </section>
+                <section>
+                  <p className={fr.cx("fr-text--lead")}>
+                    Continuer avec un email, et recevez un lien directement pour
+                    accéder à votre espace sans délai.
+                  </p>
+                  <div className={fr.cx("fr-my-2w")}>
+                    <Input label={"Email"} />
+                    <Button>Recevoir le lien de connexion</Button>
+                  </div>
+                </section>
               </>
             </PageHeader>
           }
