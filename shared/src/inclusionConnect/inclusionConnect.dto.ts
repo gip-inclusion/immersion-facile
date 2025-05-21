@@ -4,7 +4,11 @@ import type {
   AgencyRole,
   User,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import type { ConventionEstablishmentRole, Role } from "../role/role.dto";
+import type {
+  ConventionEstablishmentRole,
+  EstablishmentRole,
+  Role,
+} from "../role/role.dto";
 import type { allowedStartOAuthLoginPages } from "../routes/routes";
 import type { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
@@ -30,6 +34,7 @@ export type AuthenticatedUserQueryParams = {
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =
+  | EstablishmentRole
   | ConventionEstablishmentRole
   | ExtractFromExisting<Role, "back-office">
   | ExcludeFromExisting<AgencyRole, "to-review">;
@@ -51,6 +56,10 @@ export const getIcUserRoleForAccessingConvention = (
   if (agencyRight && agencyRoleIsNotToReview(agencyRight.roles))
     roles.push(...agencyRight.roles);
 
+  const establishmentRights = user.establishments?.find(
+    (establishment) => establishment.siret === convention.siret,
+  );
+  if (establishmentRights) roles.push(establishmentRights.role);
   return roles;
 };
 
