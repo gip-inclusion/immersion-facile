@@ -20,6 +20,7 @@ import type {
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { authSlice } from "../auth/auth.slice";
 
 type FeedbackWithActionName = {
   action: ActionCreatorWithPayload<any, string>;
@@ -53,6 +54,7 @@ const topics = [
   "establishment-dashboard-discussion-send-message",
   "establishments-batch",
   "form-establishment",
+  "login-by-email",
   "partner-conventions",
   "search-result",
   "send-signature-link",
@@ -582,6 +584,18 @@ export const feedbacks: Record<
       title: "Problème lors de l'envoi du message",
       message:
         "Une erreur est survenue. Votre message n'a pas pu être envoyé. Veuillez réessayer dans quelques instants.",
+    },
+  },
+  "login-by-email": {
+    "execute.success": {
+      action: authSlice.actions.loginByEmailSucceded,
+      title: "Votre lien de connexion a bien été envoyé",
+      message: "",
+    },
+    "execute.error": {
+      action: authSlice.actions.loginByEmailFailed,
+      title: "Nous n’avons pas pu envoyer le lien de connexion",
+      message: "",
     },
   },
   unused: {},
