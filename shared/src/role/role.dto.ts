@@ -23,6 +23,8 @@ export const allRoles = [
   "agency-admin",
   "to-review",
   "agency-viewer",
+  "establishment-admin",
+  "establishment-contact",
 ] as const;
 
 export const allSignatoryRoles = [
@@ -56,6 +58,8 @@ export const allowedRolesToAccessAssessment = [
   ...allowedRolesToCreateAssessment,
   "back-office",
   "establishment-representative",
+  "establishment-admin",
+  "establishment-contact",
   "beneficiary",
 ] as const;
 

@@ -198,6 +198,10 @@ const requesterNameByRole = (
       errors.convention.forbiddenModification(requesterRole),
     "agency-viewer": errors.convention.forbiddenModification(requesterRole),
     "to-review": errors.convention.forbiddenModification(requesterRole),
+    "establishment-admin":
+      errors.convention.forbiddenModification(requesterRole),
+    "establishment-contact":
+      errors.convention.forbiddenModification(requesterRole),
   };
   return strategy[requesterRole];
 };
