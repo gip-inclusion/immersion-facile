@@ -5,8 +5,11 @@ import {
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type ContactMode,
+  type DataWithPagination,
   type DiscussionDto,
   type DiscussionId,
+  type DiscussionInList,
+  type DiscussionOrderKey,
   type DiscussionStatus,
   type Exchange,
   type PotentialBeneficiaryCommonProps,
@@ -25,8 +28,16 @@ import type { Database } from "../../../config/pg/kysely/model/database";
 import type {
   DiscussionRepository,
   GetDiscussionsParams,
+  GetPaginatedDiscussionsForUserParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
+
+const orderColumnByOrderKey: Record<
+  DiscussionOrderKey,
+  `discussions.${keyof Database["discussions"]}`
+> = {
+  createdAt: "discussions.created_at",
+};
 
 export class PgDiscussionRepository implements DiscussionRepository {
   constructor(private transaction: KyselyDb) {}
@@ -61,7 +72,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
-    const results = await executeGetDiscussion(this.transaction, {
+    const results = await executeGetDiscussions(this.transaction, {
       filters: {},
       limit: 1,
       id: discussionId,
@@ -73,9 +84,129 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getDiscussions(
     params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
-    return executeGetDiscussion(this.transaction, params).then((results) =>
+    return executeGetDiscussions(this.transaction, params).then((results) =>
       makeDiscussionDtoFromPgDiscussion(results),
     );
+  }
+
+  public async getPaginatedDiscussionsForUser({
+    pagination,
+    filters,
+    userId,
+    order,
+  }: GetPaginatedDiscussionsForUserParams): Promise<
+    DataWithPagination<DiscussionInList>
+  > {
+    const builder = pipeWithValue(
+      this.transaction
+        .selectFrom("establishments__users as eu")
+        .innerJoin("discussions", "eu.siret", "discussions.siret")
+        .innerJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+        .innerJoin(
+          "public_appellations_data as pad",
+          "discussions.appellation_code",
+          "pad.ogr_appellation",
+        )
+        .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
+        .where("eu.user_id", "=", userId),
+      (b) => {
+        if (!filters?.statuses || filters.statuses.length === 0) return b;
+        return b.where("discussions.status", "in", filters.statuses);
+      },
+      (b) => {
+        if (!filters?.sirets || filters.sirets.length === 0) return b;
+        return b.where("discussions.siret", "in", filters.sirets);
+      },
+    );
+
+    const page = pagination.page;
+    const limit = pagination.perPage;
+    const offset = (page - 1) * limit;
+
+    const addPagination = (b: typeof builder) => b.limit(limit).offset(offset);
+    const addOrder = (b: typeof builder) => {
+      if (order)
+        return b.orderBy(orderColumnByOrderKey[order.by], order.direction);
+      return b.orderBy("discussions.created_at", "desc");
+    };
+
+    const groupByAndSelectAttributes = (b: typeof builder) =>
+      b
+        .groupBy([
+          "discussions.id",
+          "discussions.created_at",
+          "discussions.siret",
+          "discussions.kind",
+          "discussions.status",
+          "discussions.immersion_objective",
+          "discussions.business_name",
+          "discussions.potential_beneficiary_first_name",
+          "discussions.potential_beneficiary_last_name",
+          "discussions.potential_beneficiary_phone",
+          "pad.ogr_appellation",
+          "pad.libelle_appellation_long",
+          "prd.code_rome",
+          "prd.libelle_rome",
+        ])
+        .select(({ ref, fn }) => [
+          "discussions.id as id",
+          jsonBuildObject({
+            romeCode: ref("prd.code_rome"),
+            romeLabel: ref("prd.libelle_rome"),
+            appellationCode: sql<string>`CAST(${ref("pad.ogr_appellation")} AS text)`,
+            appellationLabel: ref("pad.libelle_appellation_long"),
+          }).as("appellation"),
+          "business_name as businessName",
+          sql<string>`TO_CHAR(${ref("created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
+            "createdAt",
+          ),
+          "discussions.siret as siret",
+          "discussions.kind as kind",
+          "discussions.status as status",
+          "immersion_objective as immersionObjective",
+          jsonBuildObject({
+            firstName: ref("potential_beneficiary_first_name"),
+            lastName: ref("potential_beneficiary_last_name"),
+            phone: ref("potential_beneficiary_phone"),
+          }).as("potentialBeneficiary"),
+          fn
+            .jsonAgg(
+              jsonBuildObject({
+                subject: ref("exchanges.subject"),
+                message: ref("exchanges.message"),
+                recipient: ref("exchanges.recipient"),
+                sender: ref("exchanges.sender"),
+                sentAt: sql<string>`TO_CHAR(${ref("exchanges.sent_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`,
+                attachments: ref("exchanges.attachments"),
+              }),
+            )
+            .as("exchanges"),
+        ]);
+
+    const [data, totalCount] = await Promise.all([
+      pipeWithValue(
+        builder,
+        addPagination,
+        addOrder,
+        groupByAndSelectAttributes,
+      ).execute(),
+      builder
+        .select(({ fn }) => [fn.count("discussions.id").distinct().as("count")])
+        .executeTakeFirstOrThrow()
+        .then((result) => Number(result.count)),
+    ]);
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      data,
+      pagination: {
+        totalRecords: totalCount,
+        currentPage: page,
+        totalPages,
+        numberPerPage: limit,
+      },
+    };
   }
 
   public async hasDiscussionMatching(
@@ -245,7 +376,7 @@ const discussionToPg = (
 });
 
 const getWithDiscussionStatusFromPgDiscussion = (
-  discussion: GetDiscussionResults[number]["discussion"],
+  discussion: GetDiscussionsResults[number]["discussion"],
 ): WithDiscussionStatus =>
   ({
     status: discussion.status,
@@ -259,7 +390,7 @@ const getWithDiscussionStatusFromPgDiscussion = (
   }) as WithDiscussionStatus;
 
 const makeDiscussionDtoFromPgDiscussion = (
-  results: GetDiscussionResults,
+  results: GetDiscussionsResults,
 ): DiscussionDto[] =>
   results.map(({ discussion }): DiscussionDto => {
     const common: CommonDiscussionDto = {
@@ -414,8 +545,8 @@ const discussionStatusWithRejectionToPg = (
   };
 };
 
-type GetDiscussionResults = Awaited<ReturnType<typeof executeGetDiscussion>>;
-const executeGetDiscussion = (
+type GetDiscussionsResults = Awaited<ReturnType<typeof executeGetDiscussions>>;
+const executeGetDiscussions = (
   transaction: KyselyDb,
   {
     filters: {

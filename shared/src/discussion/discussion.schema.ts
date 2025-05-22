@@ -10,6 +10,7 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
+import { paginationQueryParamsSchema } from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
@@ -25,6 +26,7 @@ import {
   type Exchange,
   type ExchangeFromDashboard,
   type ExchangeRole,
+  type GetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionRejection,
@@ -118,9 +120,18 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     }),
   ]);
 
+const discussionAcceptedStatusSchema = z.literal("ACCEPTED");
+const discussionRejectedStatusSchema = z.literal("REJECTED");
+const discussionPendingStatusSchema = z.literal("PENDING");
+const discussionStatusSchema = z.union([
+  discussionAcceptedStatusSchema,
+  discussionRejectedStatusSchema,
+  discussionPendingStatusSchema,
+]);
+
 export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
   z.object({
-    status: z.literal("ACCEPTED"),
+    status: discussionAcceptedStatusSchema,
     candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     conventionId: conventionIdSchema.optional(),
   });
@@ -128,7 +139,7 @@ export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
 export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
   z
     .object({
-      status: z.literal("REJECTED"),
+      status: discussionRejectedStatusSchema,
     })
     .and(discussionRejectionSchema);
 
@@ -143,7 +154,7 @@ export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard>
 
 const discussionPendingSchema: z.Schema<WithDiscussionStatusPending> = z.object(
   {
-    status: z.literal("PENDING"),
+    status: discussionPendingStatusSchema,
   },
 );
 
@@ -239,3 +250,18 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
         }),
       ]),
     );
+
+export const getPaginatedDiscussionsParamsSchema: z.Schema<GetPaginatedDiscussionsParams> =
+  z.object({
+    filters: z.object({
+      status: z.array(discussionStatusSchema).optional(),
+      sirets: z.array(siretSchema).optional(),
+    }),
+    order: z
+      .object({
+        by: z.enum(["createdAt"]),
+        direction: z.enum(["asc", "desc"]),
+      })
+      .optional(),
+    pagination: paginationQueryParamsSchema.optional(),
+  });

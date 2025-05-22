@@ -1,6 +1,7 @@
 import type { ColumnType, Generated, JSONColumnType } from "kysely";
 import type {
   AbsoluteUrl,
+  Attachment,
   ContactLevelOfEducation,
   ConventionId,
   DateTimeIsoString,
@@ -154,7 +155,7 @@ interface Exchanges {
   sent_at: Timestamp;
   subject: Generated<string>;
   id: Generated<number>;
-  attachments: Generated<Json>;
+  attachments: JSONColumnType<Attachment[]>;
 }
 
 interface Groups {
