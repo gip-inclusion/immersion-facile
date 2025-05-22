@@ -90,16 +90,12 @@ export const SignButton = ({
                 closeSignModal();
               },
               type: "button",
-              iconId: "fr-icon-edit-fill",
-              iconPosition: "left",
             },
             {
               priority: "primary",
               children: "Je termine la signature",
               onClick: onConfirmClick,
               type: "button",
-              iconId: "fr-icon-checkbox-circle-line",
-              iconPosition: "left",
               nativeButtonProps: {
                 id: submitButtonId,
               },
