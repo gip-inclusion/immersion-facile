@@ -40,6 +40,7 @@ export const RequestAgencyRegistrationPage = () => {
             linkProps={{
               href: `${routes.myProfile().href}`,
             }}
+            priority={"secondary"}
           >
             Retourner sur mon profil
           </Button>

@@ -1,7 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { formatDistance } from "date-fns";
@@ -140,6 +139,10 @@ export const ConventionValidation = ({
       {convention.statusJustification && (
         <p>Justification : {convention.statusJustification}</p>
       )}
+      <Feedback
+        topics={["send-signature-link"]}
+        className={fr.cx("fr-my-4w")}
+      />
       {isConventionRenewed(convention) && (
         <ConventionRenewedInformations renewed={convention.renewed} />
       )}
@@ -156,7 +159,26 @@ export const ConventionValidation = ({
       />
 
       {createPortal(
-        <sendSignatureLinkModal.Component title="Envoyer le lien de signature par SMS">
+        <sendSignatureLinkModal.Component
+          title="Envoyer le lien de signature par SMS"
+          buttons={[
+            {
+              priority: "secondary",
+              children: "Annuler",
+              onClick: () => {
+                sendSignatureLinkModal.close();
+              },
+            },
+            {
+              id: domElementIds.manageConvention
+                .submitSendSignatureLinkModalButton,
+              priority: "primary",
+              children: "Envoyer",
+              disabled: hasErrorFeedback || isSending,
+              onClick: () => onSubmitSendSignatureLink(),
+            },
+          ]}
+        >
           <p>
             Le{" "}
             {signatoryToSendSignatureLink &&
@@ -166,33 +188,6 @@ export const ConventionValidation = ({
             recevra un lien de signature au{" "}
             {signatoryToSendSignatureLink?.signatoryPhone}
           </p>
-
-          <Feedback
-            topics={["send-signature-link"]}
-            className={fr.cx("fr-my-4w")}
-          />
-
-          <ButtonsGroup
-            inlineLayoutWhen="always"
-            alignment="right"
-            buttons={[
-              {
-                priority: "secondary",
-                children: "Annuler",
-                onClick: () => {
-                  sendSignatureLinkModal.close();
-                },
-              },
-              {
-                id: domElementIds.manageConvention
-                  .submitSendSignatureLinkModalButton,
-                priority: "primary",
-                children: "Envoyer",
-                disabled: hasErrorFeedback || isSending,
-                onClick: () => onSubmitSendSignatureLink(),
-              },
-            ]}
-          />
         </sendSignatureLinkModal.Component>,
         document.body,
       )}
