@@ -139,6 +139,10 @@ export const ConventionValidation = ({
       {convention.statusJustification && (
         <p>Justification : {convention.statusJustification}</p>
       )}
+      <Feedback
+        topics={["send-signature-link"]}
+        className={fr.cx("fr-my-4w")}
+      />
       {isConventionRenewed(convention) && (
         <ConventionRenewedInformations renewed={convention.renewed} />
       )}
@@ -184,11 +188,6 @@ export const ConventionValidation = ({
             recevra un lien de signature au{" "}
             {signatoryToSendSignatureLink?.signatoryPhone}
           </p>
-
-          <Feedback
-            topics={["send-signature-link"]}
-            className={fr.cx("fr-my-4w")}
-          />
         </sendSignatureLinkModal.Component>,
         document.body,
       )}
