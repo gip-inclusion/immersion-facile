@@ -10,6 +10,7 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
+import { paginationQueryParamsSchema } from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
@@ -27,6 +28,7 @@ import type {
   DiscussionStatusWithRejection,
   Exchange,
   ExchangeRole,
+  GetPaginatedDiscussionsParams,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
   WithDiscussionRejection,
@@ -208,3 +210,12 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
       }),
     ]),
   );
+
+export const getPaginatedDiscussionsParamsSchema: z.Schema<GetPaginatedDiscussionsParams> =
+  z.object({
+    filters: z.object({
+      status: z.array(discussionStatusSchema).optional(),
+      sirets: z.array(siretSchema).optional(),
+    }),
+    pagination: paginationQueryParamsSchema.optional(),
+  });

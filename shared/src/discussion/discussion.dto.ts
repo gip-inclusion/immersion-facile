@@ -1,5 +1,6 @@
 import {
   type ContactLevelOfEducation,
+  type PaginationQueryParams,
   type Phone,
   type WithDiscussionId,
   type discoverObjective,
@@ -243,3 +244,22 @@ export type DiscussionDisplayStatus =
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
+
+export type DiscussionInList = Pick<
+  DiscussionDto,
+  | "id"
+  | "siret"
+  | "businessName"
+  | "status"
+  | "createdAt"
+  | "potentialBeneficiary"
+  | "exchanges"
+>;
+
+export type GetPaginatedDiscussionsParams = {
+  filters?: {
+    statuses?: DiscussionStatus[];
+    sirets?: SiretDto[];
+  };
+  pagination?: PaginationQueryParams;
+};

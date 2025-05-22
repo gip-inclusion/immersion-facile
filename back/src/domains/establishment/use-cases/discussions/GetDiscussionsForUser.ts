@@ -1,32 +1,31 @@
 import {
-  type ConventionDto,
   type DataWithPagination,
-  type GetConventionsForAgencyUserParams,
+  type DiscussionInList,
+  type GetPaginatedDiscussionsParams,
   type InclusionConnectedUser,
-  getConventionsForAgencyUserParamsSchema,
+  getPaginatedDiscussionsParamsSchema,
+  getPaginationParamsForWeb,
 } from "shared";
-import { getPaginationParamsForWeb } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 
-export const makeGetConventionsForAgencyUser = createTransactionalUseCase<
-  GetConventionsForAgencyUserParams,
-  DataWithPagination<ConventionDto>,
+export const makeGetDiscussionsForUser = createTransactionalUseCase<
+  GetPaginatedDiscussionsParams,
+  DataWithPagination<DiscussionInList>,
   InclusionConnectedUser
 >(
   {
-    inputSchema: getConventionsForAgencyUserParamsSchema,
-    name: "GetConventionsForAgencyUser",
+    inputSchema: getPaginatedDiscussionsParamsSchema,
+    name: "GetDiscussionsForUser",
   },
   async ({ inputParams, uow, currentUser }) => {
-    const { filters, sortBy } = inputParams;
+    const { filters } = inputParams;
 
     const pagination = getPaginationParamsForWeb(inputParams.pagination);
 
-    return uow.conventionQueries.getPaginatedConventionsForAgencyUser({
+    return uow.discussionRepository.getPaginatedDiscussionsForUser({
       filters,
-      sortBy,
-      agencyUserId: currentUser.id,
       pagination,
+      userId: currentUser.id,
     });
   },
 );

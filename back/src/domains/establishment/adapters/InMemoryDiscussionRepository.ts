@@ -1,5 +1,10 @@
 import isAfter from "date-fns/isAfter";
-import type { DiscussionDto, DiscussionId, SiretDto } from "shared";
+import type {
+  DataWithPagination,
+  DiscussionDto,
+  DiscussionId,
+  SiretDto,
+} from "shared";
 import type {
   DiscussionRepository,
   GetDiscussionsParams,
@@ -12,6 +17,12 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   constructor(private _discussions: DiscussionsById = {}) {}
 
   public discussionCallsCount = 0;
+
+  public async getPaginatedDiscussionsForUser(): Promise<
+    DataWithPagination<DiscussionDto>
+  > {
+    throw new Error("Not implemented");
+  }
 
   public async getDiscussions({
     filters,

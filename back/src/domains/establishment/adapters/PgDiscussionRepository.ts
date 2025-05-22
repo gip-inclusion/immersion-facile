@@ -24,6 +24,7 @@ import type { Database } from "../../../config/pg/kysely/model/database";
 import type {
   DiscussionRepository,
   GetDiscussionsParams,
+  GetPaginatedDiscussionsForUserParams,
   HasDiscussionMatchingParams,
 } from "../ports/DiscussionRepository";
 
@@ -60,7 +61,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getById(
     discussionId: DiscussionId,
   ): Promise<DiscussionDto | undefined> {
-    const results = await executeGetDiscussion(this.transaction, {
+    const results = await executeGetDiscussions(this.transaction, {
       filters: {},
       limit: 1,
       id: discussionId,
@@ -72,9 +73,30 @@ export class PgDiscussionRepository implements DiscussionRepository {
   public async getDiscussions(
     params: GetDiscussionsParams,
   ): Promise<DiscussionDto[]> {
-    return executeGetDiscussion(this.transaction, params).then((results) =>
+    return executeGetDiscussions(this.transaction, params).then((results) =>
       makeDiscussionDtoFromPgDiscussion(results),
     );
+  }
+
+  public async getPaginatedDiscussionsForUser({
+    pagination,
+    filters,
+    userId,
+  }: GetPaginatedDiscussionsForUserParams) {
+    const data = await this.transaction
+      .selectFrom("discussions")
+      .select(["id", "status"])
+      .execute();
+
+    return {
+      data,
+      pagination: {
+        totalRecords: 0,
+        currentPage: 1,
+        totalPages: 1,
+        numberPerPage: 10,
+      },
+    };
   }
 
   public async hasDiscussionMatching(

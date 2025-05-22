@@ -471,6 +471,63 @@ describe("PgDiscussionRepository", () => {
     });
   });
 
+  describe("getPaginatedDiscussionsForUser", () => {
+    const discussion1 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000001")
+      .withCreatedAt(new Date("2025-05-18"))
+      .withStatus("PENDING")
+      .build();
+
+    const discussion2 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000002")
+      .withCreatedAt(new Date("2025-05-19"))
+      .withStatus("ACCEPTED")
+      .build();
+
+    const discussion3 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000003")
+      .withCreatedAt(new Date("2025-05-20"))
+      .withStatus("REJECTED")
+      .build();
+
+    beforeEach(async () => {
+      await pgDiscussionRepository.insert(discussion1);
+      await pgDiscussionRepository.insert(discussion2);
+      await pgDiscussionRepository.insert(discussion3);
+    });
+
+    it("filters on statuses", async () => {
+      const result =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          filters: {
+            statuses: ["ACCEPTED", "REJECTED"],
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          userId: "yo",
+        });
+
+      expectToEqual(result, {
+        data: [discussion2, discussion3],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 10,
+          totalPages: 1,
+          totalRecords: 0,
+        },
+      });
+    });
+
+    it("filters on sirets", () => {});
+
+    it("supports pagination", () => {});
+  });
+
   describe("hasDiscussionMatching", () => {
     const discussionWithLastExchangeByPotentialBeneficiary1 =
       new DiscussionBuilder()
