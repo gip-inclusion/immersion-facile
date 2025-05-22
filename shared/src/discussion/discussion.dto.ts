@@ -1,26 +1,29 @@
-import type {
-  ConnectedUserJwt,
-  ContactLevelOfEducation,
-  Phone,
-  WithDiscussionId,
-  discoverObjective,
-  exchangeRoles,
-} from "..";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
+import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
 import type {
   ConventionId,
   ImmersionObjective,
+  discoverObjective,
 } from "../convention/convention.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
+import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
+import type { Phone } from "../sms/smsTemplateByName";
+import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
-import type { EmptyObject, OmitFromExistingKeys } from "../utils";
+import type {
+  EmptyObject,
+  ExtractFromExisting,
+  OmitFromExistingKeys,
+} from "../utils";
 import type { DateString } from "../utils/date";
+import type { exchangeRoles } from "./discussion.schema";
 
 export const candidateWarnedMethods = [
   "phone",
@@ -270,3 +273,39 @@ export type DiscussionDisplayStatus =
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
+
+export type DiscussionInList = Pick<
+  DiscussionReadDto,
+  | "id"
+  | "appellation"
+  | "businessName"
+  | "createdAt"
+  | "siret"
+  | "kind"
+  | "exchanges"
+  | "status"
+> & {
+  potentialBeneficiary: {
+    firstName: string;
+    lastName: string;
+    phone: string | null;
+  };
+  immersionObjective: ImmersionObjective | null;
+};
+
+export type DiscussionOrderKey = ExtractFromExisting<
+  keyof DiscussionInList,
+  "createdAt"
+>;
+
+export type GetPaginatedDiscussionsParams = {
+  filters?: {
+    statuses?: DiscussionStatus[];
+    sirets?: SiretDto[];
+  };
+  order?: {
+    by: DiscussionOrderKey;
+    direction: "asc" | "desc";
+  };
+  pagination?: PaginationQueryParams;
+};

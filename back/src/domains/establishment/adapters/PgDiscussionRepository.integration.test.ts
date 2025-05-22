@@ -4,7 +4,9 @@ import {
   type AppellationAndRomeDto,
   DiscussionBuilder,
   type DiscussionDto,
+  type DiscussionInList,
   type Exchange,
+  type ImmersionObjective,
   UserBuilder,
   errors,
   expectPromiseToFailWithError,
@@ -467,6 +469,242 @@ describe("PgDiscussionRepository", () => {
             discussionToMatchWithLotOfExchanges,
           ],
         );
+      });
+    });
+  });
+
+  describe("getPaginatedDiscussionsForUser", () => {
+    const discussion1 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000001")
+      .withCreatedAt(new Date("2025-05-18"))
+      .withStatus({ status: "PENDING" })
+      .build();
+
+    const discussion2Objective: ImmersionObjective =
+      "Confirmer un projet professionnel";
+
+    const potentialBeneficiaryPhone = "0606060606";
+    const discussion2 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000002")
+      .withCreatedAt(new Date("2025-05-19"))
+      .withAppellationCode(styliste.appellationCode)
+      .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
+      .withImmersionObjective(discussion2Objective)
+      .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "phone" })
+      .build();
+
+    const discussion3Objective: ImmersionObjective =
+      "Initier une démarche de recrutement";
+
+    const discussion3 = new DiscussionBuilder()
+      .withId(uuid())
+      .withSiret("00000000000003")
+      .withAppellationCode(styliste.appellationCode)
+      .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
+      .withCreatedAt(new Date("2025-05-20"))
+      .withImmersionObjective(discussion3Objective)
+      .withStatus({ status: "REJECTED", rejectionKind: "UNABLE_TO_HELP" })
+      .build();
+
+    const discussion2InList: DiscussionInList = {
+      id: discussion2.id,
+      siret: discussion2.siret,
+      status: discussion2.status,
+      appellation: styliste,
+      businessName: discussion2.businessName,
+      createdAt: discussion2.createdAt,
+      kind: discussion2.kind,
+      potentialBeneficiary: {
+        firstName: discussion2.potentialBeneficiary.firstName,
+        lastName: discussion2.potentialBeneficiary.lastName,
+        phone: potentialBeneficiaryPhone,
+      },
+      immersionObjective: discussion2Objective,
+      exchanges: discussion2.exchanges,
+    };
+
+    const discussion3InList: DiscussionInList = {
+      id: discussion3.id,
+      siret: discussion3.siret,
+      status: discussion3.status,
+      appellation: styliste,
+      businessName: discussion3.businessName,
+      createdAt: discussion3.createdAt,
+      kind: discussion3.kind,
+      potentialBeneficiary: {
+        firstName: discussion3.potentialBeneficiary.firstName,
+        lastName: discussion3.potentialBeneficiary.lastName,
+        phone: potentialBeneficiaryPhone,
+      },
+      immersionObjective: discussion3Objective,
+      exchanges: discussion3.exchanges,
+    };
+
+    beforeEach(async () => {
+      await pgDiscussionRepository.insert(discussion1);
+      await pgDiscussionRepository.insert(discussion2);
+      await pgDiscussionRepository.insert(discussion3);
+
+      await establishmentAggregateRepo.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(discussion2.siret)
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: user.id,
+              job: "",
+              phone: "",
+            },
+          ])
+          .withOffers([offer])
+          .build(),
+      );
+
+      await establishmentAggregateRepo.insertEstablishmentAggregate(
+        new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret(discussion3.siret)
+          .withLocationId(uuid())
+          .withUserRights([
+            {
+              role: "establishment-admin",
+              userId: user.id,
+              job: "",
+              phone: "",
+            },
+          ])
+          .withOffers([offer])
+          .build(),
+      );
+    });
+
+    it("gets all conventions of a user without filters, and supports ordering by createdAt", async () => {
+      const resultWithDefaultOrder =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          userId: user.id,
+        });
+
+      expectToEqual(resultWithDefaultOrder, {
+        data: [discussion3InList, discussion2InList],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 10,
+          totalPages: 1,
+          totalRecords: 2,
+        },
+      });
+
+      const resultWithAscOrder =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          order: { by: "createdAt", direction: "asc" },
+          userId: user.id,
+        });
+
+      expectToEqual(resultWithAscOrder, {
+        data: [discussion2InList, discussion3InList],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 10,
+          totalPages: 1,
+          totalRecords: 2,
+        },
+      });
+    });
+
+    it("filters on statuses", async () => {
+      const result =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          filters: {
+            statuses: ["ACCEPTED"],
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          userId: user.id,
+        });
+
+      expectToEqual(result, {
+        data: [discussion2InList],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 10,
+          totalPages: 1,
+          totalRecords: 1,
+        },
+      });
+    });
+
+    it("filters on sirets", async () => {
+      const result =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          filters: {
+            sirets: [discussion3.siret],
+          },
+          pagination: {
+            page: 1,
+            perPage: 10,
+          },
+          userId: user.id,
+        });
+
+      expectToEqual(result, {
+        data: [discussion3InList],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 10,
+          totalPages: 1,
+          totalRecords: 1,
+        },
+      });
+    });
+
+    it("supports pagination", async () => {
+      const resultPage1 =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          pagination: {
+            page: 1,
+            perPage: 1,
+          },
+          userId: user.id,
+        });
+
+      expectToEqual(resultPage1, {
+        data: [discussion3InList],
+        pagination: {
+          currentPage: 1,
+          numberPerPage: 1,
+          totalPages: 2,
+          totalRecords: 2,
+        },
+      });
+
+      const resultPage2 =
+        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+          pagination: {
+            page: 2,
+            perPage: 1,
+          },
+          userId: user.id,
+        });
+
+      expectToEqual(resultPage2, {
+        data: [discussion2InList],
+        pagination: {
+          currentPage: 2,
+          numberPerPage: 1,
+          totalPages: 2,
+          totalRecords: 2,
+        },
       });
     });
   });

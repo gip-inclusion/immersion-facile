@@ -14,7 +14,10 @@ const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
 export const getDiscussionDisplayStatus = ({
   discussion,
   now,
-}: { discussion: DiscussionReadDto; now: Date }): DiscussionDisplayStatus => {
+}: {
+  discussion: Pick<DiscussionReadDto, "status" | "exchanges" | "createdAt">;
+  now: Date;
+}): DiscussionDisplayStatus => {
   return match(discussion.status)
     .with("REJECTED", (): DiscussionDisplayStatus => "rejected")
     .with("ACCEPTED", (): DiscussionDisplayStatus => "accepted")
