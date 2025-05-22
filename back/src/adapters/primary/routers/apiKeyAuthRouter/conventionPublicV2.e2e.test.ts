@@ -219,5 +219,37 @@ describe("Convention routes", () => {
         status: 200,
       });
     });
+
+    it("200 - also works when providing only one value in an array expected query param", async () => {
+      inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+      inMemoryUow.conventionRepository.setConventions([convention]);
+
+      expect(displayRouteName(publicApiV2ConventionRoutes.getConventions)).toBe(
+        "GET /v2/conventions -",
+      );
+
+      const { body, status } = await request
+        .get(publicApiV2ConventionRoutes.getConventions.url)
+        .query({ withStatuses: ["DRAFT"] })
+        .set("Authorization", conventionReadConsumerWithAgencyIdsScopeToken);
+
+      expectToEqual(
+        { body, status },
+        {
+          body: [
+            {
+              ...convention,
+              agencyName: agency.name,
+              agencyDepartment: agency.address.departmentCode,
+              agencyKind: agency.kind,
+              agencySiret: agency.agencySiret,
+              agencyCounsellorEmails: agency.counsellorEmails,
+              agencyValidatorEmails: agency.validatorEmails,
+            },
+          ],
+          status: 200,
+        },
+      );
+    });
   });
 });

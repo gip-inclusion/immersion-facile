@@ -8,10 +8,15 @@ export type GetConventionsByFiltersQueryParamsV2 = {
   withStatuses?: ConventionStatus[];
 };
 
+const conventionStatusSchema = z.enum(conventionStatuses);
+
 export const getConventionsByFiltersQueryParamsV2Schema = z.object({
   startDateGreater: z.coerce.date().optional(),
   startDateLessOrEqual: z.coerce.date().optional(),
-  withStatuses: z.array(z.enum(conventionStatuses)).optional(),
+  withStatuses: z
+    .array(conventionStatusSchema)
+    .optional()
+    .or(conventionStatusSchema.optional()),
 });
 
 export const getConventionsByFiltersV2ToDomain = (
