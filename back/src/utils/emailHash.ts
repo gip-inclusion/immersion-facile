@@ -121,4 +121,6 @@ export const makeHashByRolesForTest = (
   "establishment-tutor": makeEmailHash(convention.establishmentTutor.email),
   counsellor: makeEmailHash(counsellor.email ?? "N/A"),
   validator: makeEmailHash(validator.email),
+  "establishment-admin": "N/A",
+  "establishment-contact": "N/A",
 });

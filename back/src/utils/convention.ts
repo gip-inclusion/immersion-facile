@@ -38,6 +38,12 @@ export const conventionEmailsByRole = (
     convention.signatories.establishmentRepresentative.email,
   ],
   "establishment-tutor": [convention.establishmentTutor.email],
+  "establishment-admin": errors.convention.roleHasNoMagicLink({
+    role: "establishment-admin",
+  }),
+  "establishment-contact": errors.convention.roleHasNoMagicLink({
+    role: "establishment-contact",
+  }),
 });
 
 export const conventionEmailsByRoleForMagicLinkRenewal = (
