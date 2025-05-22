@@ -28,19 +28,20 @@ export const UserProfile = ({
 }: UserProfileProps) => (
   <div>
     <div className={fr.cx("fr-grid-row")}>
-      <h1 className={fr.cx("fr-col-12", "fr-col-sm-10")}>{title}</h1>
-      <Button
-        id={domElementIds.profile.registerAgenciesSearchLink}
-        priority="secondary"
-        className={fr.cx("fr-col-12", "fr-col-sm-2")}
-        linkProps={{
-          href: `${routes.myProfileAgencyRegistration().href}`,
-        }}
-      >
-        {currentUser.agencyRights.length > 0
-          ? "Demander l'accès à d'autres organismes"
-          : "Demander l'accès à des organismes"}
-      </Button>
+      <h1 className={fr.cx("fr-col-12", "fr-col-md")}>{title}</h1>
+      <div className={fr.cx("fr-ml-md-auto")}>
+        <Button
+          id={domElementIds.profile.registerAgenciesSearchLink}
+          priority="secondary"
+          linkProps={{
+            href: `${routes.myProfileAgencyRegistration().href}`,
+          }}
+        >
+          {currentUser.agencyRights.length > 0
+            ? "Demander l'accès à d'autres organismes"
+            : "Demander l'accès à des organismes"}
+        </Button>
+      </div>
     </div>
     <PersonnalInformationsSection
       user={userWithRights}
