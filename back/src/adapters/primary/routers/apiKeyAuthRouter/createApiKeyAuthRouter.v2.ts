@@ -2,6 +2,7 @@ import { Router } from "express";
 import { andThen, keys, map } from "ramda";
 import {
   type ApiConsumer,
+  type ConventionStatus,
   type LocationId,
   type SearchQueryParamsDto,
   type SiretDto,
@@ -179,9 +180,20 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
       )
         throw errors.apiConsumer.forbidden();
 
+      const getWithStatus = (): ConventionStatus[] | undefined => {
+        if (Array.isArray(req.query.withStatuses))
+          return req.query.withStatuses;
+        if (typeof req.query.withStatuses === "string")
+          return [req.query.withStatuses];
+      };
+
       return pipeWithValue(
         await deps.useCases.getConventionsForApiConsumer.execute(
-          getConventionsByFiltersV2ToDomain(req.query),
+          getConventionsByFiltersV2ToDomain({
+            startDateGreater: req.query.startDateGreater,
+            startDateLessOrEqual: req.query.startDateLessOrEqual,
+            withStatuses: getWithStatus(),
+          }),
           req.apiConsumer,
         ),
         map(conventionReadToConventionReadPublicV2),
