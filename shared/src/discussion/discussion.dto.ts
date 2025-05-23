@@ -1,4 +1,5 @@
 import {
+  type ConnectedUserJwt,
   type ContactLevelOfEducation,
   type Phone,
   type WithDiscussionId,
@@ -47,6 +48,15 @@ export type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
   firstname?: string;
   lastname?: string;
 };
+
+export type WithDiscussionMessage = {
+  message: string;
+};
+
+export type SendMessageToDiscussionFromDashboardRequestPayload = {
+  discussionId: DiscussionId;
+  jwt: ConnectedUserJwt;
+} & WithDiscussionMessage;
 
 type WithContactByEmailProps<
   D extends DiscussionKind,

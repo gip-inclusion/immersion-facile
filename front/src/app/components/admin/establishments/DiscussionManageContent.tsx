@@ -4,19 +4,13 @@ import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
-import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
-import { useEffect, useState } from "react";
-import {
-  CopyButton,
-  DiscussionMeta,
-  ExchangeMessage,
-  Loader,
-} from "react-design-system";
+import { type ReactNode, useEffect, useState } from "react";
+import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -30,7 +24,7 @@ import {
   type WithDiscussionId,
   type WithDiscussionRejection,
   addressDtoToString,
-  createOpaqueEmail,
+  discussionIdSchema,
   discussionRejectionSchema,
   domElementIds,
   getDiscussionDisplayStatus,
@@ -55,6 +49,7 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
+import { z } from "zod";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
@@ -127,15 +122,6 @@ const DiscussionDetails = ({
   discussion,
   userEmail,
 }: { discussion: DiscussionReadDto; userEmail: Email }): JSX.Element => {
-  const draftConvention = makeConventionFromDiscussion({
-    initialConvention: getConventionInitialValuesFromUrl({
-      route: routes.conventionImmersion(),
-      internshipKind: "immersion",
-    }),
-    discussion,
-    userEmail,
-  });
-
   const statusBadgeData: Record<
     DiscussionDisplayStatus,
     {
@@ -171,52 +157,11 @@ const DiscussionDetails = ({
 
   const statusBadge =
     statusBadgeData[
-      getDiscussionDisplayStatus({ discussion, now: new Date() })
+      getDiscussionDisplayStatus({
+        discussion,
+        now: new Date(),
+      })
     ];
-  const candidateContactButtons: [ButtonProps, ...ButtonProps[]] = [
-    {
-      id: domElementIds.establishmentDashboard.discussion
-        .replyToCandidateByEmail,
-      priority: "primary",
-      linkProps: {
-        href: `mailto:${createOpaqueEmail({
-          discussionId: discussion.id,
-          recipient: {
-            kind: "potentialBeneficiary",
-            firstname: discussion.potentialBeneficiary.firstName,
-            lastname: discussion.potentialBeneficiary.lastName,
-          },
-          replyDomain: `reply.${window.location.hostname}`,
-        })}?subject=${encodeURI(
-          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
-        )}`,
-        target: "_blank",
-      },
-      children: "Répondre au candidat",
-    },
-  ];
-  if (discussion.status === "PENDING") {
-    if (discussion.kind === "IF") {
-      candidateContactButtons.push({
-        id: domElementIds.establishmentDashboard.discussion
-          .activateDraftConvention,
-        priority: "tertiary",
-        linkProps: {
-          href: makeDraftConventionLink(draftConvention, discussion.id).href,
-          target: "_blank",
-        },
-        children: "Pré-remplir la convention pour cette mise en relation",
-      });
-    }
-    candidateContactButtons.push({
-      id: domElementIds.establishmentDashboard.discussion
-        .rejectApplicationOpenModal,
-      priority: "secondary",
-      type: "button",
-      onClick: () => openRejectApplicationModal(),
-      children: "Refuser la candidature",
-    });
-  }
 
   return (
     <>
@@ -269,40 +214,33 @@ const DiscussionDetails = ({
               </a>
             )}
         </DiscussionMeta>
-        <ButtonsGroup
-          inlineLayoutWhen="always"
-          buttonsSize="small"
-          buttons={candidateContactButtons}
+        <CandidateContactButtons
+          discussion={discussion}
+          userEmail={userEmail}
         />
-        <div className={fr.cx("fr-grid-row")}>
-          <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
-            <Highlight className={fr.cx("fr-ml-0", "fr-pt-2w", "fr-pb-1w")}>
-              <p className={fr.cx("fr-text--sm", "fr-mb-2w")}>
-                Vous ne parvenez pas à répondre au candidat ? Copiez dans votre
-                presse papier l'adresse email sécurisée de cette discussion et
-                utilisez-la directement depuis votre boîte mail.
-              </p>
-              <CopyButton
-                textToCopy={createOpaqueEmail({
-                  discussionId: discussion.id,
-                  recipient: {
-                    kind: "potentialBeneficiary",
-                    firstname: discussion.potentialBeneficiary.firstName,
-                    lastname: discussion.potentialBeneficiary.lastName,
-                  },
-                  replyDomain: `reply.${window.location.hostname}`,
-                })}
-                id={
-                  domElementIds.establishmentDashboard.discussion
-                    .copyEmailButton
-                }
-                withIcon
-                label="Copier l'adresse email"
-              />
-            </Highlight>
-          </div>
-        </div>
       </header>
+
+      <DiscussionEchangeMessageForm discussionId={discussion.id} />
+
+      <DiscussionExchangesList discussion={discussion} />
+
+      {createPortal(
+        <RejectApplicationModal title="Refuser la candidature">
+          <RejectApplicationForm discussion={discussion} />
+        </RejectApplicationModal>,
+        document.body,
+      )}
+    </>
+  );
+};
+
+const DiscussionExchangesList = ({
+  discussion,
+}: {
+  discussion: DiscussionReadDto;
+}): JSX.Element => {
+  return (
+    <>
       {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
           <header
@@ -347,13 +285,6 @@ const DiscussionDetails = ({
           </section>
         </ExchangeMessage>
       ))}
-
-      {createPortal(
-        <RejectApplicationModal title="Refuser la candidature">
-          <RejectApplicationForm discussion={discussion} />
-        </RejectApplicationModal>,
-        document.body,
-      )}
     </>
   );
 };
@@ -551,6 +482,138 @@ const RejectApplicationForm = ({
         ]}
         inlineLayoutWhen="always"
       />
+    </form>
+  );
+};
+
+const CandidateContactButtons = ({
+  discussion,
+  userEmail,
+}: {
+  discussion: DiscussionReadDto;
+  userEmail: Email;
+}): ReactNode => {
+  const draftConvention = makeConventionFromDiscussion({
+    initialConvention: getConventionInitialValuesFromUrl({
+      route: routes.conventionImmersion(),
+      internshipKind: "immersion",
+    }),
+    discussion,
+    userEmail,
+  });
+
+  const candidateContactButtons: ButtonProps[] =
+    discussion.status === "PENDING"
+      ? [
+          ...(discussion.kind === "IF"
+            ? [
+                {
+                  id: domElementIds.establishmentDashboard.discussion
+                    .activateDraftConvention,
+                  priority: "tertiary",
+                  linkProps: {
+                    href: makeDraftConventionLink(
+                      draftConvention,
+                      discussion.id,
+                    ).href,
+                    target: "_blank",
+                  },
+                  children:
+                    "Pré-remplir la convention pour cette mise en relation",
+                } as ButtonProps,
+              ]
+            : []),
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationOpenModal,
+            priority: "secondary",
+            type: "button",
+            onClick: () => openRejectApplicationModal(),
+            children: "Refuser la candidature",
+          } as ButtonProps,
+        ]
+      : [];
+
+  if (!isNonEmptyButtonArray(candidateContactButtons)) {
+    return null;
+  }
+
+  return (
+    <ButtonsGroup
+      inlineLayoutWhen="always"
+      buttonsSize="small"
+      buttons={candidateContactButtons}
+    />
+  );
+};
+
+const isNonEmptyButtonArray = (
+  buttons: ButtonProps[],
+): buttons is [ButtonProps, ...ButtonProps[]] => buttons.length > 0;
+
+const messageFormSchema = z.object({
+  discussionId: discussionIdSchema,
+  message: z.string().min(1, "Le message ne peut pas être vide"),
+});
+
+type MessageFormValues = z.infer<typeof messageFormSchema>;
+
+const DiscussionEchangeMessageForm = ({
+  discussionId,
+}: {
+  discussionId: DiscussionId;
+}) => {
+  const { register, handleSubmit, formState } = useForm<MessageFormValues>({
+    resolver: zodResolver(messageFormSchema),
+    defaultValues: {
+      message: "",
+    },
+  });
+  const getFieldError = makeFieldError(formState);
+  const dispatch = useDispatch();
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
+
+  const onSubmit = (data: MessageFormValues) => {
+    if (inclusionConnectedJwt) {
+      dispatch(
+        discussionSlice.actions.sendMessageRequested({
+          jwt: inclusionConnectedJwt,
+          discussionId,
+          message: data.message,
+          feedbackTopic: "establishment-dashboard-discussion-send-message",
+        }),
+      );
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
+      <input type="hidden" {...register("discussionId")} value={discussionId} />
+      <Input
+        textArea
+        label="Répondre au candidat"
+        nativeTextAreaProps={{
+          id: domElementIds.establishmentDashboard.discussion.sendMessageInput,
+          rows: 5,
+          placeholder: "Rédigez votre message ici...",
+          ...register("message"),
+        }}
+        {...getFieldError("message")}
+      />
+      <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
+        <Button
+          id={
+            domElementIds.establishmentDashboard.discussion
+              .sendMessageSubmitButton
+          }
+          type="submit"
+          disabled={formState.isSubmitting}
+        >
+          Envoyer un message
+        </Button>
+      </div>
     </form>
   );
 };
