@@ -125,12 +125,6 @@ const rejectConventionEpic = makeConventionStatusChangeEpic({
   failedAction: conventionActionSlice.actions.rejectConventionFailed,
 });
 
-const editConventionEpic = makeConventionStatusChangeEpic({
-  requestAction: conventionActionSlice.actions.editConventionRequested,
-  successAction: conventionActionSlice.actions.editConventionSucceeded,
-  failedAction: conventionActionSlice.actions.editConventionFailed,
-});
-
 const acceptByValidatorEpic = makeConventionStatusChangeEpic({
   requestAction: conventionActionSlice.actions.acceptByValidatorRequested,
   successAction: conventionActionSlice.actions.acceptByValidatorSucceeded,
@@ -212,7 +206,6 @@ export const conventionActionEpics = [
   cancelConventionEpic,
   deprecateConventionEpic,
   rejectConventionEpic,
-  editConventionEpic,
   acceptByValidatorEpic,
   acceptByCounsellorEpic,
   signConventionEpic,

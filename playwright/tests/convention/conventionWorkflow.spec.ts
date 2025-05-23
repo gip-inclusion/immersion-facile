@@ -142,7 +142,7 @@ test.describe("Convention creation and modification workflow", () => {
           .click();
 
         await page.fill(
-          `#${domElementIds.conventionImmersionRoute.statusJustificationTextarea}`,
+          `#${domElementIds.conventionImmersionRoute.statusJustificationInput}`,
           "justification de la modification",
         );
 

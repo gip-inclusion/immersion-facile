@@ -95,7 +95,10 @@ export const ConventionManageContent = ({
 
   return (
     <>
-      <Feedback topics={["convention-form"]} className="fr-mb-4w" />
+      <Feedback
+        topics={["convention-form", "convention-action-edit"]}
+        className="fr-mb-4w"
+      />
       <ConventionValidation convention={convention} jwtParams={jwtParams} />
       <ConventionManageActions
         jwtParams={jwtParams}

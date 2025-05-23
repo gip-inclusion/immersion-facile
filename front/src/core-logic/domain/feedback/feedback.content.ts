@@ -453,14 +453,16 @@ export const feedbacks: Record<
   },
   "convention-action-edit": {
     "update.success": {
-      action: conventionActionSlice.actions.editConventionSucceeded,
-      title: "La demande de modification a bien été prise en compte",
-      message: "La demande de modification a bien été prise en compte",
+      action: conventionSlice.actions.updateConventionSucceeded,
+      title: "La convention a bien été mise à jour",
+      message:
+        "Les signataires ont reçu un email leur demandant de signer la version modifiée.",
     },
     "update.error": {
-      action: conventionActionSlice.actions.editConventionFailed,
-      title: "Problème lors de la demande de modification",
-      message: "Une erreur est survenue lors de la demande de modification",
+      action: conventionSlice.actions.updateConventionFailed,
+      title: "Problème lors de la mise à jour de la convention",
+      message:
+        "Une erreur est survenue lors de la mise à jour de la convention",
     },
   },
   "convention-action-accept-by-validator": {

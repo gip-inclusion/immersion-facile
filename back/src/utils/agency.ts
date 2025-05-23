@@ -5,6 +5,7 @@ import {
   type AgencyRight,
   type AgencyUsersRights,
   type AgencyWithUsersRights,
+  type ConventionAgencyFields,
   type Email,
   type UserId,
   type UserWithAdminRights,
@@ -190,3 +191,14 @@ export const throwErrorIfAgencyNotFound = async ({
     });
   }
 };
+
+export const agencyDtoToConventionAgencyFields = (
+  agency: AgencyDto,
+): ConventionAgencyFields => ({
+  agencyCounsellorEmails: agency.counsellorEmails,
+  agencyValidatorEmails: agency.validatorEmails,
+  agencyKind: agency.kind,
+  agencyName: agency.name,
+  agencySiret: agency.agencySiret,
+  agencyDepartment: agency.coveredDepartments[0],
+});

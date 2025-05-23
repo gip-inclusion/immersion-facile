@@ -77,7 +77,6 @@ export const ConventionManageActions = ({
     "convention-action-reject",
     "convention-action-deprecate",
     "convention-action-cancel",
-    "convention-action-edit",
     "convention-action-renew",
   ]);
 
@@ -270,19 +269,6 @@ export const ConventionManageActions = ({
         skipIntro: true,
       }).link,
     },
-
-    //   ...getVerificationActionProps({
-    //     initialStatus: convention.status,
-    //     children: t.verification.modifyConventionOtherInformations,
-    //     modalTitle: t.verification.modifyConvention,
-    //     verificationAction: "REQUEST_EDIT",
-    //     convention,
-    //     disabled,
-    //     currentSignatoryRoles: requesterRoles,
-    //     onSubmit: createOnSubmitWithFeedbackKind,
-    //   }).buttonProps,
-    //   id: domElementIds.manageConvention.requestEditButton,
-    // },
   ];
 
   return (
@@ -315,7 +301,6 @@ export const ConventionManageActions = ({
           "convention-action-reject",
           "convention-action-deprecate",
           "convention-action-cancel",
-          "convention-action-edit",
           "convention-action-renew",
         ]}
         className="fr-mb-2w"
@@ -437,7 +422,7 @@ export const ConventionManageActions = ({
                   }).link
                 }
               >
-                {t.verification.modifyConventionOtherInformations}
+                {t.verification.modifyConvention}
               </Button>
             )}
           </>

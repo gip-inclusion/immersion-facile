@@ -12,7 +12,10 @@ import {
   statusTransitionConfigs,
   updateConventionRequestSchema,
 } from "shared";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import {
+  agencyDtoToConventionAgencyFields,
+  agencyWithRightToAgencyDto,
+} from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -59,11 +62,11 @@ export class UpdateConvention extends TransactionalUseCase<
     if (!conventionFromRepo)
       throw errors.convention.notFound({ conventionId: convention.id });
 
-    if (
-      !statusTransitionConfigs[
-        minimalValidStatus
-      ].validInitialStatuses.includes(conventionFromRepo.status)
-    )
+    const isTransitionAllowed = statusTransitionConfigs[
+      minimalValidStatus
+    ].validInitialStatuses.includes(conventionFromRepo.status);
+
+    if (!isTransitionAllowed)
       throw errors.convention.updateBadStatusInRepo({
         id: conventionFromRepo.id,
         status: conventionFromRepo.status,
@@ -82,9 +85,9 @@ export class UpdateConvention extends TransactionalUseCase<
     const hasSignatoryRole = userRolesOnConvention.some((role) =>
       isSignatoryRole(role),
     );
-    const conventionWithClearedSignatories = {
+    const conventionWithSignatoriesSignedAtCleared = {
       ...convention,
-      signatories: clearSignatories(convention),
+      signatories: clearSignedAtForAllSignatories(convention),
     };
 
     const triggeredBy: TriggeredBy =
@@ -111,14 +114,8 @@ export class UpdateConvention extends TransactionalUseCase<
       const { signedConvention } = await signConvention({
         uow,
         convention: {
-          ...conventionWithClearedSignatories,
-          agencyCounsellorEmails: agency.counsellorEmails,
-          agencyValidatorEmails: agency.validatorEmails,
-          agencyKind: agency.kind,
-          agencyId: agency.id,
-          agencyName: agency.name,
-          agencySiret: agency.agencySiret,
-          agencyDepartment: agency.coveredDepartments[0],
+          ...conventionWithSignatoriesSignedAtCleared,
+          ...agencyDtoToConventionAgencyFields(agency),
         },
         jwtPayload,
         now: this.timeGateway.now().toISOString(),
@@ -138,12 +135,14 @@ export class UpdateConvention extends TransactionalUseCase<
       ]);
     } else {
       await Promise.all([
-        uow.conventionRepository.update(conventionWithClearedSignatories),
+        uow.conventionRepository.update(
+          conventionWithSignatoriesSignedAtCleared,
+        ),
         uow.outboxRepository.save(
           this.createNewEvent({
             topic: "ConventionSubmittedAfterModification",
             payload: {
-              convention: conventionWithClearedSignatories,
+              convention: conventionWithSignatoriesSignedAtCleared,
               triggeredBy,
             },
           }),
@@ -209,7 +208,9 @@ const throwIfNotAllowedToUpdateConvention = async (
   }
 };
 
-const clearSignatories = (convention: ConventionDto): Signatories => {
+const clearSignedAtForAllSignatories = (
+  convention: ConventionDto,
+): Signatories => {
   return {
     beneficiary: {
       ...convention.signatories.beneficiary,
