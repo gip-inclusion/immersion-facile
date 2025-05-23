@@ -1,36 +1,28 @@
+import { renderContent } from "html-templates/src/components/email";
 import {
   type BrevoEmailItem,
   type DiscussionEmailParams,
   type DiscussionEmailParamsWithRecipientKind,
+  type Email,
   type LegacyDiscussionEmailParams,
   errors,
+  immersionFacileContactEmail,
   makeExchangeEmailSchema,
 } from "shared";
 
+const defaultSubject = "Sans objet";
+
 export const getDiscussionParamsFromEmail = (
-  email: BrevoEmailItem,
+  email: Email,
   replyDomain: string,
 ): DiscussionEmailParamsWithRecipientKind => {
-  const recipientEmailParams = email.To.filter(
-    (brevoRecipient) => !!brevoRecipient.Address,
-  )
-    .map((brevoRecipient) => {
-      const validatedEmail = makeExchangeEmailSchema(replyDomain).safeParse(
-        brevoRecipient.Address,
-      );
-      if (!validatedEmail.success)
-        throw errors.discussion.badEmailFormat({
-          email: brevoRecipient.Address,
-        });
-
-      return validatedEmail.data;
-    })
-    .at(0);
-
-  if (!recipientEmailParams)
+  const validatedEmail = makeExchangeEmailSchema(replyDomain).safeParse(email);
+  if (!validatedEmail.success)
     throw errors.discussion.badEmailFormat({
-      email: email.To.map((recipient) => recipient.Address).join(", "),
+      email,
     });
+
+  const recipientEmailParams = validatedEmail.data;
 
   const { discussionId, rawRecipientKind } = recipientEmailParams;
 
@@ -58,4 +50,28 @@ const hasDiscussionParamsFirstnameAndLastname = (
   return (
     "firstname" in recipientEmailParams && "lastname" in recipientEmailParams
   );
+};
+export const cleanContactEmailFromMessage = (message: string) =>
+  message
+    .replaceAll(`<${immersionFacileContactEmail}>`, "")
+    .replaceAll(
+      `&lt;<a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>&gt;`,
+      "",
+    )
+    .replaceAll(
+      `&lt;<a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>&gt;`,
+      "",
+    );
+
+export const processInboundParsingEmailMessage = (item: BrevoEmailItem) => {
+  const emailContent =
+    item.RawHtmlBody ||
+    (item.RawTextBody &&
+      renderContent(item.RawTextBody, { wrapInTable: false })) ||
+    "Pas de contenu";
+  return cleanContactEmailFromMessage(emailContent);
+};
+
+export const getSubjectFromEmail = (item: BrevoEmailItem) => {
+  return item.Subject || defaultSubject;
 };

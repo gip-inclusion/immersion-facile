@@ -1,6 +1,7 @@
 import {
   type BrevoInboundBody,
   DiscussionBuilder,
+  InclusionConnectedUserBuilder,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -14,11 +15,42 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { AddExchangeToDiscussion } from "./AddExchangeToDiscussion";
+import {
+  AddExchangeToDiscussion,
+  type AddExchangeToDiscussionInput,
+} from "./AddExchangeToDiscussion";
 
 const domain = "my-domain.com";
 const replyDomain = `reply.${domain}`;
+const discussion1 = new DiscussionBuilder()
+  .withAppellationCode("20567")
+  .withId("11111111-e89b-12d3-a456-426614174000")
+  .withExchanges([
+    {
+      subject: "Ma discussion 1",
+      message: "Hello",
+      sender: "potentialBeneficiary",
+      sentAt: new Date().toISOString(),
+      recipient: "establishment",
+      attachments: [],
+    },
+  ])
+  .build();
 
+const discussion2 = new DiscussionBuilder()
+  .withAppellationCode("13252")
+  .withId("22222222-e89b-12d3-a456-426614174000")
+  .withExchanges([
+    {
+      subject: "",
+      message: "Hello",
+      sender: "potentialBeneficiary",
+      sentAt: new Date().toISOString(),
+      recipient: "establishment",
+      attachments: [],
+    },
+  ])
+  .build();
 describe("AddExchangeToDiscussion", () => {
   let uow: InMemoryUnitOfWork;
   let addExchangeToDiscussion: AddExchangeToDiscussion;
@@ -32,51 +64,52 @@ describe("AddExchangeToDiscussion", () => {
         uuidGenerator: new UuidV4Generator(),
         timeGateway: new CustomTimeGateway(),
       }),
-      domain,
     );
+
+    uow.discussionRepository.discussions = [discussion1, discussion2];
   });
 
   describe("right paths", () => {
-    const discussion1 = new DiscussionBuilder()
-      .withAppellationCode("20567")
-      .withId("my-discussion-id-1")
-      .withExchanges([
-        {
-          subject: "Ma discussion 1",
-          message: "Hello",
-          sender: "potentialBeneficiary",
-          sentAt: new Date().toISOString(),
-          recipient: "establishment",
-          attachments: [],
-        },
-      ])
-      .build();
+    it("saves the new exchange in the discussion with attachment ref and source inbound-parsing", async () => {
+      const [firstInboundParsingItem, secondInboundParsingItem] =
+        createInboundParsingResponse([
+          `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
+          `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
+        ]).items;
 
-    const discussion2 = new DiscussionBuilder()
-      .withAppellationCode("13252")
-      .withId("my-discussion-id-2")
-      .withExchanges([
-        {
-          subject: "",
-          message: "Hello",
-          sender: "potentialBeneficiary",
-          sentAt: new Date().toISOString(),
-          recipient: "establishment",
-          attachments: [],
-        },
-      ])
-      .build();
+      const payload: AddExchangeToDiscussionInput = {
+        source: "inbound-parsing",
+        messageInputs: [
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: firstInboundParsingItem.RawHtmlBody!,
+            discussionId: discussion1.id,
+            recipientRole: "potentialBeneficiary",
+            sentAt: new Date(firstInboundParsingItem.SentAtDate).toISOString(),
+            attachments:
+              firstInboundParsingItem.Attachments?.map((attachment) => ({
+                name: attachment.Name,
+                link: attachment.DownloadToken,
+              })) ?? [],
+            subject: firstInboundParsingItem.Subject,
+          },
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: secondInboundParsingItem.RawHtmlBody!,
+            discussionId: discussion2.id,
+            recipientRole: "establishment",
+            sentAt: new Date(secondInboundParsingItem.SentAtDate).toISOString(),
+            attachments:
+              secondInboundParsingItem.Attachments?.map((attachment) => ({
+                name: attachment.Name,
+                link: attachment.DownloadToken,
+              })) ?? [],
+            subject: secondInboundParsingItem.Subject,
+          },
+        ],
+      };
 
-    beforeEach(() => {
-      uow.discussionRepository.discussions = [discussion1, discussion2];
-    });
-
-    it("saves the new exchange in the discussion with attachment ref", async () => {
-      const brevoResponse = createBrevoResponse([
-        `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
-        `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
-      ]);
-      await addExchangeToDiscussion.execute(brevoResponse);
+      await addExchangeToDiscussion.execute(payload);
 
       expectToEqual(uow.discussionRepository.discussions, [
         {
@@ -84,19 +117,16 @@ describe("AddExchangeToDiscussion", () => {
           exchanges: [
             ...discussion1.exchanges,
             {
-              message: brevoResponse.items[0].RawHtmlBody,
+              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
               sender: "establishment",
               sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "potentialBeneficiary",
-              subject: brevoResponse.items[0].Subject,
-              attachments: brevoResponse.items[0].Attachments?.length
-                ? [
-                    {
-                      name: brevoResponse.items[0].Attachments[0].Name,
-                      link: brevoResponse.items[0].Attachments[0].DownloadToken,
-                    },
-                  ]
-                : [],
+              subject: firstInboundParsingItem.Subject,
+              attachments:
+                firstInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
             },
           ],
         },
@@ -105,19 +135,16 @@ describe("AddExchangeToDiscussion", () => {
           exchanges: [
             ...discussion2.exchanges,
             {
-              message: brevoResponse.items[1].RawHtmlBody,
+              message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
               sender: "potentialBeneficiary",
               sentAt: "2023-06-28T08:06:52.000Z",
               recipient: "establishment",
-              subject: brevoResponse.items[1].Subject,
-              attachments: brevoResponse.items[1].Attachments?.length
-                ? [
-                    {
-                      name: brevoResponse.items[1].Attachments[0].Name,
-                      link: brevoResponse.items[1].Attachments[0].DownloadToken,
-                    },
-                  ]
-                : [],
+              subject: secondInboundParsingItem.Subject,
+              attachments:
+                secondInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
             },
           ],
         },
@@ -135,15 +162,89 @@ describe("AddExchangeToDiscussion", () => {
       ]);
     });
 
-    it("saves the new exchange in the discussion with attachment ref and with a default subject if not provided", async () => {
-      const brevoResponse = createBrevoResponse(
-        [
-          `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
-          `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
+    it("saves the new exchange in the discussion with attachment ref and source dashboard", async () => {
+      const sentAt = new Date().toISOString();
+      const inclusionConnectedUser = new InclusionConnectedUserBuilder()
+        .withId("11111111-e89b-12d3-a456-426614174000")
+        .build();
+      const payload: AddExchangeToDiscussionInput = {
+        source: "dashboard",
+        messageInputs: [
+          {
+            message: "Hello",
+            discussionId: discussion1.id,
+            recipientRole: "potentialBeneficiary",
+            subject: "My fake subject",
+            attachments: [],
+            sentAt,
+          },
         ],
-        "",
-      );
-      await addExchangeToDiscussion.execute(brevoResponse);
+      };
+
+      await addExchangeToDiscussion.execute(payload, inclusionConnectedUser);
+
+      expectToEqual(uow.discussionRepository.discussions, [
+        {
+          ...discussion1,
+          exchanges: [
+            ...discussion1.exchanges,
+            {
+              message: "Hello",
+              sender: "establishment",
+              sentAt,
+              recipient: "potentialBeneficiary",
+              subject: "My fake subject",
+              attachments: [],
+            },
+          ],
+        },
+        discussion2,
+      ]);
+    });
+
+    it("saves the new exchange in the discussion with attachment ref and with a default subject if not provided", async () => {
+      const [firstInboundParsingItem, secondInboundParsingItem] =
+        createInboundParsingResponse(
+          [
+            `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
+            `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
+          ],
+          "",
+        ).items;
+
+      const payload: AddExchangeToDiscussionInput = {
+        source: "inbound-parsing",
+        messageInputs: [
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: firstInboundParsingItem.RawHtmlBody!,
+            discussionId: discussion1.id,
+            recipientRole: "potentialBeneficiary",
+            attachments:
+              firstInboundParsingItem.Attachments?.map((attachment) => ({
+                name: attachment.Name,
+                link: attachment.DownloadToken,
+              })) ?? [],
+            subject: "",
+            sentAt: new Date(firstInboundParsingItem.SentAtDate).toISOString(),
+          },
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: secondInboundParsingItem.RawHtmlBody!,
+            discussionId: discussion2.id,
+            recipientRole: "establishment",
+            attachments:
+              secondInboundParsingItem.Attachments?.map((attachment) => ({
+                name: attachment.Name,
+                link: attachment.DownloadToken,
+              })) ?? [],
+            subject: "",
+            sentAt: new Date(secondInboundParsingItem.SentAtDate).toISOString(),
+          },
+        ],
+      };
+
+      await addExchangeToDiscussion.execute(payload);
 
       expectToEqual(uow.discussionRepository.discussions, [
         {
@@ -154,16 +255,15 @@ describe("AddExchangeToDiscussion", () => {
               sender: "establishment",
               recipient: "potentialBeneficiary",
               subject: "Sans objet",
-              message: brevoResponse.items[0].RawHtmlBody,
-              sentAt: new Date(brevoResponse.items[0].SentAtDate).toISOString(),
-              attachments: brevoResponse.items[0].Attachments?.length
-                ? [
-                    {
-                      name: brevoResponse.items[0].Attachments[0].Name,
-                      link: brevoResponse.items[0].Attachments[0].DownloadToken,
-                    },
-                  ]
-                : [],
+              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
+              sentAt: new Date(
+                firstInboundParsingItem.SentAtDate,
+              ).toISOString(),
+              attachments:
+                firstInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
             },
           ],
         },
@@ -175,16 +275,15 @@ describe("AddExchangeToDiscussion", () => {
               sender: "potentialBeneficiary",
               recipient: "establishment",
               subject: "Sans objet",
-              sentAt: new Date(brevoResponse.items[1].SentAtDate).toISOString(),
-              message: brevoResponse.items[1].RawHtmlBody,
-              attachments: brevoResponse.items[1].Attachments?.length
-                ? [
-                    {
-                      name: brevoResponse.items[1].Attachments[0].Name,
-                      link: brevoResponse.items[1].Attachments[0].DownloadToken,
-                    },
-                  ]
-                : [],
+              sentAt: new Date(
+                secondInboundParsingItem.SentAtDate,
+              ).toISOString(),
+              message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(),
+              attachments:
+                secondInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
             },
           ],
         },
@@ -204,38 +303,108 @@ describe("AddExchangeToDiscussion", () => {
   });
 
   describe("wrong paths", () => {
-    it("throws an error if the email does not have the right format", async () => {
-      const email = "gerard@reply-dev.immersion-facile.beta.gouv.fr";
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(createBrevoResponse([email])),
-        errors.discussion.badEmailFormat({ email }),
-      );
-    });
+    // Done in router now, we don't need to test it here anymore
+    // it("throws an error if the email does not have the right format", async () => {
+    //   const inboundParsingResponse = createInboundParsingResponse([
+    //     "gerard@reply-dev.immersion-facile.beta.gouv.fr",
+    //   ]);
 
-    it("throws an error if the email does not have the right recipient kind", async () => {
-      await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(
-          createBrevoResponse([
-            `firstname_lastname__discussionId_bob@${replyDomain}`,
-          ]),
-        ),
-        errors.discussion.badRecipientKindFormat({ kind: "bob" }),
-      );
-    });
+    //   const payload: AddExchangeToDiscussionInput = {
+    //     source: "inbound-parsing",
+    //     messageInputs: [
+    //       {
+    //         // biome-ignore lint/style/noNonNullAssertion: testing purpose
+    //         message: inboundParsingResponse.items[0].RawHtmlBody!,
+    //         discussionId: "11111111-e89b-12d3-a456-426614174000",
+    //         recipientRole: "potentialBeneficiary",
+    //         attachments: [],
+    //         subject: "",
+    //         sentAt: new Date().toISOString(),
+    //       },
+    //     ],
+    //   };
+    //   await expectPromiseToFailWithError(
+    //     addExchangeToDiscussion.execute(payload),
+    //     errors.discussion.badEmailFormat({
+    //       email: "gerard@reply-dev.immersion-facile.beta.gouv.fr",
+    //     }),
+    //   );
+    // });
+
+    // Done in router now, we don't need to test it here anymore
+    // it("throws an error if the email does not have the right recipient kind", async () => {
+    //   const inboundParsingResponse = createInboundParsingResponse([
+    //     `firstname_lastname__discussionId_bob@${replyDomain}`,
+    //   ]);
+
+    //   const payload: AddExchangeToDiscussionInput = {
+    //     source: "inbound-parsing",
+    //     messageInputs: [
+    //       {
+    //         // biome-ignore lint/style/noNonNullAssertion: testing purpose
+    //         message: inboundParsingResponse.items[0].RawHtmlBody!,
+    //         discussionId: "my-discussion-id",
+    //         recipientRole: "potentialBeneficiary",
+    //         attachments: [],
+    //         subject: "",
+    //         sentAt: new Date().toISOString(),
+    //       },
+    //     ],
+    //   };
+    //   await expectPromiseToFailWithError(
+    //     addExchangeToDiscussion.execute(payload),
+    //     errors.discussion.badRecipientKindFormat({ kind: "bob" }),
+    //   );
+    // });
 
     it("throws an error if the discussion does not exist", async () => {
-      const discussionId = "my-discussion-id";
-      const email = `firstname_lastname__${discussionId}_e@${replyDomain}`;
-      const brevoResponse = createBrevoResponse([email]);
+      const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
+      const email = `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`;
+      const brevoResponse = createInboundParsingResponse([email]);
+      const payload: AddExchangeToDiscussionInput = {
+        source: "inbound-parsing",
+        messageInputs: [
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: brevoResponse.items[0].RawHtmlBody!,
+            discussionId: notFoundDiscussionId,
+            recipientRole: "establishment",
+            attachments: [],
+            subject: "",
+            sentAt: new Date().toISOString(),
+          },
+        ],
+      };
       await expectPromiseToFailWithError(
-        addExchangeToDiscussion.execute(brevoResponse),
-        errors.discussion.notFound({ discussionId }),
+        addExchangeToDiscussion.execute(payload),
+        errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
+      );
+    });
+    it("throws an error if the source is dashboard, but user is not connected", async () => {
+      const sentAt = new Date().toISOString();
+      const payload: AddExchangeToDiscussionInput = {
+        source: "dashboard",
+        messageInputs: [
+          {
+            message: "Hello",
+            discussionId: "11111111-e89b-12d3-a456-426614174000",
+            recipientRole: "potentialBeneficiary",
+            attachments: [],
+            subject: "Fake subject",
+            sentAt,
+          },
+        ],
+      };
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(payload),
+        errors.user.unauthorized(),
       );
     });
   });
 });
 
-const createBrevoResponse = (
+const createInboundParsingResponse = (
   toAddresses: string[],
   subject?: string,
 ): BrevoInboundBody => ({
@@ -267,7 +436,7 @@ const createBrevoResponse = (
     ],
     ReplyTo: null,
     SentAtDate: "Wed, 28 Jun 2023 10:06:52 +0200",
-    Subject: subject ?? "Fwd: Hey !",
+    Subject: subject ?? `Sending message to ${address}`,
     Attachments: [
       {
         Name: "IMG_20230617_151239.jpg",

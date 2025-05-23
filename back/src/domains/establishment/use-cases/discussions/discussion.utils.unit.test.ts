@@ -29,7 +29,10 @@ describe("getDiscussionParamsFromEmail", () => {
       Attachments: [],
       SentAtDate: "2021-01-01",
     };
-    const result = getDiscussionParamsFromEmail(email, "reply.domain.com");
+    const result = getDiscussionParamsFromEmail(
+      email.To[0].Address,
+      "reply.domain.com",
+    );
     expectToEqual(result, {
       discussionId: "discussion-id",
       firstname: "john",

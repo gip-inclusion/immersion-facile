@@ -8,6 +8,7 @@ import {
 import {
   discussionReadSchema,
   discussionRejectedSchema,
+  exchangeFromDashboardSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -102,6 +103,17 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
+    },
+  }),
+  sendMessageToDiscussion: defineRoute({
+    method: "post",
+    url: "/discussion-for-establishment/:discussionId/send-message",
+    ...withAuthorizationHeaders,
+    requestBodySchema: exchangeFromDashboardSchema,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
     },
   }),
 });
