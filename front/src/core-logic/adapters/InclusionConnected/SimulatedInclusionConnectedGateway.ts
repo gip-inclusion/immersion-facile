@@ -8,7 +8,10 @@ import {
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type {
+  FetchDiscussionRequestedPayload,
+  SendMessageRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 const simulatedUserConnected: InclusionConnectedUser = {
@@ -78,6 +81,10 @@ export class SimulatedInclusionConnectedGateway
       discussionId: string;
     } & DiscussionRejected,
   ): Observable<void> {
+    return of(undefined).pipe(delay(this.simulatedLatency));
+  }
+
+  public sendMessage$(_payload: SendMessageRequestedPayload): Observable<void> {
     return of(undefined).pipe(delay(this.simulatedLatency));
   }
 }

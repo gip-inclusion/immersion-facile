@@ -101,5 +101,27 @@ export const createInclusionConnectedAllowedRouter = (
       }),
   );
 
+  inclusionConnectedSharedRoutes.sendMessageToDiscussion(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
+        const discussionId = req.params.discussionId;
+        return deps.useCases.addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                ...req.body,
+                discussionId,
+                attachments: [],
+                recipientRole: "potentialBeneficiary",
+              },
+            ],
+          },
+          req.payloads.currentUser,
+        );
+      }),
+  );
   return inclusionConnectedRouter;
 };

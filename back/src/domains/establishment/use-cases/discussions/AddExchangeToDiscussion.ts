@@ -1,82 +1,152 @@
-import { renderContent } from "html-templates/src/components/email";
 import {
-  type BrevoEmailItem,
-  type BrevoInboundBody,
-  brevoInboundBodySchema,
+  type Attachment,
+  type DateString,
+  type DiscussionId,
+  type ExchangeRole,
+  type InclusionConnectedUser,
+  attachementSchema,
+  discussionIdSchema,
   errors,
-  immersionFacileContactEmail,
+  exchangeRoleSchema,
+  zStringMinLength1,
 } from "shared";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getDiscussionParamsFromEmail } from "./discussion.utils";
+
+type MessageInputCommonFields = {
+  message: string;
+  discussionId: DiscussionId;
+  sentAt: DateString;
+  subject: string;
+};
+
+type MessageInputFromDashboard = MessageInputCommonFields & {
+  recipientRole: Extract<ExchangeRole, "potentialBeneficiary">;
+  attachments: never[];
+};
+
+type FullMessageInput = MessageInputCommonFields & {
+  recipientRole: ExchangeRole;
+  attachments: Attachment[];
+};
+
+type InputSource = (typeof inputSources)[number];
+
+export type MessageInput = MessageInputFromDashboard | FullMessageInput;
+
+export type AddExchangeToDiscussionInput = {
+  source: InputSource;
+  messageInputs: MessageInput[];
+};
+
+const inputSources = ["dashboard", "inbound-parsing"] as const;
+
+const messageInputCommonFieldsSchema = z.object({
+  message: zStringMinLength1,
+  discussionId: discussionIdSchema,
+  sentAt: z.string().datetime(),
+  subject: z.string(),
+});
+
+const messageInputFromDashboardSchema = messageInputCommonFieldsSchema.extend({
+  recipientRole: z.literal("potentialBeneficiary"),
+  attachments: z.array(z.never()),
+});
+
+const inputFromDashboardSchema = z.object({
+  source: z.literal("dashboard"),
+  messageInputs: z.array(messageInputFromDashboardSchema),
+});
+
+const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
+  recipientRole: exchangeRoleSchema,
+  attachments: z.array(attachementSchema),
+});
+
+const inputFromInboundParsingSchema = z.object({
+  source: z.literal("inbound-parsing"),
+  messageInputs: z.array(fullMessageInputSchema),
+});
+
+export const messageInputSchema = z.discriminatedUnion("source", [
+  inputFromInboundParsingSchema,
+  inputFromDashboardSchema,
+]);
 
 const defaultSubject = "Sans objet";
 
-export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBody> {
-  protected inputSchema = brevoInboundBodySchema;
-
-  readonly #replyDomain: string;
+export class AddExchangeToDiscussion extends TransactionalUseCase<
+  AddExchangeToDiscussionInput,
+  void,
+  InclusionConnectedUser | null
+> {
+  protected inputSchema = messageInputSchema;
 
   readonly #createNewEvent: CreateNewEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
-    domain: string,
   ) {
     super(uowPerformer);
-    this.#replyDomain = `reply.${domain}`;
-
     this.#createNewEvent = createNewEvent;
   }
 
   protected async _execute(
-    brevoResponse: BrevoInboundBody,
+    input: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
+    inclusionConnectedUser: InclusionConnectedUser | null,
   ): Promise<void> {
+    if (input.source === "dashboard" && !inclusionConnectedUser) {
+      throw errors.user.unauthorized();
+    }
     await Promise.all(
-      brevoResponse.items.map((item) => this.#processBrevoItem(uow, item)),
+      input.messageInputs.map((messageInput) => {
+        return this.#processSendMessage(uow, {
+          ...messageInput,
+          recipientRole: messageInput.recipientRole,
+          subject: fallbackToDefaultSubject(messageInput.subject),
+        });
+      }),
     );
   }
 
-  async #processBrevoItem(
+  async #processSendMessage(
     uow: UnitOfWork,
-    item: BrevoEmailItem,
+    params: FullMessageInput,
   ): Promise<void> {
-    const { discussionId, recipientKind } = getDiscussionParamsFromEmail(
-      item,
-      this.#replyDomain,
-    );
+    const {
+      discussionId,
+      message,
+      recipientRole,
+      subject,
+      attachments,
+      sentAt,
+    } = params;
+
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
-
     const sender =
-      recipientKind === "establishment"
+      recipientRole === "establishment"
         ? "potentialBeneficiary"
         : "establishment";
-
     await uow.discussionRepository.update({
       ...discussion,
       exchanges: [
         ...discussion.exchanges,
         {
-          subject: item.Subject || defaultSubject,
-          message: processEmailMessage(item),
-          sentAt: new Date(item.SentAtDate).toISOString(),
-          recipient: recipientKind,
+          subject,
+          message,
+          sentAt,
+          recipient: recipientRole,
           sender,
-          attachments: item.Attachments
-            ? item.Attachments.map(({ Name, DownloadToken }) => ({
-                name: Name,
-                link: DownloadToken,
-              }))
-            : [],
+          attachments,
         },
       ],
     });
-
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "ExchangeAddedToDiscussion",
@@ -86,23 +156,5 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBo
   }
 }
 
-const cleanContactEmailFromMessage = (message: string) =>
-  message
-    .replaceAll(`<${immersionFacileContactEmail}>`, "")
-    .replaceAll(
-      `&lt;<a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>&gt;`,
-      "",
-    )
-    .replaceAll(
-      `&lt;<a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>&gt;`,
-      "",
-    );
-
-const processEmailMessage = (item: BrevoEmailItem) => {
-  const emailContent =
-    item.RawHtmlBody ||
-    (item.RawTextBody &&
-      renderContent(item.RawTextBody, { wrapInTable: false })) ||
-    "Pas de contenu";
-  return cleanContactEmailFromMessage(emailContent);
-};
+const fallbackToDefaultSubject = (subject: string) =>
+  subject === "" ? defaultSubject : subject;

@@ -3,6 +3,7 @@ import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import {
+  type BrevoEmailItem,
   ForbiddenError,
   type TallyForm,
   errors,
@@ -13,6 +14,11 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
+import {
+  getDiscussionParamsFromEmail,
+  getSubjectFromEmail,
+  processInboundParsingEmailMessage,
+} from "../../../../domains/establishment/use-cases/discussions/discussion.utils";
 import { createLogger } from "../../../../utils/logger";
 import { createOpenApiSpecV2 } from "../apiKeyAuthRouter/createOpenApiV2";
 
@@ -81,9 +87,29 @@ export const createTechnicalRouter = (
       },
     }),
     async (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.addExchangeToDiscussion.execute(req.body),
-      ),
+      sendHttpResponse(req, res, () => {
+        return deps.useCases.addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: req.body.items.map((emailItem: BrevoEmailItem) => {
+            const { discussionId, recipientKind } =
+              getDiscussionParamsFromEmail(
+                emailItem.To[0].Address,
+                `reply.${deps.config.immersionFacileDomain}`,
+              );
+            return {
+              message: processInboundParsingEmailMessage(emailItem),
+              discussionId,
+              recipientRole: recipientKind,
+              sentAt: new Date(emailItem.SentAtDate).toISOString(),
+              attachments: (emailItem.Attachments || []).map((attachment) => ({
+                name: attachment.Name,
+                link: attachment.DownloadToken,
+              })),
+              subject: getSubjectFromEmail(emailItem),
+            };
+          }),
+        });
+      }),
   );
 
   technicalSharedRouter.openApiSpec(async (req, res) =>

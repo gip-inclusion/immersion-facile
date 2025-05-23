@@ -25,7 +25,7 @@ import {
   buildTestApp,
 } from "../../../../utils/buildTestApp";
 
-const discussionId = "my-discussion-id";
+const discussionId = "11111111-1111-4111-1111-111111111111";
 const domain = "immersion-facile.beta.gouv.fr";
 const tallySecret = "tally-secret";
 
@@ -161,13 +161,60 @@ describe("technical router", () => {
       ];
 
       const response = await httpClient.inboundEmailParsing({
-        body: correctBrevoResponse,
+        body: correctBrevoResponse(),
         headers: { "X-Forwarded-For": appConfig.inboundEmailAllowedIps[0] },
       });
 
       expectHttpResponseToEqual(response, {
         status: 200,
         body: "",
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.inboundEmailParsing,
+    )} 400 - when email has a wrong structure`, async () => {
+      const incorrectDiscussionEmail = "john.doe@invalid-email.com";
+      const brevoResponseWithInvalidEmail = correctBrevoResponse(
+        incorrectDiscussionEmail,
+      );
+      const response = await httpClient.inboundEmailParsing({
+        body: brevoResponseWithInvalidEmail,
+        headers: { "X-Forwarded-For": appConfig.inboundEmailAllowedIps[0] },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          message: errors.discussion.badEmailFormat({
+            email: incorrectDiscussionEmail,
+          }).message,
+          status: 400,
+        },
+        status: 400,
+      });
+    });
+
+    it(`${displayRouteName(
+      technicalRoutes.inboundEmailParsing,
+    )} 400 - when email has a wrong recipient kind`, async () => {
+      const incorrectRecipientEmail =
+        "firstname1_lastname1__11111111-1111-4111-1111-111111111111_wrong@reply.immersion-facile.beta.gouv.fr";
+      const brevoResponseWithInvalidEmail = correctBrevoResponse(
+        incorrectRecipientEmail,
+      );
+      const response = await httpClient.inboundEmailParsing({
+        body: brevoResponseWithInvalidEmail,
+        headers: { "X-Forwarded-For": appConfig.inboundEmailAllowedIps[0] },
+      });
+
+      expectHttpResponseToEqual(response, {
+        body: {
+          message: errors.discussion.badRecipientKindFormat({
+            kind: "wrong",
+          }).message,
+          status: 400,
+        },
+        status: 400,
       });
     });
 
@@ -195,7 +242,7 @@ describe("technical router", () => {
     )} 403 - when IP is not allowed`, async () => {
       const unallowedIp = "245.10.12.54";
       const response = await httpClient.inboundEmailParsing({
-        body: correctBrevoResponse,
+        body: correctBrevoResponse(),
         headers: { "X-Forwarded-For": unallowedIp },
       });
 
@@ -365,7 +412,7 @@ describe("technical router", () => {
   });
 });
 
-const correctBrevoResponse: BrevoInboundBody = {
+const correctBrevoResponse = (recipientEmail?: string): BrevoInboundBody => ({
   items: [
     {
       Uuid: ["8d79f2b1-20ae-4939-8d0b-d2517331a9e5"],
@@ -380,7 +427,9 @@ const correctBrevoResponse: BrevoInboundBody = {
       To: [
         {
           Name: null,
-          Address: `firstname1_lastname1__${discussionId}_b@reply.${domain}`,
+          Address:
+            recipientEmail ??
+            `firstname1_lastname1__${discussionId}_b@reply.${domain}`,
         },
       ],
       Cc: [
@@ -412,4 +461,4 @@ const correctBrevoResponse: BrevoInboundBody = {
         "---------- Forwarded message ---------\r\nDe : Enguerran Weiss <enguerranweiss@gmail.com>\r\nDate: mer. 28 juin 2023 à 09:57\r\nSubject: Fwd: Hey !\r\nTo: <tristan@reply-dev.immersion-facile.beta.gouv.fr>\r\n\n\n\n\n---------- Forwarded message ---------\r\nDe : Enguerran Weiss <enguerranweiss@gmail.com>\r\nDate: mer. 28 juin 2023 à 09:55\r\nSubject: Hey !\r\nTo: <roger@reply-dev.immersion-facile.gouv.fr>\r\n\n\n\nComment ça va ?\r\n\n[image: IMG_20230617_151239.jpg]\r\n\n\nA + !\r\n\n-- \r\n\n+33(0)6 10 13 76 84\r\nhello@enguerranweiss.fr\r\nhttp://www.enguerranweiss.fr\r\n\n\n-- \r\n\n+33(0)6 10 13 76 84\r\nhello@enguerranweiss.fr\r\nhttp://www.enguerranweiss.fr\r\n\n\n-- \r\n\n+33(0)6 10 13 76 84\r\nhello@enguerranweiss.fr\r\nhttp://www.enguerranweiss.fr\r\n",
     },
   ],
-};
+});

@@ -212,6 +212,33 @@ describe("Discussion slice", () => {
     });
   });
 
+  describe("send a new exchange on discussion", () => {
+    it("send message requested", () => {
+      expectDiscussionSelector(defaultStartingDiscussionState);
+
+      store.dispatch(
+        discussionSlice.actions.sendMessageRequested({
+          jwt,
+          discussionId: discussion.id,
+          message: "Hello",
+          feedbackTopic: "establishment-dashboard-discussion-send-message",
+        }),
+      );
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: true,
+      });
+
+      dependencies.inclusionConnectedGateway.sendMessageResponse$.next();
+
+      expectDiscussionSelector({
+        ...defaultStartingDiscussionState,
+        isLoading: false,
+      });
+    });
+  });
+
   const feedGatewayWithDiscussionOrError = (
     discussionOrError?: DiscussionReadDto | Error,
   ) => {
