@@ -57,3 +57,12 @@ export const conventionPresentationSchema: z.Schema<ConventionPresentation> =
         .optional(),
     }),
   );
+
+export type WithStatusJustification = {
+  statusJustification: string;
+};
+
+export const statusJustificationSchema: z.Schema<WithStatusJustification> =
+  z.object({
+    statusJustification: zStringMinLength1,
+  });

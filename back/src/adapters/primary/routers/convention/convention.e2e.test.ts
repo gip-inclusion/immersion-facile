@@ -412,12 +412,20 @@ describe("convention e2e", () => {
 
   describe(`${displayRouteName(
     conventionMagicLinkRoutes.updateConvention,
-  )} updates a draft convention`, () => {
+  )} updates convention`, () => {
     beforeEach(() => {
       inMemoryUow.conventionRepository.setConventions([convention]);
     });
 
     it("200 - Success with JWT ConventionJwt", async () => {
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(
+          AgencyDtoBuilder.create(convention.agencyId)
+            .withName("TEST-name")
+            .withSignature("TEST-signature")
+            .build(),
+        ),
+      ];
       const updatedConvention: ConventionDto = new ConventionDtoBuilder(
         convention,
       )
@@ -873,7 +881,7 @@ describe("convention e2e", () => {
       .withDateStart(new Date("2023-02-15").toISOString())
       .withDateEnd(new Date("2023-02-20").toISOString())
       .withDateSubmission(new Date("2023-02-10").toISOString())
-      .withStatus("DRAFT")
+      .withStatus("PARTIALLY_SIGNED")
       .build();
 
     beforeEach(async () => {
@@ -933,7 +941,7 @@ describe("convention e2e", () => {
         headers: { authorization: jwt },
         queryParams: {
           dateStartFrom: "2023-01-01",
-          statuses: ["ACCEPTED_BY_VALIDATOR", "DRAFT"],
+          statuses: ["ACCEPTED_BY_VALIDATOR", "PARTIALLY_SIGNED"],
           sortBy: "dateStart",
           page: 1,
           perPage: 10,
@@ -958,7 +966,7 @@ describe("convention e2e", () => {
           agencyUserId: validator.id,
           filters: {
             dateStart: { from: "2023-01-01" },
-            statuses: ["ACCEPTED_BY_VALIDATOR", "DRAFT"],
+            statuses: ["ACCEPTED_BY_VALIDATOR", "PARTIALLY_SIGNED"],
           },
           pagination: {
             page: 1,

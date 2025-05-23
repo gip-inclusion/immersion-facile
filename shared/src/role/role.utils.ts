@@ -7,8 +7,10 @@ import {
 } from "..";
 import {
   type AgencyModifierRole,
+  type ModifierRole,
   type Role,
   type SignatoryRole,
+  allModifierRoles,
   allowedRolesToAccessAssessment,
   allowedRolesToCreateAssessment,
 } from "./role.dto";
@@ -58,4 +60,16 @@ export const hasAllowedRoleOnAssessment = (
     ((mode === "CreateAssessment" && hasAllowedRoleToCreateAssessment) ||
       (mode === "GetAssessment" && hasAllowedRoleToAccessAssessment))
   );
+};
+
+export const isModifierRole = (role: Role): role is ModifierRole =>
+  allModifierRoles.includes(role as ModifierRole);
+
+export const hasAllowedRolesToEditConvention = (
+  userRolesOnConvention: Role[],
+): boolean => {
+  const hasAllowedRoleToEditConvention =
+    intersection(allModifierRoles, userRolesOnConvention).length > 0;
+
+  return userRolesOnConvention.length > 0 && hasAllowedRoleToEditConvention;
 };

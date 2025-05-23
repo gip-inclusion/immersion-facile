@@ -19,7 +19,6 @@ import {
   type Signatories,
   type SignatoryRole,
   type UserWithRights,
-  type WithConventionId,
   agencyModifierRoles,
   allSignatoryRoles,
   errors,
@@ -30,6 +29,7 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
+import type { DomainTopic } from "../../core/events/events";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
@@ -388,37 +388,29 @@ const isAllowedToSign = (role: Role): role is SignatoryRole =>
 
 export const signConvention = async ({
   uow,
-  conventionId,
+  convention,
   jwtPayload,
   now,
-}: WithConventionId & {
+}: {
   uow: UnitOfWork;
+  convention: ConventionReadDto;
   jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload;
   now: DateTimeIsoString;
 }) => {
-  const initialConventionRead =
-    await uow.conventionQueries.getConventionById(conventionId);
-  if (!initialConventionRead)
-    throw errors.convention.notFound({ conventionId });
-
   const { role, userWithRights } = await getRoleAndIcUser(
     jwtPayload,
     uow,
-    initialConventionRead,
+    convention,
   );
 
   if (!isAllowedToSign(role))
     throw errors.convention.roleNotAllowedToSign({ role });
 
-  const signedConvention = signConventionDtoWithRole(
-    initialConventionRead,
-    role,
-    now,
-  );
+  const signedConvention = signConventionDtoWithRole(convention, role, now);
   throwIfTransitionNotAllowed({
     roles: [role],
     targetStatus: signedConvention.status,
-    conventionRead: initialConventionRead,
+    conventionRead: convention,
     hasAssessment: false,
   });
   const signedId = await uow.conventionRepository.update(signedConvention);
@@ -430,4 +422,48 @@ export const signConvention = async ({
     userWithRights,
     signedConvention,
   };
+};
+
+export const domainTopicByTargetStatusMap: Partial<
+  Record<ConventionStatus, DomainTopic>
+> = {
+  PARTIALLY_SIGNED: "ConventionPartiallySigned",
+  IN_REVIEW: "ConventionFullySigned",
+};
+
+export const extractUserRolesOnConventionFromJwtPayload = async (
+  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+  uow: UnitOfWork,
+  initialConvention: ConventionDto,
+): Promise<Role[]> => {
+  const roles: Role[] = [];
+  if ("role" in jwtPayload) {
+    if (jwtPayload.applicationId !== initialConvention.id)
+      throw errors.convention.forbiddenMissingRights({
+        conventionId: initialConvention.id,
+      });
+    roles.push(jwtPayload.role);
+  }
+
+  if ("userId" in jwtPayload) {
+    const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+    if (userWithRights.isBackofficeAdmin) roles.push("back-office");
+
+    if (
+      userWithRights.email ===
+      initialConvention.signatories.establishmentRepresentative.email
+    )
+      roles.push(
+        initialConvention.signatories.establishmentRepresentative.role,
+      );
+
+    const userRightOnAgency = userWithRights.agencyRights.find(
+      (agencyRight) => agencyRight.agency.id === initialConvention.agencyId,
+    );
+
+    if (userRightOnAgency) roles.push(...userRightOnAgency.roles);
+  }
+
+  return roles;
 };

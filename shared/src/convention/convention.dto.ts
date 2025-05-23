@@ -13,7 +13,6 @@ import type {
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import {
-  type ModifierRole,
   type Role,
   type SignatoryRole,
   allSignatoryRoles,
@@ -74,21 +73,18 @@ export const doesStatusNeedsValidators = (
   );
 };
 
-export const conventionStatusesWithJustificationWithoutModifierRole = [
-  "REJECTED",
-  "CANCELLED",
-  "DEPRECATED",
-] as const;
-
-export const conventionStatusesWithJustificationWithModifierRole = [
-  "DRAFT",
+export const conventionStatusesAllowedForModification: ConventionStatus[] = [
+  "IN_REVIEW",
+  "PARTIALLY_SIGNED",
+  "READY_TO_SIGN",
 ] as const;
 
 export type ConventionStatusWithJustification =
   (typeof conventionStatusesWithJustification)[number];
 export const conventionStatusesWithJustification = [
-  ...conventionStatusesWithJustificationWithoutModifierRole,
-  ...conventionStatusesWithJustificationWithModifierRole,
+  "REJECTED",
+  "CANCELLED",
+  "DEPRECATED",
 ] as const;
 export type ConventionStatusWithValidator =
   (typeof conventionStatusesWithValidator)[number];
@@ -167,6 +163,7 @@ export type ConventionCommon = {
   dateEnd: DateString;
   dateValidation?: DateString; // undefined until the convention is validated
   dateApproval?: DateString; // undefined until the convention is accepted by counsellor
+  updatedAt?: DateString;
   siret: SiretDto;
   businessName: string;
   schedule: ScheduleDto;
@@ -352,22 +349,11 @@ export type UpdateConventionStatusWithoutJustification = {
   conventionId: ConventionId;
 };
 
-export type UpdateConventionStatusWithJustificationWithoutModifierRole = {
-  status: Exclude<ConventionStatusWithJustification, "DRAFT">;
+export type UpdateConventionStatusWithJustification = {
+  status: ConventionStatusWithJustification;
   conventionId: ConventionId;
   statusJustification: string;
 };
-
-export type UpdateConventionStatusWithJustificationWithModifierRole = {
-  status: Extract<ConventionStatusWithJustification, "DRAFT">;
-  conventionId: ConventionId;
-  statusJustification: string;
-  modifierRole: ModifierRole;
-};
-
-export type UpdateConventionStatusWithJustification =
-  | UpdateConventionStatusWithJustificationWithoutModifierRole
-  | UpdateConventionStatusWithJustificationWithModifierRole;
 
 export type UpdateConventionStatusRequestDto =
   | UpdateConventionStatusWithoutJustification

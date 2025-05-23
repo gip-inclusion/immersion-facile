@@ -30,6 +30,7 @@ type SignButtonProps = {
   onConfirmClick: MouseEventHandler<HTMLButtonElement>;
   submitButtonId: string;
   className?: string;
+  onOpenSignModal?: () => Promise<boolean>;
 };
 
 export const SignButton = ({
@@ -41,6 +42,7 @@ export const SignButton = ({
   onConfirmClick,
   submitButtonId,
   className,
+  onOpenSignModal,
 }: SignButtonProps) => {
   const { signatoryFullName, signatoryFunction } =
     getSignatoryProcessedData(signatory);
@@ -56,9 +58,15 @@ export const SignButton = ({
           id,
         }}
         disabled={disabled}
-        onClick={() => {
+        onClick={async () => {
           if (onCloseSignModalWithoutSignature) {
             onCloseSignModalWithoutSignature(false);
+          }
+          if (onOpenSignModal) {
+            const shouldOpen = await onOpenSignModal();
+            if (!shouldOpen) {
+              return;
+            }
           }
           openSignModal();
         }}

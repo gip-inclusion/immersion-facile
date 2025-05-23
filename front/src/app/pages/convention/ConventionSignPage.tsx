@@ -16,6 +16,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";
@@ -91,6 +92,8 @@ const ConventionSignPageContent = ({
     convention ? convention.internshipKind : "immersion",
   );
 
+  useScrollToTop(true);
+
   return (
     <>
       {match({
@@ -155,17 +158,6 @@ const ConventionSignPageContent = ({
                       }
                     />
                   )}
-                  {convention.status === "DRAFT" && (
-                    <Alert
-                      severity="info"
-                      title={t.sign.needsModification.title}
-                      description={
-                        <p className={fr.cx("fr-mt-1w")}>
-                          {t.sign.needsModification.detail}
-                        </p>
-                      }
-                    />
-                  )}
                   {convention.status === "DEPRECATED" && (
                     <Alert
                       severity="error"
@@ -185,8 +177,7 @@ const ConventionSignPageContent = ({
                       }
                     />
                   )}
-                  {convention.status !== "DRAFT" &&
-                    convention.status !== "REJECTED" &&
+                  {convention.status !== "REJECTED" &&
                     convention.status !== "DEPRECATED" && (
                       <ConventionSignForm convention={convention} jwt={jwt} />
                     )}

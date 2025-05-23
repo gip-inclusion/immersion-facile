@@ -28,7 +28,7 @@ export const goToAdminTab = async (page: Page, tabName: AdminTabRouteName) => {
   );
 };
 
-export const openEmailInAdmin = async (
+const openEmailInAdmin = async (
   page: Page,
   emailType: EmailType,
   elementIndex = 0,
@@ -43,17 +43,45 @@ export const openEmailInAdmin = async (
   return emailSection;
 };
 
-export const getMagicLinkInEmailWrapper = (
-  emailWrapper: Locator,
+export const getMagicLinkLocatorFromEmail = async ({
+  page,
+  emailType,
+  elementIndex = 0,
   label = "magicLink",
-) =>
-  emailWrapper
+}: {
+  page: Page;
+  emailType: EmailType;
+  elementIndex?: number;
+  label?: string;
+}): Promise<Locator> => {
+  const emailWrapper = await openEmailInAdmin(page, emailType, elementIndex);
+  return emailWrapper
     .locator("li")
     .filter({
       hasText: label,
     })
-    .getByRole("link")
-    .getAttribute("href");
+    .getByRole("link");
+};
+
+export const getMagicLinkFromEmail = async ({
+  page,
+  emailType,
+  elementIndex = 0,
+  label = "magicLink",
+}: {
+  page: Page;
+  emailType: EmailType;
+  elementIndex?: number;
+  label?: string;
+}): Promise<string | null> => {
+  const locator = await getMagicLinkLocatorFromEmail({
+    page,
+    emailType,
+    elementIndex,
+    label,
+  });
+  return locator.getAttribute("href");
+};
 
 export const getTabIndexByTabName = (
   tabList: readonly AdminTabRouteName[] | readonly EstablishmentDashboardTab[],

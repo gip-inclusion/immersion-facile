@@ -813,7 +813,6 @@ describe("conventionDtoSchema", () => {
     describe("status that are available without signatures", () => {
       const [allowWithoutSignature, failingWithoutSignature] =
         splitCasesBetweenPassingAndFailing(conventionStatuses, [
-          "DRAFT",
           "READY_TO_SIGN",
           "PARTIALLY_SIGNED",
           "REJECTED",

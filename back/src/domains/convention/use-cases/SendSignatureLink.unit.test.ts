@@ -169,23 +169,23 @@ describe("Send signature link", () => {
     ] as const)(
       "throws bad request if convention status %s does not allow send signature link",
       async (conventionStatus) => {
-        const draftConvention = new ConventionDtoBuilder()
+        const convention = new ConventionDtoBuilder()
           .withId(conventionId)
           .withStatus(conventionStatus)
           .build();
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.conventionRepository.setConventions([draftConvention]);
+        uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
           usecase.execute(
             {
-              conventionId: draftConvention.id,
+              conventionId: convention.id,
               role: "beneficiary-representative",
             },
             validatorJwtPayload,
           ),
           errors.convention.sendSignatureLinkNotAllowedForStatus({
-            status: draftConvention.status,
+            status: convention.status,
           }),
         );
       },

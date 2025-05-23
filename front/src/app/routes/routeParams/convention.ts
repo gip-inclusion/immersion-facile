@@ -53,7 +53,7 @@ export const getConventionInitialValuesFromUrl = ({
   const initialFormWithStoredAndUrlParams: ConventionPresentation = {
     ...conventionPresentationFromParams(params),
     id: uuidV4(),
-    status: "DRAFT",
+    status: "READY_TO_SIGN",
     dateSubmission: toDateUTCString(new Date()),
     internshipKind,
   };

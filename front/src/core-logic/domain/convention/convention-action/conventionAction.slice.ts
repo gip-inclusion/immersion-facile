@@ -67,13 +67,6 @@ export const conventionActionSlice = createSlice({
     cancelConventionFailed:
       setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
-    editConventionRequested:
-      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
-    editConventionSucceeded:
-      setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
-    editConventionFailed:
-      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
-
     deprecateConventionRequested:
       setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(true),
     deprecateConventionSucceeded:

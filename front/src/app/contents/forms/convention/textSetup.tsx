@@ -112,20 +112,6 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
           </p>
         </>
       ),
-    conventionModificationNotification: (
-      statusJustification: string | undefined,
-    ) => (
-      <>
-        <p>
-          Une demande de modification sur la convention vous a été demandée pour
-          la raison suivante :
-        </p>
-        <p>
-          <strong>"{statusJustification}"</strong>
-        </p>
-        <p>Modifiez le formulaire et validez-le.</p>
-      </>
-    ),
   },
 
   agencySection: {
@@ -211,8 +197,7 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
       : "Cette demande de stage n'est plus modifiable.",
   verification: {
     rejectConvention: "Refuser l'immersion",
-    modifyConvention: "Demander une modification",
-    modifyConventionTitle: "Demander une modification",
+    modifyConvention: "Modifier la convention",
     modifyConventionAgency: "Modifier la structure d'accompagnement",
     modifyConventionAgencyTitle:
       "Rediriger vers la bonne structure d'accompagnement",
