@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  type ExchangeFromDashboard,
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
   type User,
@@ -685,5 +686,53 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       // TODO : when we store all partner responses, check that they have been called
     });
+  });
+  describe(`${displayRouteName(
+    inclusionConnectedAllowedRoutes.sendMessageToDiscussion,
+  )}`, () => {
+    it("200 - saves the exchange to a discussion", async () => {
+      const user = new InclusionConnectedUserBuilder().buildUser();
+      const payload: ExchangeFromDashboard = {
+        message: "My fake message",
+        sentAt: new Date().toISOString(),
+        subject: "My fake subject",
+      };
+      const discussion = new DiscussionBuilder()
+        .withEstablishmentContact({
+          email: user.email,
+        })
+        .build();
+      const existingToken = generateInclusionConnectJwt({
+        userId: user.id,
+        version: currentJwtVersions.inclusion,
+      });
+      inMemoryUow.discussionRepository.discussions = [discussion];
+      inMemoryUow.userRepository.users = [user];
+
+      const response = await httpClient.sendMessageToDiscussion({
+        headers: { authorization: existingToken },
+        urlParams: { discussionId: discussion.id },
+        body: payload,
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+      expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
+        new DiscussionBuilder(discussion)
+          .withExchanges([
+            ...discussion.exchanges,
+            {
+              ...payload,
+              recipient: "potentialBeneficiary",
+              sender: "establishment",
+              attachments: [],
+            },
+          ])
+          .build(),
+      ]);
+    });
+    it;
   });
 });

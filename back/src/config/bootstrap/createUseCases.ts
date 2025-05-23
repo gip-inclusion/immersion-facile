@@ -214,7 +214,6 @@ export const createUseCases = (
       addExchangeToDiscussion: new AddExchangeToDiscussion(
         uowPerformer,
         createNewEvent,
-        config.immersionFacileDomain,
       ),
       sendExchangeToRecipient: new SendExchangeToRecipient(
         uowPerformer,

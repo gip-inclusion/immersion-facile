@@ -789,6 +789,8 @@ export const errors = {
       new BadRequestError(
         `Pas de label trouvé pour le code appélation métier '${appellationCode}'.`,
       ),
+    unsupportedSource: ({ source }: { source: string }) =>
+      new BadRequestError(`Le source '${source}' n'est pas supporté.`),
     rejectForbidden: ({
       discussionId,
       userId,

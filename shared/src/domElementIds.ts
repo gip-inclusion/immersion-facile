@@ -827,6 +827,10 @@ export const domElementIds = {
         "im-manage-establishment__reject-application-cancel-button",
       statusBadge: "im-manage-establishment__discussion-status-badge",
       copyEmailButton: "im-manage-establishment__discussion-copy-email-button",
+      sendMessageInput:
+        "im-manage-establishment__discussion-send-message-input",
+      sendMessageSubmitButton:
+        "im-manage-establishment__discussion-send-message-submit-button",
     },
     manageConventionForm: {
       submitButton: "im-manage-establishment__manage-convention-submit-button",

@@ -7,13 +7,19 @@ import type {
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type {
+  FetchDiscussionRequestedPayload,
+  SendMessageRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
 export class TestInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
   public discussion$ = new Subject<DiscussionReadDto | undefined>();
+
+  public sendMessageResponse$ = new Subject<void>();
+
   // for test purpose
   public currentUser$ = new Subject<InclusionConnectedUser>();
 
@@ -37,6 +43,10 @@ export class TestInclusionConnectedGateway
     _payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined> {
     return this.discussion$;
+  }
+
+  public sendMessage$(_payload: SendMessageRequestedPayload): Observable<void> {
+    return this.sendMessageResponse$;
   }
 
   public markPartnersErroredConventionAsHandled$(
