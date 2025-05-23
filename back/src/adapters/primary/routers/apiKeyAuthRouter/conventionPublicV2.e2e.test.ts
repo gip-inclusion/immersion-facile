@@ -230,7 +230,7 @@ describe("Convention routes", () => {
 
       const { body, status } = await request
         .get(publicApiV2ConventionRoutes.getConventions.url)
-        .query({ withStatuses: ["DRAFT"] })
+        .query({ withStatuses: ["READY_TO_SIGN"] })
         .set("Authorization", conventionReadConsumerWithAgencyIdsScopeToken);
 
       expectToEqual(
