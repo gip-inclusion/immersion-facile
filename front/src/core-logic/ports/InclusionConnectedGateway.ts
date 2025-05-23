@@ -7,6 +7,7 @@ import type {
   DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  SendMessageToDiscussionFromDashboardRequestPayload,
   WithIdToken,
 } from "shared";
 import type { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
@@ -24,6 +25,9 @@ export interface InclusionConnectedGateway {
   getDiscussionById$(
     payload: FetchDiscussionRequestedPayload,
   ): Observable<DiscussionReadDto | undefined>;
+  sendMessage$(
+    payload: SendMessageToDiscussionFromDashboardRequestPayload,
+  ): Observable<void>;
   getLogoutUrl$(
     payload: WithIdToken & { authToken: string },
   ): Observable<AbsoluteUrl>;

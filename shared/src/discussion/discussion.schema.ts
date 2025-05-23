@@ -29,6 +29,7 @@ import type {
   ExchangeRole,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
+  SendMessageToDiscussionFromDashboardRequestPayload,
   WithDiscussionRejection,
 } from "./discussion.dto";
 
@@ -79,9 +80,9 @@ export const makeExchangeEmailSchema = (
         }),
     );
 
-const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
+export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
-const attachementSchema: z.Schema<Attachment> = z.object({
+export const attachementSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
   link: z.string(),
 });
@@ -112,6 +113,20 @@ export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
     status: z.literal("REJECTED"),
   })
   .and(discussionRejectionSchema);
+
+export const withMessageSchema: z.Schema<{
+  message: string;
+}> = z.object({
+  message: zStringMinLength1,
+});
+
+export const sendMessageToDiscussionSchema: z.Schema<SendMessageToDiscussionFromDashboardRequestPayload> =
+  z
+    .object({
+      discussionId: discussionIdSchema,
+      jwt: z.string(),
+    })
+    .and(withMessageSchema);
 
 const discussionNotRejectedSchema: z.Schema<
   DiscussionAccepted | DiscussionPending

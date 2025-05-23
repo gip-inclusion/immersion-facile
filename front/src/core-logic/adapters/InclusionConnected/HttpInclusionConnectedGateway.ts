@@ -7,6 +7,7 @@ import type {
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  SendMessageToDiscussionFromDashboardRequestPayload,
   WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -111,6 +112,26 @@ export class HttpInclusionConnectedGateway
           match(response)
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public sendMessage$(
+    payload: SendMessageToDiscussionFromDashboardRequestPayload,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .sendMessageToDiscussion({
+          headers: { authorization: payload.jwt },
+          urlParams: { discussionId: payload.discussionId },
+          body: { message: payload.message },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

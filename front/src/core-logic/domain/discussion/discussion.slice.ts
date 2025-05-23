@@ -26,6 +26,12 @@ export type DiscussionState = {
   fetchError: string | null;
 };
 
+export type SendMessageRequestedPayload = {
+  jwt: ConnectedUserJwt;
+  discussionId: DiscussionId;
+  message: string;
+};
+
 const initialDiscussionState: DiscussionState = {
   discussion: null,
   isLoading: false,
@@ -71,6 +77,21 @@ export const discussionSlice = createSlice({
       state.isLoading = false;
     },
     updateDiscussionStatusFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    sendMessageRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<SendMessageRequestedPayload>,
+    ) => {
+      state.isLoading = true;
+    },
+    sendMessageSucceeded: (state, _action: PayloadActionWithFeedbackTopic) => {
+      state.isLoading = false;
+    },
+    sendMessageFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {
