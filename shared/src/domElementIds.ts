@@ -255,8 +255,7 @@ export const domElementIds = {
     submitFormButtonMobile: "im-convention-form__submit-form-button--mobile",
     confirmSubmitFormButton: "im-convention-form__confirm-submit-form-button",
     summaryEditButton: "im-convention-form__summary-edit-button",
-    statusJustificationTextarea:
-      "im-convention-form__status-justification-textarea",
+    statusJustificationInput: "im-convention-form__status-justification-input",
     conventionSection: {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",

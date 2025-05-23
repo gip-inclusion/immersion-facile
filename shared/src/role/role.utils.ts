@@ -7,6 +7,7 @@ import {
 } from "..";
 import {
   type AgencyModifierRole,
+  type ModifierRole,
   type Role,
   type SignatoryRole,
   allModifierRoles,
@@ -61,10 +62,8 @@ export const hasAllowedRoleOnAssessment = (
   );
 };
 
-export const isModifierRole = (
-  role: Role,
-): role is (typeof allModifierRoles)[number] =>
-  allModifierRoles.includes(role as (typeof allModifierRoles)[number]);
+export const isModifierRole = (role: Role): role is ModifierRole =>
+  allModifierRoles.includes(role as ModifierRole);
 
 export const hasAllowedRolesToEditConvention = (
   userRolesOnConvention: Role[],

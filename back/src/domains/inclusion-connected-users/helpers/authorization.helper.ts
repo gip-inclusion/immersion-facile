@@ -1,6 +1,5 @@
 import {
   type AgencyId,
-  // type InclusionConnectDomainJwtPayload,
   type InclusionConnectedUser,
   type UserWithAdminRights,
   errors,

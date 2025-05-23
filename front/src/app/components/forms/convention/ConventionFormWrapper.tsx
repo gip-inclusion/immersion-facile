@@ -18,7 +18,6 @@ import {
   type Role,
   agencyModifierRoles,
   conventionStatusesAllowedForModification,
-  conventionUpdateConflictMessage,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
@@ -30,7 +29,7 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import {
-  type StatusJustification,
+  type WithStatusJustification,
   statusJustificationSchema,
 } from "src/app/components/forms/convention/conventionHelpers";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
@@ -49,7 +48,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
 
 const {
@@ -87,6 +86,9 @@ export const ConventionFormWrapper = ({
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
   const dispatch = useDispatch();
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const conventionActionEditFeedback = useFeedbackTopic(
+    "convention-action-edit",
+  );
   const inclusionConnectedRoles = useAppSelector(
     inclusionConnectedSelectors.userRolesForFetchedConvention,
   );
@@ -98,15 +100,28 @@ export const ConventionFormWrapper = ({
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
+
+  // const formSuccessfullySubmitted =
+  //   conventionFormFeedback?.level === "success" &&
+  //   (conventionFormFeedback.on === "create" ||
+  //     conventionFormFeedback.on === "update");
+
   const formSuccessfullySubmitted =
-    conventionFormFeedback?.level === "success" &&
-    (conventionFormFeedback.on === "create" ||
-      conventionFormFeedback.on === "update");
+    (conventionFormFeedback?.level === "success" &&
+      (conventionFormFeedback.on === "create" ||
+        conventionFormFeedback.on === "update")) ||
+    (conventionActionEditFeedback?.level === "success" &&
+      conventionActionEditFeedback.on === "update");
 
   const hasConventionUpdateConflict =
-    conventionFormFeedback?.level === "error" &&
-    conventionFormFeedback.on === "update" &&
-    conventionFormFeedback.message === conventionUpdateConflictMessage;
+    (conventionFormFeedback?.level === "error" &&
+      conventionFormFeedback.on === "update" &&
+      conventionFormFeedback.message ===
+        errors.convention.conventionGotUpdatedWhileUpdating().message) ||
+    (conventionActionEditFeedback?.level === "error" &&
+      conventionActionEditFeedback.on === "update" &&
+      conventionActionEditFeedback.message ===
+        errors.convention.conventionGotUpdatedWhileUpdating().message);
 
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
     inclusionConnectedRoles,
@@ -206,7 +221,9 @@ export const ConventionFormWrapper = ({
             <Alert
               severity="error"
               title="Attention ! Vos modifications n'ont pas été prises en compte"
-              description={conventionUpdateConflictMessage}
+              description={
+                errors.convention.conventionGotUpdatedWhileUpdating().message
+              }
             />
             {routeToRedirectTo && (
               <Button
@@ -321,9 +338,22 @@ const ConventionSummarySection = ({
     conventionSelectors.similarConventionIds,
   );
   const conventionFormFeedback = useFeedbackTopic("convention-form");
+  const conventionActionEditFeedback = useFeedbackTopic(
+    "convention-action-edit",
+  );
+
+  // const conventionSuccessfullySubmitted =
+  //   conventionFormFeedback?.level === "success" &&
+  //   (conventionFormFeedback.on === "create" ||
+  //     conventionFormFeedback.on === "update");
+
   const conventionSuccessfullySubmitted =
-    conventionFormFeedback?.level === "success" &&
-    conventionFormFeedback.on === "create";
+    (conventionFormFeedback?.level === "success" &&
+      (conventionFormFeedback.on === "create" ||
+        conventionFormFeedback.on === "update")) ||
+    (conventionActionEditFeedback?.level === "success" &&
+      conventionActionEditFeedback.on === "update");
+
   const { signatory: currentSignatory } = useAppSelector(
     conventionSelectors.signatoryData,
   );
@@ -340,9 +370,15 @@ const ConventionSummarySection = ({
   if (!convention) {
     throw errors.convention.notFound({ conventionId });
   }
+  const isMagicLinkUser =
+    route.params.jwt &&
+    "applicationId" in
+      decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+        route.params.jwt,
+      );
 
   const { register, handleSubmit, formState, getValues, trigger } =
-    useForm<StatusJustification>({
+    useForm<WithStatusJustification>({
       mode: "onTouched",
       defaultValues: { statusJustification: "" },
       resolver: zodResolver(statusJustificationSchema),
@@ -358,7 +394,9 @@ const ConventionSummarySection = ({
           status: "READY_TO_SIGN",
         },
         discussionId: route.params.discussionId,
-        feedbackTopic: "convention-form",
+        feedbackTopic: isMagicLinkUser
+          ? "convention-form"
+          : "convention-action-edit",
       }),
     );
   };
@@ -401,7 +439,7 @@ const ConventionSummarySection = ({
         <>
           {!conventionSuccessfullySubmitted && (
             <Feedback
-              topics={["convention-form"]}
+              topics={["convention-form", "convention-action-edit"]}
               className={fr.cx("fr-mb-2w")}
               closable
             />
@@ -414,7 +452,7 @@ const ConventionSummarySection = ({
               nativeTextAreaProps={{
                 ...register("statusJustification"),
                 id: domElementIds.conventionImmersionRoute
-                  .statusJustificationTextarea,
+                  .statusJustificationInput,
               }}
               {...getFieldError("statusJustification")}
             />
@@ -447,7 +485,7 @@ const ConventionSummarySection = ({
                 signatory={currentSignatory}
                 internshipKind={convention?.internshipKind}
                 onConfirmClick={handleSubmit(onConfirmSubmit)}
-                onBeforeOpenSignModal={() => trigger("statusJustification")}
+                onOpenSignModal={() => trigger("statusJustification")}
                 onCloseSignModalWithoutSignature={
                   setIsModalClosedWithoutSignature
                 }
@@ -572,43 +610,76 @@ const getRouteToRedirectAfterSubmit = ({
   route: SupportedConventionRoutes;
   fetchedConvention: { id: string } | null;
 }) => {
-  if (!fetchedConvention) return undefined;
-  if (mode === "edit") {
-    const userIsSignatory = userRolesOnConvention.some((role) =>
-      isSignatory(role),
-    );
-    if (userIsSignatory && route.params.jwt) {
-      const { applicationId } =
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-          route.params.jwt,
-        );
-      if (applicationId) {
-        return routes.conventionToSign({ jwt: route.params.jwt });
-      }
-      return routes.manageConventionConnectedUser({
-        conventionId: fetchedConvention.id,
-      });
-    }
-    if (userRolesOnConvention.includes("back-office")) {
-      return routes.adminConventionDetail({
-        conventionId: fetchedConvention.id,
-      });
-    }
-    if (
-      intersection(userRolesOnConvention, agencyModifierRoles).length > 0 &&
-      route.params.jwt
-    ) {
-      const { applicationId } =
-        decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-          route.params.jwt,
-        );
-      if (applicationId) {
-        return routes.manageConvention({ jwt: route.params.jwt });
-      }
-      return routes.manageConventionConnectedUser({
-        conventionId: fetchedConvention.id,
-      });
-    }
-  }
-  return undefined;
+  return match({
+    mode,
+    userRolesOnConvention,
+    route,
+    fetchedConvention,
+  })
+    .with({ fetchedConvention: null }, () => undefined)
+    .with(
+      {
+        mode: "edit",
+        userRolesOnConvention: P.when((roles) =>
+          roles.some((role) => isSignatory(role)),
+        ),
+        route: {
+          params: {
+            jwt: P.string,
+          },
+        },
+        fetchedConvention: { id: P.string },
+      },
+      ({ route, fetchedConvention }) => {
+        const { applicationId } =
+          decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+            route.params.jwt,
+          );
+
+        if (applicationId) {
+          return routes.conventionToSign({ jwt: route.params.jwt });
+        }
+        return routes.manageConventionConnectedUser({
+          conventionId: fetchedConvention.id,
+        });
+      },
+    )
+    .with(
+      {
+        mode: "edit",
+        userRolesOnConvention: P.when((roles) => roles.includes("back-office")),
+        fetchedConvention: { id: P.string },
+      },
+      ({ fetchedConvention }) =>
+        routes.adminConventionDetail({
+          conventionId: fetchedConvention.id,
+        }),
+    )
+    .with(
+      {
+        mode: "edit",
+        userRolesOnConvention: P.when(
+          (roles) => intersection(roles, agencyModifierRoles).length > 0,
+        ),
+        route: {
+          params: {
+            jwt: P.string,
+          },
+        },
+        fetchedConvention: { id: P.string },
+      },
+      ({ route, fetchedConvention }) => {
+        const { applicationId } =
+          decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
+            route.params.jwt,
+          );
+        if (applicationId) {
+          return routes.manageConvention({ jwt: route.params.jwt });
+        }
+        return routes.manageConventionConnectedUser({
+          conventionId: fetchedConvention.id,
+        });
+      },
+    )
+    .otherwise(() => undefined);
 };

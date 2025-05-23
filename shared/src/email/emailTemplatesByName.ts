@@ -1106,7 +1106,7 @@ Tél : ${beneficiaryPhone}`,
         conventionId,
         conventionSignShortlink,
         internshipKind,
-        justification: reason,
+        justification,
         signatoryFirstName,
         signatoryLastName,
       }) => ({
@@ -1124,7 +1124,7 @@ Tél : ${beneficiaryPhone}`,
         de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de ${businessName} vient d'être modifiée.
         
         <strong>Les modifications sont&nbsp;:</strong>
-        ${reason}
+        ${justification}
         
         Votre signature sur la première demande de convention a donc été annulée.`,
         buttons: [

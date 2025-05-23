@@ -126,7 +126,6 @@ const getConventionEpic: ConventionEpic = (
           action,
         ) ||
         conventionActionSlice.actions.rejectConventionSucceeded.match(action) ||
-        conventionActionSlice.actions.editConventionSucceeded.match(action) ||
         conventionActionSlice.actions.cancelConventionSucceeded.match(action) ||
         conventionActionSlice.actions.transferConventionToAgencySucceeded.match(
           action,

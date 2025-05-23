@@ -328,6 +328,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
     });
     it("send notification only to signatories that didn't sign yet", async () => {
       const justification = "justif";
+
       const convention = new ConventionDtoBuilder()
         .withAgencyId(agency.id)
         .withStatusJustification(justification)
@@ -354,6 +355,15 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           signedAt: undefined,
         })
         .build();
+      const commonEmailParams = {
+        agencyLogoUrl: agency.logoUrl ?? undefined,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        businessName: convention.businessName,
+        conventionId: convention.id,
+        internshipKind: convention.internshipKind,
+        justification,
+      };
       uow.conventionRepository.setConventions([convention]);
 
       await useCase.execute({ convention });
@@ -366,15 +376,8 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.establishmentRepresentative.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              businessName: convention.businessName,
-              conventionId: convention.id,
+              ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
-              internshipKind: convention.internshipKind,
-              justification,
               signatoryFirstName:
                 convention.signatories.establishmentRepresentative.firstName,
               signatoryLastName:
@@ -388,15 +391,8 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              businessName: convention.businessName,
-              conventionId: convention.id,
+              ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
-              internshipKind: convention.internshipKind,
-              justification,
               signatoryFirstName:
                 // biome-ignore lint/style/noNonNullAssertion:
                 convention.signatories.beneficiaryRepresentative!.firstName,
@@ -412,19 +408,11 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
-              agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              businessName: convention.businessName,
-              conventionId: convention.id,
+              ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[2]),
-              internshipKind: convention.internshipKind,
-              justification,
               signatoryFirstName:
                 // biome-ignore lint/style/noNonNullAssertion:
                 convention.signatories.beneficiaryCurrentEmployer!.firstName,
-
               signatoryLastName:
                 // biome-ignore lint/style/noNonNullAssertion:
                 convention.signatories.beneficiaryCurrentEmployer!.lastName,

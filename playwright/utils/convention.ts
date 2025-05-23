@@ -411,7 +411,7 @@ export const submitEditConventionForm = async (
   ).toBeVisible();
 
   await page.fill(
-    `#${domElementIds.conventionImmersionRoute.statusJustificationTextarea}`,
+    `#${domElementIds.conventionImmersionRoute.statusJustificationInput}`,
     "justification de la modification",
   );
 
