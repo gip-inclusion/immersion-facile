@@ -9,7 +9,7 @@ import {
 } from "../../utils/admin";
 import {
   type ConventionSubmitted,
-  allSignatoriesSignConvention,
+  allOtherSignatoriesSignConvention,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,
@@ -30,7 +30,7 @@ test.describe("Convention creation and modification workflow", () => {
   test.describe("Convention admin get notifications magic links", () => {
     test.use({ storageState: testConfig.adminAuthFile });
 
-    test.describe("convention signatures", () => {
+    test.describe("convention initial signatures before modification", () => {
       const signatoriesCount = 2;
       const signatoriesMagicLinks: string[] = [];
 
@@ -51,7 +51,7 @@ test.describe("Convention creation and modification workflow", () => {
         await expect(signatoriesMagicLinks.length).toBe(signatoriesCount);
       });
 
-      test("signatory signs the convention", async ({ page }) => {
+      test("first two signatories signs the convention", async ({ page }) => {
         await signConvention(
           page,
           signatoriesMagicLinks,
@@ -75,12 +75,12 @@ test.describe("Convention creation and modification workflow", () => {
       });
     });
 
-    test.describe("convention modification", () => {
+    test.describe("convention modification adding other signatories", () => {
       test.use({
         timezoneId: "Europe/Paris",
       });
 
-      test("by validator", async ({ page }) => {
+      test("validator does the modification", async ({ page }) => {
         await page.goto("/");
         const validatorMagicLinkLocator = await getMagicLinkLocatorFromEmail({
           page,
@@ -108,7 +108,7 @@ test.describe("Convention creation and modification workflow", () => {
         await submitEditConventionForm(page, conventionSubmitted);
       });
 
-      test("then by signatory (his submission also signs the convention", async ({
+      test("then first signatory also edit the convention (his submission also signs the convention)", async ({
         page,
       }) => {
         await page.goto("/");
@@ -157,15 +157,14 @@ test.describe("Convention creation and modification workflow", () => {
 
     test.describe("convention signatures after modification", () => {
       test("all other signatories sign the convention", async ({ page }) => {
-        await allSignatoriesSignConvention({
+        await allOtherSignatoriesSignConvention({
           page,
-          signatoriesCount: 4,
           expectedConventionEndDate: updatedEndDateDisplayed,
         });
       });
     });
 
-    test.describe("convention validation", () => {
+    test.describe("convention review and validation", () => {
       test("reviews and validate convention", async ({ page }) => {
         await page.goto("/");
         const href = await getMagicLinkFromEmail({
