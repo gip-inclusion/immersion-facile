@@ -1,31 +1,31 @@
-import type { CombinedState } from "@reduxjs/toolkit";
-import { InclusionConnectedUserBuilder } from "shared";
+import { InclusionConnectedUserBuilder, expectToEqual } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
   type TestDependencies,
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
-import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import type { ReduxStore, RootState } from "src/core-logic/storeConfig/store";
 
 describe("rootApp epic", () => {
   let store: ReduxStore;
-  let afterResetStoreState: CombinedState<unknown>;
   let dependencies: TestDependencies;
+
   beforeEach(() => {
     ({ store, dependencies } = createTestStore());
-    afterResetStoreState = { ...store.getState() };
   });
 
   it("should reset the app store", () => {
-    const afterReadyStoreState = {
-      ...afterResetStoreState,
+    const afterReadyStoreState: RootState = {
+      ...store.getState(),
       auth: {
+        isRequestingLoginByEmail: false,
         isLoading: false,
         afterLoginRedirectionUrl: null,
         federatedIdentityWithUser: null,
       },
     };
+
     store.dispatch(
       searchSlice.actions.searchRequested({
         distanceKm: 10,
@@ -41,7 +41,7 @@ describe("rootApp epic", () => {
 
     store.dispatch(rootAppSlice.actions.appResetRequested());
 
-    expect(store.getState()).toEqual(afterReadyStoreState);
+    expectToEqual(store.getState(), afterReadyStoreState);
   });
 
   it("should dispatch appIsReady action", () => {

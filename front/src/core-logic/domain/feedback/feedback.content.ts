@@ -587,12 +587,12 @@ export const feedbacks: Record<
     },
   },
   "login-by-email": {
-    "execute.success": {
+    "create.success": {
       action: authSlice.actions.loginByEmailSucceded,
       title: "Votre lien de connexion a bien été envoyé",
       message: "",
     },
-    "execute.error": {
+    "create.error": {
       action: authSlice.actions.loginByEmailFailed,
       title: "Nous n’avons pas pu envoyer le lien de connexion",
       message: "",

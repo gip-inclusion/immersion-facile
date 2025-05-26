@@ -25,6 +25,7 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import { authSelectors } from "../auth/auth.selectors";
 import { type FederatedIdentityWithUser, authSlice } from "../auth/auth.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
@@ -176,9 +177,10 @@ describe("InclusionConnected", () => {
       expectCurrentUserToBe(inclusionConnectedUser);
     });
 
-    it("disconnects the users if the response includes : 'jwt expired'", () => {
+    it("disconnects the connected user and auth slice federatedIdentity if the response includes : 'jwt expired'", () => {
       ({ store, dependencies } = createTestStore({
         auth: {
+          isRequestingLoginByEmail: false,
           federatedIdentityWithUser: {
             token: "some-existing-token",
             provider: "proConnect",
@@ -203,6 +205,7 @@ describe("InclusionConnected", () => {
         new Error(errorMessage),
       );
       expectCurrentUserToBe(null);
+      expectToEqual(authSelectors.federatedIdentity(store.getState()), null);
     });
 
     it("stores error on failure when trying to fetch current IC user", () => {
