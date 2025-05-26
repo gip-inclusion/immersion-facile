@@ -23,9 +23,30 @@ describe("PgOngoingOAuthRepository", () => {
     pgUserRepository = new PgUserRepository(db);
   });
 
+  const state = "11111111-1111-1111-1111-111111111111";
+  const ongoingOAuth: OngoingOAuth = {
+    state,
+    nonce: "123",
+    provider: "proConnect",
+    usedAt: null,
+  };
+  const user: User = {
+    id: "22222222-2222-2222-2222-222222222222",
+    firstName: "John",
+    lastName: "Doe",
+    email: "john.doe@mail.com",
+    proConnect: {
+      externalId: "john-external-id",
+      siret: fakeProConnectSiret,
+    },
+    createdAt: new Date().toISOString(),
+  };
+
   beforeEach(async () => {
     await db.deleteFrom("users_ongoing_oauths").execute();
     await db.deleteFrom("users").execute();
+    await pgUserRepository.save(user);
+    await pgOngoingOAuthRepository.save(ongoingOAuth);
   });
 
   afterAll(async () => {
@@ -34,31 +55,8 @@ describe("PgOngoingOAuthRepository", () => {
 
   describe("with provider 'proConnect'", () => {
     it("saves an ongoing OAuth, then gets it from its states, then updates it, than gets ongoingOauth from userId", async () => {
-      const state = "11111111-1111-1111-1111-111111111111";
-      const ongoingOAuth: OngoingOAuth = {
-        state,
-        nonce: "123",
-        provider: "proConnect",
-      };
-      const user: User = {
-        id: "22222222-2222-2222-2222-222222222222",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@mail.com",
-        proConnect: {
-          externalId: "john-external-id",
-          siret: fakeProConnectSiret,
-        },
-        createdAt: new Date().toISOString(),
-      };
-      await pgUserRepository.save(user);
-      await pgOngoingOAuthRepository.save(ongoingOAuth);
-
       const fetchedFromState =
-        await pgOngoingOAuthRepository.findByStateAndProvider(
-          state,
-          "proConnect",
-        );
+        await pgOngoingOAuthRepository.findByState(state);
       expectToEqual(fetchedFromState, ongoingOAuth);
 
       const results = await db
@@ -80,6 +78,37 @@ describe("PgOngoingOAuthRepository", () => {
         user.id,
       );
       expectToEqual(fetchedFromUserId, updatedOngoingOAuth);
+    });
+
+    it("also saves the date of use and the email when it is of kind email", async () => {
+      const state = "22222222-2222-2222-2222-222222222222";
+      const ongoingOAuth: OngoingOAuth = {
+        state,
+        nonce: "444",
+        provider: "email",
+        email: "bob@mail.com",
+        usedAt: null,
+      };
+      await pgOngoingOAuthRepository.save(ongoingOAuth);
+
+      const fetchedFromState =
+        await pgOngoingOAuthRepository.findByState(state);
+
+      expectToEqual(fetchedFromState, ongoingOAuth);
+
+      const updatedOngoingOAuth: OngoingOAuth = {
+        ...ongoingOAuth,
+        userId: user.id,
+        usedAt: new Date(),
+      };
+      await pgOngoingOAuthRepository.save(updatedOngoingOAuth);
+      const fetchedFromUserId = await pgOngoingOAuthRepository.findByUserId(
+        user.id,
+      );
+      expectToEqual(fetchedFromUserId, {
+        ...updatedOngoingOAuth,
+        email: ongoingOAuth.email,
+      });
     });
   });
 });

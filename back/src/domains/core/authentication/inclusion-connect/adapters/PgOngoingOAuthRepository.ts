@@ -12,21 +12,21 @@ type PersistenceOngoingOAuth = {
   user_id: string | null;
   external_id: string | null;
   access_token: string | null;
+  email: string | null;
+  used_at: Date | null;
 };
 
 export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   constructor(private transaction: KyselyDb) {}
 
-  public async findByStateAndProvider(
+  public async findByState(
     state: OAuthState,
-    provider: IdentityProvider,
   ): Promise<OngoingOAuth | undefined> {
     const pgOngoingOAuth: PersistenceOngoingOAuth | undefined =
       await this.transaction
         .selectFrom("users_ongoing_oauths")
         .selectAll()
         .where("state", "=", state)
-        .where("provider", "=", provider)
         .executeTakeFirst();
 
     return this.#toOngoingOAuth(pgOngoingOAuth);
@@ -45,18 +45,24 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
-    const { state, nonce, provider, userId, externalId, accessToken } =
-      ongoingOAuth;
-    if (await this.findByStateAndProvider(state, provider)) {
+    const { provider, nonce, state, userId, usedAt } = ongoingOAuth;
+    if (await this.findByState(state)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
         .set({
-          state,
           nonce,
-          provider,
           user_id: userId,
-          external_id: externalId,
-          access_token: accessToken,
+          provider,
+          used_at: usedAt,
+          ...(ongoingOAuth.provider === "proConnect"
+            ? {
+                external_id: ongoingOAuth.externalId,
+                access_token: ongoingOAuth.accessToken,
+              }
+            : {}),
+          ...(ongoingOAuth.provider === "email"
+            ? { email: ongoingOAuth.email }
+            : {}),
           updated_at: sql`now()`,
         })
         .where("state", "=", state)
@@ -69,8 +75,16 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
           nonce,
           provider,
           user_id: userId,
-          external_id: externalId,
-          access_token: accessToken,
+          ...(ongoingOAuth.provider === "proConnect"
+            ? {
+                external_id: ongoingOAuth.externalId,
+                access_token: ongoingOAuth.accessToken,
+              }
+            : {}),
+          ...(ongoingOAuth.provider === "email"
+            ? { email: ongoingOAuth.email }
+            : {}),
+          used_at: usedAt,
         })
         .execute();
     }
@@ -78,13 +92,30 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
 
   #toOngoingOAuth(raw?: PersistenceOngoingOAuth): OngoingOAuth | undefined {
     if (!raw) return;
+    const provider = raw.provider as IdentityProvider;
+    const usedAt = raw.used_at;
+
+    if (provider === "proConnect")
+      return {
+        state: raw.state,
+        nonce: raw.nonce,
+        userId: optional(raw.user_id),
+        provider,
+        accessToken: optional(raw.access_token),
+        externalId: optional(raw.external_id),
+        usedAt,
+      };
+
+    if (!raw.email)
+      throw new Error(`Unsupported, raw.email was : ${raw?.email}`);
+
     return {
       state: raw.state,
       nonce: raw.nonce,
-      provider: raw.provider as IdentityProvider,
       userId: optional(raw.user_id),
-      accessToken: optional(raw.access_token),
-      externalId: optional(raw.external_id),
+      provider,
+      email: raw.email,
+      usedAt,
     };
   }
 }
