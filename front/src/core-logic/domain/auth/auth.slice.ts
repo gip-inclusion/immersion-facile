@@ -1,6 +1,14 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { AbsoluteUrl, FederatedIdentity } from "shared";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
+import type {
+  AbsoluteUrl,
+  Email,
+  FederatedIdentity,
+  WithSourcePage,
+} from "shared";
+import type {
+  PayloadActionWithFeedbackTopic,
+  PayloadActionWithFeedbackTopicError,
+} from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FederatedIdentityWithUser = FederatedIdentity & {
   email: string;
@@ -14,12 +22,14 @@ type WithUrl = {
 
 interface AuthState {
   isLoading: boolean;
+  isRequestingLoginByEmail: boolean;
   federatedIdentityWithUser: FederatedIdentityWithUser | null;
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
 
 const initialState: AuthState = {
   isLoading: true,
+  isRequestingLoginByEmail: false,
   federatedIdentityWithUser: null,
   afterLoginRedirectionUrl: null,
 };
@@ -82,9 +92,28 @@ export const authSlice = createSlice({
     federatedIdentityInDeviceDeletionSucceeded: (state) => {
       state.federatedIdentityWithUser = null;
     },
-    loggedOutSuccessfullyFromProvider: (state) => state,
-    loggedOutFailedFromInclusionConnect: (state) => {
+    logOutFromProviderSucceeded: (state) => state,
+    logOutFromProviderFailed: (state) => {
       state.federatedIdentityWithUser = null;
+    },
+    loginByEmailRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<
+        WithSourcePage & {
+          email: Email;
+        }
+      >,
+    ) => {
+      state.isRequestingLoginByEmail = true;
+    },
+    loginByEmailSucceded: (state, _action: PayloadActionWithFeedbackTopic) => {
+      state.isRequestingLoginByEmail = false;
+    },
+    loginByEmailFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isRequestingLoginByEmail = false;
     },
   },
 });

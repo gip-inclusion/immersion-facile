@@ -7,6 +7,7 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
+import { authSlice } from "../auth/auth.slice";
 
 type InclusionConnectedState = {
   currentUser: InclusionConnectedUser | null;
@@ -64,6 +65,9 @@ export const inclusionConnectedSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(authSlice.actions.logOutFromProviderSucceeded, (state) => {
+      state.currentUser = null;
+    });
     builder.addCase(
       updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       (state, action) => {
