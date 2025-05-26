@@ -1,8 +1,9 @@
-import type { ConnectedUserJwt, Flavor, UserWithRights } from "..";
 import type { ConventionDto } from "../convention/convention.dto";
+import type { Email } from "../email/email.dto";
 import type {
   AgencyRole,
   User,
+  UserWithRights,
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type {
   ConventionEstablishmentRole,
@@ -10,6 +11,8 @@ import type {
   Role,
 } from "../role/role.dto";
 import type { allowedStartOAuthLoginPages } from "../routes/routes";
+import type { ConnectedUserJwt } from "../tokens/jwt.dto";
+import type { Flavor } from "../typeFlavors";
 import type { ExcludeFromExisting, ExtractFromExisting } from "../utils";
 
 export type IdToken = Flavor<string, "IdToken">;
@@ -69,3 +72,8 @@ export const agencyRoleIsNotToReview = (
   !agencyRoles.includes("to-review");
 
 export const inclusionConnectTokenExpiredMessage = "Token is expired";
+
+export type InitiateLoginByEmailParams = {
+  page: AllowedStartInclusionConnectLoginSourcesKind;
+  email: Email;
+};
