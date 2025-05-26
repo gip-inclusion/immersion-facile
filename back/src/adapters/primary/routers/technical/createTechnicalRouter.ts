@@ -87,8 +87,8 @@ export const createTechnicalRouter = (
       },
     }),
     async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        return deps.useCases.addExchangeToDiscussion.execute({
+      sendHttpResponse(req, res, async () => {
+        await deps.useCases.addExchangeToDiscussion.execute({
           source: "inbound-parsing",
           messageInputs: req.body.items.map((emailItem: BrevoEmailItem) => {
             const { discussionId, recipientKind } =

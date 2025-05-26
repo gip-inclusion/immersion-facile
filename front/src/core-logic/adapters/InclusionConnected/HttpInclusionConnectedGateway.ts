@@ -4,6 +4,7 @@ import type {
   AgencyId,
   DiscussionReadDto,
   DiscussionRejected,
+  Exchange,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
@@ -119,7 +120,7 @@ export class HttpInclusionConnectedGateway
 
   public sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<void> {
+  ): Observable<Exchange> {
     return from(
       this.httpClient
         .sendMessageToDiscussion({
@@ -127,13 +128,11 @@ export class HttpInclusionConnectedGateway
           urlParams: { discussionId: payload.discussionId },
           body: {
             message: payload.message,
-            sentAt: payload.sentAt,
-            subject: payload.subject,
           },
         })
         .then((response) =>
           match(response)
-            .with({ status: 200 }, () => undefined)
+            .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
