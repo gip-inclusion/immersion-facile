@@ -6,6 +6,7 @@ import type { AddressGateway } from "src/core-logic/ports/AddressGateway";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 import type { AssessmentGateway } from "src/core-logic/ports/AssessmentGateway";
+import type { AuthGateway } from "src/core-logic/ports/AuthGateway";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
 import type {
   DeviceRepository,
@@ -25,6 +26,7 @@ import { createStore } from "src/core-logic/storeConfig/store";
 export type Dependencies = {
   adminGateway: AdminGateway;
   assessmentGateway: AssessmentGateway;
+  authGateway: AuthGateway;
   formCompletionGateway: FormCompletionGateway;
   agencyGateway: AgencyGateway;
   addressGateway: AddressGateway;
