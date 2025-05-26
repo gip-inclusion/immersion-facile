@@ -4,6 +4,7 @@ import type {
   AgencyId,
   DiscussionReadDto,
   DiscussionRejected,
+  Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
@@ -18,7 +19,7 @@ export class TestInclusionConnectedGateway
 {
   public discussion$ = new Subject<DiscussionReadDto | undefined>();
 
-  public sendMessageResponse$ = new Subject<void>();
+  public sendMessageResponse$ = new Subject<Exchange>();
 
   // for test purpose
   public currentUser$ = new Subject<InclusionConnectedUser>();
@@ -45,7 +46,9 @@ export class TestInclusionConnectedGateway
     return this.discussion$;
   }
 
-  public sendMessage$(_payload: SendMessageRequestedPayload): Observable<void> {
+  public sendMessage$(
+    _payload: SendMessageRequestedPayload,
+  ): Observable<Exchange> {
     return this.sendMessageResponse$;
   }
 

@@ -214,6 +214,7 @@ export const createUseCases = (
       addExchangeToDiscussion: new AddExchangeToDiscussion(
         uowPerformer,
         createNewEvent,
+        gateways.timeGateway,
       ),
       sendExchangeToRecipient: new SendExchangeToRecipient(
         uowPerformer,

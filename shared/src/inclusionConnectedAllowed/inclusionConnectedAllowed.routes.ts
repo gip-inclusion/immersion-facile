@@ -9,6 +9,7 @@ import {
   discussionReadSchema,
   discussionRejectedSchema,
   exchangeFromDashboardSchema,
+  exchangeSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -111,7 +112,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: exchangeFromDashboardSchema,
     responses: {
-      200: expressEmptyResponseBody,
+      200: exchangeSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
     },

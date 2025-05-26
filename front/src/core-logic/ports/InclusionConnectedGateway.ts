@@ -5,6 +5,7 @@ import type {
   ConventionSupportedJwt,
   DiscussionReadDto,
   DiscussionRejected,
+  Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
   SendMessageToDiscussionFromDashboardRequestPayload,
@@ -27,7 +28,7 @@ export interface InclusionConnectedGateway {
   ): Observable<DiscussionReadDto | undefined>;
   sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<void>;
+  ): Observable<Exchange>;
   getLogoutUrl$(
     payload: WithIdToken & { authToken: string },
   ): Observable<AbsoluteUrl>;

@@ -594,9 +594,11 @@ const DiscussionEchangeMessageForm = ({
     if (inclusionConnectedJwt) {
       dispatch(
         discussionSlice.actions.sendMessageRequested({
-          jwt: inclusionConnectedJwt,
-          discussionId,
-          message: data.message,
+          exchangeData: {
+            jwt: inclusionConnectedJwt,
+            discussionId,
+            message: data.message,
+          },
           feedbackTopic: "establishment-dashboard-discussion-send-message",
         }),
       );
