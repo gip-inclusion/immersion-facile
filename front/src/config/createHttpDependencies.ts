@@ -8,6 +8,7 @@ import {
   establishmentLeadRoutes,
   establishmentRoutes,
   formCompletionRoutes,
+  inclusionConnectImmersionRoutes,
   inclusionConnectedAllowedRoutes,
   nafRoutes,
   searchImmersionRoutes,
@@ -22,6 +23,7 @@ import { HttpAddressGateway } from "src/core-logic/adapters/AddressGateway/HttpA
 import { HttpAdminGateway } from "src/core-logic/adapters/AdminGateway/HttpAdminGateway";
 import { HttpAgencyGateway } from "src/core-logic/adapters/AgencyGateway/HttpAgencyGateway";
 import { HttpAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/HttpAssessmentGateway";
+import { HttpAuthGateway } from "src/core-logic/adapters/AuthGateway/HttpAuthGateway";
 import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpConventionGateway";
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/HttpEstablishmentLeadGateway";
@@ -54,6 +56,9 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     adminGateway: new HttpAdminGateway(
       createAxiosHttpClientOnSlashApi(adminRoutes),
+    ),
+    authGateway: new HttpAuthGateway(
+      createAxiosHttpClientOnSlashApi(inclusionConnectImmersionRoutes),
     ),
     agencyGateway: new HttpAgencyGateway(
       createAxiosHttpClientOnSlashApi(agencyRoutes),
