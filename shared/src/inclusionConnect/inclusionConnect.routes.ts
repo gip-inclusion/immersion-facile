@@ -1,7 +1,8 @@
 import { defineRoute, defineRoutes } from "shared-routes";
-import { emptyObjectSchema } from "../zodUtils";
+import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 import {
   authenticateWithOAuthCodeSchema,
+  initiateLoginByEmailParamsSchema,
   withSourcePageSchema,
 } from "./inclusionConnect.schema";
 
@@ -24,6 +25,14 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
     queryParamsSchema: authenticateWithOAuthCodeSchema,
     responses: {
       302: emptyObjectSchema,
+    },
+  }),
+  initiateLoginByEmail: defineRoute({
+    method: "post",
+    url: "/initiate-login-by-email",
+    requestBodySchema: initiateLoginByEmailParamsSchema,
+    responses: {
+      200: expressEmptyResponseBody,
     },
   }),
 });
