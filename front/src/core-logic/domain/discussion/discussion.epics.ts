@@ -58,7 +58,33 @@ const updateDiscussionStatusEpic: DiscussionEpic = (
     ),
   );
 
+const sendMessageEpic: DiscussionEpic = (
+  action$,
+  _state$,
+  { inclusionConnectedGateway },
+) =>
+  action$.pipe(
+    filter(discussionSlice.actions.sendMessageRequested.match),
+    switchMap((action) =>
+      inclusionConnectedGateway.sendMessage$(action.payload.exchangeData).pipe(
+        map((exchange) =>
+          discussionSlice.actions.sendMessageSucceeded({
+            exchangeData: exchange,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          discussionSlice.actions.sendMessageFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
 export const discussionEpics = [
   fetchDiscussionByIdEpic,
   updateDiscussionStatusEpic,
+  sendMessageEpic,
 ];

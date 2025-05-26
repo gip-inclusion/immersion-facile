@@ -2,6 +2,7 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  type Exchange,
   type ExchangeFromDashboard,
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
@@ -694,8 +695,6 @@ describe("InclusionConnectedAllowedRoutes", () => {
       const user = new InclusionConnectedUserBuilder().buildUser();
       const payload: ExchangeFromDashboard = {
         message: "My fake message",
-        sentAt: new Date().toISOString(),
-        subject: "My fake subject",
       };
       const discussion = new DiscussionBuilder()
         .withEstablishmentContact({
@@ -715,24 +714,24 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: payload,
       });
 
+      const expectedExchange: Exchange = {
+        subject: "Réponse de My businessName à votre demande",
+        message: "My fake message",
+        sentAt: new Date().toISOString(),
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        attachments: [],
+      };
+
       expectHttpResponseToEqual(response, {
         status: 200,
-        body: "",
+        body: expectedExchange,
       });
       expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
         new DiscussionBuilder(discussion)
-          .withExchanges([
-            ...discussion.exchanges,
-            {
-              ...payload,
-              recipient: "potentialBeneficiary",
-              sender: "establishment",
-              attachments: [],
-            },
-          ])
+          .withExchanges([...discussion.exchanges, expectedExchange])
           .build(),
       ]);
     });
-    it;
   });
 });

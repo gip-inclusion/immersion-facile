@@ -8,6 +8,7 @@ import {
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
+import type { Exchange } from "shared/src/discussion/discussion.dto";
 import type {
   FetchDiscussionRequestedPayload,
   SendMessageRequestedPayload,
@@ -84,7 +85,16 @@ export class SimulatedInclusionConnectedGateway
     return of(undefined).pipe(delay(this.simulatedLatency));
   }
 
-  public sendMessage$(_payload: SendMessageRequestedPayload): Observable<void> {
-    return of(undefined).pipe(delay(this.simulatedLatency));
+  public sendMessage$(
+    _payload: SendMessageRequestedPayload,
+  ): Observable<Exchange> {
+    return of({
+      subject: "Réponse de My businessName à votre demande",
+      message: "My message",
+      sentAt: new Date().toISOString(),
+      sender: "establishment",
+      recipient: "potentialBeneficiary",
+      attachments: [],
+    } satisfies Exchange).pipe(delay(this.simulatedLatency));
   }
 }
