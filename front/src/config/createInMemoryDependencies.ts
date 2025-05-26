@@ -5,6 +5,7 @@ import { InMemoryAddressGateway } from "src/core-logic/adapters/AddressGateway/I
 import { SimulatedAdminGateway } from "src/core-logic/adapters/AdminGateway/SimulatedAdminGateway";
 import { SimulatedAgencyGateway } from "src/core-logic/adapters/AgencyGateway/SimulatedAgencyGateway";
 import { SimulatedAssessmentGateway } from "src/core-logic/adapters/AssessmentGateway/SimulatedAssessmentGateway";
+import { SimulatedAuthGateway } from "src/core-logic/adapters/AuthGateway/SimulatedAuthGateway";
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { SimulatedEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/SimulatedEstablishmentGateway";
 import { SimulatedEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/SimulatedEstablishmentLeadGateway";
@@ -22,6 +23,7 @@ export const createInMemoryDependencies = (): Dependencies => ({
   addressGateway: new InMemoryAddressGateway(SIMULATED_LATENCY_MS),
   adminGateway: new SimulatedAdminGateway(),
   agencyGateway: new SimulatedAgencyGateway(),
+  authGateway: new SimulatedAuthGateway(),
   conventionGateway: new InMemoryConventionGateway(SIMULATED_LATENCY_MS),
   establishmentGateway: new SimulatedEstablishmentGateway([
     FormEstablishmentDtoBuilder.valid()
