@@ -18,7 +18,7 @@ export type Feedbacks = Partial<Record<FeedbackTopic, Feedback>>;
 
 export const initialFeedbacks: Feedbacks = {};
 
-type ActionKind = "create" | "update" | "fetch" | "delete" | "execute";
+type ActionKind = "create" | "update" | "fetch" | "delete";
 
 export type ActionKindAndLevel = `${ActionKind}.${Feedback["level"]}`;
 

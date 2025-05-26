@@ -179,6 +179,7 @@ describe("InclusionConnected", () => {
     it("disconnects the users if the response includes : 'jwt expired'", () => {
       ({ store, dependencies } = createTestStore({
         auth: {
+          isRequestingLoginByEmail: false,
           federatedIdentityWithUser: {
             token: "some-existing-token",
             provider: "proConnect",

@@ -573,7 +573,7 @@ export const feedbacks: Record<
     },
   },
   "login-by-email": {
-    "execute.success": {
+    "create.success": {
       action: authSlice.actions.loginByEmailSucceded,
       title: "Votre lien de connexion a bien été envoyé",
       // TODO : fournir l'email dans le message de feedback
@@ -583,7 +583,7 @@ export const feedbacks: Record<
       Si vous avez déjà utilisé Immersion Facilitée, assurez-vous d’avoir renseigné la même adresse email que précédemment.
       Cela nous permet de retrouver votre entreprise ou vos conventions.`,
     },
-    "execute.error": {
+    "create.error": {
       action: authSlice.actions.loginByEmailFailed,
       title: "Nous n’avons pas pu envoyer le lien de connexion",
       // TODO : fournir l'email dans le message de feedback

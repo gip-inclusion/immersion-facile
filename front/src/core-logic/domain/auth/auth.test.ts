@@ -1,4 +1,5 @@
 import {
+  type Email,
   type FederatedIdentity,
   type InclusionConnectedUser,
   expectToEqual,
@@ -16,6 +17,8 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
+import { feedbacks } from "../feedback/feedback.content";
+import { feedbacksSelectors } from "../feedback/feedback.selectors";
 
 const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
   provider: "peConnect",
@@ -26,7 +29,7 @@ const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
 };
 
 const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
-  provider: "connectedUser",
+  provider: "proConnect",
   token: "123",
   email: "john.doe@mail.com",
   firstName: "John",
@@ -58,6 +61,7 @@ describe("Auth slice", () => {
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
+        isRequestingLoginByEmail: false,
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
@@ -89,6 +93,7 @@ describe("Auth slice", () => {
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
+        isRequestingLoginByEmail: false,
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
@@ -118,6 +123,7 @@ describe("Auth slice", () => {
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page (when provider is not 'inclusionConnect')", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
+        isRequestingLoginByEmail: false,
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
@@ -216,6 +222,66 @@ describe("Auth slice", () => {
     ]);
   });
 
+  describe("login by email", () => {
+    const email: Email = "email@mail.com";
+
+    it("should handle login by email successfully", () => {
+      expectIsRequestingLoginByEmailToBe(false);
+
+      store.dispatch(
+        authSlice.actions.loginByEmailRequested({
+          page: "establishment",
+          email,
+          feedbackTopic: "login-by-email",
+        }),
+      );
+
+      expectIsRequestingLoginByEmailToBe(true);
+      dependencies.authGateway.loginByEmailResponse$.next();
+      expectIsRequestingLoginByEmailToBe(false);
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["login-by-email"],
+        {
+          on: "create",
+          level: "success",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks["login-by-email"]["create.success"]!.title,
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          message: feedbacks["login-by-email"]["create.success"]!.message,
+        },
+      );
+    });
+
+    it("should handle login by email failed", () => {
+      expectIsRequestingLoginByEmailToBe(false);
+
+      store.dispatch(
+        authSlice.actions.loginByEmailRequested({
+          page: "establishment",
+          email,
+          feedbackTopic: "login-by-email",
+        }),
+      );
+
+      expectIsRequestingLoginByEmailToBe(true);
+      const errorMessage = "Error message";
+      dependencies.authGateway.loginByEmailResponse$.error(
+        new Error(errorMessage),
+      );
+      expectIsRequestingLoginByEmailToBe(false);
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())["login-by-email"],
+        {
+          on: "create",
+          level: "error",
+          // biome-ignore lint/style/noNonNullAssertion: Should crash if not present
+          title: feedbacks["login-by-email"]["create.error"]!.title,
+          message: errorMessage,
+        },
+      );
+    });
+  });
+
   const expectFederatedIdentityToEqual = (
     expected: FederatedIdentity | null,
   ) => {
@@ -224,6 +290,12 @@ describe("Auth slice", () => {
 
   const expectIsLoadingToBe = (expected: boolean) => {
     expect(authSelectors.isLoading(store.getState())).toBe(expected);
+  };
+
+  const expectIsRequestingLoginByEmailToBe = (expected: boolean) => {
+    expect(authSelectors.isRequestingLoginByEmail(store.getState())).toBe(
+      expected,
+    );
   };
 
   const expectFederatedIdentityInDevice = (
