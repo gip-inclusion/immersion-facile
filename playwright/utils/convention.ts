@@ -5,6 +5,7 @@ import {
   type AgencyId,
   addressRoutes,
   domElementIds,
+  executeInSequence,
   frontRoutes,
   technicalRoutes,
 } from "shared";
@@ -190,11 +191,10 @@ export const submitBasicConventionForm = async (
 
 export const signConvention = async (
   page: Page,
-  magicLinks: string[],
-  signatoryIndex: number,
+  magicLink: string,
   dateEndDisplayed: string,
 ) => {
-  await page.goto(magicLinks[signatoryIndex]);
+  await page.goto(magicLink);
   await expect(page.locator(".fr-alert--success")).toBeHidden();
 
   await checkConventionSummary(page, dateEndDisplayed);
@@ -236,10 +236,9 @@ export const allOtherSignatoriesSignConvention = async ({
       signatoriesMagicLinks.push(href);
     }
   }
-  await Promise.all(
-    signatoriesMagicLinks.map((href, index) =>
-      signConvention(page, [href], index, expectedConventionEndDate),
-    ),
+
+  await executeInSequence(signatoriesMagicLinks, (href) =>
+    signConvention(page, href, expectedConventionEndDate),
   );
 };
 
