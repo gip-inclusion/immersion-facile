@@ -54,8 +54,7 @@ test.describe("Convention creation and modification workflow", () => {
       test("first two signatories signs the convention", async ({ page }) => {
         await signConvention(
           page,
-          signatoriesMagicLinks,
-          0,
+          signatoriesMagicLinks[0],
           tomorrowDateDisplayed,
         );
       });
@@ -67,8 +66,7 @@ test.describe("Convention creation and modification workflow", () => {
         test("signs convention for signatory 4", async ({ page }) => {
           await signConvention(
             page,
-            signatoriesMagicLinks,
-            1,
+            signatoriesMagicLinks[1],
             tomorrowDateDisplayed,
           );
         });
