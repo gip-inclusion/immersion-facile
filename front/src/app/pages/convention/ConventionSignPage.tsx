@@ -12,7 +12,6 @@ import {
   errors,
   isSignatory,
 } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -143,7 +142,7 @@ const ConventionSignPageContent = ({
             >
               {convention && (
                 <div className={fr.cx("fr-mb-4w")}>
-                  <Feedback topics={["convention-action-edit"]} closable />
+                  {/* <Feedback topics={["convention-action-edit"]} closable /> */}
                   {convention.status === "REJECTED" && (
                     <Alert
                       severity="error"

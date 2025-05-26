@@ -214,19 +214,18 @@ export const signConvention = async (
   await expect(page.locator(".fr-alert--success")).toBeVisible();
 };
 
-export const allSignatoriesSignConvention = async ({
+export const allOtherSignatoriesSignConvention = async ({
   page,
-  signatoriesCount,
   expectedConventionEndDate,
 }: {
   page: Page;
-  signatoriesCount: number;
   expectedConventionEndDate: string;
 }) => {
   const signatoriesMagicLinks: string[] = [];
   await page.goto("/");
   await goToAdminTab(page, "adminNotifications");
-  for (let index = 0; index < signatoriesCount; index++) {
+  const allOtherSignatoriesCount = 3;
+  for (let index = 0; index < allOtherSignatoriesCount; index++) {
     const href = await getMagicLinkFromEmail({
       page,
       emailType: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE",
@@ -237,26 +236,10 @@ export const allSignatoriesSignConvention = async ({
       signatoriesMagicLinks.push(href);
     }
   }
-
-  await signConvention(
-    page,
-    signatoriesMagicLinks,
-    0,
-    expectedConventionEndDate,
-  );
-
-  await signConvention(
-    page,
-    signatoriesMagicLinks,
-    1,
-    expectedConventionEndDate,
-  );
-
-  await signConvention(
-    page,
-    signatoriesMagicLinks,
-    2,
-    expectedConventionEndDate,
+  await Promise.all(
+    signatoriesMagicLinks.map((href, index) =>
+      signConvention(page, [href], index, expectedConventionEndDate),
+    ),
   );
 };
 

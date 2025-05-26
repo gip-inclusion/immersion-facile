@@ -101,11 +101,6 @@ export const ConventionFormWrapper = ({
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
 
-  // const formSuccessfullySubmitted =
-  //   conventionFormFeedback?.level === "success" &&
-  //   (conventionFormFeedback.on === "create" ||
-  //     conventionFormFeedback.on === "update");
-
   const formSuccessfullySubmitted =
     (conventionFormFeedback?.level === "success" &&
       (conventionFormFeedback.on === "create" ||
@@ -342,11 +337,6 @@ const ConventionSummarySection = ({
     "convention-action-edit",
   );
 
-  // const conventionSuccessfullySubmitted =
-  //   conventionFormFeedback?.level === "success" &&
-  //   (conventionFormFeedback.on === "create" ||
-  //     conventionFormFeedback.on === "update");
-
   const conventionSuccessfullySubmitted =
     (conventionFormFeedback?.level === "success" &&
       (conventionFormFeedback.on === "create" ||
@@ -370,12 +360,6 @@ const ConventionSummarySection = ({
   if (!convention) {
     throw errors.convention.notFound({ conventionId });
   }
-  const isMagicLinkUser =
-    route.params.jwt &&
-    "applicationId" in
-      decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
-        route.params.jwt,
-      );
 
   const { register, handleSubmit, formState, getValues, trigger } =
     useForm<WithStatusJustification>({
@@ -394,9 +378,8 @@ const ConventionSummarySection = ({
           status: "READY_TO_SIGN",
         },
         discussionId: route.params.discussionId,
-        feedbackTopic: isMagicLinkUser
-          ? "convention-form"
-          : "convention-action-edit",
+        feedbackTopic:
+          mode === "edit" ? "convention-action-edit" : "convention-form",
       }),
     );
   };
@@ -439,7 +422,7 @@ const ConventionSummarySection = ({
         <>
           {!conventionSuccessfullySubmitted && (
             <Feedback
-              topics={["convention-form", "convention-action-edit"]}
+              topics={["convention-action-edit"]}
               className={fr.cx("fr-mb-2w")}
               closable
             />
