@@ -20,6 +20,7 @@ test.describe("Establishment dashboard workflow", () => {
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(2);
+      await page.click("#button-with-submenu");
       await page.click(
         `#${domElementIds.establishmentDashboard.discussion.rejectApplicationOpenModal}`,
       );
