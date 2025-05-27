@@ -201,6 +201,8 @@ const createConventionSelection = <
         businessName: ref("conventions.business_name"),
         workConditions: ref("conventions.work_conditions"),
         agencyId: ref("conventions.agency_id"),
+        agencyReferentFirstName: ref("conventions.agency_referent_first_name"),
+        agencyReferentLastName: ref("conventions.agency_referent_last_name"),
         individualProtection: ref("conventions.individual_protection"),
         individualProtectionDescription: ref(
           "conventions.individual_protection_description",
