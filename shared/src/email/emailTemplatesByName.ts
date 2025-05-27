@@ -98,6 +98,7 @@ export const emailTemplatesByName =
       tags: ["bilan_prescripteur_formulaireBilan"],
       createEmailVariables: ({
         agencyLogoUrl,
+        agencyReferentName,
         assessmentCreationLink,
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -124,6 +125,12 @@ export const emailTemplatesByName =
         ],
         subContent: `
       Ces informations sont importantes pour la suite du parcours professionnel de ${beneficiaryFirstName} ${beneficiaryLastName}.    
+      ${
+        agencyReferentName &&
+        `
+        <strong>Conseiller :</strong>${agencyReferentName}
+        `
+      }
       ${defaultSignature(internshipKind)}
       `,
         agencyLogoUrl,
@@ -251,6 +258,7 @@ export const emailTemplatesByName =
         "Bilan - Prescripteurs - Notification de création du bilan à l'agence (cas complet ou partiel)",
       tags: ["bilan_complet_ou_partiel_créé_prescripteur_confirmation"],
       createEmailVariables: ({
+        agencyReferentName,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -322,6 +330,12 @@ export const emailTemplatesByName =
           ],
           subContent: `
           La fiche bilan a également été communiquée au candidat.
+          ${
+            agencyReferentName &&
+            `
+            <strong>Conseiller :</strong>${agencyReferentName}
+            `
+          }
 
           ${defaultSignature(internshipKind)}`,
         };
@@ -332,6 +346,7 @@ export const emailTemplatesByName =
         "Bilan - Prescripteurs - Notification de création du bilan à l'agence - (cas absent)",
       tags: ["bilan_absent_créé_prescripteur_confirmation"],
       createEmailVariables: ({
+        agencyReferentName,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -357,7 +372,14 @@ export const emailTemplatesByName =
           
           Nous vous invitons à contacter l'entreprise si vous souhaitez obtenir des précisions supplémentaires.
           
-          La fiche bilan a également été communiquée au candidat.`,
+          La fiche bilan a également été communiquée au candidat.
+          ${
+            agencyReferentName &&
+            `
+            <strong>Conseiller :</strong> ${agencyReferentName}
+            `
+          }
+          `,
 
           subContent: defaultSignature(internshipKind),
         };
@@ -630,6 +652,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       createEmailVariables: ({
         agencyLogoUrl,
         agencyName,
+        agencyReferentName,
         businessName,
         conventionId,
         dateEnd,
@@ -667,8 +690,14 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       - au ${dateEnd}      
 
       <strong>Bénéficiaire :</strong> 
-      ${firstName} ${lastName}      
-
+      ${firstName} ${lastName}    
+      ${
+        agencyReferentName &&
+        `
+        <strong>Conseiller :</strong>
+        ${agencyReferentName}
+        `
+      }
       <strong>Entreprise :</strong>
       ${businessName}      
 
@@ -800,6 +829,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       tags: ["notification conseiller demande d’immersion signée à valider"],
       createEmailVariables: ({
         agencyLogoUrl,
+        agencyReferentName,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -828,7 +858,12 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       }
       
       Elle concerne le bénéficiaire ${beneficiaryFirstName} ${beneficiaryLastName} dans l'entreprise ${businessName} 
-
+      ${
+        agencyReferentName &&
+        `
+        <strong>Conseiller :</strong> ${agencyReferentName}
+        `
+      }
       Nous vous remercions d'en prendre connaissance pour ${possibleRoleAction}.
       `,
         buttons: [
@@ -889,6 +924,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       tags: ["relance vérification manquante"],
       createEmailVariables: ({
         agencyMagicLinkUrl,
+        agencyReferentName,
         agencyName,
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -903,13 +939,18 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         content: `
       Merci de ne pas oublier de traiter la demande de convention d'immersion qui concerne :
 
-      Bénéficiaire : ${beneficiaryFirstName} ${beneficiaryLastName}
+      <strong>Bénéficiaire :</strong> ${beneficiaryFirstName} ${beneficiaryLastName}
+      ${
+        agencyReferentName &&
+        `
+        <strong>Conseiller :</strong> ${agencyReferentName}
+        `
+      }
+      <strong>Entreprise :</strong> ${businessName}
 
-      Entreprise : ${businessName}
+      <strong>Structure d'accompagnement :</strong> ${agencyName}
 
-      Structure d'accompagnement : ${agencyName}
-
-      Dates de l'immersion :
+      <strong>Dates de l'immersion :</strong>
       - du ${dateStart}
       - au ${dateEnd}
 
@@ -929,6 +970,7 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
       tags: ["relance vérification manquante"],
       createEmailVariables: ({
         agencyMagicLinkUrl,
+        agencyReferentName,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -939,7 +981,12 @@ Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
         greetings: greetingsWithConventionId(conventionId),
         content: `
       L'immersion demandée par Bénéficiaire <strong>${beneficiaryFirstName} ${beneficiaryLastName}</strong> au sein de l'entreprise <strong>${businessName}</strong> doit démarrer demain.
-
+      ${
+        agencyReferentName &&
+        `
+        <strong>Conseiller :</strong> ${agencyReferentName}
+        `
+      }
       Nous vous remercions d'examiner rapidement la demande de convention qui vous a été envoyée afin que votre décision soit transmise au bénéficiaire et à l'entreprise.`,
         buttons: [
           {
