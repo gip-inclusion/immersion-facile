@@ -1,14 +1,17 @@
 .im-button-with-sub-menu {
   $component: &;
   position: relative;
+  --underline-img: none;
+
   &__menu {
     max-height: 999px;
     overflow: auto;
     top: 100%;
     right: 0;
     max-width: fit-content(18rem, 22rem);
-    display: none;    
+    display: none;
   }
+
   &__list {
     list-style-type: none;
     width: max-content;
@@ -18,14 +21,16 @@
     #{$component}__menu {
       display: block;
     }
+
     .fr-btn:after {
       transform: rotate(180deg);
     }
   }
+
   &--opened-top {
     #{$component}__menu {
       top: auto;
       bottom: 100%;
-    }    
+    }
   }
 }
