@@ -18,13 +18,13 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionStatus,
-  type ConventionValidatorInputName,
   type ConventionValidatorInputNames,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   type ImmersionObjective,
   type InternshipKind,
   type Renewed,
+  type WithFirstnameAndLastname,
   isBeneficiary,
   isBeneficiaryStudent,
 } from "./convention.dto";
@@ -715,7 +715,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withValidator(
-    agencyValidator: ConventionValidatorInputName,
+    agencyValidator: WithFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -727,7 +727,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withCounsellor(
-    agencyCounsellor: ConventionValidatorInputName,
+    agencyCounsellor: WithFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -735,6 +735,24 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
         ...this.dto.validators,
         agencyCounsellor,
       },
+    });
+  }
+
+  public withAgencyReferentFirstName(
+    agencyReferentFirstName: string,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      agencyReferentFirstName,
+    });
+  }
+
+  public withAgencyReferentLastName(
+    agencyReferentLastName: string,
+  ): ConventionDtoBuilder {
+    return new ConventionDtoBuilder({
+      ...this.dto,
+      agencyReferentLastName,
     });
   }
 

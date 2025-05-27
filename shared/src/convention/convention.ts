@@ -12,15 +12,15 @@ import type {
   ConventionDto,
   ConventionRenewed,
   ConventionStatus,
-  ConventionValidatorInputName,
   FlatGetConventionsForAgencyUserParams,
   GetConventionsForAgencyUserParams,
   Signatories,
   Signatory,
+  WithFirstnameAndLastname,
 } from "./convention.dto";
 
 export const concatValidatorNames = (
-  validator: ConventionValidatorInputName,
+  validator: WithFirstnameAndLastname,
 ): string => [validator.firstname, validator.lastname].join(" ").trim();
 
 export const allSignatoriesSigned = (signatories: Signatories) =>
