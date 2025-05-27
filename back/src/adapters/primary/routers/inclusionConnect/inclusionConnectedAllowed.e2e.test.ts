@@ -715,9 +715,10 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       const expectedExchange: Exchange = {
-        subject: "Réponse de My businessName à votre demande",
+        subject:
+          "Réponse de My default business name à votre demande d'immersion",
         message: "My fake message",
-        sentAt: new Date().toISOString(),
+        sentAt: "2021-09-01T10:10:00.000Z",
         sender: "establishment",
         recipient: "potentialBeneficiary",
         attachments: [],
