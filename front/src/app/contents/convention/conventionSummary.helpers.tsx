@@ -400,6 +400,16 @@ const makeSignatoriesSubsections = (
               ),
             }
           : null,
+        convention.agencyReferentFirstName || convention.agencyReferentLastName
+          ? {
+              key: "agencyReferent",
+              label: "Accompagnateur",
+              value: [
+                convention.agencyReferentFirstName,
+                convention.agencyReferentLastName,
+              ].join(" "),
+            }
+          : null,
         convention.dateValidation
           ? ({
               key: "dateValidation",
