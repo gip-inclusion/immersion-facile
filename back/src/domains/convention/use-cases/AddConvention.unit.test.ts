@@ -77,6 +77,43 @@ describe("Add Convention", () => {
     ]);
   });
 
+  it("saves valid conventions with agency referent firstname and lastname in the repository", async () => {
+    const occurredAt = new Date("2021-10-15T15:00");
+    const id = "eventId";
+    timeGateway.setNextDate(occurredAt);
+    uuidGenerator.setNextUuid(id);
+
+    const validConventionWithAgencyReferent = {
+      ...validConvention,
+      agencyReferentFirstName: "Fredy",
+      agencyReferentLastName: "L'accompagnateur",
+    };
+    expect(
+      await addConvention.execute({
+        convention: validConventionWithAgencyReferent,
+      }),
+    ).toEqual({
+      id: validConvention.id,
+    });
+
+    const storedInRepo = uow.conventionRepository.conventions;
+    expect(storedInRepo[0]).toEqual(validConventionWithAgencyReferent);
+    expectDomainEventsToBeInOutbox([
+      {
+        id,
+        occurredAt: occurredAt.toISOString(),
+        topic: "ConventionSubmittedByBeneficiary",
+        payload: {
+          convention: validConventionWithAgencyReferent,
+          triggeredBy: null,
+        },
+        publications: [],
+        status: "never-published",
+        wasQuarantined: false,
+      },
+    ]);
+  });
+
   it("also sends the discussionId in the event, if initialy provided to the use case", async () => {
     const discussion = new DiscussionBuilder().build();
     const occurredAt = new Date("2021-10-15T15:00");
