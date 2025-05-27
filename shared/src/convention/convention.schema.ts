@@ -39,6 +39,8 @@ import type { OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
+  firstnameSchema,
+  lastnameSchema,
   localization,
   zBoolean,
   zEnumValidation,
@@ -256,8 +258,8 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     immersionSkills: zStringPossiblyEmptyWithMax(2000),
     establishmentTutor: establishmentTutorSchema,
     validators: conventionValidatorsSchema.optional(),
-    agencyReferentFirstName: zStringCanBeEmpty.optional(),
-    agencyReferentLastName: zStringCanBeEmpty.optional(),
+    agencyReferentFirstName: firstnameSchema.optional(),
+    agencyReferentLastName: lastnameSchema.optional(),
     renewed: renewedSchema.optional(),
     establishmentNumberEmployeesRange: numberOfEmployeesRangeSchema.optional(),
   })

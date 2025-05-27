@@ -92,7 +92,7 @@ describe("Get Convention", () => {
     })
     .withEstablishmentRepresentativeEmail(establishmentRep.email)
     .withAgencyReferentFirstName("Fredy")
-    .withAgencyReferentLastName("L'accompagnateur")
+    .withAgencyReferentLastName("L'ACCOMPAGNATEUR")
     .build();
   const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
     .withId(uuidGenerator.new())
