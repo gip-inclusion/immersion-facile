@@ -8,7 +8,7 @@ import {
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
 } from "shared";
-import type { Exchange } from "shared/src/discussion/discussion.dto";
+import type { Exchange } from "shared";
 import type {
   FetchDiscussionRequestedPayload,
   SendMessageRequestedPayload,

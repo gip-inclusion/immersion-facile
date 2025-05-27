@@ -118,8 +118,6 @@ export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
 export const exchangeFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
   z.object({
     message: zStringMinLength1,
-    sentAt: makeDateStringSchema(),
-    subject: zStringMinLength1,
   });
 
 export const sendMessageToDiscussionSchema: z.Schema<SendMessageToDiscussionFromDashboardRequestPayload> =

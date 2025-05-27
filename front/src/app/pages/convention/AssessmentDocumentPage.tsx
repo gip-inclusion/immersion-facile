@@ -13,6 +13,7 @@ import {
   makeSiretDescriptionLink,
   toDisplayedDate,
 } from "shared";
+import { escapeHtml } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";
@@ -20,7 +21,6 @@ import { usePdfGenerator } from "src/app/hooks/pdf.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import type { routes } from "src/app/routes/routes";
-import { escapeHtml } from "src/app/utils/sanitize";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import type { Route } from "type-route";

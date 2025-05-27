@@ -19,6 +19,8 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
+const inputSources = ["dashboard", "inbound-parsing"] as const;
+
 type MessageInputCommonFields = {
   message: string;
   discussionId: DiscussionId;
@@ -38,15 +40,18 @@ type FullMessageInput = MessageInputCommonFields & {
 
 type InputSource = (typeof inputSources)[number];
 
-// TODO : better typing to avoid usage including sentAt and subject on dashboard source
-export type MessageInput = MessageInputFromDashboard | FullMessageInput;
+export type AddExchangeToDiscussionInput =
+  | {
+      source: Extract<InputSource, "dashboard">;
+      messageInputs: MessageInputFromDashboard[];
+    }
+  | {
+      source: Extract<InputSource, "inbound-parsing">;
+      messageInputs: FullMessageInput[];
+    };
 
-export type AddExchangeToDiscussionInput = {
-  source: InputSource;
-  messageInputs: MessageInput[];
-};
-
-const inputSources = ["dashboard", "inbound-parsing"] as const;
+export type MessageInput =
+  AddExchangeToDiscussionInput["messageInputs"][number];
 
 const messageInputCommonFieldsSchema = z.object({
   message: zStringMinLength1,
@@ -120,7 +125,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
   async #processSendMessage(
     uow: UnitOfWork,
     source: InputSource,
-    params: MessageInput | FullMessageInput,
+    params: MessageInput,
   ): Promise<Exchange> {
     const { discussionId, message, recipientRole, attachments } = params;
 
@@ -170,7 +175,7 @@ const makeFormattedSubject = ({
 }): string => {
   const hasNoSubject = !subject || subject === "";
   if (source === "dashboard" && hasNoSubject) {
-    return `Réponse de ${discussion.businessName} à votre demande`;
+    return `Réponse de ${discussion.businessName} à votre demande d'immersion`;
   }
   return hasNoSubject ? defaultSubject : subject;
 };

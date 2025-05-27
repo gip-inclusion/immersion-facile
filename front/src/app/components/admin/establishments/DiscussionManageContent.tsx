@@ -27,6 +27,7 @@ import {
   discussionIdSchema,
   discussionRejectionSchema,
   domElementIds,
+  escapeHtml,
   getDiscussionDisplayStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
@@ -568,7 +569,10 @@ const RejectApplicationForm = ({
 
 const messageFormSchema = z.object({
   discussionId: discussionIdSchema,
-  message: z.string().min(1, "Le message ne peut pas être vide"),
+  message: z
+    .string()
+    .min(1, "Le message ne peut pas être vide")
+    .transform(escapeHtml),
 });
 
 type MessageFormValues = z.infer<typeof messageFormSchema>;
@@ -620,6 +624,10 @@ const DiscussionEchangeMessageForm = ({
         {...getFieldError("message")}
       />
       <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
+        <Feedback
+          topics={["establishment-dashboard-discussion-send-message"]}
+          className={fr.cx("fr-mb-2w")}
+        />
         <Button
           id={
             domElementIds.establishmentDashboard.discussion
