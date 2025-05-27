@@ -20,16 +20,16 @@ import {
   type DiscussionId,
   type DiscussionReadDto,
   type Email,
+  type ExchangeFromDashboard,
   type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
   type WithDiscussionId,
   type WithDiscussionRejection,
   addressDtoToString,
   createOpaqueEmail,
-  discussionIdSchema,
   discussionRejectionSchema,
   domElementIds,
-  escapeHtml,
+  exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
@@ -52,7 +52,6 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
-import z from "zod";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
@@ -567,23 +566,13 @@ const RejectApplicationForm = ({
   );
 };
 
-const messageFormSchema = z.object({
-  discussionId: discussionIdSchema,
-  message: z
-    .string()
-    .min(1, "Le message ne peut pas être vide")
-    .transform(escapeHtml),
-});
-
-type MessageFormValues = z.infer<typeof messageFormSchema>;
-
 const DiscussionEchangeMessageForm = ({
   discussionId,
 }: {
   discussionId: DiscussionId;
 }) => {
-  const { register, handleSubmit, formState } = useForm<MessageFormValues>({
-    resolver: zodResolver(messageFormSchema),
+  const { register, handleSubmit, formState } = useForm<ExchangeFromDashboard>({
+    resolver: zodResolver(exchangeMessageFromDashboardSchema),
     defaultValues: {
       message: "",
     },
@@ -594,7 +583,7 @@ const DiscussionEchangeMessageForm = ({
     authSelectors.inclusionConnectToken,
   );
 
-  const onSubmit = (data: MessageFormValues) => {
+  const onSubmit = (data: ExchangeFromDashboard) => {
     if (inclusionConnectedJwt) {
       dispatch(
         discussionSlice.actions.sendMessageRequested({

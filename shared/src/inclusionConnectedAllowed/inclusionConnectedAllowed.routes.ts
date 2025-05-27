@@ -8,8 +8,8 @@ import {
 import {
   discussionReadSchema,
   discussionRejectedSchema,
-  exchangeFromDashboardSchema,
   exchangeSchema,
+  withExchangeMessageSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
@@ -110,7 +110,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     method: "post",
     url: "/discussion-for-establishment/:discussionId/send-message",
     ...withAuthorizationHeaders,
-    requestBodySchema: exchangeFromDashboardSchema,
+    requestBodySchema: withExchangeMessageSchema,
     responses: {
       200: exchangeSchema,
       400: httpErrorSchema,
