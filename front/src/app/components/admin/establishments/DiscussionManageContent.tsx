@@ -320,7 +320,8 @@ const DiscussionExchangesList = ({
   discussion: DiscussionReadDto;
 }): JSX.Element => {
   return (
-    <>
+    <section>
+      <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
       {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
           <header
@@ -365,7 +366,7 @@ const DiscussionExchangesList = ({
           </section>
         </ExchangeMessage>
       ))}
-    </>
+    </section>
   );
 };
 
