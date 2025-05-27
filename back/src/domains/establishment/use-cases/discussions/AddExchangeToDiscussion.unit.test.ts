@@ -190,7 +190,8 @@ describe("AddExchangeToDiscussion", () => {
               sender: "establishment",
               sentAt: "2021-09-01T10:10:00.000Z",
               recipient: "potentialBeneficiary",
-              subject: "Réponse de My default business name à votre demande",
+              subject:
+                "Réponse de My default business name à votre demande d'immersion",
               attachments: [],
             },
           ],
