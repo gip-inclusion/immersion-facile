@@ -1288,20 +1288,17 @@ Tél : ${beneficiaryPhone}`,
     },
 
     MAGIC_LINK_RENEWAL: {
-      niceName: "Convention - Renouvellement de lien magique",
+      niceName: "Renouvellement de lien",
       tags: ["renouvellement de lien"],
       createEmailVariables: ({ conventionId, internshipKind, magicLink }) => ({
-        subject:
-          internshipKind === "immersion"
-            ? "Voici votre nouveau lien magique pour accéder à la demande d'immersion"
-            : "Mini Stage - Voici votre nouveau lien magique pour accéder à la demande de mini stage",
+        subject: "Voici votre nouveau lien",
+
         greetings: conventionId
           ? greetingsWithConventionId(conventionId)
           : "Bonjour ,",
         content: `
-      Vous venez de demander le renouvellement d'un lien pour accéder à une demande ${
-        internshipKind === "immersion" ? "d'immersion" : "de mini stage"
-      }. Veuillez le trouver ci-dessous :
+      Vous venez de demander le renouvellement d'un lien sur Immersion Facilitée. 
+      Veuillez le trouver ci-dessous :
       `,
         buttons: [
           {
