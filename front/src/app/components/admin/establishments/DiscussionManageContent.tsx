@@ -7,11 +7,13 @@ import { Card } from "@codegouvfr/react-dsfr/Card";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
-import { ButtonWithSubMenu } from "react-design-system";
 import { useEffect, useState } from "react";
+import { ButtonWithSubMenu } from "react-design-system";
 import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
 import { createPortal } from "react-dom";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DiscussionDisplayStatus,
@@ -32,8 +34,10 @@ import {
   rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
+import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   getConventionInitialValuesFromUrl,
@@ -48,12 +52,8 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { P, match } from "ts-pattern";
-import { Feedback } from "../../feedback/Feedback";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
-import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import z from "zod";
+import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
 
