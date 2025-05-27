@@ -79,6 +79,16 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Veuillez sélectionner une structure d'accompagnement"
         : "Veuillez sélectionner un point orientation",
   },
+  agencyReferentFirstName: {
+    label: "Prénom de l'accompagnateur",
+    id: conventionSectionIds.agencyReferentFirstName,
+    hintText:
+      "Indiquez la personne qui prescrit l’immersion, si vous le connaissez (accompagnateur du candidat ou conseiller entreprise par exemple).",
+  },
+  agencyReferentLastName: {
+    label: "Nom de l'accompagnateur",
+    id: conventionSectionIds.agencyReferentLastName,
+  },
   agencyRefersTo: {
     label: "Votre structure prescriptrice",
     id: "",
