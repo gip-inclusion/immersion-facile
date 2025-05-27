@@ -91,6 +91,8 @@ describe("Get Convention", () => {
       role: "beneficiary-current-employer",
     })
     .withEstablishmentRepresentativeEmail(establishmentRep.email)
+    .withAgencyReferentFirstName("Fredy")
+    .withAgencyReferentLastName("L'accompagnateur")
     .build();
   const conventionWithEstablishmentTutor = new ConventionDtoBuilder()
     .withId(uuidGenerator.new())
