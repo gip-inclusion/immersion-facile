@@ -1,3 +1,4 @@
+import { sql } from "kysely";
 import { andThen } from "ramda";
 import { type ConventionDto, filter, pipeWithValue } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
@@ -34,6 +35,12 @@ export class PgEstablishmentLeadQueries implements EstablishmentLeadQueries {
     return pipeWithValue(
       createConventionQueryBuilder(this.transaction),
       makeGetLastConventionWithSiretInList(sirets),
+      (builder) =>
+        builder.where(
+          sql`conventions.date_end`,
+          ">",
+          params.conventionEndDateGreater,
+        ),
       (builder) => builder.execute(),
       andThen(filter((conv) => conv.rn === "1")),
       andThen(validateConventionResults),

@@ -1,6 +1,11 @@
-import { subDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import type { Pool } from "pg";
-import { AgencyDtoBuilder, ConventionDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConventionDtoBuilder,
+  expectToEqual,
+  reasonableSchedule,
+} from "shared";
 import { v4 as uuid } from "uuid";
 import {
   type KyselyDb,
@@ -28,6 +33,9 @@ const agency = new AgencyDtoBuilder().withId(agencyId).build();
 
 const convention1 = new ConventionDtoBuilder()
   .withId(conventionId1)
+  .withDateStart("2025-05-01T00:00:00.000Z")
+  .withDateEnd("2025-05-10T00:00:00.000Z")
+  .withSchedule(reasonableSchedule)
   .withAgencyId(agencyId)
   .withSiret(siret1)
   .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -36,6 +44,9 @@ const convention1 = new ConventionDtoBuilder()
 
 const convention2 = new ConventionDtoBuilder()
   .withId(conventionId2)
+  .withDateStart("2025-05-01T00:00:00.000Z")
+  .withDateEnd("2025-05-10T00:00:00.000Z")
+  .withSchedule(reasonableSchedule)
   .withAgencyId(agencyId)
   .withSiret(siret2)
   .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -118,13 +129,37 @@ describe("PgEstablishmentLeadQueries", () => {
     it("returns empty array when no data matches", async () => {
       const result =
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          conventionEndDateGreater: new Date(convention1.dateEnd),
           kind: "to-be-reminded",
           maxResults: 1000,
         });
       expectToEqual(result, []);
     });
 
-    it("get the last convention by last event kind ", async () => {
+    it("returns empty array when convention ended only 5 days ago", async () => {
+      const validator = makeUniqueUserForTest(uuid());
+
+      await pgUserRepository.save(validator);
+      await agencyRepo.insert(
+        toAgencyWithRights(agency, {
+          [validator.id]: { isNotifiedByEmail: true, roles: ["validator"] },
+        }),
+      );
+      await Promise.all([
+        conventionRepository.save(convention1),
+        establishmentLeadRepository.save(establishmentLead1),
+      ]);
+
+      const result =
+        await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          conventionEndDateGreater: addDays(new Date(convention1.dateEnd), 1),
+          kind: "to-be-reminded",
+          maxResults: 1000,
+        });
+      expectToEqual(result, []);
+    });
+
+    it("get the last convention by last event kind", async () => {
       const validator = makeUniqueUserForTest(uuid());
 
       await pgUserRepository.save(validator);
@@ -143,6 +178,7 @@ describe("PgEstablishmentLeadQueries", () => {
 
       const result =
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          conventionEndDateGreater: subDays(new Date(convention1.dateEnd), 1),
           kind: "to-be-reminded",
           maxResults: 1000,
         });
@@ -179,6 +215,7 @@ describe("PgEstablishmentLeadQueries", () => {
 
       const result =
         await establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+          conventionEndDateGreater: subDays(new Date(convention1.dateEnd), 1),
           kind: "to-be-reminded",
           maxResults: 1,
         });

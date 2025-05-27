@@ -1,3 +1,4 @@
+import { subDays } from "date-fns";
 import {
   type AbsoluteUrl,
   type ConventionDto,
@@ -79,8 +80,10 @@ export class SendEstablishmentLeadReminderScript extends TransactionalUseCase<
     { kind, beforeDate }: EstablishmentLeadReminderParams,
     uow: UnitOfWork,
   ): Promise<SendEstablishmentLeadReminderOutput> {
+    const tenDaysAgo = subDays(this.#timeGateway.now(), 10);
     const conventions =
       await uow.establishmentLeadQueries.getLastConventionsByUniqLastEventKind({
+        conventionEndDateGreater: tenDaysAgo,
         kind,
         beforeDate,
         maxResults: 1000,

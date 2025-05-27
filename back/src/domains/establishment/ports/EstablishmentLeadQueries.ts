@@ -2,7 +2,10 @@ import type { ConventionDto } from "shared";
 import type { EstablishmentLeadReminderParams } from "../use-cases/SendEstablishmentLeadReminderScript";
 
 export type GetLastConventionsByUniqLastEventKindParams =
-  EstablishmentLeadReminderParams & { maxResults: number };
+  EstablishmentLeadReminderParams & {
+    maxResults: number;
+    conventionEndDateGreater: Date;
+  };
 
 export interface EstablishmentLeadQueries {
   getLastConventionsByUniqLastEventKind(
