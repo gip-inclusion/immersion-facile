@@ -53,7 +53,7 @@ describe("PgConventionRepository", () => {
     .withImmersionAppellation(styliste)
     .withUpdatedAt(anyConventionUpdatedAt)
     .withAgencyReferentFirstName("Fredy")
-    .withAgencyReferentLastName("L'accompagnateur")
+    .withAgencyReferentLastName("L'ACCOMPAGNATEUR")
     .withAgencyId(agency.id);
 
   let pool: Pool;
@@ -131,7 +131,7 @@ describe("PgConventionRepository", () => {
       .withDateEnd(new Date("2023-01-06").toISOString())
       .withSchedule(reasonableSchedule)
       .withAgencyReferentFirstName("Fredy")
-      .withAgencyReferentLastName("L'accompagnateur")
+      .withAgencyReferentLastName("L'ACCOMPAGNATEUR")
       .build();
 
     await conventionRepository.save(convention);
@@ -887,7 +887,7 @@ describe("PgConventionRepository", () => {
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
         .withAgencyReferentFirstName("New")
-        .withAgencyReferentLastName("Referent")
+        .withAgencyReferentLastName("REFERENT")
         .build();
 
       await conventionRepository.update(
