@@ -70,3 +70,11 @@ export const getFullname = (
   firstname?: string,
   lastname?: string,
 ): string | undefined => [firstname, lastname].join(" ").trim() || undefined;
+
+export const escapeHtml = (unsafe: string) =>
+  unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");

@@ -321,7 +321,8 @@ describe("AddExchangeToDiscussion", () => {
         message: "Hello without sentAt and subject",
         sender: "establishment",
         recipient: "potentialBeneficiary",
-        subject: "Réponse de My default business name à votre demande",
+        subject:
+          "Réponse de My default business name à votre demande d'immersion",
         sentAt: "2021-09-01T10:10:00.000Z",
         attachments: [],
       });
@@ -406,7 +407,6 @@ describe("AddExchangeToDiscussion", () => {
         );
       });
       it("throws an error if the source is dashboard, but user is not connected", async () => {
-        const sentAt = new Date().toISOString();
         const payload: AddExchangeToDiscussionInput = {
           source: "dashboard",
           messageInputs: [
@@ -415,8 +415,6 @@ describe("AddExchangeToDiscussion", () => {
               discussionId: "11111111-e89b-12d3-a456-426614174000",
               recipientRole: "potentialBeneficiary",
               attachments: [],
-              subject: "Fake subject",
-              sentAt,
             },
           ],
         };
