@@ -30,7 +30,6 @@ import type {
   ExchangeRole,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
-  SendMessageToDiscussionFromDashboardRequestPayload,
   WithDiscussionRejection,
 } from "./discussion.dto";
 
@@ -115,18 +114,14 @@ export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
   })
   .and(discussionRejectionSchema);
 
-export const exchangeFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
-  z.object({
-    message: zStringMinLength1,
-  });
+export const withExchangeMessageSchema: z.Schema<
+  Pick<ExchangeFromDashboard, "message">
+> = z.object({
+  message: zStringMinLength1,
+});
 
-export const sendMessageToDiscussionSchema: z.Schema<SendMessageToDiscussionFromDashboardRequestPayload> =
-  z
-    .object({
-      discussionId: discussionIdSchema,
-      jwt: z.string(),
-    })
-    .and(exchangeFromDashboardSchema);
+export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
+  withExchangeMessageSchema.and(z.object({ discussionId: discussionIdSchema }));
 
 const discussionNotRejectedSchema: z.Schema<
   DiscussionAccepted | DiscussionPending
