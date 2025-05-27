@@ -162,6 +162,12 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
+    ...(federatedIdentity?.payload && mode === "create-from-scratch"
+      ? {
+          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
+          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
+        }
+      : {}),
   }).current;
   useExistingSiret({
     siret: initialValues.siret,
