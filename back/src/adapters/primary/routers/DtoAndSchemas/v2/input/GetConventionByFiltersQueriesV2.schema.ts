@@ -10,14 +10,16 @@ export type GetConventionsByFiltersQueryParamsV2 = {
 
 const conventionStatusSchema = z.enum(conventionStatuses);
 
-export const getConventionsByFiltersQueryParamsV2Schema = z.object({
-  startDateGreater: z.coerce.date().optional(),
-  startDateLessOrEqual: z.coerce.date().optional(),
-  withStatuses: z
-    .array(conventionStatusSchema)
-    .optional()
-    .or(conventionStatusSchema.optional()),
-});
+export const getConventionsByFiltersQueryParamsV2Schema = z
+  .object({
+    startDateGreater: z.coerce.date().optional(),
+    startDateLessOrEqual: z.coerce.date().optional(),
+    withStatuses: z
+      .array(conventionStatusSchema)
+      .optional()
+      .or(conventionStatusSchema.optional()),
+  })
+  .strict();
 
 export const getConventionsByFiltersV2ToDomain = (
   paramsV2: GetConventionsByFiltersQueryParamsV2,

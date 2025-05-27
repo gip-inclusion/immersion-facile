@@ -190,6 +190,23 @@ describe("Convention routes", () => {
       });
     });
 
+    it("400 - fails if unknown keys are provided", async () => {
+      const response = await sharedRequest.getConventions({
+        headers: { authorization: "whatever" },
+        queryParams: { someUnknownKey: "yolo" } as any,
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          status: 400,
+          message:
+            "Shared-route schema 'queryParamsSchema' was not respected in adapter 'express'.\nRoute: GET /v2/conventions",
+          issues: [" : Unrecognized key(s) in object: 'someUnknownKey'"],
+        },
+      });
+    });
+
     it("200 - returns the conventions matching agencyIds in scope", async () => {
       inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
       inMemoryUow.conventionRepository.setConventions([convention]);
