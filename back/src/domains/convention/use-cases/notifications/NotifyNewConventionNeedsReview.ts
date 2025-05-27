@@ -108,6 +108,13 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
           recipients: [recipient.email],
           params: {
             agencyLogoUrl: agency.logoUrl ?? undefined,
+            agencyReferentName:
+              [
+                convention.agencyReferentFirstName,
+                convention.agencyReferentLastName,
+              ]
+                .join(" ")
+                .trim() || undefined,
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
             businessName: convention.businessName,

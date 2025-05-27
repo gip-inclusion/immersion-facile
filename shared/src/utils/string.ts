@@ -65,3 +65,8 @@ export const doesObjectContainsHTML = (obj: object): boolean => {
   };
   return values(obj).reduce(browseObjectProps, false);
 };
+
+export const getFullname = (
+  firstname?: string,
+  lastname?: string,
+): string | undefined => [firstname, lastname].join(" ").trim() || undefined;

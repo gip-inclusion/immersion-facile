@@ -15,6 +15,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  getFullname,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -761,6 +762,10 @@ const makeAgencyFirstReminderEmail = ({
   kind: "AGENCY_FIRST_REMINDER",
   recipients: [email],
   params: {
+    agencyReferentName: getFullname(
+      convention.agencyReferentFirstName,
+      convention.agencyReferentLastName,
+    ),
     conventionId: convention.id,
     agencyName: agency.name,
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
@@ -785,6 +790,10 @@ const makeAgencyLastReminderEmail = ({
   recipients: [email],
   params: {
     conventionId: convention.id,
+    agencyReferentName: getFullname(
+      convention.agencyReferentFirstName,
+      convention.agencyReferentLastName,
+    ),
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
     beneficiaryLastName: convention.signatories.beneficiary.lastName,
     businessName: convention.businessName,

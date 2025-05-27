@@ -11,6 +11,7 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  getFullname,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
@@ -95,6 +96,10 @@ describe("SendAssessmentNeededNotifications", () => {
       params: {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         agencyLogoUrl: agency.logoUrl!,
+        agencyReferentName: getFullname(
+          conventionEndingTomorrow.agencyReferentFirstName,
+          conventionEndingTomorrow.agencyReferentLastName,
+        ),
         beneficiaryFirstName:
           conventionEndingTomorrow.signatories.beneficiary.firstName,
         beneficiaryLastName:
@@ -121,6 +126,10 @@ describe("SendAssessmentNeededNotifications", () => {
       params: {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         agencyLogoUrl: agency.logoUrl!,
+        agencyReferentName: getFullname(
+          conventionEndingTomorrow.agencyReferentFirstName,
+          conventionEndingTomorrow.agencyReferentLastName,
+        ),
         beneficiaryFirstName:
           conventionEndingTomorrow.signatories.beneficiary.firstName,
         beneficiaryLastName:
