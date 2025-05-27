@@ -266,6 +266,8 @@ interface Conventions extends WithAcquisition {
   date_approval: Timestamp | null;
   establishment_number_employees: NumberEmployeesRange | null;
   individual_protection_description: Generated<string>;
+  agency_referent_first_name: Generated<string | null>;
+  agency_referent_last_name: Generated<string | null>;
 }
 
 interface ConventionsToSyncWithPe {
