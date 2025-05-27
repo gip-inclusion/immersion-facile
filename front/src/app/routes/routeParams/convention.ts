@@ -323,7 +323,8 @@ export const conventionValuesFromUrl = {
   erEmail: param.query.optional.string,
   immersionAddress: param.query.optional.string,
   agencyId: param.query.optional.string,
-
+  agencyReferentFirstName: param.query.optional.string,
+  agencyReferentLastName: param.query.optional.string,
   immersionObjective: param.query.optional.string,
   immersionActivities: param.query.optional.string,
   immersionSkills: param.query.optional.string,
@@ -417,6 +418,8 @@ const conventionPresentationFromParams = (
   agencyId: params.agencyId ?? undefined,
   agencyDepartment: params.agencyDepartment ?? "",
   agencyKind: params.agencyKind as AgencyKind | undefined,
+  agencyReferentFirstName: params.agencyReferentFirstName ?? "",
+  agencyReferentLastName: params.agencyReferentLastName ?? "",
 
   //Actors
   establishmentTutor: {
