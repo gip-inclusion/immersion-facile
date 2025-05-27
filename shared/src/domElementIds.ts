@@ -260,6 +260,8 @@ export const domElementIds = {
       agencyDepartment: "im-convention-form__agencyDepartement",
       agencyId: "im-convention-form__agencyId",
       agencyKind: "im-convention-form__agencyKind",
+      agencyReferentFirstName: "im-convention-form__agencyReferentFirstName",
+      agencyReferentLastName: "im-convention-form__agencyReferentLastName",
       dateStart: "im-convention-form__dateStart",
       dateEnd: "im-convention-form__dateEnd",
       addHoursButton: "im-convention-form__add-hours-button",

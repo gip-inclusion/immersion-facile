@@ -70,6 +70,7 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 
+import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errors as errorMessage } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -189,6 +190,7 @@ export const ConventionForm = ({
     getValues,
     getFieldState,
     formState,
+    register,
     reset,
   } = methods;
 
@@ -228,6 +230,12 @@ export const ConventionForm = ({
       agencyKind: convention.agencyKind,
       agencyDepartment: convention.agencyDepartment,
       workConditions: undefinedIfEmptyString(convention.workConditions),
+      agencyReferentFirstName: undefinedIfEmptyString(
+        convention.agencyReferentFirstName,
+      ),
+      agencyReferentLastName: undefinedIfEmptyString(
+        convention.agencyReferentLastName,
+      ),
       establishmentNumberEmployeesRange:
         establishmentNumberEmployeesRange === ""
           ? undefined
@@ -476,27 +484,47 @@ export const ConventionForm = ({
                     }
                     {...makeAccordionProps(1)}
                   >
-                    <AgencySelector
-                      fields={{
-                        agencyDepartmentField,
-                        agencyIdField,
-                        agencyKindField,
-                      }}
-                      shouldLockToPeAgencies={shouldLockToPeAgencies}
-                      shouldFilterDelegationPrescriptionAgencyKind={false}
-                      shouldShowAgencyKindField={
-                        conventionValues?.internshipKind === "immersion"
-                      }
-                      agencyDepartmentOptions={departmentOptions}
-                      onDepartmentCodeChangedMemoized={
-                        onDepartmentCodeChangedMemoized
-                      }
-                      agencyOptions={agencyOptions}
-                      isLoading={isAgenciesLoading}
-                      isFetchAgencyOptionsError={
-                        agenciesFeedback.kind === "errored"
-                      }
-                    />
+                    <>
+                      <AgencySelector
+                        fields={{
+                          agencyDepartmentField,
+                          agencyIdField,
+                          agencyKindField,
+                        }}
+                        shouldLockToPeAgencies={shouldLockToPeAgencies}
+                        shouldFilterDelegationPrescriptionAgencyKind={false}
+                        shouldShowAgencyKindField={
+                          conventionValues?.internshipKind === "immersion"
+                        }
+                        agencyDepartmentOptions={departmentOptions}
+                        onDepartmentCodeChangedMemoized={
+                          onDepartmentCodeChangedMemoized
+                        }
+                        agencyOptions={agencyOptions}
+                        isLoading={isAgenciesLoading}
+                        isFetchAgencyOptionsError={
+                          agenciesFeedback.kind === "errored"
+                        }
+                      />
+                      <Input
+                        label={formContents.agencyReferentFirstName.label}
+                        hintText={formContents.agencyReferentFirstName.hintText}
+                        nativeInputProps={{
+                          ...formContents.agencyReferentFirstName,
+                          ...register("agencyReferentFirstName"),
+                        }}
+                        {...getFieldError("agencyReferentFirstName")}
+                      />
+                      <Input
+                        label={formContents.agencyReferentLastName.label}
+                        hintText={formContents.agencyReferentLastName.hintText}
+                        nativeInputProps={{
+                          ...formContents.agencyReferentLastName,
+                          ...register("agencyReferentLastName"),
+                        }}
+                        {...getFieldError("agencyReferentLastName")}
+                      />
+                    </>
                   </Accordion>
 
                   <Accordion
