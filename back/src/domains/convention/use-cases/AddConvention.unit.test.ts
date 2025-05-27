@@ -86,7 +86,7 @@ describe("Add Convention", () => {
     const validConventionWithAgencyReferent = {
       ...validConvention,
       agencyReferentFirstName: "Fredy",
-      agencyReferentLastName: "L'accompagnateur",
+      agencyReferentLastName: "L'ACCOMPAGNATEUR",
     };
     expect(
       await addConvention.execute({

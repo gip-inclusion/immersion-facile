@@ -1,5 +1,7 @@
 import { ZodError } from "zod";
 import {
+  firstnameSchema,
+  lastnameSchema,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
@@ -239,4 +241,39 @@ describe("zTrimmedStringWithMax schema validation", () => {
   ])(`fails to validate "%s"`, ({ input, expectedError }) => {
     expect(() => zTrimmedStringWithMax(3).parse(input)).toThrow(expectedError);
   });
+});
+
+describe("firstnameSchema", () => {
+  it.each([
+    { firstname: "", expectedFirstname: "" },
+    { firstname: ".", expectedFirstname: "." },
+    { firstname: "julien", expectedFirstname: "Julien" },
+    { firstname: "Julien", expectedFirstname: "Julien" },
+    { firstname: "JULIEN", expectedFirstname: "Julien" },
+    { firstname: "jean-paul", expectedFirstname: "Jean-Paul" },
+    { firstname: "jean  paul", expectedFirstname: "Jean Paul" },
+  ])(
+    "applies firstname transformation",
+    ({
+      firstname,
+      expectedFirstname,
+    }: { firstname: string; expectedFirstname: string }) => {
+      expect(firstnameSchema.parse(firstname)).toBe(expectedFirstname);
+    },
+  );
+});
+
+describe("lastnameSchema", () => {
+  it.each([
+    { lastname: "julien", expectedLastname: "JULIEN" },
+    { lastname: "L'accompagnateur", expectedLastname: "L'ACCOMPAGNATEUR" },
+  ])(
+    "applies firstname transformation",
+    ({
+      lastname,
+      expectedLastname,
+    }: { lastname: string; expectedLastname: string }) => {
+      expect(lastnameSchema.parse(lastname)).toBe(expectedLastname);
+    },
+  );
 });
