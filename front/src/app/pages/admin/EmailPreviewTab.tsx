@@ -210,6 +210,7 @@ export const defaultEmailValueByEmailKind: {
   },
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     agencyName: "AGENCY_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
@@ -220,6 +221,7 @@ export const defaultEmailValueByEmailKind: {
   },
   AGENCY_LAST_REMINDER: {
     agencyMagicLinkUrl: "CONVENTION_VERIFICATION_LINK",
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
@@ -293,6 +295,7 @@ export const defaultEmailValueByEmailKind: {
   },
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     assessmentCreationLink: "ASSESSMENT_CREATION_LINK",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
@@ -480,6 +483,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "MAGIC_LINK",
   },
   ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
@@ -503,6 +507,7 @@ export const defaultEmailValueByEmailKind: {
     magicLink: "http://MAGIC_LINK",
   },
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
@@ -520,6 +525,7 @@ export const defaultEmailValueByEmailKind: {
   },
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     internshipKind: "immersion",
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     conventionId: "CONVENTION_ID",
     firstName: "FIRST_NAME",
     lastName: "LAST_NAME",
@@ -562,6 +568,7 @@ export const defaultEmailValueByEmailKind: {
   },
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,
+    agencyReferentName: "AGENCY_REFERENT_NAME",
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
