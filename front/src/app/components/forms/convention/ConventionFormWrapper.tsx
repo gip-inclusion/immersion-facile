@@ -122,7 +122,7 @@ export const ConventionFormWrapper = ({
     inclusionConnectedRoles,
   );
 
-  useScrollToTop(formSuccessfullySubmitted);
+  useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
 
   useEffect(() => {
     if (mode === "edit" && route.params.jwt) {
@@ -430,7 +430,7 @@ const ConventionSummarySection = ({
           <form>
             <Input
               textArea
-              label="Expliquer les modifications"
+              label="Expliquer les modifications *"
               hintText="Votre message sera envoyé aux autres signataires"
               nativeTextAreaProps={{
                 ...register("statusJustification"),
