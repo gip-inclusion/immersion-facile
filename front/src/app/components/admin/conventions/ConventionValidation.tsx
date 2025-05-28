@@ -25,11 +25,10 @@ import {
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
-import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { sendSignatureLinkSelectors } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.selectors";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
-import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
 import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
@@ -49,6 +48,8 @@ const sendSignatureLinkModal = createModal({
   isOpenedByDefault: false,
 });
 
+type SignatureLinkState = Record<SignatoryRole, boolean>;
+
 export interface ConventionValidationProps {
   convention: ConventionReadDto;
   jwtParams: JwtKindProps;
@@ -60,15 +61,22 @@ export const ConventionValidation = ({
 }: ConventionValidationProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
-  const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
-  const isSending = useAppSelector(sendSignatureLinkSelectors.isSending);
-  const hasErrorFeedback = feedbacks["send-signature-link"]?.level === "error";
+
+  useScrollToTop(!!useFeedbackTopic("send-signature-link"));
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
     useState<{
       signatoryRole: SignatoryRole;
       signatoryPhone: Phone;
     } | null>(null);
+
+  const [signatureLinksSent, setSignatureLinksSent] =
+    useState<SignatureLinkState>({
+      beneficiary: false,
+      "establishment-representative": false,
+      "beneficiary-representative": false,
+      "beneficiary-current-employer": false,
+    });
 
   const closeSendSignatureLinkModal = () => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
@@ -96,34 +104,42 @@ export const ConventionValidation = ({
   } chez ${businessName} ${beforeAfterString(dateStart)}`;
 
   const onSubmitSendSignatureLink = () => {
-    if (signatoryToSendSignatureLink)
+    if (signatoryToSendSignatureLink) {
+      const { signatoryRole } = signatoryToSendSignatureLink;
+
       dispatch(
         sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
           conventionId: convention.id,
-          signatoryRole: signatoryToSendSignatureLink.signatoryRole,
+          signatoryRole,
           jwt: jwtParams.jwt,
           feedbackTopic: "send-signature-link",
         }),
       );
+
+      setSignatureLinksSent((prev) => ({
+        ...prev,
+        [signatoryRole]: true,
+      }));
+    }
   };
 
   const openSendSignatureLinkButtonProps: (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
-  ) => ButtonProps = (signatoryRole, signatoryPhone, signatoryAlreadySign) => {
-    return {
-      priority: "tertiary",
-      children: "Faire signer par SMS",
-      disabled: !isValidMobilePhone(signatoryPhone) || signatoryAlreadySign,
-      onClick: () => {
-        sendSignatureLinkModal.open();
-        setSignatoryToSendSignatureLink({ signatoryRole, signatoryPhone });
-      },
-
-      id: domElementIds.manageConvention.openSendSignatureLinkModal,
-    };
-  };
+  ) => ButtonProps = (signatoryRole, signatoryPhone, signatoryAlreadySign) => ({
+    priority: "tertiary",
+    children: "Faire signer par SMS",
+    disabled:
+      !isValidMobilePhone(signatoryPhone) ||
+      signatoryAlreadySign ||
+      signatureLinksSent[signatoryRole],
+    onClick: () => {
+      sendSignatureLinkModal.open();
+      setSignatoryToSendSignatureLink({ signatoryRole, signatoryPhone });
+    },
+    id: domElementIds.manageConvention.openSendSignatureLinkModal,
+  });
 
   return (
     <>
@@ -174,7 +190,6 @@ export const ConventionValidation = ({
                 .submitSendSignatureLinkModalButton,
               priority: "primary",
               children: "Envoyer",
-              disabled: hasErrorFeedback || isSending,
               onClick: () => onSubmitSendSignatureLink(),
             },
           ]}
