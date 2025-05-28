@@ -237,7 +237,9 @@ export type Exchange = {
   attachments: Attachment[];
 };
 
-export type ExchangeFromDashboard = Pick<Exchange, "message"> &
+export type ExchangeMessageFromDashboard = Pick<Exchange, "message">;
+
+export type ExchangeFromDashboard = ExchangeMessageFromDashboard &
   WithDiscussionId;
 
 export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
