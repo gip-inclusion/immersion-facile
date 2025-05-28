@@ -319,10 +319,13 @@ const DiscussionExchangesList = ({
 }: {
   discussion: DiscussionReadDto;
 }): JSX.Element => {
+  const sortedBySentAtDesc = discussion.exchanges.sort(
+    (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
+  );
   return (
     <section>
       <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
-      {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
+      {sortedBySentAtDesc.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
           <header
             className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
