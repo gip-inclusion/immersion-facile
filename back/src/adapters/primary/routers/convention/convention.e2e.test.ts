@@ -35,8 +35,8 @@ import { match } from "ts-pattern";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
+  type GenerateConnectedUserJwt,
   type GenerateConventionJwt,
-  type GenerateInclusionConnectJwt,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
@@ -88,7 +88,7 @@ describe("convention e2e", () => {
   let magicLinkRequest: HttpClient<ConventionMagicLinkRoutes>;
   let technicalRoutesClient: HttpClient<TechnicalRoutes>;
   let generateConventionJwt: GenerateConventionJwt;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let gateways: InMemoryGateways;
@@ -102,7 +102,7 @@ describe("convention e2e", () => {
       eventCrawler,
       gateways,
       generateConventionJwt,
-      generateInclusionConnectJwt,
+      generateConnectedUserJwt,
       inMemoryUow,
       appConfig,
     } = testApp);
@@ -302,10 +302,10 @@ describe("convention e2e", () => {
             }),
           )
           .with("BackOfficeJwt", () =>
-            generateInclusionConnectJwt(backofficeAdminJwtPayload),
+            generateConnectedUserJwt(backofficeAdminJwtPayload),
           )
           .with("InclusionConnectJwt", () =>
-            generateInclusionConnectJwt({
+            generateConnectedUserJwt({
               userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
@@ -528,7 +528,7 @@ describe("convention e2e", () => {
             ),
           )
           .with("BackOfficeJwt", () =>
-            generateInclusionConnectJwt({
+            generateConnectedUserJwt({
               userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
@@ -537,7 +537,7 @@ describe("convention e2e", () => {
             }),
           )
           .with("InclusionConnectJwt", () =>
-            generateInclusionConnectJwt({
+            generateConnectedUserJwt({
               userId: validator.id,
               version: currentJwtVersions.inclusion,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
@@ -892,7 +892,7 @@ describe("convention e2e", () => {
         eventCrawler,
         gateways,
         generateConventionJwt,
-        generateInclusionConnectJwt,
+        generateConnectedUserJwt,
         inMemoryUow,
         appConfig,
       } = testApp);
@@ -931,7 +931,7 @@ describe("convention e2e", () => {
 
     it("200 - Successfully gets conventions with date filter", async () => {
       gateways.timeGateway.setNextDate(new Date());
-      const jwt = generateInclusionConnectJwt({
+      const jwt = generateConnectedUserJwt({
         userId: validator.id,
         version: currentJwtVersions.inclusion,
         iat: Math.round(gateways.timeGateway.now().getTime() / 1000),

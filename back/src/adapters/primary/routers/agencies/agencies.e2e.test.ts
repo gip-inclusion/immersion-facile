@@ -17,7 +17,7 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -44,12 +44,11 @@ describe("Agency routes", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let backofficeAdminToken: ConnectedUserJwt;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   beforeEach(async () => {
     const deps = await buildTestApp();
-    ({ gateways, eventCrawler, inMemoryUow, generateInclusionConnectJwt } =
-      deps);
+    ({ gateways, eventCrawler, inMemoryUow, generateConnectedUserJwt } = deps);
 
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
@@ -57,7 +56,7 @@ describe("Agency routes", () => {
     inMemoryUow.userRepository.users = [backofficeAdminUser];
     gateways.timeGateway.defaultDate = new Date();
 
-    backofficeAdminToken = generateInclusionConnectJwt({
+    backofficeAdminToken = generateConnectedUserJwt({
       userId: backofficeAdminUser.id,
       version: currentJwtVersions.inclusion,
       iat: new Date().getTime(),

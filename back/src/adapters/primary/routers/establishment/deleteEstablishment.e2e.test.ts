@@ -15,7 +15,7 @@ import {
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import type { CustomTimeGateway } from "../../../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
@@ -49,12 +49,12 @@ describe("Delete establishment", () => {
 
   let httpClient: HttpClient<EstablishmentRoutes>;
   let uow: InMemoryUnitOfWork;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let timeGateway: CustomTimeGateway;
 
   beforeEach(async () => {
     const testAppAndDeps = await buildTestApp();
-    ({ inMemoryUow: uow, generateInclusionConnectJwt } = testAppAndDeps);
+    ({ inMemoryUow: uow, generateConnectedUserJwt } = testAppAndDeps);
     const request = testAppAndDeps.request;
     timeGateway = testAppAndDeps.gateways.timeGateway;
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
@@ -73,7 +73,7 @@ describe("Delete establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
     });
 
@@ -118,7 +118,7 @@ describe("Delete establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateInclusionConnectJwt({
+        authorization: generateConnectedUserJwt({
           ...backofficeAdminJwtPayload,
           iat: Math.round(now.getTime() / 1000),
           exp: Math.round(subDays(now, 10).getTime() / 1000),
@@ -142,7 +142,7 @@ describe("Delete establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             userId: user.id,
             now: timeGateway.now(),
@@ -169,7 +169,7 @@ describe("Delete establishment", () => {
         siret: establishmentAggregate.establishment.siret,
       },
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
     });
 

@@ -11,9 +11,7 @@ import {
 } from "shared";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
-import type { GenerateInclusionConnectJwt } from "../../core/jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
@@ -25,24 +23,15 @@ export class SuggestEditEstablishment extends TransactionalUseCase<
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
-  readonly #timeGateway: TimeGateway;
-
-  readonly #generateInclusionConnectJwt: GenerateInclusionConnectJwt;
-
   readonly #immersionFacileBaseUrl: AbsoluteUrl;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
-    timeGateway: TimeGateway,
-    generateInclusionConnectJwt: GenerateInclusionConnectJwt,
     immersionFacileBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
-
-    this.#generateInclusionConnectJwt = generateInclusionConnectJwt;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
-    this.#timeGateway = timeGateway;
     this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
   }
 

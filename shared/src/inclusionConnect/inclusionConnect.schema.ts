@@ -4,9 +4,10 @@ import { allowedStartOAuthLoginPages } from "../routes/routes";
 import type {
   AuthenticateWithOAuthCodeParams,
   InitiateLoginByEmailParams,
+  WithSourcePage,
 } from "./inclusionConnect.dto";
 
-export const withSourcePageSchema = z.object({
+export const withSourcePageSchema: z.Schema<WithSourcePage> = z.object({
   page: z.enum(allowedStartOAuthLoginPages),
 });
 

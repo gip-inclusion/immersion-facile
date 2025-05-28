@@ -20,7 +20,7 @@ import {
   unauthorizedApiConsumer,
 } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
@@ -37,7 +37,7 @@ describe("Add form establishment", () => {
 
   let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   const user = new InclusionConnectedUserBuilder().withId(uuid()).buildUser();
 
@@ -47,7 +47,7 @@ describe("Add form establishment", () => {
       inMemoryUow,
       gateways,
       eventCrawler,
-      generateInclusionConnectJwt,
+      generateConnectedUserJwt,
     } = await buildTestApp());
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
     inMemoryUow.apiConsumerRepository.consumers = [
@@ -99,7 +99,7 @@ describe("Add form establishment", () => {
           .withUserRights([adminFormRight])
           .build(),
         headers: {
-          authorization: generateInclusionConnectJwt(
+          authorization: generateConnectedUserJwt(
             createInclusionConnectJwtPayload({
               userId: user.id,
               durationDays: 1,
@@ -154,7 +154,7 @@ describe("Add form establishment", () => {
       const response = await httpClient.addFormEstablishment({
         body: formEstablishment,
         headers: {
-          authorization: generateInclusionConnectJwt(
+          authorization: generateConnectedUserJwt(
             createInclusionConnectJwtPayload({
               userId: user.id,
               durationDays: 1,

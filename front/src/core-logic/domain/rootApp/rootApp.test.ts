@@ -51,7 +51,7 @@ describe("rootApp epic", () => {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
-      provider: "connectedUser",
+      provider: "proConnect",
       token,
       idToken: "inclusion-connect-id-token",
     });

@@ -25,10 +25,7 @@ import type { StoredFileId } from "../file/file.dto";
 import type { FileValidationError } from "../file/file.validators";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GroupSlug } from "../group/group.dto";
-import type {
-  IdentityProvider,
-  OAuthState,
-} from "../inclusionConnect/inclusionConnect.dto";
+import type { OAuthState } from "../inclusionConnect/inclusionConnect.dto";
 import type {
   AgencyRole,
   UserId,
@@ -193,16 +190,12 @@ export const errors = {
   inclusionConnect: {
     missingOAuth: ({
       state,
-      identityProvider,
     }: {
       state?: OAuthState;
-      identityProvider?: IdentityProvider;
     }) =>
-      state && identityProvider
-        ? new ForbiddenError(
-            `Il n'y a pas d'OAuth en cours avec l'état '${state}' et le provider '${identityProvider}'.`,
-          )
-        : new ForbiddenError("Il n'y a pas d'OAuth en cours"),
+      new ForbiddenError(
+        `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}}`,
+      ),
     nonceMismatch: () =>
       new ForbiddenError("Il y a un décalage sur le 'Nonce'."),
     couldNotGetUserInfo: ({ message }: { message: string }) =>
@@ -655,9 +648,17 @@ export const errors = {
       ),
   },
   user: {
+    alreadyUsedAuthentication: () =>
+      new ForbiddenError(
+        "Cette authentification a déjà été utilisée. Veuillez réessayer.",
+      ),
     unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>
       new ForbiddenError("Aucun jeton d'authentification (JWT) fourni."),
+    invalidJwt: () =>
+      new ForbiddenError(
+        "Le jeton d'authentification (JWT) fourni est invalide.",
+      ),
     expiredJwt: () =>
       new ForbiddenError("Le jeton d'authentification (JWT) fourni a expiré."),
     notFound: ({ userId }: { userId: UserId }) =>

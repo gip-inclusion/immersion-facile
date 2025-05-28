@@ -26,7 +26,7 @@ import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { Gateways } from "../../../../config/bootstrap/createGateways";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
-import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { broadcastToFtLegacyServiceName } from "../../../../domains/core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
@@ -46,7 +46,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   };
 
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: Gateways;
   let eventCrawler: BasicEventCrawler;
@@ -56,7 +56,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     let request: SuperTest<Test>;
     ({
       request,
-      generateInclusionConnectJwt,
+      generateConnectedUserJwt,
       inMemoryUow,
       gateways,
       eventCrawler,
@@ -90,7 +90,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       const response = await httpClient.getInclusionConnectedUser({
         queryParams: {},
         headers: {
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: agencyUser.id,
             version: currentJwtVersions.inclusion,
           }),
@@ -163,7 +163,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.getInclusionConnectedUser,
     )} 401 with expired token`, async () => {
       const userId = "123";
-      const token = generateInclusionConnectJwt(
+      const token = generateConnectedUserJwt(
         { userId, version: currentJwtVersions.inclusion },
         0,
       );
@@ -189,7 +189,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       const response = await httpClient.registerAgenciesToUser({
         headers: {
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: agencyUser.id,
             version: currentJwtVersions.inclusion,
           }),
@@ -268,7 +268,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inclusionConnectedAllowedRoutes.markPartnersErroredConventionAsHandled,
     )} 401 with expired token`, async () => {
       const userId = "123";
-      const token = generateInclusionConnectJwt(
+      const token = generateConnectedUserJwt(
         { userId, version: currentJwtVersions.inclusion },
         0,
       );
@@ -298,7 +298,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
-      const token = generateInclusionConnectJwt({
+      const token = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
@@ -364,7 +364,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         occurredAt: new Date("2023-10-26T12:00:00.000"),
         handledByAgency: false,
       });
-      const token = generateInclusionConnectJwt({
+      const token = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
@@ -422,10 +422,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
             state,
             nonce: "fake-nonce",
             externalId: agencyUser.proConnect?.externalId,
+            usedAt: null,
           },
         ];
 
-        const token = generateInclusionConnectJwt({
+        const token = generateConnectedUserJwt({
           userId: agencyUser.id,
           version: currentJwtVersions.inclusion,
         });
@@ -468,7 +469,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         inMemoryUow.discussionRepository.discussions = [discussion];
         inMemoryUow.userRepository.users = [user];
 
-        const token = generateInclusionConnectJwt({
+        const token = generateConnectedUserJwt({
           userId: user.id,
           version: currentJwtVersions.inclusion,
         });
@@ -496,7 +497,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         })
         .withStatus("REJECTED")
         .build();
-      const existingToken = generateInclusionConnectJwt({
+      const existingToken = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
@@ -553,7 +554,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     it("403 - throws if user is not bound to discussion", async () => {
       const user = new InclusionConnectedUserBuilder().buildUser();
       const discussion = new DiscussionBuilder().build();
-      const existingToken = generateInclusionConnectJwt({
+      const existingToken = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
@@ -602,7 +603,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           email: user.email,
         })
         .build();
-      const existingToken = generateInclusionConnectJwt({
+      const existingToken = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
@@ -652,7 +653,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
       inMemoryUow.userRepository.users = [adminUser, validator];
 
-      const token = generateInclusionConnectJwt({
+      const token = generateConnectedUserJwt({
         userId: adminUser.id,
         version: currentJwtVersions.inclusion,
       });

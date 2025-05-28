@@ -11,7 +11,6 @@ import {
   type ExpectSavedNotificationsAndEvents,
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import type { GenerateInclusionConnectJwt } from "../../core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -34,13 +33,6 @@ describe("SuggestEditEstablishment", () => {
 
   const fakeBaseUrl: AbsoluteUrl = "https://if-base-url";
 
-  const generateFakeInclusionConnectJwt: GenerateInclusionConnectJwt = ({
-    userId,
-    version,
-    exp,
-    iat,
-  }) => `${userId}-${version}-${exp}-${iat}`;
-
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
@@ -53,8 +45,6 @@ describe("SuggestEditEstablishment", () => {
     suggestEditEstablishment = new SuggestEditEstablishment(
       new InMemoryUowPerformer(uow),
       makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
-      timeGateway,
-      generateFakeInclusionConnectJwt,
       fakeBaseUrl,
     );
   });
