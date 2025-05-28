@@ -702,7 +702,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
           email: user.email,
         })
         .build();
-      const existingToken = generateInclusionConnectJwt({
+      const existingToken = generateConnectedUserJwt({
         userId: user.id,
         version: currentJwtVersions.inclusion,
       });
