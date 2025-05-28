@@ -292,6 +292,7 @@ export const createUseCases = ({
         gateways.oAuthGateway,
         uuidGenerator,
         generateConnectedUserJwt,
+        verifyEmailAuthCodeJwt,
         config.immersionFacileBaseUrl,
         gateways.timeGateway,
       ),

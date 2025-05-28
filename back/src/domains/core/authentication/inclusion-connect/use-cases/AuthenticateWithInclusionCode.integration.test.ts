@@ -5,7 +5,9 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
+import { generateES256KeyPair } from "../../../../../utils/jwt";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
+import { makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
@@ -54,6 +56,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       inclusionConnectGateway,
       uuidGenerator,
       () => correctToken,
+      makeVerifyJwtES256<"emailAuthCode">(generateES256KeyPair().publicKey),
       immersionBaseUrl,
       new CustomTimeGateway(),
     );
@@ -80,14 +83,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
         page: "agencyDashboard",
       });
 
-      const expectedOngoingOauth =
-        await uow.ongoingOAuthRepository.findByStateAndProvider(
-          initialOngoingOAuth.state,
-          initialOngoingOAuth.provider,
-        );
+      const expectedOngoingOauth = await uow.ongoingOAuthRepository.findByState(
+        initialOngoingOAuth.state,
+      );
 
       expectObjectsToMatch(expectedOngoingOauth, {
         ...initialOngoingOAuth,
+        usedAt: expect.any(Date),
+        userId: expect.any(String),
         accessToken,
         externalId: defaultExpectedIcIdTokenPayload.sub,
       });
@@ -117,6 +120,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       provider: "proConnect",
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
+      usedAt: null,
     };
     await uow.ongoingOAuthRepository.save(initialOngoingOAuth);
 
