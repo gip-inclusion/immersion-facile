@@ -17,7 +17,8 @@ const federatedIdentityFoundInDeviceEpic: InclusionConnectedEpic = (action$) =>
     filter(authSlice.actions.federatedIdentityFoundInDevice.match),
     filter(
       (action) =>
-        action.payload?.federatedIdentityWithUser?.provider === "connectedUser",
+        action.payload?.federatedIdentityWithUser?.provider === "proConnect" ||
+        action.payload?.federatedIdentityWithUser?.provider === "email",
     ),
     map((action) =>
       inclusionConnectedSlice.actions.currentUserFetchRequested({
@@ -35,8 +36,8 @@ const federatedIdentityFromStoreToDeviceStorageSucceededEpic: InclusionConnected
       ),
       filter(
         (action) =>
-          action.payload?.federatedIdentityWithUser.provider ===
-          "connectedUser",
+          action.payload?.federatedIdentityWithUser.provider === "proConnect" ||
+          action.payload?.federatedIdentityWithUser.provider === "email",
       ),
       map((action) =>
         inclusionConnectedSlice.actions.currentUserFetchRequested({

@@ -63,7 +63,7 @@ describe("InclusionConnected", () => {
     email: inclusionConnectedUser.email,
     firstName: inclusionConnectedUser.firstName,
     lastName: inclusionConnectedUser.lastName,
-    provider: "connectedUser",
+    provider: "proConnect",
     token: "fake-token",
     idToken: "inclusion-connect-id-token",
   };
@@ -181,7 +181,7 @@ describe("InclusionConnected", () => {
         auth: {
           federatedIdentityWithUser: {
             token: "some-existing-token",
-            provider: "connectedUser",
+            provider: "proConnect",
             firstName: "John",
             lastName: "Doe",
             email: "john.doe@mail.com",

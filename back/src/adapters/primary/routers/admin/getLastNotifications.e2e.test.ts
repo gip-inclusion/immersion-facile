@@ -39,7 +39,7 @@ describe("Get last notification route", () => {
 
     inMemoryUow.userRepository.users = [backofficeAdminUser];
 
-    adminToken = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);
+    adminToken = testApp.generateConnectedUserJwt(backofficeAdminJwtPayload);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 

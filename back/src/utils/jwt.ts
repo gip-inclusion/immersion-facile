@@ -1,20 +1,50 @@
-import * as crypto from "node:crypto";
+import { createHash, generateKeyPairSync } from "node:crypto";
 import {
   type ConventionJwtPayload,
   type CreateConventionMagicLinkPayloadProperties,
   type Email,
   type EmailHash,
   currentJwtVersions,
+  errors,
 } from "shared";
+import type { JwtKind, VerifyJwtFn } from "../domains/core/jwt";
+
+export const generateES256KeyPair = (): {
+  publicKey: string;
+  privateKey: string;
+} =>
+  generateKeyPairSync("ec", {
+    namedCurve: "prime256v1", // This is the P-256 curve
+    publicKeyEncoding: {
+      type: "spki", // SubjectPublicKeyInfo format
+      format: "pem",
+    },
+    privateKeyEncoding: {
+      type: "pkcs8", // Public-Key Cryptography Standards #8
+      format: "pem",
+    },
+  });
+
+export const makeThrowIfIncorrectJwt =
+  <K extends JwtKind>(verfifyJwt: VerifyJwtFn<K>) =>
+  (code: string) => {
+    try {
+      verfifyJwt(code);
+    } catch (error: any) {
+      if (error?.message === "jwt expired") throw errors.user.expiredJwt();
+      throw errors.user.invalidJwt();
+    }
+  };
 
 const stringToMd5 = (str: string) => {
   try {
-    return crypto.createHash("md5").update(str).digest("hex");
+    return createHash("md5").update(str).digest("hex");
   } catch (error) {
     Error.captureStackTrace(error as Error);
     throw error;
   }
 };
+export const makeEmailHash = (email: Email): string => stringToMd5(email);
 
 export const createConventionMagicLinkPayload = ({
   id,
@@ -35,13 +65,11 @@ export const createConventionMagicLinkPayload = ({
     role,
     iat,
     exp,
-    emailHash: stringToMd5(email),
+    emailHash: makeEmailHash(email),
     ...(sub ? { sub } : {}),
   };
 };
 export const isSomeEmailMatchingEmailHash = (
-  emailsOrError: Email[],
+  emails: Email[],
   emailHash: EmailHash,
-): boolean => emailsOrError.some((email) => stringToMd5(email) === emailHash);
-
-export const makeEmailHash = (email: Email): string => stringToMd5(email);
+): boolean => emails.some((email) => makeEmailHash(email) === emailHash);

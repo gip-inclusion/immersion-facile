@@ -87,7 +87,7 @@ describe("POST /add-form-establishment-batch", () => {
     ]);
     gateways.timeGateway.defaultDate = new Date();
 
-    token = testApp.generateInclusionConnectJwt(backofficeAdminJwtPayload);
+    token = testApp.generateConnectedUserJwt(backofficeAdminJwtPayload);
   });
 
   it("throws 401 if invalid token", async () => {

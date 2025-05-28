@@ -34,6 +34,7 @@ export type WithSourcePage = {
 export type AuthenticatedUserQueryParams = {
   token: ConnectedUserJwt;
   idToken: string;
+  provider: IdentityProvider;
 } & Pick<User, "email" | "firstName" | "lastName">;
 
 type InclusionConnectConventionManageAllowedRole =

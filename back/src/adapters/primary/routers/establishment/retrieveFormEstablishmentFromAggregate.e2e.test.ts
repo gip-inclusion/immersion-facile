@@ -18,7 +18,7 @@ import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
-import type { GenerateInclusionConnectJwt } from "../../../../domains/core/jwt";
+import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentAdminRight } from "../../../../domains/establishment/entities/EstablishmentAggregate";
@@ -87,13 +87,13 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     .build();
 
   let httpClient: HttpClient<EstablishmentRoutes>;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let gateways: InMemoryGateways;
 
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
-    ({ request, inMemoryUow, gateways, generateInclusionConnectJwt } =
+    ({ request, inMemoryUow, gateways, generateConnectedUserJwt } =
       await buildTestApp());
     inMemoryUow.userRepository.users = [
       backofficeAdminUser,
@@ -113,7 +113,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             userId: establishmentAdmin.id,
             durationDays: 1,
@@ -185,7 +185,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
       urlParams: { siret: TEST_OPEN_ESTABLISHMENT_1.siret },
     });
@@ -244,7 +244,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
       urlParams: {
         siret: TEST_OPEN_ESTABLISHMENT_1.siret,
@@ -290,7 +290,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             userId: establishmentAdmin.id,
             now: gateways.timeGateway.now(),
@@ -321,7 +321,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     const response = await httpClient.getFormEstablishment({
       body: {},
       headers: {
-        authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+        authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
       },
       urlParams: {
         siret: TEST_OPEN_ESTABLISHMENT_1.siret,

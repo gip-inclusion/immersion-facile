@@ -4,8 +4,13 @@ import type { PayloadKey } from "./jwtPayload.dto";
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
 export type ConventionJwt = Flavor<string, "ConventionJwt">;
 export type ConnectedUserJwt = Flavor<string, "ConnectedUserJwt">;
+export type EmailAuthCodeJwt = Flavor<string, "EmailAuthCodeJwt">;
 
-export type AppSupportedJwt = ApiConsumerJwt | ConventionJwt | ConnectedUserJwt;
+export type AppSupportedJwt =
+  | ApiConsumerJwt
+  | ConventionJwt
+  | ConnectedUserJwt
+  | EmailAuthCodeJwt;
 
 export type ConventionSupportedJwt = ConventionJwt | ConnectedUserJwt;
 

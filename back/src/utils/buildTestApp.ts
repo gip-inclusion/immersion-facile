@@ -13,8 +13,8 @@ import type { BasicEventCrawler } from "../domains/core/events/adapters/EventCra
 import type { InMemoryDocumentGateway } from "../domains/core/file-storage/adapters/InMemoryDocumentGateway";
 import type {
   GenerateApiConsumerJwt,
+  GenerateConnectedUserJwt,
   GenerateConventionJwt,
-  GenerateInclusionConnectJwt,
 } from "../domains/core/jwt";
 import type { InMemoryNotificationGateway } from "../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import type { InMemoryPdfGeneratorGateway } from "../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
@@ -63,7 +63,7 @@ export type TestAppAndDeps = {
   appConfig: AppConfig;
   generateApiConsumerJwt: GenerateApiConsumerJwt;
   generateConventionJwt: GenerateConventionJwt;
-  generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  generateConnectedUserJwt: GenerateConnectedUserJwt;
   uuidGenerator: UuidGenerator;
   inMemoryUow: InMemoryUnitOfWork;
 };
@@ -109,7 +109,7 @@ export const buildTestApp = async (
     eventCrawler: rawEventCrawler,
     generateApiConsumerJwt,
     generateConventionJwt,
-    generateInclusionConnectJwt,
+    generateConnectedUserJwt,
     uuidGenerator,
     inMemoryUow: uow,
   } = await createApp(appConfig);
@@ -127,7 +127,7 @@ export const buildTestApp = async (
     appConfig,
     generateApiConsumerJwt,
     generateConventionJwt,
-    generateInclusionConnectJwt,
+    generateConnectedUserJwt,
     uuidGenerator,
     inMemoryUow,
   };
