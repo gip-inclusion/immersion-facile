@@ -1,5 +1,5 @@
 import { filter } from "rxjs";
-import { delay, map, switchMap } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -14,11 +14,11 @@ export type SendSignatureLinkAction = ActionOfSlice<
 type SendSignatureLinkEpic = AppEpic<
   SendSignatureLinkAction | { type: "do-nothing" }
 >;
-const minimumDelayBeforeItIsPossibleToSendSignatureLinkAgainMs = 10_000;
+
 const sendSignatureLinkEpic: SendSignatureLinkEpic = (
   action$,
   _,
-  { conventionGateway, scheduler },
+  { conventionGateway },
 ) =>
   action$.pipe(
     filter(sendSignatureLinkSlice.actions.sendSignatureLinkRequested.match),
@@ -26,10 +26,6 @@ const sendSignatureLinkEpic: SendSignatureLinkEpic = (
       conventionGateway
         .sendSignatureLink$(action.payload, action.payload.jwt)
         .pipe(
-          delay(
-            minimumDelayBeforeItIsPossibleToSendSignatureLinkAgainMs,
-            scheduler,
-          ),
           map(() =>
             sendSignatureLinkSlice.actions.sendSignatureLinkSucceeded(
               action.payload,

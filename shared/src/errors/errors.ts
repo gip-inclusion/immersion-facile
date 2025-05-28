@@ -228,7 +228,7 @@ export const errors = {
       ),
     conventionGotUpdatedWhileUpdating: () =>
       new BadRequestError(
-        "Quelqu’un d’autre a modifié la demande en même temps que vous. Veuillez la relire puis la signer ou la modifier.",
+        "Quelqu'un d'autre a modifié la demande en même temps que vous. Veuillez la relire puis la signer ou la modifier.",
       ),
     missingFTAdvisor: ({ ftExternalId }: { ftExternalId: FtExternalId }) =>
       new NotFoundError(
@@ -401,12 +401,14 @@ export const errors = {
     smsSignatureLinkAlreadySent: ({
       signatoryRole,
       minHoursBetweenReminder,
+      timeRemaining,
     }: {
       signatoryRole: SignatoryRole;
       minHoursBetweenReminder: number;
+      timeRemaining: string;
     }) =>
       new TooManyRequestApiError(
-        `Une relance de signature au ${signatoryTitleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h`,
+        `Une relance de signature au ${signatoryTitleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
   establishment: {
