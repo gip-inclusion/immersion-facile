@@ -110,8 +110,8 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
             agencyLogoUrl: agency.logoUrl ?? undefined,
             agencyReferentName:
               [
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ]
                 .join(" ")
                 .trim() || undefined,

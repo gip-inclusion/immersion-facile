@@ -214,6 +214,8 @@ const conventionToConventionInUrl = (
     emergencyContactEmail: beneficiary.emergencyContactEmail,
     fedId: beneficiary.federatedIdentity?.token,
     fedIdProvider: beneficiary.federatedIdentity?.provider,
+    agencyReferentFirstName: convention.agencyReferent?.firstname,
+    agencyReferentLastName: convention.agencyReferent?.lastname,
   };
 };
 
@@ -418,8 +420,10 @@ const conventionPresentationFromParams = (
   agencyId: params.agencyId ?? undefined,
   agencyDepartment: params.agencyDepartment ?? "",
   agencyKind: params.agencyKind as AgencyKind | undefined,
-  agencyReferentFirstName: params.agencyReferentFirstName ?? "",
-  agencyReferentLastName: params.agencyReferentLastName ?? "",
+  agencyReferent: {
+    firstname: params.agencyReferentFirstName ?? "",
+    lastname: params.agencyReferentLastName ?? "",
+  },
 
   //Actors
   establishmentTutor: {

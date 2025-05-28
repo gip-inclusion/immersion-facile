@@ -52,8 +52,10 @@ describe("PgConventionRepository", () => {
   const conventionStylisteBuilder = new ConventionDtoBuilder()
     .withImmersionAppellation(styliste)
     .withUpdatedAt(anyConventionUpdatedAt)
-    .withAgencyReferentFirstName("Fredy")
-    .withAgencyReferentLastName("L'ACCOMPAGNATEUR")
+    .withAgencyReferent({
+      firstname: "Fredy",
+      lastname: "L'ACCOMPAGNATEUR",
+    })
     .withAgencyId(agency.id);
 
   let pool: Pool;
@@ -122,7 +124,7 @@ describe("PgConventionRepository", () => {
     expect(savedExternalId).toBeUndefined();
   });
 
-  it("fails to add a convention if it already exits", async () => {
+  it("fails to add a convention if it already exists", async () => {
     const convention = new ConventionDtoBuilder()
       .withInternshipKind("immersion")
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
@@ -130,8 +132,7 @@ describe("PgConventionRepository", () => {
       .withDateStart(new Date("2023-01-02").toISOString())
       .withDateEnd(new Date("2023-01-06").toISOString())
       .withSchedule(reasonableSchedule)
-      .withAgencyReferentFirstName("Fredy")
-      .withAgencyReferentLastName("L'ACCOMPAGNATEUR")
+      .withAgencyReferent({ firstname: "Fredy", lastname: "L'ACCOMPAGNATEUR" })
       .build();
 
     await conventionRepository.save(convention);
@@ -886,8 +887,7 @@ describe("PgConventionRepository", () => {
 
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
-        .withAgencyReferentFirstName("New")
-        .withAgencyReferentLastName("REFERENT")
+        .withAgencyReferent({ firstname: "New", lastname: "REFERENT" })
         .build();
 
       await conventionRepository.update(

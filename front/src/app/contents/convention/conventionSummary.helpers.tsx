@@ -401,14 +401,14 @@ const makeSignatoriesSubsections = (
             }
           : null,
         convention.agencyRefersTo &&
-        (convention.agencyReferentFirstName ||
-          convention.agencyReferentLastName)
+        (convention.agencyReferent?.firstname ||
+          convention.agencyReferent?.lastname)
           ? {
               key: "agencyReferent",
               label: "Accompagnateur",
               value: [
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ].join(" "),
             }
           : null,
@@ -448,14 +448,14 @@ const makeSignatoriesSubsections = (
           ),
         },
         !convention.agencyRefersTo &&
-        (convention.agencyReferentFirstName ||
-          convention.agencyReferentLastName)
+        (convention.agencyReferent?.firstname ||
+          convention.agencyReferent?.firstname)
           ? {
               key: "agencyReferent",
               label: "Accompagnateur",
               value: [
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ].join(" "),
             }
           : null,

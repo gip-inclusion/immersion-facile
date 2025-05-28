@@ -145,8 +145,8 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               internshipKind: convention.internshipKind,
               agencyName: agency.name,
               agencyReferentName: getFullname(
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ),
               businessName: convention.businessName,
               dateEnd: convention.dateEnd,
