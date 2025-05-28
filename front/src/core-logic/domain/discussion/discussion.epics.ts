@@ -64,17 +64,17 @@ const sendMessageEpic: DiscussionEpic = (
   { inclusionConnectedGateway },
 ) =>
   action$.pipe(
-    filter(discussionSlice.actions.sendMessageRequested.match),
+    filter(discussionSlice.actions.sendExchangeRequested.match),
     switchMap((action) =>
       inclusionConnectedGateway.sendMessage$(action.payload.exchangeData).pipe(
         map((exchange) =>
-          discussionSlice.actions.sendMessageSucceeded({
+          discussionSlice.actions.sendExchangeSucceeded({
             exchangeData: exchange,
             feedbackTopic: action.payload.feedbackTopic,
           }),
         ),
         catchEpicError((error) =>
-          discussionSlice.actions.sendMessageFailed({
+          discussionSlice.actions.sendExchangeFailed({
             errorMessage: error.message,
             feedbackTopic: action.payload.feedbackTopic,
           }),

@@ -106,7 +106,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  sendMessageToDiscussion: defineRoute({
+  sendExchangeToDiscussion: defineRoute({
     method: "post",
     url: "/discussion-for-establishment/:discussionId/send-message",
     ...withAuthorizationHeaders,
