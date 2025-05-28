@@ -13,7 +13,7 @@ import {
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type DiscussionState,
-  type SendMessageRequestedPayload,
+  type SendExchangeRequestedPayload,
   discussionSlice,
 } from "./discussion.slice";
 
@@ -220,7 +220,7 @@ describe("Discussion slice", () => {
   describe("send a new exchange on discussion", () => {
     it("send message requested and discussion is not in state", () => {
       expectDiscussionSelector(defaultStartingDiscussionState);
-      const exchangePayload: SendMessageRequestedPayload = {
+      const exchangePayload: SendExchangeRequestedPayload = {
         jwt,
         discussionId: discussion.id,
         message: "My message",
@@ -236,7 +236,7 @@ describe("Discussion slice", () => {
       };
 
       store.dispatch(
-        discussionSlice.actions.sendMessageRequested({
+        discussionSlice.actions.sendExchangeRequested({
           exchangeData: exchangePayload,
           feedbackTopic: "establishment-dashboard-discussion-send-message",
         }),
@@ -268,7 +268,7 @@ describe("Discussion slice", () => {
 
     it("send message requested and populate discussion with new exchange", () => {
       expectDiscussionSelector(defaultStartingDiscussionState);
-      const exchangePayload: SendMessageRequestedPayload = {
+      const exchangePayload: SendExchangeRequestedPayload = {
         jwt,
         discussionId: discussion.id,
         message: "My message",
@@ -293,7 +293,7 @@ describe("Discussion slice", () => {
       feedGatewayWithDiscussionOrError(discussion);
 
       store.dispatch(
-        discussionSlice.actions.sendMessageRequested({
+        discussionSlice.actions.sendExchangeRequested({
           exchangeData: exchangePayload,
           feedbackTopic: "establishment-dashboard-discussion-send-message",
         }),

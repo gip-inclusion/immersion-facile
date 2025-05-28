@@ -573,12 +573,12 @@ export const feedbacks: Record<
   },
   "establishment-dashboard-discussion-send-message": {
     "create.success": {
-      action: discussionSlice.actions.sendMessageSucceeded,
+      action: discussionSlice.actions.sendExchangeSucceeded,
       title: "Message envoyé",
       message: "Le message a bien été envoyé",
     },
     "create.error": {
-      action: discussionSlice.actions.sendMessageFailed,
+      action: discussionSlice.actions.sendExchangeFailed,
       title: "Problème lors de l'envoi du message",
       message:
         "Une erreur est survenue. Votre message n'a pas pu être envoyé. Veuillez réessayer dans quelques instants.",
