@@ -400,7 +400,9 @@ const makeSignatoriesSubsections = (
               ),
             }
           : null,
-        convention.agencyReferentFirstName || convention.agencyReferentLastName
+        convention.agencyRefersTo &&
+        (convention.agencyReferentFirstName ||
+          convention.agencyReferentLastName)
           ? {
               key: "agencyReferent",
               label: "Accompagnateur",
@@ -445,6 +447,18 @@ const makeSignatoriesSubsections = (
             />
           ),
         },
+        !convention.agencyRefersTo &&
+        (convention.agencyReferentFirstName ||
+          convention.agencyReferentLastName)
+          ? {
+              key: "agencyReferent",
+              label: "Accompagnateur",
+              value: [
+                convention.agencyReferentFirstName,
+                convention.agencyReferentLastName,
+              ].join(" "),
+            }
+          : null,
       ]),
       isFullWidthDisplay: true,
       hasBackgroundColor: true,
