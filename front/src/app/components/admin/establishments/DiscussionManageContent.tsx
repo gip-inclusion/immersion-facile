@@ -4,7 +4,6 @@ import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
-import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
@@ -13,7 +12,6 @@ import { renderContent } from "html-templates/src/components/email";
 import { useEffect, useState } from "react";
 import {
   ButtonWithSubMenu,
-  CopyButton,
   DiscussionMeta,
   ExchangeMessage,
   Loader,
@@ -26,6 +24,7 @@ import {
   type DiscussionId,
   type DiscussionReadDto,
   type Email,
+  type ExchangeFromDashboard,
   type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
   type WithDiscussionId,
@@ -34,6 +33,8 @@ import {
   createOpaqueEmail,
   discussionRejectionSchema,
   domElementIds,
+  escapeHtml,
+  exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
   rejectDiscussionEmailParams,
   toDisplayedDate,
@@ -232,7 +233,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
 
   const statusBadge =
     statusBadgeData[
-      getDiscussionDisplayStatus({ discussion, now: new Date() })
+      getDiscussionDisplayStatus({
+        discussion,
+        now: new Date(),
+      })
     ];
 
   return (
@@ -299,37 +303,34 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               </a>
             )}
         </DiscussionMeta>
-        <div className={fr.cx("fr-grid-row")}>
-          <div className={fr.cx("fr-col-12", "fr-col-lg-8")}>
-            <Highlight className={fr.cx("fr-ml-0", "fr-pt-2w", "fr-pb-1w")}>
-              <span className={fr.cx("fr-text--sm", "fr-mb-2w")}>
-                Vous ne parvenez pas à répondre au candidat ? Copiez dans votre
-                presse papier l'adresse email sécurisée de cette discussion et
-                utilisez-la directement depuis votre boîte mail.
-              </span>
-              <br />
-              <CopyButton
-                textToCopy={createOpaqueEmail({
-                  discussionId: discussion.id,
-                  recipient: {
-                    kind: "potentialBeneficiary",
-                    firstname: discussion.potentialBeneficiary.firstName,
-                    lastname: discussion.potentialBeneficiary.lastName,
-                  },
-                  replyDomain: `reply.${window.location.hostname}`,
-                })}
-                id={
-                  domElementIds.establishmentDashboard.discussion
-                    .copyEmailButton
-                }
-                withIcon
-                label="Copier l'adresse email"
-              />
-            </Highlight>
-          </div>
-        </div>
       </header>
-      {discussion.exchanges.map(({ sender, sentAt, subject, message }) => (
+
+      <DiscussionEchangeMessageForm discussionId={discussion.id} />
+
+      <DiscussionExchangesList discussion={discussion} />
+
+      {createPortal(
+        <RejectApplicationModal title="Refuser la candidature">
+          <RejectApplicationForm discussion={discussion} />
+        </RejectApplicationModal>,
+        document.body,
+      )}
+    </>
+  );
+};
+
+const DiscussionExchangesList = ({
+  discussion,
+}: {
+  discussion: DiscussionReadDto;
+}): JSX.Element => {
+  const sortedBySentAtDesc = [...discussion.exchanges].sort(
+    (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
+  );
+  return (
+    <section>
+      <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
+      {sortedBySentAtDesc.map(({ sender, sentAt, subject, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
           <header
             className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
@@ -373,14 +374,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           </section>
         </ExchangeMessage>
       ))}
-
-      {createPortal(
-        <RejectApplicationModal title="Refuser la candidature">
-          <RejectApplicationForm discussion={discussion} />
-        </RejectApplicationModal>,
-        document.body,
-      )}
-    </>
+    </section>
   );
 };
 
@@ -577,6 +571,76 @@ const RejectApplicationForm = ({
         ]}
         inlineLayoutWhen="always"
       />
+    </form>
+  );
+};
+
+const DiscussionEchangeMessageForm = ({
+  discussionId,
+}: {
+  discussionId: DiscussionId;
+}) => {
+  const { register, handleSubmit, formState } = useForm<ExchangeFromDashboard>({
+    resolver: zodResolver(exchangeMessageFromDashboardSchema),
+    defaultValues: {
+      message: "",
+    },
+  });
+  const getFieldError = makeFieldError(formState);
+  const dispatch = useDispatch();
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
+
+  const onSubmit = (data: ExchangeFromDashboard) => {
+    if (inclusionConnectedJwt) {
+      dispatch(
+        discussionSlice.actions.sendExchangeRequested({
+          exchangeData: {
+            jwt: inclusionConnectedJwt,
+            discussionId,
+            message: data.message,
+          },
+          feedbackTopic: "establishment-dashboard-discussion-send-message",
+        }),
+      );
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
+      <Feedback
+        topics={["establishment-dashboard-discussion-send-message"]}
+        className={fr.cx("fr-mb-2w")}
+        closable
+      />
+      <input type="hidden" {...register("discussionId")} value={discussionId} />
+      <Input
+        textArea
+        label="Répondre au candidat"
+        nativeTextAreaProps={{
+          id: domElementIds.establishmentDashboard.discussion.sendMessageInput,
+          rows: 5,
+          placeholder: "Rédigez votre message ici...",
+          ...register("message", {
+            setValueAs: escapeHtml,
+          }),
+        }}
+        {...getFieldError("message")}
+      />
+      <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
+        <Button
+          id={
+            domElementIds.establishmentDashboard.discussion
+              .sendMessageSubmitButton
+          }
+          type="submit"
+          disabled={formState.isSubmitting}
+          size="small"
+        >
+          Envoyer un message
+        </Button>
+      </div>
     </form>
   );
 };

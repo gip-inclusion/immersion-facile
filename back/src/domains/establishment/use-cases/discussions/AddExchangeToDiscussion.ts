@@ -1,108 +1,187 @@
-import { renderContent } from "html-templates/src/components/email";
 import {
-  type BrevoEmailItem,
-  type BrevoInboundBody,
-  brevoInboundBodySchema,
+  type Attachment,
+  type DateString,
+  type DiscussionDto,
+  type DiscussionId,
+  type Exchange,
+  type ExchangeRole,
+  type InclusionConnectedUser,
+  attachementSchema,
+  discussionIdSchema,
   errors,
-  immersionFacileContactEmail,
+  exchangeRoleSchema,
+  zStringMinLength1,
 } from "shared";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
+import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getDiscussionParamsFromEmail } from "./discussion.utils";
+
+const inputSources = ["dashboard", "inbound-parsing"] as const;
+
+type MessageInputCommonFields = {
+  message: string;
+  discussionId: DiscussionId;
+};
+
+type MessageInputFromDashboard = MessageInputCommonFields & {
+  recipientRole: Extract<ExchangeRole, "potentialBeneficiary">;
+  attachments: never[];
+};
+
+type FullMessageInput = MessageInputCommonFields & {
+  recipientRole: ExchangeRole;
+  attachments: Attachment[];
+  sentAt: DateString;
+  subject: string;
+};
+
+type InputSource = (typeof inputSources)[number];
+
+export type AddExchangeToDiscussionInput =
+  | {
+      source: Extract<InputSource, "dashboard">;
+      messageInputs: MessageInputFromDashboard[];
+    }
+  | {
+      source: Extract<InputSource, "inbound-parsing">;
+      messageInputs: FullMessageInput[];
+    };
+
+export type MessageInput =
+  AddExchangeToDiscussionInput["messageInputs"][number];
+
+const messageInputCommonFieldsSchema = z.object({
+  message: zStringMinLength1,
+  discussionId: discussionIdSchema,
+});
+
+const messageInputFromDashboardSchema = messageInputCommonFieldsSchema.extend({
+  recipientRole: z.literal("potentialBeneficiary"),
+  attachments: z.array(z.never()),
+});
+
+const inputFromDashboardSchema = z.object({
+  source: z.literal("dashboard"),
+  messageInputs: z.array(messageInputFromDashboardSchema),
+});
+
+const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
+  recipientRole: exchangeRoleSchema,
+  attachments: z.array(attachementSchema),
+  sentAt: z.string().datetime(),
+  subject: z.string(),
+});
+
+const inputFromInboundParsingSchema = z.object({
+  source: z.literal("inbound-parsing"),
+  messageInputs: z.array(fullMessageInputSchema),
+});
+
+export const messageInputSchema = z.discriminatedUnion("source", [
+  inputFromInboundParsingSchema,
+  inputFromDashboardSchema,
+]);
 
 const defaultSubject = "Sans objet";
 
-export class AddExchangeToDiscussion extends TransactionalUseCase<BrevoInboundBody> {
-  protected inputSchema = brevoInboundBodySchema;
-
-  readonly #replyDomain: string;
+export class AddExchangeToDiscussion extends TransactionalUseCase<
+  AddExchangeToDiscussionInput,
+  Exchange,
+  InclusionConnectedUser | null
+> {
+  protected inputSchema = messageInputSchema;
 
   readonly #createNewEvent: CreateNewEvent;
+  readonly #timeGateway: TimeGateway;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
-    domain: string,
+    timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
-    this.#replyDomain = `reply.${domain}`;
-
     this.#createNewEvent = createNewEvent;
+    this.#timeGateway = timeGateway;
   }
 
   protected async _execute(
-    brevoResponse: BrevoInboundBody,
+    input: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
-  ): Promise<void> {
-    await Promise.all(
-      brevoResponse.items.map((item) => this.#processBrevoItem(uow, item)),
-    );
+    inclusionConnectedUser: InclusionConnectedUser | null,
+  ): Promise<Exchange> {
+    if (input.source === "dashboard" && !inclusionConnectedUser) {
+      throw errors.user.unauthorized();
+    }
+    return await Promise.all(
+      input.messageInputs.map((messageInput) =>
+        this.#processSendMessage(uow, input.source, messageInput),
+      ),
+    ).then((exchanges) => exchanges[0]);
   }
 
-  async #processBrevoItem(
+  async #processSendMessage(
     uow: UnitOfWork,
-    item: BrevoEmailItem,
-  ): Promise<void> {
-    const { discussionId, recipientKind } = getDiscussionParamsFromEmail(
-      item,
-      this.#replyDomain,
-    );
+    source: InputSource,
+    params: MessageInput,
+  ): Promise<Exchange> {
+    const { discussionId, message, recipientRole, attachments } = params;
+
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
-
     const sender =
-      recipientKind === "establishment"
+      recipientRole === "establishment"
         ? "potentialBeneficiary"
         : "establishment";
-
+    const formattedSubject = makeFormattedSubject({
+      subject: isFullMessageInput(params) ? params.subject : undefined,
+      discussion,
+      source,
+    });
+    const exchange: Exchange = {
+      subject: formattedSubject,
+      message,
+      sentAt: isFullMessageInput(params)
+        ? params.sentAt
+        : this.#timeGateway.now().toISOString(),
+      recipient: recipientRole,
+      sender,
+      attachments,
+    };
     await uow.discussionRepository.update({
       ...discussion,
-      exchanges: [
-        ...discussion.exchanges,
-        {
-          subject: item.Subject || defaultSubject,
-          message: processEmailMessage(item),
-          sentAt: new Date(item.SentAtDate).toISOString(),
-          recipient: recipientKind,
-          sender,
-          attachments: item.Attachments
-            ? item.Attachments.map(({ Name, DownloadToken }) => ({
-                name: Name,
-                link: DownloadToken,
-              }))
-            : [],
-        },
-      ],
+      exchanges: [...discussion.exchanges, exchange],
     });
-
     await uow.outboxRepository.save(
       this.#createNewEvent({
         topic: "ExchangeAddedToDiscussion",
         payload: { discussionId: discussion.id, siret: discussion.siret },
       }),
     );
+    return exchange;
   }
 }
 
-const cleanContactEmailFromMessage = (message: string) =>
-  message
-    .replaceAll(`<${immersionFacileContactEmail}>`, "")
-    .replaceAll(
-      `&lt;<a href="mailto:${immersionFacileContactEmail}">${immersionFacileContactEmail}</a>&gt;`,
-      "",
-    )
-    .replaceAll(
-      `&lt;<a href="mailto:${immersionFacileContactEmail}" target="_blank">${immersionFacileContactEmail}</a>&gt;`,
-      "",
-    );
+const makeFormattedSubject = ({
+  subject,
+  discussion,
+  source,
+}: {
+  subject?: string;
+  discussion: DiscussionDto;
+  source: InputSource;
+}): string => {
+  const hasNoSubject = !subject || subject === "";
+  if (source === "dashboard" && hasNoSubject) {
+    return `Réponse de ${discussion.businessName} à votre demande d'immersion`;
+  }
+  return hasNoSubject ? defaultSubject : subject;
+};
 
-const processEmailMessage = (item: BrevoEmailItem) => {
-  const emailContent =
-    item.RawHtmlBody ||
-    (item.RawTextBody &&
-      renderContent(item.RawTextBody, { wrapInTable: false })) ||
-    "Pas de contenu";
-  return cleanContactEmailFromMessage(emailContent);
+const isFullMessageInput = (
+  messageInput: MessageInput,
+): messageInput is FullMessageInput => {
+  return "sentAt" in messageInput && "subject" in messageInput;
 };

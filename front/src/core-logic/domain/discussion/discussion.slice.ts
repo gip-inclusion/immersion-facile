@@ -4,6 +4,8 @@ import type {
   DiscussionId,
   DiscussionReadDto,
   DiscussionRejected,
+  Exchange,
+  ExchangeFromDashboard,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -25,6 +27,11 @@ export type DiscussionState = {
   isLoading: boolean;
   fetchError: string | null;
 };
+
+export type SendExchangeRequestedPayload = {
+  jwt: ConnectedUserJwt;
+  discussionId: DiscussionId;
+} & ExchangeFromDashboard;
 
 const initialDiscussionState: DiscussionState = {
   discussion: null,
@@ -71,6 +78,35 @@ export const discussionSlice = createSlice({
       state.isLoading = false;
     },
     updateDiscussionStatusFailed: (
+      state,
+      _action: PayloadActionWithFeedbackTopicError,
+    ) => {
+      state.isLoading = false;
+    },
+    sendExchangeRequested: (
+      state,
+      _action: PayloadActionWithFeedbackTopic<{
+        exchangeData: SendExchangeRequestedPayload;
+      }>,
+    ) => {
+      state.isLoading = true;
+    },
+    sendExchangeSucceeded: (
+      state,
+      action: PayloadActionWithFeedbackTopic<{
+        exchangeData: Exchange;
+      }>,
+    ) => {
+      state.isLoading = false;
+      if (!state.discussion) {
+        return;
+      }
+      state.discussion = {
+        ...state.discussion,
+        exchanges: [...state.discussion.exchanges, action.payload.exchangeData],
+      };
+    },
+    sendExchangeFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

@@ -26,6 +26,7 @@ import type {
   DiscussionRejected,
   DiscussionStatusWithRejection,
   Exchange,
+  ExchangeFromDashboard,
   ExchangeRole,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
@@ -79,9 +80,9 @@ export const makeExchangeEmailSchema = (
         }),
     );
 
-const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
+export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
-const attachementSchema: z.Schema<Attachment> = z.object({
+export const attachementSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
   link: z.string(),
 });
@@ -112,6 +113,15 @@ export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
     status: z.literal("REJECTED"),
   })
   .and(discussionRejectionSchema);
+
+export const withExchangeMessageSchema: z.Schema<
+  Pick<ExchangeFromDashboard, "message">
+> = z.object({
+  message: zStringMinLength1,
+});
+
+export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
+  withExchangeMessageSchema.and(z.object({ discussionId: discussionIdSchema }));
 
 const discussionNotRejectedSchema: z.Schema<
   DiscussionAccepted | DiscussionPending

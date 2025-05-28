@@ -58,6 +58,7 @@ const topics = [
   "convention-status-dashboard",
   "convention-form",
   "establishment-dashboard-users-rights",
+  "establishment-dashboard-discussion-send-message",
   "unused",
 ] as const;
 
@@ -568,6 +569,19 @@ export const feedbacks: Record<
       title: "Problème lors de la mise à jour de l'utilisateur",
       message:
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    },
+  },
+  "establishment-dashboard-discussion-send-message": {
+    "create.success": {
+      action: discussionSlice.actions.sendExchangeSucceeded,
+      title: "Message envoyé",
+      message: "Le message a bien été envoyé",
+    },
+    "create.error": {
+      action: discussionSlice.actions.sendExchangeFailed,
+      title: "Problème lors de l'envoi du message",
+      message:
+        "Une erreur est survenue. Votre message n'a pas pu être envoyé. Veuillez réessayer dans quelques instants.",
     },
   },
   unused: {},

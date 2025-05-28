@@ -65,3 +65,11 @@ export const doesObjectContainsHTML = (obj: object): boolean => {
   };
   return values(obj).reduce(browseObjectProps, false);
 };
+
+export const escapeHtml = (unsafe: string) =>
+  unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");

@@ -2,6 +2,8 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
+  type Exchange,
+  type ExchangeMessageFromDashboard,
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
   type User,
@@ -684,6 +686,53 @@ describe("InclusionConnectedAllowedRoutes", () => {
       ]);
 
       // TODO : when we store all partner responses, check that they have been called
+    });
+  });
+  describe(`${displayRouteName(
+    inclusionConnectedAllowedRoutes.sendExchangeToDiscussion,
+  )}`, () => {
+    it("200 - saves the exchange to a discussion", async () => {
+      const user = new InclusionConnectedUserBuilder().buildUser();
+      const payload: ExchangeMessageFromDashboard = {
+        message: "My fake message",
+      };
+      const discussion = new DiscussionBuilder()
+        .withEstablishmentContact({
+          email: user.email,
+        })
+        .build();
+      const existingToken = generateInclusionConnectJwt({
+        userId: user.id,
+        version: currentJwtVersions.inclusion,
+      });
+      inMemoryUow.discussionRepository.discussions = [discussion];
+      inMemoryUow.userRepository.users = [user];
+
+      const response = await httpClient.sendExchangeToDiscussion({
+        headers: { authorization: existingToken },
+        urlParams: { discussionId: discussion.id },
+        body: payload,
+      });
+
+      const expectedExchange: Exchange = {
+        subject:
+          "Réponse de My default business name à votre demande d'immersion",
+        message: "My fake message",
+        sentAt: "2021-09-01T10:10:00.000Z",
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        attachments: [],
+      };
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: expectedExchange,
+      });
+      expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
+        new DiscussionBuilder(discussion)
+          .withExchanges([...discussion.exchanges, expectedExchange])
+          .build(),
+      ]);
     });
   });
 });
