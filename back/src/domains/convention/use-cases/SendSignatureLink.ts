@@ -237,9 +237,22 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
     new Date(lastSms.createdAt) >
       subHours(timeGateway.now(), MIN_HOURS_BETWEEN_REMINDER)
   ) {
+    const nextAllowedTime = new Date(lastSms.createdAt);
+    nextAllowedTime.setHours(
+      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_REMINDER,
+    );
+    const timeRemainingMs =
+      nextAllowedTime.getTime() - timeGateway.now().getTime();
+    const hoursRemaining = Math.floor(timeRemainingMs / (1000 * 60 * 60));
+    const minutesRemaining = Math.ceil(
+      (timeRemainingMs % (1000 * 60 * 60)) / (1000 * 60),
+    );
+    const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
+
     throw errors.convention.smsSignatureLinkAlreadySent({
       signatoryRole,
       minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
+      timeRemaining: formattedTimeRemaining,
     });
   }
 };

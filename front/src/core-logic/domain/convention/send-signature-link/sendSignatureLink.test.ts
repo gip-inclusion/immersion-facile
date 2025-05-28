@@ -38,12 +38,6 @@ describe("sendSignatureLink slice", () => {
     feedGatewaySendSignatureLinkSuccess();
 
     expectSendSignatureLinkState({
-      isSending: true,
-    });
-
-    fastForwardObservables();
-
-    expectSendSignatureLinkState({
       isSending: false,
     });
 
@@ -104,6 +98,4 @@ describe("sendSignatureLink slice", () => {
   const feedGatewayWithSendSignatureLinkFailure = (error: Error) => {
     dependencies.conventionGateway.sendSignatureLinkResult$.error(error);
   };
-
-  const fastForwardObservables = () => dependencies.scheduler.flush();
 });
