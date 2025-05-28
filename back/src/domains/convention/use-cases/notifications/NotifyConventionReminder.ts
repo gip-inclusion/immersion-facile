@@ -312,8 +312,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               conventionId: convention.id,
               agencyName: agency.name,
               agencyReferentName: getFullname(
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ),
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
@@ -333,8 +333,8 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             params: {
               conventionId: convention.id,
               agencyReferentName: getFullname(
-                convention.agencyReferentFirstName,
-                convention.agencyReferentLastName,
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
               ),
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,

@@ -738,21 +738,12 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withAgencyReferentFirstName(
-    agencyReferentFirstName: string,
+  public withAgencyReferent(
+    agencyReferent: WithFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
-      agencyReferentFirstName,
-    });
-  }
-
-  public withAgencyReferentLastName(
-    agencyReferentLastName: string,
-  ): ConventionDtoBuilder {
-    return new ConventionDtoBuilder({
-      ...this.dto,
-      agencyReferentLastName,
+      agencyReferent,
     });
   }
 

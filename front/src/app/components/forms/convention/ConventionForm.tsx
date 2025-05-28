@@ -236,12 +236,10 @@ export const ConventionForm = ({
       agencyKind: convention.agencyKind,
       agencyDepartment: convention.agencyDepartment,
       workConditions: undefinedIfEmptyString(convention.workConditions),
-      agencyReferentFirstName: undefinedIfEmptyString(
-        convention.agencyReferentFirstName,
-      ),
-      agencyReferentLastName: undefinedIfEmptyString(
-        convention.agencyReferentLastName,
-      ),
+      agencyReferent: {
+        firstname: undefinedIfEmptyString(convention.agencyReferent?.firstname),
+        lastname: undefinedIfEmptyString(convention.agencyReferent?.lastname),
+      },
       establishmentNumberEmployeesRange:
         establishmentNumberEmployeesRange === ""
           ? undefined
@@ -251,6 +249,8 @@ export const ConventionForm = ({
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
     };
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    console.log("conventionToSave", conventionToSave);
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
@@ -513,22 +513,26 @@ export const ConventionForm = ({
                         }
                       />
                       <Input
-                        label={formContents.agencyReferentFirstName.label}
-                        hintText={formContents.agencyReferentFirstName.hintText}
+                        label={formContents["agencyReferent.firstname"].label}
+                        hintText={
+                          formContents["agencyReferent.firstname"].hintText
+                        }
                         nativeInputProps={{
-                          ...formContents.agencyReferentFirstName,
-                          ...register("agencyReferentFirstName"),
+                          ...formContents["agencyReferent.firstname"],
+                          ...register("agencyReferent.firstname"),
                         }}
-                        {...getFieldError("agencyReferentFirstName")}
+                        {...getFieldError("agencyReferent.firstname")}
                       />
                       <Input
-                        label={formContents.agencyReferentLastName.label}
-                        hintText={formContents.agencyReferentLastName.hintText}
+                        label={formContents["agencyReferent.lastname"].label}
+                        hintText={
+                          formContents["agencyReferent.lastname"].hintText
+                        }
                         nativeInputProps={{
-                          ...formContents.agencyReferentLastName,
-                          ...register("agencyReferentLastName"),
+                          ...formContents["agencyReferent.lastname"],
+                          ...register("agencyReferent.lastname"),
                         }}
-                        {...getFieldError("agencyReferentLastName")}
+                        {...getFieldError("agencyReferent.lastname")}
                       />
                     </>
                   </Accordion>

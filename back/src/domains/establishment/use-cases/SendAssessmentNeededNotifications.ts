@@ -257,8 +257,8 @@ export class SendAssessmentNeededNotifications extends UseCase<
         kind: "ASSESSMENT_AGENCY_NOTIFICATION",
         params: {
           agencyReferentName: getFullname(
-            convention.agencyReferentFirstName,
-            convention.agencyReferentLastName,
+            convention.agencyReferent?.firstname,
+            convention.agencyReferent?.lastname,
           ),
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,

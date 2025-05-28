@@ -154,8 +154,7 @@ export class PgConventionRepository implements ConventionRepository {
       establishmentTutor,
       businessAdvantages,
       statusJustification,
-      agencyReferentFirstName,
-      agencyReferentLastName,
+      agencyReferent,
       renewed,
     } = convention;
 
@@ -185,8 +184,8 @@ export class PgConventionRepository implements ConventionRepository {
         id: conventionId,
         status,
         agency_id: agencyId,
-        agency_referent_first_name: agencyReferentFirstName,
-        agency_referent_last_name: agencyReferentLastName,
+        agency_referent_first_name: agencyReferent?.firstname ?? null,
+        agency_referent_last_name: agencyReferent?.lastname ?? null,
         date_submission: dateSubmission,
         date_start: dateStart,
         date_end: dateEnd,
@@ -586,8 +585,9 @@ export class PgConventionRepository implements ConventionRepository {
       .set({
         status: convention.status,
         agency_id: convention.agencyId,
-        agency_referent_first_name: convention.agencyReferentFirstName ?? null,
-        agency_referent_last_name: convention.agencyReferentLastName ?? null,
+        agency_referent_first_name:
+          convention.agencyReferent?.firstname ?? null,
+        agency_referent_last_name: convention.agencyReferent?.lastname ?? null,
         date_submission: convention.dateSubmission,
         date_start: convention.dateStart,
         date_end: convention.dateEnd,

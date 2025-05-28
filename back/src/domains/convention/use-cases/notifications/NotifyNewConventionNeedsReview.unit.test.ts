@@ -142,8 +142,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [councellor2.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReview.agencyReferentFirstName,
-                conventionInReview.agencyReferentLastName,
+                conventionInReview.agencyReferent?.firstname,
+                conventionInReview.agencyReferent?.lastname,
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
@@ -198,8 +198,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator1.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReview.agencyReferentFirstName,
-                conventionInReview.agencyReferentLastName,
+                conventionInReview.agencyReferent?.firstname,
+                conventionInReview.agencyReferent?.lastname,
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
@@ -221,8 +221,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator2.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReview.agencyReferentFirstName,
-                conventionInReview.agencyReferentLastName,
+                conventionInReview.agencyReferent?.firstname,
+                conventionInReview.agencyReferent?.lastname,
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
@@ -290,8 +290,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [councellor2.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReviewWithFtAdvisor.agencyReferentFirstName,
-                conventionInReviewWithFtAdvisor.agencyReferentLastName,
+                conventionInReviewWithFtAdvisor.agencyReferent?.firstname,
+                conventionInReviewWithFtAdvisor.agencyReferent?.lastname,
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
@@ -377,8 +377,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [ftAdvisorEmail],
             params: {
               agencyReferentName: getFullname(
-                conventionInReviewWithFtAdvisor.agencyReferentFirstName,
-                conventionInReviewWithFtAdvisor.agencyReferentLastName,
+                conventionInReviewWithFtAdvisor.agencyReferent?.firstname,
+                conventionInReviewWithFtAdvisor.agencyReferent?.lastname,
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
@@ -405,8 +405,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator1.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReviewWithFtAdvisor.agencyReferentFirstName,
-                conventionInReviewWithFtAdvisor.agencyReferentLastName,
+                conventionInReviewWithFtAdvisor.agencyReferent?.firstname,
+                conventionInReviewWithFtAdvisor.agencyReferent?.lastname,
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
@@ -433,8 +433,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator2.email],
             params: {
               agencyReferentName: getFullname(
-                conventionInReviewWithFtAdvisor.agencyReferentFirstName,
-                conventionInReviewWithFtAdvisor.agencyReferentLastName,
+                conventionInReviewWithFtAdvisor.agencyReferent?.firstname,
+                conventionInReviewWithFtAdvisor.agencyReferent?.lastname,
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
@@ -505,8 +505,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator1.email],
             params: {
               agencyReferentName: getFullname(
-                acceptedByCounsellorConvention.agencyReferentFirstName,
-                acceptedByCounsellorConvention.agencyReferentLastName,
+                acceptedByCounsellorConvention.agencyReferent?.firstname,
+                acceptedByCounsellorConvention.agencyReferent?.lastname,
               ),
               conventionId: acceptedByCounsellorConvention.id,
               internshipKind: acceptedByCounsellorConvention.internshipKind,
@@ -528,8 +528,8 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator2.email],
             params: {
               agencyReferentName: getFullname(
-                acceptedByCounsellorConvention.agencyReferentFirstName,
-                acceptedByCounsellorConvention.agencyReferentLastName,
+                acceptedByCounsellorConvention.agencyReferent?.firstname,
+                acceptedByCounsellorConvention.agencyReferent?.lastname,
               ),
               conventionId: acceptedByCounsellorConvention.id,
               internshipKind: acceptedByCounsellorConvention.internshipKind,
@@ -626,8 +626,10 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [ftAdvisorEmail],
             params: {
               agencyReferentName: getFullname(
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentFirstName,
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentLastName,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.firstname,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.lastname,
               ),
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:
@@ -656,8 +658,10 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator1.email],
             params: {
               agencyReferentName: getFullname(
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentFirstName,
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentLastName,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.firstname,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.lastname,
               ),
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:
@@ -686,8 +690,10 @@ describe("NotifyConventionNeedsReview", () => {
             recipients: [validator2.email],
             params: {
               agencyReferentName: getFullname(
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentFirstName,
-                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferentLastName,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.firstname,
+                conventionAcceptedByCounsellorWithFtAdvisor.agencyReferent
+                  ?.lastname,
               ),
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:

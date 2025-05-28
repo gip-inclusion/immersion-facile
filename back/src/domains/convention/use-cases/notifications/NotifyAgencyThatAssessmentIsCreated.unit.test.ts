@@ -127,8 +127,8 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
           params: {
             agencyReferentName: getFullname(
-              convention.agencyReferentFirstName,
-              convention.agencyReferentLastName,
+              convention.agencyReferent?.firstname,
+              convention.agencyReferent?.lastname,
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
@@ -156,8 +156,8 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
           params: {
             agencyReferentName: getFullname(
-              convention.agencyReferentFirstName,
-              convention.agencyReferentLastName,
+              convention.agencyReferent?.firstname,
+              convention.agencyReferent?.lastname,
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
@@ -218,8 +218,8 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
           kind: "ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION",
           params: {
             agencyReferentName: getFullname(
-              convention.agencyReferentFirstName,
-              convention.agencyReferentLastName,
+              convention.agencyReferent?.firstname,
+              convention.agencyReferent?.lastname,
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,

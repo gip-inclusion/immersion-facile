@@ -73,8 +73,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
           ),
           params: {
             agencyReferentName: getFullname(
-              convention.agencyReferentFirstName,
-              convention.agencyReferentLastName,
+              convention.agencyReferent?.firstname,
+              convention.agencyReferent?.lastname,
             ),
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -124,8 +124,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
               recipients: [email],
               params: {
                 agencyReferentName: getFullname(
-                  convention.agencyReferentFirstName,
-                  convention.agencyReferentLastName,
+                  convention.agencyReferent?.firstname,
+                  convention.agencyReferent?.lastname,
                 ),
                 beneficiaryFirstName:
                   convention.signatories.beneficiary.firstName,

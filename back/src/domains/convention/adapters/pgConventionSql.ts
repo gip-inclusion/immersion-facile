@@ -201,8 +201,21 @@ const createConventionSelection = <
         businessName: ref("conventions.business_name"),
         workConditions: ref("conventions.work_conditions"),
         agencyId: ref("conventions.agency_id"),
-        agencyReferentFirstName: ref("conventions.agency_referent_first_name"),
-        agencyReferentLastName: ref("conventions.agency_referent_last_name"),
+        agencyReferent: eb
+          .case()
+          .when(
+            sql`conventions.agency_referent_first_name IS NULL AND conventions.agency_referent_last_name IS NULL`,
+            "is",
+            true,
+          )
+          .then(null)
+          .else(
+            jsonBuildObject({
+              firstname: ref("conventions.agency_referent_first_name"),
+              lastname: ref("conventions.agency_referent_last_name"),
+            }),
+          )
+          .end(),
         individualProtection: ref("conventions.individual_protection"),
         individualProtectionDescription: ref(
           "conventions.individual_protection_description",
