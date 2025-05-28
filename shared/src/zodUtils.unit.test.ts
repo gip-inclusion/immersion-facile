@@ -1,7 +1,6 @@
 import { ZodError } from "zod";
 import {
-  firstnameSchema,
-  lastnameSchema,
+  personNameSchema,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
@@ -243,37 +242,30 @@ describe("zTrimmedStringWithMax schema validation", () => {
   });
 });
 
-describe("firstnameSchema", () => {
+describe("personNameSchema", () => {
   it.each([
-    { firstname: "", expectedFirstname: "" },
-    { firstname: ".", expectedFirstname: "." },
-    { firstname: "julien", expectedFirstname: "Julien" },
-    { firstname: "Julien", expectedFirstname: "Julien" },
-    { firstname: "JULIEN", expectedFirstname: "Julien" },
-    { firstname: "jean-paul", expectedFirstname: "Jean-Paul" },
-    { firstname: "jean  paul", expectedFirstname: "Jean Paul" },
+    { name: "julien", expectedName: "julien" },
+    { name: "Julien", expectedName: "Julien" },
+    { name: "jean-paul", expectedName: "jean-paul" },
+    { name: "jean  paul", expectedName: "jean paul" },
+    { name: "O'Brien", expectedName: "O'Brien" },
+    { name: "Marie-Claire", expectedName: "Marie-Claire" },
+    { name: "  trimmed  ", expectedName: "trimmed" },
+    { name: "multiple   spaces", expectedName: "multiple spaces" },
+    { name: "Éléonore", expectedName: "Éléonore" },
   ])(
-    "applies firstname transformation",
-    ({
-      firstname,
-      expectedFirstname,
-    }: { firstname: string; expectedFirstname: string }) => {
-      expect(firstnameSchema.parse(firstname)).toBe(expectedFirstname);
+    "accepts valid name '%s' and transforms to '%s'",
+    ({ name, expectedName }) => {
+      expect(personNameSchema.parse(name)).toBe(expectedName);
     },
   );
-});
 
-describe("lastnameSchema", () => {
-  it.each([
-    { lastname: "julien", expectedLastname: "JULIEN" },
-    { lastname: "L'accompagnateur", expectedLastname: "L'ACCOMPAGNATEUR" },
-  ])(
-    "applies firstname transformation",
-    ({
-      lastname,
-      expectedLastname,
-    }: { lastname: string; expectedLastname: string }) => {
-      expect(lastnameSchema.parse(lastname)).toBe(expectedLastname);
+  it.each(["123", "John@Doe", "John.Doe"])(
+    "rejects invalid name '%s'",
+    (name) => {
+      expect(() => personNameSchema.parse(name)).toThrow(
+        "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
+      );
     },
   );
 });

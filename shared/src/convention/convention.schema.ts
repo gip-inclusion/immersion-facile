@@ -40,6 +40,7 @@ import type { DateString } from "../utils/date";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {
   localization,
+  personNameSchema,
   zBoolean,
   zEnumValidation,
   zStringCanBeEmpty,
@@ -209,8 +210,8 @@ export const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
 
 const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> =
   z.object({
-    firstname: z.string().optional(),
-    lastname: z.string().optional(),
+    firstname: personNameSchema.optional(),
+    lastname: personNameSchema.optional(),
   });
 
 const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
