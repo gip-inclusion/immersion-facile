@@ -7,6 +7,8 @@
     "db:down": "pnpm back db:down",
     "db:up": "pnpm back db:up",
     "db:up:bun": "pnpm back db:up:bun",
+    "db:down:bun": "pnpm back db:down:bun",
+    "db:redo:bun": "pnpm back db:redo:bun",
     "db:redo": "pnpm back db:redo",
     "db:seed": "pnpm back db:seed",
     "db:seed:bun": "pnpm back db:seed:bun",
