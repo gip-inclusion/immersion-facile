@@ -1,4 +1,5 @@
 import { join, keys, reduce } from "ramda";
+import type { AbsoluteUrl } from "../AbsoluteUrl";
 import { pipeWithValue } from "../pipeWithValue";
 
 type RawQueryParams = { [key: string]: string | boolean | number };
@@ -24,3 +25,21 @@ export const queryParamsAsString = <Q extends QueryParams<RawQueryParams>>(
     ),
     join("&"),
   );
+
+export const decodeURIParams = (
+  url: AbsoluteUrl,
+): Record<string, string> | undefined =>
+  url
+    .split("?")[1]
+    .split("&")
+    .reduce<Record<string, string>>((agg, current) => {
+      const [key, value] = current.split("=");
+      return {
+        ...agg,
+        ...(key !== undefined && value !== undefined
+          ? {
+              [key]: value,
+            }
+          : {}),
+      };
+    }, {});
