@@ -371,6 +371,7 @@ export const createUseCases = (
           gateways.timeGateway,
           createNewEvent,
           saveNotificationAndRelatedEvent,
+          config.immersionFacileBaseUrl,
         ),
       insertEstablishmentAggregateFromForm,
       addEstablishmentLead: new AddEstablishmentLead(

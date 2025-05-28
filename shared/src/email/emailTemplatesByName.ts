@@ -1645,6 +1645,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         lastName,
         triggeredByUserFirstName,
         triggeredByUserLastName,
+        immersionBaseUrl,
       }) => ({
         subject: `Votre accès ${businessName} sur Immersion Facilitée`,
         greetings: `Bonjour ${firstName && lastName ? `${firstName} ${lastName}` : ""},`,
@@ -1662,7 +1663,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
         buttons: [
           {
             label: "Créer mon compte",
-            url: `${frontRoutes.establishmentDashboard}`,
+            url: `${immersionBaseUrl}/${frontRoutes.establishmentDashboard}`,
           },
         ],
         subContent: defaultSignature("immersion"),
