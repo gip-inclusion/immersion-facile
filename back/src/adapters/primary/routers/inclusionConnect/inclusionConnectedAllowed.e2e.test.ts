@@ -3,7 +3,7 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   type Exchange,
-  type ExchangeFromDashboard,
+  type ExchangeMessageFromDashboard,
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
   type User,
@@ -693,7 +693,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   )}`, () => {
     it("200 - saves the exchange to a discussion", async () => {
       const user = new InclusionConnectedUserBuilder().buildUser();
-      const payload: ExchangeFromDashboard = {
+      const payload: ExchangeMessageFromDashboard = {
         message: "My fake message",
       };
       const discussion = new DiscussionBuilder()
