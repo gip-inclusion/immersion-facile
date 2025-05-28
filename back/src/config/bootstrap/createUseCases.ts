@@ -73,6 +73,7 @@ import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../dom
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
+import { makeInitiateLoginByEmail } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateLoginByEmail";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
@@ -814,6 +815,15 @@ export const createUseCases = ({
         uowPerformer,
         deps: { saveNotificationAndRelatedEvent },
       }),
+    initiateLoginByEmail: makeInitiateLoginByEmail({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        saveNotificationAndRelatedEvent,
+        oAuthConfig: config.proConnectConfig,
+        generateEmailAuthCodeJwt,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

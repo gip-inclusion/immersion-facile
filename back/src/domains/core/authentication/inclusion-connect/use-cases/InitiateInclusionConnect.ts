@@ -34,6 +34,7 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
       nonce,
       state,
       provider: "proConnect",
+      usedAt: null,
     });
 
     return this.oAuthGateway.getLoginUrl({
