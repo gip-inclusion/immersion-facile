@@ -38,6 +38,9 @@ export const BroadcastAgainButton = ({
   const feedbacks = useAppSelector(feedbacksSelectors.feedbacks);
   const hasErrorFeedback =
     feedbacks["broadcast-convention-again"]?.level === "error";
+  const isConventionValidated =
+    feedbacks["convention-action-accept-by-validator"]?.level === "success" &&
+    feedbacks["convention-action-accept-by-validator"].on === "update";
   const isModalButtonDisabled = disabled ?? false;
 
   const closeBroadcastFeedbackModal = () => {
@@ -74,7 +77,10 @@ export const BroadcastAgainButton = ({
           broadcastAgainModal.open();
         }}
         disabled={
-          disabled || consumerNames.length === 0 || isLoadingApiConsumer
+          disabled ||
+          consumerNames.length === 0 ||
+          isLoadingApiConsumer ||
+          isConventionValidated
         }
       >
         Rediffuser dans votre SI ou système applicatif
