@@ -27,6 +27,30 @@ const defaultSignature = (internshipKind: InternshipKind) =>
 // to add a new EmailType, or changes the params of one, edit first EmailParamsByEmailType and let types guide you
 export const emailTemplatesByName =
   createTemplatesByName<EmailParamsByEmailType>({
+    LOGIN_BY_EMAIL_REQUESTED: {
+      niceName: "Connexion - Entreprise - Lien magique",
+      tags: ["connexion_entreprise_lienMagique"],
+      createEmailVariables: ({ loginLink, fullname }) => ({
+        subject: "Votre lien de connexion à Immersion Facilitée",
+        greetings: `Bonjour ${fullname ?? ""},`,
+        content: `Voici votre lien de connexion à Immersion Facilitée.
+          Cliquez sur le bouton ci-dessous pour accéder à votre espace`,
+        buttons: [
+          {
+            label: "Se connecter",
+            url: loginLink,
+          },
+        ],
+        subContent: `
+          Ce lien est valable pendant 24 heures et ne peut être utilisé qu’une seule fois.
+          
+          Si vous n’êtes pas à l’origine de cette demande, vous pouvez ignorer ce message.
+          
+          À bientôt,
+          L’équipe Immersion Facilitée
+        `,
+      }),
+    },
     ASSESSMENT_AGENCY_FIRST_REMINDER: {
       niceName:
         "Bilan - Prescripteurs - Relance à 3 jours après la fin de l’immersion",

@@ -199,6 +199,10 @@ export const defaultEmailValueByEmailKind: {
     EmailTemplatesByName[K]["createEmailVariables"]
   >[0];
 } = {
+  LOGIN_BY_EMAIL_REQUESTED: {
+    loginLink: "https://google.com",
+    fullname: "BOB",
+  },
   TEST_EMAIL: {
     input1: "input1",
     input2: "input2",

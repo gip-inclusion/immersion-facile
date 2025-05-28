@@ -1,12 +1,30 @@
-import type { ExternalId, Flavor, IdentityProvider, OAuthState } from "shared";
+import type {
+  Email,
+  ExternalId,
+  ExtractFromExisting,
+  Flavor,
+  IdentityProvider,
+  OAuthState,
+} from "shared";
 
 export type OAuthJwt = Flavor<string, "OAuthJwt">;
 export type OAuthNonce = Flavor<string, "InclusionConnectNonce">;
-export type OngoingOAuth = {
+
+type OngoingAuthCommon = {
   userId?: string;
-  externalId?: ExternalId;
-  provider: IdentityProvider;
   state: OAuthState;
   nonce: OAuthNonce;
+  usedAt: Date | null;
+};
+
+export type EmailOngoingAuth = OngoingAuthCommon & {
+  provider: ExtractFromExisting<IdentityProvider, "email">;
+  email: Email;
+};
+export type ProConnectOngoingAuth = OngoingAuthCommon & {
+  provider: ExtractFromExisting<IdentityProvider, "proConnect">;
+  externalId?: ExternalId;
   accessToken?: OAuthJwt; //TODO Pourquoi on le stocke en DB (on ne fait que le save)
 };
+
+export type OngoingOAuth = ProConnectOngoingAuth | EmailOngoingAuth;

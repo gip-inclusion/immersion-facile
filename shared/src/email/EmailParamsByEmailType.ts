@@ -322,6 +322,10 @@ export type EmailParamsByEmailType = {
     agencyName: string;
     justification: string;
   };
+  LOGIN_BY_EMAIL_REQUESTED: {
+    fullname?: string;
+    loginLink: AbsoluteUrl;
+  };
   MAGIC_LINK_RENEWAL: {
     conventionId: ConventionId | undefined;
     internshipKind: InternshipKind;

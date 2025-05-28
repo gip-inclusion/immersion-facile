@@ -56,6 +56,7 @@ describe("InitiateInclusionConnect usecase", () => {
             provider: "proConnect",
             externalId: undefined,
             accessToken: undefined,
+            usedAt: null,
           },
         ]);
       },
