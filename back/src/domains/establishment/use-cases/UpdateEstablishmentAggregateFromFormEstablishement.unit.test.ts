@@ -1,4 +1,5 @@
 import {
+  type AbsoluteUrl,
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
   type ContactFormEstablishmentUserRight,
@@ -57,6 +58,7 @@ describe("Update Establishment aggregate from form data", () => {
 
   const creationDate = new Date("2022-01-01");
   const now = new Date();
+  const immersionBaseUrl: AbsoluteUrl = "https://immersion-base-url.com";
 
   beforeEach(() => {
     siretGateway = new InMemorySiretGateway();
@@ -72,6 +74,7 @@ describe("Update Establishment aggregate from form data", () => {
         timeGateway,
         makeCreateNewEvent({ timeGateway, uuidGenerator }),
         makeSaveNotificationAndRelatedEvent(uuidGenerator, timeGateway),
+        immersionBaseUrl,
       );
   });
 
@@ -742,6 +745,7 @@ describe("Update Establishment aggregate from form data", () => {
                 triggeredByUserFirstName: icBackofficeAdminUser.firstName,
                 triggeredByUserLastName: icBackofficeAdminUser.lastName,
                 role: "establishment-admin",
+                immersionBaseUrl,
               },
               recipients: [newAdminEmail],
             },

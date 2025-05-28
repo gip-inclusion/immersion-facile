@@ -687,5 +687,6 @@ export const defaultEmailValueByEmailKind: {
     triggeredByUserFirstName: "ADMIN_FIRST_NAME",
     triggeredByUserLastName: "ADMIN_LAST_NAME",
     role: "establishment-admin",
+    immersionBaseUrl: "http://some-base-url.com",
   },
 };

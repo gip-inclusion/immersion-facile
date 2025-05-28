@@ -303,6 +303,7 @@ export type EmailParamsByEmailType = {
     triggeredByUserFirstName: string;
     triggeredByUserLastName: string;
     role: EstablishmentRole;
+    immersionBaseUrl: AbsoluteUrl;
   };
   FULL_PREVIEW_EMAIL: {
     agencyLogoUrl: AbsoluteUrl | undefined;

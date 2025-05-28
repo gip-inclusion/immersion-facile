@@ -1,5 +1,6 @@
 import { equals } from "ramda";
 import {
+  type AbsoluteUrl,
   type InclusionConnectDomainJwtPayload,
   type WithFormEstablishmentDto,
   errors,
@@ -37,6 +38,8 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
+  readonly #immersionBaseUrl: AbsoluteUrl;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     addressAPI: AddressGateway,
@@ -44,6 +47,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     timeGateway: TimeGateway,
     createNewEvent: CreateNewEvent,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
+    immersionBaseUrl: AbsoluteUrl,
   ) {
     super(uowPerformer);
 
@@ -52,6 +56,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
     this.#uuidGenerator = uuidGenerator;
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
+    this.#immersionBaseUrl = immersionBaseUrl;
   }
 
   public async _execute(
@@ -128,6 +133,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
               triggeredByUserFirstName: triggeredByUser.firstName,
               triggeredByUserLastName: triggeredByUser.lastName,
               role: userRight.role,
+              immersionBaseUrl: this.#immersionBaseUrl,
             },
           },
           followedIds: {
