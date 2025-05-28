@@ -580,7 +580,8 @@ export const feedbacks: Record<
     "create.error": {
       action: discussionSlice.actions.sendMessageFailed,
       title: "Problème lors de l'envoi du message",
-      message: "Une erreur est survenue lors de l'envoi du message",
+      message:
+        "Une erreur est survenue. Votre message n'a pas pu être envoyé. Veuillez réessayer dans quelques instants.",
     },
   },
   unused: {},
