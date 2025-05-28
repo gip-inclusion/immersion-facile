@@ -97,8 +97,8 @@ describe("SendAssessmentNeededNotifications", () => {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         agencyLogoUrl: agency.logoUrl!,
         agencyReferentName: getFullname(
-          conventionEndingTomorrow.agencyReferentFirstName,
-          conventionEndingTomorrow.agencyReferentLastName,
+          conventionEndingTomorrow.agencyReferent?.firstname,
+          conventionEndingTomorrow.agencyReferent?.lastname,
         ),
         beneficiaryFirstName:
           conventionEndingTomorrow.signatories.beneficiary.firstName,
@@ -127,8 +127,8 @@ describe("SendAssessmentNeededNotifications", () => {
         // biome-ignore lint/style/noNonNullAssertion: <explanation>
         agencyLogoUrl: agency.logoUrl!,
         agencyReferentName: getFullname(
-          conventionEndingTomorrow.agencyReferentFirstName,
-          conventionEndingTomorrow.agencyReferentLastName,
+          conventionEndingTomorrow.agencyReferent?.firstname,
+          conventionEndingTomorrow.agencyReferent?.lastname,
         ),
         beneficiaryFirstName:
           conventionEndingTomorrow.signatories.beneficiary.firstName,

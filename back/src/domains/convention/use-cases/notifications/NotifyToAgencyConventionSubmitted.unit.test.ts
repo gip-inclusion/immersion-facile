@@ -200,8 +200,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [validator.email],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(agencyWithOnlyValidator, validConvention),
@@ -249,8 +249,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [councellor1.email],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -267,8 +267,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [councellor2.email],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -335,8 +335,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [councellor1.email],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             warning:
@@ -355,8 +355,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [councellor2.email],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -426,8 +426,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           recipients: [ftAdvisorEmail],
           params: {
             agencyReferentName: getFullname(
-              validConvention.agencyReferentFirstName,
-              validConvention.agencyReferentLastName,
+              validConvention.agencyReferent?.firstname,
+              validConvention.agencyReferent?.lastname,
             ),
             internshipKind: validConvention.internshipKind,
             warning: undefined,

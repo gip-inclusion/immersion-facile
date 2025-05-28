@@ -42,6 +42,7 @@ export const formConventionFieldsLabels: (
   ...beneficiaryCurrentEmployerSection,
   ...establishmentTutorSection(internshipKind),
   ...establishmentRepresentativeSection(),
+
   //
   // TODO: exclude these fields from typing
   //
@@ -79,13 +80,13 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         ? "Veuillez sélectionner une structure d'accompagnement"
         : "Veuillez sélectionner un point orientation",
   },
-  agencyReferentFirstName: {
+  "agencyReferent.firstname": {
     label: "Prénom de l'accompagnateur",
     id: conventionSectionIds.agencyReferentFirstName,
     hintText:
       "Indiquez la personne qui prescrit l’immersion, si vous le connaissez (accompagnateur du candidat ou conseiller entreprise par exemple).",
   },
-  agencyReferentLastName: {
+  "agencyReferent.lastname": {
     label: "Nom de l'accompagnateur",
     id: conventionSectionIds.agencyReferentLastName,
   },
@@ -543,6 +544,10 @@ const fieldsToExclude = {
   },
 
   establishmentTutor: {
+    label: "",
+    id: "",
+  },
+  agencyReferent: {
     label: "",
     id: "",
   },

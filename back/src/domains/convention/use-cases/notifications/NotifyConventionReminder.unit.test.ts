@@ -763,8 +763,8 @@ const makeAgencyFirstReminderEmail = ({
   recipients: [email],
   params: {
     agencyReferentName: getFullname(
-      convention.agencyReferentFirstName,
-      convention.agencyReferentLastName,
+      convention.agencyReferent?.firstname,
+      convention.agencyReferent?.lastname,
     ),
     conventionId: convention.id,
     agencyName: agency.name,
@@ -791,8 +791,8 @@ const makeAgencyLastReminderEmail = ({
   params: {
     conventionId: convention.id,
     agencyReferentName: getFullname(
-      convention.agencyReferentFirstName,
-      convention.agencyReferentLastName,
+      convention.agencyReferent?.firstname,
+      convention.agencyReferent?.lastname,
     ),
     beneficiaryFirstName: convention.signatories.beneficiary.firstName,
     beneficiaryLastName: convention.signatories.beneficiary.lastName,
