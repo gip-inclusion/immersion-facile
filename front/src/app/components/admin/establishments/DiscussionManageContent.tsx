@@ -29,6 +29,7 @@ import {
   createOpaqueEmail,
   discussionRejectionSchema,
   domElementIds,
+  escapeHtml,
   exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
   rejectDiscussionEmailParams,
@@ -319,7 +320,7 @@ const DiscussionExchangesList = ({
 }: {
   discussion: DiscussionReadDto;
 }): JSX.Element => {
-  const sortedBySentAtDesc = discussion.exchanges.sort(
+  const sortedBySentAtDesc = [...discussion.exchanges].sort(
     (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
   );
   return (
@@ -604,6 +605,11 @@ const DiscussionEchangeMessageForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
+      <Feedback
+        topics={["establishment-dashboard-discussion-send-message"]}
+        className={fr.cx("fr-mb-2w")}
+        closable
+      />
       <input type="hidden" {...register("discussionId")} value={discussionId} />
       <Input
         textArea
@@ -612,15 +618,13 @@ const DiscussionEchangeMessageForm = ({
           id: domElementIds.establishmentDashboard.discussion.sendMessageInput,
           rows: 5,
           placeholder: "Rédigez votre message ici...",
-          ...register("message"),
+          ...register("message", {
+            setValueAs: escapeHtml,
+          }),
         }}
         {...getFieldError("message")}
       />
       <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
-        <Feedback
-          topics={["establishment-dashboard-discussion-send-message"]}
-          className={fr.cx("fr-mb-2w")}
-        />
         <Button
           id={
             domElementIds.establishmentDashboard.discussion
@@ -628,6 +632,7 @@ const DiscussionEchangeMessageForm = ({
           }
           type="submit"
           disabled={formState.isSubmitting}
+          size="small"
         >
           Envoyer un message
         </Button>
