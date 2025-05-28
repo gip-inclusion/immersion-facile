@@ -399,6 +399,7 @@ describe("Send signature link", () => {
         errors.convention.smsSignatureLinkAlreadySent({
           signatoryRole: "establishment-representative",
           minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
+          timeRemaining: "22h00",
         }),
       );
     });
