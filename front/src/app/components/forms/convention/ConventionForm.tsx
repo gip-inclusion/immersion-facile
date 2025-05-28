@@ -70,6 +70,7 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 
+import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { errors as errorMessage } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
@@ -161,6 +162,12 @@ export const ConventionForm = ({
         federatedIdentity,
       ),
     },
+    ...(federatedIdentity?.payload && mode === "create-from-scratch"
+      ? {
+          agencyReferentFirstName: federatedIdentity.payload.advisor.firstName,
+          agencyReferentLastName: federatedIdentity.payload.advisor.lastName,
+        }
+      : {}),
   }).current;
   useExistingSiret({
     siret: initialValues.siret,
@@ -189,6 +196,7 @@ export const ConventionForm = ({
     getValues,
     getFieldState,
     formState,
+    register,
     reset,
   } = methods;
 
@@ -228,6 +236,10 @@ export const ConventionForm = ({
       agencyKind: convention.agencyKind,
       agencyDepartment: convention.agencyDepartment,
       workConditions: undefinedIfEmptyString(convention.workConditions),
+      agencyReferent: {
+        firstname: undefinedIfEmptyString(convention.agencyReferent?.firstname),
+        lastname: undefinedIfEmptyString(convention.agencyReferent?.lastname),
+      },
       establishmentNumberEmployeesRange:
         establishmentNumberEmployeesRange === ""
           ? undefined
@@ -237,6 +249,8 @@ export const ConventionForm = ({
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
     };
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    console.log("conventionToSave", conventionToSave);
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,
@@ -476,27 +490,51 @@ export const ConventionForm = ({
                     }
                     {...makeAccordionProps(1)}
                   >
-                    <AgencySelector
-                      fields={{
-                        agencyDepartmentField,
-                        agencyIdField,
-                        agencyKindField,
-                      }}
-                      shouldLockToPeAgencies={shouldLockToPeAgencies}
-                      shouldFilterDelegationPrescriptionAgencyKind={false}
-                      shouldShowAgencyKindField={
-                        conventionValues?.internshipKind === "immersion"
-                      }
-                      agencyDepartmentOptions={departmentOptions}
-                      onDepartmentCodeChangedMemoized={
-                        onDepartmentCodeChangedMemoized
-                      }
-                      agencyOptions={agencyOptions}
-                      isLoading={isAgenciesLoading}
-                      isFetchAgencyOptionsError={
-                        agenciesFeedback.kind === "errored"
-                      }
-                    />
+                    <>
+                      <AgencySelector
+                        fields={{
+                          agencyDepartmentField,
+                          agencyIdField,
+                          agencyKindField,
+                        }}
+                        shouldLockToPeAgencies={shouldLockToPeAgencies}
+                        shouldFilterDelegationPrescriptionAgencyKind={false}
+                        shouldShowAgencyKindField={
+                          conventionValues?.internshipKind === "immersion"
+                        }
+                        agencyDepartmentOptions={departmentOptions}
+                        onDepartmentCodeChangedMemoized={
+                          onDepartmentCodeChangedMemoized
+                        }
+                        agencyOptions={agencyOptions}
+                        isLoading={isAgenciesLoading}
+                        isFetchAgencyOptionsError={
+                          agenciesFeedback.kind === "errored"
+                        }
+                      />
+                      <Input
+                        label={formContents["agencyReferent.firstname"].label}
+                        hintText={
+                          formContents["agencyReferent.firstname"].hintText
+                        }
+                        nativeInputProps={{
+                          ...formContents["agencyReferent.firstname"],
+                          ...register("agencyReferent.firstname"),
+                        }}
+                        {...getFieldError("agencyReferent.firstname")}
+                      />
+                      <Input
+                        label={formContents["agencyReferent.lastname"].label}
+                        hintText={
+                          formContents["agencyReferent.lastname"].hintText
+                        }
+                        nativeInputProps={{
+                          ...formContents["agencyReferent.lastname"],
+                          ...register("agencyReferent.lastname"),
+                        }}
+                        {...getFieldError("agencyReferent.lastname")}
+                      />
+                    </>
                   </Accordion>
 
                   <Accordion

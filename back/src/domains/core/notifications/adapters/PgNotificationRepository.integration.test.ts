@@ -97,6 +97,7 @@ const emailNotifications: EmailNotification[] = [
       recipients: ["yo@remind.com"],
       cc: ["yala@jo.com"],
       params: {
+        agencyReferentName: "Agency Referent Name",
         conventionId: "",
         agencyMagicLinkUrl: "",
         beneficiaryFirstName: "Bob",

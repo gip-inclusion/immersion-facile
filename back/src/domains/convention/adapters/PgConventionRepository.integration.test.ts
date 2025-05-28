@@ -52,6 +52,10 @@ describe("PgConventionRepository", () => {
   const conventionStylisteBuilder = new ConventionDtoBuilder()
     .withImmersionAppellation(styliste)
     .withUpdatedAt(anyConventionUpdatedAt)
+    .withAgencyReferent({
+      firstname: "Fredy",
+      lastname: "L'ACCOMPAGNATEUR",
+    })
     .withAgencyId(agency.id);
 
   let pool: Pool;
@@ -120,7 +124,7 @@ describe("PgConventionRepository", () => {
     expect(savedExternalId).toBeUndefined();
   });
 
-  it("fails to add a convention if it already exits", async () => {
+  it("fails to add a convention if it already exists", async () => {
     const convention = new ConventionDtoBuilder()
       .withInternshipKind("immersion")
       .withId("aaaaac99-9c0b-1bbb-bb6d-6bb9bd38aaaa")
@@ -128,6 +132,7 @@ describe("PgConventionRepository", () => {
       .withDateStart(new Date("2023-01-02").toISOString())
       .withDateEnd(new Date("2023-01-06").toISOString())
       .withSchedule(reasonableSchedule)
+      .withAgencyReferent({ firstname: "Fredy", lastname: "L'ACCOMPAGNATEUR" })
       .build();
 
     await conventionRepository.save(convention);
@@ -860,6 +865,54 @@ describe("PgConventionRepository", () => {
       const updatedConvention = conventionStylisteBuilder
         .withId(idA)
         .withBeneficiaryRepresentative(undefined)
+        .build();
+
+      await conventionRepository.update(
+        updatedConvention,
+        anyConventionUpdatedAt,
+      );
+
+      expect(await conventionRepository.getById(idA)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("Updates the agency referent firstname and lastname of an already saved immersion", async () => {
+      const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .build();
+      await conventionRepository.save(convention, anyConventionUpdatedAt);
+
+      const updatedConvention = conventionStylisteBuilder
+        .withId(idA)
+        .withAgencyReferent({ firstname: "New", lastname: "REFERENT" })
+        .build();
+
+      await conventionRepository.update(
+        updatedConvention,
+        anyConventionUpdatedAt,
+      );
+
+      expect(await conventionRepository.getById(idA)).toEqual(
+        updatedConvention,
+      );
+    });
+
+    it("Clears the agency referent firstname and lastname of an already saved immersion", async () => {
+      const idA: ConventionId = "aaaaac99-9c0b-1aaa-aa6d-6bb9bd38aaaa";
+      const convention = conventionStylisteBuilder
+        .withId(idA)
+        .withBeneficiaryRepresentative(beneficiaryRepresentative)
+        .build();
+      await conventionRepository.save(convention, anyConventionUpdatedAt);
+
+      const updatedConvention = new ConventionDtoBuilder()
+        .withImmersionAppellation(styliste)
+        .withUpdatedAt(anyConventionUpdatedAt)
+        .withAgencyId(agency.id)
+        .withId(idA)
         .build();
 
       await conventionRepository.update(

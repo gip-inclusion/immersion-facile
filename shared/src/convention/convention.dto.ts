@@ -181,6 +181,7 @@ export type ConventionCommon = {
   establishmentNumberEmployeesRange?: NumberEmployeesRange;
   establishmentTutor: EstablishmentTutor;
   validators?: ConventionValidatorInputNames;
+  agencyReferent?: WithFirstnameAndLastname;
 } & Partial<WithRenewed> &
   WithAcquisition;
 
@@ -196,11 +197,11 @@ export type WithRenewed = {
 };
 
 export type ConventionValidatorInputNames = {
-  agencyCounsellor?: ConventionValidatorInputName;
-  agencyValidator?: ConventionValidatorInputName;
+  agencyCounsellor?: WithFirstnameAndLastname;
+  agencyValidator?: WithFirstnameAndLastname;
 };
 
-export type ConventionValidatorInputName = {
+export type WithFirstnameAndLastname = {
   firstname?: string;
   lastname?: string;
 };

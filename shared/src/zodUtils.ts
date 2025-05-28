@@ -113,6 +113,15 @@ export const emptyObjectSchema: z.Schema<Record<string, never>> = z
   .object({})
   .strict();
 
+export const personNameSchema = z
+  .string()
+  .trim()
+  .regex(
+    /^[A-Za-zÀ-ÿ\s'-]*$/,
+    "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
+  )
+  .transform((val) => val.replace(/\s+/g, " "));
+
 export const expressEmptyResponseBody = z.void().or(z.literal(""));
 
 export const expressEmptyResponseBodyOrEmptyObject =

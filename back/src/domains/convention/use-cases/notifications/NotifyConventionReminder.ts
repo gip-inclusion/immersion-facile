@@ -17,6 +17,7 @@ import {
   errors,
   filterNotFalsy,
   frontRoutes,
+  getFullname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
   smsRecipientPhoneSchema,
@@ -310,6 +311,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             params: {
               conventionId: convention.id,
               agencyName: agency.name,
+              agencyReferentName: getFullname(
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
+              ),
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -327,6 +332,10 @@ export class NotifyConventionReminder extends TransactionalUseCase<
             recipients: [email],
             params: {
               conventionId: convention.id,
+              agencyReferentName: getFullname(
+                convention.agencyReferent?.firstname,
+                convention.agencyReferent?.lastname,
+              ),
               beneficiaryFirstName:
                 convention.signatories.beneficiary.firstName,
               beneficiaryLastName: convention.signatories.beneficiary.lastName,

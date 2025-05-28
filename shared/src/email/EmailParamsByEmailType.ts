@@ -31,6 +31,7 @@ export type EmailParamsByEmailType = {
   AGENCY_FIRST_REMINDER: {
     agencyMagicLinkUrl: string;
     agencyName: string;
+    agencyReferentName: string | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     conventionId: ConventionId;
@@ -40,6 +41,7 @@ export type EmailParamsByEmailType = {
   };
   AGENCY_LAST_REMINDER: {
     agencyMagicLinkUrl: string;
+    agencyReferentName: string | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
@@ -75,6 +77,7 @@ export type EmailParamsByEmailType = {
   };
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
+    agencyReferentName: string | undefined;
     assessmentCreationLink: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
@@ -124,6 +127,7 @@ export type EmailParamsByEmailType = {
     internshipKind: InternshipKind;
   };
   ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION: {
+    agencyReferentName: string | undefined;
     immersionObjective: ImmersionObjective | undefined;
     conventionId: ConventionId;
     beneficiaryFirstName: string;
@@ -137,6 +141,7 @@ export type EmailParamsByEmailType = {
     magicLink: string;
   };
   ASSESSMENT_CREATED_WITH_STATUS_DID_NOT_SHOW_AGENCY_NOTIFICATION: {
+    agencyReferentName: string | undefined;
     immersionObjective: ImmersionObjective | undefined;
     conventionId: ConventionId;
     beneficiaryFirstName: string;
@@ -325,6 +330,7 @@ export type EmailParamsByEmailType = {
   NEW_CONVENTION_AGENCY_NOTIFICATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
     agencyName: string;
+    agencyReferentName: string | undefined;
     businessName: string;
     conventionId: ConventionId;
     dateEnd: string;
@@ -363,6 +369,7 @@ export type EmailParamsByEmailType = {
   };
   NEW_CONVENTION_REVIEW_FOR_ELIGIBILITY_OR_VALIDATION: {
     agencyLogoUrl: AbsoluteUrl | undefined;
+    agencyReferentName: string | undefined;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;

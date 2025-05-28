@@ -1,5 +1,6 @@
 import { ZodError } from "zod";
 import {
+  personNameSchema,
   zStringCanBeEmpty,
   zStringMinLength1,
   zStringPossiblyEmptyWithMax,
@@ -239,4 +240,32 @@ describe("zTrimmedStringWithMax schema validation", () => {
   ])(`fails to validate "%s"`, ({ input, expectedError }) => {
     expect(() => zTrimmedStringWithMax(3).parse(input)).toThrow(expectedError);
   });
+});
+
+describe("personNameSchema", () => {
+  it.each([
+    { name: "julien", expectedName: "julien" },
+    { name: "Julien", expectedName: "Julien" },
+    { name: "jean-paul", expectedName: "jean-paul" },
+    { name: "jean  paul", expectedName: "jean paul" },
+    { name: "O'Brien", expectedName: "O'Brien" },
+    { name: "Marie-Claire", expectedName: "Marie-Claire" },
+    { name: "  trimmed  ", expectedName: "trimmed" },
+    { name: "multiple   spaces", expectedName: "multiple spaces" },
+    { name: "Éléonore", expectedName: "Éléonore" },
+  ])(
+    "accepts valid name '%s' and transforms to '%s'",
+    ({ name, expectedName }) => {
+      expect(personNameSchema.parse(name)).toBe(expectedName);
+    },
+  );
+
+  it.each(["123", "John@Doe", "John.Doe"])(
+    "rejects invalid name '%s'",
+    (name) => {
+      expect(() => personNameSchema.parse(name)).toThrow(
+        "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
+      );
+    },
+  );
 });
