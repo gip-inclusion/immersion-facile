@@ -6,9 +6,15 @@ export type FederatedIdentityProvider =
   (typeof federatedIdentityProviders)[number];
 
 export const federatedIdentityProviders = [
-  "connectedUser",
+  "proConnect",
+  "email",
   "peConnect",
 ] as const;
+
+export const isFederatedIdentityProvider = (
+  provider: string,
+): provider is FederatedIdentityProvider =>
+  federatedIdentityProviders.includes(provider as FederatedIdentityProvider);
 
 type GenericFederatedIdentity<
   Provider extends FederatedIdentityProvider,
@@ -57,7 +63,7 @@ export const isFtConnectIdentity = (
   federatedIdentity?.provider === "peConnect";
 
 type ConnectedUserIdentity = GenericFederatedIdentity<
-  "connectedUser",
+  "proConnect" | "email",
   ConnectedUserJwt
 >;
 

@@ -153,8 +153,8 @@ export const commonDiscussionReadSchema: z.Schema<
     appellation: appellationDtoSchema,
     address: addressSchema,
     establishmentContact: z.object({
-      firstName: zStringMinLength1,
-      lastName: zStringMinLength1,
+      firstName: zStringCanBeEmpty,
+      lastName: zStringCanBeEmpty,
       job: zStringMinLength1,
     }),
     exchanges: exchangesSchema,

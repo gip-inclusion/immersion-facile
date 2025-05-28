@@ -21,7 +21,7 @@ import type supertest from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import {
-  type GenerateInclusionConnectJwt,
+  type GenerateConnectedUserJwt,
   makeGenerateJwtES256,
 } from "../../../../domains/core/jwt";
 import {
@@ -43,7 +43,7 @@ describe("Edit form establishments", () => {
   let appConfig: AppConfig;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   const formEstablishment = FormEstablishmentDtoBuilder.valid()
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
@@ -68,13 +68,8 @@ describe("Edit form establishments", () => {
 
   beforeEach(async () => {
     let request: supertest.SuperTest<supertest.Test>;
-    ({
-      request,
-      appConfig,
-      gateways,
-      inMemoryUow,
-      generateInclusionConnectJwt,
-    } = await buildTestApp(new AppConfigBuilder().build()));
+    ({ request, appConfig, gateways, inMemoryUow, generateConnectedUserJwt } =
+      await buildTestApp(new AppConfigBuilder().build()));
     httpClient = createSupertestSharedClient(establishmentRoutes, request);
 
     inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
@@ -93,7 +88,7 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             now: gateways.timeGateway.now(),
             durationDays: 30,
@@ -138,7 +133,7 @@ describe("Edit form establishments", () => {
       await httpClient.updateFormEstablishment({
         body: updatedFormEstablishment,
         headers: {
-          authorization: generateInclusionConnectJwt(
+          authorization: generateConnectedUserJwt(
             createInclusionConnectJwtPayload({
               now: gateways.timeGateway.now(),
               durationDays: 30,
@@ -192,9 +187,7 @@ describe("Edit form establishments", () => {
       await httpClient.updateFormEstablishment({
         body: formEstablishment,
         headers: {
-          authorization: generateInclusionConnectJwt(
-            backofficeAdminICJwtPayload,
-          ),
+          authorization: generateConnectedUserJwt(backofficeAdminICJwtPayload),
         },
       }),
       {
@@ -229,7 +222,7 @@ describe("Edit form establishments", () => {
   });
 
   it("401 - Jwt is generated from wrong private key", async () => {
-    const generateJwtWithWrongKey = makeGenerateJwtES256<"inclusionConnect">(
+    const generateJwtWithWrongKey = makeGenerateJwtES256<"connectedUser">(
       appConfig.apiJwtPrivateKey, // Private Key is the wrong one !
       undefined,
     );
@@ -271,7 +264,7 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: formEstablishment,
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             userId: establishmentAdminUser.id,
             now: subYears(gateways.timeGateway.now(), 1),
@@ -299,7 +292,7 @@ describe("Edit form establishments", () => {
     const response = await httpClient.updateFormEstablishment({
       body: establishment,
       headers: {
-        authorization: generateInclusionConnectJwt(
+        authorization: generateConnectedUserJwt(
           createInclusionConnectJwtPayload({
             now: gateways.timeGateway.now(),
             durationDays: 30,

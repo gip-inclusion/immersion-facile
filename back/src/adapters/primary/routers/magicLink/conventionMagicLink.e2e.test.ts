@@ -22,8 +22,8 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
 import type {
+  GenerateConnectedUserJwt,
   GenerateConventionJwt,
-  GenerateInclusionConnectJwt,
 } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -58,7 +58,7 @@ describe("Magic link router", () => {
 
   let request: SuperTest<Test>;
   let generateConventionJwt: GenerateConventionJwt;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<ConventionMagicLinkRoutes>;
   let gateways: InMemoryGateways;
@@ -67,7 +67,7 @@ describe("Magic link router", () => {
     ({
       request,
       generateConventionJwt,
-      generateInclusionConnectJwt,
+      generateConnectedUserJwt,
       inMemoryUow,
       gateways,
     } = await buildTestApp());
@@ -142,7 +142,7 @@ describe("Magic link router", () => {
           urlParams: { conventionId: updatedConvention.id },
           body: { convention: updatedConvention },
           headers: {
-            authorization: generateInclusionConnectJwt({
+            authorization: generateConnectedUserJwt({
               userId: notAdminUser.id,
               version: currentJwtVersions.inclusion,
             }),
@@ -171,7 +171,7 @@ describe("Magic link router", () => {
           .notSigned()
           .build();
 
-        const backOfficeJwt = generateInclusionConnectJwt(
+        const backOfficeJwt = generateConnectedUserJwt(
           backofficeAdminJwtPayload,
         );
 
@@ -328,7 +328,7 @@ describe("Magic link router", () => {
         .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
-          authorization: generateInclusionConnectJwt(backofficeAdminJwtPayload),
+          authorization: generateConnectedUserJwt(backofficeAdminJwtPayload),
         });
 
       expectToEqual(response.body, "");
@@ -401,7 +401,7 @@ describe("Magic link router", () => {
         .post(conventionMagicLinkRoutes.renewConvention.url)
         .send(renewedConventionParams)
         .set({
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: validator.id,
             version: 1,
             iat: new Date().getTime() / 1000,
@@ -518,7 +518,7 @@ describe("Magic link router", () => {
         .post(`/auth/sign-application/${convention.id}`)
         .send()
         .set({
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: establishmentRepresentative.id,
             version: 1,
           }),
@@ -563,7 +563,7 @@ describe("Magic link router", () => {
       const response = await request
         .post(`/auth/sign-application/${convention.id}`)
         .set({
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: notEstablishmentRepresentative.id,
             version: 1,
           }),
@@ -618,7 +618,7 @@ describe("Magic link router", () => {
           signatoryRole: "establishment-representative",
         },
         headers: {
-          authorization: generateInclusionConnectJwt({
+          authorization: generateConnectedUserJwt({
             userId: validator.id,
             version: 1,
           }),

@@ -45,6 +45,7 @@ const inclusionConnectedParams = createInclusionConnectedParams({
   lastName: param.query.optional.string,
   email: param.query.optional.string,
   idToken: param.query.optional.string,
+  provider: param.query.optional.string,
 });
 
 export const acquisitionParams = {

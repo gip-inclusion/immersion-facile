@@ -7,12 +7,14 @@ import type {
   ConnectedUserJwt,
   ConventionJwt,
   ConventionJwtPayload,
+  EmailAuthCodeJwt,
   InclusionConnectJwtPayload,
 } from "shared";
 
 export type GenerateConventionJwt = GenerateJwtFn<"convention">;
-export type GenerateInclusionConnectJwt = GenerateJwtFn<"inclusionConnect">;
+export type GenerateConnectedUserJwt = GenerateJwtFn<"connectedUser">;
 export type GenerateApiConsumerJwt = GenerateJwtFn<"apiConsumer">;
+export type GenerateEmailAuthCodeJwt = GenerateJwtFn<"emailAuthCode">;
 
 type JwtTokenMapping<
   K extends string,
@@ -27,11 +29,12 @@ type JwtTokenMapping<
 type JwtMap =
   | JwtTokenMapping<"convention", ConventionJwt, ConventionJwtPayload>
   | JwtTokenMapping<
-      "inclusionConnect",
+      "connectedUser",
       ConnectedUserJwt,
       InclusionConnectJwtPayload
     >
-  | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>;
+  | JwtTokenMapping<"apiConsumer", ApiConsumerJwt, ApiConsumerJwtPayload>
+  | JwtTokenMapping<"emailAuthCode", EmailAuthCodeJwt, CommonJwtPayload>;
 
 export type JwtKind = JwtMap["kind"];
 
@@ -58,7 +61,7 @@ export const makeGenerateJwtES256 =
     });
   };
 
-type VerifyJwtFn<K extends JwtKind> = (
+export type VerifyJwtFn<K extends JwtKind> = (
   jwt: Extract<JwtMap, { kind: K }>["token"],
 ) => CommonJwtPayload & Extract<JwtMap, { kind: K }>["payload"];
 
