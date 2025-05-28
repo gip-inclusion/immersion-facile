@@ -101,7 +101,7 @@ export const createInclusionConnectedAllowedRouter = (
       }),
   );
 
-  inclusionConnectedSharedRoutes.sendMessageToDiscussion(
+  inclusionConnectedSharedRoutes.sendExchangeToDiscussion(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {

@@ -123,7 +123,7 @@ export class HttpInclusionConnectedGateway
   ): Observable<Exchange> {
     return from(
       this.httpClient
-        .sendMessageToDiscussion({
+        .sendExchangeToDiscussion({
           headers: { authorization: payload.jwt },
           urlParams: { discussionId: payload.discussionId },
           body: {

@@ -28,7 +28,7 @@ export type DiscussionState = {
   fetchError: string | null;
 };
 
-export type SendMessageRequestedPayload = {
+export type SendExchangeRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
 } & ExchangeFromDashboard;
@@ -83,15 +83,15 @@ export const discussionSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
-    sendMessageRequested: (
+    sendExchangeRequested: (
       state,
       _action: PayloadActionWithFeedbackTopic<{
-        exchangeData: SendMessageRequestedPayload;
+        exchangeData: SendExchangeRequestedPayload;
       }>,
     ) => {
       state.isLoading = true;
     },
-    sendMessageSucceeded: (
+    sendExchangeSucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<{
         exchangeData: Exchange;
@@ -106,7 +106,7 @@ export const discussionSlice = createSlice({
         exchanges: [...state.discussion.exchanges, action.payload.exchangeData],
       };
     },
-    sendMessageFailed: (
+    sendExchangeFailed: (
       state,
       _action: PayloadActionWithFeedbackTopicError,
     ) => {

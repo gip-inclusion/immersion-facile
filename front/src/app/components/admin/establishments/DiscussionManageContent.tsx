@@ -10,8 +10,12 @@ import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
 import { useEffect, useState } from "react";
-import { ButtonWithSubMenu } from "react-design-system";
-import { DiscussionMeta, ExchangeMessage, Loader } from "react-design-system";
+import {
+  ButtonWithSubMenu,
+  DiscussionMeta,
+  ExchangeMessage,
+  Loader,
+} from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -591,7 +595,7 @@ const DiscussionEchangeMessageForm = ({
   const onSubmit = (data: ExchangeFromDashboard) => {
     if (inclusionConnectedJwt) {
       dispatch(
-        discussionSlice.actions.sendMessageRequested({
+        discussionSlice.actions.sendExchangeRequested({
           exchangeData: {
             jwt: inclusionConnectedJwt,
             discussionId,

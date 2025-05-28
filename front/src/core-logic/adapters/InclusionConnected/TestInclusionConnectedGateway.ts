@@ -10,7 +10,7 @@ import type {
 } from "shared";
 import type {
   FetchDiscussionRequestedPayload,
-  SendMessageRequestedPayload,
+  SendExchangeRequestedPayload,
 } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
@@ -47,7 +47,7 @@ export class TestInclusionConnectedGateway
   }
 
   public sendMessage$(
-    _payload: SendMessageRequestedPayload,
+    _payload: SendExchangeRequestedPayload,
   ): Observable<Exchange> {
     return this.sendMessageResponse$;
   }
