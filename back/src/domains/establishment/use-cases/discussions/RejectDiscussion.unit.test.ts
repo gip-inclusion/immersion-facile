@@ -69,6 +69,7 @@ describe("RejectDiscussion", () => {
           {
             discussionId: discussion.id,
             rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
           },
           authorizedUser,
         ),
@@ -96,6 +97,7 @@ describe("RejectDiscussion", () => {
           {
             discussionId: discussion.id,
             rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
           },
           unauthorizedUser,
         ),
@@ -111,6 +113,7 @@ describe("RejectDiscussion", () => {
         ...discussion,
         status: "REJECTED",
         rejectionKind: "UNABLE_TO_HELP",
+        candidateWarnedMethod: null,
       };
 
       uow.discussionRepository.discussions = [alreadyRejectedDiscussion];
@@ -120,6 +123,7 @@ describe("RejectDiscussion", () => {
           {
             discussionId: alreadyRejectedDiscussion.id,
             rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
           },
           authorizedUser,
         ),
@@ -137,6 +141,7 @@ describe("RejectDiscussion", () => {
           {
             discussionId: discussion.id,
             rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
           },
           unauthorizedUser,
         ),
@@ -157,6 +162,7 @@ describe("RejectDiscussion", () => {
           params: {
             discussionId: discussion.id,
             rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
           },
           expectedRejectionReason:
             "l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.",
@@ -165,6 +171,7 @@ describe("RejectDiscussion", () => {
           params: {
             discussionId: discussion.id,
             rejectionKind: "NO_TIME",
+            candidateWarnedMethod: null,
           },
           expectedRejectionReason:
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -174,6 +181,7 @@ describe("RejectDiscussion", () => {
             discussionId: discussion.id,
             rejectionKind: "OTHER",
             rejectionReason: "my rejection reason",
+            candidateWarnedMethod: null,
           },
           expectedRejectionReason: "my rejection reason",
         },
@@ -226,6 +234,7 @@ describe("RejectDiscussion", () => {
           const params: RejectDiscussionAndSendNotificationParam = {
             discussionId: discussion.id,
             rejectionKind: "NO_TIME",
+            candidateWarnedMethod: null,
           };
 
           await rejectPotentialBeneficiaryOnDiscussion.execute(
@@ -248,6 +257,7 @@ describe("RejectDiscussion", () => {
               ...discussion,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
+              candidateWarnedMethod: null,
               exchanges: [
                 ...discussion.exchanges,
                 {
@@ -278,6 +288,7 @@ describe("RejectDiscussion", () => {
           const params: RejectDiscussionAndSendNotificationParam = {
             discussionId: discussionWithEmailInCopy.id,
             rejectionKind: "NO_TIME",
+            candidateWarnedMethod: null,
           };
 
           await rejectPotentialBeneficiaryOnDiscussion.execute(
@@ -300,6 +311,7 @@ describe("RejectDiscussion", () => {
               ...discussionWithEmailInCopy,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
+              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithEmailInCopy.exchanges,
                 {
@@ -346,6 +358,7 @@ describe("RejectDiscussion", () => {
           const params: RejectDiscussionAndSendNotificationParam = {
             discussionId: discussionWithoutUserEmail.id,
             rejectionKind: "NO_TIME",
+            candidateWarnedMethod: null,
           };
 
           await rejectPotentialBeneficiaryOnDiscussion.execute(
@@ -368,6 +381,7 @@ describe("RejectDiscussion", () => {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
+              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithoutUserEmail.exchanges,
                 {
@@ -405,6 +419,7 @@ describe("RejectDiscussion", () => {
           const params: RejectDiscussionAndSendNotificationParam = {
             discussionId: discussionWithoutUserEmail.id,
             rejectionKind: "NO_TIME",
+            candidateWarnedMethod: null,
           };
 
           await rejectPotentialBeneficiaryOnDiscussion.execute(
@@ -427,6 +442,7 @@ describe("RejectDiscussion", () => {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
+              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithoutUserEmail.exchanges,
                 {

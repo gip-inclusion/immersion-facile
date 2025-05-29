@@ -60,6 +60,7 @@ describe("MarkDiscussionLinkedToConvention", () => {
     const expectedUpdatedDiscussion: DiscussionDto = {
       ...discussion,
       status: "ACCEPTED",
+      candidateWarnedMethod: null,
       conventionId: convention.id,
     };
 

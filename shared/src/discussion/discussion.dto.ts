@@ -107,6 +107,8 @@ export type DiscussionEstablishmentContact = {
   job: string;
 };
 
+export type CandidateWarnedMethod = "phone" | "email" | "in_person" | "other";
+
 export type CommonDiscussionDto = {
   address: AddressDto;
   appellationCode: AppellationCode;
@@ -141,6 +143,7 @@ export type WithDiscussionStatus =
 
 export type DiscussionAccepted = {
   status: "ACCEPTED";
+  candidateWarnedMethod: CandidateWarnedMethod | null;
 };
 
 export type DiscussionRejected = {
@@ -157,11 +160,13 @@ export type WithDiscussionRejection =
 
 type RejectionWithoutReason = {
   rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
+  candidateWarnedMethod: CandidateWarnedMethod | null;
 };
 
 type RejectionWithReason = {
   rejectionKind: "OTHER";
   rejectionReason: string;
+  candidateWarnedMethod: CandidateWarnedMethod | null;
 };
 
 export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
@@ -232,8 +237,12 @@ export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
     | {
         rejectionKind: Extract<RejectionKind, "OTHER">;
         rejectionReason: string;
+        candidateWarnedMethod: CandidateWarnedMethod | null;
       }
-    | { rejectionKind: Exclude<RejectionKind, "OTHER"> }
+    | {
+        rejectionKind: Exclude<RejectionKind, "OTHER">;
+        candidateWarnedMethod: CandidateWarnedMethod | null;
+      }
   );
 
 export type DiscussionDisplayStatus =

@@ -356,7 +356,7 @@ describe("PgDiscussionRepository", () => {
         const discussionToMatchWithLotOfExchanges = new DiscussionBuilder()
           .withId(uuid())
           .withCreatedAt(date)
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges(
             [
               sendedByBeneficiary,
@@ -678,7 +678,7 @@ describe("PgDiscussionRepository", () => {
         {
           title: "insert with status and conventionId",
           discussion: new DiscussionBuilder()
-            .withStatus("ACCEPTED")
+            .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
             .withConventionId("some-convention-id")
             .build(),
         },
@@ -763,13 +763,17 @@ describe("PgDiscussionRepository", () => {
         const discussion = new DiscussionBuilder()
           .withSiret(siret)
           .withCreatedAt(new Date("2023-07-07"))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .build();
 
         await pgDiscussionRepository.insert(discussion);
 
         const updatedDiscussion = new DiscussionBuilder(discussion)
-          .withStatus("REJECTED", "UNABLE_TO_HELP")
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
+          })
           .withConventionId("some-other-convention-id")
           .build();
 
@@ -792,13 +796,18 @@ describe("PgDiscussionRepository", () => {
         const discussion = new DiscussionBuilder()
           .withSiret(siret)
           .withCreatedAt(new Date("2023-07-07"))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .build();
 
         await pgDiscussionRepository.insert(discussion);
 
         const updatedDiscussion = new DiscussionBuilder(discussion)
-          .withStatus("REJECTED", "OTHER", "my custom reason")
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "OTHER",
+            rejectionReason: "my custom reason",
+            candidateWarnedMethod: null,
+          })
           .build();
 
         await pgDiscussionRepository.update(updatedDiscussion);
@@ -820,13 +829,13 @@ describe("PgDiscussionRepository", () => {
         const discussion = new DiscussionBuilder()
           .withSiret(siret)
           .withCreatedAt(new Date("2023-07-07"))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .build();
 
         await pgDiscussionRepository.insert(discussion);
 
         const updatedDiscussion = new DiscussionBuilder(discussion)
-          .withStatus("ACCEPTED")
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
           .build();
 
         await pgDiscussionRepository.update(updatedDiscussion);

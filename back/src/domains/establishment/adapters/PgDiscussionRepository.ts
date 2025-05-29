@@ -240,10 +240,18 @@ const discussionToPg = (
   acquisition_campaign: discussion.acquisitionCampaign,
   acquisition_keyword: discussion.acquisitionKeyword,
   convention_id: discussion.conventionId,
-  ...discussionStatusWithRejectionToPg(
-    makeDiscussionStatusAndRejection(discussion),
-  ),
+  ...discussionStatusWithRejectionToPg(discussion),
 });
+
+const getWithDiscussionStatusFromPgDiscussion = (
+  discussion: GetDiscussionResults[number]["discussion"],
+): WithDiscussionStatus =>
+  ({
+    status: discussion.status,
+    rejectionKind: discussion.rejectionKind,
+    rejectionReason: discussion.rejectionReason,
+    candidateWarnedMethod: discussion.candidateWarnedMethod,
+  }) as WithDiscussionStatus;
 
 const makeDiscussionDtoFromPgDiscussion = (
   results: GetDiscussionResults,
@@ -264,21 +272,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       acquisitionKeyword: discussion.acquisition_keyword,
       conventionId: discussion.conventionId,
       id: discussion.id,
-      ...(discussion.status === "REJECTED"
-        ? {
-            status: "REJECTED",
-            ...(discussion.rejectionKind === "OTHER"
-              ? {
-                  rejectionKind: "OTHER",
-                  rejectionReason: discussion.rejectionReason ?? "",
-                }
-              : {
-                  rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
-                }),
-          }
-        : {
-            status: discussion.status,
-          }),
+      ...getWithDiscussionStatusFromPgDiscussion(discussion),
     };
 
     const commonPotentialBeneficiary: PotentialBeneficiaryCommonProps = {
@@ -367,24 +361,28 @@ const makeDiscussionDtoFromPgDiscussion = (
     };
   });
 
-const makeDiscussionStatusAndRejection = (
-  discussion: WithDiscussionStatus,
-): WithDiscussionStatus =>
-  discussion.status === "REJECTED"
-    ? {
-        status: "REJECTED",
-        ...(discussion.rejectionKind === "OTHER"
-          ? {
-              rejectionKind: "OTHER",
-              rejectionReason: discussion.rejectionReason ?? "",
-            }
-          : {
-              rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
-            }),
-      }
-    : {
-        status: discussion.status,
-      };
+// const makeDiscussionStatusAndRejection = (
+//   discussion: WithDiscussionStatus,
+// ): WithDiscussionStatus =>
+//   {
+//     return discussion.status === "REJECTED"
+//       ? {
+//         status: "REJECTED",
+//         ...(discussion.rejectionKind === "OTHER"
+//           ? {
+//             rejectionKind: "OTHER",
+//             rejectionReason: discussion.rejectionReason ?? "",
+//             candidateWarnedMethod: discussion.candidateWarnedMethod,
+//           }
+//           : {
+//             rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
+//             candidateWarnedMethod: discussion.candidateWarnedMethod,
+//           }),
+//       }
+//       : {
+//         status: discussion.status,
+//       };
+//   };
 
 const discussionStatusWithRejectionToPg = (
   discussionStatusWithRejection: WithDiscussionStatus,
@@ -549,10 +547,11 @@ const executeGetDiscussion = (
             .$castTo<Exchange[] | undefined>(),
           conventionId: ref("d.convention_id"),
           status: sql<DiscussionStatus>`${ref("d.status")}`,
-          rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
+          rejectionKind: sql<RejectionKind | null>`${ref("d.rejection_kind")}`,
           rejectionReason: ref("d.rejection_reason"),
           acquisition_campaign: ref("d.acquisition_campaign"),
           acquisition_keyword: ref("d.acquisition_keyword"),
+          candidateWarnedMethod: ref("d.candidate_warned_method"),
           kind: ref("d.kind"),
         }),
       ).as("discussion"),

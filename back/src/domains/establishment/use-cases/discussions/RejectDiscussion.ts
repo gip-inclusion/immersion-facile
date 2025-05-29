@@ -75,6 +75,7 @@ export const makeRejectDiscussion = createTransactionalUseCase<
     const updatedDiscussion: DiscussionDto = {
       ...discussion,
       status: "REJECTED",
+      candidateWarnedMethod: inputParams.candidateWarnedMethod,
       ...(inputParams.rejectionKind === "OTHER"
         ? {
             rejectionKind: inputParams.rejectionKind,
