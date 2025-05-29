@@ -4,10 +4,10 @@ import type {
   AgencyId,
   ConventionSupportedJwt,
   DiscussionReadDto,
-  DiscussionRejected,
   Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithDiscussionStatusRejected,
   SendMessageToDiscussionFromDashboardRequestPayload,
   WithIdToken,
 } from "shared";
@@ -36,6 +36,6 @@ export interface InclusionConnectedGateway {
     payload: {
       jwt: ConventionSupportedJwt;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void>;
 }

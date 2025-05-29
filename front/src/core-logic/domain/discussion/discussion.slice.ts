@@ -3,7 +3,7 @@ import type {
   ConnectedUserJwt,
   DiscussionId,
   DiscussionReadDto,
-  DiscussionRejected,
+  WithDiscussionStatusRejected,
   Exchange,
   ExchangeFromDashboard,
 } from "shared";
@@ -20,7 +20,7 @@ export type FetchDiscussionRequestedPayload = {
 export type RejectDiscussionRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
-} & DiscussionRejected;
+} & WithDiscussionStatusRejected;
 
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;

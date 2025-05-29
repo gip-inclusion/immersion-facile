@@ -4,9 +4,9 @@ import {
   type AgencyId,
   DiscussionBuilder,
   type DiscussionReadDto,
-  type DiscussionRejected,
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
+  type WithDiscussionStatusRejected,
 } from "shared";
 import type { Exchange } from "shared";
 import type {
@@ -80,7 +80,7 @@ export class SimulatedInclusionConnectedGateway
     _payload: {
       jwt: string;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void> {
     return of(undefined).pipe(delay(this.simulatedLatency));
   }
