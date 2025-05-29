@@ -146,7 +146,7 @@ describe("ContactRequestReminder", () => {
         new DiscussionBuilder()
           .withId(uuid())
           .withCreatedAt(new Date("2024-07-01 09:19:35"))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             {
               sender: "potentialBeneficiary",
@@ -185,7 +185,7 @@ describe("ContactRequestReminder", () => {
         new DiscussionBuilder()
           .withId(uuid())
           .withCreatedAt(new Date("2024-07-26 06:48:59"))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             {
               sender: "potentialBeneficiary",
@@ -240,16 +240,24 @@ describe("ContactRequestReminder", () => {
     it("no discussion with status other than PENDING", async () => {
       uow.discussionRepository.discussions = [
         new DiscussionBuilder(discussionWith3DaysSinceBeneficiaryExchange)
-          .withStatus("ACCEPTED")
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
           .build(),
         new DiscussionBuilder(discussionWith4DaysSinceBeneficiaryExchange)
-          .withStatus("REJECTED")
+          .withStatus({
+            status: "REJECTED",
+            candidateWarnedMethod: null,
+            rejectionKind: "UNABLE_TO_HELP",
+          })
           .build(),
         new DiscussionBuilder(discussionWith7DaysSinceBeneficiaryExchange)
-          .withStatus("ACCEPTED")
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
           .build(),
         new DiscussionBuilder(discussionWith8DaysSinceBeneficiaryExchange)
-          .withStatus("REJECTED")
+          .withStatus({
+            status: "REJECTED",
+            candidateWarnedMethod: null,
+            rejectionKind: "UNABLE_TO_HELP",
+          })
           .build(),
       ];
       const reminderQty3d = await contactRequestReminder.execute(
