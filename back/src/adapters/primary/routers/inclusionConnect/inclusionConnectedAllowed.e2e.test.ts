@@ -1,3 +1,4 @@
+import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
@@ -23,7 +24,6 @@ import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import type { Gateways } from "../../../../config/bootstrap/createGateways";
 import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
@@ -31,7 +31,10 @@ import { broadcastToFtLegacyServiceName } from "../../../../domains/core/saved-e
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { buildTestApp } from "../../../../utils/buildTestApp";
+import {
+  type InMemoryGateways,
+  buildTestApp,
+} from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {
   const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
@@ -48,7 +51,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
   let httpClient: HttpClient<InclusionConnectedAllowedRoutes>;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
-  let gateways: Gateways;
+  let gateways: InMemoryGateways;
   let eventCrawler: BasicEventCrawler;
   let appConfig: AppConfig;
 
@@ -486,144 +489,203 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
     });
   });
-  describe(`${displayRouteName(
-    inclusionConnectedAllowedRoutes.updateDiscussionStatus,
-  )}`, () => {
-    it("400 - throws if discussion is already rejected", async () => {
-      const user = new InclusionConnectedUserBuilder().buildUser();
-      const discussion = new DiscussionBuilder()
-        .withEstablishmentContact({
-          email: user.email,
-        })
-        .withStatus("REJECTED")
-        .build();
-      const existingToken = generateConnectedUserJwt({
-        userId: user.id,
-        version: currentJwtVersions.inclusion,
-      });
-      inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.users = [user];
+  describe("update discussion status", () => {
+    describe(`${displayRouteName(
+      inclusionConnectedAllowedRoutes.updateDiscussionStatus,
+    )}`, () => {
+      it("400 - throws if discussion is already rejected", async () => {
+        const user = new InclusionConnectedUserBuilder().buildUser();
+        const discussion = new DiscussionBuilder()
+          .withEstablishmentContact({
+            email: user.email,
+          })
+          .withStatus("REJECTED")
+          .build();
+        const existingToken = generateConnectedUserJwt({
+          userId: user.id,
+          version: currentJwtVersions.inclusion,
+        });
+        inMemoryUow.discussionRepository.discussions = [discussion];
+        inMemoryUow.userRepository.users = [user];
 
-      const response = await httpClient.updateDiscussionStatus({
-        headers: { authorization: existingToken },
-        urlParams: {
-          discussionId: discussion.id,
-        },
-        body: {
-          status: "REJECTED",
-          rejectionKind: "OTHER",
-          rejectionReason: "No reason",
-        },
-      });
-
-      expectHttpResponseToEqual(response, {
-        status: 400,
-        body: {
-          message: errors.discussion.alreadyRejected({
+        const response = await httpClient.updateDiscussionStatus({
+          headers: { authorization: existingToken },
+          urlParams: {
             discussionId: discussion.id,
-          }).message,
+          },
+          body: {
+            status: "REJECTED",
+            rejectionKind: "OTHER",
+            rejectionReason: "No reason",
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
           status: 400,
-        },
+          body: {
+            message: errors.discussion.alreadyRejected({
+              discussionId: discussion.id,
+            }).message,
+            status: 400,
+          },
+        });
       });
-    });
-    it("401 - throws if user is not known", async () => {
-      const discussion = new DiscussionBuilder().build();
+      it("401 - throws if user is not known", async () => {
+        const discussion = new DiscussionBuilder().build();
 
-      inMemoryUow.discussionRepository.discussions = [discussion];
+        inMemoryUow.discussionRepository.discussions = [discussion];
 
-      const response = await httpClient.updateDiscussionStatus({
-        headers: { authorization: "" },
-        urlParams: {
-          discussionId: discussion.id,
-        },
-        body: {
-          status: "REJECTED",
-          rejectionKind: "OTHER",
-          rejectionReason: "No reason",
-        },
-      });
-
-      expectHttpResponseToEqual(response, {
-        status: 401,
-        body: {
-          message: "Veuillez vous authentifier",
-          status: 401,
-        },
-      });
-    });
-    it("403 - throws if user is not bound to discussion", async () => {
-      const user = new InclusionConnectedUserBuilder().buildUser();
-      const discussion = new DiscussionBuilder().build();
-      const existingToken = generateConnectedUserJwt({
-        userId: user.id,
-        version: currentJwtVersions.inclusion,
-      });
-      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
-        new EstablishmentAggregateBuilder()
-          .withEstablishmentSiret(discussion.siret)
-          .withUserRights([
-            {
-              role: "establishment-admin",
-              userId: "other",
-              job: "",
-              phone: "",
-            },
-          ])
-          .build(),
-      ];
-      inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.users = [user];
-
-      const response = await httpClient.updateDiscussionStatus({
-        headers: { authorization: existingToken },
-        urlParams: {
-          discussionId: discussion.id,
-        },
-        body: {
-          status: "REJECTED",
-          rejectionKind: "OTHER",
-          rejectionReason: "No reason",
-        },
-      });
-      expectHttpResponseToEqual(response, {
-        status: 403,
-        body: {
-          message: errors.discussion.rejectForbidden({
+        const response = await httpClient.updateDiscussionStatus({
+          headers: { authorization: "" },
+          urlParams: {
             discussionId: discussion.id,
-            userId: user.id,
-          }).message,
-          status: 403,
-        },
-      });
-    });
-    it("200 - rejects discussion", async () => {
-      const user = new InclusionConnectedUserBuilder().buildUser();
-      const discussion = new DiscussionBuilder()
-        .withEstablishmentContact({
-          email: user.email,
-        })
-        .build();
-      const existingToken = generateConnectedUserJwt({
-        userId: user.id,
-        version: currentJwtVersions.inclusion,
-      });
-      inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.users = [user];
+          },
+          body: {
+            status: "REJECTED",
+            rejectionKind: "OTHER",
+            rejectionReason: "No reason",
+          },
+        });
 
-      const response = await httpClient.updateDiscussionStatus({
-        headers: { authorization: existingToken },
-        urlParams: {
-          discussionId: discussion.id,
-        },
-        body: {
-          status: "REJECTED",
-          rejectionKind: "OTHER",
-          rejectionReason: "No reason",
-        },
+        expectHttpResponseToEqual(response, {
+          status: 401,
+          body: {
+            message: "Veuillez vous authentifier",
+            status: 401,
+          },
+        });
       });
-      expectHttpResponseToEqual(response, {
-        status: 200,
-        body: "",
+      it("403 - throws if user is not bound to discussion", async () => {
+        const user = new InclusionConnectedUserBuilder().buildUser();
+        const discussion = new DiscussionBuilder().build();
+        const existingToken = generateConnectedUserJwt({
+          userId: user.id,
+          version: currentJwtVersions.inclusion,
+        });
+        inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+          new EstablishmentAggregateBuilder()
+            .withEstablishmentSiret(discussion.siret)
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "other",
+                job: "",
+                phone: "",
+              },
+            ])
+            .build(),
+        ];
+        inMemoryUow.discussionRepository.discussions = [discussion];
+        inMemoryUow.userRepository.users = [user];
+
+        const response = await httpClient.updateDiscussionStatus({
+          headers: { authorization: existingToken },
+          urlParams: {
+            discussionId: discussion.id,
+          },
+          body: {
+            status: "REJECTED",
+            rejectionKind: "OTHER",
+            rejectionReason: "No reason",
+          },
+        });
+        expectHttpResponseToEqual(response, {
+          status: 403,
+          body: {
+            message: errors.discussion.rejectForbidden({
+              discussionId: discussion.id,
+              userId: user.id,
+            }).message,
+            status: 403,
+          },
+        });
+      });
+      it("200 - rejects discussion", async () => {
+        const user = new InclusionConnectedUserBuilder().buildUser();
+        const discussion = new DiscussionBuilder()
+          .withEstablishmentContact({
+            email: user.email,
+          })
+          .build();
+        const existingToken = generateConnectedUserJwt({
+          userId: user.id,
+          version: currentJwtVersions.inclusion,
+        });
+        inMemoryUow.discussionRepository.discussions = [discussion];
+        inMemoryUow.userRepository.users = [user];
+
+        gateways.timeGateway.defaultDate = addDays(
+          new Date(discussion.createdAt),
+          2,
+        );
+
+        const response = await httpClient.updateDiscussionStatus({
+          headers: { authorization: existingToken },
+          urlParams: {
+            discussionId: discussion.id,
+          },
+          body: {
+            status: "REJECTED",
+            rejectionKind: "OTHER",
+            rejectionReason: "No reason",
+          },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 200,
+          body: "",
+        });
+
+        const emailSubject =
+          "L’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion";
+
+        expectArraysToMatch(inMemoryUow.outboxRepository.events, [
+          {
+            topic: "DiscussionRejected",
+            payload: {
+              discussion: {
+                ...discussion,
+                status: "REJECTED",
+                rejectionKind: "OTHER",
+                rejectionReason: "No reason",
+                exchanges: [
+                  ...discussion.exchanges,
+                  {
+                    subject: emailSubject,
+                    message: expect.any(String),
+                    sender: "establishment",
+                    recipient: "potentialBeneficiary",
+                    sentAt: expect.any(String),
+                    attachments: [],
+                  },
+                ],
+              },
+              triggeredBy: { kind: "inclusion-connected", userId: user.id },
+            },
+          },
+        ]);
+
+        await eventCrawler.processNewEvents();
+
+        expectArraysToMatch(inMemoryUow.notificationRepository.notifications, [
+          {
+            kind: "email",
+            templatedContent: {
+              kind: "DISCUSSION_EXCHANGE",
+              params: {
+                htmlContent: expect.any(String),
+                subject: emailSubject,
+              },
+              recipients: [discussion.potentialBeneficiary.email],
+              cc: [],
+              attachments: [],
+            },
+            followedIds: {
+              userId: user.id,
+              establishmentSiret: discussion.siret,
+            },
+          },
+        ]);
       });
     });
   });

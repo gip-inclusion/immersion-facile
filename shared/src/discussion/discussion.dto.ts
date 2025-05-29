@@ -127,7 +127,7 @@ export type CommonDiscussionDto = {
   exchanges: Exchange[];
   id: DiscussionId;
   siret: SiretDto;
-} & DiscussionStatusWithRejection &
+} & WithDiscussionStatus &
   WithAcquisition;
 
 type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
@@ -144,14 +144,10 @@ type GenericDiscussionDto<
 export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = DiscussionRejected["rejectionKind"];
 
-export type DiscussionStatusWithRejection =
+export type WithDiscussionStatus =
   | DiscussionAccepted
   | DiscussionRejected
   | DiscussionPending;
-
-export type WithDiscussionRejection =
-  | RejectionWithoutReason
-  | RejectionWithReason;
 
 export type DiscussionAccepted = {
   status: "ACCEPTED";
@@ -161,6 +157,14 @@ export type DiscussionRejected = {
   status: "REJECTED";
 } & WithDiscussionRejection;
 
+export type DiscussionPending = {
+  status: "PENDING";
+};
+
+export type WithDiscussionRejection =
+  | RejectionWithoutReason
+  | RejectionWithReason;
+
 type RejectionWithoutReason = {
   rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
 };
@@ -168,10 +172,6 @@ type RejectionWithoutReason = {
 type RejectionWithReason = {
   rejectionKind: "OTHER";
   rejectionReason: string;
-};
-
-export type DiscussionPending = {
-  status: "PENDING";
 };
 
 export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
@@ -258,3 +258,7 @@ export type DiscussionDisplayStatus =
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
+
+export type WithDiscussionDto = {
+  discussion: DiscussionDto;
+};
