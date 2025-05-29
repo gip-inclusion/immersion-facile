@@ -2,6 +2,7 @@ import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
 import {
+  type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type ContactMode,
   type DiscussionDto,
@@ -250,7 +251,11 @@ const getWithDiscussionStatusFromPgDiscussion = (
     status: discussion.status,
     rejectionKind: discussion.rejectionKind,
     rejectionReason: discussion.rejectionReason,
-    candidateWarnedMethod: discussion.candidateWarnedMethod,
+    ...(discussion.status === "PENDING"
+      ? {}
+      : {
+          candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
+        }),
   }) as WithDiscussionStatus;
 
 const makeDiscussionDtoFromPgDiscussion = (
@@ -390,6 +395,7 @@ const discussionStatusWithRejectionToPg = (
   status: DiscussionStatus;
   rejection_kind: RejectionKind | null;
   rejection_reason: string | null;
+  candidate_warned_method: CandidateWarnedMethod | null;
 } => {
   const { status } = discussionStatusWithRejection;
   if (status === "REJECTED") {
@@ -403,12 +409,19 @@ const discussionStatusWithRejectionToPg = (
         discussionStatusWithRejection.rejectionKind === "OTHER"
           ? discussionStatusWithRejection.rejectionReason
           : null,
+      candidate_warned_method:
+        discussionStatusWithRejection.candidateWarnedMethod,
     };
   }
+
   return {
     status: status,
     rejection_kind: null,
     rejection_reason: null,
+    candidate_warned_method:
+      status === "PENDING"
+        ? null
+        : discussionStatusWithRejection.candidateWarnedMethod,
   };
 };
 
