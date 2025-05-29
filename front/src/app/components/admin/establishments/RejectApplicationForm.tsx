@@ -14,9 +14,10 @@ import { useDispatch } from "react-redux";
 import {
   type CandidateWarnedMethod,
   type DiscussionReadDto,
-  type RejectDiscussionAndSendNotificationParam,
   type RejectionKind,
+  type WithDiscussionId,
   type WithDiscussionRejection,
+  type WithDiscussionStatusRejected,
   candidateWarnedMethods,
   discussionRejectionSchema,
   domElementIds,
@@ -60,8 +61,9 @@ export const RejectApplicationForm = ({
   const dispatch = useDispatch();
   const watchedFormValues = watch();
 
-  const [rejectParams, setRejectParams] =
-    useState<RejectDiscussionAndSendNotificationParam | null>(null);
+  const [rejectParams, setRejectParams] = useState<
+    (WithDiscussionStatusRejected & WithDiscussionId) | null
+  >(null);
 
   const [isCandidateWarned, setIsCandidateWarned] = useState<boolean>();
 
@@ -136,7 +138,6 @@ export const RejectApplicationForm = ({
               onClick: () =>
                 dispatch(
                   discussionSlice.actions.updateDiscussionStatusRequested({
-                    status: "REJECTED",
                     feedbackTopic: "dashboard-discussion-rejection",
                     ...rejectParams,
                     jwt: inclusionConnectedJwt,
@@ -153,7 +154,11 @@ export const RejectApplicationForm = ({
   return (
     <form
       onSubmit={handleSubmit((values) =>
-        setRejectParams({ ...values, discussionId: discussion.id }),
+        setRejectParams({
+          ...values,
+          status: "REJECTED",
+          discussionId: discussion.id,
+        }),
       )}
     >
       <div>
