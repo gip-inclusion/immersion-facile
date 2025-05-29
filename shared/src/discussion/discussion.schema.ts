@@ -18,6 +18,7 @@ import type { OmitFromExistingKeys } from "../utils";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import type {
   Attachment,
+  CandidateWarnedMethod,
   DiscussionAccepted,
   DiscussionEmailParams,
   DiscussionId,
@@ -97,20 +98,35 @@ export const exchangeSchema: z.Schema<Exchange> = z.object({
 });
 export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
+const candidateWarnedMethodSchema = z.enum([
+  "phone",
+  "email",
+  "in_person",
+  "other",
+]) satisfies z.Schema<CandidateWarnedMethod>;
+
 export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
   z.union([
     z.object({
       rejectionKind: z.literal("OTHER"),
       rejectionReason: zStringMinLength1,
+      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     }),
     z.object({
       rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"]),
+      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     }),
   ]);
+
+export const discussionAcceptedSchema: z.Schema<DiscussionAccepted> = z.object({
+  status: z.literal("ACCEPTED"),
+  candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
+});
 
 export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
   .object({
     status: z.literal("REJECTED"),
+    candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
   })
   .and(discussionRejectionSchema);
 
@@ -123,15 +139,14 @@ export const withExchangeMessageSchema: z.Schema<
 export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
   withExchangeMessageSchema.and(z.object({ discussionId: discussionIdSchema }));
 
-const discussionNotRejectedSchema: z.Schema<
-  DiscussionAccepted | DiscussionPending
-> = z.object({
-  status: z.enum(["PENDING", "ACCEPTED"]),
+const discussionPendingSchema: z.Schema<DiscussionPending> = z.object({
+  status: z.literal("PENDING"),
 });
 
 const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> = z.union([
   discussionRejectedSchema,
-  discussionNotRejectedSchema,
+  discussionPendingSchema,
+  discussionAcceptedSchema,
 ]);
 
 const potentialBeneficiaryCommonSchema = z.object({

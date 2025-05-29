@@ -22,6 +22,7 @@ export const makeMarkDiscussionLinkedToConvention =
         ...discussion,
         conventionId: convention.id,
         status: "ACCEPTED",
+        candidateWarnedMethod: null,
       });
     },
   );

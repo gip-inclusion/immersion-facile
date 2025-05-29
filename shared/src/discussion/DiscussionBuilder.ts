@@ -22,9 +22,8 @@ import type {
   DiscussionId,
   DiscussionKind,
   DiscussionReadDto,
-  DiscussionStatus,
   Exchange,
-  RejectionKind,
+  WithDiscussionStatus,
 } from "./discussion.dto";
 
 const createdAt = new Date("2023-06-23T12:00:00.000").toISOString();
@@ -480,18 +479,10 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     });
   }
 
-  withStatus(
-    status: DiscussionStatus,
-    rejectionKind?: RejectionKind,
-    rejectionReason?: string,
-  ) {
+  withStatus(withStatus: WithDiscussionStatus) {
     let updatedDiscussion: DiscussionDto = this.discussion;
 
-    match({
-      status,
-      rejectionKind,
-      rejectionReason,
-    })
+    match(withStatus)
       .with(
         {
           status: "PENDING",
@@ -507,10 +498,11 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
         {
           status: "ACCEPTED",
         },
-        ({ status }) => {
+        ({ status, candidateWarnedMethod }) => {
           updatedDiscussion = {
             ...updatedDiscussion,
             status,
+            candidateWarnedMethod,
           };
         },
       )
@@ -519,11 +511,12 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           status: "REJECTED",
           rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME"),
         },
-        ({ status, rejectionKind }) => {
+        ({ status, rejectionKind, candidateWarnedMethod }) => {
           updatedDiscussion = {
             ...updatedDiscussion,
             status,
             rejectionKind,
+            candidateWarnedMethod,
           };
         },
       )
@@ -532,28 +525,17 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           status: "REJECTED",
           rejectionKind: "OTHER",
         },
-        ({ status, rejectionKind, rejectionReason }) => {
+        ({ status, rejectionKind, rejectionReason, candidateWarnedMethod }) => {
           updatedDiscussion = {
             ...updatedDiscussion,
             status,
             rejectionKind,
             rejectionReason: rejectionReason ?? "default rejection reason",
+            candidateWarnedMethod,
           };
         },
       )
-      .with(
-        {
-          status: "REJECTED",
-          rejectionKind: P.nullish,
-        },
-        ({ status }) => {
-          updatedDiscussion = {
-            ...updatedDiscussion,
-            status,
-            rejectionKind: "UNABLE_TO_HELP",
-          };
-        },
-      );
+      .exhaustive();
 
     return new DiscussionBuilder(updatedDiscussion);
   }

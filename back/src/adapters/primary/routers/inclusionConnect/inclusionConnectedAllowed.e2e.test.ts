@@ -498,7 +498,11 @@ describe("InclusionConnectedAllowedRoutes", () => {
           .withEstablishmentContact({
             email: user.email,
           })
-          .withStatus("REJECTED")
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
+          })
           .build();
         const existingToken = generateInclusionConnectJwt({
           userId: user.id,
@@ -516,6 +520,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "No reason",
+            candidateWarnedMethod: null,
           },
         });
 
@@ -543,6 +548,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "No reason",
+            candidateWarnedMethod: null,
           },
         });
 
@@ -586,6 +592,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "No reason",
+            candidateWarnedMethod: null,
           },
         });
         expectHttpResponseToEqual(response, {
@@ -627,6 +634,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "No reason",
+            candidateWarnedMethod: null,
           },
         });
 
@@ -647,6 +655,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
                 status: "REJECTED",
                 rejectionKind: "OTHER",
                 rejectionReason: "No reason",
+                candidateWarnedMethod: null,
                 exchanges: [
                   ...discussion.exchanges,
                   {
