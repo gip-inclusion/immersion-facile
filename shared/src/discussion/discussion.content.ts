@@ -1,13 +1,14 @@
 import { errors } from "../errors/errors";
+import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { frontRoutes } from "../routes/routes";
 import type {
   DiscussionDto,
   DiscussionReadDto,
-  RejectDiscussionAndSendNotificationParam,
+  WithDiscussionStatusRejected,
 } from "./discussion.dto";
 
 export const rejectDiscussionEmailParams = (
-  params: RejectDiscussionAndSendNotificationParam,
+  params: WithDiscussionStatusRejected & WithDiscussionId,
   discussion: DiscussionDto | DiscussionReadDto,
 ) => ({
   subject: `L’entreprise ${discussion.businessName} ne souhaite pas donner suite à votre candidature à l’immersion`, // TODO check content
@@ -28,7 +29,7 @@ ${discussion.establishmentContact.firstName} ${
 });
 
 const makeRejectionText = (
-  params: RejectDiscussionAndSendNotificationParam,
+  params: WithDiscussionStatusRejected & WithDiscussionId,
 ): string => {
   if (params.rejectionKind === "OTHER") return params.rejectionReason;
   if (params.rejectionKind === "UNABLE_TO_HELP")

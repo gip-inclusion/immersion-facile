@@ -124,8 +124,8 @@ import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishmen
 import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
-import { makeRejectDiscussion } from "../../domains/establishment/use-cases/discussions/RejectDiscussion";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
+import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
 import { makeWarnSenderThatMessageCouldNotBeDelivered } from "../../domains/establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
 import { makeNotifyCandidateThatContactRequestHasBeenSent } from "../../domains/establishment/use-cases/notifications/NotifyCandidateThatContactRequestHasBeenSent";
 import { NotifyConfirmationEstablishmentCreated } from "../../domains/establishment/use-cases/notifications/NotifyConfirmationEstablishmentCreated";
@@ -757,7 +757,7 @@ export const createUseCases = ({
     getEstablishmentNameAndAdmins: makeGetEstablishmentNameAndAdmins({
       uowPerformer,
     }),
-    rejectDiscussion: makeRejectDiscussion({
+    updateDiscussionStatus: makeUpdateDiscussionStatus({
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,

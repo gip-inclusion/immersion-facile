@@ -1,8 +1,9 @@
 import {
+  ConventionDtoBuilder,
   DiscussionBuilder,
   type DiscussionDto,
   InclusionConnectedUserBuilder,
-  type RejectDiscussionAndSendNotificationParam,
+  type UpdateDiscussionStatusParams,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
@@ -19,11 +20,11 @@ import {
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  type RejectDiscussion,
-  makeRejectDiscussion,
-} from "./RejectDiscussion";
+  type UpdateDiscussionStatus,
+  makeUpdateDiscussionStatus,
+} from "./UpdateDiscussionStatus";
 
-describe("RejectDiscussion", () => {
+describe("UpdateDiscussionStatus", () => {
   const authorizedUser = new InclusionConnectedUserBuilder()
     .withId("authorizedUser")
     .withEmail("authorized@domain.com")
@@ -42,14 +43,14 @@ describe("RejectDiscussion", () => {
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
   let uuidGenerator: TestUuidGenerator;
-  let rejectPotentialBeneficiaryOnDiscussion: RejectDiscussion;
+  let updateDiscussionStatus: UpdateDiscussionStatus;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
 
-    rejectPotentialBeneficiaryOnDiscussion = makeRejectDiscussion({
+    updateDiscussionStatus = makeUpdateDiscussionStatus({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
         timeGateway,
@@ -65,9 +66,10 @@ describe("RejectDiscussion", () => {
       uow.discussionRepository.discussions = [];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
             candidateWarnedMethod: null,
           },
@@ -93,9 +95,10 @@ describe("RejectDiscussion", () => {
       ];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
             candidateWarnedMethod: null,
           },
@@ -119,9 +122,10 @@ describe("RejectDiscussion", () => {
       uow.discussionRepository.discussions = [alreadyRejectedDiscussion];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: alreadyRejectedDiscussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
             candidateWarnedMethod: null,
           },
@@ -137,9 +141,10 @@ describe("RejectDiscussion", () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
             candidateWarnedMethod: null,
           },
@@ -152,15 +157,88 @@ describe("RejectDiscussion", () => {
     });
   });
 
-  describe("Right paths", () => {
+  describe("Accept discussion", () => {
+    it("accepts a discussion, providing candidateWarnedMethod", async () => {
+      await updateDiscussionStatus.execute(
+        {
+          discussionId: discussion.id,
+          status: "ACCEPTED",
+          candidateWarnedMethod: "inPerson",
+        },
+        authorizedUser,
+      );
+
+      expectDiscussionInRepoAndInOutbox({
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: authorizedUser.id,
+        },
+        expectedDiscussion: {
+          ...discussion,
+          status: "ACCEPTED",
+          candidateWarnedMethod: "inPerson",
+        },
+      });
+    });
+
+    describe("providing a conventionId", () => {
+      it("throws if convention is not found", async () => {
+        const conventionId = "40400000-0000-0000-0000-000000000404";
+
+        await expectPromiseToFailWithError(
+          updateDiscussionStatus.execute(
+            {
+              discussionId: discussion.id,
+              status: "ACCEPTED",
+              candidateWarnedMethod: null,
+              conventionId,
+            },
+            authorizedUser,
+          ),
+          errors.convention.notFound({ conventionId }),
+        );
+      });
+
+      it("accepts a discussion, when convention exists", async () => {
+        const convention = new ConventionDtoBuilder().build();
+        uow.conventionRepository.setConventions([convention]);
+
+        await updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "ACCEPTED",
+            candidateWarnedMethod: null,
+            conventionId: convention.id,
+          },
+          authorizedUser,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
+            status: "ACCEPTED",
+            candidateWarnedMethod: null,
+            conventionId: convention.id,
+          },
+        });
+      });
+    });
+  });
+
+  describe("Reject discussion", () => {
     describe("validate each possible statuses", () => {
       it.each<{
-        params: RejectDiscussionAndSendNotificationParam;
+        params: UpdateDiscussionStatusParams;
         expectedRejectionReason: string;
       }>([
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
             candidateWarnedMethod: null,
           },
@@ -170,6 +248,7 @@ describe("RejectDiscussion", () => {
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
             candidateWarnedMethod: null,
           },
@@ -179,6 +258,7 @@ describe("RejectDiscussion", () => {
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "my rejection reason",
             candidateWarnedMethod: null,
@@ -191,7 +271,7 @@ describe("RejectDiscussion", () => {
           expectedRejectionReason,
           params: { discussionId, ...rest },
         }) => {
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
+          await updateDiscussionStatus.execute(
             { discussionId, ...rest },
             authorizedUser,
           );
@@ -209,7 +289,6 @@ describe("RejectDiscussion", () => {
             },
             expectedDiscussion: {
               ...discussion,
-              status: "REJECTED",
               ...rest,
               exchanges: [
                 ...discussion.exchanges,
@@ -231,16 +310,14 @@ describe("RejectDiscussion", () => {
     describe("validate user rights", () => {
       describe("when user email is on discussion", () => {
         it("allow rejection when user email is on discussion main contact", async () => {
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
             candidateWarnedMethod: null,
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -285,16 +362,14 @@ describe("RejectDiscussion", () => {
 
           uow.discussionRepository.discussions = [discussionWithEmailInCopy];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithEmailInCopy.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
             candidateWarnedMethod: null,
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -355,16 +430,14 @@ describe("RejectDiscussion", () => {
               .build(),
           ];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithoutUserEmail.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
             candidateWarnedMethod: null,
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -416,16 +489,14 @@ describe("RejectDiscussion", () => {
               .build(),
           ];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithoutUserEmail.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
             candidateWarnedMethod: null,
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -472,7 +543,7 @@ describe("RejectDiscussion", () => {
 
     expectArraysToMatch(uow.outboxRepository.events, [
       {
-        topic: "DiscussionRejected",
+        topic: "DiscussionStatusManuallyUpdated",
         payload: {
           discussion: expectedDiscussion,
           triggeredBy,
