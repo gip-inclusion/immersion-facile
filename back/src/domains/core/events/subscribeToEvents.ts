@@ -31,8 +31,19 @@ const getUseCasesByTopics = (
   DiscussionExchangeDeliveryFailed: [
     useCases.warnSenderThatMessageCouldNotBeDelivered,
   ],
+  DiscussionRejected: [
+    {
+      useCaseName: useCases.sendExchangeToRecipient.useCaseName,
+      execute: ({ discussion, triggeredBy }) =>
+        useCases.sendExchangeToRecipient.execute({
+          discussionId: discussion.id,
+          triggeredBy,
+        }),
+    },
+  ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
-  // "Happy case" for immersion application.
+
+  // "Happy case" for conventions.
   ConventionSubmittedByBeneficiary: [
     useCases.bindConventionToFederatedIdentity,
     useCases.markDiscussionLinkedToConvention,
