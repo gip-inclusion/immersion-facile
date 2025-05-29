@@ -3,23 +3,26 @@ import {
   type Email,
   type EstablishmentRole,
   type InclusionConnectedUser,
-  type RejectDiscussionAndSendNotificationParam,
+  type UpdateDiscussionStatusParams,
   type UserId,
   discussionIdSchema,
-  discussionRejectionSchema,
   errors,
   rejectDiscussionEmailParams,
+  withDiscussionStatusSchema,
 } from "shared";
+import { match } from "ts-pattern";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
-export type RejectDiscussion = ReturnType<typeof makeRejectDiscussion>;
+export type UpdateDiscussionStatus = ReturnType<
+  typeof makeUpdateDiscussionStatus
+>;
 
-export const makeRejectDiscussion = createTransactionalUseCase<
-  RejectDiscussionAndSendNotificationParam,
+export const makeUpdateDiscussionStatus = createTransactionalUseCase<
+  UpdateDiscussionStatusParams,
   void,
   InclusionConnectedUser,
   {
@@ -28,12 +31,12 @@ export const makeRejectDiscussion = createTransactionalUseCase<
   }
 >(
   {
-    name: "RejectDiscussion",
+    name: "UpdateDiscussionStatus",
     inputSchema: z
       .object({
         discussionId: discussionIdSchema,
       })
-      .and(discussionRejectionSchema),
+      .and(withDiscussionStatusSchema),
   },
   async ({
     inputParams,
@@ -67,41 +70,70 @@ export const makeRejectDiscussion = createTransactionalUseCase<
         userId,
       });
 
-    const { htmlContent, subject } = rejectDiscussionEmailParams(
-      inputParams,
-      discussion,
-    );
+    const updatedDiscussion = await match<
+      UpdateDiscussionStatusParams,
+      Promise<DiscussionDto>
+    >(inputParams)
+      .with({ status: "REJECTED" }, async (params) => {
+        const { htmlContent, subject } = rejectDiscussionEmailParams(
+          params,
+          discussion,
+        );
 
-    const updatedDiscussion: DiscussionDto = {
-      ...discussion,
-      status: "REJECTED",
-      candidateWarnedMethod: inputParams.candidateWarnedMethod,
-      ...(inputParams.rejectionKind === "OTHER"
-        ? {
-            rejectionKind: inputParams.rejectionKind,
-            rejectionReason: inputParams.rejectionReason,
-          }
-        : {
-            rejectionKind: inputParams.rejectionKind,
-          }),
-      exchanges: [
-        ...discussion.exchanges,
-        {
-          subject,
-          message: htmlContent,
-          sender: "establishment",
-          recipient: "potentialBeneficiary",
-          sentAt: deps.timeGateway.now().toISOString(),
-          attachments: [],
-        },
-      ],
-    };
+        return {
+          ...discussion,
+          status: "REJECTED",
+          candidateWarnedMethod: params.candidateWarnedMethod,
+          ...(params.rejectionKind === "OTHER"
+            ? {
+                rejectionKind: params.rejectionKind,
+                rejectionReason: params.rejectionReason,
+              }
+            : {
+                rejectionKind: params.rejectionKind,
+              }),
+          exchanges: [
+            ...discussion.exchanges,
+            {
+              subject,
+              message: htmlContent,
+              sender: "establishment",
+              recipient: "potentialBeneficiary",
+              sentAt: deps.timeGateway.now().toISOString(),
+              attachments: [],
+            },
+          ],
+        };
+      })
+      .with({ status: "ACCEPTED" }, async (params) => {
+        if (params.conventionId) {
+          const convention = await uow.conventionRepository.getById(
+            params.conventionId,
+          );
+          if (!convention)
+            throw errors.convention.notFound({
+              conventionId: params.conventionId,
+            });
+        }
+        return {
+          ...discussion,
+          status: "ACCEPTED",
+          candidateWarnedMethod: params.candidateWarnedMethod,
+          conventionId: params.conventionId,
+        };
+      })
+      .with({ status: "PENDING" }, () => {
+        throw new Error(
+          `Le passage d'une discussion à l'état PENDING n'est pas supporté. (DiscussionID : ${discussion.id})`,
+        );
+      })
+      .exhaustive();
 
     await Promise.all([
       uow.discussionRepository.update(updatedDiscussion),
       uow.outboxRepository.save(
         deps.createNewEvent({
-          topic: "DiscussionRejected",
+          topic: "DiscussionStatusManuallyUpdated",
           payload: {
             discussion: updatedDiscussion,
             triggeredBy: {

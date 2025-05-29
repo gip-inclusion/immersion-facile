@@ -648,7 +648,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
 
         expectArraysToMatch(inMemoryUow.outboxRepository.events, [
           {
-            topic: "DiscussionRejected",
+            topic: "DiscussionStatusManuallyUpdated",
             payload: {
               discussion: {
                 ...discussion,

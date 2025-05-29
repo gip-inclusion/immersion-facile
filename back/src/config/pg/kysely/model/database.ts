@@ -141,7 +141,7 @@ interface Discussions extends WithAcquisition {
   status: DiscussionStatus;
   rejection_kind: string | null;
   rejection_reason: string | null;
-  candidate_warned_method: "phone" | "email" | "in_person" | "other" | null;
+  candidate_warned_method: "phone" | "email" | "inPerson" | "other" | null;
 }
 
 type ExchangeRole = "establishment" | "potentialBeneficiary";

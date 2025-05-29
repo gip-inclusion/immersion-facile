@@ -31,7 +31,7 @@ const getUseCasesByTopics = (
   DiscussionExchangeDeliveryFailed: [
     useCases.warnSenderThatMessageCouldNotBeDelivered,
   ],
-  DiscussionRejected: [
+  DiscussionStatusManuallyUpdated: [
     {
       useCaseName: useCases.sendExchangeToRecipient.useCaseName,
       execute: ({ discussion, triggeredBy }) =>

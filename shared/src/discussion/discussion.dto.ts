@@ -143,23 +143,24 @@ type GenericDiscussionDto<
 > = CommonDiscussionDto & SpecificDiscussionDto<C, D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
-export type RejectionKind = DiscussionRejected["rejectionKind"];
+export type RejectionKind = WithDiscussionStatusRejected["rejectionKind"];
 
 export type WithDiscussionStatus =
-  | DiscussionAccepted
-  | DiscussionRejected
-  | DiscussionPending;
+  | WithDiscussionStatusAccepted
+  | WithDiscussionStatusRejected
+  | WithDiscussionStatusPending;
 
-export type DiscussionAccepted = {
+export type WithDiscussionStatusAccepted = {
   status: "ACCEPTED";
   candidateWarnedMethod: CandidateWarnedMethod | null;
+  conventionId?: ConventionId;
 };
 
-export type DiscussionRejected = {
+export type WithDiscussionStatusRejected = {
   status: "REJECTED";
 } & WithDiscussionRejection;
 
-export type DiscussionPending = {
+export type WithDiscussionStatusPending = {
   status: "PENDING";
 };
 
@@ -176,6 +177,13 @@ type RejectionWithReason = {
   rejectionKind: "OTHER";
   rejectionReason: string;
   candidateWarnedMethod: CandidateWarnedMethod | null;
+};
+
+export type UpdateDiscussionStatusParams = WithDiscussionId &
+  WithDiscussionStatus;
+
+export type WithDiscussionDto = {
+  discussion: DiscussionDto;
 };
 
 export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
@@ -246,19 +254,6 @@ export type ExchangeMessageFromDashboard = Pick<Exchange, "message">;
 export type ExchangeFromDashboard = ExchangeMessageFromDashboard &
   WithDiscussionId;
 
-export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
-  (
-    | {
-        rejectionKind: Extract<RejectionKind, "OTHER">;
-        rejectionReason: string;
-        candidateWarnedMethod: CandidateWarnedMethod | null;
-      }
-    | {
-        rejectionKind: Exclude<RejectionKind, "OTHER">;
-        candidateWarnedMethod: CandidateWarnedMethod | null;
-      }
-  );
-
 export type DiscussionDisplayStatus =
   | "accepted"
   | "rejected"
@@ -266,7 +261,3 @@ export type DiscussionDisplayStatus =
   | "needs-answer"
   | "needs-urgent-answer"
   | "answered";
-
-export type WithDiscussionDto = {
-  discussion: DiscussionDto;
-};

@@ -91,7 +91,7 @@ export const createInclusionConnectedAllowedRouter = (
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        return deps.useCases.rejectDiscussion.execute(
+        return deps.useCases.updateDiscussionStatus.execute(
           {
             discussionId: req.params.discussionId,
             ...req.body,
