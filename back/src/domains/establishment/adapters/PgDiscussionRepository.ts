@@ -7,11 +7,11 @@ import {
   type DiscussionDto,
   type DiscussionId,
   type DiscussionStatus,
-  type DiscussionStatusWithRejection,
   type Exchange,
   type PotentialBeneficiaryCommonProps,
   type RejectionKind,
   type SiretDto,
+  type WithDiscussionStatus,
   errors,
   pipeWithValue,
 } from "shared";
@@ -368,8 +368,8 @@ const makeDiscussionDtoFromPgDiscussion = (
   });
 
 const makeDiscussionStatusAndRejection = (
-  discussion: DiscussionStatusWithRejection,
-): DiscussionStatusWithRejection =>
+  discussion: WithDiscussionStatus,
+): WithDiscussionStatus =>
   discussion.status === "REJECTED"
     ? {
         status: "REJECTED",
@@ -387,7 +387,7 @@ const makeDiscussionStatusAndRejection = (
       };
 
 const discussionStatusWithRejectionToPg = (
-  discussionStatusWithRejection: DiscussionStatusWithRejection,
+  discussionStatusWithRejection: WithDiscussionStatus,
 ): {
   status: DiscussionStatus;
   rejection_kind: RejectionKind | null;

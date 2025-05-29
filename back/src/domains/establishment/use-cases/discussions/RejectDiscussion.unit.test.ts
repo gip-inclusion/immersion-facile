@@ -4,15 +4,12 @@ import {
   InclusionConnectedUserBuilder,
   type RejectDiscussionAndSendNotificationParam,
   errors,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  immersionFacileNoReplyEmailSender,
 } from "shared";
-import {
-  type ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { TriggeredBy } from "../../../core/events/events";
+import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -22,11 +19,11 @@ import {
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  type RejectDiscussionAndSendNotification,
-  makeRejectDiscussionAndSendNotification,
-} from "./RejectDiscussionAndSendNotification";
+  type RejectDiscussion,
+  makeRejectDiscussion,
+} from "./RejectDiscussion";
 
-describe("RejectDiscussionAndSendNotification", () => {
+describe("RejectDiscussion", () => {
   const authorizedUser = new InclusionConnectedUserBuilder()
     .withId("authorizedUser")
     .withEmail("authorized@domain.com")
@@ -44,29 +41,21 @@ describe("RejectDiscussionAndSendNotification", () => {
 
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let rejectPotentialBeneficiaryOnDiscussion: RejectDiscussionAndSendNotification;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let uuidGenerator: TestUuidGenerator;
+  let rejectPotentialBeneficiaryOnDiscussion: RejectDiscussion;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
+    uuidGenerator = new TestUuidGenerator();
 
-    rejectPotentialBeneficiaryOnDiscussion =
-      makeRejectDiscussionAndSendNotification({
-        uowPerformer: new InMemoryUowPerformer(uow),
-        deps: {
-          replyDomain: "reply-domain",
-          timeGateway,
-          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-            new TestUuidGenerator(),
-            timeGateway,
-          ),
-        },
-      });
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
+    rejectPotentialBeneficiaryOnDiscussion = makeRejectDiscussion({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+        createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+      },
+    });
 
     uow.discussionRepository.discussions = [discussion];
   });
@@ -205,8 +194,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussion.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussion,
               status: "REJECTED",
               ...rest,
@@ -222,23 +215,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
-                  name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
-                },
-              },
-            ],
           });
         },
       );
@@ -263,8 +239,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussion.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussion,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -280,23 +260,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
-                  name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
-                },
-              },
-            ],
           });
         });
 
@@ -328,8 +291,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithEmailInCopy.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithEmailInCopy,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -345,23 +312,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithEmailInCopy.potentialBeneficiary.firstName}_${discussionWithEmailInCopy.potentialBeneficiary.lastName}__${discussionWithEmailInCopy.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithEmailInCopy.establishmentContact.firstName}_${discussionWithEmailInCopy.establishmentContact.lastName}__${discussionWithEmailInCopy.id}_e@reply-domain`,
-                  name: `${discussionWithEmailInCopy.establishmentContact.firstName} ${discussionWithEmailInCopy.establishmentContact.lastName} - ${discussionWithEmailInCopy.businessName}`,
-                },
-              },
-            ],
           });
         });
       });
@@ -409,8 +359,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithoutUserEmail.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -426,23 +380,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
-                  name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
-                },
-              },
-            ],
           });
         });
 
@@ -481,8 +418,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithoutUserEmail.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -498,28 +439,31 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
-                  name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
-                },
-              },
-            ],
           });
         });
       });
     });
   });
+
+  const expectDiscussionInRepoAndInOutbox = ({
+    expectedDiscussion,
+    triggeredBy,
+  }: {
+    expectedDiscussion: DiscussionDto;
+    triggeredBy: TriggeredBy;
+  }) => {
+    expectToEqual(uow.discussionRepository.discussions, [expectedDiscussion]);
+
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "DiscussionRejected",
+        payload: {
+          discussion: expectedDiscussion,
+          triggeredBy,
+        },
+      },
+    ]);
+  };
 });
 
 const makeExpectedEmailParams = (

@@ -14,6 +14,7 @@ import {
   type WithAssessmentDto,
   type WithConventionDto,
   type WithConventionIdLegacy,
+  type WithDiscussionDto,
   type WithDiscussionId,
   type WithSiretDto,
   roleSchema,
@@ -124,6 +125,7 @@ export type DomainEvent =
   | GenericEvent<"EstablishmentDeleted", WithSiretDto & WithTriggeredBy>
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
   | GenericEvent<"DiscussionExchangeDeliveryFailed", WarnSenderThatMessageCouldNotBeDeliveredParams>
+  | GenericEvent<"DiscussionRejected", WithDiscussionDto & WithTriggeredBy>
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
