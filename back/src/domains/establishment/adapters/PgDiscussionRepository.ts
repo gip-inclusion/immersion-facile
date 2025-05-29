@@ -366,29 +366,6 @@ const makeDiscussionDtoFromPgDiscussion = (
     };
   });
 
-// const makeDiscussionStatusAndRejection = (
-//   discussion: WithDiscussionStatus,
-// ): WithDiscussionStatus =>
-//   {
-//     return discussion.status === "REJECTED"
-//       ? {
-//         status: "REJECTED",
-//         ...(discussion.rejectionKind === "OTHER"
-//           ? {
-//             rejectionKind: "OTHER",
-//             rejectionReason: discussion.rejectionReason ?? "",
-//             candidateWarnedMethod: discussion.candidateWarnedMethod,
-//           }
-//           : {
-//             rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
-//             candidateWarnedMethod: discussion.candidateWarnedMethod,
-//           }),
-//       }
-//       : {
-//         status: discussion.status,
-//       };
-//   };
-
 const discussionStatusWithRejectionToPg = (
   discussionStatusWithRejection: WithDiscussionStatus,
 ): {
