@@ -758,7 +758,7 @@ describe("PgDiscussionRepository", () => {
     });
 
     describe("update", () => {
-      it("update with status REJECTED and conventionId", async () => {
+      it("update with status REJECTED, conventionId and a candidate warn method", async () => {
         const siret = "01234567891011";
         const discussion = new DiscussionBuilder()
           .withSiret(siret)
@@ -772,7 +772,7 @@ describe("PgDiscussionRepository", () => {
           .withStatus({
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
+            candidateWarnedMethod: "phone",
           })
           .withConventionId("some-other-convention-id")
           .build();
@@ -782,11 +782,12 @@ describe("PgDiscussionRepository", () => {
         expectToEqual(
           await db
             .selectFrom("discussions")
-            .select(["status", "convention_id"])
+            .select(["status", "convention_id", "candidate_warned_method"])
             .executeTakeFirst(),
           {
             status: "REJECTED",
             convention_id: "some-other-convention-id",
+            candidate_warned_method: "phone",
           },
         );
       });
