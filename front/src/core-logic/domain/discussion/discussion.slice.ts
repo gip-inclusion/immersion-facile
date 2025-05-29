@@ -3,7 +3,7 @@ import type {
   ConnectedUserJwt,
   DiscussionId,
   DiscussionReadDto,
-  DiscussionRejected,
+  WithDiscussionStatusRejected,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -18,7 +18,7 @@ export type FetchDiscussionRequestedPayload = {
 export type RejectDiscussionRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
-} & DiscussionRejected;
+} & WithDiscussionStatusRejected;
 
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;

@@ -3,9 +3,9 @@ import type {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
-  DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithDiscussionStatusRejected,
 } from "shared";
 import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
@@ -57,7 +57,7 @@ export class TestInclusionConnectedGateway
     _payload: {
       jwt: string;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void> {
     return this.updateDiscussionStatusResponse$;
   }
