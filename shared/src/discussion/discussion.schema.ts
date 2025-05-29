@@ -16,9 +16,12 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import type { OmitFromExistingKeys } from "../utils";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  type CandidateWarnedMethod,
+  candidateWarnedMethods,
+} from "./CandidateWarnedMethod";
 import type {
   Attachment,
-  CandidateWarnedMethod,
   DiscussionAccepted,
   DiscussionEmailParams,
   DiscussionId,
@@ -98,12 +101,9 @@ export const exchangeSchema: z.Schema<Exchange> = z.object({
 });
 export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
-const candidateWarnedMethodSchema = z.enum([
-  "phone",
-  "email",
-  "in_person",
-  "other",
-]) satisfies z.Schema<CandidateWarnedMethod>;
+const candidateWarnedMethodSchema = z.enum(
+  candidateWarnedMethods,
+) satisfies z.Schema<CandidateWarnedMethod>;
 
 export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
   z.union([

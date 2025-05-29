@@ -22,6 +22,7 @@ import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
 import type { EmptyObject, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
+import type { CandidateWarnedMethod } from "./CandidateWarnedMethod";
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
 export const isExchangeRole = includesTypeGuard(exchangeRoles);
@@ -116,8 +117,6 @@ export type DiscussionEstablishmentContact = {
   phone: string;
   job: string;
 };
-
-export type CandidateWarnedMethod = "phone" | "email" | "in_person" | "other";
 
 export type CommonDiscussionDto = {
   address: AddressDto;
