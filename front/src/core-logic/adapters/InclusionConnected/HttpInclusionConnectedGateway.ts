@@ -158,8 +158,12 @@ export class HttpInclusionConnectedGateway
               ? {
                   rejectionKind: params.rejectionKind,
                   rejectionReason: params.rejectionReason,
+                  candidateWarnedMethod: params.candidateWarnedMethod ?? null,
                 }
-              : { rejectionKind: params.rejectionKind }),
+              : {
+                  rejectionKind: params.rejectionKind,
+                  candidateWarnedMethod: params.candidateWarnedMethod ?? null,
+                }),
           },
         })
         .then((response) =>

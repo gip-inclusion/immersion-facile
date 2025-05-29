@@ -43,14 +43,18 @@ describe("Discussions", () => {
         message: "status is REJECTED",
         expectedDisplayStatus: "rejected",
         discussion: new DiscussionBuilder()
-          .withStatus({ status: "REJECTED" })
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "UNABLE_TO_HELP",
+            candidateWarnedMethod: null,
+          })
           .buildRead(),
       },
       {
         message: "status is ACCEPTED",
         expectedDisplayStatus: "accepted",
         discussion: new DiscussionBuilder()
-          .withStatus({ status: "ACCEPTED" })
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
           .buildRead(),
       },
       {
