@@ -151,6 +151,7 @@ const getDiscussionButtons = ({
         .replyToCandidateByEmail,
       priority: "primary",
       linkProps: {
+        style: { backgroundImage: "none" }, // this is to avoid the underline in the list
         href: `mailto:${createOpaqueEmail({
           discussionId: discussion.id,
           recipient: {
@@ -173,6 +174,7 @@ const getDiscussionButtons = ({
               .activateDraftConvention,
             priority: "tertiary",
             linkProps: {
+              style: { backgroundImage: "none" }, // this is to avoid the underline in the list
               href: makeDraftConventionLink(draftConvention, discussion.id)
                 .href,
               target: "_blank",
@@ -269,6 +271,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             </h1>
           </div>
           <ButtonWithSubMenu
+            priority="primary"
             buttonLabel={"Gérer la candidature"}
             buttonIconId="fr-icon-arrow-down-s-line"
             iconPosition="right"
