@@ -24,12 +24,12 @@ import type {
   DiscussionPending,
   DiscussionReadDto,
   DiscussionRejected,
-  DiscussionStatusWithRejection,
   Exchange,
   ExchangeRole,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
   WithDiscussionRejection,
+  WithDiscussionStatus,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
@@ -119,9 +119,10 @@ const discussionNotRejectedSchema: z.Schema<
   status: z.enum(["PENDING", "ACCEPTED"]),
 });
 
-const discussionStatusSchema: z.Schema<DiscussionStatusWithRejection> = z.union(
-  [discussionRejectedSchema, discussionNotRejectedSchema],
-);
+const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> = z.union([
+  discussionRejectedSchema,
+  discussionNotRejectedSchema,
+]);
 
 const potentialBeneficiaryCommonSchema = z.object({
   firstName: zStringMinLength1,
@@ -150,7 +151,7 @@ export const commonDiscussionReadSchema: z.Schema<
     exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
-  .and(discussionStatusSchema);
+  .and(withDiscussionStatusSchema);
 
 const discussionKindIfSchema = z.literal("IF");
 const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");
