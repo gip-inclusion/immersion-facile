@@ -304,7 +304,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <DiscussionExchangesList discussion={discussion} />
 
       {createPortal(
-        <RejectApplicationModal title="Refuser la candidature">
+        <RejectApplicationModal title="Marquer comme refusée">
           <RejectApplicationForm discussion={discussion} />
         </RejectApplicationModal>,
         document.body,
