@@ -22,12 +22,9 @@ import {
 } from "./CandidateWarnedMethod";
 import type {
   Attachment,
-  DiscussionAccepted,
   DiscussionEmailParams,
   DiscussionId,
-  DiscussionPending,
   DiscussionReadDto,
-  DiscussionRejected,
   Exchange,
   ExchangeFromDashboard,
   ExchangeRole,
@@ -35,6 +32,9 @@ import type {
   PotentialBeneficiaryCommonProps,
   WithDiscussionRejection,
   WithDiscussionStatus,
+  WithDiscussionStatusAccepted,
+  WithDiscussionStatusPending,
+  WithDiscussionStatusRejected,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
@@ -118,17 +118,20 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     }),
   ]);
 
-export const discussionAcceptedSchema: z.Schema<DiscussionAccepted> = z.object({
-  status: z.literal("ACCEPTED"),
-  candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
-});
-
-export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
-  .object({
-    status: z.literal("REJECTED"),
+export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
+  z.object({
+    status: z.literal("ACCEPTED"),
     candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
-  })
-  .and(discussionRejectionSchema);
+    conventionId: conventionIdSchema.optional(),
+  });
+
+export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
+  z
+    .object({
+      status: z.literal("REJECTED"),
+      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
+    })
+    .and(discussionRejectionSchema);
 
 export const withExchangeMessageSchema: z.Schema<
   Pick<ExchangeFromDashboard, "message">
@@ -139,15 +142,18 @@ export const withExchangeMessageSchema: z.Schema<
 export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard> =
   withExchangeMessageSchema.and(z.object({ discussionId: discussionIdSchema }));
 
-const discussionPendingSchema: z.Schema<DiscussionPending> = z.object({
-  status: z.literal("PENDING"),
-});
+const discussionPendingSchema: z.Schema<WithDiscussionStatusPending> = z.object(
+  {
+    status: z.literal("PENDING"),
+  },
+);
 
-const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> = z.union([
-  discussionRejectedSchema,
-  discussionPendingSchema,
-  discussionAcceptedSchema,
-]);
+export const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> =
+  z.union([
+    discussionRejectedSchema,
+    discussionPendingSchema,
+    discussionAcceptedSchema,
+  ]);
 
 const potentialBeneficiaryCommonSchema = z.object({
   firstName: zStringMinLength1,
