@@ -771,7 +771,7 @@ describe("PgDiscussionRepository", () => {
         const updatedDiscussion = new DiscussionBuilder(discussion)
           .withStatus({
             status: "REJECTED",
-            rejectionKind: "UNABLE_TO_HELP",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
             candidateWarnedMethod: "phone",
           })
           .withConventionId("some-other-convention-id")
@@ -807,7 +807,6 @@ describe("PgDiscussionRepository", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "my custom reason",
-            candidateWarnedMethod: null,
           })
           .build();
 

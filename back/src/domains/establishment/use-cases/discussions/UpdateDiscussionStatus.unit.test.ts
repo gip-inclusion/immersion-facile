@@ -71,7 +71,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           },
           authorizedUser,
         ),
@@ -100,7 +99,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           },
           unauthorizedUser,
         ),
@@ -116,7 +114,6 @@ describe("UpdateDiscussionStatus", () => {
         ...discussion,
         status: "REJECTED",
         rejectionKind: "UNABLE_TO_HELP",
-        candidateWarnedMethod: null,
       };
 
       uow.discussionRepository.discussions = [alreadyRejectedDiscussion];
@@ -127,7 +124,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: alreadyRejectedDiscussion.id,
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           },
           authorizedUser,
         ),
@@ -146,7 +142,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           },
           unauthorizedUser,
         ),
@@ -158,7 +153,7 @@ describe("UpdateDiscussionStatus", () => {
   });
 
   describe("Accept discussion", () => {
-    it("accepts a discussion, providing candidateWarnedMethod", async () => {
+    it("accepts a discussion, providing candidateWarnedMethod. Should skip email sending", async () => {
       await updateDiscussionStatus.execute(
         {
           discussionId: discussion.id,
@@ -178,6 +173,7 @@ describe("UpdateDiscussionStatus", () => {
           status: "ACCEPTED",
           candidateWarnedMethod: "inPerson",
         },
+        skipSendingEmail: true,
       });
     });
 
@@ -224,12 +220,40 @@ describe("UpdateDiscussionStatus", () => {
             candidateWarnedMethod: null,
             conventionId: convention.id,
           },
+          skipSendingEmail: true,
         });
       });
     });
   });
 
   describe("Reject discussion", () => {
+    describe("providing candidateWarnedMethod", () => {
+      it("works, and does not send email", async () => {
+        await updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "REJECTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
+            candidateWarnedMethod: "inPerson",
+          },
+          authorizedUser,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
+            status: "REJECTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
+            candidateWarnedMethod: "inPerson",
+          },
+          skipSendingEmail: true,
+        });
+      });
+    });
     describe("validate each possible statuses", () => {
       it.each<{
         params: UpdateDiscussionStatusParams;
@@ -240,7 +264,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           },
           expectedRejectionReason:
             "l’entreprise estime ne pas être en capacité de vous aider dans votre projet professionnel.",
@@ -250,7 +273,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "NO_TIME",
-            candidateWarnedMethod: null,
           },
           expectedRejectionReason:
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -261,7 +283,6 @@ describe("UpdateDiscussionStatus", () => {
             status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "my rejection reason",
-            candidateWarnedMethod: null,
           },
           expectedRejectionReason: "my rejection reason",
         },
@@ -314,7 +335,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussion.id,
             status: "REJECTED",
             rejectionKind: "NO_TIME",
-            candidateWarnedMethod: null,
           };
 
           await updateDiscussionStatus.execute(params, authorizedUser);
@@ -334,7 +354,6 @@ describe("UpdateDiscussionStatus", () => {
               ...discussion,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
-              candidateWarnedMethod: null,
               exchanges: [
                 ...discussion.exchanges,
                 {
@@ -366,7 +385,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussionWithEmailInCopy.id,
             status: "REJECTED",
             rejectionKind: "NO_TIME",
-            candidateWarnedMethod: null,
           };
 
           await updateDiscussionStatus.execute(params, authorizedUser);
@@ -386,7 +404,6 @@ describe("UpdateDiscussionStatus", () => {
               ...discussionWithEmailInCopy,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
-              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithEmailInCopy.exchanges,
                 {
@@ -434,7 +451,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussionWithoutUserEmail.id,
             status: "REJECTED",
             rejectionKind: "NO_TIME",
-            candidateWarnedMethod: null,
           };
 
           await updateDiscussionStatus.execute(params, authorizedUser);
@@ -454,7 +470,6 @@ describe("UpdateDiscussionStatus", () => {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
-              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithoutUserEmail.exchanges,
                 {
@@ -493,7 +508,6 @@ describe("UpdateDiscussionStatus", () => {
             discussionId: discussionWithoutUserEmail.id,
             status: "REJECTED",
             rejectionKind: "NO_TIME",
-            candidateWarnedMethod: null,
           };
 
           await updateDiscussionStatus.execute(params, authorizedUser);
@@ -513,7 +527,6 @@ describe("UpdateDiscussionStatus", () => {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
-              candidateWarnedMethod: null,
               exchanges: [
                 ...discussionWithoutUserEmail.exchanges,
                 {
@@ -535,9 +548,11 @@ describe("UpdateDiscussionStatus", () => {
   const expectDiscussionInRepoAndInOutbox = ({
     expectedDiscussion,
     triggeredBy,
+    skipSendingEmail,
   }: {
     expectedDiscussion: DiscussionDto;
     triggeredBy: TriggeredBy;
+    skipSendingEmail?: boolean;
   }) => {
     expectToEqual(uow.discussionRepository.discussions, [expectedDiscussion]);
 
@@ -547,6 +562,7 @@ describe("UpdateDiscussionStatus", () => {
         payload: {
           discussion: expectedDiscussion,
           triggeredBy,
+          ...(skipSendingEmail !== undefined ? { skipSendingEmail } : {}),
         },
       },
     ]);

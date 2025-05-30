@@ -511,12 +511,11 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           status: "REJECTED",
           rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME"),
         },
-        ({ status, rejectionKind, candidateWarnedMethod }) => {
+        ({ status, rejectionKind }) => {
           updatedDiscussion = {
             ...updatedDiscussion,
             status,
             rejectionKind,
-            candidateWarnedMethod,
           };
         },
       )
@@ -525,12 +524,25 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           status: "REJECTED",
           rejectionKind: "OTHER",
         },
-        ({ status, rejectionKind, rejectionReason, candidateWarnedMethod }) => {
+        ({ status, rejectionKind, rejectionReason }) => {
           updatedDiscussion = {
             ...updatedDiscussion,
             status,
             rejectionKind,
             rejectionReason: rejectionReason ?? "default rejection reason",
+          };
+        },
+      )
+      .with(
+        {
+          status: "REJECTED",
+          rejectionKind: "CANDIDATE_ALREADY_WARNED",
+        },
+        ({ status, rejectionKind, candidateWarnedMethod }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+            rejectionKind,
             candidateWarnedMethod,
           };
         },
