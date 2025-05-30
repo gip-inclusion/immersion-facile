@@ -37,8 +37,13 @@ const loginWithIdentityProvider = async (
   routeName: "agencyDashboard" | "establishmentDashboard" | "admin",
   identityProviderMode: ProviderMode,
 ) => {
-  const { loginButtonId, navLink, username, password, headerNavLink } =
-    buttonByRouteName(identityProviderMode)[routeName];
+  const {
+    proConnectLoginButtonId,
+    navLink,
+    username,
+    password,
+    headerNavLink,
+  } = buttonByRouteName(identityProviderMode)[routeName];
 
   if (routeName === "admin") {
     await page.goto("/admin");
@@ -50,7 +55,7 @@ const loginWithIdentityProvider = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }
 
-  const authButton = await page.locator(`#${loginButtonId} .fr-btn`);
+  const authButton = await page.locator(`#${proConnectLoginButtonId} .fr-btn`);
   await expect(authButton).toBeVisible();
 
   await authButton.click();
@@ -94,7 +99,7 @@ const buttonByRouteName = (
 ): Record<
   InclusionConnectRoute,
   {
-    loginButtonId: string;
+    proConnectLoginButtonId: string;
     navLink: string;
     username: string;
     password: string;
@@ -106,21 +111,23 @@ const buttonByRouteName = (
 
   return {
     agencyDashboard: {
-      loginButtonId: domElementIds.agencyDashboard.login.connectButton,
+      proConnectLoginButtonId:
+        domElementIds.agencyDashboard.login.proConnectButton,
       navLink: domElementIds.header.navLinks.agency.dashboard,
       username,
       password,
       headerNavLink: "fr-header-main-navigation-button-3",
     },
     establishmentDashboard: {
-      loginButtonId: domElementIds.establishmentDashboard.login.connectButton,
+      proConnectLoginButtonId:
+        domElementIds.establishmentDashboard.login.proConnectButton,
       navLink: domElementIds.header.navLinks.establishment.dashboard,
       username,
       password,
       headerNavLink: "fr-header-main-navigation-button-2",
     },
     admin: {
-      loginButtonId: domElementIds.admin.login.connectButton,
+      proConnectLoginButtonId: domElementIds.admin.login.proConnectButton,
       navLink: domElementIds.header.navLinks.admin.backOffice,
       username: adminUsername,
       password: adminPassword,
