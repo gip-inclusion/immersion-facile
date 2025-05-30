@@ -75,6 +75,15 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
       Promise<DiscussionDto>
     >(inputParams)
       .with({ status: "REJECTED" }, async (params) => {
+        if (params.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
+          return {
+            ...discussion,
+            status: "REJECTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
+            candidateWarnedMethod: params.candidateWarnedMethod,
+          };
+        }
+
         const { htmlContent, subject } = rejectDiscussionEmailParams(
           params,
           discussion,
@@ -83,7 +92,6 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
         return {
           ...discussion,
           status: "REJECTED",
-          candidateWarnedMethod: params.candidateWarnedMethod,
           ...(params.rejectionKind === "OTHER"
             ? {
                 rejectionKind: params.rejectionKind,
@@ -129,6 +137,14 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
       })
       .exhaustive();
 
+    const shouldSkipSendingEmail = () => {
+      if (updatedDiscussion.status === "ACCEPTED") return true;
+      if (updatedDiscussion.status === "REJECTED") {
+        return updatedDiscussion.rejectionKind === "CANDIDATE_ALREADY_WARNED";
+      }
+      return false;
+    };
+
     await Promise.all([
       uow.discussionRepository.update(updatedDiscussion),
       uow.outboxRepository.save(
@@ -140,6 +156,7 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
               kind: "inclusion-connected",
               userId,
             },
+            ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
           },
         }),
       ),
