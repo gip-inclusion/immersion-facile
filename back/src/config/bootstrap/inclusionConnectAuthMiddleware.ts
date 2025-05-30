@@ -12,7 +12,7 @@ export const makeInclusionConnectAuthMiddleware = (
   dashboardGateway: DashboardGateway,
   timeGateway: TimeGateway,
 ) => {
-  const verifyJwt = makeVerifyJwtES256<"inclusionConnect">(jwtPublicKey);
+  const verifyJwt = makeVerifyJwtES256<"connectedUser">(jwtPublicKey);
   return async (
     req: Request<any, any, any, any>,
     res: Response,

@@ -12,6 +12,7 @@ import { type RootState, createStore } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessmentGateway";
+import { TestAuthGateway } from "../adapters/AuthGateway/TestAuthGateway";
 import { TestEstablishmentGateway } from "../adapters/EstablishmentGateway/TestEstablishmentGateway";
 import { TestFormCompletionGateway } from "../adapters/FormCompletionGateway/TestFormCompletionGateway";
 import { TestSearchGateway } from "../adapters/SearchGateway/TestSearchGateway";
@@ -23,6 +24,7 @@ const createTestDependencies = () =>
     addressGateway: new TestAddressGateway(),
     adminGateway: new TestAdminGateway(),
     agencyGateway: new TestAgencyGateway(),
+    authGateway: new TestAuthGateway(),
     assessmentGateway: new TestAssessmentGateway(),
     conventionGateway: new InMemoryConventionGateway(),
     localDeviceRepository: createTestDeviceRepository(),

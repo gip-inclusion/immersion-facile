@@ -8,6 +8,8 @@
     "db:down": "pnpm db:migrate down",
     "db:migrate": "ts-node --compilerOptions '{\"resolveJsonModule\": true}' node_modules/node-pg-migrate/bin/node-pg-migrate -j ts -m src/config/pg/migrations",
     "db:up:bun": "bun node_modules/node-pg-migrate/bin/node-pg-migrate -m src/config/pg/migrations up",
+    "db:down:bun": "bun node_modules/node-pg-migrate/bin/node-pg-migrate -m src/config/pg/migrations down",
+    "db:redo:bun": "bun node_modules/node-pg-migrate/bin/node-pg-migrate -m src/config/pg/migrations redo",
     "db:redo": "pnpm db:migrate redo",
     "db:seed": "ts-node src/scripts/seed.ts",
     "db:seed:bun": "bun src/scripts/seed.ts",

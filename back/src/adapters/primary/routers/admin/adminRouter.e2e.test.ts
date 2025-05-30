@@ -36,7 +36,7 @@ import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/cor
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
   type GenerateApiConsumerJwt,
-  type GenerateInclusionConnectJwt,
+  type GenerateConnectedUserJwt,
   makeVerifyJwtES256,
 } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -69,7 +69,7 @@ describe("Admin router", () => {
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
   let generateApiConsumerJwt: GenerateApiConsumerJwt;
-  let generateInclusionConnectJwt: GenerateInclusionConnectJwt;
+  let generateConnectedUserJwt: GenerateConnectedUserJwt;
   let getFeatureFlags: () => Promise<FeatureFlags>;
   let eventCrawler: BasicEventCrawler;
 
@@ -89,7 +89,7 @@ describe("Admin router", () => {
       appConfig,
       generateApiConsumerJwt,
       eventCrawler,
-      generateInclusionConnectJwt,
+      generateConnectedUserJwt,
     } = testDepsAndApp);
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
@@ -98,7 +98,7 @@ describe("Admin router", () => {
     inMemoryUow.agencyRepository.agencies = [];
 
     gateways.timeGateway.defaultDate = now;
-    token = generateInclusionConnectJwt(backofficeAdminJwtPayload);
+    token = generateConnectedUserJwt(backofficeAdminJwtPayload);
 
     getFeatureFlags = async () => {
       const { body } = await request.get(technicalRoutes.featureFlags.url);

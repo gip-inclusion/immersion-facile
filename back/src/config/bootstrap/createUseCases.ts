@@ -73,6 +73,7 @@ import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../dom
 import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
 import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
 import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
+import { makeInitiateLoginByEmail } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateLoginByEmail";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
@@ -81,8 +82,10 @@ import { SetFeatureFlag } from "../../domains/core/feature-flags/use-cases/SetFe
 import { UploadFile } from "../../domains/core/file-storage/useCases/UploadFile";
 import type {
   GenerateApiConsumerJwt,
+  GenerateConnectedUserJwt,
   GenerateConventionJwt,
-  GenerateInclusionConnectJwt,
+  GenerateEmailAuthCodeJwt,
+  VerifyJwtFn,
 } from "../../domains/core/jwt";
 import { makeGetNafSuggestions } from "../../domains/core/naf/use-cases/GetNafSuggestions";
 import {
@@ -141,15 +144,34 @@ import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "./magicLinkUrl";
 
-export const createUseCases = (
-  config: AppConfig,
-  gateways: Gateways,
-  generateConventionJwt: GenerateConventionJwt,
-  generateAuthenticatedUserToken: GenerateInclusionConnectJwt,
-  generateApiConsumerJwt: GenerateApiConsumerJwt,
-  uowPerformer: UnitOfWorkPerformer,
-  uuidGenerator: UuidGenerator,
-) => {
+type CreateUsecasesParams = {
+  config: AppConfig;
+  gateways: Gateways;
+  deps: {
+    uowPerformer: UnitOfWorkPerformer;
+    uuidGenerator: UuidGenerator;
+  };
+  jwt: {
+    generateConventionJwt: GenerateConventionJwt;
+    generateConnectedUserJwt: GenerateConnectedUserJwt;
+    generateApiConsumerJwt: GenerateApiConsumerJwt;
+    generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt;
+    verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode">;
+  };
+};
+
+export const createUseCases = ({
+  config,
+  deps: { uowPerformer, uuidGenerator },
+  gateways,
+  jwt: {
+    generateApiConsumerJwt,
+    generateConnectedUserJwt,
+    generateConventionJwt,
+    generateEmailAuthCodeJwt,
+    verifyEmailAuthCodeJwt,
+  },
+}: CreateUsecasesParams) => {
   const createNewEvent = makeCreateNewEvent({
     timeGateway: gateways.timeGateway,
     uuidGenerator,
@@ -269,7 +291,8 @@ export const createUseCases = (
         createNewEvent,
         gateways.oAuthGateway,
         uuidGenerator,
-        generateAuthenticatedUserToken,
+        generateConnectedUserJwt,
+        verifyEmailAuthCodeJwt,
         config.immersionFacileBaseUrl,
         gateways.timeGateway,
       ),
@@ -793,6 +816,15 @@ export const createUseCases = (
         uowPerformer,
         deps: { saveNotificationAndRelatedEvent },
       }),
+    initiateLoginByEmail: makeInitiateLoginByEmail({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        saveNotificationAndRelatedEvent,
+        oAuthConfig: config.proConnectConfig,
+        generateEmailAuthCodeJwt,
+      },
+    }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
 

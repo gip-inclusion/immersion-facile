@@ -96,7 +96,7 @@ const logoutFromInclusionConnect: AuthEpic = (
         throw errors.inclusionConnect.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
-        provider === "connectedUser" &&
+        provider === "proConnect" &&
         action.payload.mode === "device-and-inclusion"
       ) {
         const { idToken } = federatedIdentityWithUser;
@@ -155,6 +155,31 @@ const checkRedirectionAfterLogin: AuthEpic = (
     }),
   );
 
+const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
+  action$.pipe(
+    filter(authSlice.actions.loginByEmailRequested.match),
+    switchMap((action) =>
+      authGateway
+        .loginByEmail$({
+          email: action.payload.email,
+          page: action.payload.page,
+        })
+        .pipe(
+          map(() =>
+            authSlice.actions.loginByEmailSucceded({
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+          catchEpicError((error) =>
+            authSlice.actions.loginByEmailFailed({
+              errorMessage: error.message,
+              feedbackTopic: action.payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
@@ -163,4 +188,5 @@ export const authEpics = [
   storeRedirectionUrlAfterLoginInDevice,
   clearAndRedirectAfterLoginFromDevice,
   checkRedirectionAfterLogin,
+  requestLoginByEmail,
 ];

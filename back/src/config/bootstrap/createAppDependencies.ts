@@ -2,9 +2,12 @@ import { type AbsoluteUrl, frontRoutes } from "shared";
 import { InMemoryEventBus } from "../../domains/core/events/adapters/InMemoryEventBus";
 import {
   type GenerateApiConsumerJwt,
+  type GenerateConnectedUserJwt,
   type GenerateConventionJwt,
-  type GenerateInclusionConnectJwt,
+  type GenerateEmailAuthCodeJwt,
+  type VerifyJwtFn,
   makeGenerateJwtES256,
+  makeVerifyJwtES256,
 } from "../../domains/core/jwt";
 import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -50,8 +53,8 @@ export const createAppDependencies = async (config: AppConfig) => {
       config.apiJwtPrivateKey,
       undefined, // no expiration
     );
-  const generateInclusionConnectJwt: GenerateInclusionConnectJwt =
-    makeGenerateJwtES256<"inclusionConnect">(
+  const generateConnectedUserJwt: GenerateConnectedUserJwt =
+    makeGenerateJwtES256<"connectedUser">(
       config.jwtPrivateKey,
       oneHourInSeconds,
     );
@@ -61,6 +64,15 @@ export const createAppDependencies = async (config: AppConfig) => {
       config.magicLinkShortDurationInDays * oneDayInSecond,
     );
 
+  const generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt =
+    makeGenerateJwtES256<"emailAuthCode">(
+      config.jwtPrivateKey,
+      oneHourInSeconds * 24,
+    );
+
+  const verifyEmailAuthCodeJwt: VerifyJwtFn<"emailAuthCode"> =
+    makeVerifyJwtES256<"emailAuthCode">(config.jwtPrivateKey);
+
   const redirectErrorUrl: AbsoluteUrl = `${config.immersionFacileBaseUrl}/${frontRoutes.error}`;
   const errorHandlers = {
     handleManagedRedirectResponseError:
@@ -69,15 +81,18 @@ export const createAppDependencies = async (config: AppConfig) => {
       makeHandleRawRedirectResponseError(redirectErrorUrl),
   };
 
-  const useCases = createUseCases(
+  const useCases = createUseCases({
     config,
     gateways,
-    generateConventionJwt,
-    generateInclusionConnectJwt,
-    generateApiConsumerJwt,
-    uowPerformer,
-    uuidGenerator,
-  );
+    deps: { uowPerformer, uuidGenerator },
+    jwt: {
+      generateConventionJwt,
+      generateConnectedUserJwt,
+      generateApiConsumerJwt,
+      generateEmailAuthCodeJwt,
+      verifyEmailAuthCodeJwt,
+    },
+  });
 
   return {
     config,
@@ -101,7 +116,7 @@ export const createAppDependencies = async (config: AppConfig) => {
     ),
     generateConventionJwt,
     generateApiConsumerJwt,
-    generateInclusionConnectJwt,
+    generateConnectedUserJwt,
     eventBus,
     eventCrawler: createEventCrawler(
       config,

@@ -62,6 +62,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
         userId: user.id,
         externalId: user.proConnect?.externalId,
         accessToken: "fake-access-token",
+        usedAt: null,
       };
       uow.ongoingOAuthRepository.ongoingOAuths = [ongoingOAuth];
       const logoutSuffixe =

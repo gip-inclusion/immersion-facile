@@ -55,6 +55,7 @@ export const LayoutHeader = () => {
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   const tools: HeaderProps["quickAccessItems"] = [
     {
@@ -112,7 +113,10 @@ export const LayoutHeader = () => {
         onClick: () => {
           dispatch(
             authSlice.actions.federatedIdentityDeletionTriggered({
-              mode: "device-and-inclusion",
+              mode:
+                federatedIdentity?.provider === "email"
+                  ? "device-only"
+                  : "device-and-inclusion",
             }),
           );
           if (isPeConnected && currentRoute.name === "conventionImmersion") {

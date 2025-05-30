@@ -20,6 +20,7 @@ import type {
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
+import { authSlice } from "../auth/auth.slice";
 
 type FeedbackWithActionName = {
   action: ActionCreatorWithPayload<any, string>;
@@ -28,37 +29,38 @@ type FeedbackWithActionName = {
 };
 
 const topics = [
-  "api-consumer-global",
-  "dashboard-discussion",
-  "dashboard-discussion-rejection",
-  "broadcast-convention-again",
-  "partner-conventions",
-  "agency-user",
-  "api-consumer-names",
-  "dashboard-agency-register-user",
-  "auth-global",
-  "establishments-batch",
-  "user",
-  "agency-user-for-dashboard",
-  "search-result",
-  "form-establishment",
-  "siret-input",
   "agency-for-dashboard",
+  "agency-user-for-dashboard",
+  "agency-user",
+  "api-consumer-global",
+  "api-consumer-names",
   "assessment",
-  "send-signature-link",
-  "transfer-convention-to-agency",
+  "auth-global",
+  "broadcast-convention-again",
+  "convention-action-accept-by-counsellor",
+  "convention-action-accept-by-validator",
   "convention-action-cancel",
   "convention-action-deprecate",
-  "convention-action-reject",
   "convention-action-edit",
-  "convention-action-accept-by-validator",
-  "convention-action-accept-by-counsellor",
-  "convention-action-sign",
+  "convention-action-reject",
   "convention-action-renew",
-  "convention-status-dashboard",
+  "convention-action-sign",
   "convention-form",
+  "convention-status-dashboard",
+  "dashboard-agency-register-user",
+  "dashboard-discussion-rejection",
+  "dashboard-discussion",
   "establishment-dashboard-users-rights",
+  "establishments-batch",
+  "form-establishment",
+  "login-by-email",
+  "partner-conventions",
+  "search-result",
+  "send-signature-link",
+  "siret-input",
+  "transfer-convention-to-agency",
   "unused",
+  "user",
 ] as const;
 
 export type FeedbackTopic = (typeof topics)[number];
@@ -568,6 +570,26 @@ export const feedbacks: Record<
       title: "Problème lors de la mise à jour de l'utilisateur",
       message:
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
+    },
+  },
+  "login-by-email": {
+    "create.success": {
+      action: authSlice.actions.loginByEmailSucceded,
+      title: "Votre lien de connexion a bien été envoyé",
+      // TODO : fournir l'email dans le message de feedback
+      message: `Un email contenant votre lien de connexion vient d’être envoyé à l’adresse xx@email.com.
+      Ce lien est valable pendant 24 heures. Pensez à vérifier vos spams si vous ne le voyez pas rapidement.
+      
+      Si vous avez déjà utilisé Immersion Facilitée, assurez-vous d’avoir renseigné la même adresse email que précédemment.
+      Cela nous permet de retrouver votre entreprise ou vos conventions.`,
+    },
+    "create.error": {
+      action: authSlice.actions.loginByEmailFailed,
+      title: "Nous n’avons pas pu envoyer le lien de connexion",
+      // TODO : fournir l'email dans le message de feedback
+      message: `Une erreur est survenue lors de l’envoi du lien de connexion à l’adresse xx@email.com.
+      Cela peut arriver en cas de problème temporaire de messagerie ou si l’adresse email renseignée est incorrecte.
+      Veuillez vérifier l’orthographe de votre adresse email et réessayer.`,
     },
   },
   unused: {},

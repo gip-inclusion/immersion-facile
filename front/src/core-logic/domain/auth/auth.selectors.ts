@@ -17,6 +17,10 @@ const afterLoginRedirectionUrl = createSelector(
 );
 
 const isLoading = createSelector(rootAuthSelector, (auth) => auth.isLoading);
+const isRequestingLoginByEmail = createSelector(
+  rootAuthSelector,
+  (auth) => auth.isRequestingLoginByEmail,
+);
 
 const isPeConnected = createSelector(
   currentFederatedIdentity,
@@ -25,13 +29,15 @@ const isPeConnected = createSelector(
     federatedIdentity.token !== authFailed,
 );
 
-const isInclusionConnected = createSelector(
+const isConnectedUser = createSelector(
   currentFederatedIdentity,
-  (federatedIdentity) => federatedIdentity?.provider === "connectedUser",
+  (federatedIdentity) =>
+    federatedIdentity?.provider === "proConnect" ||
+    federatedIdentity?.provider === "email",
 );
 
 const inclusionConnectToken = createSelector(
-  isInclusionConnected,
+  isConnectedUser,
   currentFederatedIdentity,
   (isInclusionConnected, federatedIdentity) =>
     isInclusionConnected
@@ -41,7 +47,7 @@ const inclusionConnectToken = createSelector(
 
 const isAdminConnected = createSelector(
   inclusionConnectedSelectors.currentUser,
-  isInclusionConnected,
+  isConnectedUser,
   (user, isInclusionConnected) =>
     (isInclusionConnected && user?.isBackofficeAdmin) ?? false,
 );
@@ -50,8 +56,8 @@ const userIsDefined = (
   federatedIdentity: FederatedIdentityWithUser | null,
 ): federatedIdentity is FederatedIdentityWithUser => {
   if (!federatedIdentity) return false;
-  const { email, firstName, lastName } = federatedIdentity;
-  return email !== "" && firstName !== "" && lastName !== "";
+  const { email } = federatedIdentity;
+  return email !== "";
 };
 
 const connectedUser = createSelector(
@@ -67,9 +73,10 @@ export const authSelectors = {
   federatedIdentity: currentFederatedIdentity,
   isAdminConnected,
   isPeConnected,
-  isInclusionConnected,
+  isInclusionConnected: isConnectedUser,
   inclusionConnectToken,
   connectedUser,
   afterLoginRedirectionUrl,
   isLoading,
+  isRequestingLoginByEmail,
 };

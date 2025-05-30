@@ -1,18 +1,14 @@
-import type { IdentityProvider, OAuthState, UserId } from "shared";
+import { type OAuthState, type UserId, replaceArrayElement } from "shared";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   // for test purpose
-  public ongoingOAuths: OngoingOAuth[] = [];
+  #ongoingOAuths: OngoingOAuth[] = [];
 
-  public async findByStateAndProvider(
-    state: OAuthState,
-    provider: IdentityProvider,
-  ) {
+  public async findByState(state: OAuthState) {
     return this.ongoingOAuths.find(
-      (ongoingOAuth) =>
-        ongoingOAuth.state === state && ongoingOAuth.provider === provider,
+      (ongoingOAuth) => ongoingOAuth.state === state,
     );
   }
 
@@ -23,16 +19,28 @@ export class InMemoryOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async save(newOngoingOAuth: OngoingOAuth): Promise<void> {
-    const existingOngoingOAuth = await this.findByStateAndProvider(
-      newOngoingOAuth.state,
-      newOngoingOAuth.provider,
-    );
+    const existingOngoingOAuth = await this.findByState(newOngoingOAuth.state);
 
     if (!existingOngoingOAuth) {
-      this.ongoingOAuths.push(newOngoingOAuth);
+      this.#ongoingOAuths = [...this.#ongoingOAuths, newOngoingOAuth];
       return;
     }
 
-    Object.assign(existingOngoingOAuth, newOngoingOAuth);
+    this.#ongoingOAuths = replaceArrayElement(
+      this.#ongoingOAuths,
+      this.#ongoingOAuths.findIndex(
+        ({ state }) => state === existingOngoingOAuth.state,
+      ),
+      newOngoingOAuth,
+    );
+  }
+
+  // for test purpose
+  public get ongoingOAuths(): OngoingOAuth[] {
+    return this.#ongoingOAuths;
+  }
+
+  public set ongoingOAuths(ongoingOAuths: OngoingOAuth[]) {
+    this.#ongoingOAuths = ongoingOAuths.map(({ ...params }) => ({ ...params }));
   }
 }

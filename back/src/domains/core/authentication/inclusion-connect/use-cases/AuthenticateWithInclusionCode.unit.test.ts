@@ -1,3 +1,4 @@
+import { subDays } from "date-fns";
 import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
@@ -15,7 +16,9 @@ import {
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../../utils/agency";
+import { generateES256KeyPair } from "../../../../../utils/jwt";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
+import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -35,6 +38,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
   const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
   const correctToken = "my-correct-token";
 
+  const { publicKey, privateKey } = generateES256KeyPair();
+
+  const generateEmailAuthCode = makeGenerateJwtES256<"emailAuthCode">(
+    privateKey,
+    60 * 60, // 1 hour expiration
+  );
+
   const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
     nonce: "nounce",
     sub: "my-user-external-id",
@@ -50,26 +60,29 @@ describe("AuthenticateWithInclusionCode use case", () => {
   let authenticateWithInclusionCode: AuthenticateWithInclusionCode;
   let timeGateway: CustomTimeGateway;
 
-  describe("With OAuthGateway provider 'proConnect'", () => {
-    beforeEach(() => {
-      uow = createInMemoryUow();
-      uuidGenerator = new TestUuidGenerator();
-      inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
-      timeGateway = new CustomTimeGateway();
-      authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
-        new InMemoryUowPerformer(uow),
-        makeCreateNewEvent({
-          timeGateway: timeGateway,
-          uuidGenerator,
-        }),
-        inclusionConnectGateway,
-        uuidGenerator,
-        () => correctToken,
-        immersionBaseUrl,
-        timeGateway,
-      );
-    });
+  beforeEach(() => {
+    uow = createInMemoryUow();
+    uuidGenerator = new TestUuidGenerator();
+    inclusionConnectGateway = new InMemoryOAuthGateway(fakeProviderConfig);
+    timeGateway = new CustomTimeGateway();
+    const verifyEmailAuthCode = makeVerifyJwtES256<"emailAuthCode">(publicKey);
 
+    authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
+      new InMemoryUowPerformer(uow),
+      makeCreateNewEvent({
+        timeGateway: timeGateway,
+        uuidGenerator,
+      }),
+      inclusionConnectGateway,
+      uuidGenerator,
+      () => correctToken,
+      verifyEmailAuthCode,
+      immersionBaseUrl,
+      timeGateway,
+    );
+  });
+
+  describe("With OAuthGateway provider 'proConnect'", () => {
     describe("right paths", () => {
       describe("when user had never connected before", () => {
         it("saves the user as Authenticated user", async () => {
@@ -110,6 +123,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
             {
               ...initialOngoingOAuth,
+              usedAt: timeGateway.now(),
               accessToken,
               userId,
               externalId: defaultExpectedIcIdTokenPayload.sub,
@@ -191,7 +205,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             page: "agencyDashboard",
           });
 
-          expectObjectInArrayToMatch(uow.userRepository.users, [
+          expectToEqual(uow.userRepository.users, [
             {
               id: alreadyExistingUser.id,
               email: alreadyExistingUser.email,
@@ -201,6 +215,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
                 externalId: defaultExpectedIcIdTokenPayload.sub,
                 siret: defaultExpectedIcIdTokenPayload.siret,
               },
+              createdAt: alreadyExistingUser.createdAt,
             },
           ]);
         });
@@ -361,7 +376,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
             });
 
             expect(redirectedUrl).toBe(
-              `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com&idToken=inclusion-connect-id-token`,
+              `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com&idToken=inclusion-connect-id-token&provider=proConnect`,
             );
           },
         );
@@ -389,7 +404,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           authenticateWithInclusionCode.execute(params),
           errors.inclusionConnect.missingOAuth({
             state: params.state,
-            identityProvider: "proConnect",
           }),
         );
       });
@@ -400,6 +414,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           provider: "proConnect",
           state: "my-state",
           nonce: existingNonce,
+          usedAt: null,
         };
         uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
@@ -422,6 +437,169 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
   });
 
+  describe("With provider 'email'", () => {
+    describe("validate token", () => {
+      const initialOngoingOAuth = {
+        provider: "email",
+        state: "my-state",
+        nonce: "nounce", // matches the one in the payload of the token
+        email: "my-email@mail.com",
+        usedAt: null,
+      } satisfies OngoingOAuth;
+
+      beforeEach(() => {
+        uow.ongoingOAuthRepository.ongoingOAuths = [{ ...initialOngoingOAuth }];
+      });
+
+      it("validate that token is from server", async () => {
+        const result = await authenticateWithInclusionCode.execute({
+          code: generateEmailAuthCode({ version: 1 }),
+          state: initialOngoingOAuth.state,
+          page: "admin",
+        });
+        expectToEqual(result, expect.any(String));
+      });
+
+      it("throws if token is NOT from the server", async () => {
+        const { privateKey: otherPrivateKey } = generateES256KeyPair();
+        const verifyEmailAuthCode =
+          makeVerifyJwtES256<"emailAuthCode">(otherPrivateKey);
+
+        authenticateWithInclusionCode = new AuthenticateWithInclusionCode(
+          new InMemoryUowPerformer(uow),
+          makeCreateNewEvent({
+            timeGateway: timeGateway,
+            uuidGenerator,
+          }),
+          inclusionConnectGateway,
+          uuidGenerator,
+          () => correctToken,
+          verifyEmailAuthCode,
+          immersionBaseUrl,
+          timeGateway,
+        );
+
+        await expectPromiseToFailWithError(
+          authenticateWithInclusionCode.execute({
+            code: generateEmailAuthCode({ version: 1 }),
+            state: initialOngoingOAuth.state,
+            page: "admin",
+          }),
+          errors.user.invalidJwt(),
+        );
+      });
+
+      it("throws if token is outdated", async () => {
+        const userId = "new-user-id";
+        uuidGenerator.setNextUuid(userId);
+
+        await expectPromiseToFailWithError(
+          authenticateWithInclusionCode.execute({
+            code: generateEmailAuthCode({
+              version: 1,
+              exp: subDays(timeGateway.now(), 1).getTime() / 1000,
+            }),
+            state: initialOngoingOAuth.state,
+            page: "admin",
+          }),
+          errors.user.expiredJwt(),
+        );
+      });
+    });
+
+    describe("handle dynamic login pages", () => {
+      it.each(allowedStartOAuthLoginPages)(
+        "generates an app token and returns a redirection url which includes token and user data for %s, create user and update onGoingOAuth",
+        async (page) => {
+          const email = "my-email@mail.com";
+
+          const initialOngoingOAuth = {
+            provider: "email",
+            state: "my-state",
+            nonce: "nounce", // matches the one in the payload of the token
+            email,
+            usedAt: null,
+          } satisfies OngoingOAuth;
+
+          uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+
+          const userId = "new-user-id";
+          uuidGenerator.setNextUuid(userId);
+
+          const redirectedUrl = await authenticateWithInclusionCode.execute({
+            code: generateEmailAuthCode({ version: 1 }),
+            state: initialOngoingOAuth.state,
+            page,
+          });
+
+          expectToEqual(uow.userRepository.users, [
+            {
+              id: userId,
+              email,
+              createdAt: timeGateway.now().toISOString(),
+              firstName: "",
+              lastName: "",
+              proConnect: null,
+            },
+          ]);
+
+          expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+            {
+              ...initialOngoingOAuth,
+              userId,
+              usedAt: timeGateway.now(),
+            },
+          ]);
+
+          expect(redirectedUrl).toBe(
+            `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+          );
+        },
+      );
+    });
+  });
+
+  describe("does not allow reuse of ongoing auth", () => {
+    it("email", () => {
+      const initialOngoingOAuth = {
+        provider: "email",
+        state: "my-state",
+        nonce: "nounce", // matches the one in the payload of the token
+        email: "toto",
+        usedAt: new Date(),
+      } satisfies OngoingOAuth;
+
+      uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+      expectPromiseToFailWithError(
+        authenticateWithInclusionCode.execute({
+          code: "osef",
+          state: initialOngoingOAuth.state,
+          page: "admin",
+        }),
+        errors.user.alreadyUsedAuthentication(),
+      );
+    });
+
+    it("proConnect", () => {
+      const initialOngoingOAuth = {
+        provider: "proConnect",
+        state: "my-state",
+        nonce: "nounce", // matches the one in the payload of the token
+        usedAt: new Date(),
+      } satisfies OngoingOAuth;
+
+      uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
+      expectPromiseToFailWithError(
+        authenticateWithInclusionCode.execute({
+          code: "osef",
+          state: initialOngoingOAuth.state,
+          page: "admin",
+        }),
+        errors.user.alreadyUsedAuthentication(),
+      );
+    });
+  });
+
   const makeSuccessfulAuthenticationConditions = (
     params?: Partial<GetAccessTokenPayload>,
   ) => {
@@ -433,6 +611,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       provider: "proConnect",
       state: "my-state",
       nonce: "nounce", // matches the one in the payload of the token
+      usedAt: null,
     };
     uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
@@ -450,7 +629,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     return {
       accessToken,
-      initialOngoingOAuth,
+      initialOngoingOAuth: { ...initialOngoingOAuth },
       userId,
     };
   };
