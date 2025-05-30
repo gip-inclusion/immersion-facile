@@ -413,7 +413,9 @@ export const domElementIds = {
 
   establishment: {
     login: {
-      connectButton: "im-login-form__inclusion-connect-button--establishment",
+      byEmailButton: "im-login-form__connect-button--establishment-email",
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--establishment",
     },
     create: {
       form: "im-form-create-establishment",
@@ -565,7 +567,6 @@ export const domElementIds = {
         "im-form-manage-establishment-admin__current-next-availablity-date-value",
     },
   },
-
   assessment: {
     form: "im-assessment-form",
     formSubmitButton: "im-assessment-form__submit-button",
@@ -646,7 +647,8 @@ export const domElementIds = {
         "im-technical-options__api-consumer-submit-button",
     },
     login: {
-      connectButton: "im-login-form__inclusion-connect-button--admin",
+      proConnectButton: "im-login-form__inclusion-connect-button--admin",
+      byEmailButton: "im-login-form__connect-button--admin-email",
     },
     agencyTab: {
       openManageUserModalButton:
@@ -752,7 +754,8 @@ export const domElementIds = {
 
   agencyDashboard: {
     login: {
-      connectButton: "im-login-form__inclusion-connect-button--agency",
+      proConnectButton: "im-login-form__inclusion-connect-button--agency",
+      byEmailButton: "im-login-form__connect-button--agency-email",
     },
     registerAgencies: {
       table: "im-register-agencies-table",
@@ -804,7 +807,10 @@ export const domElementIds = {
     initiateConventionModalButton:
       "im-manage-establishment__initiate-convention-modal-button",
     login: {
-      connectButton: "im-login-form__inclusion-connect-button--establishment",
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--establishment-dashboard",
+      byEmailButton:
+        "im-login-form__connect-button--establishment-dashboard-email",
     },
     discussion: {
       activateDraftConvention:
