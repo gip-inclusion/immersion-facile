@@ -4,9 +4,9 @@ import type {
   AgencyId,
   ConventionSupportedJwt,
   DiscussionReadDto,
-  DiscussionRejected,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithDiscussionStatusRejected,
   WithIdToken,
 } from "shared";
 import type { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
@@ -31,6 +31,6 @@ export interface InclusionConnectedGateway {
     payload: {
       jwt: ConventionSupportedJwt;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void>;
 }

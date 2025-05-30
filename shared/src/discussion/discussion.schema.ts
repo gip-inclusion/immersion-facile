@@ -16,20 +16,24 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import type { OmitFromExistingKeys } from "../utils";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  type CandidateWarnedMethod,
+  candidateWarnedMethods,
+} from "./CandidateWarnedMethod";
 import type {
   Attachment,
-  DiscussionAccepted,
   DiscussionEmailParams,
   DiscussionId,
-  DiscussionPending,
   DiscussionReadDto,
-  DiscussionRejected,
-  DiscussionStatusWithRejection,
   Exchange,
   ExchangeRole,
   LegacyDiscussionEmailParams,
   PotentialBeneficiaryCommonProps,
   WithDiscussionRejection,
+  WithDiscussionStatus,
+  WithDiscussionStatusAccepted,
+  WithDiscussionStatusPending,
+  WithDiscussionStatusRejected,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
@@ -96,6 +100,10 @@ export const exchangeSchema: z.Schema<Exchange> = z.object({
 });
 export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
+const candidateWarnedMethodSchema = z.enum(
+  candidateWarnedMethods,
+) satisfies z.Schema<CandidateWarnedMethod>;
+
 export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
   z.union([
     z.object({
@@ -105,23 +113,38 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     z.object({
       rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"]),
     }),
+    z.object({
+      rejectionKind: z.literal("CANDIDATE_ALREADY_WARNED"),
+      candidateWarnedMethod: candidateWarnedMethodSchema,
+    }),
   ]);
 
-export const discussionRejectedSchema: z.Schema<DiscussionRejected> = z
-  .object({
-    status: z.literal("REJECTED"),
-  })
-  .and(discussionRejectionSchema);
+export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
+  z.object({
+    status: z.literal("ACCEPTED"),
+    candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
+    conventionId: conventionIdSchema.optional(),
+  });
 
-const discussionNotRejectedSchema: z.Schema<
-  DiscussionAccepted | DiscussionPending
-> = z.object({
-  status: z.enum(["PENDING", "ACCEPTED"]),
-});
+export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
+  z
+    .object({
+      status: z.literal("REJECTED"),
+    })
+    .and(discussionRejectionSchema);
 
-const discussionStatusSchema: z.Schema<DiscussionStatusWithRejection> = z.union(
-  [discussionRejectedSchema, discussionNotRejectedSchema],
+const discussionPendingSchema: z.Schema<WithDiscussionStatusPending> = z.object(
+  {
+    status: z.literal("PENDING"),
+  },
 );
+
+export const withDiscussionStatusSchema: z.Schema<WithDiscussionStatus> =
+  z.union([
+    discussionRejectedSchema,
+    discussionPendingSchema,
+    discussionAcceptedSchema,
+  ]);
 
 const potentialBeneficiaryCommonSchema = z.object({
   firstName: zStringMinLength1,
@@ -150,7 +173,7 @@ export const commonDiscussionReadSchema: z.Schema<
     exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
-  .and(discussionStatusSchema);
+  .and(withDiscussionStatusSchema);
 
 const discussionKindIfSchema = z.literal("IF");
 const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");

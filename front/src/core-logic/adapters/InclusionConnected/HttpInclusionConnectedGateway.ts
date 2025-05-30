@@ -3,10 +3,10 @@ import type {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
-  DiscussionRejected,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  UpdateDiscussionStatusParams,
   WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -120,22 +120,15 @@ export class HttpInclusionConnectedGateway
     params: {
       jwt: string;
       discussionId: string;
-    } & DiscussionRejected,
+    } & UpdateDiscussionStatusParams,
   ): Observable<void> {
+    const { discussionId, jwt, ...body } = params;
     return from(
       this.httpClient
         .updateDiscussionStatus({
           headers: { authorization: params.jwt },
           urlParams: { discussionId: params.discussionId },
-          body: {
-            status: params.status,
-            ...(params.rejectionKind === "OTHER"
-              ? {
-                  rejectionKind: params.rejectionKind,
-                  rejectionReason: params.rejectionReason,
-                }
-              : { rejectionKind: params.rejectionKind }),
-          },
+          body,
         })
         .then((response) =>
           match(response)

@@ -4,9 +4,9 @@ import {
   type AgencyId,
   DiscussionBuilder,
   type DiscussionReadDto,
-  type DiscussionRejected,
   type InclusionConnectedUser,
   type MarkPartnersErroredConventionAsHandledRequest,
+  type WithDiscussionStatusRejected,
 } from "shared";
 import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
@@ -76,7 +76,7 @@ export class SimulatedInclusionConnectedGateway
     _payload: {
       jwt: string;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void> {
     return of(undefined).pipe(delay(this.simulatedLatency));
   }

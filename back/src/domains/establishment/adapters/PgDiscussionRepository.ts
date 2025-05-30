@@ -2,16 +2,17 @@ import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
 import {
+  type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type ContactMode,
   type DiscussionDto,
   type DiscussionId,
   type DiscussionStatus,
-  type DiscussionStatusWithRejection,
   type Exchange,
   type PotentialBeneficiaryCommonProps,
   type RejectionKind,
   type SiretDto,
+  type WithDiscussionStatus,
   errors,
   pipeWithValue,
 } from "shared";
@@ -240,10 +241,22 @@ const discussionToPg = (
   acquisition_campaign: discussion.acquisitionCampaign,
   acquisition_keyword: discussion.acquisitionKeyword,
   convention_id: discussion.conventionId,
-  ...discussionStatusWithRejectionToPg(
-    makeDiscussionStatusAndRejection(discussion),
-  ),
+  ...discussionStatusWithRejectionToPg(discussion),
 });
+
+const getWithDiscussionStatusFromPgDiscussion = (
+  discussion: GetDiscussionResults[number]["discussion"],
+): WithDiscussionStatus =>
+  ({
+    status: discussion.status,
+    rejectionKind: discussion.rejectionKind,
+    rejectionReason: discussion.rejectionReason,
+    ...(discussion.status === "PENDING"
+      ? {}
+      : {
+          candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
+        }),
+  }) as WithDiscussionStatus;
 
 const makeDiscussionDtoFromPgDiscussion = (
   results: GetDiscussionResults,
@@ -264,21 +277,7 @@ const makeDiscussionDtoFromPgDiscussion = (
       acquisitionKeyword: discussion.acquisition_keyword,
       conventionId: discussion.conventionId,
       id: discussion.id,
-      ...(discussion.status === "REJECTED"
-        ? {
-            status: "REJECTED",
-            ...(discussion.rejectionKind === "OTHER"
-              ? {
-                  rejectionKind: "OTHER",
-                  rejectionReason: discussion.rejectionReason ?? "",
-                }
-              : {
-                  rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
-                }),
-          }
-        : {
-            status: discussion.status,
-          }),
+      ...getWithDiscussionStatusFromPgDiscussion(discussion),
     };
 
     const commonPotentialBeneficiary: PotentialBeneficiaryCommonProps = {
@@ -367,31 +366,13 @@ const makeDiscussionDtoFromPgDiscussion = (
     };
   });
 
-const makeDiscussionStatusAndRejection = (
-  discussion: DiscussionStatusWithRejection,
-): DiscussionStatusWithRejection =>
-  discussion.status === "REJECTED"
-    ? {
-        status: "REJECTED",
-        ...(discussion.rejectionKind === "OTHER"
-          ? {
-              rejectionKind: "OTHER",
-              rejectionReason: discussion.rejectionReason ?? "",
-            }
-          : {
-              rejectionKind: discussion.rejectionKind ?? "UNABLE_TO_HELP",
-            }),
-      }
-    : {
-        status: discussion.status,
-      };
-
 const discussionStatusWithRejectionToPg = (
-  discussionStatusWithRejection: DiscussionStatusWithRejection,
+  discussionStatusWithRejection: WithDiscussionStatus,
 ): {
   status: DiscussionStatus;
   rejection_kind: RejectionKind | null;
   rejection_reason: string | null;
+  candidate_warned_method: CandidateWarnedMethod | null;
 } => {
   const { status } = discussionStatusWithRejection;
   if (status === "REJECTED") {
@@ -405,12 +386,22 @@ const discussionStatusWithRejectionToPg = (
         discussionStatusWithRejection.rejectionKind === "OTHER"
           ? discussionStatusWithRejection.rejectionReason
           : null,
+      candidate_warned_method:
+        discussionStatusWithRejection.rejectionKind ===
+        "CANDIDATE_ALREADY_WARNED"
+          ? discussionStatusWithRejection.candidateWarnedMethod
+          : null,
     };
   }
+
   return {
     status: status,
     rejection_kind: null,
     rejection_reason: null,
+    candidate_warned_method:
+      status === "PENDING"
+        ? null
+        : discussionStatusWithRejection.candidateWarnedMethod,
   };
 };
 
@@ -549,10 +540,11 @@ const executeGetDiscussion = (
             .$castTo<Exchange[] | undefined>(),
           conventionId: ref("d.convention_id"),
           status: sql<DiscussionStatus>`${ref("d.status")}`,
-          rejectionKind: sql<RejectionKind>`${ref("d.rejection_kind")}`,
+          rejectionKind: sql<RejectionKind | null>`${ref("d.rejection_kind")}`,
           rejectionReason: ref("d.rejection_reason"),
           acquisition_campaign: ref("d.acquisition_campaign"),
           acquisition_keyword: ref("d.acquisition_keyword"),
+          candidateWarnedMethod: ref("d.candidate_warned_method"),
           kind: ref("d.kind"),
         }),
       ).as("discussion"),

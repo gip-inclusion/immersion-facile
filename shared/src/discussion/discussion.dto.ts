@@ -21,6 +21,7 @@ import type { Flavor } from "../typeFlavors";
 import { includesTypeGuard } from "../typeGuard";
 import type { EmptyObject, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
+import type { CandidateWarnedMethod } from "./CandidateWarnedMethod";
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
 export const isExchangeRole = includesTypeGuard(exchangeRoles);
@@ -117,7 +118,7 @@ export type CommonDiscussionDto = {
   exchanges: Exchange[];
   id: DiscussionId;
   siret: SiretDto;
-} & DiscussionStatusWithRejection &
+} & WithDiscussionStatus &
   WithAcquisition;
 
 type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
@@ -132,24 +133,31 @@ type GenericDiscussionDto<
 > = CommonDiscussionDto & SpecificDiscussionDto<C, D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
-export type RejectionKind = DiscussionRejected["rejectionKind"];
+export type RejectionKind = WithDiscussionStatusRejected["rejectionKind"];
 
-export type DiscussionStatusWithRejection =
-  | DiscussionAccepted
-  | DiscussionRejected
-  | DiscussionPending;
+export type WithDiscussionStatus =
+  | WithDiscussionStatusAccepted
+  | WithDiscussionStatusRejected
+  | WithDiscussionStatusPending;
+
+export type WithDiscussionStatusAccepted = {
+  status: "ACCEPTED";
+  candidateWarnedMethod: CandidateWarnedMethod | null;
+  conventionId?: ConventionId;
+};
+
+export type WithDiscussionStatusRejected = {
+  status: "REJECTED";
+} & WithDiscussionRejection;
+
+export type WithDiscussionStatusPending = {
+  status: "PENDING";
+};
 
 export type WithDiscussionRejection =
   | RejectionWithoutReason
-  | RejectionWithReason;
-
-export type DiscussionAccepted = {
-  status: "ACCEPTED";
-};
-
-export type DiscussionRejected = {
-  status: "REJECTED";
-} & WithDiscussionRejection;
+  | RejectionWithReason
+  | RejectionCandidateAlreadyWarned;
 
 type RejectionWithoutReason = {
   rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
@@ -160,8 +168,16 @@ type RejectionWithReason = {
   rejectionReason: string;
 };
 
-export type DiscussionPending = {
-  status: "PENDING";
+export type RejectionCandidateAlreadyWarned = {
+  rejectionKind: "CANDIDATE_ALREADY_WARNED";
+  candidateWarnedMethod: CandidateWarnedMethod;
+};
+
+export type UpdateDiscussionStatusParams = WithDiscussionId &
+  WithDiscussionStatus;
+
+export type WithDiscussionDto = {
+  discussion: DiscussionDto;
 };
 
 export type DiscussionDto = DiscussionDtoIF | DiscussionDto1Eleve1Stage; // TODO: DiscussionDto = ContactEstablishmentRequestDto ? pourquoi conserver les deux ?
@@ -226,15 +242,6 @@ export type Exchange = {
   sentAt: DateString;
   attachments: Attachment[];
 };
-
-export type RejectDiscussionAndSendNotificationParam = WithDiscussionId &
-  (
-    | {
-        rejectionKind: Extract<RejectionKind, "OTHER">;
-        rejectionReason: string;
-      }
-    | { rejectionKind: Exclude<RejectionKind, "OTHER"> }
-  );
 
 export type DiscussionDisplayStatus =
   | "accepted"

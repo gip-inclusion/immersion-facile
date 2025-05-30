@@ -1,18 +1,16 @@
 import {
+  ConventionDtoBuilder,
   DiscussionBuilder,
   type DiscussionDto,
   InclusionConnectedUserBuilder,
-  type RejectDiscussionAndSendNotificationParam,
+  type UpdateDiscussionStatusParams,
   errors,
+  expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  immersionFacileNoReplyEmailSender,
 } from "shared";
-import {
-  type ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
-import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import type { TriggeredBy } from "../../../core/events/events";
+import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -22,11 +20,11 @@ import {
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
-  type RejectDiscussionAndSendNotification,
-  makeRejectDiscussionAndSendNotification,
-} from "./RejectDiscussionAndSendNotification";
+  type UpdateDiscussionStatus,
+  makeUpdateDiscussionStatus,
+} from "./UpdateDiscussionStatus";
 
-describe("RejectDiscussionAndSendNotification", () => {
+describe("UpdateDiscussionStatus", () => {
   const authorizedUser = new InclusionConnectedUserBuilder()
     .withId("authorizedUser")
     .withEmail("authorized@domain.com")
@@ -44,29 +42,21 @@ describe("RejectDiscussionAndSendNotification", () => {
 
   let uow: InMemoryUnitOfWork;
   let timeGateway: CustomTimeGateway;
-  let rejectPotentialBeneficiaryOnDiscussion: RejectDiscussionAndSendNotification;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
+  let uuidGenerator: TestUuidGenerator;
+  let updateDiscussionStatus: UpdateDiscussionStatus;
 
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
+    uuidGenerator = new TestUuidGenerator();
 
-    rejectPotentialBeneficiaryOnDiscussion =
-      makeRejectDiscussionAndSendNotification({
-        uowPerformer: new InMemoryUowPerformer(uow),
-        deps: {
-          replyDomain: "reply-domain",
-          timeGateway,
-          saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
-            new TestUuidGenerator(),
-            timeGateway,
-          ),
-        },
-      });
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
+    updateDiscussionStatus = makeUpdateDiscussionStatus({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        timeGateway,
+        createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+      },
+    });
 
     uow.discussionRepository.discussions = [discussion];
   });
@@ -76,9 +66,10 @@ describe("RejectDiscussionAndSendNotification", () => {
       uow.discussionRepository.discussions = [];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           },
           authorizedUser,
@@ -103,9 +94,10 @@ describe("RejectDiscussionAndSendNotification", () => {
       ];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           },
           unauthorizedUser,
@@ -127,9 +119,10 @@ describe("RejectDiscussionAndSendNotification", () => {
       uow.discussionRepository.discussions = [alreadyRejectedDiscussion];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: alreadyRejectedDiscussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           },
           authorizedUser,
@@ -144,9 +137,10 @@ describe("RejectDiscussionAndSendNotification", () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [];
 
       await expectPromiseToFailWithError(
-        rejectPotentialBeneficiaryOnDiscussion.execute(
+        updateDiscussionStatus.execute(
           {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           },
           unauthorizedUser,
@@ -158,15 +152,117 @@ describe("RejectDiscussionAndSendNotification", () => {
     });
   });
 
-  describe("Right paths", () => {
+  describe("Accept discussion", () => {
+    it("accepts a discussion, providing candidateWarnedMethod. Should skip email sending", async () => {
+      await updateDiscussionStatus.execute(
+        {
+          discussionId: discussion.id,
+          status: "ACCEPTED",
+          candidateWarnedMethod: "inPerson",
+        },
+        authorizedUser,
+      );
+
+      expectDiscussionInRepoAndInOutbox({
+        triggeredBy: {
+          kind: "inclusion-connected",
+          userId: authorizedUser.id,
+        },
+        expectedDiscussion: {
+          ...discussion,
+          status: "ACCEPTED",
+          candidateWarnedMethod: "inPerson",
+        },
+        skipSendingEmail: true,
+      });
+    });
+
+    describe("providing a conventionId", () => {
+      it("throws if convention is not found", async () => {
+        const conventionId = "40400000-0000-0000-0000-000000000404";
+
+        await expectPromiseToFailWithError(
+          updateDiscussionStatus.execute(
+            {
+              discussionId: discussion.id,
+              status: "ACCEPTED",
+              candidateWarnedMethod: null,
+              conventionId,
+            },
+            authorizedUser,
+          ),
+          errors.convention.notFound({ conventionId }),
+        );
+      });
+
+      it("accepts a discussion, when convention exists", async () => {
+        const convention = new ConventionDtoBuilder().build();
+        uow.conventionRepository.setConventions([convention]);
+
+        await updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "ACCEPTED",
+            candidateWarnedMethod: null,
+            conventionId: convention.id,
+          },
+          authorizedUser,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
+            status: "ACCEPTED",
+            candidateWarnedMethod: null,
+            conventionId: convention.id,
+          },
+          skipSendingEmail: true,
+        });
+      });
+    });
+  });
+
+  describe("Reject discussion", () => {
+    describe("providing candidateWarnedMethod", () => {
+      it("works, and does not send email", async () => {
+        await updateDiscussionStatus.execute(
+          {
+            discussionId: discussion.id,
+            status: "REJECTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
+            candidateWarnedMethod: "inPerson",
+          },
+          authorizedUser,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "inclusion-connected",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
+            status: "REJECTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
+            candidateWarnedMethod: "inPerson",
+          },
+          skipSendingEmail: true,
+        });
+      });
+    });
     describe("validate each possible statuses", () => {
       it.each<{
-        params: RejectDiscussionAndSendNotificationParam;
+        params: UpdateDiscussionStatusParams;
         expectedRejectionReason: string;
       }>([
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           },
           expectedRejectionReason:
@@ -175,6 +271,7 @@ describe("RejectDiscussionAndSendNotification", () => {
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
           },
           expectedRejectionReason:
@@ -183,6 +280,7 @@ describe("RejectDiscussionAndSendNotification", () => {
         {
           params: {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "OTHER",
             rejectionReason: "my rejection reason",
           },
@@ -194,7 +292,7 @@ describe("RejectDiscussionAndSendNotification", () => {
           expectedRejectionReason,
           params: { discussionId, ...rest },
         }) => {
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
+          await updateDiscussionStatus.execute(
             { discussionId, ...rest },
             authorizedUser,
           );
@@ -205,10 +303,13 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussion.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussion,
-              status: "REJECTED",
               ...rest,
               exchanges: [
                 ...discussion.exchanges,
@@ -222,23 +323,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
-                  name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
-                },
-              },
-            ],
           });
         },
       );
@@ -247,15 +331,13 @@ describe("RejectDiscussionAndSendNotification", () => {
     describe("validate user rights", () => {
       describe("when user email is on discussion", () => {
         it("allow rejection when user email is on discussion main contact", async () => {
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussion.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -263,8 +345,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussion.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussion,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -280,23 +366,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply-domain`,
-                  name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
-                },
-              },
-            ],
           });
         });
 
@@ -312,15 +381,13 @@ describe("RejectDiscussionAndSendNotification", () => {
 
           uow.discussionRepository.discussions = [discussionWithEmailInCopy];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithEmailInCopy.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -328,8 +395,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithEmailInCopy.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithEmailInCopy,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -345,23 +416,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithEmailInCopy.potentialBeneficiary.firstName}_${discussionWithEmailInCopy.potentialBeneficiary.lastName}__${discussionWithEmailInCopy.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithEmailInCopy.establishmentContact.firstName}_${discussionWithEmailInCopy.establishmentContact.lastName}__${discussionWithEmailInCopy.id}_e@reply-domain`,
-                  name: `${discussionWithEmailInCopy.establishmentContact.firstName} ${discussionWithEmailInCopy.establishmentContact.lastName} - ${discussionWithEmailInCopy.businessName}`,
-                },
-              },
-            ],
           });
         });
       });
@@ -393,15 +447,13 @@ describe("RejectDiscussionAndSendNotification", () => {
               .build(),
           ];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithoutUserEmail.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -409,8 +461,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithoutUserEmail.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -426,23 +482,6 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
-                  name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
-                },
-              },
-            ],
           });
         });
 
@@ -465,15 +504,13 @@ describe("RejectDiscussionAndSendNotification", () => {
               .build(),
           ];
 
-          const params: RejectDiscussionAndSendNotificationParam = {
+          const params: UpdateDiscussionStatusParams = {
             discussionId: discussionWithoutUserEmail.id,
+            status: "REJECTED",
             rejectionKind: "NO_TIME",
           };
 
-          await rejectPotentialBeneficiaryOnDiscussion.execute(
-            params,
-            authorizedUser,
-          );
+          await updateDiscussionStatus.execute(params, authorizedUser);
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
@@ -481,8 +518,12 @@ describe("RejectDiscussionAndSendNotification", () => {
             discussionWithoutUserEmail.establishmentContact.lastName,
           );
 
-          expectToEqual(uow.discussionRepository.discussions, [
-            {
+          expectDiscussionInRepoAndInOutbox({
+            triggeredBy: {
+              kind: "inclusion-connected",
+              userId: authorizedUser.id,
+            },
+            expectedDiscussion: {
               ...discussionWithoutUserEmail,
               status: "REJECTED",
               rejectionKind: params.rejectionKind,
@@ -498,28 +539,34 @@ describe("RejectDiscussionAndSendNotification", () => {
                 },
               ],
             },
-          ]);
-
-          expectSavedNotificationsAndEvents({
-            emails: [
-              {
-                kind: "DISCUSSION_EXCHANGE",
-                sender: immersionFacileNoReplyEmailSender,
-                params: { subject, htmlContent },
-                recipients: [
-                  `${discussionWithoutUserEmail.potentialBeneficiary.firstName}_${discussionWithoutUserEmail.potentialBeneficiary.lastName}__${discussionWithoutUserEmail.id}_b@reply-domain`,
-                ],
-                replyTo: {
-                  email: `${discussionWithoutUserEmail.establishmentContact.firstName}_${discussionWithoutUserEmail.establishmentContact.lastName}__${discussionWithoutUserEmail.id}_e@reply-domain`,
-                  name: `${discussionWithoutUserEmail.establishmentContact.firstName} ${discussionWithoutUserEmail.establishmentContact.lastName} - ${discussionWithoutUserEmail.businessName}`,
-                },
-              },
-            ],
           });
         });
       });
     });
   });
+
+  const expectDiscussionInRepoAndInOutbox = ({
+    expectedDiscussion,
+    triggeredBy,
+    skipSendingEmail,
+  }: {
+    expectedDiscussion: DiscussionDto;
+    triggeredBy: TriggeredBy;
+    skipSendingEmail?: boolean;
+  }) => {
+    expectToEqual(uow.discussionRepository.discussions, [expectedDiscussion]);
+
+    expectArraysToMatch(uow.outboxRepository.events, [
+      {
+        topic: "DiscussionStatusManuallyUpdated",
+        payload: {
+          discussion: expectedDiscussion,
+          triggeredBy,
+          ...(skipSendingEmail !== undefined ? { skipSendingEmail } : {}),
+        },
+      },
+    ]);
+  };
 });
 
 const makeExpectedEmailParams = (
