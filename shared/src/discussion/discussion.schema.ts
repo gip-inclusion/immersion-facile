@@ -109,11 +109,13 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     z.object({
       rejectionKind: z.literal("OTHER"),
       rejectionReason: zStringMinLength1,
-      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     }),
     z.object({
       rejectionKind: z.enum(["UNABLE_TO_HELP", "NO_TIME"]),
-      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
+    }),
+    z.object({
+      rejectionKind: z.literal("CANDIDATE_ALREADY_WARNED"),
+      candidateWarnedMethod: candidateWarnedMethodSchema,
     }),
   ]);
 
@@ -128,7 +130,6 @@ export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
   z
     .object({
       status: z.literal("REJECTED"),
-      candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     })
     .and(discussionRejectionSchema);
 

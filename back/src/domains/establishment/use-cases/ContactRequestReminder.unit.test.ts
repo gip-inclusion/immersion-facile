@@ -245,7 +245,6 @@ describe("ContactRequestReminder", () => {
         new DiscussionBuilder(discussionWith4DaysSinceBeneficiaryExchange)
           .withStatus({
             status: "REJECTED",
-            candidateWarnedMethod: null,
             rejectionKind: "UNABLE_TO_HELP",
           })
           .build(),
@@ -255,7 +254,6 @@ describe("ContactRequestReminder", () => {
         new DiscussionBuilder(discussionWith8DaysSinceBeneficiaryExchange)
           .withStatus({
             status: "REJECTED",
-            candidateWarnedMethod: null,
             rejectionKind: "UNABLE_TO_HELP",
           })
           .build(),

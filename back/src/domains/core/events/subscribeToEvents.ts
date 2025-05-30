@@ -34,11 +34,13 @@ const getUseCasesByTopics = (
   DiscussionStatusManuallyUpdated: [
     {
       useCaseName: useCases.sendExchangeToRecipient.useCaseName,
-      execute: ({ discussion, triggeredBy }) =>
-        useCases.sendExchangeToRecipient.execute({
+      execute: async ({ discussion, skipSendingEmail, triggeredBy }) => {
+        if (skipSendingEmail) return;
+        return useCases.sendExchangeToRecipient.execute({
           discussionId: discussion.id,
           triggeredBy,
-        }),
+        });
+      },
     },
   ],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],

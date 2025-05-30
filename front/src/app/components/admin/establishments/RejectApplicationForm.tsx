@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import {
   type CandidateWarnedMethod,
   type DiscussionReadDto,
+  type RejectionCandidateAlreadyWarned,
   type RejectionKind,
   type WithDiscussionId,
   type WithDiscussionRejection,
@@ -52,7 +53,6 @@ export const RejectApplicationForm = ({
   const { register, watch, handleSubmit, formState, setValue } =
     useForm<WithDiscussionRejection>({
       resolver: zodResolver(discussionRejectionSchema),
-      defaultValues: { candidateWarnedMethod: null },
     });
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
@@ -87,7 +87,7 @@ export const RejectApplicationForm = ({
   if (!inclusionConnectedJwt) throw new Error("No jwt found");
 
   if (rejectParams) {
-    if (rejectParams.candidateWarnedMethod !== null) {
+    if (rejectParams.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
       return (
         <div>
           Etant donnée que vous avez déjà prévenu (
@@ -173,6 +173,7 @@ export const RejectApplicationForm = ({
                 Boolean(option.nativeInputProps.value) === isCandidateWarned,
               onChange: () => {
                 setIsCandidateWarned(option.nativeInputProps.value === 1);
+                setValue("rejectionKind", "CANDIDATE_ALREADY_WARNED");
               },
             },
           }))}
@@ -189,7 +190,8 @@ export const RejectApplicationForm = ({
                 ...option.nativeInputProps,
                 checked:
                   option.nativeInputProps.value ===
-                  watchedFormValues.candidateWarnedMethod,
+                  (watchedFormValues as RejectionCandidateAlreadyWarned)
+                    .candidateWarnedMethod,
                 onChange: () => {
                   setValue(
                     "candidateWarnedMethod",

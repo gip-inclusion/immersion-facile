@@ -46,7 +46,6 @@ describe("Discussions", () => {
           .withStatus({
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
-            candidateWarnedMethod: null,
           })
           .buildRead(),
       },
