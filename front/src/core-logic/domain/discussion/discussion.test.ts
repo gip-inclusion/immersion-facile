@@ -158,7 +158,6 @@ describe("Discussion slice", () => {
           feedbackTopic: "dashboard-discussion-rejection",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
-          candidateWarnedMethod: null,
         }),
       );
 
@@ -192,7 +191,6 @@ describe("Discussion slice", () => {
           feedbackTopic: "dashboard-discussion-rejection",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
-          candidateWarnedMethod: null,
         }),
       );
 

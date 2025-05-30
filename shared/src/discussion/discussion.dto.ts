@@ -166,17 +166,21 @@ export type WithDiscussionStatusPending = {
 
 export type WithDiscussionRejection =
   | RejectionWithoutReason
-  | RejectionWithReason;
+  | RejectionWithReason
+  | RejectionCandidateAlreadyWarned;
 
 type RejectionWithoutReason = {
   rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
-  candidateWarnedMethod: CandidateWarnedMethod | null;
 };
 
 type RejectionWithReason = {
   rejectionKind: "OTHER";
   rejectionReason: string;
-  candidateWarnedMethod: CandidateWarnedMethod | null;
+};
+
+export type RejectionCandidateAlreadyWarned = {
+  rejectionKind: "CANDIDATE_ALREADY_WARNED";
+  candidateWarnedMethod: CandidateWarnedMethod;
 };
 
 export type UpdateDiscussionStatusParams = WithDiscussionId &

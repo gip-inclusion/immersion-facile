@@ -387,7 +387,10 @@ const discussionStatusWithRejectionToPg = (
           ? discussionStatusWithRejection.rejectionReason
           : null,
       candidate_warned_method:
-        discussionStatusWithRejection.candidateWarnedMethod,
+        discussionStatusWithRejection.rejectionKind ===
+        "CANDIDATE_ALREADY_WARNED"
+          ? discussionStatusWithRejection.candidateWarnedMethod
+          : null,
     };
   }
 
