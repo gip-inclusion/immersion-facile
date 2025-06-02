@@ -149,6 +149,10 @@ export class HttpInclusionConnectedGateway
     } & UpdateDiscussionStatusParams,
   ): Observable<void> {
     const { discussionId, jwt, ...body } = params;
+    console.log(
+      "Update discussion status with params in HttpGateway: ",
+      params,
+    );
     return from(
       this.httpClient
         .updateDiscussionStatus({
@@ -163,6 +167,7 @@ export class HttpInclusionConnectedGateway
             .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
+      // .catch(error => console.log("ERROR in gateway" , error)),
     );
   }
 

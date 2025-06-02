@@ -30,6 +30,10 @@ import {
   toDisplayedDate,
 } from "shared";
 import {
+  AcceptApplicationModal,
+  openAcceptApplicationModal,
+} from "src/app/components/admin/establishments/AcceptApplicationModal";
+import {
   RejectApplicationModal,
   openRejectApplicationModal,
 } from "src/app/components/admin/establishments/RejectApplicationModal";
@@ -67,7 +71,7 @@ export const DiscussionManageContent = ({
   );
   const dispatch = useDispatch();
   useFeedbackEventCallback(
-    "dashboard-discussion-rejection",
+    "dashboard-discussion-status-updated",
     "update.success",
     () => {
       if (inclusionConnectedJwt) {
@@ -174,11 +178,19 @@ const getDiscussionButtons = ({
       ? [
           {
             id: domElementIds.establishmentDashboard.discussion
+              .acceptApplicationOpenModal,
+            priority: "secondary",
+            type: "button",
+            onClick: openAcceptApplicationModal,
+            children: "Marquer comme acceptée",
+          } satisfies ButtonProps,
+          {
+            id: domElementIds.establishmentDashboard.discussion
               .rejectApplicationOpenModal,
             priority: "secondary",
             type: "button",
             onClick: openRejectApplicationModal,
-            children: "Refuser la candidature",
+            children: "Marquer comme refusée",
           } satisfies ButtonProps,
         ]
       : []),
@@ -218,20 +230,28 @@ const statusBadgeData: Record<
   },
 };
 
-const getRejectionFeedbackMessage = (discussion: DiscussionReadDto) => {
-  if (discussion.status !== "REJECTED") return "";
-  return match(discussion.rejectionKind)
-    .with(
-      "CANDIDATE_ALREADY_WARNED",
-      () =>
-        "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
-    )
-    .with(
-      P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
-      () =>
-        "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
-    )
-    .exhaustive();
+const getDiscussionStatusUpdatedFeedbackMessage = (
+  discussion: DiscussionReadDto,
+): string => {
+  const {status} = discussion;
+  if (status === "PENDING") return "";
+  if (status === "ACCEPTED")
+    return "La candidature a bien été marquée comme accepté. Merci pour votre retour.";
+  if(status === "REJECTED")
+    return match(discussion.rejectionKind)
+      .with(
+        "CANDIDATE_ALREADY_WARNED",
+        () =>
+          "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
+      )
+      .with(
+        P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
+        () =>
+          "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
+      )
+      .exhaustive();
+  status satisfies never;
+  throw new Error(`Unexpected discussion status: ${status}`);
 };
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
@@ -248,11 +268,15 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   return (
     <>
       <Feedback
-        topics={["dashboard-discussion-rejection"]}
-        render={({ title, level }) => (
+        topics={["dashboard-discussion-status-updated"]}
+        render={({ title, level, message }) => (
           <Alert
             title={title}
-            description={getRejectionFeedbackMessage(discussion)}
+            description={
+              level === "error"
+                ? message
+                : getDiscussionStatusUpdatedFeedbackMessage(discussion)
+            }
             severity={level}
             small
           />
@@ -328,6 +352,11 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
 
       {createPortal(
         <RejectApplicationModal discussion={discussion} />,
+        document.body,
+      )}
+
+      {createPortal(
+        <AcceptApplicationModal discussion={discussion} />,
         document.body,
       )}
     </>

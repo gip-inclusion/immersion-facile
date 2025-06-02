@@ -7,7 +7,7 @@ import type {
   Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
-  WithDiscussionStatusRejected,
+  WithDiscussionStatus,
   SendMessageToDiscussionFromDashboardRequestPayload,
   WithIdToken,
 } from "shared";
@@ -36,6 +36,6 @@ export interface InclusionConnectedGateway {
     payload: {
       jwt: ConventionSupportedJwt;
       discussionId: string;
-    } & WithDiscussionStatusRejected,
+    } & WithDiscussionStatus,
   ): Observable<void>;
 }

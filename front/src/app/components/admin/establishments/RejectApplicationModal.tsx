@@ -99,7 +99,7 @@ export const RejectApplicationModal = ({
     if (values.rejectionKind === "CANDIDATE_ALREADY_WARNED")
       return dispatch(
         discussionSlice.actions.updateDiscussionStatusRequested({
-          feedbackTopic: "dashboard-discussion-rejection",
+          feedbackTopic: "dashboard-discussion-status-updated",
           status: "REJECTED",
           rejectionKind: "CANDIDATE_ALREADY_WARNED",
           candidateWarnedMethod: values.candidateWarnedMethod,
@@ -144,7 +144,7 @@ export const RejectApplicationModal = ({
             onClick: () =>
               dispatch(
                 discussionSlice.actions.updateDiscussionStatusRequested({
-                  feedbackTopic: "dashboard-discussion-rejection",
+                  feedbackTopic: "dashboard-discussion-status-updated",
                   ...rejectParams,
                   jwt: inclusionConnectedJwt,
                 }),
