@@ -378,10 +378,7 @@ const discussionStatusWithRejectionToPg = (
   if (status === "REJECTED") {
     return {
       status: status,
-      rejection_kind:
-        discussionStatusWithRejection.rejectionKind === "OTHER"
-          ? "OTHER"
-          : "UNABLE_TO_HELP",
+      rejection_kind: discussionStatusWithRejection.rejectionKind,
       rejection_reason:
         discussionStatusWithRejection.rejectionKind === "OTHER"
           ? discussionStatusWithRejection.rejectionReason

@@ -782,11 +782,17 @@ describe("PgDiscussionRepository", () => {
         expectToEqual(
           await db
             .selectFrom("discussions")
-            .select(["status", "convention_id", "candidate_warned_method"])
+            .select([
+              "status",
+              "convention_id",
+              "rejection_kind",
+              "candidate_warned_method",
+            ])
             .executeTakeFirst(),
           {
             status: "REJECTED",
             convention_id: "some-other-convention-id",
+            rejection_kind: "CANDIDATE_ALREADY_WARNED",
             candidate_warned_method: "phone",
           },
         );
