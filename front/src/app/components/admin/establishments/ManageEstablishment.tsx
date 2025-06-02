@@ -20,7 +20,7 @@ export const ManageEstablishment = (): JSX.Element => {
     });
   return (
     <>
-      <h5 className={fr.cx("fr-h5")}>Piloter une entreprise</h5>
+      <h2 className={fr.cx("fr-h5")}>Piloter une entreprise</h2>
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ siret }) =>

@@ -16,9 +16,9 @@ export const EditAgency = () => {
   const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
         Editer une agence
-      </h5>
+      </h2>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
           locator="agencyAdminAutocomplete"

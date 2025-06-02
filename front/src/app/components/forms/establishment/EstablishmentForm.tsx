@@ -429,8 +429,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {match(currentStep)
               .with(null, () => (
                 <>
-                  <EstablishmentUsersList />
-                  <h2>{steps[1].title}</h2>
+                  <h3 className={fr.cx("fr-h6")}>{steps[1].title}</h3>
                   <AvailabilitySection
                     mode={mode}
                     onStepChange={onStepChange}
@@ -441,20 +440,21 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                       initialUrlParams.current.shouldUpdateAvailability,
                     )}
                   />
-                  <h2>{steps[2].title}</h2>
+                  <EstablishmentUsersList />
+                  <h3 className={fr.cx("fr-h6")}>{steps[2].title}</h3>
                   <SearchableBySection
                     mode={mode}
                     onStepChange={onStepChange}
                     currentStep={currentStep}
                   />
-                  <h2>{steps[3].title}</h2>
+                  <h3 className={fr.cx("fr-h6")}>{steps[3].title}</h3>
                   <BusinessContactSection
                     mode={mode}
                     onStepChange={onStepChange}
                     currentStep={currentStep}
                     setInvalidEmailMessage={setInvalidEmailMessage}
                   />
-                  <h2>{steps[4].title}</h2>
+                  <h3 className={fr.cx("fr-h6")}>{steps[4].title}</h3>
                   <DetailsSection
                     mode={mode}
                     isEstablishmentAdmin={isEstablishmentAdmin}

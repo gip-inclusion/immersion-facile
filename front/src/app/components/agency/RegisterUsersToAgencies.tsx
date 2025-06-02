@@ -37,9 +37,9 @@ export const RegisterUsersToAgencies = () => {
 
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
         Rapprocher un utilisateur d'une agence
-      </h5>
+      </h2>
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card", "fr-mb-4w")}>
         <>
           <Select
