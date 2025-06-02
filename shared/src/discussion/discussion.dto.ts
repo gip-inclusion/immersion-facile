@@ -168,11 +168,6 @@ export type WithDiscussionStatusPending = {
   status: "PENDING";
 };
 
-declare const d: DiscussionReadDto;
-if (d.status === "REJECTED") {
-  d.rejectionKind;
-}
-
 export type WithDiscussionRejection =
   | RejectionWithoutReason
   | RejectionWithReason

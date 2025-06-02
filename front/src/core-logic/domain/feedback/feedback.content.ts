@@ -136,8 +136,7 @@ export const feedbacks: Record<
     "update.success": {
       action: discussionSlice.actions.updateDiscussionStatusSucceeded,
       title: "La candidature a bien été rejetée",
-      message:
-        "La candidature a bien été rejetée, un email a été envoyé au candidat",
+      message: "La candidature a bien été rejetée.",
     },
     "update.error": {
       action: discussionSlice.actions.updateDiscussionStatusFailed,
