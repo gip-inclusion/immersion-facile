@@ -14,7 +14,6 @@ import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import type { OmitFromExistingKeys } from "../utils";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   type CandidateWarnedMethod,
@@ -22,6 +21,7 @@ import {
 } from "./CandidateWarnedMethod";
 import type {
   Attachment,
+  CommonDiscussionDto,
   DiscussionEmailParams,
   DiscussionId,
   DiscussionReadDto,
@@ -162,24 +162,13 @@ const potentialBeneficiaryCommonSchema = z.object({
   email: zStringCanBeEmpty,
 }) satisfies z.Schema<PotentialBeneficiaryCommonProps>;
 
-export const commonDiscussionReadSchema: z.Schema<
-  OmitFromExistingKeys<
-    DiscussionReadDto,
-    "kind" | "contactMode" | "potentialBeneficiary"
-  >
-> = z
+const commonDiscussionSchema: z.Schema<CommonDiscussionDto> = z
   .object({
     id: discussionIdSchema,
     createdAt: makeDateStringSchema(),
     siret: siretSchema,
     businessName: zStringMinLength1,
-    appellation: appellationDtoSchema,
     address: addressSchema,
-    establishmentContact: z.object({
-      firstName: zStringCanBeEmpty,
-      lastName: zStringCanBeEmpty,
-      job: zStringMinLength1,
-    }),
     exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
@@ -191,53 +180,64 @@ const discussionKind1Eleve1StageSchema = z.literal("1_ELEVE_1_STAGE");
 const discussionLevelOfEducationSchema = z.enum(["3ème", "2nde"]);
 
 export const discussionReadSchema: z.Schema<DiscussionReadDto> =
-  commonDiscussionReadSchema.and(
-    z.union([
+  commonDiscussionSchema
+    .and(
       z.object({
-        contactMode: preferEmailContactSchema,
-        kind: discussionKindIfSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-          phone: phoneSchema,
-          datePreferences: zStringMinLength1,
-          immersionObjective: immersionObjectiveSchema.or(z.null()),
-          resumeLink: zStringCanBeEmpty.optional(),
-          hasWorkingExperience: z.boolean().optional(),
-          experienceAdditionalInformation: zStringMinLength1.optional(),
+        appellation: appellationDtoSchema,
+        establishmentContact: z.object({
+          firstName: zStringMinLength1,
+          lastName: zStringMinLength1,
+          job: zStringMinLength1,
         }),
       }),
-      z.object({
-        contactMode: preferEmailContactSchema,
-        kind: discussionKind1Eleve1StageSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-          phone: phoneSchema,
-          datePreferences: zStringMinLength1,
-          immersionObjective: z.literal(discoverObjective),
-          levelOfEducation: discussionLevelOfEducationSchema,
+    )
+    .and(
+      z.union([
+        z.object({
+          contactMode: preferEmailContactSchema,
+          kind: discussionKindIfSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+            phone: phoneSchema,
+            datePreferences: zStringMinLength1,
+            immersionObjective: immersionObjectiveSchema.or(z.null()),
+            resumeLink: zStringCanBeEmpty.optional(),
+            hasWorkingExperience: z.boolean().optional(),
+            experienceAdditionalInformation: zStringMinLength1.optional(),
+          }),
         }),
-      }),
-      z.object({
-        contactMode: preferInPersonContactSchema,
-        kind: discussionKindIfSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema,
-      }),
-      z.object({
-        contactMode: preferInPersonContactSchema,
-        kind: discussionKind1Eleve1StageSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-          levelOfEducation: z.enum(["3ème", "2nde"]),
+        z.object({
+          contactMode: preferEmailContactSchema,
+          kind: discussionKind1Eleve1StageSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+            phone: phoneSchema,
+            datePreferences: zStringMinLength1,
+            immersionObjective: z.literal(discoverObjective),
+            levelOfEducation: discussionLevelOfEducationSchema,
+          }),
         }),
-      }),
-      z.object({
-        contactMode: preferPhoneContactSchema,
-        kind: discussionKindIfSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema,
-      }),
-      z.object({
-        contactMode: preferPhoneContactSchema,
-        kind: discussionKind1Eleve1StageSchema,
-        potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
-          levelOfEducation: z.enum(["3ème", "2nde"]),
+        z.object({
+          contactMode: preferInPersonContactSchema,
+          kind: discussionKindIfSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema,
         }),
-      }),
-    ]),
-  );
+        z.object({
+          contactMode: preferInPersonContactSchema,
+          kind: discussionKind1Eleve1StageSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+            levelOfEducation: z.enum(["3ème", "2nde"]),
+          }),
+        }),
+        z.object({
+          contactMode: preferPhoneContactSchema,
+          kind: discussionKindIfSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema,
+        }),
+        z.object({
+          contactMode: preferPhoneContactSchema,
+          kind: discussionKind1Eleve1StageSchema,
+          potentialBeneficiary: potentialBeneficiaryCommonSchema.extend({
+            levelOfEducation: z.enum(["3ème", "2nde"]),
+          }),
+        }),
+      ]),
+    );
