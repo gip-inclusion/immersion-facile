@@ -45,6 +45,23 @@ const candidateWarnedMethod: RadioButtonsProps["options"] =
     },
   }));
 
+const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
+  {
+    label:
+      "Je ne suis pas en capacité d'aider le candidat dans son projet professionnel",
+    value: "UNABLE_TO_HELP",
+  },
+  {
+    label:
+      "Je traverse une période chargée et je n'ai pas le temps d'accueillir une immersion",
+    value: "NO_TIME",
+  },
+  {
+    label: "Autre",
+    value: "OTHER",
+  },
+];
+
 export const RejectApplicationForm = ({
   discussion,
 }: {
@@ -67,41 +84,14 @@ export const RejectApplicationForm = ({
 
   const [isCandidateWarned, setIsCandidateWarned] = useState<boolean>();
 
-  const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
-    {
-      label:
-        "Je ne suis pas en capacité d'aider le candidat dans son projet professionnel",
-      value: "UNABLE_TO_HELP",
-    },
-    {
-      label:
-        "Je traverse une période chargée et je n'ai pas le temps d'accueillir une immersion",
-      value: "NO_TIME",
-    },
-    {
-      label: "Autre",
-      value: "OTHER",
-    },
-  ];
-
   if (!inclusionConnectedJwt) throw new Error("No jwt found");
 
   if (rejectParams) {
-    if (rejectParams.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
-      return (
-        <div>
-          Etant donnée que vous avez déjà prévenu (
-          {labelByCandidateWarnedMethod[rejectParams.candidateWarnedMethod]}),
-          le candidat, nous n'allons pas le notifier. Mais cette candidature
-          passera bien à "Rejeté"
-        </div>
-      );
-    }
-
     const { htmlContent, subject } = rejectDiscussionEmailParams(
       rejectParams,
       discussion,
     );
+
     return (
       <>
         <p>
@@ -153,13 +143,24 @@ export const RejectApplicationForm = ({
 
   return (
     <form
-      onSubmit={handleSubmit((values) =>
-        setRejectParams({
+      onSubmit={handleSubmit((values) => {
+        if (values.rejectionKind === "CANDIDATE_ALREADY_WARNED")
+          return dispatch(
+            discussionSlice.actions.updateDiscussionStatusRequested({
+              feedbackTopic: "dashboard-discussion-rejection",
+              status: "REJECTED",
+              rejectionKind: "CANDIDATE_ALREADY_WARNED",
+              candidateWarnedMethod: values.candidateWarnedMethod,
+              discussionId: discussion.id,
+              jwt: inclusionConnectedJwt,
+            }),
+          );
+        return setRejectParams({
           ...values,
           status: "REJECTED",
           discussionId: discussion.id,
-        }),
-      )}
+        });
+      })}
     >
       <div>
         <RadioButtons
@@ -239,12 +240,16 @@ export const RejectApplicationForm = ({
             priority: "secondary",
             children: "Annuler",
             type: "button",
+            ...(rejectParams === null && { className: fr.cx("fr-hidden") }),
           },
           {
             id: domElementIds.establishmentDashboard.discussion
               .rejectApplicationSubmitPreviewButton,
             priority: "primary",
-            children: "Prévisualiser et envoyer",
+            children:
+              watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
+                ? "Rejeter la candidature"
+                : "Prévisualiser et envoyer",
           },
         ]}
         inlineLayoutWhen="always"

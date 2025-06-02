@@ -189,40 +189,57 @@ const getDiscussionButtons = ({
   ];
 };
 
+const statusBadgeData: Record<
+  DiscussionDisplayStatus,
+  {
+    severity: BadgeProps["severity"];
+    label: string;
+  }
+> = {
+  new: {
+    severity: "info",
+    label: "Nouveau",
+  },
+  "needs-answer": {
+    severity: "warning",
+    label: "En cours - à répondre",
+  },
+  "needs-urgent-answer": {
+    severity: "error",
+    label: "En cours - Urgent",
+  },
+  answered: {
+    severity: "new",
+    label: "En cours - répondu",
+  },
+  accepted: {
+    severity: "success",
+    label: "Acceptée",
+  },
+  rejected: {
+    severity: undefined,
+    label: "Refusée",
+  },
+};
+
+const getRejectionFeedbackMessage = (discussion: DiscussionReadDto) => {
+  if (discussion.status !== "REJECTED") return "";
+  return match(discussion.rejectionKind)
+    .with(
+      "CANDIDATE_ALREADY_WARNED",
+      () =>
+        "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
+    )
+    .with(
+      P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
+      () =>
+        "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
+    )
+    .exhaustive();
+};
+
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const { discussion } = props;
-  const statusBadgeData: Record<
-    DiscussionDisplayStatus,
-    {
-      severity: BadgeProps["severity"];
-      label: string;
-    }
-  > = {
-    new: {
-      severity: "info",
-      label: "Nouveau",
-    },
-    "needs-answer": {
-      severity: "warning",
-      label: "En cours - à répondre",
-    },
-    "needs-urgent-answer": {
-      severity: "error",
-      label: "En cours - Urgent",
-    },
-    answered: {
-      severity: "new",
-      label: "En cours - répondu",
-    },
-    accepted: {
-      severity: "success",
-      label: "Acceptée",
-    },
-    rejected: {
-      severity: undefined,
-      label: "Refusée",
-    },
-  };
 
   const statusBadge =
     statusBadgeData[
@@ -234,7 +251,17 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
 
   return (
     <>
-      <Feedback topics={["dashboard-discussion-rejection"]} />
+      <Feedback
+        topics={["dashboard-discussion-rejection"]}
+        render={({ title, level }) => (
+          <Alert
+            title={title}
+            description={getRejectionFeedbackMessage(discussion)}
+            severity={level}
+            small
+          />
+        )}
+      />
       <header>
         <Button
           type="button"
