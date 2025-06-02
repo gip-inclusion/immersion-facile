@@ -7,6 +7,10 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: false,
     },
   });
+
+  pgm.addTypeValue("discussion_rejection_kind", "CANDIDATE_ALREADY_WARNED", {
+    ifNotExists: true,
+  });
 }
 
 export async function down(pgm: MigrationBuilder): Promise<void> {
