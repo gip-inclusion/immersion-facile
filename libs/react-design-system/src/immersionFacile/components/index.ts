@@ -44,3 +44,4 @@ export * from "./exchange-message";
 export * from "./tag";
 export * from "./search-result-illustration";
 export * from "./rs-autocomplete";
+export * from "./separated-section";
