@@ -1,4 +1,3 @@
-import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import { errors, expectPromiseToFailWithError, expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -7,7 +6,8 @@ import {
   AppConfig,
   type FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGateway";
@@ -23,7 +23,7 @@ describe("HttpFranceTravailGateway", () => {
   describe("getAccessToken", () => {
     it("fails when client is not allowed", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosSharedClient(config),
+        createFtAxiosHttpClientForTest(config),
         createCachingGateway(),
         config.ftApiUrl,
         {
@@ -40,7 +40,7 @@ describe("HttpFranceTravailGateway", () => {
 
     it("fails when scope is not valid", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosSharedClient(config),
+        createFtAxiosHttpClientForTest(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -54,7 +54,7 @@ describe("HttpFranceTravailGateway", () => {
 
     it("gets the token when all is good", async () => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosSharedClient(config),
+        createFtAxiosHttpClientForTest(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -110,7 +110,7 @@ describe("HttpFranceTravailGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosSharedClient(config),
+        createFtAxiosHttpClientForTest(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -163,7 +163,7 @@ describe("HttpFranceTravailGateway", () => {
     "Should have status $expected.status when $testMessage",
     async ({ fields, expected }) => {
       const httpFranceTravailGateway = new HttpFranceTravailGateway(
-        createFtAxiosSharedClient(config),
+        createFtAxiosHttpClientForTest(config),
         cachingGateway,
         config.ftApiUrl,
         config.franceTravailAccessTokenConfig,
@@ -183,13 +183,16 @@ describe("HttpFranceTravailGateway", () => {
   );
 
   it("error feedback axios timeout", async () => {
-    const ftApiUrl = "https://fake-ft.fr";
-    const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
-    const routes = createFranceTravailRoutes({ ftApiUrl, ftEnterpriseUrl });
-    const axiosInstance = axios.create({ validateStatus: () => true });
-    const httpClient = createAxiosSharedClient(routes, axiosInstance, {
-      skipResponseValidation: true,
-    });
+    const axiosInstance = makeAxiosInstances(
+      config.externalAxiosTimeout,
+    ).axiosWithValidateStatus;
+    const httpClient = createAxiosSharedClient(
+      ftRoutesWithFakeUrls,
+      axiosInstance,
+      {
+        skipResponseValidation: true,
+      },
+    );
 
     const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
       new RealTimeGateway(),
@@ -198,9 +201,9 @@ describe("HttpFranceTravailGateway", () => {
 
     const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      ftApiUrl,
+      ftApiUrl: fakeFtApiUrl,
       ftAuthCandidatUrl: "https://",
-      ftEnterpriseUrl,
+      ftEnterpriseUrl: fakeFtEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
@@ -208,7 +211,7 @@ describe("HttpFranceTravailGateway", () => {
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
-      ftApiUrl,
+      fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
     );
@@ -217,10 +220,10 @@ describe("HttpFranceTravailGateway", () => {
 
     mock
       .onPost(
-        `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+        `${fakeFtEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastLegacyConvention.url)
+      .onPost(ftRoutesWithFakeUrls.broadcastLegacyConvention.url)
       .timeout();
 
     const response =
@@ -236,13 +239,16 @@ describe("HttpFranceTravailGateway", () => {
   });
 
   it("error feedback on bad response code", async () => {
-    const ftApiUrl = "https://fake-ft.fr";
-    const ftEnterpriseUrl = "https://fake-ft-enterprise.fr";
-    const routes = createFranceTravailRoutes({ ftApiUrl, ftEnterpriseUrl });
-
-    const httpClient = createAxiosSharedClient(routes, axios, {
-      skipResponseValidation: true,
-    });
+    const { axiosWithoutValidateStatus } = makeAxiosInstances(
+      config.externalAxiosTimeout,
+    );
+    const httpClient = createAxiosSharedClient(
+      ftRoutesWithFakeUrls,
+      axiosWithoutValidateStatus,
+      {
+        skipResponseValidation: true,
+      },
+    );
 
     const cachingGateway = new InMemoryCachingGateway<AccessTokenResponse>(
       new RealTimeGateway(),
@@ -251,9 +257,9 @@ describe("HttpFranceTravailGateway", () => {
 
     const accessTokenConfig: FTAccessTokenConfig = {
       immersionFacileBaseUrl: "https://",
-      ftApiUrl: ftApiUrl,
+      ftApiUrl: fakeFtApiUrl,
       ftAuthCandidatUrl: "https://",
-      ftEnterpriseUrl: ftEnterpriseUrl,
+      ftEnterpriseUrl: fakeFtEnterpriseUrl,
       clientId: "",
       clientSecret: "",
     };
@@ -261,19 +267,19 @@ describe("HttpFranceTravailGateway", () => {
     const franceTravailGateway = new HttpFranceTravailGateway(
       httpClient,
       cachingGateway,
-      ftApiUrl,
+      fakeFtApiUrl,
       accessTokenConfig,
       noRetries,
     );
 
-    const mock = new MockAdapter(axios);
+    const mock = new MockAdapter(axiosWithoutValidateStatus);
 
     mock
       .onPost(
-        `${ftEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
+        `${fakeFtEnterpriseUrl}/connexion/oauth2/access_token?realm=%2Fpartenaire`,
       )
       .reply(200, { access_token: "yolo" })
-      .onPost(routes.broadcastLegacyConvention.url)
+      .onPost(ftRoutesWithFakeUrls.broadcastLegacyConvention.url)
       .reply(204, { message: "yolo" });
 
     const response =
@@ -353,3 +359,10 @@ type TestCase = {
   expected: FranceTravailBroadcastResponse;
   testMessage?: string;
 };
+
+const fakeFtApiUrl = "https://fake-ft.fr";
+const fakeFtEnterpriseUrl = "https://fake-ft-enterprise.fr";
+const ftRoutesWithFakeUrls = createFranceTravailRoutes({
+  ftApiUrl: fakeFtApiUrl,
+  ftEnterpriseUrl: fakeFtEnterpriseUrl,
+});

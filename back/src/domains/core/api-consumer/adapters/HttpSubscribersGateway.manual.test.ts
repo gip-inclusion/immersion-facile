@@ -1,4 +1,3 @@
-import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {
   type AbsoluteUrl,
@@ -7,6 +6,9 @@ import {
   type SubscriptionParams,
   expectToEqual,
 } from "shared";
+import { AppConfig } from "../../../../config/bootstrap/appConfig";
+
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import type { ConventionUpdatedSubscriptionCallbackBody } from "../ports/SubscribersGateway";
 import { HttpSubscribersGateway } from "./HttpSubscribersGateway";
 
@@ -40,8 +42,14 @@ describe("HttpSubscribersGateway", () => {
   });
 
   beforeEach(() => {
-    httpSubscribersGateway = new HttpSubscribersGateway(axios);
-    mock = new MockAdapter(axios);
+    const config = AppConfig.createFromEnv();
+    const { axiosWithoutValidateStatus } = makeAxiosInstances(
+      config.externalAxiosTimeout,
+    );
+    httpSubscribersGateway = new HttpSubscribersGateway(
+      axiosWithoutValidateStatus,
+    );
+    mock = new MockAdapter(axiosWithoutValidateStatus);
   });
 
   it("send notification", async () => {
@@ -87,9 +95,7 @@ describe("HttpSubscribersGateway", () => {
   });
 
   it("consumer api returns an string error", async () => {
-    httpSubscribersGateway = new HttpSubscribersGateway(axios);
     const callbackUrl = "https://fake-callback-url.fr";
-    const mock = new MockAdapter(axios);
 
     mock.onPost(callbackUrl).reply(500, "Custom server error");
 

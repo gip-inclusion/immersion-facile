@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance } from "axios";
+import type { AxiosInstance } from "axios";
 import { Pool } from "pg";
 import {
   errors,
@@ -75,6 +75,7 @@ import { InMemoryPassEmploiGateway } from "../../domains/establishment/adapters/
 import { brevoContactRoutes } from "../../domains/marketing/adapters/establishmentMarketingGateway/BrevoContact.routes";
 import { BrevoEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/BrevoEstablishmentMarketingGateway";
 import { InMemoryEstablishmentMarketingGateway } from "../../domains/marketing/adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
+import { makeAxiosInstances } from "../../utils/axiosUtils";
 import { createLogger } from "../../utils/logger";
 import {
   type AccessTokenResponse,
@@ -162,11 +163,11 @@ export const createGateways = async (
     routes,
     partnerName,
     logInputCbOnSuccess,
-    axiosInstance = axios.create({ timeout: config.externalAxiosTimeout }),
+    axiosInstance,
   }: {
     routes: R;
     partnerName: string;
-    axiosInstance?: AxiosInstance;
+    axiosInstance: AxiosInstance;
     logInputCbOnSuccess?: LogInputCbOnSuccess;
   }) =>
     createAxiosSharedClient(routes, axiosInstance, {
@@ -182,6 +183,9 @@ export const createGateways = async (
       ? new CustomTimeGateway()
       : new RealTimeGateway();
 
+  const { axiosWithValidateStatus, axiosWithoutValidateStatus } =
+    makeAxiosInstances(config.externalAxiosTimeout);
+
   const franceTravailGateway =
     config.franceTravailGateway === "HTTPS"
       ? new HttpFranceTravailGateway(
@@ -191,10 +195,7 @@ export const createGateways = async (
               ftApiUrl: config.ftApiUrl,
               ftEnterpriseUrl: config.ftEnterpriseUrl,
             }),
-            axiosInstance: axios.create({
-              timeout: config.externalAxiosTimeout,
-              validateStatus: () => true,
-            }),
+            axiosInstance: axiosWithValidateStatus,
           }),
           new InMemoryCachingGateway<AccessTokenResponse>(
             timeGateway,
@@ -218,6 +219,7 @@ export const createGateways = async (
               ftApiUrl: config.ftApiUrl,
               ftAuthCandidatUrl: config.ftAuthCandidatUrl,
             }),
+            axiosInstance: axiosWithoutValidateStatus,
           }),
           {
             immersionFacileBaseUrl: config.immersionFacileBaseUrl,
@@ -235,6 +237,7 @@ export const createGateways = async (
             routes: makeProConnectRoutes(
               config.proConnectConfig.providerBaseUri,
             ),
+            axiosInstance: axiosWithoutValidateStatus,
           }),
           config.proConnectConfig,
         )
@@ -344,10 +347,7 @@ export const createGateways = async (
           partnerName: partnerNames.inseeSiret,
           routes: makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
           logInputCbOnSuccess: logQwhenExists,
-          axiosInstance: axios.create({
-            timeout: config.externalAxiosTimeout,
-            validateStatus: () => true,
-          }),
+          axiosInstance: axiosWithValidateStatus,
         }),
         timeGateway,
         noRetries,
@@ -385,10 +385,7 @@ export const createGateways = async (
           createLegacyAxiosHttpClientForExternalAPIs({
             partnerName: partnerNames.pdfGenerator,
             routes: makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
-            axiosInstance: axios.create({
-              timeout: config.externalAxiosTimeout,
-              validateStatus: () => true,
-            }),
+            axiosInstance: axiosWithValidateStatus,
           }),
           config.pdfGenerator.apiKey,
           uuidGenerator,
@@ -445,11 +442,7 @@ export const createGateways = async (
         : new InMemoryLaBonneBoiteGateway(),
     subscribersGateway:
       config.subscribersGateway === "HTTPS"
-        ? new HttpSubscribersGateway(
-            axios.create({
-              timeout: config.externalAxiosTimeout,
-            }),
-          )
+        ? new HttpSubscribersGateway(axiosWithoutValidateStatus)
         : new InMemorySubscribersGateway(),
     passEmploiGateway:
       config.passEmploiGateway === "HTTPS"
@@ -467,10 +460,7 @@ export const createGateways = async (
             httpClient: createLegacyAxiosHttpClientForExternalAPIs({
               partnerName: partnerNames.brevoEstablishmentMarketing,
               routes: brevoContactRoutes,
-              axiosInstance: axios.create({
-                timeout: config.externalAxiosTimeout,
-                validateStatus: () => true,
-              }),
+              axiosInstance: axiosWithValidateStatus,
             }),
           })
         : new InMemoryEstablishmentMarketingGateway(),

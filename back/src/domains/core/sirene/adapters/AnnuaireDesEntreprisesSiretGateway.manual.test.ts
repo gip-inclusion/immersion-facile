@@ -1,4 +1,3 @@
-import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { createFetchSharedClient } from "shared-routes/fetch";
@@ -6,6 +5,7 @@ import {
   type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
@@ -25,7 +25,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
   const config = AppConfig.createFromEnv();
   const inseeHttpClient = createAxiosSharedClient(
     makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
-    axios.create({ validateStatus: () => true }),
+    makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     {
       skipResponseValidation: true,
       onResponseSideEffect: ({ input, route, response }) =>

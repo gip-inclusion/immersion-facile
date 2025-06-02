@@ -1,6 +1,6 @@
-import axios from "axios";
 import type { Environment } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
+import { makeAxiosInstances } from "./axiosUtils";
 import { createLogger } from "./logger";
 
 const logger = createLogger(__filename);
@@ -23,8 +23,8 @@ const notifyDiscord = async (rawContent: string) => {
 
   const content = rawContent.slice(0, discordSizeLimit);
 
-  return axios
-    .post(
+  return makeAxiosInstances(config.externalAxiosTimeout)
+    .axiosWithoutValidateStatus.post(
       discordWebhookUrl,
       {
         username: `${config.envType} - ${config.immersionFacileBaseUrl}`,
@@ -50,8 +50,8 @@ const notifySlack = async (rawContent: string, isError: boolean) => {
 
   if (!slackBotToken) return Promise.resolve();
 
-  return axios
-    .post(
+  return makeAxiosInstances(config.externalAxiosTimeout)
+    .axiosWithoutValidateStatus.post(
       "https://slack.com/api/chat.postMessage",
       {
         channel: getSlackChannelName(config.envType, isError),

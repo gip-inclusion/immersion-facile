@@ -1,5 +1,6 @@
-import axios, { type AxiosError, type AxiosInstance } from "axios";
+import type { AxiosError, AxiosInstance } from "axios";
 import { type SubscriptionParams, castError } from "shared";
+import { isAxiosError } from "../../../../utils/axiosUtils";
 import type {
   ConventionUpdatedSubscriptionCallbackBody,
   SubscriberErrorFeedback,
@@ -47,7 +48,7 @@ export class HttpSubscribersGateway implements SubscribersGateway {
           callbackUrl,
           conventionId: payload.convention.id,
           conventionStatus: payload.convention.status,
-          ...(axios.isAxiosError(error)
+          ...(isAxiosError(error)
             ? { ...makeFeedbackFromError(error), body: error.response?.data }
             : {
                 status: 500,
