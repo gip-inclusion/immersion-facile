@@ -102,7 +102,10 @@ const makeEstablishmentDashboardTabs = (
   ).length > 0
     ? [
         {
-          label: "Fiche établissement",
+          label:
+            establishments.length > 1
+              ? "Mes établissements"
+              : "Mon établissement",
           tabId: "fiche-entreprise",
           content: (
             <ManageEstablishmentsTab

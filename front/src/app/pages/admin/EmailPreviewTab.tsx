@@ -53,7 +53,7 @@ export const EmailPreviewTab = () => {
 
   return (
     <div className={cx("admin-tab__email-preview")}>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>Aperçu de template email</h5>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>Aperçu de template email</h2>
       <div>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>

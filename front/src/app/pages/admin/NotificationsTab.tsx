@@ -51,11 +51,11 @@ export const NotificationsTab = () => {
           )
         }
       />
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
         {`Derniers ${
           notificationKindToShow === "email" ? "Emails" : "Sms"
         } envoyés`}
-      </h5>
+      </h2>
       {errorMessage ? (
         <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (
