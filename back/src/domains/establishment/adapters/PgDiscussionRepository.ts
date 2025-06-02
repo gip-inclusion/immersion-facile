@@ -264,17 +264,13 @@ const makeDiscussionDtoFromPgDiscussion = (
   results.map(({ discussion }): DiscussionDto => {
     const common: CommonDiscussionDto = {
       address: discussion.address,
-      appellationCode: discussion.appellationCode,
       businessName: discussion.businessName,
       createdAt: new Date(discussion.createdAt).toISOString(),
-      establishmentContact: discussion.establishmentContact,
       exchanges: (discussion.exchanges ?? []).map(({ sentAt, ...rest }) => ({
         ...rest,
         sentAt: new Date(sentAt).toISOString(),
       })),
       siret: discussion.siret,
-      acquisitionCampaign: discussion.acquisition_campaign,
-      acquisitionKeyword: discussion.acquisition_keyword,
       conventionId: discussion.conventionId,
       id: discussion.id,
       ...getWithDiscussionStatusFromPgDiscussion(discussion),
@@ -298,6 +294,10 @@ const makeDiscussionDtoFromPgDiscussion = (
       if (discussion.kind === "IF") {
         return {
           ...common,
+          appellationCode: discussion.appellationCode,
+          establishmentContact: discussion.establishmentContact,
+          acquisitionCampaign: discussion.acquisition_campaign,
+          acquisitionKeyword: discussion.acquisition_keyword,
           contactMode: discussion.contactMode,
           kind: discussion.kind,
           potentialBeneficiary: {
@@ -330,6 +330,10 @@ const makeDiscussionDtoFromPgDiscussion = (
         });
       return {
         ...common,
+        appellationCode: discussion.appellationCode,
+        establishmentContact: discussion.establishmentContact,
+        acquisitionCampaign: discussion.acquisition_campaign,
+        acquisitionKeyword: discussion.acquisition_keyword,
         contactMode: discussion.contactMode,
         kind: discussion.kind,
         potentialBeneficiary: {
@@ -349,6 +353,10 @@ const makeDiscussionDtoFromPgDiscussion = (
 
       return {
         ...common,
+        appellationCode: discussion.appellationCode,
+        establishmentContact: discussion.establishmentContact,
+        acquisitionCampaign: discussion.acquisition_campaign,
+        acquisitionKeyword: discussion.acquisition_keyword,
         contactMode: discussion.contactMode,
         kind: discussion.kind,
         potentialBeneficiary: {
@@ -360,6 +368,10 @@ const makeDiscussionDtoFromPgDiscussion = (
 
     return {
       ...common,
+      appellationCode: discussion.appellationCode,
+      establishmentContact: discussion.establishmentContact,
+      acquisitionCampaign: discussion.acquisition_campaign,
+      acquisitionKeyword: discussion.acquisition_keyword,
       contactMode: discussion.contactMode,
       kind: discussion.kind,
       potentialBeneficiary: commonPotentialBeneficiary,
