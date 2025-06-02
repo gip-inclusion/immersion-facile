@@ -66,7 +66,7 @@ export const EstablishmentUsersList = () => {
     <div className="fr-mt-4w">
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <div>
-          <h2>Utilisateurs</h2>
+          <h3 className={fr.cx("fr-h6")}>Utilisateurs</h3>
           <UsersWithoutNameHint />
         </div>
         <div className={fr.cx("fr-ml-auto")}>
