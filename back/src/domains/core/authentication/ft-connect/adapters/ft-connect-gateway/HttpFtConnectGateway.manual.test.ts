@@ -1,4 +1,3 @@
-import axios from "axios";
 import MockAdapter from "axios-mock-adapter";
 import {
   FTConnectError,
@@ -10,6 +9,8 @@ import {
   testRawFTConnectError,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
+import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
+import { makeAxiosInstances } from "../../../../../../utils/axiosUtils";
 import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
 import type {
   ExternalAccessToken,
@@ -30,17 +31,24 @@ describe("HttpFtConnectGateway", () => {
     ftAuthCandidatUrl: "https://fake-ft.fr/auth/candidat",
   });
 
-  const httpClient = createAxiosSharedClient(routes, axios, {
-    skipResponseValidation: true,
-  });
+  const config = AppConfig.createFromEnv();
+  const { axiosWithoutValidateStatus } = makeAxiosInstances(
+    config.externalAxiosTimeout,
+  );
 
-  const ftConnectGateway = new HttpFtConnectGateway(httpClient, {
-    immersionFacileBaseUrl: "https://fake-immersion.fr",
-    franceTravailClientId: "pe-client-id",
-    franceTravailClientSecret: "pe-client-secret",
-  });
+  const ftConnectGateway = new HttpFtConnectGateway(
+    createAxiosSharedClient(routes, axiosWithoutValidateStatus, {
+      skipResponseValidation: true,
+    }),
+    {
+      immersionFacileBaseUrl: "https://fake-immersion.fr",
+      franceTravailClientId: "pe-client-id",
+      franceTravailClientSecret: "pe-client-secret",
+    },
+  );
 
-  const mock = new MockAdapter(axios);
+  const mock = new MockAdapter(axiosWithoutValidateStatus);
+
   const peExternalUser: ExternalFtConnectUser = {
     email: "maurice.chevalier@gmail.com",
     family_name: "chevalier",

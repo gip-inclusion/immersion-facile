@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   type AddressAndPosition,
   type AddressDto,
@@ -9,7 +8,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { createAxiosSharedClient } from "shared-routes/axios";
+import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
 import type { AddressGateway } from "../ports/AddressGateway";
@@ -52,8 +51,12 @@ describe("HttpOpenCageDataAddressGateway", () => {
   let httpAddressGateway: AddressGateway;
 
   beforeEach(() => {
+    const config = AppConfig.createFromEnv();
     httpAddressGateway = new HttpAddressGateway(
-      createAxiosSharedClient(addressesExternalRoutes, axios),
+      createFetchSharedClient(addressesExternalRoutes, fetch, {
+        timeout: config.externalAxiosTimeout,
+        skipResponseValidation: true,
+      }),
       geocodingApiKey,
       geosearchApiKey,
       withNoCache,

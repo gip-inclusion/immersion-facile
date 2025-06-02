@@ -2,7 +2,7 @@ import {
   type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
@@ -10,12 +10,11 @@ import { RealTimeGateway } from "../../../core/time-gateway/adapters/RealTimeGat
 import { HttpFtAgenciesReferential } from "./HttpFtAgenciesReferential";
 
 const config = AppConfig.createFromEnv();
-const axiosHttpClient = createFtAxiosSharedClient(config);
 
 const referencielAgencesPE = new HttpFtAgenciesReferential(
   config.ftApiUrl,
   new HttpFranceTravailGateway(
-    axiosHttpClient,
+    createFtAxiosHttpClientForTest(config),
     new InMemoryCachingGateway<AccessTokenResponse>(
       new RealTimeGateway(),
       "expires_in",

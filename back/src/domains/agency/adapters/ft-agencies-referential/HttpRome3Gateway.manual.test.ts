@@ -1,11 +1,11 @@
-import axios from "axios";
 import { expectToEqual } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
-import { createFtAxiosSharedClient } from "../../../../config/helpers/createAxiosSharedClients";
+import { createFtAxiosHttpClientForTest } from "../../../../config/helpers/createFtAxiosHttpClientForTest";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { HttpFranceTravailGateway } from "../../../convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../../core/retry-strategy/ports/RetryStrategy";
@@ -21,7 +21,7 @@ describe("HttpRome3Gateway", () => {
   );
 
   const franceTravailGateway = new HttpFranceTravailGateway(
-    createFtAxiosSharedClient(config),
+    createFtAxiosHttpClientForTest(config),
     cachingGateway,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
@@ -29,7 +29,11 @@ describe("HttpRome3Gateway", () => {
   );
 
   const httpRome3Gateway = new HttpRome3Gateway(
-    createAxiosSharedClient(makeRome3Routes(config.ftApiUrl), axios),
+    createAxiosSharedClient(
+      makeRome3Routes(config.ftApiUrl),
+      makeAxiosInstances(config.externalAxiosTimeout)
+        .axiosWithoutValidateStatus,
+    ),
     franceTravailGateway,
     config.franceTravailClientId,
   );
