@@ -11,6 +11,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "UNABLE_TO_HELP",
     "NO_TIME",
     "OTHER",
+    "CANDIDATE_ALREADY_WARNED", // added later, to not break local migrations
   ] satisfies RejectionKind[]);
   pgm.addColumns("discussions", {
     status: { type: "discussion_status", default: "PENDING" },
