@@ -1,0 +1,54 @@
+@import "../../../config/responsive";
+
+
+.im-separated-section {
+  &__separator {
+    position: relative;
+    padding: 1rem 0;
+
+    @include for-screen-min($bp-lg) {
+      padding: 0;
+    }
+
+    &:before {
+      content: "";
+      display: block;
+      position: absolute;
+      background: var(--grey-900-175);
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+
+      @include for-screen-min($bp-lg) {
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: 1px;
+        height: auto;
+      }
+    }
+
+    &:after {
+      content: "Ou";
+      display: block;
+      position: absolute;
+
+      background: var(--grey-1000-100);
+      border-radius: 1rem;
+      color: var(--grey-425-625);
+      padding: .5rem;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      @include for-screen-min($bp-lg) {
+        top: 20%;
+        transform: translateX(-50%);
+
+      }
+    }
+  }
+}
