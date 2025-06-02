@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Pool } from "pg";
 import { random, sleep } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
@@ -20,6 +19,7 @@ import { makeInseeExternalRoutes } from "../domains/core/sirene/adapters/InseeSi
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UpdateEstablishmentsFromSirenApiScript } from "../domains/establishment/use-cases/UpdateEstablishmentsFromSirenApiScript";
+import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -44,10 +44,7 @@ const main = async () => {
 
   const httpClient = createAxiosSharedClient(
     makeInseeExternalRoutes(config.inseeHttpConfig.endpoint),
-    axios.create({
-      timeout: config.externalAxiosTimeout,
-      validateStatus: () => true,
-    }),
+    makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
     {
       skipResponseValidation: true,
       onResponseSideEffect: logPartnerResponses({

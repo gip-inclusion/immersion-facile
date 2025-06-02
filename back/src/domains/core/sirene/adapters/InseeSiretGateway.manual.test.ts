@@ -1,4 +1,3 @@
-import axios from "axios";
 import { subMonths } from "date-fns";
 import {
   expectObjectsToMatch,
@@ -10,6 +9,7 @@ import {
   type AccessTokenResponse,
   AppConfig,
 } from "../../../../config/bootstrap/appConfig";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { InMemoryCachingGateway } from "../../caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../../retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../../time-gateway/adapters/RealTimeGateway";
@@ -38,7 +38,7 @@ describe("InseeSiretGateway", () => {
       config.inseeHttpConfig,
       createAxiosSharedClient(
         inseeExternalRoutes,
-        axios.create({ validateStatus: () => true }),
+        makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
         {
           onResponseSideEffect: ({ response, input }) =>
             console.info(

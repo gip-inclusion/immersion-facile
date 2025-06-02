@@ -1,8 +1,8 @@
 import { existsSync } from "node:fs";
-import axios from "axios";
 import { arrayFromNumber } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
+import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   ScalingoPdfGeneratorGateway,
@@ -16,13 +16,13 @@ describe("ScalingoPdfGeneratorGateway", () => {
     await Promise.all(
       arrayFromNumber(10).map(async (_, index) => {
         const uuidGenerator = new TestUuidGenerator([index.toString()]);
-        const httpClient = createAxiosSharedClient(
-          makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
-          axios,
-        );
         const fileName = `result_${index.toString()}.pdf`;
         const pdfGeneratorGateway = new ScalingoPdfGeneratorGateway(
-          httpClient,
+          createAxiosSharedClient(
+            makeScalingoPdfGeneratorRoutes(config.pdfGenerator.baseUrl),
+            makeAxiosInstances(config.externalAxiosTimeout)
+              .axiosWithValidateStatus,
+          ),
           config.pdfGenerator.apiKey,
           uuidGenerator,
         );
