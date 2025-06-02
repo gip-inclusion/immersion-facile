@@ -58,14 +58,14 @@ describe("Feedbacks", () => {
 
       store.dispatch(
         discussionSlice.actions.updateDiscussionStatusSucceeded({
-          feedbackTopic: "dashboard-discussion-rejection",
+          feedbackTopic: "dashboard-discussion-status-updated",
         }),
       );
       expect(keys(feedbacksSelectors.feedbacks(store.getState()))).toHaveLength(
         1,
       );
       expectFeedbackStoreByTopicToEqual({
-        topic: "dashboard-discussion-rejection",
+        topic: "dashboard-discussion-status-updated",
         kindAndLevel: "update.success",
       });
     });

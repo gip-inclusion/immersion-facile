@@ -48,7 +48,7 @@ const topics = [
   "convention-form",
   "convention-status-dashboard",
   "dashboard-agency-register-user",
-  "dashboard-discussion-rejection",
+  "dashboard-discussion-status-updated",
   "dashboard-discussion",
   "establishment-dashboard-users-rights",
   "establishment-dashboard-discussion-send-message",
@@ -132,16 +132,17 @@ export const feedbacks: Record<
       message: "Une erreur est survenue lors de l'envoi du SMS.",
     },
   },
-  "dashboard-discussion-rejection": {
+  "dashboard-discussion-status-updated": {
     "update.success": {
       action: discussionSlice.actions.updateDiscussionStatusSucceeded,
-      title: "La candidature a bien été rejetée",
-      message: "La candidature a bien été rejetée.",
+      title: "La candidature a bien été mise à jour",
+      message: "La candidature a bien été mise à jour",
     },
     "update.error": {
       action: discussionSlice.actions.updateDiscussionStatusFailed,
-      title: "Problème lors du rejet de la candidature",
-      message: "Une erreur est survenue lors du rejet de la candidature",
+      title: "Problème lors de la mise à jour de la candidature",
+      message:
+        "Une erreur est survenue lors de la mise à jour de la candidature",
     },
   },
   "dashboard-discussion": {
