@@ -168,7 +168,7 @@ export const AgencyUsers = ({
 
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h5>
+      <h2 className={fr.cx("fr-h5", "fr-mb-1v", "fr-mt-4w")}>Utilisateurs</h2>
       <UsersWithoutNameHint />
       <Feedback
         topics={
@@ -250,9 +250,9 @@ export const AgencyUsers = ({
         >
           {selectedUserData && mode && (
             <>
-              <h5 className={fr.cx("fr-text--bold", "fr-text--sm")}>
+              <h3 className={fr.cx("fr-h5", "fr-text--bold", "fr-text--sm")}>
                 Informations personnelles
-              </h5>
+              </h3>
               <p className={fr.cx("fr-text--sm")}>
                 {selectedUserData.isIcUser
                   ? `Pour modifier ses informations personnelles, l'utilisateur doit passer par son compte ProConnect créé avec l'email ${selectedUserData.email}`

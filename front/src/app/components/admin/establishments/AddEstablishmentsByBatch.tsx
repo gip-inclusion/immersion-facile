@@ -176,9 +176,9 @@ export const AddEstablishmentsByBatch = () => {
   return (
     <section className={fr.cx("fr-mt-4w")}>
       {isLoading && <Loader />}
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
         Import en masse d'entreprises
-      </h5>
+      </h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Renseignez un nom de groupe d'entreprises *"

@@ -21,7 +21,7 @@ export const UsersTab = () => {
     <>
       <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
         <div className={fr.cx("fr-col-lg-6")}>
-          <h5 className={fr.cx("fr-h5", "fr-mb-0", "fr-mt-0")}>Utilisateurs</h5>
+          <h2 className={fr.cx("fr-h5", "fr-mb-0", "fr-mt-0")}>Utilisateurs</h2>
           <UsersWithoutNameHint />
         </div>
         <div className={fr.cx("fr-col-lg-6")}>

@@ -20,9 +20,14 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
   const { isValid } = formState;
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
+      {/* 
+      
+      TODO: create a DashboardTabContent component with header (title and button) and content
+
+      */}
+      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
         Piloter une mise en relation
-      </h5>
+      </h2>
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ discussionId }) => {
