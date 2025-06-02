@@ -254,7 +254,6 @@ describe("ContactEstablishment", () => {
     describe("creates a Discussion Aggregate and adds in to repo", () => {
       const makeExpectedCommon = (now: Date): CommonDiscussionDto => ({
         id: discussionId,
-        appellationCode: immersionOffer.appellationCode,
         siret: validEmailRequest.siret,
         businessName:
           establishmentAggregateWithEmail.establishment.customizedName ||
@@ -262,6 +261,12 @@ describe("ContactEstablishment", () => {
         address:
           establishmentAggregateWithEmail.establishment.locations[0].address,
         createdAt: now.toISOString(),
+        status: "PENDING",
+        exchanges: [],
+      });
+
+      const withExpectedAppellationCodeAndEstablishmentContact = {
+        appellationCode: immersionOffer.appellationCode,
         establishmentContact: {
           email: adminUser.email,
           firstName: adminUser.firstName,
@@ -270,9 +275,7 @@ describe("ContactEstablishment", () => {
           job: establishmentAdminRight.job,
           copyEmails: [contactUser.email],
         },
-        status: "PENDING",
-        exchanges: [],
-      });
+      };
 
       describe("with discussion kind IF", () => {
         it("and contact mode EMAIL", async () => {
@@ -285,6 +288,15 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              appellationCode: immersionOffer.appellationCode,
+              establishmentContact: {
+                email: adminUser.email,
+                firstName: adminUser.firstName,
+                lastName: adminUser.lastName,
+                phone: establishmentAdminRight.phone,
+                job: establishmentAdminRight.job,
+                copyEmails: [contactUser.email],
+              },
               contactMode: "EMAIL",
               kind: "IF",
               potentialBeneficiary: {
@@ -341,6 +353,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              ...withExpectedAppellationCodeAndEstablishmentContact,
               contactMode: "PHONE",
               kind: "IF",
               potentialBeneficiary: {
@@ -367,6 +380,15 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              appellationCode: immersionOffer.appellationCode,
+              establishmentContact: {
+                email: adminUser.email,
+                firstName: adminUser.firstName,
+                lastName: adminUser.lastName,
+                phone: establishmentAdminRight.phone,
+                job: establishmentAdminRight.job,
+                copyEmails: [contactUser.email],
+              },
               contactMode: "IN_PERSON",
               kind: "IF",
               potentialBeneficiary: {
@@ -398,6 +420,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              ...withExpectedAppellationCodeAndEstablishmentContact,
               contactMode: "EMAIL",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -457,6 +480,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              ...withExpectedAppellationCodeAndEstablishmentContact,
               contactMode: "PHONE",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -489,6 +513,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
+              ...withExpectedAppellationCodeAndEstablishmentContact,
               contactMode: "IN_PERSON",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {

@@ -120,16 +120,18 @@ export type DiscussionEstablishmentContact = {
 
 export type CommonDiscussionDto = {
   address: AddressDto;
-  appellationCode: AppellationCode;
   businessName: string;
   conventionId?: ConventionId;
   createdAt: DateString;
-  establishmentContact: DiscussionEstablishmentContact;
   exchanges: Exchange[];
   id: DiscussionId;
   siret: SiretDto;
-} & WithDiscussionStatus &
-  WithAcquisition;
+} & WithDiscussionStatus;
+
+export type ExtraDiscussionDtoProperties = WithAcquisition & {
+  appellationCode: AppellationCode;
+  establishmentContact: DiscussionEstablishmentContact;
+};
 
 type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
   contactMode: C;
@@ -140,7 +142,9 @@ type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
 type GenericDiscussionDto<
   D extends DiscussionKind,
   C extends ContactMode,
-> = CommonDiscussionDto & SpecificDiscussionDto<C, D>;
+> = CommonDiscussionDto &
+  ExtraDiscussionDtoProperties &
+  SpecificDiscussionDto<C, D>;
 
 export type DiscussionStatus = DiscussionDto["status"];
 export type RejectionKind = WithDiscussionStatusRejected["rejectionKind"];
@@ -163,6 +167,11 @@ export type WithDiscussionStatusRejected = {
 export type WithDiscussionStatusPending = {
   status: "PENDING";
 };
+
+declare const d: DiscussionReadDto;
+if (d.status === "REJECTED") {
+  d.rejectionKind;
+}
 
 export type WithDiscussionRejection =
   | RejectionWithoutReason
@@ -217,19 +226,14 @@ export type DiscussionDtoInPerson =
 export type GenericDiscussionReadDto<
   D extends DiscussionKind,
   C extends ContactMode,
-> = OmitFromExistingKeys<
-  GenericDiscussionDto<D, C>,
-  | "establishmentContact"
-  | "appellationCode"
-  | "acquisitionCampaign"
-  | "acquisitionKeyword"
-> & {
-  appellation: AppellationAndRomeDto;
-  establishmentContact: OmitFromExistingKeys<
-    DiscussionEstablishmentContact,
-    "email" | "copyEmails" | "phone"
-  >;
-};
+> = CommonDiscussionDto &
+  SpecificDiscussionDto<C, D> & {
+    appellation: AppellationAndRomeDto;
+    establishmentContact: OmitFromExistingKeys<
+      DiscussionEstablishmentContact,
+      "email" | "copyEmails" | "phone"
+    >;
+  };
 
 export type DiscussionReadDto =
   | GenericDiscussionReadDto<"IF", "EMAIL">

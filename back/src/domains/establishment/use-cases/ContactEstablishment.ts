@@ -10,6 +10,7 @@ import {
   type DiscussionDtoEmail,
   type DiscussionDtoInPerson,
   type DiscussionDtoPhone,
+  type ExtraDiscussionDtoProperties,
   contactEstablishmentRequestSchema,
   emailTemplatesByName,
   errors,
@@ -176,6 +177,12 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         establishment.establishment.customizedName ??
         establishment.establishment.name,
       createdAt: now.toISOString(),
+      address: matchingAddress.address,
+      exchanges: [],
+      status: "PENDING",
+    };
+
+    const extraDiscussionDtoProperties: ExtraDiscussionDtoProperties = {
       establishmentContact: {
         email: firstAdminUser.email,
         firstName: firstAdminUser.firstName,
@@ -185,18 +192,16 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         copyEmails: otherUsers.map((user) => user.email),
       },
       appellationCode: contactRequest.appellationCode,
-      address: matchingAddress.address,
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
-      exchanges: [],
-      status: "PENDING",
     };
 
     if (contactRequest.contactMode === "EMAIL") {
       return makeDiscussionDtoEmail({
         contactRequest,
         domain: this.#domain,
-        common: common,
+        common,
+        extraDiscussionDtoProperties,
         now,
         uow,
       });
@@ -205,11 +210,13 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (contactRequest.contactMode === "PHONE")
       return makeDiscussionDtoPhone({
         common,
+        extraDiscussionDtoProperties,
         contactRequest,
       });
 
     return makeDiscussionDtoInPerson({
       common,
+      extraDiscussionDtoProperties,
       contactRequest,
     });
   }
@@ -292,12 +299,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
 const makeDiscussionDtoEmail = async ({
   common,
+  extraDiscussionDtoProperties,
   contactRequest,
   now,
   domain,
   uow,
 }: {
   common: CommonDiscussionDto;
+  extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
   contactRequest: ContactEstablishmentByMailDto;
   domain: string;
   uow: UnitOfWork;
@@ -305,6 +314,7 @@ const makeDiscussionDtoEmail = async ({
 }): Promise<DiscussionDtoEmail> => {
   const discussion: DiscussionDtoEmail = {
     ...common,
+    ...extraDiscussionDtoProperties,
     contactMode: contactRequest.contactMode,
     ...(contactRequest.kind === "IF"
       ? {
@@ -371,12 +381,15 @@ const makeDiscussionDtoEmail = async ({
 
 const makeDiscussionDtoInPerson = ({
   common,
+  extraDiscussionDtoProperties,
   contactRequest,
 }: {
   common: CommonDiscussionDto;
+  extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
   contactRequest: ContactEstablishmentInPersonDto;
 }): DiscussionDtoInPerson => ({
   ...common,
+  ...extraDiscussionDtoProperties,
   contactMode: contactRequest.contactMode,
   ...(contactRequest.kind === "IF"
     ? {
@@ -400,12 +413,15 @@ const makeDiscussionDtoInPerson = ({
 
 const makeDiscussionDtoPhone = ({
   common,
+  extraDiscussionDtoProperties,
   contactRequest,
 }: {
   common: CommonDiscussionDto;
+  extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
   contactRequest: ContactEstablishmentByPhoneDto;
 }): DiscussionDtoPhone => ({
   ...common,
+  ...extraDiscussionDtoProperties,
   contactMode: contactRequest.contactMode,
   ...(contactRequest.kind === "IF"
     ? {
