@@ -5,7 +5,6 @@ import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Card } from "@codegouvfr/react-dsfr/Card";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
@@ -30,7 +29,10 @@ import {
   getDiscussionDisplayStatus,
   toDisplayedDate,
 } from "shared";
-import { RejectApplicationForm } from "src/app/components/admin/establishments/RejectApplicationForm";
+import {
+  RejectApplicationModal,
+  openRejectApplicationModal,
+} from "src/app/components/admin/establishments/RejectApplicationModal";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
@@ -51,12 +53,6 @@ import { P, match } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
-
-const { open: openRejectApplicationModal, Component: RejectApplicationModal } =
-  createModal({
-    isOpenedByDefault: false,
-    id: domElementIds.establishmentDashboard.discussion.rejectApplicationModal,
-  });
 
 export const DiscussionManageContent = ({
   discussionId,
@@ -181,7 +177,7 @@ const getDiscussionButtons = ({
               .rejectApplicationOpenModal,
             priority: "secondary",
             type: "button",
-            onClick: () => openRejectApplicationModal(),
+            onClick: openRejectApplicationModal,
             children: "Refuser la candidature",
           } satisfies ButtonProps,
         ]
@@ -331,9 +327,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <DiscussionExchangesList discussion={discussion} />
 
       {createPortal(
-        <RejectApplicationModal title="Marquer comme refusée">
-          <RejectApplicationForm discussion={discussion} />
-        </RejectApplicationModal>,
+        <RejectApplicationModal discussion={discussion} />,
         document.body,
       )}
     </>

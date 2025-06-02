@@ -175,8 +175,7 @@ describe("Discussion slice", () => {
           on: "update",
           level: "success",
           title: "La candidature a bien été rejetée",
-          message:
-            "La candidature a bien été rejetée, un email a été envoyé au candidat",
+          message: "La candidature a bien été rejetée.",
         },
       });
     });
