@@ -123,7 +123,7 @@ export class HttpInclusionConnectedGateway
   ): Observable<Exchange> {
     return from(
       this.httpClient
-        .sendExchangeToDiscussion({
+        .replyToDiscussion({
           headers: { authorization: payload.jwt },
           urlParams: { discussionId: payload.discussionId },
           body: {
@@ -135,6 +135,7 @@ export class HttpInclusionConnectedGateway
             .with({ status: 200 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

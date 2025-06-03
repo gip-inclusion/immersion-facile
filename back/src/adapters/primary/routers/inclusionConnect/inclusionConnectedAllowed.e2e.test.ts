@@ -689,7 +689,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
     });
   });
   describe(`${displayRouteName(
-    inclusionConnectedAllowedRoutes.sendExchangeToDiscussion,
+    inclusionConnectedAllowedRoutes.replyToDiscussion,
   )}`, () => {
     it("200 - saves the exchange to a discussion", async () => {
       const user = new InclusionConnectedUserBuilder().buildUser();
@@ -708,7 +708,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       inMemoryUow.discussionRepository.discussions = [discussion];
       inMemoryUow.userRepository.users = [user];
 
-      const response = await httpClient.sendExchangeToDiscussion({
+      const response = await httpClient.replyToDiscussion({
         headers: { authorization: existingToken },
         urlParams: { discussionId: discussion.id },
         body: payload,

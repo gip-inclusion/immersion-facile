@@ -330,60 +330,6 @@ describe("AddExchangeToDiscussion", () => {
     });
 
     describe("wrong paths", () => {
-      // Done in router now, we don't need to test it here anymore
-      // it("throws an error if the email does not have the right format", async () => {
-      //   const inboundParsingResponse = createInboundParsingResponse([
-      //     "gerard@reply-dev.immersion-facile.beta.gouv.fr",
-      //   ]);
-
-      //   const payload: AddExchangeToDiscussionInput = {
-      //     source: "inbound-parsing",
-      //     messageInputs: [
-      //       {
-      //         // biome-ignore lint/style/noNonNullAssertion: testing purpose
-      //         message: inboundParsingResponse.items[0].RawHtmlBody!,
-      //         discussionId: "11111111-e89b-12d3-a456-426614174000",
-      //         recipientRole: "potentialBeneficiary",
-      //         attachments: [],
-      //         subject: "",
-      //         sentAt: new Date().toISOString(),
-      //       },
-      //     ],
-      //   };
-      //   await expectPromiseToFailWithError(
-      //     addExchangeToDiscussion.execute(payload),
-      //     errors.discussion.badEmailFormat({
-      //       email: "gerard@reply-dev.immersion-facile.beta.gouv.fr",
-      //     }),
-      //   );
-      // });
-
-      // Done in router now, we don't need to test it here anymore
-      // it("throws an error if the email does not have the right recipient kind", async () => {
-      //   const inboundParsingResponse = createInboundParsingResponse([
-      //     `firstname_lastname__discussionId_bob@${replyDomain}`,
-      //   ]);
-
-      //   const payload: AddExchangeToDiscussionInput = {
-      //     source: "inbound-parsing",
-      //     messageInputs: [
-      //       {
-      //         // biome-ignore lint/style/noNonNullAssertion: testing purpose
-      //         message: inboundParsingResponse.items[0].RawHtmlBody!,
-      //         discussionId: "my-discussion-id",
-      //         recipientRole: "potentialBeneficiary",
-      //         attachments: [],
-      //         subject: "",
-      //         sentAt: new Date().toISOString(),
-      //       },
-      //     ],
-      //   };
-      //   await expectPromiseToFailWithError(
-      //     addExchangeToDiscussion.execute(payload),
-      //     errors.discussion.badRecipientKindFormat({ kind: "bob" }),
-      //   );
-      // });
-
       it("throws an error if the discussion does not exist", async () => {
         const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
         const email = `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`;
