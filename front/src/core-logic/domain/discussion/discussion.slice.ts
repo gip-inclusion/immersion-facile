@@ -98,13 +98,15 @@ export const discussionSlice = createSlice({
       }>,
     ) => {
       state.isLoading = false;
-      if (!state.discussion) {
-        return;
+      if (state.discussion) {
+        state.discussion = {
+          ...state.discussion,
+          exchanges: [
+            ...state.discussion.exchanges,
+            action.payload.exchangeData,
+          ],
+        };
       }
-      state.discussion = {
-        ...state.discussion,
-        exchanges: [...state.discussion.exchanges, action.payload.exchangeData],
-      };
     },
     sendExchangeFailed: (
       state,
