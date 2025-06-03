@@ -52,7 +52,11 @@ export const AcceptApplicationModal = ({
   const { register, watch, handleSubmit, formState, setValue } =
     useForm<WithDiscussionStatusAccepted>({
       resolver: zodResolver(discussionAcceptedSchema),
-      defaultValues: { status: "ACCEPTED", candidateWarnedMethod: null },
+      defaultValues: {
+        status: "ACCEPTED",
+        candidateWarnedMethod: null,
+        conventionId: undefined,
+      },
     });
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
@@ -169,7 +173,9 @@ export const AcceptApplicationModal = ({
               nativeInputProps={{
                 id: domElementIds.establishmentDashboard.discussion
                   .acceptApplicationConventionIdInput,
-                ...register("conventionId"),
+                ...register("conventionId", {
+                  setValueAs: (value) => value?.trim() || undefined,
+                }),
               }}
               {...getFieldError("conventionId")}
             />
