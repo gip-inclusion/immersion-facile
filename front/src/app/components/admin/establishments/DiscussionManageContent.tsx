@@ -179,7 +179,7 @@ const getDiscussionButtons = ({
       ? [
           {
             id: domElementIds.establishmentDashboard.discussion
-              .acceptApplicationOpenModal,
+              .acceptApplicationOpenModalButton,
             priority: "secondary",
             type: "button",
             onClick: openAcceptApplicationModal,
@@ -187,7 +187,7 @@ const getDiscussionButtons = ({
           } satisfies ButtonProps,
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationOpenModal,
+              .rejectApplicationOpenModalButton,
             priority: "secondary",
             type: "button",
             onClick: openRejectApplicationModal,
@@ -311,6 +311,10 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           </div>
           <ButtonWithSubMenu
             priority="primary"
+            id={
+              domElementIds.establishmentDashboard.discussion
+                .handleDiscussionButton
+            }
             buttonLabel={"Gérer la candidature"}
             buttonIconId="fr-icon-arrow-down-s-line"
             iconPosition="right"
