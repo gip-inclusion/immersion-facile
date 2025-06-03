@@ -2,9 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { Card } from "@codegouvfr/react-dsfr/Card";
-import Input from "@codegouvfr/react-dsfr/Input";
 import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
@@ -20,12 +17,9 @@ import {
   type DiscussionReadDto,
   type Email,
   type WithDiscussionId,
-  type ExchangeFromDashboard,
   addressDtoToString,
   createOpaqueEmail,
   domElementIds,
-  escapeHtml,
-  exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
   toDisplayedDate,
 } from "shared";
@@ -233,11 +227,11 @@ const statusBadgeData: Record<
 const getDiscussionStatusUpdatedFeedbackMessage = (
   discussion: DiscussionReadDto,
 ): string => {
-  const {status} = discussion;
+  const { status } = discussion;
   if (status === "PENDING") return "";
   if (status === "ACCEPTED")
     return "La candidature a bien été marquée comme accepté. Merci pour votre retour.";
-  if(status === "REJECTED")
+  if (status === "REJECTED")
     return match(discussion.rejectionKind)
       .with(
         "CANDIDATE_ALREADY_WARNED",
@@ -346,7 +340,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </DiscussionMeta>
       </header>
 
-      <DiscussionEchangeMessageForm discussionId={discussion.id} />
+      {/*<DiscussionEchangeMessageForm discussionId={discussion.id} />*/}
 
       <DiscussionExchangesList discussion={discussion} />
 

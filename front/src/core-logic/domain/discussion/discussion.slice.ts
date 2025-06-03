@@ -3,9 +3,9 @@ import type {
   ConnectedUserJwt,
   DiscussionId,
   DiscussionReadDto,
-  WithDiscussionStatus,
   Exchange,
   ExchangeFromDashboard,
+  WithDiscussionStatus,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,

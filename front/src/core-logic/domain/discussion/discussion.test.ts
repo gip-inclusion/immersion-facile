@@ -174,8 +174,8 @@ describe("Discussion slice", () => {
         "dashboard-discussion-status-updated": {
           on: "update",
           level: "success",
-          title: "La candidature a bien été rejetée",
-          message: "La candidature a bien été rejetée.",
+          title: "La candidature a bien été mise à jour",
+          message: "La candidature a bien été mise à jour",
         },
       });
     });
