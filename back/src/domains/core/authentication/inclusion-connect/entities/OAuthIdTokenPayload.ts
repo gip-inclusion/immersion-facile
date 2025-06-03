@@ -27,16 +27,6 @@ export type ProConnectOAuthIdTokenPayload = ProviderTokenPayloadBase & {
   };
 };
 
-export const icAuthTokenPayloadSchema: z.Schema<IcOAuthIdTokenPayload> =
-  z.object({
-    nonce: z.string(),
-    sub: z.string(),
-    given_name: z.string(),
-    family_name: z.string(),
-    email: emailSchema,
-    structure_pe: z.string().optional(),
-  });
-
 export const proConnectAuthTokenPayloadSchema: z.Schema<ProConnectOAuthIdTokenPayload> =
   z.object({
     sub: z.string(),

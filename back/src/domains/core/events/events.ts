@@ -92,10 +92,6 @@ export type WithTriggeredBy = {
   triggeredBy: TriggeredBy | null;
 };
 
-export const withTriggeredBySchema: z.Schema<WithTriggeredBy> = z.object({
-  triggeredBy: triggeredBySchema.or(z.null()),
-});
-
 // biome-ignore format: better readability without formatting
 export type DomainEvent =
   | NotificationAddedEvent
@@ -131,7 +127,7 @@ export type DomainEvent =
 
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
-  
+
   // AGENCY RELATED
   | GenericEvent<"NewAgencyAdded", WithAgencyId & WithTriggeredBy>
   | GenericEvent<"AgencyActivated", WithAgencyId & WithTriggeredBy>
