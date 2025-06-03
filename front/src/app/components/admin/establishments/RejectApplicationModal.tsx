@@ -171,94 +171,101 @@ export const RejectApplicationModal = ({
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <modal.Component
-        title={modalTitle}
-        buttons={[
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitPreviewButton,
-            priority: "primary",
-            type: "submit",
-            doClosesModal: false,
-            children:
-              watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
-                ? "Rejeter la candidature"
-                : "Prévisualiser et envoyer",
+    <modal.Component
+      title={modalTitle}
+      buttons={[
+        {
+          id: domElementIds.establishmentDashboard.discussion
+            .rejectApplicationSubmitPreviewButton,
+          priority: "primary",
+          type: "submit",
+          nativeButtonProps: {
+            form: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationForm,
           },
-        ]}
+          doClosesModal: false,
+          children:
+            watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
+              ? "Rejeter la candidature"
+              : "Prévisualiser et envoyer",
+        },
+      ]}
+    >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        id={
+          domElementIds.establishmentDashboard.discussion.rejectApplicationForm
+        }
       >
-        <>
+        <RadioButtons
+          legend="Avez-vous informé le candidat de ce refus ? *"
+          name="isCandidateInformed"
+          options={booleanSelectOptions.map((option) => ({
+            ...option,
+            nativeInputProps: {
+              ...option.nativeInputProps,
+              checked:
+                Boolean(option.nativeInputProps.value) === isCandidateWarned,
+              onChange: () => {
+                setIsCandidateWarned(option.nativeInputProps.value === 1);
+                setValue("rejectionKind", "CANDIDATE_ALREADY_WARNED");
+              },
+            },
+          }))}
+          orientation="vertical"
+        />
+
+        {isCandidateWarned === true && (
           <RadioButtons
-            legend="Avez-vous informé le candidat de ce refus ? *"
-            name="isCandidateInformed"
-            options={booleanSelectOptions.map((option) => ({
+            legend="Comment l'avez-vous informé ? *"
+            name="candidateWarnedMethod"
+            options={candidateWarnedMethod.map((option) => ({
               ...option,
               nativeInputProps: {
                 ...option.nativeInputProps,
                 checked:
-                  Boolean(option.nativeInputProps.value) === isCandidateWarned,
+                  option.nativeInputProps.value ===
+                  (watchedFormValues as RejectionCandidateAlreadyWarned)
+                    .candidateWarnedMethod,
                 onChange: () => {
-                  setIsCandidateWarned(option.nativeInputProps.value === 1);
-                  setValue("rejectionKind", "CANDIDATE_ALREADY_WARNED");
+                  setValue(
+                    "candidateWarnedMethod",
+                    option.nativeInputProps.value as CandidateWarnedMethod,
+                  );
                 },
               },
             }))}
             orientation="vertical"
           />
+        )}
 
-          {isCandidateWarned === true && (
-            <RadioButtons
-              legend="Comment l'avez-vous informé ? *"
-              name="candidateWarnedMethod"
-              options={candidateWarnedMethod.map((option) => ({
-                ...option,
-                nativeInputProps: {
-                  ...option.nativeInputProps,
-                  checked:
-                    option.nativeInputProps.value ===
-                    (watchedFormValues as RejectionCandidateAlreadyWarned)
-                      .candidateWarnedMethod,
-                  onChange: () => {
-                    setValue(
-                      "candidateWarnedMethod",
-                      option.nativeInputProps.value as CandidateWarnedMethod,
-                    );
-                  },
-                },
-              }))}
-              orientation="vertical"
+        {isCandidateWarned === false && (
+          <div className={fr.cx("fr-mb-2w")}>
+            <Select
+              label="Pour quel motif souhaitez-vous refuser cette candidature ?"
+              nativeSelectProps={{
+                id: domElementIds.establishmentDashboard.discussion
+                  .rejectApplicationJustificationKindInput,
+                ...register("rejectionKind"),
+              }}
+              options={rejectionKindOptions}
+              {...getFieldError("rejectionKind")}
             />
-          )}
-
-          {isCandidateWarned === false && (
-            <div className={fr.cx("fr-mb-2w")}>
-              <Select
-                label="Pour quel motif souhaitez-vous refuser cette candidature ?"
-                nativeSelectProps={{
+            {watchedFormValues.rejectionKind === "OTHER" && (
+              <Input
+                textArea
+                label="Précisez"
+                nativeTextAreaProps={{
                   id: domElementIds.establishmentDashboard.discussion
-                    .rejectApplicationJustificationKindInput,
-                  ...register("rejectionKind"),
+                    .rejectApplicationJustificationReasonInput,
+                  ...register("rejectionReason"),
                 }}
-                options={rejectionKindOptions}
-                {...getFieldError("rejectionKind")}
+                {...getFieldError("rejectionReason")}
               />
-              {watchedFormValues.rejectionKind === "OTHER" && (
-                <Input
-                  textArea
-                  label="Précisez"
-                  nativeTextAreaProps={{
-                    id: domElementIds.establishmentDashboard.discussion
-                      .rejectApplicationJustificationReasonInput,
-                    ...register("rejectionReason"),
-                  }}
-                  {...getFieldError("rejectionReason")}
-                />
-              )}
-            </div>
-          )}
-        </>
-      </modal.Component>
-    </form>
+            )}
+          </div>
+        )}
+      </form>
+    </modal.Component>
   );
 };
