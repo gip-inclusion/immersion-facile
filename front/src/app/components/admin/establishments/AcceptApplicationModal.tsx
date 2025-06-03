@@ -81,94 +81,101 @@ export const AcceptApplicationModal = ({
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <modal.Component
-        title={"Marquer comme acceptée"}
-        buttons={[
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .acceptApplicationCancelButton,
-            priority: "secondary",
-            type: "button",
-            children: "Annuler",
-            onClick: () => modal.close(),
+    <modal.Component
+      title={"Marquer comme acceptée"}
+      buttons={[
+        {
+          id: domElementIds.establishmentDashboard.discussion
+            .acceptApplicationCancelButton,
+          priority: "secondary",
+          type: "button",
+          children: "Annuler",
+          onClick: () => modal.close(),
+        },
+        {
+          id: domElementIds.establishmentDashboard.discussion
+            .acceptApplicationSubmitButton,
+          priority: "primary",
+          type: "submit",
+          nativeButtonProps: {
+            form: domElementIds.establishmentDashboard.discussion
+              .acceptApplicationForm,
           },
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .acceptApplicationSubmitButton,
-            priority: "primary",
-            type: "submit",
-            doClosesModal: false,
-            children: "Marquer comme acceptée",
-          },
-        ]}
+          doClosesModal: false,
+          children: "Marquer comme acceptée",
+        },
+      ]}
+    >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        id={
+          domElementIds.establishmentDashboard.discussion.acceptApplicationForm
+        }
       >
-        <div>
+        <RadioButtons
+          legend="Avez-vous déjà réalisé la convention pour cette candidature ? *"
+          name="wasConventionEstablished"
+          options={booleanSelectOptions.map((option) => ({
+            ...option,
+            nativeInputProps: {
+              ...option.nativeInputProps,
+              checked:
+                Boolean(option.nativeInputProps.value) ===
+                wasConventionEstablished,
+              onChange: () => {
+                setWasConventionEstablished(
+                  option.nativeInputProps.value === 1,
+                );
+                if (option.nativeInputProps.value === 0) {
+                  setValue("conventionId", undefined);
+                }
+              },
+            },
+          }))}
+          orientation="vertical"
+        />
+
+        {wasConventionEstablished === false && (
           <RadioButtons
-            legend="Avez-vous déjà réalisé la convention pour cette candidature ? *"
-            name="wasConventionEstablished"
-            options={booleanSelectOptions.map((option) => ({
+            legend="Comment avez-vous informé le candidat que sa candidature était acceptée ? *"
+            name="candidateWarnedMethod"
+            options={candidateWarnedMethod.map((option) => ({
               ...option,
               nativeInputProps: {
                 ...option.nativeInputProps,
                 checked:
-                  Boolean(option.nativeInputProps.value) ===
-                  wasConventionEstablished,
+                  option.nativeInputProps.value ===
+                  watchedFormValues.candidateWarnedMethod,
                 onChange: () => {
-                  setWasConventionEstablished(
-                    option.nativeInputProps.value === 1,
+                  setValue(
+                    "candidateWarnedMethod",
+                    option.nativeInputProps.value as CandidateWarnedMethod,
                   );
-                  if (option.nativeInputProps.value === 0) {
-                    setValue("conventionId", undefined);
-                  }
                 },
               },
             }))}
             orientation="vertical"
           />
+        )}
 
-          {wasConventionEstablished === false && (
-            <RadioButtons
-              legend="Comment avez-vous informé le candidat que sa candidature était acceptée ? *"
-              name="candidateWarnedMethod"
-              options={candidateWarnedMethod.map((option) => ({
-                ...option,
-                nativeInputProps: {
-                  ...option.nativeInputProps,
-                  checked:
-                    option.nativeInputProps.value ===
-                    watchedFormValues.candidateWarnedMethod,
-                  onChange: () => {
-                    setValue(
-                      "candidateWarnedMethod",
-                      option.nativeInputProps.value as CandidateWarnedMethod,
-                    );
-                  },
-                },
-              }))}
-              orientation="vertical"
+        {wasConventionEstablished === true && (
+          <div className={fr.cx("fr-mb-2w")}>
+            <p>
+              Si c'était une convention Immersion Facilitée, indiquez si
+              possible l'ID de cette convention.
+            </p>
+            <Input
+              label="ID de convention (optionnel)"
+              nativeInputProps={{
+                id: domElementIds.establishmentDashboard.discussion
+                  .acceptApplicationConventionIdInput,
+                ...register("conventionId"),
+              }}
+              {...getFieldError("conventionId")}
             />
-          )}
-
-          {wasConventionEstablished === true && (
-            <div className={fr.cx("fr-mb-2w")}>
-              <p>
-                Si c'était une convention Immersion Facilitée, indiquez si
-                possible l'ID de cette convention.
-              </p>
-              <Input
-                label="ID de convention (optionnel)"
-                nativeInputProps={{
-                  id: domElementIds.establishmentDashboard.discussion
-                    .acceptApplicationConventionIdInput,
-                  ...register("conventionId"),
-                }}
-                {...getFieldError("conventionId")}
-              />
-            </div>
-          )}
-        </div>
-      </modal.Component>
-    </form>
+          </div>
+        )}
+      </form>
+    </modal.Component>
   );
 };

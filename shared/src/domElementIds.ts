@@ -807,6 +807,8 @@ export const domElementIds = {
       connectButton: "im-login-form__inclusion-connect-button--establishment",
     },
     discussion: {
+      acceptApplicationForm: "im-manage-establishment__accept-application-form",
+      rejectApplicationForm: "im-manage-establishment__reject-application-form",
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
