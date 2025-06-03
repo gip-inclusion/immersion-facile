@@ -3,13 +3,12 @@ import type {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
-  DiscussionRejected,
   Exchange,
   InclusionConnectedAllowedRoutes,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
-  UpdateDiscussionStatusParams,
   SendMessageToDiscussionFromDashboardRequestPayload,
+  UpdateDiscussionStatusParams,
   WithIdToken,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -149,10 +148,6 @@ export class HttpInclusionConnectedGateway
     } & UpdateDiscussionStatusParams,
   ): Observable<void> {
     const { discussionId, jwt, ...body } = params;
-    console.log(
-      "Update discussion status with params in HttpGateway: ",
-      params,
-    );
     return from(
       this.httpClient
         .updateDiscussionStatus({
@@ -167,7 +162,6 @@ export class HttpInclusionConnectedGateway
             .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
-      // .catch(error => console.log("ERROR in gateway" , error)),
     );
   }
 

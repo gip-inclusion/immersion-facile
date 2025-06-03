@@ -7,8 +7,8 @@ import type {
   Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
-  WithDiscussionStatus,
   SendMessageToDiscussionFromDashboardRequestPayload,
+  WithDiscussionStatus,
   WithIdToken,
 } from "shared";
 import type { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
