@@ -81,13 +81,13 @@ const conventionSection = (internshipKind: InternshipKind) => ({
         : "Veuillez sélectionner un point orientation",
   },
   "agencyReferent.firstname": {
-    label: "Prénom de l'accompagnateur",
+    label: "Prénom du conseiller",
     id: conventionSectionIds.agencyReferentFirstName,
     hintText:
-      "Indiquez la personne qui prescrit l’immersion, si vous le connaissez (accompagnateur du candidat ou conseiller entreprise par exemple).",
+      "Indiquez la personne qui prescrit l’immersion, si vous le connaissez (conseiller du candidat ou conseiller entreprise par exemple).",
   },
   "agencyReferent.lastname": {
-    label: "Nom de l'accompagnateur",
+    label: "Nom du conseiller",
     id: conventionSectionIds.agencyReferentLastName,
   },
   agencyRefersTo: {

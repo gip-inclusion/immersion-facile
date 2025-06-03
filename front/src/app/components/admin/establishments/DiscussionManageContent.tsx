@@ -164,7 +164,7 @@ const getDiscussionButtons = ({
         )}`,
         target: "_blank",
       },
-      children: "Répondre au candidat",
+      children: "Répondre au candidat par email",
     } satisfies ButtonProps,
     ...(discussion.status === "PENDING" && discussion.kind === "IF"
       ? [

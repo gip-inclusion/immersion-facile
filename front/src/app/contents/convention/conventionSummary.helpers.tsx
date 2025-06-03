@@ -18,6 +18,7 @@ import {
   type SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
+  getFullname,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
@@ -449,14 +450,15 @@ const makeSignatoriesSubsections = (
         },
         !convention.agencyRefersTo &&
         (convention.agencyReferent?.firstname ||
-          convention.agencyReferent?.firstname)
+          convention.agencyReferent?.lastname)
           ? {
               key: "agencyReferent",
-              label: "Accompagnateur",
-              value: [
-                convention.agencyReferent?.firstname,
-                convention.agencyReferent?.lastname,
-              ].join(" "),
+              label: "Conseiller",
+              value:
+                getFullname(
+                  convention.agencyReferent?.firstname,
+                  convention.agencyReferent?.lastname,
+                ) ?? "",
             }
           : null,
       ]),

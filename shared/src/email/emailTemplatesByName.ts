@@ -128,7 +128,7 @@ export const emailTemplatesByName =
       ${
         agencyReferentName &&
         `
-        <strong>Conseiller :</strong>${agencyReferentName}
+        <strong>Conseiller : </strong>${agencyReferentName}
         `
       }
       ${defaultSignature(internshipKind)}
@@ -333,7 +333,7 @@ export const emailTemplatesByName =
           ${
             agencyReferentName &&
             `
-            <strong>Conseiller :</strong>${agencyReferentName}
+            <strong>Conseiller : </strong>${agencyReferentName}
             `
           }
 
