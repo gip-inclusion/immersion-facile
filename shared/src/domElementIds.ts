@@ -813,6 +813,8 @@ export const domElementIds = {
         "im-login-form__connect-button--establishment-dashboard-email",
     },
     discussion: {
+      handleDiscussionButton:
+        "im-manage-establishment__handle-discussion-button",
       acceptApplicationForm: "im-manage-establishment__accept-application-form",
       rejectApplicationForm: "im-manage-establishment__reject-application-form",
       activateDraftConvention:
@@ -821,7 +823,7 @@ export const domElementIds = {
         "im-manage-establishment__reply-to-candidate-by-email",
       acceptApplicationModal:
         "im-manage-establishment__accept-application-modal",
-      acceptApplicationOpenModal:
+      acceptApplicationOpenModalButton:
         "im-manage-establishment__accept-application-button-open-modal",
       acceptApplicationSubmitButton:
         "im-manage-establishment__accept-application-modal-submit-button",
@@ -831,7 +833,9 @@ export const domElementIds = {
         "im-manage-establishment__accept-application-convention-id-input",
       rejectApplicationModal:
         "im-manage-establishment__reject-application-modal",
-      rejectApplicationOpenModal:
+      rejectApplicationIsCandidateWarned:
+        "im-manage-establishment__reject-application-is-candidate-warned",
+      rejectApplicationOpenModalButton:
         "im-manage-establishment__reject-application-button-open-modal",
       rejectApplicationJustificationKindInput:
         "im-manage-establishment__reject-application-justification-kind-input",

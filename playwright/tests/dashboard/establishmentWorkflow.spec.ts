@@ -20,10 +20,20 @@ test.describe("Establishment dashboard workflow", () => {
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(2);
-      await page.click("#button-with-submenu");
       await page.click(
-        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationOpenModal}`,
+        `#${domElementIds.establishmentDashboard.discussion.handleDiscussionButton}`,
       );
+
+      page.click(
+        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationOpenModalButton}`,
+      );
+
+      await page
+        .locator(
+          `[for=${domElementIds.establishmentDashboard.discussion.rejectApplicationIsCandidateWarned}-1]`,
+        )
+        .click();
+
       await page.selectOption(
         `#${domElementIds.establishmentDashboard.discussion.rejectApplicationJustificationKindInput}`,
         {
