@@ -1,54 +1,9 @@
-import type { FormEstablishmentUserRight } from "shared";
 import { type UserWithAdminRights, errors } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
   EstablishmentAdminRight,
   EstablishmentAggregate,
 } from "../entities/EstablishmentAggregate";
-
-export const establishmentFormUserRightsFromEstablishmentAggregateAndUsers =
-  async (
-    uow: UnitOfWork,
-    establishmentAggregate: EstablishmentAggregate,
-  ): Promise<FormEstablishmentUserRight[]> => {
-    const firstAdminRight = establishmentAggregate.userRights.find(
-      (right): right is EstablishmentAdminRight =>
-        right.role === "establishment-admin",
-    );
-    if (!firstAdminRight)
-      throw errors.establishment.adminNotFound({
-        siret: establishmentAggregate.establishment.siret,
-      });
-    const firstAdmin = await uow.userRepository.getById(firstAdminRight.userId);
-    if (!firstAdmin)
-      throw errors.establishment.adminNotFound({
-        siret: establishmentAggregate.establishment.siret,
-      });
-
-    const establishmentUsers = await uow.userRepository.getByIds(
-      establishmentAggregate.userRights.map(({ userId }) => userId),
-    );
-
-    return establishmentAggregate.userRights.map(
-      ({ role, userId, job, phone }) => {
-        const user = establishmentUsers.find((user) => user.id === userId);
-        if (!user) throw errors.user.notFound({ userId });
-        return role === "establishment-admin"
-          ? {
-              role,
-              email: user.email,
-              job,
-              phone,
-            }
-          : {
-              role,
-              email: user.email,
-              job,
-              phone,
-            };
-      },
-    );
-  };
 
 export const getDiscussionContactsFromAggregate = async (
   uow: UnitOfWork,

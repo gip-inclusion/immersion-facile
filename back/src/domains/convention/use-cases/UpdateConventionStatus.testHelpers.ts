@@ -1,7 +1,6 @@
 import { values } from "ramda";
 import {
   AgencyDtoBuilder,
-  type AgencyRole,
   type BadRequestError,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -9,7 +8,6 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type Email,
-  type ExcludeFromExisting,
   type Role,
   type UnauthorizedError,
   type UpdateConventionStatusRequestDto,
@@ -679,13 +677,3 @@ export const acceptStatusTransitionTests = ({
     );
   });
 };
-
-export const agencyRolesEmptyOrContainsToReviewOrAgencyAdmin = (
-  roles: (AgencyRole | Role)[],
-): roles is ExcludeFromExisting<
-  AgencyRole | Role,
-  "to-review" | "agency-admin"
->[] =>
-  roles.length === 0 ||
-  roles.includes("to-review") ||
-  roles.includes("agency-admin");

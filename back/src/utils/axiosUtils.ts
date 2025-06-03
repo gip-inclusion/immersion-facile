@@ -1,9 +1,5 @@
-import axios, {
-  type AxiosError,
-  type AxiosInstance,
-  type AxiosRequestConfig,
-} from "axios";
-import { type OpacifiedLogger, createLogger } from "./logger";
+import axios, { type AxiosInstance, type AxiosRequestConfig } from "axios";
+import { createLogger } from "./logger";
 
 const _logger = createLogger(__filename);
 
@@ -20,26 +16,4 @@ export const createAxiosInstance = (
     return response;
   });
   return axiosInstance;
-};
-
-const QUOTA_EXEEDED_STATUSES = new Set([429, 503]);
-const TIMEOUT_CODES = new Set(["ETIMEDOUT", "ECONNABORTED"]);
-
-export const isRetryableError = (
-  logger: OpacifiedLogger,
-  error: AxiosError,
-): boolean => {
-  if (
-    error.response?.status &&
-    QUOTA_EXEEDED_STATUSES.has(error.response?.status)
-  ) {
-    logger.warn({ message: "Request quota exceeded", error });
-    return true;
-  }
-  if (error.code && TIMEOUT_CODES.has(error.code)) {
-    logger.warn({ message: "Request timed out", error });
-    return true;
-  }
-
-  return false;
 };

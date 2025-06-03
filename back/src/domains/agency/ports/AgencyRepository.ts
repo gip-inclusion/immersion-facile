@@ -31,8 +31,6 @@ export type AgencyWithoutRights = Omit<
   "counsellorEmails" | "validatorEmails"
 >;
 
-export type UsersAgencyRights = Record<UserId, AgencyRight[]>;
-
 export type PartialAgencyWithUsersRights = Partial<AgencyWithUsersRights> & {
   id: AgencyId;
 };

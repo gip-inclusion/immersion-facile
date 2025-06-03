@@ -1,23 +1,9 @@
 import type {
-  AgencyId,
   Email,
   GetUsersFilters,
-  InclusionConnectedUser,
   UserId,
   UserWithAdminRights,
-  WithAgencyRole,
 } from "shared";
-
-export type InclusionConnectedFilters = Partial<WithAgencyRole> & {
-  agencyId?: AgencyId;
-  email?: Email;
-  isNotifiedByEmail?: boolean;
-};
-
-export type InclusionConnectedUserWithoutRights = Omit<
-  InclusionConnectedUser,
-  "agencyRights"
->;
 
 export interface UserRepository {
   save(user: UserWithAdminRights): Promise<void>;
