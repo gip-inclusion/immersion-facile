@@ -200,6 +200,10 @@ export const RejectApplicationModal = ({
         <RadioButtons
           legend="Avez-vous informé le candidat de ce refus ? *"
           name="isCandidateInformed"
+          id={
+            domElementIds.establishmentDashboard.discussion
+              .rejectApplicationIsCandidateWarned
+          }
           options={booleanSelectOptions.map((option) => ({
             ...option,
             nativeInputProps: {
