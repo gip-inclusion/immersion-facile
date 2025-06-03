@@ -73,7 +73,8 @@ export const agencyRoleIsNotToReview = (
 ): agencyRoles is ExcludeFromExisting<AgencyRole, "to-review">[] =>
   !agencyRoles.includes("to-review");
 
-export const inclusionConnectTokenExpiredMessage = "Token is expired";
+export const connectedUserTokenExpiredMessage =
+  "Le jeton d'authentification (JWT) fourni a expiré.";
 
 export type InitiateLoginByEmailParams = {
   page: AllowedStartInclusionConnectLoginSourcesKind;

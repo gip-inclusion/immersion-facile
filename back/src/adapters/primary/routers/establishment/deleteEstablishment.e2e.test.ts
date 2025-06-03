@@ -4,6 +4,7 @@ import {
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
   UserBuilder,
+  connectedUserTokenExpiredMessage,
   createInclusionConnectJwtPayload,
   currentJwtVersions,
   displayRouteName,
@@ -11,7 +12,6 @@ import {
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
-  inclusionConnectTokenExpiredMessage,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -127,7 +127,7 @@ describe("Delete establishment", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
+      body: { message: connectedUserTokenExpiredMessage, status: 401 },
       status: 401,
     });
   });

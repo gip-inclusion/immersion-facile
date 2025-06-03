@@ -5,6 +5,7 @@ import {
   FormEstablishmentDtoBuilder,
   type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
+  connectedUserTokenExpiredMessage,
   createInclusionConnectJwtPayload,
   currentJwtVersions,
   errors,
@@ -12,7 +13,6 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
-  inclusionConnectTokenExpiredMessage,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -276,7 +276,7 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: inclusionConnectTokenExpiredMessage,
+        message: connectedUserTokenExpiredMessage,
         status: 401,
       },
       status: 401,

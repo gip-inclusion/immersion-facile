@@ -25,7 +25,10 @@ import type { StoredFileId } from "../file/file.dto";
 import type { FileValidationError } from "../file/file.validators";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GroupSlug } from "../group/group.dto";
-import type { OAuthState } from "../inclusionConnect/inclusionConnect.dto";
+import {
+  type OAuthState,
+  connectedUserTokenExpiredMessage,
+} from "../inclusionConnect/inclusionConnect.dto";
 import type {
   AgencyRole,
   UserId,
@@ -659,8 +662,7 @@ export const errors = {
       new ForbiddenError(
         "Le jeton d'authentification (JWT) fourni est invalide.",
       ),
-    expiredJwt: () =>
-      new ForbiddenError("Le jeton d'authentification (JWT) fourni a expiré."),
+    expiredJwt: () => new ForbiddenError(connectedUserTokenExpiredMessage),
     notFound: ({ userId }: { userId: UserId }) =>
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,

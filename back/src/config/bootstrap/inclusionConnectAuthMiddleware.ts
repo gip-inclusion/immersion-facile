@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { errors, inclusionConnectTokenExpiredMessage } from "shared";
+import { connectedUserTokenExpiredMessage, errors } from "shared";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { makeVerifyJwtES256 } from "../../domains/core/jwt";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
@@ -48,7 +48,7 @@ export const makeInclusionConnectAuthMiddleware = (
         status: unauthorizedError.status,
         message:
           "name" in error && error.name === "TokenExpiredError"
-            ? inclusionConnectTokenExpiredMessage
+            ? connectedUserTokenExpiredMessage
             : invalidTokenMessage,
       });
     }

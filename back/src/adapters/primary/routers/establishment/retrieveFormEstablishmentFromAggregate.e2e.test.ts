@@ -5,13 +5,13 @@ import {
   InclusionConnectedUserBuilder,
   UserBuilder,
   addressDtoToString,
+  connectedUserTokenExpiredMessage,
   createInclusionConnectJwtPayload,
   currentJwtVersions,
   displayRouteName,
   errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
-  inclusionConnectTokenExpiredMessage,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -308,7 +308,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: inclusionConnectTokenExpiredMessage,
+        message: connectedUserTokenExpiredMessage,
         status: 401,
       },
       status: 401,

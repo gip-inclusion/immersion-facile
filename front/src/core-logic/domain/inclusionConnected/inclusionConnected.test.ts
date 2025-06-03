@@ -7,9 +7,9 @@ import {
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   type WithAgencyIds,
+  connectedUserTokenExpiredMessage,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
-  inclusionConnectTokenExpiredMessage,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
@@ -200,7 +200,7 @@ describe("InclusionConnected", () => {
       );
       expectIsLoadingToBe(true);
 
-      const errorMessage = `Something went wrong : ${inclusionConnectTokenExpiredMessage}`;
+      const errorMessage = `Something went wrong : ${connectedUserTokenExpiredMessage} blah blah`;
       dependencies.inclusionConnectedGateway.currentUser$.error(
         new Error(errorMessage),
       );
