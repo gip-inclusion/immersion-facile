@@ -84,7 +84,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     label: "Prénom du conseiller",
     id: conventionSectionIds.agencyReferentFirstName,
     hintText:
-      "Indiquez la personne qui prescrit l’immersion, si vous le connaissez (conseiller du candidat ou conseiller entreprise par exemple).",
+      "Si vous la connaissez, indiquez la personne qui prescrit l’immersion (accompagnateur du candidat ou conseiller entreprise par exemple).",
   },
   "agencyReferent.lastname": {
     label: "Nom du conseiller",
