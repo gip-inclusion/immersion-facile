@@ -131,15 +131,6 @@ export class AppConfig {
     return this.#throwIfNotGeosearchApiKey("API_KEY_OPEN_CAGE_DATA_GEOSEARCH");
   }
 
-  public get backofficePassword() {
-    return this.#throwIfNotDefinedOrDefault("BACKOFFICE_PASSWORD");
-  }
-
-  // == Backoffice ==
-  public get backofficeUsername() {
-    return this.#throwIfNotDefinedOrDefault("BACKOFFICE_USERNAME");
-  }
-
   public get cache() {
     return this.#throwIfNotInArray({
       variableName: "CACHE",
@@ -193,10 +184,6 @@ export class AppConfig {
     });
   }
 
-  public get discordPipelineReportsWebhookUrl() {
-    return this.env.DISCORD_PIPELINE_REPORTS_WEBHOOK_URL;
-  }
-
   // == Discord notifications ==
   public get discordWebhookUrl(): string | undefined {
     return this.env.DISCORD_WEBHOOK_URL;
@@ -230,16 +217,6 @@ export class AppConfig {
   // == Email notifications ==
   public get emailAllowList() {
     return parseStringList(this.env.EMAIL_ALLOW_LIST);
-  }
-
-  public get emailDomainBlackList(): string[] {
-    const emailDomainBlackListRaw = this.#throwIfNotDefinedOrDefault(
-      "EMAIL_DOMAIN_BLACK_LIST",
-      "",
-    );
-
-    if (!emailDomainBlackListRaw) return [];
-    return emailDomainBlackListRaw.split(",");
   }
 
   // == Email validation gateway ==
@@ -483,10 +460,6 @@ export class AppConfig {
       variableName: "POLE_EMPLOI_GATEWAY",
       authorizedValues: ["IN_MEMORY", "HTTPS"],
     });
-  }
-
-  public get previousJwtPrivateKey() {
-    return this.env.JWT_PREVIOUS_PRIVATE_KEY;
   }
 
   public get previousJwtPublicKey() {

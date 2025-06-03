@@ -302,7 +302,6 @@ export const createGateways = async (
           partnerName: partnerNames.brevoNotifications,
           routes: brevoNotificationGatewayRoutes,
         }),
-        blackListedEmailDomains: config.emailDomainBlackList,
         defaultSender: immersionFacileNoReplyEmailSender,
         emailAllowListPredicate: makeEmailAllowListPredicate({
           skipEmailAllowList: config.skipEmailAllowlist,

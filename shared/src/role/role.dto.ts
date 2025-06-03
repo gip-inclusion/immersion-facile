@@ -5,10 +5,6 @@ export type SignatoryRole = (typeof allSignatoryRoles)[number];
 export type AgencyModifierRole = (typeof agencyModifierRoles)[number];
 export type ModifierRole = (typeof allModifierRoles)[number];
 
-export type CreateAssessmentRole =
-  (typeof allowedRolesToCreateAssessment)[number];
-export type AccessAssessmentRole =
-  (typeof allowedRolesToAccessAssessment)[number];
 export type ConventionEstablishmentRole =
   (typeof conventionEstablishmentsRoles)[number];
 export const allRoles = [
@@ -63,13 +59,6 @@ export const allowedRolesToAccessAssessment = [
   "establishment-contact",
   "beneficiary",
 ] as const;
-
-export const getRequesterRole = (roles: Role[]): Role => {
-  if (roles.includes("back-office")) return "back-office";
-  if (roles.includes("validator")) return "validator";
-  if (roles.includes("counsellor")) return "counsellor";
-  return roles[0];
-};
 
 export const establishmentsRoles = [
   "establishment-admin",
