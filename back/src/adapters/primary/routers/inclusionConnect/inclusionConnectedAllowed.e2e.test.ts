@@ -7,6 +7,7 @@ import {
   type InclusionConnectedAllowedRoutes,
   InclusionConnectedUserBuilder,
   type User,
+  connectedUserTokenExpiredMessage,
   currentJwtVersions,
   defaultProConnectInfos,
   displayRouteName,
@@ -14,7 +15,6 @@ import {
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
-  inclusionConnectTokenExpiredMessage,
   inclusionConnectedAllowedRoutes,
   queryParamsAsString,
   toAgencyDtoForAgencyUsersAndAdmins,
@@ -174,7 +174,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
+        body: { message: connectedUserTokenExpiredMessage, status: 401 },
         status: 401,
       });
     });
@@ -277,7 +277,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         body: { conventionId: "11111111-1111-4111-1111-111111111111" },
       });
       expectHttpResponseToEqual(response, {
-        body: { message: inclusionConnectTokenExpiredMessage, status: 401 },
+        body: { message: connectedUserTokenExpiredMessage, status: 401 },
         status: 401,
       });
     });
