@@ -813,6 +813,8 @@ export const domElementIds = {
         "im-login-form__connect-button--establishment-dashboard-email",
     },
     discussion: {
+      acceptApplicationForm: "im-manage-establishment__accept-application-form",
+      rejectApplicationForm: "im-manage-establishment__reject-application-form",
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
