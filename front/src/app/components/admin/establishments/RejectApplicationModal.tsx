@@ -8,7 +8,7 @@ import RadioButtons, {
 import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { renderContent } from "html-templates/src/components/email";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -91,8 +91,6 @@ export const RejectApplicationModal = ({
 
   const [isCandidateWarned, setIsCandidateWarned] = useState<boolean>();
 
-  const formRef = useRef<HTMLFormElement>(null);
-
   if (!inclusionConnectedJwt) throw new Error("No jwt found");
 
   const onSubmit = (values: WithDiscussionRejection) => {
@@ -173,27 +171,24 @@ export const RejectApplicationModal = ({
   }
 
   return (
-    <modal.Component
-      title={modalTitle}
-      buttons={[
-        {
-          id: domElementIds.establishmentDashboard.discussion
-            .rejectApplicationSubmitPreviewButton,
-          priority: "primary",
-          type: "button",
-          onClick: () => {
-            onSubmit(watchedFormValues);
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <modal.Component
+        title={modalTitle}
+        buttons={[
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationSubmitPreviewButton,
+            priority: "primary",
+            type: "submit",
+            doClosesModal: false,
+            children:
+              watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
+                ? "Rejeter la candidature"
+                : "Prévisualiser et envoyer",
           },
-          doClosesModal: false,
-          children:
-            watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
-              ? "Rejeter la candidature"
-              : "Prévisualiser et envoyer",
-        },
-      ]}
-    >
-      <form ref={formRef} onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        ]}
+      >
+        <>
           <RadioButtons
             legend="Avez-vous informé le candidat de ce refus ? *"
             name="isCandidateInformed"
@@ -262,8 +257,8 @@ export const RejectApplicationModal = ({
               )}
             </div>
           )}
-        </div>
-      </form>
-    </modal.Component>
+        </>
+      </modal.Component>
+    </form>
   );
 };
