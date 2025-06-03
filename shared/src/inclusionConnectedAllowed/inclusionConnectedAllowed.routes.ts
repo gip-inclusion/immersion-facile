@@ -7,8 +7,8 @@ import {
 } from "../convention/convention.schema";
 import {
   discussionReadSchema,
-  withDiscussionStatusSchema,
   exchangeSchema,
+  withDiscussionStatusSchema,
   withExchangeMessageSchema,
 } from "../discussion/discussion.schema";
 import { withAuthorizationHeaders } from "../headers";
