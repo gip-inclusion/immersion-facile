@@ -69,7 +69,16 @@ export const doesObjectContainsHTML = (obj: object): boolean => {
 export const getFullname = (
   firstname?: string,
   lastname?: string,
-): string | undefined => [firstname, lastname].join(" ").trim() || undefined;
+): string | undefined => {
+  const splitFirstNames = firstname?.split(/[\s-]/g);
+  const formattedFirstName = splitFirstNames
+    ?.map((word) => capitalize(word))
+    .join(firstname?.includes("-") ? "-" : " ");
+
+  return (
+    [formattedFirstName, lastname?.toUpperCase()].join(" ").trim() || undefined
+  );
+};
 
 export const escapeHtml = (unsafe: string) =>
   unsafe

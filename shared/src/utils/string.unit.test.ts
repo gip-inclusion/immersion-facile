@@ -1,6 +1,7 @@
 import {
   cleanStringToHTMLAttribute,
   doesStringContainsHTML,
+  getFullname,
   looksLikeSiret,
   removeDiacritics,
   slugify,
@@ -124,6 +125,60 @@ describe("string utils", () => {
       ["> < emoji ?", false],
     ])(`should return true for "%s"`, (input, expected) => {
       expect(doesStringContainsHTML(input)).toBe(expected);
+    });
+  });
+
+  describe("getFullname", () => {
+    it.each([
+      {
+        inputs: {
+          firstname: "John",
+          lastname: "Doe",
+        },
+        expectedOutput: "John DOE",
+      },
+      {
+        inputs: {
+          lastname: "Doe",
+        },
+        expectedOutput: "DOE",
+      },
+      {
+        inputs: {
+          firstname: "jean-claude",
+          lastname: "Duss",
+        },
+        expectedOutput: "Jean-Claude DUSS",
+      },
+      {
+        inputs: {
+          firstname: "jean claude",
+          lastname: "Duss",
+        },
+        expectedOutput: "Jean Claude DUSS",
+      },
+      {
+        inputs: {
+          firstname: "Chris",
+          lastname: "O'donnell",
+        },
+        expectedOutput: "Chris O'DONNELL",
+      },
+      {
+        inputs: {
+          firstname: "PrénOM-cheLOu composé",
+          lastname: "Nom-cheLOU composé",
+        },
+        expectedOutput: "PrénOM-CheLOu-Composé NOM-CHELOU COMPOSÉ",
+      },
+      {
+        inputs: {},
+        expectedOutput: undefined,
+      },
+    ])("for $inputs return $expectedOutput", ({ inputs, expectedOutput }) => {
+      expect(getFullname(inputs.firstname, inputs.lastname)).toBe(
+        expectedOutput,
+      );
     });
   });
 });
