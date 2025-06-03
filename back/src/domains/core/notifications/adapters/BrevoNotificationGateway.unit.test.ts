@@ -52,7 +52,6 @@ describe("BrevoNotificationGateway unit", () => {
         {
           httpClient: fakeHttpClient,
           defaultSender: sender,
-          blackListedEmailDomains: [],
           emailAllowListPredicate: allowListPredicate,
           generateHtmlOptions: { skipHead: true },
         },
@@ -357,7 +356,6 @@ describe("BrevoNotificationGateway unit", () => {
         {
           httpClient: fakeHttpClient,
           defaultSender: sender,
-          blackListedEmailDomains: ["outlook.fr", "hotmail.fr", "live.fr"],
           emailAllowListPredicate: allowListPredicate,
           generateHtmlOptions: { skipHead: true },
         },
@@ -365,40 +363,7 @@ describe("BrevoNotificationGateway unit", () => {
       );
     });
 
-    it("shouldn't send emails to email containing blacklisted domain", async () => {
-      await notificationGateway.sendEmail({
-        kind: "AGENCY_WAS_ACTIVATED",
-        recipients: ["recipient-test@outlook.fr"],
-        params: {
-          agencyName: "AGENCY_NAME",
-          agencyLogoUrl: "https://beta.gouv.fr/img/logo_twitter_image-2019.jpg",
-          refersToOtherAgency: false,
-          agencyReferdToName: undefined,
-          users: [
-            {
-              firstName: "Jean",
-              lastName: "Dupont",
-              email: "jean-dupont@gmail.com",
-              agencyName: "Agence du Grand Est",
-              isNotifiedByEmail: true,
-              roles: ["validator"],
-            },
-
-            {
-              firstName: "Jeanne",
-              lastName: "Dupont",
-              email: "jeanne-dupont@gmail.com",
-              agencyName: "Agence du Grand Est",
-              isNotifiedByEmail: true,
-              roles: ["counsellor"],
-            },
-          ],
-        },
-      });
-      expectToEqual(sentEmails, []);
-    });
-
-    it("should send emails but not to emails containing blacklisted domain", async () => {
+    it("should send emails", async () => {
       await notificationGateway.sendEmail({
         kind: "AGENCY_WAS_ACTIVATED",
         recipients: ["toto-test@mail.fr", "jean-louis@hotmail.fr"],
@@ -431,8 +396,8 @@ describe("BrevoNotificationGateway unit", () => {
       });
 
       expect(sentEmails[0]?.body.to[0].email).toBe("toto-test@mail.fr");
-      expect(sentEmails[0]?.body.to[1]).toBeUndefined();
-      expect(sentEmails[0]?.body.cc).toBeUndefined();
+      expect(sentEmails[0]?.body.to[1].email).toBe("jean-louis@hotmail.fr");
+      expect(sentEmails[0]?.body.cc?.[0].email).toBe("cc@live.fr");
     });
   });
 });

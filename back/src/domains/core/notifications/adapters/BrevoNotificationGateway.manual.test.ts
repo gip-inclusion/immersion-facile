@@ -18,7 +18,6 @@ describe("BrevoNotificationGateway manual", () => {
         ),
         emailAllowListPredicate: () => true,
         defaultSender: { email: "bob@fake.mail", name: "Immersion Facilitée" },
-        blackListedEmailDomains: [],
       },
       config.apiKeyBrevo,
     );
