@@ -118,6 +118,9 @@ export const AcceptApplicationModal = ({
                   setWasConventionEstablished(
                     option.nativeInputProps.value === 1,
                   );
+                  if (option.nativeInputProps.value === 0) {
+                    setValue("conventionId", undefined);
+                  }
                 },
               },
             }))}
