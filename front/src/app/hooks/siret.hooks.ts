@@ -3,7 +3,6 @@ import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import type { AddressAutocompleteLocator } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
@@ -138,30 +137,4 @@ export const useExistingSiret = ({
       );
     }
   }, [siret, dispatch, addressAutocompleteLocator]);
-};
-
-export const useEstablishmentSiret = ({
-  addressAutocompleteLocator,
-}: {
-  addressAutocompleteLocator: AddressAutocompleteLocator;
-}) => {
-  const { currentSiret, updateSiret, siretErrorToDisplay } = useSiretFetcher({
-    shouldFetchEvenIfAlreadySaved: false,
-    addressAutocompleteLocator,
-  });
-  const isSiretAlreadySaved = useAppSelector(
-    siretSelectors.isSiretAlreadySaved,
-  );
-  const isReadyForRequestOrRedirection = useAppSelector(
-    establishmentSelectors.isReadyForRedirection,
-  );
-  const clearSiret = () => updateSiret("");
-  return {
-    currentSiret,
-    siretErrorToDisplay,
-    isSiretAlreadySaved,
-    isReadyForRequestOrRedirection,
-    clearSiret,
-    updateSiret,
-  };
 };

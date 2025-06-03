@@ -18,10 +18,6 @@ export type PayloadActionWithLocator<
   Payload = typeof emptyObject,
 > = PayloadAction<Payload & { locator: Locator }>;
 
-export const initialAutocompleteState = {
-  data: {},
-};
-
 export const initialAutocompleteItem = {
   suggestions: [],
   value: null,
