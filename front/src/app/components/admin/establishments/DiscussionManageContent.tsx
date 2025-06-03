@@ -2,6 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
@@ -10,16 +12,20 @@ import {
   Loader,
 } from "react-design-system";
 import { createPortal } from "react-dom";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DiscussionDisplayStatus,
   type DiscussionId,
   type DiscussionReadDto,
   type Email,
+  type ExchangeFromDashboard,
   type WithDiscussionId,
   addressDtoToString,
   createOpaqueEmail,
   domElementIds,
+  escapeHtml,
+  exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
   toDisplayedDate,
 } from "shared";
@@ -34,6 +40,7 @@ import {
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
+import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
   getConventionInitialValuesFromUrl,
@@ -340,7 +347,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </DiscussionMeta>
       </header>
 
-      {/*<DiscussionEchangeMessageForm discussionId={discussion.id} />*/}
+      <DiscussionExchangeMessageForm discussionId={discussion.id} />
 
       <DiscussionExchangesList discussion={discussion} />
 
@@ -473,3 +480,73 @@ const makeConventionFromDiscussion = ({
   immersionAppellation: discussion.appellation,
   immersionAddress: addressDtoToString(discussion.address),
 });
+
+const DiscussionExchangeMessageForm = ({
+  discussionId,
+}: {
+  discussionId: DiscussionId;
+}) => {
+  const { register, handleSubmit, formState } = useForm<ExchangeFromDashboard>({
+    resolver: zodResolver(exchangeMessageFromDashboardSchema),
+    defaultValues: {
+      message: "",
+    },
+  });
+  const getFieldError = makeFieldError(formState);
+  const dispatch = useDispatch();
+  const inclusionConnectedJwt = useAppSelector(
+    authSelectors.inclusionConnectToken,
+  );
+
+  const onSubmit = (data: ExchangeFromDashboard) => {
+    if (inclusionConnectedJwt) {
+      dispatch(
+        discussionSlice.actions.sendExchangeRequested({
+          exchangeData: {
+            jwt: inclusionConnectedJwt,
+            discussionId,
+            message: data.message,
+          },
+          feedbackTopic: "establishment-dashboard-discussion-send-message",
+        }),
+      );
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className={fr.cx("fr-mb-4w")}>
+      <Feedback
+        topics={["establishment-dashboard-discussion-send-message"]}
+        className={fr.cx("fr-mb-2w")}
+        closable
+      />
+      <input type="hidden" {...register("discussionId")} value={discussionId} />
+      <Input
+        textArea
+        label="Répondre au candidat"
+        nativeTextAreaProps={{
+          id: domElementIds.establishmentDashboard.discussion.sendMessageInput,
+          rows: 5,
+          placeholder: "Rédigez votre message ici...",
+          ...register("message", {
+            setValueAs: escapeHtml,
+          }),
+        }}
+        {...getFieldError("message")}
+      />
+      <div className={fr.cx("fr-mt-2w", "fr-mb-4w")}>
+        <Button
+          id={
+            domElementIds.establishmentDashboard.discussion
+              .sendMessageSubmitButton
+          }
+          type="submit"
+          disabled={formState.isSubmitting}
+          size="small"
+        >
+          Envoyer un message
+        </Button>
+      </div>
+    </form>
+  );
+};
