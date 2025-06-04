@@ -14,7 +14,7 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import {
   throwErrorOnConventionIdMismatch,
-  throwIfNotAllowedForUser,
+  throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
@@ -59,7 +59,7 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       agencyRepository: uow.agencyRepository,
     });
 
-    await throwIfNotAllowedForUser({
+    await throwIfUserIsNotIFAdminNorAgencyModifier({
       uow,
       jwtPayload,
       agencyId: convention.agencyId,

@@ -164,7 +164,7 @@ export const isConventionInScope = (
   isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
   isAgencyKindInConsumerScope(conventionRead, apiConsumer);
 
-export const throwIfNotAllowedForUser = async ({
+export const throwIfUserIsNotIFAdminNorAgencyModifier = async ({
   uow,
   jwtPayload,
   agencyId,
