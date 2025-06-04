@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { mergeDeepRight } from "ramda";
 import { useEffect, useState } from "react";
@@ -8,7 +7,6 @@ import {
   ConventionRenewedInformations,
   ConventionSummary,
 } from "react-design-system";
-import { createPortal } from "react-dom";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -18,14 +16,15 @@ import {
   type SignatoryRole,
   domElementIds,
   isConventionRenewed,
-  signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import {
+  SendSignatureLinkModalWrapper,
   type SignatureLinkState,
   makeConventionSections,
   sendSignatureLinkButtonProps,
+  sendSignatureLinkModal,
 } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -44,11 +43,6 @@ type ConventionSignFormProperties = {
   jwt: string;
   convention: ConventionReadDto;
 };
-
-const sendSignatureLinkModal = createModal({
-  id: domElementIds.manageConvention.sendSignatureLinkModal,
-  isOpenedByDefault: false,
-});
 
 export const ConventionSignForm = ({
   jwt,
@@ -236,38 +230,11 @@ export const ConventionSignForm = ({
           )}
         </form>
       </FormProvider>
-      {createPortal(
-        <sendSignatureLinkModal.Component
-          title="Envoyer le lien de signature par SMS"
-          buttons={[
-            {
-              priority: "secondary",
-              children: "Annuler",
-              onClick: () => {
-                sendSignatureLinkModal.close();
-              },
-            },
-            {
-              id: domElementIds.manageConvention
-                .submitSendSignatureLinkModalButton,
-              priority: "primary",
-              children: "Envoyer",
-              onClick: () => onSendSignatureLinkSubmit(),
-            },
-          ]}
-        >
-          <p>
-            Le{" "}
-            {signatoryToSendSignatureLink &&
-              signatoryTitleByRole[
-                signatoryToSendSignatureLink.signatoryRole
-              ]}{" "}
-            recevra un lien de signature au{" "}
-            {signatoryToSendSignatureLink?.signatoryPhone}
-          </p>
-        </sendSignatureLinkModal.Component>,
-        document.body,
-      )}
+      <SendSignatureLinkModalWrapper
+        signatory={signatoryToSendSignatureLink?.signatoryRole}
+        signatoryPhone={signatoryToSendSignatureLink?.signatoryPhone}
+        onConfirm={onSendSignatureLinkSubmit}
+      />
     </>
   );
 };

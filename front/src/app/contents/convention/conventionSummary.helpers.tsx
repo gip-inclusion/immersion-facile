@@ -1,6 +1,7 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
   type ConventionSummaryField,
   ConventionWeeklySchedule,
@@ -10,6 +11,7 @@ import type {
   ConventionSummarySection,
   ConventionSummarySubSection,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
+import { createPortal } from "react-dom";
 import {
   type ConventionReadDto,
   type DateString,
@@ -24,6 +26,7 @@ import {
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
+  signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
 
@@ -841,6 +844,47 @@ const renderSiret = (siret: string) => (
     {siret}
   </a>
 );
+
+export const sendSignatureLinkModal = createModal({
+  id: domElementIds.manageConvention.sendSignatureLinkModal,
+  isOpenedByDefault: false,
+});
+
+export const SendSignatureLinkModalWrapper = ({
+  signatory,
+  signatoryPhone,
+  onConfirm,
+}: {
+  signatory?: SignatoryRole;
+  signatoryPhone?: string;
+  onConfirm: () => void;
+}) =>
+  createPortal(
+    <sendSignatureLinkModal.Component
+      title="Envoyer le lien de signature par SMS"
+      buttons={[
+        {
+          priority: "secondary",
+          children: "Annuler",
+          onClick: () => {
+            sendSignatureLinkModal.close();
+          },
+        },
+        {
+          id: domElementIds.manageConvention.submitSendSignatureLinkModalButton,
+          priority: "primary",
+          children: "Envoyer",
+          onClick: () => onConfirm(),
+        },
+      ]}
+    >
+      <p>
+        Le {signatory && signatoryTitleByRole[signatory]} recevra un lien de
+        signature au {signatoryPhone}
+      </p>
+    </sendSignatureLinkModal.Component>,
+    document.body,
+  );
 
 export type SignatureLinkState = Record<SignatoryRole, boolean>;
 export const sendSignatureLinkButtonProps =
