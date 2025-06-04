@@ -424,8 +424,7 @@ export const emailTemplatesByName =
     TEST_EMAIL: {
       niceName: "Email de test Immersion Facilitée",
       createEmailVariables: ({ input1, input2, url }) => ({
-        subject:
-          "[Immersion Facilitée] Le bilan de votre immersion est disponible !",
+        subject: "[Immersion Facilitée] Un email de test",
         greetings: "Bonjour,",
         content: `
           Cet email vous a été envoyé dans le cadre d'un test.
