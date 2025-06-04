@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
-import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { formatDistance } from "date-fns";
@@ -18,7 +17,6 @@ import {
   type SignatoryRole,
   domElementIds,
   isConventionRenewed,
-  isValidMobilePhone,
   signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
@@ -31,7 +29,11 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
-import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
+import {
+  type SignatureLinkState,
+  makeConventionSections,
+  sendSignatureLinkButtonProps,
+} from "../../../contents/convention/conventionSummary.helpers";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -47,8 +49,6 @@ const sendSignatureLinkModal = createModal({
   id: domElementIds.manageConvention.sendSignatureLinkModal,
   isOpenedByDefault: false,
 });
-
-type SignatureLinkState = Record<SignatoryRole, boolean>;
 
 export interface ConventionValidationProps {
   convention: ConventionReadDto;
@@ -123,24 +123,6 @@ export const ConventionValidation = ({
     }
   };
 
-  const openSendSignatureLinkButtonProps: (
-    signatoryRole: SignatoryRole,
-    signatoryPhone: Phone,
-    signatoryAlreadySign: boolean,
-  ) => ButtonProps = (signatoryRole, signatoryPhone, signatoryAlreadySign) => ({
-    priority: "tertiary",
-    children: "Faire signer par SMS",
-    disabled:
-      !isValidMobilePhone(signatoryPhone) ||
-      signatoryAlreadySign ||
-      signatureLinksSent[signatoryRole],
-    onClick: () => {
-      sendSignatureLinkModal.open();
-      setSignatoryToSendSignatureLink({ signatoryRole, signatoryPhone });
-    },
-    id: domElementIds.manageConvention.openSendSignatureLinkModal,
-  });
-
   return (
     <>
       <Badge
@@ -169,7 +151,16 @@ export const ConventionValidation = ({
         })}
         summary={makeConventionSections(
           convention,
-          openSendSignatureLinkButtonProps,
+          sendSignatureLinkButtonProps({
+            signatureLinksSent,
+            onClick: ({ signatoryRole, signatoryPhone }) => {
+              sendSignatureLinkModal.open();
+              setSignatoryToSendSignatureLink({
+                signatoryRole,
+                signatoryPhone,
+              });
+            },
+          }),
         )}
         conventionId={convention.id}
       />
