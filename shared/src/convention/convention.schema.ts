@@ -214,10 +214,15 @@ const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> =
     lastname: personNameSchema.optional(),
   });
 
+const conventionValidatorSchema: z.Schema<WithFirstnameAndLastname> = z.object({
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+});
+
 const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
   z.object({
-    agencyCounsellor: withFirstnameAndLastnameSchema.optional(),
-    agencyValidator: withFirstnameAndLastnameSchema.optional(),
+    agencyCounsellor: conventionValidatorSchema.optional(),
+    agencyValidator: conventionValidatorSchema.optional(),
   });
 
 const renewedSchema = z.object({
