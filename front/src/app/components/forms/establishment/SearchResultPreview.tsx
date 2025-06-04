@@ -53,20 +53,13 @@ export const SearchResultPreview = ({
   const { cx } = useStyles();
   return (
     <section className={cx("im-establishment-preview")}>
-      <h2 className={fr.cx("fr-text--lead", "fr-mb-2w")}>
-        Prévisualisation de votre entreprise
-      </h2>
-      <p className={fr.cx("fr-hint-text")}>
-        Voici un exemple d'aperçu de votre entreprise, tel qu'il apparaitra dans
-        notre moteur de recherche
-      </p>
       <div
         className={cx(
           fr.cx("fr-grid-row", "fr-mb-4w"),
           "im-establishment-preview__inner",
         )}
       >
-        <div className={fr.cx("fr-col-12", "fr-col-lg-6")}>
+        <div className={fr.cx("fr-col-12", "fr-col-lg-4")}>
           <SearchResult
             illustration={
               <SearchResultIllustration illustration={searchIllustrations[0]}>

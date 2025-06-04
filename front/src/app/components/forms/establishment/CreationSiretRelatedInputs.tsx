@@ -70,7 +70,6 @@ export const CreationSiretRelatedInputs = () => {
       <Input
         label={formContents.siret.label}
         hintText={formContents.siret.hintText}
-        disabled={isFetchingSiret}
         nativeInputProps={{
           ...formContents.siret,
           ...register("siret"),
@@ -78,12 +77,22 @@ export const CreationSiretRelatedInputs = () => {
             updateSiret(event.target.value);
             setValue("siret", event.target.value);
           },
+          readOnly: isFetchingSiret,
         }}
         state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
         stateRelatedMessage={
           touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
         }
       />
+      <p>
+        <a
+          href={"https://annuaire-entreprises.data.gouv.fr"}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Retrouver votre SIRET sur l’Annuaire des Entreprises
+        </a>
+      </p>
 
       <Input
         label={formContents.businessName.label}
