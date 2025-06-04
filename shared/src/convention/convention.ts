@@ -16,11 +16,11 @@ import type {
   GetConventionsForAgencyUserParams,
   Signatories,
   Signatory,
-  WithFirstnameAndLastname,
+  WithOptionalFirstnameAndLastname,
 } from "./convention.dto";
 
 export const concatValidatorNames = (
-  validator: WithFirstnameAndLastname,
+  validator: WithOptionalFirstnameAndLastname,
 ): string => [validator.firstname, validator.lastname].join(" ").trim();
 
 export const allSignatoriesSigned = (signatories: Signatories) =>

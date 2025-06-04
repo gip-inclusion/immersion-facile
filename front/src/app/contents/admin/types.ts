@@ -6,13 +6,13 @@ import type {
   ConventionReadDto,
   EstablishmentRepresentative,
   EstablishmentTutor,
-  WithFirstnameAndLastname,
+  WithOptionalFirstnameAndLastname,
 } from "shared";
 
 export type ConventionField =
   | keyof ConventionReadDto
   | `agencyRefersTo.${keyof AgencyRefersToInConvention}`
-  | `agencyReferent.${keyof WithFirstnameAndLastname}`
+  | `agencyReferent.${keyof WithOptionalFirstnameAndLastname}`
   | `establishmentTutor.${keyof EstablishmentTutor}`
   | `signatories.beneficiary.${keyof Beneficiary<"immersion">}`
   | `signatories.beneficiary.${keyof Beneficiary<"mini-stage-cci">}`

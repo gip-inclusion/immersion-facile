@@ -92,7 +92,7 @@ import {
   type WithConventionDto,
   type WithConventionId,
   type WithConventionIdLegacy,
-  type WithFirstnameAndLastname,
+  type WithOptionalFirstnameAndLastname,
   conventionObjectiveOptions,
   conventionStatuses,
   conventionStatusesWithJustification,
@@ -208,16 +208,17 @@ export const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
     localization.invalidImmersionObjective,
   );
 
-const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> =
+const withOptionalFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstnameAndLastname> =
   z.object({
     firstname: personNameSchema.optional(),
     lastname: personNameSchema.optional(),
   });
 
-const conventionValidatorSchema: z.Schema<WithFirstnameAndLastname> = z.object({
-  firstname: z.string().optional(),
-  lastname: z.string().optional(),
-});
+const conventionValidatorSchema: z.Schema<WithOptionalFirstnameAndLastname> =
+  z.object({
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
+  });
 
 const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
   z.object({
@@ -262,7 +263,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
     immersionSkills: zStringPossiblyEmptyWithMax(2000),
     establishmentTutor: establishmentTutorSchema,
     validators: conventionValidatorsSchema.optional(),
-    agencyReferent: withFirstnameAndLastnameSchema.optional(),
+    agencyReferent: withOptionalFirstnameAndLastnameSchema.optional(),
     renewed: renewedSchema.optional(),
     establishmentNumberEmployeesRange: numberOfEmployeesRangeSchema.optional(),
   })

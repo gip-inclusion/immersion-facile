@@ -24,7 +24,7 @@ import {
   type ImmersionObjective,
   type InternshipKind,
   type Renewed,
-  type WithFirstnameAndLastname,
+  type WithOptionalFirstnameAndLastname,
   isBeneficiary,
   isBeneficiaryStudent,
 } from "./convention.dto";
@@ -715,7 +715,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withValidator(
-    agencyValidator: WithFirstnameAndLastname,
+    agencyValidator: WithOptionalFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -727,7 +727,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withCounsellor(
-    agencyCounsellor: WithFirstnameAndLastname,
+    agencyCounsellor: WithOptionalFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
@@ -739,7 +739,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
   }
 
   public withAgencyReferent(
-    agencyReferent: WithFirstnameAndLastname,
+    agencyReferent: WithOptionalFirstnameAndLastname,
   ): ConventionDtoBuilder {
     return new ConventionDtoBuilder({
       ...this.dto,
