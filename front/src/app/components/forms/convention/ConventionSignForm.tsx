@@ -28,7 +28,9 @@ import {
   sendSignatureLinkButtonProps,
 } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
@@ -141,6 +143,8 @@ export const ConventionSignForm = ({
     );
   };
 
+  useScrollToTop(!!useFeedbackTopic("send-signature-link"));
+
   useEffect(() => {
     if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
   }, [isSendSignatureLinkModalOpen]);
@@ -166,7 +170,10 @@ export const ConventionSignForm = ({
   }
   return (
     <>
-      <Feedback topics={["convention-action-sign"]} />
+      <Feedback
+        topics={["convention-action-sign", "send-signature-link"]}
+        closable
+      />
       <FormProvider {...methods}>
         <Alert
           {...t.conventionReadyToBeSigned}
