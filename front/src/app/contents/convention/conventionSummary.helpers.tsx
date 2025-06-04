@@ -18,7 +18,9 @@ import {
   type SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
+  domElementIds,
   getFullname,
+  isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
@@ -31,7 +33,7 @@ const makeSignatoriesSubsections = (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
-  ) => ButtonProps,
+  ) => ButtonProps | null,
 ): ConventionSummarySubSection[] => {
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
@@ -86,11 +88,11 @@ const makeSignatoriesSubsections = (
         action:
           ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
           signatoriesSubsectionButtonProps
-            ? signatoriesSubsectionButtonProps(
+            ? (signatoriesSubsectionButtonProps(
                 "beneficiary",
                 convention.signatories.beneficiary.phone,
                 !!convention.signatories.beneficiary.signedAt,
-              )
+              ) ?? undefined)
             : undefined,
       },
       fields: removeEmptyValue([
@@ -155,11 +157,11 @@ const makeSignatoriesSubsections = (
               ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
                 convention.status,
               ) && signatoriesSubsectionButtonProps
-                ? signatoriesSubsectionButtonProps(
+                ? (signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
                     convention.signatories.beneficiaryRepresentative.phone,
                     !!convention.signatories.beneficiaryRepresentative.signedAt,
-                  )
+                  ) ?? undefined)
                 : undefined,
           },
           fields: removeEmptyValue([
@@ -223,11 +225,11 @@ const makeSignatoriesSubsections = (
         action:
           ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
           signatoriesSubsectionButtonProps
-            ? signatoriesSubsectionButtonProps(
+            ? (signatoriesSubsectionButtonProps(
                 "establishment-representative",
                 convention.signatories.establishmentRepresentative.phone,
                 !!convention.signatories.establishmentRepresentative.signedAt,
-              )
+              ) ?? undefined)
             : undefined,
       },
       fields: removeEmptyValue([
@@ -299,12 +301,12 @@ const makeSignatoriesSubsections = (
               ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
                 convention.status,
               ) && signatoriesSubsectionButtonProps
-                ? signatoriesSubsectionButtonProps(
+                ? (signatoriesSubsectionButtonProps(
                     "beneficiary-current-employer",
                     convention.signatories.beneficiaryCurrentEmployer.phone,
                     !!convention.signatories.beneficiaryCurrentEmployer
                       .signedAt,
-                  )
+                  ) ?? undefined)
                 : undefined,
           },
           fields: removeEmptyValue([
@@ -767,7 +769,7 @@ export const makeConventionSections = (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
-  ) => ButtonProps,
+  ) => ButtonProps | null,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -839,3 +841,38 @@ const renderSiret = (siret: string) => (
     {siret}
   </a>
 );
+
+export type SignatureLinkState = Record<SignatoryRole, boolean>;
+export const sendSignatureLinkButtonProps =
+  ({
+    triggeredByRole,
+    signatureLinksSent,
+    onClick,
+  }: {
+    triggeredByRole?: SignatoryRole;
+    signatureLinksSent: SignatureLinkState;
+    onClick: (params: {
+      signatoryRole: SignatoryRole;
+      signatoryPhone: Phone;
+    }) => void;
+  }) =>
+  (
+    signatoryRole: SignatoryRole,
+    signatoryPhone: Phone,
+    signatoryAlreadySign: boolean,
+  ): ButtonProps | null =>
+    triggeredByRole && triggeredByRole === signatoryRole
+      ? null
+      : {
+          priority: "tertiary",
+          children: "Faire signer par SMS",
+          disabled:
+            !isValidMobilePhone(signatoryPhone) ||
+            signatoryAlreadySign ||
+            signatureLinksSent[signatoryRole],
+          onClick: () => {
+            onClick({ signatoryRole, signatoryPhone });
+          },
+          type: "button",
+          id: domElementIds.manageConvention.openSendSignatureLinkModal,
+        };
