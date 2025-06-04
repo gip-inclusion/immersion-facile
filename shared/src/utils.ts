@@ -201,3 +201,12 @@ export const filter: Filter = (predicate) => (array) => array.filter(predicate);
 
 // biome-ignore lint/complexity/noBannedTypes: <explanation>
 export type EmptyObject = {};
+
+export type RangeOfPosition<
+  N extends number,
+  Result extends Array<unknown> = [],
+> = Result["length"] extends N
+  ? Result["length"]
+  :
+      | (Result["length"] extends 0 ? never : Result["length"])
+      | RangeOfPosition<N, [unknown, ...Result]>;

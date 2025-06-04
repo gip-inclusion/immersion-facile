@@ -32,6 +32,7 @@ export const formEstablishmentFieldsLabels = (
   siret: {
     label: "Indiquez le SIRET de la structure d'accueil",
     id: domElementIds.establishment[mode].siret,
+    hintText: "Format attendu : 123 456 789 01234",
     required: true,
   },
 
@@ -56,27 +57,35 @@ export const formEstablishmentFieldsLabels = (
     placeholder: "Ex : 26 rue du labrador, 37000 Tours",
   },
   "userRights.0.firstName": {
-    label: "Prénom du référent",
+    label: "Prénom de l'administrateur",
+    hintText:
+      "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect",
     required: true,
     id: domElementIds.establishment[mode].businessContact.firstName,
   },
   "userRights.0.lastName": {
-    label: "Nom du référent",
+    label: "Nom de l'administrateur",
+    hintText:
+      "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect",
     required: true,
     id: domElementIds.establishment[mode].businessContact.lastName,
   },
   "userRights.0.email": {
-    label: "Email du référent",
+    label: "Email de l'administrateur",
+    hintText:
+      "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect",
     required: true,
     id: domElementIds.establishment[mode].businessContact.email,
   },
   "userRights.0.job": {
-    label: "Fonction du référent",
+    label: "Fonction de l'administrateur",
     required: true,
     id: domElementIds.establishment[mode].businessContact.job,
   },
   "userRights.0.phone": {
-    label: "Numéro de téléphone (ne sera pas communiqué directement)",
+    label: "Numéro de téléphone de l'administrateur",
+    hintText:
+      "Renseignez de préférence un numéro de téléphone mobile. Exemple : 06 00 00 00 00",
     required: true,
     id: domElementIds.establishment[mode].businessContact.phone,
   },
@@ -85,8 +94,8 @@ export const formEstablishmentFieldsLabels = (
     id: "",
   },
   userRights: {
-    label: "Autres emails susceptibles de répondre aux demandes",
-    id: domElementIds.establishment[mode].businessContact.copyEmails,
+    label: "Informations de l'administrateur",
+    id: "not-used",
   },
   contactMode: {
     label: "Comment souhaitez-vous que les candidats vous contactent ?",
@@ -105,6 +114,8 @@ export const formEstablishmentFieldsLabels = (
   },
   appellations: {
     label: "Les métiers que vous proposez à l'immersion",
+    hintText:
+      "Chaque métier correspond à une offre qui apparaitra dans la recherche. Votre établissement peut donc apparaître dans différentes recherches.",
     id: domElementIds.establishment[mode].appellations,
     required: true,
   },
