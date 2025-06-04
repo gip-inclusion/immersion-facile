@@ -6,6 +6,7 @@ import {
   type InclusionConnectDomainJwtPayload,
   InclusionConnectedUserBuilder,
   type Notification,
+  type SignatoryRole,
   UserBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
@@ -45,6 +46,7 @@ const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
 const convention = new ConventionDtoBuilder()
   .withId(conventionId)
   .withStatus("READY_TO_SIGN")
+  .withBeneficiaryPhone("+33611111111")
   .signedByEstablishmentRepresentative(undefined)
   .signedByBeneficiary(undefined)
   .withBeneficiarySignedAt(undefined)
@@ -601,7 +603,7 @@ describe("Send signature link", () => {
     });
 
     it.each(["validator", "counsellor"] as const)(
-      "When not connected %s triggers it",
+      "When not connected agency user %s triggers it",
       async (role) => {
         const shortLinkId = "link1";
         shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
@@ -623,6 +625,72 @@ describe("Send signature link", () => {
             role: "establishment-representative",
           },
           role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
+        );
+
+        expectObjectInArrayToMatch(uow.outboxRepository.events, [
+          { topic: "NotificationAdded" },
+          {
+            topic: "ConventionSignatureLinkManuallySent",
+            payload: {
+              convention,
+              recipientRole: "establishment-representative",
+              transport: "sms",
+              triggeredBy: {
+                kind: "convention-magic-link",
+                role,
+              },
+            },
+          },
+        ]);
+        expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+          {
+            kind: "sms",
+            followedIds: {
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
+              userId: undefined,
+            },
+            templatedContent: {
+              recipientPhone:
+                convention.signatories.establishmentRepresentative.phone,
+              kind: "ReminderForSignatories",
+              params: {
+                shortLink: makeShortLinkUrl(config, shortLinkId),
+              },
+            },
+          },
+        ]);
+      },
+    );
+
+    it.each([
+      "beneficiary",
+      "beneficiary-representative",
+      "beneficiary-current-employer",
+      "establishment-representative",
+    ] as SignatoryRole[])(
+      "When not connected signatory %s triggers it",
+      async (role) => {
+        const signatoryJwtPayload = createConventionMagicLinkPayload({
+          id: conventionId,
+          role: role,
+          email: `${role}@mail.com`,
+          now: new Date(),
+        });
+        const shortLinkId = "link1";
+        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+
+        uow.conventionRepository.setConventions([convention]);
+        uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
+        uow.userRepository.users = [notConnectedUser];
+
+        await usecase.execute(
+          {
+            conventionId,
+            role: "establishment-representative",
+          },
+          signatoryJwtPayload,
         );
 
         expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -788,6 +856,73 @@ describe("Send signature link", () => {
           templatedContent: {
             recipientPhone:
               convention.signatories.establishmentRepresentative.phone,
+            kind: "ReminderForSignatories",
+            params: {
+              shortLink: makeShortLinkUrl(config, shortLinkId),
+            },
+          },
+        },
+      ]);
+    });
+
+    it("send signature link if requested for another signatory", async () => {
+      const shortLinkId = "link2";
+      const otherSmsNotification: Notification = {
+        id: "other-notification-id",
+        createdAt: timeGateway.now().toISOString(),
+        kind: "sms",
+        followedIds: {
+          conventionId: convention.id,
+          agencyId: convention.agencyId,
+          establishmentSiret: convention.siret,
+          userId: connectedUser.id,
+        },
+        templatedContent: {
+          recipientPhone:
+            convention.signatories.establishmentRepresentative.phone,
+          kind: "ReminderForSignatories",
+          params: {
+            shortLink: makeShortLinkUrl(config, shortLinkId),
+          },
+        },
+      };
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+      uow.conventionRepository.setConventions([convention]);
+      uow.agencyRepository.agencies = [
+        toAgencyWithRights(agency, {
+          [connectedUser.id]: {
+            roles: ["validator"],
+            isNotifiedByEmail: false,
+          },
+        }),
+      ];
+      uow.userRepository.users = [connectedUser];
+      uow.notificationRepository.notifications = [otherSmsNotification];
+
+      await usecase.execute(
+        {
+          conventionId,
+          role: "beneficiary",
+        },
+        connectedUserPayload,
+      );
+
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+        { topic: "ConventionSignatureLinkManuallySent" },
+      ]);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        otherSmsNotification,
+        {
+          kind: "sms",
+          followedIds: {
+            conventionId: convention.id,
+            agencyId: convention.agencyId,
+            establishmentSiret: convention.siret,
+            userId: connectedUser.id,
+          },
+          templatedContent: {
+            recipientPhone: convention.signatories.beneficiary.phone,
             kind: "ReminderForSignatories",
             params: {
               shortLink: makeShortLinkUrl(config, shortLinkId),
