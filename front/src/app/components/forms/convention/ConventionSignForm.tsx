@@ -1,22 +1,32 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { mergeDeepRight } from "ramda";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,
 } from "react-design-system";
+import { createPortal } from "react-dom";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   type ConventionReadDto,
+  type Phone,
+  type SignatoryRole,
   domElementIds,
   isConventionRenewed,
+  signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
+import {
+  type SignatureLinkState,
+  makeConventionSections,
+  sendSignatureLinkButtonProps,
+} from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -25,11 +35,18 @@ import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
+import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { SignatureActions } from "./SignatureActions";
 type ConventionSignFormProperties = {
   jwt: string;
   convention: ConventionReadDto;
 };
+
+const sendSignatureLinkModal = createModal({
+  id: domElementIds.manageConvention.sendSignatureLinkModal,
+  isOpenedByDefault: false,
+});
 
 export const ConventionSignForm = ({
   jwt,
@@ -41,6 +58,29 @@ export const ConventionSignForm = ({
   );
   const alreadySigned = !!currentSignatory?.signedAt;
 
+  const closeSendSignatureLinkModal = () => {
+    dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    sendSignatureLinkModal.close();
+  };
+
+  const isSendSignatureLinkModalOpen = useIsModalOpen(sendSignatureLinkModal, {
+    onConceal: () => closeSendSignatureLinkModal(),
+  });
+
+  const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
+    useState<{
+      signatoryRole: SignatoryRole;
+      signatoryPhone: Phone;
+    } | null>(null);
+
+  const [signatureLinksSent, setSignatureLinksSent] =
+    useState<SignatureLinkState>({
+      beneficiary: false,
+      "establishment-representative": false,
+      "beneficiary-representative": false,
+      "beneficiary-current-employer": false,
+    });
+
   const [isModalClosedWithoutSignature, setIsModalClosedWithoutSignature] =
     useState<boolean>(false);
 
@@ -49,6 +89,26 @@ export const ConventionSignForm = ({
     mode: "onTouched",
   });
   const t = useConventionTexts(convention.internshipKind);
+
+  const onSendSignatureLinkSubmit = () => {
+    if (signatoryToSendSignatureLink) {
+      const { signatoryRole } = signatoryToSendSignatureLink;
+
+      dispatch(
+        sendSignatureLinkSlice.actions.sendSignatureLinkRequested({
+          conventionId: convention.id,
+          signatoryRole,
+          jwt,
+          feedbackTopic: "send-signature-link",
+        }),
+      );
+
+      setSignatureLinksSent((prev) => ({
+        ...prev,
+        [signatoryRole]: true,
+      }));
+    }
+  };
 
   const onSignFormSubmit: SubmitHandler<ConventionReadDto> = (values): void => {
     if (!currentSignatory)
@@ -80,6 +140,10 @@ export const ConventionSignForm = ({
       }),
     );
   };
+
+  useEffect(() => {
+    if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
+  }, [isSendSignatureLinkModalOpen]);
 
   if (alreadySigned) {
     return (
@@ -120,7 +184,20 @@ export const ConventionSignForm = ({
               submittedAt={toDisplayedDate({
                 date: new Date(convention.dateSubmission),
               })}
-              summary={makeConventionSections(convention)}
+              summary={makeConventionSections(
+                convention,
+                sendSignatureLinkButtonProps({
+                  triggeredByRole: currentSignatory.role,
+                  signatureLinksSent,
+                  onClick: ({ signatoryRole, signatoryPhone }) => {
+                    sendSignatureLinkModal.open();
+                    setSignatoryToSendSignatureLink({
+                      signatoryRole,
+                      signatoryPhone,
+                    });
+                  },
+                }),
+              )}
               conventionId={convention.id}
             />
           )}
@@ -152,6 +229,38 @@ export const ConventionSignForm = ({
           )}
         </form>
       </FormProvider>
+      {createPortal(
+        <sendSignatureLinkModal.Component
+          title="Envoyer le lien de signature par SMS"
+          buttons={[
+            {
+              priority: "secondary",
+              children: "Annuler",
+              onClick: () => {
+                sendSignatureLinkModal.close();
+              },
+            },
+            {
+              id: domElementIds.manageConvention
+                .submitSendSignatureLinkModalButton,
+              priority: "primary",
+              children: "Envoyer",
+              onClick: () => onSendSignatureLinkSubmit(),
+            },
+          ]}
+        >
+          <p>
+            Le{" "}
+            {signatoryToSendSignatureLink &&
+              signatoryTitleByRole[
+                signatoryToSendSignatureLink.signatoryRole
+              ]}{" "}
+            recevra un lien de signature au{" "}
+            {signatoryToSendSignatureLink?.signatoryPhone}
+          </p>
+        </sendSignatureLinkModal.Component>,
+        document.body,
+      )}
     </>
   );
 };
