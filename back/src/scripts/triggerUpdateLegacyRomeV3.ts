@@ -1,4 +1,3 @@
-import axios from "axios";
 import { sql } from "kysely";
 import { Pool } from "pg";
 import { map, splitEvery } from "ramda";
@@ -8,7 +7,6 @@ import {
   type AccessTokenResponse,
   AppConfig,
 } from "../config/bootstrap/appConfig";
-import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -18,10 +16,12 @@ import {
   HttpRome3Gateway,
   makeRome3Routes,
 } from "../domains/agency/adapters/ft-agencies-referential/HttpRome3Gateway";
+import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -41,7 +41,13 @@ const main = async () => {
   );
 
   const franceTravailGateway = new HttpFranceTravailGateway(
-    createFtAxiosSharedClient(config),
+    createAxiosSharedClient(
+      createFranceTravailRoutes({
+        ftApiUrl: config.ftApiUrl,
+        ftEnterpriseUrl: config.ftEnterpriseUrl,
+      }),
+      makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
+    ),
     cachingGateway,
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,
@@ -49,7 +55,11 @@ const main = async () => {
   );
 
   const httpRome3Gateway = new HttpRome3Gateway(
-    createAxiosSharedClient(makeRome3Routes(config.ftApiUrl), axios),
+    createAxiosSharedClient(
+      makeRome3Routes(config.ftApiUrl),
+      makeAxiosInstances(config.externalAxiosTimeout)
+        .axiosWithoutValidateStatus,
+    ),
     franceTravailGateway,
     config.franceTravailClientId,
   );

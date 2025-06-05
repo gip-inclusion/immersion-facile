@@ -1,15 +1,17 @@
+import { createAxiosSharedClient } from "shared-routes/axios";
 import {
   type AccessTokenResponse,
   AppConfig,
 } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
-import { createFtAxiosSharedClient } from "../config/helpers/createAxiosSharedClients";
+import { createFranceTravailRoutes } from "../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { HttpFranceTravailGateway } from "../domains/convention/adapters/france-travail-gateway/HttpFranceTravailGateway";
 import { ResyncOldConventionsToFt } from "../domains/convention/use-cases/ResyncOldConventionsToFt";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { noRetries } from "../domains/core/retry-strategy/ports/RetryStrategy";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { makeAxiosInstances } from "../utils/axiosUtils";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -19,10 +21,15 @@ const config = AppConfig.createFromEnv();
 
 const executeUsecase = async () => {
   const timeGateway = new RealTimeGateway();
-  const peAxiosHttpClient = createFtAxiosSharedClient(config);
 
   const httpFranceTravailGateway = new HttpFranceTravailGateway(
-    peAxiosHttpClient,
+    createAxiosSharedClient(
+      createFranceTravailRoutes({
+        ftApiUrl: config.ftApiUrl,
+        ftEnterpriseUrl: config.ftEnterpriseUrl,
+      }),
+      makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
+    ),
     new InMemoryCachingGateway<AccessTokenResponse>(timeGateway, "expires_in"),
     config.ftApiUrl,
     config.franceTravailAccessTokenConfig,

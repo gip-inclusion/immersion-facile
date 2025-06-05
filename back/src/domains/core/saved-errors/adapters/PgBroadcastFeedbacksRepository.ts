@@ -1,7 +1,7 @@
-import { isAxiosError } from "axios";
 import { sql } from "kysely";
 import { type ConventionId, errors } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
+import { isAxiosError } from "../../../../utils/axiosUtils";
 import type {
   BroadcastFeedback,
   BroadcastFeedbacksRepository,

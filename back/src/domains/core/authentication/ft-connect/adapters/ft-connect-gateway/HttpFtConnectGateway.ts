@@ -1,9 +1,9 @@
-import axios from "axios";
 import Bottleneck from "bottleneck";
 import { HTTP_STATUS, errors, queryParamsAsString } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
+import { isAxiosError } from "../../../../../../utils/axiosUtils";
 import {
   type LoggerParamsWithMessage,
   type OpacifiedLogger,
@@ -324,7 +324,7 @@ const manageFtConnectError = (
       `Is not an error: ${JSON.stringify(error)}`,
       errors.generic.notAnError(),
     );
-  if (axios.isAxiosError(error)) {
+  if (isAxiosError(error)) {
     logger.error({
       message: `FT CONNECT ERROR - ${routeName}`,
       error,
@@ -358,5 +358,5 @@ const isJobSeekerFromStatus = (codeStatutIndividu: "0" | "1"): boolean =>
 
 /** Should not occur if FT apis respect contract => a jobseeker OAuth should have advisors */
 const isJobseekerButNoAdvisorsResponse = (error: unknown) =>
-  axios.isAxiosError(error) &&
+  isAxiosError(error) &&
   error.response?.status === HTTP_STATUS.INTERNAL_SERVER_ERROR;

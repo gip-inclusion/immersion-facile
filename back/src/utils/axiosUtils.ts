@@ -17,3 +17,15 @@ export const createAxiosInstance = (
   });
   return axiosInstance;
 };
+
+export const makeAxiosInstances = (timeout: number) => ({
+  axiosWithoutValidateStatus: axios.create({
+    timeout,
+  }),
+  axiosWithValidateStatus: axios.create({
+    timeout,
+    validateStatus: () => true,
+  }),
+});
+
+export const isAxiosError = axios.isAxiosError;
