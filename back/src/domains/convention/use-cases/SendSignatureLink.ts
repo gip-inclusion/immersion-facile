@@ -11,6 +11,7 @@ import {
   conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
+  isSignatory,
   signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
@@ -28,7 +29,7 @@ import {
   throwErrorIfPhoneNumberNotValid,
   throwErrorIfSignatoryAlreadySigned,
   throwErrorOnConventionIdMismatch,
-  throwIfNotAllowedForUser,
+  throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_REMINDER = 24;
@@ -80,12 +81,17 @@ export const makeSendSignatureLink = createTransactionalUseCase<
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
 
-    await throwIfNotAllowedForUser({
-      uow,
-      jwtPayload,
-      agencyId: convention.agencyId,
-      convention,
-    });
+    const isNotSignatory = !(
+      "role" in jwtPayload && isSignatory(jwtPayload.role)
+    );
+    if (isNotSignatory) {
+      await throwIfUserIsNotIFAdminNorAgencyModifier({
+        uow,
+        jwtPayload,
+        agencyId: convention.agencyId,
+        convention,
+      });
+    }
 
     const signatoryKey =
       conventionSignatoryRoleBySignatoryKey[inputParams.role];

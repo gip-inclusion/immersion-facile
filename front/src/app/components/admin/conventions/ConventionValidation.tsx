@@ -1,7 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
-import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { formatDistance } from "date-fns";
 import { fr as french } from "date-fns/locale";
@@ -10,16 +8,12 @@ import {
   ConventionRenewedInformations,
   ConventionSummary,
 } from "react-design-system";
-import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   type ConventionReadDto,
   type Phone,
   type SignatoryRole,
-  domElementIds,
   isConventionRenewed,
-  isValidMobilePhone,
-  signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
@@ -31,7 +25,13 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
-import { makeConventionSections } from "../../../contents/convention/conventionSummary.helpers";
+import {
+  SendSignatureLinkModalWrapper,
+  type SignatureLinkState,
+  makeConventionSections,
+  sendSignatureLinkButtonProps,
+  sendSignatureLinkModal,
+} from "../../../contents/convention/conventionSummary.helpers";
 
 const beforeAfterString = (date: string) => {
   const eventDate = new Date(date);
@@ -42,13 +42,6 @@ const beforeAfterString = (date: string) => {
     locale: french,
   });
 };
-
-const sendSignatureLinkModal = createModal({
-  id: domElementIds.manageConvention.sendSignatureLinkModal,
-  isOpenedByDefault: false,
-});
-
-type SignatureLinkState = Record<SignatoryRole, boolean>;
 
 export interface ConventionValidationProps {
   convention: ConventionReadDto;
@@ -123,24 +116,6 @@ export const ConventionValidation = ({
     }
   };
 
-  const openSendSignatureLinkButtonProps: (
-    signatoryRole: SignatoryRole,
-    signatoryPhone: Phone,
-    signatoryAlreadySign: boolean,
-  ) => ButtonProps = (signatoryRole, signatoryPhone, signatoryAlreadySign) => ({
-    priority: "tertiary",
-    children: "Faire signer par SMS",
-    disabled:
-      !isValidMobilePhone(signatoryPhone) ||
-      signatoryAlreadySign ||
-      signatureLinksSent[signatoryRole],
-    onClick: () => {
-      sendSignatureLinkModal.open();
-      setSignatoryToSendSignatureLink({ signatoryRole, signatoryPhone });
-    },
-    id: domElementIds.manageConvention.openSendSignatureLinkModal,
-  });
-
   return (
     <>
       <Badge
@@ -169,43 +144,24 @@ export const ConventionValidation = ({
         })}
         summary={makeConventionSections(
           convention,
-          openSendSignatureLinkButtonProps,
+          sendSignatureLinkButtonProps({
+            signatureLinksSent,
+            onClick: ({ signatoryRole, signatoryPhone }) => {
+              sendSignatureLinkModal.open();
+              setSignatoryToSendSignatureLink({
+                signatoryRole,
+                signatoryPhone,
+              });
+            },
+          }),
         )}
         conventionId={convention.id}
       />
-
-      {createPortal(
-        <sendSignatureLinkModal.Component
-          title="Envoyer le lien de signature par SMS"
-          buttons={[
-            {
-              priority: "secondary",
-              children: "Annuler",
-              onClick: () => {
-                sendSignatureLinkModal.close();
-              },
-            },
-            {
-              id: domElementIds.manageConvention
-                .submitSendSignatureLinkModalButton,
-              priority: "primary",
-              children: "Envoyer",
-              onClick: () => onSubmitSendSignatureLink(),
-            },
-          ]}
-        >
-          <p>
-            Le{" "}
-            {signatoryToSendSignatureLink &&
-              signatoryTitleByRole[
-                signatoryToSendSignatureLink.signatoryRole
-              ]}{" "}
-            recevra un lien de signature au{" "}
-            {signatoryToSendSignatureLink?.signatoryPhone}
-          </p>
-        </sendSignatureLinkModal.Component>,
-        document.body,
-      )}
+      <SendSignatureLinkModalWrapper
+        signatory={signatoryToSendSignatureLink?.signatoryRole}
+        signatoryPhone={signatoryToSendSignatureLink?.signatoryPhone}
+        onConfirm={onSubmitSendSignatureLink}
+      />
     </>
   );
 };

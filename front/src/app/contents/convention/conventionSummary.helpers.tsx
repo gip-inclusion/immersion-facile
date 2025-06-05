@@ -1,6 +1,7 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
   type ConventionSummaryField,
   ConventionWeeklySchedule,
@@ -10,6 +11,7 @@ import type {
   ConventionSummarySection,
   ConventionSummarySubSection,
 } from "react-design-system/src/immersionFacile/components/convention-summary";
+import { createPortal } from "react-dom";
 import {
   type ConventionReadDto,
   type DateString,
@@ -18,10 +20,13 @@ import {
   type SignatoryRole,
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
+  domElementIds,
   getFullname,
+  isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
+  signatoryTitleByRole,
   toDisplayedDate,
 } from "shared";
 
@@ -31,7 +36,7 @@ const makeSignatoriesSubsections = (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
-  ) => ButtonProps,
+  ) => ButtonProps | null,
 ): ConventionSummarySubSection[] => {
   const shouldDisplayDefaultSignatoryBadge =
     convention.status === "READY_TO_SIGN" ||
@@ -86,11 +91,11 @@ const makeSignatoriesSubsections = (
         action:
           ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
           signatoriesSubsectionButtonProps
-            ? signatoriesSubsectionButtonProps(
+            ? (signatoriesSubsectionButtonProps(
                 "beneficiary",
                 convention.signatories.beneficiary.phone,
                 !!convention.signatories.beneficiary.signedAt,
-              )
+              ) ?? undefined)
             : undefined,
       },
       fields: removeEmptyValue([
@@ -155,11 +160,11 @@ const makeSignatoriesSubsections = (
               ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
                 convention.status,
               ) && signatoriesSubsectionButtonProps
-                ? signatoriesSubsectionButtonProps(
+                ? (signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
                     convention.signatories.beneficiaryRepresentative.phone,
                     !!convention.signatories.beneficiaryRepresentative.signedAt,
-                  )
+                  ) ?? undefined)
                 : undefined,
           },
           fields: removeEmptyValue([
@@ -223,11 +228,11 @@ const makeSignatoriesSubsections = (
         action:
           ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(convention.status) &&
           signatoriesSubsectionButtonProps
-            ? signatoriesSubsectionButtonProps(
+            ? (signatoriesSubsectionButtonProps(
                 "establishment-representative",
                 convention.signatories.establishmentRepresentative.phone,
                 !!convention.signatories.establishmentRepresentative.signedAt,
-              )
+              ) ?? undefined)
             : undefined,
       },
       fields: removeEmptyValue([
@@ -299,12 +304,12 @@ const makeSignatoriesSubsections = (
               ["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(
                 convention.status,
               ) && signatoriesSubsectionButtonProps
-                ? signatoriesSubsectionButtonProps(
+                ? (signatoriesSubsectionButtonProps(
                     "beneficiary-current-employer",
                     convention.signatories.beneficiaryCurrentEmployer.phone,
                     !!convention.signatories.beneficiaryCurrentEmployer
                       .signedAt,
-                  )
+                  ) ?? undefined)
                 : undefined,
           },
           fields: removeEmptyValue([
@@ -767,7 +772,7 @@ export const makeConventionSections = (
     signatoryRole: SignatoryRole,
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
-  ) => ButtonProps,
+  ) => ButtonProps | null,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -839,3 +844,79 @@ const renderSiret = (siret: string) => (
     {siret}
   </a>
 );
+
+export const sendSignatureLinkModal = createModal({
+  id: domElementIds.manageConvention.sendSignatureLinkModal,
+  isOpenedByDefault: false,
+});
+
+export const SendSignatureLinkModalWrapper = ({
+  signatory,
+  signatoryPhone,
+  onConfirm,
+}: {
+  signatory?: SignatoryRole;
+  signatoryPhone?: string;
+  onConfirm: () => void;
+}) =>
+  createPortal(
+    <sendSignatureLinkModal.Component
+      title="Envoyer le lien de signature par SMS"
+      buttons={[
+        {
+          priority: "secondary",
+          children: "Annuler",
+          onClick: () => {
+            sendSignatureLinkModal.close();
+          },
+        },
+        {
+          id: domElementIds.manageConvention.submitSendSignatureLinkModalButton,
+          priority: "primary",
+          children: "Envoyer",
+          onClick: () => onConfirm(),
+        },
+      ]}
+    >
+      <p>
+        Le {signatory && signatoryTitleByRole[signatory]} recevra un lien de
+        signature au {signatoryPhone}
+      </p>
+    </sendSignatureLinkModal.Component>,
+    document.body,
+  );
+
+export type SignatureLinkState = Record<SignatoryRole, boolean>;
+export const sendSignatureLinkButtonProps =
+  ({
+    triggeredByRole,
+    signatureLinksSent,
+    onClick,
+  }: {
+    triggeredByRole?: SignatoryRole;
+    signatureLinksSent: SignatureLinkState;
+    onClick: (params: {
+      signatoryRole: SignatoryRole;
+      signatoryPhone: Phone;
+    }) => void;
+  }) =>
+  (
+    signatoryRole: SignatoryRole,
+    signatoryPhone: Phone,
+    signatoryAlreadySign: boolean,
+  ): ButtonProps | null =>
+    triggeredByRole && triggeredByRole === signatoryRole
+      ? null
+      : {
+          priority: "tertiary",
+          children: "Faire signer par SMS",
+          disabled:
+            !isValidMobilePhone(signatoryPhone) ||
+            signatoryAlreadySign ||
+            signatureLinksSent[signatoryRole],
+          onClick: () => {
+            onClick({ signatoryRole, signatoryPhone });
+          },
+          type: "button",
+          id: domElementIds.manageConvention.openSendSignatureLinkModal,
+        };
