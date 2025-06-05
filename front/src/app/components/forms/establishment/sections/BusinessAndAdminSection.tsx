@@ -9,7 +9,7 @@ import { type FormEstablishmentDto, domElementIds } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
-import { EstablishmentFormSection } from "src/app/components/forms/establishment/EstablishmentFormSection";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   displayReadableError,
@@ -49,36 +49,42 @@ export const BusinessAndAdminSection = ({
   ).getFormErrors();
 
   return (
-    <EstablishmentFormSection title="Informations de votre établissement">
-      {match(mode)
-        .with("create", () => <CreationSiretRelatedInputs />)
-        .with(P.union("admin", "edit"), () => (
-          <EditionSiretRelatedInputs mode={mode} />
-        ))
-        .exhaustive()}
-      <Input
-        label={formContents.website.label}
-        hintText={formContents.website.hintText}
-        nativeInputProps={{
-          ...formContents.website,
-          ...register("website"),
-        }}
-        {...getFieldError("website")}
-      />
-      <Input
-        label={formContents.additionalInformation.label}
-        hintText={formContents.additionalInformation.hintText}
-        textArea
-        nativeTextAreaProps={{
-          ...formContents.additionalInformation,
-          ...register("additionalInformation"),
-        }}
-        {...getFieldError("additionalInformation")}
-      />
+    <>
+      <HeadingSection title="Informations de votre établissement">
+        {match(mode)
+          .with("create", () => <CreationSiretRelatedInputs />)
+          .with(P.union("admin", "edit"), () => (
+            <EditionSiretRelatedInputs mode={mode} />
+          ))
+          .exhaustive()}
+        <Input
+          label={formContents.website.label}
+          hintText={formContents.website.hintText}
+          nativeInputProps={{
+            ...formContents.website,
+            ...register("website"),
+          }}
+          {...getFieldError("website")}
+        />
+        <Input
+          label={formContents.additionalInformation.label}
+          hintText={formContents.additionalInformation.hintText}
+          textArea
+          nativeTextAreaProps={{
+            ...formContents.additionalInformation,
+            ...register("additionalInformation"),
+          }}
+          {...getFieldError("additionalInformation")}
+        />
+      </HeadingSection>
 
       {match(mode)
         .with(P.union("edit", "admin"), () => <EstablishmentUsersList />)
-        .with("create", () => <EstablishmentAdminInfos />)
+        .with("create", () => (
+          <HeadingSection title="Administrateurs de l'établissement">
+            <EstablishmentAdminInfos />
+          </HeadingSection>
+        ))
         .exhaustive()}
 
       <ErrorNotifications
@@ -134,7 +140,7 @@ export const BusinessAndAdminSection = ({
           ]}
         />
       )}
-    </EstablishmentFormSection>
+    </>
   );
 };
 
@@ -148,33 +154,45 @@ const EstablishmentAdminInfos = () => {
   const getFieldError = makeFieldError(methods.formState);
   return (
     <>
-      <h3 className={fr.cx("fr-h6")}>Administrateur de l'établissement</h3>
       <Alert
         className={fr.cx("fr-mb-2w")}
         severity="info"
         small
         description="L’administrateur accède aux conventions, aux candidatures et peut gérer la fiche entreprise et les utilisateurs de l’établissement. Vous pourrez ajouter d’autres utilisateurs à votre établissement une fois celui-ci créé."
       />
-      <Input
-        label={formContents["userRights.0.firstName"].label}
-        hintText={formContents["userRights.0.firstName"].hintText}
-        disabled
-        nativeInputProps={{
-          value: federatedIdentity?.firstName,
-          id: domElementIds.establishment.create.businessContact.firstName,
-        }}
-      />
-      <Input
-        label={formContents["userRights.0.lastName"].label}
-        hintText={
-          "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
-        }
-        disabled
-        nativeInputProps={{
-          value: federatedIdentity?.lastName,
-          id: domElementIds.establishment.create.businessContact.lastName,
-        }}
-      />
+      {/* 
+      
+      TODO: federatedIdentity.provider === "proconnect" 
+      when ready and add the "email" case so we redirect the user to its account 
+      
+      */}
+      {federatedIdentity && (
+        <>
+          <Input
+            label={formContents["userRights.0.firstName"].label}
+            hintText={
+              "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+            }
+            disabled
+            nativeInputProps={{
+              value: federatedIdentity?.firstName,
+              id: domElementIds.establishment.create.businessContact.firstName,
+            }}
+          />
+          <Input
+            label={formContents["userRights.0.lastName"].label}
+            hintText={
+              "Ce champ est renseigné automatiquement depuis les données renseignées sur ProConnect"
+            }
+            disabled
+            nativeInputProps={{
+              value: federatedIdentity?.lastName,
+              id: domElementIds.establishment.create.businessContact.lastName,
+            }}
+          />
+        </>
+      )}
+
       <Input
         label={formContents["userRights.0.email"].label}
         hintText={formContents["userRights.0.email"].hintText}
