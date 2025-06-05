@@ -38,11 +38,11 @@ export const SelectConventionFromIdForm = ({
       >
         <div className={fr.cx("fr-grid-row")}>
           <Input
-            label="Id de la convention *"
+            label="Identifiant de la convention *"
             nativeInputProps={{
               ...register("conventionId"),
               id: "manageConventionAdminForm-conventionId",
-              placeholder: "Id de la convention",
+              placeholder: "Ex: cf0755c7-e014-4515-82fa-39270f1db6d8",
               onChange: (event) => {
                 setValue("conventionId", event.currentTarget.value.trim(), {
                   shouldValidate: true,
