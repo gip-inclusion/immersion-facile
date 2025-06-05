@@ -9,16 +9,14 @@ import "src/assets/admin.css";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { EditAgencyForm } from "../forms/agency/EditAgencyForm";
+import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 import { AgencyAdminAutocomplete } from "./AgencyAdminAutocomplete";
 
 export const EditAgency = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
   const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
   return (
-    <>
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
-        Editer une agence
-      </h2>
+    <BackofficeDashboardTabContent title="Editer une agence">
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <AgencyAdminAutocomplete
           locator="agencyAdminAutocomplete"
@@ -50,6 +48,6 @@ export const EditAgency = () => {
           routeName="adminAgencies"
         />
       )}
-    </>
+    </BackofficeDashboardTabContent>
   );
 };

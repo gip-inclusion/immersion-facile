@@ -30,44 +30,41 @@ export const SelectConventionFromIdForm = ({
     });
   const { isValid } = formState;
   return (
-    <>
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>Piloter une convention</h2>
-      <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
-        <form
-          onSubmit={handleSubmit(({ conventionId }) => {
-            routes[routeNameToRedirectTo]({ conventionId }).push();
-          })}
+    <div className={fr.cx("fr-mb-4w")}>
+      <form
+        onSubmit={handleSubmit(({ conventionId }) => {
+          routes[routeNameToRedirectTo]({ conventionId }).push();
+        })}
+      >
+        <div className={fr.cx("fr-grid-row")}>
+          <Input
+            label="Id de la convention *"
+            nativeInputProps={{
+              ...register("conventionId"),
+              id: "manageConventionAdminForm-conventionId",
+              placeholder: "Id de la convention",
+              onChange: (event) => {
+                setValue("conventionId", event.currentTarget.value.trim(), {
+                  shouldValidate: true,
+                });
+              },
+            }}
+            className={fr.cx("fr-col-12", "fr-col-lg-6")}
+            {...makeFieldError(formState)("conventionId")}
+          />
+        </div>
+        <Button
+          title="Piloter la convention"
+          disabled={!isValid}
+          className={fr.cx("fr-mt-2w")}
+          id={
+            domElementIds.establishmentDashboard.manageConventionForm
+              .submitButton
+          }
         >
-          <div className={fr.cx("fr-grid-row")}>
-            <Input
-              label="Id de la convention *"
-              nativeInputProps={{
-                ...register("conventionId"),
-                id: "manageConventionAdminForm-conventionId",
-                placeholder: "Id de la convention",
-                onChange: (event) => {
-                  setValue("conventionId", event.currentTarget.value.trim(), {
-                    shouldValidate: true,
-                  });
-                },
-              }}
-              className={fr.cx("fr-col-12", "fr-col-lg-6")}
-              {...makeFieldError(formState)("conventionId")}
-            />
-          </div>
-          <Button
-            title="Piloter la convention"
-            disabled={!isValid}
-            className={fr.cx("fr-mt-2w")}
-            id={
-              domElementIds.establishmentDashboard.manageConventionForm
-                .submitButton
-            }
-          >
-            Piloter la convention
-          </Button>
-        </form>
-      </div>
-    </>
+          Piloter la convention
+        </Button>
+      </form>
+    </div>
   );
 };

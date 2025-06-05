@@ -1,6 +1,8 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
@@ -59,8 +61,14 @@ const makeEstablishmentDashboardTabs = (
     tabId: "conventions",
     content: (
       <>
-        <InitiateConventionButton />
-        <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+        <HeadingSection
+          title="Piloter une convention"
+          titleAs="h2"
+          titleAction={<InitiateConventionButton />}
+          className={fr.cx("fr-mt-0")}
+        >
+          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+        </HeadingSection>
         {conventions ? (
           <MetabaseView
             title={"Tableau des conventions en cours"}
@@ -80,17 +88,23 @@ const makeEstablishmentDashboardTabs = (
       <DiscussionManageContent discussionId={route.params.discussionId} />
     ) : (
       <>
-        <ManageDiscussionFormSection />
+        <HeadingSection
+          title="Gérer une candidature"
+          titleAs="h2"
+          className={fr.cx("fr-mt-0")}
+        >
+          <ManageDiscussionFormSection />
+        </HeadingSection>
         {discussions ? (
           <MetabaseView
-            title={`Suivi des mises en relations pour ${firstName} ${lastName}`}
+            title={`Suivi des candidatures pour ${firstName} ${lastName}`}
             url={discussions}
           />
         ) : (
           <p>
             {" "}
-            Nous n'avons pas trouvé de mises en relation où vous êtes référencés
-            en tant que contact d'entreprise.
+            Nous n'avons pas trouvé de candidatures où vous êtes référencés en
+            tant que contact d'entreprise.
           </p>
         )}
       </>

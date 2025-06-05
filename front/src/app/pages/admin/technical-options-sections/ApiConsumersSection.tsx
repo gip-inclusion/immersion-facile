@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
@@ -33,6 +34,7 @@ import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsu
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {
@@ -107,15 +109,19 @@ export const ApiConsumersSection = () => {
     makeApiConsumerActionButtons(apiConsumer, onEditButtonClick),
   ]);
   return (
-    <>
-      <h4>Consommateurs API</h4>
-      <Button
-        type="button"
-        onClick={onApiConsumerAddClick}
-        id={domElementIds.admin.technicalOptionsTab.addApiConsumerButton}
-      >
-        Ajouter un nouveau consommateur
-      </Button>
+    <BackofficeDashboardTabContent
+      title="Consommateurs API"
+      titleAction={
+        <Button
+          type="button"
+          onClick={onApiConsumerAddClick}
+          id={domElementIds.admin.technicalOptionsTab.addApiConsumerButton}
+        >
+          Ajouter un nouveau consommateur
+        </Button>
+      }
+      className={fr.cx("fr-mt-4w")}
+    >
       <Table
         fixed
         data={tableDataFromApiConsumers}
@@ -154,7 +160,7 @@ export const ApiConsumersSection = () => {
         </apiConsumerModal.Component>,
         document.body,
       )}
-    </>
+    </BackofficeDashboardTabContent>
   );
 };
 

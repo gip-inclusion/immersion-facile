@@ -1,4 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { SearchBar } from "@codegouvfr/react-dsfr/SearchBar";
 import { Table } from "@codegouvfr/react-dsfr/Table";
 import { type ElementRef, useRef } from "react";
@@ -6,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
@@ -18,45 +18,43 @@ export const UsersTab = () => {
   const inputElement = useRef<ElementRef<"input">>(null);
 
   return (
-    <>
-      <div className={fr.cx("fr-grid-row", "fr-grid-row--middle")}>
-        <div className={fr.cx("fr-col-lg-6")}>
-          <h2 className={fr.cx("fr-h5", "fr-mb-0", "fr-mt-0")}>Utilisateurs</h2>
-          <UsersWithoutNameHint />
-        </div>
-        <div className={fr.cx("fr-col-lg-6")}>
-          <SearchBar
-            renderInput={({ className, id, placeholder, type }) => (
-              <input
-                ref={inputElement}
-                className={className}
-                id={id}
-                placeholder={placeholder}
-                type={type}
-                value={query}
-                // Note: The default behavior for an input of type 'text' is to clear the input value when the escape key is pressed.
-                // However, due to a bug in @gouvfr/dsfr the escape key event is not propagated to the input element.
-                // As a result this onChange is not called when the escape key is pressed.
-                onChange={(event) =>
-                  dispatch(
-                    listUsersSlice.actions.queryUpdated(
-                      event.currentTarget.value,
-                    ),
-                  )
+    <BackofficeDashboardTabContent
+      title="Utilisateurs"
+      description={<UsersWithoutNameHint />}
+      titleAction={
+        <SearchBar
+          renderInput={({ className, id, placeholder, type }) => (
+            <input
+              ref={inputElement}
+              className={className}
+              id={id}
+              placeholder={placeholder}
+              type={type}
+              value={query}
+              // Note: The default behavior for an input of type 'text' is to clear the input value when the escape key is pressed.
+              // However, due to a bug in @gouvfr/dsfr the escape key event is not propagated to the input element.
+              // As a result this onChange is not called when the escape key is pressed.
+              onChange={(event) =>
+                dispatch(
+                  listUsersSlice.actions.queryUpdated(
+                    event.currentTarget.value,
+                  ),
+                )
+              }
+              // Same goes for the keydown event so this is useless but we hope the bug will be fixed soon.
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  inputElement.current?.blur();
                 }
-                // Same goes for the keydown event so this is useless but we hope the bug will be fixed soon.
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    inputElement.current?.blur();
-                  }
-                }}
-              />
-            )}
-          />
-        </div>
-      </div>
+              }}
+            />
+          )}
+        />
+      }
+      titleActionCols={4}
+    >
       <UsersTable />
-    </>
+    </BackofficeDashboardTabContent>
   );
 };
 
