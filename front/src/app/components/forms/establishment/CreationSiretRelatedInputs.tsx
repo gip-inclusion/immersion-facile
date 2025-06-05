@@ -1,3 +1,4 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
@@ -86,6 +87,7 @@ export const CreationSiretRelatedInputs = () => {
       />
       <p>
         <a
+          className={fr.cx("fr-link")}
           href={"https://annuaire-entreprises.data.gouv.fr"}
           target="_blank"
           rel="noreferrer"
