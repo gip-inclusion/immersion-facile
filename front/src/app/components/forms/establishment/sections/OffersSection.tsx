@@ -3,9 +3,9 @@ import type {
   OnStepChange,
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
-import { EstablishmentFormSection } from "src/app/components/forms/establishment/EstablishmentFormSection";
 import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
 import { MultipleAppellationInput } from "src/app/components/forms/establishment/MultipleAppellationInput";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   displayReadableError,
@@ -53,7 +53,7 @@ export const OffersSection = ({
   ).getFormErrors();
   return (
     <>
-      <EstablishmentFormSection
+      <HeadingSection
         title={formContents.businessAddresses.label}
         description="Par défaut, vous apparaîtrez dans les résultats de recherche liés à l’adresse de votre établissement. Vous pouvez ajouter d’autres adresses si vous proposez des immersions ailleurs. Par exemple : votre société est située à Dijon (adresse liée à votre SIRET) mais vous proposez une immersion dans votre antenne de Nantes."
       >
@@ -83,8 +83,8 @@ export const OffersSection = ({
           }}
           id={domElementIds.establishment[mode].businessAddresses}
         />
-      </EstablishmentFormSection>
-      <EstablishmentFormSection
+      </HeadingSection>
+      <HeadingSection
         title={formContents.appellations.label}
         description="Les métiers que vous proposez à l’immersion"
       >
@@ -108,7 +108,7 @@ export const OffersSection = ({
           currentAppellations={formValues.appellations}
           error={errors?.appellations?.message}
         />
-      </EstablishmentFormSection>
+      </HeadingSection>
       {isStepMode && (
         <>
           <ErrorNotifications

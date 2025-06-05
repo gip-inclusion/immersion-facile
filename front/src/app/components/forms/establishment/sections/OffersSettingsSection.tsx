@@ -6,8 +6,10 @@ import RadioButtons, {
 import { equals } from "ramda";
 
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import {
   type EstablishmentSearchableBy,
   type FormEstablishmentDto,
@@ -16,6 +18,7 @@ import {
   toDateUTCString,
   toDisplayedDate,
 } from "shared";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import {
   booleanSelectOptions,
   richBooleanSelectOptions,
@@ -28,11 +31,18 @@ import {
   getFormContents,
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
+import { useAdminToken } from "src/app/hooks/jwt.hooks";
+import { useRoute } from "src/app/routes/routes";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import allUsersSvg from "../../../../../assets/img/all.svg";
 import jobSeekerSvg from "../../../../../assets/img/jobseeker.svg";
 import studentSvg from "../../../../../assets/img/student.svg";
-import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
-import { EstablishmentFormSection } from "../EstablishmentFormSection";
+import type {
+  Mode,
+  OnStepChange,
+  RouteByMode,
+  Step,
+} from "../EstablishmentForm";
 
 const searchableByValues: Record<
   "all" | keyof EstablishmentSearchableBy,
@@ -69,6 +79,11 @@ export const OffersSettingsSection = ({
 }) => {
   const { setValue, watch, clearErrors, getValues, register, formState } =
     useFormContext<FormEstablishmentDto>();
+  const adminJwt = useAdminToken();
+  const route = useRoute() as RouteByMode[Mode];
+  const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
+
+  const dispatch = useDispatch();
   const isStepMode = currentStep !== null;
 
   const formContents = getFormContents(
@@ -123,12 +138,30 @@ export const OffersSettingsSection = ({
     return false;
   };
 
+  const onClickEstablishmentDeleteButton = () => {
+    const confirmed = confirm(
+      `! Etes-vous sûr de vouloir supprimer cet établissement ? !
+                (cette opération est irréversible 💀)`,
+    );
+    if (confirmed && adminJwt)
+      dispatch(
+        establishmentSlice.actions.deleteEstablishmentRequested({
+          establishmentDelete: {
+            siret: formValues.siret,
+            jwt: adminJwt,
+          },
+          feedbackTopic: "form-establishment",
+        }),
+      );
+    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
+  };
+
   const availableForImmersion = isAvailableForImmersion();
   const formValues = getValues();
 
   return (
     <>
-      <EstablishmentFormSection
+      <HeadingSection
         title="Disponibilité"
         description="Êtes-vous disponible actuellement pour recevoir des personnes en immersion ?"
       >
@@ -184,26 +217,25 @@ export const OffersSettingsSection = ({
             {...getFieldError("nextAvailabilityDate")}
           />
         )}
-        {availableForImmersion !== undefined &&
-          (mode === "edit" || mode === "admin") && (
-            <Input
-              label={
-                availableForImmersion
-                  ? formContents.maxContactsPerMonth.label
-                  : formContents.maxContactsPerMonthWhenAvailable.label
-              }
-              nativeInputProps={{
-                ...formContents.maxContactsPerMonth,
-                ...register("maxContactsPerMonth", {
-                  valueAsNumber: true,
-                }),
-                type: "number",
-                min: 1,
-                pattern: "\\d*",
-              }}
-              {...getFieldError("maxContactsPerMonth")}
-            />
-          )}
+        {availableForImmersion !== undefined && (
+          <Input
+            label={
+              availableForImmersion
+                ? formContents.maxContactsPerMonth.label
+                : formContents.maxContactsPerMonthWhenAvailable.label
+            }
+            nativeInputProps={{
+              ...formContents.maxContactsPerMonth,
+              ...register("maxContactsPerMonth", {
+                valueAsNumber: true,
+              }),
+              type: "number",
+              min: 1,
+              pattern: "\\d*",
+            }}
+            {...getFieldError("maxContactsPerMonth")}
+          />
+        )}
         {mode === "admin" && (
           <Alert
             severity="info"
@@ -256,9 +288,9 @@ export const OffersSettingsSection = ({
             </p>
           </div>
         )}
-      </EstablishmentFormSection>
+      </HeadingSection>
 
-      <EstablishmentFormSection
+      <HeadingSection
         title="Type de candidats"
         description="Quelle catégorie de public souhaitez-vous recevoir en immersion ?"
       >
@@ -325,14 +357,14 @@ export const OffersSettingsSection = ({
             },
           }))}
         />
-        <EstablishmentFormSection title="Moyen de contact">
+        <HeadingSection title="Moyen de contact">
           <RadioButtons
             id={domElementIds.establishment[mode].contactMode}
             {...register("contactMode")}
             options={preferredContactModeOptions(register("contactMode"))}
             {...getFieldError("contactMode")}
           />
-        </EstablishmentFormSection>
+        </HeadingSection>
         {isStepMode && (
           <ButtonsGroup
             inlineLayoutWhen="always"
@@ -375,7 +407,36 @@ export const OffersSettingsSection = ({
             ]}
           />
         )}
-      </EstablishmentFormSection>
+        {!isStepMode && (
+          <ButtonsGroup
+            inlineLayoutWhen="always"
+            alignment="left"
+            buttonsEquisized
+            buttons={[
+              {
+                children: "Enregistrer les modifications",
+                iconId: "fr-icon-save-line",
+                priority: "primary",
+                type: "submit",
+                id: domElementIds.establishment[mode].submitFormButton,
+              },
+              ...(isEstablishmentAdmin
+                ? [
+                    {
+                      children: "Supprimer l'établissement",
+                      iconId: "fr-icon-delete-bin-line",
+                      priority: "secondary",
+                      type: "button",
+                      onClick: onClickEstablishmentDeleteButton,
+                      id: domElementIds.admin.manageEstablishment
+                        .submitDeleteButton,
+                    } satisfies ButtonProps,
+                  ]
+                : []),
+            ]}
+          />
+        )}
+      </HeadingSection>
     </>
   );
 };
