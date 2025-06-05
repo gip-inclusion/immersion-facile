@@ -155,7 +155,7 @@ describe("Discussion slice", () => {
         discussionSlice.actions.updateDiscussionStatusRequested({
           jwt,
           discussionId: discussion.id,
-          feedbackTopic: "dashboard-discussion-rejection",
+          feedbackTopic: "dashboard-discussion-status-updated",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
         }),
@@ -171,12 +171,11 @@ describe("Discussion slice", () => {
       expectToEqual(discussionSelectors.isLoading(store.getState()), false);
 
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-        "dashboard-discussion-rejection": {
+        "dashboard-discussion-status-updated": {
           on: "update",
           level: "success",
-          title: "La candidature a bien été rejetée",
-          message:
-            "La candidature a bien été rejetée, un email a été envoyé au candidat",
+          title: "La candidature a bien été mise à jour",
+          message: "La candidature a bien été mise à jour",
         },
       });
     });
@@ -188,7 +187,7 @@ describe("Discussion slice", () => {
         discussionSlice.actions.updateDiscussionStatusRequested({
           jwt,
           discussionId: discussion.id,
-          feedbackTopic: "dashboard-discussion-rejection",
+          feedbackTopic: "dashboard-discussion-status-updated",
           status: "REJECTED",
           rejectionKind: "NO_TIME",
         }),
@@ -207,10 +206,10 @@ describe("Discussion slice", () => {
         ...defaultStartingDiscussionState,
       });
       expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
-        "dashboard-discussion-rejection": {
+        "dashboard-discussion-status-updated": {
           on: "update",
           level: "error",
-          title: "Problème lors du rejet de la candidature",
+          title: "Problème lors de la mise à jour de la candidature",
           message: discussionFetchErrorMessage,
         },
       });

@@ -2,14 +2,9 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { Card } from "@codegouvfr/react-dsfr/Card";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import Select, { type SelectProps } from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { renderContent } from "html-templates/src/components/email";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
   DiscussionMeta,
@@ -25,20 +20,23 @@ import {
   type DiscussionReadDto,
   type Email,
   type ExchangeFromDashboard,
-  type RejectDiscussionAndSendNotificationParam,
-  type RejectionKind,
   type WithDiscussionId,
-  type WithDiscussionRejection,
   addressDtoToString,
   createOpaqueEmail,
-  discussionRejectionSchema,
   domElementIds,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
   getDiscussionDisplayStatus,
-  rejectDiscussionEmailParams,
   toDisplayedDate,
 } from "shared";
+import {
+  AcceptApplicationModal,
+  openAcceptApplicationModal,
+} from "src/app/components/admin/establishments/AcceptApplicationModal";
+import {
+  RejectApplicationModal,
+  openRejectApplicationModal,
+} from "src/app/components/admin/establishments/RejectApplicationModal";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
@@ -61,12 +59,6 @@ import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
 
-const { open: openRejectApplicationModal, Component: RejectApplicationModal } =
-  createModal({
-    isOpenedByDefault: false,
-    id: domElementIds.establishmentDashboard.discussion.rejectApplicationModal,
-  });
-
 export const DiscussionManageContent = ({
   discussionId,
 }: DiscussionManageContentProps): JSX.Element => {
@@ -80,7 +72,7 @@ export const DiscussionManageContent = ({
   );
   const dispatch = useDispatch();
   useFeedbackEventCallback(
-    "dashboard-discussion-rejection",
+    "dashboard-discussion-status-updated",
     "update.success",
     () => {
       if (inclusionConnectedJwt) {
@@ -151,6 +143,7 @@ const getDiscussionButtons = ({
         .replyToCandidateByEmail,
       priority: "primary",
       linkProps: {
+        style: { backgroundImage: "none" }, // this is to avoid the underline in the list
         href: `mailto:${createOpaqueEmail({
           discussionId: discussion.id,
           recipient: {
@@ -173,6 +166,7 @@ const getDiscussionButtons = ({
               .activateDraftConvention,
             priority: "tertiary",
             linkProps: {
+              style: { backgroundImage: "none" }, // this is to avoid the underline in the list
               href: makeDraftConventionLink(draftConvention, discussion.id)
                 .href,
               target: "_blank",
@@ -185,51 +179,84 @@ const getDiscussionButtons = ({
       ? [
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationOpenModal,
+              .acceptApplicationOpenModalButton,
             priority: "secondary",
             type: "button",
-            onClick: () => openRejectApplicationModal(),
-            children: "Refuser la candidature",
+            onClick: openAcceptApplicationModal,
+            children: "Marquer comme acceptée",
+          } satisfies ButtonProps,
+          {
+            id: domElementIds.establishmentDashboard.discussion
+              .rejectApplicationOpenModalButton,
+            priority: "secondary",
+            type: "button",
+            onClick: openRejectApplicationModal,
+            children: "Marquer comme refusée",
           } satisfies ButtonProps,
         ]
       : []),
   ];
 };
 
+const statusBadgeData: Record<
+  DiscussionDisplayStatus,
+  {
+    severity: BadgeProps["severity"];
+    label: string;
+  }
+> = {
+  new: {
+    severity: "info",
+    label: "Nouveau",
+  },
+  "needs-answer": {
+    severity: "warning",
+    label: "En cours - à répondre",
+  },
+  "needs-urgent-answer": {
+    severity: "error",
+    label: "En cours - Urgent",
+  },
+  answered: {
+    severity: "new",
+    label: "En cours - répondu",
+  },
+  accepted: {
+    severity: "success",
+    label: "Acceptée",
+  },
+  rejected: {
+    severity: undefined,
+    label: "Refusée",
+  },
+};
+
+const getDiscussionStatusUpdatedFeedbackMessage = (
+  discussion: DiscussionReadDto,
+): string => {
+  const { status } = discussion;
+  if (status === "PENDING") return "";
+  if (status === "ACCEPTED")
+    return "La candidature a bien été marquée comme accepté. Merci pour votre retour.";
+  if (status === "REJECTED")
+    return match(discussion.rejectionKind)
+      .with(
+        "CANDIDATE_ALREADY_WARNED",
+        () =>
+          "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
+      )
+      .with(
+        P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
+        () =>
+          "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
+      )
+      .exhaustive();
+  status satisfies never;
+  throw new Error(`Unexpected discussion status: ${status}`);
+};
+
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const { discussion } = props;
-  const statusBadgeData: Record<
-    DiscussionDisplayStatus,
-    {
-      severity: BadgeProps["severity"];
-      label: string;
-    }
-  > = {
-    new: {
-      severity: "info",
-      label: "Nouveau",
-    },
-    "needs-answer": {
-      severity: "warning",
-      label: "En cours - à répondre",
-    },
-    "needs-urgent-answer": {
-      severity: "error",
-      label: "En cours - Urgent",
-    },
-    answered: {
-      severity: "new",
-      label: "En cours - répondu",
-    },
-    accepted: {
-      severity: "success",
-      label: "Acceptée",
-    },
-    rejected: {
-      severity: undefined,
-      label: "Refusée",
-    },
-  };
 
   const statusBadge =
     statusBadgeData[
@@ -241,7 +268,21 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
 
   return (
     <>
-      <Feedback topics={["dashboard-discussion-rejection"]} />
+      <Feedback
+        topics={["dashboard-discussion-status-updated"]}
+        render={({ title, level, message }) => (
+          <Alert
+            title={title}
+            description={
+              level === "error"
+                ? message
+                : getDiscussionStatusUpdatedFeedbackMessage(discussion)
+            }
+            severity={level}
+            small
+          />
+        )}
+      />
       <header>
         <Button
           type="button"
@@ -269,6 +310,11 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
             </h1>
           </div>
           <ButtonWithSubMenu
+            priority="primary"
+            id={
+              domElementIds.establishmentDashboard.discussion
+                .handleDiscussionButton
+            }
             buttonLabel={"Gérer la candidature"}
             buttonIconId="fr-icon-arrow-down-s-line"
             iconPosition="right"
@@ -305,14 +351,17 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         </DiscussionMeta>
       </header>
 
-      <DiscussionEchangeMessageForm discussionId={discussion.id} />
+      <DiscussionExchangeMessageForm discussionId={discussion.id} />
 
       <DiscussionExchangesList discussion={discussion} />
 
       {createPortal(
-        <RejectApplicationModal title="Refuser la candidature">
-          <RejectApplicationForm discussion={discussion} />
-        </RejectApplicationModal>,
+        <RejectApplicationModal discussion={discussion} />,
+        document.body,
+      )}
+
+      {createPortal(
+        <AcceptApplicationModal discussion={discussion} />,
         document.body,
       )}
     </>
@@ -436,146 +485,7 @@ const makeConventionFromDiscussion = ({
   immersionAddress: addressDtoToString(discussion.address),
 });
 
-const RejectApplicationForm = ({
-  discussion,
-}: {
-  discussion: DiscussionReadDto;
-}): JSX.Element => {
-  const { register, watch, handleSubmit, formState } =
-    useForm<WithDiscussionRejection>({
-      resolver: zodResolver(discussionRejectionSchema),
-    });
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-  const getFieldError = makeFieldError(formState);
-  const dispatch = useDispatch();
-  const watchedFormValues = watch();
-  const [rejectParams, setRejectParams] =
-    useState<RejectDiscussionAndSendNotificationParam | null>(null);
-  const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
-    {
-      label:
-        "Je ne suis pas en capacité d'aider le candidat dans son projet professionnel",
-      value: "UNABLE_TO_HELP",
-    },
-    {
-      label:
-        "Je traverse une période chargée et je n'ai pas le temps d'accueillir une immersion",
-      value: "NO_TIME",
-    },
-    {
-      label: "Autre",
-      value: "OTHER",
-    },
-  ];
-  if (!inclusionConnectedJwt) throw new Error("No jwt found");
-  if (rejectParams) {
-    const { htmlContent, subject } = rejectDiscussionEmailParams(
-      rejectParams,
-      discussion,
-    );
-    return (
-      <>
-        <p>
-          Voici l'email qui sera envoyé au candidat si vous rejetez sa
-          candidature :
-        </p>
-        <Card
-          title={`Sujet : ${subject}`}
-          className={fr.cx("fr-mb-2w")}
-          desc={
-            <div
-              dangerouslySetInnerHTML={{
-                __html:
-                  renderContent(htmlContent, { wrapInTable: false }) ?? "",
-              }}
-            />
-          }
-        />
-        <ButtonsGroup
-          buttons={[
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .rejectApplicationCancelButton,
-              priority: "secondary",
-              children: "Annuler",
-              type: "button",
-              onClick: () => setRejectParams(null),
-            },
-            {
-              id: domElementIds.establishmentDashboard.discussion
-                .rejectApplicationSubmitButton,
-              priority: "primary",
-              children: "Rejeter la candidature et notifier le candidat",
-              onClick: () =>
-                dispatch(
-                  discussionSlice.actions.updateDiscussionStatusRequested({
-                    status: "REJECTED",
-                    feedbackTopic: "dashboard-discussion-rejection",
-                    ...rejectParams,
-                    jwt: inclusionConnectedJwt,
-                  }),
-                ),
-            },
-          ]}
-          inlineLayoutWhen="always"
-        />
-      </>
-    );
-  }
-
-  return (
-    <form
-      onSubmit={handleSubmit((values) =>
-        setRejectParams({ ...values, discussionId: discussion.id }),
-      )}
-    >
-      <Select
-        label="Pour quel motif souhaitez-vous refuser cette candidature ?"
-        nativeSelectProps={{
-          id: domElementIds.establishmentDashboard.discussion
-            .rejectApplicationJustificationKindInput,
-          ...register("rejectionKind"),
-        }}
-        options={rejectionKindOptions}
-        {...getFieldError("rejectionKind")}
-      />
-      {watchedFormValues.rejectionKind === "OTHER" && (
-        <Input
-          textArea
-          label="Précisez"
-          nativeTextAreaProps={{
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationJustificationReasonInput,
-            ...register("rejectionReason"),
-          }}
-          {...getFieldError("rejectionReason")}
-        />
-      )}
-      <ButtonsGroup
-        buttons={[
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationCancelButton,
-            priority: "secondary",
-            children: "Annuler",
-            type: "button",
-          },
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitPreviewButton,
-            priority: "primary",
-            children: "Prévisualiser et envoyer",
-          },
-        ]}
-        inlineLayoutWhen="always"
-      />
-    </form>
-  );
-};
-
-const DiscussionEchangeMessageForm = ({
+const DiscussionExchangeMessageForm = ({
   discussionId,
 }: {
   discussionId: DiscussionId;

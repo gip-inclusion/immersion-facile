@@ -7,14 +7,26 @@ import {
   immersionFacileNoReplyEmailSender,
   withDiscussionSchemaId,
 } from "shared";
+import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
+import {
+  type WithTriggeredBy,
+  triggeredBySchema,
+} from "../../../core/events/events";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { NotificationGateway } from "../../../core/notifications/ports/NotificationGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussionId> {
-  protected inputSchema = withDiscussionSchemaId;
+type SendExchangeToRecipientParams = WithDiscussionId &
+  Partial<WithTriggeredBy>;
+
+export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeToRecipientParams> {
+  protected inputSchema = withDiscussionSchemaId.and(
+    z.object({
+      triggeredBy: triggeredBySchema.optional(),
+    }),
+  );
 
   readonly #replyDomain: string;
 
@@ -36,7 +48,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
   }
 
   protected async _execute(
-    { discussionId }: WithDiscussionId,
+    { discussionId, triggeredBy }: SendExchangeToRecipientParams,
     uow: UnitOfWork,
   ): Promise<void> {
     const discussion = await uow.discussionRepository.getById(discussionId);
@@ -128,6 +140,9 @@ export class SendExchangeToRecipient extends TransactionalUseCase<WithDiscussion
         attachments,
       },
       followedIds: {
+        ...(triggeredBy?.kind === "inclusion-connected"
+          ? { userId: triggeredBy.userId }
+          : undefined),
         establishmentSiret: discussion.siret,
       },
     });

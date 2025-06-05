@@ -3,9 +3,9 @@ import type {
   ConnectedUserJwt,
   DiscussionId,
   DiscussionReadDto,
-  DiscussionRejected,
   Exchange,
   ExchangeFromDashboard,
+  WithDiscussionStatus,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -17,10 +17,10 @@ export type FetchDiscussionRequestedPayload = {
   discussionId: DiscussionId;
 };
 
-export type RejectDiscussionRequestedPayload = {
+export type UpdateDiscussionStatusRequestedPayload = {
   jwt: ConnectedUserJwt;
   discussionId: DiscussionId;
-} & DiscussionRejected;
+} & WithDiscussionStatus;
 
 export type DiscussionState = {
   discussion: DiscussionReadDto | null;
@@ -67,7 +67,7 @@ export const discussionSlice = createSlice({
     },
     updateDiscussionStatusRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<RejectDiscussionRequestedPayload>,
+      _action: PayloadActionWithFeedbackTopic<UpdateDiscussionStatusRequestedPayload>,
     ) => {
       state.isLoading = true;
     },

@@ -42,18 +42,25 @@ describe("Discussions", () => {
       {
         message: "status is REJECTED",
         expectedDisplayStatus: "rejected",
-        discussion: new DiscussionBuilder().withStatus("REJECTED").buildRead(),
+        discussion: new DiscussionBuilder()
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "UNABLE_TO_HELP",
+          })
+          .buildRead(),
       },
       {
         message: "status is ACCEPTED",
         expectedDisplayStatus: "accepted",
-        discussion: new DiscussionBuilder().withStatus("ACCEPTED").buildRead(),
+        discussion: new DiscussionBuilder()
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
+          .buildRead(),
       },
       {
         message: "candidate has sent the first message without being answered",
         expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 1),
@@ -67,7 +74,7 @@ describe("Discussions", () => {
           "candidate has sent the last message without being answered (but it is not the first message)",
         expectedDisplayStatus: "needs-answer",
         discussion: new DiscussionBuilder()
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 3),
@@ -88,7 +95,7 @@ describe("Discussions", () => {
         message: "last message is sent by establishment",
         expectedDisplayStatus: "answered",
         discussion: new DiscussionBuilder()
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 2),
@@ -106,7 +113,7 @@ describe("Discussions", () => {
           "last message is from beneficiary and has had no answer for more than 15 days",
         expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 15),
@@ -120,7 +127,7 @@ describe("Discussions", () => {
         expectedDisplayStatus: "new",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 14))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withContactMode("PHONE")
           .withExchanges([])
           .buildRead(),
@@ -131,7 +138,7 @@ describe("Discussions", () => {
         expectedDisplayStatus: "needs-urgent-answer",
         discussion: new DiscussionBuilder()
           .withCreatedAt(subDays(now, 15))
-          .withStatus("PENDING")
+          .withStatus({ status: "PENDING" })
           .withContactMode("PHONE")
           .withExchanges([])
           .buildRead(),

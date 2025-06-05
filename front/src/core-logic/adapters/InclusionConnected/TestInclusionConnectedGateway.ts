@@ -3,10 +3,10 @@ import type {
   AbsoluteUrl,
   AgencyId,
   DiscussionReadDto,
-  DiscussionRejected,
   Exchange,
   InclusionConnectedUser,
   MarkPartnersErroredConventionAsHandledRequest,
+  WithDiscussionStatusRejected,
 } from "shared";
 import type {
   FetchDiscussionRequestedPayload,
@@ -70,7 +70,7 @@ export class TestInclusionConnectedGateway
     _payload: {
       jwt: string;
       discussionId: string;
-    } & DiscussionRejected,
+    } & WithDiscussionStatusRejected,
   ): Observable<void> {
     return this.updateDiscussionStatusResponse$;
   }
