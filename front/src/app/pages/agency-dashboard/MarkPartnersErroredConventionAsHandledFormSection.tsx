@@ -76,7 +76,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <div className={fr.cx("fr-grid-row")}>
           <Input
-            label="Id de la convention *"
+            label="Identifiant de la convention *"
             nativeInputProps={{
               ...conventionIdRegistration,
               onChange: (event) => {
@@ -97,7 +97,7 @@ export const MarkPartnersErroredConventionAsHandledFormSection = ({
                 conventionIdRegistration.onChange(event);
               },
               id: "MarkPartnersErroredConvention-conventionId",
-              placeholder: "Id de la convention",
+              placeholder: "Ex: cf0755c7-e014-4515-82fa-39270f1db6d8",
             }}
             className={fr.cx("fr-col-12", "fr-col-lg-6")}
             {...makeFieldError(methods.formState)("conventionId")}

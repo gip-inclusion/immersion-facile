@@ -30,12 +30,12 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
         >
           <div className={fr.cx("fr-grid-row")}>
             <Input
-              label="Id de la mise en relation *"
+              label="Identifiant de la candidature *"
               nativeInputProps={{
                 ...register("discussionId"),
                 id: domElementIds.establishmentDashboard.manageDiscussion
                   .discussionIdInput,
-                placeholder: "Id de la mise en relation",
+                placeholder: "Ex: cf0755c7-e014-4515-82fa-39270f1db6d8",
                 onChange: (event) => {
                   setValue("discussionId", event.currentTarget.value.trim(), {
                     shouldValidate: true,
