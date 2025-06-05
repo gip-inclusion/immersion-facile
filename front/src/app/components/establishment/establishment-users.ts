@@ -15,12 +15,12 @@ export const establishmentRoleToDisplay: Record<
     label: "Administrateur",
     className: "fr-badge--green-emeraude",
     description:
-      "Peut modifier les informations de l'entreprise, ajouter et supprimer des utilisateurs, modifier leur rôles, consulter les conventions et les mises en relation. Peut répondre aux mises en relation de l'entreprise.",
+      "Peut modifier les informations de l'entreprise, ajouter et supprimer des utilisateurs, modifier leur rôles, consulter les conventions et les candidatures. Peut répondre aux candidatures de l'entreprise.",
   },
   "establishment-contact": {
     label: "Contact d'entreprise",
     className: "fr-badge--purple-glycine",
     description:
-      "Peut consulter des conventions et des mises en relation de l'entreprise. Peut répondre aux mises en relation de l'entreprise.",
+      "Peut consulter des conventions et des candidatures de l'entreprise. Peut répondre aux candidatures de l'entreprise.",
   },
 };

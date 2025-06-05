@@ -15,6 +15,7 @@ import type {
   SmsVariables,
 } from "shared";
 import { TextCell } from "src/app/components/admin/TextCell";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { adminSelectors } from "src/core-logic/domain/admin/admin.selectors";
 import { notificationsSlice } from "src/core-logic/domain/admin/notifications/notificationsSlice";
@@ -36,26 +37,28 @@ export const NotificationsTab = () => {
     useState<NotificationKind>("email");
   if (isLoading) return <Loader />;
   return (
-    <div>
-      <ToggleSwitch
-        label={
-          notificationKindToShow === "sms"
-            ? "Sms (pour voir les emails décocher)"
-            : "Emails (pour voir les sms cocher)"
-        }
-        checked={notificationKindToShow === "sms"}
-        showCheckedHint={notificationKindToShow === "sms"}
-        onChange={() =>
-          setNotificationKindToShow(
-            notificationKindToShow === "email" ? "sms" : "email",
-          )
-        }
-      />
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
-        {`Derniers ${
-          notificationKindToShow === "email" ? "Emails" : "Sms"
-        } envoyés`}
-      </h2>
+    <BackofficeDashboardTabContent
+      title={`Derniers ${
+        notificationKindToShow === "email" ? "Emails" : "Sms"
+      } envoyés`}
+      titleAction={
+        <ToggleSwitch
+          label={
+            notificationKindToShow === "sms"
+              ? "Sms (décocher pour voir les emails)"
+              : "Emails (cocher pour voir les sms)"
+          }
+          checked={notificationKindToShow === "sms"}
+          showCheckedHint={notificationKindToShow === "sms"}
+          onChange={() =>
+            setNotificationKindToShow(
+              notificationKindToShow === "email" ? "sms" : "email",
+            )
+          }
+        />
+      }
+      titleActionCols={4}
+    >
       {errorMessage ? (
         <Alert title={"Oups..."} severity="error" description={errorMessage} />
       ) : (
@@ -77,7 +80,7 @@ export const NotificationsTab = () => {
             ))}
         </ul>
       )}
-    </div>
+    </BackofficeDashboardTabContent>
   );
 };
 
