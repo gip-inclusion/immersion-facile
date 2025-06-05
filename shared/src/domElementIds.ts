@@ -848,6 +848,8 @@ export const domElementIds = {
     manageEstablishments: {
       selectEstablishmentInput: "im-manage-establishment__establishment-select",
       addUserButton: "im-manage-establishment__add-user-button",
+      createEstablishment:
+        "im-manage-establishment__create-establishment-button",
       editUserButton: "im-manage-establishment__edit-user-button",
       deleteUserButton: "im-manage-establishment__delete-user-button",
     },
