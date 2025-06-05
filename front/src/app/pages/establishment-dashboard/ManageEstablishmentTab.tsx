@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { type WithEstablishmentData, domElementIds } from "shared";
@@ -26,11 +27,26 @@ export const ManageEstablishmentsTab = ({
   }
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
-        Piloter votre établissement
-      </h5>
-      <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
-        {establishments.length > 1 && (
+      <div className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}>
+        <h2 className={fr.cx("fr-h2")}>Piloter votre établissement</h2>
+        <div className={fr.cx("fr-ml-md-auto")}>
+          <Button
+            iconId="fr-icon-add-circle-line"
+            type="button"
+            onClick={() => {
+              routes.formEstablishment().push();
+            }}
+            id={
+              domElementIds.establishmentDashboard.manageEstablishments
+                .createEstablishment
+            }
+          >
+            Créer un nouvel établissement
+          </Button>
+        </div>
+      </div>
+      {establishments.length > 1 && (
+        <div className={fr.cx("fr-mb-2w")}>
           <Select
             label={"Sélectionner un établissement"}
             options={[
@@ -55,9 +71,13 @@ export const ManageEstablishmentsTab = ({
               },
             }}
           />
-        )}
-        {route.params.siret && <EstablishmentForm mode="edit" />}
-      </div>
+        </div>
+      )}
+      {route.params.siret && (
+        <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
+          <EstablishmentForm mode="edit" />
+        </div>
+      )}
     </>
   );
 };
