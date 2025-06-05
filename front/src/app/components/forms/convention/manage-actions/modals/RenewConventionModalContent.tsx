@@ -76,7 +76,7 @@ export const RenewConventionModalContent = ({
         id="im-convention-renew-form"
       >
         <Input
-          label="Id de la convention renouvelée"
+          label="Identifiant de la convention renouvelée"
           hintText={
             "Il n'est pas modificable, mais vous pouvez le copier pour le garder de côté"
           }
