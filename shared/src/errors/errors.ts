@@ -953,4 +953,8 @@ export const errors = {
       appellationCode: AppellationCode;
     }) => new NotFoundError(`Code appellation ${appellationCode} non trouvé.`),
   },
+  url: {
+    notFromIFDomain: (url: string) =>
+      new BadRequestError(`L'url ${url} ne provient pas d'Immersion Facilitée`),
+  },
 };

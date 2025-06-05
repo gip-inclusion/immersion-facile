@@ -1,9 +1,11 @@
 import {
   type AbsoluteUrl,
   type ShareLinkByEmailDto,
+  errors,
   shareLinkByEmailSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
+import { notifyToTeamAndThrowError } from "../../../utils/notifyTeam";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { makeShortLink } from "../../core/short-link/ShortLink";
@@ -36,12 +38,18 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkBy
     params: ShareLinkByEmailDto,
     uow: UnitOfWork,
   ): Promise<void> {
+    throwErrorIfUrlNotFromIFDomain({
+      url: params.conventionLink,
+      expectedDomain: this.#config.immersionFacileDomain,
+    });
+
     const shortLink = await makeShortLink({
       uow,
       longLink: params.conventionLink as AbsoluteUrl,
       shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
       config: this.#config,
     });
+
     await this.#saveNotificationAndRelatedEvent(uow, {
       kind: "email",
       templatedContent: {
@@ -57,3 +65,13 @@ export class ShareConventionLinkByEmail extends TransactionalUseCase<ShareLinkBy
     });
   }
 }
+
+const throwErrorIfUrlNotFromIFDomain = ({
+  url,
+  expectedDomain,
+}: { url: string; expectedDomain: string }) => {
+  const urlObj = new URL(url);
+  if (!urlObj.hostname.endsWith(expectedDomain)) {
+    notifyToTeamAndThrowError(errors.url.notFromIFDomain(url));
+  }
+};
