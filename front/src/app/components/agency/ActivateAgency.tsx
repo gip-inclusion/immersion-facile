@@ -22,6 +22,7 @@ import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agen
 import { z } from "zod";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { AgencyDetails } from "../admin/AgencyDetails";
+import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 
 type RejectionJustificationForm = { rejectionJustification: string };
 type ManageAgencyToReviewAdminForm = {
@@ -144,10 +145,10 @@ export const ActivateAgency = () => {
   };
 
   return (
-    <>
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
-        Activer ou Rejeter une agence
-      </h2>
+    <BackofficeDashboardTabContent
+      title="Activer ou Rejeter une agence"
+      className={fr.cx("fr-mt-4w")}
+    >
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card")}>
         <form onSubmit={handleSubmit(setSelectedAgencyNeedingReviewId)}>
           <Input
@@ -213,6 +214,6 @@ export const ActivateAgency = () => {
           />,
           document.body,
         )}
-    </>
+    </BackofficeDashboardTabContent>
   );
 };

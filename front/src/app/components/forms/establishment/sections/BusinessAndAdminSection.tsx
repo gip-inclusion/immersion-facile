@@ -50,7 +50,10 @@ export const BusinessAndAdminSection = ({
 
   return (
     <>
-      <HeadingSection title="Informations de votre établissement">
+      <HeadingSection
+        title="Informations de votre établissement"
+        className={fr.cx("fr-mt-0")}
+      >
         {match(mode)
           .with("create", () => <CreationSiretRelatedInputs />)
           .with(P.union("admin", "edit"), () => (

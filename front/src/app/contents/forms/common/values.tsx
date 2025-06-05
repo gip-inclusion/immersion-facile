@@ -32,7 +32,7 @@ export const richBooleanSelectOptions: RadioButtonsProps["options"] = [
     illustration: <img src={eyeSvg} alt="" />,
     label: "Oui",
     hintText:
-      "Vous serez visibles par les candidats jusqu’à ce que votre limite de mises en relations mensuelle soit atteinte",
+      "Vous serez visibles par les candidats jusqu’à ce que votre limite de candidatures mensuelle soit atteinte",
     nativeInputProps: {
       value: 1,
     },

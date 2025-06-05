@@ -18,6 +18,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { establishmentBatchSelectors } from "src/core-logic/domain/establishmentBatch/establishmentBatch.selectors";
 import { establishmentBatchSlice } from "src/core-logic/domain/establishmentBatch/establishmentBatch.slice";
 import { makeStyles } from "tss-react/dsfr";
+import { BackofficeDashboardTabContent } from "../../layout/BackofficeDashboardTabContent";
 
 type AddEstablishmentByBatchTabForm = {
   groupName: string;
@@ -174,11 +175,11 @@ export const AddEstablishmentsByBatch = () => {
     );
   };
   return (
-    <section className={fr.cx("fr-mt-4w")}>
+    <BackofficeDashboardTabContent
+      title="Import en masse d'entreprises"
+      className={fr.cx("fr-mt-4w")}
+    >
       {isLoading && <Loader />}
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>
-        Import en masse d'entreprises
-      </h2>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           label="Renseignez un nom de groupe d'entreprises *"
@@ -380,7 +381,7 @@ export const AddEstablishmentsByBatch = () => {
           </div>
         </div>
       )}
-    </section>
+    </BackofficeDashboardTabContent>
   );
 };
 

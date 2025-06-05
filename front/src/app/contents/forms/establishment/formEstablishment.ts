@@ -134,14 +134,14 @@ export const formEstablishmentFieldsLabels = (
   },
   maxContactsPerMonth: {
     label:
-      "Au maximum, combien de mises en relation souhaitez-vous recevoir par mois ?",
+      "Au maximum, combien de candidatures souhaitez-vous recevoir par mois ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes ce mois, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'au mois prochain.",
     id: domElementIds.establishment[mode].maxContactsPerMonth,
   },
   maxContactsPerMonthWhenAvailable: {
     label:
-      "Quand vous serez à nouveau disponible, combien de mises en relation par mois souhaiteriez-vous recevoir ?",
+      "Quand vous serez à nouveau disponible, combien de candidatures par mois souhaiteriez-vous recevoir ?",
     hintText:
       "Par exemple, en renseignant 5 : si vous avez déjà reçu 5 demandes ce mois, vous n'apparaîtrez plus dans la liste des entreprises accueillantes jusqu'au mois suivant.",
     id: domElementIds.establishment[mode].maxContactsPerMonthWhenAvailable,

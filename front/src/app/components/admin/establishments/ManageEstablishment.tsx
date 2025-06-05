@@ -11,6 +11,7 @@ import {
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
+import { BackofficeDashboardTabContent } from "../../layout/BackofficeDashboardTabContent";
 
 export const ManageEstablishment = (): JSX.Element => {
   const { register, handleSubmit, formState, setValue } =
@@ -19,8 +20,7 @@ export const ManageEstablishment = (): JSX.Element => {
       mode: "onTouched",
     });
   return (
-    <>
-      <h2 className={fr.cx("fr-h5")}>Piloter une entreprise</h2>
+    <BackofficeDashboardTabContent title="Piloter une entreprise">
       <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ siret }) =>
@@ -53,6 +53,6 @@ export const ManageEstablishment = (): JSX.Element => {
           </Button>
         </form>
       </div>
-    </>
+    </BackofficeDashboardTabContent>
   );
 };

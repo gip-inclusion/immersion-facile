@@ -14,7 +14,7 @@ Elle peut traiter des données à caractère personnel pour les finalités suiva
 • Améliorer et faciliter le parcours d’accès à l’immersion professionnelle ;
 • Construire et développer une base entreprises immersions contenant les entreprises volontaires pour accueillir les personnes ;
 • Aider et faciliter la tâche des prescripteurs dans la décision et le suivi des personnes.
-• Suivre les statistiques des échanges lors des mises en relation.
+• Suivre les statistiques des échanges lors des candidatures.
 
 <strong>Quelles sont les données que nous traitons ?</strong>
 
@@ -48,7 +48,7 @@ Données relatives aux représentants des entreprises structures d’accueil de 
 
 • <strong>Jusqu’à la fin du contrat du tuteur ou de la tutrice avec la structure d’immersion professionnelle</strong> ou le cas échéant, jusqu’à la dissolution de la structure, dès lors qu’Immersion Facilitée en prend connaissance.
 
-Données de suivi des statistiques des échanges lors des mises en relation :
+Données de suivi des statistiques des échanges lors des candidatures :
 • Les données sont automatiquement supprimées 6 mois après leur collecte.
 
 <strong>Quels sont vos droits ?</strong>
