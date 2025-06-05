@@ -48,7 +48,7 @@ import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConn
 import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
 
-type RouteByMode = {
+export type RouteByMode = {
   create:
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;

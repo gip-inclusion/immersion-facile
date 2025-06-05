@@ -196,26 +196,25 @@ const SubSection = ({
           ) && conventionSummaryStyles.subsectionVerticalSeparator,
         )}
       >
-        <div className={fr.cx("fr-col-12")}>
-          <div className={fr.cx("fr-grid-row")}>
-            <div
-              className={cx(
-                fr.cx("fr-col-12"),
-                subSection.header?.action ? "fr-col-lg-6" : "",
-              )}
-            >
-              {subSection.header?.title && (
-                <h3 className={fr.cx("fr-mb-2v", "fr-h6")}>
-                  {subSection.header.title}
-                </h3>
-              )}
-              {subSection.header?.badge && (
-                <div className={fr.cx("fr-col-12", "fr-mb-2w")}>
-                  <Badge small {...subSection.header.badge} />
-                </div>
-              )}
+        <div>
+          {subSection.header && (
+            <div className={fr.cx("fr-grid-row")}>
+              <div className={cx(subSection.header?.action && "fr-col-lg-6")}>
+                {subSection.header?.title && (
+                  <h3 className={fr.cx("fr-mb-2v", "fr-h6")}>
+                    {subSection.header.title}
+                  </h3>
+                )}
+                {subSection.header?.badge && (
+                  <div className={fr.cx("fr-col-12", "fr-mb-2w")}>
+                    <Badge small {...subSection.header.badge} />
+                  </div>
+                )}
+              </div>
             </div>
-            {subSection.header?.action && (
+          )}
+          {subSection.header?.action && (
+            <div className={fr.cx("fr-grid-row")}>
               <div
                 className={cx(
                   fr.cx("fr-col-12", "fr-col-lg-6", "fr-pr-2w"),
@@ -224,15 +223,15 @@ const SubSection = ({
               >
                 <Button size="small" {...subSection.header.action} />
               </div>
-            )}
-          </div>
+            </div>
+          )}
           {subSection.isSchedule && <Schedule fields={subSection.fields} />}
           {!subSection.isSchedule && (
             <div className={fr.cx("fr-grid-row")}>
               {subSection.fields.map((field) => {
                 if ("severity" in field) {
                   return (
-                    <div key={field.key} className={cx(fr.cx("fr-col-12"))}>
+                    <div key={field.key}>
                       <Badge small {...field} />
                     </div>
                   );

@@ -64,9 +64,11 @@
     margin-top: .5rem;
   }
 
-  &__control--is-focused {
-    .im-select__single-value {
-      color: var(--grey-425-625) !important;
+  &__control {
+    &--is-focused {
+      .im-select__single-value {
+        color: var(--grey-425-625) !important;
+      }
     }
   }
 }

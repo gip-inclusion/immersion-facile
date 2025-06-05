@@ -1,20 +1,20 @@
+import { fr } from "@codegouvfr/react-dsfr";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
+import { SectionHighlight } from "react-design-system";
 import { useFormContext } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { type FormEstablishmentDto, domElementIds, getFullname } from "shared";
 import type {
   Mode,
   OnStepChange,
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
-import { EstablishmentFormSection } from "src/app/components/forms/establishment/EstablishmentFormSection";
 import { SearchResultPreview } from "src/app/components/forms/establishment/SearchResultPreview";
-import { useAdminToken } from "src/app/hooks/jwt.hooks";
-import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
 export const SummarySection = ({
-  currentStep,
   mode,
   onStepChange,
   isEstablishmentAdmin,
@@ -29,26 +29,7 @@ export const SummarySection = ({
     formState: { isSubmitting },
   } = useFormContext<FormEstablishmentDto>();
   const formValues = getValues();
-  const adminJwt = useAdminToken();
-  const dispatch = useDispatch();
-  const onClickEstablishmentDeleteButton = () => {
-    const confirmed = confirm(
-      `! Etes-vous sûr de vouloir supprimer cet établissement ? !
-                (cette opération est irréversible 💀)`,
-    );
-    if (confirmed && adminJwt)
-      dispatch(
-        establishmentSlice.actions.deleteEstablishmentRequested({
-          establishmentDelete: {
-            siret: formValues.siret,
-            jwt: adminJwt,
-          },
-          feedbackTopic: "form-establishment",
-        }),
-      );
-    if (confirmed && !adminJwt) alert("Vous n'êtes pas admin.");
-  };
-  const isStepMode = currentStep !== null;
+  const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
 
   const buttons: [ButtonProps, ...ButtonProps[]] = [
     {
@@ -61,32 +42,18 @@ export const SummarySection = ({
       disabled: isSubmitting,
       id: domElementIds.establishment[mode].submitFormButton,
     },
-  ];
-  if (isStepMode) {
-    buttons.unshift({
+    {
       children: "Étape précédente",
       iconId: "fr-icon-arrow-left-line",
       priority: "secondary",
       type: "button",
       id: domElementIds.establishment[mode].previousButtonFromStepAndMode({
-        currentStep,
+        currentStep: 3,
         mode,
       }),
       onClick: () => onStepChange(3, []),
-    });
-  }
-
-  if (isEstablishmentAdmin) {
-    buttons.push({
-      children: "Supprimer l'entreprise",
-      iconId: "fr-icon-delete-bin-line",
-      priority: "secondary",
-      type: "button",
-      onClick: onClickEstablishmentDeleteButton,
-      disabled: isSubmitting,
-      id: domElementIds.admin.manageEstablishment.submitDeleteButton,
-    });
-  }
+    },
+  ];
   return (
     <>
       <p>
@@ -94,25 +61,35 @@ export const SummarySection = ({
         {formValues.businessName} (SIRET : {formValues.siret}). L’administrateur
         sera :{" "}
         <strong>
-          {getFullname(
-            "formValues.userRights[0].firstName",
-            "formValues.userRights[0].lastName",
-          )}{" "}
-          - {formValues.userRights[0].email}
+          {/* TODO: federatedIdentity.provider === "proconnect" */}
+          {federatedIdentity && (
+            <>
+              {getFullname(
+                federatedIdentity.firstName,
+                federatedIdentity.lastName,
+              )}
+              {" - "}
+            </>
+          )}
+          {formValues.userRights[0].email}
         </strong>
       </p>
-      <EstablishmentFormSection
+      <HeadingSection
         title="Lieux et métiers référencés"
         description="Ces éléments apparaîtront dans la recherche d’entreprises accueillantes. Votre établissement peut donc apparaître dans différentes recherches."
       >
-        <div>
-          <p>Adresses d'accueil :</p>
+        <SectionHighlight>
+          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
+            Adresses d'accueil :
+          </p>
           <ul>
             {formValues.businessAddresses.map((businessAddress) => (
               <li key={businessAddress.id}>{businessAddress.rawAddress}</li>
             ))}
           </ul>
-          <p>Métiers proposés :</p>
+          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
+            Métiers proposés :
+          </p>
           <ul>
             {formValues.appellations.map((appellation) => (
               <li key={appellation.appellationCode}>
@@ -120,28 +97,37 @@ export const SummarySection = ({
               </li>
             ))}
           </ul>
-        </div>
-      </EstablishmentFormSection>
-      <EstablishmentFormSection title="Paramètres de vos offres">
-        <div>
-          <p>Disponibilité :</p>
+        </SectionHighlight>
+      </HeadingSection>
+      <HeadingSection title="Paramètres de vos offres">
+        <SectionHighlight>
+          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>Disponibilité :</p>
           <p>
             L’établissement sera visible dans l’annuaire, avec un maximum de{" "}
             {formValues.maxContactsPerMonth} candidatures par mois
           </p>
-        </div>
-        <div>
-          <p>Type de candidats :</p>
-          <DisplaySearchableByValue searchableBy={formValues.searchableBy} />
-        </div>
-        <div>
-          <p>Moyen de contact :</p>
-          <DisplayContactModeValue contactMode={formValues.contactMode} />
-        </div>
-      </EstablishmentFormSection>
-      <EstablishmentFormSection title="Prévisualisation de votre établissement">
+
+          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
+            Type de candidats :
+          </p>
+          <p>
+            <DisplaySearchableByValue searchableBy={formValues.searchableBy} />
+          </p>
+
+          <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
+            Moyen de contact :
+          </p>
+          <p>
+            <DisplayContactModeValue contactMode={formValues.contactMode} />
+          </p>
+        </SectionHighlight>
+      </HeadingSection>
+      <HeadingSection
+        title="Prévisualisation de votre établissement"
+        description="Cette prévisualisation est donnée à titre indicatif. Elle affiche un exemple parmi les métiers et lieux que vous avez renseignés."
+      >
         <SearchResultPreview establishment={formValues} />
-      </EstablishmentFormSection>
+      </HeadingSection>
       <ButtonsGroup
         buttons={buttons}
         inlineLayoutWhen="always"

@@ -76,6 +76,7 @@ export const RSAutocomplete = <T, L>({
           menuList: () =>
             cx(fr.cx("fr-menu__list", "fr-mb-0"), Styles.menuList),
           option: () => cx(fr.cx("fr-nav__link")),
+          control: () => cx(fr.cx("fr-mt-1w")),
         }}
         components={{
           DropdownIndicator: () => null,
