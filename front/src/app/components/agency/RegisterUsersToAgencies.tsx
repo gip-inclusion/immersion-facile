@@ -8,6 +8,7 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { P, match } from "ts-pattern";
+import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 import { IcUserAgenciesToReview } from "./IcUserAgenciesToReview";
 
 export const RegisterUsersToAgencies = () => {
@@ -36,10 +37,10 @@ export const RegisterUsersToAgencies = () => {
   }, [agenciesNeedingReviewForUser, dispatch]);
 
   return (
-    <>
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w", "fr-mt-4w")}>
-        Rapprocher un utilisateur d'une agence
-      </h2>
+    <BackofficeDashboardTabContent
+      title="Rapprocher un utilisateur d'une agence"
+      className={fr.cx("fr-mt-4w")}
+    >
       <div className={fr.cx("fr-px-6w", "fr-py-4w", "fr-card", "fr-mb-4w")}>
         <>
           <Select
@@ -164,6 +165,6 @@ export const RegisterUsersToAgencies = () => {
             ))}
         </>
       </div>
-    </>
+    </BackofficeDashboardTabContent>
   );
 };

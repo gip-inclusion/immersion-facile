@@ -138,7 +138,7 @@ export const InitiateConventionButton = () => {
   }, [isEstablishmentDefault, establishment, values, setValue]);
 
   return (
-    <div className={fr.cx("fr-grid-row", "fr-grid-row--right")}>
+    <>
       <Button onClick={() => openInitiateConventionModal()}>
         Initier une convention
       </Button>
@@ -251,6 +251,6 @@ export const InitiateConventionButton = () => {
         </InitiateConventionModal>,
         document.body,
       )}
-    </div>
+    </>
   );
 };

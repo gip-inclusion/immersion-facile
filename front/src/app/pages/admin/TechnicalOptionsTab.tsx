@@ -1,5 +1,3 @@
-import { fr } from "@codegouvfr/react-dsfr";
-
 import { Loader } from "react-design-system";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -14,15 +12,9 @@ export const TechnicalOptionsTab = () => {
   return (
     <>
       {(isFeatureFlagsLoading || isApiConsumersLoading) && <Loader />}
-      <div className={fr.cx("fr-container")}>
-        <FeatureFlagsSection />
-      </div>
-      <div className={fr.cx("fr-container", "fr-mt-6w")}>
-        <UploadFileSection />
-      </div>
-      <div className={fr.cx("fr-container", "fr-mt-6w")}>
-        <ApiConsumersSection />
-      </div>
+      <FeatureFlagsSection />
+      <UploadFileSection />
+      <ApiConsumersSection />
     </>
   );
 };

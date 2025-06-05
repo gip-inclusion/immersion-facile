@@ -15,6 +15,7 @@ import {
   emailTemplatesByName,
   internshipKinds,
 } from "shared";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { useStyles } from "tss-react/dsfr";
 
 const defaultEmailPreviewUrl =
@@ -52,8 +53,7 @@ export const EmailPreviewTab = () => {
   };
 
   return (
-    <div className={cx("admin-tab__email-preview")}>
-      <h2 className={fr.cx("fr-h5", "fr-mb-2w")}>Aperçu de template email</h2>
+    <BackofficeDashboardTabContent title="Aperçu de template email">
       <div>
         <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
           <aside className={fr.cx("fr-col-12", "fr-col-lg-4")}>
@@ -143,7 +143,7 @@ export const EmailPreviewTab = () => {
           </section>
         </div>
       </div>
-    </div>
+    </BackofficeDashboardTabContent>
   );
 };
 

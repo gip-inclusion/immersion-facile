@@ -1,4 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 
 import { MetabaseView } from "src/app/components/MetabaseView";
 import { SelectConventionFromIdForm } from "src/app/components/SelectConventionFromIdForm";
@@ -9,13 +10,13 @@ export const ConventionTab = () => {
   return error ? (
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
-    <>
+    <BackofficeDashboardTabContent title="Piloter une convention">
       <SelectConventionFromIdForm routeNameToRedirectTo="adminConventionDetail" />
       <MetabaseView
         title="Consulter les conventions"
         subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
         url={url}
       />
-    </>
+    </BackofficeDashboardTabContent>
   );
 };

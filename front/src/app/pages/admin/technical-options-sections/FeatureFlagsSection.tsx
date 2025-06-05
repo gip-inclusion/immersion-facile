@@ -18,6 +18,7 @@ import {
   featureFlagTextImageAndRedirectValueSchema,
   featureFlagTextWithSeverityValueSchema,
 } from "shared";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import {
   formHighlightFieldsLabels,
   formTextImageAndRedirectFieldsLabels,
@@ -37,8 +38,7 @@ export const FeatureFlagsSection = () => {
   const { isLoading, ...featureFlags } = useFeatureFlags();
 
   return (
-    <>
-      <h4>Les fonctionnalités optionnelles</h4>
+    <BackofficeDashboardTabContent title="Les fonctionnalités optionnelles">
       <FeatureFlagListWrapper>
         {keys(labelsByFeatureFlag).map((featureFlagName, index) => (
           <div key={featureFlagName} className={fr.cx(index > 0 && "fr-mt-4w")}>
@@ -93,7 +93,7 @@ export const FeatureFlagsSection = () => {
           </div>
         ))}
       </FeatureFlagListWrapper>
-    </>
+    </BackofficeDashboardTabContent>
   );
 };
 

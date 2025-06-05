@@ -12,6 +12,7 @@ import {
   domElementIds,
   miniStageAgencyKinds,
 } from "shared";
+import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { routes } from "src/app/routes/routes";
 import { MetabaseView } from "../../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../../SelectConventionFromIdForm";
@@ -21,10 +22,13 @@ const selectAgencyToInitiateConventionModal = createModal({
   id: domElementIds.agencyDashboard.dashboard
     .selectAgencyToInitiateConventionModal,
 });
-export const ConventionTabContent = (
-  dashboards: WithAgencyDashboards & WithEstablishmentDashboards,
-  activeAgencies: AgencyDtoForAgencyUsersAndAdmins[],
-) => {
+export const ConventionTabContent = ({
+  dashboards,
+  activeAgencies,
+}: {
+  dashboards: WithAgencyDashboards & WithEstablishmentDashboards;
+  activeAgencies: AgencyDtoForAgencyUsersAndAdmins[];
+}) => {
   const [selectedAgency, setSelectedAgency] = useState<AgencyId | null>(null);
 
   const redirectToConventionPage = (
@@ -59,8 +63,11 @@ export const ConventionTabContent = (
     }
   };
   return (
-    <>
-      <div className={fr.cx("fr-grid-row", "fr-grid-row--right")}>
+    <HeadingSection
+      titleAs="h2"
+      title="Piloter une convention"
+      className={fr.cx("fr-mt-0")}
+      titleAction={
         <Button
           id={domElementIds.agencyDashboard.dashboard.initiateConventionButton}
           priority="primary"
@@ -69,8 +76,8 @@ export const ConventionTabContent = (
         >
           Initier une convention
         </Button>
-      </div>
-
+      }
+    >
       <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
       <MetabaseView
         title="Tableau de bord agence"
@@ -129,6 +136,6 @@ export const ConventionTabContent = (
         </selectAgencyToInitiateConventionModal.Component>,
         document.body,
       )}
-    </>
+    </HeadingSection>
   );
 };
