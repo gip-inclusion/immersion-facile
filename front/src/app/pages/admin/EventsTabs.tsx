@@ -8,6 +8,6 @@ export const EventsTab = () => {
   return error ? (
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
-    <MetabaseView title="Evénements" url={url} />
+    <MetabaseView title="Événements" url={url} />
   );
 };

@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
-import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -10,16 +10,17 @@ import {
   type DotNestedKeys,
   type FormEstablishmentDto,
   type FormEstablishmentUserRight,
+  type RangeOfPosition,
   domElementIds,
   errors,
   formEstablishmentSchema,
 } from "shared";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
-import { AvailabilitySection } from "src/app/components/forms/establishment/sections/AvailabilitySection";
-import { BusinessContactSection } from "src/app/components/forms/establishment/sections/BusinessContactSection";
+import { BusinessAndAdminSection } from "src/app/components/forms/establishment/sections/BusinessAndAdminSection";
 import { CreateIntroSection } from "src/app/components/forms/establishment/sections/CreateIntroSection";
-import { DetailsSection } from "src/app/components/forms/establishment/sections/DetailsSection";
-import { SearchableBySection } from "src/app/components/forms/establishment/sections/SearchableBySection";
+import { OffersSection } from "src/app/components/forms/establishment/sections/OffersSection";
+import { OffersSettingsSection } from "src/app/components/forms/establishment/sections/OffersSettingsSection";
+import { SummarySection } from "src/app/components/forms/establishment/sections/SummarySection";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
@@ -37,7 +38,6 @@ import {
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
-import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
@@ -46,9 +46,8 @@ import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice"
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
 import type { Route } from "type-route";
-import { EstablishmentUsersList } from "../../../pages/establishment-dashboard/EstablishmentUsersList";
 
-type RouteByMode = {
+export type RouteByMode = {
   create:
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;
@@ -62,33 +61,37 @@ type EstablishmentFormProps = {
   mode: Mode;
 };
 
-type FormStep = 1 | 2 | 3 | 4;
+export const formSteps = 4;
+
+type FormStep = RangeOfPosition<typeof formSteps>;
 
 const steps: Record<FormStep, Pick<StepperProps, "title" | "nextTitle">> = {
   1: {
-    title: "Visibilité",
-    nextTitle: "Référent immersion",
+    title: "Votre établissement",
+    nextTitle: "Vos offres",
   },
   2: {
-    title: "Type de candidats",
-    nextTitle: "Référent immersion",
+    title: "Vos offres",
+    nextTitle: "Paramètres de vos offres",
   },
   3: {
-    title: "Référent immersion",
-    nextTitle: "Votre fiche dans l’annuaire Immersion Facilitée",
+    title: "Paramètres de vos offres",
+    nextTitle: "Récapitulatif de votre établissement",
   },
   4: {
-    title: "Votre fiche dans l’annuaire Immersion Facilitée",
+    title: "Récapitulatif de votre établissement",
   },
 };
+
+export type FieldsToValidate = (
+  | keyof FormEstablishmentDto
+  | DotNestedKeys<FormEstablishmentDto>
+)[];
 
 export type Step = 0 | FormStep | null;
 export type OnStepChange = (
   step: Step,
-  fieldsToValidate: (
-    | keyof FormEstablishmentDto
-    | DotNestedKeys<FormEstablishmentDto>
-  )[],
+  fieldsToValidate: FieldsToValidate,
 ) => void;
 
 export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
@@ -133,8 +136,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const [availableForImmersion, setAvailableForImmersion] = useState<
     boolean | undefined
   >(undefined);
-  const [invalidEmailMessage, setInvalidEmailMessage] =
-    useState<ReactNode | null>(null);
 
   const [currentStep, setCurrentStep] = useState<Step>(
     isEstablishmentAdmin || isEstablishmentDashboard ? null : 0,
@@ -163,6 +164,10 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   );
 
   const currentRoute = isEstablishmentDashboard ? route : useRef(route).current;
+
+  const shouldUpdateAvailability = Boolean(
+    initialUrlParams.current.shouldUpdateAvailability,
+  );
 
   const methods = useForm<FormEstablishmentDto>({
     defaultValues: defaultFormValues,
@@ -201,12 +206,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           );
-          if (currentUser)
-            dispatch(
-              fetchUserSlice.actions.fetchUserRequested({
-                userId: currentUser.id,
-              }),
-            );
+          //
+          // fetchUserRequested is calling GetInclusionConnectedUser useCase which will throw if not used by an admin
+          //
+          // if (currentUser)
+          //   dispatch(
+          //     fetchUserSlice.actions.fetchUserRequested({
+          //       userId: currentUser.id,
+          //     }),
+          //   );
         },
       )
       .with(
@@ -392,7 +400,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           inclusionConnectedJwt: P.nullish,
         },
         () => {
-          throw new Error("Accès interdit sans être inclusion connecté.");
+          throw new Error("Accès interdit sans être connecté.");
         },
       )
       .exhaustive();
@@ -407,7 +415,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     );
     if (validatedFields.every((validatedField) => validatedField)) {
       if (
-        currentStep === 1 &&
+        currentStep === 3 &&
         availableForImmersion === undefined &&
         mode === "create"
       )
@@ -429,44 +437,29 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
             {match(currentStep)
               .with(null, () => (
                 <>
-                  <EstablishmentUsersList />
-                  <h2>{steps[1].title}</h2>
-                  <AvailabilitySection
+                  <BusinessAndAdminSection
                     mode={mode}
                     onStepChange={onStepChange}
                     currentStep={currentStep}
-                    setAvailableForImmersion={setAvailableForImmersion}
+                  />
+                  <OffersSection
+                    mode={mode}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
+                  />
+                  <OffersSettingsSection
+                    mode={mode}
+                    onStepChange={onStepChange}
+                    currentStep={currentStep}
                     availableForImmersion={availableForImmersion}
-                    shouldUpdateAvailability={Boolean(
-                      initialUrlParams.current.shouldUpdateAvailability,
-                    )}
-                  />
-                  <h2>{steps[2].title}</h2>
-                  <SearchableBySection
-                    mode={mode}
-                    onStepChange={onStepChange}
-                    currentStep={currentStep}
-                  />
-                  <h2>{steps[3].title}</h2>
-                  <BusinessContactSection
-                    mode={mode}
-                    onStepChange={onStepChange}
-                    currentStep={currentStep}
-                    setInvalidEmailMessage={setInvalidEmailMessage}
-                  />
-                  <h2>{steps[4].title}</h2>
-                  <DetailsSection
-                    mode={mode}
-                    isEstablishmentAdmin={isEstablishmentAdmin}
-                    currentStep={currentStep}
-                    onStepChange={onStepChange}
-                    invalidEmailMessage={invalidEmailMessage}
+                    setAvailableForImmersion={setAvailableForImmersion}
+                    shouldUpdateAvailability={shouldUpdateAvailability}
                   />
                 </>
               ))
               .with(0, () => <CreateIntroSection onStepChange={onStepChange} />)
               .otherwise((currentStep) => (
-                <div className={fr.cx("fr-col-8")}>
+                <div className={fr.cx("fr-col")}>
                   <Stepper
                     currentStep={currentStep}
                     stepCount={keys(steps).length}
@@ -475,37 +468,35 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
                   />
                   {match(currentStep)
                     .with(1, () => (
-                      <AvailabilitySection
+                      <BusinessAndAdminSection
                         mode={mode}
-                        onStepChange={onStepChange}
                         currentStep={currentStep}
-                        availableForImmersion={availableForImmersion}
-                        setAvailableForImmersion={setAvailableForImmersion}
-                        shouldUpdateAvailability={undefined}
+                        onStepChange={onStepChange}
                       />
                     ))
                     .with(2, () => (
-                      <SearchableBySection
+                      <OffersSection
                         mode={mode}
                         onStepChange={onStepChange}
                         currentStep={currentStep}
                       />
                     ))
                     .with(3, () => (
-                      <BusinessContactSection
+                      <OffersSettingsSection
                         mode={mode}
                         onStepChange={onStepChange}
                         currentStep={currentStep}
-                        setInvalidEmailMessage={setInvalidEmailMessage}
+                        availableForImmersion={availableForImmersion}
+                        setAvailableForImmersion={setAvailableForImmersion}
+                        shouldUpdateAvailability={shouldUpdateAvailability}
                       />
                     ))
                     .with(4, () => (
-                      <DetailsSection
-                        isEstablishmentAdmin={isEstablishmentAdmin}
+                      <SummarySection
                         mode={mode}
-                        currentStep={currentStep}
                         onStepChange={onStepChange}
-                        invalidEmailMessage={invalidEmailMessage}
+                        currentStep={currentStep}
+                        isEstablishmentAdmin={isEstablishmentAdmin}
                       />
                     ))
                     .exhaustive()}
