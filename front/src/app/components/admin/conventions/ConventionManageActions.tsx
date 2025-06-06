@@ -633,15 +633,22 @@ export const ConventionManageActions = ({
           <>
             {shouldShowAssessmentDocumentAction && (
               <Button
-                id={domElementIds.manageConvention.assessmentDocumentButton}
                 iconId="fr-icon-file-text-line"
                 priority="secondary"
-                linkProps={{
-                  href: routes.assessmentDocument({
-                    jwt: jwtParams.jwt,
-                    conventionId: convention.id,
-                  }).href,
+                onClick={() => {
+                  const payload = decodeMagicLinkJwtWithoutSignatureCheck(
+                    jwtParams.jwt,
+                  );
+                  const isConventionMagicLinkJwt =
+                    "role" in payload && payload.role !== "back-office";
+                  return routes
+                    .assessmentDocument({
+                      jwt: isConventionMagicLinkJwt ? jwtParams.jwt : undefined,
+                      conventionId: convention.id,
+                    })
+                    .push();
                 }}
+                id={domElementIds.manageConvention.openDocumentButton}
               >
                 Consulter le bilan
               </Button>
@@ -707,7 +714,7 @@ export const ConventionManageActions = ({
                     })
                     .push();
                 }}
-                id={domElementIds.manageConvention.openDocumentButton}
+                id={domElementIds.manageConvention.assessmentDocumentButton}
               >
                 Voir la convention
               </Button>
