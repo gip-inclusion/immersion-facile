@@ -464,6 +464,11 @@ export const domElementIds = {
       nextButtonFromStepAndMode: ({ currentStep }) =>
         `im-form-create-establishment__next-button--step-${currentStep}`,
       searchableBy: "im-form-create-establishment__searchable-by",
+      summarySiretValue: "im-form-create-establishment__summary-siret-value",
+      summaryAdminName: "im-form-create-establishment__summary-admin-name",
+      summaryBusinessAddresses:
+        "im-form-create-establishment__summary-business-addresses",
+      summaryAppellations: "im-form-create-establishment__summary-appellations",
     },
     edit: {
       form: "im-form-edit-establishment",

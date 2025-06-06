@@ -33,16 +33,6 @@ export const SummarySection = ({
 
   const buttons: [ButtonProps, ...ButtonProps[]] = [
     {
-      children: isEstablishmentAdmin
-        ? "Enregistrer les modifications"
-        : "Valider et créer l'établissement",
-      iconId: "fr-icon-checkbox-circle-line",
-      iconPosition: "right",
-      type: "submit",
-      disabled: isSubmitting,
-      id: domElementIds.establishment[mode].submitFormButton,
-    },
-    {
       children: "Étape précédente",
       iconId: "fr-icon-arrow-left-line",
       priority: "secondary",
@@ -53,23 +43,36 @@ export const SummarySection = ({
       }),
       onClick: () => onStepChange(3, []),
     },
+    {
+      children: isEstablishmentAdmin
+        ? "Enregistrer les modifications"
+        : "Valider et créer l'établissement",
+      iconId: "fr-icon-checkbox-circle-line",
+      iconPosition: "right",
+      type: "submit",
+      disabled: isSubmitting,
+      id: domElementIds.establishment[mode].submitFormButton,
+    },
   ];
   return (
     <>
       <p>
         Voici un récapitulatif des informations saisies pour l’établissement{" "}
-        {formValues.businessName} (SIRET : {formValues.siret}). L’administrateur
-        sera :{" "}
+        {formValues.businessName} (SIRET :{" "}
+        <strong id={domElementIds.establishment.create.summarySiretValue}>
+          {formValues.siret}
+        </strong>
+        ). L’administrateur sera :{" "}
         <strong>
           {/* TODO: federatedIdentity.provider === "proconnect" */}
           {federatedIdentity && (
-            <>
+            <span id={domElementIds.establishment.create.summaryAdminName}>
               {getFullname(
                 federatedIdentity.firstName,
                 federatedIdentity.lastName,
               )}
               {" - "}
-            </>
+            </span>
           )}
           {formValues.userRights[0].email}
         </strong>
@@ -82,7 +85,7 @@ export const SummarySection = ({
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Adresses d'accueil :
           </p>
-          <ul>
+          <ul id={domElementIds.establishment.create.summaryBusinessAddresses}>
             {formValues.businessAddresses.map((businessAddress) => (
               <li key={businessAddress.id}>{businessAddress.rawAddress}</li>
             ))}
@@ -90,7 +93,7 @@ export const SummarySection = ({
           <p className={fr.cx("fr-text--bold", "fr-mb-0")}>
             Métiers proposés :
           </p>
-          <ul>
+          <ul id={domElementIds.establishment.create.summaryAppellations}>
             {formValues.appellations.map((appellation) => (
               <li key={appellation.appellationCode}>
                 {appellation.appellationLabel}
