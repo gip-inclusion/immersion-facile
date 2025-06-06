@@ -1,5 +1,5 @@
 import { uniq } from "ramda";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import { emailSchema } from "../email/email.schema";

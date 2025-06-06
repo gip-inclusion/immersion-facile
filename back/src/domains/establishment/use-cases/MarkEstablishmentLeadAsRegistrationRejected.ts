@@ -1,5 +1,5 @@
 import { type ConventionJwtPayload, errors } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

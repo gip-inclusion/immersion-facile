@@ -4,7 +4,7 @@ import {
   removeSpaces,
   tallyFormSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { createLogger } from "../../../../utils/logger";
 import { createTransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";

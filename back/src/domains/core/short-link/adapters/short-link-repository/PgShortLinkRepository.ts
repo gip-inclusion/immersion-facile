@@ -1,5 +1,5 @@
 import { type AbsoluteUrl, type ShortLinkId, castError } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { createLogger } from "../../../../../utils/logger";
 import type { ShortLinkRepository } from "../../ports/ShortLinkRepository";
 import { pgShortLinkRepositorySchema } from "../PgShortLinkHelpers";

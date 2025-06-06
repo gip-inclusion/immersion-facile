@@ -11,7 +11,7 @@ import {
   frontRoutes,
   immersionFacileNoReplyEmailSender,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import type { ConventionRepository } from "../../convention/ports/ConventionRepository";

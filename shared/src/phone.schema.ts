@@ -1,6 +1,6 @@
 import { type CountryCode, isValidPhoneNumber } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { Phone } from "./sms/smsTemplateByName";
 import { zStringMinLength1 } from "./zodUtils";
 

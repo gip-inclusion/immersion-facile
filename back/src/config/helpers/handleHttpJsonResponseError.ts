@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/node";
 import { isAxiosError } from "axios";
 import type { Request, Response } from "express";
 import { HttpError, type HttpErrorResponseBody } from "shared";
-import { ZodError } from "zod";
+import { ZodError } from "zod/v4";
 import { type LoggerParamsWithMessage, createLogger } from "../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../utils/notifyTeam";
 

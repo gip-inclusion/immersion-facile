@@ -1,6 +1,6 @@
 import { type AbsoluteUrl, withAuthorizationHeaders } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 // see documentation : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md
 
