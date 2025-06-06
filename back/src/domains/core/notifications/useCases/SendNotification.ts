@@ -5,7 +5,7 @@ import {
   exhaustiveCheck,
 } from "shared";
 import { P, match } from "ts-pattern";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../UseCase";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";

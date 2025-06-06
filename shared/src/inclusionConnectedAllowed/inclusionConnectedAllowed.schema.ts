@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { agencyDtoForAgencyUsersAndAdminsSchema } from "../agency/agency.schema";
 import { discussionIdSchema } from "../discussion/discussion.schema";

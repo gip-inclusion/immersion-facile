@@ -19,7 +19,7 @@ import {
   roleSchema,
   userIdSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";

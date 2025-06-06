@@ -13,7 +13,7 @@ import {
   frontRoutes,
   signatoryRoleSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createTransactionalUseCase } from "../../core/UseCase";

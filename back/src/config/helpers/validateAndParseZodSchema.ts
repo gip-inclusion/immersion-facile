@@ -1,5 +1,5 @@
 import { errors, flattenZodErrors } from "shared";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 import type { OpacifiedLogger } from "../../utils/logger";
 
 export const validateAndParseZodSchemaV2 = <T>(

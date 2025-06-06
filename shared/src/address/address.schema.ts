@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import type {

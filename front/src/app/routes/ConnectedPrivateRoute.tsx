@@ -39,7 +39,7 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { Feedback } from "../components/feedback/Feedback";
 import { EmailValidationInput } from "../components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "../hooks/formContents.hooks";

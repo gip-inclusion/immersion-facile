@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { FtConnectIdentity } from "./federatedIdentity.dto";
 
 export const peConnectIdentitySchema: z.Schema<FtConnectIdentity> = z.object({

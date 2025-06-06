@@ -1,5 +1,5 @@
 import { castError } from "shared";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 import type { OpacifiedLogger } from "./logger";
 
 export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(

@@ -5,7 +5,7 @@ import {
   validateFile,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { UseCase } from "../../UseCase";
 import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { StoredFile } from "../entity/StoredFile";

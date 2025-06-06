@@ -23,7 +23,7 @@ import {
   establishmentSlice,
 } from "src/core-logic/domain/establishment/establishment.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const {
   Component: InitiateConventionModal,
