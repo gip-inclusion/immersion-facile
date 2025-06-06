@@ -1,5 +1,5 @@
 import parseMobile from "libphonenumber-js/mobile";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { phoneSchema } from "../phone.schema";
 import type { Phone, TemplatedSms } from "./smsTemplateByName";
 

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { emailSchema } from "../email/email.schema";
 import { allowedStartOAuthLoginPages } from "../routes/routes";
 import type {

@@ -7,7 +7,7 @@ import {
   emailSchema,
   smsRecipientPhoneSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export type RecipientOrSender = {
   name?: string;

@@ -6,7 +6,7 @@ import {
   type ReminderKind,
   castError,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { DomainEvent } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";

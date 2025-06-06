@@ -1,4 +1,4 @@
-import { ZodError, z } from "zod";
+import { ZodError, z } from "zod/v4";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { conventionSchema } from "../convention/convention.schema";
 import { expectArraysToEqual, expectToEqual } from "../test.helpers";

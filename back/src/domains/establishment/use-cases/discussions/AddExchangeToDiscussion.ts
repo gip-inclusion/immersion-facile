@@ -12,7 +12,7 @@ import {
   exchangeRoleSchema,
   zStringMinLength1,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

@@ -11,7 +11,7 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   legacyAssessmentDtoSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
 
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";

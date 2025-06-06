@@ -4,7 +4,7 @@ import {
   conventionStatuses,
 } from "shared";
 import { ForbiddenError } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { GetConventionsFilters } from "../ports/ConventionQueries";

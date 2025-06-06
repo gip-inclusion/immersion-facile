@@ -39,9 +39,14 @@ import { authSlice } from "src/core-logic/domain/auth/auth.slice";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
+<<<<<<< HEAD
 import { z } from "zod";
 import { LoginByEmailFeedback } from "../components/feedback/LoginByEmailFeedback";
 import { WithFeedbackReplacer } from "../components/feedback/WithFeedbackReplacer";
+=======
+import { z } from "zod/v4";
+import { Feedback } from "../components/feedback/Feedback";
+>>>>>>> e570258dd (updated zod, use v4 imports)
 import { EmailValidationInput } from "../components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "../hooks/formContents.hooks";
 

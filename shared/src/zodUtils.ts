@@ -1,4 +1,4 @@
-import { type ZodError, type ZodIssue, z } from "zod";
+import { type ZodError, type ZodIssue, z } from "zod/v4";
 import { timeHHmmRegExp } from "./utils/date";
 
 // Change default error map behavior to provide context

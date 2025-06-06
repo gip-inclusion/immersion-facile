@@ -5,7 +5,7 @@ import {
   errors,
   siretSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";

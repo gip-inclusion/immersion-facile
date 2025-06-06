@@ -5,8 +5,8 @@ import {
   conventionReadSchema,
 } from "shared";
 import { createOpenApiGenerator } from "shared-routes/openapi";
-import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { z } from "zod/v4";
 import type { ConventionUpdatedSubscriptionCallbackBody } from "../../../../domains/core/api-consumer/ports/SubscribersGateway";
 import type { ContactEstablishmentPublicV2Dto } from "../DtoAndSchemas/v2/input/ContactEstablishmentPublicV2.dto";
 import type { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";

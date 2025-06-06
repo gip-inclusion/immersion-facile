@@ -13,7 +13,7 @@ import {
   immersionFacileNoReplyEmailSender,
   withDateRangeSchema,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";

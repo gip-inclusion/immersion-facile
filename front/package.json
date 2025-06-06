@@ -81,7 +81,11 @@
     "vite": "^5.4.19",
     "vite-plugin-pwa": "^0.17.2",
     "workbox-window": "^7.0.0",
+<<<<<<< HEAD
     "zod": "3.25.63"
+=======
+    "zod": "3.25.55"
+>>>>>>> e570258dd (updated zod, use v4 imports)
   },
   "peerDependencies": {
     "@emotion/react": "^11.9.0",

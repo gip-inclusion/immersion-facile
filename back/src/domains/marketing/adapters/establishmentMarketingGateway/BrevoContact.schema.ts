@@ -1,5 +1,5 @@
 import { emailSchema, numberOfEmployeesRangeSchema } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import {
   type CreateContactAttributes,
   type CreateContactBody,

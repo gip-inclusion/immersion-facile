@@ -1,4 +1,4 @@
-import type { ZodError } from "zod";
+import type { ZodError } from "zod/v4";
 
 export type HttpErrorResponseBody = {
   status: number;

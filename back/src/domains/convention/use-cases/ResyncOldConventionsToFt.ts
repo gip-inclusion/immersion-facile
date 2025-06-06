@@ -1,6 +1,6 @@
 import { type ConventionId, errors } from "shared";
 import { match } from "ts-pattern";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

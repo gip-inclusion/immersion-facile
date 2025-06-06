@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { zStringMinLength1 } from "../zodUtils";

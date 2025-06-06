@@ -1,5 +1,5 @@
 import { differenceInYears } from "date-fns";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import {
   agencyIdSchema,

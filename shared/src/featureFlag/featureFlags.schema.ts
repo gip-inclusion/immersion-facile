@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {

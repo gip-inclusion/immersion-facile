@@ -18589,6 +18589,33 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  jscodeshift@0.15.2(@babel/preset-env@7.26.0(@babel/core@7.26.10)):
+    dependencies:
+      '@babel/core': 7.26.10
+      '@babel/parser': 7.26.2
+      '@babel/plugin-transform-class-properties': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-modules-commonjs': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-nullish-coalescing-operator': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-optional-chaining': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-private-methods': 7.25.9(@babel/core@7.26.10)
+      '@babel/preset-flow': 7.25.9(@babel/core@7.26.10)
+      '@babel/preset-typescript': 7.26.0(@babel/core@7.26.10)
+      '@babel/register': 7.25.9(@babel/core@7.26.10)
+      babel-core: 7.0.0-bridge.0(@babel/core@7.26.10)
+      chalk: 4.1.2
+      flow-parser: 0.205.0
+      graceful-fs: 4.2.11
+      micromatch: 4.0.5
+      neo-async: 2.6.2
+      node-dir: 0.1.17
+      recast: 0.23.9
+      temp: 0.8.4
+      write-file-atomic: 2.4.3
+    optionalDependencies:
+      '@babel/preset-env': 7.26.0(@babel/core@7.26.10)
+    transitivePeerDependencies:
+      - supports-color
+
   jsesc@0.5.0: {}
 
   jsesc@2.5.2: {}

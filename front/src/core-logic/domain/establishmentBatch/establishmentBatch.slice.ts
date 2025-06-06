@@ -8,7 +8,7 @@ import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import type { z } from "zod";
+import type { z } from "zod/v4";
 
 export type FormEstablishmentDtoWithErrors = {
   formEstablishment: FormEstablishmentDto | null;
