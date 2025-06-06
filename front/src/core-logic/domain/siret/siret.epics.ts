@@ -1,4 +1,4 @@
-import { type Observable, filter, iif, map, of, switchMap } from "rxjs";
+import { type Observable, filter, map, switchMap } from "rxjs";
 import {
   type GetSiretInfo,
   type GetSiretInfoError,
@@ -30,13 +30,12 @@ const toggleShouldFetchEvenIfAlreadySaved: SiretEpic = (action$, state$) =>
 const triggerSiretFetchEpic: SiretEpic = (action$) =>
   action$.pipe(
     filter(siretSlice.actions.siretModified.match),
-    switchMap((action) =>
-      iif(
-        () => siretSchema.safeParse(action.payload.siret).success,
-        of(siretSlice.actions.siretInfoRequested(action.payload)),
-        of(siretSlice.actions.siretWasNotValid()),
-      ),
-    ),
+    map((action) => {
+      const isValid = siretSchema.safeParse(action.payload.siret).success;
+      return isValid
+        ? siretSlice.actions.siretInfoRequested(action.payload)
+        : siretSlice.actions.siretWasNotValid();
+    }),
   );
 
 const getSiretEpic: SiretEpic = (

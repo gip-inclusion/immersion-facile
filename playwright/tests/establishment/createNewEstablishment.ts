@@ -10,6 +10,7 @@ import { testConfig } from "../../custom.config";
 import {
   type PlaywrightTestCallback,
   expectLocatorToBeVisibleAndEnabled,
+  expectNoErrorVisible,
   fillAutocomplete,
 } from "../../utils/utils";
 import {
@@ -33,11 +34,11 @@ export const createEstablishmentForm =
 
     await step0(page);
 
-    await step1(page);
+    await step1(page, adminRight);
 
     await step2(page);
 
-    await step3(page, adminRight);
+    await step3(page);
 
     await step4(page, establishment);
 
@@ -60,30 +61,15 @@ export const step0 = async (page: Page) => {
   await addEstablishmentButton.click();
 };
 
-const step1 = async (page: Page) => {
-  const initialRadioButtonLocator = page.locator(
-    `#${domElementIds.establishment.create.availabilityButton}`,
-  );
-  await expect(initialRadioButtonLocator.getByText("Oui")).not.toBeChecked();
-  await expect(initialRadioButtonLocator.getByText("Non")).not.toBeChecked();
-
-  await initialRadioButtonLocator.getByText("Oui").click();
-
-  await goToNextStep(page, 1, "create");
-};
-
-const step2 = async (page: Page) => {
-  await page
-    .locator(`[for="${domElementIds.establishment.create.searchableBy}-2"]`) // searchable by students
-    .click();
-
-  await goToNextStep(page, 2, "create");
-};
-
-const step3 = async (
+const step1 = async (
   page: Page,
   adminRight: AdminFormEstablishmentUserRight,
 ) => {
+  const siretInput = await page.locator(
+    `#${domElementIds.establishment.create.siret}`,
+  );
+  await expect(siretInput).toHaveValue("13003013300016");
+
   await expect(
     page.locator(
       `#${domElementIds.establishment.create.businessContact.firstName}`,
@@ -109,36 +95,11 @@ const step3 = async (
     adminRight.phone,
   );
 
-  await page
-    .locator(`[for='${domElementIds.establishment.create.contactMode}-0']`)
-    .click();
-
-  await goToNextStep(page, 3, "create");
+  await goToNextStep(page, 1, "create");
 };
 
-const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
-  const siretInput = await page.locator(
-    `#${domElementIds.establishment.create.siret}`,
-  );
-  await expect(siretInput).toHaveValue("13003013300016");
-
-  await siretInput.fill(establishment.siret);
-
-  // await expect(
-  //   page.locator(`#${domElementIds.establishment.create.businessName}`),
-  // ).toHaveValue(establishment.businessName.toUpperCase());
-
-  // await expect(
-  //   page.locator(
-  //     `#${domElementIds.establishment.create.addressAutocomplete}-wrapper .im-select__single-value`,
-  //   ),
-  // ).toContainText(establishment.businessAddresses[0].rawAddress.toUpperCase());
-  // await expect(
-  //   await page
-  //     .locator(`#${domElementIds.establishment.create.businessAddresses}-0`)
-  //     .inputValue(),
-  // ).toContain(establishment.businessAddresses[0].rawAddress.toUpperCase());
-
+const step2 = async (page: Page) => {
+  await expectNoErrorVisible(page);
   await page.click(
     `#${domElementIds.establishment.create.businessAddresses}-add-option-button`,
   );
@@ -160,6 +121,51 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
     value: "boulang",
     endpoint: formCompletionRoutes.appellation.url,
   });
+
+  await goToNextStep(page, 2, "create");
+};
+
+const step3 = async (page: Page) => {
+  await expectNoErrorVisible(page);
+
+  const availableRadioLocator = page.locator(
+    `[for='${domElementIds.establishment.create.availabilityButton}-1']`,
+  );
+  const unavailableRadioLocator = page.locator(
+    `[for='${domElementIds.establishment.create.availabilityButton}-0']`,
+  );
+  await expect(availableRadioLocator).not.toBeChecked();
+  await expect(unavailableRadioLocator).not.toBeChecked();
+
+  await availableRadioLocator.click();
+
+  await page
+    .locator(`[for='${domElementIds.establishment.create.contactMode}-0']`)
+    .click();
+
+  await goToNextStep(page, 3, "create");
+};
+
+const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
+  const summarySiretValue = await page.locator(
+    `#${domElementIds.establishment.create.summarySiretValue}`,
+  );
+  await expect(summarySiretValue).toHaveText("13003013300016");
+
+  const summaryAdminName = await page.locator(
+    `#${domElementIds.establishment.create.summaryAdminName}`,
+  );
+  await expect(summaryAdminName).toContainText("Jean IMMERSION");
+
+  const summaryBusinessAddresses = await page.locator(
+    `#${domElementIds.establishment.create.summaryBusinessAddresses} li`,
+  );
+  await expect(summaryBusinessAddresses).toHaveCount(2);
+
+  const summaryAppellations = await page.locator(
+    `#${domElementIds.establishment.create.summaryAppellations} li`,
+  );
+  await expect(summaryAppellations).toHaveCount(1);
 
   await page.click(`#${domElementIds.establishment.create.submitFormButton}`);
   await expect(page.url()).toContain(`siret=${establishment.siret}`);

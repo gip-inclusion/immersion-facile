@@ -120,7 +120,7 @@ test.describe("Establishment creation and modification workflow", () => {
     );
 
     test(
-      "in establishment dashboard",
+      "checks that establishment is unavailable through establishment dashboard",
       checkAvailabilityThoughEstablishmentDashboard(makeUpdatedEstablishment),
     );
   });
