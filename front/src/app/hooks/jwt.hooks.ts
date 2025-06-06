@@ -20,10 +20,8 @@ export const useJwt = (
   >,
 ) => {
   const jwtQueryParam: ConventionSupportedJwt | undefined = route.params?.jwt;
-  const inclusionConnectJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-  const jwt = jwtQueryParam ?? inclusionConnectJwt ?? "";
+  const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const jwt = jwtQueryParam ?? connectedUserJwt ?? "";
   const jwtPayload =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt ?? "");
 
