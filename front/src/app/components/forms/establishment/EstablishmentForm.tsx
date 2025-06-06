@@ -38,7 +38,6 @@ import {
   filterParamsForRoute,
   getUrlParameters,
 } from "src/app/utils/url.utils";
-import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
@@ -207,12 +206,15 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           );
-          if (currentUser)
-            dispatch(
-              fetchUserSlice.actions.fetchUserRequested({
-                userId: currentUser.id,
-              }),
-            );
+          //
+          // fetchUserRequested is calling GetInclusionConnectedUser useCase which will throw if not used by an admin
+          //
+          // if (currentUser)
+          //   dispatch(
+          //     fetchUserSlice.actions.fetchUserRequested({
+          //       userId: currentUser.id,
+          //     }),
+          //   );
         },
       )
       .with(
@@ -398,7 +400,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           inclusionConnectedJwt: P.nullish,
         },
         () => {
-          throw new Error("Accès interdit sans être inclusion connecté.");
+          throw new Error("Accès interdit sans être connecté.");
         },
       )
       .exhaustive();

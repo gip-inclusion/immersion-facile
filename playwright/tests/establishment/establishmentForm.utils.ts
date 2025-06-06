@@ -11,16 +11,9 @@ export const checkAvailabilityButtons = async (
   expectedAvailability: "Oui" | "Non",
 ) => {
   const availibilityRadioButton = page.locator(
-    `#${domElementIds.establishment[mode].availabilityButton}`,
+    `#${domElementIds.establishment[mode].availabilityButton}-${expectedAvailability === "Oui" ? "1" : "0"}`,
   );
-  await expect(
-    availibilityRadioButton.getByText(expectedAvailability),
-  ).toBeChecked();
-  await expect(
-    availibilityRadioButton.getByText(
-      expectedAvailability === "Oui" ? "Non" : "Oui",
-    ),
-  ).not.toBeChecked();
+  await expect(availibilityRadioButton).toBeChecked();
 };
 
 export const goToNextStep = async (
@@ -28,6 +21,13 @@ export const goToNextStep = async (
   currentStep: 1 | 2 | 3 | 4,
   mode: "create" | "edit",
 ) => {
+  const nextButton = page.locator(
+    `#${domElementIds.establishment[mode].nextButtonFromStepAndMode({
+      currentStep,
+      mode,
+    })}`,
+  );
+  await expect(nextButton).toBeEnabled();
   await page
     .locator(
       `#${domElementIds.establishment[mode].nextButtonFromStepAndMode({

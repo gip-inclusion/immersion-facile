@@ -91,10 +91,21 @@ export const OffersSettingsSection = ({
   ).getFormFields();
   const getFieldError = makeFieldError(formState);
 
+  const showErrorOnAvailableForImmersion = () => {
+    if (availableForImmersionInProps === undefined) return true;
+    if (availableForImmersionInProps && getFieldError("maxContactsPerMonth"))
+      return true;
+    if (
+      availableForImmersionInProps === false &&
+      (getFieldError("nextAvailabilityDate") ||
+        getFieldError("maxContactsPerMonth"))
+    )
+      return true;
+    return false;
+  };
+
   const shouldShowErrorOnAvailableForImmersion =
-    availableForImmersionInProps === undefined &&
-    (getFieldError("maxContactsPerMonth") ||
-      getFieldError("nextAvailabilityDate"));
+    showErrorOnAvailableForImmersion();
 
   const currentNextAvailabilityDate = getValues("nextAvailabilityDate");
 
