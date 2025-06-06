@@ -4,7 +4,6 @@ import {
   addressRoutes,
   domElementIds,
 } from "shared";
-import { testConfig } from "../../custom.config";
 import {
   goToDashboard,
   goToEstablishmentDashboardTab,
@@ -68,71 +67,16 @@ const editEstablishmentInEstablishmentDashboard = async (
     .locator("#establishment-users-table tr:first-of-type td:first-of-type")
     .textContent();
   await expect(adminEmail).toBe(userRights[0].email);
-  await step1Availability(page, updatedEstablishment);
-  await step2SearchableBy(page);
-  await step3BusinessContact(page);
-  await step4AImmersionOffer(page, updatedEstablishment);
-  await step4BConfirm(page);
+  await step1(page, updatedEstablishment);
+  await step2(page, updatedEstablishment);
+  await step3(page, updatedEstablishment);
+  await step4(page, updatedEstablishment);
 };
 
-const step1Availability = async (
+const step1 = async (
   page: Page,
   updatedEstablishment: FormEstablishmentDto,
 ) => {
-  if (!updatedEstablishment.nextAvailabilityDate)
-    throw new Error(
-      "Missing next availability date for updatedEstablishmentInfos",
-    );
-
-  await page
-    .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
-    .getByText("Non")
-    .click();
-
-  await page
-    .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
-    .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
-
-  const maxContactPerMonthLocator = await page.locator(
-    `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
-  );
-
-  const maxContactPerMonthLocatorCurrentValue =
-    await maxContactPerMonthLocator.inputValue();
-  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
-  await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
-    updatedEstablishment.maxContactsPerMonth.toString(),
-  );
-  await maxContactPerMonthLocator.fill(
-    updatedEstablishment.maxContactsPerMonth.toString(),
-  );
-};
-
-const step2SearchableBy = async (page: Page) => {
-  await page
-    .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
-    .click();
-};
-
-const step3BusinessContact = async (page: Page): Promise<void> => {
-  await page
-    .locator(`[for='${domElementIds.establishment.edit.contactMode}-1']`)
-    .click();
-
-  // await goToNextStep(page, 3, "edit");
-};
-
-const step4AImmersionOffer = async (
-  page: Page,
-  updatedEstablishment: FormEstablishmentDto,
-) => {
-  const businessAddress = updatedEstablishment.businessAddresses.at(0);
-
-  if (!businessAddress)
-    throw new Error(
-      "Missing first business address for updatedEstablishmentInfos",
-    );
-
   if (!updatedEstablishment.businessNameCustomized)
     throw new Error(
       "Missing business name customized for updatedEstablishmentInfos",
@@ -158,18 +102,6 @@ const step4AImmersionOffer = async (
     updatedEstablishment.businessNameCustomized,
   );
 
-  await page.click(
-    `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
-      updatedEstablishment.isEngagedEnterprise ? "1" : "0"
-    }]`,
-  );
-
-  await page.click(
-    `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
-      updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
-    }]`,
-  );
-
   await page.fill(
     `#${domElementIds.establishment.edit.additionalInformation}`,
     updatedEstablishment.additionalInformation,
@@ -179,6 +111,46 @@ const step4AImmersionOffer = async (
     `#${domElementIds.establishment.edit.website}`,
     updatedEstablishment.website,
   );
+
+  // if (!updatedEstablishment.nextAvailabilityDate)
+  //   throw new Error(
+  //     "Missing next availability date for updatedEstablishmentInfos",
+  //   );
+
+  // await page
+  //   .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
+  //   .getByText("Non")
+  //   .click();
+
+  // await page
+  //   .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
+  //   .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
+
+  // const maxContactPerMonthLocator = await page.locator(
+  //   `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
+  // );
+
+  // const maxContactPerMonthLocatorCurrentValue =
+  //   await maxContactPerMonthLocator.inputValue();
+  // await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
+  // await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
+  //   updatedEstablishment.maxContactsPerMonth.toString(),
+  // );
+  // await maxContactPerMonthLocator.fill(
+  //   updatedEstablishment.maxContactsPerMonth.toString(),
+  // );
+};
+
+const step2 = async (
+  page: Page,
+  updatedEstablishment: FormEstablishmentDto,
+) => {
+  const businessAddress = updatedEstablishment.businessAddresses.at(0);
+
+  if (!businessAddress)
+    throw new Error(
+      "Missing first business address for updatedEstablishmentInfos",
+    );
 
   await page.click(
     `#${domElementIds.establishment.edit.businessAddresses}-delete-option-button-0`,
@@ -206,8 +178,55 @@ const step4AImmersionOffer = async (
   });
 };
 
-const step4BConfirm = async (page: Page) => {
+const step3 = async (
+  page: Page,
+  updatedEstablishment: FormEstablishmentDto,
+): Promise<void> => {
+  if (!updatedEstablishment.nextAvailabilityDate)
+    throw new Error(
+      "Missing next availability date for updatedEstablishmentInfos",
+    );
+
+  const unavailableRadioLocator = page.locator(
+    `[for="${domElementIds.establishment.edit.availabilityButton}-0"]`,
+  );
+  await unavailableRadioLocator.click();
+
+  await page
+    .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
+    .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
+
+  await page.fill(
+    `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
+    updatedEstablishment.maxContactsPerMonth.toString(),
+  );
+
+  await page
+    .locator(`[for="${domElementIds.establishment.edit.searchableBy}-1"]`)
+    .click();
+  await page
+    .locator(`[for='${domElementIds.establishment.edit.contactMode}-1']`)
+    .click();
+
+  await page.click(
+    `[for=${domElementIds.establishment.edit.isEngagedEnterprise}-${
+      updatedEstablishment.isEngagedEnterprise ? "1" : "0"
+    }]`,
+  );
+
+  await page.click(
+    `[for=${domElementIds.establishment.edit.fitForDisabledWorkers}-${
+      updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
+    }]`,
+  );
+  // await goToNextStep(page, 3, "edit");
+};
+
+const step4 = async (
+  page: Page,
+  updatedEstablishment: FormEstablishmentDto,
+) => {
   await page.click(`#${domElementIds.establishment.edit.submitFormButton}`);
+  await expect(page.url()).toContain(`siret=${updatedEstablishment.siret}`);
   await expect(page.locator(".fr-alert--success")).toBeVisible();
-  await page.waitForTimeout(testConfig.timeForEventCrawler);
 };

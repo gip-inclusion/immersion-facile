@@ -1,6 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useEffect } from "react";
+import { Loader } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
   type FormEstablishmentDto,
@@ -28,7 +29,7 @@ export const CreationSiretRelatedInputs = () => {
   const {
     setValue,
     register,
-    formState: { touchedFields },
+    formState: { touchedFields, errors },
   } = useFormContext<FormEstablishmentDto>();
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels("create"),
@@ -66,8 +67,19 @@ export const CreationSiretRelatedInputs = () => {
         : defaultMaxContactsPerMonth,
     );
   }, [establishmentInfos]);
+  const getSiretError = () => {
+    if (errors.siret) {
+      return errors.siret.message;
+    }
+    if (siretErrorToDisplay && touchedFields.siret) {
+      return siretErrorToDisplay;
+    }
+    return "";
+  };
+  const siretError = getSiretError();
   return (
     <>
+      {isFetchingSiret && <Loader />}
       <Input
         label={formContents.siret.label}
         hintText={formContents.siret.hintText}
@@ -78,12 +90,9 @@ export const CreationSiretRelatedInputs = () => {
             updateSiret(event.target.value);
             setValue("siret", event.target.value);
           },
-          readOnly: isFetchingSiret,
         }}
-        state={siretErrorToDisplay && touchedFields.siret ? "error" : "default"}
-        stateRelatedMessage={
-          touchedFields.siret && siretErrorToDisplay ? siretErrorToDisplay : ""
-        }
+        state={siretError ? "error" : "default"}
+        stateRelatedMessage={siretError}
       />
       <p>
         <a

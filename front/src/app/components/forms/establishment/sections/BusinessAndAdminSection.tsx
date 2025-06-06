@@ -6,7 +6,6 @@ import { values } from "ramda";
 import { ErrorNotifications } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { type FormEstablishmentDto, domElementIds } from "shared";
-import { Feedback } from "src/app/components/feedback/Feedback";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { HeadingSection } from "src/app/components/layout/HeadingSection";
@@ -43,7 +42,6 @@ export const BusinessAndAdminSection = ({
   const formContents = getFormContents(
     formEstablishmentFieldsLabels(mode),
   ).getFormFields();
-
   const formErrors = getFormContents(
     formEstablishmentFieldsLabels(mode),
   ).getFormErrors();
@@ -90,58 +88,60 @@ export const BusinessAndAdminSection = ({
         ))
         .exhaustive()}
 
-      <ErrorNotifications
-        errorsWithLabels={toErrorsWithLabels({
-          labels: formErrors,
-          errors: displayReadableError(errors),
-        })}
-        visible={values(errors).length > 0}
-      />
-
-      <Feedback topics={["form-establishment"]} />
       {isStepMode && (
-        <ButtonsGroup
-          inlineLayoutWhen="always"
-          alignment="left"
-          buttonsEquisized
-          className={fr.cx("fr-mt-4w")}
-          buttons={[
-            {
-              children: "Étape précédente",
-              iconId: "fr-icon-arrow-left-line",
-              priority: "secondary",
-              disabled: true,
-              id: domElementIds.establishment[
-                mode
-              ].previousButtonFromStepAndMode({
-                currentStep,
-                mode,
-              }),
-            },
-            {
-              children: "Étape suivante",
-              onClick: () => {
-                onStepChange(2, [
-                  "siret",
-                  "businessName",
-                  "businessNameCustomized",
-                  "website",
-                  "additionalInformation",
-                  "userRights.0.job",
-                  "userRights.0.phone",
-                  "userRights.0.email",
-                ]);
+        <>
+          <ErrorNotifications
+            errorsWithLabels={toErrorsWithLabels({
+              labels: formErrors,
+              errors: displayReadableError(errors),
+            })}
+            visible={values(errors).length > 0}
+          />
+          <ButtonsGroup
+            inlineLayoutWhen="always"
+            alignment="left"
+            buttonsEquisized
+            className={fr.cx("fr-mt-4w")}
+            buttons={[
+              {
+                children: "Étape précédente",
+                iconId: "fr-icon-arrow-left-line",
+                priority: "secondary",
+                disabled: true,
+                id: domElementIds.establishment[
+                  mode
+                ].previousButtonFromStepAndMode({
+                  currentStep,
+                  mode,
+                }),
               },
-              type: "button",
-              iconId: "fr-icon-arrow-right-line",
-              iconPosition: "right",
-              id: domElementIds.establishment[mode].nextButtonFromStepAndMode({
-                currentStep,
-                mode,
-              }),
-            },
-          ]}
-        />
+              {
+                children: "Étape suivante",
+                onClick: () => {
+                  onStepChange(2, [
+                    "siret",
+                    "businessName",
+                    "businessNameCustomized",
+                    "website",
+                    "additionalInformation",
+                    "userRights.0.job",
+                    "userRights.0.phone",
+                    "userRights.0.email",
+                  ]);
+                },
+                type: "button",
+                iconId: "fr-icon-arrow-right-line",
+                iconPosition: "right",
+                id: domElementIds.establishment[mode].nextButtonFromStepAndMode(
+                  {
+                    currentStep,
+                    mode,
+                  },
+                ),
+              },
+            ]}
+          />
+        </>
       )}
     </>
   );
