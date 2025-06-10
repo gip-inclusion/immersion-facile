@@ -143,106 +143,107 @@ export const ConventionSignForm = ({
     if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
   }, [isSendSignatureLinkModalOpen]);
 
-  if (alreadySigned) {
-    return (
-      <>
-        <Alert
-          {...t.conventionAlreadySigned(convention.id, convention.agencyName)}
-          severity="success"
-          className={fr.cx("fr-mb-5v")}
-        />
-        <ConventionSummary
-          illustration={commonIllustrations.documentsAdministratifs}
-          submittedAt={toDisplayedDate({
-            date: new Date(convention.dateSubmission),
-          })}
-          summary={makeConventionSections(
-            convention,
-            sendSignatureLinkButtonProps({
-              triggeredByRole: currentSignatory.role,
-              signatureLinksSent,
-              onClick: ({ signatoryRole, signatoryPhone }) => {
-                sendSignatureLinkModal.open();
-                setSignatoryToSendSignatureLink({
-                  signatoryRole,
-                  signatoryPhone,
-                });
-              },
-            }),
-          )}
-          conventionId={convention.id}
-        />
-      </>
-    );
-  }
   return (
     <>
       <Feedback
         topics={["convention-action-sign", "send-signature-link"]}
         closable
       />
-      <FormProvider {...methods}>
-        <Alert
-          {...t.conventionReadyToBeSigned}
-          severity="info"
-          className={fr.cx("fr-mb-4w")}
-        />
-        {isConventionRenewed(convention) && (
-          <ConventionRenewedInformations renewed={convention.renewed} />
-        )}
-        <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>{t.sign.regulations}</p>
-        <form id={domElementIds.conventionToSign.form}>
-          {currentSignatory && (
-            <ConventionSummary
-              illustration={commonIllustrations.documentsAdministratifs}
-              submittedAt={toDisplayedDate({
-                date: new Date(convention.dateSubmission),
-              })}
-              summary={makeConventionSections(
-                convention,
-                sendSignatureLinkButtonProps({
-                  triggeredByRole: currentSignatory.role,
-                  signatureLinksSent,
-                  onClick: ({ signatoryRole, signatoryPhone }) => {
-                    sendSignatureLinkModal.open();
-                    setSignatoryToSendSignatureLink({
-                      signatoryRole,
-                      signatoryPhone,
-                    });
-                  },
-                }),
-              )}
-              conventionId={convention.id}
-            />
-          )}
-          {isModalClosedWithoutSignature && (
-            <Alert
-              {...t.conventionNeedToBeSign}
-              closable={true}
-              severity="warning"
-              small
-              className={fr.cx("fr-mb-5w")}
-            />
-          )}
-          {currentSignatory && (
-            <SignatureActions
-              internshipKind={convention.internshipKind}
-              signatory={currentSignatory}
-              onSubmitClick={methods.handleSubmit(
-                onSignFormSubmit,
-                (errors) => {
-                  console.error(methods.getValues(), errors);
+      {alreadySigned ? (
+        <>
+          <Alert
+            {...t.conventionAlreadySigned(convention.id, convention.agencyName)}
+            severity="success"
+            className={fr.cx("fr-mb-5v")}
+          />
+          <ConventionSummary
+            illustration={commonIllustrations.documentsAdministratifs}
+            submittedAt={toDisplayedDate({
+              date: new Date(convention.dateSubmission),
+            })}
+            summary={makeConventionSections(
+              convention,
+              sendSignatureLinkButtonProps({
+                triggeredByRole: currentSignatory.role,
+                signatureLinksSent,
+                onClick: ({ signatoryRole, signatoryPhone }) => {
+                  sendSignatureLinkModal.open();
+                  setSignatoryToSendSignatureLink({
+                    signatoryRole,
+                    signatoryPhone,
+                  });
                 },
-              )}
-              jwt={jwt}
-              convention={convention}
-              onCloseSignModalWithoutSignature={
-                setIsModalClosedWithoutSignature
-              }
-            />
+              }),
+            )}
+            conventionId={convention.id}
+          />
+        </>
+      ) : (
+        <FormProvider {...methods}>
+          <Alert
+            {...t.conventionReadyToBeSigned}
+            severity="info"
+            className={fr.cx("fr-mb-4w")}
+          />
+          {isConventionRenewed(convention) && (
+            <ConventionRenewedInformations renewed={convention.renewed} />
           )}
-        </form>
-      </FormProvider>
+          <p className={fr.cx("fr-text--xs", "fr-mt-1w")}>
+            {t.sign.regulations}
+          </p>
+          <form id={domElementIds.conventionToSign.form}>
+            {currentSignatory && (
+              <ConventionSummary
+                illustration={commonIllustrations.documentsAdministratifs}
+                submittedAt={toDisplayedDate({
+                  date: new Date(convention.dateSubmission),
+                })}
+                summary={makeConventionSections(
+                  convention,
+                  sendSignatureLinkButtonProps({
+                    triggeredByRole: currentSignatory.role,
+                    signatureLinksSent,
+                    onClick: ({ signatoryRole, signatoryPhone }) => {
+                      sendSignatureLinkModal.open();
+                      setSignatoryToSendSignatureLink({
+                        signatoryRole,
+                        signatoryPhone,
+                      });
+                    },
+                  }),
+                )}
+                conventionId={convention.id}
+              />
+            )}
+            {isModalClosedWithoutSignature && (
+              <Alert
+                {...t.conventionNeedToBeSign}
+                closable={true}
+                severity="warning"
+                small
+                className={fr.cx("fr-mb-5w")}
+              />
+            )}
+            {currentSignatory && (
+              <SignatureActions
+                internshipKind={convention.internshipKind}
+                signatory={currentSignatory}
+                onSubmitClick={methods.handleSubmit(
+                  onSignFormSubmit,
+                  (errors) => {
+                    console.error(methods.getValues(), errors);
+                  },
+                )}
+                jwt={jwt}
+                convention={convention}
+                onCloseSignModalWithoutSignature={
+                  setIsModalClosedWithoutSignature
+                }
+              />
+            )}
+          </form>
+        </FormProvider>
+      )}
       <SendSignatureLinkModalWrapper
         signatory={signatoryToSendSignatureLink?.signatoryRole}
         signatoryPhone={signatoryToSendSignatureLink?.signatoryPhone}
