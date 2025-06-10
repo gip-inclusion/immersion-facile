@@ -5,8 +5,8 @@ import { discussionIdSchema } from "../discussion/discussion.schema";
 import { emailSchema } from "../email/email.schema";
 import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
 import { establishmentsRoles } from "../role/role.dto";
-import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   type AgencyRight,

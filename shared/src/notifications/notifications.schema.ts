@@ -3,12 +3,10 @@ import { agencyIdSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { templatedEmailSchema } from "../email/email.schema";
 import { userIdSchema } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
-import {
-  dateTimeIsoStringSchema,
-  makeDateStringSchema,
-} from "../schedule/Schedule.schema";
+import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { templatedSmsSchema } from "../sms/sms.schema";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import { localization } from "../zodUtils";
 import type {
   EmailNotification,

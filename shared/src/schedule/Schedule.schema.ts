@@ -58,4 +58,3 @@ export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
   isSimple: z.boolean(),
   complexSchedule: immersionDaysScheduleSchema,
 });
-export { dateTimeIsoStringSchema };

@@ -62,6 +62,21 @@ describe("SendExchangeToRecipient", () => {
       };
     });
 
+    it("skips the use case, if the skip parameter is provided", async () => {
+      const discussion = new DiscussionBuilder().build();
+      uow.discussionRepository.discussions = [discussion];
+
+      await useCase.execute({
+        skipSendingEmail: true,
+        discussionId: discussion.id,
+      });
+
+      expectSavedNotificationsAndEvents({
+        emails: [],
+        sms: [],
+      });
+    });
+
     it("sends the email to the right recipient (response from establishment to potential beneficiary)", async () => {
       const lastExchange: Exchange = {
         sender: "establishment",
