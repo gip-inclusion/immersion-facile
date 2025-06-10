@@ -234,25 +234,30 @@ const statusBadgeData: Record<
 const getDiscussionStatusUpdatedFeedbackMessage = (
   discussion: DiscussionReadDto,
 ): string => {
-  const { status } = discussion;
-  if (status === "PENDING") return "";
-  if (status === "ACCEPTED")
-    return "La candidature a bien été marquée comme accepté. Merci pour votre retour.";
-  if (status === "REJECTED")
-    return match(discussion.rejectionKind)
-      .with(
-        "CANDIDATE_ALREADY_WARNED",
-        () =>
-          "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
-      )
-      .with(
-        P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
-        () =>
-          "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
-      )
-      .exhaustive();
-  status satisfies never;
-  throw new Error(`Unexpected discussion status: ${status}`);
+  return match(discussion)
+    .with({ status: "PENDING" }, () => "")
+    .with(
+      { status: "ACCEPTED" },
+      () =>
+        "La candidature a bien été marquée comme accepté. Merci pour votre retour.",
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "CANDIDATE_ALREADY_WARNED",
+      },
+      () =>
+        "Candidature marquée comme refusée. Merci d’avoir indiqué que le candidat a bien été informé.",
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME", "OTHER"),
+      },
+      () =>
+        "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
+    )
+    .exhaustive();
 };
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
