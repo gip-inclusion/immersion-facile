@@ -4,7 +4,6 @@ import {
   type ConventionId,
   type DateString,
   type Flavor,
-  type IdentityProvider,
   type RejectIcUserRoleForAgencyParams,
   type Role,
   type SignatoryRole,
@@ -23,6 +22,7 @@ import { z } from "zod";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
+import type { UserAuthenticatedPayload } from "../../inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import type {
   ConventionReminderPayload,
@@ -67,12 +67,6 @@ export type NotificationBatchAddedEvent = GenericEvent<
   "NotificationBatchAdded",
   WithNotificationIdAndKind[]
 >;
-
-export type UserAuthenticatedPayload = {
-  userId: string;
-  provider: IdentityProvider;
-  codeSafir: string | null;
-};
 
 export type TriggeredBy =
   | { kind: "inclusion-connected"; userId: UserId }

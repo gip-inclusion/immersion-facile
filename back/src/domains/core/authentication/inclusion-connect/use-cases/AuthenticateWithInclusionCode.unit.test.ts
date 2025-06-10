@@ -145,7 +145,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
             {
               topic: "UserAuthenticatedSuccessfully",
               payload: {
-                provider: initialOngoingOAuth.provider,
                 userId,
                 codeSafir: null,
                 triggeredBy: {

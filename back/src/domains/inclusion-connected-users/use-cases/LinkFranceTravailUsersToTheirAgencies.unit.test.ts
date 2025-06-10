@@ -73,7 +73,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     it("does nothing", async () => {
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
-        provider: "proConnect",
         codeSafir: null,
       });
 
@@ -89,7 +88,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     it("add agency right to IC user if user has no rights on agency", async () => {
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
-        provider: "proConnect",
         codeSafir: codeSafir,
       });
 
@@ -130,7 +128,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
-        provider: "proConnect",
         codeSafir: codeSafir,
       });
 
@@ -164,7 +161,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
-        provider: "proConnect",
         codeSafir: codeSafir,
       });
 
@@ -196,7 +192,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
     it("don't add agency right to IC user if there is no agency with this code safir", async () => {
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: "my-user-id",
-        provider: "proConnect",
         codeSafir: "not-existing-code-safir",
       });
 
@@ -228,7 +223,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: defaultUser.id,
-        provider: "proConnect",
         codeSafir: closedAgency.codeSafir,
       });
       expectToEqual(uow.agencyRepository.agencies, [
@@ -238,7 +232,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: defaultUser.id,
-        provider: "proConnect",
         codeSafir: rejectedAgency.codeSafir,
       });
       expectToEqual(uow.agencyRepository.agencies, [
@@ -266,7 +259,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: defaultUser.id,
-        provider: "proConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 
@@ -315,7 +307,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: defaultUser.id,
-        provider: "proConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 
@@ -376,7 +367,6 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
 
       await linkFranceTravailUsersToTheirAgencies.execute({
         userId: defaultUser.id,
-        provider: "proConnect",
         codeSafir: agencyGroupCodeSafir,
       });
 

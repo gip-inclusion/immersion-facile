@@ -121,7 +121,6 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
           topic: "UserAuthenticatedSuccessfully",
           payload: {
             userId: newOrUpdatedUser.id,
-            provider: ongoingOAuth.provider,
             codeSafir: accessToken?.payload.structure_pe ?? null,
             triggeredBy: {
               kind: "inclusion-connected",
