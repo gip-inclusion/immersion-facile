@@ -52,11 +52,6 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
         discussionId: inputParams.discussionId,
       });
 
-    if (discussion.status === "REJECTED")
-      throw errors.discussion.alreadyRejected({
-        discussionId: discussion.id,
-      });
-
     if (
       !(await userHasRights({
         uow,
@@ -68,6 +63,11 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
       throw errors.discussion.rejectForbidden({
         discussionId: discussion.id,
         userId,
+      });
+
+    if (discussion.status === "REJECTED")
+      throw errors.discussion.alreadyRejected({
+        discussionId: discussion.id,
       });
 
     const updatedDiscussion = await match<

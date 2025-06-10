@@ -2,13 +2,14 @@ import { ZodError, z } from "zod";
 import { ConventionDtoBuilder } from "../convention/ConventionDtoBuilder";
 import { conventionSchema } from "../convention/convention.schema";
 import { expectArraysToEqual, expectToEqual } from "../test.helpers";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import { localization } from "../zodUtils";
 import type {
   DateIntervalDto,
   ScheduleDto,
   SelectedDaysOfTheWeekDto,
 } from "./Schedule.dto";
-import { dateTimeIsoStringSchema, scheduleSchema } from "./Schedule.schema";
+import { scheduleSchema } from "./Schedule.schema";
 import { ScheduleDtoBuilder, defaultInterval } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
