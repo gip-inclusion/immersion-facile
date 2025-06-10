@@ -7,9 +7,9 @@ import { nafSchema } from "../naf/naf.schema";
 import { phoneSchema } from "../phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import type { NotEmptyArray } from "../utils";
+import { dateTimeIsoStringSchema } from "../utils/date";
 import { frenchEstablishmentKinds } from "../utils/establishment";
 import { addressWithPostalCodeSchema } from "../utils/postalCode";
 import {

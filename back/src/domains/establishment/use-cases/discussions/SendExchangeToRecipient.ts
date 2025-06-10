@@ -19,12 +19,15 @@ import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 type SendExchangeToRecipientParams = WithDiscussionId &
-  Partial<WithTriggeredBy>;
+  Partial<WithTriggeredBy> & {
+    skipSendingEmail?: boolean;
+  };
 
 export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeToRecipientParams> {
   protected inputSchema = withDiscussionSchemaId.and(
     z.object({
       triggeredBy: triggeredBySchema.optional(),
+      skipSendingEmail: z.boolean().optional(),
     }),
   );
 
@@ -48,9 +51,14 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
   }
 
   protected async _execute(
-    { discussionId, triggeredBy }: SendExchangeToRecipientParams,
+    {
+      discussionId,
+      triggeredBy,
+      skipSendingEmail,
+    }: SendExchangeToRecipientParams,
     uow: UnitOfWork,
   ): Promise<void> {
+    if (skipSendingEmail) return;
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
 
