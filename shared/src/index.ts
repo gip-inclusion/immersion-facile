@@ -37,7 +37,6 @@ export * from "./dashboard/dashboard.schema";
 export * from "./dashboard/establishmentDashboardTabs";
 export * from "./discussion/discussion.content";
 export * from "./discussion/discussion.dto";
-export * from "./discussion/CandidateWarnedMethod";
 export * from "./discussion/discussion.schema";
 export * from "./domElementIds";
 export * from "./email/email";
