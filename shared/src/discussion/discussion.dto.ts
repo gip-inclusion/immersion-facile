@@ -1,9 +1,9 @@
-import {
-  type ConnectedUserJwt,
-  type ContactLevelOfEducation,
-  type Phone,
-  type WithDiscussionId,
-  type discoverObjective,
+import type {
+  ConnectedUserJwt,
+  ContactLevelOfEducation,
+  Phone,
+  WithDiscussionId,
+  discoverObjective,
   exchangeRoles,
 } from "..";
 import type { WithAcquisition } from "../acquisition.dto";
@@ -19,13 +19,19 @@ import type {
 } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
-import { includesTypeGuard } from "../typeGuard";
 import type { EmptyObject, OmitFromExistingKeys } from "../utils";
 import type { DateString } from "../utils/date";
-import type { CandidateWarnedMethod } from "./CandidateWarnedMethod";
+
+export const candidateWarnedMethods = [
+  "phone",
+  "email",
+  "inPerson",
+  "other",
+] as const;
+
+export type CandidateWarnedMethod = (typeof candidateWarnedMethods)[number];
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
-export const isExchangeRole = includesTypeGuard(exchangeRoles);
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 

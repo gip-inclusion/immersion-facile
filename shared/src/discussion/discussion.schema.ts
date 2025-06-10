@@ -16,25 +16,23 @@ import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
+  type Attachment,
   type CandidateWarnedMethod,
+  type CommonDiscussionDto,
+  type DiscussionEmailParams,
+  type DiscussionId,
+  type DiscussionReadDto,
+  type Exchange,
+  type ExchangeFromDashboard,
+  type ExchangeRole,
+  type LegacyDiscussionEmailParams,
+  type PotentialBeneficiaryCommonProps,
+  type WithDiscussionRejection,
+  type WithDiscussionStatus,
+  type WithDiscussionStatusAccepted,
+  type WithDiscussionStatusPending,
+  type WithDiscussionStatusRejected,
   candidateWarnedMethods,
-} from "./CandidateWarnedMethod";
-import type {
-  Attachment,
-  CommonDiscussionDto,
-  DiscussionEmailParams,
-  DiscussionId,
-  DiscussionReadDto,
-  Exchange,
-  ExchangeFromDashboard,
-  ExchangeRole,
-  LegacyDiscussionEmailParams,
-  PotentialBeneficiaryCommonProps,
-  WithDiscussionRejection,
-  WithDiscussionStatus,
-  WithDiscussionStatusAccepted,
-  WithDiscussionStatusPending,
-  WithDiscussionStatusRejected,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
