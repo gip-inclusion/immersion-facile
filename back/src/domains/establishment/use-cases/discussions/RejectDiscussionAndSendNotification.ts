@@ -12,7 +12,7 @@ import {
   immersionFacileNoReplyEmailSender,
   rejectDiscussionEmailParams,
 } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";

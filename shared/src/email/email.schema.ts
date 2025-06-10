@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { toLowerCaseWithoutDiacritics } from "../utils/string";
 import { requiredText } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";

@@ -4,7 +4,7 @@ import {
   parsePhoneNumber,
 } from "libphonenumber-js";
 import type { MigrationBuilder } from "node-pg-migrate";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 const supportedCountryCode: CountryCode[] = ["FR", "NC", "PF", "WF", "PM"];
 

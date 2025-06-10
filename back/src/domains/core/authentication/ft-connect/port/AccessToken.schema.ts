@@ -1,5 +1,5 @@
 import { makezTrimmedString } from "shared";
-import { z } from "zod";
+import { z } from "zod/v4";
 import type { ExternalAccessToken } from "../adapters/ft-connect-gateway/ftConnectApi.dto";
 
 export const externalAccessTokenSchema: z.Schema<ExternalAccessToken> =
