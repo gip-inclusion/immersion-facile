@@ -211,7 +211,11 @@ export const signConvention = async (
     await page.locator(`#${domElementIds.conventionToSign.submitButton}`),
   );
   await page.click(`#${domElementIds.conventionToSign.submitButton}`);
-  await expect(page.locator(".fr-alert--success")).toBeVisible();
+  await expect(
+    page
+      .locator(".fr-alert--success")
+      .getByRole("heading", { name: "La convention a bien été signée" }),
+  ).toBeVisible();
 };
 
 export const allOtherSignatoriesSignConvention = async ({
