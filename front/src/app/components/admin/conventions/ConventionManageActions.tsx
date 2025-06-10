@@ -588,7 +588,10 @@ export const ConventionManageActions = ({
                   priority={"secondary"}
                   buttonIconId="fr-icon-arrow-down-s-line"
                   iconPosition="right"
-                  id={domElementIds.manageConvention.assessmentFullFillButton}
+                  id={
+                    domElementIds.manageConvention
+                      .conventionValidationCancelActionButtons
+                  }
                 />
               ) : (
                 <Button
@@ -653,7 +656,7 @@ export const ConventionManageActions = ({
                 ...conventionEstablishmentsRoles,
               ]).length > 0 && (
                 <FillAssessmentButton
-                  id={domElementIds.manageConvention.assessmentFullFillButton}
+                  id={domElementIds.manageConvention.abandonAssessmentButton}
                   label="Déclarer un abandon"
                   modalTitle="Déclarer un abandon"
                   modalMessage="Seule la personne désignée comme tuteur ou tutrice dans la convention peut déclarer un abandon. N'hésitez pas à transmettre l'information au bon interlocuteur."
@@ -672,7 +675,7 @@ export const ConventionManageActions = ({
 
             {shouldShowAssessmentFullFillAction && (
               <FillAssessmentButton
-                id={domElementIds.manageConvention.assessmentDocumentButton}
+                id={domElementIds.manageConvention.assessmentFullFillButton}
                 label="Compléter le bilan"
                 modalTitle="Compléter le bilan"
                 modalMessage="Seule la personne désignée comme tuteur ou tutrice dans la convention peut remplir le bilan d'immersion. N'hésitez pas à transmettre l'information au bon interlocuteur."

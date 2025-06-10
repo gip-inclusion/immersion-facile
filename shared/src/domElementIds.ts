@@ -373,6 +373,8 @@ export const domElementIds = {
     conventionValidationValidateButton:
       "im-convention-validation__validate-button",
     conventionValidationCancelButton: "im-convention-validation__cancel-button",
+    conventionValidationCancelActionButtons:
+      "im-convention-validation__cancel--actions-buttons",
     conventionValidationDeprecateButton:
       "im-convention-validation__deprecate-button",
     rejectedModalCancelButton: "im-rejected-modal__cancel-button",
