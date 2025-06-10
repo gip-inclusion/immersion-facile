@@ -156,7 +156,20 @@ export const ConventionSignForm = ({
           submittedAt={toDisplayedDate({
             date: new Date(convention.dateSubmission),
           })}
-          summary={makeConventionSections(convention)}
+          summary={makeConventionSections(
+            convention,
+            sendSignatureLinkButtonProps({
+              triggeredByRole: currentSignatory.role,
+              signatureLinksSent,
+              onClick: ({ signatoryRole, signatoryPhone }) => {
+                sendSignatureLinkModal.open();
+                setSignatoryToSendSignatureLink({
+                  signatoryRole,
+                  signatoryPhone,
+                });
+              },
+            }),
+          )}
           conventionId={convention.id}
         />
       </>
