@@ -14,15 +14,18 @@ import {
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import { TransactionalUseCase } from "../../core/UseCase";
-import type { UserAuthenticatedPayload } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getUserWithRights } from "../helpers/userRights.helper";
 
+export type UserAuthenticatedPayload = {
+  userId: string;
+  codeSafir: string | null; // Code safir non stocké en DB côté utilisateur
+};
+
 const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   userId: z.string(),
-  provider: z.enum(["proConnect"]),
   codeSafir: z.string().or(z.null()),
 });
 
