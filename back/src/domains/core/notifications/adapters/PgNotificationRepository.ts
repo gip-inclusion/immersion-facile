@@ -1,6 +1,8 @@
+import { addDays } from "date-fns";
 import { sql } from "kysely";
 import { map, uniq } from "ramda";
 import {
+  type DateRange,
   type EmailNotification,
   type Notification,
   type NotificationId,
@@ -93,22 +95,37 @@ export class PgNotificationRepository implements NotificationRepository {
       .then(map((row) => row.notif));
   }
 
-  public async getLastEmailsByFilters(
-    filters?: EmailNotificationFilters,
+  public async getEmailsByFilters(
+    filters: EmailNotificationFilters,
   ): Promise<EmailNotification[]> {
+    const startOfDay = filters.createdAt
+      ? new Date(
+          filters.createdAt.getFullYear(),
+          filters.createdAt.getMonth(),
+          filters.createdAt.getDate(),
+        )
+      : null;
+    const dateRange: DateRange | null = startOfDay
+      ? {
+          from: startOfDay,
+          to: addDays(startOfDay, 1),
+        }
+      : null;
     return pipeWithValue(
-      getEmailsNotificationBuilder(this.transaction).where(
-        "e.created_at",
-        ">",
-        sql<Date>`NOW() - INTERVAL '2 day'`,
-      ),
+      getEmailsNotificationBuilder(this.transaction),
       (qb) =>
-        filters?.emailType
+        dateRange
+          ? qb.where((qb) =>
+              qb.between(qb.ref("e.created_at"), dateRange.from, dateRange.to),
+            )
+          : qb,
+      (qb) =>
+        filters.emailType
           ? qb.where("e.email_kind", "=", filters.emailType)
           : qb,
-      (qb) => (filters?.email ? qb.where("r.email", "=", filters?.email) : qb),
+      (qb) => (filters.email ? qb.where("r.email", "=", filters?.email) : qb),
       (qb) =>
-        filters?.conventionId
+        filters.conventionId
           ? qb.where("e.convention_id", "=", filters?.conventionId)
           : qb,
     )
@@ -124,9 +141,18 @@ export class PgNotificationRepository implements NotificationRepository {
       .limit(this.maxRetrievedNotifications)
       .execute()
       .then(async (rows) => ({
-        emails: await this.getLastEmailsByFilters(),
+        emails: await this.#getLastEmails(),
         sms: rows.map((row) => row.notif),
       }));
+  }
+
+  async #getLastEmails(): Promise<EmailNotification[]> {
+    return getEmailsNotificationBuilder(this.transaction)
+      .where("e.created_at", ">", sql<Date>`NOW() - INTERVAL '2 day'`)
+      .orderBy("e.created_at", "desc")
+      .limit(this.maxRetrievedNotifications)
+      .execute()
+      .then(map((row) => row.notif));
   }
 
   public async save(notification: Notification): Promise<void> {

@@ -191,7 +191,6 @@ describe("SendAssessmentNeededNotifications", () => {
   describe("Right paths", () => {
     it("Sends an email to tutors and agency validators and counsellors with is_notified_by_email active for immersions that end in time range and are kind immersion", async () => {
       // Arrange
-
       uow.conventionRepository.setConventions([
         conventionEndingTomorrow,
         conventionEndingInTwoDays,
