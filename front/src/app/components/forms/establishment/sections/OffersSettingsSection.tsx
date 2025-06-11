@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
+import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
-
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-import Input from "@codegouvfr/react-dsfr/Input";
+import { HeadingSection } from "react-design-system";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -18,7 +18,6 @@ import {
   toDateUTCString,
   toDisplayedDate,
 } from "shared";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import {
   booleanSelectOptions,
   richBooleanSelectOptions,

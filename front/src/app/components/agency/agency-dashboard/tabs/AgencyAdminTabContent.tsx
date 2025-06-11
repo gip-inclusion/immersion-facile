@@ -2,12 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Table from "@codegouvfr/react-dsfr/Table";
 import { Fragment } from "react";
+import { HeadingSection } from "react-design-system";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   addressDtoToString,
   agencyKindToLabelIncludingIF,
 } from "shared";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { routes } from "src/app/routes/routes";
 import { AgencyStatusBadge } from "../../AgencyStatusBadge";
 import { AgencyTag } from "../../AgencyTag";
