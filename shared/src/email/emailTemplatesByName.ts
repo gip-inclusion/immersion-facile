@@ -51,68 +51,44 @@ export const emailTemplatesByName =
         `,
       }),
     },
-    ASSESSMENT_AGENCY_FIRST_REMINDER: {
-      niceName:
-        "Bilan - Prescripteurs - Relance à 3 jours après la fin de l’immersion",
-      tags: ["bilan_prescripteur_formulaireBilan_J+3"],
+    ASSESSMENT_ESTABLISHMENT_REMINDER: {
+      niceName: "Bilan - Entreprise - Relance",
+      tags: ["bilan_entreprise_relance"],
       createEmailVariables: ({
         assessmentCreationLink,
         beneficiaryFirstName,
         beneficiaryLastName,
-        businessName,
+        establishmentTutorFirstName,
+        establishmentTutorLastName,
         conventionId,
-        establishmentContactEmail,
         internshipKind,
       }) => ({
         subject: `Immersion Facilitée - Bilan non complété pour l'immersion de ${beneficiaryFirstName}`,
-        greetings: greetingsWithConventionId(conventionId),
+        greetings: greetingsWithConventionId(
+          conventionId,
+          `${establishmentTutorFirstName} ${establishmentTutorLastName}`,
+        ),
         content: `
-        Nous constatons que le bilan de l’immersion de ${beneficiaryFirstName} ${beneficiaryLastName} n’a pas encore été complété par l’entreprise ${businessName}.
+        L'immersion de ${beneficiaryFirstName} ${beneficiaryLastName} au sein de votre établissement s'est terminée il y a quelques jours.
         
-        Afin de clôturer cette étape, vous pouvez :
-        
-        1. <a href="mailto:${establishmentContactEmail}" target="_blank">Relancer directement l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan en ligne.
-        2. Les contacter par téléphone pour les accompagner dans la saisie du bilan.
+        Pour finaliser cette démarche, il vous reste à compléter le bilan de fin d’immersion.
         `,
         buttons: [
           {
-            label: "Formulaire de bilan",
+            label: "Compléter le bilan",
             url: assessmentCreationLink,
           },
         ],
         subContent: `
-        ${defaultSignature(internshipKind)}
-        `,
-      }),
-    },
-    ASSESSMENT_AGENCY_SECOND_REMINDER: {
-      niceName:
-        "Bilan - Prescripteurs - Relance à 10 jours après la fin de l’immersion",
-      tags: ["bilan_prescripteur_formulaireBilan_J+10"],
-      createEmailVariables: ({
-        assessmentCreationLink,
-        beneficiaryFirstName,
-        beneficiaryLastName,
-        businessName,
-        conventionId,
-        establishmentContactEmail,
-        internshipKind,
-      }) => ({
-        subject: `Immersion Facilitée - Urgent : Bilan toujours non complété pour l'immersion de ${beneficiaryFirstName}`,
-        greetings: greetingsWithConventionId(conventionId),
-        content: `
-        Malgré une première relance, le bilan de l’immersion de ${beneficiaryFirstName} ${beneficiaryLastName} chez ${businessName} reste incomplet.
+        <strong>Ce bilan est essentiel :</strong>
+        - Il permet au candidat d'avoir un retour sur son expérience,
+        - Il aide les prescripteurs à mieux l'accompagner dans la suite de son parcours,
+        - Il contribue à améliorer le fonctionnement de notre service.
         
-        1. <a href="mailto:${establishmentContactEmail}" target="_blank">Relancer l'entreprise</a> (${establishmentContactEmail}) pour qu’elle remplisse le bilan.
-        2. Les contacter par téléphone et les accompagner pour le compléter ensemble.
-        `,
-        buttons: [
-          {
-            label: "Formulaire de bilan",
-            url: assessmentCreationLink,
-          },
-        ],
-        subContent: `
+        En cas de difficulté, prévenez au plus vite la structure d'accompagnement pour que vous soyez conseillé au mieux.
+        
+        Merci !
+        
         ${defaultSignature(internshipKind)}
         `,
       }),
