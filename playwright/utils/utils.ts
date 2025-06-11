@@ -17,9 +17,9 @@ export const expectElementToBeVisible = async (
   page: Page,
   selector: string,
 ) => {
-  const confirmation = await page.locator(selector).first();
-  await confirmation.waitFor();
-  await expect(confirmation).toBeVisible();
+  const element = await page.locator(selector).first();
+  await element.waitFor();
+  await expect(element).toBeVisible();
 };
 
 export const fillAutocomplete = async ({
@@ -102,4 +102,8 @@ export const expectLocatorToBeReadOnly = async (
 ): Promise<void> => {
   await expect(locator).toBeVisible();
   await expect(locator).not.toBeEditable();
+};
+
+export const expectNoErrorVisible = async (page: Page) => {
+  await expect(page.locator(".fr-alert--error")).not.toBeVisible();
 };

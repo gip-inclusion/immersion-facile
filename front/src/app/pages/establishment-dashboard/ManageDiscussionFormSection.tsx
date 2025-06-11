@@ -20,10 +20,7 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
   const { isValid } = formState;
   return (
     <>
-      <h5 className={fr.cx("fr-h5", "fr-mb-2w")}>
-        Piloter une mise en relation
-      </h5>
-      <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
+      <div className={fr.cx("fr-mb-4w")}>
         <form
           onSubmit={handleSubmit(({ discussionId }) => {
             routes
@@ -33,12 +30,12 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
         >
           <div className={fr.cx("fr-grid-row")}>
             <Input
-              label="Id de la mise en relation *"
+              label="Identifiant de la candidature *"
               nativeInputProps={{
                 ...register("discussionId"),
                 id: domElementIds.establishmentDashboard.manageDiscussion
                   .discussionIdInput,
-                placeholder: "Id de la mise en relation",
+                placeholder: "Ex: cf0755c7-e014-4515-82fa-39270f1db6d8",
                 onChange: (event) => {
                   setValue("discussionId", event.currentTarget.value.trim(), {
                     shouldValidate: true,

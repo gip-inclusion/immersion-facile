@@ -4,7 +4,7 @@ import { Tooltip } from "react-design-system";
 import { domElementIds } from "shared";
 
 export const UsersWithoutNameHint = () => (
-  <div className={fr.cx("fr-mb-2w", "fr-mt-0", "fr-hint-text")}>
+  <p className={fr.cx("fr-mb-2w", "fr-mt-0", "fr-hint-text")}>
     Pourquoi certains utilisateurs n'ont pas de nom ?
     <Tooltip
       type="click"
@@ -13,5 +13,5 @@ export const UsersWithoutNameHint = () => (
             leurs infos et accéder à leur espace personnel."
       id={domElementIds.admin.agencyTab.editAgencyUserTooltip}
     />
-  </div>
+  </p>
 );

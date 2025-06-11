@@ -4,9 +4,9 @@ import Button from "@codegouvfr/react-dsfr/Button";
 
 import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
-import { useStyles } from "tss-react/dsfr";
 
 const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
   <a
@@ -28,7 +28,6 @@ export const MetabaseView = ({
   title: string;
   subtitle?: string;
 }) => {
-  const { cx } = useStyles();
   const consent = useConsent();
   if (!consent.finalityConsent?.statistics)
     return (
@@ -49,11 +48,11 @@ export const MetabaseView = ({
     );
   if (!url) return <p>Chargement du dashboard en cours...</p>;
   return (
-    <div>
-      <h2 className={cx(fr.cx("fr-h5", "fr-mb-2w"), "flex")}>
-        {title} <TitleButton url={url} />
-        {subtitle && <p className={fr.cx("fr-hint-text")}>{subtitle}</p>}
-      </h2>
+    <BackofficeDashboardTabContent
+      title={title}
+      titleAction={<TitleButton url={url} />}
+      description={subtitle}
+    >
       {ENV.envType === "production" ||
       url === globalStatsUrl ||
       url === immersionStatsUrl ? (
@@ -72,6 +71,6 @@ export const MetabaseView = ({
           metabase en dehors de la production)"
         />
       )}
-    </div>
+    </BackofficeDashboardTabContent>
   );
 };

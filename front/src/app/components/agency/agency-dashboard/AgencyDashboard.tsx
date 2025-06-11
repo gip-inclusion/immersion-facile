@@ -107,7 +107,12 @@ const rawAgencyDashboardTabs = ({
           {
             tabId: "agencyDashboardMain" satisfies AgencyDashboardRouteName,
             label: "Tableau de bord",
-            content: ConventionTabContent(dashboards, agenciesWithActiveStatus),
+            content: (
+              <ConventionTabContent
+                dashboards={dashboards}
+                activeAgencies={agenciesWithActiveStatus}
+              />
+            ),
           },
         ]
       : []),
@@ -117,10 +122,12 @@ const rawAgencyDashboardTabs = ({
             tabId:
               "agencyDashboardSynchronisedConventions" satisfies AgencyDashboardRouteName,
             label: "Conventions synchronisées",
-            content: ErroredConventionTabContent(
-              activeAgencyRights,
-              inclusionConnectedJwt,
-              dashboards,
+            content: (
+              <ErroredConventionTabContent
+                activeAgencyRights={activeAgencyRights}
+                inclusionConnectedJwt={inclusionConnectedJwt}
+                dashboards={dashboards}
+              />
             ),
           },
         ]
@@ -130,7 +137,11 @@ const rawAgencyDashboardTabs = ({
           {
             tabId: "agencyDashboardAgencies" satisfies AgencyDashboardRouteName,
             label: "Mes Organismes",
-            content: AgencyAdminTabContent(agenciesUserIsAdminOn),
+            content: (
+              <AgencyAdminTabContent
+                agenciesUserIsAdminOn={agenciesUserIsAdminOn}
+              />
+            ),
           },
         ]
       : []),

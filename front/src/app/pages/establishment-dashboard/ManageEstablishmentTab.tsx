@@ -2,15 +2,18 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 
+import { HeadingSection } from "react-design-system";
 import { type WithEstablishmentData, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import type { Route } from "type-route";
+
 type ManageEstablishmentTabProps = {
   establishments: WithEstablishmentData[];
   route: Route<typeof routes.establishmentDashboard>;
 };
+
 export const ManageEstablishmentsTab = ({
   establishments,
   route,
@@ -26,27 +29,28 @@ export const ManageEstablishmentsTab = ({
       .push();
   }
   return (
-    <>
-      <div className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}>
-        <h2 className={fr.cx("fr-h2")}>Piloter votre établissement</h2>
-        <div className={fr.cx("fr-ml-md-auto")}>
-          <Button
-            iconId="fr-icon-add-circle-line"
-            type="button"
-            onClick={() => {
-              routes.formEstablishment().push();
-            }}
-            id={
-              domElementIds.establishmentDashboard.manageEstablishments
-                .createEstablishment
-            }
-          >
-            Créer un nouvel établissement
-          </Button>
-        </div>
-      </div>
-      {establishments.length > 1 && (
-        <div className={fr.cx("fr-mb-2w")}>
+    <HeadingSection
+      title="Piloter votre établissement"
+      titleAs="h2"
+      className={fr.cx("fr-mt-0")}
+      titleAction={
+        <Button
+          iconId="fr-icon-add-circle-line"
+          type="button"
+          onClick={() => {
+            routes.formEstablishment().push();
+          }}
+          id={
+            domElementIds.establishmentDashboard.manageEstablishments
+              .createEstablishment
+          }
+        >
+          Créer un nouvel établissement
+        </Button>
+      }
+    >
+      <div className={fr.cx("fr-mb-4w")}>
+        {establishments.length > 1 && (
           <Select
             label={"Sélectionner un établissement"}
             options={[
@@ -71,13 +75,9 @@ export const ManageEstablishmentsTab = ({
               },
             }}
           />
-        </div>
-      )}
-      {route.params.siret && (
-        <div className={fr.cx("fr-card", "fr-px-4w", "fr-py-2w", "fr-mb-4w")}>
-          <EstablishmentForm mode="edit" />
-        </div>
-      )}
-    </>
+        )}
+        {route.params.siret && <EstablishmentForm mode="edit" />}
+      </div>
+    </HeadingSection>
   );
 };
