@@ -2,6 +2,7 @@ import {
   type FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
@@ -34,6 +35,18 @@ const defaultFeatureFlags: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -54,6 +67,18 @@ const flagsFromApi: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "My establishment dashboard highlight",
+    message: "My establishment dashboard highlight message",
+    href: "https://",
+    label: "My establishment dashboard highlight label",
+  }),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "My agency dashboard highlight",
+    message: "My agency dashboard highlight message",
+    href: "https://",
+    label: "My agency dashboard highlight label",
+  }),
 };
 
 describe("feature flag slice", () => {

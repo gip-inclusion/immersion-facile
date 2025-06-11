@@ -10,13 +10,16 @@ import { ErrorNotifications } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  type FeatureFlagHighlight,
   type FeatureFlagName,
   type FeatureFlagTextImageAndRedirect,
   type FeatureFlagTextWithSeverity,
+  featureFlagHighlightValueSchema,
   featureFlagTextImageAndRedirectValueSchema,
   featureFlagTextWithSeverityValueSchema,
 } from "shared";
 import {
+  formHighlightFieldsLabels,
   formTextImageAndRedirectFieldsLabels,
   formTextWithOptionsFieldsLabels,
 } from "src/app/contents/forms/admin/technicalOptions";
@@ -84,6 +87,12 @@ export const FeatureFlagsSection = () => {
                   ),
                 )
                 .with({ kind: "boolean" }, () => null)
+                .with({ kind: "highlight" }, (featureFlagHighlight) => (
+                  <FeatureFlagHighlightForm
+                    featureFlag={featureFlagHighlight}
+                    featureFlagName={featureFlagName}
+                  />
+                ))
                 .exhaustive()}
             </div>
           ))}
@@ -138,6 +147,14 @@ const labelsByFeatureFlag: Record<
   enableBroadcastOfCapEmploiToFT: {
     title: null,
     enableLabel: "Activer les Cap-Emploi",
+  },
+  enableEstablishmentDashboardHighlight: {
+    title: null,
+    enableLabel: "Promotion sur le tableau de bord entreprise",
+  },
+  enableAgencyDashboardHighlight: {
+    title: null,
+    enableLabel: "Promotion sur le tableau de bord prescripteur",
   },
 };
 
@@ -288,6 +305,84 @@ const FeatureFlagTextImageAndRedirectForm = ({
         nativeInputProps={{
           ...formFields.redirectUrl,
           ...register("redirectUrl"),
+        }}
+      />
+      <ErrorNotifications
+        errorsWithLabels={toErrorsWithLabels({
+          errors: displayReadableError(formState.errors),
+          labels: getFormErrors(),
+        })}
+        visible={
+          formState.submitCount !== 0 &&
+          Object.values(formState.errors).length > 0
+        }
+      />
+      <Button size="small">Mettre à jour cette option</Button>
+    </form>
+  );
+};
+
+const FeatureFlagHighlightForm = ({
+  featureFlag,
+  featureFlagName,
+}: {
+  featureFlag: FeatureFlagHighlight;
+  featureFlagName: FeatureFlagName;
+}) => {
+  const dispatch = useDispatch();
+
+  const { register, handleSubmit, formState } = useForm<
+    FeatureFlagHighlight["value"]
+  >({
+    defaultValues: featureFlag.value,
+    mode: "onTouched",
+    resolver: zodResolver(featureFlagHighlightValueSchema),
+  });
+  const { getFormErrors, getFormFields } = getFormContents(
+    formHighlightFieldsLabels,
+  );
+
+  const formFields = getFormFields();
+
+  const onFormSubmit = (value: FeatureFlagHighlight["value"]) => {
+    dispatch(
+      featureFlagsSlice.actions.setFeatureFlagRequested({
+        flagName: featureFlagName,
+        featureFlag: {
+          ...featureFlag,
+          value,
+        },
+      }),
+    );
+  };
+  return (
+    <form className={fr.cx("fr-ml-9w")} onSubmit={handleSubmit(onFormSubmit)}>
+      <Input
+        {...formFields.title}
+        nativeInputProps={{
+          ...formFields.title,
+          ...register("title"),
+        }}
+      />
+      <Input
+        {...formFields.message}
+        nativeInputProps={{
+          ...formFields.message,
+          ...register("message"),
+        }}
+      />
+      <Input
+        {...formFields.href}
+        nativeInputProps={{
+          ...formFields.href,
+          ...register("href"),
+        }}
+      />
+      <Input
+        {...formFields.label}
+        nativeInputProps={{
+          ...formFields.label,
+          ...register("label"),
         }}
       />
       <ErrorNotifications

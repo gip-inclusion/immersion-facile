@@ -2,6 +2,7 @@ import {
   type FeatureFlags,
   type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
@@ -25,6 +26,18 @@ export const defaultFlags: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "Mon titre de highlight",
+    message: "Mon message de highlight",
+    href: "https://www.example.com",
+    label: "Mon label de highlight",
+  }),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "Mon titre de highlight",
+    message: "Mon message de highlight",
+    href: "https://www.example.com",
+    label: "Mon label de highlight",
+  }),
 };
 
 export class InMemoryFeatureFlagRepository implements FeatureFlagRepository {
