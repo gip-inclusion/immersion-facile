@@ -182,12 +182,13 @@ export const RejectDiscussionModal = ({
           nativeButtonProps: {
             form: domElementIds.establishmentDashboard.discussion
               .rejectDiscussionForm,
+            disabled: isCandidateWarned === undefined,
           },
           doClosesModal: false,
           children:
-            watchedFormValues.rejectionKind === "CANDIDATE_ALREADY_WARNED"
-              ? "Rejeter la candidature"
-              : "Prévisualiser et envoyer",
+            isCandidateWarned === false
+              ? "Refuser avec un message"
+              : "Marquer comme refusée",
         },
       ]}
     >
@@ -212,7 +213,9 @@ export const RejectDiscussionModal = ({
                 Boolean(option.nativeInputProps.value) === isCandidateWarned,
               onChange: () => {
                 setIsCandidateWarned(option.nativeInputProps.value === 1);
-                setValue("rejectionKind", "CANDIDATE_ALREADY_WARNED");
+                if (option.nativeInputProps.value === 1) {
+                  setValue("rejectionKind", "CANDIDATE_ALREADY_WARNED");
+                }
               },
             },
           }))}

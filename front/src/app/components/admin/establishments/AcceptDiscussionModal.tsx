@@ -104,6 +104,7 @@ export const AcceptDiscussionModal = ({
           nativeButtonProps: {
             form: domElementIds.establishmentDashboard.discussion
               .acceptDiscussionForm,
+            disabled: wasConventionEstablished === undefined,
           },
           doClosesModal: false,
           children: "Marquer comme acceptée",
@@ -130,6 +131,9 @@ export const AcceptDiscussionModal = ({
                 setWasConventionEstablished(
                   option.nativeInputProps.value === 1,
                 );
+                if (option.nativeInputProps.value === 1) {
+                  setValue("candidateWarnedMethod", null);
+                }
                 if (option.nativeInputProps.value === 0) {
                   setValue("conventionId", undefined);
                 }
