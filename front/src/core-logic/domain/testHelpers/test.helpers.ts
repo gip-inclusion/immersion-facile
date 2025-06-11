@@ -1,6 +1,7 @@
 import {
   type FeatureFlags,
   makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
@@ -23,6 +24,18 @@ const defaultFlagsInFront: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
 };
 
 export const makeStubFeatureFlags = (

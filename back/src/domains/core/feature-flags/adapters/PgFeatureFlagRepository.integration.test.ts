@@ -3,6 +3,7 @@ import {
   type FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
@@ -53,6 +54,18 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
       enableStandardFormatBroadcastToFranceTravail:
         makeBooleanFeatureFlag(false),
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
+      enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
     };
 
     await featureFlagRepository.insertAll(expectedFeatureFlags);
@@ -76,6 +89,18 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
       enableStandardFormatBroadcastToFranceTravail:
         makeBooleanFeatureFlag(false),
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
+      enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
     });
   });
 
@@ -99,6 +124,18 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
       enableStandardFormatBroadcastToFranceTravail:
         makeBooleanFeatureFlag(false),
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
+      enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
     };
 
     await featureFlagRepository.insertAll(initialFeatureFlags);
@@ -141,6 +178,18 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
       enableStandardFormatBroadcastToFranceTravail:
         makeBooleanFeatureFlag(false),
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
+      enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+        title: "Mon titre de highlight",
+        message: "Mon message de highlight",
+        href: "https://www.example.com",
+        label: "Mon label de highlight",
+      }),
     });
   });
 });

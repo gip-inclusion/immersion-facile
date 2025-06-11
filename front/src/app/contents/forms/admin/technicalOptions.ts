@@ -1,4 +1,5 @@
 import type {
+  FeatureFlagHighlight,
   FeatureFlagTextImageAndRedirect,
   FeatureFlagTextWithSeverity,
 } from "shared";
@@ -86,3 +87,32 @@ export const formTextWithOptionsFieldsLabels: FeatureFlagTextWithOptionsFieldsLa
       ],
     },
   };
+
+export const formHighlightFieldsLabels: FormFieldsObjectForContent<
+  Record<
+    Partial<keyof FeatureFlagHighlight["value"]>,
+    FormFieldAttributesForContent
+  >
+> = {
+  title: {
+    label: "Titre",
+    placeholder: "Ex : Avez-vous des questions ?",
+    id: "form-highlight-title",
+  },
+  message: {
+    label: "Message",
+    placeholder:
+      "Ex : Répondez à notre questionnaire pour nous aider à améliorer notre service.",
+    id: "form-highlight-message",
+  },
+  href: {
+    label: "Url du bouton",
+    placeholder: "Ex : https://www.example.com",
+    id: "form-highlight-href",
+  },
+  label: {
+    label: "Label du bouton",
+    placeholder: "Ex : Répondre au questionnaire",
+    id: "label",
+  },
+};

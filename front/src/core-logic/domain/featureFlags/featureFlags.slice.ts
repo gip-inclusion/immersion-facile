@@ -3,6 +3,7 @@ import {
   type FeatureFlags,
   type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
+  makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
 } from "shared";
@@ -29,6 +30,18 @@ const initialState: FeatureFlagsState = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
+    title: "",
+    message: "",
+    href: "",
+    label: "",
+  }),
   isLoading: true,
 };
 

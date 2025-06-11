@@ -14,6 +14,8 @@ export const featureFlagNames = [
   "enableBroadcastOfConseilDepartementalToFT",
   "enableBroadcastOfCapEmploiToFT",
   "enableStandardFormatBroadcastToFranceTravail",
+  "enableEstablishmentDashboardHighlight",
+  "enableAgencyDashboardHighlight",
 ] as const;
 
 const _insureAllFeatureFlagsAreInList = (
@@ -26,6 +28,7 @@ const featureFlagKinds = [
   "boolean",
   "textImageAndRedirect",
   "textWithSeverity",
+  "highlight",
 ] as const;
 
 type GenericFeatureFlag<K extends FeatureFlagKind, V = void> = {
@@ -33,15 +36,21 @@ type GenericFeatureFlag<K extends FeatureFlagKind, V = void> = {
   isActive: boolean;
 } & (V extends void ? object : { value: V });
 
-type WithFeatureFlagTextValue = { message: string };
+export type WithFeatureFlagTextValue = { message: string };
+export type WithFeatureFlagTitleValue = { title: string };
+export type WithFeatureFlagButtonValue = { href: string; label: string };
 
 type WithImageAndRedirect = {
   imageUrl: AbsoluteUrl;
   imageAlt: string;
   redirectUrl: AbsoluteUrl;
-  title: string;
   overtitle: string;
-};
+} & WithFeatureFlagTitleValue;
+
+type WithHighlight = WithFeatureFlagTitleValue &
+  WithFeatureFlagTextValue &
+  WithFeatureFlagButtonValue;
+
 type WithSeverityValue = {
   severity: FeatureFlagSeverity;
 };
@@ -56,11 +65,16 @@ export type FeatureFlagTextImageAndRedirect = GenericFeatureFlag<
   WithFeatureFlagTextValue & WithImageAndRedirect
 >;
 export type FeatureFlagBoolean = GenericFeatureFlag<"boolean">;
+export type FeatureFlagHighlight = GenericFeatureFlag<
+  "highlight",
+  WithHighlight
+>;
 
 export type FeatureFlag =
   | FeatureFlagBoolean
   | FeatureFlagTextImageAndRedirect
-  | FeatureFlagTextWithSeverity;
+  | FeatureFlagTextWithSeverity
+  | FeatureFlagHighlight;
 
 export type FeatureFlags = {
   enableMaintenance: FeatureFlagTextWithSeverity;
@@ -70,6 +84,8 @@ export type FeatureFlags = {
   enableBroadcastOfConseilDepartementalToFT: FeatureFlagBoolean;
   enableBroadcastOfCapEmploiToFT: FeatureFlagBoolean;
   enableStandardFormatBroadcastToFranceTravail: FeatureFlagBoolean;
+  enableEstablishmentDashboardHighlight: FeatureFlagHighlight;
+  enableAgencyDashboardHighlight: FeatureFlagHighlight;
 };
 
 export type SetFeatureFlagParam = {
@@ -85,7 +101,9 @@ const makeFeatureFlag =
       ? [FeatureFlagTextWithSeverity["value"]]
       : K extends "textImageAndRedirect"
         ? [FeatureFlagTextImageAndRedirect["value"]]
-        : []
+        : K extends "highlight"
+          ? [FeatureFlagHighlight["value"]]
+          : []
   ): Extract<FeatureFlag, { kind: K }> => {
     if (kind === "boolean")
       return { kind, isActive } as Extract<FeatureFlag, { kind: K }>;
@@ -102,7 +120,7 @@ export const makeTextImageAndRedirectFeatureFlag = makeFeatureFlag(
 );
 export const makeTextWithSeverityFeatureFlag =
   makeFeatureFlag("textWithSeverity");
-
+export const makeHighlightFeatureFlag = makeFeatureFlag("highlight");
 export const hasFeatureFlagValue = (
   flag: FeatureFlag | SetFeatureFlagParam["featureFlag"],
 ): flag is Extract<FeatureFlag, { value: object }> =>
