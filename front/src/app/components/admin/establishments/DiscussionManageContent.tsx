@@ -124,10 +124,10 @@ type DiscussionDetailsProps = {
 
 type ButtonPropsWithId = ButtonProps & { id: string };
 
-const getDiscussionButtons = ({
+const getActivateDraftConventionButtonProps = ({
   discussion,
   userEmail,
-}: DiscussionDetailsProps): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
+}: DiscussionDetailsProps): ButtonProps => {
   const draftConvention = makeConventionFromDiscussion({
     initialConvention: getConventionInitialValuesFromUrl({
       route: routes.conventionImmersion(),
@@ -137,43 +137,25 @@ const getDiscussionButtons = ({
     userEmail,
   });
 
+  return {
+    id: domElementIds.establishmentDashboard.discussion.activateDraftConvention,
+    priority: "tertiary",
+    linkProps: {
+      style: { backgroundImage: "none" }, // this is to avoid the underline in the list
+      href: makeDraftConventionLink(draftConvention, discussion.id).href,
+      target: "_blank",
+    },
+    children: "Pré-remplir la convention pour cette mise en relation",
+  } satisfies ButtonProps;
+};
+
+const getDiscussionButtons = ({
+  discussion,
+  userEmail,
+}: DiscussionDetailsProps): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   return [
-    {
-      id: domElementIds.establishmentDashboard.discussion
-        .replyToCandidateByEmail,
-      priority: "primary",
-      linkProps: {
-        style: { backgroundImage: "none" }, // this is to avoid the underline in the list
-        href: `mailto:${createOpaqueEmail({
-          discussionId: discussion.id,
-          recipient: {
-            kind: "potentialBeneficiary",
-            firstname: discussion.potentialBeneficiary.firstName,
-            lastname: discussion.potentialBeneficiary.lastName,
-          },
-          replyDomain: `reply.${window.location.hostname}`,
-        })}?subject=${encodeURI(
-          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
-        )}`,
-        target: "_blank",
-      },
-      children: "Répondre au candidat par email",
-    } satisfies ButtonProps,
     ...(discussion.status === "PENDING" && discussion.kind === "IF"
-      ? [
-          {
-            id: domElementIds.establishmentDashboard.discussion
-              .activateDraftConvention,
-            priority: "tertiary",
-            linkProps: {
-              style: { backgroundImage: "none" }, // this is to avoid the underline in the list
-              href: makeDraftConventionLink(draftConvention, discussion.id)
-                .href,
-              target: "_blank",
-            },
-            children: "Pré-remplir la convention pour cette mise en relation",
-          } satisfies ButtonProps,
-        ]
+      ? [getActivateDraftConventionButtonProps({ discussion, userEmail })]
       : []),
     ...(discussion.status === "PENDING"
       ? [
@@ -195,7 +177,28 @@ const getDiscussionButtons = ({
           } satisfies ButtonProps,
         ]
       : []),
-  ];
+    {
+      id: domElementIds.establishmentDashboard.discussion
+        .replyToCandidateByEmail,
+      priority: "primary",
+      linkProps: {
+        style: { backgroundImage: "none" }, // this is to avoid the underline in the list
+        href: `mailto:${createOpaqueEmail({
+          discussionId: discussion.id,
+          recipient: {
+            kind: "potentialBeneficiary",
+            firstname: discussion.potentialBeneficiary.firstName,
+            lastname: discussion.potentialBeneficiary.lastName,
+          },
+          replyDomain: `reply.${window.location.hostname}`,
+        })}?subject=${encodeURI(
+          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
+        )}`,
+        target: "_blank",
+      },
+      children: "Répondre au candidat par email",
+    } satisfies ButtonProps,
+  ] as unknown as [ButtonPropsWithId, ...ButtonPropsWithId[]];
 };
 
 const statusBadgeData: Record<
@@ -314,18 +317,30 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
               {discussion.potentialBeneficiary.lastName}
             </h1>
           </div>
-          <ButtonWithSubMenu
-            priority="primary"
-            id={
-              domElementIds.establishmentDashboard.discussion
-                .handleDiscussionButton
-            }
-            buttonLabel={"Gérer la candidature"}
-            buttonIconId="fr-icon-arrow-down-s-line"
-            iconPosition="right"
-            navItems={getDiscussionButtons(props)}
-            className={fr.cx("fr-ml-md-auto")}
-          />
+          {props.discussion.status === "ACCEPTED" &&
+            props.discussion.candidateWarnedMethod !== null &&
+            props.discussion.conventionId === undefined && (
+              <Button
+                {...getActivateDraftConventionButtonProps(props)}
+                priority="primary"
+              >
+                Pré-remplir la convention
+              </Button>
+            )}
+          {props.discussion.status === "PENDING" && (
+            <ButtonWithSubMenu
+              priority="primary"
+              id={
+                domElementIds.establishmentDashboard.discussion
+                  .handleDiscussionButton
+              }
+              buttonLabel={"Gérer la candidature"}
+              buttonIconId="fr-icon-arrow-down-s-line"
+              iconPosition="right"
+              navItems={getDiscussionButtons(props)}
+              className={fr.cx("fr-ml-md-auto")}
+            />
+          )}
         </div>
         <DiscussionMeta>
           <p
