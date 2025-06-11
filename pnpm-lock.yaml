@@ -646,8 +646,8 @@ importers:
         specifier: ^3.7.3
         version: 3.7.4
       libphonenumber-js:
-        specifier: ^1.11.1
-        version: 1.11.1
+        specifier: ^1.12.9
+        version: 1.12.9
       pino:
         specifier: ^7.9.1
         version: 7.11.0
@@ -6686,6 +6686,9 @@ packages:
 
   libphonenumber-js@1.11.1:
     resolution: {integrity: sha512-Wze1LPwcnzvcKGcRHFGFECTaLzxOtujwpf924difr5zniyYv1C2PiW0419qDR7m8lKDxsImu5mwxFuXhXpjmvw==}
+
+  libphonenumber-js@1.12.9:
+    resolution: {integrity: sha512-VWwAdNeJgN7jFOD+wN4qx83DTPMVPPAUyx9/TUkBXKLiNkuWWk6anV0439tgdtwaJDrEdqkvdN22iA6J4bUCZg==}
 
   lie@3.1.1:
     resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==}
@@ -13861,7 +13864,7 @@ snapshots:
       get-port: 5.1.1
       giget: 1.1.2
       globby: 11.1.0
-      jscodeshift: 0.15.2(@babel/preset-env@7.26.0(@babel/core@7.20.12))
+      jscodeshift: 0.15.2(@babel/preset-env@7.26.0(@babel/core@7.26.0))
       leven: 3.1.0
       ora: 5.4.1
       prettier: 2.8.2
@@ -13899,7 +13902,7 @@ snapshots:
       '@types/cross-spawn': 6.0.6
       cross-spawn: 7.0.3
       globby: 11.1.0
-      jscodeshift: 0.15.2(@babel/preset-env@7.26.0(@babel/core@7.20.12))
+      jscodeshift: 0.15.2(@babel/preset-env@7.26.0(@babel/core@7.26.10))
       lodash: 4.17.21
       prettier: 2.8.2
       recast: 0.23.9
@@ -17603,7 +17606,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jscodeshift@0.15.2(@babel/preset-env@7.26.0(@babel/core@7.20.12)):
+  jscodeshift@0.15.2(@babel/preset-env@7.26.0(@babel/core@7.26.0)):
     dependencies:
       '@babel/core': 7.26.10
       '@babel/parser': 7.26.2
@@ -17627,6 +17630,33 @@ snapshots:
       write-file-atomic: 2.4.3
     optionalDependencies:
       '@babel/preset-env': 7.26.0(@babel/core@7.26.0)
+    transitivePeerDependencies:
+      - supports-color
+
+  jscodeshift@0.15.2(@babel/preset-env@7.26.0(@babel/core@7.26.10)):
+    dependencies:
+      '@babel/core': 7.26.10
+      '@babel/parser': 7.26.2
+      '@babel/plugin-transform-class-properties': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-modules-commonjs': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-nullish-coalescing-operator': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-optional-chaining': 7.25.9(@babel/core@7.26.10)
+      '@babel/plugin-transform-private-methods': 7.25.9(@babel/core@7.26.10)
+      '@babel/preset-flow': 7.25.9(@babel/core@7.26.10)
+      '@babel/preset-typescript': 7.26.0(@babel/core@7.26.10)
+      '@babel/register': 7.25.9(@babel/core@7.26.10)
+      babel-core: 7.0.0-bridge.0(@babel/core@7.26.10)
+      chalk: 4.1.2
+      flow-parser: 0.205.0
+      graceful-fs: 4.2.11
+      micromatch: 4.0.5
+      neo-async: 2.6.2
+      node-dir: 0.1.17
+      recast: 0.23.9
+      temp: 0.8.4
+      write-file-atomic: 2.4.3
+    optionalDependencies:
+      '@babel/preset-env': 7.26.0(@babel/core@7.26.10)
     transitivePeerDependencies:
       - supports-color
 
@@ -17709,6 +17739,8 @@ snapshots:
   leven@3.1.0: {}
 
   libphonenumber-js@1.11.1: {}
+
+  libphonenumber-js@1.12.9: {}
 
   lie@3.1.1:
     dependencies:
