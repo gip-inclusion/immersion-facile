@@ -27,16 +27,16 @@ export const defaultFlags: FeatureFlags = {
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
   enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "Mon titre de highlight",
-    message: "Mon message de highlight",
+    title: "Mon titre de highlight pour l'entreprise",
+    message: "Mon message de highlight pour l'entreprise",
     href: "https://www.example.com",
-    label: "Mon label de highlight",
+    label: "Mon label de highlight pour l'entreprise",
   }),
   enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "Mon titre de highlight",
-    message: "Mon message de highlight",
+    title: "Mon titre de highlight pour l'agence",
+    message: "Mon message de highlight pour l'agence",
     href: "https://www.example.com",
-    label: "Mon label de highlight",
+    label: "Mon label de highlight pour l'agence",
   }),
 };
 
