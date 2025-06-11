@@ -1,4 +1,5 @@
 import {
+  type FeatureFlagHighlight,
   type FeatureFlags,
   expectToEqual,
   makeBooleanFeatureFlag,
@@ -16,6 +17,20 @@ import {
   createTestStore,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
+
+const defaultHighlightFeatureFlagValue: FeatureFlagHighlight["value"] = {
+  title: "",
+  message: "",
+  href: "",
+  label: "",
+};
+
+const highlightFeatureFlagFromApi: FeatureFlagHighlight["value"] = {
+  title: "My establishment dashboard highlight",
+  message: "My establishment dashboard highlight message",
+  href: "https://",
+  label: "My establishment dashboard highlight label",
+};
 
 const defaultFeatureFlags: FeatureFlags = {
   enableTemporaryOperation: makeTextImageAndRedirectFeatureFlag(false, {
@@ -35,18 +50,14 @@ const defaultFeatureFlags: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
-  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "",
-    message: "",
-    href: "",
-    label: "",
-  }),
-  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "",
-    message: "",
-    href: "",
-    label: "",
-  }),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(
+    false,
+    defaultHighlightFeatureFlagValue,
+  ),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(
+    false,
+    defaultHighlightFeatureFlagValue,
+  ),
 };
 
 const flagsFromApi: FeatureFlags = {
@@ -67,18 +78,14 @@ const flagsFromApi: FeatureFlags = {
   enableBroadcastOfCapEmploiToFT: makeBooleanFeatureFlag(false),
   enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
   enableStandardFormatBroadcastToFranceTravail: makeBooleanFeatureFlag(false),
-  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "My establishment dashboard highlight",
-    message: "My establishment dashboard highlight message",
-    href: "https://",
-    label: "My establishment dashboard highlight label",
-  }),
-  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
-    title: "My agency dashboard highlight",
-    message: "My agency dashboard highlight message",
-    href: "https://",
-    label: "My agency dashboard highlight label",
-  }),
+  enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(
+    false,
+    highlightFeatureFlagFromApi,
+  ),
+  enableAgencyDashboardHighlight: makeHighlightFeatureFlag(
+    false,
+    highlightFeatureFlagFromApi,
+  ),
 };
 
 describe("feature flag slice", () => {

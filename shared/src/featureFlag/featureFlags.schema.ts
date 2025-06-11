@@ -20,24 +20,27 @@ const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({
   kind: z.literal("boolean"),
 });
 
-const featureFlagTitleSchema: z.Schema<WithFeatureFlagTitleValue> = z.object({
-  title: zStringCanBeEmpty,
-});
+const withFeatureFlagTitleSchema: z.Schema<WithFeatureFlagTitleValue> =
+  z.object({
+    title: zStringCanBeEmpty,
+  });
 
-const featureFlagMessageSchema: z.Schema<WithFeatureFlagTextValue> = z.object({
-  message: zStringCanBeEmpty,
-});
+const withFeatureFlagMessageSchema: z.Schema<WithFeatureFlagTextValue> =
+  z.object({
+    message: zStringCanBeEmpty,
+  });
 
-const featureFlagButtonSchema: z.Schema<WithFeatureFlagButtonValue> = z.object({
-  href: absoluteUrlSchema,
-  label: zStringMinLength1,
-});
+const withFeatureFlagButtonSchema: z.Schema<WithFeatureFlagButtonValue> =
+  z.object({
+    href: absoluteUrlSchema,
+    label: zStringMinLength1,
+  });
 
 export const featureFlagHighlightValueSchema: z.Schema<
   FeatureFlagHighlight["value"]
-> = featureFlagTitleSchema
-  .and(featureFlagMessageSchema)
-  .and(featureFlagButtonSchema);
+> = withFeatureFlagTitleSchema
+  .and(withFeatureFlagMessageSchema)
+  .and(withFeatureFlagButtonSchema);
 
 export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
   FeatureFlagTextImageAndRedirect["value"]
@@ -48,8 +51,8 @@ export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
     redirectUrl: absoluteUrlSchema,
     overtitle: zStringCanBeEmpty,
   })
-  .and(featureFlagMessageSchema)
-  .and(featureFlagTitleSchema);
+  .and(withFeatureFlagMessageSchema)
+  .and(withFeatureFlagTitleSchema);
 
 export const featureFlagTextWithSeverityValueSchema: z.Schema<
   FeatureFlagTextWithSeverity["value"]
