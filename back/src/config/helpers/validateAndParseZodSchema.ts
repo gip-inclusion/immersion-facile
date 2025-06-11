@@ -1,5 +1,5 @@
-import { errors, flattenZodErrors } from "shared";
-import type { z } from "zod/v4";
+import { errors } from "shared";
+import { type z, treeifyError } from "zod/v4";
 import type { OpacifiedLogger } from "../../utils/logger";
 
 export const validateAndParseZodSchemaV2 = <T>(
@@ -14,6 +14,6 @@ export const validateAndParseZodSchemaV2 = <T>(
     schemaParsingInput,
     message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
   });
-  const flattenErrors = flattenZodErrors(result.error);
+  const flattenErrors = treeifyError(result.error).errors;
   throw errors.inputs.badSchema({ flattenErrors });
 };

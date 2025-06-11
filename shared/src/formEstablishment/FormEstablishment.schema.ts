@@ -7,7 +7,6 @@ import { nafSchema } from "../naf/naf.schema";
 import { phoneSchema } from "../phone.schema";
 import { establishmentRoleSchema } from "../role/role.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
-import { dateTimeIsoStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
 import type { NotEmptyArray } from "../utils";
 import { frenchEstablishmentKinds } from "../utils/establishment";
@@ -32,6 +31,7 @@ import type {
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
+import { dateTimeIsoStringSchema } from "../utils/date";
 
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
@@ -120,7 +120,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     userRights: formEstablishmentUserRightsSchema,
     maxContactsPerMonth: z
       .number({
-        invalid_type_error:
+        error:
           "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
       })
       .nonnegative({

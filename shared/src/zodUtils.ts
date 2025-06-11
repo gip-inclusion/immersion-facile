@@ -1,34 +1,4 @@
-import { type ZodError, type ZodIssue, z } from "zod/v4";
-import { timeHHmmRegExp } from "./utils/date";
-
-// Change default error map behavior to provide context
-// https://github.com/colinhacks/zod/blob/master/ERROR_HANDLING.md#global-error-map
-z.setErrorMap((issue, ctx) => {
-  if (issue.code === "invalid_string" && issue.validation === "datetime")
-    return {
-      message: localization.invalidDate,
-    };
-
-  if (issue.code === "invalid_enum_value")
-    return {
-      message: "Vous devez sélectionner une option parmi celles proposées",
-    };
-
-  if (issue.code === "invalid_string" && issue.validation === "email")
-    return {
-      message: `${localization.invalidEmailFormat} - email fourni : ${
-        ctx.data && ctx.data !== "" ? ctx.data : "vide"
-      }`,
-    };
-
-  // Temporary regex instead of email - waiting for zod release
-  if (issue.code === "invalid_string" && issue.validation === "regex")
-    return {
-      message: `invalide - valeur fournie : ${ctx.data}`,
-    };
-
-  return { message: ctx.defaultError };
-});
+import { z } from "zod/v4";
 
 export const localization = {
   atLeastOneEmail: "Vous devez renseigner au moins un email",
@@ -61,6 +31,7 @@ export const localization = {
   signatoriesDistinctPhoneNumbers:
     "Les numéros de téléphone des signataires doivent être différents.",
   invalidAppellations: "Les métiers renseignés sont invalides.",
+  invalidEnum: "Vous devez sélectionner une option parmi celles proposées",
 };
 
 export const requiredText = {
@@ -74,11 +45,17 @@ export const requiredBoolean = {
 };
 
 export const zStringMinLength1 = z
-  .string(requiredText)
+  .string({
+    error: localization.required,
+  })
   .trim()
   .min(1, localization.required);
 
-export const zStringCanBeEmpty = z.string(requiredText).trim();
+export const zStringCanBeEmpty = z
+  .string({
+    error: localization.required,
+  })
+  .trim();
 
 export const zStringPossiblyEmptyWithMax = (max: number): z.Schema<string> =>
   zStringCanBeEmpty.max(max, localization.maxCharacters(max));
@@ -88,16 +65,14 @@ export const zTrimmedStringWithMax = (max: number) =>
 
 export const stringWithMaxLength255 = zTrimmedStringWithMax(255);
 
-export const zTimeString = z
-  .string(requiredText)
-  .regex(timeHHmmRegExp, localization.invalidTimeFormat);
-
 export const makezTrimmedString = (message: string) =>
   zStringMinLength1
     .transform((s) => s.trim())
     .refine((s) => s.length > 0, message);
 
-export const zBoolean = z.boolean(requiredBoolean);
+export const zBoolean = z.boolean({
+  error: localization.required,
+});
 
 export const zToBoolean = z
   .any()
@@ -116,10 +91,10 @@ export const emptyObjectSchema: z.Schema<Record<string, never>> = z
 export const personNameSchema = z
   .string()
   .trim()
-  .regex(
-    /^[A-Za-zÀ-ÿ\s'-]*$/,
-    "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
-  )
+  .regex(/^[A-Za-zÀ-ÿ\s'-]*$/, {
+    error:
+      "Le nom ne peut contenir que des lettres, espaces, tirets et apostrophes",
+  })
   .transform((val) => val.replace(/\s+/g, " "));
 
 export const expressEmptyResponseBody = z.void().or(z.literal(""));
@@ -130,10 +105,9 @@ export const expressEmptyResponseBodyOrEmptyObject =
 export const zEnumValidation = <T extends string>(
   values: readonly [T, ...T[]],
   errorMessage: string,
-): z.ZodType<T, z.ZodTypeDef, T> =>
+) =>
   z.enum(values, {
-    required_error: errorMessage,
-    invalid_type_error: errorMessage,
+    error: errorMessage,
   });
 
 // Following is from https://github.com/colinhacks/zod/issues/372#issuecomment-826380330
@@ -143,34 +117,8 @@ export const zEnumValidation = <T extends string>(
 // for example you can use .passthrough() for a z.object() which you could not do with z.Schema<T>
 
 export const zSchemaForType =
-  <T>() =>
-  <S extends z.ZodType<T, z.ZodTypeDef, T>>(arg: S) =>
-    arg;
+  <Output, Input>() =>
+    <S extends z.ZodType<Output, Input>>(arg: S) =>
+      arg;
 
-export const zAnyObj = z.object({}).passthrough();
-
-export const flattenZodErrors = (
-  error: ZodError<any>,
-  path: (string | number)[] = [],
-): string[] => {
-  const result = error.errors.reduce<string[]>((acc, issue: ZodIssue) => {
-    const currentPath = [...path, ...(issue.path || [])];
-
-    if (issue.code === "invalid_union" && issue.unionErrors) {
-      const unionMessages = issue.unionErrors.reduce<string[]>(
-        (unionMsgs: string[], unionError: ZodError<any>) => {
-          return unionMsgs.concat(flattenZodErrors(unionError, currentPath));
-        },
-        [],
-      );
-      return [...acc, ...unionMessages];
-    }
-
-    const key = currentPath.join(".");
-    const message = issue.message;
-    const flatMessage = key ? `${key} : ${message}` : message;
-    return [...acc, flatMessage];
-  }, []);
-
-  return Array.from(new Set(result));
-};
+export const zAnyObj = z.object({}).loose();

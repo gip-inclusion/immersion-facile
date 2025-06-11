@@ -27,10 +27,10 @@ export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
 export const makeDateStringSchema: (
   errorMessage?: string,
 ) => z.Schema<DateString> = (errorMessage) =>
-  zStringMinLength1.refine(
-    (dateString) => dateString.match(dateRegExp),
-    errorMessage ?? localization.invalidDate,
-  );
+    zStringMinLength1.refine(
+      (dateString) => dateString.match(dateRegExp),
+      errorMessage ?? localization.invalidDate,
+    );
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   date: dateTimeIsoStringSchema,
@@ -58,4 +58,3 @@ export const scheduleSchema: z.Schema<ScheduleDto> = z.object({
   isSimple: z.boolean(),
   complexSchedule: immersionDaysScheduleSchema,
 });
-export { dateTimeIsoStringSchema };

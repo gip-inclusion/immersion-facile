@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 import { toLowerCaseWithoutDiacritics } from "../utils/string";
-import { requiredText } from "../zodUtils";
+import { localization } from "../zodUtils";
 import type { EmailType, TemplatedEmail } from "./email";
 import type { Email, EmailAttachment } from "./email.dto";
 
@@ -17,13 +17,17 @@ const emailTypeSchema = z.string() as z.Schema<EmailType>;
 const temporaryEmailRegex =
   /^[A-Z0-9._+-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)*\.[A-Z]{2,}$/i;
 export const emailSchema: z.Schema<Email> = z
-  .string(requiredText)
+  .string({
+    error: (ctx) => `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+  })
   .transform((arg) => toLowerCaseWithoutDiacritics(arg.trim()))
   .pipe(
     //Temporary regex instead of email - waiting zod release
     z
       .string()
-      .regex(temporaryEmailRegex),
+      .regex(temporaryEmailRegex, {
+        error: (ctx) => `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+      }),
   );
 
 export const templatedEmailSchema = z.object({

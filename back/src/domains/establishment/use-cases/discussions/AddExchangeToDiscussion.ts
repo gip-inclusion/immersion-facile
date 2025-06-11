@@ -1,12 +1,13 @@
 import {
   type Attachment,
-  type DateString,
+  type DateTimeIsoString,
   type DiscussionDto,
   type DiscussionId,
   type Exchange,
   type ExchangeRole,
   type InclusionConnectedUser,
   attachementSchema,
+  dateTimeIsoStringSchema,
   discussionIdSchema,
   errors,
   exchangeRoleSchema,
@@ -34,7 +35,7 @@ type MessageInputFromDashboard = MessageInputCommonFields & {
 type FullMessageInput = MessageInputCommonFields & {
   recipientRole: ExchangeRole;
   attachments: Attachment[];
-  sentAt: DateString;
+  sentAt: DateTimeIsoString;
   subject: string;
 };
 
@@ -42,13 +43,13 @@ type InputSource = (typeof inputSources)[number];
 
 export type AddExchangeToDiscussionInput =
   | {
-      source: Extract<InputSource, "dashboard">;
-      messageInputs: MessageInputFromDashboard[];
-    }
+    source: Extract<InputSource, "dashboard">;
+    messageInputs: MessageInputFromDashboard[];
+  }
   | {
-      source: Extract<InputSource, "inbound-parsing">;
-      messageInputs: FullMessageInput[];
-    };
+    source: Extract<InputSource, "inbound-parsing">;
+    messageInputs: FullMessageInput[];
+  };
 
 export type MessageInput =
   AddExchangeToDiscussionInput["messageInputs"][number];
@@ -71,7 +72,7 @@ const inputFromDashboardSchema = z.object({
 const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
   recipientRole: exchangeRoleSchema,
   attachments: z.array(attachementSchema),
-  sentAt: z.string().datetime(),
+  sentAt: dateTimeIsoStringSchema,
   subject: z.string(),
 });
 

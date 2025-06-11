@@ -1,6 +1,7 @@
 import {
   createPaginatedSchema,
   createWebhookSubscriptionSchema,
+  dateTimeIsoStringSchema,
   emptyObjectSchema,
   expressEmptyResponseBody,
   httpErrorSchema,
@@ -144,7 +145,7 @@ export const publicApiV2WebhooksRoutes = defineRoutes({
         createWebhookSubscriptionSchema.and(
           z.object({
             id: z.string(),
-            createdAt: z.string().datetime(),
+            createdAt: dateTimeIsoStringSchema,
           }),
         ),
       ),

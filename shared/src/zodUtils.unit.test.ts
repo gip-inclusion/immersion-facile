@@ -9,7 +9,7 @@ import {
   zTrimmedStringWithMax,
 } from "./zodUtils";
 
-describe("zToBolean schema validation", () => {
+describe("zToBoolean schema validation", () => {
   it.each([
     ["true", true],
     ["TRUE", true],
@@ -58,13 +58,13 @@ describe("zStringMinLength1 schema validation", () => {
       input: "",
       expectedError: new ZodError([
         {
+          origin: "string",
+          input: undefined,
           code: "too_small",
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
-          message: "Obligatoire",
           path: [],
+          message: "Obligatoire",
         },
       ]),
     },
@@ -72,13 +72,13 @@ describe("zStringMinLength1 schema validation", () => {
       input: "\n",
       expectedError: new ZodError([
         {
+          origin: "string",
           code: "too_small",
+          input: undefined,
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
-          message: "Obligatoire",
           path: [],
+          message: "Obligatoire",
         },
       ]),
     },
@@ -86,13 +86,13 @@ describe("zStringMinLength1 schema validation", () => {
       input: " ",
       expectedError: new ZodError([
         {
+          origin: "string",
           code: "too_small",
+          input: undefined,
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
-          message: "Obligatoire",
           path: [],
+          message: "Obligatoire",
         },
       ]),
     },
@@ -101,15 +101,16 @@ describe("zStringMinLength1 schema validation", () => {
       expected: new ZodError([
         {
           code: "too_small",
+          origin: "string",
+          input: "   ",
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
           message: "Obligatoire",
           path: [],
         },
         {
           code: "custom",
+          input: "   ",
           message: "Obligatoire",
           path: [],
         },
@@ -160,10 +161,10 @@ describe("zStringPossiblyEmptyWithMax schema validation", () => {
     const expectedError: ZodError = new ZodError([
       {
         code: "too_big",
+        origin: "string",
+        input: "Fourni par l'employeur",
         maximum: 3,
-        type: "string",
         inclusive: true,
-        exact: false,
         message: "Le maximum est de 3 caractères",
         path: [],
       },
@@ -186,10 +187,10 @@ describe("zTrimmedStringWithMax schema validation", () => {
       expectedError: new ZodError([
         {
           code: "too_small",
+          origin: "string",
+          input: "",
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
           message: "Obligatoire",
           path: [],
         },
@@ -200,10 +201,10 @@ describe("zTrimmedStringWithMax schema validation", () => {
       expectedError: new ZodError([
         {
           code: "too_small",
+          origin: "string",
+          input: "\n",
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
           message: "Obligatoire",
           path: [],
         },
@@ -214,10 +215,10 @@ describe("zTrimmedStringWithMax schema validation", () => {
       expectedError: new ZodError([
         {
           code: "too_small",
+          origin: "string",
+          input: " ",
           minimum: 1,
-          type: "string",
           inclusive: true,
-          exact: false,
           message: "Obligatoire",
           path: [],
         },
@@ -228,10 +229,10 @@ describe("zTrimmedStringWithMax schema validation", () => {
       expectedError: new ZodError([
         {
           code: "too_big",
+          origin: "string",
+          input: "texte trop long",
           maximum: 3,
-          type: "string",
           inclusive: true,
-          exact: false,
           message: "Le maximum est de 3 caractères",
           path: [],
         },

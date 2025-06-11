@@ -5,7 +5,7 @@ import { romeCodeSchema } from "../rome";
 import { appellationCodeSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { siretSchema } from "../siret/siret.schema";
 import { dateTimeIsoStringSchema } from "../utils/date";
-import { zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
+import { localization, zStringCanBeEmpty, zStringMinLength1, zUuidLike } from "../zodUtils";
 import type { SearchResultDto } from "./SearchResult.dto";
 
 export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
@@ -25,7 +25,9 @@ export const searchResultSchema: z.Schema<SearchResultDto> = z.object({
     departmentCode: zStringMinLength1,
     city: zStringMinLength1,
   }),
-  contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"]).optional(),
+  contactMode: z.enum(["EMAIL", "PHONE", "IN_PERSON"], {
+    error: localization.invalidEnum,
+  }).optional(),
   distance_m: z.number().optional(),
   numberOfEmployeeRange: z.string().optional(),
   website: absoluteUrlSchema.or(z.literal("")).optional(),
