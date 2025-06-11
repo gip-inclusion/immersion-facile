@@ -1,7 +1,4 @@
-import {
-  HeadingSection,
-  type HeadingSectionProps,
-} from "src/app/components/layout/HeadingSection";
+import { HeadingSection, type HeadingSectionProps } from "react-design-system";
 
 export const BackofficeDashboardTabContent = (props: HeadingSectionProps) => {
   return (

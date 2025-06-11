@@ -111,34 +111,6 @@ const step1 = async (
     `#${domElementIds.establishment.edit.website}`,
     updatedEstablishment.website,
   );
-
-  // if (!updatedEstablishment.nextAvailabilityDate)
-  //   throw new Error(
-  //     "Missing next availability date for updatedEstablishmentInfos",
-  //   );
-
-  // await page
-  //   .locator(`#${domElementIds.establishment.edit.availabilityButton}`)
-  //   .getByText("Non")
-  //   .click();
-
-  // await page
-  //   .locator(`#${domElementIds.establishment.edit.nextAvailabilityDateInput}`)
-  //   .fill(updatedEstablishment.nextAvailabilityDate.split("T")[0]);
-
-  // const maxContactPerMonthLocator = await page.locator(
-  //   `#${domElementIds.establishment.edit.maxContactsPerMonth}`,
-  // );
-
-  // const maxContactPerMonthLocatorCurrentValue =
-  //   await maxContactPerMonthLocator.inputValue();
-  // await expect(maxContactPerMonthLocatorCurrentValue).not.toBe("");
-  // await expect(maxContactPerMonthLocatorCurrentValue).not.toBe(
-  //   updatedEstablishment.maxContactsPerMonth.toString(),
-  // );
-  // await maxContactPerMonthLocator.fill(
-  //   updatedEstablishment.maxContactsPerMonth.toString(),
-  // );
 };
 
 const step2 = async (
@@ -219,7 +191,6 @@ const step3 = async (
       updatedEstablishment.fitForDisabledWorkers ? "1" : "0"
     }]`,
   );
-  // await goToNextStep(page, 3, "edit");
 };
 
 const step4 = async (

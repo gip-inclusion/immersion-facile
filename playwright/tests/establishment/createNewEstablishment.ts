@@ -34,7 +34,7 @@ export const createEstablishmentForm =
 
     await step0(page);
 
-    await step1(page, adminRight);
+    await step1(page, adminRight, establishment);
 
     await step2(page);
 
@@ -64,11 +64,12 @@ export const step0 = async (page: Page) => {
 const step1 = async (
   page: Page,
   adminRight: AdminFormEstablishmentUserRight,
+  establishment: FormEstablishmentDto,
 ) => {
   const siretInput = await page.locator(
     `#${domElementIds.establishment.create.siret}`,
   );
-  await expect(siretInput).toHaveValue("13003013300016");
+  await expect(siretInput).toHaveValue(establishment.siret);
 
   await expect(
     page.locator(
@@ -150,7 +151,7 @@ const step4 = async (page: Page, establishment: FormEstablishmentDto) => {
   const summarySiretValue = await page.locator(
     `#${domElementIds.establishment.create.summarySiretValue}`,
   );
-  await expect(summarySiretValue).toHaveText("13003013300016");
+  await expect(summarySiretValue).toHaveText(establishment.siret);
 
   const summaryAdminName = await page.locator(
     `#${domElementIds.establishment.create.summaryAdminName}`,
