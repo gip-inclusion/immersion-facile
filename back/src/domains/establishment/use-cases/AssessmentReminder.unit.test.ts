@@ -1,13 +1,18 @@
+import { subMonths } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
+  type AgencyDto,
   AgencyDtoBuilder,
+  type ConventionDto,
   ConventionDtoBuilder,
-  InclusionConnectedUserBuilder,
+  type DateString,
+  type Notification,
   expectObjectInArrayToMatch,
   frontRoutes,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
+import type { AssessmentEntity } from "../../convention/entities/AssessmentEntity";
 import {
   type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
@@ -49,127 +54,219 @@ describe("AssessmentReminder", () => {
     });
   });
 
-  it("send first assessment reminder", async () => {
-    const now = timeGateway.now();
-    const conventionEndDate = subDays(now, 3);
-    const agency = new AgencyDtoBuilder().build();
-    const convention = new ConventionDtoBuilder()
-      .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withDateEnd(conventionEndDate.toISOString())
-      .withAgencyId(agency.id)
-      .build();
-    const validator = new InclusionConnectedUserBuilder()
-      .withId("10000000-0000-0000-0000-000000000003")
-      .withEmail("validator@agency1.fr")
-      .buildUser();
-    await uow.userRepository.save(validator);
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(agency, {
-        [validator.id]: {
-          isNotifiedByEmail: true,
-          roles: ["validator"],
-        },
-      }),
-    ];
-    await uow.conventionRepository.save(convention);
+  describe("reminders are not sent", () => {
+    let now: Date;
+    let agency: AgencyDto;
+    let convention: ConventionDto;
 
-    const { numberOfReminders } = await assessmentReminder.execute({
-      mode: "3daysAfterConventionEnd",
+    beforeEach(async () => {
+      now = timeGateway.now();
+      agency = new AgencyDtoBuilder().build();
+      convention = new ConventionDtoBuilder()
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateEnd(subMonths(now, 3).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+
+      await uow.conventionRepository.save(convention);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
     });
 
-    expect(numberOfReminders).toBe(1);
-    expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-      {
-        templatedContent: {
-          kind: "ASSESSMENT_AGENCY_FIRST_REMINDER",
-          params: {
-            conventionId: convention.id,
-            internshipKind: convention.internshipKind,
-            businessName: convention.businessName,
-            establishmentContactEmail:
-              convention.signatories.establishmentRepresentative.email,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
-              email: validator.email,
-              role: "validator",
-              targetRoute: frontRoutes.assessment,
-              now,
-            }),
-          },
-          recipients: [validator.email],
-          sender: {
-            email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-            name: "Immersion Facilitée",
-          },
-        },
-      },
-    ]);
-    expectObjectInArrayToMatch(uow.outboxRepository.events, [
-      { topic: "NotificationAdded" },
-    ]);
+    it("when tutor receive initial assessment email long ago", async () => {
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention,
+          createdAt: subMonths(now, 1).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+
+      const { numberOfReminders } = await assessmentReminder.execute({
+        mode: "10daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfReminders).toBe(0);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+    });
+
+    it("when tutor already filled the assessment", async () => {
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention,
+          createdAt: subDays(now, 3).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+      const assessment: AssessmentEntity = {
+        conventionId: convention.id,
+        status: "COMPLETED",
+        endedWithAJob: false,
+        establishmentFeedback: "Ca s'est bien passé",
+        establishmentAdvices: "mon conseil",
+        numberOfHoursActuallyMade: 404,
+        _entityName: "Assessment",
+      };
+      await uow.assessmentRepository.save(assessment);
+
+      const { numberOfReminders } = await assessmentReminder.execute({
+        mode: "3daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfReminders).toBe(0);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, []);
+    });
   });
 
-  it("send second assessment reminder", async () => {
-    const now = timeGateway.now();
-    const conventionEndDate = subDays(now, 10);
-    const agency = new AgencyDtoBuilder().build();
-    const convention = new ConventionDtoBuilder()
-      .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withDateEnd(conventionEndDate.toISOString())
-      .withAgencyId(agency.id)
-      .build();
-    const validator = new InclusionConnectedUserBuilder()
-      .withId("10000000-0000-0000-0000-000000000003")
-      .withEmail("validator@agency1.fr")
-      .buildUser();
-    await uow.userRepository.save(validator);
-    uow.agencyRepository.agencies = [
-      toAgencyWithRights(agency, {
-        [validator.id]: {
-          isNotifiedByEmail: true,
-          roles: ["validator"],
-        },
-      }),
-    ];
-    await uow.conventionRepository.save(convention);
+  describe("reminders are sent", () => {
+    let now: Date;
+    let agency: AgencyDto;
+    let convention: ConventionDto;
 
-    const { numberOfReminders } = await assessmentReminder.execute({
-      mode: "10daysAfterConventionEnd",
+    beforeEach(async () => {
+      now = timeGateway.now();
+      agency = new AgencyDtoBuilder().build();
+      convention = new ConventionDtoBuilder()
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .withDateEnd(subMonths(now, 3).toISOString())
+        .withAgencyId(agency.id)
+        .build();
+
+      await uow.conventionRepository.save(convention);
+      uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
     });
 
-    expect(numberOfReminders).toBe(1);
-    expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
-      {
-        templatedContent: {
-          kind: "ASSESSMENT_AGENCY_SECOND_REMINDER",
-          params: {
-            conventionId: convention.id,
-            internshipKind: convention.internshipKind,
-            businessName: convention.businessName,
-            establishmentContactEmail:
-              convention.signatories.establishmentRepresentative.email,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-              id: convention.id,
-              email: validator.email,
-              role: "validator",
-              targetRoute: frontRoutes.assessment,
-              now,
-            }),
-          },
-          recipients: [validator.email],
-          sender: {
-            email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
-            name: "Immersion Facilitée",
+    it("send first assessment reminder", async () => {
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention,
+          createdAt: subDays(now, 3).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+
+      const { numberOfReminders } = await assessmentReminder.execute({
+        mode: "3daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfReminders).toBe(1);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              establishmentTutorFirstName:
+                convention.establishmentTutor.firstName,
+              establishmentTutorLastName:
+                convention.establishmentTutor.lastName,
+              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+                id: convention.id,
+                email: convention.establishmentTutor.email,
+                role: "establishment-tutor",
+                targetRoute: frontRoutes.assessment,
+                now,
+              }),
+            },
+            recipients: [convention.establishmentTutor.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
           },
         },
-      },
-    ]);
-    expectObjectInArrayToMatch(uow.outboxRepository.events, [
-      { topic: "NotificationAdded" },
-    ]);
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+      ]);
+    });
+
+    it("send second assessment reminder", async () => {
+      const initialEstablishmentNotification: Notification =
+        buildEstablishmentNotificationFrom({
+          convention,
+          createdAt: subDays(now, 10).toISOString(),
+        });
+      await uow.notificationRepository.save(initialEstablishmentNotification);
+
+      const { numberOfReminders } = await assessmentReminder.execute({
+        mode: "10daysAfterInitialAssessmentEmail",
+      });
+
+      expect(numberOfReminders).toBe(1);
+      expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
+        initialEstablishmentNotification,
+        {
+          templatedContent: {
+            kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
+            params: {
+              conventionId: convention.id,
+              internshipKind: convention.internshipKind,
+              beneficiaryFirstName:
+                convention.signatories.beneficiary.firstName,
+              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              establishmentTutorFirstName:
+                convention.establishmentTutor.firstName,
+              establishmentTutorLastName:
+                convention.establishmentTutor.lastName,
+              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
+                id: convention.id,
+                email: convention.establishmentTutor.email,
+                role: "establishment-tutor",
+                targetRoute: frontRoutes.assessment,
+                now,
+              }),
+            },
+            recipients: [convention.establishmentTutor.email],
+            sender: {
+              email: "ne-pas-ecrire-a-cet-email@immersion-facile.beta.gouv.fr",
+              name: "Immersion Facilitée",
+            },
+          },
+        },
+      ]);
+      expectObjectInArrayToMatch(uow.outboxRepository.events, [
+        { topic: "NotificationAdded" },
+      ]);
+    });
   });
 });
+
+const buildEstablishmentNotificationFrom = ({
+  convention,
+  createdAt,
+}: { convention: ConventionDto; createdAt: DateString }): Notification => {
+  return {
+    id: "22222222-2222-4444-2222-222222222222",
+    kind: "email",
+    followedIds: {
+      conventionId: convention.id,
+    },
+    createdAt: createdAt,
+    templatedContent: {
+      kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      recipients: [convention.establishmentTutor.email],
+      sender: {
+        email: "recette@immersion-facile.beta.gouv.fr",
+        name: "Recette Immersion Facile",
+      },
+      cc: [],
+      params: {
+        agencyLogoUrl: undefined,
+        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+        conventionId: convention.id,
+        internshipKind: convention.internshipKind,
+        assessmentCreationLink: "old-link",
+      },
+    },
+  };
+};
