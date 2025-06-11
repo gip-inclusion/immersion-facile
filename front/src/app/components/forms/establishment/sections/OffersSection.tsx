@@ -1,22 +1,7 @@
-import type {
-  Mode,
-  OnStepChange,
-  Step,
-} from "src/app/components/forms/establishment/EstablishmentForm";
-import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
-import { MultipleAppellationInput } from "src/app/components/forms/establishment/MultipleAppellationInput";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
-import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
-import {
-  displayReadableError,
-  getFormContents,
-  toErrorsWithLabels,
-} from "src/app/hooks/formContents.hooks";
-import { v4 as uuidV4 } from "uuid";
-
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { values } from "ramda";
+import { HeadingSection } from "react-design-system";
 import { ErrorNotifications } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
@@ -27,6 +12,20 @@ import {
   emptyAppellationAndRome,
   removeAtIndex,
 } from "shared";
+import type {
+  Mode,
+  OnStepChange,
+  Step,
+} from "src/app/components/forms/establishment/EstablishmentForm";
+import { MultipleAddressInput } from "src/app/components/forms/establishment/MultipleAddressInput";
+import { MultipleAppellationInput } from "src/app/components/forms/establishment/MultipleAppellationInput";
+import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
+import {
+  displayReadableError,
+  getFormContents,
+  toErrorsWithLabels,
+} from "src/app/hooks/formContents.hooks";
+import { v4 as uuidV4 } from "uuid";
 
 export const OffersSection = ({
   mode,
@@ -51,6 +50,7 @@ export const OffersSection = ({
   const formErrors = getFormContents(
     formEstablishmentFieldsLabels(mode),
   ).getFormErrors();
+
   return (
     <>
       <HeadingSection

@@ -1,9 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
 import { SectionHighlight } from "react-design-system";
+import { HeadingSection } from "react-design-system";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
@@ -14,8 +16,6 @@ import type { Route } from "type-route";
 import { MetabaseView } from "../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 import { DiscussionManageContent } from "../../admin/establishments/DiscussionManageContent";
-import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import Button from "@codegouvfr/react-dsfr/Button";
 
 type EstablishmentDashboardTabsProps = {
   currentUser: InclusionConnectedUser;

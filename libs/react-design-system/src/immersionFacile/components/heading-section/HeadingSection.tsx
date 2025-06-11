@@ -1,5 +1,4 @@
 import { type FrClassName, fr } from "@codegouvfr/react-dsfr";
-import type { RangeOfPosition } from "shared";
 import { useStyles } from "tss-react/dsfr";
 
 export type HeadingSectionProps = {
@@ -8,7 +7,7 @@ export type HeadingSectionProps = {
   description?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-  titleActionCols?: RangeOfPosition<12>;
+  titleActionCols?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
   titleAs?: "h1" | "h2" | "h3" | "h4";
 };
 

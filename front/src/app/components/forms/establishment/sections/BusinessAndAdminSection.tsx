@@ -4,11 +4,11 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { values } from "ramda";
 import { ErrorNotifications } from "react-design-system";
+import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { type FormEstablishmentDto, domElementIds } from "shared";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {
   displayReadableError,

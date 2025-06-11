@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { SectionHighlight } from "react-design-system";
+import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import { type FormEstablishmentDto, domElementIds, getFullname } from "shared";
 import type {
@@ -10,7 +11,6 @@ import type {
   Step,
 } from "src/app/components/forms/establishment/EstablishmentForm";
 import { SearchResultPreview } from "src/app/components/forms/establishment/SearchResultPreview";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 
@@ -54,6 +54,7 @@ export const SummarySection = ({
       id: domElementIds.establishment[mode].submitFormButton,
     },
   ];
+
   return (
     <>
       <p>
@@ -64,8 +65,7 @@ export const SummarySection = ({
         </strong>
         ). L’administrateur sera :{" "}
         <strong>
-          {/* TODO: federatedIdentity.provider === "proconnect" */}
-          {federatedIdentity && (
+          {federatedIdentity?.provider === "proConnect" && (
             <span id={domElementIds.establishment.create.summaryAdminName}>
               {getFullname(
                 federatedIdentity.firstName,

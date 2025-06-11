@@ -5,6 +5,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { HeadingSection } from "react-design-system";
 import { createPortal } from "react-dom";
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -16,7 +17,6 @@ import {
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";

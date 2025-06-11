@@ -3,6 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useState } from "react";
+import { HeadingSection } from "react-design-system";
 import { createPortal } from "react-dom";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
@@ -12,7 +13,6 @@ import {
   domElementIds,
   miniStageAgencyKinds,
 } from "shared";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { routes } from "src/app/routes/routes";
 import { MetabaseView } from "../../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../../SelectConventionFromIdForm";

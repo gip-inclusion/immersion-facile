@@ -1,13 +1,13 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { SectionHighlight } from "react-design-system";
+import { HeadingSection } from "react-design-system";
 import type {
   AgencyRight,
   ConnectedUserJwt,
   WithAgencyDashboards,
   WithEstablishmentDashboards,
 } from "shared";
-import { HeadingSection } from "src/app/components/layout/HeadingSection";
 import { MarkPartnersErroredConventionAsHandledFormSection } from "src/app/pages/agency-dashboard/MarkPartnersErroredConventionAsHandledFormSection";
 import { MetabaseView } from "../../../MetabaseView";
 

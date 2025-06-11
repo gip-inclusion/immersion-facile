@@ -206,15 +206,6 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               feedbackTopic: "form-establishment",
             }),
           );
-          //
-          // fetchUserRequested is calling GetInclusionConnectedUser useCase which will throw if not used by an admin
-          //
-          // if (currentUser)
-          //   dispatch(
-          //     fetchUserSlice.actions.fetchUserRequested({
-          //       userId: currentUser.id,
-          //     }),
-          //   );
         },
       )
       .with(
