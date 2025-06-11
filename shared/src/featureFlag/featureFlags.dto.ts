@@ -22,7 +22,7 @@ const _insureAllFeatureFlagsAreInList = (
   featureFlagName: FeatureFlagName,
 ): (typeof featureFlagNames)[number] => featureFlagName;
 
-type FeatureFlagKind = (typeof featureFlagKinds)[number];
+export type FeatureFlagKind = (typeof featureFlagKinds)[number];
 
 const featureFlagKinds = [
   "boolean",

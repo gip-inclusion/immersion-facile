@@ -155,6 +155,16 @@ describe("PG getFeatureFlags", () => {
     });
 
     await featureFlagRepository.update({
+      flagName: "enableEstablishmentDashboardHighlight",
+      featureFlag: makeHighlightFeatureFlag(true, {
+        title: "updatedTitle",
+        message: "updatedMessage",
+        href: "https://www.example.com",
+        label: "updatedLabel",
+      }),
+    });
+
+    await featureFlagRepository.update({
       flagName: "enableSearchByScore",
       featureFlag: makeBooleanFeatureFlag(true),
     });
@@ -178,11 +188,11 @@ describe("PG getFeatureFlags", () => {
       enableBroadcastOfMissionLocaleToFT: makeBooleanFeatureFlag(false),
       enableStandardFormatBroadcastToFranceTravail:
         makeBooleanFeatureFlag(false),
-      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(false, {
-        title: "Mon titre de highlight",
-        message: "Mon message de highlight",
+      enableEstablishmentDashboardHighlight: makeHighlightFeatureFlag(true, {
+        title: "updatedTitle",
+        message: "updatedMessage",
         href: "https://www.example.com",
-        label: "Mon label de highlight",
+        label: "updatedLabel",
       }),
       enableAgencyDashboardHighlight: makeHighlightFeatureFlag(false, {
         title: "Mon titre de highlight",

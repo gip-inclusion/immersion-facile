@@ -9,7 +9,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
   flagNames.forEach((flagName) => {
     pgm.sql(`
       INSERT INTO ${tableName} (flag_name, kind, is_active, value)
-      VALUES ('${flagName}', 'highlight', false, '{"title": "" , "message": "message","href":"https://href", "label":"label" }');
+      VALUES ('${flagName}', 'highlight', false, '{"title": "Titre par défaut" , "message": "Message par défaut","href":"https://www.exemple.com", "label":"Bouton par défaut" }');
     `);
   });
 }

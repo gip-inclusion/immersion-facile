@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
-import { zStringMinLength1 } from "../zodUtils";
+import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   type FeatureFlag,
   type FeatureFlagBoolean,
@@ -20,17 +20,17 @@ const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({
   kind: z.literal("boolean"),
 });
 
+const featureFlagTitleSchema: z.Schema<WithFeatureFlagTitleValue> = z.object({
+  title: zStringCanBeEmpty,
+});
+
 const featureFlagMessageSchema: z.Schema<WithFeatureFlagTextValue> = z.object({
-  message: zStringMinLength1,
+  message: zStringCanBeEmpty,
 });
 
 const featureFlagButtonSchema: z.Schema<WithFeatureFlagButtonValue> = z.object({
   href: absoluteUrlSchema,
   label: zStringMinLength1,
-});
-
-const featureFlagTitleSchema: z.Schema<WithFeatureFlagTitleValue> = z.object({
-  title: zStringMinLength1,
 });
 
 export const featureFlagHighlightValueSchema: z.Schema<
@@ -46,7 +46,7 @@ export const featureFlagTextImageAndRedirectValueSchema: z.Schema<
     imageUrl: absoluteUrlSchema,
     imageAlt: z.string(),
     redirectUrl: absoluteUrlSchema,
-    overtitle: zStringMinLength1,
+    overtitle: zStringCanBeEmpty,
   })
   .and(featureFlagMessageSchema)
   .and(featureFlagTitleSchema);
@@ -81,7 +81,8 @@ const featureFlagHighlightSchema: z.Schema<FeatureFlagHighlight> = z.object({
 export const featureFlagSchema: z.Schema<FeatureFlag> =
   featureFlagTextImageAndRedirectSchema
     .or(featureFlagTextWithSeveritySchema)
-    .or(featureFlagBooleanSchema);
+    .or(featureFlagBooleanSchema)
+    .or(featureFlagHighlightSchema);
 
 export const setFeatureFlagSchema: z.Schema<SetFeatureFlagParam> = z.object({
   flagName: z.enum(featureFlagNames),

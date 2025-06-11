@@ -40,62 +40,58 @@ export const FeatureFlagsSection = () => {
     <>
       <h4>Les fonctionnalités optionnelles</h4>
       <FeatureFlagListWrapper>
-        {!isLoading &&
-          keys(labelsByFeatureFlag).map((featureFlagName, index) => (
-            <div
-              key={featureFlagName}
-              className={fr.cx(index > 0 && "fr-mt-4w")}
-            >
-              {labelsByFeatureFlag[featureFlagName].title && (
-                <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
-              )}
-              <ToggleSwitch
-                label={labelsByFeatureFlag[featureFlagName].enableLabel}
-                checked={featureFlags[featureFlagName].isActive}
-                showCheckedHint={false}
-                onChange={() => {
-                  const isConfirmed = window.confirm(
-                    "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
-                  );
+        {keys(labelsByFeatureFlag).map((featureFlagName, index) => (
+          <div key={featureFlagName} className={fr.cx(index > 0 && "fr-mt-4w")}>
+            {labelsByFeatureFlag[featureFlagName].title && (
+              <h5>{labelsByFeatureFlag[featureFlagName].title}</h5>
+            )}
+            <ToggleSwitch
+              label={labelsByFeatureFlag[featureFlagName].enableLabel}
+              checked={featureFlags[featureFlagName].isActive}
+              showCheckedHint={false}
+              onChange={() => {
+                const isConfirmed = window.confirm(
+                  "Vous aller changer ce réglage pour tous les utilisateurs, voulez-vous confirmer ?",
+                );
 
-                  if (isConfirmed)
-                    dispatch(
-                      featureFlagsSlice.actions.setFeatureFlagRequested({
-                        flagName: featureFlagName,
-                        featureFlag: {
-                          ...featureFlags[featureFlagName],
-                          isActive: !featureFlags[featureFlagName].isActive,
-                        },
-                      }),
-                    );
-                }}
-              />
-              {match(featureFlags[featureFlagName])
-                .with({ kind: "textWithSeverity" }, (featureFlagText) => (
-                  <FeatureFlagTextWithSeverityForm
-                    featureFlag={featureFlagText}
+                if (isConfirmed)
+                  dispatch(
+                    featureFlagsSlice.actions.setFeatureFlagRequested({
+                      flagName: featureFlagName,
+                      featureFlag: {
+                        ...featureFlags[featureFlagName],
+                        isActive: !featureFlags[featureFlagName].isActive,
+                      },
+                    }),
+                  );
+              }}
+            />
+            {match(featureFlags[featureFlagName])
+              .with({ kind: "textWithSeverity" }, (featureFlagText) => (
+                <FeatureFlagTextWithSeverityForm
+                  featureFlag={featureFlagText}
+                  featureFlagName={featureFlagName}
+                />
+              ))
+              .with(
+                { kind: "textImageAndRedirect" },
+                (featureFlagTextImageAndRedirect) => (
+                  <FeatureFlagTextImageAndRedirectForm
+                    featureFlag={featureFlagTextImageAndRedirect}
                     featureFlagName={featureFlagName}
                   />
-                ))
-                .with(
-                  { kind: "textImageAndRedirect" },
-                  (featureFlagTextImageAndRedirect) => (
-                    <FeatureFlagTextImageAndRedirectForm
-                      featureFlag={featureFlagTextImageAndRedirect}
-                      featureFlagName={featureFlagName}
-                    />
-                  ),
-                )
-                .with({ kind: "boolean" }, () => null)
-                .with({ kind: "highlight" }, (featureFlagHighlight) => (
-                  <FeatureFlagHighlightForm
-                    featureFlag={featureFlagHighlight}
-                    featureFlagName={featureFlagName}
-                  />
-                ))
-                .exhaustive()}
-            </div>
-          ))}
+                ),
+              )
+              .with({ kind: "boolean" }, () => null)
+              .with({ kind: "highlight" }, (featureFlagHighlight) => (
+                <FeatureFlagHighlightForm
+                  featureFlag={featureFlagHighlight}
+                  featureFlagName={featureFlagName}
+                />
+              ))
+              .exhaustive()}
+          </div>
+        ))}
       </FeatureFlagListWrapper>
     </>
   );
@@ -149,7 +145,7 @@ const labelsByFeatureFlag: Record<
     enableLabel: "Activer les Cap-Emploi",
   },
   enableEstablishmentDashboardHighlight: {
-    title: null,
+    title: "Promotion via les tableaux de bord",
     enableLabel: "Promotion sur le tableau de bord entreprise",
   },
   enableAgencyDashboardHighlight: {
