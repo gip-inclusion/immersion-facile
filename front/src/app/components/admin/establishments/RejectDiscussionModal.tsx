@@ -32,7 +32,7 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 
 const modal = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.establishmentDashboard.discussion.rejectApplicationModal,
+  id: domElementIds.establishmentDashboard.discussion.rejectDiscussionModal,
 });
 
 const labelByCandidateWarnedMethod: Record<CandidateWarnedMethod, string> = {
@@ -67,9 +67,9 @@ const rejectionKindOptions: SelectProps.Option<RejectionKind>[] = [
   },
 ];
 
-export const openRejectApplicationModal = () => modal.open();
+export const openRejectDiscussionModal = () => modal.open();
 
-export const RejectApplicationModal = ({
+export const RejectDiscussionModal = ({
   discussion,
 }: {
   discussion: DiscussionReadDto;
@@ -127,7 +127,7 @@ export const RejectApplicationModal = ({
         buttons={[
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationCancelButton,
+              .rejectDiscussionCancelButton,
             priority: "secondary",
             children: "Précédent",
             doClosesModal: false,
@@ -136,7 +136,7 @@ export const RejectApplicationModal = ({
           },
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationSubmitButton,
+              .rejectDiscussionSubmitButton,
             priority: "primary",
             children: "Rejeter la candidature et notifier le candidat",
             onClick: () =>
@@ -176,12 +176,12 @@ export const RejectApplicationModal = ({
       buttons={[
         {
           id: domElementIds.establishmentDashboard.discussion
-            .rejectApplicationSubmitPreviewButton,
+            .rejectDiscussionSubmitPreviewButton,
           priority: "primary",
           type: "submit",
           nativeButtonProps: {
             form: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationForm,
+              .rejectDiscussionForm,
           },
           doClosesModal: false,
           children:
@@ -194,7 +194,7 @@ export const RejectApplicationModal = ({
       <form
         onSubmit={handleSubmit(onSubmit)}
         id={
-          domElementIds.establishmentDashboard.discussion.rejectApplicationForm
+          domElementIds.establishmentDashboard.discussion.rejectDiscussionForm
         }
       >
         <RadioButtons
@@ -202,7 +202,7 @@ export const RejectApplicationModal = ({
           name="isCandidateInformed"
           id={
             domElementIds.establishmentDashboard.discussion
-              .rejectApplicationIsCandidateWarned
+              .rejectDiscussionIsCandidateWarned
           }
           options={booleanSelectOptions.map((option) => ({
             ...option,
@@ -249,7 +249,7 @@ export const RejectApplicationModal = ({
               label="Pour quel motif souhaitez-vous refuser cette candidature ?"
               nativeSelectProps={{
                 id: domElementIds.establishmentDashboard.discussion
-                  .rejectApplicationJustificationKindInput,
+                  .rejectDiscussionJustificationKindInput,
                 ...register("rejectionKind"),
               }}
               options={rejectionKindOptions}
@@ -261,7 +261,7 @@ export const RejectApplicationModal = ({
                 label="Précisez"
                 nativeTextAreaProps={{
                   id: domElementIds.establishmentDashboard.discussion
-                    .rejectApplicationJustificationReasonInput,
+                    .rejectDiscussionJustificationReasonInput,
                   ...register("rejectionReason"),
                 }}
                 {...getFieldError("rejectionReason")}

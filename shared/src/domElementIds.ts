@@ -815,38 +815,36 @@ export const domElementIds = {
     discussion: {
       handleDiscussionButton:
         "im-manage-establishment__handle-discussion-button",
-      acceptApplicationForm: "im-manage-establishment__accept-application-form",
-      rejectApplicationForm: "im-manage-establishment__reject-application-form",
+      acceptDiscussionForm: "im-manage-establishment__accept-discussion-form",
+      rejectDiscussionForm: "im-manage-establishment__reject-discussion-form",
       activateDraftConvention:
         "im-manage-establishment__convert-discussion-to-draft-convention",
       replyToCandidateByEmail:
         "im-manage-establishment__reply-to-candidate-by-email",
-      acceptApplicationModal:
-        "im-manage-establishment__accept-application-modal",
-      acceptApplicationOpenModalButton:
-        "im-manage-establishment__accept-application-button-open-modal",
-      acceptApplicationSubmitButton:
-        "im-manage-establishment__accept-application-modal-submit-button",
-      acceptApplicationCancelButton:
-        "im-manage-establishment__accept-application-cancel-button",
-      acceptApplicationConventionIdInput:
-        "im-manage-establishment__accept-application-convention-id-input",
-      rejectApplicationModal:
-        "im-manage-establishment__reject-application-modal",
-      rejectApplicationIsCandidateWarned:
-        "im-manage-establishment__reject-application-is-candidate-warned",
-      rejectApplicationOpenModalButton:
-        "im-manage-establishment__reject-application-button-open-modal",
-      rejectApplicationJustificationKindInput:
-        "im-manage-establishment__reject-application-justification-kind-input",
-      rejectApplicationJustificationReasonInput:
-        "im-manage-establishment__reject-application-justification-text-input",
-      rejectApplicationSubmitPreviewButton:
-        "im-manage-establishment__reject-application-submit-preview-button",
-      rejectApplicationSubmitButton:
-        "im-manage-establishment__reject-application-submit-button",
-      rejectApplicationCancelButton:
-        "im-manage-establishment__reject-application-cancel-button",
+      acceptDiscussionModal: "im-manage-establishment__accept-discussion-modal",
+      acceptDiscussionOpenModalButton:
+        "im-manage-establishment__accept-discussion-button-open-modal",
+      acceptDiscussionSubmitButton:
+        "im-manage-establishment__accept-discussion-modal-submit-button",
+      acceptDiscussionCancelButton:
+        "im-manage-establishment__accept-discussion-cancel-button",
+      acceptDiscussionConventionIdInput:
+        "im-manage-establishment__accept-discussion-convention-id-input",
+      rejectDiscussionModal: "im-manage-establishment__reject-discussion-modal",
+      rejectDiscussionIsCandidateWarned:
+        "im-manage-establishment__reject-discussion-is-candidate-warned",
+      rejectDiscussionOpenModalButton:
+        "im-manage-establishment__reject-discussion-button-open-modal",
+      rejectDiscussionJustificationKindInput:
+        "im-manage-establishment__reject-discussion-justification-kind-input",
+      rejectDiscussionJustificationReasonInput:
+        "im-manage-establishment__reject-discussion-justification-text-input",
+      rejectDiscussionSubmitPreviewButton:
+        "im-manage-establishment__reject-discussion-submit-preview-button",
+      rejectDiscussionSubmitButton:
+        "im-manage-establishment__reject-discussion-submit-button",
+      rejectDiscussionCancelButton:
+        "im-manage-establishment__reject-discussion-cancel-button",
       statusBadge: "im-manage-establishment__discussion-status-badge",
       copyEmailButton: "im-manage-establishment__discussion-copy-email-button",
       sendMessageInput:

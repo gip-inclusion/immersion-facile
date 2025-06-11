@@ -24,7 +24,7 @@ import { discussionSlice } from "src/core-logic/domain/discussion/discussion.sli
 
 const modal = createModal({
   isOpenedByDefault: false,
-  id: domElementIds.establishmentDashboard.discussion.acceptApplicationModal,
+  id: domElementIds.establishmentDashboard.discussion.acceptDiscussionModal,
 });
 
 const labelByCandidateWarnedMethod: Record<CandidateWarnedMethod, string> = {
@@ -42,9 +42,9 @@ const candidateWarnedMethod: RadioButtonsProps["options"] =
     },
   }));
 
-export const openAcceptApplicationModal = () => modal.open();
+export const openAcceptDiscussionModal = () => modal.open();
 
-export const AcceptApplicationModal = ({
+export const AcceptDiscussionModal = ({
   discussion,
 }: {
   discussion: DiscussionReadDto;
@@ -90,7 +90,7 @@ export const AcceptApplicationModal = ({
       buttons={[
         {
           id: domElementIds.establishmentDashboard.discussion
-            .acceptApplicationCancelButton,
+            .acceptDiscussionCancelButton,
           priority: "secondary",
           type: "button",
           children: "Annuler",
@@ -98,12 +98,12 @@ export const AcceptApplicationModal = ({
         },
         {
           id: domElementIds.establishmentDashboard.discussion
-            .acceptApplicationSubmitButton,
+            .acceptDiscussionSubmitButton,
           priority: "primary",
           type: "submit",
           nativeButtonProps: {
             form: domElementIds.establishmentDashboard.discussion
-              .acceptApplicationForm,
+              .acceptDiscussionForm,
           },
           doClosesModal: false,
           children: "Marquer comme acceptée",
@@ -113,7 +113,7 @@ export const AcceptApplicationModal = ({
       <form
         onSubmit={handleSubmit(onSubmit)}
         id={
-          domElementIds.establishmentDashboard.discussion.acceptApplicationForm
+          domElementIds.establishmentDashboard.discussion.acceptDiscussionForm
         }
       >
         <RadioButtons
@@ -172,7 +172,7 @@ export const AcceptApplicationModal = ({
               label="ID de convention (optionnel)"
               nativeInputProps={{
                 id: domElementIds.establishmentDashboard.discussion
-                  .acceptApplicationConventionIdInput,
+                  .acceptDiscussionConventionIdInput,
                 ...register("conventionId", {
                   setValueAs: (value) => value?.trim() || undefined,
                 }),
