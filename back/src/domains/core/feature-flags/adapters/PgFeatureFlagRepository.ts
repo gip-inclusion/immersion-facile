@@ -1,5 +1,6 @@
 import { keys } from "ramda";
 import {
+  type FeatureFlagKind,
   type FeatureFlags,
   type SetFeatureFlagParam,
   hasFeatureFlagValue,
@@ -52,18 +53,22 @@ export class PgFeatureFlagRepository implements FeatureFlagRepository {
   }
 }
 
-const rawPgToFeatureFlags = (raw: any[]): FeatureFlags =>
-  raw.reduce(
+const rawPgToFeatureFlags = (raw: any[]): FeatureFlags => {
+  const flagKindsNeedingValue: Extract<
+    FeatureFlagKind,
+    "textWithSeverity" | "textImageAndRedirect" | "highlight"
+  >[] = ["textWithSeverity", "textImageAndRedirect", "highlight"];
+  return raw.reduce(
     (acc, row) => ({
       ...acc,
       [row.flag_name]: {
         isActive: row.is_active,
         kind: row.kind,
-        ...((row.kind === "textWithSeverity" ||
-          row.kind === "textImageAndRedirect") && {
+        ...(flagKindsNeedingValue.includes(row.kind) && {
           value: row.value,
         }),
       },
     }),
     {} as FeatureFlags,
   );
+};

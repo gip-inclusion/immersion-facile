@@ -1,6 +1,10 @@
+import { fr } from "@codegouvfr/react-dsfr";
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import type { ReactNode } from "react";
+import { SectionHighlight } from "react-design-system";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
+import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
@@ -25,21 +29,45 @@ export const EstablishmentDashboardTabs = ({
     makeEstablishmentDashboardTabs(currentUser, route),
     route.params.tab,
   );
+  const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   return (
-    <Tabs
-      tabs={tabs}
-      selectedTabId={route.params.tab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
-      onTabChange={(tab) => {
-        if (isEstablishmentDashboardTab(tab))
-          routes
-            .establishmentDashboard({
-              tab,
-            })
-            .push();
-      }}
-    >
-      {tabs.find((tab) => tab.tabId === route.params.tab)?.content}
-    </Tabs>
+    <>
+      {enableEstablishmentDashboardHighlight.isActive && (
+        <SectionHighlight>
+          <h2 className={fr.cx("fr-h6", "fr-mb-1w")}>
+            {enableEstablishmentDashboardHighlight.value.title}
+          </h2>
+          <p className={fr.cx("fr-text--lg", "fr-mb-2w")}>
+            {enableEstablishmentDashboardHighlight.value.message}
+          </p>
+          <Button
+            size="small"
+            linkProps={{
+              href: enableEstablishmentDashboardHighlight.value.href,
+              target: "_blank",
+              rel: "noopener noreferrer",
+            }}
+          >
+            {enableEstablishmentDashboardHighlight.value.label}
+          </Button>
+        </SectionHighlight>
+      )}
+      <Tabs
+        tabs={tabs}
+        className={fr.cx("fr-mt-4w")}
+        selectedTabId={route.params.tab} // shouldn't be necessary as it's handled by isDefault, but typescript complains (should report to react-dsfr)
+        onTabChange={(tab) => {
+          if (isEstablishmentDashboardTab(tab))
+            routes
+              .establishmentDashboard({
+                tab,
+              })
+              .push();
+        }}
+      >
+        {tabs.find((tab) => tab.tabId === route.params.tab)?.content}
+      </Tabs>
+    </>
   );
 };
 
