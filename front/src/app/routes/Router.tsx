@@ -1,4 +1,10 @@
-import { type ReactElement, type ReactNode, lazy, useEffect } from "react";
+import {
+  type ReactElement,
+  type ReactNode,
+  lazy,
+  useEffect,
+  useRef,
+} from "react";
 import { PageHeader } from "react-design-system";
 import {
   type AdminTabRouteName,
@@ -34,6 +40,8 @@ import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
 import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { ConnectedPrivateRoute } from "src/app/routes/ConnectedPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
+import { store } from "src/config/dependencies";
+import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import type { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
@@ -83,6 +91,17 @@ const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
   }, []);
   return null;
 };
+
+const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
+  {
+    establishmentDashboard: () => {
+      store.dispatch(
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "unused",
+        }),
+      );
+    },
+  };
 
 const getPageByRouteName: {
   [K in keyof Routes]: (route: Route<Routes[K]>) => ReactNode;
@@ -230,6 +249,15 @@ const getPageByRouteName: {
 export const Router = (): ReactNode => {
   const route = useRoute();
   const routeName = route.name;
+  const previousRouteName = useRef<keyof Routes | undefined>(undefined);
+  if (
+    routeName &&
+    previousRouteName.current !== routeName &&
+    getPageSideEffectByRouteName[routeName]
+  ) {
+    getPageSideEffectByRouteName[routeName]();
+    previousRouteName.current = routeName;
+  }
   return routeName === false ? (
     <ErrorPage error={frontErrors.generic.pageNotFound()} />
   ) : (
