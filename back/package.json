@@ -88,11 +88,7 @@
     "ts-node": "^10.9.1",
     "ts-pattern": "5.7.0",
     "uuid": "^8.3.2",
-<<<<<<< HEAD
     "zod": "3.25.63",
-=======
-    "zod": "3.25.55",
->>>>>>> e570258dd (updated zod, use v4 imports)
     "zod-to-json-schema": "^3.21.4"
   },
   "devDependencies": {

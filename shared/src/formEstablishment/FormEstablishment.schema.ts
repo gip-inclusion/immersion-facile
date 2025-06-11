@@ -32,6 +32,7 @@ import type {
   SiretAdditionFailure,
   WithFormEstablishmentDto,
 } from "./FormEstablishment.dto";
+import { dateTimeIsoStringSchema } from "../utils/date";
 
 export const defaultMaxContactsPerMonth = 12;
 export const noContactPerMonth = 0;
@@ -120,7 +121,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
     userRights: formEstablishmentUserRightsSchema,
     maxContactsPerMonth: z
       .number({
-        invalid_type_error:
+        error:
           "Veuillez renseigner le nombre maximum de mise en contact par semaine que vous souhaitez recevoir",
       })
       .nonnegative({

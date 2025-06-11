@@ -3,8 +3,9 @@ import {
   type DateString,
   dateRegExp,
   dateTimeIsoStringSchema,
+  zTimeString,
 } from "../utils/date";
-import { localization, zStringMinLength1, zTimeString } from "../zodUtils";
+import { localization, zStringMinLength1 } from "../zodUtils";
 import type {
   DailyScheduleDto,
   ScheduleDto,
@@ -27,10 +28,10 @@ export const timePeriodsSchema: z.Schema<TimePeriodsDto> =
 export const makeDateStringSchema: (
   errorMessage?: string,
 ) => z.Schema<DateString> = (errorMessage) =>
-  zStringMinLength1.refine(
-    (dateString) => dateString.match(dateRegExp),
-    errorMessage ?? localization.invalidDate,
-  );
+    zStringMinLength1.refine(
+      (dateString) => dateString.match(dateRegExp),
+      errorMessage ?? localization.invalidDate,
+    );
 
 export const dailyScheduleSchema: z.Schema<DailyScheduleDto> = z.object({
   date: dateTimeIsoStringSchema,

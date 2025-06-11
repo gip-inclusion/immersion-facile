@@ -14,18 +14,20 @@ import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
 import { siretSchema } from "../siret/siret.schema";
-import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
+import {
+  localization,
+  zStringCanBeEmpty,
+  zStringMinLength1,
+} from "../zodUtils";
 import {
   type Attachment,
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
-  type DiscussionEmailParams,
   type DiscussionId,
   type DiscussionReadDto,
   type Exchange,
   type ExchangeFromDashboard,
   type ExchangeRole,
-  type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionRejection,
   type WithDiscussionStatus,
@@ -45,18 +47,16 @@ export const makeExchangeEmailRegex = (replyDomain: string) =>
 export const makeLegacyExchangeEmailRegex = (replyDomain: string) =>
   new RegExp(`^[^_]+_[^_]+@${replyDomain}$`);
 
-export const makeExchangeEmailSchema = (
-  replyDomain: string,
-): z.ZodUnion<
-  [
-    z.ZodEffects<z.ZodString, DiscussionEmailParams, string>,
-    z.ZodEffects<z.ZodString, LegacyDiscussionEmailParams, string>,
-  ]
-> =>
+export const makeExchangeEmailSchema = (replyDomain: string) =>
   z
-    .string()
-    .email()
-    .regex(makeExchangeEmailRegex(replyDomain))
+    .email({
+      error: (ctx) =>
+        `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+    })
+    .regex(makeExchangeEmailRegex(replyDomain), {
+      error: (ctx) =>
+        `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+    })
     .transform((email) => {
       const [namepart, discussionPart] = email.split("@")[0].split("__");
       const [firstname, lastname] = namepart.split("_");
@@ -70,9 +70,14 @@ export const makeExchangeEmailSchema = (
     })
     .or(
       z
-        .string()
-        .email()
-        .regex(makeLegacyExchangeEmailRegex(replyDomain))
+        .email({
+          error: (ctx) =>
+            `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+        })
+        .regex(makeLegacyExchangeEmailRegex(replyDomain), {
+          error: (ctx) =>
+            `${localization.invalidEmailFormat} - email fourni : ${ctx.data && ctx.data !== "" ? ctx.data : "vide"}`,
+        })
         .transform((email) => {
           const [id, rawRecipientKind] = email.split("@")[0].split("_");
           return {
