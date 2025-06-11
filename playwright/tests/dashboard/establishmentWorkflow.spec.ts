@@ -25,26 +25,26 @@ test.describe("Establishment dashboard workflow", () => {
       );
 
       page.click(
-        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationOpenModalButton}`,
+        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionOpenModalButton}`,
       );
 
       await page
         .locator(
-          `[for=${domElementIds.establishmentDashboard.discussion.rejectApplicationIsCandidateWarned}-1]`,
+          `[for=${domElementIds.establishmentDashboard.discussion.rejectDiscussionIsCandidateWarned}-1]`,
         )
         .click();
 
       await page.selectOption(
-        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationJustificationKindInput}`,
+        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionJustificationKindInput}`,
         {
           index: 1,
         },
       );
       await page.click(
-        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationSubmitPreviewButton}`,
+        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionSubmitPreviewButton}`,
       );
       await page.click(
-        `#${domElementIds.establishmentDashboard.discussion.rejectApplicationSubmitButton}`,
+        `#${domElementIds.establishmentDashboard.discussion.rejectDiscussionSubmitButton}`,
       );
       const badgeLocator = await page.locator(
         `#${domElementIds.establishmentDashboard.discussion.statusBadge}`,

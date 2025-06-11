@@ -30,13 +30,13 @@ import {
   toDisplayedDate,
 } from "shared";
 import {
-  AcceptApplicationModal,
-  openAcceptApplicationModal,
-} from "src/app/components/admin/establishments/AcceptApplicationModal";
+  AcceptDiscussionModal,
+  openAcceptDiscussionModal,
+} from "src/app/components/admin/establishments/AcceptDiscussionModal";
 import {
-  RejectApplicationModal,
-  openRejectApplicationModal,
-} from "src/app/components/admin/establishments/RejectApplicationModal";
+  RejectDiscussionModal,
+  openRejectDiscussionModal,
+} from "src/app/components/admin/establishments/RejectDiscussionModal";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
@@ -179,18 +179,18 @@ const getDiscussionButtons = ({
       ? [
           {
             id: domElementIds.establishmentDashboard.discussion
-              .acceptApplicationOpenModalButton,
+              .acceptDiscussionOpenModalButton,
             priority: "secondary",
             type: "button",
-            onClick: openAcceptApplicationModal,
+            onClick: openAcceptDiscussionModal,
             children: "Marquer comme acceptée",
           } satisfies ButtonProps,
           {
             id: domElementIds.establishmentDashboard.discussion
-              .rejectApplicationOpenModalButton,
+              .rejectDiscussionOpenModalButton,
             priority: "secondary",
             type: "button",
-            onClick: openRejectApplicationModal,
+            onClick: openRejectDiscussionModal,
             children: "Marquer comme refusée",
           } satisfies ButtonProps,
         ]
@@ -361,12 +361,12 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <DiscussionExchangesList discussion={discussion} />
 
       {createPortal(
-        <RejectApplicationModal discussion={discussion} />,
+        <RejectDiscussionModal discussion={discussion} />,
         document.body,
       )}
 
       {createPortal(
-        <AcceptApplicationModal discussion={discussion} />,
+        <AcceptDiscussionModal discussion={discussion} />,
         document.body,
       )}
     </>
