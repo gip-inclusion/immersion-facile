@@ -149,7 +149,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
     uow: UnitOfWork;
     convention: ConventionDto;
   }) {
-    const emails = await uow.notificationRepository.getLastEmailsByFilters({
+    const emails = await uow.notificationRepository.getEmailsByFilters({
       email: convention.signatories.beneficiary.email,
       emailType: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
       conventionId: convention.id,

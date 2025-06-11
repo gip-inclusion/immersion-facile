@@ -263,7 +263,8 @@ describe("PgNotificationRepository", () => {
         smsNotification,
       ]);
 
-      const response = await pgNotificationRepository.getLastEmailsByFilters();
+      const response = await pgNotificationRepository.getEmailsByFilters({});
+
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate
@@ -281,7 +282,7 @@ describe("PgNotificationRepository", () => {
     it("saves a batch of notifications sms only", async () => {
       await pgNotificationRepository.saveBatch([smsNotification]);
 
-      const response = await pgNotificationRepository.getLastEmailsByFilters();
+      const response = await pgNotificationRepository.getEmailsByFilters({});
       expectArraysToEqual(response, []);
 
       const smsResponse = await pgNotificationRepository.getByIdAndKind(
@@ -337,7 +338,7 @@ describe("PgNotificationRepository", () => {
     });
 
     it("without filters returns all emails", async () => {
-      const response = await pgNotificationRepository.getLastEmailsByFilters();
+      const response = await pgNotificationRepository.getEmailsByFilters({});
       expectToEqual(
         response,
         emailNotificationsReOrderedByDate
@@ -349,7 +350,7 @@ describe("PgNotificationRepository", () => {
     describe("with filters", () => {
       it("returns matching email when required filters match", async () => {
         const emailNotification = emailNotifications[0];
-        const response = await pgNotificationRepository.getLastEmailsByFilters({
+        const response = await pgNotificationRepository.getEmailsByFilters({
           email: emailNotification.templatedContent.recipients[0],
           emailType: emailNotification.templatedContent.kind,
         });
@@ -358,7 +359,7 @@ describe("PgNotificationRepository", () => {
         ]);
       });
 
-      it("returns matching email when all filters match", async () => {
+      it("returns matching email when required filters + conventionId match", async () => {
         const emailNotification: EmailNotification = {
           createdAt: new Date().toISOString(),
           followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
@@ -387,7 +388,7 @@ describe("PgNotificationRepository", () => {
         };
         await pgNotificationRepository.save(emailNotification);
 
-        const response = await pgNotificationRepository.getLastEmailsByFilters({
+        const response = await pgNotificationRepository.getEmailsByFilters({
           email: emailNotification.templatedContent.recipients[0],
           emailType: emailNotification.templatedContent.kind,
           conventionId: emailNotification.followedIds.conventionId,
@@ -398,8 +399,78 @@ describe("PgNotificationRepository", () => {
         ]);
       });
 
+      it("returns matching email when required filters + aroundCreatedAt match", async () => {
+        const today = new Date();
+        const oldEmailNotification: EmailNotification = {
+          createdAt: subDays(today, 15).toISOString(),
+          followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
+          id: "11111111-1111-4444-1111-111111111111",
+          kind: "email",
+          templatedContent: {
+            kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
+            recipients: ["bob@mail.com"],
+            sender: {
+              email: "fake-email@email.com",
+              name: "Fake name",
+            },
+            cc: [],
+            params: {
+              beneficiaryFirstName: "Bob",
+              beneficiaryLastName: "L'éponge",
+              beneficiaryEmail: "bob@mail.com",
+              conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
+              beneficiaryPhone: "0606060606",
+              previousAgencyName: "Agence du Grand Est",
+              internshipKind: "immersion",
+              justification: "Justification",
+              magicLink: "https://magic-link.com",
+            },
+          },
+        };
+        const emailNotification: EmailNotification = {
+          createdAt: today.toISOString(),
+          followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccd" },
+          id: "11111111-1111-4444-1111-111111111112",
+          kind: "email",
+          templatedContent: {
+            kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
+            recipients: ["bob@mail.com"],
+            sender: {
+              email: "fake-email@email.com",
+              name: "Fake name",
+            },
+            cc: [],
+            params: {
+              beneficiaryFirstName: "Bob",
+              beneficiaryLastName: "L'éponge",
+              beneficiaryEmail: "bob@mail.com",
+              conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
+              beneficiaryPhone: "0606060606",
+              previousAgencyName: "Agence du Grand Est",
+              internshipKind: "immersion",
+              justification: "Justification",
+              magicLink: "https://magic-link.com",
+            },
+          },
+        };
+        await pgNotificationRepository.saveBatch([
+          oldEmailNotification,
+          emailNotification,
+        ]);
+
+        const response = await pgNotificationRepository.getEmailsByFilters({
+          email: emailNotification.templatedContent.recipients[0],
+          emailType: emailNotification.templatedContent.kind,
+          createdAt: today,
+        });
+
+        expectToEqual(response, [
+          { ...emailNotification, ...withToBeSendState },
+        ]);
+      });
+
       it("returns empty array when no match found", async () => {
-        const response = await pgNotificationRepository.getLastEmailsByFilters({
+        const response = await pgNotificationRepository.getEmailsByFilters({
           email: "fake-email@email.com",
           emailType: emailNotifications[0].templatedContent.kind,
         });
