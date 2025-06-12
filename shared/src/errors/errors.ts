@@ -678,10 +678,6 @@ export const errors = {
       ),
   },
   user: {
-    alreadyUsedAuthentication: () =>
-      new ForbiddenError(
-        "Cette authentification a déjà été utilisée. Veuillez réessayer.",
-      ),
     unauthorized: () => new UnauthorizedError(),
     noJwtProvided: () =>
       new ForbiddenError("Aucun jeton d'authentification (JWT) fourni."),

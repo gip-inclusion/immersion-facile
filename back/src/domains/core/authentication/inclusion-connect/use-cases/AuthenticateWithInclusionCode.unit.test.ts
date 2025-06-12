@@ -558,8 +558,10 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
   });
 
-  describe("does not allow reuse of ongoing auth", () => {
-    it("email", () => {
+  describe("does not allow reuse of ongoing auth by redirecting to auth page with param alreadyUsedAuthentication true", () => {
+    const page = "admin";
+
+    it("email", async () => {
       const initialOngoingOAuth = {
         provider: "email",
         state: "my-state",
@@ -569,17 +571,25 @@ describe("AuthenticateWithInclusionCode use case", () => {
       } satisfies OngoingOAuth;
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
-      expectPromiseToFailWithError(
-        authenticateWithInclusionCode.execute({
-          code: "osef",
-          state: initialOngoingOAuth.state,
-          page: "admin",
-        }),
-        errors.user.alreadyUsedAuthentication(),
+
+      const redirectUrl = await authenticateWithInclusionCode.execute({
+        code: "osef",
+        state: initialOngoingOAuth.state,
+        page: page,
+      });
+
+      expectToEqual(
+        redirectUrl,
+        `${immersionBaseUrl}/${frontRoutes[page]}?alreadyUsedAuthentication=true`,
       );
+
+      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+        initialOngoingOAuth,
+      ]);
+      expectToEqual(uow.userRepository.users, []);
     });
 
-    it("proConnect", () => {
+    it("proConnect", async () => {
       const initialOngoingOAuth = {
         provider: "proConnect",
         state: "my-state",
@@ -588,14 +598,21 @@ describe("AuthenticateWithInclusionCode use case", () => {
       } satisfies OngoingOAuth;
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
-      expectPromiseToFailWithError(
-        authenticateWithInclusionCode.execute({
-          code: "osef",
-          state: initialOngoingOAuth.state,
-          page: "admin",
-        }),
-        errors.user.alreadyUsedAuthentication(),
+
+      const redirectUrl = await authenticateWithInclusionCode.execute({
+        code: "osef",
+        state: initialOngoingOAuth.state,
+        page: page,
+      });
+      expectToEqual(
+        redirectUrl,
+        `${immersionBaseUrl}/${frontRoutes[page]}?alreadyUsedAuthentication=true`,
       );
+
+      expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
+        initialOngoingOAuth,
+      ]);
+      expectToEqual(uow.userRepository.users, []);
     });
   });
 
