@@ -122,14 +122,18 @@ describe("POST contact-establishment public V2 route", () => {
       headers: {
         authorization: authToken,
       },
-      body: { ...contactEstablishment, siret: "wrong" },
+      body: { ...contactEstablishment, contactMode: "wrong" as any },
     });
 
     expectToEqual(body, {
       status: 400,
       message:
         "Shared-route schema 'requestBodySchema' was not respected in adapter 'express'.\nRoute: POST /v2/contact-establishment",
-      issues: ["siret : SIRET doit être composé de 14 chiffres"],
+      issues: [
+        'contactMode : Invalid literal value, expected "EMAIL"',
+        'contactMode : Invalid literal value, expected "PHONE"',
+        'contactMode : Invalid literal value, expected "IN_PERSON"',
+      ],
     });
     expectToEqual(status, 400);
   });
