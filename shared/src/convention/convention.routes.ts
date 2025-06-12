@@ -132,6 +132,19 @@ export const conventionMagicLinkRoutes = defineRoutes({
     },
   }),
 
+  sendAssessmentLink: defineRoute({
+    url: "/auth/assessment/send-assessment-link",
+    method: "post",
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      429: httpErrorSchema,
+    },
+  }),
+
   transferConventionToAgency: defineRoute({
     url: "/auth/convention/transfer-to-agency",
     method: "post",

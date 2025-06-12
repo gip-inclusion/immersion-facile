@@ -3,7 +3,9 @@ import {
   type AssessmentDto,
   type ConventionId,
   type ConventionMagicLinkRoutes,
+  type ConventionSupportedJwt,
   type LegacyAssessmentDto,
+  type WithConventionId,
   errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -11,6 +13,7 @@ import {
   logBodyAndThrow,
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
+  throwTooManyRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import type {
   AssessmentAndJwt,
@@ -64,6 +67,27 @@ export class HttpAssessmentGateway implements AssessmentGateway {
             .with({ status: P.union(400, 401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow);
         }),
+    );
+  }
+
+  public sendAssessmentLink$(
+    params: WithConventionId,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .sendAssessmentLink({
+          headers: { authorization: jwt },
+          body: { params },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 429 }, throwTooManyRequestWithExplicitMessage)
+            .with({ status: P.union(403, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
     );
   }
 }
