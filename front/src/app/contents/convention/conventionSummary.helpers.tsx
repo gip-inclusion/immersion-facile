@@ -26,7 +26,7 @@ import {
   makeSiretDescriptionLink,
   makeWeeklySchedule,
   removeEmptyValue,
-  signatoryTitleByRole,
+  titleByRole,
   toDisplayedDate,
 } from "shared";
 
@@ -889,8 +889,8 @@ export const SendSignatureLinkModalWrapper = ({
       ]}
     >
       <p>
-        Le {signatory && signatoryTitleByRole[signatory]} recevra un lien de
-        signature au {signatoryPhone}
+        Le {signatory && titleByRole[signatory]} recevra un lien de signature au{" "}
+        {signatoryPhone}
       </p>
     </sendSignatureLinkModal.Component>,
     document.body,

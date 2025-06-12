@@ -167,6 +167,7 @@ const getUseCasesByTopics = (
   ],
   EmailWithLinkToCreateAssessmentSent: [],
   BeneficiaryAssessmentEmailSent: [],
+  AssessmentReminderManuallySent: [],
 
   UserAuthenticatedSuccessfully: [
     useCases.linkFranceTravailUsersToTheirAgencies,

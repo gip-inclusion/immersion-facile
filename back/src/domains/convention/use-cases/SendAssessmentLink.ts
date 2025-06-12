@@ -6,11 +6,10 @@ import {
   type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
   type UserId,
-  conventionIdSchema,
   errors,
   frontRoutes,
+  withConventionIdSchema,
 } from "shared";
-import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -22,25 +21,16 @@ import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/Sh
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
-  throwErrorIfSignatoryPhoneNumberNotValid,
+  throwErrorIfPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
 } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
-type SendAssessmentLinkParams = {
-  conventionId: ConventionId;
-};
-
-const sendAssessmentLinkParamsSchema: z.Schema<SendAssessmentLinkParams> =
-  z.object({
-    conventionId: conventionIdSchema,
-  });
-
 export type SendAssessmentLink = ReturnType<typeof makeSendAssessmentLink>;
 
 export const makeSendAssessmentLink = createTransactionalUseCase<
-  SendAssessmentLinkParams,
+  { conventionId: ConventionId },
   void,
   ConventionRelatedJwtPayload,
   {
@@ -54,7 +44,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
 >(
   {
     name: "SendAssessmentLink",
-    inputSchema: sendAssessmentLinkParamsSchema,
+    inputSchema: withConventionIdSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -73,17 +63,15 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
 
-
-    throwErrorIfSignatoryPhoneNumberNotValid({
-      convention,
-      signatoryKey,
-      signatoryRole: "",
+    throwErrorIfPhoneNumberNotValid({
+      conventionId: convention.id,
+      phone: convention.establishmentTutor.phone,
+      role: "establishment-tutor",
     });
 
     await throwErrorIfAssessmentLinkAlreadySent({
       timeGateway: deps.timeGateway,
-      tutorPhoneNumber: signatory.phone,
-      signatoryRole: signatory.role,
+      tutorPhoneNumber: convention.establishmentTutor.phone,
       notificationRepository: uow.notificationRepository,
       conventionId: convention.id,
     });
@@ -91,22 +79,21 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     await sendSms({
       conventionMagicLinkPayload: {
         id: convention.id,
-        role: inputParams.role,
-        email: signatory.email,
+        role: "establishment-tutor",
+        email: convention.establishmentTutor.email,
         now: deps.timeGateway.now(),
       },
       userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
-      signatoryPhone: signatory.phone,
+      recipientPhone: convention.establishmentTutor.phone,
       uow,
       convention,
       ...deps,
     });
 
     const event = deps.createNewEvent({
-      topic: "ConventionSignatureLinkManuallySent",
+      topic: "AssessmentReminderManuallySent",
       payload: {
         convention,
-        recipientRole: signatory.role,
         transport: "sms",
         triggeredBy:
           "userId" in jwtPayload
@@ -141,7 +128,7 @@ const sendSms = async ({
   config,
   convention,
   uow,
-  signatoryPhone,
+  recipientPhone,
   userId,
 }: {
   conventionMagicLinkPayload: CreateConventionMagicLinkPayloadProperties;
@@ -151,7 +138,7 @@ const sendSms = async ({
   config: AppConfig;
   convention: ConventionReadDto;
   uow: UnitOfWork;
-  signatoryPhone: string;
+  recipientPhone: string;
   userId: UserId | undefined;
 }) => {
   const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
@@ -177,7 +164,7 @@ const sendSms = async ({
       userId: userId,
     },
     templatedContent: {
-      recipientPhone: signatoryPhone,
+      recipientPhone,
       kind: "ReminderForSignatories",
       params: { shortLink: shortLink },
     },

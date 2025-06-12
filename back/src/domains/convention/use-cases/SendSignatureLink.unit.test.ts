@@ -449,7 +449,7 @@ describe("Send signature link", () => {
           ),
           errors.convention.invalidMobilePhoneNumber({
             conventionId: conventionWithIncorrectPhoneFormat.id,
-            signatoryRole: "beneficiary",
+            role: "beneficiary",
           }),
         );
       },

@@ -160,12 +160,12 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        const conventionId = req.body;
+        const conventionId = req.body.conventionId;
 
         return match(req.payloads)
           .with({ convention: P.not(P.nullish) }, ({ convention }) =>
             deps.useCases.sendAssessmentLink.execute(
-              { conventionId},
+              { conventionId },
               convention,
             ),
           )
