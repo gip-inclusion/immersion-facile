@@ -38,10 +38,7 @@ import type {
   NotificationKind,
 } from "../notifications/notifications.dto";
 import type { AgencyModifierRole, Role, SignatoryRole } from "../role/role.dto";
-import {
-  agencyModifierTitleByRole,
-  signatoryTitleByRole,
-} from "../role/role.utils";
+import { titleByRole } from "../role/role.utils";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
@@ -167,6 +164,10 @@ export const errors = {
       new ConflictError(
         `Il n'est pas possible de créer le bilan car un bilan existe déjà pour la convention '${conventionId}'.`,
       ),
+    assessmentAlreadyFullfilled: (conventionId: ConventionId) =>
+      new BadRequestError(
+        `Le bilan pour la convention '${conventionId}' a déjà été complété.`,
+      ),
     badStatus: (status: ConventionStatus) =>
       new BadRequestError(
         `Il n'est pas possible de créer un bilan d'immersion pour une convention qui n'est pas validée, le status actuel étant '${status}'.`,
@@ -181,6 +182,10 @@ export const errors = {
           mode === "GetAssessment" ? "récupérer" : "créer"
         } le bilan.`,
       ),
+    conventionEndingInMoreThanOneDay: () =>
+      new BadRequestError(
+        `Impossible de relancer la demande de completion du bilan pour les conventions se terminant dans plus d'un jour.`,
+      ),
     conventionIdMismatch: () =>
       new ForbiddenError(
         "Il y a un décalage d'identifiant de convention dans les données envoyées.",
@@ -188,6 +193,28 @@ export const errors = {
     missingAssessment: ({ conventionId }: { conventionId: ConventionId }) =>
       new BadRequestError(
         `Il manque le bilan dans les paramêtres pour la convention ${conventionId}`,
+      ),
+    sendAssessmentLinkForbidden: () =>
+      new BadRequestError(
+        "Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
+      ),
+    sendAssessmentLinkNotAllowedForStatus: ({
+      status,
+    }: {
+      status: ConventionStatus;
+    }) =>
+      new BadRequestError(
+        `Impossible de relancer la demande de completion du bilan pour les conventions ayant le statut "${status}".`,
+      ),
+    smsAssessmentLinkAlreadySent: ({
+      minHoursBetweenReminder,
+      timeRemaining,
+    }: {
+      minHoursBetweenReminder: number;
+      timeRemaining: string;
+    }) =>
+      new TooManyRequestApiError(
+        `Une relance de demande de completion du bilan a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
   inclusionConnect: {
@@ -207,6 +234,10 @@ export const errors = {
       ),
   },
   convention: {
+    emailNotLinkedToConvention: (role: Role) =>
+      new BadRequestError(
+        `L'email fournit n'est pas lié à la convention pour l'utilisateur ayant le role ${role}.`,
+      ),
     updateBadStatusInParams: ({ id }: { id: ConventionId }) =>
       new ForbiddenError(
         `Convention ${id} with modifications should have status READY_TO_SIGN`,
@@ -334,7 +365,7 @@ export const errors = {
       signatoryRole: SignatoryRole;
     }) =>
       new BadRequestError(
-        `Le  ${signatoryTitleByRole[signatoryRole]} a déjà signé la convention ${conventionId}.`,
+        `Le  ${titleByRole[signatoryRole]} a déjà signé la convention ${conventionId}.`,
       ),
     magicLinkNotAssociatedToConvention: () =>
       new BadRequestError(
@@ -352,15 +383,11 @@ export const errors = {
         `Il n'y a pas de role ${role} pour la convention ${conventionId}.`,
       ),
     missingSignatorySignature: ({ role }: { role: SignatoryRole }) =>
-      new BadRequestError(
-        `Signature manquante pour ${signatoryTitleByRole[role]}.`,
-      ),
+      new BadRequestError(`Signature manquante pour ${titleByRole[role]}.`),
     missingAgencyApprovalOrValidation: ({
       role,
     }: { role: AgencyModifierRole }) =>
-      new BadRequestError(
-        `Validation manquante par le ${agencyModifierTitleByRole[role]}.`,
-      ),
+      new BadRequestError(`Validation manquante par le ${titleByRole[role]}.`),
     unsupportedRole: ({ role }: { role: Role }) =>
       new ForbiddenError(
         `Le rôle ${role} n'est pas supporté pour cette fonctionnalité.`,
@@ -386,13 +413,13 @@ export const errors = {
       ),
     invalidMobilePhoneNumber: ({
       conventionId,
-      signatoryRole,
+      role,
     }: {
       conventionId: ConventionId;
-      signatoryRole: SignatoryRole;
+      role: Role;
     }) =>
       new BadRequestError(
-        `Le numéro de téléphone du ${signatoryTitleByRole[signatoryRole]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
+        `Le numéro de téléphone du ${titleByRole[role]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
     smsSignatureLinkAlreadySent: ({
       signatoryRole,
@@ -404,7 +431,7 @@ export const errors = {
       timeRemaining: string;
     }) =>
       new TooManyRequestApiError(
-        `Une relance de signature au ${signatoryTitleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
+        `Une relance de signature au ${titleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
   establishment: {
