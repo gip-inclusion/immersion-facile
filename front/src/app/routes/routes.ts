@@ -1,5 +1,6 @@
 import {
   type AdminTabRouteName,
+  type AlreadyAuthenticatedUserQueryParams,
   type AuthenticatedUserQueryParams,
   type ValueOf,
   adminTabRouteNames,
@@ -22,12 +23,6 @@ import {
 import { formEstablishmentParamsInUrl } from "./routeParams/formEstablishment";
 import { standardPagesSerializer } from "./routeParams/standardPage";
 
-const createInclusionConnectedParams = <
-  T extends Record<keyof AuthenticatedUserQueryParams, unknown>,
->(
-  t: T,
-) => t;
-
 export type AcquisitionParams = Partial<{
   [K in AcquisitionParamsKeys]: (typeof acquisitionParams)[K]["~internal"]["valueSerializer"] extends ValueSerializer<
     infer T
@@ -38,15 +33,19 @@ export type AcquisitionParams = Partial<{
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
 
-const inclusionConnectedParams = createInclusionConnectedParams({
-  page: param.query.optional.string,
+const inclusionConnectedParams = {
   token: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
   email: param.query.optional.string,
   idToken: param.query.optional.string,
   provider: param.query.optional.string,
-});
+  alreadyUsedAuthentication: param.query.optional.string,
+} satisfies Record<
+  | keyof AuthenticatedUserQueryParams
+  | keyof AlreadyAuthenticatedUserQueryParams,
+  typeof param.query.optional.string
+>;
 
 export const acquisitionParams = {
   mtm_campaign: param.query.optional.string,
