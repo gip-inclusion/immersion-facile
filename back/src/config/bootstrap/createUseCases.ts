@@ -27,6 +27,7 @@ import { makeGetConventionsForAgencyUser } from "../../domains/convention/use-ca
 import { GetConventionsForApiConsumer } from "../../domains/convention/use-cases/GetConventionsForApiConsumer";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
+import { makeSendAssessmentLink } from "../../domains/convention/use-cases/SendAssessmentLink";
 import { SendEmailWhenAgencyIsRejected } from "../../domains/convention/use-cases/SendEmailWhenAgencyIsRejected";
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "../../domains/convention/use-cases/SendEmailWhenNewAgencyOfTypeOtherAdded";
 import { SendEmailsWhenAgencyIsActivated } from "../../domains/convention/use-cases/SendEmailsWhenAgencyIsActivated";
@@ -792,6 +793,17 @@ export const createUseCases = ({
         deps: { saveNotificationAndRelatedEvent },
       }),
     sendSignatureLink: makeSendSignatureLink({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        config,
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        createNewEvent,
+      },
+    }),
+    sendAssessmentLink: makeSendAssessmentLink({
       uowPerformer,
       deps: {
         timeGateway: gateways.timeGateway,
