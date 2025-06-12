@@ -59,16 +59,16 @@ export const createTechnicalRouter = (
     technicalRoutes,
     technicalRouter,
     {
-      onInputValidationError: (zodError, route) => {
+      onInputValidationError: (schemaFailure, route) => {
         if (route.url === technicalRoutes.inboundEmailParsing.url) {
           logger.error({
             message: `Inbound email parsing failed : ${route.method.toUpperCase()} ${
               route.url
             }`,
-            error: zodError,
+            error: new Error(JSON.stringify(schemaFailure)),
           });
         }
-        return zodError;
+        return schemaFailure;
       },
     },
   );

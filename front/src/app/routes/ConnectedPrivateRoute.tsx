@@ -485,21 +485,37 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
 
 const LoginWithProConnect = ({
   page,
-}: { page: AllowedStartOAuthLoginPage }) => (
-  <>
-    <p>
-      <strong>Connectez-vous avec ProConnect</strong>, et accédez à votre espace
-      avec votre identité professionnelle sécurisée (24h de validation).
-    </p>
-    <div className={fr.cx("fr-my-2w")}>
-      <ProConnectButton
-        id={domElementIds[page].login.proConnectButton}
-        url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
-          inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema.parse(
-            { page },
-          ),
-        )}`}
-      />
-    </div>
-  </>
-);
+}: { page: AllowedStartOAuthLoginPage }) => {
+  const queryParamsResult =
+    inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema[
+      "~standard"
+    ].validate({ page });
+
+  if (queryParamsResult instanceof Promise) {
+    throw new TypeError("Schema validation must be synchronous");
+  }
+
+  if (queryParamsResult.issues) {
+    throw new Error(
+      `Query params format is not valid. ${queryParamsResult.issues.map((issue) => `${issue.path?.join(".")}: ${issue.message}`).join(", ")}`,
+    );
+  }
+
+  return (
+    <>
+      <p>
+        <strong>Connectez-vous avec ProConnect</strong>, et accédez à votre
+        espace avec votre identité professionnelle sécurisée (24h de
+        validation).
+      </p>
+      <div className={fr.cx("fr-my-2w")}>
+        <ProConnectButton
+          id={domElementIds[page].login.proConnectButton}
+          url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
+            queryParamsResult.value,
+          )}`}
+        />
+      </div>
+    </>
+  );
+};

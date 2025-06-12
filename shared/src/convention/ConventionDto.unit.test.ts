@@ -44,17 +44,6 @@ import {
   getOverMaxWorkedDaysMessageAndPath,
 } from "./conventionRefinements";
 
-const currentEmployer: BeneficiaryCurrentEmployer = {
-  role: "beneficiary-current-employer",
-  email: "email@email.com",
-  phone: "",
-  firstName: "",
-  lastName: "",
-  job: "",
-  businessSiret: "",
-  businessName: "",
-  businessAddress: "",
-};
 const beneficiaryRepresentative: BeneficiaryRepresentative = {
   role: "beneficiary-representative",
   firstName: "Benef",
@@ -201,29 +190,35 @@ describe("conventionDtoSchema", () => {
     });
 
     it("rejects equal beneficiary current employer and other signatories", () => {
+      const currentEmployer: BeneficiaryCurrentEmployer = {
+        role: "beneficiary-current-employer",
+        email: "email@email.com",
+        phone: "+33600110011",
+        firstName: "John",
+        lastName: "Doe",
+        businessSiret: "11112222333344",
+        businessName: "machin",
+        businessAddress: "truc",
+        job: "Chef",
+      };
+
       const convention = new ConventionDtoBuilder()
         .withBeneficiaryCurrentEmployer(currentEmployer)
         .build();
+
       expectConventionInvalidWithIssueMessages(
         conventionSchema,
         new ConventionDtoBuilder(convention)
           .withBeneficiaryEmail(currentEmployer.email)
           .build(),
         {
-          "signatories.beneficiaryCurrentEmployer.firstName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.lastName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.phone": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessSiret":
-            "SIRET doit être composé de 14 chiffres",
-          "signatories.beneficiaryCurrentEmployer.businessAddress":
-            "Obligatoire",
           "signatories.beneficiary.email":
             "Les emails des signataires doivent être différents.",
           "signatories.beneficiaryCurrentEmployer.email":
             "Les emails des signataires doivent être différents.",
         },
       );
+
       expectConventionInvalidWithIssueMessages(
         conventionSchema,
         new ConventionDtoBuilder(convention)
@@ -233,37 +228,19 @@ describe("conventionDtoSchema", () => {
           })
           .build(),
         {
-          "signatories.beneficiaryRepresentative.firstName": "Obligatoire",
-          "signatories.beneficiaryRepresentative.lastName": "Obligatoire",
-          "signatories.beneficiaryRepresentative.phone": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.firstName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.lastName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.phone": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessSiret":
-            "SIRET doit être composé de 14 chiffres",
-          "signatories.beneficiaryCurrentEmployer.businessAddress":
-            "Obligatoire",
           "signatories.beneficiaryRepresentative.email":
             "Les emails des signataires doivent être différents.",
           "signatories.beneficiaryCurrentEmployer.email":
             "Les emails des signataires doivent être différents.",
         },
       );
+
       expectConventionInvalidWithIssueMessages(
         conventionSchema,
         new ConventionDtoBuilder(convention)
           .withEstablishmentRepresentativeEmail(currentEmployer.email)
           .build(),
         {
-          "signatories.beneficiaryCurrentEmployer.firstName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.lastName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.phone": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessName": "Obligatoire",
-          "signatories.beneficiaryCurrentEmployer.businessSiret":
-            "SIRET doit être composé de 14 chiffres",
-          "signatories.beneficiaryCurrentEmployer.businessAddress":
-            "Obligatoire",
           "signatories.establishmentRepresentative.email":
             "Les emails des signataires doivent être différents.",
           "signatories.beneficiaryCurrentEmployer.email":
