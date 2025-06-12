@@ -802,6 +802,17 @@ export const createUseCases = ({
         createNewEvent,
       },
     }),
+    sendAssessmentLink: makeSendAssessmentLink({
+      uowPerformer,
+      deps: {
+        timeGateway: gateways.timeGateway,
+        config,
+        saveNotificationAndRelatedEvent,
+        generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        createNewEvent,
+      },
+    }),
     getConventionsForAgencyUser: makeGetConventionsForAgencyUser({
       uowPerformer,
     }),

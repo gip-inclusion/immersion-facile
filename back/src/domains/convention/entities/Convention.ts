@@ -272,7 +272,7 @@ export const throwErrorIfSignatoryAlreadySigned = ({
   }
 };
 
-export const throwErrorIfPhoneNumberNotValid = ({
+export const throwErrorIfSignatoryPhoneNumberNotValid = ({
   convention,
   signatoryRole,
   signatoryKey,
@@ -293,6 +293,14 @@ export const throwErrorIfPhoneNumberNotValid = ({
       signatoryRole,
     });
 };
+
+export const throwErrorIfPhoneNumberNotValid = (conventionId: ConventionId, phone: string, role: Role) {
+  if (!isValidMobilePhone(phone))
+    throw errors.convention.invalidMobilePhoneNumber({
+      conventionId,
+      role,
+    });
+}
 
 export const getLinkedAgencies = async (
   uow: UnitOfWork,

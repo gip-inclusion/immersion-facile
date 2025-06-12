@@ -5,14 +5,10 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
-  type SignatoryRole,
   type UserId,
   conventionIdSchema,
-  conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
-  isSignatory,
-  signatoryRoleSchema,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -26,29 +22,25 @@ import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/Sh
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
-  throwErrorIfSignatoryAlreadySigned,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
-export const MIN_HOURS_BETWEEN_SIGNATURE_REMINDER = 24;
+export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
-type SendSignatureLinkParams = {
+type SendAssessmentLinkParams = {
   conventionId: ConventionId;
-  role: SignatoryRole;
 };
 
-const sendSignatureLinkParamsSchema: z.Schema<SendSignatureLinkParams> =
+const sendAssessmentLinkParamsSchema: z.Schema<SendAssessmentLinkParams> =
   z.object({
     conventionId: conventionIdSchema,
-    role: signatoryRoleSchema,
   });
 
-export type SendSignatureLink = ReturnType<typeof makeSendSignatureLink>;
+export type SendAssessmentLink = ReturnType<typeof makeSendAssessmentLink>;
 
-export const makeSendSignatureLink = createTransactionalUseCase<
-  SendSignatureLinkParams,
+export const makeSendAssessmentLink = createTransactionalUseCase<
+  SendAssessmentLinkParams,
   void,
   ConventionRelatedJwtPayload,
   {
@@ -61,8 +53,8 @@ export const makeSendSignatureLink = createTransactionalUseCase<
   }
 >(
   {
-    name: "RemindSignatories",
-    inputSchema: sendSignatureLinkParamsSchema,
+    name: "SendAssessmentLink",
+    inputSchema: sendAssessmentLinkParamsSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -81,43 +73,16 @@ export const makeSendSignatureLink = createTransactionalUseCase<
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
 
-    const isNotSignatory = !(
-      "role" in jwtPayload && isSignatory(jwtPayload.role)
-    );
-    if (isNotSignatory) {
-      await throwIfUserIsNotIFAdminNorAgencyModifier({
-        uow,
-        jwtPayload,
-        agencyId: convention.agencyId,
-        convention,
-      });
-    }
-
-    const signatoryKey =
-      conventionSignatoryRoleBySignatoryKey[inputParams.role];
-    const signatory = convention.signatories[signatoryKey];
-    if (!signatory) {
-      throw errors.convention.missingActor({
-        conventionId: convention.id,
-        role: inputParams.role,
-      });
-    }
 
     throwErrorIfSignatoryPhoneNumberNotValid({
       convention,
       signatoryKey,
-      signatoryRole: inputParams.role,
+      signatoryRole: "",
     });
 
-    throwErrorIfSignatoryAlreadySigned({
-      convention,
-      signatoryKey,
-      signatoryRole: inputParams.role,
-    });
-
-    await throwErrorIfSignatureLinkAlreadySent({
+    await throwErrorIfAssessmentLinkAlreadySent({
       timeGateway: deps.timeGateway,
-      signatoryPhoneNumber: signatory.phone,
+      tutorPhoneNumber: signatory.phone,
       signatoryRole: signatory.role,
       notificationRepository: uow.notificationRepository,
       conventionId: convention.id,
@@ -161,8 +126,8 @@ export const makeSendSignatureLink = createTransactionalUseCase<
 );
 
 const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
-  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
-    throw errors.convention.sendSignatureLinkNotAllowedForStatus({
+  if (status !== "ACCEPTED_BY_VALIDATOR") {
+    throw errors.assessment.sendAssessmentLinkNotAllowedForStatus({
       status: status,
     });
   }
@@ -219,33 +184,31 @@ const sendSms = async ({
   });
 };
 
-const throwErrorIfSignatureLinkAlreadySent = async ({
+const throwErrorIfAssessmentLinkAlreadySent = async ({
   notificationRepository,
   timeGateway,
   conventionId,
-  signatoryPhoneNumber,
-  signatoryRole,
+  tutorPhoneNumber,
 }: {
   notificationRepository: NotificationRepository;
   timeGateway: TimeGateway;
   conventionId: ConventionId;
-  signatoryPhoneNumber: string;
-  signatoryRole: SignatoryRole;
+  tutorPhoneNumber: string;
 }) => {
   const lastSms = await notificationRepository.getLastSmsNotificationByFilter({
-    smsKind: "ReminderForSignatories",
+    smsKind: "ReminderForAssessment",
     conventionId,
-    recipientPhoneNumber: signatoryPhoneNumber,
+    recipientPhoneNumber: tutorPhoneNumber,
   });
 
   if (
     lastSms &&
     new Date(lastSms.createdAt) >
-      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_SIGNATURE_REMINDER)
+      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER)
   ) {
     const nextAllowedTime = new Date(lastSms.createdAt);
     nextAllowedTime.setHours(
-      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
+      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
     );
     const timeRemainingMs =
       nextAllowedTime.getTime() - timeGateway.now().getTime();
@@ -255,9 +218,8 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
     );
     const formattedTimeRemaining = `${hoursRemaining}h${minutesRemaining.toString().padStart(2, "0")}`;
 
-    throw errors.convention.smsSignatureLinkAlreadySent({
-      signatoryRole,
-      minHoursBetweenReminder: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
+    throw errors.assessment.smsAssessmentLinkAlreadySent({
+      minHoursBetweenReminder: MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
       timeRemaining: formattedTimeRemaining,
     });
   }
