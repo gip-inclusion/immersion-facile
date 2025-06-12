@@ -227,9 +227,9 @@ export const LayoutHeader = () => {
           text: "Mon espace",
           isActive:
             currentRoute.name ===
-            routes.establishmentDashboard({ tab: "conventions" }).name,
+            routes.establishmentDashboardConventions().name,
           linkProps: {
-            ...routes.establishmentDashboard({ tab: "conventions" }).link,
+            ...routes.establishmentDashboardConventions().link,
             id: establishmentIds.dashboard,
           },
         },

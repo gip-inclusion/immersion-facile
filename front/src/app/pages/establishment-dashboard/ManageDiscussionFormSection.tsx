@@ -27,7 +27,7 @@ export const ManageDiscussionFormSection = (): JSX.Element => {
         <form
           onSubmit={handleSubmit(({ discussionId }) => {
             routes
-              .establishmentDashboard({ discussionId, tab: "discussions" })
+              .establishmentDashboardDiscussionDetail({ discussionId })
               .push();
           })}
         >

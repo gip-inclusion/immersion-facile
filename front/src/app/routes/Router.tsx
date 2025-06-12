@@ -6,13 +6,7 @@ import {
   useRef,
 } from "react";
 import { PageHeader } from "react-design-system";
-import {
-  type AdminTabRouteName,
-  type EstablishmentDashboardTab,
-  adminTabRouteNames,
-  establishmentDashboardTabsList,
-} from "shared";
-import { Breadcrumbs } from "src/app/components/Breadcrumbs";
+import { type AdminTabRouteName, adminTabRouteNames } from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
 import { StatsPage } from "src/app/pages/StatsPage";
@@ -37,8 +31,8 @@ import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
 import { AdminPrivateRoute } from "src/app/routes/AdminPrivateRoute";
-import { AgencyDashboardPrivateRoute } from "src/app/routes/AgencyDashboardPrivateRoute";
 import { ConnectedPrivateRoute } from "src/app/routes/ConnectedPrivateRoute";
+import { DashboardPrivateRoute } from "src/app/routes/DashboardPrivateRoute";
 import { RenewExpiredLinkPage } from "src/app/routes/RenewExpiredLinkPage";
 import { store } from "src/config/dependencies";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
@@ -132,29 +126,29 @@ const getPageByRouteName: {
     <RedirectTo route={routes.agencyDashboardMain(route.params)} />
   ),
   agencyDashboardMain: (route) => (
-    <AgencyDashboardPrivateRoute route={route}>
+    <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
-    </AgencyDashboardPrivateRoute>
+    </DashboardPrivateRoute>
   ),
   agencyDashboardOnboarding: (route) => (
-    <AgencyDashboardPrivateRoute route={route}>
+    <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
-    </AgencyDashboardPrivateRoute>
+    </DashboardPrivateRoute>
   ),
   agencyDashboardSynchronisedConventions: (route) => (
-    <AgencyDashboardPrivateRoute route={route}>
+    <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
-    </AgencyDashboardPrivateRoute>
+    </DashboardPrivateRoute>
   ),
   agencyDashboardAgencies: (route) => (
-    <AgencyDashboardPrivateRoute route={route}>
+    <DashboardPrivateRoute route={route}>
       <AgencyDashboardPage route={route} />
-    </AgencyDashboardPrivateRoute>
+    </DashboardPrivateRoute>
   ),
   agencyDashboardAgencyDetails: (route) => (
-    <AgencyDashboardPrivateRoute route={route}>
+    <DashboardPrivateRoute route={route}>
       <AgencyDetailForAgencyDashboard route={route} />
-    </AgencyDashboardPrivateRoute>
+    </DashboardPrivateRoute>
   ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
@@ -173,29 +167,26 @@ const getPageByRouteName: {
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
   debugPopulateDB: () => undefined,
-  establishmentDashboard: (route) =>
-    establishmentDashboardTabsList.includes(
-      route.params.tab as EstablishmentDashboardTab,
-    ) ? (
-      <ConnectedPrivateRoute
-        route={route}
-        inclusionConnectConnexionPageHeader={
-          <PageHeader
-            title="Retrouvez vos conventions en tant qu'entreprise"
-            breadcrumbs={<Breadcrumbs />}
-          />
-        }
-      >
-        <EstablishmentDashboardPage route={route} />
-      </ConnectedPrivateRoute>
-    ) : (
-      <ErrorPage
-        error={frontErrors.establishment.notFound({
-          siret: route.params.siret,
-        })}
-      />
-    ),
-
+  establishmentDashboard: (route) => (
+    <RedirectTo
+      route={routes.establishmentDashboardConventions(route.params)}
+    />
+  ),
+  establishmentDashboardConventions: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <EstablishmentDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
+  establishmentDashboardFicheEntreprise: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <EstablishmentDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
+  establishmentDashboardDiscussionDetail: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <EstablishmentDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
   formEstablishment: (route) => <EstablishmentCreationFormPage route={route} />,
   formEstablishmentForExternals: (route) => (
     <EstablishmentFormPageForExternals route={route} />
