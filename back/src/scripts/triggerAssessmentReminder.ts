@@ -37,7 +37,7 @@ const triggerAssessmentReminder = async () => {
           generateConventionJwt,
         ),
       },
-    }).execute({ mode: "3daysAfterConventionEnd" });
+    }).execute({ mode: "3daysAfterInitialAssessmentEmail" });
 
   const { numberOfReminders: numberOfSecondReminders } =
     await makeAssessmentReminder({
@@ -54,7 +54,7 @@ const triggerAssessmentReminder = async () => {
           generateConventionJwt,
         ),
       },
-    }).execute({ mode: "10daysAfterConventionEnd" });
+    }).execute({ mode: "10daysAfterInitialAssessmentEmail" });
 
   return {
     numberOfFirstReminders,

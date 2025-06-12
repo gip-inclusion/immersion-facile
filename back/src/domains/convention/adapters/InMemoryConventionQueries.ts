@@ -66,8 +66,8 @@ export class InMemoryConventionQueries implements ConventionQueries {
     assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
     const notifications = (
-      await this.notificationRepository.getLastEmailsByFilters()
-    ).filter(
+      await this.notificationRepository.getLastNotifications()
+    ).emails.filter(
       (notification) =>
         notification.templatedContent.kind === assessmentEmailKind,
     );

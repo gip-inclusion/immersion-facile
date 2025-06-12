@@ -1,4 +1,4 @@
-import { parseISO } from "date-fns";
+import { addDays, parseISO } from "date-fns";
 import {
   type AgencyDto,
   type AgencyWithUsersRights,
@@ -72,21 +72,42 @@ export class InMemoryNotificationRepository implements NotificationRepository {
     ])[0];
   }
 
-  public async getLastEmailsByFilters(filters?: EmailNotificationFilters) {
+  public async getEmailsByFilters(filters: EmailNotificationFilters) {
     return this.notifications.filter(
       (notification): notification is EmailNotification => {
         if (notification.kind !== "email") return false;
 
-        if (!filters) return true;
+        if (
+          filters.email &&
+          !notification.templatedContent.recipients.includes(filters.email)
+        )
+          return false;
 
-        const matchesRequiredFilters =
-          notification.templatedContent.recipients.includes(filters.email) &&
-          notification.templatedContent.kind === filters.emailType;
+        if (
+          filters.emailType &&
+          notification.templatedContent.kind !== filters.emailType
+        )
+          return false;
 
-        if (!matchesRequiredFilters) return false;
+        if (
+          filters.conventionId &&
+          notification.followedIds.conventionId !== filters.conventionId
+        )
+          return false;
 
-        if (filters.conventionId !== undefined) {
-          return notification.followedIds.conventionId === filters.conventionId;
+        const startOfDay = filters.createdAt
+          ? new Date(
+              filters.createdAt.getFullYear(),
+              filters.createdAt.getMonth(),
+              filters.createdAt.getDate(),
+            )
+          : null;
+
+        if (startOfDay) {
+          return (
+            new Date(notification.createdAt) > startOfDay &&
+            new Date(notification.createdAt) < addDays(startOfDay, 1)
+          );
         }
 
         return true;
@@ -96,7 +117,10 @@ export class InMemoryNotificationRepository implements NotificationRepository {
 
   public async getLastNotifications() {
     return {
-      emails: await this.getLastEmailsByFilters(),
+      emails: this.notifications.filter(
+        (notification): notification is EmailNotification =>
+          notification.kind === "email",
+      ),
       sms: this.notifications.filter(
         (notification): notification is SmsNotification =>
           notification.kind === "sms",

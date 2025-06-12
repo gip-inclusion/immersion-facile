@@ -85,29 +85,20 @@ export type EmailParamsByEmailType = {
     conventionId: ConventionId;
     internshipKind: InternshipKind;
   };
-  ASSESSMENT_AGENCY_FIRST_REMINDER: {
-    assessmentCreationLink: string;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    conventionId: ConventionId;
-    establishmentContactEmail: Email;
-    internshipKind: InternshipKind;
-  };
-  ASSESSMENT_AGENCY_SECOND_REMINDER: {
-    assessmentCreationLink: string;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    businessName: string;
-    conventionId: ConventionId;
-    establishmentContactEmail: Email;
-    internshipKind: InternshipKind;
-  };
   ASSESSMENT_BENEFICIARY_NOTIFICATION: {
     conventionId: ConventionId;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
+    internshipKind: InternshipKind;
+  };
+  ASSESSMENT_ESTABLISHMENT_REMINDER: {
+    assessmentCreationLink: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    establishmentTutorFirstName: string;
+    establishmentTutorLastName: string;
+    conventionId: ConventionId;
     internshipKind: InternshipKind;
   };
   ASSESSMENT_ESTABLISHMENT_NOTIFICATION: {

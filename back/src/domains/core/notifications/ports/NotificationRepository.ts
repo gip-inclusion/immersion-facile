@@ -13,9 +13,10 @@ import type {
 } from "shared";
 
 export type EmailNotificationFilters = {
-  email: Email;
-  emailType: EmailType;
+  email?: Email;
+  emailType?: EmailType;
   conventionId?: ConventionId;
+  createdAt?: Date;
 };
 
 export type SmsNotificationFilters = {
@@ -42,8 +43,8 @@ export interface NotificationRepository {
     emails: EmailNotification[];
     sms: SmsNotification[];
   }>;
-  getLastEmailsByFilters: (
-    filters?: EmailNotificationFilters,
+  getEmailsByFilters: (
+    filters: EmailNotificationFilters,
   ) => Promise<EmailNotification[]>;
   deleteAllEmailAttachements: () => Promise<number>;
   getLastSmsNotificationByFilter: (
