@@ -126,7 +126,9 @@ export const LayoutHeader = () => {
               ...rest
             } = currentRoute.params;
             routes.conventionImmersion(rest).replace();
+            return;
           }
+          routes.home().push();
         },
       },
     });

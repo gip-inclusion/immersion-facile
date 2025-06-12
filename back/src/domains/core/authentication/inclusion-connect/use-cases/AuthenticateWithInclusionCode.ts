@@ -1,6 +1,7 @@
 import {
   type AbsoluteUrl,
   type AllowedStartInclusionConnectLoginSourcesKind,
+  type AlreadyAuthenticatedUserQueryParams,
   type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
   type EmailAuthCodeJwt,
@@ -91,7 +92,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         state,
       });
 
-    if (ongoingOAuth.usedAt) throw errors.user.alreadyUsedAuthentication();
+    if (ongoingOAuth.usedAt)
+      return `${this.#immersionFacileBaseUrl}/${
+        frontRoutes[page]
+      }?${queryParamsAsString<AlreadyAuthenticatedUserQueryParams>({
+        alreadyUsedAuthentication: true,
+      })}`;
 
     const { newOrUpdatedUser, accessToken } = await (ongoingOAuth.provider ===
     "email"

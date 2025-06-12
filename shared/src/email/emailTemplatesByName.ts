@@ -34,7 +34,7 @@ export const emailTemplatesByName =
         subject: "Votre lien de connexion à Immersion Facilitée",
         greetings: `Bonjour ${fullname ?? ""},`,
         content: `Voici votre lien de connexion à Immersion Facilitée.
-          Cliquez sur le bouton ci-dessous pour accéder à votre espace`,
+          Cliquez sur le bouton ci-dessous pour accéder à votre espace :`,
         buttons: [
           {
             label: "Se connecter",
