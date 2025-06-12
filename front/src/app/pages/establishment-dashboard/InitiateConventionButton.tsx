@@ -90,31 +90,6 @@ export const InitiateConventionButton = () => {
 
   useEffect(() => {
     if (
-      isEstablishmentDefault &&
-      currentUser.establishments &&
-      currentUser.establishments.length === 1 &&
-      defaultValues?.siret === currentUser.establishments[0].siret
-    ) {
-      dispatch(
-        establishmentSlice.actions.fetchEstablishmentRequested({
-          establishmentRequested: {
-            siret: currentUser.establishments[0].siret,
-            jwt: token,
-          },
-          feedbackTopic: "unused",
-        }),
-      );
-    }
-  }, [
-    defaultValues,
-    dispatch,
-    currentUser.establishments,
-    token,
-    isEstablishmentDefault,
-  ]);
-
-  useEffect(() => {
-    if (
       !isEstablishmentDefault &&
       establishment.appellations.length === 1 &&
       values.appellation === undefined
@@ -123,7 +98,7 @@ export const InitiateConventionButton = () => {
         shouldValidate: true,
       });
     }
-  }, [isEstablishmentDefault, establishment, values, setValue]);
+  }, [isEstablishmentDefault, establishment.appellations, values, setValue]);
 
   useEffect(() => {
     if (
@@ -135,11 +110,35 @@ export const InitiateConventionButton = () => {
         shouldValidate: true,
       });
     }
-  }, [isEstablishmentDefault, establishment, values, setValue]);
+  }, [
+    isEstablishmentDefault,
+    establishment.businessAddresses,
+    values,
+    setValue,
+  ]);
 
   return (
     <>
-      <Button onClick={() => openInitiateConventionModal()}>
+      <Button
+        onClick={() => {
+          if (
+            isEstablishmentDefault &&
+            currentUser.establishments &&
+            currentUser.establishments.length === 1
+          ) {
+            dispatch(
+              establishmentSlice.actions.fetchEstablishmentRequested({
+                establishmentRequested: {
+                  siret: currentUser.establishments[0].siret,
+                  jwt: token,
+                },
+                feedbackTopic: "unused",
+              }),
+            );
+          }
+          openInitiateConventionModal();
+        }}
+      >
         Initier une convention
       </Button>
       {createPortal(

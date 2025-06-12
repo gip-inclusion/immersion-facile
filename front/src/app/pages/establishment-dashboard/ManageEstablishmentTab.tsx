@@ -5,24 +5,25 @@ import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { HeadingSection } from "react-design-system";
 import { type WithEstablishmentData, domElementIds } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { routes } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
   establishments: WithEstablishmentData[];
-  route: Route<typeof routes.establishmentDashboard>;
 };
 
 export const ManageEstablishmentsTab = ({
   establishments,
-  route,
 }: ManageEstablishmentTabProps) => {
+  const route = useRoute() as Route<
+    typeof routes.establishmentDashboardFicheEntreprise
+  >;
+  const { siret } = route.params;
   const initialUrlParams = getUrlParameters(window.location);
   if (establishments.length === 1) {
     routes
-      .establishmentDashboard({
-        tab: "fiche-entreprise",
+      .establishmentDashboardFicheEntreprise({
         siret: establishments[0].siret,
         shouldUpdateAvailability: initialUrlParams.shouldUpdateAvailability,
       })
@@ -62,13 +63,12 @@ export const ManageEstablishmentsTab = ({
             placeholder="Sélectionner un établissement"
             nativeSelectProps={{
               defaultValue: "",
-              value: route.params.siret,
+              value: siret,
               id: domElementIds.establishmentDashboard.manageEstablishments
                 .selectEstablishmentInput,
               onChange: (event) => {
                 routes
-                  .establishmentDashboard({
-                    tab: "fiche-entreprise",
+                  .establishmentDashboardFicheEntreprise({
                     siret: event.currentTarget.value,
                   })
                   .push();

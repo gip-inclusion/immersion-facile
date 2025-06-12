@@ -5,19 +5,18 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EstablishmentDashboardTabs } from "src/app/components/establishment/establishment-dashboard/EstablishmentDashboardTabs";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { routes } from "src/app/routes/routes";
+import type { FrontEstablishmentDashboardRoute } from "src/app/routes/ConnectedPrivateRoute";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
-import type { Route } from "type-route";
 import { EstablishmentDashboardAccessNotAllowedContent } from "../../components/establishment/establishment-dashboard/EstablishmentDashboardAccessNotAllowedContent";
 
 export const EstablishmentDashboardPage = ({
   route,
 }: {
-  route: Route<typeof routes.establishmentDashboard>;
+  route: FrontEstablishmentDashboardRoute;
 }): ReactNode => {
   const dispatch = useDispatch();
   const inclusionConnectedJwt = useAppSelector(
@@ -56,7 +55,7 @@ export const EstablishmentDashboardPage = ({
               !currentUser.dashboards.establishments.conventions;
 
             useEffect(() => {
-              if (isEstablishmentNameAndAdminsRequired)
+              if (isEstablishmentNameAndAdminsRequired) {
                 dispatch(
                   establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested(
                     {
@@ -66,6 +65,7 @@ export const EstablishmentDashboardPage = ({
                     },
                   ),
                 );
+              }
             }, [
               proConnectSiret,
               isEstablishmentNameAndAdminsRequired,

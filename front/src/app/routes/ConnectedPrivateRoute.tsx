@@ -67,6 +67,15 @@ export const agencyDashboardRoutes = [
   "agencyDashboardOnboarding",
 ] satisfies AgencyDashboardRouteName[];
 
+export type EstablishmentDashboardRouteName =
+  FrontEstablishmentDashboardRoute["name"];
+
+export type FrontEstablishmentDashboardRoute =
+  | Route<typeof routes.establishmentDashboard>
+  | Route<typeof routes.establishmentDashboardConventions>
+  | Route<typeof routes.establishmentDashboardFicheEntreprise>
+  | Route<typeof routes.establishmentDashboardDiscussionDetail>;
+
 export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
 
 export type FrontAgencyDashboardRoute =
@@ -76,11 +85,14 @@ export type FrontAgencyDashboardRoute =
   | Route<typeof routes.agencyDashboardAgencies>
   | Route<typeof routes.agencyDashboardAgencyDetails>;
 
+export type FrontDashboardRoute =
+  | FrontAgencyDashboardRoute
+  | FrontEstablishmentDashboardRoute;
+
 type ConnectPrivateRoute =
   | FrontAdminRoute
-  | FrontAgencyDashboardRoute
+  | FrontDashboardRoute
   | Route<typeof routes.formEstablishment>
-  | Route<typeof routes.establishmentDashboard>
   | Route<typeof routes.myProfile>;
 
 type ConnectedPrivateRouteProps = {

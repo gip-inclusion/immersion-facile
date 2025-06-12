@@ -7,7 +7,6 @@ import {
   adminTabs,
   frontRoutes,
 } from "shared";
-import { icUserEstablishmentDashboardTabSerializer } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import {
   type ValueSerializer,
   createRouter,
@@ -97,6 +96,11 @@ const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
   `/${frontRoutes.agencyDashboard}`,
   "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
 ]);
+
+const establishmentDashboard = defineRoute(
+  inclusionConnectedParams,
+  () => `/${frontRoutes.establishmentDashboard}`,
+);
 
 const myProfile = defineRoute(
   inclusionConnectedParams,
@@ -210,18 +214,36 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     { count: param.path.number },
     (params) => `/debug/populate/${params.count}`,
   ),
-  establishmentDashboard: defineRoute(
+  establishmentDashboard,
+  establishmentDashboardConventions:
+    establishmentDashboard.extend("/conventions"),
+  establishmentDashboardFicheEntreprise: establishmentDashboard.extend(
     {
-      ...inclusionConnectedParams,
-      tab: param.path.optional
-        .ofType(icUserEstablishmentDashboardTabSerializer)
-        .default("conventions"),
-      siret: param.query.optional.string,
-      discussionId: param.query.optional.string,
+      siret: param.path.optional.string,
       shouldUpdateAvailability: param.query.optional.string,
     },
-    ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
+    ({ siret }) =>
+      `/${frontRoutes.establishmentDashboard}/fiche-entreprise/${siret}`,
   ),
+  establishmentDashboardDiscussionDetail: establishmentDashboard.extend(
+    {
+      discussionId: param.path.optional.string,
+    },
+    ({ discussionId }) =>
+      `/${frontRoutes.establishmentDashboard}/discussions/${discussionId}`,
+  ),
+  // establishmentDashboard: defineRoute(
+  //   {
+  //     ...inclusionConnectedParams,
+  //     tab: param.path.optional
+  //       .ofType(icUserEstablishmentDashboardTabSerializer)
+  //       .default("conventions"),
+  //     siret: param.query.optional.string,
+  //     discussionId: param.query.optional.string,
+  //     shouldUpdateAvailability: param.query.optional.string,
+  //   },
+  //   ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
+  // ),
   formEstablishment: defineRoute(
     {
       ...inclusionConnectedParams,

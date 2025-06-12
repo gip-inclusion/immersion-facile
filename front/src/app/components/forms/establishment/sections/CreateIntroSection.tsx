@@ -71,9 +71,8 @@ export const CreateIntroSection = ({
                         .navigateToEstablishmentDashboard,
                       priority: "primary",
                       children: "Gérer ma fiche établissement",
-                      linkProps: routes.establishmentDashboard({
-                        tab: "fiche-entreprise",
-                      }).link,
+                      linkProps:
+                        routes.establishmentDashboardFicheEntreprise().link,
                     },
                   ]}
                 />
