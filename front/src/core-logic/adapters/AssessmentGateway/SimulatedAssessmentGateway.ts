@@ -1,5 +1,10 @@
 import { type Observable, delay, of, throwError } from "rxjs";
-import type { AssessmentDto, ConventionId } from "shared";
+import type {
+  AssessmentDto,
+  ConventionId,
+  ConventionSupportedJwt,
+  WithConventionId,
+} from "shared";
 import type {
   AssessmentAndJwt,
   AssessmentGateway,
@@ -27,5 +32,12 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
       establishmentAdvices: "my advices",
       establishmentFeedback: "my feedback",
     });
+  }
+
+  public sendAssessmentLink$(
+    _params: WithConventionId,
+    _jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return of(undefined).pipe(delay(this.latency));
   }
 }

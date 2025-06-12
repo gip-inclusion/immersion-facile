@@ -25,6 +25,7 @@ import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -153,11 +154,11 @@ export const ConventionValidation = ({
 
     setIsAssessmentLinkSent(true);
 
-    //   sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
-    //     conventionId: convention.id,
-    //     phone: convention.establishmentTutor.phone,
-    //   }),
-    // );
+    sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
+      conventionId: convention.id,
+      jwt: jwtParams.jwt,
+      feedbackTopic: "send-assessment-link",
+    });
   };
 
   return (
@@ -175,7 +176,7 @@ export const ConventionValidation = ({
         <p>Justification : {convention.statusJustification}</p>
       )}
       <Feedback
-        topics={["send-signature-link"]}
+        topics={["send-signature-link", "send-assessment-link"]}
         className={fr.cx("fr-my-4w")}
       />
       {isConventionRenewed(convention) && (

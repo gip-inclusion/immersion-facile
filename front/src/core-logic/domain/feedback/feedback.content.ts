@@ -7,6 +7,7 @@ import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
@@ -58,6 +59,7 @@ const topics = [
   "partner-conventions",
   "search-result",
   "send-signature-link",
+  "send-assessment-link",
   "siret-input",
   "transfer-convention-to-agency",
   "unused",
@@ -128,6 +130,25 @@ export const feedbacks: Record<
     },
     "create.error": {
       action: sendSignatureLinkSlice.actions.sendSignatureLinkFailed,
+      title: "Problème lors de l'envoi SMS",
+      message: "Une erreur est survenue lors de l'envoi du SMS.",
+    },
+  },
+  "send-assessment-link": {
+    "create.success": {
+      action: sendAssessmentLinkSlice.actions.sendAssessmentLinkSucceeded,
+      title: "Le SMS a bien été envoyé",
+      message:
+        "Le destinataire devrait le recevoir dans les prochaines minutes.",
+    },
+    "create.info": {
+      action: sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested,
+      title: "Le sms est en cours d'envoi",
+      message:
+        "Le sms est en cours d'envoi au signataire. Cela peut prendre une quinzaine de secondes.",
+    },
+    "create.error": {
+      action: sendAssessmentLinkSlice.actions.sendAssessmentLinkFailed,
       title: "Problème lors de l'envoi SMS",
       message: "Une erreur est survenue lors de l'envoi du SMS.",
     },
