@@ -14,7 +14,7 @@ import {
   OverFooter,
   type OverFooterCols,
 } from "react-design-system";
-import { domElementIds } from "shared";
+import { type AbsoluteUrl, domElementIds } from "shared";
 import { getConsentModal } from "src/app/components/ConsentManager";
 import { ressourcesAndWebinarsUrl } from "src/app/contents/home/content";
 import { routes } from "src/app/routes/routes";
@@ -144,6 +144,10 @@ const links: NavLink[] = [
     target: "_blank",
   },
 ];
+
+export const immersionFacileSupportUrl: AbsoluteUrl =
+  "https://immersion-facile.beta.gouv.fr/aide/";
+
 const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   {
     label: "Accessibilité : partiellement conforme",
@@ -167,7 +171,7 @@ const bottomsLinks: (NavLink | typeof headerFooterDisplayItem)[] = [
   },
   {
     label: "Nous contacter",
-    href: "https://immersion-facile.beta.gouv.fr/aide/",
+    href: immersionFacileSupportUrl,
     id: bottomsLinksIds.contact,
     target: "_blank",
   },
