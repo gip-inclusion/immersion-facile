@@ -8,10 +8,8 @@ describe("sms phone number schema", () => {
     );
   });
 
-  // TODO : this mobile phone number appears to be valid according to libphonenumber-js and wikipedia
-
-  // it("wrong path", () => {
-  //   const mobilePhoneNumber = "+596697000001"; // Martinique, not a mobile phone number
-  //   expect(() => smsRecipientPhoneSchema.parse(mobilePhoneNumber)).toThrow();
-  // });
+  it("wrong path", () => {
+    const mobilePhoneNumber = "+596596300330"; // Martinique, not a mobile phone number
+    expect(() => smsRecipientPhoneSchema.parse(mobilePhoneNumber)).toThrow();
+  });
 });
