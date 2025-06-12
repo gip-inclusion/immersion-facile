@@ -565,6 +565,7 @@ const makeBeneficiarySubSections = (
 
 const makeEstablishmentSubSections = (
   convention: ConventionReadDto,
+  assesmentReminderButtonProps?: (phone: Phone) => ButtonProps,
 ): ConventionSummarySubSection[] => {
   return [
     {
@@ -585,7 +586,12 @@ const makeEstablishmentSubSections = (
     },
     {
       key: "establishmentTutor",
-      header: { title: "Tuteur" },
+      header: {
+        title: "Tuteur",
+        action: assesmentReminderButtonProps
+          ? assesmentReminderButtonProps(convention.establishmentTutor.phone)
+          : undefined,
+      },
       fields: [
         {
           key: "establishmentTutorFirstname",
@@ -773,6 +779,7 @@ export const makeConventionSections = (
     signatoryPhone: Phone,
     signatoryAlreadySign: boolean,
   ) => ButtonProps | null,
+  assesmentReminderButtonProps?: (phone: Phone) => ButtonProps,
 ): ConventionSummarySection[] => {
   return [
     {
@@ -788,7 +795,10 @@ export const makeConventionSections = (
     },
     {
       title: "Informations de l'entreprise",
-      subSections: makeEstablishmentSubSections(convention),
+      subSections: makeEstablishmentSubSections(
+        convention,
+        assesmentReminderButtonProps,
+      ),
     },
     {
       title: "Informations sur l'immersion",
@@ -886,6 +896,44 @@ export const SendSignatureLinkModalWrapper = ({
     document.body,
   );
 
+export const sendAssessmentLinkModal = createModal({
+  id: domElementIds.manageConvention.sendAssessmentLinkModal,
+  isOpenedByDefault: false,
+});
+
+export const SendAssessmentLinkModalWrapper = ({
+  phone,
+  onConfirm,
+}: {
+  phone: Phone;
+  onConfirm: () => void;
+}) =>
+  createPortal(
+    <sendAssessmentLinkModal.Component
+      title="Renvoyer le bilan par SMS"
+      buttons={[
+        {
+          priority: "secondary",
+          children: "Annuler",
+          onClick: () => {
+            sendAssessmentLinkModal.close();
+          },
+        },
+        {
+          priority: "primary",
+          children: "Envoyer",
+          onClick: () => onConfirm(),
+        },
+      ]}
+    >
+      <p>
+        Le tuteur recevra un lien lui permettant de compléter le bilan au{" "}
+        {phone}
+      </p>
+    </sendAssessmentLinkModal.Component>,
+    document.body,
+  );
+
 export type SignatureLinkState = Record<SignatoryRole, boolean>;
 export const sendSignatureLinkButtonProps =
   ({
@@ -920,3 +968,24 @@ export const sendSignatureLinkButtonProps =
           type: "button",
           id: domElementIds.manageConvention.openSendSignatureLinkModal,
         };
+
+export const sendAssessmentLinkButtonProps =
+  ({
+    isAssessmentLinkSent,
+    onClick,
+  }: {
+    isAssessmentLinkSent: boolean;
+    onClick: (params: {
+      phone: Phone;
+    }) => void;
+  }) =>
+  (phone: Phone): ButtonProps => ({
+    priority: "tertiary",
+    children: "Renvoyer le bilan par SMS",
+    disabled: !isValidMobilePhone(phone) || isAssessmentLinkSent,
+    onClick: () => {
+      onClick({ phone });
+    },
+    type: "button",
+    id: domElementIds.manageConvention.openSendAssessmentLinkModal,
+  });
