@@ -145,7 +145,7 @@ export const heroHeaderNavCards: (
         icon: "fr-icon-admin-line",
         type: "establishment",
         id: domElementIds.homeEstablishments.heroHeader.establishmentDashboard,
-        link: routes.establishmentDashboard({ tab: "conventions" }).link,
+        link: routes.establishmentDashboardConventions().link,
         alternateTitle:
           "Mon espace : espace personnel nominatif où retrouver mes conventions, échanges avec les candidats, etc.",
       },
