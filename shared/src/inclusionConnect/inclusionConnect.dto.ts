@@ -38,6 +38,10 @@ export type AuthenticatedUserQueryParams = {
   provider: IdentityProvider;
 } & Pick<User, "email" | "firstName" | "lastName">;
 
+export type AlreadyAuthenticatedUserQueryParams = {
+  alreadyUsedAuthentication: boolean;
+};
+
 type InclusionConnectConventionManageAllowedRole =
   | EstablishmentRole
   | ConventionEstablishmentRole

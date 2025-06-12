@@ -151,6 +151,8 @@ export const ConnectedPrivateRoute = ({
 
   const page = getPage(route);
   const pageContent = pageContentByRoute[page] ?? pageContentByRoute.default;
+  const alreadyUsedAuthentication = route.params.alreadyUsedAuthentication;
+
   if (!isInclusionConnected) {
     return (
       <HeaderFooterLayout>
@@ -166,6 +168,14 @@ export const ConnectedPrivateRoute = ({
               }
             >
               <>
+                {alreadyUsedAuthentication && (
+                  <Alert
+                    className={fr.cx("fr-mb-2w")}
+                    severity="warning"
+                    title="Ce lien d'authentification a déjà été utilisé."
+                    description="Veuillez renouveler votre demande de connexion."
+                  />
+                )}
                 <p className={fr.cx("fr-text--lead")}>
                   {pageContent.description}
                 </p>
@@ -177,6 +187,7 @@ export const ConnectedPrivateRoute = ({
                 ) : (
                   <LoginWithProConnect page={page} />
                 )}
+
                 <p className={fr.cx("fr-hint-text")}>
                   Si votre messagerie est protégée une anti-spam, pensez à
                   ajouter l’adresse{" "}
