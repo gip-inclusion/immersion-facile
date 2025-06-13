@@ -37,6 +37,19 @@ export const EstablishmentDashboardTabs = ({
     [currentUser, currentTab],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
+
+  if (
+    route.name === "establishmentDashboardFicheEntreprise" &&
+    route.params.siret &&
+    !currentUser.establishments?.some(
+      (establishment) =>
+        establishment.siret === route.params.siret &&
+        establishment.role === "establishment-admin",
+    )
+  ) {
+    routes.establishmentDashboard().push();
+    return;
+  }
   return (
     <>
       {enableEstablishmentDashboardHighlight.isActive && (
@@ -83,66 +96,69 @@ const makeEstablishmentDashboardTabs = ({
   firstName,
   lastName,
   establishments,
-}: InclusionConnectedUser): DashboardTab[] => [
-  {
-    label: "Conventions",
-    tabId: "conventions",
-    content: (
-      <>
-        <InitiateConventionButton />
-        <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
-        {conventions ? (
-          <MetabaseView
-            title={"Tableau des conventions en cours"}
-            subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
-            url={conventions}
-          />
-        ) : (
-          <p> Aucune convention trouvée pour votre compte</p>
-        )}
-      </>
-    ),
-  },
-  {
-    label: "Candidatures",
-    tabId: "discussions",
-    content: (
-      <>
-        <ManageDiscussionFormSection />
-        {discussions ? (
-          <MetabaseView
-            title={`Suivi des mises en relations pour ${firstName} ${lastName}`}
-            url={discussions}
-          />
-        ) : (
-          <p>
-            {" "}
-            Nous n'avons pas trouvé de mises en relation où vous êtes référencés
-            en tant que contact d'entreprise.
-          </p>
-        )}
-      </>
-    ),
-  },
-  ...(establishments &&
-  establishments?.filter(
-    (establishment) => establishment.role === "establishment-admin",
-  ).length > 0
-    ? [
-        {
-          label: "Fiche établissement",
-          tabId: "fiche-entreprise",
-          content: (
-            <ManageEstablishmentsTab
-              establishments={establishments.filter(
-                (establishment) => establishment.role === "establishment-admin",
-              )}
+}: InclusionConnectedUser): DashboardTab[] => {
+  return [
+    {
+      label: "Conventions",
+      tabId: "conventions",
+      content: (
+        <>
+          <InitiateConventionButton />
+          <SelectConventionFromIdForm routeNameToRedirectTo="manageConventionConnectedUser" />
+          {conventions ? (
+            <MetabaseView
+              title={"Tableau des conventions en cours"}
+              subtitle="Cliquer sur l'identifiant de la convention pour y accéder."
+              url={conventions}
             />
-          ),
-        },
-      ]
-    : []),
-];
+          ) : (
+            <p> Aucune convention trouvée pour votre compte</p>
+          )}
+        </>
+      ),
+    },
+    {
+      label: "Candidatures",
+      tabId: "discussions",
+      content: (
+        <>
+          <ManageDiscussionFormSection />
+          {discussions ? (
+            <MetabaseView
+              title={`Suivi des mises en relations pour ${firstName} ${lastName}`}
+              url={discussions}
+            />
+          ) : (
+            <p>
+              {" "}
+              Nous n'avons pas trouvé de mises en relation où vous êtes
+              référencés en tant que contact d'entreprise.
+            </p>
+          )}
+        </>
+      ),
+    },
+    ...(establishments &&
+    establishments?.filter(
+      (establishment) => establishment.role === "establishment-admin",
+    ).length > 0
+      ? [
+          {
+            label: "Fiche établissement",
+            tabId: "fiche-entreprise",
+            content: (
+              <ManageEstablishmentsTab
+                establishments={establishments.filter(
+                  (establishment) =>
+                    establishment.role === "establishment-admin",
+                )}
+              />
+            ),
+          },
+        ]
+      : []),
+  ];
+};
 
 const getDashboardTabs = (
   rawTabs: DashboardTab[],

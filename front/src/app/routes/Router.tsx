@@ -95,6 +95,27 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
         }),
       );
     },
+    establishmentDashboardFicheEntreprise: () => {
+      store.dispatch(
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "unused",
+        }),
+      );
+    },
+    establishmentDashboardDiscussionDetail: () => {
+      store.dispatch(
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "unused",
+        }),
+      );
+    },
+    establishmentDashboardConventions: () => {
+      store.dispatch(
+        inclusionConnectedSlice.actions.currentUserFetchRequested({
+          feedbackTopic: "unused",
+        }),
+      );
+    },
   };
 
 const getPageByRouteName: {
