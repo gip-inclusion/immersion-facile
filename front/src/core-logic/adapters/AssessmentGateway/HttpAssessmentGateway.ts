@@ -78,7 +78,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
       this.httpClient
         .sendAssessmentLink({
           headers: { authorization: jwt },
-          body: { params },
+          body: params,
         })
         .then((response) =>
           match(response)

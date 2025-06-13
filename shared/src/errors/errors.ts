@@ -164,6 +164,10 @@ export const errors = {
       new ConflictError(
         `Il n'est pas possible de créer le bilan car un bilan existe déjà pour la convention '${conventionId}'.`,
       ),
+    assessmentAlreadyFullfilled: (conventionId: ConventionId) =>
+      new BadRequestError(
+        `Le bilan pour la convention '${conventionId}' a déjà été complété.`,
+      ),
     badStatus: (status: ConventionStatus) =>
       new BadRequestError(
         `Il n'est pas possible de créer un bilan d'immersion pour une convention qui n'est pas validée, le status actuel étant '${status}'.`,
@@ -178,6 +182,10 @@ export const errors = {
           mode === "GetAssessment" ? "récupérer" : "créer"
         } le bilan.`,
       ),
+    conventionEndingInMoreThanOneDay: () =>
+      new BadRequestError(
+        `Impossible de relancer la demande de completion du bilan pour les conventions se terminant dans plus d'un jour.`,
+      ),
     conventionIdMismatch: () =>
       new ForbiddenError(
         "Il y a un décalage d'identifiant de convention dans les données envoyées.",
@@ -185,6 +193,10 @@ export const errors = {
     missingAssessment: ({ conventionId }: { conventionId: ConventionId }) =>
       new BadRequestError(
         `Il manque le bilan dans les paramêtres pour la convention ${conventionId}`,
+      ),
+    sendAssessmentLinkForbidden: () =>
+      new BadRequestError(
+        "Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
     sendAssessmentLinkNotAllowedForStatus: ({
       status,
@@ -222,6 +234,10 @@ export const errors = {
       ),
   },
   convention: {
+    emailNotLinkedToConvention: (role: Role) =>
+      new BadRequestError(
+        `L'email fournit n'est pas lié à la convention pour l'utilisateur ayant le role ${role}.`,
+      ),
     updateBadStatusInParams: ({ id }: { id: ConventionId }) =>
       new ForbiddenError(
         `Convention ${id} with modifications should have status READY_TO_SIGN`,
