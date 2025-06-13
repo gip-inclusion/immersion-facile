@@ -3,18 +3,18 @@ import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   ConnectedPrivateRoute,
-  type FrontAgencyDashboardRoute,
+  type FrontDashboardRoute,
 } from "src/app/routes/ConnectedPrivateRoute";
 
-type AgencyDashboardPrivateRouteProps = {
-  route: FrontAgencyDashboardRoute;
+type DashboardPrivateRouteProps = {
+  route: FrontDashboardRoute;
   children: ReactElement;
 };
 
-export const AgencyDashboardPrivateRoute = ({
+export const DashboardPrivateRoute = ({
   route,
   children,
-}: AgencyDashboardPrivateRouteProps) => (
+}: DashboardPrivateRouteProps) => (
   <ConnectedPrivateRoute
     route={route}
     inclusionConnectConnexionPageHeader={

@@ -296,8 +296,8 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           type="button"
           onClick={() =>
             routes
-              .establishmentDashboard({
-                tab: "discussions",
+              .establishmentDashboardDiscussionDetail({
+                discussionId: discussion.id,
               })
               .push()
           }

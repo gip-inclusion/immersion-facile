@@ -53,11 +53,17 @@ type WithAgencyRights = {
   agencyRights: AgencyRight[];
 };
 
+export type EstablishmentAdminPrivateData = {
+  firstName: string;
+  lastName: string;
+  email: Email;
+};
+
 export type WithEstablishmentData = {
   siret: SiretDto;
   businessName: string;
   role: EstablishmentRole;
-  admins: { firstName: string; lastName: string; email: Email }[];
+  admins: EstablishmentAdminPrivateData[];
 };
 
 export type WithEstablishments = {
