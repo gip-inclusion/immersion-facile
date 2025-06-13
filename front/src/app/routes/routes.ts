@@ -232,18 +232,6 @@ export const { RouteProvider, useRoute, routes } = createRouter({
     ({ discussionId }) =>
       `/${frontRoutes.establishmentDashboard}/discussions/${discussionId}`,
   ),
-  // establishmentDashboard: defineRoute(
-  //   {
-  //     ...inclusionConnectedParams,
-  //     tab: param.path.optional
-  //       .ofType(icUserEstablishmentDashboardTabSerializer)
-  //       .default("conventions"),
-  //     siret: param.query.optional.string,
-  //     discussionId: param.query.optional.string,
-  //     shouldUpdateAvailability: param.query.optional.string,
-  //   },
-  //   ({ tab }) => `/${frontRoutes.establishmentDashboard}/${tab}`,
-  // ),
   formEstablishment: defineRoute(
     {
       ...inclusionConnectedParams,

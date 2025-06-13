@@ -1,8 +1,19 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { AgencyDto, InclusionConnectedUser, WithAgencyIds } from "shared";
+import type {
+  AgencyDto,
+  FormEstablishmentDto,
+  FormEstablishmentUserRight,
+  InclusionConnectedUser,
+  WithAgencyIds,
+  WithEstablishmentData,
+} from "shared";
 import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.helpers";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
+import {
+  type EstablishmentUpdatePayload,
+  establishmentSlice,
+} from "src/core-logic/domain/establishment/establishment.slice";
 import type {
   PayloadActionWithFeedbackTopic,
   PayloadActionWithFeedbackTopicError,
@@ -68,6 +79,19 @@ export const inclusionConnectedSlice = createSlice({
     builder.addCase(authSlice.actions.logOutFromProviderSucceeded, (state) => {
       state.currentUser = null;
     });
+
+    builder.addCase(
+      establishmentSlice.actions.updateEstablishmentSucceeded,
+      (state, action) => {
+        if (!state.currentUser) return;
+        state.currentUser.establishments =
+          updateUserRightsOnUpdatedEstablishment(
+            state.currentUser,
+            action.payload.establishmentUpdate,
+          );
+      },
+    );
+
     builder.addCase(
       updateUserOnAgencySlice.actions.updateUserAgencyRightSucceeded,
       (state, action) => {
@@ -98,3 +122,52 @@ export const inclusionConnectedSlice = createSlice({
     );
   },
 });
+
+const updateUserRightsOnUpdatedEstablishment = (
+  user: InclusionConnectedUser,
+  establishment: EstablishmentUpdatePayload,
+): InclusionConnectedUser["establishments"] => {
+  if (!user || !user.establishments) return;
+  const { siret, userRights: formEstablishmentUserRights } =
+    establishment.formEstablishment;
+  const currentUserRightsOnEstablishment = formEstablishmentUserRights.find(
+    (right) => right.email === user.email,
+  );
+  const otherEstablishmentUserRights = user.establishments.filter(
+    (right) => right.siret !== siret,
+  );
+
+  if (!currentUserRightsOnEstablishment) return otherEstablishmentUserRights;
+
+  const establishmentAdmins = user.establishments.find(
+    (establishment) => establishment.siret === siret,
+  )?.admins;
+
+  if (!establishmentAdmins) return;
+
+  const updatedUserRightsOnEstablishment: WithEstablishmentData[] =
+    formEstablishmentUserRights
+      .filter((right) => right.email === user.email)
+      .map((right) =>
+        formEstablishmentUserRightToWithEstablishmentData(
+          establishment.formEstablishment,
+          right,
+          establishmentAdmins,
+        ),
+      );
+
+  return [...otherEstablishmentUserRights, ...updatedUserRightsOnEstablishment];
+};
+
+const formEstablishmentUserRightToWithEstablishmentData = (
+  establishment: FormEstablishmentDto,
+  userRight: FormEstablishmentUserRight,
+  admins: WithEstablishmentData["admins"],
+): WithEstablishmentData => {
+  return {
+    siret: establishment.siret,
+    businessName: establishment.businessName,
+    admins,
+    role: userRight.role,
+  };
+};
