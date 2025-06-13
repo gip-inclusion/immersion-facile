@@ -4,9 +4,13 @@ import {
   type AgencyRight,
   ConventionDtoBuilder,
   type ConventionReadDto,
+  type EstablishmentAdminPrivateData,
+  FormEstablishmentDtoBuilder,
+  type FormEstablishmentUserRight,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
   type WithAgencyIds,
+  type WithEstablishmentData,
   connectedUserTokenExpiredMessage,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
@@ -17,6 +21,10 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import {
+  type EstablishmentUpdatePayload,
+  establishmentSlice,
+} from "src/core-logic/domain/establishment/establishment.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
@@ -545,6 +553,257 @@ describe("InclusionConnected", () => {
     });
   });
 
+  describe("when establishment is updated", () => {
+    describe("when current user is an admin of the establishment", () => {
+      it("does nothing if current user rights are not updated", () => {
+        const currentUserAdminData: EstablishmentAdminPrivateData = {
+          email: "user@email.com",
+          firstName: "My current user first name",
+          lastName: "My current user last name",
+        };
+        const otherUserAdminData: EstablishmentAdminPrivateData = {
+          email: "other-user@email.com",
+          firstName: "Other first name",
+          lastName: "Other last name",
+        };
+        const user = new InclusionConnectedUserBuilder()
+          .withEmail(currentUserAdminData.email)
+          .withFirstName(currentUserAdminData.firstName)
+          .withLastName(currentUserAdminData.lastName)
+          .withId("my-fake-user-id")
+          .withEstablishments([
+            {
+              admins: [currentUserAdminData, otherUserAdminData],
+              businessName: "Ma super entreprise",
+              role: "establishment-admin",
+              siret: "01234567890123",
+            },
+            {
+              admins: [otherUserAdminData],
+              businessName: "Ma super entreprise 2",
+              role: "establishment-admin",
+              siret: "01234567890124",
+            },
+          ])
+          .build();
+
+        ({ store, dependencies } = createTestStore({
+          inclusionConnected: {
+            currentUser: user,
+            agenciesToReview: [],
+            isLoading: false,
+          },
+        }));
+
+        const establishment = FormEstablishmentDtoBuilder.valid()
+          .withUserRights([
+            {
+              email: currentUserAdminData.email,
+              role: "establishment-admin",
+              job: "fake job",
+              phone: "+33600000000",
+            },
+            {
+              email: otherUserAdminData.email,
+              role: "establishment-admin",
+              job: "fake job",
+              phone: "+33600000000",
+            },
+          ])
+          .build();
+        const establishmentUpdate: EstablishmentUpdatePayload = {
+          formEstablishment: establishment,
+          jwt: "my-fake-jwt",
+        };
+
+        store.dispatch(
+          establishmentSlice.actions.updateEstablishmentSucceeded({
+            establishmentUpdate,
+            feedbackTopic: "unused",
+          }),
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          inclusionConnectedSelectors.currentUser(store.getState())
+            ?.establishments ?? [],
+          user.establishments ?? [],
+        );
+      });
+
+      it("removes current user admin rights if removed from establishment", () => {
+        const currentUserAdminData: EstablishmentAdminPrivateData = {
+          email: "user@email.com",
+          firstName: "My current user first name",
+          lastName: "My current user last name",
+        };
+        const otherUserAdminData: EstablishmentAdminPrivateData = {
+          email: "other-user@email.com",
+          firstName: "Other first name",
+          lastName: "Other last name",
+        };
+        const otherEstablishmentToKeepUserRight: FormEstablishmentUserRight = {
+          email: otherUserAdminData.email,
+          role: "establishment-contact",
+          job: "fake job",
+          phone: "+33600000000",
+        };
+        const otherEstablishmentToKeepData: WithEstablishmentData = {
+          admins: [otherUserAdminData],
+          businessName: "Ma super entreprise 2",
+          role: otherEstablishmentToKeepUserRight.role,
+          siret: "01234567890124",
+        };
+        const user = new InclusionConnectedUserBuilder()
+          .withEmail(currentUserAdminData.email)
+          .withFirstName(currentUserAdminData.firstName)
+          .withLastName(currentUserAdminData.lastName)
+          .withId("my-fake-user-id")
+          .withIsAdmin(false)
+          .withEstablishments([
+            {
+              admins: [currentUserAdminData],
+              businessName: "Ma super entreprise",
+              role: "establishment-admin",
+              siret: "01234567890123",
+            },
+            otherEstablishmentToKeepData,
+          ])
+          .build();
+
+        ({ store, dependencies } = createTestStore({
+          inclusionConnected: {
+            currentUser: user,
+            agenciesToReview: [],
+            isLoading: false,
+          },
+        }));
+
+        const establishment = FormEstablishmentDtoBuilder.valid()
+          .withUserRights([otherEstablishmentToKeepUserRight])
+          .build();
+        const establishmentUpdate: EstablishmentUpdatePayload = {
+          formEstablishment: establishment,
+          jwt: "my-fake-jwt",
+        };
+
+        expectToEqual(
+          inclusionConnectedSelectors.currentUser(store.getState()),
+          {
+            ...user,
+            establishments: [
+              {
+                admins: [currentUserAdminData],
+                businessName: establishment.businessName,
+                siret: establishment.siret,
+                role: "establishment-admin",
+              },
+              otherEstablishmentToKeepData,
+            ],
+          },
+        );
+
+        store.dispatch(
+          establishmentSlice.actions.updateEstablishmentSucceeded({
+            establishmentUpdate,
+            feedbackTopic: "unused",
+          }),
+        );
+
+        expectToEqual(
+          inclusionConnectedSelectors.currentUser(store.getState())
+            ?.establishments ?? [],
+          [otherEstablishmentToKeepData],
+        );
+      });
+      it("switch current user admin rights to establishment-contact if updated in establishment", () => {
+        const currentUserAdminData: EstablishmentAdminPrivateData = {
+          email: "user@email.com",
+          firstName: "My current user first name",
+          lastName: "My current user last name",
+        };
+        const otherUserAdminData: EstablishmentAdminPrivateData = {
+          email: "other-user@email.com",
+          firstName: "Other first name",
+          lastName: "Other last name",
+        };
+        const otherEstablishmentUserRight: FormEstablishmentUserRight = {
+          email: otherUserAdminData.email,
+          role: "establishment-contact",
+          job: "fake job",
+          phone: "+33600000000",
+        };
+        const otherEstablishmentData: WithEstablishmentData = {
+          admins: [otherUserAdminData],
+          businessName: "Ma super entreprise 2",
+          role: otherEstablishmentUserRight.role,
+          siret: "01234567890124",
+        };
+        const user = new InclusionConnectedUserBuilder()
+          .withEmail(currentUserAdminData.email)
+          .withFirstName(currentUserAdminData.firstName)
+          .withLastName(currentUserAdminData.lastName)
+          .withId("my-fake-user-id")
+          .withIsAdmin(false)
+          .withEstablishments([
+            {
+              admins: [currentUserAdminData],
+              businessName: "Ma super entreprise",
+              role: "establishment-admin",
+              siret: "01234567890123",
+            },
+            otherEstablishmentData,
+          ])
+          .build();
+
+        ({ store, dependencies } = createTestStore({
+          inclusionConnected: {
+            currentUser: user,
+            agenciesToReview: [],
+            isLoading: false,
+          },
+        }));
+
+        const updatedEstablishmentUserRight: FormEstablishmentUserRight = {
+          email: currentUserAdminData.email,
+          role: "establishment-contact",
+          job: "fake job",
+          phone: "+33600000000",
+        };
+
+        const establishment = FormEstablishmentDtoBuilder.valid()
+          .withUserRights([
+            updatedEstablishmentUserRight,
+            otherEstablishmentUserRight,
+          ])
+          .build();
+        const establishmentUpdate: EstablishmentUpdatePayload = {
+          formEstablishment: establishment,
+          jwt: "my-fake-jwt",
+        };
+
+        store.dispatch(
+          establishmentSlice.actions.updateEstablishmentSucceeded({
+            establishmentUpdate,
+            feedbackTopic: "unused",
+          }),
+        );
+
+        expectArraysToEqualIgnoringOrder(
+          inclusionConnectedSelectors.currentUser(store.getState())
+            ?.establishments ?? [],
+          [
+            {
+              admins: [currentUserAdminData],
+              businessName: establishment.businessName,
+              siret: establishment.siret,
+              role: "establishment-contact",
+            },
+            otherEstablishmentData,
+          ],
+        );
+      });
+    });
+  });
   const expectIsLoadingToBe = (expected: boolean) => {
     expect(inclusionConnectedSelectors.isLoading(store.getState())).toBe(
       expected,

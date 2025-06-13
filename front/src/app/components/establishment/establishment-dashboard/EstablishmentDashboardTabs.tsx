@@ -38,6 +38,18 @@ export const EstablishmentDashboardTabs = ({
     [currentUser, currentTab],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
+  const shouldRedirectToMainTab =
+    route.name === "establishmentDashboardFicheEntreprise" &&
+    route.params.siret &&
+    !currentUser.establishments?.some(
+      (establishment) =>
+        establishment.siret === route.params.siret &&
+        establishment.role === "establishment-admin",
+    );
+  if (shouldRedirectToMainTab) {
+    routes.establishmentDashboard().push();
+    return;
+  }
   return (
     <>
       {enableEstablishmentDashboardHighlight.isActive && (
