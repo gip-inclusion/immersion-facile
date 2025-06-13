@@ -24,6 +24,7 @@ import {
   updateConventionRequestSchema,
   updateConventionStatusRequestSchema,
   withConventionIdLegacySchema,
+  withConventionIdSchema,
 } from "./convention.schema";
 
 export type ConventionMagicLinkRoutes = typeof conventionMagicLinkRoutes;
@@ -122,6 +123,20 @@ export const conventionMagicLinkRoutes = defineRoutes({
     url: "/auth/convention/signatories/send-signature-link",
     method: "post",
     requestBodySchema: sendSignatureLinkRequestSchema,
+    ...withAuthorizationHeaders,
+    responses: {
+      200: expressEmptyResponseBody,
+      400: httpErrorSchema,
+      403: httpErrorSchema,
+      404: httpErrorSchema,
+      429: httpErrorSchema,
+    },
+  }),
+
+  sendAssessmentLink: defineRoute({
+    url: "/auth/assessment/send-assessment-link",
+    method: "post",
+    requestBodySchema: withConventionIdSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,

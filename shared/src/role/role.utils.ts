@@ -6,7 +6,6 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
 } from "..";
 import {
-  type AgencyModifierRole,
   type ModifierRole,
   type Role,
   type SignatoryRole,
@@ -15,12 +14,21 @@ import {
   allowedRolesToCreateAssessment,
 } from "./role.dto";
 
-export const signatoryTitleByRole: Record<SignatoryRole, string> = {
+export const titleByRole: Record<Role, string> = {
+  "back-office": "back-office",
   beneficiary: "bénéficiaire",
   "beneficiary-representative": "représentant légal du bénéficiaire",
   "establishment-representative": "représentant de l'entreprise",
   "beneficiary-current-employer":
     "représentant de l'entreprise actuelle du candidat",
+  "establishment-tutor": "tuteur de l'entreprise",
+  "agency-admin": "administrateur de l'agence",
+  "to-review": "à revoir",
+  counsellor: "conseiller",
+  validator: "valideur",
+  "agency-viewer": "lecteur",
+  "establishment-contact": "contact de l'entreprise",
+  "establishment-admin": "administrateur de l'entreprise",
 };
 
 export const conventionSignatoryRoleBySignatoryKey: Record<
@@ -31,11 +39,6 @@ export const conventionSignatoryRoleBySignatoryKey: Record<
   "beneficiary-current-employer": "beneficiaryCurrentEmployer",
   "beneficiary-representative": "beneficiaryRepresentative",
   "establishment-representative": "establishmentRepresentative",
-};
-
-export const agencyModifierTitleByRole: Record<AgencyModifierRole, string> = {
-  counsellor: "conseiller",
-  validator: "valideur",
 };
 
 export const hasAllowedRoleOnAssessment = (

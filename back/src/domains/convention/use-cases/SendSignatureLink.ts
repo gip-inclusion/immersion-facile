@@ -26,13 +26,13 @@ import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/Sh
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
-  throwErrorIfPhoneNumberNotValid,
   throwErrorIfSignatoryAlreadySigned,
+  throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
   throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
-export const MIN_HOURS_BETWEEN_REMINDER = 24;
+export const MIN_HOURS_BETWEEN_SIGNATURE_REMINDER = 24;
 
 type SendSignatureLinkParams = {
   conventionId: ConventionId;
@@ -84,6 +84,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     const isNotSignatory = !(
       "role" in jwtPayload && isSignatory(jwtPayload.role)
     );
+    // Todo fix here a pro connect user that have his mail refenced on the convention as establishment representtative will be unhauturized will it shouldn't
     if (isNotSignatory) {
       await throwIfUserIsNotIFAdminNorAgencyModifier({
         uow,
@@ -103,7 +104,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       });
     }
 
-    throwErrorIfPhoneNumberNotValid({
+    throwErrorIfSignatoryPhoneNumberNotValid({
       convention,
       signatoryKey,
       signatoryRole: inputParams.role,
@@ -241,11 +242,11 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
   if (
     lastSms &&
     new Date(lastSms.createdAt) >
-      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_REMINDER)
+      subHours(timeGateway.now(), MIN_HOURS_BETWEEN_SIGNATURE_REMINDER)
   ) {
     const nextAllowedTime = new Date(lastSms.createdAt);
     nextAllowedTime.setHours(
-      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_REMINDER,
+      nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
     );
     const timeRemainingMs =
       nextAllowedTime.getTime() - timeGateway.now().getTime();
@@ -257,7 +258,7 @@ const throwErrorIfSignatureLinkAlreadySent = async ({
 
     throw errors.convention.smsSignatureLinkAlreadySent({
       signatoryRole,
-      minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
+      minHoursBetweenReminder: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
       timeRemaining: formattedTimeRemaining,
     });
   }

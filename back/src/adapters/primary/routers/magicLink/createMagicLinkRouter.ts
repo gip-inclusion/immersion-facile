@@ -156,5 +156,30 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       }),
   );
 
+  sharedRouter.sendAssessmentLink(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        const conventionId = req.body.conventionId;
+
+        return match(req.payloads)
+          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
+            deps.useCases.sendAssessmentLink.execute(
+              { conventionId },
+              convention,
+            ),
+          )
+          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
+            deps.useCases.sendAssessmentLink.execute(
+              { conventionId },
+              inclusion,
+            ),
+          )
+          .otherwise(() => {
+            throw errors.user.unauthorized();
+          });
+      }),
+  );
+
   return expressRouter;
 };

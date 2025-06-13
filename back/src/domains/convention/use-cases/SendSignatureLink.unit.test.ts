@@ -36,7 +36,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  MIN_HOURS_BETWEEN_REMINDER,
+  MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
   type SendSignatureLink,
   makeSendSignatureLink,
 } from "./SendSignatureLink";
@@ -355,7 +355,7 @@ describe("Send signature link", () => {
       });
     });
 
-    it(`throws too many requests if there was already a signature link sent less than ${MIN_HOURS_BETWEEN_REMINDER} hours before`, async () => {
+    it(`throws too many requests if there was already a signature link sent less than ${MIN_HOURS_BETWEEN_SIGNATURE_REMINDER} hours before`, async () => {
       const shortLinkId = "link2";
       shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
       uow.conventionRepository.setConventions([convention]);
@@ -400,7 +400,7 @@ describe("Send signature link", () => {
         ),
         errors.convention.smsSignatureLinkAlreadySent({
           signatoryRole: "establishment-representative",
-          minHoursBetweenReminder: MIN_HOURS_BETWEEN_REMINDER,
+          minHoursBetweenReminder: MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
           timeRemaining: "22h00",
         }),
       );
@@ -449,7 +449,7 @@ describe("Send signature link", () => {
           ),
           errors.convention.invalidMobilePhoneNumber({
             conventionId: conventionWithIncorrectPhoneFormat.id,
-            signatoryRole: "beneficiary",
+            role: "beneficiary",
           }),
         );
       },
@@ -797,7 +797,7 @@ describe("Send signature link", () => {
       ]);
     });
 
-    it(`send signature link if last signature link was sent more than ${MIN_HOURS_BETWEEN_REMINDER} hours ago`, async () => {
+    it(`send signature link if last signature link was sent more than ${MIN_HOURS_BETWEEN_SIGNATURE_REMINDER} hours ago`, async () => {
       const shortLinkId = "link2";
       const pastSmsNotification: Notification = {
         id: "past-notification-id",

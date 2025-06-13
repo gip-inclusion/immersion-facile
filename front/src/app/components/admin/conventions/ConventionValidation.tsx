@@ -1,8 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import { formatDistance } from "date-fns";
+import { addDays, formatDistance, isAfter, isBefore } from "date-fns";
 import { fr as french } from "date-fns/locale";
+import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
@@ -12,7 +13,10 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionReadDto,
   type Phone,
+  type Role,
   type SignatoryRole,
+  agencyModifierRoles,
+  allSignatoryRoles,
   isConventionRenewed,
   toDisplayedDate,
 } from "shared";
@@ -20,15 +24,22 @@ import type { JwtKindProps } from "src/app/components/admin/conventions/Conventi
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
+import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
 import {
+  SendAssessmentLinkModalWrapper,
   SendSignatureLinkModalWrapper,
   type SignatureLinkState,
   makeConventionSections,
+  sendAssessmentLinkButtonProps,
+  sendAssessmentLinkModal,
   sendSignatureLinkButtonProps,
   sendSignatureLinkModal,
 } from "../../../contents/convention/conventionSummary.helpers";
@@ -46,14 +57,19 @@ const beforeAfterString = (date: string) => {
 export interface ConventionValidationProps {
   convention: ConventionReadDto;
   jwtParams: JwtKindProps;
+  roles: Role[];
 }
 
 export const ConventionValidation = ({
   convention,
   jwtParams,
+  roles,
 }: ConventionValidationProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
+  const assessment = useAppSelector(assessmentSelectors.currentAssessment);
+  const [isAssessmentLinkSent, setIsAssessmentLinkSent] =
+    useState<boolean>(false);
 
   useScrollToTop(!!useFeedbackTopic("send-signature-link"));
 
@@ -76,13 +92,23 @@ export const ConventionValidation = ({
     sendSignatureLinkModal.close();
   };
 
-  const isModalOpen = useIsModalOpen(sendSignatureLinkModal, {
+  const isSignatureModalOpen = useIsModalOpen(sendSignatureLinkModal, {
     onConceal: () => closeSendSignatureLinkModal(),
   });
 
   useEffect(() => {
-    if (!isModalOpen) setSignatoryToSendSignatureLink(null);
-  }, [isModalOpen]);
+    if (!isSignatureModalOpen) setSignatoryToSendSignatureLink(null);
+  }, [isSignatureModalOpen]);
+
+  useEffect(() => {
+    dispatch(
+      assessmentSlice.actions.getAssessmentRequested({
+        conventionId: convention.id,
+        jwt: jwtParams.jwt,
+        feedbackTopic: "assessment",
+      }),
+    );
+  }, [dispatch, convention.id, jwtParams.jwt]);
 
   const {
     status,
@@ -91,6 +117,24 @@ export const ConventionValidation = ({
     dateStart,
     dateEnd: _,
   } = convention;
+
+  const isConventionEndingInOneDayOrMore = isAfter(
+    new Date(convention.dateEnd),
+    addDays(new Date(), 1),
+  );
+  const canAssessmentBeFilled =
+    convention.status === "ACCEPTED_BY_VALIDATOR" &&
+    isBefore(new Date(convention.dateStart), new Date()) &&
+    !assessment;
+
+  const shouldShowAssessmentReminderButton =
+    canAssessmentBeFilled &&
+    !isConventionEndingInOneDayOrMore &&
+    intersection(roles, [
+      ...agencyModifierRoles,
+      ...allSignatoryRoles,
+      "back-office",
+    ]).length > 0;
 
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
@@ -116,6 +160,19 @@ export const ConventionValidation = ({
     }
   };
 
+  const onSubmitSendAssessmentLink = () => {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    console.log(" ====>");
+
+    setIsAssessmentLinkSent(true);
+
+    sendAssessmentLinkSlice.actions.sendAssessmentLinkRequested({
+      conventionId: convention.id,
+      jwt: jwtParams.jwt,
+      feedbackTopic: "send-assessment-link",
+    });
+  };
+
   return (
     <>
       <Badge
@@ -131,7 +188,7 @@ export const ConventionValidation = ({
         <p>Justification : {convention.statusJustification}</p>
       )}
       <Feedback
-        topics={["send-signature-link"]}
+        topics={["send-signature-link", "send-assessment-link"]}
         className={fr.cx("fr-my-4w")}
       />
       {isConventionRenewed(convention) && (
@@ -154,13 +211,26 @@ export const ConventionValidation = ({
               });
             },
           }),
+          shouldShowAssessmentReminderButton
+            ? sendAssessmentLinkButtonProps({
+                isAssessmentLinkSent,
+                onClick: () => {
+                  sendAssessmentLinkModal.open();
+                },
+              })
+            : undefined,
         )}
         conventionId={convention.id}
       />
+
       <SendSignatureLinkModalWrapper
         signatory={signatoryToSendSignatureLink?.signatoryRole}
         signatoryPhone={signatoryToSendSignatureLink?.signatoryPhone}
         onConfirm={onSubmitSendSignatureLink}
+      />
+      <SendAssessmentLinkModalWrapper
+        phone={convention.establishmentTutor.phone}
+        onConfirm={onSubmitSendAssessmentLink}
       />
     </>
   );
