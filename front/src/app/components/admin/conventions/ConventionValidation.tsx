@@ -3,6 +3,7 @@ import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import { addDays, formatDistance, isAfter, isBefore } from "date-fns";
 import { fr as french } from "date-fns/locale";
+import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
@@ -12,7 +13,10 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionReadDto,
   type Phone,
+  type Role,
   type SignatoryRole,
+  agencyModifierRoles,
+  allSignatoryRoles,
   isConventionRenewed,
   toDisplayedDate,
 } from "shared";
@@ -53,11 +57,13 @@ const beforeAfterString = (date: string) => {
 export interface ConventionValidationProps {
   convention: ConventionReadDto;
   jwtParams: JwtKindProps;
+  roles: Role[];
 }
 
 export const ConventionValidation = ({
   convention,
   jwtParams,
+  roles,
 }: ConventionValidationProps) => {
   const { cx } = useStyles();
   const dispatch = useDispatch();
@@ -122,7 +128,13 @@ export const ConventionValidation = ({
     !assessment;
 
   const shouldShowAssessmentReminderButton =
-    canAssessmentBeFilled && !isConventionEndingInOneDayOrMore;
+    canAssessmentBeFilled &&
+    !isConventionEndingInOneDayOrMore &&
+    intersection(roles, [
+      ...agencyModifierRoles,
+      ...allSignatoryRoles,
+      "back-office",
+    ]).length > 0;
 
   const title = `${beneficiary.lastName.toUpperCase()} ${
     beneficiary.firstName
