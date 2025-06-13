@@ -6,9 +6,11 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
+  type Email,
   type Role,
   type UserId,
   errors,
+  establishmentsRoles,
   frontRoutes,
   withConventionIdSchema,
 } from "shared";
@@ -61,6 +63,21 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
+    const agencyWithRights = await uow.agencyRepository.getById(
+      convention.agencyId,
+    );
+    if (!agencyWithRights)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+    await throwIfNotAllowedToSendAssessmentLink(
+      uow,
+      convention,
+      agency,
+      jwtPayload,
+    );
+
     throwErrorIfConventionStatusNotAllowed(convention.status);
 
     throwErrorIfConventionEndInMoreThanOneDay(
@@ -82,21 +99,6 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       notificationRepository: uow.notificationRepository,
       conventionId: convention.id,
     });
-
-    const agencyWithRights = await uow.agencyRepository.getById(
-      convention.agencyId,
-    );
-    if (!agencyWithRights)
-      throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-    await throwIfNotAllowedToSendAssessmentLink(
-      uow,
-      convention,
-      agency,
-      jwtPayload,
-    );
 
     await sendSms({
       conventionMagicLinkPayload: {
@@ -192,9 +194,9 @@ const sendSms = async ({
   });
 
   const shortLink = await makeShortMagicLink({
-    targetRoute: frontRoutes.conventionToSign,
+    targetRoute: frontRoutes.assessment,
     lifetime: "short",
-    extraQueryParams: { mtm_source: "sms-signature-link" },
+    extraQueryParams: { mtm_source: "sms-assessment-link" },
   });
 
   await saveNotificationAndRelatedEvent(uow, {
@@ -207,7 +209,7 @@ const sendSms = async ({
     },
     templatedContent: {
       recipientPhone,
-      kind: "ReminderForSignatories",
+      kind: "ReminderForAssessment",
       params: { shortLink: shortLink },
     },
   });
@@ -271,6 +273,11 @@ const throwIfNotAllowedToSendAssessmentLink = async (
       userWithRights.email ===
       convention.signatories.establishmentRepresentative.email;
 
+    const hasEstablishmentRole = userWithRights.establishments?.some(
+      (establishmentRight) =>
+        establishmentsRoles.includes(establishmentRight.role),
+    );
+
     const hasEnoughRightsOnAgency = userWithRights.agencyRights.some(
       (agencyRight) =>
         agencyRight.agency.id === convention.agencyId &&
@@ -285,6 +292,10 @@ const throwIfNotAllowedToSendAssessmentLink = async (
       hasEnoughRightsOnAgency
     ) {
       return;
+    }
+
+    if (hasEstablishmentRole) {
+      throw errors.assessment.sendAssessmentLinkForbidden();
     }
 
     if (!hasEnoughRightsOnAgency)
@@ -311,6 +322,7 @@ const throwIfNotAllowedToSendAssessmentLink = async (
     )[role];
 
     if (emailsOrError instanceof Error) throw emailsOrError;
+
     if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
       throw errors.convention.emailNotLinkedToConvention(role);
   }
@@ -320,13 +332,17 @@ const getEmailsByRoleForReminder = (
   convention: ConventionReadDto,
   agency: AgencyDto,
   forbiddenError: Error,
-): Record<Role, string[] | Error> => ({
+): Record<Role, Email[] | Error> => ({
   "back-office": forbiddenError,
   "to-review": forbiddenError,
   "agency-viewer": forbiddenError,
   beneficiary: [convention.signatories.beneficiary.email],
-  "beneficiary-current-employer": forbiddenError,
-  "beneficiary-representative": forbiddenError,
+  "beneficiary-current-employer": [
+    convention.signatories.beneficiaryCurrentEmployer?.email ?? "",
+  ],
+  "beneficiary-representative": [
+    convention.signatories.beneficiaryRepresentative?.email ?? "",
+  ],
   "agency-admin": forbiddenError,
   "establishment-representative": [
     convention.signatories.establishmentRepresentative.email,
