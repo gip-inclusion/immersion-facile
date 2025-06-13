@@ -84,7 +84,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     const isNotSignatory = !(
       "role" in jwtPayload && isSignatory(jwtPayload.role)
     );
-    // Todo fix here a pro connect user that have his mail refenced on the convention as establishment representtative will be unhauturized will it shouldn't
+
     if (isNotSignatory) {
       await throwIfUserIsNotIFAdminNorAgencyModifier({
         uow,
