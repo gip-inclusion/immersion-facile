@@ -13,11 +13,11 @@
       "size": "M"
     },
     {
-      "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
+      "command": "30 05 * * * pnpm back run trigger-sending-assessment-needed-notifications",
       "size": "M"
     },
     {
-      "command": "30 06 * * * pnpm back run trigger-sending-assessment-needed-notifications",
+      "command": "00 6 * * * pnpm back run trigger-establishment-leads-reminders",
       "size": "M"
     },
     {
