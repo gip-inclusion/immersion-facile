@@ -6,6 +6,9 @@ export const crispDeleteReason =
   "Cela ne correspond pas à notre processus de vérification, d'enregistrement et de signature interne.";
 export const conventionFromTally = "11112222-3333-4444-5555-666677778888";
 export const crispTicketSiret = "11112222333344";
+export const conventionWithAssessment = "22223333-4444-5555-6666-777788889999";
+export const assessmentLink =
+  "https://immersion-facile.beta.gouv.fr/assessment/22223333-4444-5555-6666-777788889999";
 
 export const tallyFormCase0TicketToSkip: TallyForm = {
   eventId: "6a49da03-cc7a-4544-bdd4-fc8ef70eb295",
@@ -1065,3 +1068,114 @@ export const tallyFormCase6: TallyForm = {
     ],
   },
 };
+
+export const makeTallyFormCase7WithAssessment = (): TallyForm => ({
+  eventId: "d23ba90d-e546-4664-b2c2-1196f11e120d",
+  eventType: "FORM_RESPONSE",
+  createdAt: "2025-02-25T12:57:44.237Z",
+  data: {
+    responseId: "QPbOpp",
+    submissionId: "QPbOpp",
+    respondentId: "957AvG",
+    formId: "mBdQQe",
+    formName: "[Support] Faire une demande de contact (réponse en 48h ouvrées)",
+    createdAt: "2025-02-25T12:57:38.000Z",
+    fields: [
+      {
+        key: "question_818ZDA_5439773a-d891-4197-871f-bd50a6bb7c86",
+        label: "segment",
+        type: "CALCULATED_FIELDS",
+        value: "email,beneficiaire",
+      },
+      {
+        key: "question_818ZDA_ebb6daf8-6141-4b37-a9c2-58af14389a59",
+        label: "close_ticket",
+        type: "CALCULATED_FIELDS",
+        value: "",
+      },
+      {
+        key: "question_PdYMgd",
+        label: "Choisissez le cas qui vous correspond le mieux",
+        type: "MULTIPLE_CHOICE",
+        value: ["4680bf5f-b7ab-4d4b-bdc0-84861c78d9c4"],
+        options: [
+          {
+            id: "104ae2c0-93d2-4399-a312-ab886254ca87",
+            text: "Vous souhaitez signer une convention ou envoyer un lien de signature",
+          },
+          {
+            id: "9b390f0c-0346-426d-a131-664e253f15e3",
+            text: "Vous recherchez une entreprise accueillante pour une immersion",
+          },
+          {
+            id: "4680bf5f-b7ab-4d4b-bdc0-84861c78d9c4",
+            text: "Autre chose",
+          },
+          {
+            id: "1f86699b-2430-4b46-a97b-6d67768c9b25",
+            text: "Vous souhaitez modifier une convention",
+          },
+        ],
+      },
+      {
+        key: "question_PpRzBx",
+        label: "Vous êtes",
+        type: "MULTIPLE_CHOICE",
+        value: ["b01a2f91-c340-487c-ace3-a9bdce96b6b4"],
+        options: [
+          {
+            id: "b01a2f91-c340-487c-ace3-a9bdce96b6b4",
+            text: "Le bénéficiaire",
+          },
+          {
+            id: "f66a955b-1e5b-42a8-9929-93b8671c8570",
+            text: "L'entreprise",
+          },
+          {
+            id: "98004797-13cf-4128-af3e-446c384948fb",
+            text: "Le prescripteur ou la structure d'accompagnement",
+          },
+          {
+            id: "a9af71a2-0b48-462d-9768-e7736fd44a68",
+            text: "Vous ne savez pas",
+          },
+        ],
+      },
+      {
+        key: "question_Oa4Y87",
+        label: "Vous nous écrivez pour...",
+        type: "MULTIPLE_CHOICE",
+        value: ["e47f860f-ed1e-43af-95b0-5b31879bd892"],
+        options: [
+          {
+            id: "e47f860f-ed1e-43af-95b0-5b31879bd892",
+            text: "Vous-même",
+          },
+          {
+            id: "7204db7d-e13e-443c-8c38-671721a2d0ce",
+            text: "Quelqu'un d'autre",
+          },
+        ],
+      },
+      {
+        key: "question_RGYMNj",
+        label:
+          "ID de convention (pour accélérer le traitement de votre demande)",
+        type: "INPUT_TEXT",
+        value: conventionWithAssessment,
+      },
+      {
+        key: "question_MeYNZk",
+        label: "Votre email",
+        type: "INPUT_EMAIL",
+        value: johnDoeEmail,
+      },
+      {
+        key: "question_lbWeGv",
+        label: "Merci de préciser votre demande",
+        type: "TEXTAREA",
+        value: crispMessageContent,
+      },
+    ],
+  },
+});

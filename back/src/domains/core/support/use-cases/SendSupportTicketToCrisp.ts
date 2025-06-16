@@ -214,6 +214,19 @@ Convention ID: ${conventionId} - Non trouvée dans la base de données
       extraSegment: [],
     };
 
+  const assessmentEmail = (
+    await uow.notificationRepository.getEmailsByFilters({
+      conventionId,
+      email: convention.establishmentTutor.email,
+      emailType: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
+    })
+  ).at(0)?.templatedContent.params;
+
+  const assessmentLink =
+    assessmentEmail && "linkToAssessment" in assessmentEmail
+      ? assessmentEmail.linkToAssessment
+      : null;
+
   return {
     extraSegment: [convention.internshipKind],
     note: `-----------
@@ -228,6 +241,14 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?id_de_convention=${co
 
 Liens magiques de cette convention:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_numero_de_convention=${conventionId}
+
+Bilan:
+${
+  assessmentLink
+    ? `Lien de complétion du bilan: ${assessmentLink}
+Email du tuteur: ${convention.establishmentTutor.email}`
+    : "Pas de lien de bilan"
+}
 `,
   };
 };

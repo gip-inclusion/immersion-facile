@@ -11,12 +11,15 @@ import {
   makeSendSupportTicketToCrisp,
 } from "./SendSupportTicketToCrisp";
 import {
+  assessmentLink,
   conventionFromTally,
+  conventionWithAssessment,
   crispDeleteReason,
   crispMessageContent,
   crispTicketSiret,
   johnDoeEmail,
   makeTallyFormCase2WithConventionId,
+  makeTallyFormCase7WithAssessment,
   tallyFormCase0TicketToSkip,
   tallyFormCase1,
   tallyFormCase3,
@@ -29,6 +32,24 @@ describe("SendSupportTicketToCrisp", () => {
   const convention = new ConventionDtoBuilder()
     .withId(conventionFromTally)
     .build();
+  const conventionWithAssessmentLink = new ConventionDtoBuilder()
+    .withId(conventionWithAssessment)
+    .withBusinessName("Test Business")
+    .withBeneficiaryFirstName("John")
+    .withBeneficiaryLastName("Doe")
+    .withBeneficiaryEmail(johnDoeEmail)
+    .withBeneficiaryPhone("0123456789")
+    .withEstablishmentRepresentativeFirstName("Jane")
+    .withEstablishmentRepresentativeLastName("Smith")
+    .withEstablishmentTutor({
+      firstName: "Jane",
+      lastName: "Smith",
+      email: "jane.smith@test.com",
+      phone: "0123456789",
+      job: "Manager",
+      role: "establishment-tutor",
+    })
+    .build();
   let sendSupportTicketToCrisp: SendSupportTicketToCrisp;
   let uow: InMemoryUnitOfWork;
   let crispApi: InMemoryCrispApi;
@@ -36,7 +57,29 @@ describe("SendSupportTicketToCrisp", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     crispApi = new InMemoryCrispApi();
-    uow.conventionRepository.setConventions([convention]);
+    uow.conventionRepository.setConventions([
+      convention,
+      conventionWithAssessmentLink,
+    ]);
+    uow.notificationRepository.save({
+      id: "test-notification-id",
+      kind: "email",
+      createdAt: new Date().toISOString(),
+      templatedContent: {
+        kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
+        recipients: [conventionWithAssessmentLink.establishmentTutor.email],
+        params: {
+          recipientFullName: `${conventionWithAssessmentLink.establishmentTutor.firstName} ${conventionWithAssessmentLink.establishmentTutor.lastName}`,
+          beneficiaryFullName: `${conventionWithAssessmentLink.signatories.beneficiary.firstName} ${conventionWithAssessmentLink.signatories.beneficiary.lastName}`,
+          businessName: conventionWithAssessmentLink.businessName,
+          linkToAssessment: assessmentLink,
+          internshipKind: conventionWithAssessmentLink.internshipKind,
+        },
+      },
+      followedIds: {
+        conventionId: conventionWithAssessment,
+      },
+    });
     sendSupportTicketToCrisp = makeSendSupportTicketToCrisp({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
@@ -94,6 +137,9 @@ https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?id_de_convention=${co
 
 Liens magiques de cette convention:
 https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_numero_de_convention=${conventionFromTally}
+
+Bilan:
+Pas de lien de bilan
 
 -----------
 Retrouver la convention par Email de bénéficiaire:
@@ -228,6 +274,45 @@ https://app-smtp.brevo.com/log
           metadata: {
             email: johnDoeEmail,
             segments: ["email", "entreprise", "suppression-entreprise"],
+          },
+        },
+      },
+      {
+        name: "case 7, with assessment link",
+        tallyForm: makeTallyFormCase7WithAssessment(),
+        expectedParams: {
+          message: crispMessageContent,
+          helperNote: `Liens magiques (de la personne écrivant au support):
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_email=${johnDoeEmail}
+
+-----------
+Convention ID: ${conventionWithAssessment}
+Type de convention: immersion
+
+Pilotage admin:
+https://immersion-facile.beta.gouv.fr/admin/conventions/${conventionWithAssessment}
+
+Liste de conventions:
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?id_de_convention=${conventionWithAssessment}
+
+Liens magiques de cette convention:
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/102?filtrer_par_numero_de_convention=${conventionWithAssessment}
+
+Bilan:
+Lien de complétion du bilan: ${assessmentLink}
+Email du tuteur: ${conventionWithAssessmentLink.establishmentTutor.email}
+
+-----------
+Retrouver la convention par Email de bénéficiaire:
+https://metabase.immersion-facile.beta.gouv.fr/dashboard/5?email_b%25C3%25A9n%25C3%25A9ficiaire=${johnDoeEmail}
+
+-----------
+Logs Brevo:
+https://app-smtp.brevo.com/log
+`,
+          metadata: {
+            email: johnDoeEmail,
+            segments: ["email", "beneficiaire", "immersion"],
           },
         },
       },
