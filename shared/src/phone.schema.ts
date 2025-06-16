@@ -1,4 +1,4 @@
-import { type CountryCode, isValidPhoneNumber } from "libphonenumber-js/max";
+import { type CountryCode, isValidPhoneNumber } from "libphonenumber-js";
 import { parsePhoneNumber } from "libphonenumber-js/mobile";
 import { z } from "zod";
 import type { Phone } from "./sms/smsTemplateByName";
