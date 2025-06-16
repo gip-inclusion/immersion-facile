@@ -2,7 +2,6 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { addDays, isAfter, isBefore } from "date-fns";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
 import { ButtonWithSubMenu } from "react-design-system";
@@ -45,6 +44,8 @@ import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConvention
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
+import { isConventionEndingInOneDayOrMore } from "src/core-logic/domain/convention/convention.utils";
+import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export type JwtKindProps =
@@ -193,23 +194,15 @@ export const ConventionManageActions = ({
     jwtParams.kind !== "backoffice" &&
     allowedToSignStatuses.includes(convention.status);
 
-  const isConventionEndingInOneDayOrMore = isAfter(
-    new Date(convention.dateEnd),
-    addDays(new Date(), 1),
-  );
-
-  const canAssessmentBeFilled =
-    convention.status === "ACCEPTED_BY_VALIDATOR" &&
-    isBefore(new Date(convention.dateStart), new Date()) &&
-    !assessment;
   const shouldShowConventionDocumentButton =
     convention.status === "ACCEPTED_BY_VALIDATOR";
   const shouldShowAssessmentAbandonAction =
-    canAssessmentBeFilled && isConventionEndingInOneDayOrMore;
+    canAssessmentBeFilled(convention, assessment) &&
+    isConventionEndingInOneDayOrMore(convention);
 
   const shouldShowAssessmentFullFillAction =
-    canAssessmentBeFilled &&
-    !isConventionEndingInOneDayOrMore &&
+    canAssessmentBeFilled(convention, assessment) &&
+    !isConventionEndingInOneDayOrMore(convention) &&
     intersection(roles, [
       ...allowedRolesToCreateAssessment,
       ...establishmentsRoles,

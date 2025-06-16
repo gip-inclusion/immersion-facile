@@ -85,7 +85,7 @@ export class HttpAssessmentGateway implements AssessmentGateway {
             .with({ status: 200 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 429 }, throwTooManyRequestWithExplicitMessage)
-            .with({ status: P.union(403, 404) }, logBodyAndThrow)
+            .with({ status: P.union(403, 401, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

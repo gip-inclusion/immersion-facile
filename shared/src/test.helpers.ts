@@ -2,6 +2,7 @@ import { partition } from "ramda";
 import type { HttpResponse, UnknownSharedRoute } from "shared-routes";
 import type { EmailType, TemplatedEmail } from "./email/email";
 import { BadRequestError } from "./errors/httpErrors";
+import type { TemplatedSms } from "./sms/smsTemplateByName";
 
 export const expectPromiseToFail = async (promise: Promise<unknown>) => {
   await expect(promise).rejects.toThrow();
@@ -76,6 +77,17 @@ export const expectEmailOfType = <
 ): Extract<E, { kind: T }> => {
   expect(email.kind).toBe(expectedEmailType);
   return email as Extract<E, { kind: T }>;
+};
+
+export const expectSmsOfType = <
+  T extends TemplatedSms["kind"],
+  E extends TemplatedSms = TemplatedSms,
+>(
+  sms: E,
+  expectedSmsType: T,
+): Extract<E, { kind: T }> => {
+  expect(sms.kind).toBe(expectedSmsType);
+  return sms as Extract<E, { kind: T }>;
 };
 
 export const expectToEqual = <T>(actual: T, expected: T) => {

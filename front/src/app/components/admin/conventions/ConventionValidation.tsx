@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
-import { addDays, formatDistance, isAfter, isBefore } from "date-fns";
+import { formatDistance } from "date-fns";
 import { fr as french } from "date-fns/locale";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
@@ -30,6 +30,8 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
+import { isConventionEndingInOneDayOrMore } from "src/core-logic/domain/convention/convention.utils";
+import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
@@ -121,18 +123,9 @@ export const ConventionValidation = ({
     dateEnd: _,
   } = convention;
 
-  const isConventionEndingInOneDayOrMore = isAfter(
-    new Date(convention.dateEnd),
-    addDays(new Date(), 1),
-  );
-  const canAssessmentBeFilled =
-    convention.status === "ACCEPTED_BY_VALIDATOR" &&
-    isBefore(new Date(convention.dateStart), new Date()) &&
-    !assessment;
-
   const shouldShowAssessmentReminderButton =
-    canAssessmentBeFilled &&
-    !isConventionEndingInOneDayOrMore &&
+    canAssessmentBeFilled(convention, assessment) &&
+    !isConventionEndingInOneDayOrMore(convention) &&
     intersection(roles, [
       ...agencyModifierRoles,
       ...allSignatoryRoles,

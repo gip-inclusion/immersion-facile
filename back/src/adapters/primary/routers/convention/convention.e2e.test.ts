@@ -977,4 +977,155 @@ describe("convention e2e", () => {
       ]);
     });
   });
+
+  describe(`${displayRouteName(
+    conventionMagicLinkRoutes.sendAssessmentLink,
+  )} sends assessment link`, () => {
+    beforeEach(() => {
+      inMemoryUow.conventionRepository.setConventions([convention]);
+      inMemoryUow.agencyRepository.agencies = [
+        toAgencyWithRights(peAgency, {
+          [validator.id]: { roles: ["validator"], isNotifiedByEmail: false },
+        }),
+      ];
+      inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
+    });
+
+    it("200 - Successfully sends assessment link", async () => {
+      const conventionWithValidStatus = new ConventionDtoBuilder(convention)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([
+        conventionWithValidStatus,
+      ]);
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithValidStatus.id,
+          role: "beneficiary",
+          email: conventionWithValidStatus.signatories.beneficiary.email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      gateways.shortLinkGenerator.addMoreShortLinkIds(["shortLink1"]);
+
+      const response = await magicLinkRequest.sendAssessmentLink({
+        headers: { authorization: jwt },
+        body: { conventionId: conventionWithValidStatus.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: "",
+      });
+
+      await processEventsForEmailToBeSent(eventCrawler);
+
+      const sentSms = gateways.notification.getSentSms();
+      expectToEqual(sentSms.length, 1);
+    });
+
+    it("400 - Cannot send assessment link when convention is READY_TO_SIGN", async () => {
+      const conventionReadyToSign = new ConventionDtoBuilder(convention)
+        .withStatus("READY_TO_SIGN")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([conventionReadyToSign]);
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionReadyToSign.id,
+          role: "beneficiary",
+          email: conventionReadyToSign.signatories.beneficiary.email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentLink({
+        headers: { authorization: jwt },
+        body: { conventionId: conventionReadyToSign.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 400,
+        body: {
+          status: 400,
+          message: errors.assessment.sendAssessmentLinkNotAllowedForStatus({
+            status: "READY_TO_SIGN",
+          }).message,
+        },
+      });
+    });
+
+    it("403 - Forbidden when unauthorized user tries to send assessment link", async () => {
+      const conventionWithValidStatus = new ConventionDtoBuilder(convention)
+        .withStatus("ACCEPTED_BY_VALIDATOR")
+        .build();
+      inMemoryUow.conventionRepository.setConventions([
+        conventionWithValidStatus,
+      ]);
+
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: conventionWithValidStatus.id,
+          role: "agency-viewer",
+          email: conventionWithValidStatus.establishmentTutor.email,
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentLink({
+        headers: { authorization: jwt },
+        body: { conventionId: conventionWithValidStatus.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.assessment.sendAssessmentLinkForbidden().message,
+        },
+      });
+    });
+
+    it("401 - Invalid JWT", async () => {
+      const response = await magicLinkRequest.sendAssessmentLink({
+        headers: { authorization: "invalid-token" },
+        body: { conventionId: convention.id },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 401,
+        body: {
+          status: 401,
+          message: "Provided token is invalid",
+        },
+      });
+    });
+
+    it("404 - Convention not found", async () => {
+      const jwt = generateConventionJwt(
+        createConventionMagicLinkPayload({
+          id: unknownId,
+          role: "beneficiary",
+          email: "some@email.com",
+          now: gateways.timeGateway.now(),
+        }),
+      );
+
+      const response = await magicLinkRequest.sendAssessmentLink({
+        headers: { authorization: jwt },
+        body: { conventionId: unknownId },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 404,
+        body: {
+          status: 404,
+          message: errors.convention.notFound({ conventionId: unknownId })
+            .message,
+        },
+      });
+    });
+  });
 });

@@ -1,9 +1,7 @@
 import { addDays, subDays, subHours } from "date-fns";
 import {
-  type AgencyDto,
   AgencyDtoBuilder,
   type AgencyRole,
-  type ConventionDto,
   ConventionDtoBuilder,
   type EstablishmentRole,
   type InclusionConnectDomainJwtPayload,
@@ -22,10 +20,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
-import {
-  type SaveNotificationAndRelatedEvent,
-  makeSaveNotificationAndRelatedEvent,
-} from "../../core/notifications/helpers/Notification";
+import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -36,7 +31,6 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import type { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import {
   MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
@@ -44,110 +38,121 @@ import {
   makeSendAssessmentLink,
 } from "./SendAssessmentLink";
 
-const conventionId = "add5c20e-6dd2-45af-affe-927358005251";
-
-const notConnectedUser = new UserBuilder()
-  .withEmail("validator@mail.com")
-  .build();
-const validatorJwtPayload = createConventionMagicLinkPayload({
-  id: conventionId,
-  role: "validator",
-  email: notConnectedUser.email,
-  now: new Date(),
-});
-
-const connectedUserPayload: InclusionConnectDomainJwtPayload = {
-  userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
-};
-
-const connectedUserBuilder = new InclusionConnectedUserBuilder().withId(
-  connectedUserPayload.userId,
-);
-const connectedUser = connectedUserBuilder.build();
-
 describe("SendAssessmentLink", () => {
   const config = new AppConfigBuilder().build();
-  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
   let uow: InMemoryUnitOfWork;
   let usecase: SendAssessmentLink;
-  let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
   let timeGateway: TimeGateway;
-  let convention: ConventionDto;
-  let agency: AgencyDto;
+
+  const now = new Date();
+
+  const shortLinkId = "link1";
+
+  const convention = new ConventionDtoBuilder()
+    .withId("add5c20e-6dd2-45af-affe-927358005251")
+    .withStatus("ACCEPTED_BY_VALIDATOR")
+    .withDateEnd(now.toISOString())
+    .withBeneficiaryEmail("beneficiary@mail.com")
+    .withBeneficiaryRepresentative({
+      email: "beneficiary-representative@mail.com",
+      firstName: "Robert",
+      lastName: "Thénardier",
+      phone: "",
+      role: "beneficiary-representative",
+    })
+    .withBeneficiaryCurrentEmployer({
+      email: "beneficiary-current-employer@mail.com",
+      firstName: "Robert",
+      lastName: "Thénardier",
+      phone: "",
+      role: "beneficiary-current-employer",
+      businessName: "",
+      businessSiret: "",
+      job: "",
+      signedAt: undefined,
+      businessAddress: "Rue des Bouchers 67065 Strasbourg",
+    })
+    .withEstablishmentRepresentative({
+      email: "establishment-representative@mail.com",
+      firstName: "Robert",
+      lastName: "Thénardier",
+      phone: "",
+      role: "establishment-representative",
+    })
+    .withEstablishmentTutor({
+      email: "tutor@mail.com",
+      firstName: "Robert",
+      lastName: "Thénardier",
+      phone: "+33612345679",
+      role: "establishment-tutor",
+      job: "Tutor",
+    })
+    .build();
+
+  const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
+
+  const notConnectedUser = new UserBuilder()
+    .withEmail("validator@mail.com")
+    .build();
+
+  const connectedUser = new InclusionConnectedUserBuilder()
+    .withId("bcc5c20e-6dd2-45cf-affe-927358005262")
+    .build();
+
+  const backofficeAdmin = new InclusionConnectedUserBuilder()
+    .withId("bcc5c20e-6dd2-45cf-affe-927358005263")
+    .withIsAdmin(true)
+    .build();
+
+  const validatorJwtPayload = createConventionMagicLinkPayload({
+    id: convention.id,
+    role: "validator",
+    email: notConnectedUser.email,
+    now: new Date(),
+  });
+
+  const counsellorJwtPayload = createConventionMagicLinkPayload({
+    id: convention.id,
+    role: "counsellor",
+    email: notConnectedUser.email,
+    now: new Date(),
+  });
 
   beforeEach(() => {
-    timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway(now);
     uow = createInMemoryUow();
-    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+    const shortLinkIdGeneratorGateway =
+      new DeterministShortLinkIdGeneratorGateway();
     const uuidGenerator = new UuidV4Generator();
-    saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
-      uuidGenerator,
-      timeGateway,
-    );
-    const createNewEvent = makeCreateNewEvent({ uuidGenerator, timeGateway });
 
     usecase = makeSendAssessmentLink({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
-        saveNotificationAndRelatedEvent,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          uuidGenerator,
+          timeGateway,
+        ),
         generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
         timeGateway,
         shortLinkIdGeneratorGateway,
         config,
-        createNewEvent,
+        createNewEvent: makeCreateNewEvent({ uuidGenerator, timeGateway }),
       },
     });
 
-    const conventionBuilder = new ConventionDtoBuilder()
-      .withId(conventionId)
-      .withStatus("ACCEPTED_BY_VALIDATOR")
-      .withDateEnd(timeGateway.now().toISOString())
-      .withBeneficiaryEmail("beneficiary@mail.com")
-      .withBeneficiaryRepresentative({
-        email: "beneficiary-representative@mail.com",
-        firstName: "Robert",
-        lastName: "Thénardier",
-        phone: "",
-        role: "beneficiary-representative",
-      })
-      .withBeneficiaryCurrentEmployer({
-        email: "beneficiary-current-employer@mail.com",
-        firstName: "Robert",
-        lastName: "Thénardier",
-        phone: "",
-        role: "beneficiary-current-employer",
-        businessName: "",
-        businessSiret: "",
-        job: "",
-        signedAt: undefined,
-        businessAddress: "Rue des Bouchers 67065 Strasbourg",
-      })
-      .withEstablishmentRepresentative({
-        email: "establishment-representative@mail.com",
-        firstName: "Robert",
-        lastName: "Thénardier",
-        phone: "",
-        role: "establishment-representative",
-      })
-      .withEstablishmentTutor({
-        email: "tutor@mail.com",
-        firstName: "Robert",
-        lastName: "Thénardier",
-        phone: "+33612345679",
-        role: "establishment-tutor",
-        job: "Tutor",
-      });
-
-    convention = conventionBuilder.build();
-
-    agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
+    uow.conventionRepository.setConventions([convention]);
+    uow.userRepository.users = [
+      notConnectedUser,
+      connectedUser,
+      backofficeAdmin,
+    ];
   });
 
   describe("wrong paths", () => {
     it("throws bad request if requested convention does not match the one in jwt", async () => {
       const wrongConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
 
-      uow.conventionRepository.setConventions([convention]);
       uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
 
       await expectPromiseToFailWithError(
@@ -164,25 +169,25 @@ describe("SendAssessmentLink", () => {
     });
 
     it("throws not found if convention does not exist", async () => {
+      uow.conventionRepository.setConventions([]);
+
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            conventionId,
+            conventionId: convention.id,
           },
           validatorJwtPayload,
         ),
         errors.convention.notFound({
-          conventionId,
+          conventionId: convention.id,
         }),
       );
     });
 
     it("throws bad request if status is not ACCEPTED_BY_VALIDATOR", async () => {
-      const convention = new ConventionDtoBuilder()
-        .withId(conventionId)
+      const conventionWithWrongStatus = new ConventionDtoBuilder(convention)
         .withStatus("IN_REVIEW")
         .build();
-      uow.userRepository.users = [notConnectedUser];
 
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
@@ -192,12 +197,12 @@ describe("SendAssessmentLink", () => {
           },
         }),
       ];
-      uow.conventionRepository.setConventions([convention]);
+      uow.conventionRepository.setConventions([conventionWithWrongStatus]);
 
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            conventionId,
+            conventionId: conventionWithWrongStatus.id,
           },
           validatorJwtPayload,
         ),
@@ -209,12 +214,12 @@ describe("SendAssessmentLink", () => {
 
     it("throws bad request if immersion ends in more than 1 day", async () => {
       const today = timeGateway.now();
-      const convention = new ConventionDtoBuilder()
-        .withId(conventionId)
-        .withStatus("ACCEPTED_BY_VALIDATOR")
+      const conventionWithDateEndInMoreThan1Days = new ConventionDtoBuilder(
+        convention,
+      )
         .withDateEnd(addDays(today, 2).toISOString())
         .build();
-      uow.userRepository.users = [notConnectedUser];
+
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
@@ -223,12 +228,14 @@ describe("SendAssessmentLink", () => {
           },
         }),
       ];
-      uow.conventionRepository.setConventions([convention]);
+      uow.conventionRepository.setConventions([
+        conventionWithDateEndInMoreThan1Days,
+      ]);
 
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            conventionId,
+            conventionId: conventionWithDateEndInMoreThan1Days.id,
           },
           validatorJwtPayload,
         ),
@@ -237,7 +244,6 @@ describe("SendAssessmentLink", () => {
     });
 
     it("throws bad request if assessment is already filled", async () => {
-      uow.userRepository.users = [notConnectedUser];
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
@@ -246,9 +252,9 @@ describe("SendAssessmentLink", () => {
           },
         }),
       ];
-      uow.conventionRepository.setConventions([convention]);
+
       uow.assessmentRepository.save({
-        conventionId: conventionId,
+        conventionId: convention.id,
         status: "COMPLETED",
         endedWithAJob: false,
         establishmentFeedback: "establishmentFeedback",
@@ -260,11 +266,11 @@ describe("SendAssessmentLink", () => {
       await expectPromiseToFailWithError(
         usecase.execute(
           {
-            conventionId,
+            conventionId: convention.id,
           },
           validatorJwtPayload,
         ),
-        errors.assessment.assessmentAlreadyFullfilled(conventionId),
+        errors.assessment.assessmentAlreadyFullfilled(convention.id),
       );
     });
 
@@ -274,12 +280,11 @@ describe("SendAssessmentLink", () => {
           userId: "bcc5c20e-6dd2-45cf-affe-927358005267",
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
           usecase.execute(
             {
-              conventionId,
+              conventionId: convention.id,
             },
             unexistingUserPayload,
           ),
@@ -290,20 +295,18 @@ describe("SendAssessmentLink", () => {
       it.each(["agency-admin", "agency-viewer", "to-review"] as AgencyRole[])(
         "throws unauthorized if agency user has not enough rights on convention",
         async (role) => {
-          uow.userRepository.users = [connectedUser];
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {
               [connectedUser.id]: { roles: [role], isNotifiedByEmail: true },
             }),
           ];
-          uow.conventionRepository.setConventions([convention]);
 
           await expectPromiseToFailWithError(
             usecase.execute(
               {
-                conventionId,
+                conventionId: convention.id,
               },
-              connectedUserPayload,
+              { userId: connectedUser.id },
             ),
             errors.user.notEnoughRightOnAgency({
               userId: connectedUser.id,
@@ -319,31 +322,26 @@ describe("SendAssessmentLink", () => {
       ] as EstablishmentRole[])(
         "throws unauthorized if establishment user has not enough rights on convention",
         async (role) => {
-          uow.userRepository.users = [connectedUser];
-          const userRights: EstablishmentUserRight[] = [
-            {
-              userId: connectedUser.id,
-              role,
-              job: "job",
-              phone: "phone",
-            },
-          ];
-          const establishmentAggregateWithEmail =
-            new EstablishmentAggregateBuilder()
-              .withUserRights(userRights)
-              .build();
           await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-            establishmentAggregateWithEmail,
+            new EstablishmentAggregateBuilder()
+              .withUserRights([
+                {
+                  userId: connectedUser.id,
+                  role,
+                  job: "job",
+                  phone: "phone",
+                },
+              ])
+              .build(),
           );
           uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-          uow.conventionRepository.setConventions([convention]);
 
           await expectPromiseToFailWithError(
             usecase.execute(
               {
-                conventionId,
+                conventionId: convention.id,
               },
-              connectedUserPayload,
+              { userId: connectedUser.id },
             ),
             errors.assessment.sendAssessmentLinkForbidden(),
           );
@@ -355,7 +353,6 @@ describe("SendAssessmentLink", () => {
       it.each(["agency-admin", "agency-viewer", "to-review"] as AgencyRole[])(
         "throws unauthorized if user has not enough rights on agency",
         async (role) => {
-          uow.userRepository.users = [notConnectedUser];
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {
               [notConnectedUser.id]: {
@@ -364,10 +361,9 @@ describe("SendAssessmentLink", () => {
               },
             }),
           ];
-          uow.conventionRepository.setConventions([convention]);
 
           const notConnectedUserJwtPayload = createConventionMagicLinkPayload({
-            id: conventionId,
+            id: convention.id,
             role,
             email: notConnectedUser.email,
             now: new Date(),
@@ -376,7 +372,7 @@ describe("SendAssessmentLink", () => {
           await expectPromiseToFailWithError(
             usecase.execute(
               {
-                conventionId,
+                conventionId: convention.id,
               },
               notConnectedUserJwtPayload,
             ),
@@ -395,15 +391,13 @@ describe("SendAssessmentLink", () => {
         async (role) => {
           uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
 
-          uow.conventionRepository.setConventions([convention]);
-
           await expectPromiseToFailWithError(
             usecase.execute(
               {
-                conventionId,
+                conventionId: convention.id,
               },
               {
-                applicationId: conventionId,
+                applicationId: convention.id,
                 role,
                 emailHash: "emailHash",
               },
@@ -414,9 +408,6 @@ describe("SendAssessmentLink", () => {
       );
 
       it(`throws too many requests if there was already a assessment link sent less than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours before`, async () => {
-        const shortLinkId = "link2";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [notConnectedUser.id]: {
@@ -425,7 +416,6 @@ describe("SendAssessmentLink", () => {
             },
           }),
         ];
-        uow.userRepository.users = [notConnectedUser];
         uow.notificationRepository.notifications = [
           {
             id: "past-notification-id",
@@ -450,7 +440,7 @@ describe("SendAssessmentLink", () => {
         await expectPromiseToFailWithError(
           usecase.execute(
             {
-              conventionId,
+              conventionId: convention.id,
             },
             validatorJwtPayload,
           ),
@@ -464,28 +454,9 @@ describe("SendAssessmentLink", () => {
   });
 
   describe("right paths: send assessment link", () => {
-    const backofficeAdminPayload: InclusionConnectDomainJwtPayload = {
-      userId: "bcc5c20e-6dd2-45cf-affe-927358005263",
-    };
-    const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withId(
-      backofficeAdminPayload.userId,
-    );
-    const backofficeAdmin = backofficeAdminBuilder.withIsAdmin(true).build();
-
-    const counsellorJwtPayload = createConventionMagicLinkPayload({
-      id: conventionId,
-      role: "counsellor",
-      email: notConnectedUser.email,
-      now: new Date(),
-    });
-
     it.each(["validator", "counsellor"] as const)(
       "When pro connected %s triggers it",
       async (role) => {
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-
-        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
             [connectedUser.id]: {
@@ -494,13 +465,12 @@ describe("SendAssessmentLink", () => {
             },
           }),
         ];
-        uow.userRepository.users = [connectedUser];
 
         await usecase.execute(
           {
-            conventionId,
+            conventionId: convention.id,
           },
-          connectedUserPayload,
+          { userId: connectedUser.id },
         );
 
         expectToEqual(uow.shortLinkQuery.getShortLinks(), {
@@ -550,18 +520,13 @@ describe("SendAssessmentLink", () => {
     );
 
     it("When backoffice admin triggers it", async () => {
-      const shortLinkId = "link1";
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-
-      uow.conventionRepository.setConventions([convention]);
       uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-      uow.userRepository.users = [backofficeAdmin];
 
       await usecase.execute(
         {
-          conventionId,
+          conventionId: convention.id,
         },
-        backofficeAdminPayload,
+        { userId: backofficeAdmin.id },
       );
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -591,15 +556,6 @@ describe("SendAssessmentLink", () => {
     it.each(["validator", "counsellor"] as const)(
       "When not connected agency user %s triggers it",
       async (role) => {
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-
-        const convention = new ConventionDtoBuilder()
-          .withId(conventionId)
-          .withStatus("ACCEPTED_BY_VALIDATOR")
-          .withDateEnd(timeGateway.now().toISOString())
-          .build();
-
         const agencyWithEmails = toAgencyWithRights(
           new AgencyDtoBuilder().withId(convention.agencyId).build(),
           {
@@ -610,13 +566,11 @@ describe("SendAssessmentLink", () => {
           },
         );
 
-        uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.agencies = [agencyWithEmails];
-        uow.userRepository.users = [notConnectedUser];
 
         await usecase.execute(
           {
-            conventionId,
+            conventionId: convention.id,
           },
           role === "validator" ? validatorJwtPayload : counsellorJwtPayload,
         );
@@ -666,63 +620,17 @@ describe("SendAssessmentLink", () => {
       async (role) => {
         const signatoryEmail = `${role}@mail.com`;
         const signatoryJwtPayload = createConventionMagicLinkPayload({
-          id: conventionId,
+          id: convention.id,
           role: role,
           email: signatoryEmail,
           now: new Date(),
         });
-        const shortLinkId = "link1";
-        shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-        const conventionBuilder = new ConventionDtoBuilder()
-          .withId(conventionId)
-          .withStatus("ACCEPTED_BY_VALIDATOR")
-          .withDateEnd(timeGateway.now().toISOString())
-          .withBeneficiaryEmail(signatoryEmail)
-          .withBeneficiaryRepresentative({
-            email: signatoryEmail,
-            firstName: "Robert",
-            lastName: "Thénardier",
-            phone: "",
-            role: "beneficiary-representative",
-          })
-          .withBeneficiaryCurrentEmployer({
-            email: signatoryEmail,
-            firstName: "Robert",
-            lastName: "Thénardier",
-            phone: "",
-            role: "beneficiary-current-employer",
-            businessName: "",
-            businessSiret: "",
-            job: "",
-            signedAt: undefined,
-            businessAddress: "Rue des Bouchers 67065 Strasbourg",
-          })
-          .withEstablishmentRepresentative({
-            email: signatoryEmail,
-            firstName: "Robert",
-            lastName: "Thénardier",
-            phone: "",
-            role: "establishment-representative",
-          })
-          .withEstablishmentTutor({
-            email: "tutor@mail.com",
-            firstName: "Robert",
-            lastName: "Thénardier",
-            phone: "+33612345679",
-            role: "establishment-tutor",
-            job: "Tutor",
-          });
-
-        const conventionWithSignatory = conventionBuilder.build();
-
-        uow.conventionRepository.setConventions([conventionWithSignatory]);
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.userRepository.users = [notConnectedUser];
 
         await usecase.execute(
           {
-            conventionId,
+            conventionId: convention.id,
           },
           signatoryJwtPayload,
         );
@@ -732,7 +640,7 @@ describe("SendAssessmentLink", () => {
           {
             topic: "AssessmentReminderManuallySent",
             payload: {
-              convention: conventionWithSignatory,
+              convention,
               transport: "sms",
               triggeredBy: {
                 kind: "convention-magic-link",
@@ -745,13 +653,13 @@ describe("SendAssessmentLink", () => {
           {
             kind: "sms",
             followedIds: {
-              conventionId: conventionWithSignatory.id,
-              agencyId: conventionWithSignatory.agencyId,
-              establishmentSiret: conventionWithSignatory.siret,
+              conventionId: convention.id,
+              agencyId: convention.agencyId,
+              establishmentSiret: convention.siret,
               userId: undefined,
             },
             templatedContent: {
-              recipientPhone: conventionWithSignatory.establishmentTutor.phone,
+              recipientPhone: convention.establishmentTutor.phone,
               kind: "ReminderForAssessment",
               params: {
                 shortLink: makeShortLinkUrl(config, shortLinkId),
@@ -777,8 +685,6 @@ describe("SendAssessmentLink", () => {
       "+681821234", // wallis et futuna
       "+508551234", // saint pierre et miquelon
     ])("for phone number %s", async (phoneNumber) => {
-      const shortLinkId = "link1";
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
       const conventionWithCustomPhoneNumer = new ConventionDtoBuilder(
         convention,
       )
@@ -794,11 +700,10 @@ describe("SendAssessmentLink", () => {
 
       uow.conventionRepository.setConventions([conventionWithCustomPhoneNumer]);
       uow.agencyRepository.agencies = [agencyWithValidatorEmails];
-      uow.userRepository.users = [notConnectedUser];
 
       await usecase.execute(
         {
-          conventionId,
+          conventionId: conventionWithCustomPhoneNumer.id,
         },
         validatorJwtPayload,
       );
@@ -829,7 +734,6 @@ describe("SendAssessmentLink", () => {
     });
 
     it(`send signature link if last signature link was sent more than ${MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER} hours ago`, async () => {
-      const shortLinkId = "link2";
       const pastSmsNotification: Notification = {
         id: "past-notification-id",
         createdAt: subDays(timeGateway.now(), 2).toISOString(),
@@ -848,8 +752,7 @@ describe("SendAssessmentLink", () => {
           },
         },
       };
-      shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
-      uow.conventionRepository.setConventions([convention]);
+
       uow.agencyRepository.agencies = [
         toAgencyWithRights(agency, {
           [connectedUser.id]: {
@@ -858,14 +761,13 @@ describe("SendAssessmentLink", () => {
           },
         }),
       ];
-      uow.userRepository.users = [connectedUser];
       uow.notificationRepository.notifications = [pastSmsNotification];
 
       await usecase.execute(
         {
-          conventionId,
+          conventionId: convention.id,
         },
-        connectedUserPayload,
+        { userId: connectedUser.id },
       );
 
       expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -892,16 +794,5 @@ describe("SendAssessmentLink", () => {
         },
       ]);
     });
-    // it.each(["validator", "counsellor"] as const)(
-    //   "when agency user %s triggers it",
-    //   () => {},
-    // );
-
-    // it.each([
-    //   "beneficiary",
-    //   "establishment-representative",
-    //   "beneficiary-current-employer",
-    //   "beneficiary-representative",
-    // ] as const)("when signatory %s triggers it", () => {});
   });
 });
