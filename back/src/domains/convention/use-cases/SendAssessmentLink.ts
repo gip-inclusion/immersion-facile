@@ -232,12 +232,14 @@ const throwErrorIfAssessmentLinkAlreadySent = async ({
     recipientPhoneNumber: tutorPhoneNumber,
   });
 
+  const lastSmsCreatedAt = lastSms && new Date(lastSms.createdAt);
+
   if (
-    lastSms &&
-    new Date(lastSms.createdAt) >
+    lastSmsCreatedAt &&
+    lastSmsCreatedAt >
       subHours(timeGateway.now(), MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER)
   ) {
-    const nextAllowedTime = new Date(lastSms.createdAt);
+    const nextAllowedTime = lastSmsCreatedAt;
     nextAllowedTime.setHours(
       nextAllowedTime.getHours() + MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
     );

@@ -141,6 +141,7 @@ export const conventionMagicLinkRoutes = defineRoutes({
     responses: {
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
+      401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,
       429: httpErrorSchema,

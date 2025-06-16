@@ -195,7 +195,7 @@ export const errors = {
         `Il manque le bilan dans les paramêtres pour la convention ${conventionId}`,
       ),
     sendAssessmentLinkForbidden: () =>
-      new BadRequestError(
+      new ForbiddenError(
         "Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
     sendAssessmentLinkNotAllowedForStatus: ({
