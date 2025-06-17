@@ -17,13 +17,13 @@ export const ManageEstablishmentsTab = ({
   establishments,
 }: ManageEstablishmentTabProps) => {
   const route = useRoute() as Route<
-    typeof routes.establishmentDashboardFicheEntreprise
+    typeof routes.establishmentDashboardFormEstablishment
   >;
   const { siret } = route.params;
   const initialUrlParams = getUrlParameters(window.location);
   if (establishments.length === 1) {
     routes
-      .establishmentDashboardFicheEntreprise({
+      .establishmentDashboardFormEstablishment({
         siret: establishments[0].siret,
         shouldUpdateAvailability: initialUrlParams.shouldUpdateAvailability,
       })
@@ -68,7 +68,7 @@ export const ManageEstablishmentsTab = ({
                 .selectEstablishmentInput,
               onChange: (event) => {
                 routes
-                  .establishmentDashboardFicheEntreprise({
+                  .establishmentDashboardFormEstablishment({
                     siret: event.currentTarget.value,
                   })
                   .push();

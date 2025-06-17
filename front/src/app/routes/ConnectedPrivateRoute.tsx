@@ -73,8 +73,15 @@ export type EstablishmentDashboardRouteName =
 export type FrontEstablishmentDashboardRoute =
   | Route<typeof routes.establishmentDashboard>
   | Route<typeof routes.establishmentDashboardConventions>
-  | Route<typeof routes.establishmentDashboardFicheEntreprise>
-  | Route<typeof routes.establishmentDashboardDiscussionDetail>;
+  | Route<typeof routes.establishmentDashboardFormEstablishment>
+  | Route<typeof routes.establishmentDashboardDiscussions>;
+
+export const establishmentDashboardRoutes = [
+  "establishmentDashboard",
+  "establishmentDashboardConventions",
+  "establishmentDashboardFormEstablishment",
+  "establishmentDashboardDiscussions",
+] satisfies EstablishmentDashboardRouteName[];
 
 export type AgencyDashboardRouteName = FrontAgencyDashboardRoute["name"];
 
@@ -164,7 +171,7 @@ export const ConnectedPrivateRoute = ({
       dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
   }, [authIsLoading, isInclusionConnected, afterLoginRedirectionUrl, dispatch]);
 
-  const page = getPage(route);
+  const page = getPage(route.name);
   const pageContent = pageContentByRoute[page] ?? pageContentByRoute.default;
   const alreadyUsedAuthentication = route.params.alreadyUsedAuthentication;
 
@@ -271,10 +278,18 @@ export const ConnectedPrivateRoute = ({
   );
 };
 
-const getPage = (route: ConnectPrivateRoute): AllowedStartOAuthLoginPage => {
-  if (route.name === "establishmentDashboard") return "establishmentDashboard";
-  if (route.name === "agencyDashboardMain") return "agencyDashboard";
-  if (route.name === "formEstablishment") return "establishment";
+const getPage = (
+  routeName: ConnectPrivateRoute["name"],
+): AllowedStartOAuthLoginPage => {
+  if (
+    establishmentDashboardRoutes.includes(
+      routeName as EstablishmentDashboardRouteName,
+    )
+  )
+    return "establishmentDashboard";
+  if (agencyDashboardRoutes.includes(routeName as AgencyDashboardRouteName))
+    return "agencyDashboard";
+  if (routeName === "formEstablishment") return "establishment";
   return "admin";
 };
 
@@ -483,7 +498,9 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
 
 const LoginWithProConnect = ({
   page,
-}: { page: AllowedStartOAuthLoginPage }) => {
+}: {
+  page: AllowedStartOAuthLoginPage;
+}) => {
   const queryParamsResult =
     inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema[
       "~standard"

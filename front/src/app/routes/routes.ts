@@ -217,20 +217,18 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   establishmentDashboard,
   establishmentDashboardConventions:
     establishmentDashboard.extend("/conventions"),
-  establishmentDashboardFicheEntreprise: establishmentDashboard.extend(
+  establishmentDashboardFormEstablishment: establishmentDashboard.extend(
     {
-      siret: param.path.optional.string,
+      siret: param.query.optional.string,
       shouldUpdateAvailability: param.query.optional.string,
     },
-    ({ siret }) =>
-      `/${frontRoutes.establishmentDashboard}/fiche-entreprise/${siret}`,
+    () => "/fiche-entreprise",
   ),
-  establishmentDashboardDiscussionDetail: establishmentDashboard.extend(
+  establishmentDashboardDiscussions: establishmentDashboard.extend(
     {
       discussionId: param.path.optional.string,
     },
-    ({ discussionId }) =>
-      `/${frontRoutes.establishmentDashboard}/discussions/${discussionId}`,
+    ({ discussionId }) => `/discussions/${discussionId}`,
   ),
   formEstablishment: defineRoute(
     {

@@ -72,7 +72,7 @@ export const CreateIntroSection = ({
                       priority: "primary",
                       children: "Gérer ma fiche établissement",
                       linkProps:
-                        routes.establishmentDashboardFicheEntreprise().link,
+                        routes.establishmentDashboardFormEstablishment().link,
                     },
                   ]}
                 />

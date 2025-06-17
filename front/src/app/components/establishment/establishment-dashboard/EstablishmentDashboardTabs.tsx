@@ -5,6 +5,7 @@ import { type ReactNode, useMemo } from "react";
 import { SectionHighlight } from "react-design-system";
 import { HeadingSection } from "react-design-system";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
+import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
 import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
@@ -34,12 +35,15 @@ export const EstablishmentDashboardTabs = ({
   );
   const tabs = useMemo(
     () =>
-      getDashboardTabs(makeEstablishmentDashboardTabs(currentUser), currentTab),
-    [currentUser, currentTab],
+      getDashboardTabs(
+        makeEstablishmentDashboardTabs(currentUser, route),
+        currentTab,
+      ),
+    [currentUser, currentTab, route],
   );
   const { enableEstablishmentDashboardHighlight } = useFeatureFlags();
   const shouldRedirectToMainTab =
-    route.name === "establishmentDashboardFicheEntreprise" &&
+    route.name === "establishmentDashboardFormEstablishment" &&
     route.params.siret &&
     !currentUser.establishments?.some(
       (establishment) =>
@@ -89,14 +93,17 @@ export const EstablishmentDashboardTabs = ({
   );
 };
 
-const makeEstablishmentDashboardTabs = ({
-  dashboards: {
-    establishments: { conventions, discussions },
-  },
-  firstName,
-  lastName,
-  establishments,
-}: InclusionConnectedUser): DashboardTab[] => [
+const makeEstablishmentDashboardTabs = (
+  {
+    dashboards: {
+      establishments: { conventions, discussions },
+    },
+    firstName,
+    lastName,
+    establishments,
+  }: InclusionConnectedUser,
+  route: FrontEstablishmentDashboardRoute,
+): DashboardTab[] => [
   {
     label: "Conventions",
     tabId: "conventions",
@@ -125,29 +132,33 @@ const makeEstablishmentDashboardTabs = ({
   {
     label: "Candidatures",
     tabId: "discussions",
-    content: (
-      <>
-        <HeadingSection
-          title="Gérer une candidature"
-          titleAs="h2"
-          className={fr.cx("fr-mt-0")}
-        >
-          <ManageDiscussionFormSection />
-        </HeadingSection>
-        {discussions ? (
-          <MetabaseView
-            title={`Suivi des candidatures pour ${firstName} ${lastName}`}
-            url={discussions}
-          />
-        ) : (
-          <p>
-            {" "}
-            Nous n'avons pas trouvé de candidatures où vous êtes référencés en
-            tant que contact d'entreprise.
-          </p>
-        )}
-      </>
-    ),
+    content:
+      route.name === "establishmentDashboardDiscussions" &&
+      route.params.discussionId ? (
+        <DiscussionManageContent discussionId={route.params.discussionId} />
+      ) : (
+        <>
+          <HeadingSection
+            title="Gérer une candidature"
+            titleAs="h2"
+            className={fr.cx("fr-mt-0")}
+          >
+            <ManageDiscussionFormSection />
+          </HeadingSection>
+          {discussions ? (
+            <MetabaseView
+              title={`Suivi des candidatures pour ${firstName} ${lastName}`}
+              url={discussions}
+            />
+          ) : (
+            <p>
+              {" "}
+              Nous n'avons pas trouvé de candidatures où vous êtes référencés en
+              tant que contact d'entreprise.
+            </p>
+          )}
+        </>
+      ),
   },
   ...(establishments &&
   establishments?.filter(
@@ -188,8 +199,8 @@ const establishmentDashboardTabFromRouteName: Record<
 > = {
   establishmentDashboard: "conventions",
   establishmentDashboardConventions: "conventions",
-  establishmentDashboardFicheEntreprise: "fiche-entreprise",
-  establishmentDashboardDiscussionDetail: "discussions",
+  establishmentDashboardFormEstablishment: "fiche-entreprise",
+  establishmentDashboardDiscussions: "discussions",
 };
 
 const establishmentDashboardRouteNameFromTabId: Record<
@@ -197,6 +208,6 @@ const establishmentDashboardRouteNameFromTabId: Record<
   EstablishmentDashboardRouteName
 > = {
   conventions: "establishmentDashboard",
-  discussions: "establishmentDashboardDiscussionDetail",
-  "fiche-entreprise": "establishmentDashboardFicheEntreprise",
+  discussions: "establishmentDashboardDiscussions",
+  "fiche-entreprise": "establishmentDashboardFormEstablishment",
 };

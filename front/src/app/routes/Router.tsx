@@ -95,14 +95,14 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
         }),
       );
     },
-    establishmentDashboardFicheEntreprise: () => {
+    establishmentDashboardFormEstablishment: () => {
       store.dispatch(
         inclusionConnectedSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
         }),
       );
     },
-    establishmentDashboardDiscussionDetail: () => {
+    establishmentDashboardDiscussions: () => {
       store.dispatch(
         inclusionConnectedSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
@@ -198,12 +198,12 @@ const getPageByRouteName: {
       <EstablishmentDashboardPage route={route} />
     </DashboardPrivateRoute>
   ),
-  establishmentDashboardFicheEntreprise: (route) => (
+  establishmentDashboardFormEstablishment: (route) => (
     <DashboardPrivateRoute route={route}>
       <EstablishmentDashboardPage route={route} />
     </DashboardPrivateRoute>
   ),
-  establishmentDashboardDiscussionDetail: (route) => (
+  establishmentDashboardDiscussions: (route) => (
     <DashboardPrivateRoute route={route}>
       <EstablishmentDashboardPage route={route} />
     </DashboardPrivateRoute>
@@ -262,14 +262,16 @@ export const Router = (): ReactNode => {
   const route = useRoute();
   const routeName = route.name;
   const previousRouteName = useRef<keyof Routes | undefined>(undefined);
-  if (
-    routeName &&
-    previousRouteName.current !== routeName &&
-    getPageSideEffectByRouteName[routeName]
-  ) {
-    getPageSideEffectByRouteName[routeName]();
-    previousRouteName.current = routeName;
-  }
+  useEffect(() => {
+    if (
+      routeName &&
+      previousRouteName.current !== routeName &&
+      getPageSideEffectByRouteName[routeName]
+    ) {
+      previousRouteName.current = routeName;
+      getPageSideEffectByRouteName[routeName]();
+    }
+  }, [routeName]);
   return routeName === false ? (
     <ErrorPage error={frontErrors.generic.pageNotFound()} />
   ) : (

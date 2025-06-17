@@ -54,7 +54,7 @@ export type RouteByMode = {
   create:
     | Route<typeof routes.formEstablishment>
     | Route<typeof routes.formEstablishmentForExternals>;
-  edit: Route<typeof routes.establishmentDashboardFicheEntreprise>;
+  edit: Route<typeof routes.establishmentDashboardFormEstablishment>;
   admin: Route<typeof routes.manageEstablishmentAdmin>;
 };
 
@@ -108,7 +108,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
     route.name === "formEstablishmentForExternals";
   const isEstablishmentAdmin = route.name === "manageEstablishmentAdmin";
   const isEstablishmentDashboard =
-    route.name === "establishmentDashboardFicheEntreprise";
+    route.name === "establishmentDashboardFormEstablishment";
 
   const inclusionConnectedJwt = useAppSelector(
     authSelectors.inclusionConnectToken,
@@ -236,7 +236,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "establishmentDashboardFicheEntreprise" },
+          route: { name: "establishmentDashboardFormEstablishment" },
           inclusionConnectedJwt: P.not(P.nullish),
         },
         ({ route, inclusionConnectedJwt }) =>
@@ -252,7 +252,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "establishmentDashboardFicheEntreprise" },
+          route: { name: "establishmentDashboardFormEstablishment" },
           inclusionConnectedJwt: P.nullish,
         },
         () => {
@@ -355,7 +355,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "establishmentDashboardFicheEntreprise" },
+          route: { name: "establishmentDashboardFormEstablishment" },
           inclusionConnectedJwt: P.not(P.nullish),
         },
         ({ inclusionConnectedJwt }) =>
@@ -391,7 +391,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       )
       .with(
         {
-          route: { name: "establishmentDashboardFicheEntreprise" },
+          route: { name: "establishmentDashboardFormEstablishment" },
           inclusionConnectedJwt: P.nullish,
         },
         () => {
