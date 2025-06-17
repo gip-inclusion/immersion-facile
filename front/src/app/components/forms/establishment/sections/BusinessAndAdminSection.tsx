@@ -169,7 +169,7 @@ const EstablishmentAdminInfos = () => {
       when ready and add the "email" case so we redirect the user to its account 
       
       */}
-      {federatedIdentity && (
+      {federatedIdentity?.provider === "proConnect" && (
         <>
           <Input
             label={formContents["userRights.0.firstName"].label}
