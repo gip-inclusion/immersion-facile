@@ -15,7 +15,6 @@ export const validateAndParseZodSchemaV2 = <T>({
   if (result.success) return result.data;
 
   logger.error({
-    schemaParsingInput,
     message: `ValidateAndParseZodSchema failed - ${inputSchema.constructor.name}`,
   });
   const flattenErrors = flattenZodErrors(result.error);

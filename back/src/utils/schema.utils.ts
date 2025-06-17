@@ -11,7 +11,6 @@ export const parseZodSchemaAndLogErrorOnParsingFailure = <T>(
     return schema.parse(schemaParsingInput);
   } catch (error) {
     logger.error({
-      schemaParsingInput,
       error: castError(error),
       message: `Parsing failed with schema '${schema.constructor.name}'`,
     });
