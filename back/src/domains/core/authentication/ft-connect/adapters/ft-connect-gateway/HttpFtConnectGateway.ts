@@ -3,6 +3,7 @@ import { HTTP_STATUS, errors, queryParamsAsString } from "shared";
 import type { HttpClient } from "shared-routes";
 import { ZodError } from "zod";
 import { UnhandledError } from "../../../../../../config/helpers/handleHttpJsonResponseError";
+import { validateAndParseZodSchemaV2 } from "../../../../../../config/helpers/validateAndParseZodSchema";
 import { isAxiosError } from "../../../../../../utils/axiosUtils";
 import {
   type LoggerParamsWithMessage,
@@ -10,7 +11,6 @@ import {
   createLogger,
 } from "../../../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../../../utils/notifyTeam";
-import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../../utils/schema.utils";
 import type { AccessTokenDto } from "../../dto/AccessToken.dto";
 import type { FtConnectAdvisorDto } from "../../dto/FtConnectAdvisor.dto";
 import type { FtConnectUserDto } from "../../dto/FtConnectUserDto";
@@ -128,11 +128,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalAccessToken = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalAccessTokenSchema,
-        response.body,
+      const externalAccessToken = validateAndParseZodSchemaV2({
+        inputSchema: externalAccessTokenSchema,
+        schemaParsingInput: response.body,
         logger,
-      );
+      });
       log.success({});
       return toAccessToken(externalAccessToken);
     } catch (error) {
@@ -199,11 +199,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return false;
       }
-      const externalFtConnectStatut = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalFtConnectUserStatutSchema,
-        response.body,
+      const externalFtConnectStatut = validateAndParseZodSchemaV2({
+        inputSchema: externalFtConnectUserStatutSchema,
+        schemaParsingInput: response.body,
         logger,
-      );
+      });
       const isJobSeeker = isJobSeekerFromStatus(
         externalFtConnectStatut.codeStatutIndividu,
       );
@@ -243,11 +243,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return undefined;
       }
-      const externalFtConnectUser = parseZodSchemaAndLogErrorOnParsingFailure(
-        externalFtConnectUserSchema,
-        response.body,
+      const externalFtConnectUser = validateAndParseZodSchemaV2({
+        inputSchema: externalFtConnectUserSchema,
+        schemaParsingInput: response.body,
         logger,
-      );
+      });
       log.success({});
       return externalFtConnectUser;
     } catch (error) {
@@ -283,12 +283,11 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         });
         return [];
       }
-      const externalFtConnectAdvisors =
-        parseZodSchemaAndLogErrorOnParsingFailure(
-          externalFtConnectAdvisorsSchema,
-          response.body,
-          logger,
-        );
+      const externalFtConnectAdvisors = validateAndParseZodSchemaV2({
+        inputSchema: externalFtConnectAdvisorsSchema,
+        schemaParsingInput: response.body,
+        logger,
+      });
       log.success({});
       return externalFtConnectAdvisors;
     } catch (error) {
