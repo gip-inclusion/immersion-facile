@@ -131,7 +131,6 @@ type LoggerParams = Partial<{
   sharedRouteResponse: HttpResponse<any, any>;
   axiosResponse: LoggedAxiosResponse;
   subscriberResponse: SubscriberResponse;
-  schemaParsingInput: unknown;
   searchLBB: SearchCompaniesParams;
   searchMade: SearchMadeEntity;
   searchParams: SearchQueryParamsDto | undefined;
@@ -200,7 +199,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
       sharedRouteResponse,
       subscriberResponse,
       axiosResponse,
-      schemaParsingInput,
       searchMade,
       searchLBB,
       logStatus,
@@ -237,7 +235,6 @@ export const createLogger = (filename: string): OpacifiedLogger => {
         sharedRouteResponse: sanitizeSharedRouteResponse(sharedRouteResponse),
         subscriberResponse,
         axiosResponse,
-        schemaParsingInput,
         searchMade,
         searchLBB,
         status: logStatus ?? logMethodToLogStatus[method],
