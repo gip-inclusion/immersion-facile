@@ -7,17 +7,13 @@ on:
         required: true
       API_KEY_OPEN_CAGE_DATA_GEOSEARCH:
         required: true
-      IC_ADMIN_PASSWORD:
-        required: true
-      IC_PASSWORD:
-        required: true
-      IC_USERNAME:
-        required: true
       PC_ADMIN_PASSWORD:
         required: true
       PC_PASSWORD:
         required: true
       PC_USERNAME:
+        required: true
+      PRO_CONNECT_CLIENT_SECRET:
         required: true
       SIRENE_INSEE_CLIENT_ID:
         required: true
@@ -26,10 +22,6 @@ on:
       SIRENE_INSEE_USERNAME:
         required: true
       SIRENE_INSEE_PASSWORD:
-        required: true
-      INCLUSION_CONNECT_CLIENT_SECRET:
-        required: true
-      PRO_CONNECT_CLIENT_SECRET:
         required: true
 
 jobs:
@@ -153,16 +145,9 @@ jobs:
       NOTIFICATION_GATEWAY: IN_MEMORY
       ESTABLISHMENT_MARKETING_GATEWAY: IN_MEMORY
       ADDRESS_API_GATEWAY: OPEN_CAGE_DATA
-      IC_USERNAME: ${{ secrets.IC_USERNAME }}
-      IC_PASSWORD: ${{ secrets.IC_PASSWORD }}
-      IC_ADMIN_PASSWORD: ${{ secrets.IC_ADMIN_PASSWORD }}
       PC_USERNAME: ${{ secrets.PC_USERNAME }}
       PC_PASSWORD: ${{ secrets.PC_PASSWORD }}
       PC_ADMIN_PASSWORD: ${{ secrets.PC_ADMIN_PASSWORD }}
-      INCLUSION_CONNECT_GATEWAY: "HTTPS"
-      INCLUSION_CONNECT_CLIENT_ID: local_inclusion_connect
-      INCLUSION_CONNECT_CLIENT_SECRET: ${{ secrets.INCLUSION_CONNECT_CLIENT_SECRET }}
-      INCLUSION_CONNECT_BASE_URI: "https://recette.connect.inclusion.beta.gouv.fr/auth"
       PRO_CONNECT_GATEWAY: "HTTPS"
       PRO_CONNECT_CLIENT_ID: 449e24c6-b5aa-4435-bb8c-728d4a3c1c94
       PRO_CONNECT_CLIENT_SECRET: ${{ secrets.PRO_CONNECT_CLIENT_SECRET }}
@@ -180,8 +165,6 @@ jobs:
       API_JWT_PRIVATE_KEY: "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIPnK7kOKC6VqJwmsXCcCgNfVEAMyt0IFm68g/dwg3/iVoAoGCCqGSM49\nAwEHoUQDQgAEXNo97BD4w2huuAYsmINnn/+TPolxYUexkcD49YyxsjJPA2d91B2r\nDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END EC PRIVATE KEY-----"
       API_JWT_PUBLIC_KEY: "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEXNo97BD4w2huuAYsmINnn/+TPolx\nYUexkcD49YyxsjJPA2d91B2rDzteUKnEsloNYDTeYW88oLPMdgmbzm+sQg==\n-----END PUBLIC KEY-----"
       DOMAIN: localhost:3000
-      BACKOFFICE_USERNAME: admin
-      BACKOFFICE_PASSWORD: password
       REPOSITORIES: PG
       INBOUND_EMAIL_ALLOWED_IPS: ::ffff:127.0.0.1
       SIRENE_REPOSITORY: ANNUAIRE_DES_ENTREPRISES
