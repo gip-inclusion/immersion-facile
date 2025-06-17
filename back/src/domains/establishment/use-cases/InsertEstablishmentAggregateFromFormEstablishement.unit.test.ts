@@ -341,6 +341,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           icUser,
         ),
         errors.inputs.badSchema({
+          context: "InsertEstablishmentAggregateFromForm",
+          id: formEstablishment.siret,
           flattenErrors: [
             "formEstablishment.userRights : La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
           ],
@@ -359,6 +361,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           icUser,
         ),
         errors.inputs.badSchema({
+          context: "InsertEstablishmentAggregateFromForm",
+          id: formEstablishment.siret,
           flattenErrors: [
             "formEstablishment.userRights : La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
           ],
@@ -377,6 +381,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           icUser,
         ),
         errors.inputs.badSchema({
+          context: "InsertEstablishmentAggregateFromForm",
+          id: formEstablishment.siret,
           flattenErrors: [
             "formEstablishment.userRights : La structure accueillante nécessite au moins un administrateur pour être valide.",
           ],

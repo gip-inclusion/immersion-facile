@@ -79,7 +79,8 @@ describe("formCompletion Routes", () => {
         status: 400,
         body: {
           status: 400,
-          message: "Schema validation failed. See issues for details.",
+          message:
+            "Schema validation failed in GetSiret for element with id not_a_valid_siret. See issues for details.",
           issues: ["siret : SIRET doit être composé de 14 chiffres"],
         },
       });

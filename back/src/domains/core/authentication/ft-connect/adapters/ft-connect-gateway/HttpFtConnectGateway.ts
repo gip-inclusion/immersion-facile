@@ -129,6 +129,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         return undefined;
       }
       const externalAccessToken = validateAndParseZodSchemaV2({
+        schemaName: "externalAccessTokenSchema",
         inputSchema: externalAccessTokenSchema,
         schemaParsingInput: response.body,
         logger,
@@ -200,6 +201,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         return false;
       }
       const externalFtConnectStatut = validateAndParseZodSchemaV2({
+        schemaName: "externalFtConnectUserStatutSchema",
         inputSchema: externalFtConnectUserStatutSchema,
         schemaParsingInput: response.body,
         logger,
@@ -244,6 +246,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         return undefined;
       }
       const externalFtConnectUser = validateAndParseZodSchemaV2({
+        schemaName: "externalFtConnectUserSchema",
         inputSchema: externalFtConnectUserSchema,
         schemaParsingInput: response.body,
         logger,
@@ -284,6 +287,7 @@ export class HttpFtConnectGateway implements FtConnectGateway {
         return [];
       }
       const externalFtConnectAdvisors = validateAndParseZodSchemaV2({
+        schemaName: "externalFtConnectAdvisorsSchema",
         inputSchema: externalFtConnectAdvisorsSchema,
         schemaParsingInput: response.body,
         logger,

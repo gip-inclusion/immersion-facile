@@ -60,6 +60,7 @@ describe("GetEstablishmentStats", () => {
         apiConsumer,
       ),
       errors.inputs.badSchema({
+        context: "GetEstablishmentStats",
         flattenErrors: ["perPage : Number must be less than or equal to 5000"],
       }),
     );

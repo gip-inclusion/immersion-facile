@@ -71,8 +71,10 @@ export class PgConventionFranceTravailAdvisorRepository
       conventionPeUserAdvisor &&
       toConventionFranceTravailUserAdvisorEntity(
         validateAndParseZodSchemaV2({
+          schemaName: "conventionFranceTravailUserAdvisorDtoSchema",
           inputSchema: conventionFranceTravailUserAdvisorDtoSchema,
           schemaParsingInput: conventionPeUserAdvisor,
+          id: conventionPeUserAdvisor.peExternalId,
           logger,
         }),
       )

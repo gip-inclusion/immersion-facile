@@ -222,6 +222,7 @@ export class PgConventionQueries implements ConventionQueries {
         throw errors.agency.notFound({ agencyId: pgResult.dto.agencyId });
 
       return validateAndParseZodSchemaV2({
+        schemaName: "conventionReadSchema",
         inputSchema: conventionReadSchema,
         schemaParsingInput: {
           ...pgResult.dto,
@@ -455,6 +456,7 @@ export const validateConventionResults = (
 ): ConventionDto[] =>
   pgResults.map((pgResult) =>
     validateAndParseZodSchemaV2({
+      schemaName: "conventionSchema",
       inputSchema: conventionSchema,
       schemaParsingInput: pgResult.dto,
       logger,

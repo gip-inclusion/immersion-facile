@@ -1230,9 +1230,12 @@ describe("SearchImmersionUseCase", () => {
           ...searchSecretariatInMetzRequestDto,
           nafCodes: [],
         }),
-        errors.generic.schemaValidation([
-          "nafCodes : Array must contain at least 1 element(s)",
-        ]),
+        errors.inputs.badSchema({
+          context: "SearchImmersion",
+          flattenErrors: [
+            "nafCodes : Array must contain at least 1 element(s)",
+          ],
+        }),
       );
     });
 
