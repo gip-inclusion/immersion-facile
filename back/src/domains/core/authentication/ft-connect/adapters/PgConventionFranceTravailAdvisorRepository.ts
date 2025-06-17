@@ -1,7 +1,7 @@
 import { type ConventionId, type FtExternalId, errors } from "shared";
+import { validateAndParseZodSchemaV2 } from "../../../../../config/helpers/validateAndParseZodSchema";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../../../utils/logger";
-import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../../../utils/schema.utils";
 import type {
   ConventionFtUserAdvisorDto,
   ConventionFtUserAdvisorEntity,
@@ -70,11 +70,11 @@ export class PgConventionFranceTravailAdvisorRepository
     return (
       conventionPeUserAdvisor &&
       toConventionFranceTravailUserAdvisorEntity(
-        parseZodSchemaAndLogErrorOnParsingFailure(
-          conventionFranceTravailUserAdvisorDtoSchema,
-          conventionPeUserAdvisor,
+        validateAndParseZodSchemaV2({
+          inputSchema: conventionFranceTravailUserAdvisorDtoSchema,
+          schemaParsingInput: conventionPeUserAdvisor,
           logger,
-        ),
+        }),
       )
     );
   }
