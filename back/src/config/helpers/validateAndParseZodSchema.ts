@@ -2,11 +2,15 @@ import { errors, flattenZodErrors } from "shared";
 import type { z } from "zod";
 import type { OpacifiedLogger } from "../../utils/logger";
 
-export const validateAndParseZodSchemaV2 = <T>(
-  inputSchema: z.Schema<T>,
-  schemaParsingInput: unknown,
-  logger: OpacifiedLogger,
-): T => {
+export const validateAndParseZodSchemaV2 = <T>({
+  inputSchema,
+  schemaParsingInput,
+  logger,
+}: {
+  inputSchema: z.Schema<T>;
+  schemaParsingInput: unknown;
+  logger: OpacifiedLogger;
+}): T => {
   const result = inputSchema.safeParse(schemaParsingInput);
   if (result.success) return result.data;
 

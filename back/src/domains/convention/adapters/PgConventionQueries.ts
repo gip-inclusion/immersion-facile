@@ -221,14 +221,14 @@ export class PgConventionQueries implements ConventionQueries {
       if (!agencyFields)
         throw errors.agency.notFound({ agencyId: pgResult.dto.agencyId });
 
-      return validateAndParseZodSchemaV2(
-        conventionReadSchema,
-        {
+      return validateAndParseZodSchemaV2({
+        inputSchema: conventionReadSchema,
+        schemaParsingInput: {
           ...pgResult.dto,
           ...agencyFields,
         },
         logger,
-      );
+      });
     });
   }
 
@@ -454,7 +454,11 @@ export const validateConventionResults = (
   pgResults: { dto: unknown }[],
 ): ConventionDto[] =>
   pgResults.map((pgResult) =>
-    validateAndParseZodSchemaV2(conventionSchema, pgResult.dto, logger),
+    validateAndParseZodSchemaV2({
+      inputSchema: conventionSchema,
+      schemaParsingInput: pgResult.dto,
+      logger,
+    }),
   );
 
 type AddToBuilder = (b: ConventionQueryBuilder) => ConventionQueryBuilder;
