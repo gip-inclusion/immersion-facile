@@ -1,4 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
+import Button from "@codegouvfr/react-dsfr/Button";
 import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
@@ -15,6 +16,7 @@ import {
   errors,
   formEstablishmentSchema,
 } from "shared";
+import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { BusinessAndAdminSection } from "src/app/components/forms/establishment/sections/BusinessAndAdminSection";
 import { CreateIntroSection } from "src/app/components/forms/establishment/sections/CreateIntroSection";
@@ -42,6 +44,7 @@ import { appellationSlice } from "src/core-logic/domain/appellation/appellation.
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { P, match } from "ts-pattern";
@@ -416,7 +419,29 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   };
 
   return (
-    <WithFeedbackReplacer topic="form-establishment">
+    <WithFeedbackReplacer
+      topic="form-establishment"
+      renderFeedback={() => {
+        return (
+          <>
+            <Feedback topics={["form-establishment"]} />
+            {mode !== "create" && (
+              <Button
+                onClick={() => {
+                  dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+                }}
+                className={fr.cx("fr-mt-2w")}
+                size="small"
+                type="button"
+                priority="secondary"
+              >
+                Revenir à la fiche entreprise
+              </Button>
+            )}
+          </>
+        );
+      }}
+    >
       <>
         {isLoading && <Loader />}
         <FormProvider {...methods}>
