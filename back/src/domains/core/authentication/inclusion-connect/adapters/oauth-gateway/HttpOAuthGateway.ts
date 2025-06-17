@@ -108,11 +108,11 @@ export class HttpOAuthGateway implements OAuthGateway {
         tokenWithPayload,
       );
 
-    const oAuthIdTokenPayload = validateAndParseZodSchemaV2(
-      proConnectAuthTokenPayloadSchema,
-      tokenPayload,
+    const oAuthIdTokenPayload = validateAndParseZodSchemaV2({
+      inputSchema: proConnectAuthTokenPayloadSchema,
+      schemaParsingInput: tokenPayload,
       logger,
-    );
+    });
 
     logger.info({
       message: `from ProConnect:

@@ -50,11 +50,11 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
     useCaseName: name,
     execute: async (inputParams, currentUser) => {
       const startDate = new Date();
-      const validParams = validateAndParseZodSchemaV2(
+      const validParams = validateAndParseZodSchemaV2({
         inputSchema,
-        inputParams,
+        schemaParsingInput: inputParams,
         logger,
-      );
+      });
       const searchParams = getSearchParams(name, validParams);
 
       return uowPerformer
@@ -111,11 +111,11 @@ export abstract class UseCase<
     const startDate = new Date();
     const useCaseName = this.constructor.name;
 
-    const validParams = validateAndParseZodSchemaV2(
-      this.inputSchema,
-      params,
-      logger as Logger,
-    );
+    const validParams = validateAndParseZodSchemaV2({
+      inputSchema: this.inputSchema,
+      schemaParsingInput: params,
+      logger: logger as Logger,
+    });
 
     try {
       const result = await Sentry.startSpan({ name: useCaseName }, () =>
@@ -163,11 +163,11 @@ export abstract class TransactionalUseCase<
   ): Promise<Output> {
     const startDate = new Date();
     const useCaseName = this.constructor.name;
-    const validParams = validateAndParseZodSchemaV2(
-      this.inputSchema,
-      params,
+    const validParams = validateAndParseZodSchemaV2({
+      inputSchema: this.inputSchema,
+      schemaParsingInput: params,
       logger,
-    );
+    });
     const searchParams = getSearchParams(useCaseName, validParams);
 
     return this.uowPerformer
