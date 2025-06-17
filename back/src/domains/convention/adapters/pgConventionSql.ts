@@ -22,6 +22,7 @@ import {
   conventionReadSchema,
   pipeWithValue,
 } from "shared";
+import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   type KyselyDb,
   cast,
@@ -30,7 +31,6 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
-import { parseZodSchemaAndLogErrorOnParsingFailure } from "../../../utils/schema.utils";
 
 // Common type for the query builder with proper return type
 type ConventionQueryBuilderDb = Database & {
@@ -419,14 +419,14 @@ export const getReadConventionById = async (
     [pgConvention.dto.agencyId],
   );
 
-  return parseZodSchemaAndLogErrorOnParsingFailure(
-    conventionReadSchema,
-    {
+  return validateAndParseZodSchemaV2({
+    inputSchema: conventionReadSchema,
+    schemaParsingInput: {
       ...pgConvention.dto,
       ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
     },
-    createLogger(__filename),
-  );
+    logger: createLogger(__filename),
+  });
 };
 
 export const makeGetLastConventionWithSiretInList =
