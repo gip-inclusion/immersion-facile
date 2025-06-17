@@ -678,11 +678,11 @@ describe("InclusionConnected", () => {
           },
         }));
 
-        const establishment = FormEstablishmentDtoBuilder.valid()
+        const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
           .withUserRights([otherEstablishmentToKeepUserRight])
           .build();
         const establishmentUpdate: EstablishmentUpdatePayload = {
-          formEstablishment: establishment,
+          formEstablishment: updatedFormEstablishment,
           jwt: "my-fake-jwt",
         };
 
@@ -693,8 +693,8 @@ describe("InclusionConnected", () => {
             establishments: [
               {
                 admins: [currentUserAdminData],
-                businessName: establishment.businessName,
-                siret: establishment.siret,
+                businessName: updatedFormEstablishment.businessName,
+                siret: updatedFormEstablishment.siret,
                 role: "establishment-admin",
               },
               otherEstablishmentToKeepData,
@@ -708,6 +708,11 @@ describe("InclusionConnected", () => {
             feedbackTopic: "unused",
           }),
         );
+
+        dependencies.inclusionConnectedGateway.currentUser$.next({
+          ...user,
+          establishments: [otherEstablishmentToKeepData],
+        });
 
         expectToEqual(
           inclusionConnectedSelectors.currentUser(store.getState())
@@ -787,6 +792,19 @@ describe("InclusionConnected", () => {
             feedbackTopic: "unused",
           }),
         );
+
+        dependencies.inclusionConnectedGateway.currentUser$.next({
+          ...user,
+          establishments: [
+            {
+              admins: [currentUserAdminData],
+              businessName: establishment.businessName,
+              siret: establishment.siret,
+              role: "establishment-contact",
+            },
+            otherEstablishmentData,
+          ],
+        });
 
         expectArraysToEqualIgnoringOrder(
           inclusionConnectedSelectors.currentUser(store.getState())

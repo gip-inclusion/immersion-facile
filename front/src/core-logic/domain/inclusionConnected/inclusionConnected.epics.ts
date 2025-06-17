@@ -2,6 +2,7 @@ import { filter, map, switchMap } from "rxjs";
 import { connectedUserTokenExpiredMessage } from "shared";
 import type { AuthAction } from "src/core-logic/domain/auth/auth.epics";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
@@ -57,7 +58,10 @@ const getCurrentUserEpic: InclusionConnectedEpic = (
         inclusionConnectedSlice.actions.currentUserFetchRequested.match(
           action,
         ) ||
-        inclusionConnectedSlice.actions.registerAgenciesSucceeded.match(action),
+        inclusionConnectedSlice.actions.registerAgenciesSucceeded.match(
+          action,
+        ) ||
+        establishmentSlice.actions.updateEstablishmentSucceeded.match(action),
     ),
     switchMap(({ payload }) =>
       inclusionConnectedGateway
