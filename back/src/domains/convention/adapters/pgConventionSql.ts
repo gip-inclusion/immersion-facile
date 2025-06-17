@@ -420,11 +420,18 @@ export const getReadConventionById = async (
   );
 
   return validateAndParseZodSchemaV2({
+    schemaName: "conventionReadSchema",
     inputSchema: conventionReadSchema,
     schemaParsingInput: {
       ...pgConvention.dto,
       ...agencyFieldsByAgencyIds[pgConvention.dto.agencyId],
     },
+    id:
+      pgConvention.dto &&
+      typeof pgConvention.dto === "object" &&
+      "id" in pgConvention.dto
+        ? (pgConvention.dto.id as string)
+        : undefined,
     logger: createLogger(__filename),
   });
 };

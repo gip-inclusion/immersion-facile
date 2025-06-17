@@ -130,6 +130,7 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
           throw errors.apiConsumer.forbidden();
         return pipeWithValue(
           validateAndParseZodSchemaV2({
+            schemaName: "contactEstablishmentPublicV2Schema",
             inputSchema: contactEstablishmentPublicV2Schema,
             schemaParsingInput: req.body,
             logger,

@@ -109,6 +109,7 @@ export class HttpOAuthGateway implements OAuthGateway {
       );
 
     const oAuthIdTokenPayload = validateAndParseZodSchemaV2({
+      schemaName: "proConnectAuthTokenPayloadSchema",
       inputSchema: proConnectAuthTokenPayloadSchema,
       schemaParsingInput: tokenPayload,
       logger,
