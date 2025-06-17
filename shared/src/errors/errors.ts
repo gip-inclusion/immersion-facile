@@ -888,9 +888,13 @@ export const errors = {
       new NotFoundError(`subscription ${id} not found`),
   },
   inputs: {
-    badSchema: ({ flattenErrors }: { flattenErrors: string[] }) =>
+    badSchema: ({
+      context,
+      id,
+      flattenErrors,
+    }: { context: string; id?: string; flattenErrors: string[] }) =>
       new BadRequestError(
-        "Schema validation failed. See issues for details.",
+        `Schema validation failed in ${context}${id ? ` for element with id ${id}` : ""}. See issues for details.`,
         flattenErrors,
       ),
   },

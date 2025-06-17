@@ -51,9 +51,12 @@ export const createTransactionalUseCase: CreateTransactionalUseCase =
     execute: async (inputParams, currentUser) => {
       const startDate = new Date();
       const validParams = validateAndParseZodSchemaV2({
+        useCaseName: name,
         inputSchema,
         schemaParsingInput: inputParams,
         logger,
+        id:
+          extractValue("id", inputParams) ?? extractValue("siret", inputParams),
       });
       const searchParams = getSearchParams(name, validParams);
 
@@ -112,9 +115,11 @@ export abstract class UseCase<
     const useCaseName = this.constructor.name;
 
     const validParams = validateAndParseZodSchemaV2({
+      useCaseName,
       inputSchema: this.inputSchema,
       schemaParsingInput: params,
       logger: logger as Logger,
+      id: extractValue("id", params) ?? extractValue("siret", params),
     });
 
     try {
@@ -164,9 +169,11 @@ export abstract class TransactionalUseCase<
     const startDate = new Date();
     const useCaseName = this.constructor.name;
     const validParams = validateAndParseZodSchemaV2({
+      useCaseName,
       inputSchema: this.inputSchema,
       schemaParsingInput: params,
       logger,
+      id: extractValue("id", params) ?? extractValue("siret", params),
     });
     const searchParams = getSearchParams(useCaseName, validParams);
 
@@ -194,4 +201,20 @@ export abstract class TransactionalUseCase<
         throw error;
       });
   }
+}
+
+function extractValue(propName: string, params: unknown): string | undefined {
+  if (typeof params !== "object" || params === null) return undefined;
+
+  if (propName in params) {
+    return (params as Record<string, unknown>)[propName] as string;
+  }
+
+  for (const value of Object.values(params)) {
+    if (typeof value === "object" && value !== null && propName in value) {
+      return (value as Record<string, unknown>)[propName] as string;
+    }
+  }
+
+  return undefined;
 }
