@@ -282,6 +282,73 @@ describe("HttpOpenCageDataAddressGateway", () => {
           },
           10000,
         );
+        it("Should work if searching for 'Strada Bogdan Amaru 11, Râmnicu Vâlcea 240408, Romania'", async () => {
+          const expectedResult = [
+            {
+              address: {
+                streetNumberAndAddress: "Strada Bogdan Amaru",
+                postcode: "240085",
+                departmentCode: "999",
+                city: "Râmnicu Vâlcea",
+              },
+              position: {
+                lat: 45.0944560977954,
+                lon: 24.3627752261322,
+              },
+            },
+            {
+              address: {
+                city: "Râmnicu Vâlcea",
+                departmentCode: "999",
+                postcode: "240312",
+                streetNumberAndAddress: "Strada Bogdan Amaru",
+              },
+              position: {
+                lat: 45.09337695,
+                lon: 24.36409695,
+              },
+            },
+          ];
+          const resultMetropolitanFrance =
+            await httpAddressGateway.lookupStreetAddress(
+              "Strada Bogdan Amaru 11, Râmnicu Vâlcea 240408, Romania",
+            );
+          expectToEqual(resultMetropolitanFrance, expectedResult);
+        });
+
+        it("Should work if searching for 'Platz der Deutschen Einheit 1, 44137 Dortmund, Germany'", async () => {
+          const expectedResult = [
+            {
+              address: {
+                streetNumberAndAddress: "Strada Bogdan Amaru",
+                postcode: "240085",
+                departmentCode: "999",
+                city: "Râmnicu Vâlcea",
+              },
+              position: {
+                lat: 45.0944560977954,
+                lon: 24.3627752261322,
+              },
+            },
+            {
+              address: {
+                city: "Râmnicu Vâlcea",
+                departmentCode: "999",
+                postcode: "240312",
+                streetNumberAndAddress: "Strada Bogdan Amaru",
+              },
+              position: {
+                lat: 45.09337695,
+                lon: 24.36409695,
+              },
+            },
+          ];
+          const resultMetropolitanFrance =
+            await httpAddressGateway.lookupStreetAddress(
+              "Platz der Deutschen Einheit 1, 44137 Dortmund, Germany",
+            );
+          expectToEqual(resultMetropolitanFrance, expectedResult);
+        });
       });
     });
 

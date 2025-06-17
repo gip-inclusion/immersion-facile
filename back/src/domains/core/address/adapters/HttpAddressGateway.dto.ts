@@ -76,4 +76,6 @@ export type OpenCageDataAddressComponents = {
   town?: string;
   township?: string;
   village?: string;
+  country?: string;
+  country_code?: string;
 };

@@ -150,14 +150,25 @@ export const departmentNameToDepartmentCode: Record<
   "Saint-Martin": "978",
 };
 
-export const getDepartmentCodeFromDepartmentNameOrCity: Record<
-  DepartmentName,
-  DepartmentCode
-> = {
-  ...departmentNameToDepartmentCode,
-  "Île-de-France": "75",
-  "Métropole de Lyon": "69",
-  "Auvergne-Rhône-Alpes": "69",
+export const getDepartmentCodeFromDepartmentName = (
+  countryCode?: SupportedCountryCode,
+  departmentName?: DepartmentName,
+): DepartmentCode => {
+  if (!countryCode) return defaultDepartmentCode;
+  const departmentData: Partial<
+    Record<SupportedCountryCode, Record<DepartmentName, DepartmentCode>>
+  > = {
+    fr: {
+      ...departmentNameToDepartmentCode,
+      "Île-de-France": "75",
+      "Métropole de Lyon": "69",
+      "Auvergne-Rhône-Alpes": "69",
+    },
+  };
+  if (departmentData[countryCode] && departmentName) {
+    return departmentData[countryCode][departmentName];
+  }
+  return defaultDepartmentCode;
 };
 
 export class LocationBuilder implements Builder<Location> {
@@ -190,3 +201,61 @@ export class LocationBuilder implements Builder<Location> {
 
   #dto: Location;
 }
+export type SupportedCountryCode = (typeof allSupportedCountryCodes)[number];
+const franceAndAttachedTerritoryCountryCodes = [
+  "fr", // France
+  "bl", // Saint Barthélemy
+  "gf", // French Guiana
+  "gp", // Guadeloupe
+  "mf", // Saint Martin
+  "mq", // Martinique
+  "nc", // New Caledonia
+  "pf", // French Polynesia
+  "pm", // Saint Pierre and Miquelon
+  "re", // Réunion
+  "tf", // French Southern Territories
+  "wf", // Wallis and Futuna
+  "yt", // Mayotte
+] as const;
+
+const europeanUnionCountryCodes = [
+  "de", // Germany
+  "at", // Austria
+  "be", // Belgium
+  "bg", // Bulgaria
+  "cy", // Cyprus
+  "hr", // Croatia
+  "dk", // Denmark
+  "es", // Spain
+  "ee", // Estonia
+  "fi", // Finland
+  "fr", // France
+  "gr", // Greece
+  "hu", // Hungary
+  "ie", // Ireland
+  "is", // Iceland
+  "it", // Italy
+  "lv", // Latvia
+  "li", // Liechtenstein
+  "lt", // Lithuania
+  "lu", // Luxembourg
+  "mt", // Malta
+  "no", // Norway
+  "nl", // Netherlands
+  "pl", // Poland
+  "pt", // Portugal
+  "cz", // Czech Republic
+  "ro", // Romania
+  "sk", // Slovakia
+  "si", // Slovenia
+  "se", // Sweden
+  "ch", // Switzerland
+] as const;
+
+export const defaultDepartmentCode = "999";
+
+export const allSupportedCountryCodesAsQueryParam = `${franceAndAttachedTerritoryCountryCodes.join(",")},${europeanUnionCountryCodes.join(",")}`;
+export const allSupportedCountryCodes = [
+  ...franceAndAttachedTerritoryCountryCodes,
+  ...europeanUnionCountryCodes,
+];

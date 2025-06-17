@@ -10,9 +10,11 @@ import {
   type OpenCageGeoSearchKey,
   type Postcode,
   type StreetNumberAndAddress,
+  type SupportedCountryCode,
+  allSupportedCountryCodesAsQueryParam,
   errors,
   filterNotFalsy,
-  getDepartmentCodeFromDepartmentNameOrCity,
+  getDepartmentCodeFromDepartmentName,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
   lookupStreetAddressSpecialCharsRegex,
@@ -56,7 +58,7 @@ export class HttpAddressGateway implements AddressGateway {
     const { status, body } = await this.#limiter.schedule(() =>
       this.httpClient.geocoding({
         queryParams: {
-          countrycode: franceAndAttachedTerritoryCountryCodes,
+          countrycode: allSupportedCountryCodesAsQueryParam,
           key: this.geocodingApiKey,
           language,
           limit: "5",
@@ -102,7 +104,7 @@ export class HttpAddressGateway implements AddressGateway {
               },
               mode: "cors",
               queryParams: {
-                countrycode: "fr",
+                countrycode: allSupportedCountryCodesAsQueryParam,
                 language,
                 limit: "10",
                 q: cachedQuery,
@@ -133,7 +135,7 @@ export class HttpAddressGateway implements AddressGateway {
 
         return this.httpClient.geocoding({
           queryParams: {
-            countrycode: franceAndAttachedTerritoryCountryCodes,
+            countrycode: "de,ro",
             key: this.geocodingApiKey,
             language,
             q: query,
@@ -151,6 +153,7 @@ export class HttpAddressGateway implements AddressGateway {
   #toAddressAndPosition(
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
   ): AddressAndPosition | undefined {
+    console.log(feature.properties.components);
     const address = this.#featureToAddress(feature);
     return (
       address && {
@@ -167,13 +170,17 @@ export class HttpAddressGateway implements AddressGateway {
     feature: GeoJSON.Feature<Point, OpenCageDataProperties>,
   ): AddressDto | undefined {
     const components = feature.properties.components;
+    const countryCode = getCountryCode(components);
+    console.log(countryCode);
     const city = getCityFromAliases(components);
+    console.log(city);
     const postcode = getPostcodeFromAliases(components);
     const departmentName = getDepartmentNameFromAliases(components);
     // OpenCageData gives the department name but not the code.
-    const departmentCode =
-      departmentName &&
-      getDepartmentCodeFromDepartmentNameOrCity[departmentName];
+    const departmentCode = getDepartmentCodeFromDepartmentName(
+      countryCode,
+      departmentName,
+    );
     const streetNumberAndAddress = makeStreetNumberAndAddress(
       getStreetNumberFromAliases(components),
       getStreetNameFromAliases(components),
@@ -253,6 +260,16 @@ const makeStreetNumberAndAddress = (
 
 // https://github.com/OpenCageData/opencagedata-misc-docs/blob/master/countrycode.md
 // On prend la france et tous ses territoires dépendants.
-const franceAndAttachedTerritoryCountryCodes =
-  "fr,bl,gf,gp,mf,mq,nc,pf,pm,re,tf,wf,yt";
 const language = "fr";
+
+const getCountryCode = (
+  components: OpenCageDataAddressComponents,
+): SupportedCountryCode | undefined => {
+  const countryCode = components.country_code;
+  if (countryCode && isSupportedCountryCode(countryCode)) return countryCode;
+};
+
+const isSupportedCountryCode = (
+  countryCode: string,
+): countryCode is SupportedCountryCode =>
+  allSupportedCountryCodesAsQueryParam.includes(countryCode);
