@@ -129,11 +129,11 @@ export const createApiKeyAuthRouterV2 = (deps: AppDependencies) => {
         )
           throw errors.apiConsumer.forbidden();
         return pipeWithValue(
-          validateAndParseZodSchemaV2(
-            contactEstablishmentPublicV2Schema,
-            req.body,
+          validateAndParseZodSchemaV2({
+            inputSchema: contactEstablishmentPublicV2Schema,
+            schemaParsingInput: req.body,
             logger,
-          ),
+          }),
           contactEstablishmentPublicV2ToDomain(() =>
             getFirstLocationIdOrThrow(deps.uowPerformer, req.body.siret),
           ),
