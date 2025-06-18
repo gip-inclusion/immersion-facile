@@ -61,6 +61,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     .withAgencyId(agency.id)
     .validated()
     .withDateValidation(firstConventionValidationDate.toISOString())
+    .withDateStart("2024-05-20T08:00:00.000Z")
     .withDateEnd("2024-05-30T08:00:00.000Z")
     .build();
   const middleConvention = new ConventionDtoBuilder()
@@ -69,6 +70,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     .withAgencyId(agency.id)
     .validated()
     .withDateValidation("2024-06-25T08:00:00.000Z")
+    .withDateStart("2024-06-20T08:00:00.000Z")
     .withDateEnd("2024-06-30T08:00:00.000Z")
     .build();
   const lastConvention = new ConventionDtoBuilder()
@@ -77,6 +79,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     .withAgencyId(agency.id)
     .validated()
     .withDateValidation(lastConventionValidationDate.toISOString())
+    .withDateStart("2024-07-01T08:00:00.000Z")
     .withDateEnd("2024-07-09T08:00:00.000Z")
     .build();
 

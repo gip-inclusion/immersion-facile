@@ -459,6 +459,10 @@ export const validateConventionResults = (
       schemaName: "conventionSchema",
       inputSchema: conventionSchema,
       schemaParsingInput: pgResult.dto,
+      id:
+        pgResult.dto && typeof pgResult.dto === "object" && "id" in pgResult.dto
+          ? (pgResult.dto.id as string)
+          : undefined,
       logger,
     }),
   );

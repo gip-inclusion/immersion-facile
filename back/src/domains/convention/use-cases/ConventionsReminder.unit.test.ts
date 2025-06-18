@@ -1,4 +1,10 @@
-import { addBusinessDays, differenceInBusinessDays, subDays } from "date-fns";
+import { faker } from "@faker-js/faker";
+import {
+  addBusinessDays,
+  addDays,
+  differenceInBusinessDays,
+  subDays,
+} from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyId,
@@ -6,7 +12,9 @@ import {
   ConventionDtoBuilder,
   type ConventionStatus,
   conventionStatuses,
+  errors,
   expectObjectInArrayToMatch,
+  expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -105,6 +113,34 @@ describe("ConventionReminder use case", () => {
       expectToEqual(uow.outboxRepository.events, []);
       expectToEqual(uow.conventionRepository.conventions, conventions);
     });
+  });
+
+  it("Throw an error when convention to remind does not validate schema", async () => {
+    const { startDate, startDateDifference } = prepareDates(now, 2);
+    expect(0 < startDateDifference && startDateDifference <= 2).toBeTruthy();
+
+    const convention = new ConventionDtoBuilder()
+      .withId("conventionId")
+      .withAgencyId(agency.id)
+      .withStatus("PARTIALLY_SIGNED")
+      .withDateStart(startDate.toISOString())
+      .withDateSubmission(subDays(startDate, 10).toISOString())
+      .build();
+
+    uow.conventionRepository.setConventions([convention]);
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
+    await expectPromiseToFailWithError(
+      conventionsReminder.execute(),
+      errors.inputs.badSchema({
+        id: convention.id,
+        context: "conventionSchema",
+        flattenErrors: [
+          "id : Le format de l'identifiant est invalide",
+          "dateEnd : La durée maximale calendaire d'une immersion est de 30 jours.",
+        ],
+      }),
+    );
   });
 
   describe("Send 'ConventionReminderRequired' event", () => {
@@ -257,12 +293,13 @@ const makeOneConventionOfEachStatuses = ({
   withDateSubmission?: Date;
   agencyId: AgencyId;
 }): ConventionDto[] =>
-  conventionStatuses.map((conventionStatus, index) =>
+  conventionStatuses.map((conventionStatus) =>
     new ConventionDtoBuilder()
-      .withId(index.toString())
+      .withId(faker.string.uuid())
       .withAgencyId(agencyId)
       .withStatus(conventionStatus)
       .withDateStart(withDateStart.toISOString())
+      .withDateEnd(addDays(withDateStart, 2).toISOString())
       .withDateSubmission(withDateSubmission.toISOString())
       .build(),
   );
