@@ -1,7 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { domElementIds, toFormatedTextSiret } from "shared";
+import { useFormContext } from "react-hook-form";
+import {
+  type FormEstablishmentDto,
+  domElementIds,
+  toFormatedTextSiret,
+} from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
@@ -19,6 +24,7 @@ export const CreateIntroSection = ({
     shouldFetchEvenIfAlreadySaved: false,
     addressAutocompleteLocator: "create-establishment-address",
   });
+  const { setValue } = useFormContext<FormEstablishmentDto>();
 
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
 
@@ -55,7 +61,10 @@ export const CreateIntroSection = ({
                       id: domElementIds.establishment.create.startFormButton,
                       children: "Créer un nouvel établissement",
                       priority: "secondary",
-                      onClick: () => onStepChange(1, []),
+                      onClick: () => {
+                        setValue("siret", "");
+                        onStepChange(1, []);
+                      },
                     },
                     {
                       id: domElementIds.establishment.create
