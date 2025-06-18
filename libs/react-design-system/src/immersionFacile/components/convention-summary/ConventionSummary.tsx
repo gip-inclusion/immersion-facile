@@ -180,11 +180,7 @@ const SubSection = ({
             !!subSection.header?.title && "fr-py-2w",
             !subSection.isFullWidthDisplay && "fr-col-md-6",
             subSection.hasBackgroundColor && "fr-p-2w",
-            shouldDisplayVerticalSeparator(
-              index,
-              !!subSection.isFullWidthDisplay,
-              isNextSubsectionFullwidth,
-            ) && "fr-pr-3w",
+            index % 2 === 0 && "fr-pr-3w",
           ),
           conventionSummaryStyles.subsection,
           subSection.hasBackgroundColor &&
@@ -196,10 +192,10 @@ const SubSection = ({
           ) && conventionSummaryStyles.subsectionVerticalSeparator,
         )}
       >
-        <div>
+        <div className={cx(conventionSummaryStyles.subsectionInnerWrapper)}>
           {subSection.header && (
             <div className={fr.cx("fr-grid-row")}>
-              <div className={cx(subSection.header?.action && "fr-col-lg-6")}>
+              <div className={cx(conventionSummaryStyles.subsectionHeaderItem)}>
                 {subSection.header?.title && (
                   <h3 className={fr.cx("fr-mb-2v", "fr-h6")}>
                     {subSection.header.title}
@@ -211,18 +207,16 @@ const SubSection = ({
                   </div>
                 )}
               </div>
-            </div>
-          )}
-          {subSection.header?.action && (
-            <div className={fr.cx("fr-grid-row")}>
-              <div
-                className={cx(
-                  fr.cx("fr-col-12", "fr-col-lg-6", "fr-pr-2w"),
-                  conventionSummaryStyles.subsectionHeaderButton,
-                )}
-              >
-                <Button size="small" {...subSection.header.action} />
-              </div>
+              {subSection.header.action && (
+                <div
+                  className={cx(
+                    conventionSummaryStyles.subsectionHeaderItem,
+                    fr.cx("fr-ml-md-auto", "fr-mr-auto", "fr-mr-md-2w"),
+                  )}
+                >
+                  <Button {...subSection.header.action} />
+                </div>
+              )}
             </div>
           )}
           {subSection.isSchedule && <Schedule fields={subSection.fields} />}
