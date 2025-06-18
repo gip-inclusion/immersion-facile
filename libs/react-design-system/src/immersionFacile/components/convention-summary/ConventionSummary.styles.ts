@@ -15,6 +15,7 @@ export const conventionSummaryStyles = {
   subsectionValue: "im-convention-summary__subsection__value",
   subsectionScheduleDay: "im-convention-summary__subsection__schedule__day",
   subsectionScheduleWeek: "im-convention-summary__subsection__schedule__week",
-  subsectionInnerWrapper: "im-convention-summary__subsection-inner-wrapper",
+  subsectionElementFullWidth:
+    "im-convention-summary__subsection-element-fullwidth",
   subsectionHeaderItem: "im-convention-summary__subsection-header-item",
 };
