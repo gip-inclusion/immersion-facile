@@ -7,6 +7,7 @@ import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
 import { equals } from "ramda";
+import { useState } from "react";
 import { HeadingSection } from "react-design-system";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -90,16 +91,20 @@ export const OffersSettingsSection = ({
   ).getFormFields();
   const getFieldError = makeFieldError(formState);
 
+  const [currentStepSubmitted, setCurrentStepSubmitted] = useState(false);
+
   const showErrorOnAvailableForImmersion = () => {
-    if (availableForImmersionInProps === undefined) return true;
-    if (availableForImmersionInProps && getFieldError("maxContactsPerMonth"))
-      return true;
-    if (
-      availableForImmersionInProps === false &&
-      (getFieldError("nextAvailabilityDate") ||
-        getFieldError("maxContactsPerMonth"))
-    )
-      return true;
+    if (currentStepSubmitted) {
+      if (availableForImmersionInProps === undefined) return true;
+      if (availableForImmersionInProps && getFieldError("maxContactsPerMonth"))
+        return true;
+      if (
+        availableForImmersionInProps === false &&
+        (getFieldError("nextAvailabilityDate") ||
+          getFieldError("maxContactsPerMonth"))
+      )
+        return true;
+    }
     return false;
   };
 
@@ -395,15 +400,17 @@ export const OffersSettingsSection = ({
               },
               {
                 children: "Étape suivante",
-                onClick: () =>
-                  onStepChange(4, [
+                onClick: () => {
+                  setCurrentStepSubmitted(true);
+                  return onStepChange(4, [
                     "searchableBy",
                     "maxContactsPerMonth",
                     "nextAvailabilityDate",
                     "isEngagedEnterprise",
                     "fitForDisabledWorkers",
                     "contactMode",
-                  ]),
+                  ]);
+                },
                 iconId: "fr-icon-arrow-right-line",
                 iconPosition: "right",
                 type: "button",
