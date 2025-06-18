@@ -8,6 +8,7 @@ import {
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
+  type AuthState,
   type FederatedIdentityWithUser,
   authSlice,
 } from "src/core-logic/domain/auth/auth.slice";
@@ -21,24 +22,24 @@ import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacks } from "../feedback/feedback.content";
 import { feedbacksSelectors } from "../feedback/feedback.selectors";
 
-const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
-  provider: "peConnect",
-  token: "123",
-  email: "john.doe@mail.com",
-  firstName: "John",
-  lastName: "Doe",
-};
-
-const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
-  provider: "proConnect",
-  token: "123",
-  email: "john.doe@mail.com",
-  firstName: "John",
-  lastName: "Doe",
-  idToken: "inclusion-connect-id-token",
-};
-
 describe("Auth slice", () => {
+  const peConnectedFederatedIdentity: FederatedIdentityWithUser = {
+    provider: "peConnect",
+    token: "123",
+    email: "john.doe@mail.com",
+    firstName: "John",
+    lastName: "Doe",
+  };
+
+  const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
+    provider: "proConnect",
+    token: "123",
+    email: "john.doe@mail.com",
+    firstName: "John",
+    lastName: "Doe",
+    idToken: "inclusion-connect-id-token",
+  };
+
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -47,16 +48,38 @@ describe("Auth slice", () => {
   });
 
   it("stores the federated identity when someones connects (in store and in device)", () => {
-    expectFederatedIdentityToEqual(null);
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     store.dispatch(
       authSlice.actions.federatedIdentityProvided({
         federatedIdentityWithUser: peConnectedFederatedIdentity,
         feedbackTopic: "auth-global",
       }),
     );
-    expectFederatedIdentityToEqual(peConnectedFederatedIdentity);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     expectFederatedIdentityInDevice(peConnectedFederatedIdentity);
-    expectIsLoadingToBe(false);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: peConnectedFederatedIdentity,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
   });
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for, and redirects to provider logout page", () => {
@@ -66,6 +89,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        requestedEmail: null,
       },
       inclusionConnected: {
         currentUser: new InclusionConnectedUserBuilder().build(),
@@ -80,20 +104,37 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
+
     store.dispatch(
       authSlice.actions.federatedIdentityDeletionTriggered({
         mode: "device-and-inclusion",
       }),
     );
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
-    expectFederatedIdentityToEqual(null);
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, [
       "http://yolo-logout.com",
     ]);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
     expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
       null,
     );
@@ -106,6 +147,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        requestedEmail: null,
       },
       inclusionConnected: {
         currentUser: new InclusionConnectedUserBuilder().build(),
@@ -126,10 +168,25 @@ describe("Auth slice", () => {
       }),
     );
 
-    expectFederatedIdentityToEqual(null);
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, []);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
     expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
       null,
     );
@@ -142,6 +199,7 @@ describe("Auth slice", () => {
         federatedIdentityWithUser: peConnectedFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
+        requestedEmail: null,
       },
       inclusionConnected: {
         currentUser: null,
@@ -156,28 +214,60 @@ describe("Auth slice", () => {
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
     });
+
     store.dispatch(
       authSlice.actions.federatedIdentityDeletionTriggered({
         mode: "device-only",
       }),
     );
-    expectFederatedIdentityToEqual(null);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     expectFederatedIdentityInDevice(undefined);
     expectPartialConventionInUrlInDevice(undefined);
     expectToEqual(dependencies.navigationGateway.wentToUrls, []);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
     expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
       null,
     );
   });
 
   it("retrieves federatedIdentity if stored in device", () => {
-    expectFederatedIdentityToEqual(null);
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
       inclusionConnectedFederatedIdentity,
     );
     store.dispatch(rootAppSlice.actions.appIsReady());
-    expectFederatedIdentityToEqual(inclusionConnectedFederatedIdentity);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     expectFederatedIdentityInDevice(inclusionConnectedFederatedIdentity);
     const icUser: InclusionConnectedUser = {
       id: "123",
@@ -197,16 +287,45 @@ describe("Auth slice", () => {
       inclusionConnectedSelectors.currentUser(store.getState()),
       icUser,
     );
-    expectIsLoadingToBe(false);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
   });
 
   it("shouldn't be logged in if no federatedIdentity stored in device", () => {
-    expectFederatedIdentityToEqual(null);
     dependencies.localDeviceRepository.delete("federatedIdentityWithUser");
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: true,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     store.dispatch(rootAppSlice.actions.appIsReady());
-    expectFederatedIdentityToEqual(null);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
+
     expectFederatedIdentityInDevice(undefined);
-    expectIsLoadingToBe(false);
+
+    expectAuthStateToBe({
+      afterLoginRedirectionUrl: null,
+      federatedIdentityWithUser: null,
+      isLoading: false,
+      isRequestingLoginByEmail: false,
+      requestedEmail: null,
+    });
   });
 
   it("should store redirection url in device storage", () => {
@@ -249,7 +368,13 @@ describe("Auth slice", () => {
     const email: Email = "email@mail.com";
 
     it("should handle login by email successfully", () => {
-      expectIsRequestingLoginByEmailToBe(false);
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: false,
+        requestedEmail: null,
+      });
 
       store.dispatch(
         authSlice.actions.loginByEmailRequested({
@@ -259,9 +384,24 @@ describe("Auth slice", () => {
         }),
       );
 
-      expectIsRequestingLoginByEmailToBe(true);
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: true,
+        requestedEmail: email,
+      });
+
       dependencies.authGateway.loginByEmailResponse$.next();
-      expectIsRequestingLoginByEmailToBe(false);
+
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: false,
+        requestedEmail: email,
+      });
+
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["login-by-email"],
         {
@@ -276,7 +416,13 @@ describe("Auth slice", () => {
     });
 
     it("should handle login by email failed", () => {
-      expectIsRequestingLoginByEmailToBe(false);
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: false,
+        requestedEmail: null,
+      });
 
       store.dispatch(
         authSlice.actions.loginByEmailRequested({
@@ -286,12 +432,26 @@ describe("Auth slice", () => {
         }),
       );
 
-      expectIsRequestingLoginByEmailToBe(true);
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: true,
+        requestedEmail: email,
+      });
+
       const errorMessage = "Error message";
       dependencies.authGateway.loginByEmailResponse$.error(
         new Error(errorMessage),
       );
-      expectIsRequestingLoginByEmailToBe(false);
+
+      expectAuthStateToBe({
+        afterLoginRedirectionUrl: null,
+        federatedIdentityWithUser: null,
+        isLoading: true,
+        isRequestingLoginByEmail: false,
+        requestedEmail: email,
+      });
       expectToEqual(
         feedbacksSelectors.feedbacks(store.getState())["login-by-email"],
         {
@@ -305,20 +465,8 @@ describe("Auth slice", () => {
     });
   });
 
-  const expectFederatedIdentityToEqual = (
-    expected: FederatedIdentity | null,
-  ) => {
-    expectToEqual(authSelectors.federatedIdentity(store.getState()), expected);
-  };
-
-  const expectIsLoadingToBe = (expected: boolean) => {
-    expect(authSelectors.isLoading(store.getState())).toBe(expected);
-  };
-
-  const expectIsRequestingLoginByEmailToBe = (expected: boolean) => {
-    expect(authSelectors.isRequestingLoginByEmail(store.getState())).toBe(
-      expected,
-    );
+  const expectAuthStateToBe = (authState: AuthState) => {
+    expectToEqual(store.getState().auth, authState);
   };
 
   const expectFederatedIdentityInDevice = (

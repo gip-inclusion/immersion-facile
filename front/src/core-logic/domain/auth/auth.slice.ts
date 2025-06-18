@@ -20,9 +20,10 @@ type WithUrl = {
   url: AbsoluteUrl;
 };
 
-interface AuthState {
+export interface AuthState {
   isLoading: boolean;
   isRequestingLoginByEmail: boolean;
+  requestedEmail: Email | null;
   federatedIdentityWithUser: FederatedIdentityWithUser | null;
   afterLoginRedirectionUrl: AbsoluteUrl | null;
 }
@@ -32,6 +33,7 @@ const initialState: AuthState = {
   isRequestingLoginByEmail: false,
   federatedIdentityWithUser: null,
   afterLoginRedirectionUrl: null,
+  requestedEmail: null,
 };
 
 const onFederatedIdentityReceived = (
@@ -98,13 +100,14 @@ export const authSlice = createSlice({
     },
     loginByEmailRequested: (
       state,
-      _action: PayloadActionWithFeedbackTopic<
+      action: PayloadActionWithFeedbackTopic<
         WithSourcePage & {
           email: Email;
         }
       >,
     ) => {
       state.isRequestingLoginByEmail = true;
+      state.requestedEmail = action.payload.email; // TODO test à faire évoluer
     },
     loginByEmailSucceded: (state, _action: PayloadActionWithFeedbackTopic) => {
       state.isRequestingLoginByEmail = false;

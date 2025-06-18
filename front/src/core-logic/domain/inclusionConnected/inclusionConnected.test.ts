@@ -191,6 +191,7 @@ describe("InclusionConnected", () => {
           },
           isLoading: true,
           afterLoginRedirectionUrl: null,
+          requestedEmail: null,
         },
       }));
       store.dispatch(
