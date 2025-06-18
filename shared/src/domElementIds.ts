@@ -421,6 +421,9 @@ export const domElementIds = {
       byEmailButton: "im-login-form__connect-button--establishment-email",
       proConnectButton:
         "im-login-form__inclusion-connect-button--establishment",
+      navigateToHome: "im-login-form__navigate-to-home-button--establishment",
+      retryButton: "im-login-form__retry-login-button--establishment",
+      contactSupport: "im-login-form__contact-support-link--establishment",
     },
     create: {
       form: "im-form-create-establishment",
@@ -659,6 +662,9 @@ export const domElementIds = {
     login: {
       proConnectButton: "im-login-form__inclusion-connect-button--admin",
       byEmailButton: "im-login-form__connect-button--admin-email",
+      navigateToHome: "im-login-form__navigate-to-home-button--admin",
+      retryButton: "im-login-form__retry-login-button--admin",
+      contactSupport: "im-login-form__contact-support-link--admin",
     },
     agencyTab: {
       openManageUserModalButton:
@@ -766,6 +772,9 @@ export const domElementIds = {
     login: {
       proConnectButton: "im-login-form__inclusion-connect-button--agency",
       byEmailButton: "im-login-form__connect-button--agency-email",
+      navigateToHome: "im-login-form__navigate-to-home-button--agency",
+      retryButton: "im-login-form__retry-login-button--agency",
+      contactSupport: "im-login-form__contact-support-link--agency",
     },
     registerAgencies: {
       table: "im-register-agencies-table",
@@ -821,6 +830,11 @@ export const domElementIds = {
         "im-login-form__inclusion-connect-button--establishment-dashboard",
       byEmailButton:
         "im-login-form__connect-button--establishment-dashboard-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--establishment-dashboard",
+      retryButton: "im-login-form__retry-login-button--establishment-dashboard",
+      contactSupport:
+        "im-login-form__contact-support-link--establishment-dashboard",
     },
     discussion: {
       handleDiscussionButton:

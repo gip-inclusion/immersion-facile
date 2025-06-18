@@ -40,7 +40,8 @@ import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.cont
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 import { z } from "zod";
-import { Feedback } from "../components/feedback/Feedback";
+import { LoginByEmailFeedback } from "../components/feedback/LoginByEmailFeedback";
+import { WithFeedbackReplacer } from "../components/feedback/WithFeedbackReplacer";
 import { EmailValidationInput } from "../components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "../hooks/formContents.hooks";
 
@@ -88,6 +89,8 @@ type ConnectedPrivateRouteProps = {
   inclusionConnectConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
 };
+
+export const loginByEmailFeedbackTopic: FeedbackTopic = "login-by-email";
 
 export const ConnectedPrivateRoute = ({
   route,
@@ -155,71 +158,81 @@ export const ConnectedPrivateRoute = ({
 
   if (!isInclusionConnected) {
     return (
-      <HeaderFooterLayout>
-        <MainWrapper
-          layout="default"
-          pageHeader={
-            <PageHeader
-              title={pageContent.title}
-              illustration={
-                "illustration" in pageContent
-                  ? pageContent.illustration
-                  : undefined
-              }
-            >
-              <>
-                {alreadyUsedAuthentication && (
-                  <Alert
-                    className={fr.cx("fr-mb-2w")}
-                    severity="warning"
-                    title="Ce lien d'authentification a déjà été utilisé."
-                    description="Veuillez renouveler votre demande de connexion."
-                  />
-                )}
-                <p className={fr.cx("fr-text--lead")}>
-                  {pageContent.description}
-                </p>
-                {"withEmailLogin" in pageContent ? (
-                  <SeparatedSection
-                    firstSection={<LoginWithEmail page={page} />}
-                    secondSection={<LoginWithProConnect page={page} />}
-                  />
-                ) : (
-                  <LoginWithProConnect page={page} />
-                )}
+      <WithFeedbackReplacer
+        topic={loginByEmailFeedbackTopic}
+        renderFeedback={({ level }) => (
+          <LoginByEmailFeedback
+            mode={level === "success" ? "success" : "failed"}
+            page={page}
+          />
+        )}
+      >
+        <HeaderFooterLayout>
+          <MainWrapper
+            layout="default"
+            pageHeader={
+              <PageHeader
+                title={pageContent.title}
+                illustration={
+                  "illustration" in pageContent
+                    ? pageContent.illustration
+                    : undefined
+                }
+              >
+                <>
+                  {alreadyUsedAuthentication && (
+                    <Alert
+                      className={fr.cx("fr-mb-2w")}
+                      severity="warning"
+                      title="Ce lien d'authentification a déjà été utilisé."
+                      description="Veuillez renouveler votre demande de connexion."
+                    />
+                  )}
+                  <p className={fr.cx("fr-text--lead")}>
+                    {pageContent.description}
+                  </p>
+                  {"withEmailLogin" in pageContent ? (
+                    <SeparatedSection
+                      firstSection={<LoginWithEmail page={page} />}
+                      secondSection={<LoginWithProConnect page={page} />}
+                    />
+                  ) : (
+                    <LoginWithProConnect page={page} />
+                  )}
 
-                <p className={fr.cx("fr-hint-text")}>
-                  Si votre messagerie est protégée une anti-spam, pensez à
-                  ajouter l’adresse{" "}
-                  <strong>{immersionFacileNoReplyEmail}</strong> à votre liste
-                  de contacts autorisés.
-                </p>
-              </>
-            </PageHeader>
-          }
-          vSpacing={2}
-        >
-          <section className={fr.cx("fr-mb-8w")}>
-            <h2 className={fr.cx("fr-h3")}>{pageContent.cardsTitle}</h2>
-            <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
-              {pageContent.cards?.map((card) => (
-                <div
-                  className={fr.cx("fr-col-12", "fr-col-lg-4")}
-                  key={card.description?.toString()}
-                >
-                  <Tile
-                    title={card.title}
-                    desc={card.description}
-                    imageUrl={card.illustration}
-                    imageAlt=""
-                    imageSvg={false}
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        </MainWrapper>
-      </HeaderFooterLayout>
+                  <p className={fr.cx("fr-hint-text")}>
+                    Si votre messagerie est protégée une anti-spam, pensez à
+                    ajouter l’adresse{" "}
+                    <strong>{immersionFacileNoReplyEmail}</strong> à votre liste
+                    de contacts autorisés.
+                  </p>
+                </>
+              </PageHeader>
+            }
+            vSpacing={2}
+          >
+            <section className={fr.cx("fr-mb-8w")}>
+              <h2 className={fr.cx("fr-h3")}>{pageContent.cardsTitle}</h2>
+              <div className={fr.cx("fr-grid-row", "fr-grid-row--gutters")}>
+                {pageContent.cards?.map((card) => (
+                  <div
+                    className={fr.cx("fr-col-12", "fr-col-lg-4")}
+                    key={card.description?.toString()}
+                  >
+                    <Tile
+                      title={card.title}
+                      desc={card.description}
+                      imageUrl={card.illustration}
+                      imageAlt=""
+                      imageSvg={false}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+          </MainWrapper>
+        </HeaderFooterLayout>
+      </WithFeedbackReplacer>
     );
   }
 
@@ -393,12 +406,9 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
     mode: "onTouched",
   });
   const dispatch = useDispatch();
-  const loginByEmailFeedbackTopic: FeedbackTopic = "login-by-email";
   const getFieldError = makeFieldError(methods.formState);
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
-  const { handleSubmit, getValues } = methods;
-  const emailInForm = getValues("email");
   const isRequestingLoginByEmail = useAppSelector(
     authSelectors.isRequestingLoginByEmail,
   );
@@ -412,7 +422,7 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
       <div className={fr.cx("fr-my-2w")}>
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(({ email }) => {
+            onSubmit={methods.handleSubmit(({ email }) => {
               dispatch(
                 authSlice.actions.loginByEmailRequested({
                   email,
@@ -447,30 +457,6 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
             </Button>
           </form>
         </FormProvider>
-        <Feedback
-          topics={[loginByEmailFeedbackTopic]}
-          closable
-          className={fr.cx("fr-my-2w")}
-          render={({ level, title }) => (
-            <Alert
-              severity={level}
-              title={title}
-              className={fr.cx("fr-mt-2w")}
-              small
-              description={
-                level === "success"
-                  ? `Un email contenant votre lien de connexion vient d’être envoyé à l’adresse ${emailInForm}.
-      Ce lien est valable pendant 24 heures. Pensez à vérifier vos spams si vous ne le voyez pas rapidement.
-      
-      Si vous avez déjà utilisé Immersion Facilitée, assurez-vous d’avoir renseigné la même adresse email que précédemment.
-      Cela nous permet de retrouver votre entreprise ou vos conventions.`
-                  : `Une erreur est survenue lors de l’envoi du lien de connexion à l’adresse ${emailInForm}.
-      Cela peut arriver en cas de problème temporaire de messagerie ou si l’adresse email renseignée est incorrecte.
-      Veuillez vérifier l’orthographe de votre adresse email et réessayer.`
-              }
-            />
-          )}
-        />
         {invalidEmailMessage !== null && (
           <Alert
             severity="error"
