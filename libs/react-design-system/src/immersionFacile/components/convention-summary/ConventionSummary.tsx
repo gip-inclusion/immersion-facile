@@ -214,7 +214,7 @@ const SubSection = ({
                     fr.cx("fr-ml-md-auto", "fr-mr-auto", "fr-mr-md-2w"),
                   )}
                 >
-                  <Button {...subSection.header.action} />
+                  <Button size="small" {...subSection.header.action} />
                 </div>
               )}
             </div>
