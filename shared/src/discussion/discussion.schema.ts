@@ -10,7 +10,10 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
-import { paginationQueryParamsSchema } from "../pagination/pagination.schema";
+import {
+  createPaginatedSchema,
+  paginationQueryParamsSchema,
+} from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
@@ -22,10 +25,12 @@ import {
   type CommonDiscussionDto,
   type DiscussionEmailParams,
   type DiscussionId,
+  type DiscussionInList,
   type DiscussionReadDto,
   type Exchange,
   type ExchangeFromDashboard,
   type ExchangeRole,
+  type FlatGetPaginatedDiscussionsParams,
   type GetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
@@ -86,7 +91,7 @@ export const makeExchangeEmailSchema = (
 
 export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
-export const attachementSchema: z.Schema<Attachment> = z.object({
+export const attachmentSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
   link: z.string(),
 });
@@ -97,7 +102,7 @@ export const exchangeSchema: z.Schema<Exchange> = z.object({
   sender: exchangeRoleSchema,
   recipient: exchangeRoleSchema,
   sentAt: makeDateStringSchema(),
-  attachments: z.array(attachementSchema),
+  attachments: z.array(attachmentSchema),
 });
 export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
@@ -265,3 +270,48 @@ export const getPaginatedDiscussionsParamsSchema: z.Schema<GetPaginatedDiscussio
       .optional(),
     pagination: paginationQueryParamsSchema.optional(),
   });
+
+export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedDiscussionsParams> =
+  z.object({
+    // pagination
+    page: z.coerce.number().optional(),
+    perPage: z.coerce.number().optional(),
+
+    // sort
+    orderBy: z.enum(["createdAt"]).optional(),
+    orderDirection: z.enum(["asc", "desc"]).optional(),
+
+    // filters
+    statuses: z
+      .union([
+        discussionStatusSchema,
+        z.array(discussionStatusSchema).nonempty(),
+      ])
+      .transform((val) => (Array.isArray(val) ? val : [val]))
+      .optional(),
+    sirets: z
+      .union([siretSchema, z.array(siretSchema).nonempty()])
+      .transform((val) => (Array.isArray(val) ? val : [val]))
+      .optional(),
+  });
+
+export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
+  id: discussionIdSchema,
+  siret: siretSchema,
+  status: discussionStatusSchema,
+  appellation: appellationDtoSchema,
+  businessName: zStringMinLength1,
+  createdAt: makeDateStringSchema(),
+  kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
+  exchanges: exchangesSchema,
+  potentialBeneficiary: z.object({
+    firstName: zStringMinLength1,
+    lastName: zStringMinLength1,
+    phone: phoneSchema.nullable(),
+  }),
+  immersionObjective: immersionObjectiveSchema.nullable(),
+});
+
+export const paginatedDiscussionListSchema = createPaginatedSchema(
+  discussionInListSchema,
+);

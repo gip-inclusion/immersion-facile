@@ -309,3 +309,17 @@ export type GetPaginatedDiscussionsParams = {
   };
   pagination?: PaginationQueryParams;
 };
+
+export type FlatGetPaginatedDiscussionsParams = {
+  // pagination
+  page?: number;
+  perPage?: number;
+
+  // sort
+  orderBy?: DiscussionOrderKey;
+  orderDirection?: "asc" | "desc";
+
+  // filters
+  statuses?: DiscussionStatus | DiscussionStatus[];
+  sirets?: SiretDto | SiretDto[];
+};
