@@ -117,5 +117,15 @@
         padding: 0;
       }
     }
+
+    &-inner-wrapper {
+      width: 100%;
+    }
+
+    &-header-item {
+      @include for-screen-min($bp-md) {
+        flex: 0 1 auto;
+      }
+    }
   }
 }
