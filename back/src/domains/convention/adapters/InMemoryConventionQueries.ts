@@ -12,9 +12,12 @@ import {
   NotFoundError,
   type SiretDto,
   type UserId,
+  conventionSchema,
   errors,
   validatedConventionStatuses,
 } from "shared";
+import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
+import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
 import type { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -26,6 +29,8 @@ import type {
   GetPaginatedConventionsForAgencyUserParams,
 } from "../ports/ConventionQueries";
 import type { InMemoryConventionRepository } from "./InMemoryConventionRepository";
+
+const logger = createLogger(__filename);
 
 export class InMemoryConventionQueries implements ConventionQueries {
   public paginatedConventionsParams: GetPaginatedConventionsForAgencyUserParams[] =
@@ -114,15 +119,27 @@ export class InMemoryConventionQueries implements ConventionQueries {
         .map((convention) => this.#addAgencyDataToConvention(convention)),
     );
 
-    return conventions.sort((previous, current) => {
-      const previousDate = previous[params.sortBy];
-      const currentDate = current[params.sortBy];
+    return conventions
+      .sort((previous, current) => {
+        const previousDate = previous[params.sortBy];
+        const currentDate = current[params.sortBy];
 
-      if (!previousDate) return 1;
-      if (!currentDate) return -1;
+        if (!previousDate) return 1;
+        if (!currentDate) return -1;
 
-      return new Date(previousDate).getTime() - new Date(currentDate).getTime();
-    });
+        return (
+          new Date(previousDate).getTime() - new Date(currentDate).getTime()
+        );
+      })
+      .map((convention) =>
+        validateAndParseZodSchemaV2({
+          schemaName: "conventionSchema",
+          inputSchema: conventionSchema,
+          schemaParsingInput: convention,
+          id: convention.id,
+          logger,
+        }),
+      );
   }
 
   public async getPaginatedConventionsForAgencyUser(

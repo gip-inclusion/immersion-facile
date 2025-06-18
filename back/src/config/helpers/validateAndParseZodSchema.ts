@@ -13,13 +13,16 @@ export const validateAndParseZodSchemaV2 = <T>(
   const result = props.inputSchema.safeParse(props.schemaParsingInput);
   if (result.success) return result.data;
 
-  props.logger.error({
-    message: `ValidateAndParseZodSchema failed - ${"schemaName" in props ? props.schemaName : props.useCaseName} ${props.id}`,
-  });
   const flattenErrors = flattenZodErrors(result.error);
-  throw errors.inputs.badSchema({
+
+  const error = errors.inputs.badSchema({
     context: "schemaName" in props ? props.schemaName : props.useCaseName,
     id: props.id,
     flattenErrors,
   });
+  props.logger.error({
+    message: error.message,
+  });
+
+  throw error;
 };
