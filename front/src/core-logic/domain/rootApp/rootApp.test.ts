@@ -23,6 +23,7 @@ describe("rootApp epic", () => {
         isLoading: false,
         afterLoginRedirectionUrl: null,
         federatedIdentityWithUser: null,
+        requestedEmail: null,
       },
     };
 

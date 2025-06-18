@@ -21,6 +21,10 @@ const isRequestingLoginByEmail = createSelector(
   rootAuthSelector,
   (auth) => auth.isRequestingLoginByEmail,
 );
+const requestedEmail = createSelector(
+  rootAuthSelector,
+  (auth) => auth.requestedEmail,
+);
 
 const isPeConnected = createSelector(
   currentFederatedIdentity,
@@ -79,4 +83,5 @@ export const authSelectors = {
   afterLoginRedirectionUrl,
   isLoading,
   isRequestingLoginByEmail,
+  requestedEmail,
 };
