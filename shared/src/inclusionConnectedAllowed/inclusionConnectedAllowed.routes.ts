@@ -8,6 +8,8 @@ import {
 import {
   discussionReadSchema,
   exchangeSchema,
+  getPaginatedDiscussionsParamsSchema,
+  paginatedDiscussionListSchema,
   withDiscussionStatusSchema,
   withExchangeMessageSchema,
 } from "../discussion/discussion.schema";
@@ -79,6 +81,17 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     responses: {
       200: absoluteUrlSchema,
+      401: httpErrorSchema,
+    },
+  }),
+  getDiscussions: defineRoute({
+    method: "get",
+    url: "/discussions",
+    ...withAuthorizationHeaders,
+    queryParamsSchema: getPaginatedDiscussionsParamsSchema,
+    responses: {
+      200: paginatedDiscussionListSchema,
+      400: httpErrorSchema,
       401: httpErrorSchema,
     },
   }),
