@@ -86,6 +86,17 @@ export const createInclusionConnectedAllowedRouter = (
       ),
   );
 
+  inclusionConnectedSharedRoutes.getDiscussions(
+    deps.inclusionConnectAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussionByIdForEstablishment.execute(
+          req.params.discussionId,
+          req.payloads?.inclusion,
+        ),
+      ),
+  );
+
   inclusionConnectedSharedRoutes.updateDiscussionStatus(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
