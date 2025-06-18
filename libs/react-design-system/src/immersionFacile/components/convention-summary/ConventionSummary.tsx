@@ -192,7 +192,7 @@ const SubSection = ({
           ) && conventionSummaryStyles.subsectionVerticalSeparator,
         )}
       >
-        <div className={cx(conventionSummaryStyles.subsectionInnerWrapper)}>
+        <div className={cx(conventionSummaryStyles.subsectionElementFullWidth)}>
           {subSection.header && (
             <div className={fr.cx("fr-grid-row")}>
               <div className={cx(conventionSummaryStyles.subsectionHeaderItem)}>
@@ -225,7 +225,12 @@ const SubSection = ({
               {subSection.fields.map((field) => {
                 if ("severity" in field) {
                   return (
-                    <div key={field.key}>
+                    <div
+                      key={field.key}
+                      className={cx(
+                        conventionSummaryStyles.subsectionElementFullWidth,
+                      )}
+                    >
                       <Badge small {...field} />
                     </div>
                   );
