@@ -124,6 +124,7 @@ import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImm
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
 import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
+import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
@@ -834,6 +835,9 @@ export const createUseCases = ({
         oAuthConfig: config.proConnectConfig,
         generateEmailAuthCodeJwt,
       },
+    }),
+    getDiscussions: makeGetDiscussionsForUser({
+      uowPerformer,
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
