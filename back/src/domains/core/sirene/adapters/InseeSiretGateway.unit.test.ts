@@ -1,7 +1,7 @@
 import { expectToEqual } from "shared";
 import {
-  type InseeApiRawEstablishment,
   convertSirenRawEstablishmentToSirenEstablishmentDto,
+  type InseeApiRawEstablishment,
 } from "./InseeSiretGateway";
 
 const validEstablishment: InseeApiRawEstablishment = {

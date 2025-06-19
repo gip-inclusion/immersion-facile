@@ -1,7 +1,7 @@
 import type { captureCheckIn } from "@sentry/node";
 import { calculateDurationInSecondsFrom, pipeWithValue, slugify } from "shared";
 import type { AppConfig } from "../config/bootstrap/appConfig";
-import { type OpacifiedLogger, createLogger } from "../utils/logger";
+import { createLogger, type OpacifiedLogger } from "../utils/logger";
 import { getSlackChannelName, notifyTeam } from "../utils/notifyTeam";
 import { configureSentry } from "./configureSentry";
 

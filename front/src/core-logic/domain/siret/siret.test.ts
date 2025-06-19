@@ -9,8 +9,8 @@ import {
   siretSlice,
 } from "src/core-logic/domain/siret/siret.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

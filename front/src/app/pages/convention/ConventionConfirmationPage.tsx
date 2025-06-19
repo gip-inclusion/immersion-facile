@@ -5,8 +5,8 @@ import {
   SectionConventionNextSteps,
   type SectionConventionNextStepsProps,
   SubmitConfirmationSection,
+  useCopyButton,
 } from "react-design-system";
-import { useCopyButton } from "react-design-system";
 import { errors, zUuidLike } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import type { routes } from "src/app/routes/routes";

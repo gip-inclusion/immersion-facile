@@ -4,9 +4,9 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionId,
+  castError,
   type DateRange,
   type Email,
-  castError,
   executeInSequence,
   frontRoutes,
   getFullname,
@@ -17,13 +17,13 @@ import { z } from "zod";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
-import { UseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

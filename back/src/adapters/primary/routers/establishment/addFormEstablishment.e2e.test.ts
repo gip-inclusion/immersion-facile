@@ -1,14 +1,14 @@
 import {
   type AdminFormEstablishmentUserRight,
-  type EstablishmentRoutes,
-  FormEstablishmentDtoBuilder,
-  InclusionConnectedUserBuilder,
   createInclusionConnectJwtPayload,
   defaultValidFormEstablishment,
   displayRouteName,
+  type EstablishmentRoutes,
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
+  FormEstablishmentDtoBuilder,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -25,8 +25,8 @@ import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapt
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import type { EstablishmentLead } from "../../../../domains/establishment/entities/EstablishmentLeadEntity";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

@@ -1,4 +1,4 @@
-import { BehaviorSubject, type Observable, Subject, delay, of } from "rxjs";
+import { BehaviorSubject, delay, type Observable, of, Subject } from "rxjs";
 import type { AppellationMatchDto, GetSiretInfo, RomeDto } from "shared";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
 

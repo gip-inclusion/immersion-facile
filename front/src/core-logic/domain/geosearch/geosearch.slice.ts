@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { LookupLocationInput, LookupSearchResult } from "shared";
 import {
   type AutocompleteState,
-  type PayloadActionWithLocator,
   initialAutocompleteItem,
+  type PayloadActionWithLocator,
 } from "src/core-logic/domain/autocomplete.utils";
 
 export type GeosearchLocator = "search-form-place";

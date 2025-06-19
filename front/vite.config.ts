@@ -2,8 +2,8 @@ import { resolve } from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import { VitePWA } from "vite-plugin-pwa";
 import type { ManifestOptions } from "vite-plugin-pwa";
+import { VitePWA } from "vite-plugin-pwa";
 
 const manifest: Partial<ManifestOptions> = {
   name: "Immersion Facilitée",

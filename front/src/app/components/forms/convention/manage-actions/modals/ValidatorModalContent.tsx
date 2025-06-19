@@ -6,9 +6,9 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
   type ConventionStatusWithValidator,
+  domElementIds,
   type UpdateConventionStatusRequestDto,
   type WithValidatorInfo,
-  domElementIds,
   withValidatorInfoSchema,
 } from "shared";
 

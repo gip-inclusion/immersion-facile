@@ -3,9 +3,9 @@ import { uniq } from "ramda";
 import type { AppellationCode, NafCode } from "shared";
 import { type KyselyDb, values } from "../../../config/pg/kysely/kyselyUtils";
 import {
+  hasSearchMadeGeoParams,
   type SearchMadeEntity,
   type SearchMadeId,
-  hasSearchMadeGeoParams,
 } from "../entities/SearchMadeEntity";
 import type { SearchMadeRepository } from "../ports/SearchMadeRepository";
 

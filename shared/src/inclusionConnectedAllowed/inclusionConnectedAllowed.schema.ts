@@ -10,6 +10,7 @@ import { dateTimeIsoStringSchema } from "../utils/date";
 import { zStringCanBeEmpty, zStringMinLength1 } from "../zodUtils";
 import {
   type AgencyRight,
+  allAgencyRoles,
   type InclusionConnectedUser,
   type ProConnectInfos,
   type User,
@@ -20,7 +21,6 @@ import {
   type WithEstablishmentDashboards,
   type WithEstablishmentData,
   type WithOptionalUserId,
-  allAgencyRoles,
 } from "./inclusionConnectedAllowed.dto";
 
 export const agencyRoleSchema = z.enum(allAgencyRoles);

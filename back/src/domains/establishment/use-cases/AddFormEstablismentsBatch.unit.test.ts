@@ -1,15 +1,15 @@
 import {
-  type FormEstablishmentBatchDto,
-  type FormEstablishmentDto,
-  FormEstablishmentDtoBuilder,
-  type GroupOptions,
-  InclusionConnectedUserBuilder,
   defaultAddress,
   defaultValidFormEstablishment,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type FormEstablishmentBatchDto,
+  type FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+  type GroupOptions,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -19,11 +19,11 @@ import {
   TEST_OPEN_ESTABLISHMENT_2,
 } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,

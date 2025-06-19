@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
 import {
-  type ManageEstablishmentAdminForm,
   domElementIds,
+  type ManageEstablishmentAdminForm,
   manageEstablishmentAdminFormSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

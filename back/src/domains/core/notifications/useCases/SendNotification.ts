@@ -1,14 +1,14 @@
 import {
-  type Notification,
-  type NotificationErrored,
   errors,
   exhaustiveCheck,
+  type Notification,
+  type NotificationErrored,
 } from "shared";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../UseCase";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { WithNotificationIdAndKind } from "../helpers/Notification";

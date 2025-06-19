@@ -2,7 +2,6 @@ import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
   type AbsoluteUrl,
-  type ProcessEnv,
   environments,
   filterNotFalsy,
   inclusionConnectImmersionRoutes,
@@ -11,6 +10,7 @@ import {
   makeThrowIfNotDefinedOrDefault,
   makeThrowIfNotInArray,
   makeThrowIfNotOpenCageGeosearchKey,
+  type ProcessEnv,
 } from "shared";
 import type { EmailableApiKey } from "../../domains/core/email-validation/adapters/EmailableEmailValidationGateway.dto";
 import type { DomainTopic } from "../../domains/core/events/events";

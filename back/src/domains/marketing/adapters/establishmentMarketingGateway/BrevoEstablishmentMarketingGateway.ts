@@ -145,7 +145,10 @@ export class BrevoEstablishmentMarketingGateway
   #removeContactFromList({
     email,
     listId,
-  }: { email: Email; listId: string }): Promise<void> {
+  }: {
+    email: Email;
+    listId: string;
+  }): Promise<void> {
     return this.#contactLimiter
       .schedule(() =>
         this.#httpClient.deleteContactFromList({

@@ -5,6 +5,8 @@ import {
   type AgencyKind,
   type AgencyWithUsersRights,
   type ApiConsumer,
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionDomainPayload,
   type ConventionDto,
   type ConventionId,
@@ -12,19 +14,17 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type DateTimeIsoString,
+  errors,
   type FeatureFlags,
   ForbiddenError,
   type InclusionConnectDomainJwtPayload,
+  isValidMobilePhone,
   type Role,
   type Signatories,
   type SignatoryRole,
-  type UserWithRights,
-  agencyModifierRoles,
-  allSignatoryRoles,
-  errors,
-  isValidMobilePhone,
   signConventionDtoWithRole,
   statusTransitionConfigs,
+  type UserWithRights,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
@@ -76,7 +76,10 @@ export const throwIfTransitionNotAllowed = ({
 const oneOfTheRolesIsAllowed = ({
   allowedRoles,
   rolesToValidate,
-}: { allowedRoles: Role[]; rolesToValidate: Role[] }) =>
+}: {
+  allowedRoles: Role[];
+  rolesToValidate: Role[];
+}) =>
   rolesToValidate.some((roleToValidate) =>
     allowedRoles.includes(roleToValidate),
   );
@@ -300,7 +303,11 @@ export const throwErrorIfPhoneNumberNotValid = ({
   conventionId,
   phone,
   role,
-}: { conventionId: ConventionId; phone: string; role: Role }) => {
+}: {
+  conventionId: ConventionId;
+  phone: string;
+  role: Role;
+}) => {
   if (!isValidMobilePhone(phone))
     throw errors.convention.invalidMobilePhoneNumber({
       conventionId,

@@ -1,9 +1,9 @@
 import { afterEach } from "node:test";
 import {
-  type InternshipKind,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
+  type InternshipKind,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import {
@@ -11,17 +11,17 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import {
-  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { ShareConventionLinkByEmail } from "./ShareConventionLinkByEmail";
 

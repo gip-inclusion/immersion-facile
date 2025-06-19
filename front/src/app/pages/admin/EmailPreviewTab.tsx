@@ -9,9 +9,9 @@ import { keys } from "ramda";
 import { useState } from "react";
 import { ImmersionTextField } from "react-design-system";
 import {
-  type EmailTemplatesByName,
   addressDtoToString,
   domElementIds,
+  type EmailTemplatesByName,
   emailTemplatesByName,
   internshipKinds,
 } from "shared";

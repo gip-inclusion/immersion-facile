@@ -1,9 +1,9 @@
 import Button from "@codegouvfr/react-dsfr/Button";
 import {
   type ConventionId,
-  type SiretDto,
   domElementIds,
   immersionFacileContactEmail,
+  type SiretDto,
 } from "shared";
 import type {
   ContactErrorInformation,

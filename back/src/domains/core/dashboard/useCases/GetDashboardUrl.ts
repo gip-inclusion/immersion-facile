@@ -1,12 +1,12 @@
 import {
   type AbsoluteUrl,
   type DashboardUrlAndName,
-  type GetDashboardParams,
   errors,
+  type GetDashboardParams,
   getDashboardParams,
 } from "shared";
-import { UseCase } from "../../UseCase";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { UseCase } from "../../UseCase";
 import type { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<

@@ -6,25 +6,25 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionRelatedJwtPayload,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
   ForbiddenError,
   InclusionConnectedUserBuilder,
   NotFoundError,
   type RenewConventionParams,
   type Role,
   ScheduleDtoBuilder,
-  errors,
-  expectPromiseToFailWithError,
-  expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddConvention } from "./AddConvention";
 import { RenewConvention } from "./RenewConvention";

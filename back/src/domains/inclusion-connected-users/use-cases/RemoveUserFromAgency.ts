@@ -1,11 +1,11 @@
 import {
+  errors,
   type InclusionConnectedUser,
   type WithAgencyIdAndUserId,
-  errors,
   withAgencyIdAndUserIdSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import {
   rejectIfEditionOfValidatorsOfAgencyWithRefersTo,
   validateAgencyRights,

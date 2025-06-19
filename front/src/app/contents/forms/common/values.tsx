@@ -1,7 +1,6 @@
 import type { RadioButtonsProps } from "@codegouvfr/react-dsfr/RadioButtons";
-
-import eyeOffSvg from "../../../../assets/img/eye-off.svg";
 import eyeSvg from "../../../../assets/img/eye.svg";
+import eyeOffSvg from "../../../../assets/img/eye-off.svg";
 
 export const booleanSelectOptions: RadioButtonsProps["options"] = [
   {

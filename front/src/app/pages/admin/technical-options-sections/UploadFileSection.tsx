@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { domElementIds } from "shared";
-import { UploadFile } from "src/app/components/UploadFile";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
+import { UploadFile } from "src/app/components/UploadFile";
 
 export const UploadFileSection = () => {
   const label = "Télécharger un document sur clever";

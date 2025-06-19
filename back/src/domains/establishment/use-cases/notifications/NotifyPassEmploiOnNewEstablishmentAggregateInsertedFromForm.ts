@@ -1,4 +1,4 @@
-import { type WithSiretDto, errors, withSiretSchema } from "shared";
+import { errors, type WithSiretDto, withSiretSchema } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";

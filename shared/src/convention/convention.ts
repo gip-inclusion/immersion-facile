@@ -1,9 +1,9 @@
 import { differenceInISOWeekYears } from "date-fns";
 import { keys, mapObjIndexed, values } from "ramda";
 import {
+  allSignatoryRoles,
   type Role,
   type SignatoryRole,
-  allSignatoryRoles,
 } from "../role/role.dto";
 import type { DotNestedKeys } from "../utils";
 import type { DateString } from "../utils/date";
@@ -175,7 +175,10 @@ export const isConventionValidated = (convention: ConventionDto) =>
 export const hasAllowedRole = ({
   allowedRoles,
   candidateRoles,
-}: { allowedRoles: Role[]; candidateRoles: Role[] }) =>
+}: {
+  allowedRoles: Role[];
+  candidateRoles: Role[];
+}) =>
   candidateRoles.some((candidateRole) => allowedRoles.includes(candidateRole));
 
 const processedDataBySignatoryRole: Record<

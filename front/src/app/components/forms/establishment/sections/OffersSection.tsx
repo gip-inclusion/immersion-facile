@@ -1,15 +1,14 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { values } from "ramda";
-import { HeadingSection } from "react-design-system";
-import { ErrorNotifications } from "react-design-system";
+import { ErrorNotifications, HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
   type AppellationAndRomeDto,
-  type FormEstablishmentDto,
   addressDtoToString,
   domElementIds,
   emptyAppellationAndRome,
+  type FormEstablishmentDto,
   removeAtIndex,
 } from "shared";
 import type {

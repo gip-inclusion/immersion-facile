@@ -8,7 +8,7 @@ import {
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 
 export const featureFlagsSeed = async (uow: UnitOfWork) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("featureFlagsSeed start ...");
 
   const featureFlags: FeatureFlags = {
@@ -45,6 +45,6 @@ export const featureFlagsSeed = async (uow: UnitOfWork) => {
 
   await uow.featureFlagRepository.insertAll(featureFlags);
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("featureFlagsSeed done");
 };

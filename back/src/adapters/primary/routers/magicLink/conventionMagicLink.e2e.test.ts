@@ -4,12 +4,6 @@ import {
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
-  type InclusionConnectJwtPayload,
-  InclusionConnectedUserBuilder,
-  type RenewConventionParams,
-  type Role,
-  ScheduleDtoBuilder,
-  type User,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -17,6 +11,12 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type InclusionConnectJwtPayload,
+  type RenewConventionParams,
+  type Role,
+  ScheduleDtoBuilder,
+  type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -28,8 +28,8 @@ import type {
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("Magic link router", () => {

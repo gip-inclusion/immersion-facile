@@ -1,16 +1,15 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
+import type { WithAgencyId } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { normalizeUsers } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
+import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
+import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-
-import type { WithAgencyId } from "shared";
-import { normalizeUsers } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
-import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
-import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedback/feedback.slice";
 
 export type FetchAgencyAction = ActionOfSlice<typeof fetchAgencySlice>;
 

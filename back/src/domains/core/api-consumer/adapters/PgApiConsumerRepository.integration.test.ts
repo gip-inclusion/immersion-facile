@@ -1,8 +1,8 @@
 import type { Pool } from "pg";
 import {
   type ApiConsumer,
-  type WebhookSubscription,
   expectToEqual,
+  type WebhookSubscription,
 } from "shared";
 import {
   type KyselyDb,

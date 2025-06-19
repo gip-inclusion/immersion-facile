@@ -21,6 +21,7 @@ import {
 import { ApiConsumerForm } from "src/app/components/admin/technical-options/ApiConsumerForm";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import {
   formatApiConsumerContact,
   formatApiConsumerDescription,
@@ -33,8 +34,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { apiConsumerSelectors } from "src/core-logic/domain/apiConsumer/apiConsumer.selector";
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-
-import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { v4 as uuidV4 } from "uuid";
 
 export const ApiConsumersSection = () => {

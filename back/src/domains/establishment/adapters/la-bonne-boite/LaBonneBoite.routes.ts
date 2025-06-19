@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
-  type WithSiretDto,
   siretSchema,
+  type WithSiretDto,
   withAuthorizationHeaders,
 } from "shared";
 import { defineRoute, defineRoutes } from "shared-routes";

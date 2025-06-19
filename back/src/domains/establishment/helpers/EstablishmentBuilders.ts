@@ -2,15 +2,15 @@ import {
   type AbsoluteUrl,
   type Builder,
   type ContactMode,
+  defaultMaxContactsPerMonth,
   type EstablishmentSearchableBy,
+  errors,
   type FormEstablishmentSource,
   type Location,
   type NafDto,
   type NumberEmployeesRange,
   type RomeCode,
   type WithAcquisition,
-  defaultMaxContactsPerMonth,
-  errors,
 } from "shared";
 import { avenueChampsElyseesDto } from "../../core/address/adapters/InMemoryAddressGateway";
 import type {

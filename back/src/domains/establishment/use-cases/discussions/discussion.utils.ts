@@ -4,9 +4,9 @@ import {
   type DiscussionEmailParams,
   type DiscussionEmailParamsWithRecipientKind,
   type Email,
-  type LegacyDiscussionEmailParams,
   errors,
   immersionFacileContactEmail,
+  type LegacyDiscussionEmailParams,
   makeExchangeEmailSchema,
 } from "shared";
 

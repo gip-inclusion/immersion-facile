@@ -11,22 +11,22 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
+  conventionReadSchema,
   type DateString,
   type Email,
   type OmitFromExistingKeys,
+  pipeWithValue,
   type RomeCode,
   type RomeLabel,
   type ScheduleDto,
   type SiretDto,
   type UserId,
-  conventionReadSchema,
-  pipeWithValue,
 } from "shared";
 import {
-  type KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";

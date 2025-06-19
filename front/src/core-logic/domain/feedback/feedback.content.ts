@@ -8,8 +8,8 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
-import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";

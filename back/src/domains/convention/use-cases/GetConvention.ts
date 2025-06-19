@@ -3,11 +3,11 @@ import {
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   type EmailHash,
+  errors,
+  getIcUserRoleForAccessingConvention,
   type Role,
   type UserId,
   type WithConventionId,
-  errors,
-  getIcUserRoleForAccessingConvention,
   withConventionIdSchema,
 } from "shared";
 import {

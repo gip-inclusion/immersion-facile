@@ -1,7 +1,7 @@
 import {
   type InclusionConnectedUser,
-  type WithUserFilters,
   isWithAgencyId,
+  type WithUserFilters,
   withUserFiltersSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";

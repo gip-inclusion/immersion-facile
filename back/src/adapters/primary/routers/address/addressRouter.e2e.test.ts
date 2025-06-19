@@ -1,9 +1,9 @@
 import {
   type AddressRoutes,
-  type LookupSearchResult,
   addressRoutes,
   displayRouteName,
   expectHttpResponseToEqual,
+  type LookupSearchResult,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";

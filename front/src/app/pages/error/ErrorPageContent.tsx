@@ -1,9 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
-
-import type { FrontErrorProps } from "src/app/contents/error/types";
-
 import ovoidSprite from "@codegouvfr/react-dsfr/dsfr/artwork/background/ovoid.svg";
 import technicalErrorSprite from "@codegouvfr/react-dsfr/dsfr/artwork/pictograms/system/technical-error.svg";
+import type { FrontErrorProps } from "src/app/contents/error/types";
 
 type ErrorPageContentProps = FrontErrorProps;
 

@@ -1,12 +1,12 @@
 import {
   type AddressAndPosition,
   type AddressDto,
-  type GeoPositionDto,
-  type Location,
-  type LookupSearchResult,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type GeoPositionDto,
+  type Location,
+  type LookupSearchResult,
 } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";

@@ -11,14 +11,14 @@ import {
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type AddressAutocompleteLocator,
-  type MultipleAddressAutocompleteLocator,
   geocodingSlice,
+  type MultipleAddressAutocompleteLocator,
 } from "./geocoding.slice";
 
 describe("Geocoding epic", () => {

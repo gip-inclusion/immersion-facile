@@ -6,12 +6,12 @@ import {
   type GetSiretInfo,
   type GetSiretRequestDto,
   type NumberEmployeesRange,
+  numberEmployeesRanges,
   type SiretDto,
   type SiretEstablishmentDto,
-  type WithSiretDto,
-  numberEmployeesRanges,
   siretInfoErrors,
   siretRegex,
+  type WithSiretDto,
 } from "./siret";
 
 export const numberOfEmployeesRangeSchema: z.Schema<NumberEmployeesRange> =

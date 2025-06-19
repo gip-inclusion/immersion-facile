@@ -1,7 +1,7 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
-import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressAndPosition } from "../address/address.dto";
+import type { Builder } from "../Builder";
 import { errors } from "../errors/errors";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";

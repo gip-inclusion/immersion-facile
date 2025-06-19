@@ -1,0 +1,22 @@
+{
+  "root": false,
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      }
+    },
+    "includes": ["!**/public", "!**/dev-dist", "!**/scalingo", "!**/dist"]
+  },
+  "formatter": {
+    "includes": [
+      "!**/front/public",
+      "!**/front/dev-dist",
+      "!**/front/scalingo",
+      "!**/front/dist"
+    ]
+  }
+}

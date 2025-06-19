@@ -9,14 +9,14 @@ import { generateES256KeyPair } from "../../../../../utils/jwt";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
-import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import { createPgUow } from "../../../unit-of-work/adapters/createPgUow";
+import { PgUowPerformer } from "../../../unit-of-work/adapters/PgUowPerformer";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  InMemoryOAuthGateway,
   fakeProConnectSiret,
   fakeProviderConfig,
+  InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload } from "../port/OAuthGateway";

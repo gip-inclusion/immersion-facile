@@ -22,6 +22,7 @@ import { makeStyles, useStyles } from "tss-react/dsfr";
 import lesEntrepriseSengagent from "../../../assets/img/les-entreprises-s-engagent.svg";
 import franceTravailLogo from "../../../assets/img/logo-france-travail.svg";
 import plateformeInclusionLogoUrl from "../../../assets/img/plateforme-inclusion-logo.svg";
+
 const {
   bottomLinks: bottomsLinksIds,
   links: linksIds,

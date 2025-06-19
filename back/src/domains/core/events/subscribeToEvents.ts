@@ -1,4 +1,4 @@
-import { type WithConventionDto, type WithSiretDto, keys } from "shared";
+import { keys, type WithConventionDto, type WithSiretDto } from "shared";
 import type { AppDependencies } from "../../../config/bootstrap/createAppDependencies";
 import type {
   InstantiatedUseCase,

@@ -4,16 +4,16 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,
   type ConventionReadDto,
-  type DailyScheduleDto,
-  type DateIntervalDto,
-  type ScheduleDto,
-  ScheduleDtoBuilder,
-  type SelectedDaysOfTheWeekDto,
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   calculateWeeklyHoursFromSchedule,
   convertLocaleDateToUtcTimezoneDate,
+  type DailyScheduleDto,
+  type DateIntervalDto,
   regularTimePeriods,
+  type ScheduleDto,
+  ScheduleDtoBuilder,
+  type SelectedDaysOfTheWeekDto,
   selectedDaysFromComplexSchedule,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";

@@ -2,8 +2,8 @@ import {
   type ApiConsumer,
   type ConventionReadDto,
   conventionStatuses,
+  ForbiddenError,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { z } from "zod";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

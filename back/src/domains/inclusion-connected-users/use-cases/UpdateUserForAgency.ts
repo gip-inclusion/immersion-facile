@@ -3,15 +3,15 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   type Email,
+  errors,
   type InclusionConnectedUser,
   type User,
   type UserParamsForAgency,
-  errors,
   userParamsForAgencySchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UserRepository } from "../../core/authentication/inclusion-connect/port/UserRepository";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {

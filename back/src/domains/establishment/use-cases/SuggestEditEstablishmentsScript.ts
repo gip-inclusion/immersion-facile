@@ -1,9 +1,9 @@
 import { subMonths } from "date-fns";
-import { type SiretDto, castError } from "shared";
+import { castError, type SiretDto } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../utils/logger";
-import { UseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UseCase } from "../../core/UseCase";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { SuggestEditEstablishment } from "./SuggestEditEstablishment";
 

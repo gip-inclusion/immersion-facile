@@ -1,5 +1,5 @@
 import type { AxiosInstance } from "axios";
-import { type Observable, from, map } from "rxjs";
+import { from, map, type Observable } from "rxjs";
 import {
   type AbsoluteUrl,
   type ConnectedUserJwt,
@@ -8,8 +8,8 @@ import {
   type FeatureFlags,
   type HtmlToPdfRequest,
   type TechnicalRoutes,
-  type ValidateEmailFeedback,
   uploadFileRoute,
+  type ValidateEmailFeedback,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {

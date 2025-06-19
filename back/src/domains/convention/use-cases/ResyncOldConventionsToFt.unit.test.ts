@@ -9,15 +9,15 @@ import {
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemoryFranceTravailGateway } from "../adapters/france-travail-gateway/InMemoryFranceTravailGateway";
 import {
-  type FranceTravailConvention,
   conventionStatusToFranceTravailStatus,
+  type FranceTravailConvention,
 } from "../ports/FranceTravailGateway";
 import { ResyncOldConventionsToFt } from "./ResyncOldConventionsToFt";
 

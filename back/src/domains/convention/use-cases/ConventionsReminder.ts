@@ -3,14 +3,14 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionStatus,
-  type ReminderKind,
   castError,
+  type ReminderKind,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { DomainEvent } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

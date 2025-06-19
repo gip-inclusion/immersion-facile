@@ -1,10 +1,10 @@
 import {
   type FeatureFlags,
-  type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
   makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
+  type SetFeatureFlagParam,
 } from "shared";
 import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";
 

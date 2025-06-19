@@ -3,18 +3,18 @@ import {
   type AgencyGroup,
   type AgencyRight,
   type AgencyWithUsersRights,
-  type UserWithRights,
   activeAgencyStatuses,
   agencyRoleIsNotToReview,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserWithRights,
 } from "shared";
 import { z } from "zod";
 import {
   getAgencyAndAdminEmailsByAgencyId,
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getUserWithRights } from "../helpers/userRights.helper";

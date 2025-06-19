@@ -1,7 +1,7 @@
 import {
   type AssessmentDto,
-  type ConventionDto,
   assessmentDtoSchema,
+  type ConventionDto,
   conventionSchema,
 } from "shared";
 import { z } from "zod";

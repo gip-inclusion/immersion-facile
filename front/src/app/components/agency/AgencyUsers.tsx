@@ -9,17 +9,17 @@ import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
   type AgencyDto,
-  type UserParamsForAgency,
   domElementIds,
+  type UserParamsForAgency,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import {
+  icUsersAdminSlice,
   type NormalizedIcUserById,
   type NormalizedInclusionConnectedUser,
-  icUsersAdminSlice,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";

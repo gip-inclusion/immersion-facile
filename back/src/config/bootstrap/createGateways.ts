@@ -16,9 +16,9 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
 import { InMemoryFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
-import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 import type { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
 import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
 import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
@@ -40,8 +40,8 @@ import { InMemoryNotificationGateway } from "../../domains/core/notifications/ad
 import type { NotificationGateway } from "../../domains/core/notifications/ports/NotificationGateway";
 import { InMemoryPdfGeneratorGateway } from "../../domains/core/pdf-generation/adapters/InMemoryPdfGeneratorGateway";
 import {
-  ScalingoPdfGeneratorGateway,
   makeScalingoPdfGeneratorRoutes,
+  ScalingoPdfGeneratorGateway,
 } from "../../domains/core/pdf-generation/adapters/ScalingoPdfGeneratorGateway";
 import type { PdfGeneratorGateway } from "../../domains/core/pdf-generation/ports/PdfGeneratorGateway";
 import { noRetries } from "../../domains/core/retry-strategy/ports/RetryStrategy";
@@ -59,9 +59,9 @@ import { annuaireDesEntreprisesSiretRoutes } from "../../domains/core/sirene/ada
 import { InMemorySiretGateway } from "../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { InseeSiretGateway } from "../../domains/core/sirene/adapters/InseeSiretGateway";
 import { makeInseeExternalRoutes } from "../../domains/core/sirene/adapters/InseeSiretGateway.routes";
+import { crispRoutes } from "../../domains/core/support/adapters/crispRoutes";
 import { HttpCrispGateway } from "../../domains/core/support/adapters/HttpCrispGateway";
 import { InMemoryCrispApi } from "../../domains/core/support/adapters/InMemoryCrispApi";
-import { crispRoutes } from "../../domains/core/support/adapters/crispRoutes";
 import type { CrispGateway } from "../../domains/core/support/ports/CrispGateway";
 import { CustomTimeGateway } from "../../domains/core/time-gateway/adapters/CustomTimeGateway";
 import { RealTimeGateway } from "../../domains/core/time-gateway/adapters/RealTimeGateway";

@@ -1,22 +1,22 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  InclusionConnectedUserBuilder,
-  type Role,
-  type User,
   defaultProConnectInfos,
   errors,
   establishmentsRoles,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type Role,
+  type User,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeEmailHash } from "../../../utils/jwt";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { GetConvention } from "./GetConvention";

@@ -3,23 +3,23 @@ import {
   type AgencyKind,
   type AppellationAndRomeDto,
   type AppellationCode,
-  type BeneficiaryCurrentEmployer,
-  type BeneficiaryRepresentative,
-  type ConventionDto,
-  type FtConnectIdentity,
-  type ImmersionObjective,
-  type InternshipKind,
-  type LevelOfEducation,
-  type NafCode,
-  type ScheduleDto,
   addressDtoToString,
   addressStringToDto,
   appellationCodeSchema,
+  type BeneficiaryCurrentEmployer,
+  type BeneficiaryRepresentative,
+  type ConventionDto,
   errors,
+  type FtConnectIdentity,
+  type ImmersionObjective,
+  type InternshipKind,
   isBeneficiaryStudent,
   keys,
+  type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
+  type NafCode,
   reasonableSchedule,
+  type ScheduleDto,
   toDateUTCString,
 } from "shared";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
@@ -29,7 +29,7 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import type { searchParams } from "src/app/routes/routes";
 import { outOfReduxDependencies } from "src/config/dependencies";
 import { ENV } from "src/config/environmentVariables";
-import { type ValueSerializer, param } from "type-route";
+import { param, type ValueSerializer } from "type-route";
 import { v4 as uuidV4 } from "uuid";
 
 type ConventionRoutes =

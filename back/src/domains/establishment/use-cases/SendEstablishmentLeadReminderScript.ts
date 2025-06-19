@@ -3,21 +3,21 @@ import {
   type AbsoluteUrl,
   type ConventionDto,
   type ConventionId,
-  type SiretDto,
   castError,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
+  type SiretDto,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { createLogger } from "../../../utils/logger";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { makeShortLink } from "../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { makeShortLink } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import {

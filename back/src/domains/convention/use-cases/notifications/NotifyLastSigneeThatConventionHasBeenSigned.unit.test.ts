@@ -13,11 +13,11 @@ import {
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "./NotifyLastSigneeThatConventionHasBeenSigned";
 
@@ -85,7 +85,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           params: {
             internshipKind: signedConvention.internshipKind,
             conventionId: signedConvention.id,
-            // biome-ignore lint/style/noNonNullAssertion: <explanation>
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
             signedAt: signedConvention.signatories.beneficiary.signedAt!,
             magicLink,
             agencyLogoUrl: agency.logoUrl ?? undefined,
@@ -115,7 +115,7 @@ describe("NotifyLastSigneeThatConventionHasBeenSigned", () => {
           params: {
             internshipKind: signedConvention.internshipKind,
             signedAt:
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               signedConvention.signatories.establishmentRepresentative
                 .signedAt!,
             conventionId: signedConvention.id,

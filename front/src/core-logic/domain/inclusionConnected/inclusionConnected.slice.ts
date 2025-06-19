@@ -1,4 +1,4 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { AgencyDto, InclusionConnectedUser, WithAgencyIds } from "shared";
 import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.helpers";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";

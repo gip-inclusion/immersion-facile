@@ -1,4 +1,4 @@
-import { type AbsoluteUrl, type ShortLinkId, castError } from "shared";
+import { type AbsoluteUrl, castError, type ShortLinkId } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../../utils/logger";
 import type { ShortLinkRepository } from "../../ports/ShortLinkRepository";

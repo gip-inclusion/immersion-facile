@@ -13,7 +13,10 @@ import { getRandomAddress, seedAddresses } from "./seedAddresses";
 export const getRandomAgencyId = ({
   kind,
   agencyIds,
-}: { kind: AgencyKind; agencyIds: Record<AgencyKind, AgencyId[]> }) => {
+}: {
+  kind: AgencyKind;
+  agencyIds: Record<AgencyKind, AgencyId[]>;
+}) => {
   const ids = agencyIds[kind];
   return ids[Math.floor(Math.random() * ids.length)];
 };

@@ -1,9 +1,9 @@
 import {
   type GetUsersFilters,
+  getUsersFiltersSchema,
   type InclusionConnectedUser,
   type UserInList,
   type UserWithAdminRights,
-  getUsersFiltersSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

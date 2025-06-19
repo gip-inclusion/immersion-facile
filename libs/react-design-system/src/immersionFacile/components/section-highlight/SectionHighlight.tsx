@@ -4,7 +4,9 @@ import Styles from "./SectionHighlight.styles";
 
 export const SectionHighlight = ({
   children,
-}: { children: React.ReactNode }) => {
+}: {
+  children: React.ReactNode;
+}) => {
   const { cx } = useStyles();
   return (
     <div className={cx(fr.cx("fr-px-4w", "fr-py-3w"), Styles.root)}>

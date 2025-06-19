@@ -5,8 +5,8 @@ import {
 } from "shared";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { type AgenciesState, agenciesSlice } from "./agencies.slice";

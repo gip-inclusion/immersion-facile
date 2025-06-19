@@ -1,9 +1,9 @@
-import { type TallyForm, expectObjectsToMatch } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
+import { expectObjectsToMatch, type TallyForm } from "shared";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { AddValidatedConventionNps } from "./AddValidatedConventionNps";
 
 describe("AddValidatedConventionNps use case", () => {

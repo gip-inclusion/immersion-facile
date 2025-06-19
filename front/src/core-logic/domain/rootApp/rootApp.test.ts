@@ -1,9 +1,9 @@
-import { InclusionConnectedUserBuilder, expectToEqual } from "shared";
+import { expectToEqual, InclusionConnectedUserBuilder } from "shared";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore, RootState } from "src/core-logic/storeConfig/store";
 

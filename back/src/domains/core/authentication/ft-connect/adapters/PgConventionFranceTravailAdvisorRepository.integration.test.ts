@@ -244,7 +244,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           conventionId,
         );
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: franceTravailFirstUserAdvisor.advisor,
         peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,
@@ -266,7 +266,7 @@ describe("PgConventionFranceTravailAdvisorRepository", () => {
           conventionId,
         );
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       expectObjectsToMatch(conventionAdvisor!, {
         advisor: undefined,
         peExternalId: franceTravailFirstUserAdvisor.user.peExternalId,

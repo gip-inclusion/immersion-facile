@@ -5,8 +5,8 @@ import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/
 
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

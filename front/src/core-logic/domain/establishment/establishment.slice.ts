@@ -1,11 +1,11 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   type ConnectedUserJwt,
+  defaultMaxContactsPerMonth,
   type EstablishmentNameAndAdmins,
+  emptyAppellationAndRome,
   type FormEstablishmentDto,
   type SiretDto,
-  defaultMaxContactsPerMonth,
-  emptyAppellationAndRome,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,

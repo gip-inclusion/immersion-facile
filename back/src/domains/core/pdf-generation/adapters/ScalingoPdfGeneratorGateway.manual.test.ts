@@ -5,8 +5,8 @@ import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { makeAxiosInstances } from "../../../../utils/axiosUtils";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  ScalingoPdfGeneratorGateway,
   makeScalingoPdfGeneratorRoutes,
+  ScalingoPdfGeneratorGateway,
 } from "./ScalingoPdfGeneratorGateway";
 
 describe("ScalingoPdfGeneratorGateway", () => {

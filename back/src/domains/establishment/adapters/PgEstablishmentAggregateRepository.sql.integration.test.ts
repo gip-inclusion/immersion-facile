@@ -5,9 +5,9 @@ import {
   ConventionDtoBuilder,
   DiscussionBuilder,
   type Exchange,
+  expectToEqual,
   type User,
   UserBuilder,
-  expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {

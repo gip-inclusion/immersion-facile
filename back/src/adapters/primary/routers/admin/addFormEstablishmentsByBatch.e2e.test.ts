@@ -1,15 +1,15 @@
 import { addDays } from "date-fns";
 import {
   type AdminRoutes,
+  adminRoutes,
   type ConnectedUserJwt,
+  currentJwtVersions,
+  expectHttpResponseToEqual,
   type FormEstablishmentBatchDto,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  type InclusionConnectJwtPayload,
   InclusionConnectedUserBuilder,
-  adminRoutes,
-  currentJwtVersions,
-  expectHttpResponseToEqual,
+  type InclusionConnectJwtPayload,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -18,8 +18,8 @@ import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConne
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("POST /add-form-establishment-batch", () => {

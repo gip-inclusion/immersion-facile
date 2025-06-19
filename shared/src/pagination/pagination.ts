@@ -1,8 +1,8 @@
 import {
-  type PaginationQueryParams,
   defaultPageInPagination,
   defaultPerPageInWebPagination,
   maxPerPageInWebPagination,
+  type PaginationQueryParams,
 } from "./pagination.dto";
 
 export const getPaginationParamsForWeb = ({

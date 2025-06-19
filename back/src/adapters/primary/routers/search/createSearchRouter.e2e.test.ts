@@ -1,13 +1,13 @@
 import {
   type AppellationAndRomeDto,
+  displayRouteName,
+  errors,
+  expectHttpResponseToEqual,
   type Group,
   type SearchQueryParamsWithGeoParams,
   type SearchResultDto,
   type SearchRoutes,
   type SiretDto,
-  displayRouteName,
-  errors,
-  expectHttpResponseToEqual,
   searchImmersionRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -21,15 +21,15 @@ import type { EstablishmentEntity } from "../../../../domains/establishment/enti
 import type { GroupEntity } from "../../../../domains/establishment/entities/GroupEntity";
 import type { OfferEntity } from "../../../../domains/establishment/entities/OfferEntity";
 import {
+  defaultLocation,
+  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-  defaultLocation,
-  defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 const siret1 = "12345678901234";

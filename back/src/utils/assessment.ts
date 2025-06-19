@@ -1,15 +1,15 @@
 import {
   type AgencyDto,
   type AssessmentMode,
+  assessmentDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  type Role,
-  assessmentDtoSchema,
   errors,
   getIcUserRoleForAccessingConvention,
   hasAllowedRoleOnAssessment,
   isEstablishmentTutorIsEstablishmentRepresentative,
   legacyAssessmentDtoSchema,
+  type Role,
 } from "shared";
 import { z } from "zod";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";

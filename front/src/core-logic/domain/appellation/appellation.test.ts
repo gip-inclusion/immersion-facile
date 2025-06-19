@@ -11,14 +11,14 @@ import {
   initialAutocompleteItem,
 } from "src/core-logic/domain/autocomplete.utils";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type AppellationAutocompleteLocator,
-  type MultipleAppellationAutocompleteLocator,
   appellationSlice,
+  type MultipleAppellationAutocompleteLocator,
 } from "./appellation.slice";
 
 describe("Appellation epic", () => {

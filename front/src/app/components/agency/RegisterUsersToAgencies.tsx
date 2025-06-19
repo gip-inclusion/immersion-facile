@@ -3,11 +3,11 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/SelectNext";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { type User, domElementIds } from "shared";
+import { domElementIds, type User } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { BackofficeDashboardTabContent } from "../layout/BackofficeDashboardTabContent";
 import { IcUserAgenciesToReview } from "./IcUserAgenciesToReview";
 

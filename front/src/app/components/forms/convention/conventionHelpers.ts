@@ -1,12 +1,12 @@
 import {
+  agencyKindSchema,
   type ConventionReadDto,
+  conventionSchema,
   type EstablishmentTutor,
   type InternshipKind,
   type OmitFromExistingKeys,
-  type Signatories,
-  agencyKindSchema,
-  conventionSchema,
   refersToAgencyIdSchema,
+  type Signatories,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";

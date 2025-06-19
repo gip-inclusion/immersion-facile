@@ -1,12 +1,12 @@
 import {
-  type GroupOptions,
-  InclusionConnectedUserBuilder,
-  UserBuilder,
   addressDtoToString,
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type GroupOptions,
+  InclusionConnectedUserBuilder,
+  UserBuilder,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -16,11 +16,11 @@ import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { DeleteEstablishment } from "./DeleteEstablishment";
@@ -174,7 +174,7 @@ describe("Delete Establishment", () => {
         },
       ]);
 
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       const deletedEstablishmentEvent = uow.outboxRepository.events.find(
         (event) => event.topic === "EstablishmentDeleted",
       )!;

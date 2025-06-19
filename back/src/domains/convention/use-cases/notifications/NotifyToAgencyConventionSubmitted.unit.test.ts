@@ -3,11 +3,11 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   ConventionDtoBuilder,
-  type FtConnectIdentity,
-  InclusionConnectedUserBuilder,
   expectToEqual,
+  type FtConnectIdentity,
   frontRoutes,
   getFullname,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -19,14 +19,14 @@ import {
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyToAgencyConventionSubmitted } from "./NotifyToAgencyConventionSubmitted";
 

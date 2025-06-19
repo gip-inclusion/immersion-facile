@@ -1,4 +1,4 @@
-import { type Observable, delay, of, throwError } from "rxjs";
+import { delay, type Observable, of, throwError } from "rxjs";
 import type {
   AssessmentDto,
   ConventionId,
@@ -24,7 +24,10 @@ export class SimulatedAssessmentGateway implements AssessmentGateway {
 
   public getAssessment$({
     conventionId,
-  }: { conventionId: ConventionId; jwt: string }): Observable<AssessmentDto> {
+  }: {
+    conventionId: ConventionId;
+    jwt: string;
+  }): Observable<AssessmentDto> {
     return of({
       conventionId,
       status: "COMPLETED",

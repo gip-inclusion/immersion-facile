@@ -2,17 +2,17 @@ import {
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
   type ContactFormEstablishmentUserRight,
+  defaultAddress,
+  errors,
+  expectObjectInArrayToMatch,
+  expectPromiseToFailWithError,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
   InclusionConnectedUserBuilder,
   type NafDto,
   type NumberEmployeesRange,
   UserBuilder,
   type WithAcquisition,
-  defaultAddress,
-  errors,
-  expectObjectInArrayToMatch,
-  expectPromiseToFailWithError,
-  expectToEqual,
 } from "shared";
 import {
   InMemoryAddressGateway,
@@ -25,11 +25,11 @@ import {
   TEST_OPEN_ESTABLISHMENT_1,
 } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,

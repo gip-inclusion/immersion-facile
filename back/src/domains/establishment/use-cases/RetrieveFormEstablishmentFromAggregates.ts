@@ -1,11 +1,11 @@
 import {
+  addressDtoToString,
+  errors,
   type FormEstablishmentDto,
   type FormEstablishmentUserRight,
   type InclusionConnectDomainJwtPayload,
   type InclusionConnectJwtPayload,
   type SiretDto,
-  addressDtoToString,
-  errors,
   siretSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";

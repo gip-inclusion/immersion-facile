@@ -5,14 +5,14 @@ import {
   type FeatureFlag,
   type FeatureFlagBoolean,
   type FeatureFlagHighlight,
+  type FeatureFlags,
   type FeatureFlagTextImageAndRedirect,
   type FeatureFlagTextWithSeverity,
-  type FeatureFlags,
+  featureFlagNames,
   type SetFeatureFlagParam,
   type WithFeatureFlagButtonValue,
   type WithFeatureFlagTextValue,
   type WithFeatureFlagTitleValue,
-  featureFlagNames,
 } from "./featureFlags.dto";
 
 const featureFlagBooleanSchema: z.Schema<FeatureFlagBoolean> = z.object({

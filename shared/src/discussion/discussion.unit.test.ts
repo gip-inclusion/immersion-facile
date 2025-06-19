@@ -24,7 +24,10 @@ describe("Discussions", () => {
     const createExchange = ({
       sentAt,
       sender,
-    }: { sentAt: Date; sender: ExchangeRole }): Exchange => ({
+    }: {
+      sentAt: Date;
+      sender: ExchangeRole;
+    }): Exchange => ({
       subject: "Some subject",
       message: "Some message",
       attachments: [],

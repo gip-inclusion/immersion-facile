@@ -1,9 +1,9 @@
-import { type UserInList, expectToEqual } from "shared";
+import { expectToEqual, type UserInList } from "shared";
 import { listUsersSelectors } from "src/core-logic/domain/admin/listUsers/listUsers.selectors";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

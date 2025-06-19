@@ -1,8 +1,8 @@
 import { startReactDsfr } from "@codegouvfr/react-dsfr/spa";
 import {
-  init as SentryInit,
   browserTracingIntegration,
   replayIntegration,
+  init as SentryInit,
 } from "@sentry/browser";
 import { StrictMode } from "react";
 

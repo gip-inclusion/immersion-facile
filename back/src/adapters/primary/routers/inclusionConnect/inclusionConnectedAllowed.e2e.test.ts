@@ -2,23 +2,23 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  DiscussionBuilder,
-  type Exchange,
-  type ExchangeMessageFromDashboard,
-  type InclusionConnectedAllowedRoutes,
-  InclusionConnectedUserBuilder,
-  type User,
   connectedUserTokenExpiredMessage,
   currentJwtVersions,
+  DiscussionBuilder,
   defaultProConnectInfos,
   displayRouteName,
+  type Exchange,
+  type ExchangeMessageFromDashboard,
   errors,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
+  type InclusionConnectedAllowedRoutes,
+  InclusionConnectedUserBuilder,
   inclusionConnectedAllowedRoutes,
   queryParamsAsString,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -32,8 +32,8 @@ import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/a
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("InclusionConnectedAllowedRoutes", () => {

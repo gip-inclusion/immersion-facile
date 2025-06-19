@@ -9,12 +9,12 @@ import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type DotNestedKeys,
-  type FormEstablishmentDto,
-  type FormEstablishmentUserRight,
-  type RangeOfPosition,
   domElementIds,
   errors,
+  type FormEstablishmentDto,
+  type FormEstablishmentUserRight,
   formEstablishmentSchema,
+  type RangeOfPosition,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
@@ -47,7 +47,7 @@ import { establishmentSlice } from "src/core-logic/domain/establishment/establis
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
 export type RouteByMode = {

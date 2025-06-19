@@ -7,7 +7,9 @@ export type DefaultCacheConfig = {
 
 export type MakeWithCache<
   Config extends DefaultCacheConfig = DefaultCacheConfig,
-> = (config: Config) => <R, T = string>(args: {
+> = (
+  config: Config,
+) => <R, T = string>(args: {
   overrideCacheDurationInHours?: number;
   getCacheKey: (param: T) => string;
   cb: (param: T) => Promise<R>;

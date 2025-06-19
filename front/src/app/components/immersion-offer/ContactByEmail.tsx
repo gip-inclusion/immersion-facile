@@ -20,21 +20,21 @@ import {
   type AppellationDto,
   type ContactEstablishmentByMailDto,
   type ContactLevelOfEducation,
-  type ImmersionObjective,
   contactEstablishmentByMailSchema,
   contactLevelsOfEducation,
   conventionObjectiveOptions,
   discoverObjective,
   domElementIds,
+  type ImmersionObjective,
   labelsForContactLevelOfEducation,
   labelsForImmersionObjective,
   toLowerCaseWithoutDiacritics,
 } from "shared";
-import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import {
   getDefaultAppellationCode,
   makeContactInputsLabelsByKey,
 } from "src/app/components/immersion-offer/contactUtils";
+import { TranscientPreferencesDisplay } from "src/app/components/immersion-offer/TranscientPreferencesDisplay";
 import {
   transcientExpirationTimeInMinutes,
   useTranscientDataFromStorage,

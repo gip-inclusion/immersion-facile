@@ -4,11 +4,11 @@ import {
   InclusionConnectedUserBuilder,
   maxPerPageInWebPagination,
 } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { makeGetConventionsForAgencyUser } from "./GetConventionsForAgencyUser";
 
 describe("GetConventionsForAgencyUser", () => {

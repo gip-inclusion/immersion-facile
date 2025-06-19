@@ -3,10 +3,10 @@ import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {

@@ -8,11 +8,11 @@ import {
   type AgencyKind,
   type AgencyOption,
   type AllowedAgencyKindToAdd,
+  agencyKindToLabel,
+  allAgencyKindsAllowedToAdd,
   type ConventionReadDto,
   type CreateAgencyDto,
   type DepartmentCode,
-  agencyKindToLabel,
-  allAgencyKindsAllowedToAdd,
   departmentNameToDepartmentCode,
   fitForDelegationAgencyKind,
 } from "shared";

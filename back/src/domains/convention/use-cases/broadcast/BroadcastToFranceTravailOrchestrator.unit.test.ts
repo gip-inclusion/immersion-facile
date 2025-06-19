@@ -1,16 +1,16 @@
 import {
   AssessmentDtoBuilder,
   ConventionDtoBuilder,
-  type WithConventionDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type WithConventionDto,
 } from "shared";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import {

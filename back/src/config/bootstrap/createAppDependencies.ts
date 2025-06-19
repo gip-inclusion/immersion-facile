@@ -5,9 +5,9 @@ import {
   type GenerateConnectedUserJwt,
   type GenerateConventionJwt,
   type GenerateEmailAuthCodeJwt,
-  type VerifyJwtFn,
   makeGenerateJwtES256,
   makeVerifyJwtES256,
+  type VerifyJwtFn,
 } from "../../domains/core/jwt";
 import { createUowPerformer } from "../../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";

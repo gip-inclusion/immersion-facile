@@ -3,15 +3,15 @@ import {
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
+  ForbiddenError,
 } from "shared";
-import { ForbiddenError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { GetConventionsForApiConsumer } from "./GetConventionsForApiConsumer";
 
 describe("Get Conventions for ApiConsumer", () => {

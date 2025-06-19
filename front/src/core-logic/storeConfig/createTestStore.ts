@@ -8,7 +8,7 @@ import { TestInclusionConnectedGateway } from "src/core-logic/adapters/Inclusion
 import { TestNafGateway } from "src/core-logic/adapters/NafGateway/TestNafGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
-import { type RootState, createStore } from "src/core-logic/storeConfig/store";
+import { createStore, type RootState } from "src/core-logic/storeConfig/store";
 import { TestAddressGateway } from "../adapters/AddressGateway/TestAddressGateway";
 import { TestAgencyGateway } from "../adapters/AgencyGateway/TestAgencyGateway";
 import { TestAssessmentGateway } from "../adapters/AssessmentGateway/TestAssessmentGateway";

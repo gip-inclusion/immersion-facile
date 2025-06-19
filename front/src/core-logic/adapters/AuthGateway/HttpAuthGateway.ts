@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type {
   InclusionConnectImmersionRoutes,
   InitiateLoginByEmailParams,

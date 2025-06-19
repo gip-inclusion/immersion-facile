@@ -6,5 +6,7 @@ export interface OutboxRepository {
   markEventsAsInProcess: (events: DomainEvent[]) => Promise<void>;
   markOldInProcessEventsAsToRepublish: ({
     eventsBeforeDate,
-  }: { eventsBeforeDate: Date }) => Promise<void>;
+  }: {
+    eventsBeforeDate: Date;
+  }) => Promise<void>;
 }

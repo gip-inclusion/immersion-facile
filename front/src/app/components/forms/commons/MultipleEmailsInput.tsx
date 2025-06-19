@@ -1,8 +1,8 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { type ChangeEvent, type ReactNode, useEffect, useState } from "react";
 import {
-  type OmitFromExistingKeys,
   notEqual,
+  type OmitFromExistingKeys,
   validateMultipleEmailRegex,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";

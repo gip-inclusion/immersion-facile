@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { type AppellationCode, type NafCode, expectToEqual } from "shared";
+import { type AppellationCode, expectToEqual, type NafCode } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,

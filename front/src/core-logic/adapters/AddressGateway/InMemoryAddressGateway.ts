@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import {
   type AddressAndPosition,
   type LookupAddress,
@@ -26,7 +26,7 @@ export class InMemoryAddressGateway implements AddressGateway {
   async #lookupStreetAddress(
     lookup: LookupAddress,
   ): Promise<AddressAndPosition[]> {
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("InMemoryApiAddresseGateway.lookupStreetAddress", lookup);
     if (this.simulatedLatencyMs) await sleep(this.simulatedLatencyMs);
 

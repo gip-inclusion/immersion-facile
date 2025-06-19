@@ -2,18 +2,18 @@ import {
   AgencyDtoBuilder,
   type AgencyKind,
   ConventionDtoBuilder,
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type GetApiConsumersByConvention,

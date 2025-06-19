@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { type NafSectionSuggestion, expectToEqual } from "shared";
+import { expectToEqual, type NafSectionSuggestion } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,

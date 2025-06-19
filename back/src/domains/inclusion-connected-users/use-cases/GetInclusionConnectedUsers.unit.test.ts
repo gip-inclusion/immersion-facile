@@ -1,18 +1,18 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeProConnectSiret } from "../../core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { GetInclusionConnectedUsers } from "./GetInclusionConnectedUsers";
 
 const johnBuilder = new InclusionConnectedUserBuilder()

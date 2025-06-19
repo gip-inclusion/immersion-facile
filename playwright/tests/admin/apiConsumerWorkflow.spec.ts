@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 import { domElementIds } from "shared";
 import { testConfig } from "../../custom.config";
 import { goToAdminTab } from "../../utils/admin";

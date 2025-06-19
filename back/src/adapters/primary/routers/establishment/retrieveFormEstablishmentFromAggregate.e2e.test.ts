@@ -1,17 +1,17 @@
 import { addDays } from "date-fns";
 import {
-  type EstablishmentRoutes,
-  type InclusionConnectJwtPayload,
-  InclusionConnectedUserBuilder,
-  UserBuilder,
   addressDtoToString,
   connectedUserTokenExpiredMessage,
   createInclusionConnectJwtPayload,
   currentJwtVersions,
   displayRouteName,
+  type EstablishmentRoutes,
   errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
+  InclusionConnectedUserBuilder,
+  type InclusionConnectJwtPayload,
+  UserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -27,8 +27,8 @@ import {
   EstablishmentEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {

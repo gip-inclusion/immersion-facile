@@ -1,20 +1,20 @@
 import {
   type DiscussionDto,
+  discussionIdSchema,
   type Email,
   type EstablishmentRole,
+  errors,
   type InclusionConnectedUser,
+  rejectDiscussionEmailParams,
   type UpdateDiscussionStatusParams,
   type UserId,
-  discussionIdSchema,
-  errors,
-  rejectDiscussionEmailParams,
   withDiscussionStatusSchema,
 } from "shared";
 import { match } from "ts-pattern";
 import { z } from "zod";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 
 export type UpdateDiscussionStatus = ReturnType<

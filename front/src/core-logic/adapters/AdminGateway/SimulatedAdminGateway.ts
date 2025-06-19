@@ -13,11 +13,11 @@ import {
   type InclusionConnectedUser,
   type NotificationsByKind,
   type RejectIcUserRoleForAgencyParams,
+  toAgencyDtoForAgencyUsersAndAdmins,
   type UserId,
   type UserInList,
   type UserParamsForAgency,
   type WithAgencyIdAndUserId,
-  toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
 

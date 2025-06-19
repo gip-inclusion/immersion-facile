@@ -1,16 +1,16 @@
 import { uniqBy } from "ramda";
 import {
-  path,
   type AppellationAndRomeDto,
   type AppellationCode,
-  type GeoPositionDto,
-  type RomeCode,
-  type SearchResultDto,
-  type SiretDto,
   conflictErrorSiret,
   errors,
+  type GeoPositionDto,
+  path,
   pathEq,
+  type RomeCode,
   replaceArrayElement,
+  type SearchResultDto,
+  type SiretDto,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";

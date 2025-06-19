@@ -1,25 +1,25 @@
 import {
   type AgencyId,
+  backOfficeEmail,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type DateString,
+  errors,
   type Role,
+  reviewedConventionStatuses,
   type UpdateConventionStatusRequestDto,
   type UserId,
   type UserWithRights,
-  type WithConventionIdLegacy,
-  backOfficeEmail,
-  errors,
-  reviewedConventionStatuses,
   updateConventionStatusRequestSchema,
   validatedConventionStatuses,
+  type WithConventionIdLegacy,
 } from "shared";
 import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";

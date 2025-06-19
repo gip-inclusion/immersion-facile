@@ -19,7 +19,7 @@ export const conventionSeed = async (
   uow: UnitOfWork,
   agencyIds: Record<AgencyKind, AgencyId[]>,
 ) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("conventionSeed start...");
 
   const uuidGenerator = new UuidV4Generator();
@@ -126,6 +126,6 @@ export const conventionSeed = async (
     },
   });
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("conventionSeed done");
 };

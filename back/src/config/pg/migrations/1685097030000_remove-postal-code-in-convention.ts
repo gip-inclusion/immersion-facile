@@ -1,4 +1,5 @@
 import type { MigrationBuilder } from "node-pg-migrate";
+
 const conventionTable = "conventions";
 
 export async function up(pgm: MigrationBuilder): Promise<void> {

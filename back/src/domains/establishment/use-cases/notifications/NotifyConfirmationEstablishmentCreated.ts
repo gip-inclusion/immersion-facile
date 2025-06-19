@@ -1,12 +1,12 @@
 import {
+  errors,
   type UserWithAdminRights,
   type WithSiretDto,
-  errors,
   withSiretSchema,
 } from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";

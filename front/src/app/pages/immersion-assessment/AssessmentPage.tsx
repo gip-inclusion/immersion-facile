@@ -5,9 +5,9 @@ import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
-  type Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
   hasAllowedRoleOnAssessment,
+  type Role,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";

@@ -1,4 +1,4 @@
-import { type Observable, Subject, delay, of } from "rxjs";
+import { delay, type Observable, of, Subject } from "rxjs";
 import type { NafSectionSuggestion } from "shared";
 import type { NafGateway } from "src/core-logic/ports/NafGateway";
 

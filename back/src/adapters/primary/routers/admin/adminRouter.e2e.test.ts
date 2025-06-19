@@ -5,14 +5,8 @@ import {
   type AgencyRole,
   type ApiConsumer,
   type ApiConsumerJwt,
-  type ConnectedUserJwt,
-  type FeatureFlags,
-  type InclusionConnectJwtPayload,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
-  type SetFeatureFlagParam,
-  type User,
   adminRoutes,
+  type ConnectedUserJwt,
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -21,11 +15,17 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  type FeatureFlags,
+  type InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
+  type InclusionConnectJwtPayload,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
+  type SetFeatureFlagParam,
   technicalRoutes,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
@@ -43,8 +43,8 @@ import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/a
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
@@ -665,7 +665,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      // biome-ignore lint/style/noNonNullAssertion:
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       const jwt = expectResponseAndReturnJwt(response, {
         status: 200,
         body: expect.any(String),
@@ -717,7 +717,7 @@ describe("Admin router", () => {
         headers: { authorization: token },
       });
 
-      // biome-ignore lint/style/noNonNullAssertion:
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       const jwt = expectResponseAndReturnJwt(response, {
         status: 200,
         body: "",

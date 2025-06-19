@@ -1,4 +1,5 @@
-import { type Observable, Subject, delay, of, throwError } from "rxjs";
+import { delay, type Observable, of, Subject, throwError } from "rxjs";
+import type { Exchange } from "shared";
 import {
   type AbsoluteUrl,
   type AgencyId,
@@ -8,7 +9,6 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   type WithDiscussionStatusRejected,
 } from "shared";
-import type { Exchange } from "shared";
 import type {
   FetchDiscussionRequestedPayload,
   SendExchangeRequestedPayload,

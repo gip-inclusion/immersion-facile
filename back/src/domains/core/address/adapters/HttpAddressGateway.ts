@@ -5,17 +5,17 @@ import {
   type AddressDto,
   type City,
   type DepartmentName,
-  type GeoPositionDto,
-  type LookupSearchResult,
-  type OpenCageGeoSearchKey,
-  type Postcode,
-  type StreetNumberAndAddress,
   errors,
   filterNotFalsy,
+  type GeoPositionDto,
   getDepartmentCodeFromDepartmentNameOrCity,
+  type LookupSearchResult,
   lookupSearchResultsSchema,
   lookupStreetAddressQueryMinLength,
   lookupStreetAddressSpecialCharsRegex,
+  type OpenCageGeoSearchKey,
+  type Postcode,
+  type StreetNumberAndAddress,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { WithCache } from "../../caching-gateway/port/WithCache";

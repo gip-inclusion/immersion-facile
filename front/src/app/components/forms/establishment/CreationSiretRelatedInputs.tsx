@@ -4,9 +4,9 @@ import { useEffect } from "react";
 import { Loader } from "react-design-system";
 import { useFormContext } from "react-hook-form";
 import {
+  defaultMaxContactsPerMonth,
   type FormEstablishmentDto,
   type NumberEmployeesRange,
-  defaultMaxContactsPerMonth,
 } from "shared";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
 import {

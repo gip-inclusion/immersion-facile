@@ -1,7 +1,7 @@
 import {
+  errors,
   type GroupWithResults,
   type WithGroupSlug,
-  errors,
   withGroupSlugSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";

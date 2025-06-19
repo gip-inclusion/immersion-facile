@@ -1,16 +1,16 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  type UnauthenticatedConventionRoutes,
   expectHttpResponseToEqual,
+  type UnauthenticatedConventionRoutes,
   unauthenticatedConventionRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../utils/buildTestApp";
 
 describe("security e2e", () => {

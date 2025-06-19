@@ -1,8 +1,8 @@
 import type { HttpClient } from "shared-routes";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import {
-  type FrancetTravailRoutes,
   createFranceTravailRoutes,
+  type FrancetTravailRoutes,
 } from "../../domains/convention/adapters/france-travail-gateway/FrancetTravailRoutes";
 import { makeAxiosInstances } from "../../utils/axiosUtils";
 import type { AppConfig } from "../bootstrap/appConfig";

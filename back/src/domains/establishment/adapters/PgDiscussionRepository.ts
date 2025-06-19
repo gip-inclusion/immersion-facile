@@ -9,17 +9,17 @@ import {
   type DiscussionId,
   type DiscussionStatus,
   type Exchange,
+  errors,
   type PotentialBeneficiaryCommonProps,
+  pipeWithValue,
   type RejectionKind,
   type SiretDto,
   type WithDiscussionStatus,
-  errors,
-  pipeWithValue,
 } from "shared";
 import {
-  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import type {

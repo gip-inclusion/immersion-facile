@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  expectToEqual,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  type UserParamsForAgency,
-  expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserParamsForAgency,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
@@ -16,10 +16,11 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
+
 describe("UpdateUserOnAgency slice", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;

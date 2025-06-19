@@ -6,11 +6,11 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { GetAgencyPublicInfoById } from "./GetAgencyPublicInfoById";
 
 describe("GetAgencyPublicInfoById", () => {

@@ -1,13 +1,13 @@
 import { type SqlBool, sql } from "kysely";
 import {
   type Email,
+  errors,
   type GetUsersFilters,
+  isTruthy,
   type SiretDto,
   type User,
   type UserId,
   type UserWithAdminRights,
-  errors,
-  isTruthy,
 } from "shared";
 import type { KyselyDb } from "../../../../../config/pg/kysely/kyselyUtils";
 import type { UserRepository } from "../port/UserRepository";

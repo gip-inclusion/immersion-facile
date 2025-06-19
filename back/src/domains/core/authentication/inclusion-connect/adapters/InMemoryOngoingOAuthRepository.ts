@@ -1,4 +1,4 @@
-import { type OAuthState, type UserId, replaceArrayElement } from "shared";
+import { type OAuthState, replaceArrayElement, type UserId } from "shared";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 

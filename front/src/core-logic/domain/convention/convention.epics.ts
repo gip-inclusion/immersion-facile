@@ -1,7 +1,7 @@
-import { concatMap, filter, map, switchMap } from "rxjs";
 import type { Observable } from "rxjs";
-import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
+import { concatMap, filter, map, switchMap } from "rxjs";
 import type { ConventionReadDto } from "shared";
+import { isEstablishmentTutorIsEstablishmentRepresentative } from "shared";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {

@@ -1,9 +1,9 @@
 import {
   type EstablishmentNameAndAdmins,
+  errors,
   type InclusionConnectedUser,
   type SiretDto,
   type WithSiretDto,
-  errors,
   withSiretSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";

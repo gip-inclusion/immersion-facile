@@ -2,15 +2,15 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyRole,
-  InclusionConnectedUserBuilder,
-  type User,
-  type UserParamsForAgency,
-  type UserWithAdminRights,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type User,
+  type UserParamsForAgency,
+  type UserWithAdminRights,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -18,11 +18,11 @@ import {
   makeCreateNewEvent,
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateUserForAgency } from "./UpdateUserForAgency";
 

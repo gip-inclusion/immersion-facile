@@ -4,13 +4,13 @@ import {
   type Group,
   type GroupSlug,
   type GroupWithResults,
-  type SiretDto,
   groupWithResultsSchema,
+  type SiretDto,
 } from "shared";
 import {
-  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { GroupEntity } from "../entities/GroupEntity";
 import type { GroupRepository } from "../ports/GroupRepository";

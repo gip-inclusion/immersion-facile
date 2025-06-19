@@ -8,9 +8,9 @@ import {
   type DateIntervalDto,
   type DateString,
   MAX_PRESENCE_DAYS_RELEASE_DATE,
-  type Weekday,
   maxPresenceDaysByInternshipKind,
   toDateUTCString,
+  type Weekday,
 } from "..";
 import {
   calculateNumberOfWorkedDays,
@@ -29,9 +29,9 @@ import {
   type ConventionDto,
   type ConventionInternshipKindSpecific,
   type ConventionReadDto,
+  conventionStatuses,
   type EstablishmentRepresentative,
   type InternshipKind,
-  conventionStatuses,
   maximumCalendarDayByInternshipKind,
 } from "./convention.dto";
 import {

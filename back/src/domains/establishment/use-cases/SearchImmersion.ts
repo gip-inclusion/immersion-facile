@@ -1,14 +1,14 @@
 import {
   type ApiConsumer,
   type AppellationCode,
+  errors,
   type SearchQueryParamsDto,
   type SearchResultDto,
-  type WithNafCodes,
-  errors,
   searchParamsSchema,
+  type WithNafCodes,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";

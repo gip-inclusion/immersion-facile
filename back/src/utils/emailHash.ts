@@ -7,9 +7,9 @@ import {
   type ConventionReadDto,
   type Email,
   type EmailHash,
+  errors,
   type Role,
   type UserWithAdminRights,
-  errors,
 } from "shared";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
 import { agencyWithRightToAgencyDto } from "./agency";

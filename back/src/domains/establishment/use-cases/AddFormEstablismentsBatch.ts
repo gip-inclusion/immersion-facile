@@ -1,10 +1,10 @@
 import {
-  type EstablishmentBatchReport,
-  type FormEstablishmentBatchDto,
-  type InclusionConnectedUser,
   castError,
+  type EstablishmentBatchReport,
   executeInSequence,
+  type FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
+  type InclusionConnectedUser,
   slugify,
 } from "shared";
 import { UseCase } from "../../core/UseCase";

@@ -1,8 +1,8 @@
 import {
   type ApiConsumer,
   type DataWithPagination,
-  type PaginationQueryParams,
   errors,
+  type PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../UseCase";

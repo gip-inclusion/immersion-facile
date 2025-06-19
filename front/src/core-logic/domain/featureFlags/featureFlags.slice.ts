@@ -1,11 +1,11 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import {
   type FeatureFlags,
-  type SetFeatureFlagParam,
   makeBooleanFeatureFlag,
   makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
+  type SetFeatureFlagParam,
 } from "shared";
 
 export type FeatureFlagsState = FeatureFlags & {

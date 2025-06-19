@@ -3,10 +3,9 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { values } from "ramda";
-import { ErrorNotifications } from "react-design-system";
-import { HeadingSection } from "react-design-system";
+import { ErrorNotifications, HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
-import { type FormEstablishmentDto, domElementIds } from "shared";
+import { domElementIds, type FormEstablishmentDto } from "shared";
 import { CreationSiretRelatedInputs } from "src/app/components/forms/establishment/CreationSiretRelatedInputs";
 import { EditionSiretRelatedInputs } from "src/app/components/forms/establishment/EditionSiretRelatedInputs";
 import { formEstablishmentFieldsLabels } from "src/app/contents/forms/establishment/formEstablishment";
@@ -19,7 +18,7 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { EstablishmentUsersList } from "src/app/pages/establishment-dashboard/EstablishmentUsersList";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import type { Mode, OnStepChange, Step } from "../EstablishmentForm";
 
 export const BusinessAndAdminSection = ({

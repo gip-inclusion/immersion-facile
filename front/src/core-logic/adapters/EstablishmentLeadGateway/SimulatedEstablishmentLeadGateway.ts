@@ -1,4 +1,4 @@
-import { type Observable, delay, of, throwError } from "rxjs";
+import { delay, type Observable, of, throwError } from "rxjs";
 import type { ConventionJwt } from "shared";
 import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 

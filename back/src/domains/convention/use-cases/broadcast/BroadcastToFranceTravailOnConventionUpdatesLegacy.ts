@@ -3,17 +3,17 @@ import {
   type WithConventionDto,
   withConventionSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 import {
   getLinkedAgencies,
   shouldBroadcastToFranceTravail,
 } from "../../entities/Convention";
 import {
+  conventionStatusToFranceTravailStatus,
   type FranceTravailConvention,
   type FranceTravailGateway,
-  conventionStatusToFranceTravailStatus,
   isBroadcastResponseOk,
 } from "../../ports/FranceTravailGateway";
 

@@ -2,13 +2,13 @@ import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
   type AgencyWithUsersRights,
-  ConflictError,
-  type GeoPositionDto,
-  InclusionConnectedUserBuilder,
   activeAgencyStatuses,
+  ConflictError,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type GeoPositionDto,
+  InclusionConnectedUserBuilder,
   miniStageAgencyKinds,
 } from "shared";
 import {

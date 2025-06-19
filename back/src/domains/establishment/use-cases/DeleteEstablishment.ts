@@ -1,15 +1,15 @@
 import {
-  type InclusionConnectedUser,
-  type SiretDto,
   addressDtoToString,
   errors,
+  type InclusionConnectedUser,
+  type SiretDto,
   siretSchema,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";

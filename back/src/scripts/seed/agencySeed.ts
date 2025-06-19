@@ -9,7 +9,7 @@ import { seedUsers } from "./userSeed";
 export const agencySeed = async (
   uow: UnitOfWork,
 ): Promise<Record<AgencyKind, AgencyId[]>> => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("agencySeed start ...");
 
   const agenciesCountByKind = 10;
@@ -131,7 +131,7 @@ export const agencySeed = async (
     agencyIds: randomAgencies,
   });
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("agencySeed done");
 
   return randomAndSpecificAgencyIds;

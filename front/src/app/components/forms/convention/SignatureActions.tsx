@@ -11,11 +11,11 @@ import { useFormContext } from "react-hook-form";
 
 import {
   type ConventionDto,
-  type InternshipKind,
-  type Signatory,
   domElementIds,
   getSignatoryProcessedData,
+  type InternshipKind,
   isConventionRenewed,
+  type Signatory,
 } from "shared";
 import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

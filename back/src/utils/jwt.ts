@@ -2,9 +2,9 @@ import { createHash, generateKeyPairSync } from "node:crypto";
 import {
   type ConventionJwtPayload,
   type CreateConventionMagicLinkPayloadProperties,
+  currentJwtVersions,
   type Email,
   type EmailHash,
-  currentJwtVersions,
   errors,
 } from "shared";
 import type { JwtKind, VerifyJwtFn } from "../domains/core/jwt";

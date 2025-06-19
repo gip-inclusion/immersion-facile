@@ -10,11 +10,11 @@ import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionIsDeprecated } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsThatConventionIsDeprecated } from "./NotifyAllActorsThatConventionIsDeprecated";
 
@@ -122,9 +122,9 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         beneficiaryRepresentative!.email,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         beneficiaryCurrentEmployer!.email,
         counsellor1.email,
         counsellor2.email,
@@ -170,9 +170,9 @@ describe("NotifyAllActorsThatApplicationIsDeprecated", () => {
       [
         beneficiary.email,
         establishmentRepresentative.email,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         beneficiaryRepresentative!.email,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         beneficiaryCurrentEmployer!.email,
         counsellor1.email,
         counsellor2.email,

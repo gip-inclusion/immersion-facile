@@ -9,9 +9,9 @@ import {
 } from "react-design-system";
 import {
   type AppellationCode,
-  type SearchResultDto,
   domElementIds,
   isSuperEstablishment,
+  type SearchResultDto,
 } from "shared";
 import { SearchMiniMap } from "src/app/components/search/SearchMiniMap";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

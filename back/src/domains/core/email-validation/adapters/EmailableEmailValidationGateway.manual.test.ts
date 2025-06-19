@@ -1,4 +1,4 @@
-import { type ValidateEmailFeedback, expectToEqual } from "shared";
+import { expectToEqual, type ValidateEmailFeedback } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";

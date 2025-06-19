@@ -1,7 +1,7 @@
 import {
+  errors,
   type GetSiretRequestDto,
   type SiretEstablishmentDto,
-  errors,
 } from "shared";
 import type { SiretGateway } from "../ports/SiretGateway";
 

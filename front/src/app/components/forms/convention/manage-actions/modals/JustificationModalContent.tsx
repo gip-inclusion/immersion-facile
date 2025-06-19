@@ -8,10 +8,10 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionDto,
   type ConventionStatusWithJustification,
-  type Role,
-  type UpdateConventionStatusRequestDto,
   doesStatusNeedsJustification,
   domElementIds,
+  type Role,
+  type UpdateConventionStatusRequestDto,
   updateConventionStatusRequestSchema,
 } from "shared";
 import type { ModalWrapperProps } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";

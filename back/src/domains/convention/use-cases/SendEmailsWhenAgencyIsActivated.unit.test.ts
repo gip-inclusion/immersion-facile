@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -12,13 +12,14 @@ import {
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendEmailsWhenAgencyIsActivated } from "./SendEmailsWhenAgencyIsActivated";
+
 const icUser1Email = "jean-dupont@mail.com";
 const icUser2Email = "pierre-durand@mail.com";
 const icUser3Email = "jeanne-ferrand@mail.com";

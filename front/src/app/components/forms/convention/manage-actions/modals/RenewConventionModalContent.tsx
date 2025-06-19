@@ -8,8 +8,8 @@ import {
   type ConventionDto,
   type ConventionReadDto,
   type DateIntervalDto,
-  type RenewConventionParams,
   domElementIds,
+  type RenewConventionParams,
   reasonableSchedule,
   renewConventionParamsSchema,
 } from "shared";

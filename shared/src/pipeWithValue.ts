@@ -111,7 +111,6 @@ export function pipeWithValue<A, B, C, D, E, F, G, H, I, J, K, L>(
   kl?: (k: K) => L,
 ): L;
 
-// biome-ignore format: better readability without formatting
 export function pipeWithValue(
   a: unknown,
   ab?: AnyFunction,
@@ -126,7 +125,7 @@ export function pipeWithValue(
   jk?: AnyFunction,
   kl?: AnyFunction,
 ): unknown {
-  // biome-ignore lint/style/noArguments: <explanation>
+  // biome-ignore lint/complexity/noArguments: <explanation>
   switch (arguments.length) {
     case 1:
       return a;
@@ -151,7 +150,9 @@ export function pipeWithValue(
     case 11:
       return jk?.(ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a))))))))));
     case 12:
-      return kl?.(jk?.(ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a)))))))))));
+      return kl?.(
+        jk?.(ij?.(hi?.(gh?.(fg?.(ef?.(de?.(cd?.(bc?.(ab?.(a)))))))))),
+      );
     default:
       throw Error(
         "Cannot handle so many arguments, check : https://github.com/gcanti/fp-ts/blob/master/src/function.ts",

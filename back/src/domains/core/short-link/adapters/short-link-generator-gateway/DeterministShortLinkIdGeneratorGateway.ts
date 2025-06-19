@@ -1,4 +1,4 @@
-import { type ShortLinkId, errors } from "shared";
+import { errors, type ShortLinkId } from "shared";
 import type { ShortLinkIdGeneratorGateway } from "../../ports/ShortLinkIdGeneratorGateway";
 
 export class DeterministShortLinkIdGeneratorGateway

@@ -5,12 +5,12 @@ import { formatDistance } from "date-fns";
 import { fr as frLocale } from "date-fns/locale";
 import { equals } from "ramda";
 
-import { type ReactNode, memo } from "react";
+import { memo, type ReactNode } from "react";
 import {
   type DateTimeIsoString,
-  type SearchResultDto,
   domElementIds,
   frenchEstablishmentKinds,
+  type SearchResultDto,
 } from "shared";
 import type { Link } from "type-route";
 import "./SearchResult.scss";

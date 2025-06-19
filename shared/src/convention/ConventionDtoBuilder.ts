@@ -1,6 +1,6 @@
-import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AgencyId } from "../agency/agency.dto";
+import type { Builder } from "../Builder";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type {
@@ -23,10 +23,10 @@ import {
   type EstablishmentTutor,
   type ImmersionObjective,
   type InternshipKind,
-  type Renewed,
-  type WithOptionalFirstnameAndLastname,
   isBeneficiary,
   isBeneficiaryStudent,
+  type Renewed,
+  type WithOptionalFirstnameAndLastname,
 } from "./convention.dto";
 
 export const DEMANDE_IMMERSION_ID = "a99eaca1-ee70-4c90-b3f4-668d492f7392";

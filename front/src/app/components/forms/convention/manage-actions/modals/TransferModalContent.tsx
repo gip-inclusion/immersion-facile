@@ -7,9 +7,9 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   type DepartmentCode,
-  type TransferConventionToAgencyRequestDto,
   domElementIds,
   makeListAgencyOptionsKindFilter,
+  type TransferConventionToAgencyRequestDto,
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import {

@@ -1,8 +1,8 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type { ConventionJwt, EstablishmentLeadRoutes } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,

@@ -10,7 +10,10 @@ const discordSizeLimit = 1950;
 export const notifyTeam = async ({
   rawContent,
   isError,
-}: { rawContent: string; isError: boolean }) => {
+}: {
+  rawContent: string;
+  isError: boolean;
+}) => {
   await notifyDiscord(rawContent);
   await notifySlack(rawContent, isError);
 };

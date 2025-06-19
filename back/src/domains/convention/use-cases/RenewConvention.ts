@@ -4,12 +4,12 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionRelatedJwtPayload,
+  clearSignaturesAndValidationDate,
+  errors,
   ForbiddenError,
   NotFoundError,
   type RenewConventionParams,
   type Role,
-  clearSignaturesAndValidationDate,
-  errors,
   renewConventionParamsSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";

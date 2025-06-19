@@ -5,10 +5,10 @@ import {
   type AssessmentDto,
   type DateRange,
   type LegacyAssessmentDto,
+  typeOfContracts,
   type WithAssessmentDto,
   type WithEndedWithAJob,
   type WithEstablishmentComments,
-  typeOfContracts,
 } from "./assessment.dto";
 
 const withAssessmentStatusSchema = z.discriminatedUnion(

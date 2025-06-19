@@ -1,21 +1,21 @@
 import { addMilliseconds, addYears } from "date-fns";
 import {
   type ApiConsumer,
-  InclusionConnectedUserBuilder,
-  type Role,
   createApiConsumerParamsFromApiConsumer,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type Role,
 } from "shared";
 import { generateApiConsumerJwtTestFn } from "../../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../adapters/InMemoryApiConsumerRepository";
 import { SaveApiConsumer } from "./SaveApiConsumer";

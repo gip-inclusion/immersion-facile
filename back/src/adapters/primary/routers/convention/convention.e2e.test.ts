@@ -3,18 +3,11 @@ import {
   type AddConventionInput,
   AgencyDtoBuilder,
   type AuthenticatedConventionRoutes,
+  authenticatedConventionRoutes,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
-  type InclusionConnectJwtPayload,
-  InclusionConnectedUserBuilder,
-  type Role,
-  type TechnicalRoutes,
-  type UnauthenticatedConventionRoutes,
-  type User,
-  type WithAuthorizationHeader,
-  authenticatedConventionRoutes,
   conventionMagicLinkRoutes,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -26,8 +19,15 @@ import {
   expectToEqual,
   expiredMagicLinkErrorMessage,
   frontRoutes,
+  InclusionConnectedUserBuilder,
+  type InclusionConnectJwtPayload,
+  type Role,
+  type TechnicalRoutes,
   technicalRoutes,
+  type UnauthenticatedConventionRoutes,
+  type User,
   unauthenticatedConventionRoutes,
+  type WithAuthorizationHeader,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -44,8 +44,8 @@ import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/a
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import {

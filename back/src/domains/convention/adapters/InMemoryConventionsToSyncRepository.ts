@@ -1,7 +1,7 @@
 import type { ConventionId } from "shared";
 import type {
-  ConventionToSync,
   ConventionsToSyncRepository,
+  ConventionToSync,
 } from "../ports/ConventionsToSyncRepository";
 
 export class InMemoryConventionsToSyncRepository

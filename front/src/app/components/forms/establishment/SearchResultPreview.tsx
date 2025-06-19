@@ -1,9 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tag as ImTag, SearchResultIllustration } from "react-design-system";
 import {
+  addressStringToDto,
   type FormEstablishmentDto,
   type SearchResultDto,
-  addressStringToDto,
 } from "shared";
 import { searchIllustrations } from "src/assets/img/illustrations";
 import { useStyles } from "tss-react/dsfr";

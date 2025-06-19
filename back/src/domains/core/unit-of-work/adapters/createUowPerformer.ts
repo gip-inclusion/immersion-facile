@@ -2,13 +2,13 @@ import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GetPgPoolFn } from "../../../../config/bootstrap/createGateways";
 import { makeKyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { UnitOfWorkPerformer } from "../ports/UnitOfWorkPerformer";
-import { InMemoryUowPerformer } from "./InMemoryUowPerformer";
-import { PgUowPerformer } from "./PgUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "./createInMemoryUow";
 import { createPgUow } from "./createPgUow";
+import { InMemoryUowPerformer } from "./InMemoryUowPerformer";
+import { PgUowPerformer } from "./PgUowPerformer";
 
 export const createUowPerformer = (
   config: AppConfig,

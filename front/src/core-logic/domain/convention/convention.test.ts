@@ -5,15 +5,15 @@ import {
   type DashboardUrlAndName,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
-  type SignatoryRole,
   expectObjectsToMatch,
   expectToEqual,
+  type SignatoryRole,
 } from "shared";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {

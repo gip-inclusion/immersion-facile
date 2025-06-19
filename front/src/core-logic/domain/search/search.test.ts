@@ -1,19 +1,19 @@
 import {
+  expectToEqual,
   type LocationId,
   type SearchQueryParamsDto,
   type SearchResultDto,
-  expectToEqual,
 } from "shared";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  type SearchStatus,
   initialState,
+  type SearchStatus,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

@@ -242,7 +242,7 @@ const v0ComplexScheduleFromComplexSchedule = (
 const frenchDayMapping = (
   date: Date | string,
 ): UniversalDayMappingToFrenchCalendar => {
-  // biome-ignore lint/style/noParameterAssign:
+  // biome-ignore lint/style/noParameterAssign: migration
   if (!(date instanceof Date)) date = parseISO(date);
   const universalDay = getDay(date);
   const mapping = dayOfWeekMapping.find(

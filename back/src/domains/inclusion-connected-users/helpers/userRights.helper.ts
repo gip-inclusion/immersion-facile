@@ -1,10 +1,10 @@
 import {
+  errors,
   type UserId,
   type UserWithAdminRights,
   type UserWithRights,
   type WithEstablishmentData,
   type WithEstablishments,
-  errors,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";

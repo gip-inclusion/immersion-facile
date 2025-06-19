@@ -2,14 +2,14 @@ import {
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
-  type TransferConventionToAgencyRequestDto,
   errors,
+  type TransferConventionToAgencyRequestDto,
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import {

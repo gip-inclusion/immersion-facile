@@ -1,8 +1,8 @@
 import type { AgencyGroup, CodeSafir, DepartmentCode } from "shared";
 import {
-  type KyselyDb,
   cast,
   jsonBuildObject,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { AgencyGroupRepository } from "../ports/AgencyGroupRepository";
 

@@ -1,5 +1,5 @@
 import type { AxiosError, AxiosInstance } from "axios";
-import { type SubscriptionParams, castError } from "shared";
+import { castError, type SubscriptionParams } from "shared";
 import { isAxiosError } from "../../../../utils/axiosUtils";
 import type {
   ConventionUpdatedSubscriptionCallbackBody,

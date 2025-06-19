@@ -4,8 +4,8 @@ import type { AppellationMatchDto } from "shared";
 import {
   type AutocompleteItem,
   type AutocompleteState,
-  type PayloadActionWithLocator,
   initialAutocompleteItem,
+  type PayloadActionWithLocator,
 } from "src/core-logic/domain/autocomplete.utils";
 
 export type MultipleAppellationAutocompleteLocator =

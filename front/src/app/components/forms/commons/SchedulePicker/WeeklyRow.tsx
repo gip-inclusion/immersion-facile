@@ -4,9 +4,9 @@ import { parseISO } from "date-fns";
 import { useWatch } from "react-hook-form";
 import {
   type ConventionReadDto,
+  calculateWeeklyHours,
   type InternshipKind,
   type WeeklyImmersionTimetableDto,
-  calculateWeeklyHours,
 } from "shared";
 import { DayCircle } from "./DayCircle";
 import { HourIndicator } from "./HourIndicator";

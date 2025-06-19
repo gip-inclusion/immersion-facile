@@ -1,8 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
-
-import { MetabaseView } from "src/app/components/MetabaseView";
 import { AddEstablishmentsByBatch } from "src/app/components/admin/establishments/AddEstablishmentsByBatch";
 import { ManageEstablishment } from "src/app/components/admin/establishments/ManageEstablishment";
+import { MetabaseView } from "src/app/components/MetabaseView";
 import { makeStyles } from "tss-react/dsfr";
 import { useAdminDashboard } from "./useAdminDashboard";
 

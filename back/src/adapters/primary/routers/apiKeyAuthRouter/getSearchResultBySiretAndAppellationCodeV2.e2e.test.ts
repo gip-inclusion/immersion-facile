@@ -15,11 +15,11 @@ import type { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { TEST_ROME_LABEL } from "../../../../domains/establishment/adapters/InMemoryEstablishmentAggregateRepository";
 import {
+  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
   TEST_LOCATION,
-  defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { buildTestApp } from "../../../../utils/buildTestApp";

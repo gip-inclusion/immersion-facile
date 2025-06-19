@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 
 import {
   type AdminTabRouteName,
-  type OmitFromExistingKeys,
-  type Prettify,
   adminTabs,
   keys,
+  type OmitFromExistingKeys,
+  type Prettify,
 } from "shared";
 import { AgencyTab } from "src/app/pages/admin/AgencyTab";
 import { ConventionTab } from "src/app/pages/admin/ConventionTab";
@@ -72,11 +72,7 @@ const getAdminTabs = (currentTab: AdminTabRouteName) =>
       isDefault: currentTab === tabId,
     }));
 
-export const AdminTabs = ({
-  route,
-}: {
-  route: FrontAdminRouteTab;
-}) => {
+export const AdminTabs = ({ route }: { route: FrontAdminRouteTab }) => {
   const currentTab = route.name;
   const tabs = getAdminTabs(route.name);
 

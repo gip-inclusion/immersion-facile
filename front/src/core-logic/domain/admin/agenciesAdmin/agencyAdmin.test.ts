@@ -4,9 +4,9 @@ import {
   type AgencyId,
   type AgencyOption,
   type AgencyRight,
+  expectToEqual,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  expectToEqual,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -18,8 +18,8 @@ import {
 } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import { makeGeocodingLocatorSelector } from "src/core-logic/domain/geocoding/geocoding.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {

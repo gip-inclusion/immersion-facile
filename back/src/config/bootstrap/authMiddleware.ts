@@ -3,12 +3,12 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import {
   type ApiConsumer,
-  type ExtractFromExisting,
-  type PayloadKey,
   castError,
   currentJwtVersions,
+  type ExtractFromExisting,
   errors,
   expiredMagicLinkErrorMessage,
+  type PayloadKey,
 } from "shared";
 import type { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
 import { type JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";

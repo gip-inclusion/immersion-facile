@@ -8,8 +8,8 @@ import {
   goToAdminTab,
 } from "../../utils/admin";
 import {
-  type ConventionSubmitted,
   allOtherSignatoriesSignConvention,
+  type ConventionSubmitted,
   signConvention,
   submitBasicConventionForm,
   submitEditConventionForm,

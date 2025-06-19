@@ -7,14 +7,14 @@ import { type FocusEvent, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import {
   type ConventionReadDto,
-  type DateIntervalDto,
-  type Weekday,
   convertLocaleDateToUtcTimezoneDate,
+  type DateIntervalDto,
   isStringDate,
   maximumCalendarDayByInternshipKind,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
   toDateUTCString,
+  type Weekday,
 } from "shared";
 import { formConventionFieldsLabels } from "src/app/contents/forms/convention/formConvention";
 import {

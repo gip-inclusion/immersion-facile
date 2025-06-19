@@ -3,11 +3,6 @@ import { subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
-  type Notification,
-  type SignatoryRole,
-  UserBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   errors,
@@ -15,6 +10,11 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  type InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
+  type Notification,
+  type SignatoryRole,
+  UserBuilder,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -22,23 +22,23 @@ import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
-  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   MIN_HOURS_BETWEEN_SIGNATURE_REMINDER,
-  type SendSignatureLink,
   makeSendSignatureLink,
+  type SendSignatureLink,
 } from "./SendSignatureLink";
 
 const conventionId = "add5c20e-6dd2-45af-affe-927358005251";

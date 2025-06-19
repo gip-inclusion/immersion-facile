@@ -1,9 +1,9 @@
 import {
   type AddressAndPosition,
   type AddressDto,
+  errors,
   type GeoPositionDto,
   type LookupSearchResult,
-  errors,
 } from "shared";
 import type { AddressGateway } from "../ports/AddressGateway";
 

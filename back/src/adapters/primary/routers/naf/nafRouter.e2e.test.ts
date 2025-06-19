@@ -1,9 +1,9 @@
 import {
+  displayRouteName,
+  expectHttpResponseToEqual,
   type NafRoutes,
   type NafSectionSuggestion,
   type NafSectionSuggestionsParams,
-  displayRouteName,
-  expectHttpResponseToEqual,
   nafRoutes,
 } from "shared";
 import type { HttpClient } from "shared-routes";

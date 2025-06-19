@@ -4,10 +4,10 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
   type AgencyRight,
-  type User,
-  type UserParamsForAgency,
   distinguishAgencyRights,
   domElementIds,
+  type User,
+  type UserParamsForAgency,
 } from "shared";
 import { Feedback } from "../../feedback/Feedback";
 import { AgencyUserModificationForm } from "../AgencyUserModificationForm";

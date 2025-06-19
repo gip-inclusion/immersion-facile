@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { MetabaseView } from "src/app/components/MetabaseView";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
+import { MetabaseView } from "src/app/components/MetabaseView";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";

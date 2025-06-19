@@ -3,16 +3,16 @@ import { andThen, keys, map } from "ramda";
 import {
   type ApiConsumer,
   type ConventionStatus,
-  type LocationId,
-  type SearchQueryParamsDto,
-  type SiretDto,
-  type WithAcquisition,
   defaultPageInPagination,
   defaultPerPageInApiPagination,
   errors,
   eventToRightName,
   isApiConsumerAllowed,
+  type LocationId,
   pipeWithValue,
+  type SearchQueryParamsDto,
+  type SiretDto,
+  type WithAcquisition,
 } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";

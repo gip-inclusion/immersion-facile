@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { SearchResultDto } from "shared";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { ContactByEmail } from "../immersion-offer/ContactByEmail";
 import { ContactByPhone } from "../immersion-offer/ContactByPhone";
 import { ContactInPerson } from "../immersion-offer/ContactInPerson";

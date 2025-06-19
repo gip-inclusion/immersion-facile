@@ -1,16 +1,16 @@
 import {
   type AssessmentDto,
+  assessmentDtoSchema,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  ForbiddenError,
-  assessmentDtoSchema,
   errors,
+  ForbiddenError,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { throwForbiddenIfNotAllowedForAssessments } from "../../../utils/assessment";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import {
   type AssessmentEntity,

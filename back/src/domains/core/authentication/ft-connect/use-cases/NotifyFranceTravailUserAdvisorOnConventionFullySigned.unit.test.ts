@@ -12,11 +12,11 @@ import {
 } from "../../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { FtUserAndAdvisor } from "../dto/FtConnect.dto";
 import type { FtConnectImmersionAdvisorDto } from "../dto/FtConnectAdvisor.dto";
@@ -125,7 +125,7 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
             conventionId,
             advisorFirstName: advisor.firstName,
             advisorLastName: advisor.lastName,
-            // biome-ignore lint/style/noNonNullAssertion: <explanation>
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
             immersionAddress: conventionDtoFromEvent.immersionAddress!,
             beneficiaryFirstName:
               conventionDtoFromEvent.signatories.beneficiary.firstName,

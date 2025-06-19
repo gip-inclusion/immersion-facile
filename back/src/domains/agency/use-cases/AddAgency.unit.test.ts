@@ -2,15 +2,15 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   BadRequestError,
+  ConflictError,
   type CreateAgencyDto,
-  InclusionConnectedUserBuilder,
-  type User,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type User,
 } from "shared";
-import { ConflictError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import {
@@ -22,11 +22,11 @@ import {
   TEST_OPEN_ESTABLISHMENT_1,
 } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { AddAgency } from "./AddAgency";
 

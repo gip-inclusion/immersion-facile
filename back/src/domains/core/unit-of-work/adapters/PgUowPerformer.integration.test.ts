@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { type Notification, expectPromiseToFailWithError } from "shared";
+import { expectPromiseToFailWithError, type Notification } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
@@ -12,8 +12,8 @@ import {
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import type { UnitOfWork } from "../ports/UnitOfWork";
-import { PgUowPerformer } from "./PgUowPerformer";
 import { createPgUow } from "./createPgUow";
+import { PgUowPerformer } from "./PgUowPerformer";
 
 describe("PgUowPerformer", () => {
   let pool: Pool;

@@ -5,12 +5,12 @@ import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
-  type ConventionJwtPayload,
-  type SignatoryRole,
   allSignatoryRoles,
+  type ConventionJwtPayload,
   decodeMagicLinkJwtWithoutSignatureCheck,
   errors,
   isSignatory,
+  type SignatoryRole,
 } from "shared";
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";

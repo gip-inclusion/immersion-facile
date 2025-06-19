@@ -2,8 +2,8 @@ import { sql } from "kysely";
 import {
   type AppellationAndRomeDto,
   type AppellationCode,
-  type RomeDto,
   castError,
+  type RomeDto,
   removeDiacritics,
 } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
@@ -239,7 +239,7 @@ export class PgRomeRepository implements RomeRepository {
 
 const toTsQuery = (input: string): string =>
   input
-    .replace(/[\/-]/g, " ")
+    .replace(/[/-]/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .replace(/'(?=\s|$)|(?<=\s|^)'/g, "")
@@ -263,7 +263,7 @@ const prepareQueryParams = (query: string): [string, string] => {
 };
 
 const removeAccentAndSpecialCharacters = (str: string) =>
-  removeDiacritics(str).replace(/[():]/g, "").replace(/[\&]/g, " ").trim();
+  removeDiacritics(str).replace(/[():]/g, "").replace(/[&]/g, " ").trim();
 
 const removeInvalidInitialCharacters = (str: string): string => {
   const firstCharacter = str.charAt(0);

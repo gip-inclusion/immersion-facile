@@ -2,19 +2,19 @@ import {
   AgencyDtoBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
-  InclusionConnectedUserBuilder,
-  type Signatories,
-  type TemplatedEmail,
-  type UpdateConventionStatusRequestDto,
-  VALID_EMAILS,
   conventionMagicLinkRoutes,
   expectArraysToEqualIgnoringOrder,
   expectEmailOfType,
   expectJwtInMagicLinkAndGetIt,
   expectObjectInArrayToMatch,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type Signatories,
+  type TemplatedEmail,
   technicalRoutes,
+  type UpdateConventionStatusRequestDto,
   unauthenticatedConventionRoutes,
+  VALID_EMAILS,
 } from "shared";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
@@ -23,8 +23,8 @@ import type { DomainEvent } from "../../../../domains/core/events/events";
 import type { InMemoryNotificationGateway } from "../../../../domains/core/notifications/adapters/InMemoryNotificationGateway";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type TestAppAndDeps,
   buildTestApp,
+  type TestAppAndDeps,
 } from "../../../../utils/buildTestApp";
 import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTestHelpers";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";

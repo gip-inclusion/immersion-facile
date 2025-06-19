@@ -4,10 +4,10 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { ErrorMessage } from "@hookform/error-message";
 import { useState } from "react";
 import {
-  type TimePeriodDto,
   domElementIds,
   removeAtIndex,
   replaceArrayElement,
+  type TimePeriodDto,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 

@@ -1,18 +1,18 @@
 import { addDays, millisecondsToSeconds, subYears } from "date-fns";
 import {
-  type EstablishmentRoutes,
-  type FormEstablishmentDto,
-  FormEstablishmentDtoBuilder,
-  type InclusionConnectJwtPayload,
-  InclusionConnectedUserBuilder,
   connectedUserTokenExpiredMessage,
   createInclusionConnectJwtPayload,
   currentJwtVersions,
+  type EstablishmentRoutes,
   errors,
   establishmentRoutes,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
+  type FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+  InclusionConnectedUserBuilder,
+  type InclusionConnectJwtPayload,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -34,8 +34,8 @@ import type { EstablishmentAggregate } from "../../../../domains/establishment/e
 import { EstablishmentAggregateBuilder } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("Edit form establishments", () => {

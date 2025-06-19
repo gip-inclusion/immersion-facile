@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type {
   AbsoluteUrl,
   AgencyId,
@@ -19,7 +19,7 @@ import {
 } from "src/core-logic/adapters/otherwiseThrow";
 import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway
   implements InclusionConnectedGateway
@@ -147,13 +147,12 @@ export class HttpInclusionConnectedGateway
       discussionId: string;
     } & UpdateDiscussionStatusParams,
   ): Observable<void> {
-    const { discussionId, jwt, ...body } = params;
     return from(
       this.httpClient
         .updateDiscussionStatus({
           headers: { authorization: params.jwt },
           urlParams: { discussionId: params.discussionId },
-          body,
+          body: params,
         })
         .then((response) =>
           match(response)

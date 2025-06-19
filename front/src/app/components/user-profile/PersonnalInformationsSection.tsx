@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { type InclusionConnectedUser, domElementIds } from "shared";
+import { domElementIds, type InclusionConnectedUser } from "shared";
 
 export const PersonnalInformationsSection = ({
   user,

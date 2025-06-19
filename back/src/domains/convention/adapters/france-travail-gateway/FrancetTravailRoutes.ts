@@ -36,7 +36,10 @@ const ftAccessTokenResponseSchema: z.Schema<AccessTokenResponse> = z.object({
 export const createFranceTravailRoutes = ({
   ftApiUrl,
   ftEnterpriseUrl,
-}: { ftApiUrl: AbsoluteUrl; ftEnterpriseUrl: AbsoluteUrl }) => {
+}: {
+  ftApiUrl: AbsoluteUrl;
+  ftEnterpriseUrl: AbsoluteUrl;
+}) => {
   const ftTestPrefix = getFtTestPrefix(ftApiUrl);
 
   return defineRoutes({

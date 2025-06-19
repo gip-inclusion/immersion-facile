@@ -2,8 +2,8 @@ import { keys } from "ramda";
 import {
   type FeatureFlagKind,
   type FeatureFlags,
-  type SetFeatureFlagParam,
   hasFeatureFlagValue,
+  type SetFeatureFlagParam,
 } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { FeatureFlagRepository } from "../ports/FeatureFlagRepository";

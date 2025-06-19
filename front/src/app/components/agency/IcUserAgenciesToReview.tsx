@@ -11,12 +11,12 @@ import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
   type AgencyRight,
+  domElementIds,
   type RejectIcUserRoleForAgencyParams,
+  rejectIcUserRoleForAgencyParamsSchema,
   type User,
   type UserId,
   type UserParamsForAgency,
-  domElementIds,
-  rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

@@ -2,9 +2,9 @@ import {
   type AssessmentDto,
   type ConventionDto,
   type ConventionStatus,
-  type LegacyAssessmentDto,
   calculateTotalImmersionHoursBetweenDateComplex,
   errors,
+  type LegacyAssessmentDto,
 } from "shared";
 import type { EntityFromDto } from "../../../utils/EntityFromDto";
 

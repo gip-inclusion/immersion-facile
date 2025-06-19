@@ -3,18 +3,18 @@ import {
   type ApiConsumer,
   type AppellationAndRomeDto,
   type ConventionReadDto,
-  type WithConventionDto,
   errors,
   isApiConsumerAllowed,
   pipeWithValue,
+  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
 import { isConventionInScope } from "../../../convention/entities/Convention";
-import { TransactionalUseCase } from "../../UseCase";
 import { broadcastToPartnersServiceName } from "../../saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import { getReferedAgency } from "../helpers/agency";

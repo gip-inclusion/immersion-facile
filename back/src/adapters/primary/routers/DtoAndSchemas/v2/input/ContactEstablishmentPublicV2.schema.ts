@@ -1,8 +1,8 @@
 import {
-  type ImmersionObjective,
   appellationCodeSchema,
   conventionObjectiveOptions,
   emailSchema,
+  type ImmersionObjective,
   localization,
   phoneSchema,
   siretSchema,

@@ -1,5 +1,6 @@
 import { type BrevoEmailItem, expectToEqual } from "shared";
 import { getDiscussionParamsFromEmail } from "./discussion.utils";
+
 describe("getDiscussionParamsFromEmail", () => {
   it("should return the discussion id and the recipient kind", () => {
     const email: BrevoEmailItem = {

@@ -12,9 +12,9 @@ import { HeadingSection } from "react-design-system";
 import { type UseFormRegisterReturn, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  domElementIds,
   type EstablishmentSearchableBy,
   type FormEstablishmentDto,
-  domElementIds,
   immersionFacileContactEmail,
   toDateUTCString,
   toDisplayedDate,

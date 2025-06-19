@@ -1,9 +1,9 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import * as Sentry from "@sentry/browser";
 import {
-  type Epic,
   combineEpics,
   createEpicMiddleware,
+  type Epic,
 } from "redux-observable";
 import { catchError } from "rxjs";
 import type { Dependencies } from "src/config/dependencies";

@@ -1,15 +1,15 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import {
   type ConnectedUserJwt,
   type EstablishmentNameAndAdmins,
   type EstablishmentRoutes,
+  errors,
   type FormEstablishmentDto,
   type SiretDto,
-  errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import {
   logBodyAndThrow,
   otherwiseThrow,

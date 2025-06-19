@@ -8,9 +8,9 @@ import {
   type NafSectionSuggestion,
   type NafSectionSuggestionsParams,
   type NafSectorCode,
-  type WithNafCodes,
   nafSectorCodes,
   nafSectorLabels,
+  type WithNafCodes,
 } from "./naf.dto";
 
 export const validNafSectorCodes = keys(nafSectorLabels).filter(

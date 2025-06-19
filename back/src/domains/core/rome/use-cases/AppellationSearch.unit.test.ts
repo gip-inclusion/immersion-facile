@@ -1,6 +1,6 @@
 import { expectToEqual } from "shared";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemoryAppellationsGateway } from "../adapters/InMemoryAppellationsGateway";
 import { InMemoryRomeRepository } from "../adapters/InMemoryRomeRepository";
 import { AppellationSearch } from "./AppellationSearch";

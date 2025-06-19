@@ -6,14 +6,15 @@ import {
   ConventionDtoBuilder,
   expectPromiseToFailWithError,
   expectToEqual,
+  ForbiddenError,
+  NotFoundError,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { GetConventionForApiConsumer } from "./GetConventionForApiConsumer";
 
 describe("Get Convention for ApiConsumer", () => {

@@ -1,11 +1,11 @@
-import { P, match } from "ts-pattern";
-import type { Builder } from "../Builder";
+import { match, P } from "ts-pattern";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
+import type { Builder } from "../Builder";
 import {
   type ConventionId,
-  type ImmersionObjective,
   discoverObjective,
+  type ImmersionObjective,
 } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";

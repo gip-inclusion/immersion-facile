@@ -1,4 +1,4 @@
-import { type AbsoluteUrl, type ShortLinkId, errors } from "shared";
+import { type AbsoluteUrl, errors, type ShortLinkId } from "shared";
 import type { ShortLinkQuery } from "../../ports/ShortLinkQuery";
 
 export class InMemoryShortLinkQuery implements ShortLinkQuery {

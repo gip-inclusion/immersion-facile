@@ -11,10 +11,9 @@ import {
 import { useDispatch } from "react-redux";
 import {
   type AgencyModifierRole,
+  addressDtoToString,
   type ConventionId,
   type ConventionReadDto,
-  type SignatoryRole,
-  addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   errors,
@@ -23,6 +22,7 @@ import {
   makeSiretDescriptionLink,
   npsFormIds,
   prettyPrintSchedule,
+  type SignatoryRole,
   toDisplayedDate,
 } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";

@@ -15,14 +15,14 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   NO_JUSTIFICATION,
@@ -277,7 +277,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
@@ -291,17 +291,17 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryRepresentative!.firstName,
               signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryRepresentative!.lastName,
             },
           },
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
@@ -315,11 +315,11 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
               internshipKind: convention.internshipKind,
               justification,
               signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryCurrentEmployer!.firstName,
 
               signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryCurrentEmployer!.lastName,
             },
           },
@@ -387,34 +387,34 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
               ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
               signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryRepresentative!.firstName,
               signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryRepresentative!.lastName,
             },
           },
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
               ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[2]),
               signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryCurrentEmployer!.firstName,
               signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 convention.signatories.beneficiaryCurrentEmployer!.lastName,
             },
           },

@@ -1,8 +1,8 @@
 import {
-  type SiretEstablishmentDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type SiretEstablishmentDto,
 } from "shared";
 import { InMemorySiretGateway } from "../adapters/InMemorySiretGateway";
 import { GetSiret } from "./GetSiret";
