@@ -2,9 +2,9 @@ import subDays from "date-fns/subDays";
 import { keys } from "ramda";
 import type { SiretDto, SiretEstablishmentDto } from "shared";
 import { z } from "zod";
-import { UseCase } from "../../core/UseCase";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type {

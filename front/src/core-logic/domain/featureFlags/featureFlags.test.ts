@@ -1,7 +1,7 @@
 import {
+  expectToEqual,
   type FeatureFlagHighlight,
   type FeatureFlags,
-  expectToEqual,
   makeBooleanFeatureFlag,
   makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
@@ -13,8 +13,8 @@ import {
   featureFlagsSlice,
 } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

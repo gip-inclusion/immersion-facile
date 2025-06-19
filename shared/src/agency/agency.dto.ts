@@ -4,8 +4,8 @@ import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
 import type { InternshipKind } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
-import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
+import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
 import type {
   AgencyRole,

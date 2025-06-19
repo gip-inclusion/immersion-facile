@@ -4,13 +4,13 @@ import {
   type AgencyRight,
   ConventionDtoBuilder,
   type ConventionReadDto,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
-  type WithAgencyIds,
   connectedUserTokenExpiredMessage,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  type InclusionConnectedUser,
+  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type WithAgencyIds,
 } from "shared";
 import { removeUserFromAgencySelectors } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.selectors";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -21,12 +21,12 @@ import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.sele
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { authSelectors } from "../auth/auth.selectors";
-import { type FederatedIdentityWithUser, authSlice } from "../auth/auth.slice";
+import { authSlice, type FederatedIdentityWithUser } from "../auth/auth.slice";
 
 const agency1 = new AgencyDtoBuilder().withId("agency-1").build();
 

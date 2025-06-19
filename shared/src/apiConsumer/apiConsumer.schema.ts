@@ -16,13 +16,13 @@ import {
   type ApiConsumerContact,
   type ApiConsumerName,
   type ApiConsumerSubscriptionId,
+  apiConsumerKinds,
+  authorizedCallbackHeaderKeys,
   type CallbackHeaders,
   type CreateWebhookSubscription,
   type WebhookSubscription,
   type WriteApiConsumerParams,
   type WriteApiConsumerRights,
-  apiConsumerKinds,
-  authorizedCallbackHeaderKeys,
 } from "./ApiConsumer";
 
 const apiConsumerContactSchema: z.Schema<ApiConsumerContact> = z.object({

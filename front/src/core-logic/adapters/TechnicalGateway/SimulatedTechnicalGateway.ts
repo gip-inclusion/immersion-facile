@@ -5,8 +5,8 @@ import {
   type Email,
   type FeatureFlags,
   type HtmlToPdfRequest,
-  type ValidateEmailFeedback,
   sleep,
+  type ValidateEmailFeedback,
 } from "shared";
 import { makeStubFeatureFlags } from "src/core-logic/domain/testHelpers/test.helpers";
 import type { TechnicalGateway } from "src/core-logic/ports/TechnicalGateway";
@@ -41,7 +41,7 @@ export class SimulatedTechnicalGateway implements TechnicalGateway {
   }
 
   public async uploadFile(file: File): Promise<AbsoluteUrl> {
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("logo uploaded : ", file);
     return `http://${file.name}-url`;
   }

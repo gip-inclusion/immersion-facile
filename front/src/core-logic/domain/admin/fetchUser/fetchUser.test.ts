@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  expectToEqual,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  expectToEqual,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -14,8 +14,8 @@ import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

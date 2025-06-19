@@ -1,4 +1,4 @@
-import { type Observable, Subject, from } from "rxjs";
+import { from, type Observable, Subject } from "rxjs";
 import type {
   AgencyDto,
   AgencyId,

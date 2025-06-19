@@ -4,14 +4,14 @@ import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
   ConventionDtoBuilder,
-  InclusionConnectedUserBuilder,
-  type Notification,
-  type TemplatedEmail,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   getFullname,
+  InclusionConnectedUserBuilder,
+  type Notification,
+  type TemplatedEmail,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
@@ -21,15 +21,15 @@ import {
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import {
-  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { SendAssessmentNeededNotifications } from "./SendAssessmentNeededNotifications";
 
@@ -94,7 +94,7 @@ describe("SendAssessmentNeededNotifications", () => {
     {
       kind: "ASSESSMENT_AGENCY_NOTIFICATION",
       params: {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         agencyLogoUrl: agency.logoUrl!,
         agencyReferentName: getFullname(
           conventionEndingTomorrow.agencyReferent?.firstname,
@@ -124,7 +124,7 @@ describe("SendAssessmentNeededNotifications", () => {
     {
       kind: "ASSESSMENT_AGENCY_NOTIFICATION",
       params: {
-        // biome-ignore lint/style/noNonNullAssertion: <explanation>
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         agencyLogoUrl: agency.logoUrl!,
         agencyReferentName: getFullname(
           conventionEndingTomorrow.agencyReferent?.firstname,
@@ -210,7 +210,7 @@ describe("SendAssessmentNeededNotifications", () => {
           {
             kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
             params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               agencyLogoUrl: agency.logoUrl!,
               beneficiaryFirstName:
                 conventionEndingTomorrow.signatories.beneficiary.firstName,
@@ -316,7 +316,7 @@ describe("SendAssessmentNeededNotifications", () => {
           {
             kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
             params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               agencyLogoUrl: agency.logoUrl!,
               beneficiaryFirstName:
                 conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
@@ -452,7 +452,7 @@ describe("SendAssessmentNeededNotifications", () => {
           {
             kind: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
             params: {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               agencyLogoUrl: agency.logoUrl!,
               beneficiaryFirstName:
                 conventionEndingTomorrow.signatories.beneficiary.firstName,

@@ -13,19 +13,19 @@ import type {
 } from "react-design-system/src/immersionFacile/components/convention-summary";
 import { createPortal } from "react-dom";
 import {
-  type ConventionReadDto,
-  type DateString,
-  type Phone,
-  type ScheduleDto,
-  type SignatoryRole,
   addressDtoToString,
+  type ConventionReadDto,
   convertLocaleDateToUtcTimezoneDate,
+  type DateString,
   domElementIds,
   getFullname,
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
+  type Phone,
   removeEmptyValue,
+  type ScheduleDto,
+  type SignatoryRole,
   titleByRole,
   toDisplayedDate,
 } from "shared";
@@ -975,9 +975,7 @@ export const sendAssessmentLinkButtonProps =
     onClick,
   }: {
     isAssessmentLinkSent: boolean;
-    onClick: (params: {
-      phone: Phone;
-    }) => void;
+    onClick: (params: { phone: Phone }) => void;
   }) =>
   (phone: Phone): ButtonProps => ({
     priority: "tertiary",

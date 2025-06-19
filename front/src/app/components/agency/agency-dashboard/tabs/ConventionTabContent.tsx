@@ -8,10 +8,10 @@ import { createPortal } from "react-dom";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   type AgencyId,
-  type WithAgencyDashboards,
-  type WithEstablishmentDashboards,
   domElementIds,
   miniStageAgencyKinds,
+  type WithAgencyDashboards,
+  type WithEstablishmentDashboards,
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { MetabaseView } from "../../../MetabaseView";

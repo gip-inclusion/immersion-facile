@@ -1,14 +1,14 @@
-import { TokenExpiredError, decode } from "jsonwebtoken";
+import { decode, TokenExpiredError } from "jsonwebtoken";
 import {
   type AppSupportedJwt,
   type ConventionId,
   type ConventionJwtPayload,
+  errors,
   ForbiddenError,
+  frontRoutes,
   type InternshipKind,
   type RenewMagicLinkRequestDto,
   type Role,
-  errors,
-  frontRoutes,
   renewMagicLinkRequestSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
@@ -17,11 +17,11 @@ import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/m
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { conventionEmailsByRoleForMagicLinkRenewal } from "../../../utils/convention";
 import { makeEmailHash } from "../../../utils/jwt";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

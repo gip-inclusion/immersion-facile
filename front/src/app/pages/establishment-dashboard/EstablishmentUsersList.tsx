@@ -12,9 +12,9 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type FormEstablishmentUserRight,
   domElementIds,
   establishmentsRoles,
+  type FormEstablishmentUserRight,
   formEstablishmentUserRightSchema,
   localization,
 } from "shared";

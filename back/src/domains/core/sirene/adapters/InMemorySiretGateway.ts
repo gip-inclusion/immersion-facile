@@ -1,10 +1,10 @@
 import {
   type Builder,
+  errors,
   type NafDto,
   type NumberEmployeesRange,
   type SiretDto,
   type SiretEstablishmentDto,
-  errors,
   tooManySirenRequestsSiret,
 } from "shared";
 import { createLogger } from "../../../../utils/logger";

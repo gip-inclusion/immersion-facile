@@ -1,9 +1,9 @@
 import {
+  expect,
   type Locator,
   type Page,
   type PlaywrightTestArgs,
   type TestInfo,
-  expect,
 } from "@playwright/test";
 
 export type PlaywrightTestCallback = (

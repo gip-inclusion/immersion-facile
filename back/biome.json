@@ -1,0 +1,15 @@
+{
+  "root": false,
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["error", "time", "timeEnd"]
+          }
+        }
+      }
+    }
+  }
+}

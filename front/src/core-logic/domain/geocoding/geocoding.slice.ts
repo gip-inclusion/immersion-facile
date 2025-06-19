@@ -5,8 +5,8 @@ import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agen
 import {
   type AutocompleteItem,
   type AutocompleteState,
-  type PayloadActionWithLocator,
   initialAutocompleteItem,
+  type PayloadActionWithLocator,
 } from "src/core-logic/domain/autocomplete.utils";
 
 export type MultipleAddressAutocompleteLocator = `multiple-address-${number}`;

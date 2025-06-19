@@ -26,8 +26,8 @@ import type { FileValidationError } from "../file/file.validators";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GroupSlug } from "../group/group.dto";
 import {
-  type OAuthState,
   connectedUserTokenExpiredMessage,
+  type OAuthState,
 } from "../inclusionConnect/inclusionConnect.dto";
 import type {
   AgencyRole,
@@ -81,8 +81,10 @@ export const errors = {
     failure: ({
       serviceName,
       message,
-    }: { serviceName: string; message: string }) =>
-      `[${serviceName}] : ${message}`,
+    }: {
+      serviceName: string;
+      message: string;
+    }) => `[${serviceName}] : ${message}`,
   },
   event: {
     saveNewPublicationFailed: (eventId: string) =>
@@ -144,7 +146,11 @@ export const errors = {
       body,
       status,
       serviceName,
-    }: { status: number; body: any; serviceName: string }) =>
+    }: {
+      status: number;
+      body: any;
+      serviceName: string;
+    }) =>
       new Error(
         `Unsupported response status form ${serviceName} : ${
           status
@@ -218,11 +224,7 @@ export const errors = {
       ),
   },
   inclusionConnect: {
-    missingOAuth: ({
-      state,
-    }: {
-      state?: OAuthState;
-    }) =>
+    missingOAuth: ({ state }: { state?: OAuthState }) =>
       new ForbiddenError(
         `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}}`,
       ),
@@ -245,7 +247,10 @@ export const errors = {
     updateBadStatusInRepo: ({
       id,
       status,
-    }: { id: ConventionId; status: ConventionStatus }) =>
+    }: {
+      id: ConventionId;
+      status: ConventionStatus;
+    }) =>
       new BadRequestError(
         `Convention ${id} cannot be modified as it has status ${status}`,
       ),
@@ -335,11 +340,7 @@ export const errors = {
       new BadRequestError(
         `Impossible de relancer la demande de signature pour les conventions ayant le statut "${status}".`,
       ),
-    transferNotAllowedForStatus: ({
-      status,
-    }: {
-      status: ConventionStatus;
-    }) =>
+    transferNotAllowedForStatus: ({ status }: { status: ConventionStatus }) =>
       new BadRequestError(
         `Impossible de transférer les conventions ayant le statut "${status}".`,
       ),
@@ -386,7 +387,9 @@ export const errors = {
       new BadRequestError(`Signature manquante pour ${titleByRole[role]}.`),
     missingAgencyApprovalOrValidation: ({
       role,
-    }: { role: AgencyModifierRole }) =>
+    }: {
+      role: AgencyModifierRole;
+    }) =>
       new BadRequestError(`Validation manquante par le ${titleByRole[role]}.`),
     unsupportedRole: ({ role }: { role: Role }) =>
       new ForbiddenError(
@@ -395,7 +398,10 @@ export const errors = {
     unsupportedRenewRoute: ({
       supportedRenewRoutes,
       originalUrl,
-    }: { supportedRenewRoutes: string[]; originalUrl: string }) =>
+    }: {
+      supportedRenewRoutes: string[];
+      originalUrl: string;
+    }) =>
       new BadRequestError(
         `Lien non supporté, le lien doit faire partie des liens supportés suivants: ${supportedRenewRoutes
           .map((route) => `/${route}`)
@@ -803,7 +809,10 @@ export const errors = {
     missingLevelOfEducation: ({
       id,
       kind,
-    }: { id: DiscussionId; kind: DiscussionKind }) =>
+    }: {
+      id: DiscussionId;
+      kind: DiscussionKind;
+    }) =>
       new Error(
         `Propriété levelOfEducation manquante pour la discussion de type ${kind} '${id}'.`,
       ),
@@ -876,7 +885,10 @@ export const errors = {
     missingCallbackParams: ({
       consumerId,
       conventionId,
-    }: { consumerId: ApiConsumerId; conventionId: ConventionId }) =>
+    }: {
+      consumerId: ApiConsumerId;
+      conventionId: ConventionId;
+    }) =>
       new NotFoundError(
         `No callback params found for convention.updated : apiConsumer : ${consumerId} | convention : ${conventionId}`,
       ),

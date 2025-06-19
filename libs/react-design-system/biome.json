@@ -1,0 +1,16 @@
+{
+  "root": false,
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      }
+    }
+  },
+  "formatter": {
+    "includes": ["!**/public/dsfr"]
+  }
+}

@@ -1,16 +1,16 @@
 import {
   DiscussionBuilder,
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 

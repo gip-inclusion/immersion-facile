@@ -19,21 +19,21 @@ import { useDispatch } from "react-redux";
 import {
   type AssessmentDto,
   type AssessmentStatus,
+  assessmentDtoSchema,
+  assessmentStatuses,
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
-  type DotNestedKeys,
-  type InternshipKind,
-  type Role,
-  type WithEndedWithAJob,
-  type WithEstablishmentComments,
-  assessmentDtoSchema,
-  assessmentStatuses,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
+  type DotNestedKeys,
   domElementIds,
+  type InternshipKind,
+  type Role,
   toDisplayedDate,
   typeOfContracts,
+  type WithEndedWithAJob,
+  type WithEstablishmentComments,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";

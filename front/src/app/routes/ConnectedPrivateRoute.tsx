@@ -16,9 +16,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AllowedStartOAuthLoginPage,
-  type Email,
   absoluteUrlSchema,
   domElementIds,
+  type Email,
   emailSchema,
   immersionFacileNoReplyEmail,
   inclusionConnectImmersionRoutes,
@@ -485,7 +485,9 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
 
 const LoginWithProConnect = ({
   page,
-}: { page: AllowedStartOAuthLoginPage }) => (
+}: {
+  page: AllowedStartOAuthLoginPage;
+}) => (
   <>
     <p>
       <strong>Connectez-vous avec ProConnect</strong>, et accédez à votre espace

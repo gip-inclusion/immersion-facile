@@ -1,7 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { SectionHighlight } from "react-design-system";
-import { HeadingSection } from "react-design-system";
+import { HeadingSection, SectionHighlight } from "react-design-system";
 import type {
   AgencyRight,
   ConnectedUserJwt,

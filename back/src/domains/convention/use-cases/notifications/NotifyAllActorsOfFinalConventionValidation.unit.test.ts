@@ -6,11 +6,11 @@ import {
   type EmailNotification,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
+  expectToEqual,
+  frontRoutes,
   InclusionConnectedUserBuilder,
   type Role,
   type ShortLinkId,
-  expectToEqual,
-  frontRoutes,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -19,16 +19,16 @@ import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import type { ConventionFtUserAdvisorEntity } from "../../../core/authentication/ft-connect/dto/FtConnect.dto";
 import { expectEmailFinalValidationConfirmationParamsMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
-  type WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
+  type WithNotificationIdAndKind,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifyAllActorsOfFinalConventionValidation } from "./NotifyAllActorsOfFinalConventionValidation";
 

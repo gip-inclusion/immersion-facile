@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  type InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -19,15 +19,15 @@ import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  type NotifyAllActorsThatConventionTransferred,
   makeNotifyAllActorsThatConventionTransferred,
+  type NotifyAllActorsThatConventionTransferred,
 } from "./NotifyAllActorsThatConventionTransferred";
 
 describe("NotifyAllActorsThatConventionTransferred", () => {

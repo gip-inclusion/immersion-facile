@@ -5,10 +5,10 @@ import {
   DiscussionBuilder,
   type DiscussionDto,
   type Exchange,
-  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {

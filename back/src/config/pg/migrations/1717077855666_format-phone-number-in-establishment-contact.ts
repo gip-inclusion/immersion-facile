@@ -63,7 +63,7 @@ async function updateEstablishmentContactTable(
 
     const { rows } = await pgm.db.query(query);
     console.timeEnd(queryDuration);
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("row.length ====>", rows.length);
     if (rows.length === 0) {
       break;
@@ -82,9 +82,9 @@ async function updateEstablishmentContactTable(
       { ids: [], phones: [] },
     );
 
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("updates.ids.length ====>", updates.ids.length);
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("updates.phones.length ====>", updates.phones.length);
 
     console.timeEnd(typescriptDuration);

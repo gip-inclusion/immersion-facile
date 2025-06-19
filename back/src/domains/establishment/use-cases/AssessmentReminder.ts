@@ -13,13 +13,13 @@ import {
 import { z } from "zod";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 type AssessmentReminderOutput = {

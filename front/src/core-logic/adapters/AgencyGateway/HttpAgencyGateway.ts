@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type {
   AgencyDto,
   AgencyId,
@@ -21,7 +21,7 @@ import {
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpAgencyGateway implements AgencyGateway {
   constructor(private readonly httpClient: HttpClient<AgencyRoutes>) {}

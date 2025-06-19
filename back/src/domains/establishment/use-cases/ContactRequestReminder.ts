@@ -1,16 +1,16 @@
 import { addDays } from "date-fns";
 import {
-  type DiscussionDto,
   createOpaqueEmail,
+  type DiscussionDto,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export type ContactRequestReminderMode = "3days" | "7days";

@@ -1,17 +1,17 @@
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
+  allRoles,
   type ConventionDomainPayload,
   ConventionDtoBuilder,
-  ForbiddenError,
-  InclusionConnectedUserBuilder,
-  type Role,
-  allRoles,
   conventionStatuses,
   errors,
   expectArraysToEqual,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
+  ForbiddenError,
+  InclusionConnectedUserBuilder,
+  type Role,
   reasonableSchedule,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
@@ -20,11 +20,11 @@ import { makeHashByRolesForTest } from "../../../utils/emailHash";
 import { makeEmailHash } from "../../../utils/jwt";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { acceptedConventionStatusesForAssessment } from "../entities/AssessmentEntity";
 import {

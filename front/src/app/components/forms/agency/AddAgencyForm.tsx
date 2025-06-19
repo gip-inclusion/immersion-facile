@@ -14,13 +14,12 @@ import {
   type AgencyDto,
   type AgencyKind,
   type AllowedAgencyKindToAdd,
-  type CreateAgencyDto,
-  type DepartmentCode,
   allAgencyKindsAllowedToAdd,
+  type CreateAgencyDto,
   createAgencySchema,
+  type DepartmentCode,
   domElementIds,
 } from "shared";
-import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { agenciesSubmitMessageByKind } from "src/app/components/agency/AgencySubmitFeedback";
 import { AgencyFormCommonFields } from "src/app/components/forms/agency/AgencyFormCommonFields";
 import { agencyListOfOptions } from "src/app/components/forms/agency/agencyKindToLabel";
@@ -28,6 +27,7 @@ import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
+import { SubmitFeedbackNotification } from "src/app/components/SubmitFeedbackNotification";
 import { formAgencyFieldsLabels } from "src/app/contents/forms/agency/formAgency";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import {
@@ -45,7 +45,7 @@ import {
   type AgenciesSubmitFeedback,
   agenciesSlice,
 } from "src/core-logic/domain/agencies/agencies.slice";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { v4 as uuidV4 } from "uuid";
 
 type CreateAgencyInitialValues = Omit<CreateAgencyDto, "kind"> & {

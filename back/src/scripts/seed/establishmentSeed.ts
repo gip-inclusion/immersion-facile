@@ -87,7 +87,7 @@ export const decathlon = new EstablishmentAggregateBuilder()
   .build();
 
 export const establishmentSeed = async (uow: UnitOfWork) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: feedback to the user
   console.log("establishmentSeed start ...");
 
   await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
@@ -142,6 +142,6 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
       .build(),
   );
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("establishmentSeed done");
 };

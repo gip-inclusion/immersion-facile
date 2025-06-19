@@ -1,19 +1,13 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
-  "organizeImports": {
-    "enabled": true,
-    "ignore": [
-      "back/src/config/pg/static-data",
-      "node_modules",
-      "front/public",
-      "front/dev-dist",
-      "front/scalingo",
-      "front/dist",
-      "*.js",
-      "*.tar.gz",
-      ".vscode"
-    ]
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
+  "root": true,
   "linter": {
     "enabled": true,
     "rules": {
@@ -23,8 +17,7 @@
       },
       "suspicious": {
         "noConfusingVoidType": "off",
-        "noExplicitAny": "off",
-        "noConsoleLog": "error"
+        "noExplicitAny": "off"
       },
       "complexity": {
         "noForEach": "off"
@@ -34,21 +27,26 @@
         "useExhaustiveDependencies": "warn",
         "noUnusedImports": "error"
       },
-      "security": {
-        "noDangerouslySetInnerHtml": "off"
+      "style": {
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       }
     },
-    "ignore": [
-      "node_modules",
-      "front/public",
-      "front/dev-dist",
-      "front/scalingo",
-      "front/dist",
-      "*.js",
-      "*.tar.gz",
-      ".vscode",
-      "libs/react-design-system/public/dsfr",
-      "*.css"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/*.js",
+      "!**/*.tar.gz",
+      "!**/.vscode",
+      "!**/*.css"
     ]
   },
   "formatter": {
@@ -56,17 +54,15 @@
     "enabled": true,
     "indentWidth": 2,
     "indentStyle": "space",
-    "ignore": [
-      "node_modules",
-      "front/public",
-      "front/dev-dist",
-      "front/scalingo",
-      "front/dist",
-      "*.js",
-      "*.tar.gz",
-      ".vscode",
-      "libs/react-design-system/public/dsfr",
-      "*.css"
+    "formatWithErrors": true,
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/*.js",
+      "!**/*.tar.gz",
+      "!**/.vscode",
+      "!**/libs/react-design-system/public/dsfr",
+      "!**/*.css"
     ]
   },
   "files": {

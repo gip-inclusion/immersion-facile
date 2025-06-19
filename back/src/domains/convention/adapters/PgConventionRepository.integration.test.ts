@@ -10,12 +10,12 @@ import {
   type ConventionId,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
-  type FtConnectToken,
-  type WithAcquisition,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type FtConnectToken,
   reasonableSchedule,
+  type WithAcquisition,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {

@@ -122,7 +122,10 @@ export const errorToString = (error: any): string => {
 export const messageAndIssuesToString = ({
   message,
   issues,
-}: { message: string; issues?: string[] }) => {
+}: {
+  message: string;
+  issues?: string[];
+}) => {
   if (!issues || issues.length === 0) return message;
   return `${message} | Les problèmes sont : ${issues.join(", ")}`;
 };

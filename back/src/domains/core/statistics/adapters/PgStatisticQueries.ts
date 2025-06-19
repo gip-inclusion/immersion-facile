@@ -1,8 +1,8 @@
 import { sql } from "kysely";
 import {
   type DataWithPagination,
-  type PaginationQueryParams,
   errors,
+  type PaginationQueryParams,
 } from "shared";
 import type { KyselyDb } from "../../../../config/pg/kysely/kyselyUtils";
 import type { StatisticQueries } from "../ports/StatisticQueries";

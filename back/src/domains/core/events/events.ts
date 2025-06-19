@@ -6,8 +6,10 @@ import {
   type Flavor,
   type RejectIcUserRoleForAgencyParams,
   type Role,
+  roleSchema,
   type SignatoryRole,
   type UserId,
+  userIdSchema,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
   type WithAssessmentDto,
@@ -16,8 +18,6 @@ import {
   type WithDiscussionDto,
   type WithDiscussionId,
   type WithSiretDto,
-  roleSchema,
-  userIdSchema,
 } from "shared";
 import { z } from "zod";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";

@@ -1,4 +1,5 @@
 import { makeTsFileContent } from "..";
+
 const withoutSpacesAndNewLines = (string) => string.replace(/\s+/g, "").trim();
 describe("scss-mapper", () => {
   it("getScssData should map Scss content to JS object", () => {

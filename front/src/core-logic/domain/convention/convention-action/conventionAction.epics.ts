@@ -1,5 +1,5 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { type Observable, filter } from "rxjs";
+import { filter, type Observable } from "rxjs";
 import { delay, map, switchMap } from "rxjs/operators";
 import { isStringJson } from "shared";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
@@ -14,8 +14,8 @@ import type {
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
 import {
-  type StatusChangePayload,
   conventionActionSlice,
+  type StatusChangePayload,
 } from "./conventionAction.slice";
 
 const makeConventionStatusChangeEpic =

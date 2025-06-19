@@ -5,15 +5,15 @@ import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
   type CreateAgencyDto,
-  type UserId,
   createAgencySchema,
   errors,
+  type UserId,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";

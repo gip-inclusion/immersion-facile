@@ -1,13 +1,13 @@
 import {
+  authFailed,
   type ConventionDto,
   type FtConnectIdentity,
-  type WithConventionDto,
-  authFailed,
   isFtConnectIdentity,
+  type WithConventionDto,
   withConventionSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../../UseCase";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
+import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 

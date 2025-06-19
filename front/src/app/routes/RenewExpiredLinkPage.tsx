@@ -5,9 +5,9 @@ import { useState } from "react";
 import { MainWrapper } from "react-design-system";
 import {
   type ConventionJwtPayload,
-  type RenewMagicLinkRequestDto,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  type RenewMagicLinkRequestDto,
 } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { routes } from "src/app/routes/routes";

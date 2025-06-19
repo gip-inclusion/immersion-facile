@@ -1,14 +1,14 @@
 import { equals } from "ramda";
 import {
   type ConventionDto,
-  type SiretDto,
-  type WithSiretDto,
   errors,
   isSuperEstablishment,
+  type SiretDto,
+  type WithSiretDto,
   withSiretSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { MarketingContact } from "../entities/MarketingContact";

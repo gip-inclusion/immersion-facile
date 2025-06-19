@@ -8,11 +8,11 @@ import {
   type ConventionScope,
   type DataWithPagination,
   type DateRange,
+  errors,
   type FindSimilarConventionsParams,
   NotFoundError,
   type SiretDto,
   type UserId,
-  errors,
   validatedConventionStatuses,
 } from "shared";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";

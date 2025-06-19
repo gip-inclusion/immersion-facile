@@ -1,12 +1,12 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import {
   type AssessmentDto,
   type ConventionId,
   type ConventionMagicLinkRoutes,
   type ConventionSupportedJwt,
+  errors,
   type LegacyAssessmentDto,
   type WithConventionId,
-  errors,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -19,7 +19,7 @@ import type {
   AssessmentAndJwt,
   AssessmentGateway,
 } from "src/core-logic/ports/AssessmentGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpAssessmentGateway implements AssessmentGateway {
   constructor(
@@ -49,9 +49,10 @@ export class HttpAssessmentGateway implements AssessmentGateway {
   public getAssessment$({
     conventionId,
     jwt,
-  }: { conventionId: ConventionId; jwt: string }): Observable<
-    AssessmentDto | LegacyAssessmentDto
-  > {
+  }: {
+    conventionId: ConventionId;
+    jwt: string;
+  }): Observable<AssessmentDto | LegacyAssessmentDto> {
     return from(
       this.httpClient
         .getAssessmentByConventionId({

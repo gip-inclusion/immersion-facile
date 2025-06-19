@@ -13,8 +13,8 @@ import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
 import type { AgencyAction } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.epics";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
 import {
-  type NormalizedIcUserById,
   icUsersAdminSlice,
+  type NormalizedIcUserById,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {

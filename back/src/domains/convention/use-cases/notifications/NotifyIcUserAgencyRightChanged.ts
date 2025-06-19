@@ -1,10 +1,10 @@
 import {
-  type WithAgencyIdAndUserId,
   errors,
+  type WithAgencyIdAndUserId,
   withAgencyIdAndUserIdSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

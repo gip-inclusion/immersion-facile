@@ -4,7 +4,7 @@ import {
   type RomeDto,
   withAuthorizationHeaders,
 } from "shared";
-import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
+import { defineRoute, defineRoutes, type HttpClient } from "shared-routes";
 import { z } from "zod";
 import type { FranceTravailGateway } from "../../../convention/ports/FranceTravailGateway";
 

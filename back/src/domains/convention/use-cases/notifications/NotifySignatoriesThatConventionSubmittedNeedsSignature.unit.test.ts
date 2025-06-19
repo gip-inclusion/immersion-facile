@@ -4,10 +4,10 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type EmailNotification,
-  InclusionConnectedUserBuilder,
-  type ShortLinkId,
   expectToEqual,
   frontRoutes,
+  InclusionConnectedUserBuilder,
+  type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -15,16 +15,16 @@ import { toAgencyWithRights } from "../../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import { expectEmailSignatoryConfirmationSignatureRequestMatchingConvention } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
 import {
-  type WithNotificationIdAndKind,
   makeSaveNotificationAndRelatedEvent,
+  type WithNotificationIdAndKind,
 } from "../../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./NotifySignatoriesThatConventionSubmittedNeedsSignature";
 
@@ -97,9 +97,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       }),
       [deterministicShortLinks[1]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         role: validConvention.signatories.establishmentRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         email: validConvention.signatories.establishmentRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
@@ -107,9 +107,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
       }),
       [deterministicShortLinks[2]]: fakeGenerateMagicLinkUrlFn({
         id: validConvention.id,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         role: validConvention.signatories.beneficiaryRepresentative!.role,
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         email: validConvention.signatories.beneficiaryRepresentative!.email,
         now: timeGateway.now(),
         targetRoute: frontRoutes.conventionToSign,
@@ -152,9 +152,9 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
     expectEmailSignatoryConfirmationSignatureRequestMatchingConvention({
       templatedEmail: emailNotifications[2].templatedContent,
       convention: validConvention,
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       signatory: validConvention.signatories.beneficiaryRepresentative!,
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       recipient: validConvention.signatories.beneficiaryRepresentative!.email,
       now: timeGateway.now(),
       agency,

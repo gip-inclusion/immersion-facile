@@ -1,10 +1,10 @@
 import type { Pool } from "pg";
 import {
-  type User,
-  type UserId,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type User,
+  type UserId,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -12,8 +12,8 @@ import {
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
-import { PgUserRepository } from "./PgUserRepository";
 import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
+import { PgUserRepository } from "./PgUserRepository";
 
 describe("PgAuthenticatedUserRepository", () => {
   const userExternalId = "my-external-id";

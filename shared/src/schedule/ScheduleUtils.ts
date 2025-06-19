@@ -16,8 +16,8 @@ import {
 import { isConventionOld } from "../convention/convention.schema";
 import { arrayFromNumber } from "../utils";
 import {
-  type DateString,
   convertLocaleDateToUtcTimezoneDate,
+  type DateString,
 } from "../utils/date";
 import {
   type DailyScheduleDto,

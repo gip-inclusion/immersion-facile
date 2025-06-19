@@ -1,11 +1,11 @@
 import axios from "axios";
 import { firstValueFrom } from "rxjs";
 import {
-  type GetSiretInfoError,
   apiSirenNotAvailableSiret,
   conflictErrorSiret,
   expectToEqual,
   formCompletionRoutes,
+  type GetSiretInfoError,
   tooManySirenRequestsSiret,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";

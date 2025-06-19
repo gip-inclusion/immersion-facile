@@ -6,8 +6,8 @@ import {
 } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

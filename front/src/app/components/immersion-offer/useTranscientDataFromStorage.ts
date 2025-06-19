@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { keys } from "shared";
 import type {
   ContactEstablishmentByMailDto,
   OmitFromExistingKeys,
 } from "shared";
+import { keys } from "shared";
 
 const transcientDataStorageKey = "IfTranscientData";
 const preferUseTranscientDataStorageKey = "IfPreferUseTranscientData";

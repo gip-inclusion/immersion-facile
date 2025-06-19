@@ -1,14 +1,14 @@
 import {
-  InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
 } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { type GetUsers, makeGetUsers } from "./GetUsers";
 
 const randomUser = new InclusionConnectedUserBuilder()

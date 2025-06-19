@@ -1,16 +1,16 @@
-import { type Page, expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import {
-  type FormEstablishmentDto,
   addressRoutes,
   domElementIds,
+  type FormEstablishmentDto,
 } from "shared";
 import {
   goToDashboard,
   goToEstablishmentDashboardTab,
 } from "../../utils/dashboard";
 import {
-  type PlaywrightTestCallback,
   fillAutocomplete,
+  type PlaywrightTestCallback,
 } from "../../utils/utils";
 import type { MakeFormEstablishmentFromRetryNumber } from "./establishmentForm.utils";
 import { goToManageEtablishmentBySiretInAdmin } from "./establishmentNavigation.utils";

@@ -3,16 +3,16 @@ import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
   type AuthenticateWithOAuthCodeParams,
-  type ExternalId,
-  type IdToken,
-  type SiretDto,
-  type UserWithAdminRights,
   allowedStartOAuthLoginPages,
+  type ExternalId,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  type IdToken,
+  type SiretDto,
+  type UserWithAdminRights,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../../utils/agency";
@@ -20,15 +20,15 @@ import { generateES256KeyPair } from "../../../../../utils/jwt";
 import { makeCreateNewEvent } from "../../../events/ports/EventBus";
 import { makeGenerateJwtES256, makeVerifyJwtES256 } from "../../../jwt";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  InMemoryOAuthGateway,
   fakeProviderConfig,
+  InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload } from "../port/OAuthGateway";
@@ -651,9 +651,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   };
 
   const addAlreadyExistingAuthenticatedUserInRepo = (
-    options: {
-      externalId?: string | null;
-    } = {},
+    options: { externalId?: string | null } = {},
   ) => {
     const alreadyExistingUser: UserWithAdminRights = {
       id: "already-existing-id",

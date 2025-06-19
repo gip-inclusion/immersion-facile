@@ -10,7 +10,9 @@ export class InMemoryOutboxRepository implements OutboxRepository {
 
   public async countAllEvents({
     status,
-  }: { status: EventStatus }): Promise<number> {
+  }: {
+    status: EventStatus;
+  }): Promise<number> {
     return this.events.filter((event) => event.status === status).length;
   }
 
@@ -38,7 +40,9 @@ export class InMemoryOutboxRepository implements OutboxRepository {
 
   public async markOldInProcessEventsAsToRepublish({
     eventsBeforeDate,
-  }: { eventsBeforeDate: Date }): Promise<void> {
+  }: {
+    eventsBeforeDate: Date;
+  }): Promise<void> {
     const oldInProcessEvents = this.events.filter(
       (event) =>
         event.status === "in-process" &&

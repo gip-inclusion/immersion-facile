@@ -1,14 +1,14 @@
 import {
   type ConventionEstablishmentRole,
-  type WithAssessmentDto,
   errors,
   frontRoutes,
+  type WithAssessmentDto,
   withAssessmentSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type NotifyEstablishmentThatAssessmentWasCreated = ReturnType<
   typeof makeNotifyEstablishmentThatAssessmentWasCreated

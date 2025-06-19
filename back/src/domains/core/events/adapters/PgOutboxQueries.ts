@@ -14,9 +14,9 @@ const logger = createLogger(__filename);
 export class PgOutboxQueries implements OutboxQueries {
   constructor(private transaction: KyselyDb) {}
 
-  public async getFailedEvents(params: { limit: number }): Promise<
-    DomainEvent[]
-  > {
+  public async getFailedEvents(params: {
+    limit: number;
+  }): Promise<DomainEvent[]> {
     const results = await this.#getEventsQueryBuilder()
       .where("status", "=", "failed-but-will-retry")
       .limit(params.limit)
@@ -25,9 +25,9 @@ export class PgOutboxQueries implements OutboxQueries {
     return convertRowsToDomainEvents(results as StoredEventRow[]);
   }
 
-  public async getEventsToPublish(params: { limit: number }): Promise<
-    DomainEvent[]
-  > {
+  public async getEventsToPublish(params: {
+    limit: number;
+  }): Promise<DomainEvent[]> {
     const results = await this.#getEventsQueryBuilder()
       .where("status", "in", ["never-published", "to-republish"])
       .limit(params.limit)

@@ -1,4 +1,4 @@
-import { type ReactElement, cloneElement, useId } from "react";
+import { cloneElement, type ReactElement, useId } from "react";
 
 export type TooltipProps =
   | {

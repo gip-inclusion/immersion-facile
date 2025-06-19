@@ -1,7 +1,7 @@
 import { addDays } from "date-fns";
 import subDays from "date-fns/subDays";
 import type { Pool } from "pg";
-import { UserBuilder, expectToEqual } from "shared";
+import { expectToEqual, UserBuilder } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,

@@ -1,12 +1,12 @@
 import {
+  errors,
   type InclusionConnectedUser,
   type PartialAgencyDto,
   type UpdateAgencyStatusParams,
-  errors,
   updateAgencyStatusParamsSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";

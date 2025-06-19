@@ -1,10 +1,10 @@
 import type {
   ConnectedUserJwt,
   ContactLevelOfEducation,
-  Phone,
-  WithDiscussionId,
   discoverObjective,
   exchangeRoles,
+  Phone,
+  WithDiscussionId,
 } from "..";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";

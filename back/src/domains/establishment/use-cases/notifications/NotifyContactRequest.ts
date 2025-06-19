@@ -1,17 +1,16 @@
 import { ascend, prop, sort } from "ramda";
 import {
-  type ContactEstablishmentEventPayload,
-  type Email,
-  type TemplatedEmail,
   addressDtoToString,
+  type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
+  type Email,
   errors,
   immersionFacileNoReplyEmailSender,
+  type TemplatedEmail,
 } from "shared";
-
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { makeContactByEmailRequestParams } from "../../helpers/contactRequest";

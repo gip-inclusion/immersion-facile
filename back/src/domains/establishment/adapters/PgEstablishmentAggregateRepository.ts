@@ -6,21 +6,21 @@ import {
   type AppellationAndRomeDto,
   type AppellationCode,
   type AppellationDto,
+  castError,
   type DateTimeIsoString,
   type EstablishmentSearchableByValue,
+  errors,
   type LocationId,
   type NafCode,
+  pipeWithValue,
   type RomeCode,
   type SearchSortedBy,
   type SiretDto,
-  castError,
-  errors,
-  pipeWithValue,
 } from "shared";
 import {
-  type KyselyDb,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";

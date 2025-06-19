@@ -35,7 +35,7 @@ import { match } from "ts-pattern";
 
 export const FeatureFlagsSection = () => {
   const dispatch = useDispatch();
-  const { isLoading, ...featureFlags } = useFeatureFlags();
+  const featureFlags = useFeatureFlags();
 
   return (
     <BackofficeDashboardTabContent title="Les fonctionnalités optionnelles">

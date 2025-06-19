@@ -11,13 +11,13 @@ import {
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionReadDto,
+  isConventionRenewed,
   type Phone,
   type Role,
   type SignatoryRole,
-  agencyModifierRoles,
-  allSignatoryRoles,
-  isConventionRenewed,
   toDisplayedDate,
 } from "shared";
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
@@ -30,16 +30,18 @@ import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
-import { isConventionEndingInOneDayOrMore } from "src/core-logic/domain/convention/convention.utils";
-import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
+import {
+  canAssessmentBeFilled,
+  isConventionEndingInOneDayOrMore,
+} from "src/core-logic/domain/convention/convention.utils";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { useStyles } from "tss-react/dsfr";
 import {
+  makeConventionSections,
   SendAssessmentLinkModalWrapper,
   SendSignatureLinkModalWrapper,
   type SignatureLinkState,
-  makeConventionSections,
   sendAssessmentLinkButtonProps,
   sendAssessmentLinkModal,
   sendSignatureLinkButtonProps,

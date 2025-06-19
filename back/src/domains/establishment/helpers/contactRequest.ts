@@ -1,8 +1,8 @@
 import {
   type DiscussionDtoEmail,
   type EmailParamsByEmailType,
-  type OmitFromExistingKeys,
   errors,
+  type OmitFromExistingKeys,
 } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 

@@ -15,7 +15,6 @@ export const PeConnectButton = ({
   const { cx } = useStyles();
   return (
     <div className={cx(fr.cx("fr-my-2w"), "pe-connect")}>
-      {/* biome-ignore lint/a11y/useValidAnchor:  */}
       <a
         onClick={onClick}
         href={`/api/${peConnectEndpoint}`}

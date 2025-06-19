@@ -1,7 +1,7 @@
 import {
-  type UserWithAdminRights,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
+  type UserWithAdminRights,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -11,11 +11,11 @@ import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type InitiateLoginByEmail,

@@ -3,21 +3,20 @@ import {
   type AgencyDto,
   type ConventionDto,
   type Email,
-  type Role,
   errors,
   frontRoutes,
+  type Role,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { TransferConventionToAgencyPayload } from "../../../core/events/eventPayload.dto";
 import { transferConventionToAgencyPayloadSchema } from "../../../core/events/eventPayload.schema";
-
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 export type NotifyAllActorsThatConventionTransferred = ReturnType<
   typeof makeNotifyAllActorsThatConventionTransferred

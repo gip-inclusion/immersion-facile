@@ -1,13 +1,13 @@
 import {
   type ContactEstablishmentRequestDto,
-  type SearchRoutes,
-  UserBuilder,
   errors,
   expectArraysToEqualIgnoringOrder,
   expectArraysToMatch,
   expectHttpResponseToEqual,
   expectToEqual,
+  type SearchRoutes,
   searchImmersionRoutes,
+  UserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -19,8 +19,8 @@ import {
   OfferEntityBuilder,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

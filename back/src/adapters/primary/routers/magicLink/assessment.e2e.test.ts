@@ -4,13 +4,13 @@ import {
   ConventionDtoBuilder,
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
-  InclusionConnectedUserBuilder,
-  type LegacyAssessmentDto,
   conventionMagicLinkRoutes,
   displayRouteName,
   errors,
   expectArraysToMatch,
   expectHttpResponseToEqual,
+  InclusionConnectedUserBuilder,
+  type LegacyAssessmentDto,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -20,8 +20,8 @@ import type { BasicEventCrawler } from "../../../../domains/core/events/adapters
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";

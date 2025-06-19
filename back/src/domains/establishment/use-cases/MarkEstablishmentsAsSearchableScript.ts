@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { UseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { UseCase } from "../../core/UseCase";
 import type { EstablishmentAggregateRepository } from "../ports/EstablishmentAggregateRepository";
 
 export class MarkEstablishmentsAsSearchableScript extends UseCase<

@@ -7,12 +7,12 @@ import {
   type ConventionDto,
   type ConventionStatus,
   type EstablishmentTutor,
+  getExactAge,
   type InternshipKind,
   MAX_PRESENCE_DAYS_RELEASE_DATE,
-  type Signatories,
-  getExactAge,
-  maxPresenceDaysByInternshipKind,
   maximumCalendarDayByInternshipKind,
+  maxPresenceDaysByInternshipKind,
+  type Signatories,
 } from "./convention.dto";
 
 type DatesInConvention = {

@@ -3,8 +3,8 @@ import { subHours } from "date-fns";
 import { splitEvery } from "ramda";
 import { calculateDurationInSecondsFrom } from "shared";
 import {
-  type LoggerParamsWithMessage,
   createLogger,
+  type LoggerParamsWithMessage,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -222,7 +222,10 @@ export class RealEventCrawler
   async #notifyDiscordOnTooManyOutboxWithStatus({
     status,
     limit,
-  }: { status: EventStatus; limit: number }) {
+  }: {
+    status: EventStatus;
+    limit: number;
+  }) {
     const count = await this.uowPerformer.perform((uow) =>
       uow.outboxRepository.countAllEvents({ status }),
     );

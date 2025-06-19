@@ -1,6 +1,6 @@
+import { AppConfig } from "../config/bootstrap/appConfig";
 import { configureSentry } from "./configureSentry";
 
-import { AppConfig } from "../config/bootstrap/appConfig";
 const appConfig = AppConfig.createFromEnv();
 
 configureSentry(appConfig.envType);

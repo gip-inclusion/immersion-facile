@@ -1,14 +1,14 @@
 import type { Pool } from "pg";
 import {
   type AppellationDto,
+  expectObjectInArrayToMatch,
+  expectObjectsToMatch,
+  expectToEqual,
   type Group,
   type GroupOptions,
   type Location,
   type SearchResultDto,
   UserBuilder,
-  expectObjectInArrayToMatch,
-  expectObjectsToMatch,
-  expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -21,9 +21,9 @@ import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate"
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { GroupEntity } from "../entities/GroupEntity";
 import {
+  defaultLocation,
   EstablishmentAggregateBuilder,
   OfferEntityBuilder,
-  defaultLocation,
 } from "../helpers/EstablishmentBuilders";
 import { PgEstablishmentAggregateRepository } from "./PgEstablishmentAggregateRepository";
 import { PgGroupRepository } from "./PgGroupRepository";

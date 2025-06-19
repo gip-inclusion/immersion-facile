@@ -1,19 +1,18 @@
-import { type ReactElement, type ReactNode, lazy, useEffect } from "react";
+import { lazy, type ReactElement, type ReactNode, useEffect } from "react";
 import { PageHeader } from "react-design-system";
 import {
   type AdminTabRouteName,
-  type EstablishmentDashboardTab,
   adminTabRouteNames,
+  type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
-import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
-import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
+import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { BeneficiaryDashboardPage } from "src/app/pages/beneficiary-dashboard/BeneficiaryDashboardPage";
 import { AssessmentDocumentPage } from "src/app/pages/convention/AssessmentDocumentPage";
 import { ConventionConfirmationPage } from "src/app/pages/convention/ConventionConfirmationPage";
@@ -24,9 +23,10 @@ import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage"
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
+import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
+import { StatsPage } from "src/app/pages/StatsPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";

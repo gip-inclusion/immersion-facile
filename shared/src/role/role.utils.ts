@@ -2,16 +2,16 @@ import { intersection } from "ramda";
 import {
   type AssessmentMode,
   type ConventionDto,
-  type Signatories,
   isEstablishmentTutorIsEstablishmentRepresentative,
+  type Signatories,
 } from "..";
 import {
-  type ModifierRole,
-  type Role,
-  type SignatoryRole,
   allModifierRoles,
   allowedRolesToAccessAssessment,
   allowedRolesToCreateAssessment,
+  type ModifierRole,
+  type Role,
+  type SignatoryRole,
 } from "./role.dto";
 
 export const titleByRole: Record<Role, string> = {

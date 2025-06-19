@@ -6,11 +6,11 @@ import { useFormContext } from "react-hook-form";
 import {
   type ConventionDto,
   type ConventionReadDto,
-  type ScheduleDto,
-  type TimePeriodsDto,
   calculateNumberOfWorkedDays,
   calculateTotalImmersionHoursFromComplexSchedule,
   convertLocaleDateToUtcTimezoneDate,
+  type ScheduleDto,
+  type TimePeriodsDto,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { DayPicker } from "./DayPicker";

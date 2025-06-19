@@ -1,16 +1,16 @@
 import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
-  type Email,
-  type InclusionConnectImmersionRoutes,
   allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   decodeURIParams,
   displayRouteName,
+  type Email,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
   frontRoutes,
+  type InclusionConnectImmersionRoutes,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
 } from "shared";
@@ -28,8 +28,8 @@ import type { UuidGenerator } from "../../../../domains/core/uuid-generator/port
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("user connexion flow", () => {
@@ -219,7 +219,7 @@ describe("user connexion flow", () => {
       await eventCrawler.processNewEvents();
 
       const user = await inMemoryUow.userRepository.findByExternalId(sub);
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
+      // biome-ignore lint/style/noNonNullAssertion: testing purpose
       const userId = user!.id;
 
       expectToEqual(inMemoryUow.agencyRepository.agencies, [

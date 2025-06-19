@@ -1,10 +1,9 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
-import { SectionHighlight } from "react-design-system";
-import { HeadingSection } from "react-design-system";
+import { HeadingSection, SectionHighlight } from "react-design-system";
 import { useFormContext } from "react-hook-form";
-import { type FormEstablishmentDto, domElementIds, getFullname } from "shared";
+import { domElementIds, type FormEstablishmentDto, getFullname } from "shared";
 import type {
   Mode,
   OnStepChange,

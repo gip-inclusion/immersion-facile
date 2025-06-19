@@ -2,20 +2,20 @@ import {
   type AbsoluteUrl,
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
-  type ContactFormEstablishmentUserRight,
-  type FormEstablishmentDto,
-  FormEstablishmentDtoBuilder,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
-  type SiretDto,
-  UserBuilder,
   addressDtoToString,
+  type ContactFormEstablishmentUserRight,
   defaultAddress,
   errors,
   expectObjectInArrayToMatch,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type FormEstablishmentDto,
+  FormEstablishmentDtoBuilder,
+  type InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
+  type SiretDto,
+  UserBuilder,
   updatedAddress1,
   updatedAddress2,
 } from "shared";
@@ -31,11 +31,11 @@ import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { InMemorySiretGateway } from "../../core/sirene/adapters/InMemorySiretGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type {
   EstablishmentAdminRight,

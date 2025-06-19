@@ -5,8 +5,8 @@ import {
   dashboardUrlsSlice,
 } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

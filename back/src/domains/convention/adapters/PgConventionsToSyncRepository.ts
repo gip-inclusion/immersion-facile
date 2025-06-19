@@ -1,8 +1,8 @@
 import type { ConventionId } from "shared";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type {
-  ConventionToSync,
   ConventionsToSyncRepository,
+  ConventionToSync,
 } from "../ports/ConventionsToSyncRepository";
 
 type PgConventionToSync = {

@@ -1,14 +1,14 @@
 import { subDays } from "date-fns";
 import {
   type ContactMode,
+  cartographeAppellationAndRome,
+  createOpaqueEmail,
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionKind,
-  type TemplatedEmail,
-  cartographeAppellationAndRome,
-  createOpaqueEmail,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
+  type TemplatedEmail,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -17,11 +17,11 @@ import {
 } from "../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type ContactRequestReminder,

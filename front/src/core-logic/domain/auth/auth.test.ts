@@ -1,21 +1,21 @@
 import {
   type Email,
+  expectToEqual,
   type FederatedIdentity,
   type InclusionConnectedUser,
   InclusionConnectedUserBuilder,
-  expectToEqual,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import {
-  type FederatedIdentityWithUser,
   authSlice,
+  type FederatedIdentityWithUser,
 } from "src/core-logic/domain/auth/auth.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacks } from "../feedback/feedback.content";

@@ -1,8 +1,8 @@
 import {
   type AbsoluteUrl,
-  type SiretDto,
   errors,
   queryParamsAsString,
+  type SiretDto,
 } from "shared";
 import type { OAuthConfig } from "../../../../../../config/bootstrap/appConfig";
 import type {

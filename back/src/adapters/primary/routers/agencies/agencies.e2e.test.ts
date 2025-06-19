@@ -3,15 +3,15 @@ import {
   type AddressDto,
   AgencyDtoBuilder,
   type AgencyRoutes,
+  agencyRoutes,
   type ConnectedUserJwt,
   type CreateAgencyDto,
-  InclusionConnectedUserBuilder,
-  agencyRoutes,
   currentJwtVersions,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -22,8 +22,8 @@ import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapt
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 

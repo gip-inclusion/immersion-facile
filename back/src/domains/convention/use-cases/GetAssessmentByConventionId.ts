@@ -1,9 +1,9 @@
 import {
   type AssessmentDto,
   type ConventionRelatedJwtPayload,
+  errors,
   type LegacyAssessmentDto,
   type WithConventionId,
-  errors,
   withConventionIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";

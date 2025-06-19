@@ -1,9 +1,9 @@
 import { Helmet } from "react-helmet-async";
 import {
-  type MetaContentType,
   defaultMetaContents,
   defaultPageMetaContents,
   groupMetaContent,
+  type MetaContentType,
   standardMetaContent,
 } from "src/app/contents/meta/metaContents";
 import type { StandardPageSlugs } from "src/app/routes/routeParams/standardPage";
