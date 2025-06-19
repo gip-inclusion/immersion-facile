@@ -1,11 +1,15 @@
 import {
+  AgencyDtoBuilder,
   AssessmentDtoBuilder,
   ConventionDtoBuilder,
+  type ConventionReadDto,
+  UserBuilder,
   type WithConventionDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import { toAgencyWithRights } from "../../../../utils/agency";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type InMemoryUnitOfWork,
@@ -27,9 +31,33 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
   let legacyBroadcastCalls: WithConventionDto[];
   let broadcastToFranceTravailOrchestrator: BroadcastToFranceTravailOrchestrator;
 
-  const convention = new ConventionDtoBuilder().build();
+  const validator = new UserBuilder().withEmail("validator@email.fr").build();
+  const referredAgency = new AgencyDtoBuilder()
+    .withId("referred-agency")
+    .build();
+  const agency = new AgencyDtoBuilder()
+    .withRefersToAgencyInfo({
+      refersToAgencyId: referredAgency.id,
+      refersToAgencyName: referredAgency.name,
+    })
+    .build();
+  const convention = new ConventionDtoBuilder().withAgencyId(agency.id).build();
+  const conventionReadDto: ConventionReadDto = {
+    ...convention,
+    agencyName: agency.name,
+    agencySiret: agency.agencySiret,
+    agencyKind: agency.kind,
+    agencyRefersTo: {
+      id: referredAgency.id,
+      name: referredAgency.name,
+      kind: referredAgency.kind,
+    },
+    agencyDepartment: agency.address.departmentCode,
+    agencyValidatorEmails: [validator.email],
+    agencyCounsellorEmails: [],
+  };
   const assessment = new AssessmentDtoBuilder()
-    .withConventionId(convention.id)
+    .withConventionId(conventionReadDto.id)
     .build();
 
   beforeEach(() => {
@@ -45,6 +73,18 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         broadcastToFranceTravailOnConventionUpdates: standardBroadcastToFT,
         broadcastToFranceTravailOnConventionUpdatesLegacy: legacyBroadcastToFT,
       });
+
+    uow.conventionRepository.setConventions([convention]);
+    uow.userRepository.users = [validator];
+    uow.agencyRepository.agencies = [
+      toAgencyWithRights(agency, {
+        [validator.id]: {
+          roles: ["validator"],
+          isNotifiedByEmail: true,
+        },
+      }),
+      toAgencyWithRights(referredAgency),
+    ];
   });
 
   describe("When enableStandardFormatBroadcastToFT feature flag is OFF", () => {
@@ -57,10 +97,10 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
 
     it("triggers legacy broadcast", async () => {
       await broadcastToFranceTravailOrchestrator.execute({
-        convention,
+        convention: conventionReadDto,
         assessment,
       });
-      expectLegacyBroadcastCallsToEqual([{ convention }]);
+      expectLegacyBroadcastCallsToEqual([{ convention: conventionReadDto }]);
     });
 
     it("does NOT trigger standard format broadcast", async () => {
@@ -99,7 +139,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
     it("triggers standard broadcast", async () => {
       await broadcastToFranceTravailOrchestrator.execute({ convention });
       expectStandardBroadcastCallsToEqual([
-        { eventType: "CONVENTION_UPDATED", convention },
+        { eventType: "CONVENTION_UPDATED", convention: conventionReadDto },
       ]);
     });
 
@@ -141,7 +181,7 @@ describe("BroadcastToFranceTravailOrchestrator", () => {
         expectStandardBroadcastCallsToEqual([
           {
             eventType: "ASSESSMENT_CREATED",
-            convention,
+            convention: conventionReadDto,
             assessment,
           },
         ]);

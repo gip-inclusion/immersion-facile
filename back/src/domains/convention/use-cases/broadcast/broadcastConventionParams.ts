@@ -1,19 +1,19 @@
 import {
   type AssessmentDto,
-  type ConventionDto,
+  type ConventionReadDto,
   assessmentDtoSchema,
-  conventionSchema,
+  conventionReadSchema,
 } from "shared";
 import { z } from "zod";
 
 export type BroadcastConventionParams =
   | {
       eventType: "CONVENTION_UPDATED";
-      convention: ConventionDto;
+      convention: ConventionReadDto;
     }
   | {
       eventType: "ASSESSMENT_CREATED";
-      convention: ConventionDto;
+      convention: ConventionReadDto;
       assessment: AssessmentDto;
     };
 
@@ -21,11 +21,11 @@ export const broadcastConventionParamsSchema: z.Schema<BroadcastConventionParams
   z.union([
     z.object({
       eventType: z.literal("CONVENTION_UPDATED"),
-      convention: conventionSchema,
+      convention: conventionReadSchema,
     }),
     z.object({
       eventType: z.literal("ASSESSMENT_CREATED"),
-      convention: conventionSchema,
+      convention: conventionReadSchema,
       assessment: assessmentDtoSchema,
     }),
   ]);

@@ -182,7 +182,15 @@ describe("ResyncOldConventionsToPe use case", () => {
           expectToEqual(ftGateway.broadcastParamsCalls, [
             {
               eventType: "CONVENTION_UPDATED",
-              convention: conventionToSync1,
+              convention: {
+                ...conventionToSync1,
+                agencyName: agencyPE.name,
+                agencyDepartment: agencyPE.address.departmentCode,
+                agencyKind: agencyPE.kind,
+                agencySiret: agencyPE.agencySiret,
+                agencyCounsellorEmails: [],
+                agencyValidatorEmails: [],
+              },
             },
           ]);
           expectToEqual(report, {
