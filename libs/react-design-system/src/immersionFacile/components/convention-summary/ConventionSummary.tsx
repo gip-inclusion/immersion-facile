@@ -194,26 +194,26 @@ const SubSection = ({
       >
         <div className={cx(conventionSummaryStyles.subsectionElementFullWidth)}>
           {subSection.header && (
-            <div className={fr.cx("fr-grid-row")}>
-              <div className={cx(conventionSummaryStyles.subsectionHeaderItem)}>
+            <div
+              className={cx(
+                fr.cx("fr-grid-row"),
+                conventionSummaryStyles.subsectionHeaderItems,
+              )}
+            >
+              <div>
                 {subSection.header?.title && (
                   <h3 className={fr.cx("fr-mb-2v", "fr-h6")}>
                     {subSection.header.title}
                   </h3>
                 )}
                 {subSection.header?.badge && (
-                  <div className={fr.cx("fr-col-12", "fr-mb-2w")}>
+                  <div className={fr.cx("fr-col-12", "fr-mb-1w")}>
                     <Badge small {...subSection.header.badge} />
                   </div>
                 )}
               </div>
               {subSection.header.action && (
-                <div
-                  className={cx(
-                    conventionSummaryStyles.subsectionHeaderItem,
-                    fr.cx("fr-ml-md-auto", "fr-mr-auto", "fr-mr-md-2w"),
-                  )}
-                >
+                <div className={cx(fr.cx("fr-mr-md-2w", "fr-mb-2w"))}>
                   <Button size="small" {...subSection.header.action} />
                 </div>
               )}

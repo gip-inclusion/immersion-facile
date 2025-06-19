@@ -122,9 +122,13 @@
       width: 100%;
     }
 
-    &-header-item {
-      @include for-screen-min($bp-md) {
-        flex: 0 1 auto;
+    &-header-items {
+      display: block;
+
+      @include for-screen-min($bp-lg) {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
       }
     }
   }
