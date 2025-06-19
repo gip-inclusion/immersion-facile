@@ -1231,7 +1231,7 @@ describe("SearchImmersionUseCase", () => {
           nafCodes: [],
         }),
         errors.inputs.badSchema({
-          context: "SearchImmersion",
+          useCaseName: "SearchImmersion",
           flattenErrors: [
             "nafCodes : Array must contain at least 1 element(s)",
           ],

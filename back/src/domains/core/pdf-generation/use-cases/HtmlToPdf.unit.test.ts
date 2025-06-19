@@ -38,7 +38,7 @@ describe("HtmlToPdf", () => {
     await expectPromiseToFailWithError(
       htmlToPdf.execute({ htmlContent: "", conventionId }, jwtPayload),
       errors.inputs.badSchema({
-        context: "HtmlToPdf",
+        useCaseName: "HtmlToPdf",
         flattenErrors: ["htmlContent : Obligatoire"],
       }),
     );

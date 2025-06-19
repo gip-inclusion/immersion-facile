@@ -168,7 +168,7 @@ describe("Admin router", () => {
         body: {
           status: 400,
           message:
-            "Schema validation failed in GetDashboardUrl. See issues for details.",
+            "Schema validation failed in usecase GetDashboardUrl. See issues for details.",
           issues: [
             "name : Vous devez sélectionner une option parmi celles proposées",
             "agencyId : Required",

@@ -16,9 +16,11 @@ export const validateAndParseZodSchemaV2 = <T>(
   const flattenErrors = flattenZodErrors(result.error);
 
   const error = errors.inputs.badSchema({
-    context: "schemaName" in props ? props.schemaName : props.useCaseName,
     id: props.id,
     flattenErrors,
+    ...("schemaName" in props
+      ? { schemaName: props.schemaName }
+      : { useCaseName: props.useCaseName }),
   });
   props.logger.error({
     message: error.message,

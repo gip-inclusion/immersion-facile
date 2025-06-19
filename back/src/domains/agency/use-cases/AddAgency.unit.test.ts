@@ -345,7 +345,7 @@ describe("AddAgency use case", () => {
       await expectPromiseToFailWithError(
         addAgency.execute(agencyWithBadAddress),
         new BadRequestError(
-          `Schema validation failed in AddAgency for element with id ${agencyWithBadAddress.id}. See issues for details.`,
+          `Schema validation failed in usecase AddAgency for element with id ${agencyWithBadAddress.id}. See issues for details.`,
           [
             "address.postcode : Obligatoire",
             "address.departmentCode : Obligatoire",
@@ -367,7 +367,7 @@ describe("AddAgency use case", () => {
       await expectPromiseToFailWithError(
         addAgency.execute(agencyWithBadPosition),
         new BadRequestError(
-          `Schema validation failed in AddAgency for element with id ${agencyWithBadPosition.id}. See issues for details.`,
+          `Schema validation failed in usecase AddAgency for element with id ${agencyWithBadPosition.id}. See issues for details.`,
           [
             "position.lat : 0 est une latitude par défaut qui ne semble pas correcte",
             "position.lon : 0 est une longitude par défaut qui ne semble pas correcte",
@@ -432,7 +432,7 @@ describe("AddAgency use case", () => {
           counsellorEmails: [],
         }),
         new BadRequestError(
-          `Schema validation failed in AddAgency for element with id ${newAgency.id}. See issues for details.`,
+          `Schema validation failed in usecase AddAgency for element with id ${newAgency.id}. See issues for details.`,
           ["validatorEmails : Vous devez renseigner au moins un email"],
         ),
       );
