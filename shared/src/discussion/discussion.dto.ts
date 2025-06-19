@@ -290,6 +290,7 @@ export type DiscussionInList = Pick<
     phone: string | null;
   };
   immersionObjective: ImmersionObjective | null;
+  city: string;
 };
 
 export type DiscussionOrderKey = ExtractFromExisting<

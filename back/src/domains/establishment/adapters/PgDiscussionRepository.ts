@@ -157,6 +157,7 @@ export class PgDiscussionRepository implements DiscussionRepository {
           sql<string>`TO_CHAR(${ref("created_at")}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as(
             "createdAt",
           ),
+          "discussions.city as city",
           "discussions.siret as siret",
           "discussions.kind as kind",
           "discussions.status as status",
