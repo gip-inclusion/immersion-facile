@@ -1,5 +1,12 @@
-import { type AssessmentDto, type ConventionDto, errors } from "shared";
+import {
+  type AssessmentDto,
+  type ConventionDto,
+  type ConventionReadDto,
+  errors,
+} from "shared";
 import type { InstantiatedUseCase } from "../../../../config/bootstrap/createUseCases";
+import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
+import { getReferedAgency } from "../../../core/api-consumer/helpers/agency";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
@@ -30,6 +37,43 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
       );
 
       if (featureFlags.enableStandardFormatBroadcastToFranceTravail.isActive) {
+        const { agency, agencyWithRights, referredAgency } =
+          await uowPerformer.perform(async (uow) => {
+            const agencyWithRights = await uow.agencyRepository.getById(
+              params.convention.agencyId,
+            );
+            if (!agencyWithRights) {
+              throw errors.agency.notFound({
+                agencyId: params.convention.agencyId,
+              });
+            }
+            const agency = await agencyWithRightToAgencyDto(
+              uow,
+              agencyWithRights,
+            );
+
+            const referredAgency = agencyWithRights.refersToAgencyId
+              ? await getReferedAgency(uow, agencyWithRights.refersToAgencyId)
+              : undefined;
+
+            return {
+              agency,
+              agencyWithRights,
+              referredAgency,
+            };
+          });
+
+        const conventionRead: ConventionReadDto = {
+          ...params.convention,
+          agencyName: agencyWithRights.name,
+          agencyDepartment: agencyWithRights.address.departmentCode,
+          agencyKind: agencyWithRights.kind,
+          agencySiret: agencyWithRights.agencySiret,
+          agencyRefersTo: referredAgency,
+          agencyCounsellorEmails: agency.counsellorEmails,
+          agencyValidatorEmails: agency.validatorEmails,
+        };
+
         if (eventType === "ASSESSMENT_CREATED") {
           if (!params.assessment)
             throw errors.assessment.missingAssessment({
@@ -38,14 +82,14 @@ export const makeBroadcastToFranceTravailOrchestrator = ({
 
           return broadcastToFranceTravailOnConventionUpdates.execute({
             eventType: "ASSESSMENT_CREATED",
-            convention: params.convention,
+            convention: conventionRead,
             assessment: params.assessment,
           });
         }
 
         return broadcastToFranceTravailOnConventionUpdates.execute({
           eventType: "CONVENTION_UPDATED",
-          convention: params.convention,
+          convention: conventionRead,
         });
       }
 

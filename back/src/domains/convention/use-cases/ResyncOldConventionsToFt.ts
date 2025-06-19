@@ -149,7 +149,7 @@ export class ResyncOldConventionsToFt extends TransactionalUseCase<
     isLegacy: boolean;
   }): Promise<void> {
     const convention =
-      await uow.conventionRepository.getById(conventionToSyncId);
+      await uow.conventionQueries.getConventionById(conventionToSyncId);
     if (!convention)
       throw errors.convention.notFound({
         conventionId: conventionToSyncId,
