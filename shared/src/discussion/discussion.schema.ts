@@ -282,6 +282,7 @@ export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
   createdAt: makeDateStringSchema(),
   kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
   exchanges: exchangesSchema,
+  city: zStringMinLength1,
   potentialBeneficiary: z.object({
     firstName: zStringMinLength1,
     lastName: zStringMinLength1,

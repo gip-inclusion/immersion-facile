@@ -521,6 +521,7 @@ describe("PgDiscussionRepository", () => {
         lastName: discussion2.potentialBeneficiary.lastName,
         phone: potentialBeneficiaryPhone,
       },
+      city: discussion2.address.city,
       immersionObjective: discussion2Objective,
       exchanges: discussion2.exchanges,
     };
@@ -538,6 +539,7 @@ describe("PgDiscussionRepository", () => {
         lastName: discussion3.potentialBeneficiary.lastName,
         phone: potentialBeneficiaryPhone,
       },
+      city: discussion3.address.city,
       immersionObjective: discussion3Objective,
       exchanges: discussion3.exchanges,
     };
