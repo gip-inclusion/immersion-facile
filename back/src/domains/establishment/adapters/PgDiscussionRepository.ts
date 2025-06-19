@@ -124,11 +124,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
     const offset = (page - 1) * limit;
 
     const addPagination = (b: typeof builder) => b.limit(limit).offset(offset);
-    const addOrder = (b: typeof builder) => {
-      if (order)
-        return b.orderBy(orderColumnByOrderKey[order.by], order.direction);
-      return b.orderBy("discussions.created_at", "desc");
-    };
+    const addOrder = (b: typeof builder) =>
+      b.orderBy(orderColumnByOrderKey[order.by], order.direction);
 
     const groupByAndSelectAttributes = (b: typeof builder) =>
       b
