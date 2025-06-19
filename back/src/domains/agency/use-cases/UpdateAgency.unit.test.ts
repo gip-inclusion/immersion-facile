@@ -136,7 +136,7 @@ describe("Update agency", () => {
           icAdmin,
         ),
         new BadRequestError(
-          `Schema validation failed in UpdateAgency for element with id ${updatedAgency.id}. See issues for details.`,
+          `Schema validation failed in usecase UpdateAgency for element with id ${updatedAgency.id}. See issues for details.`,
           [
             "position.lat : 0 est une latitude par défaut qui ne semble pas correcte",
             "position.lon : 0 est une longitude par défaut qui ne semble pas correcte",

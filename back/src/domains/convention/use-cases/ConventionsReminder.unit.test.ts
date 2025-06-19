@@ -134,7 +134,7 @@ describe("ConventionReminder use case", () => {
       conventionsReminder.execute(),
       errors.inputs.badSchema({
         id: convention.id,
-        context: "conventionSchema",
+        schemaName: "conventionSchema",
         flattenErrors: [
           "id : Le format de l'identifiant est invalide",
           "dateEnd : La durée maximale calendaire d'une immersion est de 30 jours.",

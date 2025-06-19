@@ -879,14 +879,15 @@ export const errors = {
       new NotFoundError(`subscription ${id} not found`),
   },
   inputs: {
-    badSchema: ({
-      context,
-      id,
-      flattenErrors,
-    }: { context: string; id?: string; flattenErrors: string[] }) =>
+    badSchema: (
+      params: { id?: string; flattenErrors: string[] } & (
+        | { schemaName: string }
+        | { useCaseName: string }
+      ),
+    ) =>
       new BadRequestError(
-        `Schema validation failed in ${context}${id ? ` for element with id ${id}` : ""}. See issues for details.`,
-        flattenErrors,
+        `Schema validation failed ${"schemaName" in params ? `for schema ${params.schemaName}` : `in usecase ${params.useCaseName}`}${params.id ? ` for element with id ${params.id}` : ""}. See issues for details.`,
+        params.flattenErrors,
       ),
   },
   siretApi: {
