@@ -88,13 +88,13 @@ export const createInclusionConnectedAllowedRouter = (
 
   inclusionConnectedSharedRoutes.getDiscussions(
     deps.inclusionConnectAuthMiddleware,
-    (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getDiscussionByIdForEstablishment.execute(
-          req.params.discussionId,
-          req.payloads?.inclusion,
-        ),
-      ),
+    (req, res) => {
+      const currentUser = req.payloads?.currentUser;
+      if (!currentUser) throw errors.user.unauthorized();
+      return sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussions.execute(req.query, currentUser),
+      );
+    },
   );
 
   inclusionConnectedSharedRoutes.updateDiscussionStatus(

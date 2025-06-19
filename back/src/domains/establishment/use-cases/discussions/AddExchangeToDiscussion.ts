@@ -6,7 +6,7 @@ import {
   type Exchange,
   type ExchangeRole,
   type InclusionConnectedUser,
-  attachementSchema,
+  attachmentSchema,
   discussionIdSchema,
   errors,
   exchangeRoleSchema,
@@ -70,7 +70,7 @@ const inputFromDashboardSchema = z.object({
 
 const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
   recipientRole: exchangeRoleSchema,
-  attachments: z.array(attachementSchema),
+  attachments: z.array(attachmentSchema),
   sentAt: z.string().datetime(),
   subject: z.string(),
 });

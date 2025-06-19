@@ -10,10 +10,7 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
-import {
-  createPaginatedSchema,
-  paginationQueryParamsSchema,
-} from "../pagination/pagination.schema";
+import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
@@ -31,7 +28,6 @@ import {
   type ExchangeFromDashboard,
   type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
-  type GetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionRejection,
@@ -256,21 +252,6 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
       ]),
     );
 
-export const getPaginatedDiscussionsParamsSchema: z.Schema<GetPaginatedDiscussionsParams> =
-  z.object({
-    filters: z.object({
-      status: z.array(discussionStatusSchema).optional(),
-      sirets: z.array(siretSchema).optional(),
-    }),
-    order: z
-      .object({
-        by: z.enum(["createdAt"]),
-        direction: z.enum(["asc", "desc"]),
-      })
-      .optional(),
-    pagination: paginationQueryParamsSchema.optional(),
-  });
-
 export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedDiscussionsParams> =
   z.object({
     // pagination
@@ -282,16 +263,13 @@ export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedD
     orderDirection: z.enum(["asc", "desc"]).optional(),
 
     // filters
-    statuses: z
-      .union([
-        discussionStatusSchema,
-        z.array(discussionStatusSchema).nonempty(),
-      ])
-      .transform((val) => (Array.isArray(val) ? val : [val]))
+    statuses: discussionStatusSchema
+      .optional()
+      .or(z.array(discussionStatusSchema).optional())
       .optional(),
-    sirets: z
-      .union([siretSchema, z.array(siretSchema).nonempty()])
-      .transform((val) => (Array.isArray(val) ? val : [val]))
+    sirets: siretSchema
+      .optional()
+      .or(z.array(siretSchema).optional())
       .optional(),
   });
 

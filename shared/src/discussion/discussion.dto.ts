@@ -8,7 +8,6 @@ import type {
 } from "../convention/convention.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
@@ -297,18 +296,6 @@ export type DiscussionOrderKey = ExtractFromExisting<
   keyof DiscussionInList,
   "createdAt"
 >;
-
-export type GetPaginatedDiscussionsParams = {
-  filters?: {
-    statuses?: DiscussionStatus[];
-    sirets?: SiretDto[];
-  };
-  order?: {
-    by: DiscussionOrderKey;
-    direction: "asc" | "desc";
-  };
-  pagination?: PaginationQueryParams;
-};
 
 export type FlatGetPaginatedDiscussionsParams = {
   // pagination

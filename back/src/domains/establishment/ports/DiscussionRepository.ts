@@ -5,9 +5,9 @@ import type {
   DiscussionDto,
   DiscussionId,
   DiscussionInList,
+  DiscussionOrderKey,
   DiscussionStatus,
   Email,
-  GetPaginatedDiscussionsParams,
   LocationId,
   PaginationQueryParams,
   SiretDto,
@@ -26,7 +26,6 @@ export type HasDiscussionMatchingParams = {
 export type GetDiscussionsParams = {
   filters: {
     status?: DiscussionStatus;
-    statuses?: [DiscussionStatus, ...DiscussionStatus[]];
     sirets?: SiretDto[];
     createdSince?: Date;
     createdBetween?: DateRange;
@@ -35,11 +34,18 @@ export type GetDiscussionsParams = {
   limit: number;
 };
 
-export type GetPaginatedDiscussionsForUserParams =
-  GetPaginatedDiscussionsParams & {
-    pagination: Required<PaginationQueryParams>;
-    userId: UserId;
+export type GetPaginatedDiscussionsForUserParams = {
+  filters?: {
+    statuses?: DiscussionStatus[];
+    sirets?: SiretDto[];
   };
+  order: {
+    by: DiscussionOrderKey;
+    direction: "asc" | "desc";
+  };
+  pagination: Required<PaginationQueryParams>;
+  userId: UserId;
+};
 
 export interface DiscussionRepository {
   insert: (discussion: DiscussionDto) => Promise<void>;
