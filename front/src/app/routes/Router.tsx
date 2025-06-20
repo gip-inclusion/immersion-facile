@@ -153,7 +153,6 @@ const getPageByRouteName: {
     <ConventionStatusDashboardPage route={route} />
   ),
   conventionToSign: (route) => <ConventionSignPage route={route} />,
-  debugPopulateDB: () => undefined,
   establishmentDashboard: (route) =>
     establishmentDashboardTabsList.includes(
       route.params.tab as EstablishmentDashboardTab,

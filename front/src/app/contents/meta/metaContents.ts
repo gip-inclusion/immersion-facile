@@ -55,10 +55,6 @@ export const defaultPageMetaContents: Partial<
     title: "Admin: établissements",
     description: "Page admin: Établissements",
   },
-  debugPopulateDB: {
-    title: "DebugPopulateDB",
-    description: "Faciliter la réalisation des immersions professionnelles.",
-  },
   formEstablishment: {
     title: "Formulaire de référencement entreprise",
     description:
