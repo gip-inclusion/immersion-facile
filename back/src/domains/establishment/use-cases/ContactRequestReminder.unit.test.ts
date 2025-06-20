@@ -23,6 +23,7 @@ import {
   createInMemoryUow,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import {
   type ContactRequestReminder,
   type ContactRequestReminderMode,
@@ -77,7 +78,6 @@ describe("ContactRequestReminder", () => {
       .withPotentialBeneficiaryEmail(`benef-${index}@email.com`)
       .withPotentialBeneficiaryFirstname(`mike-${index}`)
       .withPotentialBeneficiaryLastName(`portnoy-${index}`)
-
       .withExchanges([
         {
           sender: "potentialBeneficiary",
@@ -89,8 +89,10 @@ describe("ContactRequestReminder", () => {
         },
       ])
       .withCreatedAt(date);
+
     if (contactMode === "EMAIL")
       builder.withPotentialBeneficiaryPhone("0677889944");
+
     return builder.build();
   });
 
@@ -119,10 +121,37 @@ describe("ContactRequestReminder", () => {
       uow.notificationRepository,
       uow.outboxRepository,
     );
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(
+          discussionWith2DaysSinceBeneficiaryExchange.siret,
+        )
+        .withUserRights([
+          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+        ])
+        .build(),
+    ];
   });
 
-  describe("wrong paths", () => {
-    it("no discussion with missing establishment response since 3 or 7 days", async () => {
+  describe("does not send a reminder", () => {
+    it("when establishment is not in repository anymore", async () => {
+      uow.establishmentAggregateRepository.establishmentAggregates = [];
+      uow.discussionRepository.discussions = [
+        discussionWith3DaysSinceBeneficiaryExchange,
+      ];
+
+      const reminderQty = await contactRequestReminder.execute(
+        "3days",
+        undefined,
+      );
+
+      expectToEqual(reminderQty, { numberOfNotifications: 0 });
+      expectSavedNotificationsAndEvents({
+        emails: [],
+      });
+    });
+
+    it("when no discussion with missing establishment response since 3 or 7 days", async () => {
       uow.discussionRepository.discussions = [
         discussionWith2DaysSinceBeneficiaryExchange,
         discussionWith6DaysSinceBeneficiaryExchange,
@@ -140,7 +169,7 @@ describe("ContactRequestReminder", () => {
       expectToEqual(uow.outboxRepository.events, []);
     });
 
-    it("no discussion when establishment already answered", async () => {
+    it("when no discussion when establishment already answered", async () => {
       timeGateway.setNextDate(new Date("2024-08-08 10:15:00"));
       uow.discussionRepository.discussions = [
         new DiscussionBuilder()
@@ -237,7 +266,7 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty7d, { numberOfNotifications: 0 });
     });
 
-    it("no discussion with status other than PENDING", async () => {
+    it("when no discussion with status other than PENDING", async () => {
       uow.discussionRepository.discussions = [
         new DiscussionBuilder(discussionWith3DaysSinceBeneficiaryExchange)
           .withStatus({ status: "ACCEPTED", candidateWarnedMethod: null })
@@ -272,7 +301,7 @@ describe("ContactRequestReminder", () => {
     });
   });
 
-  describe("right paths", () => {
+  describe("send reminder notification", () => {
     beforeEach(() => {
       uow.discussionRepository.discussions = [
         discussionWith2DaysSinceBeneficiaryExchange,
