@@ -3,6 +3,7 @@ import {
   type DiscussionDto,
   createOpaqueEmail,
   immersionFacileNoReplyEmailSender,
+  isTruthy,
 } from "shared";
 import { z } from "zod";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -33,9 +34,11 @@ export const makeContactRequestReminder = createTransactionalUseCase<
   { name: "ContactRequestReminder", inputSchema: z.enum(["3days", "7days"]) },
   async ({ inputParams: mode, uow, deps }) => {
     const now = deps.timeGateway.now();
+
     const discussions = await uow.discussionRepository.getDiscussions({
       filters: {
         status: "PENDING",
+        contactMode: "EMAIL",
         answeredByEstablishment: false,
         createdBetween: {
           from: addDays(now, mode === "3days" ? -4 : -8),
@@ -45,24 +48,20 @@ export const makeContactRequestReminder = createTransactionalUseCase<
       limit: MAX_DISCUSSIONS,
     });
 
-    const maybeNotifications = await Promise.all(
-      discussions
-        .filter(({ contactMode }) => contactMode === "EMAIL")
-        .map((discussion) =>
+    const notifications = (
+      await Promise.all(
+        discussions.map((discussion) =>
           makeNotification({ uow, discussion, mode, domain: deps.domain }),
         ),
-    );
-
-    const notifications = maybeNotifications.filter(
-      (notifications): notifications is NotificationContentAndFollowedIds =>
-        notifications !== null,
-    );
+      )
+    ).filter(isTruthy);
 
     await Promise.all(
       notifications.map((notification) =>
         deps.saveNotificationAndRelatedEvent(uow, notification),
       ),
     );
+
     return { numberOfNotifications: notifications.length };
   },
 );
@@ -78,10 +77,17 @@ const makeNotification = async ({
   mode: ContactRequestReminderMode;
   discussion: DiscussionDto;
 }): Promise<NotificationContentAndFollowedIds | null> => {
+  if (
+    !(await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+      discussion.siret,
+    ))
+  )
+    return null;
   const appellations =
     await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
       [discussion.appellationCode],
     );
+
   const appellation = appellations.at(0);
   const replyTo = createOpaqueEmail({
     discussionId: discussion.id,
@@ -92,12 +98,19 @@ const makeNotification = async ({
     },
     replyDomain: `reply.${domain}`,
   });
+
   return appellation
     ? ({
         followedIds: { establishmentSiret: discussion.siret },
         kind: "email",
         templatedContent: {
           kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
+          sender: immersionFacileNoReplyEmailSender,
+          recipients: [discussion.establishmentContact.email],
+          replyTo: {
+            email: replyTo,
+            name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+          },
           params: {
             appellationLabel: appellation.appellationLabel,
             beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
@@ -106,12 +119,6 @@ const makeNotification = async ({
             domain,
             mode,
           },
-          replyTo: {
-            email: replyTo,
-            name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
-          },
-          sender: immersionFacileNoReplyEmailSender,
-          recipients: [discussion.establishmentContact.email],
         },
       } satisfies NotificationContentAndFollowedIds)
     : null;
