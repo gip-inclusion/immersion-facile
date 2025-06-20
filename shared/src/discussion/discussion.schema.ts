@@ -10,6 +10,7 @@ import {
   conventionIdSchema,
   immersionObjectiveSchema,
 } from "../convention/convention.schema";
+import { createPaginatedSchema } from "../pagination/pagination.schema";
 import { phoneSchema } from "../phone.schema";
 import { appellationDtoSchema } from "../romeAndAppellationDtos/romeAndAppellation.schema";
 import { makeDateStringSchema } from "../schedule/Schedule.schema";
@@ -21,10 +22,12 @@ import {
   type CommonDiscussionDto,
   type DiscussionEmailParams,
   type DiscussionId,
+  type DiscussionInList,
   type DiscussionReadDto,
   type Exchange,
   type ExchangeFromDashboard,
   type ExchangeRole,
+  type FlatGetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
   type WithDiscussionRejection,
@@ -84,7 +87,7 @@ export const makeExchangeEmailSchema = (
 
 export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
 
-export const attachementSchema: z.Schema<Attachment> = z.object({
+export const attachmentSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
   link: z.string(),
 });
@@ -95,7 +98,7 @@ export const exchangeSchema: z.Schema<Exchange> = z.object({
   sender: exchangeRoleSchema,
   recipient: exchangeRoleSchema,
   sentAt: makeDateStringSchema(),
-  attachments: z.array(attachementSchema),
+  attachments: z.array(attachmentSchema),
 });
 export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
 
@@ -118,9 +121,18 @@ export const discussionRejectionSchema: z.Schema<WithDiscussionRejection> =
     }),
   ]);
 
+const discussionAcceptedStatusSchema = z.literal("ACCEPTED");
+const discussionRejectedStatusSchema = z.literal("REJECTED");
+const discussionPendingStatusSchema = z.literal("PENDING");
+const discussionStatusSchema = z.union([
+  discussionAcceptedStatusSchema,
+  discussionRejectedStatusSchema,
+  discussionPendingStatusSchema,
+]);
+
 export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
   z.object({
-    status: z.literal("ACCEPTED"),
+    status: discussionAcceptedStatusSchema,
     candidateWarnedMethod: candidateWarnedMethodSchema.or(z.null()),
     conventionId: conventionIdSchema.optional(),
   });
@@ -128,7 +140,7 @@ export const discussionAcceptedSchema: z.Schema<WithDiscussionStatusAccepted> =
 export const discussionRejectedSchema: z.Schema<WithDiscussionStatusRejected> =
   z
     .object({
-      status: z.literal("REJECTED"),
+      status: discussionRejectedStatusSchema,
     })
     .and(discussionRejectionSchema);
 
@@ -143,7 +155,7 @@ export const exchangeMessageFromDashboardSchema: z.Schema<ExchangeFromDashboard>
 
 const discussionPendingSchema: z.Schema<WithDiscussionStatusPending> = z.object(
   {
-    status: z.literal("PENDING"),
+    status: discussionPendingStatusSchema,
   },
 );
 
@@ -239,3 +251,46 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
         }),
       ]),
     );
+
+export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedDiscussionsParams> =
+  z.object({
+    // pagination
+    page: z.coerce.number().optional(),
+    perPage: z.coerce.number().optional(),
+
+    // sort
+    orderBy: z.enum(["createdAt"]).optional(),
+    orderDirection: z.enum(["asc", "desc"]).optional(),
+
+    // filters
+    statuses: discussionStatusSchema
+      .optional()
+      .or(z.array(discussionStatusSchema).optional())
+      .optional(),
+    sirets: siretSchema
+      .optional()
+      .or(z.array(siretSchema).optional())
+      .optional(),
+  });
+
+export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
+  id: discussionIdSchema,
+  siret: siretSchema,
+  status: discussionStatusSchema,
+  appellation: appellationDtoSchema,
+  businessName: zStringMinLength1,
+  createdAt: makeDateStringSchema(),
+  kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
+  exchanges: exchangesSchema,
+  city: zStringMinLength1,
+  potentialBeneficiary: z.object({
+    firstName: zStringMinLength1,
+    lastName: zStringMinLength1,
+    phone: phoneSchema.nullable(),
+  }),
+  immersionObjective: immersionObjectiveSchema.nullable(),
+});
+
+export const paginatedDiscussionListSchema = createPaginatedSchema(
+  discussionInListSchema,
+);
