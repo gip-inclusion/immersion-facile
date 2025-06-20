@@ -37,18 +37,51 @@ export const updateAllEstablishmentScoresQuery = async (
     )
     .updateTable("establishments as e")
     .set({
-      score: sql`ROUND
+      /*
+        ARRONDI (
+          ( 
+            Score minimum (10) 
+            + 
+            ( nombre conventions validée de l'entreprise depuis 12 mois * coef conventions (20) )
+          ) 
+          * 
+          taux de réponse aux candidatures de l'entreprise depuis 12 mois
+        )
+      */
+      score: sql`
+      ROUND
       (
-          (${minimumScore} + COALESCE ((SELECT convention_count * ${conventionCountCoefficient} FROM convention_counts WHERE siret = e.siret), 0)) * (COALESCE ((
-              SELECT
-              CASE
-              WHEN total_discussions > 0
-              THEN (answered_discussions::float / total_discussions)
-              ELSE 1
-              END
+        (
+          ${minimumScore} 
+          +
+          COALESCE 
+          (
+            (
+              SELECT convention_count * ${conventionCountCoefficient} 
+              FROM convention_counts 
+              WHERE siret = e.siret
+            ), 
+            0
+          )
+        )
+        *
+        (
+          COALESCE 
+          (
+            (
+              SELECT 
+                CASE
+                  WHEN total_discussions > 0 
+                  THEN (answered_discussions::float / total_discussions) 
+                  ELSE 1 
+                END
               FROM discussion_counts
               WHERE siret = e.siret
-              ), 1)))`,
+            ), 
+            1
+          )
+        )
+      )`,
     })
     .execute();
 };
