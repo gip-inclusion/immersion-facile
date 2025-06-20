@@ -50,6 +50,10 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
           ? exchanges.filter((e) => e.sender === "establishment").length > 0 ===
             filters.answeredByEstablishment
           : true,
+      ({ contactMode }) =>
+        filters.contactMode !== undefined
+          ? contactMode === filters.contactMode
+          : true,
     ];
     const discussions = this.discussions
       .filter((discussion) =>
