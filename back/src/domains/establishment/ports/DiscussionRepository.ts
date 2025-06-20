@@ -1,5 +1,6 @@
 import type {
   AppellationCode,
+  ContactMode,
   DateRange,
   DiscussionDto,
   DiscussionId,
@@ -20,11 +21,12 @@ export type HasDiscussionMatchingParams = {
 
 export type GetDiscussionsParams = {
   filters: {
+    answeredByEstablishment?: boolean;
+    createdBetween?: DateRange;
+    createdSince?: Date;
+    contactMode?: ContactMode;
     status?: DiscussionStatus;
     sirets?: SiretDto[];
-    createdSince?: Date;
-    createdBetween?: DateRange;
-    answeredByEstablishment?: boolean;
   };
   limit: number;
 };
