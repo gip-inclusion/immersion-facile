@@ -23,7 +23,7 @@ import {
 import type { JwtKindProps } from "src/app/components/admin/conventions/ConventionManageActions";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
-import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -74,8 +74,7 @@ export const ConventionValidation = ({
     useState<boolean>(false);
 
   useScrollToTop(
-    !!useFeedbackTopic("send-signature-link") ||
-      !!useFeedbackTopic("send-assessment-link"),
+    !!useFeedbackTopics(["send-signature-link", "send-assessment-link"]),
   );
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
