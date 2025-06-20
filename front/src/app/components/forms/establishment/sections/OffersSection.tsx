@@ -88,7 +88,6 @@ export const OffersSection = ({
         title={formContents.appellations.label}
         description="Les métiers que vous proposez à l’immersion"
       >
-        {" "}
         <MultipleAppellationInput
           name={formContents.appellations.name}
           id={domElementIds.establishment[mode].appellations}

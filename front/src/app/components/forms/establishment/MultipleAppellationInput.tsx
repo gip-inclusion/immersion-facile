@@ -1,12 +1,16 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-
+import { useDispatch } from "react-redux";
 import {
   type AppellationAndRomeDto,
   type AppellationCode,
   type AppellationLabel,
   emptyAppellationAndRome,
 } from "shared";
+import {
+  type AppellationAutocompleteLocator,
+  appellationSlice,
+} from "src/core-logic/domain/appellation/appellation.slice";
 import { useStyles } from "tss-react/dsfr";
 import { v4 as uuidV4 } from "uuid";
 import { AppellationAutocomplete } from "../autocomplete/AppellationAutocomplete";
@@ -41,6 +45,7 @@ export const MultipleAppellationInput = ({
   disabled = false,
 }: MultipleAppellationInputProps) => {
   const { cx } = useStyles();
+  const dispatch = useDispatch();
   return (
     <div
       className={cx(fr.cx("fr-input-group"), "im-appellation-autocomplete")}
@@ -49,46 +54,55 @@ export const MultipleAppellationInput = ({
       <>
         {label && <h2 className={fr.cx("fr-text--lead")}>{label}</h2>}
         {currentAppellations.map(
-          ({ appellationCode, appellationLabel }, index) => (
-            <div
-              className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
-              key={getAppellationKey(appellationCode, appellationLabel)}
-            >
-              <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
-                <AppellationAutocomplete
-                  locator={`multiple-appellation-${index}`}
+          ({ appellationCode, appellationLabel }, index) => {
+            const key = getAppellationKey(appellationCode, appellationLabel);
+            const locator: AppellationAutocompleteLocator = `multiple-appellation-${index}`;
+            return (
+              <div
+                className={fr.cx("fr-grid-row", "fr-grid-row--bottom")}
+                key={key}
+              >
+                <div className={fr.cx("fr-col", !!index && "fr-mt-2w")}>
+                  <AppellationAutocomplete
+                    locator={locator}
+                    disabled={disabled}
+                    multiple
+                    label={"Rechercher un métier *"}
+                    onAppellationSelected={(selectedAppellationMatch) => {
+                      onAppellationAdd(
+                        selectedAppellationMatch.appellation,
+                        index,
+                      );
+                    }}
+                    onAppellationClear={() => {
+                      onAppellationDelete(index);
+                    }}
+                    selectProps={{
+                      inputId: `${id}-${index}`,
+                    }}
+                  />
+                </div>
+                <Button
+                  type="button"
+                  iconId="fr-icon-delete-bin-line"
+                  title="Suppression"
                   disabled={disabled}
-                  multiple
-                  label={"Rechercher un métier *"}
-                  onAppellationSelected={(selectedAppellationMatch) => {
-                    onAppellationAdd(
-                      selectedAppellationMatch.appellation,
-                      index,
-                    );
-                  }}
-                  onAppellationClear={() => {
+                  id="im-multiple-appellation-input__delete-option-button"
+                  onClick={() => {
                     onAppellationDelete(index);
-                  }}
-                  selectProps={{
-                    inputId: `${id}-${index}`,
+                    dispatch(
+                      appellationSlice.actions.clearLocatorDataRequested({
+                        locator,
+                        multiple: true,
+                      }),
+                    );
                   }}
                 />
               </div>
-              <Button
-                type="button"
-                iconId="fr-icon-delete-bin-line"
-                title="Suppression"
-                disabled={disabled}
-                id="im-multiple-appellation-input__delete-option-button"
-                onClick={() => {
-                  onAppellationDelete(index);
-                }}
-              />
-            </div>
-          ),
+            );
+          },
         )}
       </>
-
       <Button
         className={fr.cx("fr-my-4v")}
         type="button"
@@ -103,7 +117,6 @@ export const MultipleAppellationInput = ({
       >
         Ajouter un métier
       </Button>
-
       {error?.length && (
         <div
           id={`${name}-error-description`}
