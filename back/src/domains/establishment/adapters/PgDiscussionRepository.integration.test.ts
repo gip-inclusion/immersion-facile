@@ -164,6 +164,65 @@ describe("PgDiscussionRepository", () => {
         });
       });
 
+      describe("contactMode filter param", () => {
+        const discussionWithContactModeEmail1 = new DiscussionBuilder()
+          .withId(uuid())
+          .withContactMode("EMAIL")
+          .build();
+        const discussionWithContactModeEmail2 = new DiscussionBuilder()
+          .withId(uuid())
+          .withContactMode("EMAIL")
+          .build();
+        const discussionWithContactModeInPerson = new DiscussionBuilder()
+          .withId(uuid())
+          .withContactMode("IN_PERSON")
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionWithContactModeEmail1);
+          await pgDiscussionRepository.insert(discussionWithContactModeEmail2);
+          await pgDiscussionRepository.insert(
+            discussionWithContactModeInPerson,
+          );
+        });
+
+        it("include discussions that have contact mode by email", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                contactMode: "EMAIL",
+              },
+              limit: 5,
+            }),
+            [discussionWithContactModeEmail1, discussionWithContactModeEmail2],
+          );
+        });
+
+        it("include discussions that have contact mode in person", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                contactMode: "IN_PERSON",
+              },
+              limit: 5,
+            }),
+            [discussionWithContactModeInPerson],
+          );
+        });
+
+        it("exclude all discussions if no discussions with contact mode by phone", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: {
+                contactMode: "PHONE",
+              },
+              limit: 5,
+            }),
+            [],
+          );
+        });
+      });
+
       describe("createdSince filter param", () => {
         const discussionCreatedSince1 = new DiscussionBuilder()
           .withId(uuid())

@@ -574,6 +574,7 @@ const executeGetDiscussions = (
       createdBetween,
       sirets,
       status,
+      contactMode,
     },
     id,
     limit,
@@ -585,6 +586,10 @@ const executeGetDiscussions = (
       (qb) =>
         pipeWithValue(
           qb.selectFrom("discussions").select("discussions.id"),
+          (qb) =>
+            contactMode
+              ? qb.where("discussions.contact_method", "=", contactMode)
+              : qb,
           (qb) => (status ? qb.where("discussions.status", "=", status) : qb),
           (qb) => (id ? qb.where("discussions.id", "=", id) : qb),
           (qb) => {
