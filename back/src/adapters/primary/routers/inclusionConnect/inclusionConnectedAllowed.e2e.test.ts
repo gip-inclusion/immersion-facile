@@ -757,8 +757,21 @@ describe("InclusionConnectedAllowedRoutes", () => {
   describe(`${displayRouteName(
     inclusionConnectedAllowedRoutes.replyToDiscussion,
   )}`, () => {
+    const user = new InclusionConnectedUserBuilder().buildUser();
+    const establishment = new EstablishmentAggregateBuilder()
+      .withUserRights([
+        { role: "establishment-admin", job: "", phone: "", userId: "" },
+      ])
+      .build();
+
+    beforeEach(() => {
+      inMemoryUow.userRepository.users = [user];
+      inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
+    });
+
     it("200 - saves the exchange to a discussion", async () => {
-      const user = new InclusionConnectedUserBuilder().buildUser();
       const payload: ExchangeMessageFromDashboard = {
         message: "My fake message",
       };
@@ -766,16 +779,18 @@ describe("InclusionConnectedAllowedRoutes", () => {
         .withEstablishmentContact({
           email: user.email,
         })
+        .withSiret(establishment.establishment.siret)
         .build();
-      const existingToken = generateConnectedUserJwt({
-        userId: user.id,
-        version: currentJwtVersions.inclusion,
-      });
+
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.users = [user];
 
       const response = await httpClient.replyToDiscussion({
-        headers: { authorization: existingToken },
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: user.id,
+            version: currentJwtVersions.inclusion,
+          }),
+        },
         urlParams: { discussionId: discussion.id },
         body: payload,
       });
@@ -798,6 +813,41 @@ describe("InclusionConnectedAllowedRoutes", () => {
         new DiscussionBuilder(discussion)
           .withExchanges([...discussion.exchanges, expectedExchange])
           .build(),
+      ]);
+    });
+
+    it("200 - not save the exchange to a discussion - bad discusssion status", async () => {
+      const payload: ExchangeMessageFromDashboard = {
+        message: "My fake message",
+      };
+
+      const discussion = new DiscussionBuilder()
+        .withSiret(establishment.establishment.siret)
+        .withEstablishmentContact({
+          email: user.email,
+        })
+        .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
+        .build();
+
+      inMemoryUow.discussionRepository.discussions = [discussion];
+
+      const response = await httpClient.replyToDiscussion({
+        headers: {
+          authorization: generateConnectedUserJwt({
+            userId: user.id,
+            version: currentJwtVersions.inclusion,
+          }),
+        },
+        urlParams: { discussionId: discussion.id },
+        body: payload,
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 200,
+        body: { reason: "discussion_completed", sender: "establishment" },
+      });
+      expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
+        discussion,
       ]);
     });
   });

@@ -1,3 +1,4 @@
+import type { discussionExchangeForbidenReasons } from "..";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
 import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
@@ -34,6 +35,14 @@ export const candidateWarnedMethods = [
 export type CandidateWarnedMethod = (typeof candidateWarnedMethods)[number];
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
+
+export type DiscussionExchangeForbidenReason =
+  (typeof discussionExchangeForbidenReasons)[number];
+
+export type DiscussionExchangeForbiddenParams = {
+  sender: ExchangeRole;
+  reason: DiscussionExchangeForbidenReason;
+};
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
 

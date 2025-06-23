@@ -1,4 +1,5 @@
 import { createTemplatesByName } from "html-templates";
+import type { DiscussionExchangeForbidenReason, ExchangeRole } from "..";
 import {
   type ConventionId,
   type InternshipKind,
@@ -1927,6 +1928,15 @@ Profil du candidat :
         content: htmlContent,
       }),
     },
+    DISCUSSION_EXCHANGE_FORBIDEN: {
+      niceName: "Établissement - Réponse à candidature impossible",
+      createEmailVariables: ({ reason, sender }) => ({
+        bypassLayout: true,
+        subject: "Réponse à la candidature impossible",
+        content: discussionExchangeForbidenContents[sender][reason],
+      }),
+      tags: ["réponse candidature impossible"],
+    },
     WARN_DISCUSSION_DELIVERY_FAILED: {
       niceName:
         "Établissement - Alerte de problème d'envoi d'un échange dans une discussion",
@@ -2081,3 +2091,31 @@ function hasWorkingExperienceWording(
     return "• Expérience professionnelle : je n’ai jamais travaillé.";
   return "• Expérience professionnelle : non communiqué.";
 }
+
+export const discussionExchangeForbidenContents: Record<
+  ExchangeRole,
+  Record<DiscussionExchangeForbidenReason, string>
+> = {
+  establishment: {
+    discussion_completed: `
+        La candidature à laquelle vous souhaitez répondre n'est plus en cours.
+        Le candidat ne recevra pas votre message.`,
+    establishment_missing: `
+        L'entreprise liée à cette candidature s’est récemment désinscrite d’Immersion Facilitée.
+        Le candidat ne recevra pas votre message.
+
+        Nous vous invitons à réinscrire votre entreprise si vous souhaitez de nouveau répondre aux candidatures.`,
+  },
+  potentialBeneficiary: {
+    discussion_completed: `
+        La candidature à laquelle vous souhaitez répondre n'est plus en cours.
+        L'entreprise ne recevra pas votre message.
+
+        Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+    establishment_missing: `
+        L’entreprise que vous souhaitez contacter s’est récemment désinscrite d’Immersion Facilitée.
+        Elle ne recevra pas votre message et ne propose plus d’immersion pour le moment.
+
+        Nous vous invitons à chercher une autre entreprise dans l’annuaire pour poursuivre votre démarche.`,
+  },
+};

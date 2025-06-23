@@ -7,7 +7,12 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
+import {
+  type ExpectSavedNotificationsAndEvents,
+  makeExpectSavedNotificationsAndEvents,
+} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
@@ -15,245 +20,102 @@ import {
   createInMemoryUow,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import {
   AddExchangeToDiscussion,
   type AddExchangeToDiscussionInput,
 } from "./AddExchangeToDiscussion";
 
-const domain = "my-domain.com";
-const replyDomain = `reply.${domain}`;
-const discussion1 = new DiscussionBuilder()
-  .withAppellationCode("20567")
-  .withId("11111111-e89b-12d3-a456-426614174000")
-  .withExchanges([
-    {
-      subject: "Ma discussion 1",
-      message: "Hello",
-      sender: "potentialBeneficiary",
-      sentAt: new Date().toISOString(),
-      recipient: "establishment",
-      attachments: [],
-    },
-  ])
-  .build();
-
-const discussion2 = new DiscussionBuilder()
-  .withAppellationCode("13252")
-  .withId("22222222-e89b-12d3-a456-426614174000")
-  .withExchanges([
-    {
-      subject: "",
-      message: "Hello",
-      sender: "potentialBeneficiary",
-      sentAt: new Date().toISOString(),
-      recipient: "establishment",
-      attachments: [],
-    },
-  ])
-  .build();
 describe("AddExchangeToDiscussion", () => {
+  const replyDomain = "reply.my-domain.com";
+  const discussion1 = new DiscussionBuilder()
+    .withAppellationCode("20567")
+    .withId("11111111-e89b-12d3-a456-426614174000")
+    .withStatus({ status: "PENDING" })
+    .withExchanges([
+      {
+        subject: "Ma discussion 1",
+        message: "Hello",
+        sender: "potentialBeneficiary",
+        sentAt: new Date().toISOString(),
+        recipient: "establishment",
+        attachments: [],
+      },
+    ])
+    .build();
+
+  const discussion2 = new DiscussionBuilder()
+    .withAppellationCode("13252")
+    .withId("22222222-e89b-12d3-a456-426614174000")
+    .withStatus({ status: "PENDING" })
+    .withExchanges([
+      {
+        subject: "",
+        message: "Hello",
+        sender: "potentialBeneficiary",
+        sentAt: new Date().toISOString(),
+        recipient: "establishment",
+        attachments: [],
+      },
+    ])
+    .build();
+
   let uow: InMemoryUnitOfWork;
   let addExchangeToDiscussion: AddExchangeToDiscussion;
-  beforeEach(() => {
-    uow = createInMemoryUow();
+  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
+  beforeEach(() => {
+    const timeGateway = new CustomTimeGateway();
+
+    uow = createInMemoryUow();
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
     addExchangeToDiscussion = new AddExchangeToDiscussion(
       new InMemoryUowPerformer(uow),
       makeCreateNewEvent({
         uuidGenerator: new UuidV4Generator(),
-        timeGateway: new CustomTimeGateway(),
+        timeGateway: timeGateway,
       }),
-      new CustomTimeGateway(),
+      makeSaveNotificationAndRelatedEvent(new UuidV4Generator(), timeGateway),
+      timeGateway,
     );
 
     uow.discussionRepository.discussions = [discussion1, discussion2];
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(discussion1.siret)
+        .withUserRights([
+          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+        ])
+        .build(),
+      new EstablishmentAggregateBuilder()
+        .withEstablishmentSiret(discussion2.siret)
+        .withUserRights([
+          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+        ])
+        .build(),
+    ];
   });
 
   describe("right paths", () => {
-    it("saves the new exchange in the discussion with attachment ref and source inbound-parsing", async () => {
-      const [firstInboundParsingItem, secondInboundParsingItem] =
-        createInboundParsingResponse([
-          `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
-          `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
-        ]).items;
-
-      const payload: AddExchangeToDiscussionInput = {
-        source: "inbound-parsing",
-        messageInputs: [
-          {
-            // biome-ignore lint/style/noNonNullAssertion: testing purpose
-            message: firstInboundParsingItem.RawHtmlBody!,
-            discussionId: discussion1.id,
-            recipientRole: "potentialBeneficiary",
-            sentAt: new Date(firstInboundParsingItem.SentAtDate).toISOString(),
-            attachments:
-              firstInboundParsingItem.Attachments?.map((attachment) => ({
-                name: attachment.Name,
-                link: attachment.DownloadToken,
-              })) ?? [],
-            subject: firstInboundParsingItem.Subject,
-          },
-          {
-            // biome-ignore lint/style/noNonNullAssertion: testing purpose
-            message: secondInboundParsingItem.RawHtmlBody!,
-            discussionId: discussion2.id,
-            recipientRole: "establishment",
-            sentAt: new Date(secondInboundParsingItem.SentAtDate).toISOString(),
-            attachments:
-              secondInboundParsingItem.Attachments?.map((attachment) => ({
-                name: attachment.Name,
-                link: attachment.DownloadToken,
-              })) ?? [],
-            subject: secondInboundParsingItem.Subject,
-          },
-        ],
-      };
-
-      await addExchangeToDiscussion.execute(payload);
-
-      expectToEqual(uow.discussionRepository.discussions, [
-        {
-          ...discussion1,
-          exchanges: [
-            ...discussion1.exchanges,
-            {
-              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
-              sender: "establishment",
-              sentAt: "2023-06-28T08:06:52.000Z",
-              recipient: "potentialBeneficiary",
-              subject: firstInboundParsingItem.Subject,
-              attachments:
-                firstInboundParsingItem.Attachments?.map((attachment) => ({
-                  name: attachment.Name,
-                  link: attachment.DownloadToken,
-                })) ?? [],
-            },
-          ],
-        },
-        {
-          ...discussion2,
-          exchanges: [
-            ...discussion2.exchanges,
-            {
-              message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
-              sender: "potentialBeneficiary",
-              sentAt: "2023-06-28T08:06:52.000Z",
-              recipient: "establishment",
-              subject: secondInboundParsingItem.Subject,
-              attachments:
-                secondInboundParsingItem.Attachments?.map((attachment) => ({
-                  name: attachment.Name,
-                  link: attachment.DownloadToken,
-                })) ?? [],
-            },
-          ],
-        },
-      ]);
-
-      expectArraysToMatch(uow.outboxRepository.events, [
-        {
-          topic: "ExchangeAddedToDiscussion",
-          payload: { discussionId: discussion1.id, siret: discussion1.siret },
-        },
-        {
-          topic: "ExchangeAddedToDiscussion",
-          payload: { discussionId: discussion2.id, siret: discussion2.siret },
-        },
-      ]);
-    });
-
-    it("saves the new exchange in the discussion with attachment ref and source dashboard", async () => {
-      const inclusionConnectedUser = new InclusionConnectedUserBuilder()
-        .withId("11111111-e89b-12d3-a456-426614174000")
-        .build();
-      const payload: AddExchangeToDiscussionInput = {
-        source: "dashboard",
-        messageInputs: [
-          {
-            message: "Hello",
-            discussionId: discussion1.id,
-            recipientRole: "potentialBeneficiary",
-            attachments: [],
-          },
-        ],
-      };
-
-      await addExchangeToDiscussion.execute(payload, inclusionConnectedUser);
-
-      expectToEqual(uow.discussionRepository.discussions, [
-        {
-          ...discussion1,
-          exchanges: [
-            ...discussion1.exchanges,
-            {
-              message: "Hello",
-              sender: "establishment",
-              sentAt: "2021-09-01T10:10:00.000Z",
-              recipient: "potentialBeneficiary",
-              subject:
-                "Réponse de My default business name à votre demande d'immersion",
-              attachments: [],
-            },
-          ],
-        },
-        discussion2,
-      ]);
-    });
-
-    it("saves the new exchange in the discussion with attachment ref and with a default subject if not provided", async () => {
-      const [firstInboundParsingItem, secondInboundParsingItem] =
-        createInboundParsingResponse(
-          [
+    describe("when establishment exist", () => {
+      it("saves the new exchange in the discussion with attachment ref and source inbound-parsing", async () => {
+        const [firstInboundParsingItem, secondInboundParsingItem] =
+          createInboundParsingResponse([
             `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
             `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
-          ],
-          "",
-        ).items;
+          ]).items;
 
-      const payload: AddExchangeToDiscussionInput = {
-        source: "inbound-parsing",
-        messageInputs: [
-          {
-            // biome-ignore lint/style/noNonNullAssertion: testing purpose
-            message: firstInboundParsingItem.RawHtmlBody!,
-            discussionId: discussion1.id,
-            recipientRole: "potentialBeneficiary",
-            attachments:
-              firstInboundParsingItem.Attachments?.map((attachment) => ({
-                name: attachment.Name,
-                link: attachment.DownloadToken,
-              })) ?? [],
-            subject: "",
-            sentAt: new Date(firstInboundParsingItem.SentAtDate).toISOString(),
-          },
-          {
-            // biome-ignore lint/style/noNonNullAssertion: testing purpose
-            message: secondInboundParsingItem.RawHtmlBody!,
-            discussionId: discussion2.id,
-            recipientRole: "establishment",
-            attachments:
-              secondInboundParsingItem.Attachments?.map((attachment) => ({
-                name: attachment.Name,
-                link: attachment.DownloadToken,
-              })) ?? [],
-            subject: "",
-            sentAt: new Date(secondInboundParsingItem.SentAtDate).toISOString(),
-          },
-        ],
-      };
-
-      await addExchangeToDiscussion.execute(payload);
-
-      expectToEqual(uow.discussionRepository.discussions, [
-        {
-          ...discussion1,
-          exchanges: [
-            ...discussion1.exchanges,
+        const payload: AddExchangeToDiscussionInput = {
+          source: "inbound-parsing",
+          messageInputs: [
             {
-              sender: "establishment",
-              recipient: "potentialBeneficiary",
-              subject: "Sans objet",
-              message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: firstInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion1.id,
+              recipientRole: "potentialBeneficiary",
               sentAt: new Date(
                 firstInboundParsingItem.SentAtDate,
               ).toISOString(),
@@ -262,115 +124,556 @@ describe("AddExchangeToDiscussion", () => {
                   name: attachment.Name,
                   link: attachment.DownloadToken,
                 })) ?? [],
+              subject: firstInboundParsingItem.Subject,
             },
-          ],
-        },
-        {
-          ...discussion2,
-          exchanges: [
-            ...discussion2.exchanges,
             {
-              sender: "potentialBeneficiary",
-              recipient: "establishment",
-              subject: "Sans objet",
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: secondInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion2.id,
+              recipientRole: "establishment",
               sentAt: new Date(
                 secondInboundParsingItem.SentAtDate,
               ).toISOString(),
-              message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(),
               attachments:
                 secondInboundParsingItem.Attachments?.map((attachment) => ({
                   name: attachment.Name,
                   link: attachment.DownloadToken,
                 })) ?? [],
-            },
-          ],
-        },
-      ]);
-
-      expectArraysToMatch(uow.outboxRepository.events, [
-        {
-          topic: "ExchangeAddedToDiscussion",
-          payload: { discussionId: discussion1.id, siret: discussion1.siret },
-        },
-        {
-          topic: "ExchangeAddedToDiscussion",
-          payload: { discussionId: discussion2.id, siret: discussion2.siret },
-        },
-      ]);
-    });
-
-    it("saves the new exchange in the discussion and provides a default sentAt and subject for dashboard", async () => {
-      const inclusionConnectedUser = new InclusionConnectedUserBuilder()
-        .withId("11111111-e89b-12d3-a456-426614174000")
-        .build();
-
-      const payload: AddExchangeToDiscussionInput = {
-        source: "dashboard",
-        messageInputs: [
-          {
-            message: "Hello without sentAt and subject",
-            discussionId: discussion1.id,
-            recipientRole: "potentialBeneficiary",
-            attachments: [],
-          },
-        ],
-      };
-
-      await addExchangeToDiscussion.execute(payload, inclusionConnectedUser);
-
-      expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
-        message: "Hello without sentAt and subject",
-        sender: "establishment",
-        recipient: "potentialBeneficiary",
-        subject:
-          "Réponse de My default business name à votre demande d'immersion",
-        sentAt: "2021-09-01T10:10:00.000Z",
-        attachments: [],
-      });
-    });
-
-    describe("wrong paths", () => {
-      it("throws an error if the discussion does not exist", async () => {
-        const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
-        const email = `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`;
-        const brevoResponse = createInboundParsingResponse([email]);
-        const payload: AddExchangeToDiscussionInput = {
-          source: "inbound-parsing",
-          messageInputs: [
-            {
-              // biome-ignore lint/style/noNonNullAssertion: testing purpose
-              message: brevoResponse.items[0].RawHtmlBody!,
-              discussionId: notFoundDiscussionId,
-              recipientRole: "establishment",
-              attachments: [],
-              subject: "",
-              sentAt: new Date().toISOString(),
+              subject: secondInboundParsingItem.Subject,
             },
           ],
         };
-        await expectPromiseToFailWithError(
-          addExchangeToDiscussion.execute(payload),
-          errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
-        );
+
+        await addExchangeToDiscussion.execute(payload);
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          {
+            ...discussion1,
+            exchanges: [
+              ...discussion1.exchanges,
+              {
+                message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
+                sender: "establishment",
+                sentAt: "2023-06-28T08:06:52.000Z",
+                recipient: "potentialBeneficiary",
+                subject: firstInboundParsingItem.Subject,
+                attachments:
+                  firstInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+              },
+            ],
+          },
+          {
+            ...discussion2,
+            exchanges: [
+              ...discussion2.exchanges,
+              {
+                message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
+                sender: "potentialBeneficiary",
+                sentAt: "2023-06-28T08:06:52.000Z",
+                recipient: "establishment",
+                subject: secondInboundParsingItem.Subject,
+                attachments:
+                  secondInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+              },
+            ],
+          },
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ExchangeAddedToDiscussion",
+            payload: { discussionId: discussion1.id, siret: discussion1.siret },
+          },
+          {
+            topic: "ExchangeAddedToDiscussion",
+            payload: { discussionId: discussion2.id, siret: discussion2.siret },
+          },
+        ]);
       });
-      it("throws an error if the source is dashboard, but user is not connected", async () => {
+
+      it("saves the new exchange in the discussion with attachment ref and source dashboard", async () => {
+        const inclusionConnectedUser = new InclusionConnectedUserBuilder()
+          .withId("11111111-e89b-12d3-a456-426614174000")
+          .build();
         const payload: AddExchangeToDiscussionInput = {
           source: "dashboard",
           messageInputs: [
             {
               message: "Hello",
-              discussionId: "11111111-e89b-12d3-a456-426614174000",
+              discussionId: discussion1.id,
               recipientRole: "potentialBeneficiary",
               attachments: [],
             },
           ],
         };
 
-        await expectPromiseToFailWithError(
-          addExchangeToDiscussion.execute(payload),
-          errors.user.unauthorized(),
-        );
+        await addExchangeToDiscussion.execute(payload, inclusionConnectedUser);
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          {
+            ...discussion1,
+            exchanges: [
+              ...discussion1.exchanges,
+              {
+                message: "Hello",
+                sender: "establishment",
+                sentAt: "2021-09-01T10:10:00.000Z",
+                recipient: "potentialBeneficiary",
+                subject:
+                  "Réponse de My default business name à votre demande d'immersion",
+                attachments: [],
+              },
+            ],
+          },
+          discussion2,
+        ]);
       });
+
+      it("saves the new exchange in the discussion with attachment ref and with a default subject if not provided", async () => {
+        const [firstInboundParsingItem, secondInboundParsingItem] =
+          createInboundParsingResponse(
+            [
+              `firstname1_lastname1__${discussion1.id}_b@${replyDomain}`,
+              `firstname2_lastname2__${discussion2.id}_e@${replyDomain}`,
+            ],
+            "",
+          ).items;
+
+        const payload: AddExchangeToDiscussionInput = {
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: firstInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion1.id,
+              recipientRole: "potentialBeneficiary",
+              attachments:
+                firstInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
+              subject: "",
+              sentAt: new Date(
+                firstInboundParsingItem.SentAtDate,
+              ).toISOString(),
+            },
+            {
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: secondInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion2.id,
+              recipientRole: "establishment",
+              attachments:
+                secondInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
+              subject: "",
+              sentAt: new Date(
+                secondInboundParsingItem.SentAtDate,
+              ).toISOString(),
+            },
+          ],
+        };
+
+        await addExchangeToDiscussion.execute(payload);
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          {
+            ...discussion1,
+            exchanges: [
+              ...discussion1.exchanges,
+              {
+                sender: "establishment",
+                recipient: "potentialBeneficiary",
+                subject: "Sans objet",
+                message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
+                sentAt: new Date(
+                  firstInboundParsingItem.SentAtDate,
+                ).toISOString(),
+                attachments:
+                  firstInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+              },
+            ],
+          },
+          {
+            ...discussion2,
+            exchanges: [
+              ...discussion2.exchanges,
+              {
+                sender: "potentialBeneficiary",
+                recipient: "establishment",
+                subject: "Sans objet",
+                sentAt: new Date(
+                  secondInboundParsingItem.SentAtDate,
+                ).toISOString(),
+                message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(),
+                attachments:
+                  secondInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+              },
+            ],
+          },
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ExchangeAddedToDiscussion",
+            payload: { discussionId: discussion1.id, siret: discussion1.siret },
+          },
+          {
+            topic: "ExchangeAddedToDiscussion",
+            payload: { discussionId: discussion2.id, siret: discussion2.siret },
+          },
+        ]);
+      });
+
+      it("saves the new exchange in the discussion and provides a default sentAt and subject for dashboard", async () => {
+        const inclusionConnectedUser = new InclusionConnectedUserBuilder()
+          .withId("11111111-e89b-12d3-a456-426614174000")
+          .build();
+
+        const payload: AddExchangeToDiscussionInput = {
+          source: "dashboard",
+          messageInputs: [
+            {
+              message: "Hello without sentAt and subject",
+              discussionId: discussion1.id,
+              recipientRole: "potentialBeneficiary",
+              attachments: [],
+            },
+          ],
+        };
+
+        await addExchangeToDiscussion.execute(payload, inclusionConnectedUser);
+
+        expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
+          message: "Hello without sentAt and subject",
+          sender: "establishment",
+          recipient: "potentialBeneficiary",
+          subject:
+            "Réponse de My default business name à votre demande d'immersion",
+          sentAt: "2021-09-01T10:10:00.000Z",
+          attachments: [],
+        });
+      });
+
+      describe("when discussion have not pending status", () => {
+        const discussion1Accepted = new DiscussionBuilder(discussion1)
+          .withStatus({
+            status: "ACCEPTED",
+            candidateWarnedMethod: "email",
+          })
+          .build();
+
+        const discussion2Rejected = new DiscussionBuilder(discussion2)
+          .withStatus({
+            status: "REJECTED",
+            rejectionKind: "NO_TIME",
+          })
+          .build();
+
+        beforeEach(() => {
+          uow.discussionRepository.discussions = [
+            discussion1Accepted,
+            discussion2Rejected,
+          ];
+        });
+
+        it("when sender is establishment, do not save the new exchange in the discussion and notify sender that discussion is completed", async () => {
+          const [firstInboundParsingItem] = createInboundParsingResponse([
+            `firstname1_lastname1__${discussion1Accepted.id}_e@${replyDomain}`,
+          ]).items;
+
+          const result = await addExchangeToDiscussion.execute({
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                message: firstInboundParsingItem.RawHtmlBody!,
+                discussionId: discussion1Accepted.id,
+                recipientRole: "potentialBeneficiary",
+                sentAt: new Date(
+                  firstInboundParsingItem.SentAtDate,
+                ).toISOString(),
+                attachments:
+                  firstInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+                subject: firstInboundParsingItem.Subject,
+              },
+            ],
+          });
+
+          expectToEqual(result, {
+            reason: "discussion_completed",
+            sender: "establishment",
+          });
+
+          expectToEqual(uow.discussionRepository.discussions, [
+            discussion1Accepted,
+            discussion2Rejected,
+          ]);
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "NotificationAdded",
+            },
+          ]);
+
+          expectSavedNotificationsAndEvents({
+            emails: [
+              {
+                kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+                params: {
+                  reason: "discussion_completed",
+                  sender: "establishment",
+                },
+                recipients: [
+                  discussion1Accepted.establishmentContact.email,
+                  ...discussion1Accepted.establishmentContact.copyEmails,
+                ],
+              },
+            ],
+            sms: [],
+          });
+        });
+
+        it("when sender is potential beneficiary, do not save the new exchange in the discussion and notify sender that discussion is completed", async () => {
+          const [firstInboundParsingItem] = createInboundParsingResponse([
+            `firstname1_lastname1__${discussion2Rejected.id}_b@${replyDomain}`,
+          ]).items;
+
+          const result = await addExchangeToDiscussion.execute({
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                // biome-ignore lint/style/noNonNullAssertion: testing purpose
+                message: firstInboundParsingItem.RawHtmlBody!,
+                discussionId: discussion2Rejected.id,
+                recipientRole: "establishment",
+                sentAt: new Date(
+                  firstInboundParsingItem.SentAtDate,
+                ).toISOString(),
+                attachments:
+                  firstInboundParsingItem.Attachments?.map((attachment) => ({
+                    name: attachment.Name,
+                    link: attachment.DownloadToken,
+                  })) ?? [],
+                subject: firstInboundParsingItem.Subject,
+              },
+            ],
+          });
+
+          expectToEqual(result, {
+            reason: "discussion_completed",
+            sender: "potentialBeneficiary",
+          });
+
+          expectToEqual(uow.discussionRepository.discussions, [
+            discussion1Accepted,
+            discussion2Rejected,
+          ]);
+
+          expectArraysToMatch(uow.outboxRepository.events, [
+            {
+              topic: "NotificationAdded",
+            },
+          ]);
+
+          expectSavedNotificationsAndEvents({
+            emails: [
+              {
+                kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+                params: {
+                  reason: "discussion_completed",
+                  sender: "potentialBeneficiary",
+                },
+                recipients: [discussion2Rejected.potentialBeneficiary.email],
+              },
+            ],
+            sms: [],
+          });
+        });
+      });
+    });
+
+    describe("when establishment does not exist", () => {
+      beforeEach(() => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [];
+      });
+
+      it("when sender is establishment, do not save the new exchange in the discussion and notify sender that establishment does not exist", async () => {
+        const [firstInboundParsingItem] = createInboundParsingResponse([
+          `firstname1_lastname1__${discussion1.id}_e@${replyDomain}`,
+        ]).items;
+
+        const result = await addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: firstInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion1.id,
+              recipientRole: "potentialBeneficiary",
+              sentAt: new Date(
+                firstInboundParsingItem.SentAtDate,
+              ).toISOString(),
+              attachments:
+                firstInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
+              subject: firstInboundParsingItem.Subject,
+            },
+          ],
+        });
+
+        expectToEqual(result, {
+          reason: "establishment_missing",
+          sender: "establishment",
+        });
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          discussion1,
+          discussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "NotificationAdded",
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+              params: {
+                reason: "establishment_missing",
+                sender: "establishment",
+              },
+              recipients: [
+                discussion1.establishmentContact.email,
+                ...discussion1.establishmentContact.copyEmails,
+              ],
+            },
+          ],
+          sms: [],
+        });
+      });
+
+      it("when sender is potential beneficiary, do not save the new exchange in the discussion and notify sender that establishment does not exist", async () => {
+        const [firstInboundParsingItem] = createInboundParsingResponse([
+          `firstname1_lastname1__${discussion1.id}_e@${replyDomain}`,
+        ]).items;
+
+        const result = await addExchangeToDiscussion.execute({
+          source: "inbound-parsing",
+          messageInputs: [
+            {
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
+              message: firstInboundParsingItem.RawHtmlBody!,
+              discussionId: discussion1.id,
+              recipientRole: "establishment",
+              sentAt: new Date(
+                firstInboundParsingItem.SentAtDate,
+              ).toISOString(),
+              attachments:
+                firstInboundParsingItem.Attachments?.map((attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                })) ?? [],
+              subject: firstInboundParsingItem.Subject,
+            },
+          ],
+        });
+
+        expectToEqual(result, {
+          reason: "establishment_missing",
+          sender: "potentialBeneficiary",
+        });
+
+        expectToEqual(uow.discussionRepository.discussions, [
+          discussion1,
+          discussion2,
+        ]);
+
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "NotificationAdded",
+          },
+        ]);
+
+        expectSavedNotificationsAndEvents({
+          emails: [
+            {
+              kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+              params: {
+                reason: "establishment_missing",
+                sender: "potentialBeneficiary",
+              },
+              recipients: [discussion1.potentialBeneficiary.email],
+            },
+          ],
+          sms: [],
+        });
+      });
+    });
+  });
+
+  describe("wrong paths", () => {
+    it("throws an error if the discussion does not exist", async () => {
+      const notFoundDiscussionId = "99999999-e89b-12d3-a456-426614174000";
+      const email = `firstname_lastname__${notFoundDiscussionId}_e@${replyDomain}`;
+      const brevoResponse = createInboundParsingResponse([email]);
+      const payload: AddExchangeToDiscussionInput = {
+        source: "inbound-parsing",
+        messageInputs: [
+          {
+            // biome-ignore lint/style/noNonNullAssertion: testing purpose
+            message: brevoResponse.items[0].RawHtmlBody!,
+            discussionId: notFoundDiscussionId,
+            recipientRole: "establishment",
+            attachments: [],
+            subject: "",
+            sentAt: new Date().toISOString(),
+          },
+        ],
+      };
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(payload),
+        errors.discussion.notFound({ discussionId: notFoundDiscussionId }),
+      );
+    });
+    it("throws an error if the source is dashboard, but user is not connected", async () => {
+      const payload: AddExchangeToDiscussionInput = {
+        source: "dashboard",
+        messageInputs: [
+          {
+            message: "Hello",
+            discussionId: "11111111-e89b-12d3-a456-426614174000",
+            recipientRole: "potentialBeneficiary",
+            attachments: [],
+          },
+        ],
+      };
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(payload),
+        errors.user.unauthorized(),
+      );
     });
   });
 

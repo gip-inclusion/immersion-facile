@@ -3,6 +3,7 @@ import type {
   AbsoluteUrl,
   AgencyId,
   ConventionSupportedJwt,
+  DiscussionExchangeForbiddenParams,
   DiscussionReadDto,
   Exchange,
   InclusionConnectedUser,
@@ -28,7 +29,7 @@ export interface InclusionConnectedGateway {
   ): Observable<DiscussionReadDto | undefined>;
   sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<Exchange>;
+  ): Observable<Exchange | DiscussionExchangeForbiddenParams>;
   getLogoutUrl$(
     payload: WithIdToken & { authToken: string },
   ): Observable<AbsoluteUrl>;

@@ -6,6 +6,7 @@ import {
   withConventionIdSchema,
 } from "../convention/convention.schema";
 import {
+  discussionExchangeForbiddenParamsSchema,
   discussionReadSchema,
   exchangeSchema,
   flatGetPaginatedDiscussionsParamsSchema,
@@ -125,7 +126,7 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: withExchangeMessageSchema,
     responses: {
-      200: exchangeSchema,
+      200: exchangeSchema.or(discussionExchangeForbiddenParamsSchema),
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
