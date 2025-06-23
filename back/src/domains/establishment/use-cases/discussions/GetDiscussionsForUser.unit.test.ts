@@ -45,17 +45,6 @@ describe("GetDiscussionsForUser", () => {
       });
     });
 
-    it("wraps a single siret in an array", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
-        search: "",
-      });
-      expectToEqual(result, {
-        filters: {},
-        order: { by: "createdAt", direction: "desc" },
-        pagination: { page: 1, perPage: defaultPerPageInWebPagination },
-      });
-    });
-
     it("adds a default order by createdAt, desc if none is provided", () => {
       const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams(
         {},

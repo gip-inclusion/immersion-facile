@@ -119,6 +119,16 @@ export class PgDiscussionRepository implements DiscussionRepository {
           eb.or([
             eb("discussions.siret", "ilike", `%${filters.search}%`),
             eb("discussions.business_name", "ilike", `%${filters.search}%`),
+            eb(
+              "discussions.potential_beneficiary_first_name",
+              "ilike",
+              `%${filters.search}%`,
+            ),
+            eb(
+              "discussions.potential_beneficiary_last_name",
+              "ilike",
+              `%${filters.search}%`,
+            ),
           ]),
         );
       },
