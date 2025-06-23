@@ -74,7 +74,8 @@ export const ConventionValidation = ({
     useState<boolean>(false);
 
   useScrollToTop(
-    !!useFeedbackTopics(["send-signature-link", "send-assessment-link"]),
+    useFeedbackTopics(["send-signature-link", "send-assessment-link"]).length >
+      0,
   );
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
