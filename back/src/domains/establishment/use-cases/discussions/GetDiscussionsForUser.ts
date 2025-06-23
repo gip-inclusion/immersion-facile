@@ -33,7 +33,7 @@ export const makeGetDiscussionsForUser = createTransactionalUseCase<
 export const flatDiscussionQueryParamsTogetPaginatedDiscussionsParams = (
   flatParams: FlatGetPaginatedDiscussionsParams,
 ): OmitFromExistingKeys<GetPaginatedDiscussionsForUserParams, "userId"> => {
-  const { page, perPage, orderBy, orderDirection, statuses, sirets, ...rest } =
+  const { page, perPage, orderBy, orderDirection, statuses, search, ...rest } =
     flatParams;
 
   rest satisfies Record<string, never>;
@@ -43,11 +43,17 @@ export const flatDiscussionQueryParamsTogetPaginatedDiscussionsParams = (
     perPage,
   });
 
+  const isSearchDefined = search !== undefined && search !== "";
+
   return {
-    filters: (statuses || sirets) && {
-      statuses: statuses && (Array.isArray(statuses) ? statuses : [statuses]),
-      sirets: sirets && (Array.isArray(sirets) ? sirets : [sirets]),
-    },
+    ...((statuses || isSearchDefined) && {
+      filters: {
+        ...(statuses && {
+          statuses: Array.isArray(statuses) ? statuses : [statuses],
+        }),
+        ...(isSearchDefined && { search }),
+      },
+    }),
     order: {
       by: orderBy || "createdAt",
       direction: orderDirection || "desc",

@@ -37,7 +37,7 @@ export type GetDiscussionsParams = {
 export type GetPaginatedDiscussionsForUserParams = {
   filters?: {
     statuses?: DiscussionStatus[];
-    sirets?: SiretDto[];
+    search?: string;
   };
   order: {
     by: DiscussionOrderKey;

@@ -9,12 +9,12 @@ describe("GetDiscussionsForUser", () => {
   describe("flatDiscussionQueryParamsTogetPaginatedDiscussionsParams", () => {
     it("converts flat filters to correct filters", () => {
       const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
-        sirets: ["siret1", "siret2"],
+        search: "siret1",
         statuses: ["PENDING", "ACCEPTED"],
       });
       expectToEqual(result, {
         filters: {
-          sirets: ["siret1", "siret2"],
+          search: "siret1",
           statuses: ["PENDING", "ACCEPTED"],
         },
         order: { by: "createdAt", direction: "desc" },
@@ -47,12 +47,10 @@ describe("GetDiscussionsForUser", () => {
 
     it("wraps a single siret in an array", () => {
       const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
-        sirets: "siret1",
+        search: "",
       });
       expectToEqual(result, {
-        filters: {
-          sirets: ["siret1"],
-        },
+        filters: {},
         order: { by: "createdAt", direction: "desc" },
         pagination: { page: 1, perPage: defaultPerPageInWebPagination },
       });

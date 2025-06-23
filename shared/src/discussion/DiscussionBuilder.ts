@@ -101,6 +101,13 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     };
   }
 
+  public withBusinessName(businessName: string) {
+    return new DiscussionBuilder({
+      ...this.discussion,
+      businessName,
+    });
+  }
+
   public withDatePreference(datePreferences: string) {
     if (
       this.discussion.kind === "IF" &&
