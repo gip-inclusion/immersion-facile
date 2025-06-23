@@ -488,6 +488,7 @@ describe("PgDiscussionRepository", () => {
     const discussion2 = new DiscussionBuilder()
       .withId(uuid())
       .withSiret("00000000000002")
+      .withPotentialBeneficiaryLastName("Smith")
       .withCreatedAt(new Date("2025-05-19"))
       .withAppellationCode(styliste.appellationCode)
       .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
@@ -501,6 +502,7 @@ describe("PgDiscussionRepository", () => {
     const discussion3 = new DiscussionBuilder()
       .withId(uuid())
       .withSiret("00000000000003")
+      .withPotentialBeneficiaryFirstname("Mark")
       .withBusinessName("Something different")
       .withAppellationCode(styliste.appellationCode)
       .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
@@ -680,6 +682,56 @@ describe("PgDiscussionRepository", () => {
           await pgDiscussionRepository.getPaginatedDiscussionsForUser({
             filters: {
               search: discussion3.businessName.slice(0, 4),
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
+
+        expectToEqual(result, {
+          data: [discussion3InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("filters on the potential beneficiary first name", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: discussion2.potentialBeneficiary.firstName.slice(0, 3),
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
+
+        expectToEqual(result, {
+          data: [discussion2InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("filters on the potential beneficiary last name", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: discussion3.potentialBeneficiary.lastName.slice(0, 3),
             },
             pagination: {
               page: 1,
