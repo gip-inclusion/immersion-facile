@@ -106,7 +106,7 @@ export JWT_PRIVATE_KEY=$(cat ./private.ec.key) JWT_PUBLIC_KEY=$(cat ./public.pem
 
 If the JWT keys need to be changed, it should be done by :
 
-- setting the old keys in the variables `JWT_PREVIOUS_PUBLIC_KEY` and `JWT_PREVIOUS_PRIVATE_KEY`,
+- setting the current `JWT_PUBLIC_KEY` in the variable `JWT_PREVIOUS_PUBLIC_KEY`,
 - creating a new pair of keys (like explained just before), and putting them in the variables : `JWT_PUBLIC_KEY` and `JWT_PRIVATE_KEY`
 
 ### Specifying environment variables
