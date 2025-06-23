@@ -242,7 +242,7 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
     .with(
       { status: "ACCEPTED" },
       () =>
-        "La candidature a bien été marquée comme accepté. Merci pour votre retour.",
+        "La candidature a bien été marquée comme acceptée. Merci pour votre retour.",
     )
     .with(
       {
