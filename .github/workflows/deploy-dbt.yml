@@ -24,9 +24,7 @@ jobs:
         run: cd bi && ./build.sh
 
       - name: Install scalingo CLI
-        run: |
-          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-          echo "$HOME/bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-scalingo-cli
 
       - name: Login to Scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}

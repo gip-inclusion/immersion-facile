@@ -16,10 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Dump and restore the PE database on scalingo Production.
     steps:
+      - uses: actions/checkout@v4 
       - name: Install scalingo CLI
-        run: |
-          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-          echo "$HOME/bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-scalingo-cli
 
       - name: Login with api-token
         run: scalingo login --api-token=${{ secrets.SCALINGO_API_TOKEN_SECNUM }}

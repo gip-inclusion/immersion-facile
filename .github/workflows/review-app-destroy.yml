@@ -13,10 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: review-app
     steps:
+      - uses: actions/checkout@v4
       - name: Install scalingo CLI
-        run: |
-          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-          echo "$HOME/bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-scalingo-cli
       - name: Login to scalingo
         run: scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN }}
       - name: Destroy review apps
