@@ -15,7 +15,6 @@ import {
   localization,
   stringWithMaxLength255,
   zEnumValidation,
-  zSchemaForType,
   zStringMinLength1,
 } from "../zodUtils";
 import {
@@ -42,11 +41,15 @@ export const agencyIdsSchema: z.Schema<AgencyId[]> = z
   .array(agencyIdSchema)
   .nonempty();
 
-export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
-  z.object({
-    agencyId: agencyIdSchema,
-  }),
-);
+export const withAgencyIdSchema: z.Schema<WithAgencyId> = z.object({
+  agencyId: agencyIdSchema,
+});
+
+export const withAgencyIdSchemaOptional: z.Schema<
+  WithAgencyId | Partial<WithAgencyId>
+> = z.object({
+  agencyId: agencyIdSchema.optional(),
+});
 
 export const agencyIdResponseSchema: z.ZodSchema<AgencyIdResponse> =
   agencyIdSchema.optional();

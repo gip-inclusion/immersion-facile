@@ -1,6 +1,6 @@
 import { defineRoute, defineRoutes } from "shared-routes";
 import { z } from "zod/v4";
-import { withAgencyIdSchema } from "../agency/agency.schema";
+import { withAgencyIdSchemaOptional } from "../agency/agency.schema";
 import {
   apiConsumerJwtSchema,
   apiConsumerSchema,
@@ -32,7 +32,7 @@ export const adminRoutes = defineRoutes({
   getDashboardUrl: defineRoute({
     method: "get",
     url: "/admin/dashboard/:dashboardName",
-    queryParamsSchema: withAgencyIdSchema.partial(),
+    queryParamsSchema: withAgencyIdSchemaOptional,
     ...withAuthorizationHeaders,
     responses: {
       200: dashboardUrlAndNameSchema,
