@@ -267,10 +267,7 @@ export const flatGetPaginatedDiscussionsParamsSchema: z.Schema<FlatGetPaginatedD
       .optional()
       .or(z.array(discussionStatusSchema).optional())
       .optional(),
-    sirets: siretSchema
-      .optional()
-      .or(z.array(siretSchema).optional())
-      .optional(),
+    search: z.string().optional(),
   });
 
 export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({

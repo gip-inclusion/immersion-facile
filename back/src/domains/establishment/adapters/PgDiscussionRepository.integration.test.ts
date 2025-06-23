@@ -501,6 +501,7 @@ describe("PgDiscussionRepository", () => {
     const discussion3 = new DiscussionBuilder()
       .withId(uuid())
       .withSiret("00000000000003")
+      .withBusinessName("Something different")
       .withAppellationCode(styliste.appellationCode)
       .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
       .withCreatedAt(new Date("2025-05-20"))
@@ -648,28 +649,55 @@ describe("PgDiscussionRepository", () => {
       });
     });
 
-    it("filters on sirets", async () => {
-      const result =
-        await pgDiscussionRepository.getPaginatedDiscussionsForUser({
-          filters: {
-            sirets: [discussion3.siret],
-          },
-          pagination: {
-            page: 1,
-            perPage: 10,
-          },
-          order: { by: "createdAt", direction: "desc" },
-          userId: user.id,
-        });
+    describe("search", () => {
+      it("filters on sirets in search", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: discussion3.siret.slice(-6), // last 6 digits of the siret (but would also work with the SIREN)
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
 
-      expectToEqual(result, {
-        data: [discussion3InList],
-        pagination: {
-          currentPage: 1,
-          numberPerPage: 10,
-          totalPages: 1,
-          totalRecords: 1,
-        },
+        expectToEqual(result, {
+          data: [discussion3InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("filters on the business name in search", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: discussion3.businessName.slice(0, 4),
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
+
+        expectToEqual(result, {
+          data: [discussion3InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
       });
     });
 

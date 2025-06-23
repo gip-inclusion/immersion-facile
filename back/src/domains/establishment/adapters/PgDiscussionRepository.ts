@@ -114,8 +114,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
         return b.where("discussions.status", "in", filters.statuses);
       },
       (b) => {
-        if (!filters?.sirets || filters.sirets.length === 0) return b;
-        return b.where("discussions.siret", "in", filters.sirets);
+        if (!filters?.search) return b;
+        return b.where((eb) =>
+          eb.or([
+            eb("discussions.siret", "ilike", `%${filters.search}%`),
+            eb("discussions.business_name", "ilike", `%${filters.search}%`),
+          ]),
+        );
       },
     );
 

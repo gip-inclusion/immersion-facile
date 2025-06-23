@@ -309,5 +309,5 @@ export type FlatGetPaginatedDiscussionsParams = {
 
   // filters
   statuses?: DiscussionStatus | DiscussionStatus[];
-  sirets?: SiretDto | SiretDto[];
+  search?: string;
 };
