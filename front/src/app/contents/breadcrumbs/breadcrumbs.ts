@@ -99,6 +99,28 @@ export const breadcrumbs: Breadcrumbs<FrontRouteKeys> = {
       },
     },
   },
+  admin: {
+    label: "Administration",
+    route: routes.admin(),
+  },
+  establishmentDashboard: {
+    label: "Tableau de bord entreprise",
+    route: routes.establishmentDashboard(),
+    children: {
+      establishmentDashboardConventions: {
+        label: "Conventions",
+        route: routes.establishmentDashboardConventions(),
+      },
+      establishmentDashboardDiscussions: {
+        label: "Discussions",
+        route: routes.establishmentDashboardDiscussions(),
+      },
+      establishmentDashboardFormEstablishment: {
+        label: "Fiche entreprise",
+        route: routes.formEstablishment(),
+      },
+    },
+  },
 };
 
 export const getBreadcrumbs = makeBreadcrumbsSegments<typeof breadcrumbs>(

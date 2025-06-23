@@ -1,8 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Breadcrumb } from "@codegouvfr/react-dsfr/Breadcrumb";
 import { slice } from "ramda";
-
-import { errors } from "shared";
 import { getBreadcrumbs } from "src/app/contents/breadcrumbs/breadcrumbs";
 import { useRoute } from "../routes/routes";
 
@@ -12,8 +10,7 @@ export const Breadcrumbs = () => {
   const segments = getBreadcrumbs({
     currentRouteKey: currentRouteName,
   });
-  if (segments.length === 1)
-    throw errors.breadcrumbs.notFound({ currentRouteName });
+  if (segments.length === 1) return null;
   const ancestors = slice(0, -1, segments);
   return (
     <div className={fr.cx("fr-container", "fr-mt-4w")}>
