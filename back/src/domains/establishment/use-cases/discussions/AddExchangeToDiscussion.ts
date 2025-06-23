@@ -2,10 +2,12 @@ import {
   type Attachment,
   type DateString,
   type DiscussionDto,
+  type DiscussionExchangeForbiddenParams,
   type DiscussionId,
   type Exchange,
   type ExchangeRole,
   type InclusionConnectedUser,
+  type UserId,
   attachmentSchema,
   discussionIdSchema,
   errors,
@@ -15,6 +17,7 @@ import {
 import { z } from "zod";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
+import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
@@ -89,21 +92,24 @@ const defaultSubject = "Sans objet";
 
 export class AddExchangeToDiscussion extends TransactionalUseCase<
   AddExchangeToDiscussionInput,
-  Exchange,
+  Exchange | DiscussionExchangeForbiddenParams,
   InclusionConnectedUser | null
 > {
   protected inputSchema = messageInputSchema;
 
   readonly #createNewEvent: CreateNewEvent;
   readonly #timeGateway: TimeGateway;
+  readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     createNewEvent: CreateNewEvent,
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
   ) {
     super(uowPerformer);
     this.#createNewEvent = createNewEvent;
+    this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
   }
 
@@ -111,13 +117,18 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     input: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
     inclusionConnectedUser: InclusionConnectedUser | null,
-  ): Promise<Exchange> {
+  ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
     if (input.source === "dashboard" && !inclusionConnectedUser) {
       throw errors.user.unauthorized();
     }
     return await Promise.all(
       input.messageInputs.map((messageInput) =>
-        this.#processSendMessage(uow, input.source, messageInput),
+        this.#processSendMessage(
+          uow,
+          input.source,
+          messageInput,
+          inclusionConnectedUser?.id || null,
+        ),
       ),
     ).then((exchanges) => exchanges[0]);
   }
@@ -126,22 +137,85 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     uow: UnitOfWork,
     source: InputSource,
     params: MessageInput,
-  ): Promise<Exchange> {
+    userId: UserId | null,
+  ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
     const { discussionId, message, recipientRole, attachments } = params;
 
-    const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion) throw errors.discussion.notFound({ discussionId });
     const sender =
       recipientRole === "establishment"
         ? "potentialBeneficiary"
         : "establishment";
-    const formattedSubject = makeFormattedSubject({
-      subject: isFullMessageInput(params) ? params.subject : undefined,
-      discussion,
-      source,
-    });
-    const exchange: Exchange = {
-      subject: formattedSubject,
+
+    const discussion = await uow.discussionRepository.getById(discussionId);
+    if (!discussion) throw errors.discussion.notFound({ discussionId });
+
+    if (discussion.status !== "PENDING") {
+      const params: DiscussionExchangeForbiddenParams = {
+        reason: "discussion_completed",
+        sender,
+      };
+
+      this.#saveNotificationAndRelatedEvent(uow, {
+        followedIds: {
+          userId: userId || undefined,
+          establishmentSiret: discussion.siret,
+        },
+        kind: "email",
+        templatedContent: {
+          kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+          params,
+          recipients:
+            sender === "establishment"
+              ? [
+                  discussion.establishmentContact.email,
+                  ...discussion.establishmentContact.copyEmails,
+                ]
+              : [discussion.potentialBeneficiary.email],
+        },
+      });
+
+      return params;
+    }
+
+    const establishment =
+      await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+        discussion.siret,
+      );
+
+    if (!establishment) {
+      const params: DiscussionExchangeForbiddenParams = {
+        reason: "establishment_missing",
+        sender,
+      };
+
+      this.#saveNotificationAndRelatedEvent(uow, {
+        followedIds: {
+          userId: userId || undefined,
+          establishmentSiret: discussion.siret,
+        },
+        kind: "email",
+        templatedContent: {
+          kind: "DISCUSSION_EXCHANGE_FORBIDEN",
+          params,
+          recipients:
+            sender === "establishment"
+              ? [
+                  discussion.establishmentContact.email,
+                  ...discussion.establishmentContact.copyEmails,
+                ]
+              : [discussion.potentialBeneficiary.email],
+        },
+      });
+
+      return params;
+    }
+
+    return this.#addExchangeAndSendEvent(uow, discussion, {
+      subject: makeFormattedSubject({
+        subject: isFullMessageInput(params) ? params.subject : undefined,
+        discussion,
+        source,
+      }),
       message,
       sentAt: isFullMessageInput(params)
         ? params.sentAt
@@ -149,17 +223,26 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
       recipient: recipientRole,
       sender,
       attachments,
-    };
-    await uow.discussionRepository.update({
-      ...discussion,
-      exchanges: [...discussion.exchanges, exchange],
     });
-    await uow.outboxRepository.save(
-      this.#createNewEvent({
-        topic: "ExchangeAddedToDiscussion",
-        payload: { discussionId: discussion.id, siret: discussion.siret },
+  }
+
+  async #addExchangeAndSendEvent(
+    uow: UnitOfWork,
+    discussion: DiscussionDto,
+    exchange: Exchange,
+  ): Promise<Exchange> {
+    await Promise.all([
+      uow.discussionRepository.update({
+        ...discussion,
+        exchanges: [...discussion.exchanges, exchange],
       }),
-    );
+      uow.outboxRepository.save(
+        this.#createNewEvent({
+          topic: "ExchangeAddedToDiscussion",
+          payload: { discussionId: discussion.id, siret: discussion.siret },
+        }),
+      ),
+    ]);
     return exchange;
   }
 }
@@ -182,6 +265,5 @@ const makeFormattedSubject = ({
 
 const isFullMessageInput = (
   messageInput: MessageInput,
-): messageInput is FullMessageInput => {
-  return "sentAt" in messageInput && "subject" in messageInput;
-};
+): messageInput is FullMessageInput =>
+  "sentAt" in messageInput && "subject" in messageInput;

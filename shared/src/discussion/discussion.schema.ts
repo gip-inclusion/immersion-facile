@@ -21,6 +21,8 @@ import {
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
   type DiscussionEmailParams,
+  type DiscussionExchangeForbiddenParams,
+  type DiscussionExchangeForbidenReason,
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
@@ -41,6 +43,10 @@ import {
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
+export const discussionExchangeForbidenReasons = [
+  "establishment_missing",
+  "discussion_completed",
+] as const;
 
 export const makeExchangeEmailRegex = (replyDomain: string) =>
   new RegExp(`[^_]+_[^_]+__([^_]+)_([^@]+)@${replyDomain}$`);
@@ -86,6 +92,8 @@ export const makeExchangeEmailSchema = (
     );
 
 export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
+export const discussionExchangeForbidenReasonSchema: z.Schema<DiscussionExchangeForbidenReason> =
+  z.enum(discussionExchangeForbidenReasons);
 
 export const attachmentSchema: z.Schema<Attachment> = z.object({
   name: z.string(),
@@ -291,3 +299,8 @@ export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
 export const paginatedDiscussionListSchema = createPaginatedSchema(
   discussionInListSchema,
 );
+export const discussionExchangeForbiddenParamsSchema: z.Schema<DiscussionExchangeForbiddenParams> =
+  z.object({
+    sender: exchangeRoleSchema,
+    reason: discussionExchangeForbidenReasonSchema,
+  });

@@ -10,7 +10,10 @@ import type {
   InternshipKind,
   Renewed,
 } from "../convention/convention.dto";
-import type { DiscussionKind } from "../discussion/discussion.dto";
+import type {
+  DiscussionExchangeForbiddenParams,
+  DiscussionKind,
+} from "../discussion/discussion.dto";
 import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
@@ -271,6 +274,7 @@ export type EmailParamsByEmailType = {
     subject: string;
     htmlContent: string;
   };
+  DISCUSSION_EXCHANGE_FORBIDEN: DiscussionExchangeForbiddenParams;
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
     errorMessage: string;
