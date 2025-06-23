@@ -19,6 +19,7 @@ const domComSupportedCountryCodes: CountryCode[] = [
 const supportedCountryCode: CountryCode[] = [
   ...domComSupportedCountryCodes,
   "FR",
+  "DE",
 ];
 
 export const phoneSchema: z.Schema<Phone> = zStringMinLength1.transform(

@@ -320,26 +320,14 @@ describe("HttpOpenCageDataAddressGateway", () => {
           const expectedResult = [
             {
               address: {
-                streetNumberAndAddress: "Strada Bogdan Amaru",
-                postcode: "240085",
+                streetNumberAndAddress: "1 Platz der Deutschen Einheit",
+                postcode: "44137",
                 departmentCode: "999",
-                city: "Râmnicu Vâlcea",
+                city: "Dortmund",
               },
               position: {
-                lat: 45.0944560977954,
-                lon: 24.3627752261322,
-              },
-            },
-            {
-              address: {
-                city: "Râmnicu Vâlcea",
-                departmentCode: "999",
-                postcode: "240312",
-                streetNumberAndAddress: "Strada Bogdan Amaru",
-              },
-              position: {
-                lat: 45.09337695,
-                lon: 24.36409695,
+                lat: 51.51623145,
+                lon: 7.45792354654804,
               },
             },
           ];

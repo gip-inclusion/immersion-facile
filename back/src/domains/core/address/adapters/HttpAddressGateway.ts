@@ -132,10 +132,9 @@ export class HttpAddressGateway implements AddressGateway {
           throw errors.address.queryToShort({
             minLength: lookupStreetAddressQueryMinLength,
           });
-
+        console.log(allSupportedCountryCodesAsQueryParam);
         return this.httpClient.geocoding({
           queryParams: {
-            countrycode: "de,ro",
             key: this.geocodingApiKey,
             language,
             q: query,
@@ -143,6 +142,7 @@ export class HttpAddressGateway implements AddressGateway {
         });
       })
       .then((response) => {
+        console.log(response.status);
         if (response.status !== 200) return [];
         return response.body.features
           .map((feature) => this.#toAddressAndPosition(feature))

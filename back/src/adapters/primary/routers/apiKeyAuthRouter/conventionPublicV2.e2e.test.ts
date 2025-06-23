@@ -142,6 +142,8 @@ describe("Convention routes", () => {
         urlParams: { conventionId: convention.id },
       });
 
+      console.log(" responsz.body ====>", response.body);
+
       expectHttpResponseToEqual(response, {
         body: {
           ...convention,
