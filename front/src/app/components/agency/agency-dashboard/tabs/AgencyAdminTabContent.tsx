@@ -45,9 +45,11 @@ const AdminAgencyLine = (agency: AgencyDtoForAgencyUsersAndAdmins) => [
 
   <Button
     key={`${agency.id}-see-agency-link`}
-    {...routes.agencyDashboardAgencyDetails({
-      agencyId: agency.id,
-    })}
+    linkProps={
+      routes.agencyDashboardAgencyDetails({
+        agencyId: agency.id,
+      }).link
+    }
     size="small"
     priority="tertiary"
     iconId="fr-icon-arrow-right-line"
