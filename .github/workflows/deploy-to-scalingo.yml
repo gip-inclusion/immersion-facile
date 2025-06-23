@@ -36,10 +36,9 @@ jobs:
       group: deploy-to-scalingo-${{ inputs.environment }}
       cancel-in-progress: true
     steps:
+      - uses: actions/checkout@v4
       - name: Install scalingo CLI
-        run: |
-          wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-          echo "$HOME/bin" >> $GITHUB_PATH
+        uses: ./.github/actions/install-scalingo-cli
       - name: Download back artefact
         uses: actions/download-artifact@v4
         with:
