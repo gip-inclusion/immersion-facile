@@ -3,7 +3,9 @@ import type {
   AbsoluteUrl,
   AgencyId,
   ConventionSupportedJwt,
+  DataWithPagination,
   DiscussionExchangeForbiddenParams,
+  DiscussionInList,
   DiscussionReadDto,
   Exchange,
   InclusionConnectedUser,
@@ -12,7 +14,10 @@ import type {
   WithDiscussionStatus,
   WithIdToken,
 } from "shared";
-import type { FetchDiscussionRequestedPayload } from "../domain/discussion/discussion.slice";
+import type {
+  FetchDiscussionListRequestedPayload,
+  FetchDiscussionRequestedPayload,
+} from "../domain/discussion/discussion.slice";
 
 export interface InclusionConnectedGateway {
   getCurrentUser$(token: string): Observable<InclusionConnectedUser>;
@@ -39,4 +44,7 @@ export interface InclusionConnectedGateway {
       discussionId: string;
     } & WithDiscussionStatus,
   ): Observable<void>;
+  getDiscussions$(
+    payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>>;
 }

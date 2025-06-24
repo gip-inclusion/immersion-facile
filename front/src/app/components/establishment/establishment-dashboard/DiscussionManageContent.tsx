@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Badge, { type BadgeProps } from "@codegouvfr/react-dsfr/Badge";
+import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,7 +15,6 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type DiscussionDisplayStatus,
   type DiscussionId,
   type DiscussionReadDto,
   type Email,
@@ -26,7 +25,6 @@ import {
   domElementIds,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
-  getDiscussionDisplayStatus,
   toDisplayedDate,
 } from "shared";
 import {
@@ -37,6 +35,7 @@ import {
   RejectDiscussionModal,
   openRejectDiscussionModal,
 } from "src/app/components/admin/establishments/RejectDiscussionModal";
+import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
 import { useDiscussion } from "src/app/hooks/discussion.hooks";
 import { useFeedbackEventCallback } from "src/app/hooks/feedback.hooks";
@@ -204,39 +203,6 @@ const getDiscussionButtons = ({
   ] as unknown as [ButtonPropsWithId, ...ButtonPropsWithId[]];
 };
 
-const statusBadgeData: Record<
-  DiscussionDisplayStatus,
-  {
-    severity: BadgeProps["severity"];
-    label: string;
-  }
-> = {
-  new: {
-    severity: "info",
-    label: "Nouveau",
-  },
-  "needs-answer": {
-    severity: "warning",
-    label: "En cours - à répondre",
-  },
-  "needs-urgent-answer": {
-    severity: "error",
-    label: "En cours - Urgent",
-  },
-  answered: {
-    severity: "new",
-    label: "En cours - répondu",
-  },
-  accepted: {
-    severity: "success",
-    label: "Acceptée",
-  },
-  rejected: {
-    severity: undefined,
-    label: "Refusée",
-  },
-};
-
 const getDiscussionStatusUpdatedFeedbackMessage = (
   discussion: DiscussionReadDto,
 ): string => {
@@ -268,15 +234,6 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
 
 const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
   const { discussion } = props;
-
-  const statusBadge =
-    statusBadgeData[
-      getDiscussionDisplayStatus({
-        discussion,
-        now: new Date(),
-      })
-    ];
-
   return (
     <>
       <Feedback
@@ -297,13 +254,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <header>
         <Button
           type="button"
-          onClick={() =>
-            routes
-              .establishmentDashboardDiscussions({
-                discussionId: discussion.id,
-              })
-              .push()
-          }
+          onClick={() => routes.establishmentDashboardDiscussions().push()}
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
           iconPosition="left"
@@ -346,16 +297,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
           )}
         </div>
         <DiscussionMeta>
-          <p
-            key="status-badge"
-            id={domElementIds.establishmentDashboard.discussion.statusBadge}
-            className={fr.cx(
-              "fr-badge",
-              statusBadge.severity && `fr-badge--${statusBadge.severity}`,
-            )}
-          >
-            {statusBadge.label}
-          </p>
+          <DiscussionStatusBadge discussion={discussion} />
           {discussion.contactMode === "EMAIL" &&
             discussion.potentialBeneficiary.immersionObjective}
           {discussion.appellation.appellationLabel}

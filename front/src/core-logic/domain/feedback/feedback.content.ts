@@ -53,6 +53,7 @@ const topics = [
   "dashboard-discussion",
   "establishment-dashboard-users-rights",
   "establishment-dashboard-discussion-send-message",
+  "establishment-dashboard-discussion-list",
   "establishments-batch",
   "form-establishment",
   "login-by-email",
@@ -579,6 +580,14 @@ export const feedbacks: Record<
       title: "Problème lors de la récupération de la convention",
       message:
         "Une erreur est survenue lors de la récupération de la convention",
+    },
+  },
+  "establishment-dashboard-discussion-list": {
+    "fetch.error": {
+      action: discussionSlice.actions.fetchDiscussionListFailed,
+      title: "Problème lors de la récupération des discussions",
+      message:
+        "Une erreur est survenue lors de la récupération des discussions",
     },
   },
   "establishment-dashboard-users-rights": {

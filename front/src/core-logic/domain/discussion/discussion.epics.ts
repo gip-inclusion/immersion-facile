@@ -92,8 +92,34 @@ const sendMessageEpic: DiscussionEpic = (
     ),
   );
 
+const fetchDiscussionListEpic: DiscussionEpic = (
+  action$,
+  _state$,
+  { inclusionConnectedGateway },
+) =>
+  action$.pipe(
+    filter(discussionSlice.actions.fetchDiscussionListRequested.match),
+    switchMap((action) =>
+      inclusionConnectedGateway.getDiscussions$(action.payload).pipe(
+        map((discussionsWithPagination) =>
+          discussionSlice.actions.fetchDiscussionListSucceeded({
+            discussionsWithPagination,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+        catchEpicError((error) =>
+          discussionSlice.actions.fetchDiscussionListFailed({
+            errorMessage: error.message,
+            feedbackTopic: action.payload.feedbackTopic,
+          }),
+        ),
+      ),
+    ),
+  );
+
 export const discussionEpics = [
   fetchDiscussionByIdEpic,
   updateDiscussionStatusEpic,
   sendMessageEpic,
+  fetchDiscussionListEpic,
 ];

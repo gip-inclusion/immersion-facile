@@ -1,8 +1,10 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type {
   AbsoluteUrl,
   AgencyId,
+  DataWithPagination,
   DiscussionExchangeForbiddenParams,
+  DiscussionInList,
   DiscussionReadDto,
   Exchange,
   InclusionConnectedAllowedRoutes,
@@ -18,16 +20,18 @@ import {
   otherwiseThrow,
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
-import type { FetchDiscussionRequestedPayload } from "src/core-logic/domain/discussion/discussion.slice";
+import type {
+  FetchDiscussionListRequestedPayload,
+  FetchDiscussionRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway
-  implements InclusionConnectedGateway
-{
+  implements InclusionConnectedGateway {
   constructor(
     private readonly httpClient: HttpClient<InclusionConnectedAllowedRoutes>,
-  ) {}
+  ) { }
   getDiscussionById$({
     discussionId,
     jwt,
@@ -48,6 +52,25 @@ export class HttpInclusionConnectedGateway
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 403 }, logBodyAndThrow)
             .with({ status: 404 }, () => undefined)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getDiscussions$(
+    payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return from(
+      this.httpClient
+        .getDiscussions({
+          queryParams: payload.filters,
+          headers: { authorization: payload.jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

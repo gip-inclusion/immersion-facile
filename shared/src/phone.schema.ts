@@ -41,3 +41,7 @@ export const phoneSchema: z.Schema<Phone> = zStringMinLength1.transform(
 export const isValidMobilePhone = (phoneNumber: Phone) => {
   return parsePhoneNumber(phoneNumber).getType() === "MOBILE";
 };
+
+export const toDisplayedPhoneNumber = (phoneNumber: string) => {
+  return parsePhoneNumber(phoneNumber).format("NATIONAL");
+};

@@ -1,0 +1,27 @@
+@import "../../../config/responsive";
+
+
+.im-rich-table {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @include for-screen-min($bp-lg) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &__dropdowns {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @include for-screen-min($bp-lg) {
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+}

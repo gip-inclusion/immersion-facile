@@ -1,5 +1,6 @@
 import {
   DiscussionBuilder,
+  type DiscussionInList,
   type DiscussionReadDto,
   type Exchange,
   expectToEqual,
@@ -13,8 +14,10 @@ import {
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type DiscussionState,
+  type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
   type SendExchangeRequestedPayload,
   discussionSlice,
+  initialDiscussionsWithPagination,
 } from "./discussion.slice";
 
 describe("Discussion slice", () => {
@@ -26,6 +29,7 @@ describe("Discussion slice", () => {
     isLoading: false,
     discussion: null,
     fetchError: null,
+    discussionsWithPagination: initialDiscussionsWithPagination,
   };
   const jwt = "my-jwt";
   const discussion: DiscussionReadDto = new DiscussionBuilder().buildRead();
@@ -56,6 +60,7 @@ describe("Discussion slice", () => {
       isLoading: false,
       discussion: null,
       fetchError: null,
+      discussionsWithPagination: initialDiscussionsWithPagination,
     });
   });
 
@@ -332,6 +337,118 @@ describe("Discussion slice", () => {
         },
       });
     });
+    describe("fetch discussion list", () => {
+      it("fetches discussion list successfully and keeps filters", () => {
+        const filtersToKeep: FlatGetPaginatedDiscussionsParamsWithStatusesAsArray =
+          {
+            orderBy: "createdAt",
+            orderDirection: "asc",
+            page: 1,
+            perPage: 20,
+            search: "test",
+          };
+        expectDiscussionSelector(defaultStartingDiscussionState);
+        store.dispatch(
+          discussionSlice.actions.fetchDiscussionListRequested({
+            jwt,
+            filters: filtersToKeep,
+            feedbackTopic: "establishment-dashboard-discussion-list",
+          }),
+        );
+
+        expectDiscussionSelector({
+          ...defaultStartingDiscussionState,
+          isLoading: true,
+        });
+
+        dependencies.inclusionConnectedGateway.discussions$.next({
+          data: [discussionToDiscussionInList(discussion)],
+          pagination: {
+            totalRecords: 1,
+            currentPage: 1,
+            totalPages: 1,
+            numberPerPage: 10,
+          },
+        });
+
+        expectDiscussionSelector({
+          ...defaultStartingDiscussionState,
+          discussionsWithPagination: {
+            data: [
+              {
+                ...discussionToDiscussionInList(discussion),
+              },
+            ],
+            pagination: {
+              totalRecords: 1,
+              currentPage: 1,
+              totalPages: 1,
+              numberPerPage: 10,
+            },
+            filters: filtersToKeep,
+          },
+        });
+      });
+      it("fails to fetch discussion list with feedback", () => {
+        expectDiscussionSelector(defaultStartingDiscussionState);
+        store.dispatch(
+          discussionSlice.actions.fetchDiscussionListRequested({
+            jwt,
+            filters: {
+              orderBy: "createdAt",
+              orderDirection: "desc",
+              page: 1,
+              perPage: 10,
+            },
+            feedbackTopic: "establishment-dashboard-discussion-list",
+          }),
+        );
+
+        expectDiscussionSelector({
+          ...defaultStartingDiscussionState,
+          isLoading: true,
+        });
+
+        dependencies.inclusionConnectedGateway.discussions$.error(
+          discussionFetchError,
+        );
+
+        expectDiscussionSelector({
+          ...defaultStartingDiscussionState,
+        });
+        expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
+          "establishment-dashboard-discussion-list": {
+            on: "fetch",
+            level: "error",
+            title: "Problème lors de la récupération des discussions",
+            message: discussionFetchErrorMessage,
+          },
+        });
+      });
+    });
+
+    const feedGatewayWithDiscussionOrError = (
+      discussionOrError?: DiscussionReadDto | Error,
+    ) => {
+      discussionOrError instanceof Error
+        ? dependencies.inclusionConnectedGateway.discussion$.error(
+            discussionOrError,
+          )
+        : dependencies.inclusionConnectedGateway.discussion$.next(
+            discussionOrError,
+          );
+    };
+
+    const expectDiscussionSelector = ({
+      isLoading,
+      discussion,
+    }: DiscussionState) => {
+      expectToEqual(discussionSelectors.isLoading(store.getState()), isLoading);
+      expectToEqual(
+        discussionSelectors.discussion(store.getState()),
+        discussion,
+      );
+    };
   });
 
   const feedGatewayWithDiscussionOrError = (
@@ -352,5 +469,19 @@ describe("Discussion slice", () => {
   }: DiscussionState) => {
     expectToEqual(discussionSelectors.isLoading(store.getState()), isLoading);
     expectToEqual(discussionSelectors.discussion(store.getState()), discussion);
+  };
+  const discussionToDiscussionInList = (
+    discussion: DiscussionReadDto,
+  ): DiscussionInList => {
+    return {
+      ...discussion,
+      potentialBeneficiary: {
+        firstName: discussion.potentialBeneficiary.firstName,
+        lastName: discussion.potentialBeneficiary.lastName,
+        phone: null,
+      },
+      city: discussion.address.city,
+      immersionObjective: null,
+    };
   };
 });
