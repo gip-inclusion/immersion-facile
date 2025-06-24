@@ -185,6 +185,12 @@ export type WithDiscussionStatusPending = {
   status: "PENDING";
 };
 
+export const discussionStatuses: DiscussionStatus[] = [
+  "ACCEPTED",
+  "REJECTED",
+  "PENDING",
+];
+
 export type WithDiscussionRejection =
   | RejectionWithoutReason
   | RejectionWithReason
@@ -307,6 +313,8 @@ export type DiscussionOrderKey = ExtractFromExisting<
   "createdAt"
 >;
 
+export type DiscussionOrderDirection = "asc" | "desc";
+
 export type FlatGetPaginatedDiscussionsParams = {
   // pagination
   page?: number;
@@ -314,7 +322,7 @@ export type FlatGetPaginatedDiscussionsParams = {
 
   // sort
   orderBy?: DiscussionOrderKey;
-  orderDirection?: "asc" | "desc";
+  orderDirection?: DiscussionOrderDirection;
 
   // filters
   statuses?: DiscussionStatus | DiscussionStatus[];

@@ -2,17 +2,16 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { type ReactNode, useMemo } from "react";
-import { SectionHighlight } from "react-design-system";
-import { HeadingSection } from "react-design-system";
+import { HeadingSection, SectionHighlight } from "react-design-system";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
-import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
+import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
+import { DiscussionManageContent } from "src/app/components/establishment/establishment-dashboard/DiscussionManageContent";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import type {
   EstablishmentDashboardRouteName,
   FrontEstablishmentDashboardRoute,
 } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
-import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
 import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { routes } from "src/app/routes/routes";
@@ -33,6 +32,7 @@ export const EstablishmentDashboardTabs = ({
     () => establishmentDashboardTabFromRouteName[route.name],
     [route.name],
   );
+
   const tabs = useMemo(
     () =>
       getDashboardTabs(
@@ -96,10 +96,8 @@ export const EstablishmentDashboardTabs = ({
 const makeEstablishmentDashboardTabs = (
   {
     dashboards: {
-      establishments: { conventions, discussions },
+      establishments: { conventions },
     },
-    firstName,
-    lastName,
     establishments,
   }: InclusionConnectedUser,
   route: FrontEstablishmentDashboardRoute,
@@ -137,27 +135,7 @@ const makeEstablishmentDashboardTabs = (
       route.params.discussionId ? (
         <DiscussionManageContent discussionId={route.params.discussionId} />
       ) : (
-        <>
-          <HeadingSection
-            title="Gérer une candidature"
-            titleAs="h2"
-            className={fr.cx("fr-mt-0")}
-          >
-            <ManageDiscussionFormSection />
-          </HeadingSection>
-          {discussions ? (
-            <MetabaseView
-              title={`Suivi des candidatures pour ${firstName} ${lastName}`}
-              url={discussions}
-            />
-          ) : (
-            <p>
-              {" "}
-              Nous n'avons pas trouvé de candidatures où vous êtes référencés en
-              tant que contact d'entreprise.
-            </p>
-          )}
-        </>
+        <DiscussionList />
       ),
   },
   ...(establishments &&
