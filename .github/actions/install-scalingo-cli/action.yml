@@ -3,19 +3,20 @@ name: 'Install Scalingo CLI'
 runs:
   using: 'composite'
   steps:
-    - name: Install Scalingo CLI
-      shell: bash
-      env:
-        SCALINGO_CLI_VERSION: 1.34.0
-      run: |
-        wget https://github.com/Scalingo/cli/releases/download/${SCALINGO_CLI_VERSION}/scalingo_${SCALINGO_CLI_VERSION}_linux_amd64.tar.gz
-        tar -xzf scalingo_${SCALINGO_CLI_VERSION}_linux_amd64.tar.gz
-        mv scalingo_${SCALINGO_CLI_VERSION}_linux_amd64/scalingo .
-        chmod +x scalingo
-        sudo mv scalingo /usr/local/bin/
-        scalingo --version
-    # Keep this for when the CLI is fixed
-    # - name: Install scalingo CLI (latest)
+    # Keep this for when you need to install a specific version of the CLI
+    # - name: Install Scalingo CLI
+    #   shell: bash
+    #   env:
+    #     SCALINGO_CLI_VERSION: 1.34.0
     #   run: |
-    #     wget -qO- https://cli-dl.scalingo.com/install.sh | bash
-    #    echo "$HOME/bin" >> $GITHUB_PATH
+    #     wget https://github.com/Scalingo/cli/releases/download/${SCALINGO_CLI_VERSION}/scalingo_${SCALINGO_CLI_VERSION}_linux_amd64.tar.gz
+    #     tar -xzf scalingo_${SCALINGO_CLI_VERSION}_linux_amd64.tar.gz
+    #     mv scalingo_${SCALINGO_CLI_VERSION}_linux_amd64/scalingo .
+    #     chmod +x scalingo
+    #     sudo mv scalingo /usr/local/bin/
+    #     scalingo --version
+    
+    - name: Install scalingo CLI (latest)
+      run: |
+        wget -qO- https://cli-dl.scalingo.com/install.sh | bash
+        echo "$HOME/bin" >> $GITHUB_PATH
