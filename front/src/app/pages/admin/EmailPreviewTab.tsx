@@ -278,6 +278,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
     internshipKind: "immersion",
+    establishmentTutorEmail: "ESTABLISHMENT_TUTOR_EMAIL",
   },
   ASSESSMENT_AGENCY_NOTIFICATION: {
     agencyLogoUrl: defaultEmailPreviewUrl,

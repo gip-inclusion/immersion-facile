@@ -91,6 +91,7 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     internshipKind: InternshipKind;
+    establishmentTutorEmail: Email;
   };
   ASSESSMENT_ESTABLISHMENT_REMINDER: {
     assessmentCreationLink: string;

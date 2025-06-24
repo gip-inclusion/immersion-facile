@@ -244,6 +244,8 @@ describe("SendAssessmentNeededNotifications", () => {
                 conventionEndingTomorrow.signatories.beneficiary.firstName,
               businessName: conventionEndingTomorrow.businessName,
               internshipKind: conventionEndingTomorrow.internshipKind,
+              establishmentTutorEmail:
+                conventionEndingTomorrow.establishmentTutor.email,
             },
             recipients: [
               conventionEndingTomorrow.signatories.beneficiary.email,
@@ -349,6 +351,8 @@ describe("SendAssessmentNeededNotifications", () => {
                 conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
               businessName: conventionCCIEndingTomorrow.businessName,
               internshipKind: conventionCCIEndingTomorrow.internshipKind,
+              establishmentTutorEmail:
+                conventionCCIEndingTomorrow.establishmentTutor.email,
             },
             recipients: [
               conventionCCIEndingTomorrow.signatories.beneficiary.email,
@@ -392,6 +396,8 @@ describe("SendAssessmentNeededNotifications", () => {
             conventionEndingTomorrow.signatories.beneficiary.firstName,
           businessName: conventionEndingTomorrow.businessName,
           internshipKind: conventionEndingTomorrow.internshipKind,
+          establishmentTutorEmail:
+            conventionEndingTomorrow.establishmentTutor.email,
         },
         recipients: [conventionEndingTomorrow.signatories.beneficiary.email],
         sender: {
