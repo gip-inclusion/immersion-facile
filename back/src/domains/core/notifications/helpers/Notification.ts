@@ -35,6 +35,7 @@ export const makeSaveNotificationAndRelatedEvent =
   async (
     uow: UnitOfWork,
     notificationContent: NotificationContentAndFollowedIds,
+    options?: { priority: number },
   ): Promise<Notification> => {
     const now = timeGateway.now().toISOString();
 
@@ -51,6 +52,7 @@ export const makeSaveNotificationAndRelatedEvent =
         id: notification.id,
         kind: notification.kind,
       },
+      priority: options?.priority,
     });
 
     await Promise.all([
