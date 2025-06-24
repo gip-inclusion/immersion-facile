@@ -486,6 +486,7 @@ interface Outbox {
   topic: string;
   payload: Json;
   status: EventStatus;
+  priority: number | null;
 }
 
 interface Nps {

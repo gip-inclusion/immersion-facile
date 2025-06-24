@@ -76,8 +76,10 @@ export class PgOutboxQueries implements OutboxQueries {
         "published_at",
         "subscription_id",
         "error_message",
+        "priority",
       ])
       .where("was_quarantined", "=", false)
+      .orderBy("priority asc")
       .orderBy("occurred_at asc");
   }
 }

@@ -21,6 +21,7 @@ export type StoredEventRow = {
   subscription_id: string | null;
   error_message: string | null;
   status: EventStatus;
+  priority: number | null;
 };
 
 const logger = createLogger(__filename);
@@ -95,7 +96,8 @@ export class PgOutboxRepository implements OutboxRepository {
   async #storeEventInOutboxOrRecoverItIfAlreadyThere(
     event: DomainEvent,
   ): Promise<DomainEvent> {
-    const { id, occurredAt, wasQuarantined, topic, payload, status } = event;
+    const { id, occurredAt, wasQuarantined, topic, payload, status, priority } =
+      event;
 
     const eventAlreadyInDb = await this.#getEventById(event.id);
     if (eventAlreadyInDb) {
@@ -117,6 +119,7 @@ export class PgOutboxRepository implements OutboxRepository {
       topic,
       payload: JSON.stringify(payload),
       status,
+      priority,
     });
 
     await builder.execute();
@@ -168,6 +171,7 @@ export class PgOutboxRepository implements OutboxRepository {
         "published_at",
         "subscription_id",
         "error_message",
+        "priority",
       ])
       .where("outbox.id", "=", id)
       .orderBy("published_at asc")
@@ -260,4 +264,5 @@ const storedEventOutboxToDomainEvent = (row: StoredEventRow): DomainEvent => ({
   wasQuarantined: row.was_quarantined,
   publications: [],
   status: row.status,
+  ...(row.priority ? { priority: row.priority } : {}),
 });

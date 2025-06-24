@@ -58,6 +58,7 @@ type GenericEvent<T extends string, P> = {
   publications: EventPublication[];
   wasQuarantined: boolean;
   status: EventStatus;
+  priority?: number;
 };
 
 export type NotificationAddedEvent = GenericEvent<

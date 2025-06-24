@@ -40,6 +40,7 @@ type CreateNewEventParams<T extends DomainTopic> = {
   wasQuarantined?: boolean;
   publications?: EventPublication[];
   status?: EventStatus;
+  priority?: number;
 };
 
 export type CreateNewEvent = <T extends DomainTopic>(
