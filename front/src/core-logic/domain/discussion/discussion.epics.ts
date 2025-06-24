@@ -1,4 +1,5 @@
 import { filter, map, switchMap } from "rxjs";
+import { discussionExchangeForbidenContents } from "shared";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
@@ -67,11 +68,19 @@ const sendMessageEpic: DiscussionEpic = (
     filter(discussionSlice.actions.sendExchangeRequested.match),
     switchMap((action) =>
       inclusionConnectedGateway.sendMessage$(action.payload.exchangeData).pipe(
-        map((exchange) =>
-          discussionSlice.actions.sendExchangeSucceeded({
-            exchangeData: exchange,
-            feedbackTopic: action.payload.feedbackTopic,
-          }),
+        map((result) =>
+          "reason" in result
+            ? discussionSlice.actions.sendExchangeFailed({
+                errorMessage:
+                  discussionExchangeForbidenContents[result.sender][
+                    result.reason
+                  ],
+                feedbackTopic: action.payload.feedbackTopic,
+              })
+            : discussionSlice.actions.sendExchangeSucceeded({
+                exchangeData: result,
+                feedbackTopic: action.payload.feedbackTopic,
+              }),
         ),
         catchEpicError((error) =>
           discussionSlice.actions.sendExchangeFailed({

@@ -2,6 +2,7 @@ import { type Observable, from } from "rxjs";
 import type {
   AbsoluteUrl,
   AgencyId,
+  DiscussionExchangeForbiddenParams,
   DiscussionReadDto,
   Exchange,
   InclusionConnectedAllowedRoutes,
@@ -120,7 +121,7 @@ export class HttpInclusionConnectedGateway
 
   public sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<Exchange> {
+  ): Observable<Exchange | DiscussionExchangeForbiddenParams> {
     return from(
       this.httpClient
         .replyToDiscussion({
