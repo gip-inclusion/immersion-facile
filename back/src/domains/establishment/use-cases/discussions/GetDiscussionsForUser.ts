@@ -21,7 +21,7 @@ export const makeGetDiscussionsForUser = createTransactionalUseCase<
   },
   async ({ inputParams, uow, currentUser }) => {
     const getPaginatedDiscussionsParams =
-      flatDiscussionQueryParamsTogetPaginatedDiscussionsParams(inputParams);
+      flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(inputParams);
 
     return uow.discussionRepository.getPaginatedDiscussionsForUser({
       ...getPaginatedDiscussionsParams,
@@ -30,7 +30,7 @@ export const makeGetDiscussionsForUser = createTransactionalUseCase<
   },
 );
 
-export const flatDiscussionQueryParamsTogetPaginatedDiscussionsParams = (
+export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
   flatParams: FlatGetPaginatedDiscussionsParams,
 ): OmitFromExistingKeys<GetPaginatedDiscussionsForUserParams, "userId"> => {
   const { page, perPage, orderBy, orderDirection, statuses, search, ...rest } =

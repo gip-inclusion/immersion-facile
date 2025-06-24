@@ -11,6 +11,7 @@ import {
   type DiscussionInList,
   type DiscussionOrderKey,
   type DiscussionStatus,
+  type EstablishmentRole,
   type Exchange,
   type PotentialBeneficiaryCommonProps,
   type RejectionKind,
@@ -97,6 +98,10 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }: GetPaginatedDiscussionsForUserParams): Promise<
     DataWithPagination<DiscussionInList>
   > {
+    const authorizedRoles: EstablishmentRole[] = [
+      "establishment-admin",
+      "establishment-contact",
+    ];
     const builder = pipeWithValue(
       this.transaction
         .selectFrom("establishments__users as eu")
@@ -108,7 +113,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
           "pad.ogr_appellation",
         )
         .innerJoin("public_romes_data as prd", "pad.code_rome", "prd.code_rome")
-        .where("eu.user_id", "=", userId),
+        .where("eu.user_id", "=", userId)
+        .where("eu.role", "in", authorizedRoles),
       (b) => {
         if (!filters?.statuses || filters.statuses.length === 0) return b;
         return b.where("discussions.status", "in", filters.statuses);
