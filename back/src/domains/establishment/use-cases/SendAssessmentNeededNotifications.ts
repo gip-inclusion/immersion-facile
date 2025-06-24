@@ -170,6 +170,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
           businessName: convention.businessName,
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
+          establishmentTutorEmail: convention.establishmentTutor.email,
         },
       },
       followedIds: {

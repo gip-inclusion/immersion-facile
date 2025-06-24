@@ -230,6 +230,7 @@ export const emailTemplatesByName =
         beneficiaryLastName,
         businessName,
         internshipKind,
+        establishmentTutorEmail,
       }) => ({
         subject: `Remplissez le bilan de fin ${
           internshipKind === "immersion" ? "d'immersion" : "de mini-stage"
@@ -246,7 +247,11 @@ export const emailTemplatesByName =
         } au sein de l'entreprise ${businessName} se termine.
         
         Prenez quelques instants avec votre tuteur : il a reçu par mail l'accès au formulaire de bilan qu'il devra compléter en votre présence.
-        Cela vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
+
+        <strong>Ce mail lui a été envoyé à l'adresse mentionnée sur la convention : ${establishmentTutorEmail}</strong>
+        N'hésitez pas à lui demander s'il l'a bien reçu !
+
+        Ce bilan vous servira dans la suite de votre parcours professionnel, que ce soit une formation, une embauche, une découverte de métier.
         
         À la fin de votre immersion, contactez votre conseiller pour faire part de vos impressions et finaliser ainsi votre bilan.
         `,
