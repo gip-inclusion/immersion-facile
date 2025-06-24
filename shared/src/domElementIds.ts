@@ -818,7 +818,6 @@ export const domElementIds = {
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
   },
-  manageDiscussion: {},
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     initiateConventionModal:

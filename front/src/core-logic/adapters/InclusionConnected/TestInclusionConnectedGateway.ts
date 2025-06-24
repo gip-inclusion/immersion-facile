@@ -2,6 +2,8 @@ import { type Observable, Subject } from "rxjs";
 import type {
   AbsoluteUrl,
   AgencyId,
+  DataWithPagination,
+  DiscussionInList,
   DiscussionReadDto,
   Exchange,
   InclusionConnectedUser,
@@ -9,6 +11,7 @@ import type {
   WithDiscussionStatusRejected,
 } from "shared";
 import type {
+  FetchDiscussionListRequestedPayload,
   FetchDiscussionRequestedPayload,
   SendExchangeRequestedPayload,
 } from "src/core-logic/domain/discussion/discussion.slice";
@@ -18,6 +21,8 @@ export class TestInclusionConnectedGateway
   implements InclusionConnectedGateway
 {
   public discussion$ = new Subject<DiscussionReadDto | undefined>();
+
+  public discussions$ = new Subject<DataWithPagination<DiscussionInList>>();
 
   public sendMessageResponse$ = new Subject<Exchange>();
 
@@ -73,5 +78,11 @@ export class TestInclusionConnectedGateway
     } & WithDiscussionStatusRejected,
   ): Observable<void> {
     return this.updateDiscussionStatusResponse$;
+  }
+
+  public getDiscussions$(
+    _payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return this.discussions$;
   }
 }

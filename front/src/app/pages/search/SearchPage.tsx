@@ -9,7 +9,7 @@ import {
   Loader,
   MainWrapper,
   PageHeader,
-  SearchFilter,
+  RichDropdown,
   SectionAccordion,
   SectionTextEmbed,
 } from "react-design-system";
@@ -379,7 +379,7 @@ export const SearchPage = ({
               )}
               id={domElementIds[route.name].searchForm}
             >
-              <SearchFilter
+              <RichDropdown
                 defaultValue="Tous les métiers"
                 iconId="fr-icon-briefcase-fill"
                 id={domElementIds[route.name].appellationFilterTag}
@@ -464,7 +464,7 @@ export const SearchPage = ({
                   ),
                 }}
               />
-              <SearchFilter
+              <RichDropdown
                 defaultValue="France entière"
                 id={domElementIds[route.name].locationFilterTag}
                 iconId="fr-icon-map-pin-2-fill"
@@ -574,7 +574,7 @@ export const SearchPage = ({
                   ),
                 }}
               />
-              <SearchFilter
+              <RichDropdown
                 defaultValue="Toutes les entreprises"
                 iconId="fr-icon-equalizer-fill"
                 id={domElementIds[route.name].fitForDisableWorkersFilterTag}
@@ -617,7 +617,7 @@ export const SearchPage = ({
                   ),
                 }}
               />
-              <SearchFilter
+              <RichDropdown
                 defaultValue="Trier par pertinence"
                 iconId="fr-icon-arrow-down-line"
                 id={domElementIds[route.name].sortFilterTag}
