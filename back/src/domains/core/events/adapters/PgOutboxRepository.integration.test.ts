@@ -120,6 +120,7 @@ describe("PgOutboxRepository", () => {
       const event = createNewEvent({
         topic: "ConventionSubmittedByBeneficiary",
         payload: { convention, triggeredBy: null },
+        priority: 1,
       });
 
       // act (when event does not exist in db)
@@ -391,7 +392,7 @@ describe("PgOutboxRepository", () => {
     db
       .executeQuery<StoredEventRow>(
         CompiledQuery.raw(`
-        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status, published_at, subscription_id, error_message
+        SELECT outbox.id as id, occurred_at, was_quarantined, topic, payload, status, published_at, subscription_id, error_message, priority
         FROM outbox
         LEFT JOIN outbox_publications ON outbox.id = outbox_publications.event_id
         LEFT JOIN outbox_failures ON outbox_failures.publication_id = outbox_publications.id

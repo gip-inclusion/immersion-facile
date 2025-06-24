@@ -25,6 +25,7 @@ describe("PgOutboxQueries for crawling purposes", () => {
   let failedButQuarantinedEvent: DomainEvent;
   let inProcessEvent: DomainEvent;
   let failedButSucceededBefore: DomainEvent;
+  let prioritizedEvent: DomainEvent;
 
   const createEvents = async (
     uuidGenerator: TestUuidGenerator,
@@ -40,6 +41,15 @@ describe("PgOutboxQueries for crawling purposes", () => {
       topic: "ConventionSubmittedByBeneficiary",
       status: "never-published",
       payload: { convention, triggeredBy: null },
+    });
+
+    uuidGenerator.setNextUuid("aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaab");
+    timeGateway.setNextDate(new Date("2021-11-15T10:00:30.000Z"));
+    prioritizedEvent = createNewEvent({
+      topic: "ConventionSubmittedByBeneficiary",
+      status: "never-published",
+      payload: { convention, triggeredBy: null },
+      priority: 1,
     });
 
     uuidGenerator.setNextUuid("bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb");
@@ -220,13 +230,18 @@ describe("PgOutboxQueries for crawling purposes", () => {
         quarantinedEvent,
         inProcessEvent,
         eventToRepublish,
+        prioritizedEvent,
       ]);
 
       // act
-      const events = await outboxQueries.getEventsToPublish({ limit: 2 });
+      const events = await outboxQueries.getEventsToPublish({ limit: 3 });
 
       // assert
-      expectToEqual(events, [eventToRepublish, neverPublished1]);
+      expectToEqual(events, [
+        prioritizedEvent,
+        eventToRepublish,
+        neverPublished1,
+      ]);
     });
   });
 
