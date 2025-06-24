@@ -152,43 +152,6 @@ describe("conventionDtoSchema", () => {
       );
     });
 
-    it("rejects equal beneficiary and establishment representative phone numbers", () => {
-      expectConventionInvalidWithIssueMessages(
-        conventionSchema,
-        new ConventionDtoBuilder()
-          .withDateSubmission("2025-05-25")
-          .withBeneficiaryPhone("+33632342426")
-          .withEstablishmentRepresentativePhone("+33632342426")
-          .build(),
-        {
-          "signatories.beneficiary.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-          "signatories.establishmentRepresentative.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-        },
-      );
-    });
-
-    it("rejects equal beneficiary and beneficiary representative phone numbers", () => {
-      expectConventionInvalidWithIssueMessages(
-        conventionSchema,
-        new ConventionDtoBuilder()
-          .withDateSubmission("2025-05-25")
-          .withBeneficiaryPhone("+33632342426")
-          .withBeneficiaryRepresentative({
-            ...beneficiaryRepresentative,
-            phone: "+33632342426",
-          })
-          .build(),
-        {
-          "signatories.beneficiary.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-          "signatories.beneficiaryRepresentative.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-        },
-      );
-    });
-
     it("rejects equal beneficiary current employer and other signatories", () => {
       const currentEmployer: BeneficiaryCurrentEmployer = {
         role: "beneficiary-current-employer",
@@ -294,31 +257,70 @@ describe("conventionDtoSchema", () => {
     });
   });
 
-  it("rejects when phone is not a valid number", () => {
-    const convention = new ConventionDtoBuilder()
-      .withBeneficiaryPhone("wrong")
-      .build();
+  describe("phone validation", () => {
+    it("rejects when phone is not a valid number", () => {
+      const convention = new ConventionDtoBuilder()
+        .withBeneficiaryPhone("wrong")
+        .build();
 
-    expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-      "signatories.beneficiary.phone": `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide.`,
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention.signatories.beneficiary.phone}' n'est pas valide.`,
+      });
+
+      const convention2 = new ConventionDtoBuilder()
+        .withBeneficiaryPhone("0203stillWrong")
+        .build();
+
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention2, {
+        "signatories.beneficiary.phone": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide.`,
+      });
     });
 
-    const convention2 = new ConventionDtoBuilder()
-      .withBeneficiaryPhone("0203stillWrong")
-      .build();
+    it("rejects when establishmentTutorPhone is not a valid number", () => {
+      const convention = new ConventionDtoBuilder()
+        .withEstablishmentTutorPhone("wrong")
+        .build();
 
-    expectConventionInvalidWithIssueMessages(conventionSchema, convention2, {
-      "signatories.beneficiary.phone": `Le numéro de téléphone '${convention2.signatories.beneficiary.phone}' n'est pas valide.`,
+      expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
+        "establishmentTutor.phone": `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide.`,
+      });
     });
-  });
 
-  it("rejects when establishmentTutorPhone is not a valid number", () => {
-    const convention = new ConventionDtoBuilder()
-      .withEstablishmentTutorPhone("wrong")
-      .build();
+    it("rejects equal beneficiary and beneficiary representative phone numbers", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        new ConventionDtoBuilder()
+          .withDateSubmission("2025-05-25")
+          .withBeneficiaryPhone("+33632342426")
+          .withBeneficiaryRepresentative({
+            ...beneficiaryRepresentative,
+            phone: "+33632342426",
+          })
+          .build(),
+        {
+          "signatories.beneficiary.phone":
+            "Les numéros de téléphone des signataires doivent être différents.",
+          "signatories.beneficiaryRepresentative.phone":
+            "Les numéros de téléphone des signataires doivent être différents.",
+        },
+      );
+    });
 
-    expectConventionInvalidWithIssueMessages(conventionSchema, convention, {
-      "establishmentTutor.phone": `Le numéro de téléphone '${convention.establishmentTutor.phone}' n'est pas valide.`,
+    it("rejects equal beneficiary and establishment representative phone numbers", () => {
+      expectConventionInvalidWithIssueMessages(
+        conventionSchema,
+        new ConventionDtoBuilder()
+          .withDateSubmission("2025-05-25")
+          .withBeneficiaryPhone("+33632342426")
+          .withEstablishmentRepresentativePhone("+33632342426")
+          .build(),
+        {
+          "signatories.beneficiary.phone":
+            "Les numéros de téléphone des signataires doivent être différents.",
+          "signatories.establishmentRepresentative.phone":
+            "Les numéros de téléphone des signataires doivent être différents.",
+        },
+      );
     });
   });
 
