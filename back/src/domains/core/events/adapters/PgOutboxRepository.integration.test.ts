@@ -434,6 +434,7 @@ const expectStoredRowsToMatchEvent = (
               published_at: new Date(publishedAt),
               subscription_id: null,
               error_message: null,
+              priority: commonStoredEventFields.priority ?? null,
             },
           ]
         : failures.map(
@@ -442,6 +443,7 @@ const expectStoredRowsToMatchEvent = (
               published_at: new Date(publishedAt),
               subscription_id: failure.subscriptionId,
               error_message: failure.errorMessage,
+              priority: commonStoredEventFields.priority ?? null,
             }),
           ),
   );
