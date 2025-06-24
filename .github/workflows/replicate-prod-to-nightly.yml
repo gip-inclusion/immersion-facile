@@ -25,12 +25,21 @@ jobs:
                   install-scalingo-cli &&
                   dbclient-fetcher pgsql &&
                   scalingo login --api-token ${{ secrets.SCALINGO_API_TOKEN_SECNUM }} &&
+                echo \"> \$(date) - Getting Bearer token\" &&
+                  BEARER_TOKEN=\$(curl -s -H \"Accept: application/json\" \
+                    -H \"Content-Type: application/json\" \
+                    -u \":tk-us-tUOhjfkfATKQBEZxrYtPRnpKXdSx6octhT1Okrf0UUkNT5e2\" \
+                    -X POST https://auth.scalingo.com/v1/tokens/exchange\
+                     | jq -r '.token') &&
                 echo \"> \$(date) - Getting PG Addon ID\" &&
-                  ADDON_ID_LINE=\$(scalingo --region osc-secnum-fr1 --app if-prod-back addons | grep 'PostgreSQL') &&
-                  regex='PostgreSQL \| (.*) \| postgresql' &&
-                  [[ \$ADDON_ID_LINE =~ \$regex ]] &&
+                  ADDON_ID=\$(curl -H \"Accept: application/json\"\
+                    -H \"Content-Type: application/json\"\
+                    -H \"Authorization: Bearer \$BEARER_TOKEN\"\
+                    -X GET https://api.osc-secnum-fr1.scalingo.com/v1/apps/if-prod-back/addons\
+                    | jq -r '.addons[] | select(.addon_provider.id==\"postgresql\") | .id') &&
+                echo \"> PG Addon ID is : \$ADDON_ID\" &&
                 echo \"> \$(date) - Downloading last DB backup\" &&
-                  scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\${BASH_REMATCH[1]} backups-download --output=dump.tar.gz &&
+                  scalingo --region osc-secnum-fr1 --app if-prod-back --addon=\$ADDON_ID backups-download --output=dump.tar.gz &&
                   tar --to-stdout -xzf dump.tar.gz > dump.pgsql &&
                 echo \"> \$(date) - Create a Table of content for restore, ignore postgis related schemas and tables:\" &&
                   pg_restore -l dump.pgsql | grep -v tiger | grep -v spatial_ref_sys | grep -v topology > list.txt &&
@@ -51,3 +60,5 @@ jobs:
                     --dbname \$SCALINGO_POSTGRESQL_URL dump.pgsql &&
                 echo \"> \$(date) - Finished restoring schema\" &&
                   exit 0"
+
+
