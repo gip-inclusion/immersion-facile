@@ -3,12 +3,12 @@ import {
   expectToEqual,
   maxPerPageInWebPagination,
 } from "shared";
-import { flatDiscussionQueryParamsTogetPaginatedDiscussionsParams } from "./GetDiscussionsForUser";
+import { flatDiscussionQueryParamsToGetPaginatedDiscussionsParams } from "./GetDiscussionsForUser";
 
 describe("GetDiscussionsForUser", () => {
   describe("flatDiscussionQueryParamsTogetPaginatedDiscussionsParams", () => {
     it("converts flat filters to correct filters", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         search: "siret1",
         statuses: ["PENDING", "ACCEPTED"],
       });
@@ -23,7 +23,7 @@ describe("GetDiscussionsForUser", () => {
     });
 
     it("returns unfiltered results when no status or siret is provided", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams(
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(
         {},
       );
       expectToEqual(result, {
@@ -33,7 +33,7 @@ describe("GetDiscussionsForUser", () => {
     });
 
     it("wraps a single status in an array", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         statuses: "PENDING",
       });
       expectToEqual(result, {
@@ -46,7 +46,7 @@ describe("GetDiscussionsForUser", () => {
     });
 
     it("adds a default order by createdAt, desc if none is provided", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams(
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(
         {},
       );
       expectToEqual(result, {
@@ -56,7 +56,7 @@ describe("GetDiscussionsForUser", () => {
     });
 
     it("uses provided order properties when they exist", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         orderBy: "createdAt",
         orderDirection: "asc",
       });
@@ -67,7 +67,7 @@ describe("GetDiscussionsForUser", () => {
     });
 
     it("makes sure pagination is in the correct range, and max it to defaultPerPageInWebPagination", () => {
-      const result = flatDiscussionQueryParamsTogetPaginatedDiscussionsParams({
+      const result = flatDiscussionQueryParamsToGetPaginatedDiscussionsParams({
         page: 2,
         perPage: 150,
       });
