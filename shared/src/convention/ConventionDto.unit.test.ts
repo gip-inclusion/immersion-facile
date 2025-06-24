@@ -8,6 +8,7 @@ import {
   type DateIntervalDto,
   type DateString,
   MAX_PRESENCE_DAYS_RELEASE_DATE,
+  SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
   type Weekday,
   maxPresenceDaysByInternshipKind,
   toDateUTCString,
@@ -286,41 +287,61 @@ describe("conventionDtoSchema", () => {
       });
     });
 
-    it("rejects equal beneficiary and beneficiary representative phone numbers", () => {
-      expectConventionInvalidWithIssueMessages(
-        conventionSchema,
-        new ConventionDtoBuilder()
-          .withDateSubmission("2025-05-25")
+    describe("when signatories have same phone numbers", () => {
+      it("does nothing if submission date if before constraint release date", () => {
+        const convention = new ConventionDtoBuilder()
+          .withDateSubmission(
+            subDays(
+              SIGNATORIES_PHONE_NUMBER_DISTINCT_RELEASE_DATE,
+              2,
+            ).toISOString(),
+          )
           .withBeneficiaryPhone("+33632342426")
           .withBeneficiaryRepresentative({
             ...beneficiaryRepresentative,
             phone: "+33632342426",
           })
-          .build(),
-        {
-          "signatories.beneficiary.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-          "signatories.beneficiaryRepresentative.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-        },
-      );
-    });
+          .build();
 
-    it("rejects equal beneficiary and establishment representative phone numbers", () => {
-      expectConventionInvalidWithIssueMessages(
-        conventionSchema,
-        new ConventionDtoBuilder()
-          .withDateSubmission("2025-05-25")
-          .withBeneficiaryPhone("+33632342426")
-          .withEstablishmentRepresentativePhone("+33632342426")
-          .build(),
-        {
-          "signatories.beneficiary.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-          "signatories.establishmentRepresentative.phone":
-            "Les numéros de téléphone des signataires doivent être différents.",
-        },
-      );
+        expectConventionDtoToBeValid(convention);
+      });
+
+      it("rejects equal beneficiary and beneficiary representative phone numbers", () => {
+        expectConventionInvalidWithIssueMessages(
+          conventionSchema,
+          new ConventionDtoBuilder()
+            .withDateSubmission("2025-05-25")
+            .withBeneficiaryPhone("+33632342426")
+            .withBeneficiaryRepresentative({
+              ...beneficiaryRepresentative,
+              phone: "+33632342426",
+            })
+            .build(),
+          {
+            "signatories.beneficiary.phone":
+              "Les numéros de téléphone des signataires doivent être différents.",
+            "signatories.beneficiaryRepresentative.phone":
+              "Les numéros de téléphone des signataires doivent être différents.",
+          },
+        );
+      });
+
+      it("rejects equal beneficiary and establishment representative phone numbers", () => {
+        expectConventionInvalidWithIssueMessages(
+          conventionSchema,
+          new ConventionDtoBuilder()
+            .withDateSubmission("2025-05-25")
+            .withBeneficiaryPhone("+33632342426")
+            .withEstablishmentRepresentativePhone("+33632342426")
+            .build(),
+          {
+            "signatories.beneficiary.phone":
+              "Les numéros de téléphone des signataires doivent être différents.",
+            "signatories.establishmentRepresentative.phone":
+              "Les numéros de téléphone des signataires doivent être différents.",
+          },
+        );
+      });
     });
   });
 
