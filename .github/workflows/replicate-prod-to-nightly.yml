@@ -28,7 +28,7 @@ jobs:
                 echo \"> \$(date) - Getting Bearer token\" &&
                   BEARER_TOKEN=\$(curl -s -H \"Accept: application/json\" \
                     -H \"Content-Type: application/json\" \
-                    -u \":tk-us-tUOhjfkfATKQBEZxrYtPRnpKXdSx6octhT1Okrf0UUkNT5e2\" \
+                    -u \":${{ secrets.SCALINGO_API_TOKEN_SECNUM }}\" \
                     -X POST https://auth.scalingo.com/v1/tokens/exchange\
                      | jq -r '.token') &&
                 echo \"> \$(date) - Getting PG Addon ID\" &&
