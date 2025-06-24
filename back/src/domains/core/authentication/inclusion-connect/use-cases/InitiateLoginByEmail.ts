@@ -42,27 +42,31 @@ export const makeInitiateLoginByEmail = createTransactionalUseCase<
       usedAt: null,
     });
 
-    await deps.saveNotificationAndRelatedEvent(uow, {
-      kind: "email",
-      templatedContent: {
-        kind: "LOGIN_BY_EMAIL_REQUESTED",
-        recipients: [email],
-        sender: immersionFacileNoReplyEmailSender,
-        params: {
-          loginLink: `${
-            deps.oAuthConfig.immersionRedirectUri.afterLogin
-          }?${queryParamsAsString<AuthenticateWithOAuthCodeParams>({
-            code: deps.generateEmailAuthCodeJwt({ version: 1 }),
-            page,
-            state,
-          })}`,
-          fullname:
-            user?.firstName && user.lastName
-              ? `${user.firstName} ${user.lastName}`
-              : "",
+    await deps.saveNotificationAndRelatedEvent(
+      uow,
+      {
+        kind: "email",
+        templatedContent: {
+          kind: "LOGIN_BY_EMAIL_REQUESTED",
+          recipients: [email],
+          sender: immersionFacileNoReplyEmailSender,
+          params: {
+            loginLink: `${
+              deps.oAuthConfig.immersionRedirectUri.afterLogin
+            }?${queryParamsAsString<AuthenticateWithOAuthCodeParams>({
+              code: deps.generateEmailAuthCodeJwt({ version: 1 }),
+              page,
+              state,
+            })}`,
+            fullname:
+              user?.firstName && user.lastName
+                ? `${user.firstName} ${user.lastName}`
+                : "",
+          },
         },
+        followedIds: { userId: user?.id },
       },
-      followedIds: { userId: user?.id },
-    });
+      { priority: 1 },
+    );
   },
 );

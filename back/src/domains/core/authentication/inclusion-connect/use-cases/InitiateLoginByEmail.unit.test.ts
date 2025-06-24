@@ -1,5 +1,6 @@
 import {
   type UserWithAdminRights,
+  expectArraysToMatch,
   expectToEqual,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -109,6 +110,10 @@ describe("RequestLoginByEmail usecase", () => {
         },
       ],
     });
+
+    expectArraysToMatch(uow.outboxRepository.events, [
+      { topic: "NotificationAdded", priority: 1 },
+    ]);
   });
 
   it("When user does not exist by email", async () => {
