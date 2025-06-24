@@ -174,8 +174,10 @@ export const ConventionForm = ({
     addressAutocompleteLocator: "convention-immersion-address",
   });
 
-  const reduxFormUiReady =
-    useWaitForReduxFormUiReadyBeforeInitialisation(initialValues);
+  const reduxFormUiReady = useWaitForReduxFormUiReadyBeforeInitialisation(
+    initialValues,
+    mode,
+  );
   const defaultValues = creationFormModes.includes(
     mode as ExcludeFromExisting<ConventionFormMode, "edit">,
   )
@@ -729,6 +731,7 @@ const makeInitialBenefiaryForm = (
 
 const useWaitForReduxFormUiReadyBeforeInitialisation = (
   initialValues: ConventionPresentation,
+  mode: ConventionFormMode,
 ) => {
   const [reduxFormUiReady, setReduxFormUiReady] = useState<boolean>(false);
   const dispatch = useDispatch();
@@ -749,13 +752,15 @@ const useWaitForReduxFormUiReadyBeforeInitialisation = (
         hasBeneficiaryCurrentEmployer(initialValues),
       ),
     );
-    dispatch(
-      conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
-        isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
-      ),
-    );
+    if (mode !== "edit") {
+      dispatch(
+        conventionSlice.actions.isTutorEstablishmentRepresentativeChanged(
+          isEstablishmentTutorIsEstablishmentRepresentative(initialValues),
+        ),
+      );
+    }
     setReduxFormUiReady(true);
-  }, [dispatch, initialValues]);
+  }, [dispatch, initialValues, mode]);
 
   return reduxFormUiReady;
 };
