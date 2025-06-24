@@ -11,6 +11,8 @@ import {
   domElementIds,
   withValidatorInfoSchema,
 } from "shared";
+import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export const ValidatorModalContent = ({
   onSubmit,
@@ -27,9 +29,17 @@ export const ValidatorModalContent = ({
     SetStateAction<string | null>
   >;
 }) => {
+  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
   const { register, handleSubmit } = useForm<WithValidatorInfo>({
     resolver: zodResolver(withValidatorInfoSchema),
     mode: "onTouched",
+    defaultValues:
+      currentUser?.firstName && currentUser.lastName
+        ? {
+            firstname: currentUser.firstName,
+            lastname: currentUser.lastName,
+          }
+        : undefined,
   });
   const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
     firstname,
