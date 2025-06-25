@@ -5,7 +5,7 @@ import {
   computeTotalHours,
   executeInSequence,
   frontRoutes,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   withAssessmentSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -72,9 +72,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
             (recipient) => recipient.email,
           ),
           params: {
-            agencyReferentName: getFullname(
-              convention.agencyReferent?.firstname,
-              convention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              convention.agencyReferent ?? {},
             ),
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,
@@ -123,9 +122,8 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
               kind: "ASSESSMENT_CREATED_WITH_STATUS_COMPLETED_AGENCY_NOTIFICATION",
               recipients: [email],
               params: {
-                agencyReferentName: getFullname(
-                  convention.agencyReferent?.firstname,
-                  convention.agencyReferent?.lastname,
+                agencyReferentName: getFormattedFirstnameAndLastname(
+                  convention.agencyReferent ?? {},
                 ),
                 beneficiaryFirstName:
                   convention.signatories.beneficiary.firstName,
