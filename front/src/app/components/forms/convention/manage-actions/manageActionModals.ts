@@ -52,6 +52,16 @@ const {
   close: closeTransferConventionModal,
 } = createModal(createTransferConventionModalParams);
 
+const createEditCounsellorNameModalParams = {
+  id: domElementIds.manageConvention.editCounsellorNameModal,
+  isOpenedByDefault: false,
+};
+const {
+  Component: EditCounsellorNameModal,
+  open: openEditCounsellorNameModal,
+  close: closeEditCounsellorNameModal,
+} = createModal(createEditCounsellorNameModalParams);
+
 const createRenewConventionModalParams = {
   id: domElementIds.manageConvention.renewModal,
   isOpenedByDefault: false,
@@ -106,6 +116,12 @@ export const modalByAction = (verificationAction: VerificationAction) => {
       openModal: openRenewConventionModal,
       closeModal: closeRenewConventionModal,
       createModalParams: createRenewConventionModalParams,
+    },
+    EDIT_COUNSELLOR_NAME: {
+      modal: EditCounsellorNameModal,
+      openModal: openEditCounsellorNameModal,
+      closeModal: closeEditCounsellorNameModal,
+      createModalParams: createEditCounsellorNameModalParams,
     },
   };
   return modals[verificationAction];
