@@ -1,6 +1,7 @@
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { pick } from "ramda";
 import type { Dispatch, SetStateAction } from "react";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
@@ -12,6 +13,7 @@ import {
   withValidatorInfoSchema,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export const ValidatorModalContent = ({
@@ -30,16 +32,24 @@ export const ValidatorModalContent = ({
   >;
 }) => {
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const fetchedConvention = useAppSelector(conventionSelectors.convention);
+
+  const currentUserName =
+    currentUser?.firstName && currentUser?.lastName
+      ? pick(["firstname", "lastname"], {
+          firstname: currentUser.firstName,
+          lastname: currentUser.lastName,
+        })
+      : undefined;
+
+  const counsellorNameInConvention = fetchedConvention?.agencyReferent
+    ? pick(["firstname", "lastname"], fetchedConvention.agencyReferent)
+    : undefined;
+
   const { register, handleSubmit } = useForm<WithValidatorInfo>({
     resolver: zodResolver(withValidatorInfoSchema),
     mode: "onTouched",
-    defaultValues:
-      currentUser?.firstName && currentUser.lastName
-        ? {
-            firstname: currentUser.firstName,
-            lastname: currentUser.lastName,
-          }
-        : undefined,
+    defaultValues: currentUserName ?? counsellorNameInConvention,
   });
   const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
     firstname,
