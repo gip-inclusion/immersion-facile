@@ -26,20 +26,32 @@ export const queryParamsAsString = <Q extends QueryParams<RawQueryParams>>(
     join("&"),
   );
 
-export const decodeURIParams = (
-  url: AbsoluteUrl,
-): Record<string, string> | undefined =>
-  url
-    .split("?")[1]
-    .split("&")
-    .reduce<Record<string, string>>((agg, current) => {
-      const [key, value] = current.split("=");
-      return {
-        ...agg,
-        ...(key !== undefined && value !== undefined
-          ? {
-              [key]: value,
-            }
-          : {}),
-      };
-    }, {});
+export const decodeURIWithParams = (
+  uri: string,
+): {
+  uriWithoutParams: string;
+  params?: Record<string, string>;
+} => {
+  const [urlWithoutParams, params] = uri.split("?");
+
+  return {
+    uriWithoutParams: urlWithoutParams as AbsoluteUrl,
+    ...(params
+      ? {
+          params: params
+            .split("&")
+            .reduce<Record<string, string>>((agg, current) => {
+              const [key, value] = current.split("=");
+              return {
+                ...agg,
+                ...(key !== undefined && value !== undefined
+                  ? {
+                      [key]: value,
+                    }
+                  : {}),
+              };
+            }, {}),
+        }
+      : {}),
+  };
+};

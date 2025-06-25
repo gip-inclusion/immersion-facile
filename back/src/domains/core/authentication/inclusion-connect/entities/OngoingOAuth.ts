@@ -15,6 +15,7 @@ type OngoingAuthCommon = {
   state: OAuthState;
   nonce: OAuthNonce;
   usedAt: Date | null;
+  fromUri: string;
 };
 
 export type EmailOngoingAuth = OngoingAuthCommon & {

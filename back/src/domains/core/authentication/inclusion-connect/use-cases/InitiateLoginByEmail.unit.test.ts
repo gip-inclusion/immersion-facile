@@ -34,6 +34,7 @@ describe("RequestLoginByEmail usecase", () => {
   const fakeGenerateEmailAuthCode: GenerateEmailAuthCodeJwt = () => fakeJwt;
 
   const baseUrl = "http://after-login.com";
+  const redirectUri = "/dashboard/discussions?discussionId=discussion0";
 
   const user: UserWithAdminRights = {
     id: "user-id",
@@ -79,15 +80,15 @@ describe("RequestLoginByEmail usecase", () => {
     const state = "state1";
     uuidGenerator.setNextUuids(["nonce1", state]);
     uow.userRepository.users = [user];
-    const page = "establishment";
 
     await initiateLoginByEmail.execute({
       email: user.email,
-      page,
+      redirectUri,
     });
 
     expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
       {
+        fromUri: redirectUri,
         provider: "email",
         userId: user.id,
         nonce: "nonce1",
@@ -102,7 +103,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `${baseUrl}?code=${fakeJwt}&page=${page}&state=${state}`,
+            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
             fullname: `${user.firstName} ${user.lastName}`,
           },
           recipients: [user.email],
@@ -122,14 +123,14 @@ describe("RequestLoginByEmail usecase", () => {
     uuidGenerator.setNextUuids(["nonce1", state]);
     uow.userRepository.users = [];
 
-    const page = "establishment";
     await initiateLoginByEmail.execute({
       email: user.email,
-      page,
+      redirectUri,
     });
 
     expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
       {
+        fromUri: redirectUri,
         provider: "email",
         nonce: "nonce1",
         state,
@@ -143,7 +144,7 @@ describe("RequestLoginByEmail usecase", () => {
         {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
-            loginLink: `${baseUrl}?code=${fakeJwt}&page=${page}&state=${state}`,
+            loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
             fullname: "",
           },
           recipients: [user.email],

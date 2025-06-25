@@ -1,27 +1,24 @@
 import { z } from "zod";
 import { emailSchema } from "../email/email.schema";
-import { allowedStartOAuthLoginPages } from "../routes/routes";
 import type {
   AuthenticateWithOAuthCodeParams,
   InitiateLoginByEmailParams,
-  WithSourcePage,
+  WithRedirectUri,
 } from "./inclusionConnect.dto";
 
-export const withSourcePageSchema: z.Schema<WithSourcePage> = z.object({
-  page: z.enum(allowedStartOAuthLoginPages),
+export const withRedirectUriSchema: z.Schema<WithRedirectUri> = z.object({
+  redirectUri: z.string(),
 });
 
 export const initiateLoginByEmailParamsSchema: z.Schema<InitiateLoginByEmailParams> =
-  withSourcePageSchema.and(
-    z.object({
-      email: emailSchema,
-    }),
-  );
-
-export const authenticateWithOAuthCodeSchema: z.Schema<AuthenticateWithOAuthCodeParams> =
   z
     .object({
-      code: z.string(),
-      state: z.string(),
+      email: emailSchema,
     })
-    .and(withSourcePageSchema);
+    .and(withRedirectUriSchema);
+
+export const authenticateWithOAuthCodeSchema: z.Schema<AuthenticateWithOAuthCodeParams> =
+  z.object({
+    code: z.string(),
+    state: z.string(),
+  });

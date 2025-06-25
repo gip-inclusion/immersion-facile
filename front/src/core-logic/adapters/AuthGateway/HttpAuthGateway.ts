@@ -12,11 +12,11 @@ export class HttpAuthGateway implements AuthGateway {
   constructor(
     private readonly httpClient: HttpClient<InclusionConnectImmersionRoutes>,
   ) {}
-  loginByEmail$({ email, page }: InitiateLoginByEmailParams): Observable<void> {
+  loginByEmail$(params: InitiateLoginByEmailParams): Observable<void> {
     return from(
       this.httpClient
         .initiateLoginByEmail({
-          body: { email, page },
+          body: params,
         })
         .then((response) =>
           match(response)

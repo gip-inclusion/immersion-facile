@@ -3,7 +3,7 @@ import { emptyObjectSchema, expressEmptyResponseBody } from "../zodUtils";
 import {
   authenticateWithOAuthCodeSchema,
   initiateLoginByEmailParamsSchema,
-  withSourcePageSchema,
+  withRedirectUriSchema,
 } from "./inclusionConnect.schema";
 
 // inclusion connect documentation is here : https://github.com/betagouv/itou-inclusion-connect/blob/master/docs/openid_connect.md#d%C3%A9tail-des-flux
@@ -14,7 +14,7 @@ export const inclusionConnectImmersionRoutes = defineRoutes({
   startInclusionConnectLogin: defineRoute({
     method: "get",
     url: "/inclusion-connect-start-login",
-    queryParamsSchema: withSourcePageSchema,
+    queryParamsSchema: withRedirectUriSchema,
     responses: {
       302: emptyObjectSchema,
     },
