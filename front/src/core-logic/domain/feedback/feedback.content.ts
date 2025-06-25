@@ -43,6 +43,7 @@ const topics = [
   "convention-action-cancel",
   "convention-action-deprecate",
   "convention-action-edit",
+  "convention-action-edit-counsellor-name",
   "convention-action-reject",
   "convention-action-renew",
   "convention-action-sign",
@@ -447,6 +448,19 @@ export const feedbacks: Record<
       action: conventionActionSlice.actions.cancelConventionFailed,
       title: "Problème lors de l'annulation de la convention",
       message: "Une erreur est survenue lors de l'annulation de la convention",
+    },
+  },
+  "convention-action-edit-counsellor-name": {
+    "update.success": {
+      action: conventionActionSlice.actions.editCounsellorNameSucceeded,
+      title: "Le nom du conseiller a bien été modifié",
+      message: "Le nom du conseiller a bien été modifié",
+    },
+    "update.error": {
+      action: conventionActionSlice.actions.editCounsellorNameFailed,
+      title: "Problème lors de la modification du nom du conseiller",
+      message:
+        "Une erreur est survenue lors de la modification du nom du conseiller",
     },
   },
   "convention-action-deprecate": {

@@ -667,6 +667,114 @@ describe("convention action slice", () => {
     });
   });
 
+  describe("editCounsellorName", () => {
+    beforeEach(() => {
+      ({ store, dependencies } = createTestStore({
+        convention: {
+          ...initialConventionState,
+          convention,
+        },
+      }));
+    });
+    it("edit counsellor name", () => {
+      expectInitialConventionActionAndFeedbackState();
+      expectConventionState({
+        isLoading: false,
+        convention,
+      });
+      store.dispatch(
+        conventionActionSlice.actions.editCounsellorNameRequested({
+          editCounsellorNameParams: {
+            conventionId: "fake-convention-id",
+            firstname: "jean",
+            lastname: "pierre",
+          },
+          jwt: "fake-jwt",
+          feedbackTopic: "convention-action-edit-counsellor-name",
+        }),
+      );
+      expectConventionActionState({
+        isLoading: true,
+      });
+
+      feedGatewayWithEditCounsellorNameSuccess();
+
+      expectConventionActionState({
+        isLoading: false,
+      });
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[
+          "convention-action-edit-counsellor-name"
+        ],
+        {
+          level: "success",
+          message: "Le nom du conseiller a bien été modifié",
+          on: "update",
+          title: "Le nom du conseiller a bien été modifié",
+        },
+      );
+      const conventionWithCounsellorNameChanged: ConventionReadDto = {
+        ...agencyFields,
+        ...new ConventionDtoBuilder(convention)
+          .withAgencyReferent({ firstname: "jean", lastname: "pierre" })
+          .build(),
+      };
+
+      feedGatewayWithConvention(conventionWithCounsellorNameChanged);
+
+      expectConventionState({
+        isLoading: false,
+        convention: conventionWithCounsellorNameChanged,
+      });
+    });
+
+    it("gets error message when editing counsellor name fails", () => {
+      expectInitialConventionActionAndFeedbackState();
+      expectConventionState({
+        isLoading: false,
+        convention,
+      });
+      store.dispatch(
+        conventionActionSlice.actions.editCounsellorNameRequested({
+          editCounsellorNameParams: {
+            conventionId: "fake-convention-id",
+            firstname: "jean",
+            lastname: "pierre",
+          },
+          jwt: "fake-jwt",
+          feedbackTopic: "convention-action-edit-counsellor-name",
+        }),
+      );
+      expectConventionActionState({
+        isLoading: true,
+      });
+      const errorMessage =
+        "Une erreur est survenue lors de la modification du nom du conseiller.";
+      feedGatewayWithEditCounsellorNameFailure(new Error(errorMessage));
+
+      expectConventionActionState({
+        isLoading: false,
+      });
+
+      expectToEqual(
+        feedbacksSelectors.feedbacks(store.getState())[
+          "convention-action-edit-counsellor-name"
+        ],
+        {
+          level: "error",
+          message: errorMessage,
+          on: "update",
+          title: "Problème lors de la modification du nom du conseiller",
+        },
+      );
+      expectConventionState({
+        isLoading: false,
+        convention,
+      });
+    });
+  });
+
   describe("Broadcast convention to partner", () => {
     it("successfully trigger the broadcast, than needs to wait for a delay before broadcast is considered successfull", () => {
       expectInitialConventionActionAndFeedbackState();
@@ -938,6 +1046,14 @@ describe("convention action slice", () => {
     dependencies.conventionGateway.transferConventionToAgencyResult$.error(
       error,
     );
+  };
+
+  const feedGatewayWithEditCounsellorNameSuccess = () => {
+    dependencies.conventionGateway.editCounsellorNameResult$.next(undefined);
+  };
+
+  const feedGatewayWithEditCounsellorNameFailure = (error: Error) => {
+    dependencies.conventionGateway.editCounsellorNameResult$.error(error);
   };
 
   const feedGatewayUpdateConventionStatusSuccess = () => {
