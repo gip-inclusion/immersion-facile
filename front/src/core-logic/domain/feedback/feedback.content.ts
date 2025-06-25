@@ -587,7 +587,7 @@ export const feedbacks: Record<
       action: discussionSlice.actions.fetchDiscussionListFailed,
       title: "Problème lors de la récupération des discussions",
       message:
-        "Une erreur est survenue lors de la récupération des discussions",
+        "Une erreur est survenue lors de la récupération des discussions, essayez de rafraîchir la page.",
     },
   },
   "establishment-dashboard-users-rights": {
