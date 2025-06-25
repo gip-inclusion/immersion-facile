@@ -85,6 +85,7 @@ export const DiscussionList = () => {
         label,
         nativeInputProps: {
           value: orderDirection,
+          defaultChecked: orderDirection === filters.orderDirection,
           onChange: () => {
             setTempFilters({
               ...tempFilters,
@@ -94,7 +95,7 @@ export const DiscussionList = () => {
         },
       }),
     );
-  }, [tempFilters]);
+  }, [tempFilters, filters]);
   useEffect(() => {
     if (token) {
       dispatch(
@@ -197,7 +198,7 @@ export const DiscussionList = () => {
                 items: [
                   {
                     id: "status",
-                    iconId: "fr-icon-settings-5-line" as const,
+                    iconId: "fr-icon-equalizer-line" as const,
                     defaultValue: "Tous les statuts",
                     values: filters.statuses?.length
                       ? [
@@ -217,7 +218,7 @@ export const DiscussionList = () => {
                   },
                   {
                     id: "date",
-                    iconId: "fr-icon-list-ordered" as const,
+                    iconId: "fr-icon-arrow-down-line" as const,
                     defaultValue: "Du plus récent au plus ancien",
                     values: [
                       displayedOrderDirections[
