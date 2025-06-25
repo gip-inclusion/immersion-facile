@@ -170,7 +170,7 @@ describe("Admin router", () => {
           message:
             "Schema validation failed in usecase GetDashboardUrl. See issues for details.",
           issues: [
-            "name : Vous devez sélectionner une option parmi celles proposées",
+            "name : Vous devez sélectionner une option parmi celles proposées - valeur fournie : unknown-dashboard",
             "agencyId : Required",
             "conventionId : Required",
           ],
