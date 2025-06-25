@@ -12,9 +12,11 @@ import {
   type WithAgencyIdAndUserId,
   type WithAssessmentDto,
   type WithConventionDto,
+  type WithConventionId,
   type WithConventionIdLegacy,
   type WithDiscussionDto,
   type WithDiscussionId,
+  type WithOptionalFirstnameAndLastname,
   type WithSiretDto,
   roleSchema,
   userIdSchema,
@@ -104,6 +106,7 @@ export type DomainEvent =
   | GenericEvent<"ConventionReminderRequired", ConventionReminderPayload>
   | GenericEvent<"ConventionBroadcastRequested", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"ConventionTransferredToAgency", TransferConventionToAgencyPayload & WithTriggeredBy>
+  | GenericEvent<"ConventionCounsellorNameEdited", WithConventionId & WithOptionalFirstnameAndLastname & WithTriggeredBy>
   | GenericEvent<"ConventionSignatureLinkManuallySent", WithConventionDto & { recipientRole: SignatoryRole, transport: "sms" } & WithTriggeredBy>
   | GenericEvent<"AssessmentReminderManuallySent", WithConventionDto & { transport: "sms" } & WithTriggeredBy>
   // UNHAPPY PATHS
