@@ -6,7 +6,7 @@ import {
   type WithConventionDto,
   concatValidatorNames,
   frontRoutes,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -109,9 +109,8 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
           recipients: [recipient.email],
           params: {
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            agencyReferentName: getFullname(
-              convention.agencyReferent?.firstname,
-              convention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              convention.agencyReferent ?? {},
             ),
             beneficiaryFirstName: convention.signatories.beneficiary.firstName,
             beneficiaryLastName: convention.signatories.beneficiary.lastName,

@@ -4,7 +4,11 @@ import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { SectionHighlight } from "react-design-system";
 import { HeadingSection } from "react-design-system";
 import { useFormContext } from "react-hook-form";
-import { type FormEstablishmentDto, domElementIds, getFullname } from "shared";
+import {
+  type FormEstablishmentDto,
+  domElementIds,
+  getFormattedFirstnameAndLastname,
+} from "shared";
 import type {
   Mode,
   OnStepChange,
@@ -67,10 +71,10 @@ export const SummarySection = ({
         <strong>
           {federatedIdentity?.provider === "proConnect" && (
             <span id={domElementIds.establishment.create.summaryAdminName}>
-              {getFullname(
-                federatedIdentity.firstName,
-                federatedIdentity.lastName,
-              )}
+              {getFormattedFirstnameAndLastname({
+                firstname: federatedIdentity.firstName,
+                lastname: federatedIdentity.lastName,
+              })}
               {" - "}
             </span>
           )}

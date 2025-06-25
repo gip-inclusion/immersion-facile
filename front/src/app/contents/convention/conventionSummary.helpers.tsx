@@ -21,7 +21,7 @@ import {
   addressDtoToString,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   isValidMobilePhone,
   makeSiretDescriptionLink,
   makeWeeklySchedule,
@@ -460,10 +460,8 @@ const makeSignatoriesSubsections = (
               key: "agencyReferent",
               label: "Conseiller",
               value:
-                getFullname(
-                  convention.agencyReferent?.firstname,
-                  convention.agencyReferent?.lastname,
-                ) ?? "",
+                getFormattedFirstnameAndLastname(convention.agencyReferent) ??
+                "",
             }
           : null,
       ]),
