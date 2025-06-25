@@ -1,4 +1,8 @@
-import { type ConventionReadDto, toDisplayedDate } from "shared";
+import {
+  type ConventionReadDto,
+  getFormattedFirstnameAndLastname,
+  toDisplayedDate,
+} from "shared";
 
 export const ImmersionDescription = ({
   convention,
@@ -6,7 +10,10 @@ export const ImmersionDescription = ({
   convention: ConventionReadDto;
 }): JSX.Element => {
   const beneficiary = convention.signatories.beneficiary;
-  const beneficiaryName = `${beneficiary.firstName} ${beneficiary.lastName}`;
+  const beneficiaryName = getFormattedFirstnameAndLastname({
+    firstname: beneficiary.firstName,
+    lastname: beneficiary.lastName,
+  });
   const dateStart = toDisplayedDate({ date: new Date(convention.dateStart) });
   const dateEnd = toDisplayedDate({ date: new Date(convention.dateEnd) });
   return (

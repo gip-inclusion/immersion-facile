@@ -102,12 +102,16 @@ const makeSignatoriesSubsections = (
         {
           key: "beneficiaryFirstname",
           label: "Prénom",
-          value: convention.signatories.beneficiary.firstName,
+          value: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
         },
         {
           key: "beneficiaryLastname",
           label: "Nom",
-          value: convention.signatories.beneficiary.lastName,
+          value: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
         },
         {
           key: "beneficiaryEmail",
@@ -171,12 +175,18 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryRepFirstname",
               label: "Prénom",
-              value: convention.signatories.beneficiaryRepresentative.firstName,
+              value: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.beneficiaryRepresentative.firstName,
+              }),
             },
             {
               key: "beneficiaryRepLastname",
               label: "Nom",
-              value: convention.signatories.beneficiaryRepresentative.lastName,
+              value: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.beneficiaryRepresentative.lastName,
+              }),
             },
             {
               key: "beneficiaryRepEmail",
@@ -239,12 +249,18 @@ const makeSignatoriesSubsections = (
         {
           key: "establishmentRepFirstname",
           label: "Prénom",
-          value: convention.signatories.establishmentRepresentative.firstName,
+          value: getFormattedFirstnameAndLastname({
+            firstname:
+              convention.signatories.establishmentRepresentative.firstName,
+          }),
         },
         {
           key: "establishmentRepLastname",
           label: "Nom",
-          value: convention.signatories.establishmentRepresentative.lastName,
+          value: getFormattedFirstnameAndLastname({
+            lastname:
+              convention.signatories.establishmentRepresentative.lastName,
+          }),
         },
         {
           key: "establishmentRepEmail",
@@ -316,13 +332,18 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryCurrentEmployerFirstname",
               label: "Prénom",
-              value:
-                convention.signatories.beneficiaryCurrentEmployer.firstName,
+              value: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.beneficiaryCurrentEmployer.firstName,
+              }),
             },
             {
               key: "beneficiaryCurrentEmployerLastname",
               label: "Nom",
-              value: convention.signatories.beneficiaryCurrentEmployer.lastName,
+              value: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.beneficiaryCurrentEmployer.lastName,
+              }),
             },
             {
               key: "beneficiaryCurrentEmployerEmail",
@@ -412,10 +433,9 @@ const makeSignatoriesSubsections = (
           ? {
               key: "agencyReferent",
               label: "Accompagnateur",
-              value: [
-                convention.agencyReferent?.firstname,
-                convention.agencyReferent?.lastname,
-              ].join(" "),
+              value:
+                getFormattedFirstnameAndLastname(convention.agencyReferent) ??
+                "",
             }
           : null,
         convention.dateValidation
@@ -594,12 +614,16 @@ const makeEstablishmentSubSections = (
         {
           key: "establishmentTutorFirstname",
           label: "Prénom",
-          value: convention.establishmentTutor.firstName,
+          value: getFormattedFirstnameAndLastname({
+            firstname: convention.establishmentTutor.firstName,
+          }),
         },
         {
           key: "establishmentTutorLastname",
           label: "Nom",
-          value: convention.establishmentTutor.lastName,
+          value: getFormattedFirstnameAndLastname({
+            lastname: convention.establishmentTutor.lastName,
+          }),
         },
         {
           key: "establishmentTutorJob",
