@@ -11,7 +11,7 @@ z.setErrorMap((issue, ctx) => {
 
   if (issue.code === "invalid_enum_value")
     return {
-      message: "Vous devez sélectionner une option parmi celles proposées",
+      message: `Vous devez sélectionner une option parmi celles proposées - valeur fournie : ${ctx.data}`,
     };
 
   if (issue.code === "invalid_string" && issue.validation === "email")
