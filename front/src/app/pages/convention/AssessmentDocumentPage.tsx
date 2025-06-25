@@ -9,6 +9,7 @@ import {
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
+  getFormattedFirstnameAndLastname,
   isStringDate,
   makeSiretDescriptionLink,
   toDisplayedDate,
@@ -155,10 +156,17 @@ export const AssessmentDocumentPage = ({
           : {convention.immersionObjective}.
         </p>
         <p>
-          Le tuteur {convention.establishmentTutor.firstName}{" "}
-          {convention.establishmentTutor.lastName} de{" "}
-          {convention.signatories.beneficiary.firstName}{" "}
-          {convention.signatories.beneficiary.lastName} a évalué son{" "}
+          Le tuteur{" "}
+          {getFormattedFirstnameAndLastname({
+            firstname: convention.establishmentTutor.firstName,
+            lastname: convention.establishmentTutor.lastName,
+          })}{" "}
+          de{" "}
+          {getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+            lastname: convention.signatories.beneficiary.lastName,
+          })}{" "}
+          a évalué son{" "}
           {convention.internshipKind === "immersion"
             ? "immersion"
             : "mini-stage"}
@@ -295,10 +303,13 @@ export const AssessmentDocumentPage = ({
             {convention.internshipKind === "immersion"
               ? "de l'immersion professionnelle réalisée"
               : "du mini-stage réalisé"}{" "}
-            par {convention.signatories.beneficiary.firstName}{" "}
-            {convention.signatories.beneficiary.lastName} chez{" "}
-            {convention.businessName}. Il peut être utilisé comme référence lors
-            de futurs entretiens ou dans le dossier de candidature pour
+            par{" "}
+            {getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+              firstname: convention.signatories.beneficiary.firstName,
+            })}{" "}
+            chez {convention.businessName}. Il peut être utilisé comme référence
+            lors de futurs entretiens ou dans le dossier de candidature pour
             valoriser l'expérience acquise au sein de l'entreprise d'accueil.
           </p>
           <p>
