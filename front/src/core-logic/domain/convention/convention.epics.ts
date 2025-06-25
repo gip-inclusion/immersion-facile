@@ -129,7 +129,8 @@ const getConventionEpic: ConventionEpic = (
         conventionActionSlice.actions.cancelConventionSucceeded.match(action) ||
         conventionActionSlice.actions.transferConventionToAgencySucceeded.match(
           action,
-        ),
+        ) ||
+        conventionActionSlice.actions.editCounsellorNameSucceeded.match(action),
     ),
     switchMap((action): Observable<ConventionAction> => {
       if ("updateStatusParams" in action.payload) {
@@ -147,11 +148,16 @@ const getConventionEpic: ConventionEpic = (
             ),
           );
       }
-      if ("transferConventionToAgencyParams" in action.payload) {
+      if (
+        "transferConventionToAgencyParams" in action.payload ||
+        "editCounsellorNameParams" in action.payload
+      ) {
         return conventionGateway
           .retrieveFromToken$({
             conventionId:
-              action.payload.transferConventionToAgencyParams.conventionId,
+              "transferConventionToAgencyParams" in action.payload
+                ? action.payload.transferConventionToAgencyParams.conventionId
+                : action.payload.editCounsellorNameParams.conventionId,
             jwt: action.payload.jwt,
           })
           .pipe(
