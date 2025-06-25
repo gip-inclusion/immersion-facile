@@ -278,16 +278,6 @@ export const ConventionManageActions = ({
         ]
       : []),
     {
-      id: domElementIds.manageConvention.editLink,
-      priority: "secondary",
-      children: t.verification.modifyConventionOtherInformations,
-      linkProps: routes.conventionImmersion({
-        conventionId: convention.id,
-        jwt: jwtParams.jwt,
-        skipIntro: true,
-      }).link,
-    },
-    {
       ...getVerificationActionProps({
         initialStatus: convention.status,
         children: t.verification.modifyCounsellorName,
@@ -300,6 +290,16 @@ export const ConventionManageActions = ({
       }).buttonProps,
 
       id: domElementIds.manageConvention.editCounsellorNameButton,
+    },
+    {
+      id: domElementIds.manageConvention.editLink,
+      priority: "secondary",
+      children: t.verification.modifyConventionOtherInformations,
+      linkProps: routes.conventionImmersion({
+        conventionId: convention.id,
+        jwt: jwtParams.jwt,
+        skipIntro: true,
+      }).link,
     },
   ];
 
