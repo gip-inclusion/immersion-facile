@@ -57,16 +57,6 @@ export const ErroredConventionTabContent = ({
               </p>
 
               <h3 className={fr.cx("fr-h6")}>
-                Identifiant National DE trouvé mais écart sur la date de
-                naissance
-              </h3>
-              <p>
-                Action → Modifier la date de naissance dans la demande pour
-                correspondre à l'information présente dans le dossier du
-                Demandeur d'emploi
-              </p>
-
-              <h3 className={fr.cx("fr-h6")}>
                 Identifiant National DE non trouvé
               </h3>
               <p>
