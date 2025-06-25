@@ -10,6 +10,7 @@ import {
 const allAgencyKindToLabel: Record<AgencyKind, string> = {
   ...agencyKindToLabel,
   "immersion-facile": "Immersion facilitée",
+  "prepa-apprentissage": "Prépa Apprentissage",
 };
 
 export const agencyListOfOptions: SelectProps.Option<AllowedAgencyKindToAdd>[] =

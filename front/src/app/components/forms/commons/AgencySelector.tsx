@@ -249,7 +249,10 @@ const agencyOptionsInSelectorFromAgencyOptions = (
 ) =>
   agencies
     .filter(
-      ({ kind }) => kind !== "immersion-facile" && agencyKinds.includes(kind),
+      ({ kind }) =>
+        kind !== "immersion-facile" &&
+        kind !== "prepa-apprentissage" &&
+        agencyKinds.includes(kind),
     )
     .sort((a, b) => a.name.localeCompare(b.name))
     .map(({ id, name }) => ({
@@ -273,10 +276,11 @@ const makeAgencyKindOptions = (
     if (shouldLockToPeAgencies) return kind === "pole-emploi";
     if (
       kind !== "immersion-facile" &&
+      kind !== "prepa-apprentissage" &&
       shouldFilterDelegationPrescriptionAgencyKind
     )
       return fitForDelegationAgencyKind.includes(kind);
-    return kind !== "immersion-facile";
+    return kind !== "immersion-facile" && kind !== "prepa-apprentissage";
   };
 
   const availableKinds = uniq(agencyOptions.map(({ kind }) => kind))
