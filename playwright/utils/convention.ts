@@ -214,7 +214,7 @@ export const signConvention = async (
   await expect(
     page
       .locator(".fr-alert--success")
-      .getByRole("heading", { name: "La convention a bien été signée" }),
+      .getByRole("heading", { name: "Vous avez signé cette convention." }),
   ).toBeVisible();
 };
 
