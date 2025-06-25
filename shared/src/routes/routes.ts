@@ -1,17 +1,20 @@
 export type AllowedStartOAuthLoginPage =
   (typeof allowedStartOAuthLoginPages)[number];
 export const allowedStartOAuthLoginPages = [
-  "agencyDashboard",
-  "establishmentDashboard",
   "admin",
   "establishment",
+  "establishmentDashboard",
+  "establishmentDashboardDiscussions",
+  "agencyDashboard",
 ] as const;
 
 export const frontRoutes = {
   addAgency: "ajouter-prescripteur",
-  [allowedStartOAuthLoginPages[0]]: "tableau-de-bord-agence",
-  [allowedStartOAuthLoginPages[1]]: "tableau-de-bord-etablissement",
-  [allowedStartOAuthLoginPages[2]]: "admin",
+  [allowedStartOAuthLoginPages[0]]: "admin",
+  [allowedStartOAuthLoginPages[1]]: "establishment",
+  [allowedStartOAuthLoginPages[2]]: "tableau-de-bord-etablissement",
+  [allowedStartOAuthLoginPages[3]]: "tableau-de-bord-etablissement/discussions",
+  [allowedStartOAuthLoginPages[4]]: "tableau-de-bord-agence",
   assessmentDocument: "bilan-document",
   beneficiaryDashboard: "tableau-de-bord-beneficiaire",
   initiateConvention: "initier-convention",
@@ -21,7 +24,6 @@ export const frontRoutes = {
   conventionStatusDashboard: "statut-convention",
   conventionToSign: "verifier-et-signer",
   error: "error",
-  establishment: "establishment",
   group: "groupe",
   homeAgencies: "accueil-prescripteurs",
   homeCandidates: "accueil-beneficiaires",
