@@ -18,6 +18,7 @@ import {
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
   errors,
+  getFormattedFirstnameAndLastname,
   isConventionRenewed,
   isStringDate,
   makeSiretDescriptionLink,
@@ -214,7 +215,10 @@ export const ConventionDocumentPage = ({
         <ul>
           <li>
             <strong>
-              {beneficiary.firstName} {beneficiary.lastName}
+              {getFormattedFirstnameAndLastname({
+                firstname: beneficiary.firstName,
+                lastname: beneficiary.lastName,
+              })}
             </strong>{" "}
             né(e) le{" "}
             <strong>
@@ -245,8 +249,10 @@ export const ConventionDocumentPage = ({
           {beneficiaryRepresentative && (
             <li>
               <strong>
-                {beneficiaryRepresentative.firstName}{" "}
-                {beneficiaryRepresentative.lastName}
+                {getFormattedFirstnameAndLastname({
+                  firstname: beneficiaryRepresentative.firstName,
+                  lastname: beneficiaryRepresentative.lastName,
+                })}
               </strong>{" "}
               en qualité de{" "}
               <strong>représentant(e) légal(e) du bénéficiaire</strong>
@@ -259,8 +265,10 @@ export const ConventionDocumentPage = ({
           {beneficiaryCurrentEmployer && (
             <li>
               <strong>
-                {beneficiaryCurrentEmployer.firstName}{" "}
-                {beneficiaryCurrentEmployer.lastName}
+                {getFormattedFirstnameAndLastname({
+                  firstname: beneficiaryCurrentEmployer.firstName,
+                  lastname: beneficiaryCurrentEmployer.lastName,
+                })}
               </strong>{" "}
               en qualité de <strong>représentant(e) de l'entreprise:</strong>{" "}
               {beneficiaryCurrentEmployer.businessName}{" "}
@@ -277,8 +285,10 @@ export const ConventionDocumentPage = ({
           {establishmentRepresentative && (
             <li>
               <strong>
-                {establishmentRepresentative.firstName}{" "}
-                {establishmentRepresentative.lastName}
+                {getFormattedFirstnameAndLastname({
+                  firstname: establishmentRepresentative.firstName,
+                  lastname: establishmentRepresentative.lastName,
+                })}
               </strong>{" "}
               en qualité de <strong>représentant de l'entreprise</strong>{" "}
               {convention.businessName}
@@ -352,14 +362,14 @@ export const ConventionDocumentPage = ({
               <li>
                 conseiller France Travail (anciennement Pôle emploi) référent :{" "}
                 <strong>
-                  {
-                    convention.signatories.beneficiary.federatedIdentity.payload
-                      .advisor.firstName
-                  }{" "}
-                  {
-                    convention.signatories.beneficiary.federatedIdentity.payload
-                      .advisor.lastName
-                  }
+                  {getFormattedFirstnameAndLastname({
+                    firstname:
+                      convention.signatories.beneficiary.federatedIdentity
+                        .payload.advisor.firstName,
+                    lastname:
+                      convention.signatories.beneficiary.federatedIdentity
+                        .payload.advisor.lastName,
+                  })}
                 </strong>
               </li>
             )}
@@ -367,8 +377,9 @@ export const ConventionDocumentPage = ({
             <li>
               Examinée par :{" "}
               <strong>
-                {convention.validators?.agencyCounsellor.firstname}{" "}
-                {convention.validators?.agencyCounsellor.lastname}
+                {getFormattedFirstnameAndLastname(
+                  convention.validators.agencyCounsellor,
+                )}
               </strong>{" "}
               (conseiller qui examine préalablement la demande de convention)
             </li>
@@ -377,8 +388,9 @@ export const ConventionDocumentPage = ({
             <li>
               Validée par :{" "}
               <strong>
-                {convention.validators?.agencyValidator.firstname}{" "}
-                {convention.validators?.agencyValidator.lastname}
+                {getFormattedFirstnameAndLastname(
+                  convention.validators.agencyValidator,
+                )}
               </strong>{" "}
               (conseiller qui valide définitivement la demande de convention)
             </li>
@@ -489,12 +501,17 @@ export const ConventionDocumentPage = ({
         <p className={fr.cx("fr-mt-2w")}>Encadrement :</p>
         <p>
           <strong>
-            {beneficiary.firstName} {beneficiary.lastName}
+            {getFormattedFirstnameAndLastname({
+              firstname: beneficiary.firstName,
+              lastname: beneficiary.lastName,
+            })}
           </strong>{" "}
           sera encadré(e) par{" "}
           <strong>
-            {convention.establishmentTutor.firstName}{" "}
-            {convention.establishmentTutor.lastName}
+            {getFormattedFirstnameAndLastname({
+              firstname: convention.establishmentTutor.firstName,
+              lastname: convention.establishmentTutor.lastName,
+            })}
           </strong>{" "}
           occupant la fonction{" "}
           {isStartingByVowel(convention.establishmentTutor.job)
@@ -508,16 +525,26 @@ export const ConventionDocumentPage = ({
         </p>
 
         <p>
-          {beneficiary.firstName} {beneficiary.lastName}
+          {getFormattedFirstnameAndLastname({
+            firstname: beneficiary.firstName,
+            lastname: beneficiary.lastName,
+          })}
           {beneficiaryRepresentative && (
             <span>
-              , {beneficiaryRepresentative.firstName}{" "}
-              {beneficiaryRepresentative.lastName}
+              ,{" "}
+              {getFormattedFirstnameAndLastname({
+                firstname: beneficiaryRepresentative.firstName,
+                lastname: beneficiaryRepresentative.lastName,
+              })}
             </span>
           )}{" "}
-          et {establishmentRepresentative.firstName}{" "}
-          {establishmentRepresentative.lastName} en signant cette convention,
-          s'engagent à respecter les obligations réglementaires{" "}
+          et{" "}
+          {getFormattedFirstnameAndLastname({
+            firstname: establishmentRepresentative.firstName,
+            lastname: establishmentRepresentative.lastName,
+          })}{" "}
+          en signant cette convention, s'engagent à respecter les obligations
+          réglementaires{" "}
           {internshipKind === "immersion"
             ? "de la Période de Mise en Situation Professionnelle"
             : "du mini-stage"}
@@ -546,7 +573,10 @@ export const ConventionDocumentPage = ({
             <li>
               √ Le bénéficiaire,{" "}
               <strong>
-                {beneficiary.firstName} {beneficiary.lastName}
+                {getFormattedFirstnameAndLastname({
+                  firstname: beneficiary.firstName,
+                  lastname: beneficiary.lastName,
+                })}
               </strong>{" "}
               (signé le{" "}
               {toDisplayedDate({
@@ -561,8 +591,10 @@ export const ConventionDocumentPage = ({
               <li>
                 √ Le représentant légal du bénéficiaire,{" "}
                 <strong>
-                  {beneficiaryRepresentative.firstName}{" "}
-                  {beneficiaryRepresentative.lastName}
+                  {getFormattedFirstnameAndLastname({
+                    firstname: beneficiaryRepresentative.firstName,
+                    lastname: beneficiaryRepresentative.lastName,
+                  })}
                 </strong>{" "}
                 (signé le{" "}
                 {toDisplayedDate({
@@ -584,8 +616,10 @@ export const ConventionDocumentPage = ({
                 √ Le représentant de l'entreprise employant actuellement le
                 bénéficiaire,{" "}
                 <strong>
-                  {beneficiaryCurrentEmployer.firstName}{" "}
-                  {beneficiaryCurrentEmployer.lastName}
+                  {getFormattedFirstnameAndLastname({
+                    firstname: beneficiaryCurrentEmployer.firstName,
+                    lastname: beneficiaryCurrentEmployer.lastName,
+                  })}
                 </strong>{" "}
                 (signé le{" "}
                 {toDisplayedDate({
@@ -604,8 +638,10 @@ export const ConventionDocumentPage = ({
             <li>
               √ Le représentant de l'entreprise d'accueil,{" "}
               <strong>
-                {establishmentRepresentative.firstName}{" "}
-                {establishmentRepresentative.lastName}
+                {getFormattedFirstnameAndLastname({
+                  firstname: establishmentRepresentative.firstName,
+                  lastname: establishmentRepresentative.lastName,
+                })}
               </strong>{" "}
               (signé le{" "}
               {toDisplayedDate({
