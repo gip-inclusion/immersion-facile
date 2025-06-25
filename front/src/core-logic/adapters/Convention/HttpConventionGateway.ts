@@ -11,6 +11,7 @@ import type {
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
+  EditCounsellorNameRequestDto,
   FindSimilarConventionsParams,
   InclusionConnectedAllowedRoutes,
   RenewConventionParams,
@@ -74,6 +75,26 @@ export class HttpConventionGateway implements ConventionGateway {
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 409 }, logBodyAndThrow)
             .with({ status: 503 }, throwServiceUnavailableWithExplicitMessage)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public editCounsellorName$(
+    params: EditCounsellorNameRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void> {
+    return from(
+      this.magicLinkHttpClient
+        .editCounsellorName({
+          body: params,
+          headers: { authorization: jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );
