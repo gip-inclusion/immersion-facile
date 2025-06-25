@@ -135,6 +135,12 @@ export class PgDiscussionRepository implements DiscussionRepository {
               "ilike",
               `%${filters.search}%`,
             ),
+            eb("pad.libelle_appellation_long", "ilike", `%${filters.search}%`),
+            eb(
+              sql`CAST(discussions.immersion_objective AS text)`, // immersion objective is ImmersionObjectives, not a string
+              "ilike",
+              `%${filters.search}%`,
+            ),
           ]),
         );
       },

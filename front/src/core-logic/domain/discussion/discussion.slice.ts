@@ -69,6 +69,7 @@ export const initialDiscussionsWithPagination: DataWithPagination<DiscussionInLi
     page: 1,
     perPage: defaultPerPageInWebPagination,
     statuses: [],
+    search: "",
   },
 };
 

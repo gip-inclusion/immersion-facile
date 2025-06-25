@@ -8,11 +8,11 @@ import {
   type DiscussionEstablishmentContact,
   type DiscussionInList,
   type Exchange,
-  type ImmersionObjective,
-  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type ImmersionObjective,
+  UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -37,20 +37,31 @@ describe("PgDiscussionRepository", () => {
     appellationCode: "19540",
     appellationLabel: "Styliste",
   };
+  const secretariat: AppellationAndRomeDto = {
+    romeCode: "M1607",
+    romeLabel: "Secrétariat",
+    appellationCode: "19364",
+    appellationLabel: "Secrétaire",
+  };
 
-  const offer = new OfferEntityBuilder()
+  const stylisteOffer = new OfferEntityBuilder()
     .withRomeCode(styliste.romeCode)
     .withAppellationCode(styliste.appellationCode)
     .withAppellationLabel(styliste.appellationLabel)
     .build();
 
   const establishmentContactWithoutFirstNameAndLastName: DiscussionEstablishmentContact =
-    {
-      email: "test@test.com",
-      phone: "0123456789",
-      job: "test",
-      copyEmails: [],
-    };
+  {
+    email: "test@test.com",
+    phone: "0123456789",
+    job: "test",
+    copyEmails: [],
+  };
+  const secretariatOffer = new OfferEntityBuilder()
+    .withRomeCode(secretariat.romeCode)
+    .withAppellationCode(secretariat.appellationCode)
+    .withAppellationLabel(secretariat.appellationLabel)
+    .build();
 
   const date = new Date("2023-07-07");
 
@@ -562,7 +573,7 @@ describe("PgDiscussionRepository", () => {
       .withSiret("00000000000002")
       .withPotentialBeneficiaryLastName("Smith")
       .withCreatedAt(new Date("2025-05-19"))
-      .withAppellationCode(styliste.appellationCode)
+      .withAppellationCode(secretariat.appellationCode)
       .withPotentialBeneficiaryPhone(potentialBeneficiaryPhone)
       .withImmersionObjective(discussion2Objective)
       .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "phone" })
@@ -587,7 +598,7 @@ describe("PgDiscussionRepository", () => {
       id: discussion2.id,
       siret: discussion2.siret,
       status: discussion2.status,
-      appellation: styliste,
+      appellation: secretariat,
       businessName: discussion2.businessName,
       createdAt: discussion2.createdAt,
       kind: discussion2.kind,
@@ -635,7 +646,7 @@ describe("PgDiscussionRepository", () => {
               phone: "",
             },
           ])
-          .withOffers([offer])
+          .withOffers([secretariatOffer])
           .build(),
       );
 
@@ -651,7 +662,7 @@ describe("PgDiscussionRepository", () => {
               phone: "",
             },
           ])
-          .withOffers([offer])
+          .withOffers([stylisteOffer])
           .build(),
       );
     });
@@ -815,6 +826,56 @@ describe("PgDiscussionRepository", () => {
 
         expectToEqual(result, {
           data: [discussion3InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("filters on the immersion objective", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: discussion3Objective.slice(0, 3),
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
+
+        expectToEqual(result, {
+          data: [discussion3InList],
+          pagination: {
+            currentPage: 1,
+            numberPerPage: 10,
+            totalPages: 1,
+            totalRecords: 1,
+          },
+        });
+      });
+
+      it("filters on the appellation label", async () => {
+        const result =
+          await pgDiscussionRepository.getPaginatedDiscussionsForUser({
+            filters: {
+              search: secretariat.appellationLabel.slice(0, 5), // "Secré"
+            },
+            pagination: {
+              page: 1,
+              perPage: 10,
+            },
+            order: { by: "createdAt", direction: "desc" },
+            userId: user.id,
+          });
+
+        expectToEqual(result, {
+          data: [discussion2InList],
           pagination: {
             currentPage: 1,
             numberPerPage: 10,
@@ -1276,7 +1337,7 @@ describe("PgDiscussionRepository", () => {
               phone: "",
             },
           ])
-          .withOffers([offer])
+          .withOffers([stylisteOffer])
           .build(),
       );
 
@@ -1358,7 +1419,7 @@ describe("PgDiscussionRepository", () => {
           phone: "",
         },
       ])
-      .withOffers([offer])
+      .withOffers([stylisteOffer])
       .build();
 
     beforeEach(async () => {

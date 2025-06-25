@@ -4,7 +4,7 @@ import Checkbox, { type CheckboxProps } from "@codegouvfr/react-dsfr/Checkbox";
 import RadioButtons, {
   type RadioButtonsProps,
 } from "@codegouvfr/react-dsfr/RadioButtons";
-import { pick } from "ramda";
+import { equals, pick } from "ramda";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { HeadingSection, RichTable } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -40,6 +40,11 @@ export const DiscussionList = () => {
     pagination,
     filters,
   } = useAppSelector(discussionSelectors.discussionsWithPagination);
+  const hasDiscussions = discussions.length > 0;
+  const filtersAreEmpty = equals(
+    filters,
+    initialDiscussionsWithPagination.filters,
+  );
   const isLoading = useAppSelector(discussionSelectors.isLoading);
   const defaultFilters = useMemo(
     () =>
@@ -101,12 +106,7 @@ export const DiscussionList = () => {
       dispatch(
         discussionSlice.actions.fetchDiscussionListRequested({
           jwt: token,
-          filters: {
-            orderBy: "createdAt",
-            orderDirection: "desc",
-            page: 1,
-            perPage: defaultPerPageInWebPagination,
-          },
+          filters: initialDiscussionsWithPagination.filters,
           feedbackTopic: "establishment-dashboard-discussion-list",
         }),
       );
@@ -115,6 +115,26 @@ export const DiscussionList = () => {
   if (!token) {
     return;
   }
+  const getTableHeaders = () => {
+    if (hasDiscussions) {
+      return [
+        "Offre d'immersion",
+        "Candidat",
+        "But de l'immersion",
+        "Date",
+        "Statut",
+        "Actions",
+      ];
+    }
+    if (!filtersAreEmpty) {
+      return [
+        "Aucune candidature trouvée avec ces filtres, vous pouvez modifier les filtres pour élargir votre recherche.",
+      ];
+    }
+    return [
+      "Nous n'avons pas trouvé de candidatures où vous êtes référencés en tant que contact d'entreprise.",
+    ];
+  };
   return (
     <HeadingSection
       title="Candidatures"
@@ -142,14 +162,7 @@ export const DiscussionList = () => {
           ))
           .with({ discussions: P.not(P.nullish) }, () => (
             <RichTable
-              headers={[
-                "Offre d'immersion",
-                "Candidat",
-                "Objet",
-                "Date",
-                "Statut",
-                "Actions",
-              ]}
+              headers={getTableHeaders()}
               className={fr.cx("fr-mt-4w")}
               isLoading={isLoading}
               data={discussions.map((discussion) => [
@@ -240,6 +253,7 @@ export const DiscussionList = () => {
                     discussionSlice.actions.fetchDiscussionListRequested({
                       jwt: token,
                       filters: {
+                        ...filters,
                         ...tempFilters,
                         page: 1,
                         perPage: defaultPerPageInWebPagination,
