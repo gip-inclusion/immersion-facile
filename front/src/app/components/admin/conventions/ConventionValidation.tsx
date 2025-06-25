@@ -74,8 +74,11 @@ export const ConventionValidation = ({
     useState<boolean>(false);
 
   useScrollToTop(
-    useFeedbackTopics(["send-signature-link", "send-assessment-link"]).length >
-      0,
+    useFeedbackTopics([
+      "send-signature-link",
+      "send-assessment-link",
+      "convention-action-sign",
+    ]).length > 0,
   );
 
   const [signatoryToSendSignatureLink, setSignatoryToSendSignatureLink] =
@@ -183,7 +186,12 @@ export const ConventionValidation = ({
         <p>Justification : {convention.statusJustification}</p>
       )}
       <Feedback
-        topics={["send-signature-link", "send-assessment-link"]}
+        topics={[
+          "send-signature-link",
+          "send-assessment-link",
+          "convention-action-sign",
+        ]}
+        closable
         className={fr.cx("fr-my-4w")}
       />
       {isConventionRenewed(convention) && (

@@ -145,10 +145,7 @@ export const ConventionSignForm = ({
 
   return (
     <>
-      <Feedback
-        topics={["convention-action-sign", "send-signature-link"]}
-        closable
-      />
+      <Feedback topics={["send-signature-link"]} closable />
       {alreadySigned ? (
         <>
           <Alert
