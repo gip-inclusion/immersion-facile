@@ -3,6 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type {
   ConventionDto,
   ConventionStatus,
+  EditCounsellorNameRequestDto,
   RenewConventionParams,
   Role,
   TransferConventionToAgencyRequestDto,
@@ -16,7 +17,8 @@ export type VerificationActionProps = {
     params:
       | UpdateConventionStatusRequestDto
       | TransferConventionToAgencyRequestDto
-      | RenewConventionParams,
+      | RenewConventionParams
+      | EditCounsellorNameRequestDto,
   ) => void;
   disabled?: boolean;
   initialStatus: ConventionStatus;
@@ -38,6 +40,7 @@ const allVerificationActions = [
   "DEPRECATE",
   "TRANSFER",
   "RENEW",
+  "EDIT_COUNSELLOR_NAME",
 ] as const;
 export type VerificationAction = (typeof allVerificationActions)[number];
 
@@ -48,7 +51,7 @@ export const newStatusByVerificationAction = {
   CANCEL: "CANCELLED",
   DEPRECATE: "DEPRECATED",
 } satisfies Record<
-  Exclude<VerificationAction, "TRANSFER" | "RENEW">,
+  Exclude<VerificationAction, "TRANSFER" | "RENEW" | "EDIT_COUNSELLOR_NAME">,
   ConventionStatus
 >;
 

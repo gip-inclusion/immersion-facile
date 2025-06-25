@@ -8,9 +8,9 @@ import {
   type ConventionId,
   type ConventionStatusWithValidator,
   type UpdateConventionStatusRequestDto,
-  type WithValidatorInfo,
+  type WithFirstnameAndLastname,
   domElementIds,
-  withValidatorInfoSchema,
+  withFirstnameAndLastnameSchema,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
@@ -46,12 +46,12 @@ export const ValidatorModalContent = ({
     ? pick(["firstname", "lastname"], fetchedConvention.agencyReferent)
     : undefined;
 
-  const { register, handleSubmit } = useForm<WithValidatorInfo>({
-    resolver: zodResolver(withValidatorInfoSchema),
+  const { register, handleSubmit } = useForm<WithFirstnameAndLastname>({
+    resolver: zodResolver(withFirstnameAndLastnameSchema),
     mode: "onTouched",
     defaultValues: currentUserName ?? counsellorNameInConvention,
   });
-  const onFormSubmit: SubmitHandler<WithValidatorInfo> = ({
+  const onFormSubmit: SubmitHandler<WithFirstnameAndLastname> = ({
     firstname,
     lastname,
   }) => {
