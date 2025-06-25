@@ -9,6 +9,7 @@ import {
   type Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -152,11 +153,12 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
                 <PageHeader
                   breadcrumbs={<Breadcrumbs />}
                   className={fr.cx("fr-mb-0")}
-                  title={
-                    convention.internshipKind === "immersion"
-                      ? `Bilan de l'immersion de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
-                      : `Bilan du mini-stage de ${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`
-                  }
+                  title={`Bilan ${convention.internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"} de ${getFormattedFirstnameAndLastname(
+                    {
+                      firstname: convention.signatories.beneficiary.firstName,
+                      lastname: convention.signatories.beneficiary.lastName,
+                    },
+                  )}`}
                 />
               }
             >
