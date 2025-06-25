@@ -104,6 +104,7 @@ const getUseCasesByTopics = (
   ConventionTransferredToAgency: [
     useCases.notifyAllActorsThatConventionHasBeenTransferred,
   ],
+  ConventionCounsellorNameEdited: [],
 
   // Edge cases for immersion application.
 
