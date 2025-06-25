@@ -27,8 +27,23 @@ export const frontErrors = {
       new FrontSpecificError({
         title: "Page non trouvé",
         subtitle: "La page que vous cherchez est introuvable.",
-        description:
-          "La page que vous cherchez est introuvable. Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte. La page n’est peut-être plus disponible. <br>Dans ce cas, pour continuer votre visite vous pouvez consulter notre page d’accueil, ou effectuer une recherche avec notre moteur de recherche en haut de page.<br>Sinon contactez-nous pour que l’on puisse vous rediriger vers la bonne information.",
+        description: (
+          <>
+            <p>
+              La page que vous cherchez est introuvable. Si vous avez tapé
+              l'adresse web dans le navigateur, vérifiez qu'elle est correcte.
+              La page n’est peut-être plus disponible.
+              <br />
+              Dans ce cas, pour continuer votre visite vous pouvez consulter
+              notre page d’accueil, ou effectuer une recherche avec notre moteur
+              de recherche en haut de page.
+            </p>
+            <p>
+              Sinon contactez-nous pour que l’on puisse vous rediriger vers la
+              bonne information.
+            </p>
+          </>
+        ),
         buttons: [HomeButton, ContactUsButton],
       }),
     unauthorized: () =>
