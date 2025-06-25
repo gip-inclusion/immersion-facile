@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import {
   type AgencyRight,
   activeAgencyStatuses,
-  agencyKindToLabelIncludingIF,
+  agencyKindToLabelIncludingIFAndPrepa,
 } from "shared";
 import { AgencyStatusBadge } from "../../AgencyStatusBadge";
 import { AgencyTag } from "../../AgencyTag";
@@ -20,6 +20,8 @@ export const AgencyLineCaracteristics = ({
         <AgencyStatusBadge status={agencyRight.agency.status} />
       </li>
     )}
-    <li>Type : {agencyKindToLabelIncludingIF[agencyRight.agency.kind]}</li>
+    <li>
+      Type : {agencyKindToLabelIncludingIFAndPrepa[agencyRight.agency.kind]}
+    </li>
   </ul>
 );
