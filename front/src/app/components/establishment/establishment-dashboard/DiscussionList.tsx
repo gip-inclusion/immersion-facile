@@ -18,6 +18,7 @@ import {
 } from "shared";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
+import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -127,162 +128,167 @@ export const DiscussionList = () => {
         ) : null
       }
     >
-      {match({
-        discussions,
-      })
+      <WithFeedbackReplacer topic="establishment-dashboard-discussion-list">
+        {match({
+          discussions,
+        })
 
-        .with({ discussions: P.nullish }, () => (
-          <p>
-            Nous n'avons pas trouvé de candidatures où vous êtes référencés en
-            tant que contact d'entreprise.
-          </p>
-        ))
-        .with({ discussions: P.not(P.nullish) }, () => (
-          <RichTable
-            headers={[
-              "Offre d'immersion",
-              "Candidat",
-              "Objet",
-              "Date",
-              "Statut",
-              "Actions",
-            ]}
-            className={fr.cx("fr-mt-4w")}
-            isLoading={isLoading}
-            data={discussions.map((discussion) => [
-              <Fragment key={discussion.id}>
-                <strong>{discussion.appellation.appellationLabel}</strong>
-                <br />
-                {discussion.businessName}
-              </Fragment>,
-              <Fragment key={discussion.id}>
-                <strong>
-                  {discussion.potentialBeneficiary.firstName}{" "}
-                  {discussion.potentialBeneficiary.lastName}
-                </strong>
-                <br />
-                {discussion.potentialBeneficiary.phone
-                  ? toDisplayedPhoneNumber(
-                      discussion.potentialBeneficiary.phone,
-                    )
-                  : "Non renseigné"}
-              </Fragment>,
-              discussion.immersionObjective,
-              toDisplayedDate({
-                date: new Date(discussion.createdAt),
-                withHours: false,
-              }),
-              <DiscussionStatusBadge
-                key={discussion.id}
-                discussion={discussion}
-              />,
-              <Button
-                key={discussion.id}
-                size="small"
-                priority="secondary"
-                onClick={() => {
-                  routes
-                    .establishmentDashboardDiscussions({
-                      discussionId: discussion.id,
-                    })
-                    .push();
-                }}
-              >
-                Voir la candidature
-              </Button>,
-            ])}
-            dropdownFilters={{
-              items: [
-                {
-                  id: "status",
-                  iconId: "fr-icon-settings-5-line" as const,
-                  defaultValue: "Tous les statuts",
-                  values: filters.statuses?.length
-                    ? [
-                        `Statut : ${filters.statuses
-                          .map((status) => displayedStatuses[status])
-                          .join(", ")}`,
-                      ]
-                    : ["Tous les statuts"],
-                  submenu: {
-                    title: "Filtrer par statut",
-                    content: (
-                      <>
-                        <Checkbox options={statusOptions} />
-                      </>
-                    ),
-                  },
-                },
-                {
-                  id: "date",
-                  iconId: "fr-icon-list-ordered" as const,
-                  defaultValue: "Du plus récent au plus ancien",
-                  values: [
-                    displayedOrderDirections[filters.orderDirection ?? "desc"],
-                  ],
-                  submenu: {
-                    title: "Trier par date",
-                    content: (
-                      <>
-                        <RadioButtons options={dateOptions} />
-                      </>
-                    ),
-                  },
-                },
-              ],
-              onSubmit: () => {
-                dispatch(
-                  discussionSlice.actions.fetchDiscussionListRequested({
-                    jwt: token,
-                    filters: {
-                      ...tempFilters,
-                      page: 1,
-                      perPage: defaultPerPageInWebPagination,
+          .with({ discussions: P.nullish }, () => (
+            <p>
+              Nous n'avons pas trouvé de candidatures où vous êtes référencés en
+              tant que contact d'entreprise.
+            </p>
+          ))
+          .with({ discussions: P.not(P.nullish) }, () => (
+            <RichTable
+              headers={[
+                "Offre d'immersion",
+                "Candidat",
+                "Objet",
+                "Date",
+                "Statut",
+                "Actions",
+              ]}
+              className={fr.cx("fr-mt-4w")}
+              isLoading={isLoading}
+              data={discussions.map((discussion) => [
+                <Fragment key={discussion.id}>
+                  <strong>{discussion.appellation.appellationLabel}</strong>
+                  <br />
+                  {discussion.businessName}
+                </Fragment>,
+                <Fragment key={discussion.id}>
+                  <strong>
+                    {discussion.potentialBeneficiary.firstName}{" "}
+                    {discussion.potentialBeneficiary.lastName}
+                  </strong>
+                  <br />
+                  {discussion.potentialBeneficiary.phone
+                    ? toDisplayedPhoneNumber(
+                        discussion.potentialBeneficiary.phone,
+                      )
+                    : "Non renseigné"}
+                </Fragment>,
+                discussion.immersionObjective,
+                toDisplayedDate({
+                  date: new Date(discussion.createdAt),
+                  withHours: false,
+                }),
+                <DiscussionStatusBadge
+                  key={discussion.id}
+                  discussion={discussion}
+                />,
+                <Button
+                  key={discussion.id}
+                  size="small"
+                  priority="secondary"
+                  onClick={() => {
+                    routes
+                      .establishmentDashboardDiscussions({
+                        discussionId: discussion.id,
+                      })
+                      .push();
+                  }}
+                >
+                  Voir la candidature
+                </Button>,
+              ])}
+              dropdownFilters={{
+                items: [
+                  {
+                    id: "status",
+                    iconId: "fr-icon-settings-5-line" as const,
+                    defaultValue: "Tous les statuts",
+                    values: filters.statuses?.length
+                      ? [
+                          `Statut : ${filters.statuses
+                            .map((status) => displayedStatuses[status])
+                            .join(", ")}`,
+                        ]
+                      : ["Tous les statuts"],
+                    submenu: {
+                      title: "Filtrer par statut",
+                      content: (
+                        <>
+                          <Checkbox options={statusOptions} />
+                        </>
+                      ),
                     },
-                    feedbackTopic: "establishment-dashboard-discussion-list",
-                  }),
-                );
-              },
-            }}
-            searchBar={{
-              label: "Rechercher",
-              placeholder: "Rechercher",
-              onSubmit: (query: string) => {
-                dispatch(
-                  discussionSlice.actions.fetchDiscussionListRequested({
-                    jwt: token,
-                    filters: {
-                      ...filters,
-                      search: query,
+                  },
+                  {
+                    id: "date",
+                    iconId: "fr-icon-list-ordered" as const,
+                    defaultValue: "Du plus récent au plus ancien",
+                    values: [
+                      displayedOrderDirections[
+                        filters.orderDirection ?? "desc"
+                      ],
+                    ],
+                    submenu: {
+                      title: "Trier par date",
+                      content: (
+                        <>
+                          <RadioButtons options={dateOptions} />
+                        </>
+                      ),
                     },
-                    feedbackTopic: "establishment-dashboard-discussion-list",
-                  }),
-                );
-              },
-            }}
-            pagination={{
-              count: pagination.totalPages,
-              defaultPage: pagination.currentPage,
-              showFirstLast: true,
-              getPageLinkProps: (pageNumber) => ({
-                title: `Résultats de recherche, page : ${pageNumber}`,
-                onClick: (event) => {
-                  event.preventDefault();
+                  },
+                ],
+                onSubmit: () => {
                   dispatch(
                     discussionSlice.actions.fetchDiscussionListRequested({
                       jwt: token,
-                      filters: { ...filters, page: pageNumber },
+                      filters: {
+                        ...tempFilters,
+                        page: 1,
+                        perPage: defaultPerPageInWebPagination,
+                      },
                       feedbackTopic: "establishment-dashboard-discussion-list",
                     }),
                   );
                 },
-                href: "#",
-                key: `pagination-link-${pageNumber}`,
-              }),
-            }}
-          />
-        ))
-        .exhaustive()}
+              }}
+              searchBar={{
+                label: "Rechercher",
+                placeholder: "Rechercher",
+                onSubmit: (query: string) => {
+                  dispatch(
+                    discussionSlice.actions.fetchDiscussionListRequested({
+                      jwt: token,
+                      filters: {
+                        ...filters,
+                        search: query,
+                      },
+                      feedbackTopic: "establishment-dashboard-discussion-list",
+                    }),
+                  );
+                },
+              }}
+              pagination={{
+                count: pagination.totalPages,
+                defaultPage: pagination.currentPage,
+                showFirstLast: true,
+                getPageLinkProps: (pageNumber) => ({
+                  title: `Résultats de recherche, page : ${pageNumber}`,
+                  onClick: (event) => {
+                    event.preventDefault();
+                    dispatch(
+                      discussionSlice.actions.fetchDiscussionListRequested({
+                        jwt: token,
+                        filters: { ...filters, page: pageNumber },
+                        feedbackTopic:
+                          "establishment-dashboard-discussion-list",
+                      }),
+                    );
+                  },
+                  href: "#",
+                  key: `pagination-link-${pageNumber}`,
+                }),
+              }}
+            />
+          ))
+          .exhaustive()}
+      </WithFeedbackReplacer>
     </HeadingSection>
   );
 };
