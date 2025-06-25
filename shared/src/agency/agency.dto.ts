@@ -108,14 +108,16 @@ export const agencyKindList = [
   "chambre-agriculture",
 ] as const;
 
-export type AllowedAgencyKindToAdd = Exclude<AgencyKind, "immersion-facile">;
+export type AllowedAgencyKindToAdd = Exclude<
+  AgencyKind,
+  "immersion-facile" | "prepa-apprentissage"
+>;
 
 export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   "mission-locale": "Mission Locale",
   "pole-emploi": "France Travail (anciennement Pôle emploi)",
   "cap-emploi": "Cap Emploi",
   "conseil-departemental": "Conseil Départemental",
-  "prepa-apprentissage": "Prépa Apprentissage",
   "structure-IAE": "Structure IAE",
   "operateur-cep": "Opérateur du CEP",
   cci: "Chambres de Commerce et d'Industrie",
@@ -124,10 +126,12 @@ export const agencyKindToLabel: Record<AllowedAgencyKindToAdd, string> = {
   autre: "Autre",
 };
 
-export const agencyKindToLabelIncludingIF: Record<AgencyKind, string> = {
-  ...agencyKindToLabel,
-  "immersion-facile": "Immersion Facilitée",
-};
+export const agencyKindToLabelIncludingIFAndPrepa: Record<AgencyKind, string> =
+  {
+    ...agencyKindToLabel,
+    "prepa-apprentissage": "Prépa Apprentissage",
+    "immersion-facile": "Immersion Facilitée",
+  };
 
 export const allAgencyKindsAllowedToAdd = keys(agencyKindToLabel);
 

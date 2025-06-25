@@ -251,8 +251,7 @@ export const ConventionForm = ({
       agencyCounsellorEmails: [],
       agencyValidatorEmails: [],
     };
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-    console.log("conventionToSave", conventionToSave);
+
     dispatch(
       conventionSlice.actions.showSummaryChangeRequested({
         showSummary: true,

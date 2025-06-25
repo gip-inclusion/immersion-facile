@@ -16,7 +16,7 @@ import {
   type AgencyId,
   type InclusionConnectedUser,
   type SiretDto,
-  agencyKindToLabelIncludingIF,
+  agencyKindToLabelIncludingIFAndPrepa,
   domElementIds,
   looksLikeSiret,
 } from "shared";
@@ -234,7 +234,7 @@ const AgencyTable = ({
               agency.refersToAgencyName
                 ? "Structure d'accompagnement"
                 : "Prescripteur"
-            } - ${agencyKindToLabelIncludingIF[agency.kind]}`}
+            } - ${agencyKindToLabelIncludingIFAndPrepa[agency.kind]}`}
           />
           <br />
           <strong>{agency.name}</strong>
