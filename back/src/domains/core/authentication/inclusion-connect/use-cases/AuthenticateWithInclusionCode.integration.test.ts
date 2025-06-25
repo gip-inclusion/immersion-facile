@@ -22,10 +22,9 @@ import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { GetAccessTokenPayload } from "../port/OAuthGateway";
 import { AuthenticateWithInclusionCode } from "./AuthenticateWithInclusionCode";
 
-const correctToken = "my-correct-token";
-const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
-
 describe("AuthenticateWithInclusionCode use case", () => {
+  const correctToken = "my-correct-token";
+  const immersionBaseUrl: AbsoluteUrl = "http://my-immersion-domain.com";
   const defaultExpectedIcIdTokenPayload: GetAccessTokenPayload = {
     nonce: "nounce",
     sub: "my-user-external-id",
@@ -75,12 +74,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
     it("saves the user as Authenticated user", async () => {
       const { accessToken, initialOngoingOAuth } =
-        await makeSuccessfulAuthenticationConditions();
+        await makeSuccessfulAuthenticationConditions(
+          `${immersionBaseUrl}/agencyDashboard`,
+        );
 
       await authenticateWithInclusionCode.execute({
         code: "my-inclusion-code",
         state: initialOngoingOAuth.state,
-        page: "agencyDashboard",
       });
 
       const expectedOngoingOauth = await uow.ongoingOAuthRepository.findByState(
@@ -114,6 +114,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   const makeSuccessfulAuthenticationConditions = async (
+    fromUri: string,
     expectedIcIdTokenPayload = defaultExpectedIcIdTokenPayload,
   ) => {
     const initialOngoingOAuth: OngoingOAuth = {
@@ -121,6 +122,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       state: "da1b4d59-ff5b-4b28-a34a-2a31da76a7b7",
       nonce: "nounce", // matches the one in the payload of the token
       usedAt: null,
+      fromUri,
     };
     await uow.ongoingOAuthRepository.save(initialOngoingOAuth);
 

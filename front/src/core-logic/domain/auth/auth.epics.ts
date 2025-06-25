@@ -160,7 +160,7 @@ const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
       authGateway
         .loginByEmail$({
           email: action.payload.email,
-          page: action.payload.page,
+          redirectUri: action.payload.redirectUri,
         })
         .pipe(
           map(() =>

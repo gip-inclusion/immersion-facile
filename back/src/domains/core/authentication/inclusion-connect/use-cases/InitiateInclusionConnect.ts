@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
-  type WithSourcePage,
-  withSourcePageSchema,
+  type WithRedirectUri,
+  withRedirectUriSchema,
 } from "shared";
 import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
@@ -10,10 +10,10 @@ import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator"
 import type { OAuthGateway } from "../port/OAuthGateway";
 
 export class InitiateInclusionConnect extends TransactionalUseCase<
-  WithSourcePage,
+  WithRedirectUri,
   AbsoluteUrl
 > {
-  protected inputSchema = withSourcePageSchema;
+  protected inputSchema = withRedirectUriSchema;
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -24,13 +24,14 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: WithSourcePage,
+    params: WithRedirectUri,
     uow: UnitOfWork,
   ): Promise<AbsoluteUrl> {
     const nonce = this.uuidGenerator.new();
     const state = this.uuidGenerator.new();
 
     await uow.ongoingOAuthRepository.save({
+      fromUri: params.redirectUri,
       nonce,
       state,
       provider: "proConnect",
@@ -38,7 +39,6 @@ export class InitiateInclusionConnect extends TransactionalUseCase<
     });
 
     return this.oAuthGateway.getLoginUrl({
-      ...params,
       nonce,
       state,
     });

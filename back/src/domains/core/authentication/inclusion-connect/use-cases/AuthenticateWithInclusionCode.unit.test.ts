@@ -12,7 +12,6 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  frontRoutes,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../../../utils/agency";
@@ -87,12 +86,11 @@ describe("AuthenticateWithInclusionCode use case", () => {
       describe("when user had never connected before", () => {
         it("saves the user as Authenticated user", async () => {
           const { initialOngoingOAuth, userId } =
-            makeSuccessfulAuthenticationConditions();
+            makeSuccessfulAuthenticationConditions("admin");
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.userRepository.users, [
@@ -112,12 +110,11 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
         it("updates ongoingOAuth with userId, accessToken and externalId", async () => {
           const { accessToken, initialOngoingOAuth, userId } =
-            makeSuccessfulAuthenticationConditions();
+            makeSuccessfulAuthenticationConditions("admin");
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -133,12 +130,11 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
         it("saves UserConnectedSuccessfully event with relevant data", async () => {
           const { initialOngoingOAuth, userId } =
-            makeSuccessfulAuthenticationConditions();
+            makeSuccessfulAuthenticationConditions("admin");
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectObjectInArrayToMatch(uow.outboxRepository.events, [
@@ -160,7 +156,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       describe("when user has already exists as an Authenticated User", () => {
         it("updates the user as Authenticated user", async () => {
           const { initialOngoingOAuth } =
-            makeSuccessfulAuthenticationConditions();
+            makeSuccessfulAuthenticationConditions("admin");
           const { alreadyExistingUser } =
             addAlreadyExistingAuthenticatedUserInRepo();
 
@@ -169,7 +165,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.userRepository.users, [
@@ -187,7 +182,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
               externalId: null,
             });
           const { initialOngoingOAuth } =
-            makeSuccessfulAuthenticationConditions({
+            makeSuccessfulAuthenticationConditions("agencyDashboard", {
               email: alreadyExistingUser.email,
             });
 
@@ -201,7 +196,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.userRepository.users, [
@@ -287,13 +281,12 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
-            state: makeSuccessfulAuthenticationConditions({
+            state: makeSuccessfulAuthenticationConditions("agencyDashboard", {
               email: updatedUser.email,
               firstName: updatedUser.firstName,
               lastName: updatedUser.lastName,
               sub: externalId,
             }).initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.userRepository.users, [updatedUser]);
@@ -339,14 +332,13 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
           await authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
-            state: makeSuccessfulAuthenticationConditions({
+            state: makeSuccessfulAuthenticationConditions("agencyDashboard", {
               email: initialUser.email,
               firstName: initialUser.firstName,
               lastName: initialUser.lastName,
               sub: initialUser.proConnect?.externalId,
               siret: proConnectSiret,
             }).initialOngoingOAuth.state,
-            page: "agencyDashboard",
           });
 
           expectToEqual(uow.userRepository.users, [
@@ -365,17 +357,18 @@ describe("AuthenticateWithInclusionCode use case", () => {
         it.each(allowedStartOAuthLoginPages)(
           "generates an app token and returns a redirection url which includes token and user data for %s",
           async (page) => {
-            const { initialOngoingOAuth } =
-              makeSuccessfulAuthenticationConditions();
+            const { initialOngoingOAuth, fromUri } =
+              makeSuccessfulAuthenticationConditions(
+                `/${page}?discussionId=discussion0`,
+              );
 
             const redirectedUrl = await authenticateWithInclusionCode.execute({
               code: "my-inclusion-code",
               state: initialOngoingOAuth.state,
-              page,
             });
 
             expect(redirectedUrl).toBe(
-              `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com&idToken=inclusion-connect-id-token&provider=proConnect`,
+              `${immersionBaseUrl}${fromUri}&token=${correctToken}&firstName=John&lastName=Doe&email=john.doe@inclusion.com&idToken=inclusion-connect-id-token&provider=proConnect`,
             );
           },
         );
@@ -397,8 +390,8 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const params: AuthenticateWithOAuthCodeParams = {
           code: "my-inclusion-code",
           state: "my-state",
-          page: "agencyDashboard",
         };
+
         await expectPromiseToFailWithError(
           authenticateWithInclusionCode.execute(params),
           errors.inclusionConnect.missingOAuth({
@@ -410,6 +403,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       it("should raise a Forbidden error if the nonce does not match", async () => {
         const existingNonce = "existing-nonce";
         const initialOngoingOAuth: OngoingOAuth = {
+          fromUri: "agencyDashboard",
           provider: "proConnect",
           state: "my-state",
           nonce: existingNonce,
@@ -428,7 +422,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           authenticateWithInclusionCode.execute({
             code: "my-inclusion-code",
             state: "my-state",
-            page: "agencyDashboard",
           }),
           errors.inclusionConnect.nonceMismatch(),
         );
@@ -438,13 +431,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
   describe("With provider 'email'", () => {
     describe("validate token", () => {
-      const initialOngoingOAuth = {
+      const initialOngoingOAuth: OngoingOAuth = {
+        fromUri: "/admin",
         provider: "email",
         state: "my-state",
         nonce: "nounce", // matches the one in the payload of the token
         email: "my-email@mail.com",
         usedAt: null,
-      } satisfies OngoingOAuth;
+      };
 
       beforeEach(() => {
         uow.ongoingOAuthRepository.ongoingOAuths = [{ ...initialOngoingOAuth }];
@@ -454,7 +448,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
         const result = await authenticateWithInclusionCode.execute({
           code: generateEmailAuthCode({ version: 1 }),
           state: initialOngoingOAuth.state,
-          page: "admin",
         });
         expectToEqual(result, expect.any(String));
       });
@@ -482,7 +475,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           authenticateWithInclusionCode.execute({
             code: generateEmailAuthCode({ version: 1 }),
             state: initialOngoingOAuth.state,
-            page: "admin",
           }),
           errors.user.invalidJwt(),
         );
@@ -499,7 +491,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
               exp: subDays(timeGateway.now(), 1).getTime() / 1000,
             }),
             state: initialOngoingOAuth.state,
-            page: "admin",
           }),
           errors.user.expiredJwt(),
         );
@@ -512,13 +503,14 @@ describe("AuthenticateWithInclusionCode use case", () => {
         async (page) => {
           const email = "my-email@mail.com";
 
-          const initialOngoingOAuth = {
+          const initialOngoingOAuth: OngoingOAuth = {
+            fromUri: `/${page}?discussionId=discussion0`,
             provider: "email",
             state: "my-state",
             nonce: "nounce", // matches the one in the payload of the token
             email,
             usedAt: null,
-          } satisfies OngoingOAuth;
+          };
 
           uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
@@ -528,7 +520,6 @@ describe("AuthenticateWithInclusionCode use case", () => {
           const redirectedUrl = await authenticateWithInclusionCode.execute({
             code: generateEmailAuthCode({ version: 1 }),
             state: initialOngoingOAuth.state,
-            page,
           });
 
           expectToEqual(uow.userRepository.users, [
@@ -551,7 +542,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
           ]);
 
           expect(redirectedUrl).toBe(
-            `${immersionBaseUrl}/${frontRoutes[page]}?token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
+            `${immersionBaseUrl}/${page}?discussionId=discussion0&token=${correctToken}&firstName=&lastName=&email=${email}&idToken=&provider=email`,
           );
         },
       );
@@ -559,28 +550,28 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   describe("does not allow reuse of ongoing auth by redirecting to auth page with param alreadyUsedAuthentication true", () => {
-    const page = "admin";
+    const redirectUrl = "/admin";
 
     it("email", async () => {
-      const initialOngoingOAuth = {
+      const initialOngoingOAuth: OngoingOAuth = {
+        fromUri: redirectUrl,
         provider: "email",
         state: "my-state",
         nonce: "nounce", // matches the one in the payload of the token
         email: "toto",
         usedAt: new Date(),
-      } satisfies OngoingOAuth;
+      };
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const redirectUrl = await authenticateWithInclusionCode.execute({
+      const loginUrl = await authenticateWithInclusionCode.execute({
         code: "osef",
         state: initialOngoingOAuth.state,
-        page: page,
       });
 
       expectToEqual(
-        redirectUrl,
-        `${immersionBaseUrl}/${frontRoutes[page]}?alreadyUsedAuthentication=true`,
+        loginUrl,
+        `${immersionBaseUrl}/${redirectUrl}?alreadyUsedAuthentication=true`,
       );
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -590,23 +581,24 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
 
     it("proConnect", async () => {
-      const initialOngoingOAuth = {
+      const initialOngoingOAuth: OngoingOAuth = {
+        fromUri: redirectUrl,
         provider: "proConnect",
         state: "my-state",
         nonce: "nounce", // matches the one in the payload of the token
         usedAt: new Date(),
-      } satisfies OngoingOAuth;
+      };
 
       uow.ongoingOAuthRepository.ongoingOAuths = [initialOngoingOAuth];
 
-      const redirectUrl = await authenticateWithInclusionCode.execute({
+      const loginUrl = await authenticateWithInclusionCode.execute({
         code: "osef",
         state: initialOngoingOAuth.state,
-        page: page,
       });
+
       expectToEqual(
-        redirectUrl,
-        `${immersionBaseUrl}/${frontRoutes[page]}?alreadyUsedAuthentication=true`,
+        loginUrl,
+        `${immersionBaseUrl}/${redirectUrl}?alreadyUsedAuthentication=true`,
       );
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -617,6 +609,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
   });
 
   const makeSuccessfulAuthenticationConditions = (
+    fromUri: string,
     params?: Partial<GetAccessTokenPayload>,
   ) => {
     const expectedIcIdTokenPayload = {
@@ -624,6 +617,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
       ...params,
     };
     const initialOngoingOAuth: OngoingOAuth = {
+      fromUri,
       provider: "proConnect",
       state: "my-state",
       nonce: "nounce", // matches the one in the payload of the token
@@ -644,6 +638,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
     });
 
     return {
+      fromUri,
       accessToken,
       initialOngoingOAuth: { ...initialOngoingOAuth },
       userId,

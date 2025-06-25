@@ -20,7 +20,7 @@ export type IdentityProvider = "proConnect" | "email";
 export type OAuthState = Flavor<string, "OAuthState">;
 export type OAuthCode = Flavor<string, "OAuthCode">;
 
-export type AuthenticateWithOAuthCodeParams = WithSourcePage & {
+export type AuthenticateWithOAuthCodeParams = {
   state: OAuthState;
   code: OAuthCode | EmailAuthCodeJwt;
 };
@@ -28,8 +28,8 @@ export type AuthenticateWithOAuthCodeParams = WithSourcePage & {
 export type AllowedStartInclusionConnectLoginSourcesKind =
   (typeof allowedStartOAuthLoginPages)[number];
 
-export type WithSourcePage = {
-  page: AllowedStartInclusionConnectLoginSourcesKind;
+export type WithRedirectUri = {
+  redirectUri: string;
 };
 
 export type AuthenticatedUserQueryParams = {
@@ -80,7 +80,6 @@ export const agencyRoleIsNotToReview = (
 export const connectedUserTokenExpiredMessage =
   "Le jeton d'authentification (JWT) fourni a expiré.";
 
-export type InitiateLoginByEmailParams = {
-  page: AllowedStartInclusionConnectLoginSourcesKind;
+export type InitiateLoginByEmailParams = WithRedirectUri & {
   email: Email;
 };
