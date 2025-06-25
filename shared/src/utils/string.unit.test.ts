@@ -1,7 +1,7 @@
 import {
   cleanStringToHTMLAttribute,
   doesStringContainsHTML,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   looksLikeSiret,
   removeDiacritics,
   slugify,
@@ -173,12 +173,10 @@ describe("string utils", () => {
       },
       {
         inputs: {},
-        expectedOutput: undefined,
+        expectedOutput: "",
       },
     ])("for $inputs return $expectedOutput", ({ inputs, expectedOutput }) => {
-      expect(getFullname(inputs.firstname, inputs.lastname)).toBe(
-        expectedOutput,
-      );
+      expect(getFormattedFirstnameAndLastname(inputs)).toBe(expectedOutput);
     });
   });
 });
