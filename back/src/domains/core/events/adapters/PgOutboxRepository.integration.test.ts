@@ -420,6 +420,7 @@ const expectStoredRowsToMatchEvent = (
         published_at: null,
         subscription_id: null,
         error_message: null,
+        priority: commonStoredEventFields.priority ?? null,
       },
     ]);
     return;
