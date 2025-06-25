@@ -9,6 +9,7 @@ import type {
   ConventionSupportedJwt,
   DashboardUrlAndName,
   DiscussionId,
+  EditCounsellorNameRequestDto,
   FindSimilarConventionsParams,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
@@ -73,6 +74,10 @@ export interface ConventionGateway {
   ): Observable<void>;
   transferConventionToAgency$(
     params: TransferConventionToAgencyRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
+  editCounsellorName$(
+    params: EditCounsellorNameRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }
