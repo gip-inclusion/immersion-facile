@@ -34,7 +34,6 @@ export const frontRoutes = {
   magicLinkRenewal: "refraichir-lien",
   manageConvention: "pilotage-convention",
   manageConventionInclusionConnected: "pilotage-convention-inclusion-connect",
-  manageDiscussion: "pilotage-mise-en-relation",
   manageEstablishmentAdmin: "pilotage-etablissement-admin",
   profile: "mon-profil",
   search: "recherche",
