@@ -25,6 +25,7 @@ describe("PgOngoingOAuthRepository", () => {
 
   const state = "11111111-1111-1111-1111-111111111111";
   const ongoingOAuth: OngoingOAuth = {
+    fromUri: "/uriWithSome?queryParam1=yeah&param2=haaaannnnnnnnn",
     state,
     nonce: "123",
     provider: "proConnect",
@@ -83,6 +84,7 @@ describe("PgOngoingOAuthRepository", () => {
     it("also saves the date of use and the email when it is of kind email", async () => {
       const state = "22222222-2222-2222-2222-222222222222";
       const ongoingOAuth: OngoingOAuth = {
+        fromUri: "/uri",
         state,
         nonce: "444",
         provider: "email",

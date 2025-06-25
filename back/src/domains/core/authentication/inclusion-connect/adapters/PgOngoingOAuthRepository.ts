@@ -6,6 +6,7 @@ import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import type { OngoingOAuthRepository } from "../port/OngoingOAuthRepositiory";
 
 type PersistenceOngoingOAuth = {
+  from_uri: string;
   provider: string;
   state: string;
   nonce: string;
@@ -45,7 +46,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
   }
 
   public async save(ongoingOAuth: OngoingOAuth): Promise<void> {
-    const { provider, nonce, state, userId, usedAt } = ongoingOAuth;
+    const { provider, nonce, state, userId, usedAt, fromUri } = ongoingOAuth;
     if (await this.findByState(state)) {
       await this.transaction
         .updateTable("users_ongoing_oauths")
@@ -71,6 +72,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
       await this.transaction
         .insertInto("users_ongoing_oauths")
         .values({
+          from_uri: fromUri,
           state,
           nonce,
           provider,
@@ -97,6 +99,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
 
     if (provider === "proConnect")
       return {
+        fromUri: raw.from_uri,
         state: raw.state,
         nonce: raw.nonce,
         userId: optional(raw.user_id),
@@ -110,6 +113,7 @@ export class PgOngoingOAuthRepository implements OngoingOAuthRepository {
       throw new Error(`Unsupported, raw.email was : ${raw?.email}`);
 
     return {
+      fromUri: raw.from_uri,
       state: raw.state,
       nonce: raw.nonce,
       userId: optional(raw.user_id),
