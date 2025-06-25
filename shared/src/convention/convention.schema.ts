@@ -65,6 +65,7 @@ import {
   type ConventionReadDto,
   type ConventionValidatorInputNames,
   DATE_CONSIDERED_OLD,
+  type EditCounsellorNameRequestDto,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   type FindSimilarConventionsParams,
@@ -208,23 +209,24 @@ export const immersionObjectiveSchema: z.Schema<ImmersionObjective> =
     localization.invalidImmersionObjective,
   );
 
-const withOptionalFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstnameAndLastname> =
+export const withOptionalFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstnameAndLastname> =
   z.object({
     firstname: personNameSchema.optional(),
     lastname: personNameSchema.optional(),
   });
 
-const conventionValidatorSchema: z.Schema<WithOptionalFirstnameAndLastname> =
-  z.object({
-    firstname: z.string().optional(),
-    lastname: z.string().optional(),
-  });
-
 const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
   z.object({
-    agencyCounsellor: conventionValidatorSchema.optional(),
-    agencyValidator: conventionValidatorSchema.optional(),
+    agencyCounsellor: withOptionalFirstnameAndLastnameSchema.optional(),
+    agencyValidator: withOptionalFirstnameAndLastnameSchema.optional(),
   });
+
+export const editCounsellorNameRequestSchema: z.Schema<EditCounsellorNameRequestDto> =
+  withOptionalFirstnameAndLastnameSchema.and(
+    z.object({
+      conventionId: conventionIdSchema,
+    }),
+  );
 
 const renewedSchema = z.object({
   from: conventionIdSchema,
@@ -445,15 +447,16 @@ export const updateConventionStatusWithJustificationSchema: z.Schema<UpdateConve
     conventionId: conventionIdSchema,
   });
 
-export type WithValidatorInfo = OmitFromExistingKeys<
+export type WithFirstnameAndLastname = OmitFromExistingKeys<
   UpdateConventionStatusWithValidator,
   "conventionId" | "status"
 >;
 
-export const withValidatorInfoSchema: z.Schema<WithValidatorInfo> = z.object({
-  firstname: zStringMinLength1,
-  lastname: zStringMinLength1,
-});
+export const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> =
+  z.object({
+    firstname: zStringMinLength1,
+    lastname: zStringMinLength1,
+  });
 
 const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
   z
@@ -461,7 +464,7 @@ const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatus
       status: z.enum(conventionStatusesWithValidator),
       conventionId: conventionIdSchema,
     })
-    .and(withValidatorInfoSchema);
+    .and(withFirstnameAndLastnameSchema);
 
 export const updateConventionStatusRequestSchema: z.Schema<UpdateConventionStatusRequestDto> =
   z.union([

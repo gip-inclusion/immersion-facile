@@ -209,6 +209,8 @@ const immersionTexts = (internshipKind: InternshipKind) => ({
     markAsCancelled: "Annuler la demande",
     conventionAlreadyCancelled: "Demande déjà annulée.",
     markAsDeprecated: "Annuler la demande",
+    modifyCounsellorName: "Modifier le nom du conseiller",
+    modifyCounsellorNameTitle: "Modifier le nom du conseiller",
   },
   sign: {
     title:

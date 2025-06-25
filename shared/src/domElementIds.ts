@@ -377,6 +377,13 @@ export const domElementIds = {
       "im-convention-validation__cancel--actions-buttons",
     conventionValidationDeprecateButton:
       "im-convention-validation__deprecate-button",
+    editCounsellorNameButton:
+      "im-convention-validation__edit-counsellor-name-button",
+    editCounsellorNameModal: "im-edit-counsellor-name-modal",
+    editCounsellorNameModalSubmitButton:
+      "im-edit-counsellor-name-modal__submit-button",
+    editCounsellorNameModalCancelButton:
+      "im-edit-counsellor-name-modal__cancel-button",
     rejectedModalCancelButton: "im-rejected-modal__cancel-button",
     cancelModalCancelButton: "im-cancel-modal__cancel-button",
     deprecatedModalCancelButton: "im-deprecated-modal__cancel-button",
@@ -412,6 +419,10 @@ export const domElementIds = {
       "im-convention-validation__open-transfer-agency-button",
     validatorModalLastNameInput: "im-validator-modal__last-name-input",
     validatorModalFirstNameInput: "im-validator-modal__first-name-input",
+    editCounsellorNameModalLastNameInput:
+      "im-edit-counsellor-name-modal__last-name-input",
+    editCounsellorNameModalFirstNameInput:
+      "im-edit-counsellor-name-modal__first-name-input",
   },
 
   unsubscribeEstablishmentLead: {},
