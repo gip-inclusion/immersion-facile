@@ -17,6 +17,7 @@ runs:
     #     scalingo --version
     
     - name: Install scalingo CLI (latest)
+      shell: bash
       run: |
         wget -qO- https://cli-dl.scalingo.com/install.sh | bash
         echo "$HOME/bin" >> $GITHUB_PATH
