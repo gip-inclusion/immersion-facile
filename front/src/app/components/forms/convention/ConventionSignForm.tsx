@@ -27,7 +27,7 @@ import {
   sendSignatureLinkModal,
 } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
-import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
+import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
@@ -137,7 +137,10 @@ export const ConventionSignForm = ({
     );
   };
 
-  useScrollToTop(!!useFeedbackTopic("send-signature-link"));
+  useScrollToTop(
+    useFeedbackTopics(["send-signature-link", "convention-action-sign"])
+      .length > 0,
+  );
 
   useEffect(() => {
     if (!isSendSignatureLinkModalOpen) setSignatoryToSendSignatureLink(null);
