@@ -419,6 +419,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
         const state = "fake-state";
         inMemoryUow.ongoingOAuthRepository.ongoingOAuths = [
           {
+            fromUri: "uri",
             userId: agencyUser.id,
             accessToken: "yolo",
             provider: "proConnect",

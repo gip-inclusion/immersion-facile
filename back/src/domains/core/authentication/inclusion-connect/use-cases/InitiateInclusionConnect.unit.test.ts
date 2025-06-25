@@ -1,5 +1,5 @@
 import {
-  type WithSourcePage,
+  type WithRedirectUri,
   allowedStartOAuthLoginPages,
   expectToEqual,
   queryParamsAsString,
@@ -30,8 +30,8 @@ describe("InitiateInclusionConnect usecase", () => {
 
         uuidGenerator.setNextUuids([nonce, state]);
 
-        const sourcePage: WithSourcePage = {
-          page,
+        const sourcePage: WithRedirectUri = {
+          redirectUri: `/${page}?discussionId=discussion0`,
         };
         const redirectUrl = await useCase.execute(sourcePage);
         const loginEndpoint = "login-pro-connect";
@@ -42,7 +42,6 @@ describe("InitiateInclusionConnect usecase", () => {
             `${
               fakeProviderConfig.providerBaseUri
             }/${loginEndpoint}?${queryParamsAsString({
-              page,
               nonce,
               state,
             })}`,
@@ -51,6 +50,7 @@ describe("InitiateInclusionConnect usecase", () => {
 
         expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
           {
+            fromUri: sourcePage.redirectUri,
             nonce,
             state,
             provider: "proConnect",

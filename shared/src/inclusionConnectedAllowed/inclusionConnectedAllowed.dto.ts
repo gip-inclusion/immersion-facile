@@ -1,3 +1,4 @@
+import type { WithRedirectUri } from "..";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
 import type {
   AgencyDtoForAgencyUsersAndAdmins,
@@ -5,7 +6,6 @@ import type {
 } from "../agency/agency.dto";
 import type { DiscussionId } from "../discussion/discussion.dto";
 import type { Email } from "../email/email.dto";
-import type { WithSourcePage } from "../inclusionConnect/inclusionConnect.dto";
 import type { EstablishmentRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
@@ -116,4 +116,4 @@ export type WithAgencyIds = {
   agencies: AgencyId[];
 };
 
-export type GetInclusionConnectLogoutUrlQueryParams = WithSourcePage;
+export type GetInclusionConnectLogoutUrlQueryParams = WithRedirectUri;

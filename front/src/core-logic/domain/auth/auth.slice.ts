@@ -3,7 +3,7 @@ import type {
   AbsoluteUrl,
   Email,
   FederatedIdentity,
-  WithSourcePage,
+  WithRedirectUri,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,
@@ -101,7 +101,7 @@ export const authSlice = createSlice({
     loginByEmailRequested: (
       state,
       action: PayloadActionWithFeedbackTopic<
-        WithSourcePage & {
+        WithRedirectUri & {
           email: Email;
         }
       >,

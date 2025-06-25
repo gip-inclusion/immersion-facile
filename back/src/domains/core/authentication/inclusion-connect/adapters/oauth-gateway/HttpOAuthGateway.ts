@@ -1,6 +1,5 @@
 import {
   type AbsoluteUrl,
-  type WithSourcePage,
   decodeJwtWithoutSignatureCheck,
   errors,
   queryParamsAsString,
@@ -44,7 +43,6 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   public async getLoginUrl({
     nonce,
-    page,
     state,
   }: GetLoginUrlParams): Promise<AbsoluteUrl> {
     const baseParams: Omit<
@@ -53,7 +51,7 @@ export class HttpOAuthGateway implements OAuthGateway {
     > = {
       state,
       nonce,
-      redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+      redirect_uri: this.#proConnectConfig.immersionRedirectUri.afterLogin,
       response_type: "code",
     };
     const queryParams = queryParamsAsString<ProConnectLoginUrlParams>({
@@ -68,7 +66,6 @@ export class HttpOAuthGateway implements OAuthGateway {
 
   async getAccessToken({
     code,
-    page,
   }: GetAccessTokenParams): Promise<GetAccessTokenResult> {
     const queryParams = {
       body: queryParamsAsString({
@@ -76,7 +73,7 @@ export class HttpOAuthGateway implements OAuthGateway {
         client_id: this.#proConnectConfig.clientId,
         client_secret: this.#proConnectConfig.clientSecret,
         grant_type: "authorization_code",
-        redirect_uri: this.#makeRedirectAfterLoginUrl({ page }),
+        redirect_uri: this.#proConnectConfig.immersionRedirectUri.afterLogin,
       }),
       headers: {
         "Content-Type": "application/x-www-form-urlencoded" as const,
@@ -148,12 +145,6 @@ export class HttpOAuthGateway implements OAuthGateway {
       id_token_hint: params.idToken,
       post_logout_redirect_uri: postLogoutRedirectUri,
     })}`;
-  }
-
-  #makeRedirectAfterLoginUrl(params: WithSourcePage): AbsoluteUrl {
-    return `${
-      this.#proConnectConfig.immersionRedirectUri.afterLogin
-    }?${queryParamsAsString<WithSourcePage>(params)}`;
   }
 }
 
