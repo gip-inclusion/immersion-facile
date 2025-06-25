@@ -368,6 +368,7 @@ interface OngoingOauths {
   created_at: Generated<Timestamp>;
   updated_at: Generated<Timestamp>;
   used_at: Timestamp | null;
+  from_uri: string;
 }
 
 type EstablishmentStatus = "DEACTIVATED_FOR_LACK_OF_RESPONSES";
