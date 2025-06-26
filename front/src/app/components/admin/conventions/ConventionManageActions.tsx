@@ -338,6 +338,7 @@ export const ConventionManageActions = ({
           "convention-action-deprecate",
           "convention-action-cancel",
           "convention-action-renew",
+          "convention-action-edit-counsellor-name",
         ]}
         className="fr-mb-2w"
         closable
