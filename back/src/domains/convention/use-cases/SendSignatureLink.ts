@@ -25,11 +25,11 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwIfUserIsNotIFAdminNorAgencyModifier } from "../../inclusion-connected-users/helpers/authorization.helper";
 import {
   throwErrorIfSignatoryAlreadySigned,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_SIGNATURE_REMINDER = 24;
