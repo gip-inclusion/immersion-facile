@@ -432,6 +432,63 @@ describe("EditCounsellorName", () => {
         },
       );
 
+      it("edit counsellor names with empty firstname and lastname", async () => {
+        const conventionWithAgencyReferent = new ConventionDtoBuilder(
+          convention,
+        )
+          .withAgencyReferent({ firstname: "ali", lastname: "baba" })
+          .build();
+        uow.conventionRepository.setConventions([conventionWithAgencyReferent]);
+        uow.userRepository.users = [connectedUser];
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency, {
+            [connectedUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(otherAgency, {}),
+        ];
+
+        await usecase.execute(
+          {
+            conventionId,
+            firstname: "",
+            lastname: "",
+          },
+          connectedUserPayload,
+        );
+
+        const updatedConvention = await uow.conventionRepository.getById(
+          conventionWithAgencyReferent.id,
+        );
+
+        expectToEqual(uow.conventionRepository.conventions, [
+          {
+            ...convention,
+            agencyReferent: {
+              firstname: "",
+              lastname: "",
+            },
+          },
+        ]);
+        expectArraysToMatch(uow.outboxRepository.events, [
+          {
+            topic: "ConventionCounsellorNameEdited",
+            payload: {
+              conventionId: updatedConvention.id,
+              triggeredBy: {
+                kind: "inclusion-connected",
+                userId: connectedUser.id,
+              },
+              firstname: "",
+              lastname: "",
+            },
+          },
+        ]);
+      });
+
       it.each(conventionStatusesWithoutJustificationNorValidator)(
         "with status %s",
         async (status) => {
