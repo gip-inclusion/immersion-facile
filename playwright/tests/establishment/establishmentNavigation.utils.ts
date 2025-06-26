@@ -15,7 +15,7 @@ export const goToManageEstablishmentThroughEstablishmentDashboard = async (
   await page
     .locator(`#${domElementIds.header.navLinks.establishment.dashboard}`)
     .click();
-  await page.locator(".fr-tabs").getByText("Mon établissement").click();
+  await page.locator(".fr-tabs").getByText("Mes établissements").click();
   const establishmentSelector = await page.locator(
     `#${domElementIds.establishmentDashboard.manageEstablishments.selectEstablishmentInput}`,
   );

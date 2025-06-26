@@ -2,16 +2,12 @@
 
 
 .im-rich-table {
+  min-height: 25rem; // prevent filters submenu to be hidden
+
   &__header {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-
-    @include for-screen-min($bp-lg) {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
   }
 
   &__dropdowns {
