@@ -58,6 +58,12 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
       job: "la compta",
       phone: "+33672787844",
     },
+    {
+      userId: seedUsers.icUser.id,
+      role: "establishment-contact",
+      job: "Contact RH",
+      phone: "+33672787846",
+    },
   ])
   .build();
 
@@ -116,7 +122,7 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
       .withId(discussionId)
       .withSiret(franceMerguez.establishment.siret)
       .withEstablishmentContact({
-        email: "recette+playwright@immersion-facile.beta.gouv.fr",
+        email: seedUsers.icUser.email,
       })
       .withPotentialBeneficiaryResumeLink(
         "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",

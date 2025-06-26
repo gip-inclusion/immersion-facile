@@ -8,10 +8,12 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   type WithDiscussionStatusRejected,
 } from "shared";
-import type { Exchange } from "shared";
-import type {
-  FetchDiscussionRequestedPayload,
-  SendExchangeRequestedPayload,
+import type { DataWithPagination, DiscussionInList, Exchange } from "shared";
+import {
+  type FetchDiscussionListRequestedPayload,
+  type FetchDiscussionRequestedPayload,
+  type SendExchangeRequestedPayload,
+  initialDiscussionsWithPagination,
 } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 
@@ -96,5 +98,13 @@ export class SimulatedInclusionConnectedGateway
       recipient: "potentialBeneficiary",
       attachments: [],
     } satisfies Exchange).pipe(delay(this.simulatedLatency));
+  }
+
+  public getDiscussions$(
+    _payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return of(initialDiscussionsWithPagination).pipe(
+      delay(this.simulatedLatency),
+    );
   }
 }

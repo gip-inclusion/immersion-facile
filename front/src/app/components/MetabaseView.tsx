@@ -1,23 +1,11 @@
-import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
-
+import { Button } from "@codegouvfr/react-dsfr/Button";
 import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
+import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
-
-const TitleButton = ({ url }: { url: AbsoluteUrl }) => (
-  <a
-    href={url}
-    target="_blank"
-    className={fr.cx("fr-btn", "fr-btn--tertiary", "fr-btn--sm", "fr-ml-auto")}
-    rel="noreferrer"
-  >
-    Ouvrir en plein écran
-  </a>
-);
 
 export const MetabaseView = ({
   title,
@@ -50,7 +38,7 @@ export const MetabaseView = ({
   return (
     <BackofficeDashboardTabContent
       title={title}
-      titleAction={<TitleButton url={url} />}
+      titleAction={<MetabaseFullScreenButton url={url} />}
       description={subtitle}
     >
       {ENV.envType === "production" ||

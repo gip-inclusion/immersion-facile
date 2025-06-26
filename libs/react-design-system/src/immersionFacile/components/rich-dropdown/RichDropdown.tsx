@@ -1,5 +1,5 @@
 import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
-import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import Tag from "@codegouvfr/react-dsfr/Tag";
 
@@ -12,9 +12,9 @@ import {
 } from "react";
 import { useStyles } from "tss-react/dsfr";
 import { prefix } from "../rs-autocomplete";
-import Styles from "./SearchFilter.styles";
+import Styles from "./RichDropdown.styles";
 
-export type SearchFilterProps = {
+export type RichDropdownProps = {
   defaultValue: string;
   values: string[];
   submenu: {
@@ -25,6 +25,7 @@ export type SearchFilterProps = {
   onReset?: () => void;
   className?: string;
   id?: string;
+  as?: "Tag" | "Button";
 };
 
 const getElementParentsClasses = (
@@ -40,7 +41,7 @@ const getElementParentsClasses = (
   return parents;
 };
 
-export const SearchFilter = ({
+export const RichDropdown = ({
   defaultValue,
   values,
   submenu,
@@ -48,11 +49,13 @@ export const SearchFilter = ({
   className,
   id,
   onReset,
-}: SearchFilterProps) => {
+  as = "Tag",
+}: RichDropdownProps) => {
   const { cx } = useStyles();
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const hasValue = values && values.length > 0;
   const wrapperElement = useRef<ElementRef<"div">>(null);
+  const ButtonComponent = as === "Tag" ? Tag : Button;
   useLayoutEffect(() => {
     if (
       isOpened &&
@@ -121,7 +124,7 @@ export const SearchFilter = ({
 
   return (
     <div className={cx(Styles.root)} ref={wrapperElement}>
-      <Tag
+      <ButtonComponent
         iconId={iconId}
         className={className}
         id={id}
@@ -131,9 +134,12 @@ export const SearchFilter = ({
             setIsOpened(true);
           },
         }}
+        {...(as === "Button" && {
+          priority: "secondary",
+        })}
       >
         {hasValue ? values.join(", ") : defaultValue}
-      </Tag>
+      </ButtonComponent>
       <section
         className={cx(
           fr.cx("fr-p-3w", isOpened ? "fr-unhidden" : "fr-hidden"),
