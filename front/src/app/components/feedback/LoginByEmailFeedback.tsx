@@ -89,7 +89,7 @@ export const LoginByEmailFeedback = ({ mode, page }: MajorFeedbackProps) => {
             dispatch(
               authSlice.actions.loginByEmailRequested({
                 email,
-                page,
+                redirectUri: route.link.href,
                 feedbackTopic: loginByEmailFeedbackTopic,
               }),
             );

@@ -378,7 +378,7 @@ describe("Auth slice", () => {
 
       store.dispatch(
         authSlice.actions.loginByEmailRequested({
-          page: "establishment",
+          redirectUri: "/if/establishment",
           email,
           feedbackTopic: "login-by-email",
         }),
@@ -426,7 +426,7 @@ describe("Auth slice", () => {
 
       store.dispatch(
         authSlice.actions.loginByEmailRequested({
-          page: "establishment",
+          redirectUri: "/if/establishmentDashboard?discussionId=discussion0",
           email,
           feedbackTopic: "login-by-email",
         }),

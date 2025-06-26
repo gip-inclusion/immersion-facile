@@ -43,7 +43,6 @@ import { AdminConventionDetail } from "../pages/convention/AdminConventionDetail
 import { ConventionDocumentPage } from "../pages/convention/ConventionDocumentPage";
 import { ConventionManagePage } from "../pages/convention/ConventionManagePage";
 import { ConventionPageForExternals } from "../pages/convention/ConventionPageForExternals";
-import { DiscussionManagePage } from "../pages/discussion/DiscussionManagePage";
 import { ErrorPage } from "../pages/error/ErrorPage";
 import { EstablishmentCreationFormPage } from "../pages/establishment/EstablishmentCreationFormPage";
 import { GroupPage } from "../pages/group/GroupPage";
@@ -224,7 +223,6 @@ const getPageByRouteName: {
   manageConventionConnectedUser: (route) => (
     <ConventionManageConnectedUserPage route={route} />
   ),
-  manageDiscussion: (route) => <DiscussionManagePage route={route} />,
   myProfile: (route) => (
     <ConnectedPrivateRoute
       route={route}

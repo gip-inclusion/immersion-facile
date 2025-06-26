@@ -56,6 +56,7 @@ describe("GetInclusionConnectLogoutUrl", () => {
 
     it("returns the oAuth logout url from %s", async () => {
       const ongoingOAuth: OngoingOAuth = {
+        fromUri: "/uri",
         state: "some-state",
         nonce: "some-nonce",
         provider: "proConnect",

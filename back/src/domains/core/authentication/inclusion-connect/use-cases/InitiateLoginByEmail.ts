@@ -27,13 +27,14 @@ export const makeInitiateLoginByEmail = createTransactionalUseCase<
     inputSchema: initiateLoginByEmailParamsSchema,
     name: "InitiateLoginByEmail",
   },
-  async ({ inputParams: { email, page }, uow, deps }) => {
+  async ({ inputParams: { email, redirectUri }, uow, deps }) => {
     const nonce = deps.uuidGenerator.new();
     const state = deps.uuidGenerator.new();
 
     const user = await uow.userRepository.findByEmail(email);
 
     await uow.ongoingOAuthRepository.save({
+      fromUri: redirectUri,
       nonce,
       state,
       userId: user?.id,
@@ -55,7 +56,6 @@ export const makeInitiateLoginByEmail = createTransactionalUseCase<
               deps.oAuthConfig.immersionRedirectUri.afterLogin
             }?${queryParamsAsString<AuthenticateWithOAuthCodeParams>({
               code: deps.generateEmailAuthCodeJwt({ version: 1 }),
-              page,
               state,
             })}`,
             fullname:

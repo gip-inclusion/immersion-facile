@@ -294,13 +294,7 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
       <header>
         <Button
           type="button"
-          onClick={() =>
-            routes
-              .establishmentDashboardDiscussions({
-                discussionId: discussion.id,
-              })
-              .push()
-          }
+          onClick={() => routes.establishmentDashboardDiscussions().push()}
           priority="tertiary"
           iconId="fr-icon-arrow-left-line"
           iconPosition="left"

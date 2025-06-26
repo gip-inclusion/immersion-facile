@@ -1,6 +1,5 @@
 import {
   type AbsoluteUrl,
-  type AllowedStartInclusionConnectLoginSourcesKind,
   type AlreadyAuthenticatedUserQueryParams,
   type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
@@ -11,8 +10,8 @@ import {
   type UserWithAdminRights,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
+  decodeURIWithParams,
   errors,
-  frontRoutes,
   queryParamsAsString,
 } from "shared";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
@@ -82,7 +81,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
   }
 
   protected async _execute(
-    { code, page, state }: AuthenticateWithOAuthCodeParams,
+    { code, state }: AuthenticateWithOAuthCodeParams,
     uow: UnitOfWork,
   ): Promise<ConnectedRedirectUrl> {
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByState(state);
@@ -92,9 +91,13 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
         state,
       });
 
+    const { uriWithoutParams, params } = decodeURIWithParams(
+      ongoingOAuth.fromUri,
+    );
+
     if (ongoingOAuth.usedAt)
       return `${this.#immersionFacileBaseUrl}/${
-        frontRoutes[page]
+        uriWithoutParams
       }?${queryParamsAsString<AlreadyAuthenticatedUserQueryParams>({
         alreadyUsedAuthentication: true,
       })}`;
@@ -102,7 +105,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     const { newOrUpdatedUser, accessToken } = await (ongoingOAuth.provider ===
     "email"
       ? this.#onEmailProvider(uow, ongoingOAuth, code as EmailAuthCodeJwt)
-      : this.#onProConnectProvider(uow, ongoingOAuth, code, page));
+      : this.#onProConnectProvider(uow, ongoingOAuth, code));
 
     const updatedOnGoingAuth: OngoingOAuth = {
       ...ongoingOAuth,
@@ -137,9 +140,10 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
       ),
     ]);
 
-    return `${this.#immersionFacileBaseUrl}/${
-      frontRoutes[page]
+    return `${this.#immersionFacileBaseUrl}${
+      uriWithoutParams
     }?${queryParamsAsString<AuthenticatedUserQueryParams>({
+      ...params,
       token: this.#generateConnectedUserJwt(
         {
           userId: newOrUpdatedUser.id,
@@ -159,14 +163,12 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     uow: UnitOfWork,
     ongoingOAuth: ProConnectOngoingAuth,
     code: EmailAuthCodeJwt | OAuthCode,
-    page: AllowedStartInclusionConnectLoginSourcesKind,
   ): Promise<{
     newOrUpdatedUser: UserWithAdminRights;
     accessToken?: GetAccessTokenResult;
   }> {
     const accessToken = await this.#oAuthGateway.getAccessToken({
       code,
-      page,
     });
 
     if (accessToken.payload.nonce !== ongoingOAuth.nonce)

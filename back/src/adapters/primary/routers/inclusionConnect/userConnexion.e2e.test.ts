@@ -5,12 +5,11 @@ import {
   type InclusionConnectImmersionRoutes,
   allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
-  decodeURIParams,
+  decodeURIWithParams,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
-  frontRoutes,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
 } from "shared";
@@ -86,9 +85,13 @@ describe("user connexion flow", () => {
           const uuids = [nonce, state, generatedUserId];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+          const redirectUri = `/${page}?discussionId=discussion0`;
+
           expectHttpResponseToEqual(
             await httpClient.startInclusionConnectLogin({
-              queryParams: { page },
+              queryParams: {
+                redirectUri,
+              },
             }),
             {
               body: {},
@@ -98,7 +101,6 @@ describe("user connexion flow", () => {
                   `${
                     appConfig.proConnectConfig.providerBaseUri
                   }/login-pro-connect?${queryParamsAsString({
-                    page,
                     nonce,
                     state,
                   })}`,
@@ -120,11 +122,11 @@ describe("user connexion flow", () => {
               siret: fakeProConnectSiret,
             },
           });
+
           const response = await httpClient.afterLoginRedirection({
             queryParams: {
               code: authCode,
               state,
-              page,
             },
           });
 
@@ -136,7 +138,7 @@ describe("user connexion flow", () => {
           if (response.status !== 302)
             throw errors.generic.testError("Response must be 302");
           const locationHeader = response.headers.location as string;
-          const locationPrefix = `${appConfig.immersionFacileBaseUrl}/${frontRoutes[page]}?token=`;
+          const locationPrefix = `${appConfig.immersionFacileBaseUrl}${redirectUri}&token=`;
 
           expect(locationHeader).toContain(locationPrefix);
           const { userId } = decodeJwtWithoutSignatureCheck<{
@@ -152,6 +154,7 @@ describe("user connexion flow", () => {
               usedAt: gateways.timeGateway.now(),
               externalId: "osef",
               accessToken: proConnectToken,
+              fromUri: redirectUri,
             },
           ]);
         },
@@ -163,9 +166,11 @@ describe("user connexion flow", () => {
       const uuids = [nonce, state, generatedUserId];
       uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+      const redirectUri: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/agencyDashboard?discussionId=discussion0`;
+
       expectHttpResponseToEqual(
         await httpClient.startInclusionConnectLogin({
-          queryParams: { page: "agencyDashboard" },
+          queryParams: { redirectUri },
         }),
         {
           body: {},
@@ -175,7 +180,6 @@ describe("user connexion flow", () => {
               `${
                 appConfig.proConnectConfig.providerBaseUri
               }/login-pro-connect?${queryParamsAsString({
-                page: "agencyDashboard",
                 nonce,
                 state,
               })}`,
@@ -203,11 +207,11 @@ describe("user connexion flow", () => {
           sub: sub,
         },
       });
+
       const response = await httpClient.afterLoginRedirection({
         queryParams: {
           code: authCode,
           state,
-          page: "agencyDashboard",
         },
       });
 
@@ -250,9 +254,11 @@ describe("user connexion flow", () => {
           ];
           uuidGenerator.new = () => uuids.shift() ?? "no-uuid-provided";
 
+          const redirectUrl: AbsoluteUrl = `${appConfig.immersionFacileBaseUrl}/${page}`;
+
           expectHttpResponseToEqual(
             await httpClient.initiateLoginByEmail({
-              body: { email, page },
+              body: { email, redirectUri: redirectUrl },
             }),
             {
               body: "",
@@ -271,9 +277,10 @@ describe("user connexion flow", () => {
           if (notification.templatedContent.kind !== "LOGIN_BY_EMAIL_REQUESTED")
             throw new Error("bads notificiation kind");
 
-          const code = decodeURIParams(
+          const code = decodeURIWithParams(
             notification.templatedContent.params.loginLink,
-          )?.code;
+          ).params?.code;
+
           if (!code)
             throw new Error(
               `missing code on url ${notification.templatedContent.params.loginLink}`,
@@ -282,7 +289,6 @@ describe("user connexion flow", () => {
             queryParams: {
               code,
               state,
-              page,
             },
           });
 
@@ -291,11 +297,12 @@ describe("user connexion flow", () => {
             status: 302,
           });
           const locationHeader = response.headers.location as AbsoluteUrl;
-          const locationPrefix = `${appConfig.immersionFacileBaseUrl}/${frontRoutes[page]}?token=`;
+          const locationPrefix = `${redirectUrl}?token=`;
 
           expect(locationHeader).toContain(locationPrefix);
 
-          const token = decodeURIParams(locationHeader)?.token;
+          const token = decodeURIWithParams(locationHeader).params?.token;
+
           if (!token)
             throw new Error(`Missing token param on url ${locationHeader}`);
           expectToEqual(
@@ -324,6 +331,7 @@ describe("user connexion flow", () => {
               state,
               usedAt: gateways.timeGateway.now(),
               email,
+              fromUri: redirectUrl,
             },
           ]);
         },

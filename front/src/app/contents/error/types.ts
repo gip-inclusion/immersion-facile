@@ -1,10 +1,10 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 
 export type FrontErrorProps = {
   buttons: ErrorButton[];
   subtitle?: string;
   title: string;
-  description: string;
+  description: ReactNode;
 };
 
 export type ErrorButton =
@@ -14,5 +14,5 @@ export type ErrorButton =
 export type ContactErrorInformation = {
   currentUrl: string;
   currentDate: string;
-  error: string;
+  error: ReactNode;
 };

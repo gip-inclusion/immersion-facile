@@ -5,11 +5,10 @@ import type {
   IdToken,
   SiretDto,
   WithIdToken,
-  WithSourcePage,
 } from "shared";
 import type { OAuthJwt } from "../entities/OngoingOAuth";
 
-export type GetAccessTokenParams = WithSourcePage & {
+export type GetAccessTokenParams = {
   code: string;
 };
 
@@ -30,7 +29,7 @@ export type GetAccessTokenResult = {
   idToken: IdToken;
 };
 
-export type GetLoginUrlParams = WithSourcePage & {
+export type GetLoginUrlParams = {
   nonce: string;
   state: string;
 };
