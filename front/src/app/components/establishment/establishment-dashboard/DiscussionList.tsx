@@ -13,6 +13,7 @@ import {
   type DiscussionStatus,
   defaultPerPageInWebPagination,
   discussionStatuses,
+  domElementIds,
   toDisplayedDate,
   toDisplayedPhoneNumber,
 } from "shared";
@@ -194,6 +195,7 @@ export const DiscussionList = () => {
                 />,
                 <Button
                   key={discussion.id}
+                  id={`${domElementIds.establishmentDashboard.manageDiscussion.goToDiscussionButton}--${discussion.id}`}
                   size="small"
                   priority="secondary"
                   onClick={() => {

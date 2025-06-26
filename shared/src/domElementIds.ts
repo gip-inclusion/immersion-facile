@@ -881,6 +881,7 @@ export const domElementIds = {
     manageDiscussion: {
       submitButton: "im-manage-establishment__manage-discussion-submit-button",
       discussionIdInput: "im-manage-establishment__manage-discussion-id-input",
+      goToDiscussionButton: "im-manage-establishment__go-to-discussion-button",
     },
     manageEstablishments: {
       selectEstablishmentInput: "im-manage-establishment__establishment-select",
