@@ -3,19 +3,19 @@ import {
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
   type TransferConventionToAgencyRequestDto,
+  agencyModifierRoles,
   errors,
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
+import { conventionDtoToConventionReadDto } from "../../../utils/convention";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
-import {
-  throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
-} from "../entities/Convention";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
   typeof makeTransferConventionToAgency
@@ -59,11 +59,22 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       agencyRepository: uow.agencyRepository,
     });
 
-    await throwIfUserIsNotIFAdminNorAgencyModifier({
-      uow,
-      jwtPayload,
-      agencyId: convention.agencyId,
+    // await throwIfUserIsNotIFAdminNorAgencyModifier({
+    //   uow,
+    //   jwtPayload,
+    //   agencyId: convention.agencyId,
+    //   convention,
+    // });
+    const conventionReadDto = await conventionDtoToConventionReadDto(
       convention,
+      uow,
+    );
+    await throwIfNotAuthorizedForRole({
+      uow,
+      convention: conventionReadDto,
+      authorizedRoles: [...agencyModifierRoles, "back-office"],
+      errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
+      jwtPayload,
     });
 
     await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({

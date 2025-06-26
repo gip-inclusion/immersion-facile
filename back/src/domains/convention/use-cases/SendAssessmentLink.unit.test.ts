@@ -308,10 +308,7 @@ describe("SendAssessmentLink", () => {
               },
               { userId: connectedUser.id },
             ),
-            errors.user.notEnoughRightOnAgency({
-              userId: connectedUser.id,
-              agencyId: agency.id,
-            }),
+            errors.assessment.sendAssessmentLinkForbidden(),
           );
         },
       );
