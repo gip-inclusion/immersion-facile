@@ -6,7 +6,7 @@ import { HeadingSection } from "react-design-system";
 import {
   type AgencyDtoForAgencyUsersAndAdmins,
   addressDtoToString,
-  agencyKindToLabelIncludingIF,
+  agencyKindToLabelIncludingIFAndPrepa,
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { AgencyStatusBadge } from "../../AgencyStatusBadge";
@@ -41,7 +41,7 @@ const AdminAgencyLine = (agency: AgencyDtoForAgencyUsersAndAdmins) => [
       {addressDtoToString(agency.address)}
     </span>
   </Fragment>,
-  agencyKindToLabelIncludingIF[agency.kind],
+  agencyKindToLabelIncludingIFAndPrepa[agency.kind],
 
   <Button
     key={`${agency.id}-see-agency-link`}
