@@ -18,17 +18,18 @@ const diagorienteErrorResponseBodySchema = z.object({
 export const diagorienteAppellationsRoutes = defineRoutes({
   searchAppellations: defineRoute({
     method: "get",
-    url: "https://recherche-referentiel-v2.prod.analytics.diagotech.dev/search/Appellations",
+    url: "https://semafor.diagoriente.fr/search/Appellations",
     queryParamsSchema: diagorienteQueryParamsSchema,
     responses: {
       200: diagorienteRawResponseSchema,
       400: diagorienteErrorResponseBodySchema,
       401: diagorienteErrorResponseBodySchema,
+      403: z.string(),
     },
   }),
   getAccessToken: defineRoute({
     method: "post",
-    url: "https://auth.prod.analytics.diagotech.dev/realms/esi-auth-keycloack/protocol/openid-connect/token",
+    url: "https://analytics-auth.atlantis.diagotech.dev/realms/esi-auth-keycloack/protocol/openid-connect/token",
     requestBodySchema: diagorienteAccessTokenQueryParamsSchema,
     responses: {
       200: diagorienteAccessTokenResponseSchema,

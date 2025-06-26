@@ -14,13 +14,13 @@ import {
   diagorienteTokenScope,
 } from "./DiagorienteAppellationsGateway.routes";
 
-const cachingGateway =
-  new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
-    new RealTimeGateway(),
-    diagorienteTokenScope,
-  );
-
 describe("DiagorienteAppellationsGateway", () => {
+  const cachingGateway =
+    new InMemoryCachingGateway<DiagorienteAccessTokenResponse>(
+      new RealTimeGateway(),
+      diagorienteTokenScope,
+    );
+
   let appellationsGateway: DiagorienteAppellationsGateway;
 
   beforeEach(() => {
@@ -58,6 +58,7 @@ describe("DiagorienteAppellationsGateway", () => {
   describe("searchAppellations", () => {
     it("fetches search corretly", async () => {
       const result = await appellationsGateway.searchAppellations("luthier");
+
       await sleep(1000);
       expect(result).toEqual([
         {
