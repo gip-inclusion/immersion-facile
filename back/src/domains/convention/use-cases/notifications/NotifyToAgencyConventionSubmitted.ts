@@ -5,7 +5,7 @@ import {
   type WithConventionDto,
   errors,
   frontRoutes,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -144,9 +144,8 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
             params: {
               internshipKind: convention.internshipKind,
               agencyName: agency.name,
-              agencyReferentName: getFullname(
-                convention.agencyReferent?.firstname,
-                convention.agencyReferent?.lastname,
+              agencyReferentName: getFormattedFirstnameAndLastname(
+                convention.agencyReferent ?? {},
               ),
               businessName: convention.businessName,
               dateEnd: convention.dateEnd,

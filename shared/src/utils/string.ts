@@ -66,18 +66,19 @@ export const doesObjectContainsHTML = (obj: object): boolean => {
   return values(obj).reduce(browseObjectProps, false);
 };
 
-export const getFullname = (
-  firstname?: string,
-  lastname?: string,
-): string | undefined => {
+export const getFormattedFirstnameAndLastname = ({
+  firstname,
+  lastname,
+}: {
+  firstname?: string;
+  lastname?: string;
+}): string => {
   const splitFirstNames = firstname?.split(/[\s-]/g);
   const formattedFirstName = splitFirstNames
     ?.map((word) => capitalize(word))
     .join(firstname?.includes("-") ? "-" : " ");
 
-  return (
-    [formattedFirstName, lastname?.toUpperCase()].join(" ").trim() || undefined
-  );
+  return [formattedFirstName, lastname?.toUpperCase()].join(" ").trim() || "";
 };
 
 export const escapeHtml = (unsafe: string) =>

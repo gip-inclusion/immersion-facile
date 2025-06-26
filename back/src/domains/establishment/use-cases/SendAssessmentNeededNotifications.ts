@@ -9,7 +9,7 @@ import {
   castError,
   executeInSequence,
   frontRoutes,
-  getFullname,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   withDateRangeSchema,
 } from "shared";
@@ -257,9 +257,8 @@ export class SendAssessmentNeededNotifications extends UseCase<
       templatedContent: {
         kind: "ASSESSMENT_AGENCY_NOTIFICATION",
         params: {
-          agencyReferentName: getFullname(
-            convention.agencyReferent?.firstname,
-            convention.agencyReferent?.lastname,
+          agencyReferentName: getFormattedFirstnameAndLastname(
+            convention.agencyReferent ?? {},
           ),
           beneficiaryFirstName: convention.signatories.beneficiary.firstName,
           beneficiaryLastName: convention.signatories.beneficiary.lastName,

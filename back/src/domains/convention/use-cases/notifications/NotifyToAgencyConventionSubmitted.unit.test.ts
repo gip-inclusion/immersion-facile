@@ -7,7 +7,7 @@ import {
   InclusionConnectedUserBuilder,
   expectToEqual,
   frontRoutes,
-  getFullname,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -199,9 +199,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [validator.email],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(agencyWithOnlyValidator, validConvention),
@@ -248,9 +247,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellor1.email],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -266,9 +264,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellor2.email],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -334,9 +331,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellor1.email],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             warning:
@@ -354,9 +350,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [councellor2.email],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             ...expectedParams(
@@ -425,9 +420,8 @@ describe("NotifyToAgencyConventionSubmitted", () => {
           kind: "NEW_CONVENTION_AGENCY_NOTIFICATION",
           recipients: [ftAdvisorEmail],
           params: {
-            agencyReferentName: getFullname(
-              validConvention.agencyReferent?.firstname,
-              validConvention.agencyReferent?.lastname,
+            agencyReferentName: getFormattedFirstnameAndLastname(
+              validConvention.agencyReferent ?? {},
             ),
             internshipKind: validConvention.internshipKind,
             warning: undefined,
