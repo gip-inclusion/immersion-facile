@@ -76,9 +76,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
               Authorization: `Bearer ${tokenData.access_token}`,
             },
           })
-          .then(({ status, body }) =>
-            status === 200 ? diagorienteRawResponseToAppellationDto(body) : [],
-          ),
+          .then(({ status, body }) => {
+            return status === 200
+              ? diagorienteRawResponseToAppellationsDto(body)
+              : [];
+          }),
     });
 
     return this.#limiter.schedule(() => {
@@ -139,7 +141,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
   }
 }
 
-const diagorienteRawResponseToAppellationDto = (
+const diagorienteRawResponseToAppellationsDto = (
   response: DiagorienteRawResponse,
 ): AppellationDto[] =>
   response.search_results
