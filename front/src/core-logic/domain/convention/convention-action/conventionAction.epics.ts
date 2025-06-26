@@ -85,6 +85,30 @@ const transferConventionToAgencyEpic: ConventionActionEpic = (
     ),
   );
 
+const editCounsellorNameEpic: ConventionActionEpic = (
+  action$,
+  _,
+  { conventionGateway },
+) =>
+  action$.pipe(
+    filter(conventionActionSlice.actions.editCounsellorNameRequested.match),
+    switchMap(({ payload }) =>
+      conventionGateway
+        .editCounsellorName$(payload.editCounsellorNameParams, payload.jwt)
+        .pipe(
+          map(() =>
+            conventionActionSlice.actions.editCounsellorNameSucceeded(payload),
+          ),
+          catchEpicError((error: Error) =>
+            conventionActionSlice.actions.editCounsellorNameFailed({
+              errorMessage: error.message,
+              feedbackTopic: payload.feedbackTopic,
+            }),
+          ),
+        ),
+    ),
+  );
+
 const renewConventionEpic: ConventionActionEpic = (
   action$,
   _,
@@ -210,6 +234,7 @@ export const conventionActionEpics = [
   acceptByCounsellorEpic,
   signConventionEpic,
   renewConventionEpic,
+  editCounsellorNameEpic,
 ];
 
 type ConventionStatusChangeAction = ActionCreatorWithPayload<

@@ -16,6 +16,7 @@ import {
   newStatusByVerificationAction,
 } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import { modalByAction } from "src/app/components/forms/convention/manage-actions/manageActionModals";
+import { EditCounsellorNameModalContent } from "src/app/components/forms/convention/manage-actions/modals/EditCounsellorNameModalContent";
 import { JustificationModalContent } from "src/app/components/forms/convention/manage-actions/modals/JustificationModalContent";
 import { RenewConventionModalContent } from "src/app/components/forms/convention/manage-actions/modals/RenewConventionModalContent";
 import { TransferModalContent } from "src/app/components/forms/convention/manage-actions/modals/TransferModalContent";
@@ -51,17 +52,21 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
   const [modalProps, setModalProps] = useState<ModalWrapperProps>(props);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const showTransferModal = verificationAction === "TRANSFER";
+  const showEditCounsellorNameModal =
+    verificationAction === "EDIT_COUNSELLOR_NAME";
   const showRenewModal =
     verificationAction === "RENEW" && renewFeedback?.level !== "success";
   const showJustificationModal =
     verificationAction !== "TRANSFER" &&
     verificationAction !== "RENEW" &&
+    verificationAction !== "EDIT_COUNSELLOR_NAME" &&
     doesStatusNeedsJustification(
       newStatusByVerificationAction[verificationAction],
     );
   const showValidatorModal =
     verificationAction !== "TRANSFER" &&
     verificationAction !== "RENEW" &&
+    verificationAction !== "EDIT_COUNSELLOR_NAME" &&
     doesStatusNeedsValidators(
       initialStatus,
       newStatusByVerificationAction[verificationAction],
@@ -71,7 +76,8 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
     !showTransferModal &&
     !showJustificationModal &&
     !showValidatorModal &&
-    !showRenewModal
+    !showRenewModal &&
+    !showEditCounsellorNameModal
   )
     return null;
 
@@ -93,11 +99,26 @@ export const ModalWrapper = (props: ModalWrapperProps) => {
           showJustificationModal,
           showValidatorModal,
           showRenewModal,
+          showEditCounsellorNameModal,
           newStatus:
-            verificationAction === "TRANSFER" || verificationAction === "RENEW"
+            verificationAction === "TRANSFER" ||
+            verificationAction === "RENEW" ||
+            verificationAction === "EDIT_COUNSELLOR_NAME"
               ? null
               : newStatusByVerificationAction[verificationAction],
         })
+          .with(
+            {
+              showEditCounsellorNameModal: true,
+            },
+            () => (
+              <EditCounsellorNameModalContent
+                onSubmit={onSubmit}
+                closeModal={closeModal}
+                conventionId={convention.id}
+              />
+            ),
+          )
           .with(
             {
               showTransferModal: true,

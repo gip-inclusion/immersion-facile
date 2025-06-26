@@ -130,6 +130,25 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
+  sharedRouter.editCounsellorName(
+    deps.conventionMagicLinkAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.editCounsellorName.execute(
+          req.body,
+          match(req.payloads)
+            .with(
+              { convention: P.not(P.nullish) },
+              ({ convention }) => convention,
+            )
+            .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) => inclusion)
+            .otherwise(() => {
+              throw errors.user.unauthorized();
+            }),
+        ),
+      ),
+  );
+
   sharedRouter.sendSignatureLink(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>

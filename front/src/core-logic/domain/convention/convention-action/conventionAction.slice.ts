@@ -4,6 +4,7 @@ import type {
   ConventionId,
   ConventionJwt,
   ConventionSupportedJwt,
+  EditCounsellorNameRequestDto,
   RenewConventionParams,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
@@ -28,6 +29,11 @@ export type RenewConventionPayload = {
 type TransferConventionToAgencyPayload = {
   jwt: ConventionSupportedJwt;
   transferConventionToAgencyParams: TransferConventionToAgencyRequestDto;
+};
+
+export type EditCounsellorNamePayload = {
+  jwt: ConventionSupportedJwt;
+  editCounsellorNameParams: EditCounsellorNameRequestDto;
 };
 
 type SignPayload = {
@@ -93,6 +99,17 @@ export const conventionActionSlice = createSlice({
     acceptByValidatorSucceeded:
       setIsLoading<PayloadActionWithFeedbackTopic<StatusChangePayload>>(false),
     acceptByValidatorFailed:
+      setIsLoading<PayloadActionWithFeedbackTopicError>(false),
+
+    editCounsellorNameRequested:
+      setIsLoading<PayloadActionWithFeedbackTopic<EditCounsellorNamePayload>>(
+        true,
+      ),
+    editCounsellorNameSucceeded:
+      setIsLoading<PayloadActionWithFeedbackTopic<EditCounsellorNamePayload>>(
+        false,
+      ),
+    editCounsellorNameFailed:
       setIsLoading<PayloadActionWithFeedbackTopicError>(false),
 
     transferConventionToAgencyRequested:

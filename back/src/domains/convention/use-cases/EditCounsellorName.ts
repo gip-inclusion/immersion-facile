@@ -2,11 +2,10 @@ import {
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
-  type TransferConventionToAgencyRequestDto,
+  type EditCounsellorNameRequestDto,
+  editCounsellorNameRequestSchema,
   errors,
-  transferConventionToAgencyRequestSchema,
 } from "shared";
-import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -16,12 +15,10 @@ import {
   throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
-export type TransferConventionToAgency = ReturnType<
-  typeof makeTransferConventionToAgency
->;
+export type EditCounsellorName = ReturnType<typeof makeEditCounsellorName>;
 
-export const makeTransferConventionToAgency = createTransactionalUseCase<
-  TransferConventionToAgencyRequestDto,
+export const makeEditCounsellorName = createTransactionalUseCase<
+  EditCounsellorNameRequestDto,
   void,
   ConventionRelatedJwtPayload,
   {
@@ -29,8 +26,8 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
   }
 >(
   {
-    name: "TransferConventionToAgency",
-    inputSchema: transferConventionToAgencyRequestSchema,
+    name: "EditCounsellorName",
+    inputSchema: editCounsellorNameRequestSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -52,11 +49,6 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       "PARTIALLY_SIGNED",
       "READY_TO_SIGN",
     ]);
-
-    await throwErrorIfAgencyNotFound({
-      agencyId: inputParams.agencyId,
-      agencyRepository: uow.agencyRepository,
-    });
 
     await throwIfUserIsNotIFAdminNorAgencyModifier({
       uow,
@@ -84,19 +76,21 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
 
     const updatedConvention: ConventionDto = {
       ...convention,
-      agencyId: inputParams.agencyId,
+      agencyReferent: {
+        firstname: inputParams.firstname,
+        lastname: inputParams.lastname,
+      },
     };
 
     await Promise.all([
       uow.conventionRepository.update(updatedConvention),
       uow.outboxRepository.save(
         deps.createNewEvent({
-          topic: "ConventionTransferredToAgency",
+          topic: "ConventionCounsellorNameEdited",
           payload: {
             conventionId: updatedConvention.id,
-            agencyId: inputParams.agencyId,
-            justification: inputParams.justification,
-            previousAgencyId: convention.agencyId,
+            firstname: inputParams.firstname,
+            lastname: inputParams.lastname,
             triggeredBy,
           },
         }),
@@ -110,7 +104,7 @@ const throwErrorIfConventionStatusNotAllowed = (
   allowedStatuses: ConventionStatus[],
 ) => {
   if (!allowedStatuses.includes(status)) {
-    throw errors.convention.transferNotAllowedForStatus({
+    throw errors.convention.editCounsellorNameNotAllowedForStatus({
       status: status,
     });
   }
