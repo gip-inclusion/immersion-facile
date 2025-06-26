@@ -3,12 +3,13 @@ import {
   type DiscussionDisplayStatus,
   type DiscussionInList,
   type DiscussionReadDto,
+  domElementIds,
   getDiscussionDisplayStatus,
 } from "shared";
 
 export const DiscussionStatusBadge = ({
   discussion,
-  id,
+  id = domElementIds.establishmentDashboard.discussion.statusBadge,
 }: { discussion: DiscussionReadDto | DiscussionInList; id?: string }) => {
   const statusBadge =
     statusBadgeData[

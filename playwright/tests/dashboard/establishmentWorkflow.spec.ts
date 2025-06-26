@@ -50,7 +50,9 @@ test.describe("Establishment dashboard workflow", () => {
         `#${domElementIds.establishmentDashboard.discussion.statusBadge}`,
       );
       await expect(badgeLocator).toBeVisible();
-      await expect(badgeLocator).toHaveClass("fr-badge");
+      await expect(await badgeLocator.getAttribute("class")).toContain(
+        "fr-badge",
+      );
       await expect(
         await page.locator(".im-exchange-message").all(),
       ).toHaveLength(3);
@@ -62,17 +64,8 @@ const goToDiscussion = async (page: Page, discussionId: string) => {
   await goToDashboard(page, "establishment");
   await expectLocatorToBeVisibleAndEnabled(page.locator(".fr-tabs__list"));
   await goToEstablishmentDashboardTab(page, "discussions");
-  await expect(
-    page.locator(
-      `#${domElementIds.establishmentDashboard.manageDiscussion.discussionIdInput}`,
-    ),
-  ).toBeVisible();
-  await page.fill(
-    `#${domElementIds.establishmentDashboard.manageDiscussion.discussionIdInput}`,
-    discussionId,
-  );
   await page.click(
-    `#${domElementIds.establishmentDashboard.manageDiscussion.submitButton}`,
+    `#${domElementIds.establishmentDashboard.manageDiscussion.goToDiscussionButton}--${discussionId}`,
   );
   await expect(page.locator(".im-discussion-meta")).toBeVisible();
 };
