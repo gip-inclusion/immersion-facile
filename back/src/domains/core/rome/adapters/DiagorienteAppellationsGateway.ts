@@ -80,7 +80,11 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
             return status === 200
               ? diagorienteRawResponseToAppellationsDto(body)
               : [];
-          }),
+          })
+          .catch(() =>
+            // Must not throw since usecase make a failback to internal appelation search
+            [],
+          ),
     });
 
     return this.#limiter.schedule(() => {
