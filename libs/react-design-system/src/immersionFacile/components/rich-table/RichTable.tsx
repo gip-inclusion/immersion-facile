@@ -65,24 +65,6 @@ export const RichTable = ({
     >
       {isLoading && <Loader />}
       <header className={cx(Styles.header)}>
-        {dropdownFilters && (
-          <form
-            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-              event.preventDefault();
-              dropdownFilters.onSubmit();
-            }}
-            className={cx(Styles.dropdowns)}
-          >
-            {dropdownFilters?.items.map((dropdownFilter) => (
-              <RichDropdown
-                {...dropdownFilter}
-                as="Button"
-                key={dropdownFilter.id}
-              />
-            ))}
-          </form>
-        )}
-
         <form
           onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
@@ -105,6 +87,23 @@ export const RichTable = ({
           />
           <Button type="submit">Rechercher</Button>
         </form>
+        {dropdownFilters && (
+          <form
+            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              dropdownFilters.onSubmit();
+            }}
+            className={cx(Styles.dropdowns)}
+          >
+            {dropdownFilters?.items.map((dropdownFilter) => (
+              <RichDropdown
+                {...dropdownFilter}
+                as="Tag"
+                key={dropdownFilter.id}
+              />
+            ))}
+          </form>
+        )}
       </header>
 
       <Table
