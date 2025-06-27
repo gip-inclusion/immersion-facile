@@ -5,7 +5,7 @@ import ProConnectButton from "@codegouvfr/react-dsfr/ProConnectButton";
 import Tile from "@codegouvfr/react-dsfr/Tile";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { type ReactElement, type ReactNode, useEffect, useState } from "react";
+import { type ReactElement, type ReactNode, useEffect } from "react";
 import {
   Loader,
   MainWrapper,
@@ -40,10 +40,10 @@ import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.cont
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 import { z } from "zod";
-import { LoginByEmailFeedback } from "../components/feedback/LoginByEmailFeedback";
-import { WithFeedbackReplacer } from "../components/feedback/WithFeedbackReplacer";
-import { EmailValidationInput } from "../components/forms/commons/EmailValidationInput";
-import { makeFieldError } from "../hooks/formContents.hooks";
+import { WithFeedbackReplacer } from "../../components/feedback/WithFeedbackReplacer";
+import { EmailValidationInput } from "../../components/forms/commons/EmailValidationInput";
+import { makeFieldError } from "../../hooks/formContents.hooks";
+import { LoginByEmailFeedbackPage } from "./LoginByEmailFeedbackPage";
 
 export type FrontAdminRoute =
   | FrontAdminRouteTab
@@ -180,7 +180,7 @@ export const ConnectedPrivateRoute = ({
       <WithFeedbackReplacer
         topic={loginByEmailFeedbackTopic}
         renderFeedback={({ level }) => (
-          <LoginByEmailFeedback
+          <LoginByEmailFeedbackPage
             mode={level === "success" ? "success" : "failed"}
             page={page}
           />
@@ -434,8 +434,6 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
   });
   const dispatch = useDispatch();
   const getFieldError = makeFieldError(methods.formState);
-  const [invalidEmailMessage, setInvalidEmailMessage] =
-    useState<ReactNode | null>(null);
   const isRequestingLoginByEmail = useAppSelector(
     authSelectors.isRequestingLoginByEmail,
   );
@@ -473,24 +471,12 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
                 },
               }}
               {...getFieldError("email")}
-              onEmailValidationFeedback={({ state, stateRelatedMessage }) =>
-                setInvalidEmailMessage(
-                  state === "error" ? stateRelatedMessage : null,
-                )
-              }
             />
             <Button id={domElementIds[page].login.byEmailButton}>
               Recevoir le lien de connexion
             </Button>
           </form>
         </FormProvider>
-        {invalidEmailMessage !== null && (
-          <Alert
-            severity="error"
-            title="Email invalide"
-            description={`L'email de contact que vous avez utilisé dans le formulaire de contact a été invalidé par notre vérificateur d'email pour la raison suivante : ${invalidEmailMessage}`}
-          />
-        )}
       </div>
     </>
   );

@@ -7,13 +7,13 @@ import { HeadingSection } from "react-design-system";
 import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
 import { DiscussionManageContent } from "src/app/components/admin/establishments/DiscussionManageContent";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
-import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
-import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
-import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import type {
   EstablishmentDashboardRouteName,
   FrontEstablishmentDashboardRoute,
-} from "src/app/routes/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoute";
+import { InitiateConventionButton } from "src/app/pages/establishment-dashboard/InitiateConventionButton";
+import { ManageDiscussionFormSection } from "src/app/pages/establishment-dashboard/ManageDiscussionFormSection";
+import { ManageEstablishmentsTab } from "src/app/pages/establishment-dashboard/ManageEstablishmentTab";
 import { isEstablishmentDashboardTab } from "src/app/routes/routeParams/establishmentDashboardTabs";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
