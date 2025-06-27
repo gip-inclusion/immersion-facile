@@ -126,8 +126,8 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_date_preferences: string | null;
   potential_beneficiary_level_of_education: ContactLevelOfEducation | null;
   establishment_contact_email: string;
-  establishment_contact_first_name: string;
-  establishment_contact_last_name: string;
+  establishment_contact_first_name: string | null;
+  establishment_contact_last_name: string | null;
   establishment_contact_phone: string;
   establishment_contact_job: string;
   establishment_contact_copy_emails: Json;

@@ -166,8 +166,8 @@ export type EmailParamsByEmailType = {
   CONTACT_BY_EMAIL_REQUEST: {
     businessName: string;
     businessAddress: string;
-    contactFirstName: string;
-    contactLastName: string;
+    contactFirstName?: string;
+    contactLastName?: string;
     appellationLabel: string;
     immersionObjective: ImmersionObjective | undefined;
     replyToEmail: Email;
@@ -197,8 +197,8 @@ export type EmailParamsByEmailType = {
   CONTACT_BY_EMAIL_REQUEST_LEGACY: {
     businessName: string;
     businessAddress: string;
-    contactFirstName: string;
-    contactLastName: string;
+    contactFirstName?: string;
+    contactLastName?: string;
     appellationLabel: string;
     potentialBeneficiaryFirstName: string;
     potentialBeneficiaryLastName: string;
@@ -210,8 +210,8 @@ export type EmailParamsByEmailType = {
   };
   CONTACT_BY_PHONE_INSTRUCTIONS: {
     businessName: string;
-    contactFirstName: string;
-    contactLastName: string;
+    contactFirstName?: string;
+    contactLastName?: string;
     contactPhone: string;
     kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
@@ -219,8 +219,8 @@ export type EmailParamsByEmailType = {
   };
   CONTACT_IN_PERSON_INSTRUCTIONS: {
     businessName: string;
-    contactFirstName: string;
-    contactLastName: string;
+    contactFirstName?: string;
+    contactLastName?: string;
     businessAddress: string;
     kind: DiscussionKind;
     potentialBeneficiaryFirstName: string;
