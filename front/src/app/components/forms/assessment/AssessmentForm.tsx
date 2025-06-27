@@ -1,6 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Button from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
@@ -36,12 +35,10 @@ import {
   typeOfContracts,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
-import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";
@@ -84,7 +81,6 @@ const steps: Record<Step, Pick<StepperProps, "title" | "nextTitle">> = {
 export const AssessmentForm = ({
   convention,
   jwt,
-  currentUserRoles,
 }: AssessmentFormProperties): JSX.Element => {
   const dispatch = useDispatch();
   const [currentStep, setCurrentStep] = useState<Step>(1);
@@ -130,61 +126,45 @@ export const AssessmentForm = ({
 
   return (
     <>
-      <WithFeedbackReplacer
-        topic="assessment"
-        renderFeedback={({ level }) =>
-          level === "success" ? (
-            <AssessmentSuccessMessage
-              firstName={convention.signatories.beneficiary.firstName}
-              lastName={convention.signatories.beneficiary.lastName}
-              currentUserRoles={currentUserRoles}
+      <ImmersionDescription convention={convention} />
+      <Feedback topics={["assessment"]} />
+      <FormProvider {...methods}>
+        <div className={fr.cx("fr-grid-row")}>
+          <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
+            <Stepper
+              currentStep={currentStep}
+              stepCount={keys(steps).length}
+              title={steps[currentStep].title}
+              nextTitle={steps[currentStep].nextTitle}
             />
-          ) : (
-            <Feedback topics={["assessment"]} />
-          )
-        }
-      >
-        <>
-          <ImmersionDescription convention={convention} />
-          <FormProvider {...methods}>
-            <div className={fr.cx("fr-grid-row")}>
-              <div className={fr.cx("fr-col-lg-7", "fr-col-12")}>
-                <Stepper
-                  currentStep={currentStep}
-                  stepCount={keys(steps).length}
-                  title={steps[currentStep].title}
-                  nextTitle={steps[currentStep].nextTitle}
-                />
-              </div>
-            </div>
+          </div>
+        </div>
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              id={domElementIds.assessment.form}
-              data-matomo-name={domElementIds.assessment.form}
-            >
-              {match(currentStep)
-                .with(1, () => (
-                  <AssessmentStatusSection
-                    convention={convention}
-                    onStepChange={onStepChange}
-                  />
-                ))
-                .with(2, () => (
-                  <AssessmentContractSection onStepChange={onStepChange} />
-                ))
-                .with(3, () => (
-                  <AssessmentCommentsSection
-                    onStepChange={onStepChange}
-                    jobTitle={convention.immersionAppellation.appellationLabel}
-                    objective={convention.immersionObjective}
-                  />
-                ))
-                .exhaustive()}
-            </form>
-          </FormProvider>
-        </>
-      </WithFeedbackReplacer>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          id={domElementIds.assessment.form}
+          data-matomo-name={domElementIds.assessment.form}
+        >
+          {match(currentStep)
+            .with(1, () => (
+              <AssessmentStatusSection
+                convention={convention}
+                onStepChange={onStepChange}
+              />
+            ))
+            .with(2, () => (
+              <AssessmentContractSection onStepChange={onStepChange} />
+            ))
+            .with(3, () => (
+              <AssessmentCommentsSection
+                onStepChange={onStepChange}
+                jobTitle={convention.immersionAppellation.appellationLabel}
+                objective={convention.immersionObjective}
+              />
+            ))
+            .exhaustive()}
+        </form>
+      </FormProvider>
     </>
   );
 };
@@ -581,68 +561,6 @@ const AssessmentCommentsSection = ({
     </div>
   );
 };
-
-const AssessmentSuccessMessage = ({
-  firstName,
-  lastName,
-  currentUserRoles,
-}: {
-  firstName: string;
-  lastName: string;
-  currentUserRoles: Role[];
-}) => (
-  <div className={fr.cx("fr-grid-row", "fr-grid-row--top")}>
-    <div
-      className={fr.cx("fr-col-lg-8")}
-      id={domElementIds.assessment.successMessage}
-    >
-      <h2>Merci d'avoir rempli le bilan !</h2>
-
-      <p>
-        Nous vous remercions d'avoir utilisé Immersion Facilitée pour
-        accompagner {firstName} {lastName} dans son immersion. Votre implication
-        contribue à améliorer notre site et à enrichir le dossier du candidat.
-      </p>
-      {currentUserRoles.includes("establishment-tutor") ? (
-        <>
-          <h3>Que faire ensuite ?</h3>
-          <p>
-            Maintenez à jour votre fiche entreprise afin de continuer à recevoir
-            des immersions.
-          </p>
-          <p>À bientôt sur Immersion Facilitée !</p>{" "}
-          <Button
-            priority="primary"
-            onClick={() => {
-              routes.establishmentDashboard().push();
-            }}
-          >
-            Accéder à ma fiche entreprise
-          </Button>
-        </>
-      ) : (
-        <Button
-          priority="primary"
-          onClick={() => {
-            routes.agencyDashboard().push();
-          }}
-        >
-          Accéder à mon espace prescripteur
-        </Button>
-      )}
-    </div>
-    <div
-      className={fr.cx(
-        "fr-col-lg-3",
-        "fr-col-offset-lg-1",
-        "fr-hidden",
-        "fr-unhidden-lg",
-      )}
-    >
-      <img src={commonIllustrations.success} alt="" />
-    </div>
-  </div>
-);
 
 export const formAssessmentDtoToAssessmentDto = (
   formAssessmentDto: FormAssessmentDto,
