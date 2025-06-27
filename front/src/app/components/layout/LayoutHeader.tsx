@@ -15,7 +15,7 @@ import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import {
   type AgencyDashboardRouteName,
   agencyDashboardRoutes,
-} from "src/app/routes/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";

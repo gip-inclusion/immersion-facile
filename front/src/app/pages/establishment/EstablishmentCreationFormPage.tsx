@@ -1,7 +1,7 @@
 import { PageHeader } from "react-design-system";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
-import { ConnectedPrivateRoute } from "src/app/routes/ConnectedPrivateRoute";
+import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import type { routes } from "src/app/routes/routes";
 import type { Route } from "type-route";
 

@@ -4,7 +4,7 @@ import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import {
   ConnectedPrivateRoute,
   type FrontDashboardRoute,
-} from "src/app/routes/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoute";
 
 type DashboardPrivateRouteProps = {
   route: FrontDashboardRoute;
