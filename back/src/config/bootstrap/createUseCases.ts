@@ -675,6 +675,8 @@ export const createUseCases = ({
         timeGateway: gateways.timeGateway,
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl,
+        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+        config,
       },
     }),
     notifyEstablishmentThatAssessmentWasCreated:
