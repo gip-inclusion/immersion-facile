@@ -3,6 +3,7 @@ import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
+import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -15,7 +16,7 @@ const config = AppConfig.createFromEnv();
 
 const triggerAssessmentReminder = async () => {
   logger.info({ message: "Starting to send emails with assessment reminder" });
-
+  const shortLinkIdGeneratorGateway = new NanoIdShortLinkIdGeneratorGateway();
   const timeGateway = new RealTimeGateway();
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
@@ -36,6 +37,8 @@ const triggerAssessmentReminder = async () => {
           config,
           generateConventionJwt,
         ),
+        shortLinkIdGeneratorGateway,
+        config,
       },
     }).execute({ mode: "3daysAfterInitialAssessmentEmail" });
 
@@ -53,6 +56,8 @@ const triggerAssessmentReminder = async () => {
           config,
           generateConventionJwt,
         ),
+        shortLinkIdGeneratorGateway,
+        config,
       },
     }).execute({ mode: "10daysAfterInitialAssessmentEmail" });
 

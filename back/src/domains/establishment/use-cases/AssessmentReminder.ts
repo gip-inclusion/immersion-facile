@@ -11,6 +11,7 @@ import {
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -19,6 +20,8 @@ import type {
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -42,6 +45,8 @@ export const makeAssessmentReminder = createTransactionalUseCase<
     timeGateway: TimeGateway;
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    config: AppConfig;
   }
 >(
   {
@@ -71,6 +76,8 @@ export const makeAssessmentReminder = createTransactionalUseCase<
         now,
         generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
         saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+        config: deps.config,
       });
     });
 
@@ -151,6 +158,8 @@ const sendAssessmentReminders = async ({
   recipientEmail,
   now,
   generateConventionMagicLinkUrl,
+  shortLinkIdGeneratorGateway,
+  config,
 }: {
   uow: UnitOfWork;
   saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
@@ -158,14 +167,27 @@ const sendAssessmentReminders = async ({
   recipientEmail: Email;
   now: Date;
   generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+  shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+  config: AppConfig;
 }) => {
-  const assessmentCreationLink = generateConventionMagicLinkUrl({
-    id: convention.id,
-    email: recipientEmail,
-    role: "establishment-tutor",
-    targetRoute: frontRoutes.assessment,
-    now,
+  const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
+    config,
+    conventionMagicLinkPayload: {
+      id: convention.id,
+      email: recipientEmail,
+      role: "establishment-tutor",
+      now,
+    },
+    generateConventionMagicLinkUrl: generateConventionMagicLinkUrl,
+    shortLinkIdGeneratorGateway: shortLinkIdGeneratorGateway,
+    uow,
   });
+  const assessmentCreationLink = await makeShortMagicLink({
+    targetRoute: frontRoutes.assessment,
+    lifetime: "short",
+    extraQueryParams: { mtm_source: "assessment-reminder" },
+  });
+
   const notification = createNotification({
     convention,
     recipientEmail: recipientEmail,

@@ -8,8 +8,9 @@ import {
   type DateString,
   type Notification,
   expectObjectInArrayToMatch,
-  frontRoutes,
 } from "shared";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import type { AssessmentEntity } from "../../convention/entities/AssessmentEntity";
@@ -17,6 +18,7 @@ import {
   type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
+import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -35,7 +37,8 @@ describe("AssessmentReminder", () => {
   let assessmentReminder: AssessmentReminder;
   let timeGateway: TimeGateway;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
+  let config: AppConfig;
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway();
@@ -44,12 +47,16 @@ describe("AssessmentReminder", () => {
       new UuidV4Generator(),
       timeGateway,
     );
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+    config = new AppConfigBuilder().build();
     assessmentReminder = makeAssessmentReminder({
       uowPerformer,
       deps: {
         timeGateway,
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
+        shortLinkIdGeneratorGateway,
+        config,
       },
     });
   });
@@ -140,6 +147,7 @@ describe("AssessmentReminder", () => {
     });
 
     it("send first assessment reminder", async () => {
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-1"]);
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention,
@@ -167,13 +175,7 @@ describe("AssessmentReminder", () => {
                 convention.establishmentTutor.firstName,
               establishmentTutorLastName:
                 convention.establishmentTutor.lastName,
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                id: convention.id,
-                email: convention.establishmentTutor.email,
-                role: "establishment-tutor",
-                targetRoute: frontRoutes.assessment,
-                now,
-              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
             },
             recipients: [convention.establishmentTutor.email],
             sender: {
@@ -189,6 +191,7 @@ describe("AssessmentReminder", () => {
     });
 
     it("send second assessment reminder", async () => {
+      shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-2"]);
       const initialEstablishmentNotification: Notification =
         buildEstablishmentNotificationFrom({
           convention,
@@ -216,13 +219,7 @@ describe("AssessmentReminder", () => {
                 convention.establishmentTutor.firstName,
               establishmentTutorLastName:
                 convention.establishmentTutor.lastName,
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                id: convention.id,
-                email: convention.establishmentTutor.email,
-                role: "establishment-tutor",
-                targetRoute: frontRoutes.assessment,
-                now,
-              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
             },
             recipients: [convention.establishmentTutor.email],
             sender: {
