@@ -1,35 +1,35 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { Button, type ButtonProps } from "@codegouvfr/react-dsfr/Button";
+import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { type AllowedStartOAuthLoginPage, domElementIds } from "shared";
+import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
+import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { loginByEmailFeedbackTopic } from "src/app/routes/ConnectedPrivateRoute";
+import { loginByEmailFeedbackTopic } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes, useRoute } from "src/app/routes/routes";
 import { loginIllustration } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { Breadcrumbs } from "../Breadcrumbs";
-import { HeaderFooterLayout } from "../layout/HeaderFooterLayout";
-import { immersionFacileSupportUrl } from "../layout/LayoutFooter";
 
 type Mode = "success" | "failed";
 
-type MajorFeedbackProps = {
+type LoginByEmailFeedbackPageProps = {
   mode: Mode;
   page: AllowedStartOAuthLoginPage;
 };
 
-export const LoginByEmailFeedback = ({ mode, page }: MajorFeedbackProps) => {
+export const LoginByEmailFeedbackPage = ({
+  mode,
+  page,
+}: LoginByEmailFeedbackPageProps) => {
   const route = useRoute();
   const dispatch = useDispatch();
-
   const email = useAppSelector(authSelectors.requestedEmail);
   const isRequestingLoginByEmail = useAppSelector(
     authSelectors.isRequestingLoginByEmail,
   );
-
   const contents: Record<
     Mode,
     {
@@ -55,6 +55,26 @@ export const LoginByEmailFeedback = ({ mode, page }: MajorFeedbackProps) => {
             renseigné la même adresse email que précédemment. Cela nous permet
             de retrouver votre entreprise ou vos conventions.
           </Highlight>
+          <p>
+            Vous n’avez pas reçu le lien ?{" "}
+            <a
+              className={fr.cx("fr-link")}
+              href={route.href}
+              id={domElementIds[page].login.retryButton}
+            >
+              Modifier mon email
+            </a>{" "}
+            ou{" "}
+            <a
+              id={domElementIds[page].login.contactSupport}
+              className={fr.cx("fr-link")}
+              href={immersionFacileSupportUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Contacter le support
+            </a>
+          </p>
         </>
       ),
       buttonProps: {
@@ -79,6 +99,26 @@ export const LoginByEmailFeedback = ({ mode, page }: MajorFeedbackProps) => {
           <p>
             Veuillez vérifier l’orthographe de votre adresse email et réessayer.
           </p>
+          <p>
+            Vous n’avez pas reçu le lien ?{" "}
+            <a
+              className={fr.cx("fr-link")}
+              href={route.href}
+              id={domElementIds[page].login.retryButton}
+            >
+              Modifier mon email
+            </a>{" "}
+            ou{" "}
+            <a
+              id={domElementIds[page].login.contactSupport}
+              className={fr.cx("fr-link")}
+              href={immersionFacileSupportUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Contacter le support
+            </a>
+          </p>
         </>
       ),
       buttonProps: {
@@ -100,41 +140,14 @@ export const LoginByEmailFeedback = ({ mode, page }: MajorFeedbackProps) => {
   };
 
   return (
-    <HeaderFooterLayout>
-      <MainWrapper layout="default" vSpacing={0} className={fr.cx("fr-mb-4w")}>
-        <PageHeader
-          title={contents[mode].title}
-          illustration={loginIllustration}
-          breadcrumbs={<Breadcrumbs />}
-        >
-          {isRequestingLoginByEmail && <Loader />}
-          {contents[mode].content}
-          <p>
-            Vous n’avez pas reçu le lien ?{" "}
-            <a
-              className={fr.cx("fr-link")}
-              href={route.href}
-              id={domElementIds[page].login.retryButton}
-            >
-              Modifier mon email
-            </a>{" "}
-            ou{" "}
-            <a
-              id={domElementIds[page].login.contactSupport}
-              className={fr.cx("fr-link")}
-              href={immersionFacileSupportUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Contacter le support
-            </a>
-          </p>
-          <Button
-            {...contents[mode].buttonProps}
-            className={fr.cx("fr-mt-2w")}
-          />
-        </PageHeader>
-      </MainWrapper>
-    </HeaderFooterLayout>
+    <>
+      {isRequestingLoginByEmail && <Loader />}
+      <FullPageFeedback
+        title={contents[mode].title}
+        illustration={loginIllustration}
+        content={contents[mode].content}
+        buttonProps={contents[mode].buttonProps}
+      />
+    </>
   );
 };

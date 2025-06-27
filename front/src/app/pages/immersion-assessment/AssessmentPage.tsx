@@ -1,5 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import { useEffect } from "react";
 import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
@@ -10,13 +11,15 @@ import {
   hasAllowedRoleOnAssessment,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
+import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { AssessmentForm } from "src/app/components/forms/assessment/AssessmentForm";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
-import type { routes } from "src/app/routes/routes";
+import { routes } from "src/app/routes/routes";
+import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
@@ -57,10 +60,15 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
     jwt: route.params.jwt,
     conventionId,
   });
+  const assessmentFormFeedback = useFeedbackTopic("assessment");
 
   const isLoading = isConventionLoading || isAssessmentLoading;
 
   const isConventionValidated = convention?.status === "ACCEPTED_BY_VALIDATOR";
+
+  const isAssessmentSuccessfullySubmitted =
+    assessmentFormFeedback?.level === "success" &&
+    assessmentFormFeedback?.on === "create";
 
   useEffect(() => {
     if (convention) {
@@ -79,6 +87,48 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
       <ShowErrorOrRedirectToRenewMagicLink
         errorMessage={conventionFormFeedback?.message}
         jwt={route.params.jwt}
+      />
+    );
+
+  if (isAssessmentSuccessfullySubmitted)
+    return (
+      <FullPageFeedback
+        title="Merci d'avoir rempli le bilan !"
+        illustration={commonIllustrations.success}
+        content={
+          <>
+            <p>
+              Nous vous remercions d'avoir utilisé Immersion Facilitée pour
+              accompagner {convention?.signatories.beneficiary.firstName}{" "}
+              {convention?.signatories.beneficiary.lastName} dans son immersion.
+              Votre implication contribue à améliorer notre site et à enrichir
+              le dossier du candidat.
+            </p>
+            {roles.includes("establishment-tutor") ? (
+              <Highlight>
+                <p>
+                  <strong>Que faire ensuite ?</strong> Maintenez à jour votre
+                  fiche entreprise afin de continuer à recevoir des immersions.
+                </p>
+              </Highlight>
+            ) : null}
+          </>
+        }
+        buttonProps={{
+          ...(roles.includes("establishment-tutor")
+            ? {
+                children: "Accéder à ma fiche entreprise",
+                onClick: () => {
+                  routes.establishmentDashboard().push();
+                },
+              }
+            : {
+                children: "Accéder à mon espace prescripteur",
+                onClick: () => {
+                  routes.agencyDashboard().push();
+                },
+              }),
+        }}
       />
     );
 

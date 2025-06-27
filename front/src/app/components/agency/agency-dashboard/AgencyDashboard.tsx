@@ -16,7 +16,7 @@ import {
   type AgencyTabRoute,
   type FrontAgencyDashboardRoute,
   agencyDashboardTabsList,
-} from "src/app/routes/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";

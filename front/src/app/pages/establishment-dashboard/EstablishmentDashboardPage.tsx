@@ -5,7 +5,7 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import { EstablishmentDashboardTabs } from "src/app/components/establishment/establishment-dashboard/EstablishmentDashboardTabs";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import type { FrontEstablishmentDashboardRoute } from "src/app/routes/ConnectedPrivateRoute";
+import type { FrontEstablishmentDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";

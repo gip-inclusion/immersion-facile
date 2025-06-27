@@ -3,7 +3,7 @@ import { PageHeader } from "react-design-system";
 import {
   ConnectedPrivateRoute,
   type FrontAdminRoute,
-} from "src/app/routes/ConnectedPrivateRoute";
+} from "src/app/pages/auth/ConnectedPrivateRoute";
 
 type AdminPrivateRouteProps = {
   route: FrontAdminRoute;
