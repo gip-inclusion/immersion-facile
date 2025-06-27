@@ -1725,7 +1725,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["mise en relation mail"],
       createEmailVariables: (params) => ({
         subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
-        greetings: `Bonjour ${params.contactFirstName} ${params.contactLastName},`,
+        greetings: `Bonjour${params.contactFirstName && params.contactLastName ? ` ${params.contactFirstName} ${params.contactLastName}` : ""},`,
         content: `Un candidat souhaite faire une immersion dans votre entreprise ${params.businessName} (${params.businessAddress}).
 
 Immersion souhaitée :
@@ -1818,7 +1818,7 @@ Profil du candidat :
         replyToEmail,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
-        greetings: `Bonjour ${contactFirstName} ${contactLastName},`,
+        greetings: `Bonjour${contactFirstName && contactLastName ? ` ${contactFirstName} ${contactLastName}` : ""},`,
         content: `
         Un candidat souhaite faire une immersion ${
           immersionObjective
@@ -1877,7 +1877,7 @@ Profil du candidat :
       Cette entreprise a souhaité être contactée par téléphone.
 
       Voici ses coordonnées :
-      - Personne à contacter : ${contactFirstName} ${contactLastName}
+      ${contactFirstName && contactLastName ? `- Personne à contacter : ${contactFirstName} ${contactLastName}` : ""}
       - Numéro de téléphone  :  ${contactPhone}      
       
       Ces informations sont personnelles et confidentielles. Elles ne peuvent pas être communiquées à d’autres personnes. 
@@ -1906,7 +1906,7 @@ Profil du candidat :
     Cette entreprise souhaite que vous vous rendiez sur place pour présenter votre demande. 
 
     Voici les coordonnées :
-    - Personne à contacter : <strong>${contactFirstName} ${contactLastName}</strong>
+    ${contactFirstName && contactLastName ? `- Personne à contacter : <strong>${contactFirstName} ${contactLastName}</strong>` : ""}
     - Adresse de l'entreprise : <strong>${businessAddress}</strong>
     `,
         highlight: {

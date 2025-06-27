@@ -195,8 +195,8 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
       z.object({
         appellation: appellationDtoSchema,
         establishmentContact: z.object({
-          firstName: zStringMinLength1,
-          lastName: zStringMinLength1,
+          firstName: zStringMinLength1.optional(),
+          lastName: zStringMinLength1.optional(),
           job: zStringMinLength1,
         }),
       }),

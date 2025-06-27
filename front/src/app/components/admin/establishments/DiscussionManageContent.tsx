@@ -192,7 +192,10 @@ const getDiscussionButtons = ({
           },
           replyDomain: `reply.${window.location.hostname}`,
         })}?subject=${encodeURI(
-          `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`,
+          discussion.establishmentContact.firstName &&
+            discussion.establishmentContact.lastName
+            ? `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`
+            : `Réponse de l'entreprise ${discussion.businessName} - Immersion potentielle en tant que ${discussion.appellation.appellationLabel}`,
         )}`,
         target: "_blank",
       },
@@ -481,14 +484,14 @@ const makeConventionFromDiscussion = ({
     },
     establishmentRepresentative: {
       ...initialConvention.signatories.establishmentRepresentative,
-      firstName: discussion.establishmentContact.firstName,
-      lastName: discussion.establishmentContact.lastName,
+      firstName: discussion.establishmentContact.firstName ?? "",
+      lastName: discussion.establishmentContact.lastName ?? "",
       email: userEmail,
     },
   },
   establishmentTutor: {
-    firstName: discussion.establishmentContact.firstName,
-    lastName: discussion.establishmentContact.lastName,
+    firstName: discussion.establishmentContact.firstName ?? "",
+    lastName: discussion.establishmentContact.lastName ?? "",
     job: "",
     email: userEmail,
     phone: "",
