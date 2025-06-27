@@ -571,8 +571,8 @@ describe("UpdateDiscussionStatus", () => {
 
 const makeExpectedEmailParams = (
   expectedRejectionReason: string,
-  firstName: string,
-  lastName: string,
+  firstName?: string,
+  lastName?: string,
 ) => ({
   subject:
     "L’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion",
@@ -585,5 +585,5 @@ La raison du refus est : ${expectedRejectionReason}
 N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/recherche">rechercher une immersion dans une autre entreprise</a> !
 
 Bonne journée, 
-${firstName} ${lastName}, représentant de l'entreprise My default business name`,
+${firstName && lastName ? `${firstName} ${lastName}, ` : "Le "}représentant de l'entreprise My default business name`,
 });

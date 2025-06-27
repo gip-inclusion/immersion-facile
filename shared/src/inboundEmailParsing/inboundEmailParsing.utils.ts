@@ -6,8 +6,8 @@ type OpaqueEmailParams = {
   replyDomain: string;
   recipient: {
     kind: ExchangeRole;
-    firstname: string;
-    lastname: string;
+    firstname?: string;
+    lastname?: string;
   };
 };
 
@@ -17,8 +17,12 @@ export const createOpaqueEmail = ({
   recipient,
 }: OpaqueEmailParams) => {
   const recipientLetter = recipient.kind === "establishment" ? "e" : "b";
-  const firstname = slugify(recipient.firstname);
-  const lastname = slugify(recipient.lastname);
-
-  return `${firstname}_${lastname}__${discussionId}_${recipientLetter}@${replyDomain}`;
+  const firstname = recipient.firstname
+    ? slugify(recipient.firstname)
+    : undefined;
+  const lastname = recipient.lastname ? slugify(recipient.lastname) : undefined;
+  if (firstname && lastname) {
+    return `${firstname}_${lastname}__${discussionId}_${recipientLetter}@${replyDomain}`;
+  }
+  return `${discussionId}_${recipientLetter}@${replyDomain}`;
 };

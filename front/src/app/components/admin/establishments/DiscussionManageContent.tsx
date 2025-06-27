@@ -481,14 +481,14 @@ const makeConventionFromDiscussion = ({
     },
     establishmentRepresentative: {
       ...initialConvention.signatories.establishmentRepresentative,
-      firstName: discussion.establishmentContact.firstName,
-      lastName: discussion.establishmentContact.lastName,
+      firstName: discussion.establishmentContact.firstName ?? "",
+      lastName: discussion.establishmentContact.lastName ?? "",
       email: userEmail,
     },
   },
   establishmentTutor: {
-    firstName: discussion.establishmentContact.firstName,
-    lastName: discussion.establishmentContact.lastName,
+    firstName: discussion.establishmentContact.firstName ?? "",
+    lastName: discussion.establishmentContact.lastName ?? "",
     job: "",
     email: userEmail,
     phone: "",

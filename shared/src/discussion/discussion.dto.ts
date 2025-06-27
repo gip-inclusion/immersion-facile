@@ -120,8 +120,8 @@ export type DiscussionPotentialBeneficiary<
 export type DiscussionEstablishmentContact = {
   email: string;
   copyEmails: string[];
-  firstName: string;
-  lastName: string;
+  firstName?: string;
+  lastName?: string;
   phone: string;
   job: string;
 };
