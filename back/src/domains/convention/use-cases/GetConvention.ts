@@ -133,11 +133,9 @@ export class GetConvention extends TransactionalUseCase<
     if (isEmailMatchingPeAdvisor) return true;
 
     const isMatchingConventionEmails = await isHashMatchConventionEmails({
-      uow,
       role,
       emailHash,
       convention,
-      agency,
     });
     if (isMatchingConventionEmails) return true;
 
