@@ -50,6 +50,8 @@ const convention = new ConventionDtoBuilder()
   .signedByEstablishmentRepresentative(undefined)
   .signedByBeneficiary(undefined)
   .withBeneficiarySignedAt(undefined)
+  .withBeneficiaryEmail("beneficiary@mail.com")
+  .withEstablishmentRepresentativeEmail("establishment-representative@mail.com")
   .build();
 
 const agency = new AgencyDtoBuilder().withId(convention.agencyId).build();
@@ -240,26 +242,6 @@ describe("Send signature link", () => {
         );
       });
 
-      it("throws unauthorized if user has no rights on agency", async () => {
-        uow.conventionRepository.setConventions([convention]);
-        uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
-        uow.userRepository.users = [connectedUser];
-
-        await expectPromiseToFailWithError(
-          usecase.execute(
-            {
-              conventionId,
-              role: "beneficiary-representative",
-            },
-            connectedUserPayload,
-          ),
-          errors.user.noRightsOnAgency({
-            userId: connectedUserPayload.userId,
-            agencyId: convention.agencyId,
-          }),
-        );
-      });
-
       it("throws unauthorized if user has not enough rights on agency", async () => {
         uow.conventionRepository.setConventions([convention]);
         uow.agencyRepository.agencies = [
@@ -280,10 +262,7 @@ describe("Send signature link", () => {
             },
             connectedUserPayload,
           ),
-          errors.user.notEnoughRightOnAgency({
-            userId: connectedUserPayload.userId,
-            agencyId: convention.agencyId,
-          }),
+          errors.convention.sendSignatureLinkNotAuthorizedForRole(),
         );
       });
     });
@@ -301,9 +280,7 @@ describe("Send signature link", () => {
             },
             viewerJwtPayload,
           ),
-          errors.convention.unsupportedRole({
-            role: "agency-viewer",
-          }),
+          errors.convention.sendSignatureLinkNotAuthorizedForRole(),
         );
       });
 
@@ -321,13 +298,19 @@ describe("Send signature link", () => {
             },
             validatorJwtPayload,
           ),
-          errors.user.notEnoughRightOnAgency({
-            agencyId: agency.id,
-          }),
+          errors.convention.emailNotLinkedToConvention(
+            validatorJwtPayload.role,
+          ),
         );
       });
 
       it("throws unauthorized if user has not enough rights on agency", async () => {
+        const agencyViewerJwtPayload = createConventionMagicLinkPayload({
+          id: conventionId,
+          role: "agency-viewer",
+          email: notConnectedUser.email,
+          now: new Date(),
+        });
         uow.userRepository.users = [notConnectedUser];
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
@@ -346,11 +329,9 @@ describe("Send signature link", () => {
               conventionId,
               role: "beneficiary-representative",
             },
-            validatorJwtPayload,
+            agencyViewerJwtPayload,
           ),
-          errors.user.notEnoughRightOnAgency({
-            agencyId: agency.id,
-          }),
+          errors.convention.sendSignatureLinkNotAuthorizedForRole(),
         );
       });
     });
@@ -681,7 +662,30 @@ describe("Send signature link", () => {
         const shortLinkId = "link1";
         shortLinkIdGeneratorGateway.addMoreShortLinkIds([shortLinkId]);
 
-        uow.conventionRepository.setConventions([convention]);
+        const conventionWithAllSignatories = new ConventionDtoBuilder(
+          convention,
+        )
+          .withBeneficiaryRepresentative({
+            role: "beneficiary-representative",
+            email: "beneficiary-representative@mail.com",
+            phone: "+33622222222",
+            firstName: "Marie",
+            lastName: "Dupont",
+          })
+          .withBeneficiaryCurrentEmployer({
+            role: "beneficiary-current-employer",
+            email: "beneficiary-current-employer@mail.com",
+            phone: "+33633333333",
+            firstName: "Jean",
+            lastName: "Martin",
+            job: "Manager",
+            businessSiret: "98765432109876",
+            businessName: "Entreprise Actuelle",
+            businessAddress: "123 rue de l'emploi, 75001 Paris",
+          })
+          .build();
+
+        uow.conventionRepository.setConventions([conventionWithAllSignatories]);
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
         uow.userRepository.users = [notConnectedUser];
 
