@@ -317,6 +317,38 @@ type PageContent = (
   }[];
 };
 
+const establishmentDashboardContent: PageContent = {
+  title: "Mon espace entreprise",
+  description: (
+    <>
+      <strong>Un compte unique</strong> pour accéder à vos candidatures, vos
+      conventions et vos offres d’immersions.
+    </>
+  ),
+  cardsTitle: "Tous les avantages du compte entreprise",
+  withEmailLogin: true,
+  cards: [
+    {
+      title: "Vos démarches centralisées",
+      description:
+        "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
+      illustration: commonIllustrations.warning,
+    },
+    {
+      title: "Un accès simplifié",
+      description:
+        "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+      illustration: commonIllustrations.inscription,
+    },
+    {
+      title: "Gérez vos offres",
+      description:
+        "Devenez administrateur de votre établissement et gérez directement vos offres d’immersions.",
+      illustration: commonIllustrations.monCompte,
+    },
+  ],
+};
+
 const pageContentByRoute: Record<
   AllowedStartOAuthLoginPage | "default",
   PageContent
@@ -357,68 +389,8 @@ const pageContentByRoute: Record<
       },
     ],
   },
-  establishmentDashboard: {
-    title: "Mon espace entreprise",
-    description: (
-      <>
-        <strong>Un compte unique</strong> pour accéder à vos candidatures, vos
-        conventions et vos offres d’immersions.
-      </>
-    ),
-    cardsTitle: "Tous les avantages du compte entreprise",
-    withEmailLogin: true,
-    cards: [
-      {
-        title: "Vos démarches centralisées",
-        description:
-          "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
-        illustration: commonIllustrations.warning,
-      },
-      {
-        title: "Un accès simplifié",
-        description:
-          "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-        illustration: commonIllustrations.inscription,
-      },
-      {
-        title: "Gérez vos offres",
-        description:
-          "Devenez administrateur de votre établissement et gérez directement vos offres d’immersions.",
-        illustration: commonIllustrations.monCompte,
-      },
-    ],
-  },
-  establishmentDashboardDiscussions: {
-    title: "Mon espace entreprise",
-    description: (
-      <>
-        <strong>Un compte unique</strong> pour accéder à vos candidatures, vos
-        conventions et vos offres d’immersions.
-      </>
-    ),
-    cardsTitle: "Tous les avantages du compte entreprise",
-    withEmailLogin: true,
-    cards: [
-      {
-        title: "Vos démarches centralisées",
-        description:
-          "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
-        illustration: commonIllustrations.warning,
-      },
-      {
-        title: "Un accès simplifié",
-        description:
-          "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-        illustration: commonIllustrations.inscription,
-      },
-      {
-        title: "Gérez vos offres",
-        description:
-          "Devenez administrateur de votre établissement et gérez directement vos offres d’immersions.",
-        illustration: commonIllustrations.monCompte,
-      },
-    ],
-  },
+  establishmentDashboard: establishmentDashboardContent,
+  establishmentDashboardDiscussions: establishmentDashboardContent,
   agencyDashboard: {
     title: "Mon espace prescripteur",
     description: (
