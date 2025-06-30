@@ -462,24 +462,32 @@ L'équipe d'Immersion Facilitée`,
       }) => ({
         subject: `[Demande d'immersion de ${beneficiaryFirstName} ${beneficiaryLastName}] Ce candidat attend toujours votre réponse.`,
         greetings: `Répondez vite à ${beneficiaryFirstName}`,
-        content: `${beneficiaryFirstName} vous a contacté il y a ${
+        content: `Bonjour,
+        <strong>${beneficiaryFirstName} ${beneficiaryLastName}</strong> vous a contacté il y a ${
           mode === "3days" ? "3" : "7"
-        } jours pour une demande d\`immersion pour le métier de ${appellationLabel}.
-<b>Votre réponse est importante</b> : ${beneficiaryFirstName} a choisi votre entreprise et une immersion est souvent clé dans le parcours des candidates ou les candidats.
-Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : `,
+        } jours pour une demande d\`immersion pour le métier de <strong>${appellationLabel}</strong>.
+        
+        Votre réponse est importante : ${beneficiaryFirstName} ${beneficiaryLastName} a choisi votre entreprise et une immersion peut jouer un rôle clé dans son parcours professionnel.
+        
+        Ne tardez pas : répondez lui directement en utilisant le bouton ci-dessous : 
+        `,
         buttons: [
           {
             label: `Répondre à ${beneficiaryFirstName}`,
             url: `mailto:${beneficiaryReplyToEmail}`,
           },
-          {
-            label: "Connexion à votre espace entreprise",
-            target: "_blank",
-            url: `https://${domain}/${frontRoutes.establishmentDashboard}`,
-          },
         ],
-        subContent: `<strong>Si la connexion ne fonctionne pas et que vous ne recevez pas le lien de réinitialisation du mot de passe, c'est que vous n'avez pas encore créé votre compte</strong>.
-        Créer votre compte avec le même mail que celui avec lequel les candidats vous contactent.
+        subContent: `
+        <strong>Vous avez déjà échangé avec lui ou elle ?</strong>
+
+        Indiquez-le dans votre espace entreprise en marquant la candidature comme acceptée ou refusée, cela nous permet de mieux vous accompagner et de tenir à jour le suivi côté candidat.
+
+        <a href="https://${domain}/${frontRoutes.establishmentDashboard}" class target="_blank">Se connecter à l'espace entreprise</a>
+
+
+        Si la connexion ne fonctionne pas ou si vous ne recevez pas le lien de réinitialisation du mot de passe, c’est probablement que vous n’avez pas encore créé votre compte.
+        Créez-le simplement avec <strong>la même adresse email</strong> que celle utilisée par les candidats pour vous contacter.
+        
 
         A très vite sur Immersion Facilitée,
         L'équipe d'Immersion Facilitée`,
