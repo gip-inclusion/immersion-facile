@@ -1,4 +1,5 @@
 import {
+  allModifierRoles,
   type ConnectedUserDomainJwtPayload,
   type ConventionDomainPayload,
   type ConventionDto,
@@ -16,6 +17,7 @@ import {
   agencyDtoToConventionAgencyFields,
   agencyWithRightToAgencyDto,
 } from "../../../utils/agency";
+import { conventionDtoToConventionReadDto } from "../../../utils/convention";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -23,6 +25,7 @@ import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import {
   extractUserRolesOnConventionFromJwtPayload,
   signConvention,
@@ -48,19 +51,30 @@ export class UpdateConvention extends TransactionalUseCase<
     uow: UnitOfWork,
     jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
-    await throwIfNotAllowedToUpdateConvention(uow, convention, jwtPayload);
-
-    const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
-
-    if (convention.status !== minimalValidStatus)
-      throw errors.convention.updateBadStatusInParams({ id: convention.id });
-
     const conventionFromRepo = await uow.conventionRepository.getById(
       convention.id,
     );
 
     if (!conventionFromRepo)
       throw errors.convention.notFound({ conventionId: convention.id });
+
+    const conventionReadDto = await conventionDtoToConventionReadDto(
+      conventionFromRepo,
+      uow,
+    );
+    await throwIfNotAuthorizedForRole({
+      uow,
+      convention: conventionReadDto,
+      authorizedRoles: [...allModifierRoles],
+      errorToThrow: errors.convention.updateForbidden({ id: convention.id }),
+      jwtPayload,
+      isPeAdvisorAllowed: true,
+    });
+
+    const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
+
+    if (convention.status !== minimalValidStatus)
+      throw errors.convention.updateBadStatusInParams({ id: convention.id });
 
     const isTransitionAllowed = statusTransitionConfigs[
       minimalValidStatus

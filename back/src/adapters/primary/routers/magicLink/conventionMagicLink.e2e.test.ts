@@ -31,6 +31,7 @@ import {
   buildTestApp,
   type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
+import { makeHashByRolesForTest } from "../../../../utils/emailHash";
 
 describe("Magic link router", () => {
   const payloadMeta = {
@@ -104,10 +105,25 @@ describe("Magic link router", () => {
           ),
         ];
 
+        const counsellor = new ConnectedUserBuilder()
+          .withId("dummy-counsellor")
+          .withEmail("counsellor@test.com")
+          .buildUser();
+        const validator = new ConnectedUserBuilder()
+          .withId("dummy-validator")
+          .withEmail("validator@test.com")
+          .buildUser();
+
+        const emailHash = makeHashByRolesForTest(
+          updatedConvention,
+          counsellor,
+          validator,
+        ).beneficiary;
+
         const backOfficeJwt = generateConventionJwt({
           ...payloadMeta,
           role: "beneficiary",
-          emailHash: "my-hash",
+          emailHash: emailHash,
           applicationId: updatedConvention.id,
         });
 
@@ -132,6 +148,12 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .build();
 
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(
+            AgencyDtoBuilder.create(updatedConvention.agencyId).build(),
+          ),
+        ];
+
         const notAdminUser = new ConnectedUserBuilder()
           .withIsAdmin(false)
           .buildUser();
@@ -153,9 +175,8 @@ describe("Magic link router", () => {
           status: 403,
           body: {
             status: 403,
-            message: errors.user.notEnoughRightOnAgency({
-              userId: notAdminUser.id,
-              agencyId: updatedConvention.agencyId,
+            message: errors.convention.updateForbidden({
+              id: updatedConvention.id,
             }).message,
           },
         });
@@ -170,6 +191,12 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .notSigned()
           .build();
+
+        inMemoryUow.agencyRepository.agencies = [
+          toAgencyWithRights(
+            AgencyDtoBuilder.create(updatedConvention.agencyId).build(),
+          ),
+        ];
 
         const backOfficeJwt = generateConnectedUserJwt(
           backofficeAdminJwtPayload,
