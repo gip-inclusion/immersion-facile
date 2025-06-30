@@ -1,11 +1,9 @@
-import { intersection, toPairs, uniq } from "ramda";
+import { uniq } from "ramda";
 import {
   type AgencyDto,
-  type AgencyId,
   type AgencyKind,
   type AgencyWithUsersRights,
   type ApiConsumer,
-  agencyModifierRoles,
   allSignatoryRoles,
   type ConnectedUserDomainJwtPayload,
   type ConventionDomainPayload,
@@ -27,8 +25,6 @@ import {
   type UserWithRights,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
-import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
-import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic } from "../../core/events/events";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -166,81 +162,6 @@ export const isConventionInScope = (
 ): boolean =>
   isAgencyIdInConsumerScope(conventionRead, apiConsumer) ||
   isAgencyKindInConsumerScope(conventionRead, apiConsumer);
-
-export const throwIfUserIsNotIFAdminNorAgencyModifier = async ({
-  uow,
-  jwtPayload,
-  agencyId,
-  convention,
-}: {
-  jwtPayload: ConventionRelatedJwtPayload;
-  uow: UnitOfWork;
-  agencyId: AgencyId;
-  convention: ConventionDto;
-}): Promise<void> => {
-  if ("role" in jwtPayload) {
-    if (jwtPayload.role === "back-office") return;
-    if (!agencyModifierRoles.includes(jwtPayload.role as any))
-      throw errors.convention.unsupportedRole({
-        role: jwtPayload.role as any,
-      });
-
-    const agency = await uow.agencyRepository.getById(agencyId);
-
-    if (!agency) throw errors.agency.notFound({ agencyId });
-
-    const userIdsWithRoleOnAgency = toPairs(agency.usersRights)
-      .filter(
-        ([_, right]) =>
-          right?.roles.includes("counsellor") ||
-          right?.roles.includes("validator"),
-      )
-      .map(([id]) => id);
-
-    const users = await uow.userRepository.getByIds(userIdsWithRoleOnAgency);
-
-    if (
-      !isHashMatchPeAdvisorEmail({
-        beneficiary: convention.signatories.beneficiary,
-        emailHash: jwtPayload.emailHash,
-      }) &&
-      !isSomeEmailMatchingEmailHash(
-        users.map(({ email }) => email),
-        jwtPayload.emailHash,
-      )
-    )
-      throw errors.user.notEnoughRightOnAgency({
-        agencyId,
-      });
-
-    return;
-  }
-
-  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-
-  if (userWithRights.isBackofficeAdmin) return;
-
-  if (!userWithRights)
-    throw errors.user.notFound({
-      userId: jwtPayload.userId,
-    });
-
-  const agencyRightOnAgency = userWithRights.agencyRights.find(
-    (agencyRight) => agencyRight.agency.id === agencyId,
-  );
-
-  if (!agencyRightOnAgency)
-    throw errors.user.noRightsOnAgency({
-      userId: userWithRights.id,
-      agencyId: agencyId,
-    });
-
-  if (intersection(agencyModifierRoles, agencyRightOnAgency.roles).length === 0)
-    throw errors.user.notEnoughRightOnAgency({
-      agencyId,
-      userId: userWithRights.id,
-    });
-};
 
 export const throwErrorOnConventionIdMismatch = ({
   requestedConventionId,

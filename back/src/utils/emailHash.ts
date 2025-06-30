@@ -65,21 +65,15 @@ export const getAgencyEmailFromEmailHash = async (
 
 export const isHashMatchConventionEmails = async ({
   convention,
-  uow,
-  agency,
   emailHash,
   role,
 }: {
   convention: ConventionReadDto;
-  uow: UnitOfWork;
-  agency: AgencyWithUsersRights;
+
   emailHash: EmailHash;
   role: Role;
 }) => {
-  const emailsByRole = conventionEmailsByRole(
-    convention,
-    await agencyWithRightToAgencyDto(uow, agency),
-  )[role];
+  const emailsByRole = conventionEmailsByRole(convention)[role];
 
   if (emailsByRole instanceof Error) throw emailsByRole;
   return isSomeEmailMatchingEmailHash(emailsByRole, emailHash);
