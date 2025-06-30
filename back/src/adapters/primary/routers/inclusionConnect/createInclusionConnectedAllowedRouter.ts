@@ -115,10 +115,10 @@ export const createInclusionConnectedAllowedRouter = (
   inclusionConnectedSharedRoutes.replyToDiscussion(
     deps.inclusionConnectAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
+      sendHttpResponse(req, res, async () => {
         if (!req.payloads?.currentUser) throw errors.user.unauthorized();
         const discussionId = req.params.discussionId;
-        return deps.useCases.addExchangeToDiscussion.execute(
+        const result = await deps.useCases.addExchangeToDiscussion.execute(
           {
             source: "dashboard",
             messageInputs: [
@@ -132,6 +132,10 @@ export const createInclusionConnectedAllowedRouter = (
           },
           req.payloads.currentUser,
         );
+        if ("reason" in result) {
+          res.status(202);
+        }
+        return result;
       }),
   );
   return inclusionConnectedRouter;

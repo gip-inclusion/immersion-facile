@@ -134,6 +134,7 @@ export class HttpInclusionConnectedGateway
         .then((response) =>
           match(response)
             .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 202 }, ({ body }) => body)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: 401 }, logBodyAndThrow)
             .with({ status: 404 }, logBodyAndThrow)
