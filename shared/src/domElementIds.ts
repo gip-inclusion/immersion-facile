@@ -818,6 +818,17 @@ export const domElementIds = {
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
   },
+  establishmentDashboardDiscussions: {
+    login: {
+      proConnectButton:
+        "im-login-form__inclusion-connect-button--manage-discussion",
+      byEmailButton: "im-login-form__connect-button--manage-discussion-email",
+      navigateToHome:
+        "im-login-form__navigate-to-home-button--manage-discussion",
+      retryButton: "im-login-form__retry-login-button--manage-discussion",
+      contactSupport: "im-login-form__contact-support-link--manage-discussion",
+    },
+  },
   manageEstablishmentAdmin: {},
   establishmentDashboard: {
     initiateConventionModal:

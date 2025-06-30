@@ -29,7 +29,7 @@ import {
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAdminRouteTab } from "src/app/pages/admin/AdminTabs";
-import { routes } from "src/app/routes/routes";
+import { routes, useRoute } from "src/app/routes/routes";
 import {
   commonIllustrations,
   loginIllustration,
@@ -171,7 +171,7 @@ export const ConnectedPrivateRoute = ({
       dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
   }, [authIsLoading, isInclusionConnected, afterLoginRedirectionUrl, dispatch]);
 
-  const page = getPage(route.name);
+  const page = getAllowedStartAuthPage(route.name);
   const pageContent = pageContentByRoute[page] ?? pageContentByRoute.default;
   const alreadyUsedAuthentication = route.params.alreadyUsedAuthentication;
 
@@ -213,10 +213,15 @@ export const ConnectedPrivateRoute = ({
                   {"withEmailLogin" in pageContent ? (
                     <SeparatedSection
                       firstSection={<LoginWithEmail page={page} />}
-                      secondSection={<LoginWithProConnect page={page} />}
+                      secondSection={
+                        <LoginWithProConnect
+                          page={page}
+                          redirectUri={route.href}
+                        />
+                      }
                     />
                   ) : (
-                    <LoginWithProConnect page={page} />
+                    <LoginWithProConnect page={page} redirectUri={route.href} />
                   )}
 
                   <p className={fr.cx("fr-hint-text")}>
@@ -278,9 +283,11 @@ export const ConnectedPrivateRoute = ({
   );
 };
 
-const getPage = (
+const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
 ): AllowedStartOAuthLoginPage => {
+  if (routeName === "establishmentDashboardDiscussions")
+    return "establishmentDashboardDiscussions";
   if (
     establishmentDashboardRoutes.includes(
       routeName as EstablishmentDashboardRouteName,
@@ -381,6 +388,37 @@ const pageContentByRoute: Record<
       },
     ],
   },
+  establishmentDashboardDiscussions: {
+    title: "Mon espace entreprise",
+    description: (
+      <>
+        <strong>Un compte unique</strong> pour accéder à vos candidatures, vos
+        conventions et vos offres d’immersions.
+      </>
+    ),
+    cardsTitle: "Tous les avantages du compte entreprise",
+    withEmailLogin: true,
+    cards: [
+      {
+        title: "Vos démarches centralisées",
+        description:
+          "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
+        illustration: commonIllustrations.warning,
+      },
+      {
+        title: "Un accès simplifié",
+        description:
+          "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+        illustration: commonIllustrations.inscription,
+      },
+      {
+        title: "Gérez vos offres",
+        description:
+          "Devenez administrateur de votre établissement et gérez directement vos offres d’immersions.",
+        illustration: commonIllustrations.monCompte,
+      },
+    ],
+  },
   agencyDashboard: {
     title: "Mon espace prescripteur",
     description: (
@@ -426,6 +464,7 @@ const pageContentByRoute: Record<
 };
 
 const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
+  const route = useRoute();
   const methods = useForm<{
     email: Email;
   }>({
@@ -451,7 +490,7 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
               dispatch(
                 authSlice.actions.loginByEmailRequested({
                   email,
-                  page,
+                  redirectUri: route.href,
                   feedbackTopic: loginByEmailFeedbackTopic,
                 }),
               );
@@ -483,14 +522,16 @@ const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
 };
 
 const LoginWithProConnect = ({
+  redirectUri,
   page,
 }: {
+  redirectUri: string;
   page: AllowedStartOAuthLoginPage;
 }) => {
   const queryParamsResult =
     inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema[
       "~standard"
-    ].validate({ page });
+    ].validate({ redirectUri });
 
   if (queryParamsResult instanceof Promise) {
     throw new TypeError("Schema validation must be synchronous");
