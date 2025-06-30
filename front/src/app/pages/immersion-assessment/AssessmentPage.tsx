@@ -8,6 +8,7 @@ import {
   type ConventionJwtPayload,
   type Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
+  domElementIds,
   hasAllowedRoleOnAssessment,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
@@ -97,7 +98,7 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
         illustration={commonIllustrations.success}
         content={
           <>
-            <p>
+            <p id={domElementIds.assessment.successMessage}>
               Nous vous remercions d'avoir utilisé Immersion Facilitée pour
               accompagner {convention?.signatories.beneficiary.firstName}{" "}
               {convention?.signatories.beneficiary.lastName} dans son immersion.
