@@ -1,14 +1,15 @@
 import {
-  type AgencyDto,
   type ConventionDto,
+  type ConventionReadDto,
   type Email,
   errors,
   type Role,
 } from "shared";
+import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
+import { agencyWithRightToAgencyDto } from "./agency";
 
 export const conventionEmailsByRole = (
-  convention: ConventionDto,
-  agency: AgencyDto,
+  convention: ConventionReadDto,
 ): Record<Role, Email[] | Error> => ({
   "back-office": errors.convention.roleHasNoMagicLink({ role: "back-office" }),
   "to-review": errors.convention.roleHasNoMagicLink({ role: "to-review" }),
@@ -29,8 +30,8 @@ export const conventionEmailsByRole = (
         conventionId: convention.id,
         role: "beneficiary-representative",
       }),
-  counsellor: agency.counsellorEmails,
-  validator: agency.validatorEmails,
+  counsellor: convention.agencyCounsellorEmails,
+  validator: convention.agencyValidatorEmails,
   "agency-admin": errors.convention.roleHasNoMagicLink({
     role: "agency-admin",
   }),
@@ -46,14 +47,30 @@ export const conventionEmailsByRole = (
   }),
 });
 
-export const conventionEmailsByRoleForMagicLinkRenewal = (
-  convention: ConventionDto,
-  agency: AgencyDto,
-): Record<Role, string[] | Error> => {
+export const conventionDtoToConventionReadDto = async (
+  conventionDto: ConventionDto,
+  uow: UnitOfWork,
+): Promise<ConventionReadDto> => {
+  const agencyWithRights = await uow.agencyRepository.getById(
+    conventionDto.agencyId,
+  );
+  if (!agencyWithRights)
+    throw errors.agency.notFound({ agencyId: conventionDto.agencyId });
+
+  const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+
+  const agencyRefersTo = agency.refersToAgencyId
+    ? await uow.agencyRepository.getById(agency.refersToAgencyId)
+    : undefined;
+
   return {
-    ...conventionEmailsByRole(convention, agency),
-    "back-office": errors.convention.roleHasNoMagicLink({
-      role: "back-office",
-    }),
+    ...conventionDto,
+    agencyCounsellorEmails: agency.counsellorEmails,
+    agencyValidatorEmails: agency.validatorEmails,
+    agencyName: agency.name,
+    agencyDepartment: agency.coveredDepartments.at(0) ?? "",
+    agencySiret: agency.agencySiret,
+    agencyKind: agency.kind,
+    ...(agencyRefersTo ? { agencyRefersTo } : {}),
   };
 };
