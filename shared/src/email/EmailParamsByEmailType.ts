@@ -393,20 +393,6 @@ export type EmailParamsByEmailType = {
     businessName: string;
     businessAddresses: string[];
   };
-  POLE_EMPLOI_ADVISOR_ON_CONVENTION_ASSOCIATION: {
-    advisorFirstName: string;
-    advisorLastName: string;
-    agencyLogoUrl: AbsoluteUrl | undefined;
-    beneficiaryFirstName: string;
-    beneficiaryLastName: string;
-    beneficiaryEmail: string;
-    businessName: string;
-    conventionId: ConventionId;
-    dateEnd: string;
-    dateStart: string;
-    immersionAddress: string;
-    magicLink: string;
-  };
   POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED: {
     advisorFirstName: string;
     advisorLastName: string;
