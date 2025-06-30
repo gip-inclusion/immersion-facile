@@ -8,11 +8,11 @@ import {
   type DiscussionEstablishmentContact,
   type DiscussionInList,
   type Exchange,
+  type ImmersionObjective,
+  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  type ImmersionObjective,
-  UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -51,12 +51,12 @@ describe("PgDiscussionRepository", () => {
     .build();
 
   const establishmentContactWithoutFirstNameAndLastName: DiscussionEstablishmentContact =
-  {
-    email: "test@test.com",
-    phone: "0123456789",
-    job: "test",
-    copyEmails: [],
-  };
+    {
+      email: "test@test.com",
+      phone: "0123456789",
+      job: "test",
+      copyEmails: [],
+    };
   const secretariatOffer = new OfferEntityBuilder()
     .withRomeCode(secretariat.romeCode)
     .withAppellationCode(secretariat.appellationCode)

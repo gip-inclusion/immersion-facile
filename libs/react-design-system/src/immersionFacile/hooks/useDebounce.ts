@@ -1,5 +1,5 @@
-import { equals } from "ramda";
 import { useEffect, useState } from "react";
+import { equals } from "../utils";
 
 const defaultDebounceTimeMs = 500;
 // taken from : https://usehooks.com/useDebounce/

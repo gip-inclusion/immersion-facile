@@ -1,6 +1,6 @@
 import { useEffect } from "react";
+import { useDebounce } from "react-design-system";
 import { objectToDependencyList } from "shared";
-import { useDebounce } from "src/app/hooks/useDebounce";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { conventionParams, routes, useRoute } from "src/app/routes/routes";
 import {
