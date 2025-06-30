@@ -346,6 +346,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de transférer les conventions ayant le statut "${status}".`,
       ),
+    transferNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à transférer la convention.`,
+      ),
     twoStepsValidationBadStatus: ({
       targetStatus,
       conventionId,
@@ -428,6 +432,10 @@ export const errors = {
     }) =>
       new BadRequestError(
         `Le numéro de téléphone du ${titleByRole[role]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
+      ),
+    sendSignatureLinkNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à envoyer un lien de signature.`,
       ),
     smsSignatureLinkAlreadySent: ({
       signatoryRole,

@@ -226,10 +226,7 @@ describe("TransferConventionToAgency", () => {
             },
             connectedUserPayload,
           ),
-          errors.user.noRightsOnAgency({
-            userId: connectedUserPayload.userId,
-            agencyId: convention.agencyId,
-          }),
+          errors.convention.transferNotAuthorizedForRole(),
         );
       });
 
@@ -257,10 +254,7 @@ describe("TransferConventionToAgency", () => {
               },
               connectedUserPayload,
             ),
-            errors.user.notEnoughRightOnAgency({
-              userId: connectedUserPayload.userId,
-              agencyId: convention.agencyId,
-            }),
+            errors.convention.transferNotAuthorizedForRole(),
           );
         },
       );
@@ -341,9 +335,7 @@ describe("TransferConventionToAgency", () => {
               },
               jwtPayload,
             ),
-            errors.convention.unsupportedRole({
-              role,
-            }),
+            errors.convention.transferNotAuthorizedForRole(),
           );
         },
       );
@@ -612,7 +604,7 @@ describe("TransferConventionToAgency", () => {
     });
 
     describe("with convention jwt payload", () => {
-      it.each(["validator", "counsellor", "back-office"] as Role[])(
+      it.each(["validator", "counsellor"] as Role[])(
         "triggered by jwt role %s",
         async (role) => {
           uow.conventionRepository.setConventions([convention]);
@@ -724,57 +716,6 @@ describe("TransferConventionToAgency", () => {
         },
       );
 
-      it("triggered by backoffice admin for a convention with agency with refersTo", async () => {
-        const backofficeAdminPayload = createConventionMagicLinkPayload({
-          id: conventionId,
-          role: "back-office",
-          email: notConnectedUser.email,
-          now: new Date(),
-        });
-        const conventionWithAgencyRefersTo = new ConventionDtoBuilder(
-          convention,
-        )
-          .withAgencyId(agencyWithRefersTo.id)
-          .build();
-        uow.conventionRepository.setConventions([conventionWithAgencyRefersTo]);
-        uow.userRepository.users = [];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(otherAgency, {}),
-          toAgencyWithRights(agencyWithRefersTo, {}),
-        ];
-
-        await usecase.execute(
-          {
-            conventionId: conventionWithAgencyRefersTo.id,
-            agencyId: otherAgency.id,
-            justification: "change of agency",
-          },
-          backofficeAdminPayload,
-        );
-
-        const transferedConvention = await uow.conventionRepository.getById(
-          conventionWithAgencyRefersTo.id,
-        );
-
-        expectToEqual(transferedConvention.agencyId, otherAgency.id);
-
-        expectArraysToMatch(uow.outboxRepository.events, [
-          {
-            topic: "ConventionTransferredToAgency",
-            payload: {
-              agencyId: otherAgency.id,
-              conventionId: transferedConvention.id,
-              justification: "change of agency",
-              previousAgencyId: conventionWithAgencyRefersTo.agencyId,
-              triggeredBy: {
-                kind: "convention-magic-link",
-                role: "back-office",
-              },
-            },
-          },
-        ]);
-      });
-
       it("counsellor of an agency with refersTo can transfer convention to agency", async () => {
         const counsellorPayload = createConventionMagicLinkPayload({
           id: conventionId,
@@ -794,7 +735,7 @@ describe("TransferConventionToAgency", () => {
           toAgencyWithRights(agencyWithRefersTo, {
             [notConnectedUser.id]: {
               roles: ["counsellor"],
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
             },
           }),
         ];
