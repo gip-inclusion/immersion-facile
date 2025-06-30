@@ -165,8 +165,12 @@ export class SendAssessmentNeededNotifications extends UseCase<
         recipients: [convention.signatories.beneficiary.email],
         sender: immersionFacileNoReplyEmailSender,
         params: {
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
           businessName: convention.businessName,
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
@@ -260,8 +264,12 @@ export class SendAssessmentNeededNotifications extends UseCase<
           agencyReferentName: getFormattedFirstnameAndLastname(
             convention.agencyReferent ?? {},
           ),
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
           businessName: convention.businessName,
@@ -292,10 +300,17 @@ export class SendAssessmentNeededNotifications extends UseCase<
         sender: immersionFacileNoReplyEmailSender,
         params: {
           agencyLogoUrl: agency.logoUrl ?? undefined,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
           conventionId: convention.id,
-          establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+          establishmentTutorName: getFormattedFirstnameAndLastname({
+            firstname: convention.establishmentTutor.firstName,
+            lastname: convention.establishmentTutor.lastName,
+          }),
           assessmentCreationLink: this.#generateConventionMagicLinkUrl({
             id: convention.id,
             email: convention.establishmentTutor.email,

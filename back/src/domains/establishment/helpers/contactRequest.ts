@@ -3,6 +3,7 @@ import {
   type EmailParamsByEmailType,
   type OmitFromExistingKeys,
   errors,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
@@ -36,10 +37,18 @@ export const makeContactByEmailRequestParams = async ({
     discussionId: discussion.id,
     businessName: discussion.businessName,
     businessAddress: `${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}`,
-    contactFirstName: discussion.establishmentContact.firstName,
-    contactLastName: discussion.establishmentContact.lastName,
-    potentialBeneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-    potentialBeneficiaryLastName: discussion.potentialBeneficiary.lastName,
+    contactFirstName: getFormattedFirstnameAndLastname({
+      firstname: discussion.establishmentContact.firstName,
+    }),
+    contactLastName: getFormattedFirstnameAndLastname({
+      lastname: discussion.establishmentContact.lastName,
+    }),
+    potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({
+      firstname: discussion.potentialBeneficiary.firstName,
+    }),
+    potentialBeneficiaryLastName: getFormattedFirstnameAndLastname({
+      lastname: discussion.potentialBeneficiary.lastName,
+    }),
     potentialBeneficiaryPhone: discussion.potentialBeneficiary.phone,
     potentialBeneficiaryDatePreferences:
       discussion.potentialBeneficiary.datePreferences,

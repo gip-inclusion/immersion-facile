@@ -75,8 +75,12 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
             agencyReferentName: getFormattedFirstnameAndLastname(
               convention.agencyReferent ?? {},
             ),
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             businessName: convention.businessName,
             conventionId: convention.id,
             immersionObjective: convention.immersionObjective,
@@ -125,10 +129,12 @@ export class NotifyAgencyThatAssessmentIsCreated extends TransactionalUseCase<Wi
                 agencyReferentName: getFormattedFirstnameAndLastname(
                   convention.agencyReferent ?? {},
                 ),
-                beneficiaryFirstName:
-                  convention.signatories.beneficiary.firstName,
-                beneficiaryLastName:
-                  convention.signatories.beneficiary.lastName,
+                beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                  firstname: convention.signatories.beneficiary.firstName,
+                }),
+                beneficiaryLastName: getFormattedFirstnameAndLastname({
+                  lastname: convention.signatories.beneficiary.lastName,
+                }),
                 businessName: convention.businessName,
                 conventionId: convention.id,
                 immersionObjective: convention.immersionObjective,

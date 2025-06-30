@@ -131,8 +131,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             businessName: convention.businessName,
             internshipKind: convention.internshipKind,
             conventionDateEnd: convention.dateEnd,
@@ -159,8 +163,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             businessName: convention.businessName,
             internshipKind: convention.internshipKind,
             conventionDateEnd: convention.dateEnd,
@@ -220,8 +228,12 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
             ),
             immersionObjective: convention.immersionObjective,
             conventionId: convention.id,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             businessName: convention.businessName,
             internshipKind: convention.internshipKind,
             immersionAppellationLabel:

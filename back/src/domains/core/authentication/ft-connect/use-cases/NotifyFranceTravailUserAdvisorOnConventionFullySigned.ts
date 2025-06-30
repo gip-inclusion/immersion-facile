@@ -1,6 +1,7 @@
 import {
   type WithConventionDto,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   withConventionSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
@@ -54,11 +55,19 @@ export class NotifyFranceTravailUserAdvisorOnConventionFullySigned extends Trans
           kind: "POLE_EMPLOI_ADVISOR_ON_CONVENTION_FULLY_SIGNED",
           recipients: [conventionFtAdvisor.advisor.email],
           params: {
-            advisorFirstName: conventionFtAdvisor.advisor.firstName,
-            advisorLastName: conventionFtAdvisor.advisor.lastName,
+            advisorFirstName: getFormattedFirstnameAndLastname({
+              firstname: conventionFtAdvisor.advisor.firstName,
+            }),
+            advisorLastName: getFormattedFirstnameAndLastname({
+              lastname: conventionFtAdvisor.advisor.lastName,
+            }),
             agencyLogoUrl: agency.logoUrl ?? undefined,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             beneficiaryEmail: convention.signatories.beneficiary.email,
             businessName: convention.businessName,
             conventionId: convention.id,

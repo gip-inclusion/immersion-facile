@@ -129,10 +129,16 @@ export class NotifyConventionReminder extends TransactionalUseCase<
       kind: "SIGNATORY_REMINDER",
       recipients: [email],
       params: {
-        actorFirstName: firstName,
-        actorLastName: lastName,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        actorFirstName: getFormattedFirstnameAndLastname({
+          firstname: firstName,
+        }),
+        actorLastName: getFormattedFirstnameAndLastname({ lastname: lastName }),
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.signatories.beneficiary.lastName,
+        }),
         businessName: convention.businessName,
         conventionId: convention.id,
         signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
@@ -314,9 +320,12 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               dateStart: convention.dateStart,
               dateEnd: convention.dateEnd,
@@ -334,9 +343,12 @@ export class NotifyConventionReminder extends TransactionalUseCase<
               agencyReferentName: getFormattedFirstnameAndLastname(
                 convention.agencyReferent ?? {},
               ),
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               agencyMagicLinkUrl: await makeShortMagicLink({
                 targetRoute: frontRoutes.manageConvention,

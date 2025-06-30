@@ -8,6 +8,7 @@ import {
   errors,
   executeInSequence,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { z } from "zod";
@@ -137,12 +138,20 @@ const createNotification = ({
     templatedContent: {
       kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
       params: {
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.signatories.beneficiary.lastName,
+        }),
         conventionId: convention.id,
         internshipKind: convention.internshipKind,
-        establishmentTutorFirstName: convention.establishmentTutor.firstName,
-        establishmentTutorLastName: convention.establishmentTutor.lastName,
+        establishmentTutorFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.establishmentTutor.firstName,
+        }),
+        establishmentTutorLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.establishmentTutor.lastName,
+        }),
         assessmentCreationLink,
       },
       recipients: [recipientEmail],

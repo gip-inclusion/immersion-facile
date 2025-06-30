@@ -2,6 +2,7 @@ import {
   type UserWithAdminRights,
   expectArraysToMatch,
   expectToEqual,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
@@ -104,7 +105,10 @@ describe("RequestLoginByEmail usecase", () => {
           kind: "LOGIN_BY_EMAIL_REQUESTED",
           params: {
             loginLink: `${baseUrl}?code=${fakeJwt}&state=${state}`,
-            fullname: `${user.firstName} ${user.lastName}`,
+            fullname: getFormattedFirstnameAndLastname({
+              firstname: user.firstName,
+              lastname: user.lastName,
+            }),
           },
           recipients: [user.email],
           sender: immersionFacileNoReplyEmailSender,

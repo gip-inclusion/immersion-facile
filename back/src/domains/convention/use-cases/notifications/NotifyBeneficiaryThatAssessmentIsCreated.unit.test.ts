@@ -6,6 +6,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -95,9 +96,12 @@ describe("NotifyBeneficiaryThatAssessmentIsCreated", () => {
             params: {
               internshipKind: convention.internshipKind,
               conventionId: convention.id,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               magicLink: fakeGenerateMagicLinkUrlFn({
                 id: convention.id,
                 email: convention.signatories.beneficiary.email,

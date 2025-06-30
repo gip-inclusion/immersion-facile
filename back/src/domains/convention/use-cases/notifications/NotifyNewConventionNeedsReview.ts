@@ -4,7 +4,6 @@ import {
   type Role,
   type TemplatedEmail,
   type WithConventionDto,
-  concatValidatorNames,
   frontRoutes,
   getFormattedFirstnameAndLastname,
   withConventionSchema,
@@ -112,8 +111,12 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
             agencyReferentName: getFormattedFirstnameAndLastname(
               convention.agencyReferent ?? {},
             ),
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             businessName: convention.businessName,
             conventionId: convention.id,
             internshipKind: convention.internshipKind,
@@ -126,7 +129,9 @@ export class NotifyNewConventionNeedsReview extends TransactionalUseCase<WithCon
                 ? "en vérifier l'éligibilité"
                 : "en considérer la validation",
             validatorName: convention.validators?.agencyCounsellor
-              ? concatValidatorNames(convention.validators?.agencyCounsellor)
+              ? getFormattedFirstnameAndLastname(
+                  convention.validators.agencyCounsellor,
+                )
               : "",
             peAdvisor: recipient.peAdvisor,
           },

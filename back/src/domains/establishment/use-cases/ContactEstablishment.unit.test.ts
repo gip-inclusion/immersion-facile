@@ -14,6 +14,7 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
@@ -313,9 +314,9 @@ describe("ContactEstablishment", () => {
               },
               exchanges: [
                 {
-                  subject: `potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
+                  subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
-                  message: `<p>Bonjour ${adminUser.firstName} ${adminUser.lastName},</p>
+                  message: `<p>Bonjour ${getFormattedFirstnameAndLastname({ firstname: adminUser.firstName, lastname: adminUser.lastName })},</p>
               
 <table width="600">
   <tr>
@@ -434,9 +435,9 @@ describe("ContactEstablishment", () => {
               },
               exchanges: [
                 {
-                  subject: `potential_beneficiary_first_name potential_beneficiary_last_name vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
+                  subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
-                  message: `<p>Bonjour ${adminUser.firstName} ${adminUser.lastName},</p>
+                  message: `<p>Bonjour ${getFormattedFirstnameAndLastname({ firstname: adminUser.firstName, lastname: adminUser.lastName })},</p>
               
 <table width="600">
   <tr>

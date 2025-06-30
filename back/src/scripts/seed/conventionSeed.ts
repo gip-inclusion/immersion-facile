@@ -4,6 +4,7 @@ import {
   ConventionDtoBuilder,
   conventionSchema,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   reasonableSchedule,
 } from "shared";
@@ -89,10 +90,16 @@ export const conventionSeed = async (
       sender: immersionFacileNoReplyEmailSender,
       params: {
         agencyLogoUrl: undefined,
-        beneficiaryFirstName:
-          conventionWithAssessmentReadyToFill.signatories.beneficiary.firstName,
-        beneficiaryLastName:
-          conventionWithAssessmentReadyToFill.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname:
+            conventionWithAssessmentReadyToFill.signatories.beneficiary
+              .firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname:
+            conventionWithAssessmentReadyToFill.signatories.beneficiary
+              .lastName,
+        }),
         conventionId: conventionWithAssessmentReadyToFill.id,
         establishmentTutorName: `${conventionWithAssessmentReadyToFill.establishmentTutor.firstName} ${conventionWithAssessmentReadyToFill.establishmentTutor.lastName}`,
         assessmentCreationLink: makeGenerateConventionMagicLinkUrl(

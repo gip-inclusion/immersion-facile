@@ -3,6 +3,7 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   reasonableSchedule,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../../utils/jwtTestHelper";
@@ -123,14 +124,21 @@ describe("NotifyFranceTravailUserAdvisorOnConventionFullySigned", () => {
           recipients: [advisor.email],
           params: {
             conventionId,
-            advisorFirstName: advisor.firstName,
-            advisorLastName: advisor.lastName,
+            advisorFirstName: getFormattedFirstnameAndLastname({
+              firstname: advisor.firstName,
+            }),
+            advisorLastName: getFormattedFirstnameAndLastname({
+              lastname: advisor.lastName,
+            }),
             // biome-ignore lint/style/noNonNullAssertion: <explanation>
             immersionAddress: conventionDtoFromEvent.immersionAddress!,
-            beneficiaryFirstName:
-              conventionDtoFromEvent.signatories.beneficiary.firstName,
-            beneficiaryLastName:
-              conventionDtoFromEvent.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname:
+                conventionDtoFromEvent.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: conventionDtoFromEvent.signatories.beneficiary.lastName,
+            }),
             beneficiaryEmail:
               conventionDtoFromEvent.signatories.beneficiary.email,
             dateStart: conventionDtoFromEvent.dateStart,

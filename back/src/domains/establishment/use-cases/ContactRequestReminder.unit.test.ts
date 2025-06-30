@@ -8,6 +8,7 @@ import {
   cartographeAppellationAndRome,
   createOpaqueEmail,
   expectToEqual,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -378,8 +379,12 @@ const makeEstablishmentContactRequestReminder = (
     discussionId: discussion.id,
     recipient: {
       kind: "potentialBeneficiary",
-      firstname: discussion.potentialBeneficiary.firstName,
-      lastname: discussion.potentialBeneficiary.lastName,
+      firstname: getFormattedFirstnameAndLastname({
+        firstname: discussion.potentialBeneficiary.firstName,
+      }),
+      lastname: getFormattedFirstnameAndLastname({
+        lastname: discussion.potentialBeneficiary.lastName,
+      }),
     },
     replyDomain: `reply.${domain}`,
   });
@@ -387,8 +392,12 @@ const makeEstablishmentContactRequestReminder = (
     kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
     params: {
       appellationLabel: cartographeAppellationAndRome.appellationLabel,
-      beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-      beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+      beneficiaryFirstName: getFormattedFirstnameAndLastname({
+        firstname: discussion.potentialBeneficiary.firstName,
+      }),
+      beneficiaryLastName: getFormattedFirstnameAndLastname({
+        lastname: discussion.potentialBeneficiary.lastName,
+      }),
       beneficiaryReplyToEmail: replyEmail,
       domain,
       mode,
@@ -397,7 +406,10 @@ const makeEstablishmentContactRequestReminder = (
     sender: immersionFacileNoReplyEmailSender,
     replyTo: {
       email: replyEmail,
-      name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+      name: getFormattedFirstnameAndLastname({
+        firstname: discussion.potentialBeneficiary.firstName,
+        lastname: discussion.potentialBeneficiary.lastName,
+      }),
     },
   };
 };

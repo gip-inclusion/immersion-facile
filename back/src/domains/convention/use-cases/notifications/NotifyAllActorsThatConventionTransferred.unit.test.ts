@@ -5,6 +5,7 @@ import {
   InclusionConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -171,8 +172,12 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
           params: {
             internshipKind: convention.internshipKind,
             beneficiaryEmail: convention.signatories.beneficiary.email,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
             beneficiaryPhone: convention.signatories.beneficiary.phone,
             previousAgencyName: previousAgency.name,
             justification: "agency change",

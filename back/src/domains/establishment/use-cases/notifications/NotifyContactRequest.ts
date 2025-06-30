@@ -7,6 +7,7 @@ import {
   contactEstablishmentEventPayloadSchema,
   createOpaqueEmail,
   errors,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 
@@ -117,7 +118,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       recipients: [discussion.establishmentContact.email],
       replyTo: {
         email: opaqueEmail,
-        name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
+        name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
       },
       cc: discussion.establishmentContact.copyEmails.filter(
         (email) => email !== discussion.establishmentContact.email,
