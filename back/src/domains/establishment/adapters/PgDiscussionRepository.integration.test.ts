@@ -4,6 +4,7 @@ import {
   type AppellationAndRomeDto,
   DiscussionBuilder,
   type DiscussionDto,
+  type DiscussionEstablishmentContact,
   type DiscussionInList,
   type Exchange,
   type ImmersionObjective,
@@ -41,6 +42,14 @@ describe("PgDiscussionRepository", () => {
     .withAppellationCode(styliste.appellationCode)
     .withAppellationLabel(styliste.appellationLabel)
     .build();
+
+  const establishmentContactWithoutFirstNameAndLastName: DiscussionEstablishmentContact =
+    {
+      email: "test@test.com",
+      phone: "0123456789",
+      job: "test",
+      copyEmails: [],
+    };
 
   const date = new Date("2023-07-07");
 
@@ -84,6 +93,9 @@ describe("PgDiscussionRepository", () => {
         const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
           .withId(uuid())
           .withCreatedAt(new Date("2024-01-02"))
+          .withEstablishmentContact(
+            establishmentContactWithoutFirstNameAndLastName,
+          )
           .build();
         const discussionWithoutSiret = new DiscussionBuilder()
           .withId(uuid())
