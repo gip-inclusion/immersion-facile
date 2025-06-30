@@ -20,6 +20,7 @@ import {
   UserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
+import { makeHashByRolesForTest } from "../../../utils/emailHash";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import {
   type CreateNewEvent,
@@ -42,9 +43,11 @@ describe("Update Convention", () => {
     .buildUser();
   const validatorUser = new ConnectedUserBuilder()
     .withId("validator-user-id")
+    .withEmail("validator@email.com")
     .buildUser();
   const counsellorUser = new ConnectedUserBuilder()
     .withId("counsellor-user-id")
+    .withEmail("counsellor@email.com")
     .buildUser();
   const agency = new AgencyDtoBuilder().build();
   const convention = new ConventionDtoBuilder()
@@ -100,11 +103,15 @@ describe("Update Convention", () => {
       createNewEvent,
       timeGateway,
     );
+
+    uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
   });
 
   describe("Wrong path", () => {
     describe("when user is not allowed", () => {
       it("throws without jwtPayload", async () => {
+        uow.conventionRepository.setConventions([convention]);
+
         await expectPromiseToFailWithError(
           updateConvention.execute({
             convention,
@@ -141,10 +148,7 @@ describe("Update Convention", () => {
               },
               { userId: connectedUser.id },
             ),
-            errors.user.notEnoughRightOnAgency({
-              userId: connectedUser.id,
-              agencyId: convention.agencyId,
-            }),
+            errors.convention.updateForbidden({ id: convention.id }),
           );
         });
 
@@ -169,10 +173,7 @@ describe("Update Convention", () => {
                 },
                 { userId: connectedUser.id },
               ),
-              errors.user.notEnoughRightOnAgency({
-                userId: connectedUser.id,
-                agencyId: convention.agencyId,
-              }),
+              errors.convention.updateForbidden({ id: convention.id }),
             );
           },
         );
@@ -180,6 +181,8 @@ describe("Update Convention", () => {
 
       describe("with convention jwt payload", () => {
         it("throws if convention id does not match the one in jwt payload", async () => {
+          uow.conventionRepository.setConventions([convention]);
+
           const requestedConventionId = "1dd5c20e-6dd2-45af-affe-927358005250";
           const jwtPayload: ConventionDomainPayload = {
             applicationId: requestedConventionId,
@@ -273,7 +276,11 @@ describe("Update Convention", () => {
             {
               applicationId: storedConvention.id,
               role: "beneficiary",
-              emailHash: "123",
+              emailHash: makeHashByRolesForTest(
+                convention,
+                counsellorUser,
+                validatorUser,
+              ).beneficiary,
             },
           ),
           errors.convention.updateBadStatusInRepo({
@@ -290,6 +297,8 @@ describe("Update Convention", () => {
         const convention = new ConventionDtoBuilder()
           .withStatus(status)
           .build();
+
+        uow.conventionRepository.setConventions([convention]);
 
         await expectPromiseToFailWithError(
           updateConvention.execute(
@@ -332,22 +341,38 @@ describe("Update Convention", () => {
       {
         applicationId: convention.id,
         role: "beneficiary",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        ).beneficiary,
       },
       {
         applicationId: convention.id,
         role: "beneficiary-current-employer",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        )["beneficiary-current-employer"],
       },
       {
         applicationId: convention.id,
         role: "beneficiary-representative",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        )["beneficiary-representative"],
       },
       {
         applicationId: convention.id,
         role: "establishment-representative",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        )["establishment-representative"],
       },
     ] as ConventionDomainPayload[])(
       "updates the Convention in the repository when updated by signatories user",
@@ -406,17 +431,20 @@ describe("Update Convention", () => {
       {
         applicationId: convention.id,
         role: "validator",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        ).validator,
       },
       {
         applicationId: convention.id,
         role: "counsellor",
-        emailHash: "osef",
-      },
-      {
-        applicationId: convention.id,
-        role: "back-office",
-        emailHash: "osef",
+        emailHash: makeHashByRolesForTest(
+          convention,
+          counsellorUser,
+          validatorUser,
+        ).counsellor,
       },
       { userId: backofficeAdminUser.id },
       { userId: validatorUser.id },
