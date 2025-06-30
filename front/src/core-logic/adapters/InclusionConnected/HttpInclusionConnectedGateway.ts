@@ -1,4 +1,4 @@
-import { from, type Observable } from "rxjs";
+import { type Observable, from } from "rxjs";
 import type {
   AbsoluteUrl,
   AgencyId,
@@ -25,13 +25,14 @@ import type {
   FetchDiscussionRequestedPayload,
 } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
-import { match, P } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
 export class HttpInclusionConnectedGateway
-  implements InclusionConnectedGateway {
+  implements InclusionConnectedGateway
+{
   constructor(
     private readonly httpClient: HttpClient<InclusionConnectedAllowedRoutes>,
-  ) { }
+  ) {}
   getDiscussionById$({
     discussionId,
     jwt,

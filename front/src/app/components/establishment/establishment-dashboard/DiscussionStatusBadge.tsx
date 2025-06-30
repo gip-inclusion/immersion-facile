@@ -10,7 +10,10 @@ import {
 export const DiscussionStatusBadge = ({
   discussion,
   id = domElementIds.establishmentDashboard.discussion.statusBadge,
-}: { discussion: DiscussionReadDto | DiscussionInList; id?: string }) => {
+}: {
+  discussion: DiscussionReadDto | DiscussionInList;
+  id?: string;
+}) => {
   const statusBadge =
     statusBadgeData[
       getDiscussionDisplayStatus({
@@ -34,11 +37,11 @@ const statusBadgeData: Record<
 > = {
   new: {
     severity: "info",
-    label: "Nouveau",
+    label: "En cours - Nouveau",
   },
   "needs-answer": {
     severity: "warning",
-    label: "En cours - à répondre",
+    label: "En cours - À répondre",
   },
   "needs-urgent-answer": {
     severity: "error",
@@ -46,7 +49,7 @@ const statusBadgeData: Record<
   },
   answered: {
     severity: "new",
-    label: "En cours - répondu",
+    label: "En cours - Répondu",
   },
   accepted: {
     severity: "success",

@@ -11,3 +11,15 @@ export const useStyleUtils = makeStyles()((_theme) => ({
 export const keys = <T extends string | number | symbol>(
   obj: Partial<Record<T, unknown>>,
 ): T[] => Object.keys(obj) as T[];
+
+export const equals = (x: unknown, y: unknown): boolean => {
+  const ok = Object.keys;
+  const tx = typeof x;
+  const ty = typeof y;
+  return x && y && tx === "object" && tx === ty
+    ? ok(x).length === ok(y).length &&
+        ok(x).every((key) =>
+          equals(x[key as keyof typeof x], y[key as keyof typeof y]),
+        )
+    : x === y;
+};

@@ -7,8 +7,9 @@ import {
 } from "@codegouvfr/react-dsfr/Pagination";
 import { Table, type TableProps } from "@codegouvfr/react-dsfr/Table";
 import { useBreakpointsValuesPx } from "@codegouvfr/react-dsfr/useBreakpointsValuesPx";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useStyles } from "tss-react/dsfr";
+import { useDebounce } from "../../hooks";
 import { Loader } from "../loader";
 import { RichDropdown, type RichDropdownProps } from "../rich-dropdown";
 import Styles from "./RichTable.styles";
@@ -46,6 +47,8 @@ export const RichTable = ({
   const [isFixedOnDesktop, setIsFixedOnDesktop] = useState(
     window.matchMedia(`(min-width: ${lgBreakpoint}px)`).matches,
   );
+  const [searchValue, setSearchValue] = useState("");
+  const debouncedSearchValue = useDebounce(searchValue, 500);
   useLayoutEffect(() => {
     const mediaQuery = window.matchMedia(`(min-width: ${lgBreakpoint}px)`);
     mediaQuery.addEventListener("change", () =>
@@ -57,6 +60,10 @@ export const RichTable = ({
       );
     };
   }, [lgBreakpoint]);
+
+  useEffect(() => {
+    searchBar.onSubmit(debouncedSearchValue);
+  }, [debouncedSearchValue]);
   return (
     <section
       role="tabpanel"
@@ -82,6 +89,9 @@ export const RichTable = ({
               placeholder: searchBar.placeholder,
               role: "search",
               name: "search",
+              onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+                setSearchValue(event.target.value);
+              },
             }}
             className={fr.cx("fr-mb-0")}
           />
