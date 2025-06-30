@@ -25,6 +25,7 @@ import {
   domElementIds,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
+  getFormattedFirstnameAndLastname,
   toDisplayedDate,
 } from "shared";
 import {
@@ -267,8 +268,11 @@ const DiscussionDetails = (props: DiscussionDetailsProps): JSX.Element => {
         >
           <div className={fr.cx("fr-col-12", "fr-col-lg")}>
             <h1>
-              Discussion avec {discussion.potentialBeneficiary.firstName}{" "}
-              {discussion.potentialBeneficiary.lastName}
+              Discussion avec{" "}
+              {getFormattedFirstnameAndLastname({
+                firstname: discussion.potentialBeneficiary.firstName,
+                lastname: discussion.potentialBeneficiary.lastName,
+              })}
             </h1>
           </div>
           {props.discussion.status === "ACCEPTED" &&
@@ -353,7 +357,10 @@ const DiscussionExchangesList = ({
               <h2 className={fr.cx("fr-mb-0", "fr-mb-1v")}>
                 {sender === "establishment"
                   ? `${discussion.businessName}`
-                  : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`}
+                  : getFormattedFirstnameAndLastname({
+                      firstname: discussion.potentialBeneficiary.firstName,
+                      lastname: discussion.potentialBeneficiary.lastName,
+                    })}
               </h2>
             </div>
             <div className={fr.cx("fr-ml-auto")}>
