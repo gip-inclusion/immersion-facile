@@ -348,7 +348,7 @@ const DiscussionExchangesList = ({
   return (
     <section>
       <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
-      {sortedBySentAtDesc.map(({ sender, sentAt, subject, message }) => (
+      {sortedBySentAtDesc.map(({ sender, sentAt, message }) => (
         <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
           <header
             className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
@@ -386,7 +386,6 @@ const DiscussionExchangesList = ({
           </header>
           <hr className={fr.cx("fr-hr")} />
           <section>
-            <h3>{subject}</h3>
             <div
               dangerouslySetInnerHTML={{
                 __html: addLineBreakOnNewLines(convertHtmlToText(message)),
