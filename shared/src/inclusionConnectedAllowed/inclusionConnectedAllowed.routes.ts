@@ -126,7 +126,8 @@ export const inclusionConnectedAllowedRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: withExchangeMessageSchema,
     responses: {
-      200: exchangeSchema.or(discussionExchangeForbiddenParamsSchema),
+      200: exchangeSchema,
+      202: discussionExchangeForbiddenParamsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,

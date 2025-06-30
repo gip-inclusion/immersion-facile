@@ -2,6 +2,7 @@ import { addDays, addHours, subDays } from "date-fns";
 import type { Pool } from "pg";
 import {
   type AppellationAndRomeDto,
+  type ContactMode,
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionEstablishmentContact,
@@ -166,15 +167,15 @@ describe("PgDiscussionRepository", () => {
 
       describe("contactMode filter param", () => {
         const discussionWithContactModeEmail1 = new DiscussionBuilder()
-          .withId(uuid())
+          .withId("83c91c93-deda-4c4b-9b8d-ed1825ee62d9")
           .withContactMode("EMAIL")
           .build();
         const discussionWithContactModeEmail2 = new DiscussionBuilder()
-          .withId(uuid())
+          .withId("958e4ce1-0ed6-4b2c-803b-fa297206ad3a")
           .withContactMode("EMAIL")
           .build();
         const discussionWithContactModeInPerson = new DiscussionBuilder()
-          .withId(uuid())
+          .withId("af11e307-b798-4d8c-9c7d-af5c1f527457")
           .withContactMode("IN_PERSON")
           .build();
 
@@ -186,39 +187,39 @@ describe("PgDiscussionRepository", () => {
           );
         });
 
-        it("include discussions that have contact mode by email", async () => {
+        it.each([
+          {
+            title: "include discussions that have contact mode by email",
+            contactMode: "EMAIL",
+            expectedDiscussions: [
+              discussionWithContactModeEmail1,
+              discussionWithContactModeEmail2,
+            ],
+          },
+          {
+            title: "include discussions that have contact mode in person",
+            contactMode: "IN_PERSON",
+            expectedDiscussions: [discussionWithContactModeInPerson],
+          },
+          {
+            title:
+              "exclude all discussions if no discussions with contact mode by phone",
+            contactMode: "PHONE",
+            expectedDiscussions: [],
+          },
+        ] satisfies {
+          title: string;
+          expectedDiscussions: DiscussionDto[];
+          contactMode: ContactMode;
+        }[])("%title", async ({ contactMode, expectedDiscussions }) => {
           expectToEqual(
             await pgDiscussionRepository.getDiscussions({
               filters: {
-                contactMode: "EMAIL",
+                contactMode,
               },
               limit: 5,
             }),
-            [discussionWithContactModeEmail1, discussionWithContactModeEmail2],
-          );
-        });
-
-        it("include discussions that have contact mode in person", async () => {
-          expectToEqual(
-            await pgDiscussionRepository.getDiscussions({
-              filters: {
-                contactMode: "IN_PERSON",
-              },
-              limit: 5,
-            }),
-            [discussionWithContactModeInPerson],
-          );
-        });
-
-        it("exclude all discussions if no discussions with contact mode by phone", async () => {
-          expectToEqual(
-            await pgDiscussionRepository.getDiscussions({
-              filters: {
-                contactMode: "PHONE",
-              },
-              limit: 5,
-            }),
-            [],
+            expectedDiscussions,
           );
         });
       });

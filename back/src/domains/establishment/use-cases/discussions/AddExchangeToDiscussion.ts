@@ -155,7 +155,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         sender,
       };
 
-      this.#saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         followedIds: {
           userId: userId || undefined,
           establishmentSiret: discussion.siret,
@@ -188,7 +188,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         sender,
       };
 
-      this.#saveNotificationAndRelatedEvent(uow, {
+      await this.#saveNotificationAndRelatedEvent(uow, {
         followedIds: {
           userId: userId || undefined,
           establishmentSiret: discussion.siret,

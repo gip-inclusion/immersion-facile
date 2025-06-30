@@ -816,7 +816,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       ]);
     });
 
-    it("200 - not save the exchange to a discussion - bad discusssion status", async () => {
+    it("202 - not save the exchange to a discussion - bad discusssion status", async () => {
       const payload: ExchangeMessageFromDashboard = {
         message: "My fake message",
       };
@@ -843,7 +843,7 @@ describe("InclusionConnectedAllowedRoutes", () => {
       });
 
       expectHttpResponseToEqual(response, {
-        status: 200,
+        status: 202,
         body: { reason: "discussion_completed", sender: "establishment" },
       });
       expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
