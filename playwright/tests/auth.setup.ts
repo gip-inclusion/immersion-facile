@@ -55,6 +55,8 @@ const loginWithIdentityProvider = async (
     await expect(page.url()).toContain(frontRoutes[routeName]);
   }
 
+  const currentPage = await page.url();
+
   const authButton = await page.locator(`#${proConnectLoginButtonId} .fr-btn`);
   await expect(authButton).toBeVisible();
 
@@ -85,7 +87,7 @@ const loginWithIdentityProvider = async (
         })
         .click();
 
-  await page.waitForURL(`${frontRoutes[routeName]}**`);
+  await page.waitForURL(currentPage);
   expect(page.url()).toContain(frontRoutes[routeName]);
 };
 
