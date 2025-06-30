@@ -1,4 +1,9 @@
-import { type WithConventionDto, errors, withConventionSchema } from "shared";
+import {
+  type WithConventionDto,
+  errors,
+  getFormattedFirstnameAndLastname,
+  withConventionSchema,
+} from "shared";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -43,8 +48,12 @@ export class NotifyAllActorsThatConventionIsCancelled extends TransactionalUseCa
           agencyName: agency.name,
           conventionId: convention.id,
           internshipKind: convention.internshipKind,
-          beneficiaryFirstName: beneficiary.firstName,
-          beneficiaryLastName: beneficiary.lastName,
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: beneficiary.lastName,
+          }),
           businessName: convention.businessName,
           signature: agency.signature,
           immersionProfession: convention.immersionAppellation.appellationLabel,

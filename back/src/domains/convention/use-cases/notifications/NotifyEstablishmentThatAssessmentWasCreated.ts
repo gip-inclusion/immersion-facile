@@ -3,6 +3,7 @@ import {
   type WithAssessmentDto,
   errors,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   withAssessmentSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -52,11 +53,24 @@ export const makeNotifyEstablishmentThatAssessmentWasCreated =
                 ? [convention.signatories.establishmentRepresentative.email]
                 : [convention.establishmentTutor.email],
             params: {
-              beneficiaryFullName: `${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`,
+              beneficiaryFullName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               recipientFullName:
                 role === "establishment-representative"
-                  ? `${convention.signatories.establishmentRepresentative.firstName} ${convention.signatories.establishmentRepresentative.lastName}`
-                  : `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+                  ? `${getFormattedFirstnameAndLastname({
+                      firstname:
+                        convention.signatories.establishmentRepresentative
+                          .firstName,
+                      lastname:
+                        convention.signatories.establishmentRepresentative
+                          .lastName,
+                    })}`
+                  : `${getFormattedFirstnameAndLastname({
+                      firstname: convention.establishmentTutor.firstName,
+                      lastname: convention.establishmentTutor.lastName,
+                    })}`,
               internshipKind: convention.internshipKind,
               businessName: convention.businessName,
               linkToAssessment: generateLink({

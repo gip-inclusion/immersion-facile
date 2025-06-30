@@ -5,6 +5,7 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -111,16 +112,23 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             recipients: [convention.signatories.beneficiary.email],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName: convention.signatories.beneficiary.firstName,
-              signatoryLastName: convention.signatories.beneficiary.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
             },
           },
           {
@@ -130,18 +138,25 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName:
-                convention.signatories.establishmentRepresentative.firstName,
-              signatoryLastName:
-                convention.signatories.establishmentRepresentative.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.establishmentRepresentative.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.establishmentRepresentative.lastName,
+              }),
             },
           },
         ],
@@ -165,16 +180,23 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             recipients: [convention.signatories.beneficiary.email],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
               internshipKind: convention.internshipKind,
               justification: NO_JUSTIFICATION,
-              signatoryFirstName: convention.signatories.beneficiary.firstName,
-              signatoryLastName: convention.signatories.beneficiary.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
             },
           },
           {
@@ -184,18 +206,25 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
               internshipKind: convention.internshipKind,
               justification: NO_JUSTIFICATION,
-              signatoryFirstName:
-                convention.signatories.establishmentRepresentative.firstName,
-              signatoryLastName:
-                convention.signatories.establishmentRepresentative.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.establishmentRepresentative.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.establishmentRepresentative.lastName,
+              }),
             },
           },
         ],
@@ -241,16 +270,23 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             recipients: [convention.signatories.beneficiary.email],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName: convention.signatories.beneficiary.firstName,
-              signatoryLastName: convention.signatories.beneficiary.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
             },
           },
           {
@@ -260,18 +296,25 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName:
-                convention.signatories.establishmentRepresentative.firstName,
-              signatoryLastName:
-                convention.signatories.establishmentRepresentative.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.establishmentRepresentative.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.establishmentRepresentative.lastName,
+              }),
             },
           },
           {
@@ -282,20 +325,32 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[2]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryRepresentative!.firstName,
-              signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryRepresentative!.lastName,
+              signatoryFirstName: convention.signatories
+                .beneficiaryRepresentative
+                ? getFormattedFirstnameAndLastname({
+                    firstname:
+                      convention.signatories.beneficiaryRepresentative
+                        .firstName,
+                  })
+                : "",
+              signatoryLastName: convention.signatories
+                .beneficiaryRepresentative
+                ? getFormattedFirstnameAndLastname({
+                    lastname:
+                      convention.signatories.beneficiaryRepresentative.lastName,
+                  })
+                : "",
             },
           },
           {
@@ -306,21 +361,33 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             ],
             params: {
               agencyLogoUrl: agency.logoUrl ?? undefined,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               businessName: convention.businessName,
               conventionId: convention.id,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[3]),
               internshipKind: convention.internshipKind,
               justification,
-              signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryCurrentEmployer!.firstName,
-
-              signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryCurrentEmployer!.lastName,
+              signatoryFirstName: convention.signatories
+                .beneficiaryCurrentEmployer
+                ? getFormattedFirstnameAndLastname({
+                    firstname:
+                      convention.signatories.beneficiaryCurrentEmployer
+                        .firstName,
+                  })
+                : "",
+              signatoryLastName: convention.signatories
+                .beneficiaryCurrentEmployer
+                ? getFormattedFirstnameAndLastname({
+                    lastname:
+                      convention.signatories.beneficiaryCurrentEmployer
+                        .lastName,
+                  })
+                : "",
             },
           },
         ],
@@ -357,8 +424,12 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
         .build();
       const commonEmailParams = {
         agencyLogoUrl: agency.logoUrl ?? undefined,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.signatories.beneficiary.lastName,
+        }),
         businessName: convention.businessName,
         conventionId: convention.id,
         internshipKind: convention.internshipKind,
@@ -378,10 +449,14 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             params: {
               ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[0]),
-              signatoryFirstName:
-                convention.signatories.establishmentRepresentative.firstName,
-              signatoryLastName:
-                convention.signatories.establishmentRepresentative.lastName,
+              signatoryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  convention.signatories.establishmentRepresentative.firstName,
+              }),
+              signatoryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  convention.signatories.establishmentRepresentative.lastName,
+              }),
             },
           },
           {
@@ -393,12 +468,21 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             params: {
               ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[1]),
-              signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryRepresentative!.firstName,
-              signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryRepresentative!.lastName,
+              signatoryFirstName: convention.signatories
+                .beneficiaryRepresentative
+                ? getFormattedFirstnameAndLastname({
+                    firstname:
+                      convention.signatories.beneficiaryRepresentative
+                        .firstName,
+                  })
+                : "",
+              signatoryLastName: convention.signatories
+                .beneficiaryRepresentative
+                ? getFormattedFirstnameAndLastname({
+                    lastname:
+                      convention.signatories.beneficiaryRepresentative.lastName,
+                  })
+                : "",
             },
           },
           {
@@ -410,12 +494,22 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
             params: {
               ...commonEmailParams,
               conventionSignShortlink: makeShortLinkUrl(config, shortLinks[2]),
-              signatoryFirstName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryCurrentEmployer!.firstName,
-              signatoryLastName:
-                // biome-ignore lint/style/noNonNullAssertion:
-                convention.signatories.beneficiaryCurrentEmployer!.lastName,
+              signatoryFirstName: convention.signatories
+                .beneficiaryCurrentEmployer
+                ? getFormattedFirstnameAndLastname({
+                    firstname:
+                      convention.signatories.beneficiaryCurrentEmployer
+                        .firstName,
+                  })
+                : "",
+              signatoryLastName: convention.signatories
+                .beneficiaryCurrentEmployer
+                ? getFormattedFirstnameAndLastname({
+                    lastname:
+                      convention.signatories.beneficiaryCurrentEmployer
+                        .lastName,
+                  })
+                : "",
             },
           },
         ],

@@ -767,8 +767,12 @@ const makeAgencyFirstReminderEmail = ({
     ),
     conventionId: convention.id,
     agencyName: agency.name,
-    beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-    beneficiaryLastName: convention.signatories.beneficiary.lastName,
+    beneficiaryFirstName: getFormattedFirstnameAndLastname({
+      firstname: convention.signatories.beneficiary.firstName,
+    }),
+    beneficiaryLastName: getFormattedFirstnameAndLastname({
+      lastname: convention.signatories.beneficiary.lastName,
+    }),
     businessName: convention.businessName,
     dateStart: convention.dateStart,
     dateEnd: convention.dateEnd,
@@ -792,8 +796,12 @@ const makeAgencyLastReminderEmail = ({
     agencyReferentName: getFormattedFirstnameAndLastname(
       convention.agencyReferent ?? {},
     ),
-    beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-    beneficiaryLastName: convention.signatories.beneficiary.lastName,
+    beneficiaryFirstName: getFormattedFirstnameAndLastname({
+      firstname: convention.signatories.beneficiary.firstName,
+    }),
+    beneficiaryLastName: getFormattedFirstnameAndLastname({
+      lastname: convention.signatories.beneficiary.lastName,
+    }),
     businessName: convention.businessName,
     agencyMagicLinkUrl: shortLinkUrl,
   },
@@ -812,10 +820,18 @@ const makeSignatoriesLastReminderEmail = ({
   recipients: [actor.email],
   params: {
     conventionId: convention.id,
-    actorFirstName: actor.firstName,
-    actorLastName: actor.lastName,
-    beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-    beneficiaryLastName: convention.signatories.beneficiary.lastName,
+    actorFirstName: getFormattedFirstnameAndLastname({
+      firstname: actor.firstName,
+    }),
+    actorLastName: getFormattedFirstnameAndLastname({
+      lastname: actor.lastName,
+    }),
+    beneficiaryFirstName: getFormattedFirstnameAndLastname({
+      firstname: convention.signatories.beneficiary.firstName,
+    }),
+    beneficiaryLastName: getFormattedFirstnameAndLastname({
+      lastname: convention.signatories.beneficiary.lastName,
+    }),
     businessName: convention.businessName,
     signatoriesSummary: toSignatoriesSummary(convention).join("\n"),
     magicLinkUrl: shortlinkUrl,

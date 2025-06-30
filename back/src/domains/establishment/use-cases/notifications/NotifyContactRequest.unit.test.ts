@@ -8,6 +8,7 @@ import {
   addressDtoToString,
   errors,
   expectPromiseToFailWithError,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
 import {
@@ -104,7 +105,7 @@ describe("NotifyContactRequest", () => {
                 sender: immersionFacileNoReplyEmailSender,
                 replyTo: {
                   email: expectedReplyToEmail,
-                  name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName} - via Immersion Facilitée`,
+                  name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
                 },
                 params:
                   discussion.kind === "IF"
@@ -113,8 +114,12 @@ describe("NotifyContactRequest", () => {
                         appellationLabel: TEST_APPELLATION_LABEL,
                         businessAddress: addressDtoToString(discussion.address),
                         businessName: discussion.businessName,
-                        contactFirstName: establishmentContact.firstName,
-                        contactLastName: establishmentContact.lastName,
+                        contactFirstName: getFormattedFirstnameAndLastname({
+                          firstname: establishmentContact.firstName,
+                        }),
+                        contactLastName: getFormattedFirstnameAndLastname({
+                          lastname: establishmentContact.lastName,
+                        }),
                         discussionId: discussion.id,
                         kind: discussion.kind,
                         domain,
@@ -122,9 +127,14 @@ describe("NotifyContactRequest", () => {
                           discussion.potentialBeneficiary.immersionObjective ??
                           undefined,
                         potentialBeneficiaryFirstName:
-                          discussion.potentialBeneficiary.firstName,
+                          getFormattedFirstnameAndLastname({
+                            firstname:
+                              discussion.potentialBeneficiary.firstName,
+                          }),
                         potentialBeneficiaryLastName:
-                          discussion.potentialBeneficiary.lastName,
+                          getFormattedFirstnameAndLastname({
+                            lastname: discussion.potentialBeneficiary.lastName,
+                          }),
                         potentialBeneficiaryDatePreferences:
                           discussion.potentialBeneficiary.datePreferences,
                         potentialBeneficiaryPhone:
@@ -142,17 +152,26 @@ describe("NotifyContactRequest", () => {
                         appellationLabel: TEST_APPELLATION_LABEL,
                         businessAddress: addressDtoToString(discussion.address),
                         businessName: discussion.businessName,
-                        contactFirstName: establishmentContact.firstName,
-                        contactLastName: establishmentContact.lastName,
+                        contactFirstName: getFormattedFirstnameAndLastname({
+                          firstname: establishmentContact.firstName,
+                        }),
+                        contactLastName: getFormattedFirstnameAndLastname({
+                          lastname: establishmentContact.lastName,
+                        }),
                         discussionId: discussion.id,
                         kind: discussion.kind,
                         domain,
                         immersionObjective:
                           discussion.potentialBeneficiary.immersionObjective,
                         potentialBeneficiaryFirstName:
-                          discussion.potentialBeneficiary.firstName,
+                          getFormattedFirstnameAndLastname({
+                            firstname:
+                              discussion.potentialBeneficiary.firstName,
+                          }),
                         potentialBeneficiaryLastName:
-                          discussion.potentialBeneficiary.lastName,
+                          getFormattedFirstnameAndLastname({
+                            lastname: discussion.potentialBeneficiary.lastName,
+                          }),
                         potentialBeneficiaryDatePreferences:
                           discussion.potentialBeneficiary.datePreferences,
                         potentialBeneficiaryPhone:

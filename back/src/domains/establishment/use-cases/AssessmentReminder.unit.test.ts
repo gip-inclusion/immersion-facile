@@ -8,6 +8,7 @@ import {
   type DateString,
   type Notification,
   expectObjectInArrayToMatch,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -168,13 +169,18 @@ describe("AssessmentReminder", () => {
             params: {
               conventionId: convention.id,
               internshipKind: convention.internshipKind,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              establishmentTutorFirstName:
-                convention.establishmentTutor.firstName,
-              establishmentTutorLastName:
-                convention.establishmentTutor.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              establishmentTutorFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.establishmentTutor.firstName,
+              }),
+              establishmentTutorLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.establishmentTutor.lastName,
+              }),
               assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
             },
             recipients: [convention.establishmentTutor.email],
@@ -212,13 +218,18 @@ describe("AssessmentReminder", () => {
             params: {
               conventionId: convention.id,
               internshipKind: convention.internshipKind,
-              beneficiaryFirstName:
-                convention.signatories.beneficiary.firstName,
-              beneficiaryLastName: convention.signatories.beneficiary.lastName,
-              establishmentTutorFirstName:
-                convention.establishmentTutor.firstName,
-              establishmentTutorLastName:
-                convention.establishmentTutor.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
+              establishmentTutorFirstName: getFormattedFirstnameAndLastname({
+                firstname: convention.establishmentTutor.firstName,
+              }),
+              establishmentTutorLastName: getFormattedFirstnameAndLastname({
+                lastname: convention.establishmentTutor.lastName,
+              }),
               assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-2`,
             },
             recipients: [convention.establishmentTutor.email],

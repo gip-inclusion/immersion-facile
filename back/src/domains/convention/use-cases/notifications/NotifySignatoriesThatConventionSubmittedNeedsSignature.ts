@@ -9,6 +9,7 @@ import {
   errors,
   filterNotFalsy,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -132,16 +133,34 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignature extends Tran
       params: {
         conventionId: convention.id,
         internshipKind: convention.internshipKind,
-        signatoryName: `${signatory.firstName} ${signatory.lastName}`,
-        beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+        signatoryName: getFormattedFirstnameAndLastname({
+          firstname: signatory.firstName,
+          lastname: signatory.lastName,
+        }),
+        beneficiaryName: getFormattedFirstnameAndLastname({
+          firstname: beneficiary.firstName,
+          lastname: beneficiary.lastName,
+        }),
+        establishmentTutorName: getFormattedFirstnameAndLastname({
+          firstname: convention.establishmentTutor.firstName,
+          lastname: convention.establishmentTutor.lastName,
+        }),
+        establishmentRepresentativeName: getFormattedFirstnameAndLastname({
+          firstname: establishmentRepresentative.firstName,
+          lastname: establishmentRepresentative.lastName,
+        }),
         beneficiaryRepresentativeName:
           beneficiaryRepresentative &&
-          `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
+          getFormattedFirstnameAndLastname({
+            firstname: beneficiaryRepresentative.firstName,
+            lastname: beneficiaryRepresentative.lastName,
+          }),
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
-          `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
+          getFormattedFirstnameAndLastname({
+            lastname: beneficiaryCurrentEmployer.lastName,
+            firstname: beneficiaryCurrentEmployer.firstName,
+          }),
         conventionSignShortlink: await makeMagicShortLink({
           targetRoute: frontRoutes.conventionToSign,
           lifetime: "short",

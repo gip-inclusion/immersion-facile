@@ -4,6 +4,7 @@ import {
   errors,
   expectPromiseToFailWithError,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import { fakeGenerateMagicLinkUrlFn } from "../../../../utils/jwtTestHelper";
 import {
@@ -93,8 +94,14 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
           kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
           recipients: [establishmentRepresentative.email],
           params: {
-            beneficiaryFullName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-            recipientFullName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+            beneficiaryFullName: getFormattedFirstnameAndLastname({
+              firstname: beneficiary.firstName,
+              lastname: beneficiary.lastName,
+            }),
+            recipientFullName: getFormattedFirstnameAndLastname({
+              firstname: establishmentRepresentative.firstName,
+              lastname: establishmentRepresentative.lastName,
+            }),
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             linkToAssessment: fakeGenerateMagicLinkUrlFn({
@@ -111,8 +118,14 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
           kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
           recipients: [establishmentTutor.email],
           params: {
-            beneficiaryFullName: `${convention.signatories.beneficiary.firstName} ${convention.signatories.beneficiary.lastName}`,
-            recipientFullName: `${establishmentTutor.firstName} ${establishmentTutor.lastName}`,
+            beneficiaryFullName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
+            recipientFullName: getFormattedFirstnameAndLastname({
+              firstname: establishmentTutor.firstName,
+              lastname: establishmentTutor.lastName,
+            }),
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             linkToAssessment: fakeGenerateMagicLinkUrlFn({
@@ -155,8 +168,14 @@ describe("NotifyEstablishmentThatAssessmentWasCreated", () => {
           kind: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
           recipients: [establishmentRepresentative.email],
           params: {
-            beneficiaryFullName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-            recipientFullName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+            beneficiaryFullName: getFormattedFirstnameAndLastname({
+              firstname: beneficiary.firstName,
+              lastname: beneficiary.lastName,
+            }),
+            recipientFullName: getFormattedFirstnameAndLastname({
+              firstname: establishmentRepresentative.firstName,
+              lastname: establishmentRepresentative.lastName,
+            }),
             internshipKind: convention.internshipKind,
             businessName: convention.businessName,
             linkToAssessment: fakeGenerateMagicLinkUrlFn({

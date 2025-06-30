@@ -8,6 +8,7 @@ import {
   type WithConventionDto,
   filterNotFalsy,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -94,8 +95,12 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
       recipients: [signatory.email],
       params: {
         agencyLogoUrl: agency.logoUrl ?? undefined,
-        beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-        beneficiaryLastName: convention.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: convention.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: convention.signatories.beneficiary.lastName,
+        }),
         businessName: convention.businessName,
         conventionId: convention.id,
         conventionSignShortlink: await prepareConventionMagicShortLinkMaker({
@@ -117,8 +122,12 @@ export class NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModifica
           },
         }),
         justification: convention.statusJustification ?? NO_JUSTIFICATION,
-        signatoryFirstName: signatory.firstName,
-        signatoryLastName: signatory.lastName,
+        signatoryFirstName: getFormattedFirstnameAndLastname({
+          firstname: signatory.firstName,
+        }),
+        signatoryLastName: getFormattedFirstnameAndLastname({
+          lastname: signatory.lastName,
+        }),
         internshipKind: convention.internshipKind,
       },
     };

@@ -99,10 +99,12 @@ describe("SendAssessmentNeededNotifications", () => {
         agencyReferentName: getFormattedFirstnameAndLastname(
           conventionEndingTomorrow.agencyReferent ?? {},
         ),
-        beneficiaryFirstName:
-          conventionEndingTomorrow.signatories.beneficiary.firstName,
-        beneficiaryLastName:
-          conventionEndingTomorrow.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: conventionEndingTomorrow.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: conventionEndingTomorrow.signatories.beneficiary.lastName,
+        }),
         conventionId: conventionEndingTomorrow.id,
         businessName: conventionEndingTomorrow.businessName,
         assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
@@ -128,10 +130,12 @@ describe("SendAssessmentNeededNotifications", () => {
         agencyReferentName: getFormattedFirstnameAndLastname(
           conventionEndingTomorrow.agencyReferent ?? {},
         ),
-        beneficiaryFirstName:
-          conventionEndingTomorrow.signatories.beneficiary.firstName,
-        beneficiaryLastName:
-          conventionEndingTomorrow.signatories.beneficiary.lastName,
+        beneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: conventionEndingTomorrow.signatories.beneficiary.firstName,
+        }),
+        beneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: conventionEndingTomorrow.signatories.beneficiary.lastName,
+        }),
         conventionId: conventionEndingTomorrow.id,
         businessName: conventionEndingTomorrow.businessName,
         assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
@@ -210,12 +214,20 @@ describe("SendAssessmentNeededNotifications", () => {
             params: {
               // biome-ignore lint/style/noNonNullAssertion: <explanation>
               agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingTomorrow.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionEndingTomorrow.signatories.beneficiary.lastName,
+              }),
               conventionId: conventionEndingTomorrow.id,
-              establishmentTutorName: `${conventionEndingTomorrow.establishmentTutor.firstName} ${conventionEndingTomorrow.establishmentTutor.lastName}`,
+              establishmentTutorName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingTomorrow.establishmentTutor.firstName,
+                lastname: conventionEndingTomorrow.establishmentTutor.lastName,
+              }),
               assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
                 email: conventionEndingTomorrow.establishmentTutor.email,
                 id: conventionEndingTomorrow.id,
@@ -236,10 +248,14 @@ describe("SendAssessmentNeededNotifications", () => {
             kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
             params: {
               conventionId: conventionEndingTomorrow.id,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionEndingTomorrow.signatories.beneficiary.lastName,
+              }),
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingTomorrow.signatories.beneficiary.firstName,
+              }),
               businessName: conventionEndingTomorrow.businessName,
               internshipKind: conventionEndingTomorrow.internshipKind,
               establishmentTutorEmail:
@@ -318,12 +334,21 @@ describe("SendAssessmentNeededNotifications", () => {
             params: {
               // biome-ignore lint/style/noNonNullAssertion: <explanation>
               agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionCCIEndingTomorrow.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionCCIEndingTomorrow.signatories.beneficiary.lastName,
+              }),
               conventionId: conventionCCIEndingTomorrow.id,
-              establishmentTutorName: `${conventionCCIEndingTomorrow.establishmentTutor.firstName} ${conventionCCIEndingTomorrow.establishmentTutor.lastName}`,
+              establishmentTutorName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionCCIEndingTomorrow.establishmentTutor.lastName,
+                firstname:
+                  conventionCCIEndingTomorrow.establishmentTutor.firstName,
+              }),
               assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
                 email: conventionCCIEndingTomorrow.establishmentTutor.email,
                 id: conventionCCIEndingTomorrow.id,
@@ -343,10 +368,14 @@ describe("SendAssessmentNeededNotifications", () => {
             kind: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
             params: {
               conventionId: conventionCCIEndingTomorrow.id,
-              beneficiaryLastName:
-                conventionCCIEndingTomorrow.signatories.beneficiary.lastName,
-              beneficiaryFirstName:
-                conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionCCIEndingTomorrow.signatories.beneficiary.lastName,
+              }),
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionCCIEndingTomorrow.signatories.beneficiary.firstName,
+              }),
               businessName: conventionCCIEndingTomorrow.businessName,
               internshipKind: conventionCCIEndingTomorrow.internshipKind,
               establishmentTutorEmail:
@@ -458,12 +487,20 @@ describe("SendAssessmentNeededNotifications", () => {
             params: {
               // biome-ignore lint/style/noNonNullAssertion: <explanation>
               agencyLogoUrl: agency.logoUrl!,
-              beneficiaryFirstName:
-                conventionEndingTomorrow.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionEndingTomorrow.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingTomorrow.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionEndingTomorrow.signatories.beneficiary.lastName,
+              }),
               conventionId: conventionEndingTomorrow.id,
-              establishmentTutorName: `${conventionEndingTomorrow.establishmentTutor.firstName} ${conventionEndingTomorrow.establishmentTutor.lastName}`,
+              establishmentTutorName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionEndingTomorrow.establishmentTutor.firstName,
+                lastname: conventionEndingTomorrow.establishmentTutor.lastName,
+              }),
               assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
                 email: conventionEndingTomorrow.establishmentTutor.email,
                 id: conventionEndingTomorrow.id,
@@ -531,12 +568,19 @@ describe("SendAssessmentNeededNotifications", () => {
               role: "establishment-tutor",
               now,
             }),
-            beneficiaryFirstName:
-              conventionEndingYesterday.signatories.beneficiary.firstName,
-            beneficiaryLastName:
-              conventionEndingYesterday.signatories.beneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname:
+                conventionEndingYesterday.signatories.beneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname:
+                conventionEndingYesterday.signatories.beneficiary.lastName,
+            }),
             conventionId: conventionEndingYesterday.id,
-            establishmentTutorName: `${conventionEndingYesterday.establishmentTutor.firstName} ${conventionEndingYesterday.establishmentTutor.lastName}`,
+            establishmentTutorName: getFormattedFirstnameAndLastname({
+              firstname: conventionEndingYesterday.establishmentTutor.firstName,
+              lastname: conventionEndingYesterday.establishmentTutor.lastName,
+            }),
             agencyLogoUrl: undefined,
           },
           recipients: [conventionEndingYesterday.establishmentTutor.email],

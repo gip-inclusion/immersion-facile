@@ -3,6 +3,7 @@ import {
   type DateRange,
   type DiscussionDto,
   createOpaqueEmail,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   isTruthy,
 } from "shared";
@@ -111,12 +112,19 @@ const makeNotification = async ({
           recipients: [discussion.establishmentContact.email],
           replyTo: {
             email: replyTo,
-            name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+            name: getFormattedFirstnameAndLastname({
+              firstname: discussion.potentialBeneficiary.firstName,
+              lastname: discussion.potentialBeneficiary.lastName,
+            }),
           },
           params: {
             appellationLabel: appellation.appellationLabel,
-            beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
-            beneficiaryLastName: discussion.potentialBeneficiary.lastName,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: discussion.potentialBeneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: discussion.potentialBeneficiary.lastName,
+            }),
             beneficiaryReplyToEmail: replyTo,
             domain,
             mode,

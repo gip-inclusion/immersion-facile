@@ -6,6 +6,7 @@ import {
   type Role,
   errors,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -174,8 +175,12 @@ const sendAgencyEmails = (
         params: {
           internshipKind: convention.internshipKind,
           beneficiaryEmail: convention.signatories.beneficiary.email,
-          beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-          beneficiaryLastName: convention.signatories.beneficiary.lastName,
+          beneficiaryFirstName: getFormattedFirstnameAndLastname({
+            firstname: convention.signatories.beneficiary.firstName,
+          }),
+          beneficiaryLastName: getFormattedFirstnameAndLastname({
+            lastname: convention.signatories.beneficiary.lastName,
+          }),
           beneficiaryPhone: convention.signatories.beneficiary.phone,
           previousAgencyName,
           justification,

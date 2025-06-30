@@ -20,9 +20,9 @@ import {
   type Notification,
   type SiretDto,
   type UserWithAdminRights,
-  concatValidatorNames,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
+  getFormattedFirstnameAndLastname,
   reasonableSchedule,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -115,7 +115,9 @@ describe("Pg implementation of ConventionQueries", () => {
               magicLink: "",
               assessmentMagicLink: "",
               validatorName: convention.validators?.agencyValidator
-                ? concatValidatorNames(convention.validators?.agencyValidator)
+                ? getFormattedFirstnameAndLastname(
+                    convention.validators.agencyValidator,
+                  )
                 : "",
             },
             recipients: ["joe-joe@gmail.com"],

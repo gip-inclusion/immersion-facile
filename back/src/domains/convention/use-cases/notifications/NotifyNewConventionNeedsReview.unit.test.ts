@@ -146,10 +146,12 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
-              beneficiaryFirstName:
-                conventionInReview.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionInReview.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: conventionInReview.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: conventionInReview.signatories.beneficiary.lastName,
+              }),
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
@@ -201,10 +203,12 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
-              beneficiaryFirstName:
-                conventionInReview.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionInReview.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: conventionInReview.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: conventionInReview.signatories.beneficiary.lastName,
+              }),
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
@@ -223,10 +227,12 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReview.id,
               internshipKind: conventionInReview.internshipKind,
-              beneficiaryFirstName:
-                conventionInReview.signatories.beneficiary.firstName,
-              beneficiaryLastName:
-                conventionInReview.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname: conventionInReview.signatories.beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname: conventionInReview.signatories.beneficiary.lastName,
+              }),
               businessName: conventionInReview.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
@@ -291,12 +297,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en vérifier l'éligibilité",
@@ -377,12 +387,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
@@ -404,12 +418,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
@@ -431,12 +449,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: conventionInReviewWithFtAdvisor.id,
               internshipKind: conventionInReviewWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                conventionInReviewWithFtAdvisor.signatories.beneficiary
-                  .lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionInReviewWithFtAdvisor.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: conventionInReviewWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[2]),
               possibleRoleAction: "en considérer la validation",
@@ -502,11 +524,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: acceptedByCounsellorConvention.id,
               internshipKind: acceptedByCounsellorConvention.internshipKind,
-              beneficiaryFirstName:
-                acceptedByCounsellorConvention.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                acceptedByCounsellorConvention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  acceptedByCounsellorConvention.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  acceptedByCounsellorConvention.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: acceptedByCounsellorConvention.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
               possibleRoleAction: "en considérer la validation",
@@ -524,11 +551,16 @@ describe("NotifyConventionNeedsReview", () => {
               ),
               conventionId: acceptedByCounsellorConvention.id,
               internshipKind: acceptedByCounsellorConvention.internshipKind,
-              beneficiaryFirstName:
-                acceptedByCounsellorConvention.signatories.beneficiary
-                  .firstName,
-              beneficiaryLastName:
-                acceptedByCounsellorConvention.signatories.beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  acceptedByCounsellorConvention.signatories.beneficiary
+                    .firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  acceptedByCounsellorConvention.signatories.beneficiary
+                    .lastName,
+              }),
               businessName: acceptedByCounsellorConvention.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
               possibleRoleAction: "en considérer la validation",
@@ -623,12 +655,16 @@ describe("NotifyConventionNeedsReview", () => {
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:
                 conventionAcceptedByCounsellorWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.firstName,
-              beneficiaryLastName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.lastName,
+              }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[0]),
@@ -653,12 +689,16 @@ describe("NotifyConventionNeedsReview", () => {
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:
                 conventionAcceptedByCounsellorWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.firstName,
-              beneficiaryLastName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.lastName,
+              }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[1]),
@@ -683,12 +723,16 @@ describe("NotifyConventionNeedsReview", () => {
               conventionId: conventionAcceptedByCounsellorWithFtAdvisor.id,
               internshipKind:
                 conventionAcceptedByCounsellorWithFtAdvisor.internshipKind,
-              beneficiaryFirstName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.firstName,
-              beneficiaryLastName:
-                conventionAcceptedByCounsellorWithFtAdvisor.signatories
-                  .beneficiary.lastName,
+              beneficiaryFirstName: getFormattedFirstnameAndLastname({
+                firstname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.firstName,
+              }),
+              beneficiaryLastName: getFormattedFirstnameAndLastname({
+                lastname:
+                  conventionAcceptedByCounsellorWithFtAdvisor.signatories
+                    .beneficiary.lastName,
+              }),
               businessName:
                 conventionAcceptedByCounsellorWithFtAdvisor.businessName,
               magicLink: makeShortLinkUrl(config, shortLinkIds[2]),

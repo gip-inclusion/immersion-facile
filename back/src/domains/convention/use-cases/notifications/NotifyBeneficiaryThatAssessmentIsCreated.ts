@@ -2,6 +2,7 @@ import {
   type WithAssessmentDto,
   errors,
   frontRoutes,
+  getFormattedFirstnameAndLastname,
   withAssessmentSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
@@ -46,8 +47,12 @@ export const makeNotifyBeneficiaryThatAssessmentIsCreated =
           params: {
             internshipKind: convention.internshipKind,
             conventionId: convention.id,
-            beneficiaryLastName: convention.signatories.beneficiary.lastName,
-            beneficiaryFirstName: convention.signatories.beneficiary.firstName,
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: convention.signatories.beneficiary.lastName,
+            }),
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: convention.signatories.beneficiary.firstName,
+            }),
             magicLink: deps.generateConventionMagicLinkUrl({
               id: convention.id,
               email: convention.signatories.beneficiary.email,

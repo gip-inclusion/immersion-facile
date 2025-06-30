@@ -151,8 +151,12 @@ export class NotifyToAgencyConventionSubmitted extends TransactionalUseCase<
               dateEnd: convention.dateEnd,
               dateStart: convention.dateStart,
               conventionId: convention.id,
-              firstName: convention.signatories.beneficiary.firstName,
-              lastName: convention.signatories.beneficiary.lastName,
+              firstName: getFormattedFirstnameAndLastname({
+                firstname: convention.signatories.beneficiary.firstName,
+              }),
+              lastName: getFormattedFirstnameAndLastname({
+                lastname: convention.signatories.beneficiary.lastName,
+              }),
               magicLink: await makeMagicShortLink({
                 targetRoute: frontRoutes.manageConvention,
                 lifetime: "short",

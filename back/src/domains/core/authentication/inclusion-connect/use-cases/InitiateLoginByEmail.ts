@@ -1,6 +1,7 @@
 import {
   type AuthenticateWithOAuthCodeParams,
   type InitiateLoginByEmailParams,
+  getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
   initiateLoginByEmailParamsSchema,
   queryParamsAsString,
@@ -60,7 +61,7 @@ export const makeInitiateLoginByEmail = createTransactionalUseCase<
             })}`,
             fullname:
               user?.firstName && user.lastName
-                ? `${user.firstName} ${user.lastName}`
+                ? `${getFormattedFirstnameAndLastname({ firstname: user.firstName, lastname: user.lastName })}`
                 : "",
           },
         },

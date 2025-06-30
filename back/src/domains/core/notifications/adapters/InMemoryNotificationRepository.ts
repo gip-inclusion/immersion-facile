@@ -12,10 +12,10 @@ import {
   type Signatory,
   type SmsNotification,
   type TemplatedEmail,
-  concatValidatorNames,
   displayEmergencyContactInfos,
   errors,
   expectToEqual,
+  getFormattedFirstnameAndLastname,
   replaceElementWhere,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -200,16 +200,34 @@ export const expectEmailSignatoryConfirmationSignatureRequestMatchingConvention 
       params: {
         conventionId: convention.id,
         internshipKind: convention.internshipKind,
-        signatoryName: `${signatory.firstName} ${signatory.lastName}`,
-        beneficiaryName: `${beneficiary.firstName} ${beneficiary.lastName}`,
-        establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
-        establishmentRepresentativeName: `${establishmentRepresentative.firstName} ${establishmentRepresentative.lastName}`,
+        signatoryName: getFormattedFirstnameAndLastname({
+          firstname: signatory.firstName,
+          lastname: signatory.lastName,
+        }),
+        beneficiaryName: getFormattedFirstnameAndLastname({
+          firstname: beneficiary.firstName,
+          lastname: beneficiary.lastName,
+        }),
+        establishmentTutorName: getFormattedFirstnameAndLastname({
+          firstname: convention.establishmentTutor.firstName,
+          lastname: convention.establishmentTutor.lastName,
+        }),
+        establishmentRepresentativeName: getFormattedFirstnameAndLastname({
+          firstname: establishmentRepresentative.firstName,
+          lastname: establishmentRepresentative.lastName,
+        }),
         beneficiaryRepresentativeName:
           beneficiaryRepresentative &&
-          `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
+          getFormattedFirstnameAndLastname({
+            firstname: beneficiaryRepresentative.firstName,
+            lastname: beneficiaryRepresentative.lastName,
+          }),
         beneficiaryCurrentEmployerName:
           beneficiaryCurrentEmployer &&
-          `${beneficiaryCurrentEmployer.firstName} ${beneficiaryCurrentEmployer.lastName}`,
+          getFormattedFirstnameAndLastname({
+            firstname: beneficiaryCurrentEmployer.firstName,
+            lastname: beneficiaryCurrentEmployer.lastName,
+          }),
         conventionSignShortlink: makeShortLinkUrl(
           config,
           conventionToSignLinkId,
@@ -235,12 +253,19 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
     params: {
       conventionId: convention.id,
       internshipKind: convention.internshipKind,
-      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      beneficiaryFirstName: getFormattedFirstnameAndLastname({
+        firstname: convention.signatories.beneficiary.firstName,
+      }),
+      beneficiaryLastName: getFormattedFirstnameAndLastname({
+        lastname: convention.signatories.beneficiary.lastName,
+      }),
       beneficiaryBirthdate: convention.signatories.beneficiary.birthdate,
       dateStart: parseISO(convention.dateStart).toLocaleDateString("fr"),
       dateEnd: parseISO(convention.dateEnd).toLocaleDateString("fr"),
-      establishmentTutorName: `${convention.establishmentTutor.firstName} ${convention.establishmentTutor.lastName}`,
+      establishmentTutorName: getFormattedFirstnameAndLastname({
+        firstname: convention.establishmentTutor.firstName,
+        lastname: convention.establishmentTutor.lastName,
+      }),
       businessName: convention.businessName,
       immersionAppellationLabel:
         convention.immersionAppellation.appellationLabel,
@@ -255,7 +280,9 @@ export const expectEmailFinalValidationConfirmationParamsMatchingConvention = (
         ? makeShortLinkUrl(config, assessmentShortlink)
         : undefined,
       validatorName: convention.validators?.agencyValidator
-        ? concatValidatorNames(convention.validators?.agencyValidator)
+        ? getFormattedFirstnameAndLastname(
+            convention.validators.agencyValidator,
+          )
         : "",
     },
   });
@@ -273,8 +300,12 @@ export const expectNotifyConventionRejected = (
       agencyName: agency.name,
       conventionId: convention.id,
       internshipKind: convention.internshipKind,
-      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      beneficiaryFirstName: getFormattedFirstnameAndLastname({
+        firstname: convention.signatories.beneficiary.firstName,
+      }),
+      beneficiaryLastName: getFormattedFirstnameAndLastname({
+        lastname: convention.signatories.beneficiary.lastName,
+      }),
       businessName: convention.businessName,
       rejectionReason: convention.statusJustification || "",
       signature: agency.signature,
@@ -297,8 +328,12 @@ export const expectNotifyConventionCancelled = (
       agencyName: agency.name,
       conventionId: convention.id,
       internshipKind: convention.internshipKind,
-      beneficiaryFirstName: convention.signatories.beneficiary.firstName,
-      beneficiaryLastName: convention.signatories.beneficiary.lastName,
+      beneficiaryFirstName: getFormattedFirstnameAndLastname({
+        firstname: convention.signatories.beneficiary.firstName,
+      }),
+      beneficiaryLastName: getFormattedFirstnameAndLastname({
+        lastname: convention.signatories.beneficiary.lastName,
+      }),
       businessName: convention.businessName,
       signature: agency.signature,
       immersionProfession: convention.immersionAppellation.appellationLabel,
