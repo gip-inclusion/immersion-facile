@@ -15,17 +15,17 @@ import { useDispatch } from "react-redux";
 import {
   type AppellationDto,
   type ContactMode,
-  type SearchResultDto,
   getMapsLink,
   makeAppellationInformationUrl,
   makeNafClassInformationUrl,
   makeSiretDescriptionLink,
+  type SearchResultDto,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import {
-  SearchMiniMap,
   getIconMarker,
+  SearchMiniMap,
 } from "src/app/components/search/SearchMiniMap";
 import { SearchResultContactSection } from "src/app/components/search/SearchResultContactSection";
 import { SearchResultLabels } from "src/app/components/search/SearchResultLabels";
@@ -34,7 +34,6 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
-import {} from "ts-pattern";
 import type { Route } from "type-route";
 
 const getFeedBackMessage = (contactMode?: ContactMode) => {
@@ -90,11 +89,7 @@ const getMetaForSearchResult = (
   };
 };
 
-export const SearchResultPage = ({
-  isExternal,
-}: {
-  isExternal?: boolean;
-}) => {
+export const SearchResultPage = ({ isExternal }: { isExternal?: boolean }) => {
   const route = useRoute() as Route<
     | typeof routes.searchResult
     | typeof routes.searchResultExternal

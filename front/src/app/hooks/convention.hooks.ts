@@ -8,8 +8,8 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  type FetchConventionRequestedPayload,
   conventionSlice,
+  type FetchConventionRequestedPayload,
 } from "src/core-logic/domain/convention/convention.slice";
 
 export const useConvention = (payload: FetchConventionRequestedPayload) => {

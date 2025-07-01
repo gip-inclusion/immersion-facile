@@ -5,12 +5,12 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
-  type RenewMagicLinkRequestDto,
-  type Role,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  type RenewMagicLinkRequestDto,
+  type Role,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -22,14 +22,14 @@ import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../../core/jwt";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 import type { RenewMagicLinkPayload } from "./notifications/DeliverRenewedMagicLink";
+import { RenewConventionMagicLink } from "./RenewConventionMagicLink";
 
 describe("RenewConventionMagicLink use case", () => {
   const currentEmployer: BeneficiaryCurrentEmployer = {

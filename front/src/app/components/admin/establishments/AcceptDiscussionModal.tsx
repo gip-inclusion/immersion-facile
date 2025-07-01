@@ -10,11 +10,11 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type CandidateWarnedMethod,
-  type DiscussionReadDto,
-  type WithDiscussionStatusAccepted,
   candidateWarnedMethods,
+  type DiscussionReadDto,
   discussionAcceptedSchema,
   domElementIds,
+  type WithDiscussionStatusAccepted,
 } from "shared";
 import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

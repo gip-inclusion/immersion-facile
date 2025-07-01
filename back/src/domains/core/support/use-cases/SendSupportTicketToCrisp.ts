@@ -1,7 +1,7 @@
 import {
   type ConventionId,
-  type TallyForm,
   removeSpaces,
+  type TallyForm,
   tallyFormSchema,
 } from "shared";
 import { z } from "zod";
@@ -191,7 +191,10 @@ const getMessage = (
 const getConventionRelatedData = async ({
   uow,
   conventionId,
-}: { uow: UnitOfWork; conventionId: ConventionId }): Promise<{
+}: {
+  uow: UnitOfWork;
+  conventionId: ConventionId;
+}): Promise<{
   note: string;
   extraSegment: string[];
 }> => {

@@ -50,7 +50,9 @@ const TopLink = ({ link }: { link: NavLink }) => {
 
 const BottomLink = ({
   link,
-}: { link: NavLink | FooterPropsDsfr.BottomItem }) => {
+}: {
+  link: NavLink | FooterPropsDsfr.BottomItem;
+}) => {
   const { cx } = useStyles();
   return (
     <li className={fr.cx("fr-footer__bottom-item")}>

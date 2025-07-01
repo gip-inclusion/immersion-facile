@@ -7,11 +7,11 @@ import {
   type AgencyWithUsersRights,
   type ConventionAgencyFields,
   type Email,
-  type UserId,
-  type UserWithAdminRights,
   errors,
   pipeWithValue,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserId,
+  type UserWithAdminRights,
 } from "shared";
 import type { AgencyRepository } from "../domains/agency/ports/AgencyRepository";
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
@@ -141,7 +141,10 @@ export const updateRightsOnMultipleAgenciesForUser = async (
 export const getAgencyAndAdminEmailsByAgencyId = async ({
   uow,
   agencyIds,
-}: { uow: UnitOfWork; agencyIds: AgencyId[] }): Promise<
+}: {
+  uow: UnitOfWork;
+  agencyIds: AgencyId[];
+}): Promise<
   Record<AgencyId, { agency: AgencyWithUsersRights; adminEmails: Email[] }>
 > => {
   const agencies = await uow.agencyRepository.getByIds(agencyIds);
@@ -182,7 +185,10 @@ export const getAgencyAndAdminEmailsByAgencyId = async ({
 export const throwErrorIfAgencyNotFound = async ({
   agencyId,
   agencyRepository,
-}: { agencyId: string; agencyRepository: AgencyRepository }) => {
+}: {
+  agencyId: string;
+  agencyRepository: AgencyRepository;
+}) => {
   const agency = await agencyRepository.getById(agencyId);
 
   if (!agency) {

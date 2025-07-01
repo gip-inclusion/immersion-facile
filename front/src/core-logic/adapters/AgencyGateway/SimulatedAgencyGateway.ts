@@ -1,5 +1,5 @@
 import { values } from "ramda";
-import { type Observable, Subject, from, of, throwError } from "rxjs";
+import { from, type Observable, of, Subject, throwError } from "rxjs";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
@@ -8,15 +8,15 @@ import {
   type AgencyPublicDisplayDto,
   type ConnectedUserJwt,
   type CreateAgencyDto,
+  errors,
   type InclusionConnectedUser,
   type ListAgencyOptionsRequestDto,
+  toAgencyDtoForAgencyUsersAndAdmins,
+  toAgencyPublicDisplayDto,
   type UpdateAgencyStatusParams,
   type UserParamsForAgency,
   type WithAgencyId,
   type WithAgencyIdAndUserId,
-  errors,
-  toAgencyDtoForAgencyUsersAndAdmins,
-  toAgencyPublicDisplayDto,
 } from "shared";
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 

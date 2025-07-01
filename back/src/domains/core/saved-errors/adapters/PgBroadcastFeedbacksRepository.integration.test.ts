@@ -8,9 +8,9 @@ import {
   expectToEqual,
 } from "shared";
 import {
-  type KyselyDb,
   cast,
   jsonBuildObject,
+  type KyselyDb,
   makeKyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
@@ -18,8 +18,8 @@ import type { SubscriberErrorFeedback } from "../../api-consumer/ports/Subscribe
 import {
   type BroadcastFeedback,
   type BroadcastFeedbackResponse,
-  type ConventionBroadcastRequestParams,
   broadcastToFtLegacyServiceName,
+  type ConventionBroadcastRequestParams,
 } from "../ports/BroadcastFeedbacksRepository";
 import { PgBroadcastFeedbacksRepository } from "./PgBroadcastFeedbacksRepository";
 

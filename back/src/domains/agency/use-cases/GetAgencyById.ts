@@ -1,9 +1,9 @@
 import {
   type AgencyDto,
   type AgencyId,
-  type InclusionConnectedUser,
   agencyIdSchema,
   errors,
+  type InclusionConnectedUser,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createTransactionalUseCase } from "../../core/UseCase";

@@ -3,15 +3,15 @@ import { addDays, differenceInCalendarDays } from "date-fns";
 import { uniq } from "ramda";
 
 import {
-  type DateIntervalDto,
-  type InternshipKind,
-  type SelectedDaysOfTheWeekDto,
-  type WeekdayNumber,
   arrayFromNumber,
   convertLocaleDateToUtcTimezoneDate,
+  type DateIntervalDto,
   frenchDayMapping,
+  type InternshipKind,
   maximumCalendarDayByInternshipKind,
   removeAtIndex,
+  type SelectedDaysOfTheWeekDto,
+  type WeekdayNumber,
 } from "shared";
 import { useStyles } from "tss-react/dsfr";
 import { DayCircle } from "./DayCircle";

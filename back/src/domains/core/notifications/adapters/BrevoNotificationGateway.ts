@@ -1,17 +1,17 @@
 import Bottleneck from "bottleneck";
 import {
-  type GenerateHtmlOptions,
   cciCustomHtmlHeader,
   configureGenerateHtmlFromTemplate,
   defaultEmailFooter,
+  type GenerateHtmlOptions,
 } from "html-templates";
 import {
-  type NotificationId,
-  type TemplatedEmail,
-  type TemplatedSms,
   emailTemplatesByName,
   errors,
+  type NotificationId,
   smsTemplatesByName,
+  type TemplatedEmail,
+  type TemplatedSms,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import type { ApiKey, BrevoHeaders } from "../../../../utils/apiBrevoUrl";

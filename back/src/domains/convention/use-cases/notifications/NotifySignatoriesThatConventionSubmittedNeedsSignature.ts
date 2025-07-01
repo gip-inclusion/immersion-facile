@@ -3,24 +3,24 @@ import {
   type AgencyDto,
   type ConventionDto,
   type CreateConventionMagicLinkPayloadProperties,
-  type Signatory,
-  type TemplatedEmail,
-  type WithConventionDto,
   errors,
   filterNotFalsy,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  type Signatory,
+  type TemplatedEmail,
+  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
 import { createLogger } from "../../../../utils/logger";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

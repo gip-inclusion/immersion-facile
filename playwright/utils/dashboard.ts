@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import {
-  type EstablishmentDashboardTab,
   domElementIds,
+  type EstablishmentDashboardTab,
   establishmentDashboardTabsList,
 } from "shared";
 import { getTabIndexByTabName } from "./admin";

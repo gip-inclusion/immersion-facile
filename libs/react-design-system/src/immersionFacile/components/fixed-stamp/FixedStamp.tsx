@@ -39,6 +39,7 @@ export const FixedStamp = ({
         )}
       </div>
       {link && link.href !== "" && (
+        // biome-ignore lint/a11y/useAriaPropsSupportedByRole: false positive
         <a
           className={cx(Styles.overlayLink)}
           {...link}

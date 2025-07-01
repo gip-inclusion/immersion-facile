@@ -1,11 +1,11 @@
 import { authFailed, expectToEqual, notJobSeeker } from "shared";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../unit-of-work/adapters/createInMemoryUow";
-import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { InMemoryFtConnectGateway } from "../adapters/ft-connect-gateway/InMemoryFtConnectGateway";
+import { CONVENTION_ID_DEFAULT_UUID } from "../adapters/InMemoryConventionFranceTravailAdvisorRepository";
 import type { AccessTokenDto } from "../dto/AccessToken.dto";
 import type {
   FtConnectAdvisorDto,

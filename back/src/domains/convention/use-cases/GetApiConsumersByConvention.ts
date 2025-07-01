@@ -3,10 +3,10 @@ import {
   type AgencyWithUsersRights,
   type ApiConsumer,
   type ApiConsumerName,
-  type InclusionConnectedUser,
-  type WithConventionId,
   errors,
+  type InclusionConnectedUser,
   userHasEnoughRightsOnConvention,
+  type WithConventionId,
   withConventionIdSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";

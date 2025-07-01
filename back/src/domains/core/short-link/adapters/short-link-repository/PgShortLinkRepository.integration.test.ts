@@ -1,9 +1,9 @@
 import type { Pool } from "pg";
 import {
   type AbsoluteUrl,
-  type ShortLinkId,
   expectArraysToMatch,
   expectPromiseToFailWithError,
+  type ShortLinkId,
 } from "shared";
 import {
   type KyselyDb,

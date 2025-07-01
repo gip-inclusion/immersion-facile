@@ -12,9 +12,9 @@ import { useDispatch } from "react-redux";
 import {
   type AgencyKind,
   type ApiConsumer,
-  type ConventionScope,
   apiConsumerKinds,
   apiConsumerSchema,
+  type ConventionScope,
   conventionScopeKeys,
   domElementIds,
 } from "shared";

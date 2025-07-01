@@ -1,10 +1,11 @@
 import {
   type ApiConsumer,
   type ConventionReadDto,
+  ForbiddenError,
+  NotFoundError,
   type WithConventionId,
   withConventionIdSchema,
 } from "shared";
-import { ForbiddenError, NotFoundError } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { isConventionInScope } from "../entities/Convention";

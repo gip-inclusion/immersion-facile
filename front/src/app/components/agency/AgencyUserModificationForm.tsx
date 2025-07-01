@@ -7,16 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type ReactNode, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import {
-  type UserParamsForAgency,
   domElementIds,
   keys,
   toLowerCaseWithoutDiacritics,
+  type UserParamsForAgency,
   userParamsForAgencySchema,
 } from "shared";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { agencyRolesToDisplay } from "../../contents/userRolesToDisplay";
 
 export const AgencyUserModificationForm = ({
@@ -91,10 +91,10 @@ export const AgencyUserModificationForm = ({
     return checkboxOptions;
   };
 
-  if (!agencyUser) return null;
-
   const [invalidEmailMessage, setInvalidEmailMessage] =
     useState<ReactNode | null>(null);
+
+  if (!agencyUser) return null;
 
   return (
     <FormProvider {...methods}>

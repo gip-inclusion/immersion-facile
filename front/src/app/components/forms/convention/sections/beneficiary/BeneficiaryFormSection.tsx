@@ -6,14 +6,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  addressDtoToString,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionReadDto,
   type DateString,
-  type InternshipKind,
-  addressDtoToString,
   domElementIds,
   emailSchema,
+  type InternshipKind,
   isBeneficiaryMinorAccordingToAge,
   isBeneficiaryStudent,
   levelsOfEducation,

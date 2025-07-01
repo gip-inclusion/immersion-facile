@@ -1,14 +1,14 @@
 import { toPairs, uniq } from "ramda";
 import {
   type AgencyStatus,
-  type UserId,
-  type WithAgencyId,
   errors,
   isTruthy,
+  type UserId,
+  type WithAgencyId,
   withAgencyIdSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

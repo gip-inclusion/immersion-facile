@@ -1,20 +1,20 @@
 import {
   type EstablishmentBatchReport,
   type EstablishmentCSVRow,
+  expectToEqual,
   type FormEstablishmentBatchDto,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  expectToEqual,
 } from "shared";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { candidateEstablishmentMapper } from "./establishmentBatch.epics";
 import {
-  type FormEstablishmentDtoWithErrors,
   establishmentBatchSlice,
+  type FormEstablishmentDtoWithErrors,
 } from "./establishmentBatch.slice";
 
 const defaultEstablishment = FormEstablishmentDtoBuilder.valid().build();

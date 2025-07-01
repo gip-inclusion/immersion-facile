@@ -4,11 +4,11 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
 } from "shared";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { ApiConsumerBuilder } from "../adapters/InMemoryApiConsumerRepository";
 import { DeleteSubscription } from "./DeleteSubscription";

@@ -1,14 +1,14 @@
 import {
+  errors,
   type NotificationErrored,
   type NotificationId,
   type NotificationKind,
-  errors,
   notificationErroredSchema,
   notificationIdSchema,
 } from "shared";
 import { z } from "zod";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
+import { createTransactionalUseCase } from "../../../core/UseCase";
 
 export type WarnSenderThatMessageCouldNotBeDeliveredParams = {
   notificationId: NotificationId;

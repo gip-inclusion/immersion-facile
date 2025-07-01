@@ -1,8 +1,8 @@
 import {
   type AddressDto,
   type CreateAgencyDto,
-  type GeoPositionDto,
   domElementIds,
+  type GeoPositionDto,
 } from "shared";
 import type { FormFieldsObjectForContent } from "src/app/hooks/formContents.hooks";
 import type { FormFieldAttributesForContent } from "../types";

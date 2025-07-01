@@ -16,14 +16,14 @@ import {
   makeExpectSavedNotificationsAndEvents,
 } from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   NO_JUSTIFICATION,
@@ -320,7 +320,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
@@ -356,7 +356,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {
@@ -462,7 +462,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryRepresentative!.email,
             ],
             params: {
@@ -488,7 +488,7 @@ describe("NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModificatio
           {
             kind: "NEW_CONVENTION_CONFIRMATION_REQUEST_SIGNATURE_AFTER_MODIFICATION",
             recipients: [
-              // biome-ignore lint/style/noNonNullAssertion:
+              // biome-ignore lint/style/noNonNullAssertion: testing purpose
               convention.signatories.beneficiaryCurrentEmployer!.email,
             ],
             params: {

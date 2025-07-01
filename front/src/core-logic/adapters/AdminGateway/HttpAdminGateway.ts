@@ -1,9 +1,10 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import {
   type AdminRoutes,
   type ApiConsumer,
   type ApiConsumerJwt,
   type ConnectedUserJwt,
+  createApiConsumerParamsFromApiConsumer,
   type DashboardUrlAndName,
   type EstablishmentBatchReport,
   type FormEstablishmentBatchDto,
@@ -17,7 +18,6 @@ import {
   type UserParamsForAgency,
   type WithAgencyIdAndUserId,
   type WithUserFilters,
-  createApiConsumerParamsFromApiConsumer,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import {
@@ -26,7 +26,7 @@ import {
   throwBadRequestWithExplicitMessage,
 } from "src/core-logic/adapters/otherwiseThrow";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpAdminGateway implements AdminGateway {
   constructor(private readonly httpClient: HttpClient<AdminRoutes>) {}

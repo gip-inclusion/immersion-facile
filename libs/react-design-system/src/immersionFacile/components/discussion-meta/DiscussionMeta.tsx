@@ -3,11 +3,7 @@ import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./DiscussionMeta.styles";
 
-export const DiscussionMeta = ({
-  children,
-}: {
-  children: ReactNode[];
-}) => {
+export const DiscussionMeta = ({ children }: { children: ReactNode[] }) => {
   const { cx } = useStyles();
   return (
     <ul className={cx(fr.cx("fr-mb-2w", "fr-pl-0"), Styles.root)}>

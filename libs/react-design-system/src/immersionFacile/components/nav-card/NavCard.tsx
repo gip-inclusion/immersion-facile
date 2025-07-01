@@ -2,7 +2,7 @@ import { type FrIconClassName, fr } from "@codegouvfr/react-dsfr";
 import type { ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import type { Link } from "type-route";
-import { type UserType, heroHeaderComponentName } from "../hero-header";
+import { heroHeaderComponentName, type UserType } from "../hero-header";
 import Styles from "./NavCard.styles";
 
 export type HeroHeaderNavCard = {

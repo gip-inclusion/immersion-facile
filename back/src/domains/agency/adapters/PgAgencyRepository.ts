@@ -12,19 +12,19 @@ import {
   type AgencyWithUsersRights,
   ConflictError,
   type DepartmentCode,
-  type OmitFromExistingKeys,
-  type UserId,
-  type WithUserFilters,
   errors,
   isTruthy,
   isWithAgencyRole,
+  type OmitFromExistingKeys,
   pipeWithValue,
+  type UserId,
+  type WithUserFilters,
 } from "shared";
 import {
-  type KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { createLogger } from "../../../utils/logger";
 import type {

@@ -17,20 +17,20 @@ import {
   toDisplayedDate,
   toDisplayedPhoneNumber,
 } from "shared";
-import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
 import { WithFeedbackReplacer } from "src/app/components/feedback/WithFeedbackReplacer";
+import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import {
-  type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
   discussionSlice,
+  type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
   initialDiscussionsWithPagination,
 } from "src/core-logic/domain/discussion/discussion.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export const DiscussionList = () => {
   const dispatch = useDispatch();

@@ -45,7 +45,6 @@ export const InitiateConventionButton = () => {
   const dispatch = useDispatch();
   const token = useAppSelector(authSelectors.inclusionConnectToken);
   const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  if (!currentUser) return null;
   const establishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
@@ -54,10 +53,11 @@ export const InitiateConventionButton = () => {
     defaultFormEstablishmentValue(),
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const currentUserEstablishments = currentUser?.establishments;
   const defaultValues =
-    currentUser.establishments && currentUser.establishments.length === 1
+    currentUserEstablishments && currentUserEstablishments.length === 1
       ? {
-          siret: currentUser.establishments[0].siret,
+          siret: currentUserEstablishments[0].siret,
           appellation: undefined,
           location: undefined,
         }
@@ -116,6 +116,7 @@ export const InitiateConventionButton = () => {
     values,
     setValue,
   ]);
+  if (!currentUser) return null;
 
   return (
     <>
@@ -123,13 +124,13 @@ export const InitiateConventionButton = () => {
         onClick={() => {
           if (
             isEstablishmentDefault &&
-            currentUser.establishments &&
-            currentUser.establishments.length === 1
+            currentUserEstablishments &&
+            currentUserEstablishments.length === 1
           ) {
             dispatch(
               establishmentSlice.actions.fetchEstablishmentRequested({
                 establishmentRequested: {
-                  siret: currentUser.establishments[0].siret,
+                  siret: currentUserEstablishments[0].siret,
                   jwt: token,
                 },
                 feedbackTopic: "unused",

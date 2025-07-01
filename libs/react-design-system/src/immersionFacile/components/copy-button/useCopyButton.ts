@@ -12,7 +12,7 @@ export const useCopyButton = (label: string) => {
           setIsCopied(false);
         }, 3_000);
       })
-
+      // biome-ignore lint/suspicious/noConsole: debug purpose
       .catch((error) => console.error(error));
   };
 

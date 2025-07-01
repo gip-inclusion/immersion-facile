@@ -1,26 +1,26 @@
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
+  allRoles,
   type ConventionDomainPayload,
   ConventionDtoBuilder,
   type ConventionJwtPayload,
-  InclusionConnectedUserBuilder,
-  type LegacyAssessmentDto,
-  type Role,
-  allRoles,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
+  type LegacyAssessmentDto,
+  type Role,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeHashByRolesForTest } from "../../../utils/emailHash";
 import { makeEmailHash } from "../../../utils/jwt";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import {
   type GetAssessmentByConventionId,

@@ -1,8 +1,8 @@
 import {
+  expectToEqual,
   type GeoPositionDto,
   type NafCode,
   type RomeDto,
-  expectToEqual,
 } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import {

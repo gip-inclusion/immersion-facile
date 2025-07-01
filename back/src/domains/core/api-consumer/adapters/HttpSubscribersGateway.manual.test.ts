@@ -3,8 +3,8 @@ import {
   type AbsoluteUrl,
   ConventionDtoBuilder,
   type ConventionReadDto,
-  type SubscriptionParams,
   expectToEqual,
+  type SubscriptionParams,
 } from "shared";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 

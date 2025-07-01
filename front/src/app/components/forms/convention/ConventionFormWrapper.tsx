@@ -12,26 +12,26 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  agencyModifierRoles,
   type ConventionId,
   type ConventionJwtPayload,
-  type InternshipKind,
-  type Role,
-  agencyModifierRoles,
   conventionStatusesAllowedForModification,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   errors,
   hasAllowedRolesToEditConvention,
+  type InternshipKind,
   isSignatory,
+  type Role,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { ConventionForm } from "src/app/components/forms/convention/ConventionForm";
-import { SignButton } from "src/app/components/forms/convention/SignButton";
 import {
-  type WithStatusJustification,
   statusJustificationSchema,
+  type WithStatusJustification,
 } from "src/app/components/forms/convention/conventionHelpers";
+import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { makeConventionSections } from "src/app/contents/convention/conventionSummary.helpers";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
@@ -48,7 +48,7 @@ import { conventionSelectors } from "src/core-logic/domain/convention/convention
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
 const {

@@ -2,9 +2,9 @@ import { fr } from "@codegouvfr/react-dsfr";
 import type { InputProps } from "@codegouvfr/react-dsfr/Input";
 
 import Select, {
-  type Props as SelectProps,
   type GroupBase,
   type OptionProps,
+  type Props as SelectProps,
 } from "react-select";
 import { useStyles } from "tss-react/dsfr";
 import Styles from "./RSAutocomplete.styles";

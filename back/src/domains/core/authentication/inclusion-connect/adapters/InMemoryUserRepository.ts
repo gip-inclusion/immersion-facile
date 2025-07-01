@@ -1,10 +1,10 @@
 import { keys, values } from "ramda";
 import {
   type Email,
+  errors,
   type GetUsersFilters,
   type UserId,
   type UserWithAdminRights,
-  errors,
 } from "shared";
 import type { UserRepository } from "../port/UserRepository";
 

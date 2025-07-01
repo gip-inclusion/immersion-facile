@@ -1,4 +1,4 @@
-import { type UserWithAdminRights, errors } from "shared";
+import { errors, type UserWithAdminRights } from "shared";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type {
   EstablishmentAdminRight,

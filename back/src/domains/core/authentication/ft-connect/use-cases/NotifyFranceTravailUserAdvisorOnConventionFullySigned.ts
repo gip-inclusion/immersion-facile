@@ -1,13 +1,13 @@
 import {
-  type WithConventionDto,
   frontRoutes,
   getFormattedFirstnameAndLastname,
+  type WithConventionDto,
   withConventionSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../../config/bootstrap/magicLinkUrl";
-import { TransactionalUseCase } from "../../../UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 

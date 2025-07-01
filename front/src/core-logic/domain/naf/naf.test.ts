@@ -1,17 +1,17 @@
 import {
-  type NafSectionSuggestion,
   expectArraysToEqual,
   expectToEqual,
+  type NafSectionSuggestion,
 } from "shared";
 import { nafSelectors } from "src/core-logic/domain/naf/naf.selectors";
 import {
-  type NafState,
   initialState,
+  type NafState,
   nafSlice,
 } from "src/core-logic/domain/naf/naf.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

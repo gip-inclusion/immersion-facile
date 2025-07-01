@@ -1,4 +1,5 @@
 import type { MigrationBuilder } from "node-pg-migrate";
+
 const tableName = "feature_flags";
 const flagName = "enableTemporaryOperation";
 

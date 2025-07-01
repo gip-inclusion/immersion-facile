@@ -1,24 +1,24 @@
 import {
   type Attachment,
+  attachmentSchema,
   type DateString,
   type DiscussionDto,
   type DiscussionExchangeForbiddenParams,
   type DiscussionId,
+  discussionIdSchema,
   type Exchange,
   type ExchangeRole,
-  type InclusionConnectedUser,
-  type UserId,
-  attachmentSchema,
-  discussionIdSchema,
   errors,
   exchangeRoleSchema,
+  type InclusionConnectedUser,
+  type UserId,
   zStringMinLength1,
 } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

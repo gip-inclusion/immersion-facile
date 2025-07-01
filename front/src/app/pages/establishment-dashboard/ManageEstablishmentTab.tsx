@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
-import { type WithEstablishmentData, domElementIds } from "shared";
+import { domElementIds, type WithEstablishmentData } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";

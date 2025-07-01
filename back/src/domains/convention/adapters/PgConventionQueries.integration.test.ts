@@ -16,14 +16,14 @@ import {
   DATE_START,
   type DateString,
   type EmailNotification,
-  InclusionConnectedUserBuilder,
-  type Notification,
-  type SiretDto,
-  type UserWithAdminRights,
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   getFormattedFirstnameAndLastname,
+  InclusionConnectedUserBuilder,
+  type Notification,
   reasonableSchedule,
+  type SiretDto,
+  type UserWithAdminRights,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {

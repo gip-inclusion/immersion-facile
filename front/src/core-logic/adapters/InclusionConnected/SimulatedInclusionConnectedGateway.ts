@@ -1,4 +1,5 @@
-import { type Observable, Subject, delay, of, throwError } from "rxjs";
+import { delay, type Observable, of, Subject, throwError } from "rxjs";
+import type { DataWithPagination, DiscussionInList, Exchange } from "shared";
 import {
   type AbsoluteUrl,
   type AgencyId,
@@ -8,12 +9,11 @@ import {
   type MarkPartnersErroredConventionAsHandledRequest,
   type WithDiscussionStatusRejected,
 } from "shared";
-import type { DataWithPagination, DiscussionInList, Exchange } from "shared";
 import {
   type FetchDiscussionListRequestedPayload,
   type FetchDiscussionRequestedPayload,
-  type SendExchangeRequestedPayload,
   initialDiscussionsWithPagination,
+  type SendExchangeRequestedPayload,
 } from "src/core-logic/domain/discussion/discussion.slice";
 import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 

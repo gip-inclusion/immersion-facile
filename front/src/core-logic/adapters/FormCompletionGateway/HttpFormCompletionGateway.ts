@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import {
   type AppellationMatchDto,
   type FormCompletionRoutes,
@@ -13,7 +13,7 @@ import type { HttpClient, HttpResponse } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/defineRoutes";
 import { otherwiseThrow } from "src/core-logic/adapters/otherwiseThrow";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpFormCompletionGateway implements FormCompletionGateway {
   constructor(private readonly httpClient: HttpClient<FormCompletionRoutes>) {}
@@ -79,6 +79,7 @@ const handleSiretResponses = (
   match(response)
     .with({ status: 200 }, ({ body }) => body)
     .with({ status: 400 }, ({ body, status }) => {
+      // biome-ignore lint/suspicious/noConsole: debug purpose
       console.error(body.message);
       return errorMessageByCode[status];
     })

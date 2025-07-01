@@ -20,6 +20,7 @@ import {
   type Attachment,
   type CandidateWarnedMethod,
   type CommonDiscussionDto,
+  candidateWarnedMethods,
   type DiscussionEmailParams,
   type DiscussionExchangeForbiddenParams,
   type DiscussionExchangeForbidenReason,
@@ -37,7 +38,6 @@ import {
   type WithDiscussionStatusAccepted,
   type WithDiscussionStatusPending,
   type WithDiscussionStatusRejected,
-  candidateWarnedMethods,
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();

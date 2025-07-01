@@ -1,18 +1,18 @@
 import {
   type AbsoluteUrl,
   type AlreadyAuthenticatedUserQueryParams,
-  type AuthenticateWithOAuthCodeParams,
   type AuthenticatedUserQueryParams,
-  type EmailAuthCodeJwt,
-  type OAuthCode,
-  TWELVE_HOURS_IN_SECONDS,
-  type UserId,
-  type UserWithAdminRights,
+  type AuthenticateWithOAuthCodeParams,
   authenticateWithOAuthCodeSchema,
   currentJwtVersions,
   decodeURIWithParams,
+  type EmailAuthCodeJwt,
   errors,
+  type OAuthCode,
   queryParamsAsString,
+  TWELVE_HOURS_IN_SECONDS,
+  type UserId,
+  type UserWithAdminRights,
 } from "shared";
 import { makeThrowIfIncorrectJwt } from "../../../../../utils/jwt";
 import {
@@ -20,10 +20,10 @@ import {
   removeAgencyRightsForUser,
   updateAgencyRightsForUser,
 } from "../../../../agency/ports/AgencyRepository";
-import { TransactionalUseCase } from "../../../UseCase";
 import type { CreateNewEvent } from "../../../events/ports/EventBus";
 import type { GenerateConnectedUserJwt, VerifyJwtFn } from "../../../jwt";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../UseCase";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";

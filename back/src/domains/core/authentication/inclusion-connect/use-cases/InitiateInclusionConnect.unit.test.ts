@@ -1,15 +1,15 @@
 import {
-  type WithRedirectUri,
   allowedStartOAuthLoginPages,
   expectToEqual,
   queryParamsAsString,
+  type WithRedirectUri,
 } from "shared";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  InMemoryOAuthGateway,
   fakeProviderConfig,
+  InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import { InitiateInclusionConnect } from "./InitiateInclusionConnect";
 

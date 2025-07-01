@@ -1,8 +1,8 @@
 import {
   type Email,
   type ExternalId,
-  type SiretDto,
   emailSchema,
+  type SiretDto,
   siretSchema,
 } from "shared";
 import { z } from "zod";

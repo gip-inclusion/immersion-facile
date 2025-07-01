@@ -2,10 +2,10 @@ import {
   type DataWithPagination,
   type DiscussionInList,
   type FlatGetPaginatedDiscussionsParams,
-  type InclusionConnectedUser,
-  type OmitFromExistingKeys,
   flatGetPaginatedDiscussionsParamsSchema,
   getPaginationParamsForWeb,
+  type InclusionConnectedUser,
+  type OmitFromExistingKeys,
 } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { GetPaginatedDiscussionsForUserParams } from "../../ports/DiscussionRepository";

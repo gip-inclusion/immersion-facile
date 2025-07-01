@@ -4,10 +4,10 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
   type AgencyRight,
-  type User,
-  type UserParamsForAgency,
   distinguishAgencyRights,
   domElementIds,
+  type User,
+  type UserParamsForAgency,
 } from "shared";
 import { Feedback } from "../../feedback/Feedback";
 import { AgencyUserModificationForm } from "../AgencyUserModificationForm";
@@ -30,11 +30,11 @@ export const AgenciesTablesSection = ({
   isBackofficeAdmin?: boolean;
   onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
 }) => {
-  if (!agencyRights.length)
-    return <p>Cet utilisateur n'est lié à aucun organisme.</p>;
-
   const [selectedAgencyRight, setSelectedAgencyRight] =
     useState<AgencyRight | null>(null);
+
+  if (!agencyRights.length)
+    return <p>Cet utilisateur n'est lié à aucun organisme.</p>;
 
   const onUpdateClicked = (agencyRight: AgencyRight) => {
     setSelectedAgencyRight(agencyRight);

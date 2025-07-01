@@ -1,20 +1,20 @@
 import {
-  type FormEstablishmentDto,
-  InclusionConnectedUserBuilder,
-  type SiretDto,
-  type User,
-  UserBuilder,
   addressDtoToString,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type FormEstablishmentDto,
   formEstablishmentSchema,
+  InclusionConnectedUserBuilder,
+  type SiretDto,
+  type User,
+  UserBuilder,
 } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import {
   EstablishmentAggregateBuilder,

@@ -1,8 +1,8 @@
 import {
   type AgencyId,
+  errors,
   type InclusionConnectedUser,
   type UserWithAdminRights,
-  errors,
 } from "shared";
 
 export const throwIfNotAdmin = (user: UserWithAdminRights | undefined) => {

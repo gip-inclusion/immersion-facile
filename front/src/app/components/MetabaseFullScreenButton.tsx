@@ -5,7 +5,10 @@ import type { AbsoluteUrl } from "shared";
 export const MetabaseFullScreenButton = ({
   url,
   label = "Ouvrir en plein écran",
-}: { url: AbsoluteUrl; label?: string }) => (
+}: {
+  url: AbsoluteUrl;
+  label?: string;
+}) => (
   <Button
     linkProps={{
       target: "_blank",

@@ -1,9 +1,9 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { LocationId } from "../address/address.dto";
 import type {
+  discoverObjective,
   ImmersionObjective,
   LevelOfEducation,
-  discoverObjective,
 } from "../convention/convention.dto";
 import type {
   DiscussionId,

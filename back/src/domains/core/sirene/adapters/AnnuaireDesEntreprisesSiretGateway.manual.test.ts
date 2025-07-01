@@ -29,6 +29,7 @@ describe("AnnuaireDesEntreprisesSiretGateway", () => {
     {
       skipResponseValidation: true,
       onResponseSideEffect: ({ input, route, response }) =>
+        // biome-ignore lint/suspicious/noConsole: debug purpose
         console.info(
           `SIREN API was called: ${route.method} ${route.url}
           with : ${JSON.stringify(input, null, 2)}.

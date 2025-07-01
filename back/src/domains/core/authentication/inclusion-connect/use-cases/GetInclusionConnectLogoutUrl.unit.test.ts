@@ -1,19 +1,19 @@
 import {
-  type User,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   queryParamsAsString,
+  type User,
 } from "shared";
+import {
+  createInMemoryUow,
+  type InMemoryUnitOfWork,
+} from "../../../unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
-  createInMemoryUow,
-} from "../../../unit-of-work/adapters/createInMemoryUow";
-import {
-  InMemoryOAuthGateway,
   fakeProviderConfig,
+  InMemoryOAuthGateway,
 } from "../adapters/oauth-gateway/InMemoryOAuthGateway";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
 import {

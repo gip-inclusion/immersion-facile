@@ -9,9 +9,9 @@ import { Loader } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  domElementIds,
   type EstablishmentCSVRow,
   type FormEstablishmentDto,
-  domElementIds,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

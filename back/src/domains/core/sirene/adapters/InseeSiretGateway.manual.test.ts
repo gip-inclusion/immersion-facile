@@ -41,6 +41,7 @@ describe("InseeSiretGateway", () => {
         makeAxiosInstances(config.externalAxiosTimeout).axiosWithValidateStatus,
         {
           onResponseSideEffect: ({ response, input }) =>
+            // biome-ignore lint/suspicious/noConsole: debug purpose
             console.info(
               JSON.stringify(
                 {

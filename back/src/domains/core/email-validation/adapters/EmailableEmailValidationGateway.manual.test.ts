@@ -1,4 +1,4 @@
-import { type ValidateEmailFeedback, expectToEqual } from "shared";
+import { expectToEqual, type ValidateEmailFeedback } from "shared";
 import { createFetchSharedClient } from "shared-routes/fetch";
 import { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { withNoCache } from "../../caching-gateway/adapters/withNoCache";
@@ -12,6 +12,7 @@ describe("EmailableEmailValidationGateway", () => {
   beforeEach(() => {
     emailableEmailValidationGateway = new EmailableEmailValidationGateway(
       createFetchSharedClient(emailableValidationRoutes, fetch, {
+        // biome-ignore lint/suspicious/noConsole: debug purpose
         onResponseSideEffect: console.log,
       }),
       AppConfig.createFromEnv().emailableApiKey,

@@ -2,8 +2,8 @@ import {
   type AgencyDto,
   type ConventionDto,
   type Email,
-  type Role,
   errors,
+  type Role,
 } from "shared";
 
 export const conventionEmailsByRole = (

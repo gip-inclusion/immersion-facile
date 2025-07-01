@@ -1,4 +1,5 @@
 import type { MigrationBuilder } from "node-pg-migrate";
+
 const table = "conventions";
 const column = "business_advantages";
 export async function up(pgm: MigrationBuilder): Promise<void> {

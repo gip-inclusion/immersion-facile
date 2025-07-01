@@ -2,8 +2,8 @@ import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
-import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
+import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
 import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
 import { ENV } from "src/config/environmentVariables";
 

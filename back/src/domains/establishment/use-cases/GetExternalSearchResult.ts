@@ -1,7 +1,7 @@
 import {
+  errors,
   type SearchResultDto,
   type SiretAndAppellationDto,
-  errors,
   siretAndAppellationSchema,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";

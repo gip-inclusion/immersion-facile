@@ -6,9 +6,9 @@ import {
   editConventionCounsellorNameRequestSchema,
   errors,
 } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import {
   throwErrorIfUserIsValidatorOfAgencyWithRefersTo,
   throwErrorOnConventionIdMismatch,

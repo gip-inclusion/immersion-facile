@@ -1,14 +1,14 @@
 import type { Pool } from "pg";
-import { type User, expectToEqual } from "shared";
+import { expectToEqual, type User } from "shared";
 import {
   type KyselyDb,
   makeKyselyDb,
 } from "../../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../../config/pg/pgUtils";
 import type { OngoingOAuth } from "../entities/OngoingOAuth";
+import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 import { PgOngoingOAuthRepository } from "./PgOngoingOAuthRepository";
 import { PgUserRepository } from "./PgUserRepository";
-import { fakeProConnectSiret } from "./oauth-gateway/InMemoryOAuthGateway";
 
 describe("PgOngoingOAuthRepository", () => {
   let pool: Pool;

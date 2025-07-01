@@ -9,32 +9,32 @@ import {
   type ConventionReadDto,
   type EstablishmentRepresentative,
   type ExtractFromExisting,
-  type GenericActor,
-  type ReminderKind,
-  type Role,
-  type TemplatedEmail,
-  type TemplatedSms,
   errors,
   filterNotFalsy,
   frontRoutes,
+  type GenericActor,
   getFormattedFirstnameAndLastname,
   isEstablishmentTutorIsEstablishmentRepresentative,
   isSignatoryRole,
+  type ReminderKind,
+  type Role,
   smsRecipientPhoneSchema,
+  type TemplatedEmail,
+  type TemplatedSms,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../../utils/agency";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { ConventionReminderPayload } from "../../../core/events/eventPayload.dto";
 import { conventionReminderPayloadSchema } from "../../../core/events/eventPayload.schema";
 import type {
   NotificationContentAndFollowedIds,
   SaveNotificationsBatchAndRelatedEvent,
 } from "../../../core/notifications/helpers/Notification";
-import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

@@ -7,22 +7,22 @@ import {
   type ContactEstablishmentRequestDto,
   DiscussionBuilder,
   type DiscussionDto,
-  type Location,
-  UserBuilder,
   errors,
   expectArraysToEqual,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   getFormattedFirstnameAndLastname,
+  type Location,
+  UserBuilder,
 } from "shared";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type {
   EstablishmentAdminRight,

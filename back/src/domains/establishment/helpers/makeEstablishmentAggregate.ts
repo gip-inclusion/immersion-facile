@@ -1,4 +1,4 @@
-import { type FormEstablishmentDto, errors, noContactPerMonth } from "shared";
+import { errors, type FormEstablishmentDto, noContactPerMonth } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";

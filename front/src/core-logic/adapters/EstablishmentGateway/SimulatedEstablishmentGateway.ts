@@ -1,4 +1,4 @@
-import { type Observable, delay, of } from "rxjs";
+import { delay, type Observable, of } from "rxjs";
 import type {
   ConnectedUserJwt,
   EstablishmentNameAndAdmins,

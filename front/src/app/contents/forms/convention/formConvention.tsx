@@ -1,7 +1,7 @@
 import { keys, mergeRight } from "ramda";
 
 import type { ReactNode } from "react";
-import { type InternshipKind, domElementIds } from "shared";
+import { domElementIds, type InternshipKind } from "shared";
 import type { ConventionField } from "../../admin/types";
 import type { FormFieldAttributesForContent } from "../types";
 

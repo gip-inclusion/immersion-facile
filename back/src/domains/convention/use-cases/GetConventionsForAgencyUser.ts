@@ -2,10 +2,10 @@ import {
   type ConventionDto,
   type DataWithPagination,
   type GetConventionsForAgencyUserParams,
-  type InclusionConnectedUser,
   getConventionsForAgencyUserParamsSchema,
+  getPaginationParamsForWeb,
+  type InclusionConnectedUser,
 } from "shared";
-import { getPaginationParamsForWeb } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 
 export const makeGetConventionsForAgencyUser = createTransactionalUseCase<

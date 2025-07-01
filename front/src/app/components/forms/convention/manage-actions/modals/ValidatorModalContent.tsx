@@ -7,9 +7,9 @@ import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
   type ConventionStatusWithValidator,
+  domElementIds,
   type UpdateConventionStatusRequestDto,
   type WithFirstnameAndLastname,
-  domElementIds,
   withFirstnameAndLastnameSchema,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

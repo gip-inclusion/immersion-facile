@@ -4,14 +4,14 @@ import {
   type ConventionId,
   type EmailAttachment,
   type EmailNotification,
+  expectArraysToEqual,
+  expectToEqual,
   type Notification,
   type NotificationErrored,
   type NotificationState,
   type SmsNotification,
   type TemplatedEmail,
   type TemplatedSms,
-  expectArraysToEqual,
-  expectToEqual,
 } from "shared";
 import {
   type KyselyDb,
@@ -593,7 +593,7 @@ describe("PgNotificationRepository", () => {
               ...emailNotification.templatedContent,
               attachments: [
                 {
-                  // biome-ignore lint/style/noNonNullAssertion:
+                  // biome-ignore lint/style/noNonNullAssertion: testing purpose
                   ...emailNotification.templatedContent.attachments![0],
                   content: "deleted-content",
                 },

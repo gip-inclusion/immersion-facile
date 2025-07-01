@@ -8,9 +8,9 @@ import {
 import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import { frontRoutes } from "../routes/routes";
 import { isStringDate, toDisplayedDate } from "../utils/date";
-import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
+import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
 import { emailAttachements } from "./emailAttachements";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 

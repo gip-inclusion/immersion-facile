@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { withAcquisitionSchema } from "../acquisition.dto";
 import {
-  type ImmersionObjective,
   conventionObjectiveOptions,
   discoverObjective,
+  type ImmersionObjective,
 } from "../convention/convention.dto";
 import { emailSchema } from "../email/email.schema";
 import { phoneSchema } from "../phone.schema";

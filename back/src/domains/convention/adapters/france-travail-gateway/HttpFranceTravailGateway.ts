@@ -7,14 +7,14 @@ import type {
   FTAccessTokenConfig,
 } from "../../../../config/bootstrap/appConfig";
 import {
-  type LoggerParamsWithMessage,
   createLogger,
+  type LoggerParamsWithMessage,
 } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { InMemoryCachingGateway } from "../../../core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
-  type RetryStrategy,
   RetryableError,
+  type RetryStrategy,
 } from "../../../core/retry-strategy/ports/RetryStrategy";
 import type {
   FranceTravailBroadcastResponse,

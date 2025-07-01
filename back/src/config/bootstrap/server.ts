@@ -11,8 +11,8 @@ import { createEstablishmentRouter } from "../../adapters/primary/routers/establ
 import { createEstablishmentLeadRouter } from "../../adapters/primary/routers/establishmentLead/createEstablishmentLeadRouter";
 import { createFormCompletionRouter } from "../../adapters/primary/routers/formCompletion/createFormCompletionRouter";
 import { createFtConnectRouter } from "../../adapters/primary/routers/ftConnect/createFtConnectRouter";
-import { createInclusionConnectRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectRouter";
 import { createInclusionConnectedAllowedRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectedAllowedRouter";
+import { createInclusionConnectRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "../../adapters/primary/routers/magicLink/createMagicLinkRouter";
 import { createNafRouter } from "../../adapters/primary/routers/naf/createNafRouter";
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";

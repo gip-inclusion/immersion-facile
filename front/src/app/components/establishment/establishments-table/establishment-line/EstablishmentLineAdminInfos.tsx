@@ -3,7 +3,9 @@ import type { WithEstablishmentData } from "shared";
 
 export const EstablishmentLineAdminsInfos = ({
   withEstablishmentData,
-}: { withEstablishmentData: WithEstablishmentData }) => (
+}: {
+  withEstablishmentData: WithEstablishmentData;
+}) => (
   <ul className={fr.cx("fr-raw-list")}>
     {withEstablishmentData.admins.map((admin) => (
       <li key={`${admin.email}-${admin.firstName}-${admin.lastName}`}>

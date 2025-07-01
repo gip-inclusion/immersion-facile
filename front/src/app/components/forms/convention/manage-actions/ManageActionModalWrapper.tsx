@@ -4,16 +4,16 @@ import { createPortal } from "react-dom";
 import {
   type ConventionDto,
   type ConventionStatus,
-  type Role,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
   doesStatusNeedsJustification,
   doesStatusNeedsValidators,
+  type Role,
 } from "shared";
 import {
+  newStatusByVerificationAction,
   type VerificationAction,
   type VerificationActionProps,
-  newStatusByVerificationAction,
 } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
 import { modalByAction } from "src/app/components/forms/convention/manage-actions/manageActionModals";
 import { EditCounsellorNameModalContent } from "src/app/components/forms/convention/manage-actions/modals/EditCounsellorNameModalContent";
@@ -22,7 +22,7 @@ import { RenewConventionModalContent } from "src/app/components/forms/convention
 import { TransferModalContent } from "src/app/components/forms/convention/manage-actions/modals/TransferModalContent";
 import { ValidatorModalContent } from "src/app/components/forms/convention/manage-actions/modals/ValidatorModalContent";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export type ModalWrapperProps = {
   title: string;

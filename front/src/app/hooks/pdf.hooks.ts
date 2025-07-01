@@ -49,6 +49,7 @@ export const usePdfGenerator = () => {
         downloadLink.click();
       } catch (e) {
         alert("Erreur lors de la génération du PDF >> voir la console.");
+        // biome-ignore lint/suspicious/noConsole: debug purpose
         console.error(JSON.stringify(e));
       } finally {
         setIsPdfLoading(false);

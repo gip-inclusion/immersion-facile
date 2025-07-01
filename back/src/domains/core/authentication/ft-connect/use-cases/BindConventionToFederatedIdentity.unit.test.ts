@@ -1,6 +1,6 @@
 import {
-  ConventionDtoBuilder,
   authFailed,
+  ConventionDtoBuilder,
   expectObjectsToMatch,
   expectToEqual,
 } from "shared";
@@ -10,8 +10,8 @@ import {
   makeCreateNewEvent,
 } from "../../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   CONVENTION_ID_DEFAULT_UUID,

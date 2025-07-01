@@ -5,16 +5,16 @@ import { Document, Loader, MainWrapper } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type AssessmentDto,
-  type LegacyAssessmentDto,
   computeTotalHours,
   convertLocaleDateToUtcTimezoneDate,
   domElementIds,
+  escapeHtml,
   getFormattedFirstnameAndLastname,
   isStringDate,
+  type LegacyAssessmentDto,
   makeSiretDescriptionLink,
   toDisplayedDate,
 } from "shared";
-import { escapeHtml } from "shared";
 import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useJwt } from "src/app/hooks/jwt.hooks";

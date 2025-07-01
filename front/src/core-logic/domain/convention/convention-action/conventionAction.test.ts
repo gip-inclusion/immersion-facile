@@ -2,25 +2,25 @@ import { addDays } from "date-fns";
 import {
   ConventionDtoBuilder,
   type ConventionReadDto,
-  ScheduleDtoBuilder,
   expectObjectsToMatch,
   expectToEqual,
+  ScheduleDtoBuilder,
 } from "shared";
-import {
-  type ConventionActionState,
-  type RenewConventionPayload,
-  conventionActionInitialState,
-  conventionActionSlice,
-} from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
   type ConventionState,
   initialConventionState,
 } from "src/core-logic/domain/convention/convention.slice";
+import {
+  type ConventionActionState,
+  conventionActionInitialState,
+  conventionActionSlice,
+  type RenewConventionPayload,
+} from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import type { Feedbacks } from "src/core-logic/domain/feedback/feedback.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 

@@ -1,8 +1,8 @@
 import {
   type ApiConsumer,
+  errors,
   type SearchResultDto,
   type SearchResultQuery,
-  errors,
   searchResultQuerySchema,
 } from "shared";
 import { TransactionalUseCase } from "../../core/UseCase";

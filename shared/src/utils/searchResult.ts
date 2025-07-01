@@ -1,4 +1,4 @@
-import { type NafDto, fromNafSubClassToNafClass } from "../naf/naf.dto";
+import { fromNafSubClassToNafClass, type NafDto } from "../naf/naf.dto";
 import type { RomeCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 
 export const makeAppellationInformationUrl = (romeCode: RomeCode) =>

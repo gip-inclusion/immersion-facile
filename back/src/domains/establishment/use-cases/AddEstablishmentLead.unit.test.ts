@@ -7,11 +7,11 @@ import {
   expectToEqual,
 } from "shared";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { InMemoryEstablishmentLeadRepository } from "../adapters/InMemoryEstablishmentLeadRepository";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";

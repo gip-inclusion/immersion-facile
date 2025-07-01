@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
 import {
-  type ManageConventionAdminForm,
   domElementIds,
+  type ManageConventionAdminForm,
   manageConventionAdminFormSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";

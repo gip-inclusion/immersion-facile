@@ -2,10 +2,10 @@ import {
   type DiscussionDto,
   type DiscussionId,
   type DiscussionReadDto,
-  type InclusionConnectDomainJwtPayload,
-  type User,
   discussionIdSchema,
   errors,
+  type InclusionConnectDomainJwtPayload,
+  type User,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";

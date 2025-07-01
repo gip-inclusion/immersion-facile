@@ -1,7 +1,7 @@
 import {
+  errors,
   type InclusionConnectedUser,
   type UserParamsForAgency,
-  errors,
 } from "shared";
 
 export const updateUserAgencyRights = (

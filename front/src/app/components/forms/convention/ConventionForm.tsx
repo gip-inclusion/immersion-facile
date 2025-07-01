@@ -3,6 +3,8 @@ import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import { Button } from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   type Dispatch,
   type ElementRef,
@@ -21,21 +23,22 @@ import {
 } from "react-design-system";
 import {
   FormProvider,
-  type SubmitHandler,
   get,
+  type SubmitHandler,
   useForm,
 } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addressDtoToString,
   type Beneficiary,
   type ConventionReadDto,
-  type DepartmentCode,
-  type ExcludeFromExisting,
-  type InternshipKind,
-  addressDtoToString,
   conventionSchema,
+  type DepartmentCode,
   domElementIds,
+  type ExcludeFromExisting,
+  errors as errorMessage,
   hasBeneficiaryCurrentEmployer,
+  type InternshipKind,
   isBeneficiaryMinor,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
@@ -44,10 +47,16 @@ import {
   makeListAgencyOptionsKindFilter,
   notJobSeeker,
 } from "shared";
+import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
 import {
   AgencySelector,
   departmentOptions,
 } from "src/app/components/forms/commons/AgencySelector";
+import {
+  type ConventionFormMode,
+  creationFormModes,
+  type SupportedConventionRoutes,
+} from "src/app/components/forms/convention/ConventionFormWrapper";
 import {
   type ConventionPresentation,
   conventionPresentationSchema,
@@ -57,30 +66,20 @@ import { BeneficiaryFormSection } from "src/app/components/forms/convention/sect
 import { EstablishmentFormSection } from "src/app/components/forms/convention/sections/establishment/EstablishmentFormSection";
 import { ImmersionDetailsSection } from "src/app/components/forms/convention/sections/immersion-details/ImmersionDetailsSection";
 import { ScheduleSection } from "src/app/components/forms/convention/sections/schedule/ScheduleSection";
+import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
 import {
   formConventionFieldsLabels,
   formUiSections,
   sidebarStepContent,
 } from "src/app/contents/forms/convention/formConvention";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
+import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import {
   displayReadableError,
   getFormContents,
   makeFieldError,
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
-
-import Input from "@codegouvfr/react-dsfr/Input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { errors as errorMessage } from "shared";
-import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
-import {
-  type ConventionFormMode,
-  type SupportedConventionRoutes,
-  creationFormModes,
-} from "src/app/components/forms/convention/ConventionFormWrapper";
-import { useUpdateConventionValuesInUrl } from "src/app/components/forms/convention/useUpdateConventionValuesInUrl";
-import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useExistingSiret } from "src/app/hooks/siret.hooks";
 import { useMatomo } from "src/app/hooks/useMatomo";
@@ -97,8 +96,8 @@ import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import {
-  type NumberOfSteps,
   conventionSlice,
+  type NumberOfSteps,
 } from "src/core-logic/domain/convention/convention.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
@@ -329,6 +328,7 @@ export const ConventionForm = ({
     );
     setStepsStatus(stepsDataValue.reduce((acc, curr) => ({ ...acc, ...curr })));
     if (type === "clearAllErrors") {
+      // biome-ignore lint/suspicious/noConsole: debug purpose
       console.info("CLEAR ALL ERRORS");
       clearErrors();
     }
@@ -663,6 +663,7 @@ export const ConventionForm = ({
                   }}
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
+                    // biome-ignore lint/suspicious/noConsole: debug purpose
                     console.error(conventionValues, errors);
                   })}
                 >
@@ -695,6 +696,7 @@ export const ConventionForm = ({
                   }
                   onClick={handleSubmit(onSubmit, (errors) => {
                     validateSteps("doNotClear");
+                    // biome-ignore lint/suspicious/noConsole: debug purpose
                     console.error(conventionValues, errors);
                   })}
                 >

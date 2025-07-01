@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
-  InclusionConnectedUserBuilder,
   allowedFileSignatures,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  InclusionConnectedUserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";

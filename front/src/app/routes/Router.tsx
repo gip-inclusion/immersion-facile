@@ -1,7 +1,7 @@
 import {
+  lazy,
   type ReactElement,
   type ReactNode,
-  lazy,
   useEffect,
   useRef,
 } from "react";
@@ -9,11 +9,10 @@ import { PageHeader } from "react-design-system";
 import { type AdminTabRouteName, adminTabRouteNames } from "shared";
 import { AdminAgencyDetail } from "src/app/components/forms/agency/AdminAgencyDetail";
 import { AgencyDetailForAgencyDashboard } from "src/app/components/forms/agency/AgencyDetailForAgencyDashboard";
-import { StatsPage } from "src/app/pages/StatsPage";
 import { AdminTabs } from "src/app/pages/admin/AdminTabs";
 import { AdminUserDetail } from "src/app/pages/admin/AdminUserDetail";
-import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AddAgencyPage } from "src/app/pages/agency/AddAgencyPage";
+import { AgencyDashboardPage } from "src/app/pages/agency-dashboard/AgencyDashboardPage";
 import { AdminPrivateRoute } from "src/app/pages/auth/AdminPrivateRoute";
 import { ConnectedPrivateRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { DashboardPrivateRoute } from "src/app/pages/auth/DashboardPrivateRoute";
@@ -28,9 +27,10 @@ import { ConventionSignPage } from "src/app/pages/convention/ConventionSignPage"
 import { ConventionStatusDashboardPage } from "src/app/pages/convention/ConventionStatusDashboardPage";
 import { InitiateConventionPage } from "src/app/pages/convention/InitiateConventionPage";
 import { frontErrors } from "src/app/pages/error/front-errors";
-import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
 import { EstablishmentFormPageForExternals } from "src/app/pages/establishment/EstablishmentFormPageForExternals";
 import { EstablishmentLeadRegistrationRejectedPage } from "src/app/pages/establishment/EstablishmentLeadRegistrationRejectedPage";
+import { EstablishmentDashboardPage } from "src/app/pages/establishment-dashboard/EstablishmentDashboardPage";
+import { StatsPage } from "src/app/pages/StatsPage";
 import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";

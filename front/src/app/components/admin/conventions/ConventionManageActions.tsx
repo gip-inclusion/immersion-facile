@@ -8,32 +8,32 @@ import { ButtonWithSubMenu } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import {
+  allowedRolesToCreateAssessment,
   type ConnectedUserJwt,
   type ConventionJwt,
   type ConventionReadDto,
   type ConventionStatus,
-  type EditConventionCounsellorNameRequestDto,
-  type ExcludeFromExisting,
-  type RenewConventionParams,
-  type Role,
-  type TransferConventionToAgencyRequestDto,
-  type UpdateConventionStatusRequestDto,
-  allowedRolesToCreateAssessment,
   conventionEstablishmentsRoles,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
+  type EditConventionCounsellorNameRequestDto,
+  type ExcludeFromExisting,
   establishmentsRoles,
   hasAllowedRole,
   hasAllowedRoleOnAssessment,
   isConventionRenewed,
   isConventionValidated,
+  type RenewConventionParams,
+  type Role,
+  type TransferConventionToAgencyRequestDto,
+  type UpdateConventionStatusRequestDto,
   userHasEnoughRightsOnConvention,
 } from "shared";
 import { BroadcastAgainButton } from "src/app/components/admin/conventions/BroadcastAgainButton";
 import { Feedback } from "src/app/components/feedback/Feedback";
-import { SignButton } from "src/app/components/forms/convention/SignButton";
-import { ModalWrapper } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
 import { getVerificationActionProps } from "src/app/components/forms/convention/manage-actions/getVerificationActionButtonProps";
+import { ModalWrapper } from "src/app/components/forms/convention/manage-actions/ManageActionModalWrapper";
+import { SignButton } from "src/app/components/forms/convention/SignButton";
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import {
   useFeedbackTopic,
@@ -44,9 +44,11 @@ import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import {
+  canAssessmentBeFilled,
+  isConventionEndingInOneDayOrMore,
+} from "src/core-logic/domain/convention/convention.utils";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
-import { isConventionEndingInOneDayOrMore } from "src/core-logic/domain/convention/convention.utils";
-import { canAssessmentBeFilled } from "src/core-logic/domain/convention/convention.utils";
 import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export type JwtKindProps =

@@ -15,26 +15,26 @@ import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type DiscussionId,
-  type DiscussionReadDto,
-  type Email,
-  type ExchangeFromDashboard,
-  type WithDiscussionId,
   addressDtoToString,
   createOpaqueEmail,
+  type DiscussionId,
+  type DiscussionReadDto,
   domElementIds,
+  type Email,
+  type ExchangeFromDashboard,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
   getFormattedFirstnameAndLastname,
   toDisplayedDate,
+  type WithDiscussionId,
 } from "shared";
 import {
   AcceptDiscussionModal,
   openAcceptDiscussionModal,
 } from "src/app/components/admin/establishments/AcceptDiscussionModal";
 import {
-  RejectDiscussionModal,
   openRejectDiscussionModal,
+  RejectDiscussionModal,
 } from "src/app/components/admin/establishments/RejectDiscussionModal";
 import { DiscussionStatusBadge } from "src/app/components/establishment/establishment-dashboard/DiscussionStatusBadge";
 import type { ConventionPresentation } from "src/app/components/forms/convention/conventionHelpers";
@@ -54,7 +54,7 @@ import {
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;

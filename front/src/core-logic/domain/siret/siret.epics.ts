@@ -1,4 +1,4 @@
-import { type Observable, filter, map, switchMap } from "rxjs";
+import { filter, map, type Observable, switchMap } from "rxjs";
 import {
   type GetSiretInfo,
   type GetSiretInfoError,

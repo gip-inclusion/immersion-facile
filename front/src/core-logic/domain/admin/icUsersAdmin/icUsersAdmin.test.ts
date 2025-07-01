@@ -4,26 +4,26 @@ import {
   AgencyDtoBuilder,
   type AgencyId,
   type AgencyRight,
-  type InclusionConnectedUser,
-  type RejectIcUserRoleForAgencyParams,
-  type UserParamsForAgency,
   errors,
   expectToEqual,
+  type InclusionConnectedUser,
+  type RejectIcUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
+  type UserParamsForAgency,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
 import {
   type IcUsersAdminFeedback,
   type IcUsersAdminState,
-  type NormalizedIcUserById,
-  type NormalizedInclusionConnectedUser,
   icUsersAdminInitialState,
   icUsersAdminSlice,
+  type NormalizedIcUserById,
+  type NormalizedInclusionConnectedUser,
 } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import { feedbacksSelectors } from "../../feedback/feedback.selectors";

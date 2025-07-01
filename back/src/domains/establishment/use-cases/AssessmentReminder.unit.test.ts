@@ -6,9 +6,9 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type DateString,
-  type Notification,
   expectObjectInArrayToMatch,
   getFormattedFirstnameAndLastname,
+  type Notification,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
@@ -16,17 +16,17 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import type { AssessmentEntity } from "../../convention/entities/AssessmentEntity";
 import {
-  type SaveNotificationAndRelatedEvent,
   makeSaveNotificationAndRelatedEvent,
+  type SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   type AssessmentReminder,
@@ -250,7 +250,10 @@ describe("AssessmentReminder", () => {
 const buildEstablishmentNotificationFrom = ({
   convention,
   createdAt,
-}: { convention: ConventionDto; createdAt: DateString }): Notification => {
+}: {
+  convention: ConventionDto;
+  createdAt: DateString;
+}): Notification => {
   return {
     id: "22222222-2222-4444-2222-222222222222",
     kind: "email",

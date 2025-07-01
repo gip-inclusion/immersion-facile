@@ -31,7 +31,9 @@ export class PgOutboxRepository implements OutboxRepository {
 
   public async countAllEvents({
     status,
-  }: { status: EventStatus }): Promise<number> {
+  }: {
+    status: EventStatus;
+  }): Promise<number> {
     const result = (await this.transaction
       .selectFrom("outbox")
       .select((eb) => eb.fn.countAll().as("total"))
@@ -58,7 +60,9 @@ export class PgOutboxRepository implements OutboxRepository {
 
   public async markOldInProcessEventsAsToRepublish({
     eventsBeforeDate,
-  }: { eventsBeforeDate: Date }): Promise<void> {
+  }: {
+    eventsBeforeDate: Date;
+  }): Promise<void> {
     await this.transaction
       .updateTable("outbox")
       .set({ status: "to-republish" })

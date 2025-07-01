@@ -1,13 +1,12 @@
 import { filter } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { getAdminToken } from "src/core-logic/domain/admin/admin.helpers";
+import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { catchEpicError } from "src/core-logic/storeConfig/catchEpicError";
 import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-
-import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 
 export type CreateUserOnAgencyAction = ActionOfSlice<
   typeof createUserOnAgencySlice

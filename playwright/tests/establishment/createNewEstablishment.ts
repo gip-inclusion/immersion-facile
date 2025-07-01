@@ -1,21 +1,21 @@
-import { type Page, expect } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 import {
   type AdminFormEstablishmentUserRight,
-  type FormEstablishmentDto,
   addressRoutes,
   domElementIds,
+  type FormEstablishmentDto,
   formCompletionRoutes,
 } from "shared";
 import { testConfig } from "../../custom.config";
 import {
-  type PlaywrightTestCallback,
   expectLocatorToBeVisibleAndEnabled,
   expectNoErrorVisible,
   fillAutocomplete,
+  type PlaywrightTestCallback,
 } from "../../utils/utils";
 import {
-  type MakeFormEstablishmentFromRetryNumber,
   goToNextStep,
+  type MakeFormEstablishmentFromRetryNumber,
 } from "./establishmentForm.utils";
 
 export const createEstablishmentForm =

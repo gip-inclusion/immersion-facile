@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/node";
 import { keys, prop } from "ramda";
-import { type DateString, errorToString, errors } from "shared";
+import { type DateString, errors, errorToString } from "shared";
 import { createLogger } from "../../../../utils/logger";
 import { notifyErrorObjectToTeam } from "../../../../utils/notifyTeam";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";

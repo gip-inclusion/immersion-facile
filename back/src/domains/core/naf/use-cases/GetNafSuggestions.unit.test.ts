@@ -1,9 +1,9 @@
-import { type NafSectionSuggestion, expectToEqual } from "shared";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
+import { expectToEqual, type NafSectionSuggestion } from "shared";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
   type GetNafSuggestions,
   makeGetNafSuggestions,

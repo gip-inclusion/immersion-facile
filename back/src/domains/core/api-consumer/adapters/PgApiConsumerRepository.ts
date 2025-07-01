@@ -6,17 +6,17 @@ import {
   type ApiConsumerContact,
   type ApiConsumerId,
   type ApiConsumerRights,
+  apiConsumerSchema,
   type DateString,
   type Email,
-  type WebhookSubscription,
-  apiConsumerSchema,
   eventToRightName,
+  type WebhookSubscription,
 } from "shared";
 import {
-  type KyselyDb,
   cast,
   jsonBuildObject,
   jsonStripNulls,
+  type KyselyDb,
 } from "../../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../../utils/logger";

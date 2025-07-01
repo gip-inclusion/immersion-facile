@@ -12,8 +12,8 @@ import {
   type ApiConsumerName,
   type ApiConsumerRights,
   type ConventionScope,
-  type NoScope,
   domElementIds,
+  type NoScope,
 } from "shared";
 
 const apiConsumerKindSeverity: Record<ApiConsumerKind, AlertProps.Severity> = {
