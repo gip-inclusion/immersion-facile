@@ -3,12 +3,7 @@ import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { MainWrapper } from "react-design-system";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { MetabaseView } from "src/app/components/MetabaseView";
-
-export const globalStatsUrl =
-  "https://metabase.immersion-facile.beta.gouv.fr/public/dashboard/93afb41e-949d-4677-aab3-95817f81223d";
-
-export const immersionStatsUrl =
-  "https://metabase.immersion-facile.beta.gouv.fr/public/dashboard/531a7757-5e85-4ed7-a958-94f4b493a11a";
+import { globalStatsUrl, immersionStatsUrl } from "src/app/contents/statsUrls";
 
 const tabs: Array<{
   label: string;

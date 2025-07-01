@@ -4,7 +4,7 @@ import type { AbsoluteUrl } from "shared";
 import { useConsent } from "src/app/components/ConsentManager";
 import { BackofficeDashboardTabContent } from "src/app/components/layout/BackofficeDashboardTabContent";
 import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenButton";
-import { globalStatsUrl, immersionStatsUrl } from "src/app/pages/StatsPage";
+import { globalStatsUrl, immersionStatsUrl } from "src/app/contents/statsUrls";
 import { ENV } from "src/config/environmentVariables";
 
 export const MetabaseView = ({
