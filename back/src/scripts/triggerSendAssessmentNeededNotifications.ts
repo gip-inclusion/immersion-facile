@@ -8,6 +8,7 @@ import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLin
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
+import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
 import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
 import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
@@ -71,6 +72,8 @@ const sendAssessmentFormNotificationsScript = async () => {
       timeGateway,
       uuidGenerator: new UuidV4Generator(),
     }),
+    config,
+    new NanoIdShortLinkIdGeneratorGateway(),
   );
 
   return sendAssessmentFormNotifications.execute({

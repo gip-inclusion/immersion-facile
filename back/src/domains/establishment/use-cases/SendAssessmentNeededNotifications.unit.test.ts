@@ -13,6 +13,7 @@ import {
   type Notification,
   type TemplatedEmail,
 } from "shared";
+import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import {
@@ -24,6 +25,7 @@ import {
   makeSaveNotificationAndRelatedEvent,
   type SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
+import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
   createInMemoryUow,
@@ -39,6 +41,8 @@ describe("SendAssessmentNeededNotifications", () => {
   let timeGateway: CustomTimeGateway;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   let saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  const config = new AppConfigBuilder().build();
+  let shortLinkIdGeneratorGateway: DeterministShortLinkIdGeneratorGateway;
 
   const now = new Date("2021-05-15T08:00:00.000Z");
   const twoDaysAgo = subDays(now, 2);
@@ -169,6 +173,7 @@ describe("SendAssessmentNeededNotifications", () => {
       uuidGenerator,
       timeGateway,
     );
+    shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
     sendEmailWithAssessmentCreationLink = new SendAssessmentNeededNotifications(
       new InMemoryUowPerformer(uow),
       saveNotificationAndRelatedEvent,
@@ -178,6 +183,8 @@ describe("SendAssessmentNeededNotifications", () => {
         timeGateway,
         uuidGenerator,
       }),
+      config,
+      shortLinkIdGeneratorGateway,
     );
 
     uow.agencyRepository.agencies = [
@@ -188,6 +195,7 @@ describe("SendAssessmentNeededNotifications", () => {
       }),
     ];
     uow.userRepository.users = [counsellor, validator1, validator2];
+    shortLinkIdGeneratorGateway.addMoreShortLinkIds(["short-link-id-1"]);
   });
 
   describe("Right paths", () => {
@@ -198,13 +206,15 @@ describe("SendAssessmentNeededNotifications", () => {
         conventionEndingInTwoDays,
       ]);
 
-      // Act
-      await sendEmailWithAssessmentCreationLink.execute({
-        conventionEndDate: {
-          from: now,
-          to: inOneDay,
-        },
-      });
+      const useCaseExecution =
+        await sendEmailWithAssessmentCreationLink.execute({
+          conventionEndDate: {
+            from: now,
+            to: inOneDay,
+          },
+        });
+
+      expect(useCaseExecution.errors).toEqual({});
 
       // Assert
       expectSavedNotificationsAndEvents({
@@ -228,13 +238,7 @@ describe("SendAssessmentNeededNotifications", () => {
                   conventionEndingTomorrow.establishmentTutor.firstName,
                 lastname: conventionEndingTomorrow.establishmentTutor.lastName,
               }),
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: conventionEndingTomorrow.establishmentTutor.email,
-                id: conventionEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "establishment-tutor",
-                now,
-              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
               internshipKind: conventionEndingTomorrow.internshipKind,
             },
             recipients: [conventionEndingTomorrow.establishmentTutor.email],
@@ -349,13 +353,7 @@ describe("SendAssessmentNeededNotifications", () => {
                 firstname:
                   conventionCCIEndingTomorrow.establishmentTutor.firstName,
               }),
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: conventionCCIEndingTomorrow.establishmentTutor.email,
-                id: conventionCCIEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "establishment-tutor",
-                now,
-              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
               internshipKind: conventionCCIEndingTomorrow.internshipKind,
             },
             recipients: [conventionCCIEndingTomorrow.establishmentTutor.email],
@@ -501,13 +499,7 @@ describe("SendAssessmentNeededNotifications", () => {
                   conventionEndingTomorrow.establishmentTutor.firstName,
                 lastname: conventionEndingTomorrow.establishmentTutor.lastName,
               }),
-              assessmentCreationLink: fakeGenerateMagicLinkUrlFn({
-                email: conventionEndingTomorrow.establishmentTutor.email,
-                id: conventionEndingTomorrow.id,
-                targetRoute: "bilan-immersion",
-                role: "establishment-tutor",
-                now,
-              }),
+              assessmentCreationLink: `${config.immersionFacileBaseUrl}/api/to/short-link-id-1`,
               internshipKind: conventionEndingTomorrow.internshipKind,
             },
             recipients: [conventionEndingTomorrow.establishmentTutor.email],
@@ -660,12 +652,14 @@ describe("SendAssessmentNeededNotifications", () => {
 
         expectToEqual(uow.outboxRepository.events, []);
 
-        await sendEmailWithAssessmentCreationLink.execute({
+        const { errors } = await sendEmailWithAssessmentCreationLink.execute({
           conventionEndDate: {
             from: oneDayAgo,
             to: now,
           },
         });
+
+        expect(errors).toEqual({});
 
         expectObjectInArrayToMatch(uow.notificationRepository.notifications, [
           {
