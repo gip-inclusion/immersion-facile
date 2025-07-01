@@ -65,7 +65,7 @@ import {
   type ConventionReadDto,
   type ConventionValidatorInputNames,
   DATE_CONSIDERED_OLD,
-  type EditCounsellorNameRequestDto,
+  type EditConventionCounsellorNameRequestDto,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   type FindSimilarConventionsParams,
@@ -221,7 +221,7 @@ const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
     agencyValidator: withOptionalFirstnameAndLastnameSchema.optional(),
   });
 
-export const editCounsellorNameRequestSchema: z.Schema<EditCounsellorNameRequestDto> =
+export const editConventionCounsellorNameRequestSchema: z.Schema<EditConventionCounsellorNameRequestDto> =
   withOptionalFirstnameAndLastnameSchema.and(
     z.object({
       conventionId: conventionIdSchema,

@@ -4,7 +4,7 @@ import type {
   ConventionId,
   ConventionJwt,
   ConventionSupportedJwt,
-  EditCounsellorNameRequestDto,
+  EditConventionCounsellorNameRequestDto,
   RenewConventionParams,
   TransferConventionToAgencyRequestDto,
   UpdateConventionStatusRequestDto,
@@ -33,7 +33,7 @@ type TransferConventionToAgencyPayload = {
 
 export type EditCounsellorNamePayload = {
   jwt: ConventionSupportedJwt;
-  editCounsellorNameParams: EditCounsellorNameRequestDto;
+  editCounsellorNameParams: EditConventionCounsellorNameRequestDto;
 };
 
 type SignPayload = {

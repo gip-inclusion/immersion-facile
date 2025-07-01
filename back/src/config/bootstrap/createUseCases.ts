@@ -18,7 +18,7 @@ import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyS
 import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeCreateAssessment } from "../../domains/convention/use-cases/CreateAssessment";
-import { makeEditCounsellorName } from "../../domains/convention/use-cases/EditCounsellorName";
+import { makeEditConventionCounsellorName } from "../../domains/convention/use-cases/EditConventionCounsellorName";
 import { GetAgencyPublicInfoById } from "../../domains/convention/use-cases/GetAgencyPublicInfoById";
 import { makeGetApiConsumersByConvention } from "../../domains/convention/use-cases/GetApiConsumersByConvention";
 import { makeGetAssessmentByConventionId } from "../../domains/convention/use-cases/GetAssessmentByConventionId";
@@ -826,7 +826,7 @@ export const createUseCases = ({
       uowPerformer,
       deps: { createNewEvent },
     }),
-    editCounsellorName: makeEditCounsellorName({
+    editConventionCounsellorName: makeEditConventionCounsellorName({
       uowPerformer,
       deps: { createNewEvent },
     }),

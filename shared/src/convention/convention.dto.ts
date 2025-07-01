@@ -334,7 +334,7 @@ export type TransferConventionToAgencyRequestDto = WithConventionId & {
   justification: string;
 };
 
-export type EditCounsellorNameRequestDto = WithConventionId &
+export type EditConventionCounsellorNameRequestDto = WithConventionId &
   WithOptionalFirstnameAndLastname;
 
 export type UpdateConventionRequestDto = {

@@ -12,7 +12,7 @@ import { expressEmptyResponseBody } from "../zodUtils";
 import { addConventionInputSchema } from "./addConventionInput";
 import {
   conventionReadSchema,
-  editCounsellorNameRequestSchema,
+  editConventionCounsellorNameRequestSchema,
   findSimilarConventionsParamsSchema,
   findSimilarConventionsResponseSchema,
   flatGetConventionsForAgencyUserParamsSchema,
@@ -162,10 +162,10 @@ export const conventionMagicLinkRoutes = defineRoutes({
     },
   }),
 
-  editCounsellorName: defineRoute({
+  editConventionCounsellorName: defineRoute({
     url: "/auth/convention/edit-counsellor-name",
     method: "post",
-    requestBodySchema: editCounsellorNameRequestSchema,
+    requestBodySchema: editConventionCounsellorNameRequestSchema,
     ...withAuthorizationHeaders,
     responses: {
       200: expressEmptyResponseBody,
