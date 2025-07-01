@@ -1,0 +1,26 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "extends": "//",
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn"
+      }
+    },
+    "includes": ["!**/public", "!**/dev-dist", "!**/scalingo", "!**/dist"]
+  },
+  "formatter": {
+    "includes": [
+      "!**/front/public",
+      "!**/front/dev-dist",
+      "!**/front/scalingo",
+      "!**/front/dist"
+    ]
+  }
+}
