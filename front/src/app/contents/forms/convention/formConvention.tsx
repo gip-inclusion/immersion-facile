@@ -73,7 +73,7 @@ const conventionSection = (internshipKind: InternshipKind) => ({
     required: true,
     hintText:
       internshipKind === "mini-stage-cci"
-        ? "Choisissez votre organisme : Chambre d'agriculture (secteur agricole), CMA (alimentation, bâtiment, fabrication et service) ou CCI (commerce, services, industrie)."
+        ? "Choisissez votre organisme : Chambre d'agriculture (secteur agricole), CMA (alimentation, bâtiment, fabrication, service) ou CCI (commerce, services, industrie)."
         : undefined,
     placeholder:
       internshipKind === "immersion"
