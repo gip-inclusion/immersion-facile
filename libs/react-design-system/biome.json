@@ -1,0 +1,25 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.6/biome.json",
+  "extends": "//",
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noConsole": "error"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn"
+      }
+    }
+  },
+  "formatter": {
+    "lineWidth": 80,
+    "enabled": true,
+    "indentWidth": 2,
+    "indentStyle": "space",
+    "formatWithErrors": true,
+    "includes": ["!**/public/dsfr"]
+  }
+}
