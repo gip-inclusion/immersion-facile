@@ -1,5 +1,7 @@
 import { addDays, subHours } from "date-fns";
 import {
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
@@ -64,13 +66,9 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       uow,
       convention,
       authorizedRoles: [
-        "counsellor",
-        "validator",
+        ...agencyModifierRoles,
+        ...allSignatoryRoles,
         "back-office",
-        "establishment-representative",
-        "beneficiary",
-        "beneficiary-current-employer",
-        "beneficiary-representative",
       ],
       errorToThrow: errors.assessment.sendAssessmentLinkForbidden(),
       jwtPayload,

@@ -178,7 +178,7 @@ export const errors = {
       ),
     forbidden: (mode: AssessmentMode) =>
       new ForbiddenError(
-        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs notifiés par email de l'agence prescriptrice peuvent ${
+        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs de l'agence prescriptrice peuvent ${
           mode === "GetAssessment" ? "récupérer" : "créer"
         } le bilan.`,
       ),
@@ -196,7 +196,7 @@ export const errors = {
       ),
     sendAssessmentLinkForbidden: () =>
       new ForbiddenError(
-        "Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
+        "Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
     sendAssessmentLinkNotAllowedForStatus: ({
       status,
@@ -348,7 +348,7 @@ export const errors = {
       ),
     transferNotAuthorizedForRole: () =>
       new ForbiddenError(
-        `Seul les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à transférer la convention.`,
+        `Seul les conseillers et les validateurs de l'agence prescriptrice sont autorisés à transférer la convention.`,
       ),
     twoStepsValidationBadStatus: ({
       targetStatus,
@@ -435,7 +435,7 @@ export const errors = {
       ),
     sendSignatureLinkNotAuthorizedForRole: () =>
       new ForbiddenError(
-        `Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à envoyer un lien de signature.`,
+        `Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à envoyer un lien de signature.`,
       ),
     smsSignatureLinkAlreadySent: ({
       signatoryRole,
