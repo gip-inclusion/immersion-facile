@@ -2,8 +2,8 @@ import {
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   type ConventionStatus,
-  type EditCounsellorNameRequestDto,
-  editCounsellorNameRequestSchema,
+  type EditConventionCounsellorNameRequestDto,
+  editConventionCounsellorNameRequestSchema,
   errors,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -15,10 +15,12 @@ import {
   throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
-export type EditCounsellorName = ReturnType<typeof makeEditCounsellorName>;
+export type EditConventionCounsellorName = ReturnType<
+  typeof makeEditConventionCounsellorName
+>;
 
-export const makeEditCounsellorName = createTransactionalUseCase<
-  EditCounsellorNameRequestDto,
+export const makeEditConventionCounsellorName = createTransactionalUseCase<
+  EditConventionCounsellorNameRequestDto,
   void,
   ConventionRelatedJwtPayload,
   {
@@ -27,7 +29,7 @@ export const makeEditCounsellorName = createTransactionalUseCase<
 >(
   {
     name: "EditCounsellorName",
-    inputSchema: editCounsellorNameRequestSchema,
+    inputSchema: editConventionCounsellorNameRequestSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
@@ -89,8 +91,6 @@ export const makeEditCounsellorName = createTransactionalUseCase<
           topic: "ConventionCounsellorNameEdited",
           payload: {
             conventionId: updatedConvention.id,
-            firstname: inputParams.firstname,
-            lastname: inputParams.lastname,
             triggeredBy,
           },
         }),

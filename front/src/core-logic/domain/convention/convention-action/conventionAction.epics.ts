@@ -85,7 +85,7 @@ const transferConventionToAgencyEpic: ConventionActionEpic = (
     ),
   );
 
-const editCounsellorNameEpic: ConventionActionEpic = (
+const editConventionCounsellorNameEpic: ConventionActionEpic = (
   action$,
   _,
   { conventionGateway },
@@ -94,7 +94,10 @@ const editCounsellorNameEpic: ConventionActionEpic = (
     filter(conventionActionSlice.actions.editCounsellorNameRequested.match),
     switchMap(({ payload }) =>
       conventionGateway
-        .editCounsellorName$(payload.editCounsellorNameParams, payload.jwt)
+        .editConventionCounsellorName$(
+          payload.editCounsellorNameParams,
+          payload.jwt,
+        )
         .pipe(
           map(() =>
             conventionActionSlice.actions.editCounsellorNameSucceeded(payload),
@@ -234,7 +237,7 @@ export const conventionActionEpics = [
   acceptByCounsellorEpic,
   signConventionEpic,
   renewConventionEpic,
-  editCounsellorNameEpic,
+  editConventionCounsellorNameEpic,
 ];
 
 type ConventionStatusChangeAction = ActionCreatorWithPayload<

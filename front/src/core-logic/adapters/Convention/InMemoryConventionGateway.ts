@@ -11,7 +11,7 @@ import {
   type ConventionReadDto,
   type ConventionSupportedJwt,
   type DashboardUrlAndName,
-  type EditCounsellorNameRequestDto,
+  type EditConventionCounsellorNameRequestDto,
   type FindSimilarConventionsParams,
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
@@ -59,7 +59,7 @@ export class InMemoryConventionGateway implements ConventionGateway {
 
   public transferConventionToAgencyResult$ = new Subject<void>();
 
-  public editCounsellorNameResult$ = new Subject<void>();
+  public editConventionCounsellorNameResult$ = new Subject<void>();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -81,11 +81,11 @@ export class InMemoryConventionGateway implements ConventionGateway {
     return this.addConventionResult$;
   }
 
-  public editCounsellorName$(
-    _params: EditCounsellorNameRequestDto,
+  public editConventionCounsellorName$(
+    _params: EditConventionCounsellorNameRequestDto,
     _jwt: ConventionSupportedJwt,
   ): Observable<void> {
-    return this.editCounsellorNameResult$;
+    return this.editConventionCounsellorNameResult$;
   }
 
   public getApiConsumersByConvention$(

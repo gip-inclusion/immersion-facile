@@ -130,11 +130,11 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       ),
   );
 
-  sharedRouter.editCounsellorName(
+  sharedRouter.editConventionCounsellorName(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.editCounsellorName.execute(
+        deps.useCases.editConventionCounsellorName.execute(
           req.body,
           match(req.payloads)
             .with(

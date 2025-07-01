@@ -3,7 +3,7 @@ import type { Dispatch, SetStateAction } from "react";
 import type {
   ConventionDto,
   ConventionStatus,
-  EditCounsellorNameRequestDto,
+  EditConventionCounsellorNameRequestDto,
   RenewConventionParams,
   Role,
   TransferConventionToAgencyRequestDto,
@@ -18,7 +18,7 @@ export type VerificationActionProps = {
       | UpdateConventionStatusRequestDto
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
-      | EditCounsellorNameRequestDto,
+      | EditConventionCounsellorNameRequestDto,
   ) => void;
   disabled?: boolean;
   initialStatus: ConventionStatus;

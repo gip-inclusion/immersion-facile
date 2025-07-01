@@ -12,7 +12,7 @@ import {
   type ConventionJwt,
   type ConventionReadDto,
   type ConventionStatus,
-  type EditCounsellorNameRequestDto,
+  type EditConventionCounsellorNameRequestDto,
   type ExcludeFromExisting,
   type RenewConventionParams,
   type Role,
@@ -106,7 +106,7 @@ export const ConventionManageActions = ({
       | UpdateConventionStatusRequestDto
       | TransferConventionToAgencyRequestDto
       | RenewConventionParams
-      | EditCounsellorNameRequestDto,
+      | EditConventionCounsellorNameRequestDto,
   ) => {
     if ("agencyId" in params) {
       dispatch(

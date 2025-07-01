@@ -11,7 +11,7 @@ import type {
   ConventionReadDto,
   ConventionSupportedJwt,
   DashboardUrlAndName,
-  EditCounsellorNameRequestDto,
+  EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
   InclusionConnectedAllowedRoutes,
   RenewConventionParams,
@@ -80,13 +80,13 @@ export class HttpConventionGateway implements ConventionGateway {
     );
   }
 
-  public editCounsellorName$(
-    params: EditCounsellorNameRequestDto,
+  public editConventionCounsellorName$(
+    params: EditConventionCounsellorNameRequestDto,
     jwt: ConventionSupportedJwt,
   ): Observable<void> {
     return from(
       this.magicLinkHttpClient
-        .editCounsellorName({
+        .editConventionCounsellorName({
           body: params,
           headers: { authorization: jwt },
         })

@@ -1049,11 +1049,15 @@ describe("convention action slice", () => {
   };
 
   const feedGatewayWithEditCounsellorNameSuccess = () => {
-    dependencies.conventionGateway.editCounsellorNameResult$.next(undefined);
+    dependencies.conventionGateway.editConventionCounsellorNameResult$.next(
+      undefined,
+    );
   };
 
   const feedGatewayWithEditCounsellorNameFailure = (error: Error) => {
-    dependencies.conventionGateway.editCounsellorNameResult$.error(error);
+    dependencies.conventionGateway.editConventionCounsellorNameResult$.error(
+      error,
+    );
   };
 
   const feedGatewayUpdateConventionStatusSuccess = () => {

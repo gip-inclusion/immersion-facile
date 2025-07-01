@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
-  type EditCounsellorNameRequestDto,
+  type EditConventionCounsellorNameRequestDto,
   type WithOptionalFirstnameAndLastname,
   domElementIds,
   withOptionalFirstnameAndLastnameSchema,
@@ -15,7 +15,7 @@ export const EditCounsellorNameModalContent = ({
   closeModal,
   conventionId,
 }: {
-  onSubmit: (params: EditCounsellorNameRequestDto) => void;
+  onSubmit: (params: EditConventionCounsellorNameRequestDto) => void;
   closeModal: () => void;
   conventionId: ConventionId;
 }) => {
