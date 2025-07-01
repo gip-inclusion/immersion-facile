@@ -14,6 +14,7 @@ import {
   withDateRangeSchema,
 } from "shared";
 import { z } from "zod";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
@@ -22,6 +23,8 @@ import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
+import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { UseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -57,12 +60,18 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   readonly #uowPerformer: UnitOfWorkPerformer;
 
+  readonly #config: AppConfig;
+
+  readonly #shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
     createNewEvent: CreateNewEvent,
+    config: AppConfig,
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway,
   ) {
     super();
     this.#uowPerformer = uowPerformer;
@@ -70,6 +79,8 @@ export class SendAssessmentNeededNotifications extends UseCase<
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
     this.#generateConventionMagicLinkUrl = generateConventionMagicLinkUrl;
+    this.#config = config;
+    this.#shortLinkIdGeneratorGateway = shortLinkIdGeneratorGateway;
   }
 
   protected async _execute(
@@ -205,7 +216,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
     await this.#saveNotificationAndRelatedEvent(
       uow,
-      this.#makeEstablishmentAssessmentEmail(convention, agency),
+      await this.#makeEstablishmentAssessmentEmail({ convention, agency, uow }),
     );
 
     if (convention.internshipKind === "immersion")
@@ -288,10 +299,33 @@ export class SendAssessmentNeededNotifications extends UseCase<
     };
   }
 
-  #makeEstablishmentAssessmentEmail(
-    convention: ConventionDto,
-    agency: AgencyWithUsersRights,
-  ): NotificationContentAndFollowedIds {
+  async #makeEstablishmentAssessmentEmail({
+    convention,
+    agency,
+    uow,
+  }: {
+    convention: ConventionDto;
+    agency: AgencyWithUsersRights;
+    uow: UnitOfWork;
+  }): Promise<NotificationContentAndFollowedIds> {
+    const makeShortMagicLink = prepareConventionMagicShortLinkMaker({
+      config: this.#config,
+      conventionMagicLinkPayload: {
+        id: convention.id,
+        email: convention.establishmentTutor.email,
+        role: "establishment-tutor",
+        now: this.#timeGateway.now(),
+      },
+      generateConventionMagicLinkUrl: this.#generateConventionMagicLinkUrl,
+      shortLinkIdGeneratorGateway: this.#shortLinkIdGeneratorGateway,
+      uow,
+    });
+
+    const assessmentCreationLink = await makeShortMagicLink({
+      targetRoute: frontRoutes.assessment,
+      lifetime: "short",
+    });
+
     return {
       kind: "email",
       templatedContent: {
@@ -311,13 +345,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
             firstname: convention.establishmentTutor.firstName,
             lastname: convention.establishmentTutor.lastName,
           }),
-          assessmentCreationLink: this.#generateConventionMagicLinkUrl({
-            id: convention.id,
-            email: convention.establishmentTutor.email,
-            role: "establishment-tutor",
-            targetRoute: frontRoutes.assessment,
-            now: this.#timeGateway.now(),
-          }),
+          assessmentCreationLink,
           internshipKind: convention.internshipKind,
         },
       },
