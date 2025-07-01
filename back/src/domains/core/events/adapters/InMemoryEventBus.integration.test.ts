@@ -11,8 +11,8 @@ import {
 } from "../../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../../config/pg/pgUtils";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { createPgUow } from "../../unit-of-work/adapters/createPgUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import type { DomainEvent, EventPublication } from "../events";
 import type { EventBus } from "../ports/EventBus";
 import { InMemoryEventBus } from "./InMemoryEventBus";

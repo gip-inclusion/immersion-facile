@@ -1,7 +1,7 @@
 import {
   type GetSiretRequestDto,
-  type SiretEstablishmentDto,
   getSiretRequestSchema,
+  type SiretEstablishmentDto,
 } from "shared";
 import { UseCase } from "../../UseCase";
 import { getSiretEstablishmentFromApi } from "../helpers/getSirenEstablishmentFromApi";

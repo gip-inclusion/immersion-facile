@@ -4,9 +4,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type SubmitHandler, useForm } from "react-hook-form";
 import {
   type ConventionId,
+  domElementIds,
   type EditConventionCounsellorNameRequestDto,
   type WithOptionalFirstnameAndLastname,
-  domElementIds,
   withOptionalFirstnameAndLastnameSchema,
 } from "shared";
 

@@ -1,15 +1,15 @@
 import {
   type AuthenticateWithOAuthCodeParams,
-  type InitiateLoginByEmailParams,
   getFormattedFirstnameAndLastname,
+  type InitiateLoginByEmailParams,
   immersionFacileNoReplyEmailSender,
   initiateLoginByEmailParamsSchema,
   queryParamsAsString,
 } from "shared";
 import type { OAuthConfig } from "../../../../../config/bootstrap/appConfig";
-import { createTransactionalUseCase } from "../../../UseCase";
 import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
+import { createTransactionalUseCase } from "../../../UseCase";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 
 export type InitiateLoginByEmail = ReturnType<typeof makeInitiateLoginByEmail>;

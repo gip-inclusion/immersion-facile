@@ -1,8 +1,8 @@
 import {
   type ConventionJwtPayload,
   type ConventionRelatedJwtPayload,
-  type HtmlToPdfRequest,
   errors,
+  type HtmlToPdfRequest,
   htmlToPdfRequestSchema,
 } from "shared";
 import { UseCase } from "../../UseCase";

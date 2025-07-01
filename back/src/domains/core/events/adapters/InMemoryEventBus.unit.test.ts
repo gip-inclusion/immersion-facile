@@ -5,11 +5,11 @@ import {
   expectArraysToMatch,
 } from "shared";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import type {
   DomainEvent,
   DomainTopic,
@@ -17,7 +17,7 @@ import type {
   EventPublication,
 } from "../events";
 import type { EventBus } from "../ports/EventBus";
-import { InMemoryEventBus, getLastPublication } from "./InMemoryEventBus";
+import { getLastPublication, InMemoryEventBus } from "./InMemoryEventBus";
 
 const domainEvt: DomainEvent = {
   id: "anId",

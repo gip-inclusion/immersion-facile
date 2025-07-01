@@ -1,4 +1,4 @@
-import { type TechnicalRoutes, expectHttpResponseToEqual } from "shared";
+import { expectHttpResponseToEqual, type TechnicalRoutes } from "shared";
 import type { HttpClient } from "shared-routes";
 
 export const shortLinkRedirectToLinkWithValidation = async (

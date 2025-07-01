@@ -1,8 +1,8 @@
 import {
-  type SiretDto,
-  UserBuilder,
   cartographeAppellationAndRome,
   expectHttpResponseToEqual,
+  type SiretDto,
+  UserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -15,10 +15,10 @@ import {
 import type { GenerateApiConsumerJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import {
+  defaultNafCode,
   EstablishmentAggregateBuilder,
   EstablishmentEntityBuilder,
   OfferEntityBuilder,
-  defaultNafCode,
 } from "../../../../domains/establishment/helpers/EstablishmentBuilders";
 import { buildTestApp } from "../../../../utils/buildTestApp";
 import type { SearchImmersionResultPublicV2 } from "../DtoAndSchemas/v2/output/SearchImmersionResultPublicV2.dto";

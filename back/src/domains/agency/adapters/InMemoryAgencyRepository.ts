@@ -8,15 +8,15 @@ import {
   type AgencyStatus,
   type AgencyWithUsersRights,
   type DepartmentCode,
+  errors,
   type GeoPositionDto,
+  isTruthy,
+  isWithAgencyRole,
   type PartialAgencyDto,
   type SiretDto,
   type UserId,
   type WithGeoPosition,
   type WithUserFilters,
-  errors,
-  isTruthy,
-  isWithAgencyRole,
 } from "shared";
 import { distanceBetweenCoordinatesInMeters } from "../../../utils/distanceBetweenCoordinatesInMeters";
 import type {

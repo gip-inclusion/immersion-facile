@@ -1,18 +1,18 @@
 import {
   type AgencyWithUsersRights,
   type ConventionDto,
+  errors,
+  frontRoutes,
   type Signatory,
   type SignatoryRole,
   type TemplatedEmail,
   type WithConventionDto,
-  errors,
-  frontRoutes,
   withConventionSchema,
 } from "shared";
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
-import { TransactionalUseCase } from "../../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

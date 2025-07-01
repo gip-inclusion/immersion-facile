@@ -5,9 +5,9 @@ import type { MouseEventHandler } from "react";
 
 import { createPortal } from "react-dom";
 import {
+  getSignatoryProcessedData,
   type InternshipKind,
   type Signatory,
-  getSignatoryProcessedData,
 } from "shared";
 
 export const createSignModalParams = {

@@ -1,17 +1,16 @@
 import MockAdapter from "axios-mock-adapter";
 import {
-  FTConnectError,
-  ManagedFTConnectError,
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
+  FTConnectError,
+  ManagedFTConnectError,
   testManagedFTConnectError,
   testRawFTConnectError,
 } from "shared";
 import { createAxiosSharedClient } from "shared-routes/axios";
 import { AppConfig } from "../../../../../../config/bootstrap/appConfig";
 import { makeAxiosInstances } from "../../../../../../utils/axiosUtils";
-import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
 import type {
   ExternalAccessToken,
   ExternalFtConnectAdvisor,
@@ -22,6 +21,7 @@ import {
   toFtConnectAdvisorDto,
   toFtConnectUserDto,
 } from "./ftConnectApi.routes";
+import { HttpFtConnectGateway } from "./HttpFtConnectGateway";
 
 const unhandledStatusCode = 201;
 

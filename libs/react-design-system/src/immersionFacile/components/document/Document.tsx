@@ -1,6 +1,6 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { type ReactElement, type ReactNode, cloneElement } from "react";
+import { cloneElement, type ReactElement, type ReactNode } from "react";
 import { useStyles } from "tss-react/dsfr";
 import "./Document.scss";
 

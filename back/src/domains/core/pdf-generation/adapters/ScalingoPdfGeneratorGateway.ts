@@ -1,10 +1,10 @@
 import {
   type AbsoluteUrl,
-  type HtmlToPdfRequest,
   errors,
+  type HtmlToPdfRequest,
   withAuthorizationHeaders,
 } from "shared";
-import { type HttpClient, defineRoute, defineRoutes } from "shared-routes";
+import { defineRoute, defineRoutes, type HttpClient } from "shared-routes";
 import { z } from "zod";
 import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";
 import type { PdfGeneratorGateway } from "../ports/PdfGeneratorGateway";

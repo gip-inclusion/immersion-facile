@@ -3,10 +3,10 @@ import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
-  type Role,
-  type WithConventionId,
   decodeMagicLinkJwtWithoutSignatureCheck,
   expiredMagicLinkErrorMessage,
+  type Role,
+  type WithConventionId,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useConvention } from "src/app/hooks/convention.hooks";

@@ -6,11 +6,11 @@ import {
   type DiscussionInList,
   type DiscussionReadDto,
   type DiscussionStatus,
+  defaultPerPageInWebPagination,
   type Exchange,
   type ExchangeFromDashboard,
   type FlatGetPaginatedDiscussionsParams,
   type WithDiscussionStatus,
-  defaultPerPageInWebPagination,
 } from "shared";
 import type {
   PayloadActionWithFeedbackTopic,

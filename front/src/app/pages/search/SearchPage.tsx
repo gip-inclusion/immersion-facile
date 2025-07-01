@@ -16,12 +16,12 @@ import {
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
+  domElementIds,
   type LatLonDistance,
   type SearchResultDto,
   type SearchSortedBy,
-  type ValueOf,
-  domElementIds,
   searchSortedByOptions,
+  type ValueOf,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { AppellationAutocomplete } from "src/app/components/forms/autocomplete/AppellationAutocomplete";
@@ -33,8 +33,8 @@ import { SearchListResults } from "src/app/components/search/SearchListResults";
 import { useGetAcquisitionParams } from "src/app/hooks/acquisition.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import {
-  type SearchRoute,
   encodedSearchUriParams,
+  type SearchRoute,
   useSearch,
 } from "src/app/hooks/search.hooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
@@ -42,8 +42,8 @@ import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/feature
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
 import {
-  type SearchPageParams,
   initialState,
+  type SearchPageParams,
   searchSlice,
 } from "src/core-logic/domain/search/search.slice";
 import { useStyles } from "tss-react/dsfr";

@@ -3,15 +3,15 @@ import {
   type AbsoluteUrl,
   type BrevoInboundBody,
   DiscussionBuilder,
-  type ShortLinkId,
-  type TechnicalRoutes,
-  type ValidateEmailFeedback,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
+  type ShortLinkId,
+  type TechnicalRoutes,
   technicalRoutes,
+  type ValidateEmailFeedback,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -21,8 +21,8 @@ import type { GenerateConventionJwt } from "../../../../domains/core/jwt";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 const discussionId = "11111111-1111-4111-1111-111111111111";

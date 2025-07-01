@@ -8,16 +8,16 @@ import {
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
   type DiscussionState,
-  type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
-  type SendExchangeRequestedPayload,
   discussionSlice,
+  type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
   initialDiscussionsWithPagination,
+  type SendExchangeRequestedPayload,
 } from "./discussion.slice";
 
 describe("Discussion slice", () => {

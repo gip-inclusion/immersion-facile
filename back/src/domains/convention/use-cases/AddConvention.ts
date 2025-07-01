@@ -1,14 +1,14 @@
 import {
   type AddConventionInput,
-  type ConventionStatus,
-  type WithConventionIdLegacy,
   addConventionInputSchema,
+  type ConventionStatus,
   errors,
+  type WithConventionIdLegacy,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { rejectsSiretIfNotAnOpenCompany } from "../../core/sirene/helpers/rejectsSiretIfNotAnOpenCompany";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

@@ -1,7 +1,7 @@
 import { expectToEqual } from "../test.helpers";
 import {
-  MAX_FILE_SIZE_MB,
   allowedFileSignatures,
+  MAX_FILE_SIZE_MB,
   validateFile,
 } from "./file.validators";
 

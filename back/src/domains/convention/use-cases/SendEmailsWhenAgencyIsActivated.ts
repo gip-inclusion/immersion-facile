@@ -1,15 +1,15 @@
 import { toPairs } from "ramda";
 import {
+  errors,
+  getCounsellorsAndValidatorsEmailsDeduplicated,
   type UserId,
   type UserParamsForMail,
   type WithAgencyId,
-  errors,
-  getCounsellorsAndValidatorsEmailsDeduplicated,
   withAgencyIdSchema,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

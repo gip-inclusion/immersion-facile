@@ -5,7 +5,9 @@ import { routes } from "src/app/routes/routes";
 
 export const AgencyLineAgencyName = ({
   agencyRight,
-}: { agencyRight: AgencyRight }): ReactNode => (
+}: {
+  agencyRight: AgencyRight;
+}): ReactNode => (
   <div key={agencyRight.agency.id}>
     {agencyRight.agency.name}
     <span className={fr.cx("fr-hint-text")}>

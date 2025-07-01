@@ -40,7 +40,7 @@ export const seedUsers = {
 };
 
 export const userSeed = async (db: KyselyDb) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("proConnectUserSeed start ...");
 
   await db
@@ -65,6 +65,6 @@ export const userSeed = async (db: KyselyDb) => {
     })
     .execute();
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("inclusionConnectUserSeed end");
 };

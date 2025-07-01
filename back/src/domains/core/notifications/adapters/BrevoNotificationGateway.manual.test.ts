@@ -14,7 +14,10 @@ describe("BrevoNotificationGateway manual", () => {
         httpClient: createFetchSharedClient(
           brevoNotificationGatewayRoutes,
           fetch,
-          { onResponseSideEffect: console.log },
+          {
+            // biome-ignore lint/suspicious/noConsole: debug purpose
+            onResponseSideEffect: console.log,
+          },
         ),
         emailAllowListPredicate: () => true,
         defaultSender: { email: "bob@fake.mail", name: "Immersion Facilitée" },

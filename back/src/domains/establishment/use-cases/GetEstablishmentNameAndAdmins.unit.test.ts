@@ -1,15 +1,15 @@
 import {
-  type InclusionConnectedUser,
-  UserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  type InclusionConnectedUser,
+  UserBuilder,
 } from "shared";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import {
   type GetEstablishmentNameAndAdmins,

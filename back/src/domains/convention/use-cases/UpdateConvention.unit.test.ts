@@ -6,18 +6,18 @@ import {
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionStatus,
-  type EstablishmentTutor,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
-  type Role,
-  UserBuilder,
   conventionSignatoryRoleBySignatoryKey,
   conventionStatuses,
+  type EstablishmentTutor,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
+  type Role,
   statusTransitionConfigs,
+  UserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createConventionMagicLinkPayload } from "../../../utils/jwt";
@@ -27,11 +27,11 @@ import {
 } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { UpdateConvention } from "./UpdateConvention";
 

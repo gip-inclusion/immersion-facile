@@ -6,6 +6,7 @@ export const logBodyAndThrow = <R extends HttpResponse<number, unknown>>({
 }: R): never => {
   const stringifiedBody = JSON.stringify(body, null, 2);
 
+  // biome-ignore lint/suspicious/noConsole: debug purpose
   console.error(stringifiedBody);
   throw new Error(stringifiedBody);
 };
@@ -50,6 +51,7 @@ export const otherwiseThrow = (unhandledResponse: never): never => {
   const message: string | undefined = (unhandledResponse as any)?.body?.message;
   const status: number | undefined = (unhandledResponse as any)?.body?.status;
 
+  // biome-ignore lint/suspicious/noConsole: debug purpose
   console.error(JSON.stringify(unhandledResponse, null, 2));
   throw new Error(
     message

@@ -10,7 +10,9 @@ import { AgencyTag } from "../../AgencyTag";
 
 export const AgencyLineCaracteristics = ({
   agencyRight,
-}: { agencyRight: AgencyRight }): ReactNode => (
+}: {
+  agencyRight: AgencyRight;
+}): ReactNode => (
   <ul className={fr.cx("fr-raw-list")}>
     <li>
       <AgencyTag refersToAgencyName={agencyRight.agency.refersToAgencyName} />

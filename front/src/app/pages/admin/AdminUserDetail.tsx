@@ -27,9 +27,6 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
 
   const userConnectedJwt = useAppSelector(authSelectors.inclusionConnectToken);
 
-  if (!userConnectedJwt)
-    return <p>Merci de vous connecter pour accéder à cette page.</p>;
-
   const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
     dispatch(
       updateUserOnAgencySlice.actions.updateUserAgencyRightRequested({
@@ -51,7 +48,8 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
   }, [dispatch]);
 
-  if (!currentUser) return <p>Vous n'êtes pas connecté...</p>;
+  if (!currentUser || !userConnectedJwt)
+    return <p>Merci de vous connecter pour accéder à cette page.</p>;
   if (isFetchingUser || isUpdatingUser) return <Loader />;
   if (!icUser) return <p>Aucun utilisateur trouvé</p>;
 

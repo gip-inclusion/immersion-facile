@@ -126,7 +126,6 @@ export function pipeWithValue(
   jk?: AnyFunction,
   kl?: AnyFunction,
 ): unknown {
-  // biome-ignore lint/style/noArguments: <explanation>
   switch (arguments.length) {
     case 1:
       return a;

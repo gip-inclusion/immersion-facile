@@ -5,13 +5,13 @@ import {
   type AgencyId,
   type AgencyRight,
   type AgencyWithUsersRights,
+  agencyRoleIsNotToReview,
   type EstablishmentDashboards,
   type InclusionConnectedUser,
   type User,
   type UserId,
   type UserWithRights,
   type WithDashboards,
-  agencyRoleIsNotToReview,
 } from "shared";
 import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";

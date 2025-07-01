@@ -31,5 +31,6 @@ export const ENV = {
 };
 
 Object.entries(ENV).forEach(([key, value]) =>
+  // biome-ignore lint/suspicious/noConsole: debug purpose
   console.info(`ENV.${key} >>> `, value),
 );

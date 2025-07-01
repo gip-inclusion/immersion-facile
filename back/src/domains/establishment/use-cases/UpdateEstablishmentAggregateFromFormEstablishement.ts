@@ -1,17 +1,17 @@
 import { equals } from "ramda";
 import {
   type AbsoluteUrl,
+  errors,
   type InclusionConnectDomainJwtPayload,
   type WithFormEstablishmentDto,
-  errors,
   withFormEstablishmentSchema,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";

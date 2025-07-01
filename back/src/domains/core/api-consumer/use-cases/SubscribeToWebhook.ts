@@ -1,13 +1,13 @@
 import {
   type ApiConsumer,
   type CreateWebhookSubscription,
-  type WebhookSubscription,
   createWebhookSubscriptionSchema,
   errors,
   eventToRightName,
+  type WebhookSubscription,
 } from "shared";
-import { TransactionalUseCase } from "../../UseCase";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../uuid-generator/ports/UuidGenerator";

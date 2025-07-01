@@ -4,8 +4,8 @@ import type { AddressDto } from "../address/address.dto";
 import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
 import type {
   ConventionId,
-  ImmersionObjective,
   discoverObjective,
+  ImmersionObjective,
 } from "../convention/convention.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";

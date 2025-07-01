@@ -11,7 +11,7 @@ import { featureFlagsSeed } from "./seed/featureFlagSeed";
 import { userSeed } from "./seed/userSeed";
 
 const executeSeedTasks = async (db: KyselyDb, deps: AppDependencies) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Seed start");
 
   await userSeed(db);
@@ -23,12 +23,12 @@ const executeSeedTasks = async (db: KyselyDb, deps: AppDependencies) => {
     await conventionSeed(uow, agencyIds);
   });
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Seed end");
 };
 
 const resetDb = async (db: KyselyDb) => {
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Reset Db start");
 
   await db.deleteFrom("immersion_assessments").execute();
@@ -54,7 +54,7 @@ const resetDb = async (db: KyselyDb) => {
   await db.deleteFrom("outbox_publications").execute();
   await db.deleteFrom("outbox").execute();
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Reset Db done");
 };
 
@@ -69,13 +69,13 @@ const seed = async () => {
   await pool.end();
   await deps.gateways.disconnectCache();
 
-  // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log("Pool end");
 };
 
 seed()
   .then(() => {
-    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    // biome-ignore lint/suspicious/noConsole: <explanation>
     console.log("Seeding script ended !");
   })
   .catch((err) => {

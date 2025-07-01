@@ -1,5 +1,5 @@
-import { type Page, expect } from "@playwright/test";
-import { type FormEstablishmentDto, domElementIds } from "shared";
+import { expect, type Page } from "@playwright/test";
+import { domElementIds, type FormEstablishmentDto } from "shared";
 
 export type MakeFormEstablishmentFromRetryNumber = (
   retryIndex: number,

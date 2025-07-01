@@ -1,7 +1,7 @@
 import { type ConventionJwtPayload, errors } from "shared";
 import { z } from "zod";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";

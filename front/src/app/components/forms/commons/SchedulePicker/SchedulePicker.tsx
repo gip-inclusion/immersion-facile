@@ -6,9 +6,9 @@ import {
   type ConventionDto,
   type ConventionReadDto,
   type DateIntervalDto,
-  type Weekday,
   reasonableSchedule,
   scheduleWithFirstDayActivity,
+  type Weekday,
 } from "shared";
 import { ComplexSchedulePicker } from "./ComplexSchedulePicker";
 import { RegularSchedulePicker } from "./RegularSchedulePicker";

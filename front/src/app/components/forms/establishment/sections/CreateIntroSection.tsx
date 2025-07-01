@@ -3,8 +3,8 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import ButtonsGroup from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { useFormContext } from "react-hook-form";
 import {
-  type FormEstablishmentDto,
   domElementIds,
+  type FormEstablishmentDto,
   toFormatedTextSiret,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";

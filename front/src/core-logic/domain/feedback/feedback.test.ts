@@ -84,7 +84,7 @@ describe("Feedbacks", () => {
       level: getLevelAndActionKindFromActionKindAndLevel(kindAndLevel).level,
       title: feedbacks[topic][kindAndLevel]?.title,
       message:
-        // biome-ignore lint/style/noNonNullAssertion:
+        // biome-ignore lint/style/noNonNullAssertion: testing purpose
         errorMessageFromApi ?? feedbacks[topic][kindAndLevel]!.message,
     });
 });

@@ -2,9 +2,9 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 import {
+  domElementIds,
   type InclusionConnectedUser,
   type UserParamsForAgency,
-  domElementIds,
 } from "shared";
 import { routes } from "src/app/routes/routes";
 import { AgenciesTablesSection } from "../agency/agencies-table/AgenciesTablesSection";

@@ -5,8 +5,8 @@ import {
   expectToEqual,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
   ListAgencyOptionsByFilter,
   toAgencyOption,

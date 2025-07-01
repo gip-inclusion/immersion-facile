@@ -1,15 +1,15 @@
 import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
-  type Email,
-  type InclusionConnectImmersionRoutes,
   allowedStartOAuthLoginPages,
   decodeJwtWithoutSignatureCheck,
   decodeURIWithParams,
   displayRouteName,
+  type Email,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
+  type InclusionConnectImmersionRoutes,
   inclusionConnectImmersionRoutes,
   queryParamsAsString,
 } from "shared";
@@ -27,8 +27,8 @@ import type { UuidGenerator } from "../../../../domains/core/uuid-generator/port
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import {
-  type InMemoryGateways,
   buildTestApp,
+  type InMemoryGateways,
 } from "../../../../utils/buildTestApp";
 
 describe("user connexion flow", () => {

@@ -12,17 +12,17 @@ import { useDispatch } from "react-redux";
 import {
   type ConventionDto,
   type ConventionReadDto,
-  type Phone,
-  type SignatoryRole,
   domElementIds,
   isConventionRenewed,
+  type Phone,
+  type SignatoryRole,
   toDisplayedDate,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import {
+  makeConventionSections,
   SendSignatureLinkModalWrapper,
   type SignatureLinkState,
-  makeConventionSections,
   sendSignatureLinkButtonProps,
   sendSignatureLinkModal,
 } from "src/app/contents/convention/conventionSummary.helpers";
@@ -31,14 +31,15 @@ import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import {
   conventionSelectors,
   signatoryDataFromConvention,
 } from "src/core-logic/domain/convention/convention.selectors";
+import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { SignatureActions } from "./SignatureActions";
+
 type ConventionSignFormProperties = {
   jwt: string;
   convention: ConventionReadDto;
@@ -231,6 +232,7 @@ export const ConventionSignForm = ({
                 onSubmitClick={methods.handleSubmit(
                   onSignFormSubmit,
                   (errors) => {
+                    // biome-ignore lint/suspicious/noConsole: debug purpose
                     console.error(methods.getValues(), errors);
                   },
                 )}

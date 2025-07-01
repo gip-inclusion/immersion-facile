@@ -6,14 +6,14 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionScope,
+  conventionSchema,
   type DataWithPagination,
   type DateRange,
+  errors,
   type FindSimilarConventionsParams,
   NotFoundError,
   type SiretDto,
   type UserId,
-  conventionSchema,
-  errors,
   validatedConventionStatuses,
 } from "shared";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";

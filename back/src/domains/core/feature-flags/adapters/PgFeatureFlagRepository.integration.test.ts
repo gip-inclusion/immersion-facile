@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
 import {
-  type FeatureFlags,
   expectToEqual,
+  type FeatureFlags,
   makeBooleanFeatureFlag,
   makeHighlightFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,

@@ -10,10 +10,10 @@ import {
   writeApiConsumerSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/authorization.helper";
-import { TransactionalUseCase } from "../../UseCase";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { GenerateApiConsumerJwt } from "../../jwt";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPerformer";
 

@@ -4,16 +4,16 @@ import {
   type AgencyRole,
   ConventionDtoBuilder,
   type EstablishmentRole,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
-  type Notification,
-  type SignatoryRole,
-  UserBuilder,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
+  type InclusionConnectDomainJwtPayload,
+  InclusionConnectedUserBuilder,
+  type Notification,
+  type SignatoryRole,
+  UserBuilder,
 } from "shared";
 import { AppConfigBuilder } from "../../../utils/AppConfigBuilder";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -21,21 +21,21 @@ import { createConventionMagicLinkPayload } from "../../../utils/jwt";
 import { fakeGenerateMagicLinkUrlFn } from "../../../utils/jwtTestHelper";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
-import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { DeterministShortLinkIdGeneratorGateway } from "../../core/short-link/adapters/short-link-generator-gateway/DeterministShortLinkIdGeneratorGateway";
+import { makeShortLinkUrl } from "../../core/short-link/ShortLink";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import {
   MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER,
-  type SendAssessmentLink,
   makeSendAssessmentLink,
+  type SendAssessmentLink,
 } from "./SendAssessmentLink";
 
 describe("SendAssessmentLink", () => {

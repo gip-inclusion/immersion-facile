@@ -1,7 +1,7 @@
 import type { AbsoluteUrl } from "../AbsoluteUrl";
-import type { Builder } from "../Builder";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, DepartmentCode } from "../address/address.dto";
+import type { Builder } from "../Builder";
 import type {
   AgencyDto,
   AgencyId,

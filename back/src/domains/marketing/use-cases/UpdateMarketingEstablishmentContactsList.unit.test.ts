@@ -2,21 +2,21 @@ import {
   AgencyDtoBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
-  UserBuilder,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   isSuperEstablishment,
+  UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
 import { InMemoryEstablishmentMarketingGateway } from "../adapters/establishmentMarketingGateway/InMemoryEstablishmentMarketingGateway";
@@ -24,8 +24,8 @@ import type { MarketingContact } from "../entities/MarketingContact";
 import type { EstablishmentMarketingGatewayDto } from "../ports/EstablishmentMarketingGateway";
 import type { EstablishmentMarketingContactEntity } from "../ports/EstablishmentMarketingRepository";
 import {
-  type UpdateMarketingEstablishmentContactList,
   makeUpdateMarketingEstablishmentContactList,
+  type UpdateMarketingEstablishmentContactList,
 } from "./UpdateMarketingEstablishmentContactsList";
 
 describe("UpdateMarketingEstablishmentContactsList", () => {

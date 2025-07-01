@@ -1,5 +1,5 @@
 import { decode } from "js-base64";
-import { type UserId, currentJwtVersions } from "..";
+import { currentJwtVersions, type UserId } from "..";
 import type {
   ConventionJwtPayload,
   InclusionConnectJwtPayload,

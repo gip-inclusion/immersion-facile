@@ -3,18 +3,18 @@ import {
   AssessmentDtoBuilder,
   ConventionDtoBuilder,
   type ConventionReadDto,
-  UserBuilder,
-  type WithConventionDto,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
+  UserBuilder,
+  type WithConventionDto,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
-import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { BroadcastToFranceTravailOnConventionUpdates } from "./BroadcastToFranceTravailOnConventionUpdates";
 import type { BroadcastToFranceTravailOnConventionUpdatesLegacy } from "./BroadcastToFranceTravailOnConventionUpdatesLegacy";
 import {

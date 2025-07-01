@@ -10,9 +10,9 @@ import { logPartnerResponses } from "../config/bootstrap/logPartnerResponses";
 import { partnerNames } from "../config/bootstrap/partnerNames";
 import { InMemoryCachingGateway } from "../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import {
-  ExponentialBackoffRetryStrategy,
   defaultMaxBackoffPeriodMs,
   defaultRetryDeadlineMs,
+  ExponentialBackoffRetryStrategy,
 } from "../domains/core/retry-strategy/adapters/ExponentialBackoffRetryStrategy";
 import { InseeSiretGateway } from "../domains/core/sirene/adapters/InseeSiretGateway";
 import { makeInseeExternalRoutes } from "../domains/core/sirene/adapters/InseeSiretGateway.routes";

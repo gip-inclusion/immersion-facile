@@ -1,4 +1,4 @@
-import { type Observable, from } from "rxjs";
+import { from, type Observable } from "rxjs";
 import type {
   AddConventionInput,
   ApiConsumerName,
@@ -33,7 +33,7 @@ import {
 } from "src/core-logic/adapters/otherwiseThrow";
 import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";
-import { P, match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 export class HttpConventionGateway implements ConventionGateway {
   constructor(

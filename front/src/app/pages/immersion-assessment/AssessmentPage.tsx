@@ -6,11 +6,11 @@ import { Loader, MainWrapper, PageHeader } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type ConventionJwtPayload,
-  type Role,
   decodeMagicLinkJwtWithoutSignatureCheck,
   domElementIds,
   getFormattedFirstnameAndLastname,
   hasAllowedRoleOnAssessment,
+  type Role,
 } from "shared";
 import { Breadcrumbs } from "src/app/components/Breadcrumbs";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";

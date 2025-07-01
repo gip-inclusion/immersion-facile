@@ -54,6 +54,7 @@ export const EmailValidationInput = (props: EmailValidationInputProps) => {
         }
       })
       .catch((error) => {
+        // biome-ignore lint/suspicious/noConsole: debug purpose
         console.error(error);
         const feedback = makeStateRelated({
           status: "unexpected_error",

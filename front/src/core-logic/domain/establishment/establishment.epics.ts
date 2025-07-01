@@ -1,9 +1,9 @@
 import { filter, map, of, switchMap, tap } from "rxjs";
 import { errors } from "shared";
 import {
-  type SiretAndJwtPayload,
   defaultFormEstablishmentValue,
   establishmentSlice,
+  type SiretAndJwtPayload,
 } from "src/core-logic/domain/establishment/establishment.slice";
 import {
   type SiretAction,

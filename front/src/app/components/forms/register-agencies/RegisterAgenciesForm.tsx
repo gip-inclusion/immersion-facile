@@ -14,11 +14,11 @@ import { Tag } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   type AgencyId,
-  type InclusionConnectedUser,
-  type SiretDto,
   agencyKindToLabelIncludingIFAndPrepa,
   domElementIds,
+  type InclusionConnectedUser,
   looksLikeSiret,
+  type SiretDto,
 } from "shared";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";

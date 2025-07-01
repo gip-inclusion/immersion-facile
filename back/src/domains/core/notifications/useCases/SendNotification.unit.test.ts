@@ -1,30 +1,30 @@
 import {
   type EmailNotification,
-  type NotificationErrored,
-  type SmsNotification,
-  type TemplatedEmail,
-  type TemplatedSms,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
+  type NotificationErrored,
+  type SmsNotification,
+  type TemplatedEmail,
+  type TemplatedSms,
 } from "shared";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
 } from "../../events/ports/EventBus";
 import { CustomTimeGateway } from "../../time-gateway/adapters/CustomTimeGateway";
-import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  type InMemoryUnitOfWork,
   createInMemoryUow,
+  type InMemoryUnitOfWork,
 } from "../../unit-of-work/adapters/createInMemoryUow";
+import { InMemoryUowPerformer } from "../../unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  InMemoryNotificationGateway,
   emailThatTriggerSendEmailError400,
   fakeHttpStatus400ErrorCode,
   fakeHttpStatus555ErrorCode,
+  InMemoryNotificationGateway,
   sendSmsError400PhoneNumber,
   sendSmsError555PhoneNumber,
 } from "../adapters/InMemoryNotificationGateway";

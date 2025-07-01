@@ -1,17 +1,17 @@
 import { identity } from "ramda";
 import {
   type AbsoluteUrl,
-  type EstablishmentDashboardTab,
-  type SiretDto,
   addressDtoToString,
+  type EstablishmentDashboardTab,
   errors,
   frontRoutes,
   immersionFacileNoReplyEmailSender,
+  type SiretDto,
   siretSchema,
 } from "shared";
 import { notifyErrorObjectToTeam } from "../../../utils/notifyTeam";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 

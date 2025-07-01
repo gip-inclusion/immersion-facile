@@ -1,26 +1,26 @@
 import {
   type ConnectedUserJwt,
+  errors,
+  expectObjectsToMatch,
+  expectToEqual,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   type SiretDto,
   type SiretEstablishmentDto,
-  errors,
-  expectObjectsToMatch,
-  expectToEqual,
 } from "shared";
 import type { FormEstablishmentParamsInUrl } from "src/app/routes/routeParams/formEstablishment";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { feedbacksSelectors } from "src/core-logic/domain/feedback/feedback.selectors";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
 import {
-  type TestDependencies,
   createTestStore,
+  type TestDependencies,
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 import {
+  defaultFormEstablishmentValue,
   type EstablishmentRequestedPayload,
   type EstablishmentState,
-  defaultFormEstablishmentValue,
   establishmentSlice,
 } from "./establishment.slice";
 

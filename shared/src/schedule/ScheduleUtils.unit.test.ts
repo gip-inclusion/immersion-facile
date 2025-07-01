@@ -10,7 +10,7 @@ import type {
   SelectedDaysOfTheWeekDto,
 } from "./Schedule.dto";
 import { scheduleSchema } from "./Schedule.schema";
-import { ScheduleDtoBuilder, defaultInterval } from "./ScheduleDtoBuilder";
+import { defaultInterval, ScheduleDtoBuilder } from "./ScheduleDtoBuilder";
 import {
   calculateNumberOfWorkedDays,
   calculateScheduleTotalDurationInDays,

@@ -1,4 +1,4 @@
-import { type ReactElement, cloneElement, useId } from "react";
+import { cloneElement, type ReactElement, useId } from "react";
 
 export type TooltipProps =
   | {
@@ -16,7 +16,8 @@ export type TooltipProps =
     };
 
 export const Tooltip = (props: TooltipProps) => {
-  const id = props.id ?? `tooltip-${useId()}`;
+  const defaultId = `tooltip-${useId()}`;
+  const id = props.id ?? defaultId;
 
   return (
     <>

@@ -13,9 +13,9 @@ import type {
 } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import {
+  allSignatoryRoles,
   type Role,
   type SignatoryRole,
-  allSignatoryRoles,
 } from "../role/role.dto";
 import type {
   AppellationAndRomeDto,
@@ -443,7 +443,10 @@ export const userHasEnoughRightsOnConvention = (
 export const getExactAge = ({
   birthDate,
   referenceDate,
-}: { birthDate: Date; referenceDate: Date }): number => {
+}: {
+  birthDate: Date;
+  referenceDate: Date;
+}): number => {
   return differenceInYears(startOfDay(referenceDate), startOfDay(birthDate));
 };
 

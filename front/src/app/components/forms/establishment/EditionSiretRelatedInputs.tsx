@@ -9,11 +9,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 
-export const EditionSiretRelatedInputs = ({
-  mode,
-}: {
-  mode: Mode;
-}) => {
+export const EditionSiretRelatedInputs = ({ mode }: { mode: Mode }) => {
   const { getFormFields } = getFormContents(
     formEstablishmentFieldsLabels(mode),
   );

@@ -1,4 +1,4 @@
-import { type ConventionId, type FtExternalId, errors } from "shared";
+import { type ConventionId, errors, type FtExternalId } from "shared";
 import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,

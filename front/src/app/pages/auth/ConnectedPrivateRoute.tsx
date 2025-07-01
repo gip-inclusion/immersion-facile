@@ -16,9 +16,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   type AllowedStartOAuthLoginPage,
-  type Email,
   absoluteUrlSchema,
   domElementIds,
+  type Email,
   emailSchema,
   immersionFacileNoReplyEmail,
   inclusionConnectImmersionRoutes,

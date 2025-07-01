@@ -4,18 +4,18 @@ import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { SectionHighlight } from "react-design-system";
 import {
   type AgencyRight,
-  type ConnectedUserJwt,
-  type WithDashboards,
   activeAgencyStatuses,
+  type ConnectedUserJwt,
   domElementIds,
+  type WithDashboards,
 } from "shared";
 import { Feedback } from "src/app/components/feedback/Feedback";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
 import {
   type AgencyDashboardRouteName,
   type AgencyTabRoute,
-  type FrontAgencyDashboardRoute,
   agencyDashboardTabsList,
+  type FrontAgencyDashboardRoute,
 } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";

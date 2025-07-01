@@ -1,4 +1,4 @@
-import { type Observable, Subject, from } from "rxjs";
+import { from, type Observable, Subject } from "rxjs";
 import {
   type AddConventionInput,
   type AgencyOption,
@@ -17,10 +17,10 @@ import {
   type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
   type ShareLinkByEmailDto,
+  sleep,
   type TransferConventionToAgencyRequestDto,
   type UpdateConventionStatusRequestDto,
   type WithConventionId,
-  sleep,
 } from "shared";
 import type { FetchConventionRequestedPayload } from "src/core-logic/domain/convention/convention.slice";
 import type { ConventionGateway } from "src/core-logic/ports/ConventionGateway";

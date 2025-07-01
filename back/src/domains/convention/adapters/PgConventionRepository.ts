@@ -11,15 +11,15 @@ import {
   type Email,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
-  type InternshipKind,
   errors,
+  type InternshipKind,
   isBeneficiaryStudent,
   isEstablishmentTutorIsEstablishmentRepresentative,
   validatedConventionStatuses,
 } from "shared";
 import {
-  type KyselyDb,
   falsyToNull,
+  type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import type { ConventionRepository } from "../ports/ConventionRepository";
 import { getReadConventionById } from "./pgConventionSql";
