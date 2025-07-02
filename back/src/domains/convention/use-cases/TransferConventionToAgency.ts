@@ -13,10 +13,7 @@ import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
-import {
-  throwErrorIfUserIsValidatorOfAgencyWithRefersTo,
-  throwErrorOnConventionIdMismatch,
-} from "../entities/Convention";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
   typeof makeTransferConventionToAgency
@@ -71,13 +68,14 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       errorToThrow: errors.convention.transferNotAuthorizedForRole(),
       jwtPayload,
       isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: false,
     });
 
-    await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
-      uow,
-      agencyId: convention.agencyId,
-      jwtPayload,
-    });
+    // await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
+    //   uow,
+    //   agencyId: convention.agencyId,
+    //   jwtPayload,
+    // });
 
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload

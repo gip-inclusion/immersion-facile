@@ -44,6 +44,7 @@ export const throwIfNotAuthorizedForRole = async ({
   errorToThrow,
   convention,
   isPeAdvisorAllowed,
+  isValidatorOfAgencyRefersToAllowed,
 }: {
   uow: UnitOfWork;
   jwtPayload: ConventionRelatedJwtPayload;
@@ -51,11 +52,33 @@ export const throwIfNotAuthorizedForRole = async ({
   errorToThrow: Error;
   convention: ConventionReadDto;
   isPeAdvisorAllowed: boolean;
+  isValidatorOfAgencyRefersToAllowed: boolean;
 }): Promise<void> => {
   if (!jwtPayload) throw errors.user.unauthorized();
 
   if ("userId" in jwtPayload) {
     const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+    if (!isValidatorOfAgencyRefersToAllowed) {
+      const agency = await uow.agencyRepository.getById(convention.agencyId);
+
+      if (!agency)
+        throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+      if (agency.refersToAgencyId) {
+        const agencyRightOnAgency = userWithRights.agencyRights.find(
+          (agencyRight) => agencyRight.agency.id === convention.agencyId,
+        );
+
+        if (
+          agencyRightOnAgency &&
+          !agencyRightOnAgency.roles.includes("counsellor")
+        )
+          throw errors.convention.unsupportedRole({
+            role: agencyRightOnAgency?.roles[0],
+          });
+      }
+    }
 
     if (
       userWithRights.isBackofficeAdmin &&
@@ -99,6 +122,8 @@ export const throwIfNotAuthorizedForRole = async ({
       return;
     }
 
+    // Validate agency refers to logic for userId payload
+
     throw errorToThrow;
   }
 
@@ -129,5 +154,18 @@ export const throwIfNotAuthorizedForRole = async ({
 
     if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
       throw errors.convention.emailNotLinkedToConvention(role);
+
+    // Validate agency refers to logic for applicationId payload
+    if (!isValidatorOfAgencyRefersToAllowed) {
+      const agency = await uow.agencyRepository.getById(convention.agencyId);
+
+      if (!agency)
+        throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+      if (agency.refersToAgencyId) {
+        if (role === "validator")
+          throw errors.convention.unsupportedRole({ role: role });
+      }
+    }
   }
 };

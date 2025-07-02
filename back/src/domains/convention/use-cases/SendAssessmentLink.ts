@@ -73,6 +73,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       errorToThrow: errors.assessment.sendAssessmentLinkForbidden(),
       jwtPayload,
       isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: true,
     });
 
     throwErrorIfConventionStatusNotAllowed(convention.status);

@@ -82,19 +82,6 @@ export const makeSendSignatureLink = createTransactionalUseCase<
 
     throwErrorIfConventionStatusNotAllowed(convention.status);
 
-    // const isNotSignatory = !(
-    //   "role" in jwtPayload && isSignatory(jwtPayload.role)
-    // );
-
-    // if (isNotSignatory) {
-    //   await throwIfUserIsNotIFAdminNorAgencyModifier({
-    //     uow,
-    //     jwtPayload,
-    //     agencyId: convention.agencyId,
-    //     convention,
-    //   });
-    // }
-
     await throwIfNotAuthorizedForRole({
       uow,
       convention,
@@ -106,6 +93,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       errorToThrow: errors.convention.sendSignatureLinkNotAuthorizedForRole(),
       jwtPayload,
       isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: true,
     });
 
     const signatoryKey =
