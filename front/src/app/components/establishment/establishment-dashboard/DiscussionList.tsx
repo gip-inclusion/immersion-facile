@@ -198,12 +198,10 @@ export const DiscussionList = () => {
                   id={`${domElementIds.establishmentDashboard.manageDiscussion.goToDiscussionButton}--${discussion.id}`}
                   size="small"
                   priority="secondary"
-                  onClick={() => {
-                    routes
-                      .establishmentDashboardDiscussions({
-                        discussionId: discussion.id,
-                      })
-                      .push();
+                  linkProps={{
+                    ...routes.establishmentDashboardDiscussions({
+                      discussionId: discussion.id,
+                    }).link,
                   }}
                 >
                   Voir la candidature
