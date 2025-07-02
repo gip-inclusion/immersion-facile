@@ -1,6 +1,8 @@
 import {
   type AgencyId,
   type ConnectedUser,
+  type ConnectedUserDomainJwtPayload,
+  type ConventionDomainPayload,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   errors,
@@ -57,115 +59,168 @@ export const throwIfNotAuthorizedForRole = async ({
   if (!jwtPayload) throw errors.user.unauthorized();
 
   if ("userId" in jwtPayload) {
-    const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-
-    if (!isValidatorOfAgencyRefersToAllowed) {
-      const agency = await uow.agencyRepository.getById(convention.agencyId);
-
-      if (!agency)
-        throw errors.agency.notFound({ agencyId: convention.agencyId });
-
-      if (agency.refersToAgencyId) {
-        const agencyRightOnAgency = userWithRights.agencyRights.find(
-          (agencyRight) => agencyRight.agency.id === convention.agencyId,
-        );
-
-        if (
-          agencyRightOnAgency &&
-          !agencyRightOnAgency.roles.includes("counsellor")
-        )
-          throw errors.convention.unsupportedRole({
-            role: agencyRightOnAgency?.roles[0],
-          });
-      }
-    }
-
-    if (
-      userWithRights.isBackofficeAdmin &&
-      authorizedRoles.includes("back-office")
-    ) {
-      return;
-    }
-
-    if (
-      userWithRights.email ===
-        convention.signatories.establishmentRepresentative.email &&
-      authorizedRoles.includes("establishment-representative")
-    ) {
-      return;
-    }
-
-    if (
-      userWithRights.email === convention.establishmentTutor.email &&
-      authorizedRoles.includes("establishment-tutor")
-    ) {
-      return;
-    }
-
-    const hasAuthorizedAgencyRole = userWithRights.agencyRights.some(
-      (agencyRight) =>
-        agencyRight.agency.id === convention.agencyId &&
-        agencyRight.roles.some((role) => authorizedRoles.includes(role)),
-    );
-
-    if (hasAuthorizedAgencyRole) {
-      return;
-    }
-
-    const hasAuthorizedEstablishmentRole = userWithRights.establishments?.some(
-      (establishmentRight) =>
-        authorizedRoles.includes(establishmentRight.role) &&
-        establishmentRight.siret === convention.siret,
-    );
-
-    if (hasAuthorizedEstablishmentRole) {
-      return;
-    }
-
-    // Validate agency refers to logic for userId payload
-
-    throw errorToThrow;
+    await onConnectedUser({
+      uow,
+      jwtPayload,
+      authorizedRoles,
+      errorToThrow,
+      convention,
+      isPeAdvisorAllowed,
+      isValidatorOfAgencyRefersToAllowed,
+    });
   }
 
   if ("applicationId" in jwtPayload) {
-    const { emailHash, role } = jwtPayload;
-
-    throwErrorOnConventionIdMismatch({
-      requestedConventionId: convention.id,
+    await onMagicLink({
+      uow,
       jwtPayload,
+      authorizedRoles,
+      errorToThrow,
+      convention,
+      isPeAdvisorAllowed,
+      isValidatorOfAgencyRefersToAllowed,
     });
+  }
+};
 
-    const emailMatchesPeAdvisoremail = isHashMatchPeAdvisorEmail({
-      beneficiary: convention.signatories.beneficiary,
-      emailHash: jwtPayload.emailHash,
-    });
+const onMagicLink = async ({
+  uow,
+  jwtPayload,
+  authorizedRoles,
+  errorToThrow,
+  convention,
+  isPeAdvisorAllowed,
+  isValidatorOfAgencyRefersToAllowed,
+}: {
+  uow: UnitOfWork;
+  jwtPayload: ConventionDomainPayload;
+  authorizedRoles: Role[];
+  errorToThrow: Error;
+  convention: ConventionReadDto;
+  isPeAdvisorAllowed: boolean;
+  isValidatorOfAgencyRefersToAllowed: boolean;
+}) => {
+  const { emailHash, role } = jwtPayload;
 
-    if (isPeAdvisorAllowed && emailMatchesPeAdvisoremail) {
-      return;
-    }
+  throwErrorOnConventionIdMismatch({
+    requestedConventionId: convention.id,
+    jwtPayload,
+  });
 
-    if (!authorizedRoles.includes(role)) {
-      throw errorToThrow;
-    }
+  const emailMatchesPeAdvisoremail = isHashMatchPeAdvisorEmail({
+    beneficiary: convention.signatories.beneficiary,
+    emailHash: jwtPayload.emailHash,
+  });
 
-    const emailsOrError = conventionEmailsByRole(convention)[role];
+  if (isPeAdvisorAllowed && emailMatchesPeAdvisoremail) {
+    return;
+  }
 
-    if (emailsOrError instanceof Error) throw emailsOrError;
+  if (!authorizedRoles.includes(role)) {
+    throw errorToThrow;
+  }
 
-    if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
-      throw errors.convention.emailNotLinkedToConvention(role);
+  const emailsOrError = conventionEmailsByRole(convention)[role];
 
-    // Validate agency refers to logic for applicationId payload
-    if (!isValidatorOfAgencyRefersToAllowed) {
-      const agency = await uow.agencyRepository.getById(convention.agencyId);
+  if (emailsOrError instanceof Error) throw emailsOrError;
 
-      if (!agency)
-        throw errors.agency.notFound({ agencyId: convention.agencyId });
+  if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
+    throw errors.convention.emailNotLinkedToConvention(role);
 
-      if (agency.refersToAgencyId) {
-        if (role === "validator")
-          throw errors.convention.unsupportedRole({ role: role });
-      }
+  // Validate agency refers to logic for applicationId payload
+  if (!isValidatorOfAgencyRefersToAllowed) {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    if (agency.refersToAgencyId) {
+      if (role === "validator")
+        throw errors.convention.validatorOfAgencyRefersToNotAllowed();
     }
   }
+};
+
+const onConnectedUser = async ({
+  uow,
+  jwtPayload,
+  authorizedRoles,
+  errorToThrow,
+  convention,
+  isValidatorOfAgencyRefersToAllowed,
+}: {
+  uow: UnitOfWork;
+  jwtPayload: ConnectedUserDomainJwtPayload;
+  authorizedRoles: Role[];
+  errorToThrow: Error;
+  convention: ConventionReadDto;
+  isPeAdvisorAllowed: boolean;
+  isValidatorOfAgencyRefersToAllowed: boolean;
+}) => {
+  const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
+
+  if (!isValidatorOfAgencyRefersToAllowed) {
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
+
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
+
+    if (agency.refersToAgencyId) {
+      const agencyRightOnAgency = userWithRights.agencyRights.find(
+        (agencyRight) => agencyRight.agency.id === convention.agencyId,
+      );
+
+      if (
+        agencyRightOnAgency &&
+        !agencyRightOnAgency.roles.includes("counsellor") &&
+        !agencyRightOnAgency.roles.includes("agency-admin") &&
+        !agencyRightOnAgency.roles.includes("agency-viewer")
+      )
+        throw errors.convention.validatorOfAgencyRefersToNotAllowed();
+    }
+  }
+
+  if (
+    userWithRights.isBackofficeAdmin &&
+    authorizedRoles.includes("back-office")
+  ) {
+    return;
+  }
+
+  if (
+    userWithRights.email ===
+      convention.signatories.establishmentRepresentative.email &&
+    authorizedRoles.includes("establishment-representative")
+  ) {
+    return;
+  }
+
+  if (
+    userWithRights.email === convention.establishmentTutor.email &&
+    authorizedRoles.includes("establishment-tutor")
+  ) {
+    return;
+  }
+
+  const hasAuthorizedAgencyRole = userWithRights.agencyRights.some(
+    (agencyRight) =>
+      agencyRight.agency.id === convention.agencyId &&
+      agencyRight.roles.some((role) => authorizedRoles.includes(role)),
+  );
+
+  if (hasAuthorizedAgencyRole) {
+    return;
+  }
+
+  const hasAuthorizedEstablishmentRole = userWithRights.establishments?.some(
+    (establishmentRight) =>
+      authorizedRoles.includes(establishmentRight.role) &&
+      establishmentRight.siret === convention.siret,
+  );
+
+  if (hasAuthorizedEstablishmentRole) {
+    return;
+  }
+
+  throw errorToThrow;
 };

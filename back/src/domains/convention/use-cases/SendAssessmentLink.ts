@@ -13,7 +13,10 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -47,7 +50,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     inputSchema: withConventionIdSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
-    const convention = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
 
@@ -62,9 +65,14 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
+    const conventionRead = await conventionDtoToConventionReadDto(
+      convention,
+      uow,
+    );
+
     await throwIfNotAuthorizedForRole({
       uow,
-      convention,
+      convention: conventionRead,
       authorizedRoles: [
         ...agencyModifierRoles,
         ...allSignatoryRoles,
@@ -114,7 +122,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
       recipientPhone: convention.establishmentTutor.phone,
       uow,
-      convention,
+      convention: conventionRead,
       ...deps,
     });
 
