@@ -3,7 +3,6 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
   type SignatoryRole,
   type UserId,
@@ -18,6 +17,7 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
@@ -80,7 +80,13 @@ export const makeSendSignatureLink = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status);
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
+      errors.convention.sendSignatureLinkNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
     await throwIfNotAuthorizedForRole({
       uow,
@@ -162,14 +168,6 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     await uow.outboxRepository.save(event);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
-  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
-    throw errors.convention.sendSignatureLinkNotAllowedForStatus({
-      status: status,
-    });
-  }
-};
 
 const sendSms = async ({
   conventionMagicLinkPayload,

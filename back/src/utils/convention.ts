@@ -1,6 +1,7 @@
 import {
   type ConventionDto,
   type ConventionReadDto,
+  type ConventionStatus,
   type Email,
   errors,
   type Role,
@@ -73,4 +74,14 @@ export const conventionDtoToConventionReadDto = async (
     agencyKind: agency.kind,
     ...(agencyRefersTo ? { agencyRefersTo } : {}),
   };
+};
+
+export const throwErrorIfConventionStatusNotAllowed = (
+  status: ConventionStatus,
+  allowedStatuses: ConventionStatus[],
+  errorToThrow: Error,
+) => {
+  if (!allowedStatuses.includes(status)) {
+    throw errorToThrow;
+  }
 };

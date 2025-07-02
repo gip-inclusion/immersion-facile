@@ -16,7 +16,10 @@ import {
   agencyDtoToConventionAgencyFields,
   agencyWithRightToAgencyDto,
 } from "../../../utils/agency";
-import { conventionDtoToConventionReadDto } from "../../../utils/convention";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -72,8 +75,11 @@ export class UpdateConvention extends TransactionalUseCase<
 
     const minimalValidStatus: ConventionStatus = "READY_TO_SIGN";
 
-    if (convention.status !== minimalValidStatus)
-      throw errors.convention.updateBadStatusInParams({ id: convention.id });
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      [minimalValidStatus],
+      errors.convention.updateBadStatusInParams({ id: convention.id }),
+    );
 
     const isTransitionAllowed = statusTransitionConfigs[
       minimalValidStatus
