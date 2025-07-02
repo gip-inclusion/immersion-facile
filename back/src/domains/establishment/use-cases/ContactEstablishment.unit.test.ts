@@ -136,7 +136,7 @@ describe("ContactEstablishment", () => {
       uuidGenerator,
       timeGateway,
       minimumNumberOfDaysBetweenSimilarContactRequests,
-      "domain.fr",
+      "http://if.fr",
     );
 
     uow.romeRepository.appellations = [

@@ -1704,7 +1704,7 @@ Profil du candidat :
           {
             label: "Répondre au candidat via mon espace",
             target: "_blank",
-            url: `https://${params.domain}/${frontRoutes.establishmentDashboard}/discussions?discussionId=${params.discussionId}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+            url: params.discussionUrl,
           },
         ],
         highlight: {

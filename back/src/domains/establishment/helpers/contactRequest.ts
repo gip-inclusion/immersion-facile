@@ -2,18 +2,20 @@ import {
   type DiscussionDtoEmail,
   type EmailParamsByEmailType,
   errors,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   type OmitFromExistingKeys,
 } from "shared";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 
 export const makeContactByEmailRequestParams = async ({
   discussion,
-  domain,
+  immersionFacileBaseUrl,
   uow,
 }: {
   discussion: DiscussionDtoEmail;
-  domain: string;
+  immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
   uow: UnitOfWork;
 }): Promise<EmailParamsByEmailType["CONTACT_BY_EMAIL_REQUEST"]> => {
   const appellationAndRomeDtos =
@@ -33,8 +35,7 @@ export const makeContactByEmailRequestParams = async ({
   > = {
     replyToEmail: discussion.potentialBeneficiary.email,
     appellationLabel,
-    domain,
-    discussionId: discussion.id,
+    discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
     businessName: discussion.businessName,
     businessAddress: `${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}`,
     contactFirstName: getFormattedFirstnameAndLastname({

@@ -427,7 +427,7 @@ export const createUseCases = ({
         uuidGenerator,
         gateways.timeGateway,
         config.minimumNumberOfDaysBetweenSimilarContactRequests,
-        config.immersionFacileDomain,
+        config.immersionFacileBaseUrl,
       ),
       legacyContactEstablishment: new LegacyContactEstablishment(
         uowPerformer,
@@ -560,6 +560,7 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
         config.immersionFacileDomain,
+        config.immersionFacileBaseUrl,
       ),
       notifyFranceTravailUserAdvisorOnConventionFullySigned:
         new NotifyFranceTravailUserAdvisorOnConventionFullySigned(

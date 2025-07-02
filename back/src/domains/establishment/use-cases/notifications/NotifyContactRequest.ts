@@ -10,6 +10,7 @@ import {
   immersionFacileNoReplyEmailSender,
   type TemplatedEmail,
 } from "shared";
+import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
@@ -23,16 +24,17 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
   readonly #saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
 
-  readonly #domain: string;
+  readonly #immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     domain: string,
+    immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"],
   ) {
     super(uowPerformer);
     this.#replyDomain = `reply.${domain}`;
-    this.#domain = domain;
+    this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
 
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
   }
@@ -127,7 +129,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
         ...(await makeContactByEmailRequestParams({
           uow,
           discussion,
-          domain: this.#domain,
+          immersionFacileBaseUrl: this.#immersionFacileBaseUrl,
         })),
         replyToEmail: opaqueEmail,
       },
