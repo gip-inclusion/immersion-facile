@@ -230,6 +230,10 @@ export const errors = {
       ),
   },
   convention: {
+    editCounsellorNameNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les conseillers et les validateurs de l'agence prescriptrice sont autorisés à modifier le nom du conseiller.`,
+      ),
     editCounsellorNameNotAllowedForStatus: ({
       status,
     }: {
