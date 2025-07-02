@@ -273,6 +273,7 @@ export const DiscussionList = () => {
                       filters: {
                         ...filters,
                         search: query,
+                        page: 1,
                       },
                       feedbackTopic: "establishment-dashboard-discussion-list",
                     }),

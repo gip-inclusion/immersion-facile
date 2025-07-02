@@ -7,7 +7,11 @@ import RadioButtons, {
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ErrorNotifications, LinkHome } from "react-design-system";
+import {
+  ErrorNotifications,
+  LinkHome,
+  useScrollToTop,
+} from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -36,7 +40,6 @@ import {
   toErrorsWithLabels,
 } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { routes } from "src/app/routes/routes";
 import errorSvg from "src/assets/img/error.svg";
 import successSvg from "src/assets/img/success.svg";

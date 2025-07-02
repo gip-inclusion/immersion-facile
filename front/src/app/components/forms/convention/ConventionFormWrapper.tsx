@@ -7,7 +7,7 @@ import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { intersection } from "ramda";
 import { useEffect, useState } from "react";
-import { ConventionSummary, Loader } from "react-design-system";
+import { ConventionSummary, Loader, useScrollToTop } from "react-design-system";
 import { createPortal } from "react-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -37,7 +37,6 @@ import { useConventionTexts } from "src/app/contents/forms/convention/textSetup"
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import type { ConventionImmersionPageRoute } from "src/app/pages/convention/ConventionImmersionPage";
 import type { ConventionMiniStagePageRoute } from "src/app/pages/convention/ConventionMiniStagePage";
 import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convention/ConventionPageForExternals";

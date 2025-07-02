@@ -2,7 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { useEffect } from "react";
-import { Loader, MainWrapper, PageHeader } from "react-design-system";
+import {
+  Loader,
+  MainWrapper,
+  PageHeader,
+  useScrollToTop,
+} from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
   allSignatoryRoles,
@@ -15,7 +20,6 @@ import {
 import { ConventionSignForm } from "src/app/components/forms/convention/ConventionSignForm";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { match } from "ts-pattern";
 import { useStyles } from "tss-react/dsfr";
 import type { Route } from "type-route";

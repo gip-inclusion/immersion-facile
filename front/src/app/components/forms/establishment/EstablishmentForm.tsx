@@ -4,7 +4,7 @@ import Stepper, { type StepperProps } from "@codegouvfr/react-dsfr/Stepper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keys } from "ramda";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader, useDebounce } from "react-design-system";
+import { Loader, useDebounce, useScrollToTop } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -28,7 +28,6 @@ import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAdminToken } from "src/app/hooks/jwt.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { useInitialSiret } from "src/app/hooks/siret.hooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import {
   formEstablishmentDtoToFormEstablishmentWithAcquisitionQueryParams,

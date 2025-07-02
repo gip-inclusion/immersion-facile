@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,
+  useScrollToTop,
 } from "react-design-system";
 import { useDispatch } from "react-redux";
 import {
@@ -25,7 +26,6 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { labelAndSeverityByStatus } from "src/app/contents/convention/labelAndSeverityByStatus";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
