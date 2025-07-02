@@ -123,7 +123,7 @@ describe("NotifyContactRequest", () => {
                         contactLastName: getFormattedFirstnameAndLastname({
                           lastname: establishmentContact.lastName,
                         }),
-                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
                         immersionObjective:
                           discussion.potentialBeneficiary.immersionObjective ??
@@ -160,7 +160,7 @@ describe("NotifyContactRequest", () => {
                         contactLastName: getFormattedFirstnameAndLastname({
                           lastname: establishmentContact.lastName,
                         }),
-                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
+                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
                         immersionObjective:
                           discussion.potentialBeneficiary.immersionObjective,
