@@ -159,6 +159,37 @@ describe("Immersion Assessment slice", () => {
       });
     });
   });
+
+  describe("clear fetched assessment", () => {
+    it("Clear fetched assessment", () => {
+      const conventionId = "11111111-1111-4111-1111-111111111111";
+      const assessment: AssessmentDto = {
+        conventionId,
+        status: "COMPLETED",
+        endedWithAJob: false,
+        establishmentAdvices: "my advices",
+        establishmentFeedback: "my feedback",
+      };
+      ({ store } = createTestStore({
+        assessment: {
+          isLoading: false,
+          currentAssessment: assessment,
+        },
+      }));
+
+      expectToEqual(
+        assessmentSelectors.currentAssessment(store.getState()),
+        assessment,
+      );
+
+      store.dispatch(assessmentSlice.actions.clearFetchedAssessment());
+      expectStateToMatchInitialState(store);
+      expectToEqual(
+        assessmentSelectors.currentAssessment(store.getState()),
+        null,
+      );
+    });
+  });
 });
 
 const expectStateToMatchInitialState = (store: ReduxStore) => {
