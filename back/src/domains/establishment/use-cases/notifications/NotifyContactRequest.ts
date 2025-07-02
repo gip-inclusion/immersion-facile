@@ -57,12 +57,19 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       const recipients = [discussion.potentialBeneficiary.email];
       const params = {
         businessName: discussion.businessName,
-        contactFirstName: discussion.establishmentContact.firstName,
-        contactLastName: discussion.establishmentContact.lastName,
+        contactFirstName: getFormattedFirstnameAndLastname({
+          firstname: discussion.establishmentContact.firstName,
+        }),
+        contactLastName: getFormattedFirstnameAndLastname({
+          lastname: discussion.establishmentContact.lastName,
+        }),
         kind: discussion.kind,
-        potentialBeneficiaryFirstName:
-          discussion.potentialBeneficiary.firstName,
-        potentialBeneficiaryLastName: discussion.potentialBeneficiary.lastName,
+        potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({
+          firstname: discussion.potentialBeneficiary.firstName,
+        }),
+        potentialBeneficiaryLastName: getFormattedFirstnameAndLastname({
+          lastname: discussion.potentialBeneficiary.lastName,
+        }),
       };
 
       await this.#saveNotificationAndRelatedEvent(uow, {

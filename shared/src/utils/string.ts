@@ -1,7 +1,7 @@
 import { values } from "ramda";
 
 export const capitalize = (str: string): string =>
-  str[0].toUpperCase() + str.slice(1);
+  str && str.length > 0 ? str[0].toUpperCase() + str.slice(1) : str;
 
 export const cleanStringToHTMLAttribute = (
   string: string,

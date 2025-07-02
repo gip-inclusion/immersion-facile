@@ -1,5 +1,6 @@
 import {
   errors,
+  getFormattedFirstnameAndLastname,
   type UserWithAdminRights,
   type WithSiretDto,
   withSiretSchema,
@@ -48,8 +49,12 @@ export class NotifyConfirmationEstablishmentCreated extends TransactionalUseCase
         recipients: [firstAdminUser.email],
         cc: establishmentContactUsers.map((user) => user.email),
         params: {
-          contactFirstName: firstAdminUser.firstName,
-          contactLastName: firstAdminUser.lastName,
+          contactFirstName: getFormattedFirstnameAndLastname({
+            firstname: firstAdminUser.firstName,
+          }),
+          contactLastName: getFormattedFirstnameAndLastname({
+            lastname: firstAdminUser.lastName,
+          }),
           businessName: establishment.establishment.name,
           businessAddresses: establishment.establishment.locations.map(
             ({ address, id }) => locationToRawAddress(id, address).rawAddress,

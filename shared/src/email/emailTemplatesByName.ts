@@ -1724,9 +1724,14 @@ Profil du candidat :
     CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
       niceName: "Candidat - Confirmation de la demande de contact",
       tags: [""],
-      createEmailVariables: ({ kind, beneficiaryFullName, businessName }) => ({
+      createEmailVariables: ({
+        kind,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+      }) => ({
         subject: ` Immersion Facilitée - Confirmation de l’envoi de votre candidature auprès de ${businessName}`,
-        greetings: `Bonjour ${beneficiaryFullName},`,
+        greetings: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},`,
         content: `<strong>Nous vous confirmons que votre candidature pour ${kind === "IF" ? "une immersion professionnelle" : "un stage"} a bien été transmise à ${businessName}</strong>. L'entreprise doit maintenant examiner votre demande.
 
           Si l'entreprise accepte, elle vous contactera pour discuter des détails de votre ${kind === "IF" ? "immersion" : "stage"}.
