@@ -2,10 +2,10 @@ import {
   type AgencyId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
+  errors,
   type InclusionConnectedUser,
   type Role,
   type UserWithAdminRights,
-  errors,
 } from "shared";
 import { conventionEmailsByRole } from "../../../utils/convention";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";

@@ -1,16 +1,16 @@
 import {
+  allModifierRoles,
   type ConventionDomainPayload,
   type ConventionDto,
   type ConventionStatus,
-  type InclusionConnectDomainJwtPayload,
-  type Signatories,
-  type UpdateConventionRequestDto,
-  type WithConventionIdLegacy,
-  allModifierRoles,
   errors,
+  type InclusionConnectDomainJwtPayload,
   isSignatoryRole,
+  type Signatories,
   statusTransitionConfigs,
+  type UpdateConventionRequestDto,
   updateConventionRequestSchema,
+  type WithConventionIdLegacy,
 } from "shared";
 import {
   agencyDtoToConventionAgencyFields,
@@ -20,10 +20,10 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";

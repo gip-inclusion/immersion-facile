@@ -1,30 +1,30 @@
 import { subHours } from "date-fns";
 import {
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
   type CreateConventionMagicLinkPayloadProperties,
-  type SignatoryRole,
-  type UserId,
-  agencyModifierRoles,
-  allSignatoryRoles,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
+  type SignatoryRole,
   signatoryRoleSchema,
+  type UserId,
 } from "shared";
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
-import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
+import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
+import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import {
