@@ -1875,7 +1875,7 @@ Profil du candidat :
         content: htmlContent,
       }),
     },
-    DISCUSSION_EXCHANGE_FORBIDEN: {
+    DISCUSSION_EXCHANGE_FORBIDDEN: {
       niceName: "Établissement - Réponse à candidature impossible",
       createEmailVariables: ({ reason, sender }) => ({
         bypassLayout: true,

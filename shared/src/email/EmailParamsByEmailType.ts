@@ -274,7 +274,7 @@ export type EmailParamsByEmailType = {
     subject: string;
     htmlContent: string;
   };
-  DISCUSSION_EXCHANGE_FORBIDEN: DiscussionExchangeForbiddenParams;
+  DISCUSSION_EXCHANGE_FORBIDDEN: DiscussionExchangeForbiddenParams;
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
     errorMessage: string;

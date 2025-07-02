@@ -155,24 +155,25 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         sender,
       };
 
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        followedIds: {
-          userId: userId || undefined,
-          establishmentSiret: discussion.siret,
-        },
-        kind: "email",
-        templatedContent: {
-          kind: "DISCUSSION_EXCHANGE_FORBIDEN",
-          params,
-          recipients:
-            sender === "establishment"
-              ? [
-                  discussion.establishmentContact.email,
-                  ...discussion.establishmentContact.copyEmails,
-                ]
-              : [discussion.potentialBeneficiary.email],
-        },
-      });
+      if (source === "inbound-parsing")
+        await this.#saveNotificationAndRelatedEvent(uow, {
+          followedIds: {
+            userId: userId || undefined,
+            establishmentSiret: discussion.siret,
+          },
+          kind: "email",
+          templatedContent: {
+            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+            params,
+            recipients:
+              sender === "establishment"
+                ? [
+                    discussion.establishmentContact.email,
+                    ...discussion.establishmentContact.copyEmails,
+                  ]
+                : [discussion.potentialBeneficiary.email],
+          },
+        });
 
       return params;
     }
@@ -188,24 +189,25 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         sender,
       };
 
-      await this.#saveNotificationAndRelatedEvent(uow, {
-        followedIds: {
-          userId: userId || undefined,
-          establishmentSiret: discussion.siret,
-        },
-        kind: "email",
-        templatedContent: {
-          kind: "DISCUSSION_EXCHANGE_FORBIDEN",
-          params,
-          recipients:
-            sender === "establishment"
-              ? [
-                  discussion.establishmentContact.email,
-                  ...discussion.establishmentContact.copyEmails,
-                ]
-              : [discussion.potentialBeneficiary.email],
-        },
-      });
+      if (source === "inbound-parsing")
+        await this.#saveNotificationAndRelatedEvent(uow, {
+          followedIds: {
+            userId: userId || undefined,
+            establishmentSiret: discussion.siret,
+          },
+          kind: "email",
+          templatedContent: {
+            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+            params,
+            recipients:
+              sender === "establishment"
+                ? [
+                    discussion.establishmentContact.email,
+                    ...discussion.establishmentContact.copyEmails,
+                  ]
+                : [discussion.potentialBeneficiary.email],
+          },
+        });
 
       return params;
     }
