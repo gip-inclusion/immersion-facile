@@ -54,6 +54,7 @@ describe("discussion e2e", () => {
         job: "Boss",
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();
@@ -202,6 +203,7 @@ describe("discussion e2e", () => {
                 userId: "other",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -325,7 +327,13 @@ describe("discussion e2e", () => {
     const user = new ConnectedUserBuilder().buildUser();
     const establishment = new EstablishmentAggregateBuilder()
       .withUserRights([
-        { role: "establishment-admin", job: "", phone: "", userId: "" },
+        {
+          role: "establishment-admin",
+          job: "",
+          phone: "",
+          userId: "",
+          shouldReceiveDiscussionNotifications: true,
+        },
       ])
       .build();
 

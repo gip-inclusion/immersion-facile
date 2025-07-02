@@ -62,9 +62,18 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
             job: "Boss",
             phone: "+3366887744",
             userId: establishmentAdmin.id,
+            shouldReceiveDiscussionNotifications: true,
           },
-          { role: "establishment-contact", userId: establishmentContact1.id },
-          { role: "establishment-contact", userId: establishmentContact2.id },
+          {
+            role: "establishment-contact",
+            userId: establishmentContact1.id,
+            shouldReceiveDiscussionNotifications: true,
+          },
+          {
+            role: "establishment-contact",
+            userId: establishmentContact2.id,
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build();
 

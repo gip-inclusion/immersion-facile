@@ -51,6 +51,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
     .object({
       role: z.literal("establishment-admin"),
       email: emailSchema,
+      shouldReceiveDiscussionNotifications: zBoolean,
       phone: phoneSchema,
       job: zStringMinLength1,
     })
@@ -58,6 +59,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
       z.object({
         role: z.literal("establishment-contact"),
         email: emailSchema,
+        shouldReceiveDiscussionNotifications: zBoolean,
         phone: phoneSchema.optional(),
         job: zStringMinLength1.optional(),
       }),

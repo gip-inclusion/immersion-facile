@@ -82,11 +82,13 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     email: establishmentAdmin.email,
     job: "osef",
     phone: "+33655445544",
+    shouldReceiveDiscussionNotifications: true,
   };
 
   const formContactRight: ContactFormEstablishmentUserRight = {
     role: "establishment-contact",
     email: establishmentContact.email,
+    shouldReceiveDiscussionNotifications: true,
   };
 
   let siretGateway: InMemorySiretGateway;
@@ -206,10 +208,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 job: formAdminRight.job,
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: establishmentContact.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers(
@@ -308,10 +312,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 job: formAdminRight.job,
                 phone: formAdminRight.phone,
                 userId: establishmentAdmin.id,
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: establishmentContact.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers(
@@ -331,7 +337,11 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       const formEstablishment = FormEstablishmentDtoBuilder.valid()
         .withUserRights([
           formAdminRight,
-          { role: "establishment-contact", email: formAdminRight.email },
+          {
+            role: "establishment-contact",
+            email: formAdminRight.email,
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build();
 
@@ -445,6 +455,12 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           job: "",
           phone: "",
           userId: establishmentAdmin.id,
+          shouldReceiveDiscussionNotifications: true,
+        },
+        {
+          role: "establishment-contact",
+          userId: establishmentContact.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -570,14 +586,17 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           job: "a job",
           phone: "+33612345678",
           userId: "estab.admin",
+          shouldReceiveDiscussionNotifications: true,
         },
         {
           role: "establishment-contact",
           userId: "estab.contact",
+          shouldReceiveDiscussionNotifications: true,
         },
         {
           role: "establishment-contact",
           userId: "no-uuid-provided",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -670,14 +689,17 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             job: "a job",
             phone: "+33612345678",
             userId: "estab.admin",
+            shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
             userId: "estab.contact",
+            shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
             userId: "no-uuid-provided",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build();
@@ -794,14 +816,17 @@ describe("InsertEstablishmentAggregateFromForm", () => {
                 job: "a job",
                 phone: "+33612345678",
                 userId: "estab.admin",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "estab.contact",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "no-uuid-provided",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -820,6 +845,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
             job: "",
             phone: "",
             userId: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build();

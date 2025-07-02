@@ -136,6 +136,7 @@ describe("search route", () => {
                 job: "",
                 phone: "",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -328,6 +329,7 @@ describe("search route", () => {
                     job: "",
                     phone: "",
                     userId: user.id,
+                    shouldReceiveDiscussionNotifications: true,
                   },
                 ])
                 .build(),
@@ -358,6 +360,7 @@ describe("search route", () => {
                     job: "",
                     phone: "",
                     userId: user.id,
+                    shouldReceiveDiscussionNotifications: true,
                   },
                 ])
                 .build(),
@@ -388,6 +391,7 @@ describe("search route", () => {
                     job: "",
                     phone: "",
                     userId: user.id,
+                    shouldReceiveDiscussionNotifications: true,
                   },
                 ])
                 .build(),

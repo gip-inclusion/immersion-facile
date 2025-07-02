@@ -88,6 +88,7 @@ describe("UpdateDiscussionStatus", () => {
               userId: "other-user",
               job: "",
               phone: "",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .build(),
@@ -442,6 +443,7 @@ describe("UpdateDiscussionStatus", () => {
                   userId: authorizedUser.id,
                   job: "",
                   phone: "",
+                  shouldReceiveDiscussionNotifications: true,
                 },
               ])
               .build(),
@@ -495,10 +497,12 @@ describe("UpdateDiscussionStatus", () => {
                   userId: "other-user-id",
                   job: "",
                   phone: "",
+                  shouldReceiveDiscussionNotifications: true,
                 },
                 {
                   role: "establishment-contact",
                   userId: authorizedUser.id,
+                  shouldReceiveDiscussionNotifications: true,
                 },
               ])
               .build(),
