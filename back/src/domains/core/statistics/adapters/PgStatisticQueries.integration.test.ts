@@ -87,6 +87,7 @@ describe("PgStatisticQueries", () => {
         userId: user.id,
         job: "",
         phone: "",
+        shouldReceiveDiscussionNotifications: true,
       };
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withEstablishmentSiret("33330000333300")

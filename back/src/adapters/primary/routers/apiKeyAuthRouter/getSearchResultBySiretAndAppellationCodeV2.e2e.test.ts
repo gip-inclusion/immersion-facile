@@ -75,7 +75,13 @@ describe("Route to get ImmersionSearchResultDto by siret and rome - /v2/offers/:
             .build(),
         )
         .withUserRights([
-          { role: "establishment-admin", userId: "osef", job: "", phone: "" },
+          {
+            role: "establishment-admin",
+            userId: "osef",
+            job: "",
+            phone: "",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .withOffers([
           new OfferEntityBuilder()

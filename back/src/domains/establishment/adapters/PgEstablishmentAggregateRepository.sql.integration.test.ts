@@ -75,6 +75,7 @@ describe("SQL queries, independent from PgEstablishmentAggregateRepository", () 
           userId: testUser.id,
           job: "",
           phone: "",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();

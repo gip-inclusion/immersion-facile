@@ -154,6 +154,7 @@ describe("POST contact-establishment public V2 route", () => {
           userId: user.id,
           job: "",
           phone: "",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .withOffers([
@@ -204,6 +205,7 @@ describe("POST contact-establishment public V2 route", () => {
             userId: user.id,
             job: "",
             phone: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .withOffers([
@@ -249,6 +251,7 @@ describe("POST contact-establishment public V2 route", () => {
             userId: user.id,
             job: "",
             phone: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .withOffers([
@@ -297,6 +300,7 @@ describe("POST contact-establishment public V2 route", () => {
             userId: user.id,
             job: "",
             phone: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .withOffers([
