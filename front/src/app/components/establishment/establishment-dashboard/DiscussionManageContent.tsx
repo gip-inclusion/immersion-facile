@@ -4,6 +4,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { emailReplySeparator } from "html-templates/src/configureGenerateHtmlFromTemplate";
 import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
@@ -25,9 +26,11 @@ import {
   escapeHtml,
   exchangeMessageFromDashboardSchema,
   getFormattedFirstnameAndLastname,
+  splitTextOnFirstSeparator,
   toDisplayedDate,
   type WithDiscussionId,
 } from "shared";
+
 import {
   AcceptDiscussionModal,
   openAcceptDiscussionModal,
@@ -58,6 +61,11 @@ import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
+
+const exchangeSeparators = [
+  /<br>\s*(De(?:&nbsp;|\u00A0|\s)*:|Le .*?,)?\s*Immersion Facilitée\s*(?:<|&lt;)ne-pas-ecrire-a-cet-email@immersion-facile\.beta\.gouv\.fr(?:>|&gt;)[^<]*<br>/i,
+  emailReplySeparator,
+];
 
 export const DiscussionManageContent = ({
   discussionId,
@@ -348,52 +356,65 @@ const DiscussionExchangesList = ({
   return (
     <section>
       <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
-      {sortedBySentAtDesc.map(({ sender, sentAt, message }) => (
-        <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
-          <header
-            className={fr.cx("fr-grid-row", "fr-grid-row--middle", "fr-mb-2w")}
-          >
-            <div>
-              <h2 className={fr.cx("fr-mb-0", "fr-mb-1v")}>
-                {sender === "establishment"
-                  ? `${discussion.businessName}`
-                  : getFormattedFirstnameAndLastname({
-                      firstname: discussion.potentialBeneficiary.firstName,
-                      lastname: discussion.potentialBeneficiary.lastName,
-                    })}
-              </h2>
-            </div>
-            <div className={fr.cx("fr-ml-auto")}>
-              <div className={fr.cx("fr-mb-2w")}>
-                <Badge
-                  className={`fr-badge--${
-                    sender === "establishment"
-                      ? "blue-cumulus"
-                      : "green-archipel"
-                  }`}
-                >
-                  {sender === "establishment" ? "Entreprise" : "Candidat"}
-                </Badge>
+      {sortedBySentAtDesc.map(({ sender, sentAt, message }) => {
+        const currentMessage = addLineBreakOnNewLines(
+          convertHtmlToText(message),
+        );
+        const messageToDisplay = splitTextOnFirstSeparator(
+          currentMessage,
+          exchangeSeparators,
+        );
+        return (
+          <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
+            <header
+              className={fr.cx(
+                "fr-grid-row",
+                "fr-grid-row--middle",
+                "fr-mb-2w",
+              )}
+            >
+              <div>
+                <h2 className={fr.cx("fr-mb-0", "fr-mb-1v")}>
+                  {sender === "establishment"
+                    ? `${discussion.businessName}`
+                    : getFormattedFirstnameAndLastname({
+                        firstname: discussion.potentialBeneficiary.firstName,
+                        lastname: discussion.potentialBeneficiary.lastName,
+                      })}
+                </h2>
               </div>
+              <div className={fr.cx("fr-ml-auto")}>
+                <div className={fr.cx("fr-mb-2w")}>
+                  <Badge
+                    className={`fr-badge--${
+                      sender === "establishment"
+                        ? "blue-cumulus"
+                        : "green-archipel"
+                    }`}
+                  >
+                    {sender === "establishment" ? "Entreprise" : "Candidat"}
+                  </Badge>
+                </div>
 
-              <span className={fr.cx("fr-hint-text")}>
-                {toDisplayedDate({
-                  date: new Date(sentAt),
-                  withHours: true,
-                })}
-              </span>
-            </div>
-          </header>
-          <hr className={fr.cx("fr-hr")} />
-          <section>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addLineBreakOnNewLines(convertHtmlToText(message)),
-              }}
-            />
-          </section>
-        </ExchangeMessage>
-      ))}
+                <span className={fr.cx("fr-hint-text")}>
+                  {toDisplayedDate({
+                    date: new Date(sentAt),
+                    withHours: true,
+                  })}
+                </span>
+              </div>
+            </header>
+            <hr className={fr.cx("fr-hr")} />
+            <section>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: messageToDisplay[0],
+                }}
+              />
+            </section>
+          </ExchangeMessage>
+        );
+      })}
     </section>
   );
 };
