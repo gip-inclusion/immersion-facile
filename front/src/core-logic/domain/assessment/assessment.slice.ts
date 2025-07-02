@@ -59,5 +59,8 @@ export const assessmentSlice = createSlice({
     ) => {
       state.isLoading = false;
     },
+    clearFetchedAssessment: (state) => {
+      state.currentAssessment = initialState.currentAssessment;
+    },
   },
 });

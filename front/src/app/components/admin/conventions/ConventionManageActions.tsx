@@ -97,6 +97,9 @@ export const ConventionManageActions = ({
         feedbackTopic: "assessment",
       }),
     );
+    return () => {
+      dispatch(assessmentSlice.actions.clearFetchedAssessment());
+    };
   }, [dispatch, convention.id, jwtParams.jwt]);
 
   const [validatorWarningMessage, setValidatorWarningMessage] = useState<
