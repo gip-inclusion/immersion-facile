@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   ConventionRenewedInformations,
   ConventionSummary,
+  useScrollToTop,
 } from "react-design-system";
 import { FormProvider, type SubmitHandler, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -29,7 +30,6 @@ import {
 import { useConventionTexts } from "src/app/contents/forms/convention/textSetup";
 import { useFeedbackTopics } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import {
   conventionSelectors,

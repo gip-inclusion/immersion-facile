@@ -12,6 +12,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 import {
   ConventionJobAndObjective,
   ConventionTotalHours,
+  useScrollToTop,
 } from "react-design-system";
 import { FormProvider, useForm, useFormContext } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -38,7 +39,6 @@ import { Feedback } from "src/app/components/feedback/Feedback";
 import { ImmersionDescription } from "src/app/components/forms/assessment/ImmersionDescription";
 import { printWeekSchedule } from "src/app/contents/convention/conventionSummary.helpers";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { match } from "ts-pattern";

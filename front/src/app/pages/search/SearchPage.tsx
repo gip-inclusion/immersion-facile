@@ -12,6 +12,7 @@ import {
   RichDropdown,
   SectionAccordion,
   SectionTextEmbed,
+  useScrollToTop,
 } from "react-design-system";
 import { useForm, useWatch } from "react-hook-form";
 import { useDispatch } from "react-redux";
@@ -37,7 +38,6 @@ import {
   type SearchRoute,
   useSearch,
 } from "src/app/hooks/search.hooks";
-import { useScrollToTop } from "src/app/hooks/window.hooks";
 import { featureFlagSelectors } from "src/core-logic/domain/featureFlags/featureFlags.selector";
 import { geosearchSlice } from "src/core-logic/domain/geosearch/geosearch.slice";
 import { searchSelectors } from "src/core-logic/domain/search/search.selectors";
