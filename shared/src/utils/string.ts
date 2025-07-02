@@ -88,3 +88,13 @@ export const escapeHtml = (unsafe: string) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
+export const splitTextOnFirstSeparator = (
+  text: string,
+  separators: (string | RegExp)[],
+): [string, ...string[]] => {
+  const separator = separators.find((separator) => text.match(separator));
+  return separator
+    ? [text.split(separator)[0], text.split(separator)[1]]
+    : [text];
+};

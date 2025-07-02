@@ -13,6 +13,9 @@ import { ignoreTabs } from "./helpers/formatters";
 
 type Attachement = { url: string } | { name: string; content: string };
 
+export const emailReplySeparator =
+  "##- Veuillez répondre au-dessus de cette ligne -##";
+
 export type GenerateHtmlOptions = {
   skipHead?: boolean;
   showContentParts?: boolean;
@@ -77,7 +80,7 @@ export const configureGenerateHtmlFromTemplate =
     const replyHeaderStyle =
       "color: #b5b5b5; font-size: 12px; margin-bottom: 12px;";
     const replyHeader = `
-        <p style="${replyHeaderStyle}">##- Veuillez répondre au-dessus de cette ligne -##</p>
+        <p style="${replyHeaderStyle}">${emailReplySeparator}</p>
         <p style="${replyHeaderStyle}">Cet email vous a été envoyé via le service Immersion Facilitée, vous pouvez répondre directement à cet email, il sera transmis à votre interlocuteur.</p>
         <p style="${replyHeaderStyle}">-----------------------------</p>`;
     const contentParts = {
