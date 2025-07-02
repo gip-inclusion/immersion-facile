@@ -15,6 +15,7 @@ export type WithEstablishmentAggregate = {
 type GenericEstablishmentUserRight<Role extends EstablishmentRole> = {
   userId: UserId;
   role: Role;
+  shouldReceiveDiscussionNotifications: boolean;
 };
 
 export type EstablishmentAdminRight =

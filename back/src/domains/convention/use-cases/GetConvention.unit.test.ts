@@ -113,6 +113,7 @@ describe("Get Convention", () => {
         job: "",
         phone: "",
         userId: tutor.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();
@@ -387,6 +388,7 @@ describe("Get Convention", () => {
                   role,
                   job: "",
                   phone: "",
+                  shouldReceiveDiscussionNotifications: true,
                 },
               ])
               .build();

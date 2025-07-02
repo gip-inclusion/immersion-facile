@@ -60,6 +60,7 @@ const osefUserRight: EstablishmentUserRight = {
   job: "osef",
   phone: "3615-OSEF",
   userId: osefUser.id,
+  shouldReceiveDiscussionNotifications: true,
 };
 
 describe("PgEstablishmentAggregateRepository", () => {
@@ -1817,6 +1818,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers([analysteEnGeomatiqueImmersionOffer, cuvisteOffer])
@@ -1830,6 +1832,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers([
@@ -1850,6 +1853,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -1863,6 +1867,7 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "sdlm!fjsdlfkjsdmlfj",
                 phone: "+33666887744",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withLocations([
@@ -2175,6 +2180,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing stuff",
           phone: "+336887875544",
           userId: user1.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -2188,6 +2194,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing other stuff",
           phone: "+33688445577",
           userId: user2.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -2201,6 +2208,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing other stuffffffffffffff",
           phone: "+33688445566",
           userId: user2.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();

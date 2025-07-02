@@ -21,6 +21,7 @@ describe("PgScriptsQueries", () => {
     job: "osef",
     phone: "3615-OSEF",
     userId: user.id,
+    shouldReceiveDiscussionNotifications: true,
   };
 
   let pool: Pool;

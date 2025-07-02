@@ -52,6 +52,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
       role: z.literal("establishment-admin"),
       email: emailSchema,
       phone: phoneNumberSchema,
+      shouldReceiveDiscussionNotifications: zBoolean,
       job: zStringMinLength1,
     })
     .or(
@@ -59,6 +60,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
         role: z.literal("establishment-contact"),
         email: emailSchema,
         phone: phoneNumberSchema.optional(),
+        shouldReceiveDiscussionNotifications: zBoolean,
         job: zStringMinLength1.optional(),
       }),
     );

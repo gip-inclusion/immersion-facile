@@ -106,6 +106,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
                 job: "",
                 phone: "",
                 userId: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -135,6 +136,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
                 job: "",
                 phone: "",
                 userId: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -278,6 +280,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
                 job: "",
                 phone: "",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -306,12 +309,14 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
                 job: "",
                 phone: "",
                 userId: "",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 job: "",
                 phone: "",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),

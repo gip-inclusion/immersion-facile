@@ -126,6 +126,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
               job: "",
               phone: "",
               role: "establishment-admin",
+              shouldReceiveDiscussionNotifications: true,
             },
           ]
         : initialFormEstablishment.userRights,

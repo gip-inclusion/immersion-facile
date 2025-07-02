@@ -107,7 +107,13 @@ describe("formCompletion Routes", () => {
     it("409 - Conflict for siret already in db", async () => {
       const establishmentAggregate = new EstablishmentAggregateBuilder()
         .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build();
       inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [

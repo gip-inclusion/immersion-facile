@@ -48,6 +48,7 @@ const userRights: EstablishmentUserRight[] = [
     role: "establishment-admin",
     job: "Chef",
     phone: "+33600000000",
+    shouldReceiveDiscussionNotifications: true,
   },
 ];
 

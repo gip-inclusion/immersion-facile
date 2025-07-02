@@ -89,6 +89,12 @@ export const formEstablishmentFieldsLabels = (
     required: true,
     id: domElementIds.establishment[mode].businessContact.phone,
   },
+  "userRights.0.shouldReceiveDiscussionNotifications": {
+    label: "Recevoir les notifications",
+    required: true,
+    id: domElementIds.establishment[mode].businessContact
+      .shouldReceiveDiscussionNotifications,
+  },
   "userRights.0.role": {
     label: "",
     id: "",

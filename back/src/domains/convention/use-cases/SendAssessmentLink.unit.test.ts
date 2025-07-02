@@ -327,6 +327,7 @@ describe("SendAssessmentLink", () => {
                   role,
                   job: "job",
                   phone: "phone",
+                  shouldReceiveDiscussionNotifications: true,
                 },
               ])
               .build(),

@@ -461,12 +461,14 @@ describe("GetConnectedUser", () => {
                 role: "establishment-admin",
                 userId: notAdmin.id,
                 phone: "+33600000000",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 job: "Dev",
                 role: "establishment-admin",
                 userId: anotherUser.id,
                 phone: "+33600000001",
+                shouldReceiveDiscussionNotifications: true,
               },
             ];
 
@@ -477,6 +479,7 @@ describe("GetConnectedUser", () => {
                 role: "establishment-contact",
                 userId: notAdmin.id,
                 phone: "+33600000000",
+                shouldReceiveDiscussionNotifications: true,
               },
             ];
 
