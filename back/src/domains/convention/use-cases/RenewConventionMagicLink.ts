@@ -14,7 +14,10 @@ import {
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import { verifyJwtConfig } from "../../../config/bootstrap/authMiddleware";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { conventionEmailsByRole } from "../../../utils/convention";
+import {
+  conventionDtoToConventionReadDto,
+  conventionEmailsByRole,
+} from "../../../utils/convention";
 import { makeEmailHash } from "../../../utils/jwt";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
@@ -65,16 +68,20 @@ export class RenewConventionMagicLink extends TransactionalUseCase<
       extractConventionJwtPayloadFromExpiredJwt(this.#config, expiredJwt),
     );
 
-    const convention =
-      await uow.conventionQueries.getConventionById(applicationId);
+    const convention = await uow.conventionRepository.getById(applicationId);
     if (!convention)
       throw errors.convention.notFound({ conventionId: applicationId });
+
+    const conventionRead = await conventionDtoToConventionReadDto(
+      convention,
+      uow,
+    );
 
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-    const emails = conventionEmailsByRole(convention)[role];
+    const emails = conventionEmailsByRole(conventionRead)[role];
     if (emails instanceof Error) throw emails;
 
     // Only renew the link if the email hash matches

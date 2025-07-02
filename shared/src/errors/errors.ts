@@ -453,6 +453,10 @@ export const errors = {
       new TooManyRequestApiError(
         `Une relance de signature au ${titleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
+    validatorOfAgencyRefersToNotAllowed: () =>
+      new ForbiddenError(
+        `Les validateurs de l'agence référente ne sont pas autorisés à accéder à cette fonctionnalité.`,
+      ),
   },
   establishment: {
     badPagination: ({
