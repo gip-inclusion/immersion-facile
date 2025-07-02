@@ -365,7 +365,8 @@ export const defaultEmailValueByEmailKind: {
   },
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {
     businessName: "BUSINESS_NAME",
-    beneficiaryFullName: "BENEFICIARY_FULL_NAME",
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     kind: "IF",
   },
   CONTACT_BY_PHONE_INSTRUCTIONS: {

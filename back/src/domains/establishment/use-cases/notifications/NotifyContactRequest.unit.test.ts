@@ -220,14 +220,22 @@ describe("NotifyContactRequest", () => {
                 sender: immersionFacileNoReplyEmailSender,
                 params: {
                   businessName: discussion.businessName,
-                  contactFirstName: discussion.establishmentContact.firstName,
-                  contactLastName: discussion.establishmentContact.lastName,
+                  contactFirstName: getFormattedFirstnameAndLastname({
+                    firstname: discussion.establishmentContact.firstName,
+                  }),
+                  contactLastName: getFormattedFirstnameAndLastname({
+                    lastname: discussion.establishmentContact.lastName,
+                  }),
                   contactPhone: discussion.establishmentContact.phone,
                   kind: discussion.kind,
                   potentialBeneficiaryFirstName:
-                    discussion.potentialBeneficiary.firstName,
+                    getFormattedFirstnameAndLastname({
+                      firstname: discussion.potentialBeneficiary.firstName,
+                    }),
                   potentialBeneficiaryLastName:
-                    discussion.potentialBeneficiary.lastName,
+                    getFormattedFirstnameAndLastname({
+                      lastname: discussion.potentialBeneficiary.lastName,
+                    }),
                 },
               },
             ],
@@ -268,14 +276,22 @@ describe("NotifyContactRequest", () => {
                 sender: immersionFacileNoReplyEmailSender,
                 params: {
                   businessName: discussion.businessName,
-                  contactFirstName: discussion.establishmentContact.firstName,
-                  contactLastName: discussion.establishmentContact.lastName,
+                  contactFirstName: getFormattedFirstnameAndLastname({
+                    firstname: discussion.establishmentContact.firstName,
+                  }),
+                  contactLastName: getFormattedFirstnameAndLastname({
+                    lastname: discussion.establishmentContact.lastName,
+                  }),
                   businessAddress: addressDtoToString(discussion.address),
                   kind: discussion.kind,
                   potentialBeneficiaryFirstName:
-                    discussion.potentialBeneficiary.firstName,
+                    getFormattedFirstnameAndLastname({
+                      firstname: discussion.potentialBeneficiary.firstName,
+                    }),
                   potentialBeneficiaryLastName:
-                    discussion.potentialBeneficiary.lastName,
+                    getFormattedFirstnameAndLastname({
+                      lastname: discussion.potentialBeneficiary.lastName,
+                    }),
                 },
               },
             ],

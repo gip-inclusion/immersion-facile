@@ -2,6 +2,7 @@ import {
   type ContactEstablishmentEventPayload,
   contactEstablishmentEventPayloadSchema,
   errors,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { createTransactionalUseCase } from "../../../core/UseCase";
@@ -40,7 +41,12 @@ export const makeNotifyCandidateThatContactRequestHasBeenSent =
           params: {
             kind: discussion.kind,
             businessName: discussion.businessName,
-            beneficiaryFullName: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: discussion.potentialBeneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: discussion.potentialBeneficiary.lastName,
+            }),
           },
         },
         followedIds: {

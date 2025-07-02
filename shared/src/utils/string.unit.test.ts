@@ -181,6 +181,20 @@ describe("string utils", () => {
         inputs: {},
         expectedOutput: "",
       },
+      {
+        inputs: {
+          firstname: "",
+          lastname: "Doe",
+        },
+        expectedOutput: "DOE",
+      },
+      {
+        inputs: {
+          firstname: "   ",
+          lastname: "Doe",
+        },
+        expectedOutput: "DOE",
+      },
     ])("for $inputs return $expectedOutput", ({ inputs, expectedOutput }) => {
       expect(getFormattedFirstnameAndLastname(inputs)).toBe(expectedOutput);
     });

@@ -2,6 +2,7 @@ import {
   DiscussionBuilder,
   errors,
   expectPromiseToFailWithError,
+  getFormattedFirstnameAndLastname,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -72,7 +73,12 @@ describe("NotifyCandidateThatContactRequestHasBeenSent", () => {
           recipients: [discussion.potentialBeneficiary.email],
           params: {
             businessName: discussion.businessName,
-            beneficiaryFullName: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
+            beneficiaryFirstName: getFormattedFirstnameAndLastname({
+              firstname: discussion.potentialBeneficiary.firstName,
+            }),
+            beneficiaryLastName: getFormattedFirstnameAndLastname({
+              lastname: discussion.potentialBeneficiary.lastName,
+            }),
             kind: discussion.kind,
           },
         },
