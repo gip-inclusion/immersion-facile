@@ -178,8 +178,7 @@ export type EmailParamsByEmailType = {
     potentialBeneficiaryLastName: string;
     potentialBeneficiaryPhone: string;
     potentialBeneficiaryDatePreferences: string;
-    domain: string;
-    discussionId: string;
+    discussionUrl: AbsoluteUrl;
   } & (
     | {
         kind: "IF";

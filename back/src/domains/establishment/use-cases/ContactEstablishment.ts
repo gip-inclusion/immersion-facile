@@ -16,6 +16,7 @@ import {
   errors,
   normalizedMonthInDays,
 } from "shared";
+import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
@@ -38,7 +39,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
 
   readonly #minimumNumberOfDaysBetweenSimilarContactRequests: number;
 
-  readonly #domain: string;
+  readonly #immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
@@ -46,7 +47,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     uuidGenerator: UuidGenerator,
     timeGateway: TimeGateway,
     minimumNumberOfDaysBetweenSimilarContactRequests: number,
-    domain: string,
+    immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"],
   ) {
     super(uowPerformer);
 
@@ -55,7 +56,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     this.#minimumNumberOfDaysBetweenSimilarContactRequests =
       minimumNumberOfDaysBetweenSimilarContactRequests;
     this.#createNewEvent = createNewEvent;
-    this.#domain = domain;
+    this.#immersionFacileBaseUrl = immersionFacileBaseUrl;
   }
 
   public async _execute(
@@ -199,7 +200,7 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     if (contactRequest.contactMode === "EMAIL") {
       return makeDiscussionDtoEmail({
         contactRequest,
-        domain: this.#domain,
+        immersionFacileBaseUrl: this.#immersionFacileBaseUrl,
         common,
         extraDiscussionDtoProperties,
         now,
@@ -302,13 +303,13 @@ const makeDiscussionDtoEmail = async ({
   extraDiscussionDtoProperties,
   contactRequest,
   now,
-  domain,
+  immersionFacileBaseUrl,
   uow,
 }: {
   common: CommonDiscussionDto;
   extraDiscussionDtoProperties: ExtraDiscussionDtoProperties;
   contactRequest: ContactEstablishmentByMailDto;
-  domain: string;
+  immersionFacileBaseUrl: AppConfig["immersionFacileBaseUrl"];
   uow: UnitOfWork;
   now: Date;
 }): Promise<DiscussionDtoEmail> => {
@@ -354,7 +355,7 @@ const makeDiscussionDtoEmail = async ({
     await makeContactByEmailRequestParams({
       uow,
       discussion,
-      domain,
+      immersionFacileBaseUrl,
     }),
     { showContentParts: true },
   );

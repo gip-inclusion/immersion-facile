@@ -360,8 +360,7 @@ export const defaultEmailValueByEmailKind: {
     potentialBeneficiaryExperienceAdditionalInformation:
       "POTENTIAL_BENEFICIARY_EXPERIENCE_ADDITIONAL_INFORMATION",
     potentialBeneficiaryHasWorkingExperience: true,
-    domain: "immersion-facile.beta.gouv.fr",
-    discussionId: "fake-discussion-id",
+    discussionUrl: "https://immersion-facile.beta.gouv.fr",
     kind: "IF",
   },
   CONTACT_BY_EMAIL_CANDIDATE_CONFIRMATION: {

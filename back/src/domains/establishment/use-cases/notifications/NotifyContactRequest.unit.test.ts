@@ -8,6 +8,7 @@ import {
   type DiscussionKind,
   errors,
   expectPromiseToFailWithError,
+  frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
 } from "shared";
@@ -39,6 +40,7 @@ describe("NotifyContactRequest", () => {
   let notifyContactRequest: NotifyContactRequest;
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
   const domain = "reply.domain.com";
+  const immersionFacileBaseUrl = "http://if";
 
   beforeEach(() => {
     uow = createInMemoryUow();
@@ -55,6 +57,7 @@ describe("NotifyContactRequest", () => {
         new CustomTimeGateway(),
       ),
       domain,
+      immersionFacileBaseUrl,
     );
 
     uow.romeRepository.appellations = [
@@ -120,9 +123,8 @@ describe("NotifyContactRequest", () => {
                         contactLastName: getFormattedFirstnameAndLastname({
                           lastname: establishmentContact.lastName,
                         }),
-                        discussionId: discussion.id,
+                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
-                        domain,
                         immersionObjective:
                           discussion.potentialBeneficiary.immersionObjective ??
                           undefined,
@@ -158,9 +160,8 @@ describe("NotifyContactRequest", () => {
                         contactLastName: getFormattedFirstnameAndLastname({
                           lastname: establishmentContact.lastName,
                         }),
-                        discussionId: discussion.id,
+                        discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}&mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
-                        domain,
                         immersionObjective:
                           discussion.potentialBeneficiary.immersionObjective,
                         potentialBeneficiaryFirstName:
