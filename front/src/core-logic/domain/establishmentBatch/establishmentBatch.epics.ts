@@ -160,17 +160,22 @@ const makeUserRightsFromCSV = (
       | undefined;
     const phone = csvRow[`${current}_phone` as keyof EstablishmentCSVRow];
     const email = csvRow[`${current}_email` as keyof EstablishmentCSVRow];
+    const shouldReceiveDiscussionNotifications =
+      csvRow[
+      `${current}_shouldReceiveDiscussionNotifications` as keyof EstablishmentCSVRow
+      ] === "1";
     return [
       ...acc,
       ...(role && phone && job && email
         ? ([
-            {
-              role,
-              job,
-              phone,
-              email,
-            },
-          ] as FormEstablishmentUserRight[])
+          {
+            role,
+            job,
+            phone,
+            email,
+            shouldReceiveDiscussionNotifications,
+          },
+        ] as FormEstablishmentUserRight[])
         : []),
     ];
   }, []);
@@ -181,6 +186,7 @@ const makeUserRightsFromCSV = (
       email: csvRow.right1_email,
       job: csvRow.right1_job,
       phone: csvRow.right1_phone,
+      shouldReceiveDiscussionNotifications: true,
     },
     ...otherThanAdminUserRights,
   ];

@@ -33,12 +33,14 @@ describe("GetEstablishmentNameAndAdmins", () => {
         userId: establishmentAdminUser.id,
         job: "osef",
         phone: "osef",
+        shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
         userId: establishmentContactUser.id,
         job: "osef",
         phone: "osef",
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();

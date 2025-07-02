@@ -53,6 +53,7 @@ test.describe("Establishment creation and modification workflow", () => {
             email: testConfig.proConnect.username,
             job: faker.person.jobType(),
             phone: faker.helpers.fromRegExp(phoneRegexp),
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .withBusinessAddresses([
@@ -81,11 +82,13 @@ test.describe("Establishment creation and modification workflow", () => {
           email: testConfig.proConnect.username,
           job: "Successfully updated job",
           phone: "0165754860",
+          shouldReceiveDiscussionNotifications: true,
         },
         {
           role: "establishment-contact",
           email:
             "recette+copy-updated-establishment2@immersion-facile.beta.gouv.fr",
+          shouldReceiveDiscussionNotifications: false,
         },
       ])
       .withContactMode("PHONE")

@@ -6,6 +6,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -311,6 +312,14 @@ const EstablishmentUsersEditForm = ({
               },
             },
           }))}
+        />
+        <ToggleSwitch
+          label="Recevoir les notifications"
+          inputTitle="Recevoir les notifications"
+          onChange={(checked) => {
+            setValue("shouldReceiveDiscussionNotifications", checked);
+          }}
+          checked={values.shouldReceiveDiscussionNotifications}
         />
         <ButtonsGroup
           alignment="right"

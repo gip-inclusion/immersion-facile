@@ -58,6 +58,7 @@ describe("Notify pass-emploi", () => {
           job: "",
           phone: "",
           userId: "osef",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
