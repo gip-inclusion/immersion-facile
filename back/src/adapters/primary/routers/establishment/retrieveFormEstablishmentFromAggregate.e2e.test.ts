@@ -56,6 +56,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
     userId: establishmentAdmin.id,
     job: "job",
     phone: "+3366887744",
+    shouldReceiveDiscussionNotifications: true,
   };
   const establishmentAggregate = new EstablishmentAggregateBuilder()
     .withEstablishment(
@@ -82,6 +83,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       {
         role: "establishment-contact",
         userId: establishmentContact.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();
@@ -159,10 +161,12 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             email: establishmentAdmin.email,
             job: establishmentAdminRight.job,
             phone: establishmentAdminRight.phone,
+            shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
             email: establishmentContact.email,
+            shouldReceiveDiscussionNotifications: true,
           },
         ],
         contactMode: establishmentAggregate.establishment.contactMode,
@@ -225,10 +229,12 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
             email: establishmentAdmin.email,
             job: establishmentAdminRight.job,
             phone: establishmentAdminRight.phone,
+            shouldReceiveDiscussionNotifications: true,
           },
           {
             role: "establishment-contact",
             email: establishmentContact.email,
+            shouldReceiveDiscussionNotifications: true,
           },
         ],
         contactMode: establishmentAggregate.establishment.contactMode,

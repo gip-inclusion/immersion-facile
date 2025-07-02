@@ -98,17 +98,26 @@ export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCas
       userRights.map(({ userId }) => userId),
     );
 
-    return userRights.map(({ role, userId, job, phone }) => {
-      const user = users.find(({ id }) => id === userId);
-      if (!user) throw errors.user.notFound({ userId });
-      return role === "establishment-admin"
-        ? {
-            role,
-            email: user.email,
-            job,
-            phone,
-          }
-        : { role, email: user.email, job, phone };
-    });
+    return userRights.map(
+      ({ role, userId, job, phone, shouldReceiveDiscussionNotifications }) => {
+        const user = users.find(({ id }) => id === userId);
+        if (!user) throw errors.user.notFound({ userId });
+        return role === "establishment-admin"
+          ? {
+              role,
+              email: user.email,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications,
+            }
+          : {
+              role,
+              email: user.email,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications,
+            };
+      },
+    );
   }
 }

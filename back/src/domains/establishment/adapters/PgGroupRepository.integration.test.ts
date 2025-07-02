@@ -64,6 +64,7 @@ describe("PgEstablishmentGroupRepository", () => {
     userId: user.id,
     job: "",
     phone: "",
+    shouldReceiveDiscussionNotifications: true,
   };
 
   let pool: Pool;

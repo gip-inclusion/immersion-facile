@@ -43,6 +43,7 @@ describe("Delete establishment", () => {
         job: "fsd",
         phone: "+66",
         userId: user.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();

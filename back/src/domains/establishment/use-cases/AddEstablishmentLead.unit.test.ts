@@ -97,6 +97,7 @@ describe("Add EstablishmentLead", () => {
             job: "",
             phone: "",
             userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build();

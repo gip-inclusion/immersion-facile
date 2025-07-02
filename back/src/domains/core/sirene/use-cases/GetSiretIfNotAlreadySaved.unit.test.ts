@@ -39,6 +39,7 @@ describe("GetSiretIfNotAlreadySaved", () => {
             job: "",
             phone: "",
             userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build(),

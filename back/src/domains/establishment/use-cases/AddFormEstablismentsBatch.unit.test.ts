@@ -206,14 +206,17 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "2",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "3",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -260,6 +263,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             job: "",
             phone: "",
             userId: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build(),
@@ -353,14 +357,17 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "2",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "3",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers(
@@ -440,14 +447,17 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
                 job: "a job",
                 phone: "+33612345678",
                 userId: "1",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "2",
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: "3",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -526,6 +536,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             job: "",
             phone: "",
             userId: "",
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build(),

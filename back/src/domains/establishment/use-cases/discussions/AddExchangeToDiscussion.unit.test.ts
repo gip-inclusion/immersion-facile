@@ -91,13 +91,25 @@ describe("AddExchangeToDiscussion", () => {
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(pendingDiscussion1.siret)
         .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build(),
       new EstablishmentAggregateBuilder()
         .withEstablishmentSiret(pendingDiscussion2.siret)
         .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build(),
     ];

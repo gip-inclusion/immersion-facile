@@ -95,12 +95,14 @@ describe("LegacyContactEstablishment", () => {
     job: "Boss",
     phone: "+33877995544",
     userId: establishmentAdmin.id,
+    shouldReceiveDiscussionNotifications: true,
   };
   const establishmentRights: EstablishmentUserRight[] = [
     establishmentAdminRight,
     {
       role: "establishment-contact",
       userId: establishmentContact.id,
+      shouldReceiveDiscussionNotifications: true,
     },
   ];
 

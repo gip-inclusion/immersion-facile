@@ -582,12 +582,14 @@ describe("InclusionConnected", () => {
               role: "establishment-admin",
               job: "fake job",
               phone: "+33600000000",
+              shouldReceiveDiscussionNotifications: true,
             },
             {
               email: otherUserAdminData.email,
               role: "establishment-admin",
               job: "fake job",
               phone: "+33600000000",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .build();
@@ -626,6 +628,7 @@ describe("InclusionConnected", () => {
           role: "establishment-contact",
           job: "fake job",
           phone: "+33600000000",
+          shouldReceiveDiscussionNotifications: true,
         };
         const otherEstablishmentToKeepData: EstablishmentData = {
           admins: [otherUserAdminData],
@@ -713,6 +716,7 @@ describe("InclusionConnected", () => {
           role: "establishment-contact",
           job: "fake job",
           phone: "+33600000000",
+          shouldReceiveDiscussionNotifications: true,
         };
         const otherEstablishmentData: EstablishmentData = {
           admins: [otherUserAdminData],
@@ -750,6 +754,7 @@ describe("InclusionConnected", () => {
           role: "establishment-contact",
           job: "fake job",
           phone: "+33600000000",
+          shouldReceiveDiscussionNotifications: true,
         };
 
         const establishment = FormEstablishmentDtoBuilder.valid()

@@ -128,7 +128,13 @@ describe("ContactRequestReminder", () => {
           discussionWith2DaysSinceBeneficiaryExchange.siret,
         )
         .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build(),
     ];

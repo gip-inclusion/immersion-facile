@@ -453,6 +453,8 @@ export const domElementIds = {
         phone: "im-form-create-establishment__businessContact-phone",
         email: "im-form-create-establishment__businessContact-email",
         copyEmails: "im-form-create-establishment__businessContact-copy-emails",
+        shouldReceiveDiscussionNotifications:
+          "im-form-create-establishment__businessContact-should-receive-discussion-notifications",
       },
       contactMode:
         "im-form-create-establishment__businessContact-contact-method",
@@ -504,6 +506,8 @@ export const domElementIds = {
         phone: "im-form-edit-establishment__businessContact-phone",
         email: "im-form-edit-establishment__businessContact-email",
         copyEmails: "im-form-edit-establishment__businessContact-copy-emails",
+        shouldReceiveDiscussionNotifications:
+          "im-form-edit-establishment__businessContact-should-receive-discussion-notifications",
       },
       contactMode: "im-form-edit-establishment__businessContact-contact-method",
       isEngagedEnterprise: "im-form-edit-establishment__is-engaged-enterprise",
@@ -563,6 +567,8 @@ export const domElementIds = {
         email: "im-form-manage-establishment-admin__businessContact-email",
         copyEmails:
           "im-form-manage-establishment-admin__businessContact-copy-emails",
+        shouldReceiveDiscussionNotifications:
+          "im-form-manage-establishment-admin__businessContact-should-receive-discussion-notifications",
       },
       contactMode:
         "im-form-manage-establishment-admin__businessContact-contact-method",

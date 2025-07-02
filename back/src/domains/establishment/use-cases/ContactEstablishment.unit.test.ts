@@ -72,6 +72,7 @@ describe("ContactEstablishment", () => {
     userId: adminUser.id,
     job: "",
     phone: "",
+    shouldReceiveDiscussionNotifications: true,
   };
 
   const userRights: EstablishmentUserRight[] = [
@@ -79,6 +80,7 @@ describe("ContactEstablishment", () => {
     {
       role: "establishment-contact",
       userId: contactUser.id,
+      shouldReceiveDiscussionNotifications: true,
     },
   ];
 

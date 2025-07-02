@@ -692,6 +692,7 @@ describe("PgDiscussionRepository", () => {
               userId: user.id,
               job: "",
               phone: "",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .withOffers([secretariatOffer])
@@ -708,6 +709,7 @@ describe("PgDiscussionRepository", () => {
               userId: user.id,
               job: "",
               phone: "",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .withOffers([stylisteOffer])
@@ -1383,6 +1385,7 @@ describe("PgDiscussionRepository", () => {
               userId: user.id,
               job: "",
               phone: "",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .withOffers([stylisteOffer])
@@ -1465,6 +1468,7 @@ describe("PgDiscussionRepository", () => {
           userId: user.id,
           job: "",
           phone: "",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .withOffers([stylisteOffer])
