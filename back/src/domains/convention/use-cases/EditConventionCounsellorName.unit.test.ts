@@ -260,7 +260,7 @@ describe("EditCounsellorName", () => {
               userId: connectedUser.id,
             },
           ),
-          errors.convention.unsupportedRole({ role: "validator" }),
+          errors.convention.validatorOfAgencyRefersToNotAllowed(),
         );
       });
     });
@@ -351,7 +351,7 @@ describe("EditCounsellorName", () => {
             },
             jwtPayload,
           ),
-          errors.convention.unsupportedRole({ role: "validator" }),
+          errors.convention.validatorOfAgencyRefersToNotAllowed(),
         );
       });
     });
@@ -789,7 +789,7 @@ describe("EditCounsellorName", () => {
           toAgencyWithRights(agencyWithRefersTo, {
             [notConnectedUser.id]: {
               roles: ["counsellor"],
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
             },
           }),
         ];

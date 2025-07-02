@@ -200,7 +200,7 @@ describe("Send signature link", () => {
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
             roles: ["validator"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
       ];
@@ -446,7 +446,7 @@ describe("Send signature link", () => {
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
             roles: ["validator"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
       ];
@@ -594,7 +594,7 @@ describe("Send signature link", () => {
           toAgencyWithRights(agency, {
             [notConnectedUser.id]: {
               roles: [role],
-              isNotifiedByEmail: false,
+              isNotifiedByEmail: true,
             },
           }),
         ];
@@ -762,7 +762,7 @@ describe("Send signature link", () => {
         toAgencyWithRights(agency, {
           [notConnectedUser.id]: {
             roles: ["validator"],
-            isNotifiedByEmail: false,
+            isNotifiedByEmail: true,
           },
         }),
       ];

@@ -6,7 +6,10 @@ import {
   editConventionCounsellorNameRequestSchema,
   errors,
 } from "shared";
-import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { createTransactionalUseCase } from "../../core/UseCase";
@@ -35,7 +38,7 @@ export const makeEditConventionCounsellorName = createTransactionalUseCase<
       jwtPayload,
     });
 
-    const convention = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
 
@@ -52,10 +55,15 @@ export const makeEditConventionCounsellorName = createTransactionalUseCase<
       }),
     );
 
+    const conventionRead = await conventionDtoToConventionReadDto(
+      convention,
+      uow,
+    );
+
     await throwIfNotAuthorizedForRole({
       uow,
       jwtPayload,
-      convention,
+      convention: conventionRead,
       authorizedRoles: [...agencyModifierRoles, "back-office"],
       errorToThrow: errors.convention.editCounsellorNameNotAuthorizedForRole(),
       isPeAdvisorAllowed: true,

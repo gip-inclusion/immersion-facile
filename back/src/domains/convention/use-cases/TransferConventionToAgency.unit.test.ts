@@ -287,7 +287,7 @@ describe("TransferConventionToAgency", () => {
             },
             connectedUserPayload,
           ),
-          errors.convention.unsupportedRole({ role: "validator" }),
+          errors.convention.validatorOfAgencyRefersToNotAllowed(),
         );
       });
     });
@@ -374,7 +374,7 @@ describe("TransferConventionToAgency", () => {
             },
             jwtPayload,
           ),
-          errors.convention.unsupportedRole({ role: "validator" }),
+          errors.convention.validatorOfAgencyRefersToNotAllowed(),
         );
       });
     });
