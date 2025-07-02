@@ -5,7 +5,6 @@ import {
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
   errors,
   frontRoutes,
@@ -14,6 +13,7 @@ import {
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import { throwErrorIfConventionStatusNotAllowed } from "../../../utils/convention";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -76,7 +76,13 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       isValidatorOfAgencyRefersToAllowed: true,
     });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status);
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["ACCEPTED_BY_VALIDATOR"],
+      errors.assessment.sendAssessmentLinkNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
     throwErrorIfConventionEndInMoreThanOneDay(
       new Date(convention.dateEnd),
@@ -133,14 +139,6 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     await uow.outboxRepository.save(event);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
-  if (status !== "ACCEPTED_BY_VALIDATOR") {
-    throw errors.assessment.sendAssessmentLinkNotAllowedForStatus({
-      status: status,
-    });
-  }
-};
 
 const throwErrorIfConventionEndInMoreThanOneDay = (
   conventionDateEnd: Date,

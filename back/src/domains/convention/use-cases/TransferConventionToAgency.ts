@@ -1,14 +1,16 @@
 import {
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type TransferConventionToAgencyRequestDto,
   agencyModifierRoles,
   errors,
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
-import { conventionDtoToConventionReadDto } from "../../../utils/convention";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -46,11 +48,13 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status, [
-      "IN_REVIEW",
-      "PARTIALLY_SIGNED",
-      "READY_TO_SIGN",
-    ]);
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["IN_REVIEW", "PARTIALLY_SIGNED", "READY_TO_SIGN"],
+      errors.convention.transferNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
     await throwErrorIfAgencyNotFound({
       agencyId: inputParams.agencyId,
@@ -70,12 +74,6 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
       isPeAdvisorAllowed: true,
       isValidatorOfAgencyRefersToAllowed: false,
     });
-
-    // await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
-    //   uow,
-    //   agencyId: convention.agencyId,
-    //   jwtPayload,
-    // });
 
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload
@@ -110,14 +108,3 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
     ]);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (
-  status: ConventionStatus,
-  allowedStatuses: ConventionStatus[],
-) => {
-  if (!allowedStatuses.includes(status)) {
-    throw errors.convention.transferNotAllowedForStatus({
-      status: status,
-    });
-  }
-};
