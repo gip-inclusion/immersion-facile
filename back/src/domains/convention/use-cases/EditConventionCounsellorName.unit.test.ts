@@ -191,10 +191,7 @@ describe("EditCounsellorName", () => {
               userId: connectedUser.id,
             },
           ),
-          errors.user.noRightsOnAgency({
-            userId: connectedUser.id,
-            agencyId: convention.agencyId,
-          }),
+          errors.convention.editCounsellorNameNotAuthorizedForRole(),
         );
       });
 
@@ -228,10 +225,7 @@ describe("EditCounsellorName", () => {
                 userId: connectedUser.id,
               },
             ),
-            errors.user.notEnoughRightOnAgency({
-              userId: connectedUser.id,
-              agencyId: convention.agencyId,
-            }),
+            errors.convention.editCounsellorNameNotAuthorizedForRole(),
           );
         },
       );
@@ -318,9 +312,7 @@ describe("EditCounsellorName", () => {
               },
               jwtPayload,
             ),
-            errors.convention.unsupportedRole({
-              role,
-            }),
+            errors.convention.editCounsellorNameNotAuthorizedForRole(),
           );
         },
       );
@@ -664,7 +656,7 @@ describe("EditCounsellorName", () => {
     });
 
     describe("with convention jwt payload", () => {
-      it.each(["validator", "counsellor", "back-office"] satisfies Role[])(
+      it.each(["validator", "counsellor"] satisfies Role[])(
         "triggered by jwt role %s",
         async (role) => {
           uow.conventionRepository.setConventions([convention]);
@@ -777,58 +769,6 @@ describe("EditCounsellorName", () => {
           ]);
         },
       );
-
-      it("triggered by backoffice admin for a convention with agency with refersTo", async () => {
-        const backofficeAdminPayload = createConventionMagicLinkPayload({
-          id: conventionId,
-          role: "back-office",
-          email: notConnectedUser.email,
-          now: new Date(),
-        });
-        const conventionWithAgencyRefersTo = new ConventionDtoBuilder(
-          convention,
-        )
-          .withAgencyId(agencyWithRefersTo.id)
-          .build();
-        uow.conventionRepository.setConventions([conventionWithAgencyRefersTo]);
-        uow.userRepository.users = [];
-        uow.agencyRepository.agencies = [
-          toAgencyWithRights(otherAgency, {}),
-          toAgencyWithRights(agencyWithRefersTo, {}),
-        ];
-
-        await usecase.execute(
-          {
-            conventionId: conventionWithAgencyRefersTo.id,
-            firstname: "ali",
-            lastname: "baba",
-          },
-          backofficeAdminPayload,
-        );
-
-        expectToEqual(uow.conventionRepository.conventions, [
-          {
-            ...conventionWithAgencyRefersTo,
-            agencyReferent: {
-              firstname: "ali",
-              lastname: "baba",
-            },
-          },
-        ]);
-
-        expectArraysToMatch(uow.outboxRepository.events, [
-          {
-            topic: "ConventionCounsellorNameEdited",
-            payload: {
-              conventionId: conventionWithAgencyRefersTo.id,
-              triggeredBy: {
-                kind: "convention-magic-link",
-                role: "back-office",
-              },
-            },
-          },
-        ]);
-      });
 
       it("counsellor of an agency with refersTo can edit counsellor name", async () => {
         const counsellorPayload = createConventionMagicLinkPayload({
