@@ -10,6 +10,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { NotificationIndicator } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -48,7 +49,13 @@ export const EstablishmentUsersList = () => {
 
   if (!formEstablishment?.userRights) return null;
 
-  const headers = ["Utilisateur", "Informations de contact", "Rôle", "Actions"];
+  const headers = [
+    "Utilisateur",
+    "Informations de contact",
+    "Rôle",
+    "Notifications (candidatures)",
+    "Actions",
+  ];
 
   const data = formEstablishment.userRights.map((userRight, index) => {
     const isLastAdmin =
@@ -314,8 +321,8 @@ const EstablishmentUsersEditForm = ({
           }))}
         />
         <ToggleSwitch
-          label="Recevoir les notifications"
-          inputTitle="Recevoir les notifications"
+          label="Recevoir les notifications pour toutes les candidatures de cet établissement"
+          inputTitle="Recevoir les notifications pour toutes les candidatures de cet établissement"
           onChange={(checked) => {
             setValue("shouldReceiveDiscussionNotifications", checked);
           }}
@@ -366,6 +373,10 @@ const getEstablishmentUserRow = ({
   >
     {userRolesToDisplay[userRight.role].label}
   </Badge>,
+  <NotificationIndicator
+    key={`${userRight.email}-${userRight.role}`}
+    isNotified={userRight.shouldReceiveDiscussionNotifications}
+  />,
   <ButtonsGroup
     key={`${userRight.email}-${userRight.role}`}
     inlineLayoutWhen="always"
