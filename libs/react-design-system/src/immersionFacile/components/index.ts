@@ -28,6 +28,7 @@ export * from "./main-wrapper";
 export * from "./maintenance-callout";
 export * from "./ministere-emploi-logo";
 export * from "./nav-card";
+export * from "./notification-indicator";
 export * from "./nps-form";
 export * from "./over-footer";
 export * from "./page-header";
