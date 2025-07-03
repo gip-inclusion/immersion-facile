@@ -2,8 +2,6 @@ import { uniq } from "ramda";
 import { filter, map, switchMap } from "rxjs";
 import {
   type AbsoluteUrl,
-  type AdminFormEstablishmentUserRight,
-  type ContactFormEstablishmentUserRight,
   type CSVBoolean,
   csvBooleanToBoolean,
   defaultMaxContactsPerMonth,
@@ -121,7 +119,6 @@ export const candidateEstablishmentMapper = (
       },
       contactMode: establishmentRow.contactMode,
     };
-
     formEstablishmentSchema.parse(mappedEstablishment);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -146,15 +143,15 @@ export const establishmentBatchEpics = [
 const makeUserRightsFromCSV = (
   csvRow: EstablishmentCSVRow,
 ): FormEstablishmentUserRight[] => {
-  const rightsKey = keys(csvRow)
-    .filter((csvRowKey) =>
-      csvRowKey.includes("right" as keyof EstablishmentCSVRow),
-    )
-    .filter((csvRowKey) => !csvRowKey.includes("1"));
+  const otherThanAdminRightsKeys = keys(csvRow).filter(
+    (csvRowKey) =>
+      csvRowKey.includes("right" as keyof EstablishmentCSVRow) &&
+      !csvRowKey.includes("1"),
+  );
 
-  const items = uniq(rightsKey.map((key) => key.split("_"))).reduce<
-    FormEstablishmentUserRight[]
-  >((acc, current) => {
+  const otherThanAdminUserRights = uniq(
+    otherThanAdminRightsKeys.map((key) => key.split("_")[0]),
+  ).reduce<FormEstablishmentUserRight[]>((acc, current) => {
     const role = csvRow[`${current}_role` as keyof EstablishmentCSVRow] as
       | EstablishmentRole
       | undefined;
@@ -163,19 +160,18 @@ const makeUserRightsFromCSV = (
       | undefined;
     const phone = csvRow[`${current}_phone` as keyof EstablishmentCSVRow];
     const email = csvRow[`${current}_email` as keyof EstablishmentCSVRow];
-
     return [
       ...acc,
       ...(role && phone && job && email
-        ? ({
-            role,
-            job,
-            phone,
-            email,
-          } as
-            | AdminFormEstablishmentUserRight
-            | ContactFormEstablishmentUserRight)
-        : ({} as any)),
+        ? ([
+            {
+              role,
+              job,
+              phone,
+              email,
+            },
+          ] as FormEstablishmentUserRight[])
+        : []),
     ];
   }, []);
 
@@ -186,6 +182,6 @@ const makeUserRightsFromCSV = (
       job: csvRow.right1_job,
       phone: csvRow.right1_phone,
     },
-    ...items,
+    ...otherThanAdminUserRights,
   ];
 };
