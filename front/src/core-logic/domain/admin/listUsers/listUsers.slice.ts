@@ -1,8 +1,8 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { GetUsersFilters, UserInList } from "shared";
+import type { GetUsersFilters, UserWithNumberOfAgencies } from "shared";
 
 type UsersState = {
-  users: UserInList[];
+  users: UserWithNumberOfAgencies[];
   isFetching: boolean;
   query: string;
 };
@@ -23,7 +23,10 @@ export const listUsersSlice = createSlice({
     fetchUsersRequested: (state, _action: PayloadAction<GetUsersFilters>) => {
       state.isFetching = true;
     },
-    fetchUsersSucceeded: (state, action: PayloadAction<UserInList[]>) => {
+    fetchUsersSucceeded: (
+      state,
+      action: PayloadAction<UserWithNumberOfAgencies[]>,
+    ) => {
       state.users = action.payload;
       state.isFetching = false;
     },

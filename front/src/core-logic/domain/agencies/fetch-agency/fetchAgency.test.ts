@@ -3,14 +3,14 @@ import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyRight,
+  type ConnectedUser,
   expectToEqual,
-  type InclusionConnectedUser,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import type {
-  NormalizedIcUserById,
-  NormalizedInclusionConnectedUser,
-} from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+  ConnectedUsersWithNormalizedAgencyRightsById,
+  ConnectedUserWithNormalizedAgencyRights,
+} from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySelectors } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.selectors";
@@ -33,7 +33,7 @@ import type { ReduxStore } from "src/core-logic/storeConfig/store";
 const agencyDto = new AgencyDtoBuilder().build();
 const agencyWithAdminEmails = toAgencyDtoForAgencyUsersAndAdmins(agencyDto, []);
 
-const user1: NormalizedInclusionConnectedUser = {
+const user1: ConnectedUserWithNormalizedAgencyRights = {
   id: "fake-user-id-1",
   email: "jbon8745@wanadoo.fr",
   firstName: "Jean",
@@ -53,7 +53,7 @@ const user1: NormalizedInclusionConnectedUser = {
   createdAt: new Date().toISOString(),
 };
 
-const user2: NormalizedInclusionConnectedUser = {
+const user2: ConnectedUserWithNormalizedAgencyRights = {
   id: "user-in-error",
   email: "fake-user-email-4@test.fr",
   firstName: "Jean-Michel",
@@ -73,7 +73,7 @@ const user2: NormalizedInclusionConnectedUser = {
   createdAt: new Date().toISOString(),
 };
 
-const fakeAgencyUsers: NormalizedIcUserById = {
+const fakeAgencyUsers: ConnectedUsersWithNormalizedAgencyRightsById = {
   [user1.id]: user1,
   [user2.id]: user2,
 };
@@ -314,7 +314,7 @@ describe("fetchAgency", () => {
           isNotifiedByEmail: false,
         };
 
-        const userToCreate: NormalizedInclusionConnectedUser = {
+        const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
           id: "fake-id",
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
@@ -327,7 +327,7 @@ describe("fetchAgency", () => {
           dashboards: { agencies: {}, establishments: {} },
         };
 
-        const icUser: InclusionConnectedUser = {
+        const user: ConnectedUser = {
           ...userToCreate,
           agencyRights: [agencyRight],
         };
@@ -344,14 +344,14 @@ describe("fetchAgency", () => {
           }),
         );
 
-        dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
+        dependencies.agencyGateway.createUserForAgencyResponse$.next(user);
 
         expectFetchAgencyStateToMatch({
           agency: agencyDto,
           agencyUsers: {
             ...fakeAgencyUsers,
             [userToCreate.id]: {
-              ...icUser,
+              ...user,
               agencyRights: {
                 [agencyDto.id]: {
                   agency: agencyWithAdminEmails,
@@ -378,7 +378,7 @@ describe("fetchAgency", () => {
           isNotifiedByEmail: false,
         };
 
-        const userToCreate: NormalizedInclusionConnectedUser = {
+        const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
           id: "fake-id",
           email: "fake-email@mail.com",
           firstName: "fake-first-name",
@@ -403,12 +403,12 @@ describe("fetchAgency", () => {
           }),
         );
 
-        const icUser: InclusionConnectedUser = {
+        const user: ConnectedUser = {
           ...userToCreate,
           agencyRights: [agencyRight],
         };
 
-        dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
+        dependencies.agencyGateway.createUserForAgencyResponse$.next(user);
 
         expectFetchAgencyStateToMatch(fetchAgencyInitialState);
       });
@@ -490,7 +490,7 @@ describe("fetchAgency", () => {
 
         const originalUser = fakeAgencyUsers[user1.id];
 
-        const updatedUser: NormalizedInclusionConnectedUser = {
+        const updatedUser: ConnectedUserWithNormalizedAgencyRights = {
           ...originalUser,
           email: "updated-email@email.fr",
           agencyRights: {
@@ -582,7 +582,9 @@ describe("fetchAgency", () => {
   const feedWithFetchedAgency = (agency: AgencyDto) => {
     dependencies.agencyGateway.fetchedAgency$.next(agency);
   };
-  const feedWithFetchedAgencyUsers = (agencyUsers: NormalizedIcUserById) => {
+  const feedWithFetchedAgencyUsers = (
+    agencyUsers: ConnectedUsersWithNormalizedAgencyRightsById,
+  ) => {
     dependencies.agencyGateway.fetchedAgencyUsers$.next(
       values(agencyUsers).map((agencyUser) => ({
         ...agencyUser,

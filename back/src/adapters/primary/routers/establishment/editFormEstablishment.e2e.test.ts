@@ -1,7 +1,9 @@
 import { addDays, millisecondsToSeconds, subYears } from "date-fns";
 import {
-  connectedUserTokenExpiredMessage,
-  createInclusionConnectJwtPayload,
+  authExpiredMessage,
+  ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
+  createConnectedUserJwtPayload,
   currentJwtVersions,
   type EstablishmentRoutes,
   errors,
@@ -11,15 +13,13 @@ import {
   expectToEqual,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import {
   type GenerateConnectedUserJwt,
   makeGenerateJwtES256,
@@ -49,7 +49,7 @@ describe("Edit form establishments", () => {
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
     .build();
 
-  const establishmentAdminUser = new InclusionConnectedUserBuilder()
+  const establishmentAdminUser = new ConnectedUserBuilder()
     .withId("admin")
     .withEmail("admin@establishment.mail")
     .buildUser();
@@ -89,7 +89,7 @@ describe("Edit form establishments", () => {
       body: formEstablishment,
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
             durationDays: 30,
             userId: establishmentAdminUser.id,
@@ -134,7 +134,7 @@ describe("Edit form establishments", () => {
         body: updatedFormEstablishment,
         headers: {
           authorization: generateConnectedUserJwt(
-            createInclusionConnectJwtPayload({
+            createConnectedUserJwtPayload({
               now: gateways.timeGateway.now(),
               durationDays: 30,
               userId: establishmentAdminUser.id,
@@ -158,20 +158,20 @@ describe("Edit form establishments", () => {
   });
 
   it("200 - Supports posting already existing form establisment when authenticated with backoffice JWT", async () => {
-    const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    const backofficeAdminUser = new ConnectedUserBuilder()
       .withId("backoffice-admin-user")
       .withIsAdmin(true)
       .buildUser();
 
-    const backofficeAdminICJwtPayload: InclusionConnectJwtPayload = {
-      version: currentJwtVersions.inclusion,
-      iat: millisecondsToSeconds(new Date().getTime()),
+    const backofficeAdminICJwtPayload: ConnectedUserJwtPayload = {
+      version: currentJwtVersions.connectedUser,
+      iat: millisecondsToSeconds(Date.now()),
       exp: millisecondsToSeconds(addDays(new Date(), 30).getTime()),
       userId: backofficeAdminUser.id,
     };
 
     const contactUsers = formEstablishment.userRights.map((right, index) =>
-      new InclusionConnectedUserBuilder()
+      new ConnectedUserBuilder()
         .withId(`contact-${index}`)
         .withEmail(right.email)
         .buildUser(),
@@ -231,7 +231,7 @@ describe("Edit form establishments", () => {
       body: formEstablishment,
       headers: {
         authorization: generateJwtWithWrongKey(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
             durationDays: 30,
             userId: establishmentAdminUser.id,
@@ -265,7 +265,7 @@ describe("Edit form establishments", () => {
       body: formEstablishment,
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             userId: establishmentAdminUser.id,
             now: subYears(gateways.timeGateway.now(), 1),
             durationDays: 30,
@@ -276,7 +276,7 @@ describe("Edit form establishments", () => {
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: connectedUserTokenExpiredMessage,
+        message: authExpiredMessage,
         status: 401,
       },
       status: 401,
@@ -293,7 +293,7 @@ describe("Edit form establishments", () => {
       body: establishment,
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             now: gateways.timeGateway.now(),
             durationDays: 30,
             userId: establishmentAdminUser.id,

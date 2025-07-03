@@ -1,12 +1,12 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
   type FtConnectIdentity,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -31,19 +31,19 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { NotifyNewConventionNeedsReview } from "./NotifyNewConventionNeedsReview";
 
 describe("NotifyConventionNeedsReview", () => {
-  const validator1 = new InclusionConnectedUserBuilder()
+  const validator1 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("aValidator@unmail.com")
     .buildUser();
-  const validator2 = new InclusionConnectedUserBuilder()
+  const validator2 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("anotherValidator@unmail.com")
     .buildUser();
-  const councellor1 = new InclusionConnectedUserBuilder()
+  const councellor1 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("aCouncellor@unmail.com")
     .build();
-  const councellor2 = new InclusionConnectedUserBuilder()
+  const councellor2 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("anotherCouncellor@unmail.com")
     .build();

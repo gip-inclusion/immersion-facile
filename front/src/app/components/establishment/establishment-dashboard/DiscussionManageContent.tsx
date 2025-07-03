@@ -70,25 +70,23 @@ const exchangeSeparators = [
 export const DiscussionManageContent = ({
   discussionId,
 }: DiscussionManageContentProps): JSX.Element => {
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const connectedUser = useAppSelector(authSelectors.connectedUser);
   const { discussion, isLoading, fetchError } = useDiscussion(
     discussionId,
-    inclusionConnectedJwt,
+    connectedUserJwt,
   );
   const dispatch = useDispatch();
   useFeedbackEventCallback(
     "dashboard-discussion-status-updated",
     "update.success",
     () => {
-      if (inclusionConnectedJwt) {
+      if (connectedUserJwt) {
         dispatch(
           discussionSlice.actions.fetchDiscussionRequested({
             discussionId,
             feedbackTopic: "dashboard-discussion",
-            jwt: inclusionConnectedJwt,
+            jwt: connectedUserJwt,
           }),
         );
       }
@@ -490,16 +488,14 @@ const DiscussionExchangeMessageForm = ({
   });
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const onSubmit = (data: ExchangeFromDashboard) => {
-    if (inclusionConnectedJwt) {
+    if (connectedUserJwt) {
       dispatch(
         discussionSlice.actions.sendExchangeRequested({
           exchangeData: {
-            jwt: inclusionConnectedJwt,
+            jwt: connectedUserJwt,
             discussionId,
             message: data.message,
           },

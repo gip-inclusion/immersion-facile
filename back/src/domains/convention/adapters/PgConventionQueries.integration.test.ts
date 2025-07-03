@@ -8,6 +8,7 @@ import {
   type AgencyId,
   type AgencyKind,
   type AppellationCode,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -19,7 +20,6 @@ import {
   expectArraysToEqualIgnoringOrder,
   expectToEqual,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
   type Notification,
   reasonableSchedule,
   type SiretDto,
@@ -34,7 +34,7 @@ import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import type { ConventionRepository } from "../ports/ConventionRepository";
@@ -125,7 +125,7 @@ describe("Pg implementation of ConventionQueries", () => {
         };
   };
 
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withEmail("validator@mail.com")
     .withId("77777777-6666-4777-7777-777777777777")
     .buildUser();
@@ -1102,7 +1102,7 @@ describe("Pg implementation of ConventionQueries", () => {
       })
       .build();
 
-    const singleAgencyUser = new InclusionConnectedUserBuilder()
+    const singleAgencyUser = new ConnectedUserBuilder()
       .withEmail("single-agency-user@mail.com")
       .withId("11111111-2222-3333-4444-555555555555")
       .buildUser();
@@ -1332,7 +1332,7 @@ describe("Pg implementation of ConventionQueries", () => {
     });
 
     it("should not return conventions if user has no appropriate role", async () => {
-      const userWithoutProperRole = new InclusionConnectedUserBuilder()
+      const userWithoutProperRole = new ConnectedUserBuilder()
         .withEmail("no-proper-role@mail.com")
         .withId("99999999-9999-9999-9999-999999999999")
         .buildUser();

@@ -58,9 +58,7 @@ export const AcceptDiscussionModal = ({
         conventionId: undefined,
       },
     });
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
@@ -68,7 +66,7 @@ export const AcceptDiscussionModal = ({
   const [wasConventionEstablished, setWasConventionEstablished] =
     useState<boolean>();
 
-  if (!inclusionConnectedJwt) throw new Error("No jwt found");
+  if (!connectedUserJwt) throw new Error("No jwt found");
 
   const onSubmit = (values: WithDiscussionStatusAccepted) => {
     modal.close();
@@ -79,7 +77,7 @@ export const AcceptDiscussionModal = ({
         candidateWarnedMethod: values.candidateWarnedMethod,
         conventionId: values.conventionId?.trim().toLowerCase() || undefined,
         discussionId: discussion.id,
-        jwt: inclusionConnectedJwt,
+        jwt: connectedUserJwt,
       }),
     );
   };

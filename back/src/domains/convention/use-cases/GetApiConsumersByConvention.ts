@@ -3,14 +3,14 @@ import {
   type AgencyWithUsersRights,
   type ApiConsumer,
   type ApiConsumerName,
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   userHasEnoughRightsOnConvention,
   type WithConventionId,
   withConventionIdSchema,
 } from "shared";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export type GetApiConsumersByConvention = ReturnType<
   typeof makeGetApiConsumersByConvention
@@ -18,7 +18,7 @@ export type GetApiConsumersByConvention = ReturnType<
 export const makeGetApiConsumersByConvention = createTransactionalUseCase<
   WithConventionId,
   ApiConsumerName[],
-  InclusionConnectedUser
+  ConnectedUser
 >(
   {
     name: "GetApiConsumersByConvention",

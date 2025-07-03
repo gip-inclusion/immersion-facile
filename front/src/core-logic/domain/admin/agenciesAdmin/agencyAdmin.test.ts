@@ -4,9 +4,9 @@ import {
   type AgencyId,
   type AgencyOption,
   type AgencyRight,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   expectToEqual,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
@@ -27,7 +27,7 @@ import {
   AGENCY_NEEDING_REVIEW_2,
   PE_AGENCY_ACTIVE,
 } from "../../../adapters/AgencyGateway/SimulatedAgencyGateway";
-import { icUsersAdminSelectors } from "../icUsersAdmin/icUsersAdmin.selectors";
+import { connectedUsersAdminSelectors } from "../connectedUsersAdmin/connectedUsersAdmin.selectors";
 
 describe("agencyAdmin", () => {
   let store: ReduxStore;
@@ -350,20 +350,23 @@ describe("agencyAdmin", () => {
         isUpdating: false,
         feedback: { kind: "agencyUpdated" },
       });
-      const user = new InclusionConnectedUserBuilder().build();
+      const user = new ConnectedUserBuilder().build();
       feedWithIcUsers([user]);
-      expectToEqual(icUsersAdminSelectors.agencyUsers(store.getState()), {
-        [user.id]: {
-          ...user,
-          agencyRights: user.agencyRights.reduce(
-            (acc, agencyRight) => ({
-              ...acc,
-              [agencyRight.agency.id]: agencyRight,
-            }),
-            {} as Record<AgencyId, AgencyRight>,
-          ),
+      expectToEqual(
+        connectedUsersAdminSelectors.agencyUsers(store.getState()),
+        {
+          [user.id]: {
+            ...user,
+            agencyRights: user.agencyRights.reduce(
+              (acc, agencyRight) => ({
+                ...acc,
+                [agencyRight.agency.id]: agencyRight,
+              }),
+              {} as Record<AgencyId, AgencyRight>,
+            ),
+          },
         },
-      });
+      );
     });
 
     it("when something goes wrong, shows error", () => {
@@ -497,7 +500,7 @@ describe("agencyAdmin", () => {
     dependencies.agencyGateway.updateAgencyResponse$.error(new Error(msg));
   };
 
-  const feedWithIcUsers = (icUsers: InclusionConnectedUser[]) => {
+  const feedWithIcUsers = (icUsers: ConnectedUser[]) => {
     dependencies.adminGateway.getAgencyUsersToReviewResponse$.next(icUsers);
   };
 

@@ -1,7 +1,7 @@
 import {
+  type ConnectedUser,
   type EstablishmentNameAndAdmins,
   errors,
-  type InclusionConnectedUser,
   type SiretDto,
   type WithSiretDto,
   withSiretSchema,
@@ -16,7 +16,7 @@ export type GetEstablishmentNameAndAdmins = ReturnType<
 export const makeGetEstablishmentNameAndAdmins = createTransactionalUseCase<
   WithSiretDto,
   EstablishmentNameAndAdmins,
-  InclusionConnectedUser,
+  ConnectedUser,
   void
 >(
   {

@@ -1,13 +1,24 @@
 import { from, type Observable } from "rxjs";
 import {
   type ConnectedUserJwt,
+  type DataWithPagination,
+  type DiscussionExchangeForbiddenParams,
+  type DiscussionInList,
+  type DiscussionReadDto,
   type EstablishmentNameAndAdmins,
   type EstablishmentRoutes,
+  type Exchange,
   errors,
   type FormEstablishmentDto,
+  type SendMessageToDiscussionFromDashboardRequestPayload,
   type SiretDto,
+  type UpdateDiscussionStatusParams,
 } from "shared";
 import type { HttpClient } from "shared-routes";
+import type {
+  FetchDiscussionListRequestedPayload,
+  FetchDiscussionRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import { match, P } from "ts-pattern";
 import {
@@ -136,6 +147,98 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
             })
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 403, 404, 409) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getDiscussionById$({
+    discussionId,
+    jwt,
+  }: FetchDiscussionRequestedPayload): Observable<
+    DiscussionReadDto | undefined
+  > {
+    return from(
+      this.httpClient
+        .getDiscussionByIdForEstablishment({
+          headers: { authorization: jwt },
+          urlParams: {
+            discussionId,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 403 }, logBodyAndThrow)
+            .with({ status: 404 }, () => undefined)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public getDiscussions$(
+    payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return from(
+      this.httpClient
+        .getDiscussions({
+          queryParams: payload.filters,
+          headers: { authorization: payload.jwt },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public sendMessage$(
+    payload: SendMessageToDiscussionFromDashboardRequestPayload,
+  ): Observable<Exchange | DiscussionExchangeForbiddenParams> {
+    return from(
+      this.httpClient
+        .replyToDiscussion({
+          headers: { authorization: payload.jwt },
+          urlParams: { discussionId: payload.discussionId },
+          body: {
+            message: payload.message,
+          },
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, ({ body }) => body)
+            .with({ status: 202 }, ({ body }) => body)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: 401 }, logBodyAndThrow)
+            .with({ status: 404 }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public updateDiscussionStatus$(
+    params: {
+      jwt: string;
+      discussionId: string;
+    } & UpdateDiscussionStatusParams,
+  ): Observable<void> {
+    const { discussionId: _, jwt: __, ...body } = params;
+    return from(
+      this.httpClient
+        .updateDiscussionStatus({
+          headers: { authorization: params.jwt },
+          urlParams: { discussionId: params.discussionId },
+          body,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+            .with({ status: P.union(401, 403, 404) }, logBodyAndThrow)
             .otherwise(otherwiseThrow),
         ),
     );

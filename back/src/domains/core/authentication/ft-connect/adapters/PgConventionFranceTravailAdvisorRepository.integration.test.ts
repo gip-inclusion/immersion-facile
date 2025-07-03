@@ -17,7 +17,7 @@ import { makeUniqueUserForTest } from "../../../../../utils/user";
 import { PgAgencyRepository } from "../../../../agency/adapters/PgAgencyRepository";
 import { PgConventionExternalIdRepository } from "../../../../convention/adapters/PgConventionExternalIdRepository";
 import { PgConventionRepository } from "../../../../convention/adapters/PgConventionRepository";
-import { PgUserRepository } from "../../inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../connected-user/adapters/PgUserRepository";
 import type {
   ConventionFtUserAdvisorEntity,
   FtUserAndAdvisor,

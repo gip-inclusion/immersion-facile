@@ -27,7 +27,7 @@ import {
   rueGuillaumeTellDto,
   rueJacquardDto,
 } from "../../core/address/adapters/InMemoryAddressGateway";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type {
   EstablishmentAggregate,
   EstablishmentUserRight,

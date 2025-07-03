@@ -4,9 +4,9 @@ import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
@@ -19,7 +19,7 @@ export interface AgencyGateway {
   createUserForAgency$(
     params: UserParamsForAgency,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser>;
+  ): Observable<ConnectedUser>;
   getAgencyById$(
     agencyId: AgencyId,
     token: ConnectedUserJwt,
@@ -27,7 +27,7 @@ export interface AgencyGateway {
   getAgencyUsers$(
     agencyId: AgencyId,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]>;
+  ): Observable<ConnectedUser[]>;
   getAgencyPublicInfoById$(
     agencyId: WithAgencyId,
   ): Observable<AgencyPublicDisplayDto>;
@@ -44,6 +44,10 @@ export interface AgencyGateway {
   updateUserAgencyRight$(
     params: UserParamsForAgency,
     token: ConnectedUserJwt,
+  ): Observable<void>;
+  registerAgenciesToCurrentUser$(
+    agencyIds: AgencyId[],
+    token: string,
   ): Observable<void>;
   removeUserFromAgency$(
     params: WithAgencyIdAndUserId,

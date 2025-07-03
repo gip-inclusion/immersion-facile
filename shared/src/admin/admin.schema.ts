@@ -1,12 +1,9 @@
 import { z } from "zod";
-import { agencyIdSchema } from "../agency/agency.schema";
+import { agencyIdSchema, agencyRoleSchema } from "../agency/agency.schema";
 import { conventionIdSchema } from "../convention/convention.schema";
 import { emailSchema } from "../email/email.schema";
-import {
-  agencyRoleSchema,
-  userIdSchema,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { siretSchema } from "../siret/siret.schema";
+import { userIdSchema } from "../user/user.schema";
 import { zStringMinLength1 } from "../zodUtils";
 import type {
   GetUsersFilters,

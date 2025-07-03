@@ -1,4 +1,4 @@
-import type { IdToken } from "../inclusionConnect/inclusionConnect.dto";
+import type { IdToken } from "../auth/auth.dto";
 import type { ConnectedUserJwt } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
 

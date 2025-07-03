@@ -37,7 +37,7 @@ describe("Agency info in store", () => {
         feedbackTopic: "partner-conventions",
       }),
     );
-    dependencies.inclusionConnectedGateway.markPartnersErroredConventionAsHandledResult$.next();
+    dependencies.conventionGateway.markPartnersErroredConventionAsHandledResult$.next();
 
     expectIsLoadingToBe(false);
     expectToEqual(feedbacksSelectors.feedbacks(store.getState()), {
@@ -60,7 +60,7 @@ describe("Agency info in store", () => {
       }),
     );
 
-    dependencies.inclusionConnectedGateway.markPartnersErroredConventionAsHandledResult$.error(
+    dependencies.conventionGateway.markPartnersErroredConventionAsHandledResult$.error(
       new Error(errorMessage),
     );
 

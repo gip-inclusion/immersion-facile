@@ -83,24 +83,23 @@ const deleteFederatedIdentityFromDevice: AuthEpic = (
     map(() => authSlice.actions.federatedIdentityInDeviceDeletionSucceeded()),
   );
 
-const logoutFromInclusionConnect: AuthEpic = (
+const logout: AuthEpic = (
   action$,
   state$,
-  { inclusionConnectedGateway, navigationGateway },
+  { navigationGateway, authGateway },
 ) =>
   action$.pipe(
     filter(authSlice.actions.federatedIdentityDeletionTriggered.match),
     switchMap((action) => {
       const { federatedIdentityWithUser } = state$.value.auth;
-      if (!federatedIdentityWithUser)
-        throw errors.inclusionConnect.missingOAuth({});
+      if (!federatedIdentityWithUser) throw errors.proConnect.missingOAuth({});
       const { provider } = federatedIdentityWithUser;
       if (
         provider === "proConnect" &&
-        action.payload.mode === "device-and-inclusion"
+        action.payload.mode === "device-and-oauth"
       ) {
         const { idToken } = federatedIdentityWithUser;
-        return inclusionConnectedGateway.getLogoutUrl$({
+        return authGateway.getLogoutUrl$({
           idToken: state$.value.auth.federatedIdentityWithUser ? idToken : "",
           authToken: state$.value.auth.federatedIdentityWithUser?.token ?? "",
         });
@@ -181,7 +180,7 @@ const requestLoginByEmail: AuthEpic = (action$, _, { authGateway }) =>
 export const authEpics = [
   storeFederatedIdentityInDevice,
   checkConnectedWithFederatedIdentity,
-  logoutFromInclusionConnect,
+  logout,
   deleteFederatedIdentityFromDevice,
   storeRedirectionUrlAfterLoginInDevice,
   clearAndRedirectAfterLoginFromDevice,

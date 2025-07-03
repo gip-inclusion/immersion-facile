@@ -2,6 +2,7 @@ import {
   type AbsoluteUrl,
   AgencyDtoBuilder,
   type AgencyWithUsersRights,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   conventionStatuses,
@@ -12,7 +13,6 @@ import {
   frontRoutes,
   type GenericActor,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
   type ReminderKind,
   type Role,
   splitCasesBetweenPassingAndFailing,
@@ -128,19 +128,19 @@ describe("NotifyThatConventionStillNeedToBeSigned use case", () => {
     const [authorizedAgencyStatuses, forbiddenAgencyStatuses] =
       splitCasesBetweenPassingAndFailing(conventionStatuses, ["IN_REVIEW"]);
 
-    const councellor1 = new InclusionConnectedUserBuilder()
+    const councellor1 = new ConnectedUserBuilder()
       .withId("counsellor1")
       .withEmail("councellor1@email.com")
       .buildUser();
-    const councellor2 = new InclusionConnectedUserBuilder()
+    const councellor2 = new ConnectedUserBuilder()
       .withId("counsellor2")
       .withEmail("councellor2@email.com")
       .buildUser();
-    const validator1 = new InclusionConnectedUserBuilder()
+    const validator1 = new ConnectedUserBuilder()
       .withId("validator1")
       .withEmail("validator1@email.com")
       .buildUser();
-    const validator2 = new InclusionConnectedUserBuilder()
+    const validator2 = new ConnectedUserBuilder()
       .withId("validator2")
       .withEmail("validator2@email.com")
       .buildUser();

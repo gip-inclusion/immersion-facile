@@ -18,6 +18,7 @@ import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -26,7 +27,6 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import {
   throwErrorIfPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
@@ -122,7 +122,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
         triggeredBy:
           "userId" in jwtPayload
             ? {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: jwtPayload.userId,
               }
             : {

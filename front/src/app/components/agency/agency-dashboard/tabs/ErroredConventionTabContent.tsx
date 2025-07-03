@@ -12,11 +12,11 @@ import { MetabaseView } from "../../../MetabaseView";
 
 export const ErroredConventionTabContent = ({
   activeAgencyRights,
-  inclusionConnectedJwt,
+  connectedUserJwt,
   dashboards,
 }: {
   activeAgencyRights: AgencyRight[];
-  inclusionConnectedJwt: ConnectedUserJwt | undefined;
+  connectedUserJwt: ConnectedUserJwt | undefined;
   dashboards: WithAgencyDashboards & WithEstablishmentDashboards;
 }) => {
   const isUserHaveFtAgencyRight = activeAgencyRights.some(
@@ -25,9 +25,9 @@ export const ErroredConventionTabContent = ({
 
   return (
     <>
-      {inclusionConnectedJwt ? (
+      {connectedUserJwt ? (
         <MarkPartnersErroredConventionAsHandledFormSection
-          jwt={inclusionConnectedJwt}
+          jwt={connectedUserJwt}
           isPeUser={isUserHaveFtAgencyRight}
         />
       ) : (

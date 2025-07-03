@@ -1,17 +1,17 @@
 import {
+  type ConnectedUser,
   type ConventionDto,
   type DataWithPagination,
   type GetConventionsForAgencyUserParams,
   getConventionsForAgencyUserParamsSchema,
   getPaginationParamsForWeb,
-  type InclusionConnectedUser,
 } from "shared";
 import { createTransactionalUseCase } from "../../core/UseCase";
 
 export const makeGetConventionsForAgencyUser = createTransactionalUseCase<
   GetConventionsForAgencyUserParams,
   DataWithPagination<ConventionDto>,
-  InclusionConnectedUser
+  ConnectedUser
 >(
   {
     inputSchema: getConventionsForAgencyUserParamsSchema,

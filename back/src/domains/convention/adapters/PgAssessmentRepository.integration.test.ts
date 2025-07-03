@@ -16,7 +16,7 @@ import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { AssessmentEntity } from "../entities/AssessmentEntity";
 import { PgAssessmentRepository } from "./PgAssessmentRepository";
 import { PgConventionRepository } from "./PgConventionRepository";

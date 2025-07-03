@@ -4,18 +4,20 @@ import {
   AgencyDtoBuilder,
   type AgencyRoutes,
   agencyRoutes,
+  ConnectedUserBuilder,
   type ConnectedUserJwt,
   type CreateAgencyDto,
   currentJwtVersions,
+  defaultProConnectInfos,
   displayRouteName,
   errors,
   expectHttpResponseToEqual,
   expectToEqual,
-  InclusionConnectedUserBuilder,
+  type User,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
@@ -35,7 +37,7 @@ describe("Agency routes", () => {
     city: "Paris",
   };
 
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withIsAdmin(true)
     .buildUser();
 
@@ -58,8 +60,8 @@ describe("Agency routes", () => {
 
     backofficeAdminToken = generateConnectedUserJwt({
       userId: backofficeAdminUser.id,
-      version: currentJwtVersions.inclusion,
-      iat: new Date().getTime(),
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
       exp: addDays(new Date(), 5).getTime(),
     });
   });
@@ -90,7 +92,7 @@ describe("Agency routes", () => {
     .withStatus("needsReview")
     .withAddress(defaultAddress)
     .build();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@mail.com")
     .buildUser();
@@ -312,6 +314,67 @@ describe("Agency routes", () => {
         });
 
         expectToEqual(inMemoryUow.agencyRepository.agencies, []);
+      });
+    });
+
+    describe("/inclusion-connected/register-agency", () => {
+      const agency = new AgencyDtoBuilder().withKind("pole-emploi").build();
+      const agencyUser: User = {
+        id: "123",
+        email: "joe@mail.com",
+        firstName: "Joe",
+        lastName: "Doe",
+        proConnect: defaultProConnectInfos,
+        createdAt: new Date().toISOString(),
+      };
+      it(`${displayRouteName(
+        agencyRoutes.registerAgenciesToUser,
+      )} 200 add an agency as registered to a connected user`, async () => {
+        inMemoryUow.userRepository.users = [agencyUser];
+        inMemoryUow.agencyRepository.agencies = [toAgencyWithRights(agency)];
+
+        const response = await httpClient.registerAgenciesToUser({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: agencyUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          body: [agency.id],
+        });
+
+        expectHttpResponseToEqual(response, {
+          body: "",
+          status: 200,
+        });
+
+        expectToEqual(inMemoryUow.userRepository.users, [agencyUser]);
+        expectToEqual(inMemoryUow.agencyRepository.agencies, [
+          toAgencyWithRights(agency, {
+            [agencyUser.id]: {
+              isNotifiedByEmail: false,
+              roles: ["to-review"],
+            },
+          }),
+        ]);
+      });
+
+      it(`${displayRouteName(
+        agencyRoutes.registerAgenciesToUser,
+      )} 400 without headers`, async () => {
+        const response = await httpClient.registerAgenciesToUser({
+          body: ["1"],
+          headers: {} as any,
+        });
+        expectHttpResponseToEqual(response, {
+          body: {
+            issues: ["authorization : Required"],
+            message:
+              "Shared-route schema 'headersSchema' was not respected in adapter 'express'.\nRoute: POST /inclusion-connected/register-agency",
+            status: 400,
+          },
+          status: 400,
+        });
       });
     });
   });

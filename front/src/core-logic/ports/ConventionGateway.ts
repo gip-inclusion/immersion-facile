@@ -11,6 +11,7 @@ import type {
   DiscussionId,
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
+  MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
@@ -78,6 +79,10 @@ export interface ConventionGateway {
   ): Observable<void>;
   editConventionCounsellorName$(
     params: EditConventionCounsellorNameRequestDto,
+    jwt: ConventionSupportedJwt,
+  ): Observable<void>;
+  markPartnersErroredConventionAsHandled$(
+    params: MarkPartnersErroredConventionAsHandledRequest,
     jwt: ConventionSupportedJwt,
   ): Observable<void>;
 }

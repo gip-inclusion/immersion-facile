@@ -4,9 +4,9 @@ import type {
   AgencyId,
   AgencyOption,
   AgencyPublicDisplayDto,
+  ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
@@ -16,7 +16,7 @@ import type {
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
 
 export class TestAgencyGateway implements AgencyGateway {
-  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+  public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
 
   public addAgencyResponse$ = new Subject<undefined>();
 
@@ -28,13 +28,15 @@ export class TestAgencyGateway implements AgencyGateway {
 
   public fetchedAgency$ = new Subject<AgencyDto>();
 
-  public fetchedAgencyUsers$ = new Subject<InclusionConnectedUser[]>();
+  public fetchedAgencyUsers$ = new Subject<ConnectedUser[]>();
 
   public updateAgencyResponse$ = new Subject<undefined>();
 
   public updateUserAgencyRightResponse$ = new Subject<undefined>();
 
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
+
+  public registerAgenciesToCurrentUserResponse$ = new Subject<undefined>();
 
   #agencies: Record<string, AgencyDto> = {};
 
@@ -45,7 +47,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     _params: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return this.createUserForAgencyResponse$;
   }
 
@@ -59,7 +61,7 @@ export class TestAgencyGateway implements AgencyGateway {
   public getAgencyUsers$(
     _agencyId: AgencyId,
     _token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<ConnectedUser[]> {
     return this.fetchedAgencyUsers$;
   }
 
@@ -111,5 +113,12 @@ export class TestAgencyGateway implements AgencyGateway {
     agencyId: AgencyId,
   ): Promise<void> {
     this.#agencies[agencyId].status = "active";
+  }
+
+  public registerAgenciesToCurrentUser$(
+    _agencyIds: AgencyId[],
+    _token: string,
+  ): Observable<void> {
+    return this.registerAgenciesToCurrentUserResponse$;
   }
 }

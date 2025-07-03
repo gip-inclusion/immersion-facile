@@ -6,6 +6,7 @@ import type {
   ApiConsumerSubscriptionId,
 } from "../apiConsumer/ApiConsumer";
 import type { AssessmentMode } from "../assessment/assessment.dto";
+import { authExpiredMessage, type OAuthState } from "../auth/auth.dto";
 import type {
   ConventionDto,
   ConventionId,
@@ -25,23 +26,21 @@ import type { StoredFileId } from "../file/file.dto";
 import type { FileValidationError } from "../file/file.validators";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
 import type { GroupSlug } from "../group/group.dto";
-import {
-  connectedUserTokenExpiredMessage,
-  type OAuthState,
-} from "../inclusionConnect/inclusionConnect.dto";
-import type {
-  AgencyRole,
-  UserId,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type {
   NotificationId,
   NotificationKind,
 } from "../notifications/notifications.dto";
-import type { AgencyModifierRole, Role, SignatoryRole } from "../role/role.dto";
+import type {
+  AgencyModifierRole,
+  AgencyRole,
+  Role,
+  SignatoryRole,
+} from "../role/role.dto";
 import { titleByRole } from "../role/role.utils";
 import type { AppellationCode } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { ShortLinkId } from "../shortLink/shortLink.dto";
 import type { SiretDto } from "../siret/siret";
+import type { UserId } from "../user/user.dto";
 import { toDisplayedDate } from "../utils/date";
 import { ManagedFTConnectError } from "./ftConnectErrors";
 import {
@@ -218,7 +217,7 @@ export const errors = {
         `Une relance de demande de completion du bilan a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
       ),
   },
-  inclusionConnect: {
+  proConnect: {
     missingOAuth: ({ state }: { state?: OAuthState }) =>
       new ForbiddenError(
         `Il n'y a pas d'OAuth en cours ${state ? `avec l'état '${state}'` : ""}}`,
@@ -694,7 +693,7 @@ export const errors = {
       new ForbiddenError(
         "Le jeton d'authentification (JWT) fourni est invalide.",
       ),
-    expiredJwt: () => new ForbiddenError(connectedUserTokenExpiredMessage),
+    expiredJwt: () => new ForbiddenError(authExpiredMessage),
     notFound: ({ userId }: { userId: UserId }) =>
       new NotFoundError(
         `Aucun utilisateur trouvé avec l'identifiant : ${userId}.`,
@@ -749,9 +748,9 @@ export const errors = {
       new ConflictError(
         `L'utilisateur ayant l'externalId ${externalId} existe déjà.`,
       ),
-    forbiddenToChangeEmailForUIcUser: () =>
+    forbiddenToChangeEmailForConnectedUser: () =>
       new ForbiddenError(
-        "Il n'est pas possible de modifier un mail d'un utilisateur inclusion connecté.",
+        "Il n'est pas possible de modifier un mail d'un utilisateur connecté.",
       ),
     forbiddenNotificationsPreferencesUpdate: () =>
       new ForbiddenError(

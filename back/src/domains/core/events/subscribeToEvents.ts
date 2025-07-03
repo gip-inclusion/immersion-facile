@@ -157,7 +157,7 @@ const getUseCasesByTopics = (
   AgencyActivated: [useCases.sendEmailsWhenAgencyIsActivated],
   AgencyUpdated: [useCases.updateAgencyReferringToUpdatedAgency],
   AgencyRejected: [useCases.sendEmailWhenAgencyIsRejected],
-  AgencyRegisteredToInclusionConnectedUser: [],
+  AgencyRegisteredToConnectedUser: [],
 
   // Assessment related:
   AssessmentCreated: [
@@ -173,11 +173,11 @@ const getUseCasesByTopics = (
   UserAuthenticatedSuccessfully: [
     useCases.linkFranceTravailUsersToTheirAgencies,
   ],
-  IcUserAgencyRightChanged: [
-    useCases.notifyIcUserAgencyRightChanged,
+  ConnectedUserAgencyRightChanged: [
+    useCases.notifyUserAgencyRightChanged,
     useCases.updateAgencyReferringToUpdatedAgency,
   ],
-  IcUserAgencyRightRejected: [useCases.notifyIcUserAgencyRightRejected],
+  ConnectedUserAgencyRightRejected: [useCases.notifyUserAgencyRightRejected],
 
   //Api Consumer related:
   ApiConsumerSaved: [],

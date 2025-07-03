@@ -13,13 +13,13 @@ type PartnersErroredConvention = ActionOfSlice<
 type PartnersErroredConventionEpic = AppEpic<PartnersErroredConvention>;
 
 const markPartnersErroredConventionAsHandledEpic: PartnersErroredConventionEpic =
-  (action$, _, { inclusionConnectedGateway }) =>
+  (action$, _, { conventionGateway }) =>
     action$.pipe(
       filter(
         partnersErroredConventionSlice.actions.markAsHandledRequested.match,
       ),
       switchMap(({ payload }) =>
-        inclusionConnectedGateway
+        conventionGateway
           .markPartnersErroredConventionAsHandled$(
             payload.markAsHandledParams,
             payload.jwt,

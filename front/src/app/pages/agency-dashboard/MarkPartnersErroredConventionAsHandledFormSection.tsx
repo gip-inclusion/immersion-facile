@@ -22,8 +22,7 @@ import { conventionSlice } from "src/core-logic/domain/convention/convention.sli
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 
 const erroredConventionHandledConfirmationModal = createModal({
-  id: domElementIds.manageConventionInclusionConnected
-    .erroredConventionHandledModal,
+  id: domElementIds.manageConventionUserConnected.erroredConventionHandledModal,
   isOpenedByDefault: false,
 });
 

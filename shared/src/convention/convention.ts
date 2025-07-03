@@ -1,11 +1,20 @@
 import { differenceInISOWeekYears } from "date-fns";
 import { keys, mapObjIndexed, values } from "ramda";
+import { agencyRoleIsNotToReview } from "../agency/agency.utils";
 import {
+  type AgencyRole,
   allSignatoryRoles,
+  type ConventionEstablishmentRole,
+  type EstablishmentRole,
   type Role,
   type SignatoryRole,
 } from "../role/role.dto";
-import type { DotNestedKeys } from "../utils";
+import type { UserWithRights } from "../user/user.dto";
+import type {
+  DotNestedKeys,
+  ExcludeFromExisting,
+  ExtractFromExisting,
+} from "../utils";
 import type { DateString } from "../utils/date";
 import type {
   BeneficiaryRepresentative,
@@ -269,4 +278,34 @@ export const flatParamsToGetConventionsForAgencyUserParams = (
       perPage,
     },
   };
+};
+
+type ConnectedUserConventionManageAllowedRole =
+  | EstablishmentRole
+  | ConventionEstablishmentRole
+  | ExtractFromExisting<Role, "back-office">
+  | ExcludeFromExisting<AgencyRole, "to-review">;
+
+export const getConventionManageAllowedRoles = (
+  convention: ConventionDto,
+  user: UserWithRights,
+): ConnectedUserConventionManageAllowedRole[] => {
+  const roles: ConnectedUserConventionManageAllowedRole[] = [];
+  if (user.isBackofficeAdmin) roles.push("back-office");
+  if (convention.signatories.establishmentRepresentative.email === user.email)
+    roles.push("establishment-representative");
+  if (convention.establishmentTutor.email === user.email)
+    roles.push("establishment-tutor");
+  const agencyRight = user.agencyRights.find(
+    (agencyRight) => agencyRight.agency.id === convention.agencyId,
+  );
+
+  if (agencyRight && agencyRoleIsNotToReview(agencyRight.roles))
+    roles.push(...agencyRight.roles);
+
+  const establishmentRights = user.establishments?.find(
+    (establishment) => establishment.siret === convention.siret,
+  );
+  if (establishmentRights) roles.push(establishmentRights.role);
+  return roles;
 };

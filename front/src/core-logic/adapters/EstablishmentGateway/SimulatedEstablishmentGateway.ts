@@ -1,10 +1,22 @@
 import { delay, type Observable, of } from "rxjs";
-import type {
-  ConnectedUserJwt,
-  EstablishmentNameAndAdmins,
-  FormEstablishmentDto,
-  SiretDto,
+import {
+  type ConnectedUserJwt,
+  type DataWithPagination,
+  DiscussionBuilder,
+  type DiscussionInList,
+  type DiscussionReadDto,
+  type EstablishmentNameAndAdmins,
+  type Exchange,
+  type FormEstablishmentDto,
+  type SiretDto,
+  type WithDiscussionStatusRejected,
 } from "shared";
+import {
+  type FetchDiscussionListRequestedPayload,
+  type FetchDiscussionRequestedPayload,
+  initialDiscussionsWithPagination,
+  type SendExchangeRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class SimulatedEstablishmentGateway implements EstablishmentGateway {
@@ -69,5 +81,39 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
         : currentEstablishment,
     );
     return of(undefined).pipe(delay(this.delay));
+  }
+
+  getDiscussionById$(
+    _payload: FetchDiscussionRequestedPayload,
+  ): Observable<DiscussionReadDto | undefined> {
+    return of(new DiscussionBuilder().buildRead()).pipe(delay(this.delay));
+  }
+
+  public updateDiscussionStatus$(
+    _payload: {
+      jwt: string;
+      discussionId: string;
+    } & WithDiscussionStatusRejected,
+  ): Observable<void> {
+    return of(undefined).pipe(delay(this.delay));
+  }
+
+  public sendMessage$(
+    _payload: SendExchangeRequestedPayload,
+  ): Observable<Exchange> {
+    return of({
+      subject: "Réponse de My businessName à votre demande",
+      message: "My message",
+      sentAt: new Date().toISOString(),
+      sender: "establishment",
+      recipient: "potentialBeneficiary",
+      attachments: [],
+    } satisfies Exchange).pipe(delay(this.delay));
+  }
+
+  public getDiscussions$(
+    _payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return of(initialDiscussionsWithPagination).pipe(delay(this.delay));
   }
 }

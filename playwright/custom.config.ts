@@ -11,13 +11,6 @@ export const testConfig = {
     adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
     adminPassword: throwIfNotDefinedOrDefault("PC_ADMIN_PASSWORD"),
   },
-  inclusionConnect: {
-    baseUrl: "https://recette.connect.inclusion.beta.gouv.fr",
-    username: process.env.IC_USERNAME ?? "",
-    password: process.env.IC_PASSWORD ?? "",
-    adminUsername: "admin+playwright@immersion-facile.beta.gouv.fr",
-    adminPassword: process.env.IC_ADMIN_PASSWORD ?? "",
-  },
   adminAuthFile: ".auth/admin.json",
   establishmentAuthFile: ".auth/establishment.json",
   agencyAuthFile: ".auth/agency.json",

@@ -15,7 +15,7 @@ import type { routes } from "src/app/routes/routes";
 
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 
-import type { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { ConnectedUsersWithNormalizedAgencyRightsById } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import type { Route } from "type-route";
 
 export type AgencyOverviewRouteName = Route<
@@ -27,7 +27,7 @@ export type AgencyOverviewRouteName = Route<
 
 type AgencyOverviewProps = {
   agency: AgencyDto;
-  agencyUsers: NormalizedIcUserById;
+  agencyUsers: ConnectedUsersWithNormalizedAgencyRightsById;
   routeName: AgencyOverviewRouteName;
 };
 

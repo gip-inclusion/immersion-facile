@@ -1,13 +1,13 @@
 import {
   AgencyDtoBuilder,
   type AgencyWithUsersRights,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   expectToEqual,
   type FtConnectIdentity,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -31,7 +31,7 @@ import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGener
 import { NotifyToAgencyConventionSubmitted } from "./NotifyToAgencyConventionSubmitted";
 
 describe("NotifyToAgencyConventionSubmitted", () => {
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator-id")
     .withFirstName("validatorName")
     .withLastName("validatorLastName")
@@ -43,7 +43,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     })
     .build();
 
-  const councellor1 = new InclusionConnectedUserBuilder()
+  const councellor1 = new ConnectedUserBuilder()
     .withId("councellor1-id")
     .withFirstName("councellor1Name")
     .withLastName("councellor1LastName")
@@ -55,7 +55,7 @@ describe("NotifyToAgencyConventionSubmitted", () => {
     })
     .build();
 
-  const councellor2 = new InclusionConnectedUserBuilder()
+  const councellor2 = new ConnectedUserBuilder()
     .withId("councellor2-id")
     .withFirstName("councellor2Name")
     .withLastName("councellor2LastName")

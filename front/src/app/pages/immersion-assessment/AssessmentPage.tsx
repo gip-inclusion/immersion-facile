@@ -24,7 +24,7 @@ import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { Route } from "type-route";
 
 type AssessmentRoute = Route<typeof routes.assessment>;
@@ -39,8 +39,8 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
   const currentAssessment = useAppSelector(
     assessmentSelectors.currentAssessment,
   );
-  const inclusionConnectedRoles = useAppSelector(
-    inclusionConnectedSelectors.userRolesForFetchedConvention,
+  const userRolesForFetchedConvention = useAppSelector(
+    connectedUserSelectors.userRolesForFetchedConvention,
   );
 
   const isAssessmentLoading = useAppSelector(assessmentSelectors.isLoading);
@@ -57,7 +57,9 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
       route.params.jwt,
     );
-  const roles: Role[] = roleFromJwt ? [roleFromJwt] : inclusionConnectedRoles;
+  const roles: Role[] = roleFromJwt
+    ? [roleFromJwt]
+    : userRolesForFetchedConvention;
   const { convention, isLoading: isConventionLoading } = useConvention({
     jwt: route.params.jwt,
     conventionId,
@@ -145,47 +147,45 @@ export const AssessmentPage = ({ route }: AssessmentPageProps) => {
           description="Vous n'êtes pas autorisé à accéder à cette page"
         />
       ) : (
-        <>
-          {convention && (
-            <MainWrapper
-              layout="default"
-              pageHeader={
-                <PageHeader
-                  breadcrumbs={<Breadcrumbs />}
-                  className={fr.cx("fr-mb-0")}
-                  title={`Bilan ${convention.internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"} de ${getFormattedFirstnameAndLastname(
-                    {
-                      firstname: convention.signatories.beneficiary.firstName,
-                      lastname: convention.signatories.beneficiary.lastName,
-                    },
-                  )}`}
-                />
-              }
-            >
-              {convention && !isConventionValidated && (
-                <Alert
-                  severity="error"
-                  title="Votre convention n'est pas prête à recevoir un bilan"
-                  description="Seule une convention entièrement validée peut recevoir un bilan"
-                />
-              )}
-              {currentAssessment && (
-                <Alert
-                  severity="error"
-                  title="Erreur"
-                  description="Le bilan a déjà été rempli et ne peut être modifié."
-                />
-              )}
-              {convention && isConventionValidated && !currentAssessment && (
-                <AssessmentForm
-                  convention={convention}
-                  jwt={route.params.jwt}
-                  currentUserRoles={roles}
-                />
-              )}
-            </MainWrapper>
-          )}
-        </>
+        convention && (
+          <MainWrapper
+            layout="default"
+            pageHeader={
+              <PageHeader
+                breadcrumbs={<Breadcrumbs />}
+                className={fr.cx("fr-mb-0")}
+                title={`Bilan ${convention.internshipKind === "immersion" ? "de l'immersion" : "du mini-stage"} de ${getFormattedFirstnameAndLastname(
+                  {
+                    firstname: convention.signatories.beneficiary.firstName,
+                    lastname: convention.signatories.beneficiary.lastName,
+                  },
+                )}`}
+              />
+            }
+          >
+            {convention && !isConventionValidated && (
+              <Alert
+                severity="error"
+                title="Votre convention n'est pas prête à recevoir un bilan"
+                description="Seule une convention entièrement validée peut recevoir un bilan"
+              />
+            )}
+            {currentAssessment && (
+              <Alert
+                severity="error"
+                title="Erreur"
+                description="Le bilan a déjà été rempli et ne peut être modifié."
+              />
+            )}
+            {convention && isConventionValidated && !currentAssessment && (
+              <AssessmentForm
+                convention={convention}
+                jwt={route.params.jwt}
+                currentUserRoles={roles}
+              />
+            )}
+          </MainWrapper>
+        )
       )}
     </HeaderFooterLayout>
   );

@@ -1,9 +1,9 @@
 import {
+  type ConnectedUserDomainJwtPayload,
   type ConventionDomainPayload,
   type ConventionDto,
   type ConventionStatus,
   errors,
-  type InclusionConnectDomainJwtPayload,
   isModifierRole,
   isSignatoryRole,
   type Signatories,
@@ -16,13 +16,13 @@ import {
   agencyDtoToConventionAgencyFields,
   agencyWithRightToAgencyDto,
 } from "../../../utils/agency";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import {
   extractUserRolesOnConventionFromJwtPayload,
   signConvention,
@@ -31,7 +31,7 @@ import {
 export class UpdateConvention extends TransactionalUseCase<
   UpdateConventionRequestDto,
   WithConventionIdLegacy,
-  ConventionDomainPayload | InclusionConnectDomainJwtPayload
+  ConventionDomainPayload | ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = updateConventionRequestSchema;
 
@@ -46,7 +46,7 @@ export class UpdateConvention extends TransactionalUseCase<
   protected async _execute(
     { convention }: UpdateConventionRequestDto,
     uow: UnitOfWork,
-    jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+    jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
   ): Promise<WithConventionIdLegacy> {
     await throwIfNotAllowedToUpdateConvention(uow, convention, jwtPayload);
 
@@ -93,7 +93,7 @@ export class UpdateConvention extends TransactionalUseCase<
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload
         ? {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: jwtPayload.userId,
           }
         : {
@@ -157,7 +157,7 @@ export class UpdateConvention extends TransactionalUseCase<
 const throwIfNotAllowedToUpdateConvention = async (
   uow: UnitOfWork,
   convention: ConventionDto,
-  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
 ) => {
   if (!jwtPayload) throw errors.user.unauthorized();
 

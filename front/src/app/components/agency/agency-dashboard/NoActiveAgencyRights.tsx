@@ -1,7 +1,7 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useState } from "react";
-import type { AgencyRight, InclusionConnectedUser } from "shared";
+import type { AgencyRight, ConnectedUser } from "shared";
 import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies/RegisterAgenciesForm";
 import { commonIllustrations } from "src/assets/img/illustrations";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
@@ -13,7 +13,7 @@ export function NoActiveAgencyRights({
   feedbackTopic,
 }: {
   toReviewAgencyRights: AgencyRight[];
-  currentUser: InclusionConnectedUser;
+  currentUser: ConnectedUser;
   feedbackTopic: FeedbackTopic;
 }): JSX.Element {
   const [showRegistrationForm, setShowRegistrationForm] =

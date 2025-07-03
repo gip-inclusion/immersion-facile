@@ -2,13 +2,13 @@ import {
   AgencyDtoBuilder,
   type AssessmentDto,
   allRoles,
+  ConnectedUserBuilder,
   type ConventionDomainPayload,
   ConventionDtoBuilder,
   type ConventionJwtPayload,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type LegacyAssessmentDto,
   type Role,
   splitCasesBetweenPassingAndFailing,
@@ -29,19 +29,19 @@ import {
 
 describe("GetAssessmentByConventionId", () => {
   const agency = new AgencyDtoBuilder().build();
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@email.com")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@email.com")
     .buildUser();
-  const userWithoutRoleOnConvention = new InclusionConnectedUserBuilder()
+  const userWithoutRoleOnConvention = new ConnectedUserBuilder()
     .withId("userWithoutRoleOnConvention")
     .withEmail("userWithoutRoleOnConvention@email.com")
     .buildUser();
-  const backOfficeAdmin = new InclusionConnectedUserBuilder()
+  const backOfficeAdmin = new ConnectedUserBuilder()
     .withId("backOfficeAdmin")
     .withEmail("backOfficeAdmin@email.com")
     .withIsAdmin(true)

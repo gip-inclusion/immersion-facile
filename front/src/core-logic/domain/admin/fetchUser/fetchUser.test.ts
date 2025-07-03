@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   expectToEqual,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
@@ -19,9 +19,8 @@ import {
 } from "src/core-logic/storeConfig/createTestStore";
 import type { ReduxStore } from "src/core-logic/storeConfig/store";
 
-const icUser = new InclusionConnectedUserBuilder().build();
-
 describe("Admin Users slice", () => {
+  const user = new ConnectedUserBuilder().build();
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
@@ -34,18 +33,15 @@ describe("Admin Users slice", () => {
     expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), null);
 
     store.dispatch(
-      fetchUserSlice.actions.fetchUserRequested({ userId: icUser.id }),
+      fetchUserSlice.actions.fetchUserRequested({ userId: user.id }),
     );
 
     expectToEqual(adminFetchUserSelectors.isFetching(store.getState()), true);
 
-    feedWithUsers(icUser);
+    feedWithUsers(user);
 
     expectToEqual(adminFetchUserSelectors.isFetching(store.getState()), false);
-    expectToEqual(
-      adminFetchUserSelectors.fetchedUser(store.getState()),
-      icUser,
-    );
+    expectToEqual(adminFetchUserSelectors.fetchedUser(store.getState()), user);
   });
 
   describe("when current user has successfully requested an update of another user", () => {
@@ -56,7 +52,7 @@ describe("Admin Users slice", () => {
         roles: ["validator"],
         isNotifiedByEmail: false,
       };
-      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+      const user: ConnectedUser = new ConnectedUserBuilder()
         .withId("user-id")
         .withIsAdmin(false)
         .withAgencyRights([agencyRight])
@@ -109,7 +105,7 @@ describe("Admin Users slice", () => {
         roles: ["validator"],
         isNotifiedByEmail: false,
       };
-      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+      const user: ConnectedUser = new ConnectedUserBuilder()
         .withId("user-id")
         .withIsAdmin(false)
         .withAgencyRights([agencyRight])
@@ -162,7 +158,7 @@ describe("Admin Users slice", () => {
         roles: ["to-review"],
         isNotifiedByEmail: false,
       };
-      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+      const user: ConnectedUser = new ConnectedUserBuilder()
         .withId("user-id")
         .withIsAdmin(false)
         .withAgencyRights([agencyRight])
@@ -210,7 +206,7 @@ describe("Admin Users slice", () => {
         roles: ["to-review"],
         isNotifiedByEmail: false,
       };
-      const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+      const user: ConnectedUser = new ConnectedUserBuilder()
         .withId("user-id")
         .withIsAdmin(false)
         .withAgencyRights([agencyRight])
@@ -249,7 +245,7 @@ describe("Admin Users slice", () => {
     });
   });
 
-  const feedWithUsers = (icUser: InclusionConnectedUser) => {
+  const feedWithUsers = (icUser: ConnectedUser) => {
     dependencies.adminGateway.getIcUserResponse$.next(icUser);
   };
 });

@@ -2,19 +2,19 @@ import { addDays } from "date-fns";
 import {
   type AdminRoutes,
   adminRoutes,
+  ConnectedUserBuilder,
   type ConnectedUserJwt,
+  type ConnectedUserJwtPayload,
   currentJwtVersions,
   expectHttpResponseToEqual,
   type FormEstablishmentBatchDto,
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
 import {
@@ -23,17 +23,17 @@ import {
 } from "../../../../utils/buildTestApp";
 
 describe("POST /add-form-establishment-batch", () => {
-  const adminBuilder = new InclusionConnectedUserBuilder()
+  const adminBuilder = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true);
-  const icAdmin = adminBuilder.build();
+  const connectedUserAdmin = adminBuilder.build();
   const admin = adminBuilder.buildUser();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
-    userId: icAdmin.id,
+    userId: connectedUserAdmin.id,
   };
 
   const formEstablishment1: FormEstablishmentDto =

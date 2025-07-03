@@ -1,4 +1,5 @@
 import {
+  ConnectedUserBuilder,
   defaultAddress,
   defaultValidFormEstablishment,
   errors,
@@ -9,7 +10,6 @@ import {
   type FormEstablishmentDto,
   FormEstablishmentDtoBuilder,
   type GroupOptions,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { InMemoryAddressGateway } from "../../core/address/adapters/InMemoryAddressGateway";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -33,13 +33,9 @@ import { AddFormEstablishmentBatch } from "./AddFormEstablismentsBatch";
 import { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 describe("AddFormEstablishmentsBatch Use Case", () => {
-  const icUserNotAdmin = new InclusionConnectedUserBuilder()
-    .withIsAdmin(false)
-    .build();
+  const userNotAdmin = new ConnectedUserBuilder().withIsAdmin(false).build();
 
-  const icUserAdmin = new InclusionConnectedUserBuilder()
-    .withIsAdmin(true)
-    .build();
+  const userAdmin = new ConnectedUserBuilder().withIsAdmin(true).build();
 
   const groupOptions: GroupOptions = {
     heroHeader: {
@@ -117,8 +113,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
-      addFormEstablishmentBatch.execute(formEstablishmentBatch, icUserNotAdmin),
-      errors.user.forbidden({ userId: icUserNotAdmin.id }),
+      addFormEstablishmentBatch.execute(formEstablishmentBatch, userNotAdmin),
+      errors.user.forbidden({ userId: userNotAdmin.id }),
     );
   });
 
@@ -126,7 +122,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
     uuidGenerator.setNextUuids(["1", "2", "3", "4", "5", "6"]);
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
-      icUserAdmin,
+      userAdmin,
     );
 
     expectToEqual(report, {
@@ -271,7 +267,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
-      icUserAdmin,
+      userAdmin,
     );
 
     expectToEqual(report, {
@@ -293,7 +289,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
-      icUserAdmin,
+      userAdmin,
     );
 
     expectToEqual(report, {
@@ -377,8 +373,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             )
             .build(),
           triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icUserAdmin.id,
+            kind: "connected-user",
+            userId: userAdmin.id,
           },
         },
       },
@@ -456,8 +452,8 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
             ])
             .build(),
           triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icUserAdmin.id,
+            kind: "connected-user",
+            userId: userAdmin.id,
           },
         },
       },
@@ -467,10 +463,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
   it("creates the establishmentGroup with the sirets of the establishments", async () => {
     uuidGenerator.setNextUuids(["event1-id", "event2-id"]);
 
-    await addFormEstablishmentBatch.execute(
-      formEstablishmentBatch,
-      icUserAdmin,
-    );
+    await addFormEstablishmentBatch.execute(formEstablishmentBatch, userAdmin);
 
     expect(uow.groupRepository.groupEntities).toHaveLength(1);
     expectToEqual(uow.groupRepository.groupEntities[0], {
@@ -541,7 +534,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
 
     const report = await addFormEstablishmentBatch.execute(
       formEstablishmentBatch,
-      icUserAdmin,
+      userAdmin,
     );
 
     expectToEqual(report, {

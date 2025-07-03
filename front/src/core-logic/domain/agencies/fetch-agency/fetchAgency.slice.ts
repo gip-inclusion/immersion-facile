@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { filter } from "ramda";
 import type { AgencyDto, WithAgencyId } from "shared";
-import type { NormalizedIcUserById } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { ConnectedUsersWithNormalizedAgencyRightsById } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateAgencySlice } from "src/core-logic/domain/agencies/update-agency/updateAgency.slice";
@@ -10,7 +10,7 @@ import type { PayloadActionWithFeedbackTopic } from "src/core-logic/domain/feedb
 
 export interface FetchAgencyState {
   agency: AgencyDto | null;
-  agencyUsers: NormalizedIcUserById;
+  agencyUsers: ConnectedUsersWithNormalizedAgencyRightsById;
   isLoading: boolean;
 }
 
@@ -52,7 +52,7 @@ export const fetchAgencySlice = createSlice({
 
     fetchAgencyUsersSucceeded: (
       state,
-      action: PayloadAction<NormalizedIcUserById>,
+      action: PayloadAction<ConnectedUsersWithNormalizedAgencyRightsById>,
     ) => {
       state.isLoading = false;
       state.agencyUsers = action.payload;

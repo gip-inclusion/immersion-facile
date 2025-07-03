@@ -6,13 +6,12 @@ import { createAddressRouter } from "../../adapters/primary/routers/address/crea
 import { createAdminRouter } from "../../adapters/primary/routers/admin/createAdminRouter";
 import { createAgenciesRouter } from "../../adapters/primary/routers/agencies/createAgenciesRouter";
 import { createApiKeyAuthRouterV2 } from "../../adapters/primary/routers/apiKeyAuthRouter/createApiKeyAuthRouter.v2";
+import { createAuthRouter } from "../../adapters/primary/routers/auth/createAuthRouter";
 import { createConventionRouter } from "../../adapters/primary/routers/convention/createConventionRouter";
 import { createEstablishmentRouter } from "../../adapters/primary/routers/establishment/createEstablishmentRouter";
 import { createEstablishmentLeadRouter } from "../../adapters/primary/routers/establishmentLead/createEstablishmentLeadRouter";
 import { createFormCompletionRouter } from "../../adapters/primary/routers/formCompletion/createFormCompletionRouter";
 import { createFtConnectRouter } from "../../adapters/primary/routers/ftConnect/createFtConnectRouter";
-import { createInclusionConnectedAllowedRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectedAllowedRouter";
-import { createInclusionConnectRouter } from "../../adapters/primary/routers/inclusionConnect/createInclusionConnectRouter";
 import { createMagicLinkRouter } from "../../adapters/primary/routers/magicLink/createMagicLinkRouter";
 import { createNafRouter } from "../../adapters/primary/routers/naf/createNafRouter";
 import { createRootApiRouter } from "../../adapters/primary/routers/rootApi/createRootApiRouter";
@@ -85,7 +84,6 @@ export const createApp = async (
   app.use(createMagicLinkRouter(deps));
   app.use(createAdminRouter(deps));
   app.use(createApiKeyAuthRouterV2(deps));
-  app.use(createInclusionConnectedAllowedRouter(deps));
   // ----
   app.use(createFormCompletionRouter(deps));
   app.use(createNafRouter(deps));
@@ -94,7 +92,7 @@ export const createApp = async (
   app.use(createConventionRouter(deps));
   app.use(createAgenciesRouter(deps));
   app.use(createFtConnectRouter(deps));
-  app.use(createInclusionConnectRouter(deps));
+  app.use(createAuthRouter(deps));
   // Auth issues below this last router
   app.use(createEstablishmentRouter(deps));
   app.use(createEstablishmentLeadRouter(deps));

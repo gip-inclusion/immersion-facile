@@ -1,5 +1,5 @@
 import type { Flavor } from "..";
-import type { PayloadKey } from "./jwtPayload.dto";
+import type { PayloadKind } from "./payload.dto";
 
 export type ApiConsumerJwt = Flavor<string, "ApiConsumerJwt">;
 export type ConventionJwt = Flavor<string, "ConventionJwt">;
@@ -14,9 +14,9 @@ export type AppSupportedJwt =
 
 export type ConventionSupportedJwt = ConventionJwt | ConnectedUserJwt;
 
-export const currentJwtVersions: Record<PayloadKey, number> = {
+export const currentJwtVersions: Record<PayloadKind, number> = {
   convention: 1,
-  inclusion: 1,
+  connectedUser: 1,
   currentUser: 1, // useless, just for typecheck
 };
 

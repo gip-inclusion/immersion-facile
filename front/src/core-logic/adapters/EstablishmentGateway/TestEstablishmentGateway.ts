@@ -1,10 +1,20 @@
 import { type Observable, Subject } from "rxjs";
 import type {
   ConnectedUserJwt,
+  DataWithPagination,
+  DiscussionInList,
+  DiscussionReadDto,
   EstablishmentNameAndAdmins,
+  Exchange,
   FormEstablishmentDto,
   SiretDto,
+  WithDiscussionStatusRejected,
 } from "shared";
+import type {
+  FetchDiscussionListRequestedPayload,
+  FetchDiscussionRequestedPayload,
+  SendExchangeRequestedPayload,
+} from "src/core-logic/domain/discussion/discussion.slice";
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 
 export class TestEstablishmentGateway implements EstablishmentGateway {
@@ -17,6 +27,14 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
   public formEstablishment$ = new Subject<FormEstablishmentDto>();
 
   public establishmentAdmins$ = new Subject<EstablishmentNameAndAdmins>();
+
+  public discussions$ = new Subject<DataWithPagination<DiscussionInList>>();
+
+  public discussion$ = new Subject<DiscussionReadDto | undefined>();
+
+  public sendMessageResponse$ = new Subject<Exchange>();
+
+  public updateDiscussionStatusResponse$ = new Subject<void>();
 
   public addFormEstablishment$(
     _formEstablishment: FormEstablishmentDto,
@@ -50,5 +68,31 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
     _jwt: ConnectedUserJwt,
   ): Observable<void> {
     return this.editFormEstablishmentResult$;
+  }
+
+  public getDiscussionById$(
+    _payload: FetchDiscussionRequestedPayload,
+  ): Observable<DiscussionReadDto | undefined> {
+    return this.discussion$;
+  }
+  public getDiscussions$(
+    _payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>> {
+    return this.discussions$;
+  }
+
+  public sendMessage$(
+    _payload: SendExchangeRequestedPayload,
+  ): Observable<Exchange> {
+    return this.sendMessageResponse$;
+  }
+
+  public updateDiscussionStatus$(
+    _payload: {
+      jwt: string;
+      discussionId: string;
+    } & WithDiscussionStatusRejected,
+  ): Observable<void> {
+    return this.updateDiscussionStatusResponse$;
   }
 }

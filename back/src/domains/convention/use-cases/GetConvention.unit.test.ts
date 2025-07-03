@@ -1,12 +1,12 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   defaultProConnectInfos,
   errors,
   establishmentsRoles,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type Role,
   type User,
 } from "shared";
@@ -23,11 +23,11 @@ import { GetConvention } from "./GetConvention";
 
 describe("Get Convention", () => {
   const uuidGenerator = new UuidV4Generator();
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.fr")
     .build();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@mail.fr")
     .build();
@@ -56,7 +56,7 @@ describe("Get Convention", () => {
     createdAt: new Date().toISOString(),
   };
 
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withId(uuidGenerator.new())
     .withIsAdmin(true)
     .buildUser();
@@ -166,7 +166,7 @@ describe("Get Convention", () => {
         );
       });
 
-      it("When the user don't have correct role on inclusion connected users neither has right on existing establishment with same siret in convention", async () => {
+      it("When the user don't have correct role on connected users neither has right on existing establishment with same siret in convention", async () => {
         uow.establishmentAggregateRepository.establishmentAggregates = [
           establishmentWithSiret,
         ];
@@ -246,7 +246,7 @@ describe("Get Convention", () => {
           },
         );
 
-        it("when the user has inclusion connect but not for the agency of this convention", async () => {
+        it("when the user has ProConnect but not for the agency of this convention", async () => {
           const anotherAgency = new AgencyDtoBuilder(agency)
             .withId("another")
             .build();
@@ -307,7 +307,7 @@ describe("Get Convention", () => {
   });
 
   describe("Right paths", () => {
-    describe("Inclusion connected user", () => {
+    describe("connected user", () => {
       it("that have agency rights", async () => {
         uow.agencyRepository.agencies = [
           toAgencyWithRights(agency, {
@@ -335,7 +335,7 @@ describe("Get Convention", () => {
       });
 
       describe("establishment rights", () => {
-        it("that establishment rep email is also the inclusion connected user email", async () => {
+        it("that establishment rep email is also the connected user email", async () => {
           expectToEqual(
             await getConvention.execute(
               { conventionId: convention.id },
@@ -355,7 +355,7 @@ describe("Get Convention", () => {
           );
         });
 
-        it("that establishment tutor email is also the inclusion connected user email", async () => {
+        it("that establishment tutor email is also the connected user email", async () => {
           expectToEqual(
             await getConvention.execute(
               { conventionId: conventionWithEstablishmentTutor.id },
@@ -376,7 +376,7 @@ describe("Get Convention", () => {
         });
 
         it.each(establishmentsRoles)(
-          "that the inclusion connected user is also %s of the existing establishment with same siret in convention",
+          "that the connected user is also %s of the existing establishment with same siret in convention",
           async (role) => {
             const establishmentWithRights = new EstablishmentAggregateBuilder(
               establishmentWithSiret,

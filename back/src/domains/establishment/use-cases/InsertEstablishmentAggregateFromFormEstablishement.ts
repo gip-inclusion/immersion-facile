@@ -1,6 +1,6 @@
 import {
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
 } from "shared";
@@ -19,7 +19,7 @@ import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregat
 export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
   void,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = withFormEstablishmentSchema;
 
@@ -37,7 +37,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
   protected async _execute(
     { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
-    currentUser?: InclusionConnectedUser,
+    currentUser?: ConnectedUser,
   ): Promise<void> {
     if (!currentUser) throw errors.user.noJwtProvided();
 
@@ -91,7 +91,7 @@ export class InsertEstablishmentAggregateFromForm extends TransactionalUseCase<
         payload: {
           establishmentAggregate,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: currentUser.id,
           },
         },

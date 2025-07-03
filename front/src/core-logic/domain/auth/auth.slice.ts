@@ -88,7 +88,7 @@ export const authSlice = createSlice({
     federatedIdentityDeletionTriggered: (
       state,
       _action: PayloadAction<{
-        mode: "device-only" | "device-and-inclusion";
+        mode: "device-only" | "device-and-oauth";
       }>,
     ) => state,
     federatedIdentityInDeviceDeletionSucceeded: (state) => {

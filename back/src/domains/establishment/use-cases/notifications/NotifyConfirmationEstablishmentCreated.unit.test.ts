@@ -1,7 +1,4 @@
-import {
-  getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
-} from "shared";
+import { ConnectedUserBuilder, getFormattedFirstnameAndLastname } from "shared";
 import { locationToRawAddress } from "../../../../utils/address";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -45,15 +42,15 @@ describe("NotifyConfirmationEstablishmentCreated", () => {
 
   describe("When establishment is valid", () => {
     it("Nominal case: Sends notification email to Establisment contact", async () => {
-      const establishmentAdmin = new InclusionConnectedUserBuilder()
+      const establishmentAdmin = new ConnectedUserBuilder()
         .withId("admin")
         .withEmail("admin@estab.com")
         .buildUser();
-      const establishmentContact1 = new InclusionConnectedUserBuilder()
+      const establishmentContact1 = new ConnectedUserBuilder()
         .withId("contact1")
         .withEmail("contact1@estab.com")
         .buildUser();
-      const establishmentContact2 = new InclusionConnectedUserBuilder()
+      const establishmentContact2 = new ConnectedUserBuilder()
         .withId("contact2")
         .withEmail("contact2@estab.com")
         .buildUser();

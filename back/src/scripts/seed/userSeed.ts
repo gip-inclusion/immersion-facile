@@ -1,9 +1,9 @@
 import { values } from "ramda";
-import { InclusionConnectedUserBuilder, UserBuilder } from "shared";
+import { ConnectedUserBuilder, UserBuilder } from "shared";
 import type { KyselyDb } from "../../config/pg/kysely/kyselyUtils";
 
 export const seedUsers = {
-  icUser: new InclusionConnectedUserBuilder()
+  icUser: new ConnectedUserBuilder()
     .withIsAdmin(false)
     .withCreatedAt(new Date("2024-04-29"))
     .withEmail("recette+playwright@immersion-facile.beta.gouv.fr")
@@ -15,7 +15,7 @@ export const seedUsers = {
       siret: "13003013300016",
     })
     .build(),
-  adminUser: new InclusionConnectedUserBuilder()
+  adminUser: new ConnectedUserBuilder()
     .withIsAdmin(true)
     .withCreatedAt(new Date("2024-04-30"))
     .withEmail("admin+playwright@immersion-facile.beta.gouv.fr")
@@ -66,5 +66,5 @@ export const userSeed = async (db: KyselyDb) => {
     .execute();
 
   // biome-ignore lint/suspicious/noConsole: <explanation>
-  console.log("inclusionConnectUserSeed end");
+  console.log("user seed end");
 };

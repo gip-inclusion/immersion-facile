@@ -6,13 +6,9 @@ import type { AgencyId, AgencyKind } from "../agency/agency.dto";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
-import type {
-  AgencyRole,
-  UserWithAdminRights,
-  UserWithAgencyRights,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { PaginationQueryParams } from "../pagination/pagination.dto";
 import {
+  type AgencyRole,
   allSignatoryRoles,
   type Role,
   type SignatoryRole,
@@ -28,6 +24,10 @@ import type {
   expiredMagicLinkErrorMessage,
 } from "../tokens/jwt.dto";
 import type { Flavor } from "../typeFlavors";
+import type {
+  UserWithAdminRights,
+  UserWithAgencyRights,
+} from "../user/user.dto";
 import type { NotEmptyArray } from "../utils";
 import type { DateString } from "../utils/date";
 

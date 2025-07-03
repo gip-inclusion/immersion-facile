@@ -148,7 +148,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
         attachments,
       },
       followedIds: {
-        ...(triggeredBy?.kind === "inclusion-connected"
+        ...(triggeredBy?.kind === "connected-user"
           ? { userId: triggeredBy.userId }
           : undefined),
         establishmentSiret: discussion.siret,

@@ -2,13 +2,13 @@ import { addDays } from "date-fns";
 import {
   type AdminRoutes,
   adminRoutes,
+  ConnectedUserBuilder,
   type ConnectedUserJwt,
+  type ConnectedUserJwtPayload,
   currentJwtVersions,
   displayRouteName,
   type EmailNotification,
   expectHttpResponseToEqual,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   type SmsNotification,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -25,14 +25,14 @@ describe("Get last notification route", () => {
     const testApp = await buildTestApp();
     ({ inMemoryUow } = testApp);
 
-    const backofficeAdminUser = new InclusionConnectedUserBuilder()
+    const backofficeAdminUser = new ConnectedUserBuilder()
       .withId("backoffice-admin-user")
       .withIsAdmin(true)
       .buildUser();
 
-    const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-      version: currentJwtVersions.inclusion,
-      iat: new Date().getTime(),
+    const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
       exp: addDays(new Date(), 30).getTime(),
       userId: backofficeAdminUser.id,
     };

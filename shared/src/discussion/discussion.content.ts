@@ -1,9 +1,9 @@
 import { errors } from "../errors/errors";
-import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { frontRoutes } from "../routes/routes";
+import { frontRoutes } from "../routes/route.utils";
 import type {
   DiscussionDto,
   DiscussionReadDto,
+  WithDiscussionId,
   WithDiscussionStatusRejected,
 } from "./discussion.dto";
 

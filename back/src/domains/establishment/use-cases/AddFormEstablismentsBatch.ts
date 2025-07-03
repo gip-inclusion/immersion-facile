@@ -1,22 +1,22 @@
 import {
+  type ConnectedUser,
   castError,
   type EstablishmentBatchReport,
   executeInSequence,
   type FormEstablishmentBatchDto,
   formEstablishmentBatchSchema,
-  type InclusionConnectedUser,
   slugify,
 } from "shared";
+import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import { UseCase } from "../../core/UseCase";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 import type { GroupEntity } from "../entities/GroupEntity";
 import type { InsertEstablishmentAggregateFromForm } from "./InsertEstablishmentAggregateFromFormEstablishement";
 
 export class AddFormEstablishmentBatch extends UseCase<
   FormEstablishmentBatchDto,
   EstablishmentBatchReport,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = formEstablishmentBatchSchema;
 
@@ -34,7 +34,7 @@ export class AddFormEstablishmentBatch extends UseCase<
       description,
       title,
     }: FormEstablishmentBatchDto,
-    currentUser: InclusionConnectedUser,
+    currentUser: ConnectedUser,
   ): Promise<EstablishmentBatchReport> {
     throwIfNotAdmin(currentUser);
     const group: GroupEntity = {

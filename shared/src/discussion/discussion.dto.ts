@@ -8,7 +8,6 @@ import type {
   ImmersionObjective,
 } from "../convention/convention.dto";
 import type { ContactMode } from "../formEstablishment/FormEstablishment.dto";
-import type { WithDiscussionId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type {
   AppellationAndRomeDto,
   AppellationCode,
@@ -45,6 +44,9 @@ export type DiscussionExchangeForbiddenParams = {
 };
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
+export type WithDiscussionId = {
+  discussionId: DiscussionId;
+};
 
 export type DiscussionKind = "IF" | "1_ELEVE_1_STAGE";
 

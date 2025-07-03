@@ -19,7 +19,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders";
 import { PgDiscussionRepository } from "./PgDiscussionRepository";

@@ -16,14 +16,14 @@ import { addressesExternalRoutes } from "../../domains/core/address/adapters/Htt
 import { InMemoryAddressGateway } from "../../domains/core/address/adapters/InMemoryAddressGateway";
 import { HttpSubscribersGateway } from "../../domains/core/api-consumer/adapters/HttpSubscribersGateway";
 import { InMemorySubscribersGateway } from "../../domains/core/api-consumer/adapters/InMemorySubscribersGateway";
+import { HttpOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/HttpOAuthGateway";
+import { InMemoryOAuthGateway } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/InMemoryOAuthGateway";
+import { makeProConnectRoutes } from "../../domains/core/authentication/connected-user/adapters/oauth-gateway/proConnect.routes";
+import type { OAuthGateway } from "../../domains/core/authentication/connected-user/port/OAuthGateway";
 import { makeFtConnectExternalRoutes } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/ftConnectApi.routes";
 import { HttpFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/HttpFtConnectGateway";
 import { InMemoryFtConnectGateway } from "../../domains/core/authentication/ft-connect/adapters/ft-connect-gateway/InMemoryFtConnectGateway";
 import type { FtConnectGateway } from "../../domains/core/authentication/ft-connect/port/FtConnectGateway";
-import { HttpOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/HttpOAuthGateway";
-import { InMemoryOAuthGateway } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/InMemoryOAuthGateway";
-import { makeProConnectRoutes } from "../../domains/core/authentication/inclusion-connect/adapters/oauth-gateway/proConnect.routes";
-import type { OAuthGateway } from "../../domains/core/authentication/inclusion-connect/port/OAuthGateway";
 import { InMemoryCachingGateway } from "../../domains/core/caching-gateway/adapters/InMemoryCachingGateway";
 import { MetabaseDashboardGateway } from "../../domains/core/dashboard/adapters/MetabaseDashboardGateway";
 import { StubDashboardGateway } from "../../domains/core/dashboard/adapters/StubDashboardGateway";

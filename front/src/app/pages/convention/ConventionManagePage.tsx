@@ -27,7 +27,7 @@ export const ConventionManagePage = ({ route }: ConventionManagePageProps) => {
       },
       () =>
         (adminToken
-          ? { jwt: adminToken, kind: "backoffice" }
+          ? { jwt: adminToken, kind: "connected user backoffice" }
           : undefined) satisfies JwtKindProps | undefined,
     )
     .with(

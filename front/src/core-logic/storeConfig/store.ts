@@ -13,8 +13,6 @@ import { dashboardUrlsEpics } from "src/core-logic/domain/admin/dashboardUrls/da
 import { dashboardUrlsSlice } from "src/core-logic/domain/admin/dashboardUrls/dashboardUrls.slice";
 import { fetchUserEpics } from "src/core-logic/domain/admin/fetchUser/fetchUser.epic";
 import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.slice";
-import { icUsersAdminEpics } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.epics";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
 import { listUsersEpics } from "src/core-logic/domain/admin/listUsers/listUsers.epics";
 import { listUsersSlice } from "src/core-logic/domain/admin/listUsers/listUsers.slice";
 import { notificationsEpics } from "src/core-logic/domain/admin/notifications/notifications.epics";
@@ -36,6 +34,8 @@ import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.sli
 import { sendAssessmentLinkEpics } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.epics";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { connectedUserEpics } from "src/core-logic/domain/connected-user/connectedUser.epics";
+import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import { conventionActionEpics } from "src/core-logic/domain/convention/convention-action/conventionAction.epics";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkEpics } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.epic";
@@ -46,8 +46,6 @@ import { establishmentLeadSlice } from "src/core-logic/domain/establishmentLead/
 import { featureFlagEpics } from "src/core-logic/domain/featureFlags/featureFlags.epics";
 import { featureFlagsSlice } from "src/core-logic/domain/featureFlags/featureFlags.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { inclusionConnectedEpics } from "src/core-logic/domain/inclusionConnected/inclusionConnected.epics";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { nafEpics } from "src/core-logic/domain/naf/naf.epics";
 import { nafSlice } from "src/core-logic/domain/naf/naf.slice";
 import { rootAppEpics } from "src/core-logic/domain/rootApp/rootApp.epics";
@@ -56,6 +54,8 @@ import { searchEpics } from "src/core-logic/domain/search/search.epics";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { siretEpics } from "src/core-logic/domain/siret/siret.epics";
 import { siretSlice } from "src/core-logic/domain/siret/siret.slice";
+import { connectedUsersAdminEpics } from "../domain/admin/connectedUsersAdmin/connectedUsersAdmin.epics";
+import { connectedUsersAdminSlice } from "../domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agenciesEpics } from "../domain/agencies/agencies.epics";
 import { agenciesSlice } from "../domain/agencies/agencies.slice";
 import { appellationEpics } from "../domain/appellation/appellation.epics";
@@ -96,8 +96,8 @@ const allEpics: AppEpic<any>[] = [
   ...fetchUserEpics,
   ...geocodingEpics,
   ...geosearchEpics,
-  ...icUsersAdminEpics,
-  ...inclusionConnectedEpics,
+  ...connectedUsersAdminEpics,
+  ...connectedUserEpics,
   ...listUsersEpics,
   ...nafEpics,
   ...notificationsEpics,
@@ -115,7 +115,7 @@ const allEpics: AppEpic<any>[] = [
 const appReducer = combineReducers({
   admin: combineReducers({
     [agencyAdminSlice.name]: agencyAdminSlice.reducer,
-    [icUsersAdminSlice.name]: icUsersAdminSlice.reducer,
+    [connectedUsersAdminSlice.name]: connectedUsersAdminSlice.reducer,
     [dashboardUrlsSlice.name]: dashboardUrlsSlice.reducer,
     [notificationsSlice.name]: notificationsSlice.reducer,
     [apiConsumerSlice.name]: apiConsumerSlice.reducer,
@@ -142,7 +142,7 @@ const appReducer = combineReducers({
   [featureFlagsSlice.name]: featureFlagsSlice.reducer,
   [geosearchSlice.name]: geosearchSlice.reducer,
   [geocodingSlice.name]: geocodingSlice.reducer,
-  [inclusionConnectedSlice.name]: inclusionConnectedSlice.reducer,
+  [connectedUserSlice.name]: connectedUserSlice.reducer,
   [feedbackSlice.name]: feedbackSlice.reducer,
   [partnersErroredConventionSlice.name]: partnersErroredConventionSlice.reducer,
   [sendSignatureLinkSlice.name]: sendSignatureLinkSlice.reducer,

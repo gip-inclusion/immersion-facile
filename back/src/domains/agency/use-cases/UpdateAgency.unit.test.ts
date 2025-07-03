@@ -1,13 +1,13 @@
 import {
   AgencyDtoBuilder,
   BadRequestError,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   errors,
   expectArraysToMatch,
   expectPromiseToFail,
   expectPromiseToFailWithError,
   expectToEqual,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserWithAdminRights,
 } from "shared";
@@ -24,24 +24,24 @@ import { UpdateAgency } from "./UpdateAgency";
 
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
-  const adminBuilder = new InclusionConnectedUserBuilder()
+  const adminBuilder = new ConnectedUserBuilder()
     .withId("backoffice-admin-id")
     .withIsAdmin(true);
 
   const admin = adminBuilder.buildUser();
-  const icAdmin = adminBuilder.build();
+  const connectedAdmin = adminBuilder.build();
 
-  const notAdminBuilder = new InclusionConnectedUserBuilder()
+  const notAdminBuilder = new ConnectedUserBuilder()
     .withId("not-admin-id")
     .withIsAdmin(false);
   const notAdmin = notAdminBuilder.buildUser();
-  const icNotAdmin = notAdminBuilder.build();
+  const connectedNotAdmin = notAdminBuilder.build();
 
-  const agencyAdminBuilder = new InclusionConnectedUserBuilder()
+  const agencyAdminBuilder = new ConnectedUserBuilder()
     .withId("agency-admin-id")
     .withIsAdmin(false);
   const agencyAdmin = agencyAdminBuilder.buildUser();
-  const icAgencyAdmin = agencyAdminBuilder
+  const connectedAgencyAdmin = agencyAdminBuilder
     .withAgencyRights([
       {
         agency: toAgencyDtoForAgencyUsersAndAdmins(initialAgencyInRepo, []),
@@ -80,7 +80,7 @@ describe("Update agency", () => {
       await expectPromiseToFailWithError(
         updateAgency.execute(
           { ...agency, validatorEmails: ["mail@mail.com"] },
-          icNotAdmin,
+          connectedNotAdmin,
         ),
         errors.user.forbidden({ userId: notAdmin.id }),
       );
@@ -91,7 +91,7 @@ describe("Update agency", () => {
       await expectPromiseToFailWithError(
         updateAgency.execute(
           { ...agency, validatorEmails: ["mail@mail.com"] },
-          icAdmin,
+          connectedAdmin,
         ),
         errors.agency.notFound({ agencyId: agency.id }),
       );
@@ -114,7 +114,7 @@ describe("Update agency", () => {
       await expectPromiseToFail(
         updateAgency.execute(
           { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
-          icAdmin,
+          connectedAdmin,
         ),
       );
     });
@@ -133,7 +133,7 @@ describe("Update agency", () => {
       await expectPromiseToFailWithError(
         updateAgency.execute(
           { ...updatedAgency, validatorEmails: ["new-validator@mail.com"] },
-          icAdmin,
+          connectedAdmin,
         ),
         new BadRequestError(
           `Schema validation failed in usecase UpdateAgency for element with id ${updatedAgency.id}. See issues for details.`,
@@ -149,17 +149,17 @@ describe("Update agency", () => {
   it.each([
     {
       triggeredByRole: "backoffice-admin",
-      triggeredByUser: icAdmin,
+      triggeredByUser: connectedAdmin,
       initialUsers: [admin, notAdmin],
     },
     {
       triggeredByRole: "agency-admin",
-      triggeredByUser: icAgencyAdmin,
+      triggeredByUser: connectedAgencyAdmin,
       initialUsers: [agencyAdmin],
     },
   ] satisfies {
     triggeredByRole: string;
-    triggeredByUser: InclusionConnectedUser;
+    triggeredByUser: ConnectedUser;
     initialUsers: UserWithAdminRights[];
   }[])(
     "$triggeredByRole can update agency without changes on user rights and create corresponding event",
@@ -193,7 +193,7 @@ describe("Update agency", () => {
           payload: {
             agencyId: updatedAgency.id,
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: triggeredByUser.id,
             },
           },

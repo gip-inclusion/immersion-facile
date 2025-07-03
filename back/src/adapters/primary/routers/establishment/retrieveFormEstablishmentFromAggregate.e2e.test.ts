@@ -1,22 +1,22 @@
 import { addDays } from "date-fns";
 import {
   addressDtoToString,
-  connectedUserTokenExpiredMessage,
-  createInclusionConnectJwtPayload,
+  authExpiredMessage,
+  ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
+  createConnectedUserJwtPayload,
   currentJwtVersions,
   displayRouteName,
   type EstablishmentRoutes,
   errors,
   establishmentRoutes,
   expectHttpResponseToEqual,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   UserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type supertest from "supertest";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import { rueSaintHonoreDto } from "../../../../domains/core/address/adapters/InMemoryAddressGateway";
 import type { GenerateConnectedUserJwt } from "../../../../domains/core/jwt";
 import { TEST_OPEN_ESTABLISHMENT_1 } from "../../../../domains/core/sirene/adapters/InMemorySiretGateway";
@@ -32,14 +32,14 @@ import {
 } from "../../../../utils/buildTestApp";
 
 describe("Route to retrieve form establishment given an establishment JWT", () => {
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true)
     .buildUser();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
     userId: backofficeAdminUser.id,
   };
@@ -105,7 +105,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
   it(`${displayRouteName(
     establishmentRoutes.getFormEstablishment,
-  )} 200 Retrieves form establishment from aggregates when exists and authenticated with inclusion connect jwt`, async () => {
+  )} 200 Retrieves form establishment from aggregates when exists and authenticated with connected user jwt`, async () => {
     await inMemoryUow.establishmentAggregateRepository.insertEstablishmentAggregate(
       establishmentAggregate,
     );
@@ -114,7 +114,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       body: {},
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             userId: establishmentAdmin.id,
             durationDays: 1,
             now: new Date(),
@@ -291,7 +291,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
       body: {},
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             userId: establishmentAdmin.id,
             now: gateways.timeGateway.now(),
             durationDays: 1,
@@ -308,7 +308,7 @@ describe("Route to retrieve form establishment given an establishment JWT", () =
 
     expectHttpResponseToEqual(response, {
       body: {
-        message: connectedUserTokenExpiredMessage,
+        message: authExpiredMessage,
         status: 401,
       },
       status: 401,

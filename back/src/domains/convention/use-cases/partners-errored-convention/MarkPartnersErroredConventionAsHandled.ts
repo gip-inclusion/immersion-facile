@@ -1,20 +1,20 @@
 import {
+  type ConnectedUserDomainJwtPayload,
   errors,
-  type InclusionConnectDomainJwtPayload,
   type MarkPartnersErroredConventionAsHandledRequest,
   markPartnersErroredConventionAsHandledRequestSchema,
 } from "shared";
+import { getUserWithRights } from "../../../connected-users/helpers/userRights.helper";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getUserWithRights } from "../../../inclusion-connected-users/helpers/userRights.helper";
 
 export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase<
   MarkPartnersErroredConventionAsHandledRequest,
   void,
-  InclusionConnectDomainJwtPayload
+  ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = markPartnersErroredConventionAsHandledRequestSchema;
 
@@ -29,7 +29,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
   public async _execute(
     params: MarkPartnersErroredConventionAsHandledRequest,
     uow: UnitOfWork,
-    payload: InclusionConnectDomainJwtPayload,
+    payload: ConnectedUserDomainJwtPayload,
   ): Promise<void> {
     if (!payload) {
       throw errors.user.unauthorized();
@@ -70,7 +70,7 @@ export class MarkPartnersErroredConventionAsHandled extends TransactionalUseCase
           conventionId: params.conventionId,
           userId,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: currentUser.id,
           },
         },

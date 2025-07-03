@@ -6,8 +6,8 @@ import {
 } from "date-fns";
 import fr from "date-fns/locale/fr";
 import {
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   userHasEnoughRightsOnConvention,
   type WithConventionId,
   withConventionIdSchema,
@@ -26,7 +26,7 @@ export type BroadcastConventionAgain = ReturnType<
 export const makeBroadcastConventionAgain = createTransactionalUseCase<
   WithConventionId,
   void,
-  InclusionConnectedUser,
+  ConnectedUser,
   { createNewEvent: CreateNewEvent; timeGateway: TimeGateway }
 >(
   {
@@ -63,7 +63,7 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
         payload: {
           convention,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: currentUser.id,
           },
         },

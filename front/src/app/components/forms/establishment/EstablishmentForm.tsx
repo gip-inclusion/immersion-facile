@@ -40,11 +40,11 @@ import {
 } from "src/app/utils/url.utils";
 import { appellationSlice } from "src/core-logic/domain/appellation/appellation.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { geocodingSlice } from "src/core-logic/domain/geocoding/geocoding.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
@@ -108,11 +108,9 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   const isEstablishmentDashboard =
     route.name === "establishmentDashboardFormEstablishment";
 
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const establishmentFeedback = useFeedbackTopic("form-establishment");
   const isLoading = useAppSelector(establishmentSelectors.isLoading);
   const initialFormEstablishment = useAppSelector(
@@ -192,7 +190,11 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   useScrollToTop(establishmentFeedback?.level === "success" || currentStep);
 
   useEffect(() => {
-    match({ route: currentRoute, adminJwt, inclusionConnectedJwt })
+    match({
+      route: currentRoute,
+      adminJwt,
+      connectedUserJwt,
+    })
       .with(
         {
           route: {
@@ -236,14 +238,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },
-          inclusionConnectedJwt: P.not(P.nullish),
+          connectedUserJwt: P.not(P.nullish),
         },
-        ({ route, inclusionConnectedJwt }) =>
+        ({ route, connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.fetchEstablishmentRequested({
               establishmentRequested: {
                 siret: route.params.siret,
-                jwt: inclusionConnectedJwt,
+                jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
             }),
@@ -252,14 +254,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },
-          inclusionConnectedJwt: P.nullish,
+          connectedUserJwt: P.nullish,
         },
         () => {
           throw errors.user.unauthorized();
         },
       )
       .exhaustive();
-  }, [adminJwt, dispatch, inclusionConnectedJwt, currentRoute, currentUser]);
+  }, [adminJwt, dispatch, connectedUserJwt, currentRoute]);
 
   useEffect(() => {
     reset({
@@ -319,20 +321,20 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
   }, [dispatch]);
 
   const onSubmit: SubmitHandler<FormEstablishmentDto> = (formEstablishment) =>
-    match({ route, adminJwt, inclusionConnectedJwt })
+    match({ route, adminJwt, connectedUserJwt })
       .with(
         {
           route: {
             name: P.union("formEstablishment", "formEstablishmentForExternals"), // TODO : formEstablishmentForExternals ???
           },
-          inclusionConnectedJwt: P.not(P.nullish),
+          connectedUserJwt: P.not(P.nullish),
         },
-        ({ inclusionConnectedJwt }) =>
+        ({ connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.createEstablishmentRequested({
               formEstablishment,
               feedbackTopic: "form-establishment",
-              jwt: inclusionConnectedJwt,
+              jwt: connectedUserJwt,
             }),
           ),
       )
@@ -355,14 +357,14 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },
-          inclusionConnectedJwt: P.not(P.nullish),
+          connectedUserJwt: P.not(P.nullish),
         },
-        ({ inclusionConnectedJwt }) =>
+        ({ connectedUserJwt }) =>
           dispatch(
             establishmentSlice.actions.updateEstablishmentRequested({
               establishmentUpdate: {
                 formEstablishment,
-                jwt: inclusionConnectedJwt,
+                jwt: connectedUserJwt,
               },
               feedbackTopic: "form-establishment",
             }),
@@ -373,7 +375,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
           route: {
             name: P.union("formEstablishment", "formEstablishmentForExternals"),
           },
-          inclusionConnectedJwt: P.nullish,
+          connectedUserJwt: P.nullish,
         },
         () => {
           throw frontErrors.generic.unauthorized();
@@ -391,7 +393,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
       .with(
         {
           route: { name: "establishmentDashboardFormEstablishment" },
-          inclusionConnectedJwt: P.nullish,
+          connectedUserJwt: P.nullish,
         },
         () => {
           throw new Error("Accès interdit sans être connecté.");
@@ -442,6 +444,7 @@ export const EstablishmentForm = ({ mode }: EstablishmentFormProps) => {
         );
       }}
     >
+      {/** biome-ignore lint/complexity/noUselessFragments: BUG BIOME */}
       <>
         {isLoading && <Loader />}
         <FormProvider {...methods}>

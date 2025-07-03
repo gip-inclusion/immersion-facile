@@ -15,13 +15,13 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
-  type AllowedStartOAuthLoginPage,
+  type AllowedLoginSource,
   absoluteUrlSchema,
+  authRoutes,
   domElementIds,
   type Email,
   emailSchema,
   immersionFacileNoReplyEmail,
-  inclusionConnectImmersionRoutes,
   isFederatedIdentityProvider,
   queryParamsAsString,
   toLowerCaseWithoutDiacritics,
@@ -36,8 +36,8 @@ import {
 } from "src/assets/img/illustrations";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 import { z } from "zod";
 import { WithFeedbackReplacer } from "../../components/feedback/WithFeedbackReplacer";
@@ -105,7 +105,7 @@ type ConnectPrivateRoute =
 type ConnectedPrivateRouteProps = {
   route: ConnectPrivateRoute;
   children: ReactElement;
-  inclusionConnectConnexionPageHeader: ReactElement;
+  oAuthConnexionPageHeader: ReactElement;
   allowAdminOnly?: boolean;
 };
 
@@ -117,11 +117,9 @@ export const ConnectedPrivateRoute = ({
   allowAdminOnly,
 }: ConnectedPrivateRouteProps) => {
   const dispatch = useDispatch();
-  const isInclusionConnected = useAppSelector(
-    authSelectors.isInclusionConnected,
-  );
+  const isConnectedUser = useAppSelector(authSelectors.isConnectedUser);
   const authIsLoading = useAppSelector(authSelectors.isLoading);
-  const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
+  const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
 
   const afterLoginRedirectionUrl = useAppSelector(
@@ -156,10 +154,10 @@ export const ConnectedPrivateRoute = ({
       const { token: _, ...routeParams } = route.params;
       routes[route.name](routeParams as any).replace();
     }
-  }, [route.params, dispatch, afterLoginRedirectionUrl]);
+  }, [route.params, dispatch, route.name]);
 
   useEffect(() => {
-    if (!authIsLoading && !isInclusionConnected) {
+    if (!authIsLoading && !isConnectedUser) {
       const windowUrl = absoluteUrlSchema.parse(window.location.href);
       dispatch(
         authSlice.actions.saveRedirectionAfterLoginRequested({
@@ -167,15 +165,15 @@ export const ConnectedPrivateRoute = ({
         }),
       );
     }
-    if (!authIsLoading && isInclusionConnected && afterLoginRedirectionUrl)
+    if (!authIsLoading && isConnectedUser && afterLoginRedirectionUrl)
       dispatch(authSlice.actions.redirectAndClearUrlAfterLoginRequested());
-  }, [authIsLoading, isInclusionConnected, afterLoginRedirectionUrl, dispatch]);
+  }, [authIsLoading, isConnectedUser, afterLoginRedirectionUrl, dispatch]);
 
   const page = getAllowedStartAuthPage(route.name);
   const pageContent = pageContentByRoute[page] ?? pageContentByRoute.default;
   const alreadyUsedAuthentication = route.params.alreadyUsedAuthentication;
 
-  if (!isInclusionConnected) {
+  if (!isConnectedUser) {
     return (
       <WithFeedbackReplacer
         topic={loginByEmailFeedbackTopic}
@@ -198,39 +196,37 @@ export const ConnectedPrivateRoute = ({
                     : undefined
                 }
               >
-                <>
-                  {alreadyUsedAuthentication && (
-                    <Alert
-                      className={fr.cx("fr-mb-2w")}
-                      severity="warning"
-                      title="Ce lien d'authentification a déjà été utilisé."
-                      description="Veuillez renouveler votre demande de connexion."
-                    />
-                  )}
-                  <p className={fr.cx("fr-text--lead")}>
-                    {pageContent.description}
-                  </p>
-                  {"withEmailLogin" in pageContent ? (
-                    <SeparatedSection
-                      firstSection={<LoginWithEmail page={page} />}
-                      secondSection={
-                        <LoginWithProConnect
-                          page={page}
-                          redirectUri={route.href}
-                        />
-                      }
-                    />
-                  ) : (
-                    <LoginWithProConnect page={page} redirectUri={route.href} />
-                  )}
+                {alreadyUsedAuthentication && (
+                  <Alert
+                    className={fr.cx("fr-mb-2w")}
+                    severity="warning"
+                    title="Ce lien d'authentification a déjà été utilisé."
+                    description="Veuillez renouveler votre demande de connexion."
+                  />
+                )}
+                <p className={fr.cx("fr-text--lead")}>
+                  {pageContent.description}
+                </p>
+                {"withEmailLogin" in pageContent ? (
+                  <SeparatedSection
+                    firstSection={<LoginWithEmail page={page} />}
+                    secondSection={
+                      <LoginWithProConnect
+                        page={page}
+                        redirectUri={route.href}
+                      />
+                    }
+                  />
+                ) : (
+                  <LoginWithProConnect page={page} redirectUri={route.href} />
+                )}
 
-                  <p className={fr.cx("fr-hint-text")}>
-                    Si votre messagerie est protégée une anti-spam, pensez à
-                    ajouter l’adresse{" "}
-                    <strong>{immersionFacileNoReplyEmail}</strong> à votre liste
-                    de contacts autorisés.
-                  </p>
-                </>
+                <p className={fr.cx("fr-hint-text")}>
+                  Si votre messagerie est protégée une anti-spam, pensez à
+                  ajouter l’adresse{" "}
+                  <strong>{immersionFacileNoReplyEmail}</strong> à votre liste
+                  de contacts autorisés.
+                </p>
               </PageHeader>
             }
             vSpacing={2}
@@ -285,7 +281,7 @@ export const ConnectedPrivateRoute = ({
 
 const getAllowedStartAuthPage = (
   routeName: ConnectPrivateRoute["name"],
-): AllowedStartOAuthLoginPage => {
+): AllowedLoginSource => {
   if (routeName === "establishmentDashboardDiscussions")
     return "establishmentDashboardDiscussions";
   if (
@@ -349,93 +345,91 @@ const establishmentDashboardContent: PageContent = {
   ],
 };
 
-const pageContentByRoute: Record<
-  AllowedStartOAuthLoginPage | "default",
-  PageContent
-> = {
-  establishment: {
-    title: "Proposer une immersion",
-    description: (
-      <>
-        <strong>Un compte unique</strong> pour publier et mettre à jour vos
-        offres d’immersion. Vous pourrez aussi suivre et gérez toutes les
-        candidatures reçues en un seul endroit.
-      </>
-    ),
-    cardsTitle: "Tous les avantages du compte entreprise",
-    withEmailLogin: true,
-    cards: [
-      {
-        title: "Vos démarches centralisées",
-        description:
-          "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
-        illustration: commonIllustrations.warning,
-      },
-      {
-        title: "Un accès simplifié",
-        description:
-          "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-        illustration: commonIllustrations.inscription,
-      },
-      {
-        title: "Gérez vos offres",
-        description: (
-          <>
-            <strong>Devenez administrateur</strong> de votre établissement et
-            gérez directement vos offres d’immersions.
-          </>
-        ),
-        illustration: commonIllustrations.monCompte,
-      },
-    ],
-  },
-  establishmentDashboard: establishmentDashboardContent,
-  establishmentDashboardDiscussions: establishmentDashboardContent,
-  agencyDashboard: {
-    title: "Mon espace prescripteur",
-    description: (
-      <>
-        <strong>Un compte unique</strong> pour accéder à vos conventions et
-        consulter vos statistiques.
-      </>
-    ),
-    cardsTitle: "Tous les avantages du compte prescripteur",
-    illustration: loginIllustration,
-    cards: [
-      {
-        title: "Une connexion simplifiée",
-        description:
-          "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
-        illustration: commonIllustrations.warning,
-      },
-      {
-        title: "Un seul identifiant",
-        description:
-          "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
-        illustration: commonIllustrations.inscription,
-      },
-      {
-        title: "Tout au même endroit",
-        description:
-          "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
-        illustration: commonIllustrations.monCompte,
-      },
-    ],
-  },
-  admin: {
-    title: "Mon espace administrateur",
-    description: "Pour la super team IF 😉",
-    withEmailLogin: true,
-  },
-  default: {
-    title: "Se connecter avec ProConnect",
-    description:
-      "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
-    illustration: loginIllustration,
-  },
-};
+const pageContentByRoute: Record<AllowedLoginSource | "default", PageContent> =
+  {
+    establishment: {
+      title: "Proposer une immersion",
+      description: (
+        <>
+          <strong>Un compte unique</strong> pour publier et mettre à jour vos
+          offres d’immersion. Vous pourrez aussi suivre et gérez toutes les
+          candidatures reçues en un seul endroit.
+        </>
+      ),
+      cardsTitle: "Tous les avantages du compte entreprise",
+      withEmailLogin: true,
+      cards: [
+        {
+          title: "Vos démarches centralisées",
+          description:
+            "Plus besoin de chercher dans vos emails ! Retrouvez toutes vos candidatures et conventions au même endroit.",
+          illustration: commonIllustrations.warning,
+        },
+        {
+          title: "Un accès simplifié",
+          description:
+            "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+          illustration: commonIllustrations.inscription,
+        },
+        {
+          title: "Gérez vos offres",
+          description: (
+            <>
+              <strong>Devenez administrateur</strong> de votre établissement et
+              gérez directement vos offres d’immersions.
+            </>
+          ),
+          illustration: commonIllustrations.monCompte,
+        },
+      ],
+    },
+    establishmentDashboard: establishmentDashboardContent,
+    establishmentDashboardDiscussions: establishmentDashboardContent,
+    agencyDashboard: {
+      title: "Mon espace prescripteur",
+      description: (
+        <>
+          <strong>Un compte unique</strong> pour accéder à vos conventions et
+          consulter vos statistiques.
+        </>
+      ),
+      cardsTitle: "Tous les avantages du compte prescripteur",
+      illustration: loginIllustration,
+      cards: [
+        {
+          title: "Une connexion simplifiée",
+          description:
+            "Pas besoin de créer un nouveau mot de passe si vous appartenez à France Travail, Cap Emploi...",
+          illustration: commonIllustrations.warning,
+        },
+        {
+          title: "Un seul identifiant",
+          description:
+            "Utilisez un seul identifiant pour vous connecter à l’ensemble des services de la Plateforme de l’Inclusion.",
+          illustration: commonIllustrations.inscription,
+        },
+        {
+          title: "Tout au même endroit",
+          description:
+            "Un seul espace pour accéder aux conventions et statistiques de vos organismes.",
+          illustration: commonIllustrations.monCompte,
+        },
+      ],
+    },
+    admin: {
+      title: "Mon espace administrateur",
+      description: "Pour la super team IF 😉",
+      withEmailLogin: true,
+    },
+    default: {
+      title: "Se connecter avec ProConnect",
+      description:
+        "ProConnect est la solution proposée par l'État pour sécuriser et simplifier la connexion aux services en ligne pour les professionnels.",
+      illustration: loginIllustration,
+    },
+  };
 
-const LoginWithEmail = ({ page }: { page: AllowedStartOAuthLoginPage }) => {
+const LoginWithEmail = ({ page }: { page: AllowedLoginSource }) => {
   const route = useRoute();
   const methods = useForm<{
     email: Email;
@@ -498,12 +492,11 @@ const LoginWithProConnect = ({
   page,
 }: {
   redirectUri: string;
-  page: AllowedStartOAuthLoginPage;
+  page: AllowedLoginSource;
 }) => {
-  const queryParamsResult =
-    inclusionConnectImmersionRoutes.startInclusionConnectLogin.queryParamsSchema[
-      "~standard"
-    ].validate({ redirectUri });
+  const queryParamsResult = authRoutes.initiateLoginByOAuth.queryParamsSchema[
+    "~standard"
+  ].validate({ redirectUri });
 
   if (queryParamsResult instanceof Promise) {
     throw new TypeError("Schema validation must be synchronous");
@@ -525,7 +518,7 @@ const LoginWithProConnect = ({
       <div className={fr.cx("fr-my-2w")}>
         <ProConnectButton
           id={domElementIds[page].login.proConnectButton}
-          url={`/api${inclusionConnectImmersionRoutes.startInclusionConnectLogin.url}?${queryParamsAsString(
+          url={`/api${authRoutes.initiateLoginByOAuth.url}?${queryParamsAsString(
             queryParamsResult.value,
           )}`}
         />

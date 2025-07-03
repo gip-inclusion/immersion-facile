@@ -8,14 +8,14 @@ import {
   type ExtractFromExisting,
   errors,
   expiredMagicLinkErrorMessage,
-  type PayloadKey,
+  type PayloadKind,
 } from "shared";
 import type { GetApiConsumerById } from "../../domains/core/api-consumer/ports/ApiConsumerRepository";
 import { type JwtKind, makeVerifyJwtES256 } from "../../domains/core/jwt";
 import type { TimeGateway } from "../../domains/core/time-gateway/ports/TimeGateway";
 import { createLogger } from "../../utils/logger";
 import type { AppConfig } from "./appConfig";
-import { invalidTokenMessage } from "./inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "./connectedUserAuthMiddleware";
 
 const logger = createLogger(__filename);
 
@@ -64,7 +64,7 @@ const responseError = (
 
 export const makeMagicLinkAuthMiddleware = (
   config: AppConfig,
-  payloadKey: ExtractFromExisting<PayloadKey, "convention">,
+  payloadKey: ExtractFromExisting<PayloadKind, "convention">,
 ): RequestHandler => {
   const { verifyJwt, verifyDeprecatedJwt } =
     verifyJwtConfig<"convention">(config);

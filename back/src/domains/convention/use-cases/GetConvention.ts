@@ -4,7 +4,7 @@ import {
   type ConventionRelatedJwtPayload,
   type EmailHash,
   errors,
-  getIcUserRoleForAccessingConvention,
+  getConventionManageAllowedRoles,
   type Role,
   type UserId,
   type WithConventionId,
@@ -15,9 +15,9 @@ import {
   isHashMatchNotNotifiedCounsellorOrValidator,
   isHashMatchPeAdvisorEmail,
 } from "../../../utils/emailHash";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export class GetConvention extends TransactionalUseCase<
   WithConventionId,
@@ -44,7 +44,7 @@ export class GetConvention extends TransactionalUseCase<
           uow,
           convention,
         })
-      : this.#onInclusionConnectPayload({
+      : this.#onConnectedUserPayload({
           userId: authPayload.userId,
           uow,
           convention,
@@ -82,7 +82,7 @@ export class GetConvention extends TransactionalUseCase<
     return convention;
   }
 
-  async #onInclusionConnectPayload({
+  async #onConnectedUserPayload({
     userId,
     convention,
     uow,
@@ -93,7 +93,7 @@ export class GetConvention extends TransactionalUseCase<
   }): Promise<ConventionReadDto> {
     const user = await getUserWithRights(uow, userId);
 
-    const roles = getIcUserRoleForAccessingConvention(convention, user);
+    const roles = getConventionManageAllowedRoles(convention, user);
     if (roles.length) return convention;
 
     const establishment =

@@ -16,13 +16,13 @@ import {
   type WithConventionIdLegacy,
 } from "shared";
 import { getAgencyEmailFromEmailHash } from "../../../utils/emailHash";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic, TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 import { throwIfTransitionNotAllowed } from "../entities/Convention";
 
 const domainTopicByTargetStatusMap: Record<
@@ -166,7 +166,7 @@ export class UpdateConventionStatus extends TransactionalUseCase<
               role: roleOrUser.roleInPayload,
             }
           : {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: roleOrUser.userWithRights.id,
             };
 

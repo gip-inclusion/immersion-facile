@@ -6,8 +6,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { routes } from "src/app/routes/routes";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
-import { icUsersAdminSelectors } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.selectors";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { connectedUsersAdminSelectors } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.selectors";
+import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import type { Route } from "type-route";
 
 type AdminAgencyDetailProps = {
@@ -16,7 +16,9 @@ type AdminAgencyDetailProps = {
 
 export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
-  const agencyUsersById = useAppSelector(icUsersAdminSelectors.agencyUsers);
+  const agencyUsersById = useAppSelector(
+    connectedUsersAdminSelectors.agencyUsers,
+  );
 
   const dispatch = useDispatch();
 
@@ -25,7 +27,7 @@ export const AdminAgencyDetail = ({ route }: AdminAgencyDetailProps) => {
       agencyAdminSlice.actions.setSelectedAgencyId(route.params.agencyId),
     );
     dispatch(
-      icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+      connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
         agencyId: route.params.agencyId,
       }),
     );

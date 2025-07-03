@@ -4,7 +4,6 @@ import { TestAdminGateway } from "src/core-logic/adapters/AdminGateway/TestAdmin
 import { InMemoryConventionGateway } from "src/core-logic/adapters/Convention/InMemoryConventionGateway";
 import { createTestDeviceRepository } from "src/core-logic/adapters/DeviceRepository/createTestDeviceRepository";
 import { TestEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/TestEstablishmentLeadGateway";
-import { TestInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/TestInclusionConnectedGateway";
 import { TestNafGateway } from "src/core-logic/adapters/NafGateway/TestNafGateway";
 import { InMemoryNavigationGateway } from "src/core-logic/adapters/NavigationGateway/InMemoryNavigationGateway";
 import { TestTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/TestTechnicalGateway";
@@ -32,7 +31,6 @@ const createTestDependencies = () =>
     establishmentGateway: new TestEstablishmentGateway(),
     establishmentLeadGateway: new TestEstablishmentLeadGateway(),
     formCompletionGateway: new TestFormCompletionGateway(),
-    inclusionConnectedGateway: new TestInclusionConnectedGateway(),
     minSearchResultsToPreventRefetch: 2,
     navigationGateway: new InMemoryNavigationGateway(),
     scheduler: new VirtualTimeScheduler(),

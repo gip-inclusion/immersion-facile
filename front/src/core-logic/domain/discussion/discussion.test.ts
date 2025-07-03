@@ -171,7 +171,7 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      dependencies.inclusionConnectedGateway.updateDiscussionStatusResponse$.next();
+      dependencies.establishmentGateway.updateDiscussionStatusResponse$.next();
 
       expectToEqual(discussionSelectors.isLoading(store.getState()), false);
 
@@ -203,7 +203,7 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      dependencies.inclusionConnectedGateway.updateDiscussionStatusResponse$.error(
+      dependencies.establishmentGateway.updateDiscussionStatusResponse$.error(
         discussionFetchError,
       );
 
@@ -251,7 +251,7 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      dependencies.inclusionConnectedGateway.sendMessageResponse$.next(
+      dependencies.establishmentGateway.sendMessageResponse$.next(
         expectedExchange,
       );
 
@@ -309,7 +309,7 @@ describe("Discussion slice", () => {
         isLoading: true,
       });
 
-      dependencies.inclusionConnectedGateway.sendMessageResponse$.next(
+      dependencies.establishmentGateway.sendMessageResponse$.next(
         expectedExchange,
       );
 
@@ -361,7 +361,7 @@ describe("Discussion slice", () => {
           isLoading: true,
         });
 
-        dependencies.inclusionConnectedGateway.discussions$.next({
+        dependencies.establishmentGateway.discussions$.next({
           data: [discussionToDiscussionInList(discussion)],
           pagination: {
             totalRecords: 1,
@@ -409,7 +409,7 @@ describe("Discussion slice", () => {
           isLoading: true,
         });
 
-        dependencies.inclusionConnectedGateway.discussions$.error(
+        dependencies.establishmentGateway.discussions$.error(
           discussionFetchError,
         );
 
@@ -431,12 +431,8 @@ describe("Discussion slice", () => {
       discussionOrError?: DiscussionReadDto | Error,
     ) => {
       discussionOrError instanceof Error
-        ? dependencies.inclusionConnectedGateway.discussion$.error(
-            discussionOrError,
-          )
-        : dependencies.inclusionConnectedGateway.discussion$.next(
-            discussionOrError,
-          );
+        ? dependencies.establishmentGateway.discussion$.error(discussionOrError)
+        : dependencies.establishmentGateway.discussion$.next(discussionOrError);
     };
 
     const expectDiscussionSelector = ({
@@ -455,12 +451,8 @@ describe("Discussion slice", () => {
     discussionOrError?: DiscussionReadDto | Error,
   ) => {
     discussionOrError instanceof Error
-      ? dependencies.inclusionConnectedGateway.discussion$.error(
-          discussionOrError,
-        )
-      : dependencies.inclusionConnectedGateway.discussion$.next(
-          discussionOrError,
-        );
+      ? dependencies.establishmentGateway.discussion$.error(discussionOrError)
+      : dependencies.establishmentGateway.discussion$.next(discussionOrError);
   };
 
   const expectDiscussionSelector = ({

@@ -4,11 +4,11 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   ConflictError,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   type GeoPositionDto,
-  InclusionConnectedUserBuilder,
   miniStageAgencyKinds,
 } from "shared";
 import {
@@ -17,7 +17,7 @@ import {
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { AgencyWithoutRights } from "../ports/AgencyRepository";
 import {
   PgAgencyRepository,
@@ -25,19 +25,19 @@ import {
 } from "./PgAgencyRepository";
 
 describe("PgAgencyRepository", () => {
-  const counsellor1 = new InclusionConnectedUserBuilder()
+  const counsellor1 = new ConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000001")
     .withEmail("counsellor1@agency1.fr")
     .buildUser();
-  const counsellor2 = new InclusionConnectedUserBuilder()
+  const counsellor2 = new ConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000002")
     .withEmail("counsellor2@agency1.fr")
     .buildUser();
-  const validator1 = new InclusionConnectedUserBuilder()
+  const validator1 = new ConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000003")
     .withEmail("validator1@agency1.fr")
     .buildUser();
-  const validator2 = new InclusionConnectedUserBuilder()
+  const validator2 = new ConnectedUserBuilder()
     .withId("10000000-0000-0000-0000-000000000004")
     .withEmail("validator2@agency1.fr")
     .buildUser();

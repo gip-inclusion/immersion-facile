@@ -1,11 +1,11 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Tag } from "react-design-system";
-import type { WithEstablishmentData } from "shared";
+import type { EstablishmentData } from "shared";
 
 export const EstablishmentLineBusinessName = ({
   withEstablishmentData,
 }: {
-  withEstablishmentData: WithEstablishmentData;
+  withEstablishmentData: EstablishmentData;
 }) => (
   <ul key={withEstablishmentData.siret} className={fr.cx("fr-raw-list")}>
     <li>

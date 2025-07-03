@@ -13,7 +13,7 @@ import type {
   DashboardUrlAndName,
   EditConventionCounsellorNameRequestDto,
   FindSimilarConventionsParams,
-  InclusionConnectedAllowedRoutes,
+  MarkPartnersErroredConventionAsHandledRequest,
   RenewConventionParams,
   RenewMagicLinkRequestDto,
   SendSignatureLinkRequestDto,
@@ -40,15 +40,50 @@ export class HttpConventionGateway implements ConventionGateway {
     private readonly magicLinkHttpClient: HttpClient<ConventionMagicLinkRoutes>,
     private readonly unauthenticatedHttpClient: HttpClient<UnauthenticatedConventionRoutes>,
     private readonly authenticatedHttpClient: HttpClient<AuthenticatedConventionRoutes>,
-    private readonly allowedInclusionConnectClient: HttpClient<InclusionConnectedAllowedRoutes>,
   ) {}
+
+  public markPartnersErroredConventionAsHandled$(
+    params: MarkPartnersErroredConventionAsHandledRequest,
+    jwt: string,
+  ): Observable<void> {
+    return from(
+      this.#markPartnersErroredConventionAsHandled(params, jwt).then(
+        () => undefined,
+      ),
+    );
+  }
+
+  #markPartnersErroredConventionAsHandled(
+    params: MarkPartnersErroredConventionAsHandledRequest,
+    jwt: string,
+  ): Promise<void> {
+    return this.authenticatedHttpClient
+      .markPartnersErroredConventionAsHandled({
+        body: params,
+        headers: { authorization: jwt },
+      })
+      .then((response) =>
+        match(response)
+          .with({ status: 200 }, () => undefined)
+          .with({ status: 400 }, throwBadRequestWithExplicitMessage)
+          .with({ status: P.union(401, 403) }, (response) => {
+            throw new Error(response.body.message);
+          })
+          .with({ status: 404 }, () => {
+            throw new Error(
+              "L'erreur sur la convention que vous cherchez à traiter n'existe pas, peut-être est-elle déjà marquée comme traitée. Rechargez la page pour mettre à jour le tableau.",
+            );
+          })
+          .otherwise(otherwiseThrow),
+      );
+  }
 
   public broadcastConventionAgain$(
     params: WithConventionId,
     jwt: ConnectedUserJwt,
   ): Observable<void> {
     return from(
-      this.allowedInclusionConnectClient
+      this.authenticatedHttpClient
         .broadcastConventionAgain({
           body: { conventionId: params.conventionId },
           headers: { authorization: jwt },

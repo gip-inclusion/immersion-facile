@@ -1,9 +1,9 @@
 import {
   type AdminTabRouteName,
   type AlreadyAuthenticatedUserQueryParams,
-  type AuthenticatedUserQueryParams,
   adminTabRouteNames,
   adminTabs,
+  type ConnectedUserQueryParams,
   frontRoutes,
   type ValueOf,
 } from "shared";
@@ -32,7 +32,7 @@ export type AcquisitionParams = Partial<{
 
 type AcquisitionParamsKeys = keyof typeof acquisitionParams;
 
-const inclusionConnectedParams = {
+const connectedUserParams = {
   token: param.query.optional.string,
   firstName: param.query.optional.string,
   lastName: param.query.optional.string,
@@ -41,8 +41,7 @@ const inclusionConnectedParams = {
   provider: param.query.optional.string,
   alreadyUsedAuthentication: param.query.optional.string,
 } satisfies Record<
-  | keyof AuthenticatedUserQueryParams
-  | keyof AlreadyAuthenticatedUserQueryParams,
+  keyof ConnectedUserQueryParams | keyof AlreadyAuthenticatedUserQueryParams,
   typeof param.query.optional.string
 >;
 
@@ -87,23 +86,20 @@ export const searchParams = {
 export type FrontRouteUnion = ValueOf<typeof routes>;
 export type FrontRouteKeys = keyof typeof routes;
 
-const admin = defineRoute(
-  inclusionConnectedParams,
-  () => `/${frontRoutes.admin}`,
-);
+const admin = defineRoute(connectedUserParams, () => `/${frontRoutes.admin}`);
 
-const agencyDashboard = defineRoute(inclusionConnectedParams, () => [
+const agencyDashboard = defineRoute(connectedUserParams, () => [
   `/${frontRoutes.agencyDashboard}`,
   "/agence-dashboard", //legacy route redirect to frontRoutes.agencyDashboard
 ]);
 
 const establishmentDashboard = defineRoute(
-  inclusionConnectedParams,
+  connectedUserParams,
   () => `/${frontRoutes.establishmentDashboard}`,
 );
 
 const myProfile = defineRoute(
-  inclusionConnectedParams,
+  connectedUserParams,
   () => `/${frontRoutes.profile}`,
 );
 
@@ -227,7 +223,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   formEstablishment: defineRoute(
     {
-      ...inclusionConnectedParams,
+      ...connectedUserParams,
       ...establishmentParams,
     },
     () => `/${frontRoutes.establishment}`,
@@ -302,7 +298,7 @@ export const { RouteProvider, useRoute, routes } = createRouter({
   ),
   manageConventionConnectedUser: defineRoute(
     { conventionId: param.query.string },
-    () => `/${frontRoutes.manageConventionInclusionConnected}`,
+    () => `/${frontRoutes.manageConventionUserConnected}`,
   ),
   manageEstablishmentAdmin: defineRoute(
     { siret: param.query.string },

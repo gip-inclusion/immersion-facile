@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { authFailed, type ConnectedUserJwt } from "shared";
 import type { FederatedIdentityWithUser } from "src/core-logic/domain/auth/auth.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { createRootSelector } from "src/core-logic/storeConfig/store";
 
 const rootAuthSelector = createRootSelector((state) => state.auth);
@@ -40,20 +40,20 @@ const isConnectedUser = createSelector(
     federatedIdentity?.provider === "email",
 );
 
-const inclusionConnectToken = createSelector(
+const connectedUserJwt = createSelector(
   isConnectedUser,
   currentFederatedIdentity,
-  (isInclusionConnected, federatedIdentity) =>
-    isInclusionConnected
+  (isConnectedUser, federatedIdentity) =>
+    isConnectedUser
       ? (federatedIdentity?.token as ConnectedUserJwt)
       : undefined,
 );
 
 const isAdminConnected = createSelector(
-  inclusionConnectedSelectors.currentUser,
+  connectedUserSelectors.currentUser,
   isConnectedUser,
-  (user, isInclusionConnected) =>
-    (isInclusionConnected && user?.isBackofficeAdmin) ?? false,
+  (user, isConnectedUser) =>
+    (isConnectedUser && user?.isBackofficeAdmin) ?? false,
 );
 
 const userIsDefined = (
@@ -77,8 +77,8 @@ export const authSelectors = {
   federatedIdentity: currentFederatedIdentity,
   isAdminConnected,
   isPeConnected,
-  isInclusionConnected: isConnectedUser,
-  inclusionConnectToken,
+  isConnectedUser,
+  connectedUserJwt,
   connectedUser,
   afterLoginRedirectionUrl,
   isLoading,

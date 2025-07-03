@@ -1,10 +1,22 @@
 import type { Observable } from "rxjs";
 import type {
   ConnectedUserJwt,
+  ConventionSupportedJwt,
+  DataWithPagination,
+  DiscussionExchangeForbiddenParams,
+  DiscussionInList,
+  DiscussionReadDto,
   EstablishmentNameAndAdmins,
+  Exchange,
   FormEstablishmentDto,
+  SendMessageToDiscussionFromDashboardRequestPayload,
   SiretDto,
+  WithDiscussionStatus,
 } from "shared";
+import type {
+  FetchDiscussionListRequestedPayload,
+  FetchDiscussionRequestedPayload,
+} from "../domain/discussion/discussion.slice";
 
 export interface EstablishmentGateway {
   deleteEstablishment$(
@@ -27,4 +39,19 @@ export interface EstablishmentGateway {
     siret: SiretDto,
     jwt: ConnectedUserJwt,
   ): Observable<EstablishmentNameAndAdmins>;
+  getDiscussionById$(
+    payload: FetchDiscussionRequestedPayload,
+  ): Observable<DiscussionReadDto | undefined>;
+  sendMessage$(
+    payload: SendMessageToDiscussionFromDashboardRequestPayload,
+  ): Observable<Exchange | DiscussionExchangeForbiddenParams>;
+  updateDiscussionStatus$(
+    payload: {
+      jwt: ConventionSupportedJwt;
+      discussionId: string;
+    } & WithDiscussionStatus,
+  ): Observable<void>;
+  getDiscussions$(
+    payload: FetchDiscussionListRequestedPayload,
+  ): Observable<DataWithPagination<DiscussionInList>>;
 }

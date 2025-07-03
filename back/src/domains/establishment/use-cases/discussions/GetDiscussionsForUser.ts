@@ -1,10 +1,10 @@
 import {
+  type ConnectedUser,
   type DataWithPagination,
   type DiscussionInList,
   type FlatGetPaginatedDiscussionsParams,
   flatGetPaginatedDiscussionsParamsSchema,
   getPaginationParamsForWeb,
-  type InclusionConnectedUser,
   type OmitFromExistingKeys,
 } from "shared";
 import { createTransactionalUseCase } from "../../../core/UseCase";
@@ -13,7 +13,7 @@ import type { GetPaginatedDiscussionsForUserParams } from "../../ports/Discussio
 export const makeGetDiscussionsForUser = createTransactionalUseCase<
   FlatGetPaginatedDiscussionsParams,
   DataWithPagination<DiscussionInList>,
-  InclusionConnectedUser
+  ConnectedUser
 >(
   {
     inputSchema: flatGetPaginatedDiscussionsParamsSchema,

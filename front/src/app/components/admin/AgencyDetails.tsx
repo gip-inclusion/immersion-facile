@@ -45,6 +45,7 @@ export const AgencyDetails = () => {
     const value = agency[field];
     if (field === "status") return formatAgencyStatus(agency.status);
     if (field === "agencySiret" && typeof value === "string") {
+      // TODO: une URL d'un partenaire qui traine comme ça dans un composant....
       const url = `https://lemarche.inclusion.beta.gouv.fr/prestataires/?q=${value}`;
       return (
         <a href={url} target="_blank" rel="noreferrer">

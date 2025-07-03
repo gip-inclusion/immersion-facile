@@ -1,5 +1,6 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   conventionMagicLinkRoutes,
@@ -8,7 +9,6 @@ import {
   expectJwtInMagicLinkAndGetIt,
   expectObjectInArrayToMatch,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type Signatories,
   type TemplatedEmail,
   technicalRoutes,
@@ -30,7 +30,7 @@ import { shortLinkRedirectToLinkWithValidation } from "../../../../utils/e2eTest
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Add Convention Notifications, then checks the mails are sent (trigerred by events)", () => {
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withEmail("validator@mail.com")
     .withId("validator")
     .buildUser();

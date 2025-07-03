@@ -2,6 +2,7 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   BadRequestError,
+  ConnectedUserBuilder,
   type ConventionDomainPayload,
   ConventionDtoBuilder,
   type ConventionId,
@@ -10,8 +11,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   ForbiddenError,
-  InclusionConnectedUserBuilder,
-  NotFoundError,
   type RenewConventionParams,
   type Role,
   ScheduleDtoBuilder,
@@ -34,15 +33,15 @@ describe("RenewConvention", () => {
   let uow: InMemoryUnitOfWork;
   let uuidGenerator: TestUuidGenerator;
 
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@mail.com")
     .buildUser();
-  const agencyAdmin = new InclusionConnectedUserBuilder()
+  const agencyAdmin = new ConnectedUserBuilder()
     .withId("agency-admin")
     .withEmail("agency-admin@mail.com")
     .buildUser();
-  const backofficeAdmin = new InclusionConnectedUserBuilder()
+  const backofficeAdmin = new ConnectedUserBuilder()
     .withId("admin")
     .withIsAdmin(true)
     .buildUser();
@@ -123,11 +122,11 @@ describe("RenewConvention", () => {
         }),
       },
       {
-        payloadKind: "inclusionConnect admin",
+        payloadKind: "connected user backoffice admin",
         payload: { userId: backofficeAdmin.id },
       },
       {
-        payloadKind: "inclusionConnect",
+        payloadKind: "connected user validator",
         payload: {
           userId: validator.id,
         },
@@ -242,20 +241,18 @@ describe("RenewConvention", () => {
       );
     });
 
-    it("throws an error when missing inclusion connect user", async () => {
+    it("throws an error when missing connect user", async () => {
       uow.userRepository.users = [];
 
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, {
           userId: validator.id,
         }),
-        new NotFoundError(
-          `Inclusion connected user '${validator.id}' not found.`,
-        ),
+        errors.user.notFound({ userId: validator.id }),
       );
     });
 
-    it("throws an error when inclusion connect user has no rights on agency", async () => {
+    it("throws an error when connected user has no rights on agency", async () => {
       uow.agencyRepository.agencies = [toAgencyWithRights(agency)];
 
       await expectPromiseToFailWithError(
@@ -268,7 +265,7 @@ describe("RenewConvention", () => {
       );
     });
 
-    it("throws an error when inclusion connect user has bad rights on agency", async () => {
+    it("throws an error when connected user has bad rights on agency", async () => {
       await expectPromiseToFailWithError(
         renewConvention.execute(renewConventionParams, {
           userId: agencyAdmin.id,

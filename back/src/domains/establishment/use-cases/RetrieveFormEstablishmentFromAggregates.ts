@@ -1,10 +1,10 @@
 import {
   addressDtoToString,
+  type ConnectedUserDomainJwtPayload,
+  type ConnectedUserJwtPayload,
   errors,
   type FormEstablishmentDto,
   type FormEstablishmentUserRight,
-  type InclusionConnectDomainJwtPayload,
-  type InclusionConnectJwtPayload,
   type SiretDto,
   siretSchema,
 } from "shared";
@@ -18,14 +18,14 @@ import type {
 export class RetrieveFormEstablishmentFromAggregates extends TransactionalUseCase<
   SiretDto,
   FormEstablishmentDto,
-  InclusionConnectDomainJwtPayload
+  ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = siretSchema;
 
   protected async _execute(
     siret: SiretDto,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectJwtPayload,
+    jwtPayload?: ConnectedUserJwtPayload,
   ) {
     if (!jwtPayload) throw errors.user.noJwtProvided();
 

@@ -7,7 +7,7 @@ import {
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { PgNotificationRepository } from "../../core/notifications/adapters/PgNotificationRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";

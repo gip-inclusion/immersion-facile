@@ -3,6 +3,7 @@ import {
   allRoles,
   allSignatoryRoles,
   type BeneficiaryRepresentative,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -13,7 +14,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   ForbiddenError,
-  InclusionConnectedUserBuilder,
   type Signatories,
   splitCasesBetweenPassingAndFailing,
 } from "shared";
@@ -116,12 +116,12 @@ describe("Sign convention", () => {
       );
     });
 
-    describe("with convention inclusion connect jwt", () => {
+    describe("with convention connected user jwt", () => {
       it("wh IC user is not establishment rep", async () => {
         const { convention, agency } =
           prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([convention]);
-        const user = new InclusionConnectedUserBuilder()
+        const user = new ConnectedUserBuilder()
           .withId("my-user-id")
           .withEmail("other@mail.com")
           .buildUser();
@@ -225,12 +225,12 @@ describe("Sign convention", () => {
       );
     });
 
-    describe("with inclusion connect jwt", () => {
+    describe("with connected user jwt", () => {
       it("updates the convention with new signature for IC user when user is establisment representative", async () => {
         const { convention, agency } =
           prepareAgencyAndConventionWithStatus("READY_TO_SIGN");
         uow.conventionRepository.setConventions([convention]);
-        const user = new InclusionConnectedUserBuilder()
+        const user = new ConnectedUserBuilder()
           .withEmail(convention.signatories.establishmentRepresentative.email)
           .withProConnectInfos({
             externalId: "billy-external-id",

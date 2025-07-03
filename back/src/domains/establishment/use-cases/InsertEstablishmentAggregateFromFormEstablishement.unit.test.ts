@@ -1,6 +1,7 @@
 import {
   type AdminFormEstablishmentUserRight,
   type AppellationAndRomeDto,
+  ConnectedUserBuilder,
   type ContactFormEstablishmentUserRight,
   defaultAddress,
   errors,
@@ -8,7 +9,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   FormEstablishmentDtoBuilder,
-  InclusionConnectedUserBuilder,
   type NafDto,
   type NumberEmployeesRange,
   UserBuilder,
@@ -45,8 +45,8 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
   const expectedNafDto: NafDto = { code: "8559A", nomenclature: "nomencl" };
   const numberEmployeesRanges: NumberEmployeesRange = "6-9";
-  const userBuilder = new InclusionConnectedUserBuilder().withId("ic-user");
-  const icUser = userBuilder.build();
+  const userBuilder = new ConnectedUserBuilder().withId("ic-user");
+  const connectedUser = userBuilder.build();
   const user = userBuilder.buildUser();
 
   const establishmentAdmin = new UserBuilder()
@@ -154,7 +154,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
       await insertEstablishmentAggregateFromForm.execute(
         { formEstablishment },
-        icUser,
+        connectedUser,
       );
 
       expectToEqual(uow.userRepository.users, [
@@ -267,7 +267,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
       await insertEstablishmentAggregateFromForm.execute(
         { formEstablishment },
-        icUser,
+        connectedUser,
       );
 
       expectToEqual(uow.userRepository.users, [
@@ -338,7 +338,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       await expectPromiseToFailWithError(
         insertEstablishmentAggregateFromForm.execute(
           { formEstablishment },
-          icUser,
+          connectedUser,
         ),
         errors.inputs.badSchema({
           useCaseName: "InsertEstablishmentAggregateFromForm",
@@ -358,7 +358,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       await expectPromiseToFailWithError(
         insertEstablishmentAggregateFromForm.execute(
           { formEstablishment },
-          icUser,
+          connectedUser,
         ),
         errors.inputs.badSchema({
           useCaseName: "InsertEstablishmentAggregateFromForm",
@@ -378,7 +378,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       await expectPromiseToFailWithError(
         insertEstablishmentAggregateFromForm.execute(
           { formEstablishment },
-          icUser,
+          connectedUser,
         ),
         errors.inputs.badSchema({
           useCaseName: "InsertEstablishmentAggregateFromForm",
@@ -415,7 +415,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
     await insertEstablishmentAggregateFromForm.execute(
       { formEstablishment },
-      icUser,
+      connectedUser,
     );
 
     const establishmentAggregate =
@@ -487,7 +487,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
     await expectPromiseToFailWithError(
       insertEstablishmentAggregateFromForm.execute(
         { formEstablishment },
-        icUser,
+        connectedUser,
       ),
       errors.establishment.conflictError({
         siret: previousEstablishment.siret,
@@ -510,7 +510,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
       {
         formEstablishment: validFormEstablishmentWithSiret,
       },
-      icUser,
+      connectedUser,
     );
 
     const createdAggregate = new EstablishmentAggregateBuilder()
@@ -592,7 +592,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         payload: {
           establishmentAggregate: createdAggregate,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: user.id,
           },
         },
@@ -620,7 +620,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
 
       await insertEstablishmentAggregateFromForm.execute(
         { formEstablishment },
-        icUser,
+        connectedUser,
       );
 
       const createdAggregate = new EstablishmentAggregateBuilder()
@@ -693,7 +693,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           payload: {
             establishmentAggregate: createdAggregate,
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: user.id,
             },
           },
@@ -736,7 +736,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         {
           formEstablishment: formEstablishmentWithWeirdAppellationDto,
         },
-        icUser,
+        connectedUser,
       );
 
       const form = FormEstablishmentDtoBuilder.valid()
@@ -833,7 +833,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           {
             formEstablishment,
           },
-          icUser,
+          connectedUser,
         ),
         errors.establishment.conflictError({ siret: formEstablishment.siret }),
       );
@@ -858,7 +858,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         await expectPromiseToFailWithError(
           insertEstablishmentAggregateFromForm.execute(
             { formEstablishment },
-            icUser,
+            connectedUser,
           ),
           errors.establishment.missingOrClosed({
             siret: formEstablishment.siret,
@@ -877,7 +877,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
           {
             formEstablishment,
           },
-          icUser,
+          connectedUser,
         );
 
         expect(uow.outboxRepository.events).toHaveLength(1);
@@ -893,7 +893,7 @@ describe("InsertEstablishmentAggregateFromForm", () => {
         await expectPromiseToFailWithError(
           insertEstablishmentAggregateFromForm.execute(
             { formEstablishment },
-            icUser,
+            connectedUser,
           ),
           errors.siretApi.unavailable({ serviceName: "Sirene API" }),
         );

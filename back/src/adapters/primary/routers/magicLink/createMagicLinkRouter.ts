@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { conventionMagicLinkRoutes, errors } from "shared";
+import {
+  type ConventionRelatedJwtPayload,
+  conventionMagicLinkRoutes,
+  errors,
+  type JwtPayloads,
+} from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import { match, P } from "ts-pattern";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
@@ -32,7 +37,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
           {
             conventionId: req.params.conventionId,
           },
-          req.payloads?.convention,
+          req.payloads?.convention, // Pas de récupération du bilan possible en mode user connecté?
         ),
       ),
   );
@@ -43,7 +48,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () =>
         deps.useCases.getConvention.execute(
           { conventionId: req.params.conventionId },
-          req.payloads?.inclusion ?? req.payloads?.convention,
+          getConventionRelatedJwtPayload(req.payloads),
         ),
       ),
   );
@@ -51,30 +56,22 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   sharedRouter.updateConvention(
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!(req.payloads?.inclusion || req.payloads?.convention))
-          throw errors.user.unauthorized();
-        return deps.useCases.updateConvention.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.updateConvention.execute(
           req.body,
-          req.payloads?.inclusion || req.payloads?.convention,
-        );
-      }),
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
   );
 
   sharedRouter.updateConventionStatus(
     deps.conventionMagicLinkAuthMiddleware,
     async (req, res) =>
       sendHttpResponse(req, res, () =>
-        match(req.payloads)
-          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
-            deps.useCases.updateConventionStatus.execute(req.body, convention),
-          )
-          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.updateConventionStatus.execute(req.body, inclusion),
-          )
-          .otherwise(() => {
-            throw errors.user.unauthorized();
-          }),
+        deps.useCases.updateConventionStatus.execute(
+          req.body,
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
       ),
   );
 
@@ -85,7 +82,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
         if (!req?.payloads?.convention) throw errors.user.unauthorized();
         return deps.useCases.signConvention.execute(
           req.params,
-          req.payloads.convention,
+          req.payloads.convention, // Pas de signature possible en mode ConnectedUser (pour les entreprises qui ont un compte qui match l'email) ?
         );
       }),
   );
@@ -105,10 +102,12 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   sharedRouter.renewConvention(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const jwtPayload = req.payloads?.convention || req.payloads?.inclusion;
-        return deps.useCases.renewConvention.execute(req.body, jwtPayload);
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.renewConvention.execute(
+          req.body,
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
   );
 
   sharedRouter.transferConventionToAgency(
@@ -117,15 +116,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.transferConventionToAgency.execute(
           req.body,
-          match(req.payloads)
-            .with(
-              { convention: P.not(P.nullish) },
-              ({ convention }) => convention,
-            )
-            .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) => inclusion)
-            .otherwise(() => {
-              throw errors.user.unauthorized();
-            }),
+          getConventionRelatedJwtPayload(req.payloads),
         ),
       ),
   );
@@ -136,15 +127,7 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.editConventionCounsellorName.execute(
           req.body,
-          match(req.payloads)
-            .with(
-              { convention: P.not(P.nullish) },
-              ({ convention }) => convention,
-            )
-            .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) => inclusion)
-            .otherwise(() => {
-              throw errors.user.unauthorized();
-            }),
+          getConventionRelatedJwtPayload(req.payloads),
         ),
       ),
   );
@@ -152,53 +135,37 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
   sharedRouter.sendSignatureLink(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const conventionId = req.body.conventionId;
-        const role = req.body.signatoryRole;
-
-        return match(req.payloads)
-          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
-            deps.useCases.sendSignatureLink.execute(
-              { conventionId, role },
-              convention,
-            ),
-          )
-          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.sendSignatureLink.execute(
-              { conventionId, role },
-              inclusion,
-            ),
-          )
-          .otherwise(() => {
-            throw errors.user.unauthorized();
-          });
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.sendSignatureLink.execute(
+          { conventionId: req.body.conventionId, role: req.body.signatoryRole },
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
   );
 
   sharedRouter.sendAssessmentLink(
     deps.conventionMagicLinkAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const conventionId = req.body.conventionId;
-
-        return match(req.payloads)
-          .with({ convention: P.not(P.nullish) }, ({ convention }) =>
-            deps.useCases.sendAssessmentLink.execute(
-              { conventionId },
-              convention,
-            ),
-          )
-          .with({ inclusion: P.not(P.nullish) }, ({ inclusion }) =>
-            deps.useCases.sendAssessmentLink.execute(
-              { conventionId },
-              inclusion,
-            ),
-          )
-          .otherwise(() => {
-            throw errors.user.unauthorized();
-          });
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.sendAssessmentLink.execute(
+          { conventionId: req.body.conventionId },
+          getConventionRelatedJwtPayload(req.payloads),
+        ),
+      ),
   );
 
   return expressRouter;
 };
+
+const getConventionRelatedJwtPayload = (
+  payloads?: JwtPayloads,
+): ConventionRelatedJwtPayload =>
+  match(payloads)
+    .with({ convention: P.not(P.nullish) }, ({ convention }) => convention)
+    .with(
+      { connectedUser: P.not(P.nullish) },
+      ({ connectedUser }) => connectedUser,
+    )
+    .otherwise(() => {
+      throw errors.user.unauthorized();
+    });

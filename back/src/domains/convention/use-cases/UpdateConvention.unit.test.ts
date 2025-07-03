@@ -2,6 +2,8 @@ import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyRole,
+  ConnectedUserBuilder,
+  type ConnectedUserDomainJwtPayload,
   type ConventionDomainPayload,
   type ConventionDto,
   ConventionDtoBuilder,
@@ -13,8 +15,6 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
   type Role,
   statusTransitionConfigs,
   UserBuilder,
@@ -36,14 +36,14 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { UpdateConvention } from "./UpdateConvention";
 
 describe("Update Convention", () => {
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withId("backoffice-admin-user-id")
     .withIsAdmin(true)
     .buildUser();
-  const validatorUser = new InclusionConnectedUserBuilder()
+  const validatorUser = new ConnectedUserBuilder()
     .withId("validator-user-id")
     .buildUser();
-  const counsellorUser = new InclusionConnectedUserBuilder()
+  const counsellorUser = new ConnectedUserBuilder()
     .withId("counsellor-user-id")
     .buildUser();
   const agency = new AgencyDtoBuilder().build();
@@ -71,7 +71,7 @@ describe("Update Convention", () => {
     .notSigned()
     .build();
 
-  const connectedUser = new InclusionConnectedUserBuilder()
+  const connectedUser = new ConnectedUserBuilder()
     .withId("connected-user-id")
     .build();
   const notConnectedUser = new UserBuilder()
@@ -421,7 +421,7 @@ describe("Update Convention", () => {
       { userId: backofficeAdminUser.id },
       { userId: validatorUser.id },
       { userId: counsellorUser.id },
-    ] as (ConventionDomainPayload | InclusionConnectDomainJwtPayload)[])(
+    ] as (ConventionDomainPayload | ConnectedUserDomainJwtPayload)[])(
       "updates the Convention in the repository updated by non signatories user",
       async (payload) => {
         uow.userRepository.users = [
@@ -464,7 +464,7 @@ describe("Update Convention", () => {
               triggeredBy: {
                 ...("userId" in payload
                   ? {
-                      kind: "inclusion-connected",
+                      kind: "connected-user",
                       userId: payload.userId,
                     }
                   : {

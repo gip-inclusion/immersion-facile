@@ -14,8 +14,8 @@ import {
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export const ValidatorModalContent = ({
   onSubmit,
@@ -32,7 +32,7 @@ export const ValidatorModalContent = ({
     SetStateAction<string | null>
   >;
 }) => {
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const fetchedConvention = useAppSelector(conventionSelectors.convention);
 
   const currentUserName =

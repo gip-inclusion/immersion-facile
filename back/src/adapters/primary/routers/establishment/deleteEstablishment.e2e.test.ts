@@ -1,7 +1,9 @@
 import { addDays, subDays } from "date-fns";
 import {
-  connectedUserTokenExpiredMessage,
-  createInclusionConnectJwtPayload,
+  authExpiredMessage,
+  ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
+  createConnectedUserJwtPayload,
   currentJwtVersions,
   displayRouteName,
   type EstablishmentRoutes,
@@ -9,8 +11,6 @@ import {
   establishmentRoutes,
   expectHttpResponseToEqual,
   expectToEqual,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   UserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -22,14 +22,14 @@ import { EstablishmentAggregateBuilder } from "../../../../domains/establishment
 import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("Delete establishment", () => {
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true)
     .buildUser();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
     userId: backofficeAdminUser.id,
   };
@@ -127,7 +127,7 @@ describe("Delete establishment", () => {
     });
 
     expectHttpResponseToEqual(response, {
-      body: { message: connectedUserTokenExpiredMessage, status: 401 },
+      body: { message: authExpiredMessage, status: 401 },
       status: 401,
     });
   });
@@ -143,7 +143,7 @@ describe("Delete establishment", () => {
       },
       headers: {
         authorization: generateConnectedUserJwt(
-          createInclusionConnectJwtPayload({
+          createConnectedUserJwtPayload({
             userId: user.id,
             now: timeGateway.now(),
             durationDays: 2,

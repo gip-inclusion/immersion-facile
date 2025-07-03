@@ -1,9 +1,10 @@
 import { decode } from "js-base64";
-import { currentJwtVersions, type UserId } from "..";
+import type { UserId } from "../user/user.dto";
+import { currentJwtVersions } from "./jwt.dto";
 import type {
+  ConnectedUserJwtPayload,
   ConventionJwtPayload,
-  InclusionConnectJwtPayload,
-} from "./jwtPayload.dto";
+} from "./payload.dto";
 
 // handle unicode parsing issues between atob and JWT base64 format
 const toBase64 = (input: string): string =>
@@ -25,9 +26,8 @@ export const decodeMagicLinkJwtWithoutSignatureCheck = <
   jwtToken: string,
 ): T => decodeJwtWithoutSignatureCheck<T>(jwtToken);
 
-export const createInclusionConnectJwtPayload = ({
+export const createConnectedUserJwtPayload = ({
   userId,
-  // biome-ignore lint/correctness/noUnusedVariables: it is used in other param
   durationDays,
   now,
   iat = Math.round(now.getTime() / 1000),
@@ -38,9 +38,9 @@ export const createInclusionConnectJwtPayload = ({
   now: Date;
   iat?: number;
   exp?: number;
-}): InclusionConnectJwtPayload => ({
+}): ConnectedUserJwtPayload => ({
   userId,
   iat,
   exp,
-  version: currentJwtVersions.inclusion,
+  version: currentJwtVersions.connectedUser,
 });

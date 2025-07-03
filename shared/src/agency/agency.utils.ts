@@ -1,5 +1,5 @@
 import { partition } from "ramda";
-import type { AgencyRight } from "..";
+import type { AgencyRight, AgencyRole, ExcludeFromExisting } from "..";
 import { errors } from "../errors/errors";
 import type { AgencyDto } from "./agency.dto";
 import type { AgencyPublicDisplayDto } from "./publicAgency.dto";
@@ -60,3 +60,8 @@ export const distinguishAgencyRights = (agencyRights: AgencyRight[]) => {
   );
   return { toReviewAgencyRights, activeAgencyRights };
 };
+
+export const agencyRoleIsNotToReview = (
+  agencyRoles: AgencyRole[],
+): agencyRoles is ExcludeFromExisting<AgencyRole, "to-review">[] =>
+  !agencyRoles.includes("to-review");

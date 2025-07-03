@@ -1,7 +1,7 @@
 import {
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type GetConventionsForAgencyUserParams,
-  InclusionConnectedUserBuilder,
   maxPerPageInWebPagination,
 } from "shared";
 import {
@@ -13,7 +13,7 @@ import { makeGetConventionsForAgencyUser } from "./GetConventionsForAgencyUser";
 
 describe("GetConventionsForAgencyUser", () => {
   const agencyUserId = "agency-user-id-12345";
-  const currentUser = new InclusionConnectedUserBuilder()
+  const currentUser = new ConnectedUserBuilder()
     .withId(agencyUserId)
     .withEmail("counsellor1@email.com")
     .withFirstName("John")

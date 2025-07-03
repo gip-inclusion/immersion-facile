@@ -21,7 +21,7 @@ import {
 import { AgencyUserModificationForm } from "src/app/components/agency/AgencyUserModificationForm";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 
 type IcUserAgenciesToReviewProps = {
   agenciesNeedingReviewForUser: AgencyRight[];
@@ -116,7 +116,7 @@ export const IcUserAgenciesToReview = ({
     userParamsForAgency: UserParamsForAgency,
   ) => {
     dispatch(
-      icUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(
+      connectedUsersAdminSlice.actions.registerAgencyWithRoleToUserRequested(
         userParamsForAgency,
       ),
     );
@@ -207,7 +207,9 @@ const RejectIcUserRegistrationToAgencyForm = ({
     values,
   ) => {
     dispatch(
-      icUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested(values),
+      connectedUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested(
+        values,
+      ),
     );
     closeIcUserRegistrationToAgencyModal();
   };

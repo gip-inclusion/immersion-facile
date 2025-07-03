@@ -1,8 +1,8 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -39,7 +39,7 @@ describe("Feature - SendEmailWhenAgencyIsRejected", () => {
     user9,
     user10,
   ] = [...Array(10).keys()].map((i) =>
-    new InclusionConnectedUserBuilder()
+    new ConnectedUserBuilder()
       .withId(`user${i + 1}`)
       .withEmail(`user${i + 1}@email.com`)
       .build(),

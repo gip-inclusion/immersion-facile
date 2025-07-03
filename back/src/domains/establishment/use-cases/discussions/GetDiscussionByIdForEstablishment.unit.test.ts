@@ -1,9 +1,9 @@
 import {
+  ConnectedUserBuilder,
   DiscussionBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
@@ -15,7 +15,7 @@ import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilde
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 
 describe("GetDiscussionByIdForEstablishment use case", () => {
-  const user = new InclusionConnectedUserBuilder().buildUser();
+  const user = new ConnectedUserBuilder().buildUser();
   const discussionWithUserEmailInContact = new DiscussionBuilder()
     .withEstablishmentContact({ email: user.email })
     .withId(uuid())

@@ -4,19 +4,19 @@ import {
   type AgencyRight,
   type ApiConsumer,
   type ApiConsumerJwt,
+  type ConnectedUser,
   type ConnectedUserJwt,
   type DashboardUrlAndName,
   type EstablishmentBatchReport,
   type FormEstablishmentBatchDto,
   type GetDashboardParams,
   type GetUsersFilters,
-  type InclusionConnectedUser,
   type NotificationsByKind,
   type RejectIcUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserId,
-  type UserInList,
   type UserParamsForAgency,
+  type UserWithNumberOfAgencies,
   type WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -87,7 +87,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   public createUserForAgency$(
     { agencyId }: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of({
@@ -118,9 +118,7 @@ export class SimulatedAdminGateway implements AdminGateway {
     return of({ name, url: `http://${name}.com` });
   }
 
-  public getInclusionConnectedUsersToReview$(): Observable<
-    InclusionConnectedUser[]
-  > {
+  public getConnectedUsersToReview$(): Observable<ConnectedUser[]> {
     return of([
       {
         id: "fake-user-id-1",
@@ -173,7 +171,7 @@ export class SimulatedAdminGateway implements AdminGateway {
         },
         createdAt: new Date().toISOString(),
       },
-    ] satisfies InclusionConnectedUser[]);
+    ] satisfies ConnectedUser[]);
   }
 
   public getLastNotifications$(
@@ -223,7 +221,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   public listUsers$(
     { emailContains }: GetUsersFilters,
     _token: string,
-  ): Observable<UserInList[]> {
+  ): Observable<UserWithNumberOfAgencies[]> {
     return of(
       simulatedUsers.filter((user) => user.email.includes(emailContains)),
     );
@@ -234,11 +232,11 @@ export class SimulatedAdminGateway implements AdminGateway {
       userId: UserId;
     },
     _token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser> {
-    const icUser = simulatedUsers.find((user) => user.id === params.userId);
-    if (!icUser) throw new Error(`User ${params.userId} not found`);
+  ): Observable<ConnectedUser> {
+    const user = simulatedUsers.find((user) => user.id === params.userId);
+    if (!user) throw new Error(`User ${params.userId} not found`);
     return of({
-      ...icUser,
+      ...user,
       agencyRights: [
         {
           agency: toAgencyDtoForAgencyUsersAndAdmins(
@@ -254,7 +252,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 }
 
-const simulatedUsers: UserInList[] = [
+const simulatedUsers: UserWithNumberOfAgencies[] = [
   {
     id: "fake-user-id-1",
     email: "jerome@mail.com",

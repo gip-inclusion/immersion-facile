@@ -11,10 +11,18 @@ import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
 import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
-import { RegisterAgencyToInclusionConnectUser } from "../../domains/agency/use-cases/RegisterAgencyToInclusionConnectUser";
+import { RegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
 import { UpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { UpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
+import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
+import { GetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
+import { GetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
+import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
+import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
+import { RejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
+import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
+import { UpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
 import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -41,13 +49,13 @@ import { makeNotifyAllActorsThatConventionTransferred } from "../../domains/conv
 import { makeNotifyBeneficiaryThatAssessmentIsCreated } from "../../domains/convention/use-cases/notifications/NotifyBeneficiaryThatAssessmentIsCreated";
 import { NotifyConventionReminder } from "../../domains/convention/use-cases/notifications/NotifyConventionReminder";
 import { makeNotifyEstablishmentThatAssessmentWasCreated } from "../../domains/convention/use-cases/notifications/NotifyEstablishmentThatAssessmentWasCreated";
-import { NotifyIcUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyIcUserAgencyRightChanged";
-import { NotifyIcUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyIcUserAgencyRightRejected";
 import { NotifyLastSigneeThatConventionHasBeenSigned } from "../../domains/convention/use-cases/notifications/NotifyLastSigneeThatConventionHasBeenSigned";
 import { NotifyNewConventionNeedsReview } from "../../domains/convention/use-cases/notifications/NotifyNewConventionNeedsReview";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignature";
 import { NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification } from "../../domains/convention/use-cases/notifications/NotifySignatoriesThatConventionSubmittedNeedsSignatureAfterModification";
 import { NotifyToAgencyConventionSubmitted } from "../../domains/convention/use-cases/notifications/NotifyToAgencyConventionSubmitted";
+import { NotifyUserAgencyRightChanged } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightChanged";
+import { NotifyUserAgencyRightRejected } from "../../domains/convention/use-cases/notifications/NotifyUserAgencyRightRejected";
 import { MarkPartnersErroredConventionAsHandled } from "../../domains/convention/use-cases/partners-errored-convention/MarkPartnersErroredConventionAsHandled";
 import { RenewConvention } from "../../domains/convention/use-cases/RenewConvention";
 import { RenewConventionMagicLink } from "../../domains/convention/use-cases/RenewConventionMagicLink";
@@ -68,13 +76,13 @@ import { DeleteSubscription } from "../../domains/core/api-consumer/use-cases/De
 import { makeListActiveSubscriptions } from "../../domains/core/api-consumer/use-cases/ListActiveSubscriptions";
 import { SaveApiConsumer } from "../../domains/core/api-consumer/use-cases/SaveApiConsumer";
 import { SubscribeToWebhook } from "../../domains/core/api-consumer/use-cases/SubscribeToWebhook";
+import { AfterOAuthSuccessRedirection } from "../../domains/core/authentication/connected-user/use-cases/AfterOAuthSuccessRedirection";
+import { makeGetOAuthLogoutUrl } from "../../domains/core/authentication/connected-user/use-cases/GetOAuthLogoutUrl";
+import { makeInitiateLoginByEmail } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByEmail";
+import { InitiateLoginByOAuth } from "../../domains/core/authentication/connected-user/use-cases/InitiateLoginByOAuth";
 import { BindConventionToFederatedIdentity } from "../../domains/core/authentication/ft-connect/use-cases/BindConventionToFederatedIdentity";
 import { LinkFranceTravailAdvisorAndRedirectToConvention } from "../../domains/core/authentication/ft-connect/use-cases/LinkFranceTravailAdvisorAndRedirectToConvention";
 import { NotifyFranceTravailUserAdvisorOnConventionFullySigned } from "../../domains/core/authentication/ft-connect/use-cases/NotifyFranceTravailUserAdvisorOnConventionFullySigned";
-import { AuthenticateWithInclusionCode } from "../../domains/core/authentication/inclusion-connect/use-cases/AuthenticateWithInclusionCode";
-import { makeGetInclusionConnectLogoutUrl } from "../../domains/core/authentication/inclusion-connect/use-cases/GetInclusionConnectLogoutUrl";
-import { InitiateInclusionConnect } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateInclusionConnect";
-import { makeInitiateLoginByEmail } from "../../domains/core/authentication/inclusion-connect/use-cases/InitiateLoginByEmail";
 import type { DashboardGateway } from "../../domains/core/dashboard/port/DashboardGateway";
 import { GetDashboardUrl } from "../../domains/core/dashboard/useCases/GetDashboardUrl";
 import { ValidateEmail } from "../../domains/core/email-validation/use-cases/ValidateEmail";
@@ -134,14 +142,6 @@ import { NotifyPassEmploiOnNewEstablishmentAggregateInsertedFromForm } from "../
 import { RetrieveFormEstablishmentFromAggregates } from "../../domains/establishment/use-cases/RetrieveFormEstablishmentFromAggregates";
 import { SearchImmersion } from "../../domains/establishment/use-cases/SearchImmersion";
 import { UpdateEstablishmentAggregateFromForm } from "../../domains/establishment/use-cases/UpdateEstablishmentAggregateFromFormEstablishement";
-import { makeCreateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/CreateUserForAgency";
-import { GetInclusionConnectedUser } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUser";
-import { GetInclusionConnectedUsers } from "../../domains/inclusion-connected-users/use-cases/GetInclusionConnectedUsers";
-import { makeGetUsers } from "../../domains/inclusion-connected-users/use-cases/GetUsers";
-import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
-import { RejectIcUserForAgency } from "../../domains/inclusion-connected-users/use-cases/RejectIcUserForAgency";
-import { makeRemoveUserFromAgency } from "../../domains/inclusion-connected-users/use-cases/RemoveUserFromAgency";
-import { UpdateUserForAgency } from "../../domains/inclusion-connected-users/use-cases/UpdateUserForAgency";
 import { makeUpdateMarketingEstablishmentContactList } from "../../domains/marketing/use-cases/UpdateMarketingEstablishmentContactsList";
 import type { AppConfig } from "./appConfig";
 import type { Gateways } from "./createGateways";
@@ -261,36 +261,38 @@ export const createUseCases = ({
         uowPerformer,
         gateways.notification,
       ),
-      registerAgencyToInclusionConnectUser:
-        new RegisterAgencyToInclusionConnectUser(uowPerformer, createNewEvent),
+      registerAgencyToConnectedUser: new RegisterAgencyToConnectedUser(
+        uowPerformer,
+        createNewEvent,
+      ),
       updateUserForAgency: new UpdateUserForAgency(
         uowPerformer,
         createNewEvent,
       ),
-      notifyIcUserAgencyRightChanged: new NotifyIcUserAgencyRightChanged(
+      notifyUserAgencyRightChanged: new NotifyUserAgencyRightChanged(
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      rejectIcUserForAgency: new RejectIcUserForAgency(
+      rejectUserForAgency: new RejectUserForAgency(
         uowPerformer,
         createNewEvent,
       ),
-      notifyIcUserAgencyRightRejected: new NotifyIcUserAgencyRightRejected(
+      notifyUserAgencyRightRejected: new NotifyUserAgencyRightRejected(
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      getIcUsers: new GetInclusionConnectedUsers(uowPerformer),
-      getInclusionConnectedUser: new GetInclusionConnectedUser(
+      getConnectedUsers: new GetConnectedUsers(uowPerformer),
+      getConnectedUser: new GetConnectedUser(
         uowPerformer,
         gateways.dashboardGateway,
         gateways.timeGateway,
       ),
-      initiateInclusionConnect: new InitiateInclusionConnect(
+      initiateLoginByOAuth: new InitiateLoginByOAuth(
         uowPerformer,
         uuidGenerator,
         gateways.oAuthGateway,
       ),
-      authenticateWithInclusionCode: new AuthenticateWithInclusionCode(
+      afterOAuthSuccessRedirection: new AfterOAuthSuccessRedirection(
         uowPerformer,
         createNewEvent,
         gateways.oAuthGateway,
@@ -694,7 +696,7 @@ export const createUseCases = ({
     getAgencyById: makeGetAgencyById({
       uowPerformer,
     }),
-    inclusionConnectLogout: makeGetInclusionConnectLogoutUrl({
+    getOAuthLogoutUrl: makeGetOAuthLogoutUrl({
       uowPerformer,
       deps: { oAuthGateway: gateways.oAuthGateway },
     }),

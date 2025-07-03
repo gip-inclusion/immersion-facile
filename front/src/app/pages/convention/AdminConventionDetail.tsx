@@ -17,7 +17,7 @@ export const AdminConventionDetail = ({
 
   return backOfficeJwt ? (
     <ConventionManageContent
-      jwtParams={{ jwt: backOfficeJwt, kind: "backoffice" }}
+      jwtParams={{ jwt: backOfficeJwt, kind: "connected user backoffice" }}
       conventionId={conventionId}
     />
   ) : (

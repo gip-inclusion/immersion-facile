@@ -9,8 +9,8 @@ import { ENV } from "src/config/environmentVariables";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 
 type MyProfileProps = {
@@ -25,9 +25,9 @@ const linkToUpdateAccountInfo =
 export const MyProfile = (_: MyProfileProps) => {
   const dispatch = useDispatch();
 
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
-  const userConnectedJwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const isLoading = useAppSelector(updateUserOnAgencySelectors.isLoading);
 
@@ -35,7 +35,7 @@ export const MyProfile = (_: MyProfileProps) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
   }, [dispatch]);
 
-  if (!currentUser || !userConnectedJwt)
+  if (!currentUser || !connectedUserJwt)
     return <p>Vous n'êtes pas connecté...</p>;
 
   if (isLoading) {
@@ -57,14 +57,12 @@ export const MyProfile = (_: MyProfileProps) => {
   };
 
   return (
-    <>
-      <UserProfile
-        title={userDisplayed}
-        currentUser={currentUser}
-        userWithRights={currentUser}
-        editInformationsLink={linkToUpdateAccountInfo}
-        onUserUpdateRequested={onUserUpdateRequested}
-      />
-    </>
+    <UserProfile
+      title={userDisplayed}
+      currentUser={currentUser}
+      userWithRights={currentUser}
+      editInformationsLink={linkToUpdateAccountInfo}
+      onUserUpdateRequested={onUserUpdateRequested}
+    />
   );
 };

@@ -2,13 +2,13 @@ import {
   AgencyDtoBuilder,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type EmailNotification,
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   expectToEqual,
   frontRoutes,
-  InclusionConnectedUserBuilder,
   type Role,
   type ShortLinkId,
 } from "shared";
@@ -45,11 +45,11 @@ describe("NotifyAllActorsOfFinalApplicationValidation", () => {
   const beneficiaryCurrentEmployerEmail = "current@employer.com";
   const beneficiaryRepresentativeEmail = "beneficiary@representative.fr";
   const peAdvisorEmail = "ft-advisor@pole-emploi.net";
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@email.fr")
     .build();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("myValidator")
     .withEmail("myValidator@mail.com")
     .build();

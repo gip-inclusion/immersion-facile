@@ -4,12 +4,11 @@ import {
   adminRoutes,
   agencyRoutes,
   authenticatedConventionRoutes,
+  authRoutes,
   conventionMagicLinkRoutes,
   establishmentLeadRoutes,
   establishmentRoutes,
   formCompletionRoutes,
-  inclusionConnectedAllowedRoutes,
-  inclusionConnectImmersionRoutes,
   nafRoutes,
   searchImmersionRoutes,
   technicalRoutes,
@@ -28,7 +27,6 @@ import { HttpConventionGateway } from "src/core-logic/adapters/Convention/HttpCo
 import { HttpEstablishmentGateway } from "src/core-logic/adapters/EstablishmentGateway/HttpEstablishmentGateway";
 import { HttpEstablishmentLeadGateway } from "src/core-logic/adapters/EstablishmentLeadGateway/HttpEstablishmentLeadGateway";
 import { HttpFormCompletionGateway } from "src/core-logic/adapters/FormCompletionGateway/HttpFormCompletionGateway";
-import { HttpInclusionConnectedGateway } from "src/core-logic/adapters/InclusionConnected/HttpInclusionConnectedGateway";
 import { HttpNafGateway } from "src/core-logic/adapters/NafGateway/HttpNafGateway";
 import { HttpSearchGateway } from "src/core-logic/adapters/SearchGateway/HttpSearchGateway";
 import { HttpTechnicalGateway } from "src/core-logic/adapters/TechnicalGateway/HttpTechnicalGateway";
@@ -58,7 +56,7 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosHttpClientOnSlashApi(adminRoutes),
     ),
     authGateway: new HttpAuthGateway(
-      createAxiosHttpClientOnSlashApi(inclusionConnectImmersionRoutes),
+      createAxiosHttpClientOnSlashApi(authRoutes),
     ),
     agencyGateway: new HttpAgencyGateway(
       createAxiosHttpClientOnSlashApi(agencyRoutes),
@@ -70,7 +68,6 @@ export const createHttpDependencies = (): Dependencies => {
       createAxiosHttpClientOnSlashApi(conventionMagicLinkRoutes),
       createAxiosHttpClientOnSlashApi(unauthenticatedConventionRoutes),
       createAxiosHttpClientOnSlashApi(authenticatedConventionRoutes),
-      createAxiosHttpClientOnSlashApi(inclusionConnectedAllowedRoutes),
     ),
     establishmentGateway: new HttpEstablishmentGateway(
       createAxiosHttpClientOnSlashApi(establishmentRoutes),
@@ -80,9 +77,6 @@ export const createHttpDependencies = (): Dependencies => {
     ),
     formCompletionGateway: new HttpFormCompletionGateway(
       createAxiosHttpClientOnSlashApi(formCompletionRoutes),
-    ),
-    inclusionConnectedGateway: new HttpInclusionConnectedGateway(
-      createAxiosHttpClientOnSlashApi(inclusionConnectedAllowedRoutes),
     ),
     searchGateway: new HttpSearchGateway(
       createAxiosHttpClientOnSlashApi(searchImmersionRoutes),

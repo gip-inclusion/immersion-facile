@@ -3,6 +3,7 @@ import {
   type AdminRoutes,
   type ApiConsumer,
   type ApiConsumerJwt,
+  type ConnectedUser,
   type ConnectedUserJwt,
   createApiConsumerParamsFromApiConsumer,
   type DashboardUrlAndName,
@@ -10,12 +11,11 @@ import {
   type FormEstablishmentBatchDto,
   type GetDashboardParams,
   type GetUsersFilters,
-  type InclusionConnectedUser,
   type RejectIcUserRoleForAgencyParams,
   type SetFeatureFlagParam,
   type UserId,
-  type UserInList,
   type UserParamsForAgency,
+  type UserWithNumberOfAgencies,
   type WithAgencyIdAndUserId,
   type WithUserFilters,
 } from "shared";
@@ -56,7 +56,7 @@ export class HttpAdminGateway implements AdminGateway {
   public createUserForAgency$(
     params: UserParamsForAgency,
     token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return from(
       this.httpClient
         .createUserForAgency({
@@ -117,13 +117,13 @@ export class HttpAdminGateway implements AdminGateway {
     );
   }
 
-  public getInclusionConnectedUsersToReview$(
+  public getConnectedUsersToReview$(
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<ConnectedUser[]> {
     return from(
       this.httpClient
-        .getInclusionConnectedUsers({
+        .getConnectedUsers({
           queryParams: filters,
           headers: { authorization: token },
         })
@@ -249,7 +249,7 @@ export class HttpAdminGateway implements AdminGateway {
   public listUsers$(
     filters: GetUsersFilters,
     token: ConnectedUserJwt,
-  ): Observable<UserInList[]> {
+  ): Observable<UserWithNumberOfAgencies[]> {
     return from(
       this.httpClient
         .getUsers({ headers: { authorization: token }, queryParams: filters })
@@ -265,7 +265,7 @@ export class HttpAdminGateway implements AdminGateway {
   public getIcUser$(
     params: { userId: UserId },
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return from(
       this.httpClient
         .getIcUser({ headers: { authorization: token }, urlParams: params })

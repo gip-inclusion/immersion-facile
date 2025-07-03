@@ -13,8 +13,8 @@ import { useConvention } from "src/app/hooks/convention.hooks";
 import { useFeedbackTopic } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes, useRoute } from "src/app/routes/routes";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { match } from "ts-pattern";
 import { NpsSection } from "../../nps/NpsSection";
 import {
@@ -28,19 +28,17 @@ export const ConventionManageContent = ({
   jwtParams,
 }: WithConventionId & { jwtParams: JwtKindProps }): JSX.Element => {
   const route = useRoute();
-  const inclusionConnectedRoles = useAppSelector(
-    inclusionConnectedSelectors.userRolesForFetchedConvention,
+  const userRolesForFetchedConvention = useAppSelector(
+    connectedUserSelectors.userRolesForFetchedConvention,
   );
-  const userRolesAreLoading = useAppSelector(
-    inclusionConnectedSelectors.isLoading,
-  );
+  const userRolesAreLoading = useAppSelector(connectedUserSelectors.isLoading);
   const conventionFormFeedback = useFeedbackTopic("convention-form");
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
     conventionFormFeedback.on === "fetch";
   const roles: Role[] = match({
     name: route.name,
-    inclusionConnectedRoles,
+    userRolesForFetchedConvention,
   })
     .with({ name: "manageConvention" }, (): Role[] => [
       decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(
@@ -49,14 +47,15 @@ export const ConventionManageContent = ({
     ])
     .with(
       { name: "adminConventionDetail" },
-      ({ inclusionConnectedRoles }): Role[] => [
+      ({ userRolesForFetchedConvention }): Role[] => [
         "back-office",
-        ...inclusionConnectedRoles,
+        ...userRolesForFetchedConvention,
       ],
     )
     .with(
       { name: "manageConventionConnectedUser" },
-      ({ inclusionConnectedRoles }): Role[] => inclusionConnectedRoles,
+      ({ userRolesForFetchedConvention }): Role[] =>
+        userRolesForFetchedConvention,
     )
     .otherwise((): Role[] => []);
 

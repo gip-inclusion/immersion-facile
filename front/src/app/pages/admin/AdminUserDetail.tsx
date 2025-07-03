@@ -10,8 +10,8 @@ import { fetchUserSlice } from "src/core-logic/domain/admin/fetchUser/fetchUser.
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import type { Route } from "type-route";
 
 type AdminUserDetailProps = {
@@ -19,13 +19,13 @@ type AdminUserDetailProps = {
 };
 
 export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const icUser = useAppSelector(adminFetchUserSelectors.fetchedUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const user = useAppSelector(adminFetchUserSelectors.fetchedUser);
   const isFetchingUser = useAppSelector(adminFetchUserSelectors.isFetching);
   const isUpdatingUser = useAppSelector(updateUserOnAgencySelectors.isLoading);
   const dispatch = useDispatch();
 
-  const userConnectedJwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const onUserUpdateRequested = (userParamsForAgency: UserParamsForAgency) => {
     dispatch(
@@ -48,21 +48,21 @@ export const AdminUserDetail = ({ route }: AdminUserDetailProps) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
   }, [dispatch]);
 
-  if (!currentUser || !userConnectedJwt)
+  if (!currentUser || !connectedUserJwt)
     return <p>Merci de vous connecter pour accéder à cette page.</p>;
   if (isFetchingUser || isUpdatingUser) return <Loader />;
-  if (!icUser) return <p>Aucun utilisateur trouvé</p>;
+  if (!user) return <p>Aucun utilisateur trouvé</p>;
 
   const title =
-    icUser.firstName && icUser.lastName
-      ? `${icUser.firstName} ${icUser.lastName}`
-      : icUser.email;
+    user.firstName && user.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user.email;
 
   return (
     <UserProfile
       title={title}
       currentUser={currentUser}
-      userWithRights={icUser}
+      userWithRights={user}
       onUserUpdateRequested={onUserUpdateRequested}
     />
   );

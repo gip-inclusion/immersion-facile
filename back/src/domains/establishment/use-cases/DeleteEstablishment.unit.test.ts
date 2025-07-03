@@ -1,11 +1,11 @@
 import {
   addressDtoToString,
+  ConnectedUserBuilder,
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   type GroupOptions,
-  InclusionConnectedUserBuilder,
   UserBuilder,
 } from "shared";
 import {
@@ -26,9 +26,8 @@ import { EstablishmentAggregateBuilder } from "../helpers/EstablishmentBuilders"
 import { DeleteEstablishment } from "./DeleteEstablishment";
 
 describe("Delete Establishment", () => {
-  const backofficeAdminBuilder =
-    new InclusionConnectedUserBuilder().withIsAdmin(true);
-  const icBackofficeAdminUser = backofficeAdminBuilder.build();
+  const backofficeAdminBuilder = new ConnectedUserBuilder().withIsAdmin(true);
+  const connectedBackofficeAdminUser = backofficeAdminBuilder.build();
   const backofficeAdminUser = backofficeAdminBuilder.buildUser();
 
   const groupOptions: GroupOptions = {
@@ -121,7 +120,7 @@ describe("Delete Establishment", () => {
           {
             siret: establishmentAggregate.establishment.siret,
           },
-          icBackofficeAdminUser,
+          connectedBackofficeAdminUser,
         ),
         errors.establishment.notFound({
           siret: establishmentAggregate.establishment.siret,
@@ -150,7 +149,7 @@ describe("Delete Establishment", () => {
         {
           siret: establishmentAggregate.establishment.siret,
         },
-        icBackofficeAdminUser,
+        connectedBackofficeAdminUser,
       );
 
       expectToEqual(
@@ -184,7 +183,7 @@ describe("Delete Establishment", () => {
         payload: {
           siret: establishmentAggregate.establishment.siret,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: backofficeAdminUser.id,
           },
         },

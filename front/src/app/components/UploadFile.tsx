@@ -34,7 +34,7 @@ export const UploadFile = ({
   const [fileBase64, setFileBase64] = useState<string | ArrayBuffer | null>(
     null,
   );
-  const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   if (!connectedUserJwt) throw errors.user.noJwtProvided();
 

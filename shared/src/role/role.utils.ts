@@ -1,10 +1,7 @@
 import { intersection } from "ramda";
-import {
-  type AssessmentMode,
-  type ConventionDto,
-  isEstablishmentTutorIsEstablishmentRepresentative,
-  type Signatories,
-} from "..";
+import type { AssessmentMode } from "../assessment/assessment.dto";
+import { isEstablishmentTutorIsEstablishmentRepresentative } from "../convention/convention";
+import type { ConventionDto, Signatories } from "../convention/convention.dto";
 import {
   allModifierRoles,
   allowedRolesToAccessAssessment,

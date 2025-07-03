@@ -13,6 +13,7 @@ import {
   type DashboardUrlAndName,
   type EditConventionCounsellorNameRequestDto,
   type FindSimilarConventionsParams,
+  type MarkPartnersErroredConventionAsHandledRequest,
   type RenewConventionParams,
   type RenewMagicLinkRequestDto,
   type SendSignatureLinkRequestDto,
@@ -60,6 +61,8 @@ export class InMemoryConventionGateway implements ConventionGateway {
   public transferConventionToAgencyResult$ = new Subject<void>();
 
   public editConventionCounsellorNameResult$ = new Subject<void>();
+
+  public markPartnersErroredConventionAsHandledResult$ = new Subject<void>();
 
   #agencies: { [id: string]: AgencyOption } = {};
 
@@ -192,5 +195,12 @@ export class InMemoryConventionGateway implements ConventionGateway {
       agencyCounsellorEmails: [],
       agencyValidatorEmails: ["validator@mail.com"],
     };
+  }
+
+  public markPartnersErroredConventionAsHandled$(
+    _params: MarkPartnersErroredConventionAsHandledRequest,
+    _jwt: string,
+  ): Observable<void> {
+    return this.markPartnersErroredConventionAsHandledResult$;
   }
 }

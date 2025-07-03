@@ -7,6 +7,7 @@ import {
   type ApiConsumer,
   agencyModifierRoles,
   allSignatoryRoles,
+  type ConnectedUserDomainJwtPayload,
   type ConventionDomainPayload,
   type ConventionDto,
   type ConventionId,
@@ -17,7 +18,6 @@ import {
   errors,
   type FeatureFlags,
   ForbiddenError,
-  type InclusionConnectDomainJwtPayload,
   isValidMobilePhone,
   type Role,
   type Signatories,
@@ -29,9 +29,9 @@ import {
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { isHashMatchPeAdvisorEmail } from "../../../utils/emailHash";
 import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
+import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
 import type { DomainTopic } from "../../core/events/events";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
 
 export const throwIfTransitionNotAllowed = ({
   targetStatus,
@@ -381,7 +381,7 @@ export const shouldBroadcastToFranceTravail = ({
 };
 
 const getRoleAndIcUser = async (
-  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
   uow: UnitOfWork,
   initialConvention: ConventionDto,
 ): Promise<{ role: Role; userWithRights: UserWithRights | undefined }> => {
@@ -415,7 +415,7 @@ export const signConvention = async ({
 }: {
   uow: UnitOfWork;
   convention: ConventionReadDto;
-  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload;
+  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload;
   now: DateTimeIsoString;
 }) => {
   const { role, userWithRights } = await getRoleAndIcUser(
@@ -453,7 +453,7 @@ export const domainTopicByTargetStatusMap: Partial<
 };
 
 export const extractUserRolesOnConventionFromJwtPayload = async (
-  jwtPayload: ConventionDomainPayload | InclusionConnectDomainJwtPayload,
+  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
   uow: UnitOfWork,
   initialConvention: ConventionDto,
 ): Promise<Role[]> => {

@@ -78,9 +78,7 @@ export const RejectDiscussionModal = ({
     useForm<WithDiscussionRejection>({
       resolver: zodResolver(discussionRejectionSchema),
     });
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
@@ -91,7 +89,7 @@ export const RejectDiscussionModal = ({
 
   const [isCandidateWarned, setIsCandidateWarned] = useState<boolean>();
 
-  if (!inclusionConnectedJwt) throw new Error("No jwt found");
+  if (!connectedUserJwt) throw new Error("No jwt found");
 
   const onSubmit = (values: WithDiscussionRejection) => {
     if (values.rejectionKind === "CANDIDATE_ALREADY_WARNED")
@@ -102,7 +100,7 @@ export const RejectDiscussionModal = ({
           rejectionKind: "CANDIDATE_ALREADY_WARNED",
           candidateWarnedMethod: values.candidateWarnedMethod,
           discussionId: discussion.id,
-          jwt: inclusionConnectedJwt,
+          jwt: connectedUserJwt,
         }),
       );
 
@@ -144,7 +142,7 @@ export const RejectDiscussionModal = ({
                 discussionSlice.actions.updateDiscussionStatusRequested({
                   feedbackTopic: "dashboard-discussion-status-updated",
                   ...rejectParams,
-                  jwt: inclusionConnectedJwt,
+                  jwt: connectedUserJwt,
                 }),
               ),
           },

@@ -16,7 +16,7 @@ import { AgencyStatusBadge } from "src/app/components/agency/AgencyStatusBadge";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.selectors";
 import { agencyAdminSlice } from "src/core-logic/domain/admin/agenciesAdmin/agencyAdmin.slice";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { useStyles } from "tss-react/dsfr";
 
 export const useAgencyAdminAutocomplete = () => {
@@ -28,7 +28,7 @@ export const useAgencyAdminAutocomplete = () => {
     selectOption: (agencyId: AgencyId) => {
       dispatch(agencyAdminSlice.actions.setSelectedAgencyId(agencyId));
       dispatch(
-        icUsersAdminSlice.actions.fetchAgencyUsersRequested({
+        connectedUsersAdminSlice.actions.fetchAgencyUsersRequested({
           agencyId,
         }),
       );

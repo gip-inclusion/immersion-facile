@@ -1,4 +1,4 @@
-import { AgencyDtoBuilder, InclusionConnectedUserBuilder } from "shared";
+import { AgencyDtoBuilder, ConnectedUserBuilder } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -15,15 +15,15 @@ import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGenerato
 import { SendEmailWhenNewAgencyOfTypeOtherAdded } from "./SendEmailWhenNewAgencyOfTypeOtherAdded";
 
 describe("Send email when agency of type other added ", () => {
-  const counsellorAndValidator = new InclusionConnectedUserBuilder()
+  const counsellorAndValidator = new ConnectedUserBuilder()
     .withId("in-both")
     .withEmail("in-both@mail.com")
     .buildUser();
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("councellor")
     .withEmail("councellor@email.com")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@email.com")
     .buildUser();

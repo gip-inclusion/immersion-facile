@@ -2,8 +2,8 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 import {
+  type ConnectedUser,
   domElementIds,
-  type InclusionConnectedUser,
   type UserParamsForAgency,
 } from "shared";
 import { routes } from "src/app/routes/routes";
@@ -13,8 +13,8 @@ import { PersonnalInformationsSection } from "./PersonnalInformationsSection";
 
 type UserProfileProps = {
   title: string;
-  currentUser: InclusionConnectedUser;
-  userWithRights: InclusionConnectedUser;
+  currentUser: ConnectedUser;
+  userWithRights: ConnectedUser;
   editInformationsLink?: string;
   onUserUpdateRequested: (userParamsForAgency: UserParamsForAgency) => void;
 };
