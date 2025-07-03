@@ -215,6 +215,7 @@ export const withOptionalFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstn
     lastname: personNameSchema.optional(),
   });
 
+//todo: to remove that when data in db is cleaned up and put a more strict schema (personNameSchema)
 const conventionValidatorFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstnameAndLastname> =
   z.object({
     firstname: z.string().optional(),
