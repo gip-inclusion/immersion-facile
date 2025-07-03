@@ -571,7 +571,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
       expectToEqual(
         loginUrl,
-        `${immersionBaseUrl}/${redirectUrl}?alreadyUsedAuthentication=true`,
+        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
       );
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [
@@ -598,7 +598,7 @@ describe("AuthenticateWithInclusionCode use case", () => {
 
       expectToEqual(
         loginUrl,
-        `${immersionBaseUrl}/${redirectUrl}?alreadyUsedAuthentication=true`,
+        `${immersionBaseUrl}${redirectUrl}?alreadyUsedAuthentication=true`,
       );
 
       expectToEqual(uow.ongoingOAuthRepository.ongoingOAuths, [

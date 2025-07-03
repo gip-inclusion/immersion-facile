@@ -96,7 +96,7 @@ export class AuthenticateWithInclusionCode extends TransactionalUseCase<
     );
 
     if (ongoingOAuth.usedAt)
-      return `${this.#immersionFacileBaseUrl}/${
+      return `${this.#immersionFacileBaseUrl}${
         uriWithoutParams
       }?${queryParamsAsString<AlreadyAuthenticatedUserQueryParams>({
         alreadyUsedAuthentication: true,
