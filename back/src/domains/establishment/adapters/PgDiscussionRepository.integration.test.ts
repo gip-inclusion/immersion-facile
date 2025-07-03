@@ -5,13 +5,12 @@ import {
   type ContactMode,
   DiscussionBuilder,
   type DiscussionDto,
-  type DiscussionEstablishmentContact,
   type DiscussionInList,
-  type Exchange,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   type ImmersionObjective,
+  type SpecificExchangeSender,
   UserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -50,13 +49,6 @@ describe("PgDiscussionRepository", () => {
     .withAppellationLabel(styliste.appellationLabel)
     .build();
 
-  const establishmentContactWithoutFirstNameAndLastName: DiscussionEstablishmentContact =
-    {
-      email: "test@test.com",
-      phone: "0123456789",
-      job: "test",
-      copyEmails: [],
-    };
   const secretariatOffer = new OfferEntityBuilder()
     .withRomeCode(secretariat.romeCode)
     .withAppellationCode(secretariat.appellationCode)
@@ -105,9 +97,6 @@ describe("PgDiscussionRepository", () => {
         const discussionWithSiret2 = new DiscussionBuilder(discussionWithSiret1)
           .withId(uuid())
           .withCreatedAt(new Date("2024-01-02"))
-          .withEstablishmentContact(
-            establishmentContactWithoutFirstNameAndLastName,
-          )
           .build();
         const discussionWithoutSiret = new DiscussionBuilder()
           .withId(uuid())
@@ -369,7 +358,6 @@ describe("PgDiscussionRepository", () => {
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               message: "",
               attachments: [],
               sentAt: new Date().toISOString(),
@@ -382,7 +370,9 @@ describe("PgDiscussionRepository", () => {
           .withExchanges([
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               message: "",
               attachments: [],
               sentAt: new Date().toISOString(),
@@ -427,14 +417,15 @@ describe("PgDiscussionRepository", () => {
     });
     describe("combo filters", () => {
       it("exclude discussions that does not match filters", async () => {
-        type ReducedExchange = Pick<Exchange, "sender" | "recipient">;
-        const sendedByBeneficiary: ReducedExchange = {
-          sender: "potentialBeneficiary",
-          recipient: "establishment",
-        };
-        const sendedByEstablishment: ReducedExchange = {
+        const sendedByBeneficiary: SpecificExchangeSender<"potentialBeneficiary"> =
+          {
+            sender: "potentialBeneficiary",
+          };
+        const sendedByEstablishment: SpecificExchangeSender<"establishment"> = {
           sender: "establishment",
-          recipient: "potentialBeneficiary",
+          email: "mail@mail.com",
+          firstname: "billy",
+          lastname: "idol",
         };
 
         const date = new Date("2024-08-02 00:00:00");
@@ -512,7 +503,6 @@ describe("PgDiscussionRepository", () => {
               message: "",
               subject: "",
               sentAt: new Date().toISOString(),
-              recipient: "establishment",
               sender: "potentialBeneficiary",
             },
           ])
@@ -936,14 +926,10 @@ describe("PgDiscussionRepository", () => {
       new DiscussionBuilder()
         .withId(uuid())
         .withSiret("00000000000001")
-        .withEstablishmentContact({
-          email: "test@email.com",
-        })
         .withExchanges([
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: new Date("2023-07-07").toISOString(),
             subject: "exchange with potentialBeneficiary 1",
             attachments: [
@@ -1003,15 +989,6 @@ describe("PgDiscussionRepository", () => {
           since: new Date(
             discussionWithLastExchangeByPotentialBeneficiary1.createdAt,
           ),
-        },
-        result: true,
-      },
-      {
-        discussionInRepo: discussionWithLastExchangeByPotentialBeneficiary1,
-        params: {
-          establishmentRepresentativeEmail:
-            discussionWithLastExchangeByPotentialBeneficiary1
-              .establishmentContact.email,
         },
         result: true,
       },
@@ -1089,28 +1066,10 @@ describe("PgDiscussionRepository", () => {
       );
     });
 
-    it("also returns discussion if discussion is searched by contact email and email is in copyEmails", async () => {
-      const discussion = new DiscussionBuilder()
-        .withId(uuid())
-        .withEstablishmentContact({
-          email: "other@email.com",
-          copyEmails: ["searchedEmail@email.com"],
-        })
-        .build();
-      await pgDiscussionRepository.insert(discussion);
-
-      expectToEqual(
-        await pgDiscussionRepository.hasDiscussionMatching({
-          establishmentRepresentativeEmail: "searchedEmail@email.com",
-        }),
-        true,
-      );
-    });
-
     it("when there is no discussion", async () => {
       expectToEqual(
         await pgDiscussionRepository.hasDiscussionMatching({
-          establishmentRepresentativeEmail: "searchedEmail@email.com",
+          siret: discussionWithoutExchanges3.siret,
         }),
         false,
       );
@@ -1352,9 +1311,11 @@ describe("PgDiscussionRepository", () => {
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
-            recipient: "potentialBeneficiary",
             sentAt: new Date("2023-11-11").toISOString(),
             sender: "establishment",
+            email: "",
+            firstname: "",
+            lastname: "",
             attachments: [],
           },
         ])
@@ -1368,9 +1329,11 @@ describe("PgDiscussionRepository", () => {
           {
             subject: "mon nouveau sujet",
             message: "mon nouveau message",
-            recipient: "potentialBeneficiary",
             sentAt: new Date("2022-11-11").toISOString(),
             sender: "establishment",
+            email: "",
+            firstname: "",
+            lastname: "",
             attachments: [
               {
                 link: "dlskfjsdmlfsdmlfjsdmlfj",
