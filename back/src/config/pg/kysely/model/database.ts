@@ -449,6 +449,7 @@ interface EstablishmentsUsers {
   role: string;
   job: string | null;
   phone: string | null;
+  should_receive_discussion_notifications: boolean;
 }
 
 type AgencyGroupKind = "france-travail";
