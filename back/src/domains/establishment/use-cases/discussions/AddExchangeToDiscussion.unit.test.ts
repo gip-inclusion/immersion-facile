@@ -1,11 +1,11 @@
 import {
   type BrevoInboundBody,
+  ConnectedUserBuilder,
   DiscussionBuilder,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -27,7 +27,7 @@ import {
 } from "./AddExchangeToDiscussion";
 
 describe("AddExchangeToDiscussion", () => {
-  const inclusionConnectedUser = new InclusionConnectedUserBuilder().build();
+  const inclusionConnectedUser = new ConnectedUserBuilder().build();
   const replyDomain = "reply.my-domain.com";
   const pendingDiscussion1 = new DiscussionBuilder()
     .withAppellationCode("20567")

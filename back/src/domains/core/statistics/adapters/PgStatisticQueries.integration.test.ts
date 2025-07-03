@@ -21,7 +21,7 @@ import { PgConventionRepository } from "../../../convention/adapters/PgConventio
 import { PgEstablishmentAggregateRepository } from "../../../establishment/adapters/PgEstablishmentAggregateRepository";
 import type { EstablishmentUserRight } from "../../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../../establishment/helpers/EstablishmentBuilders";
-import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
 import { PgStatisticQueries } from "./PgStatisticQueries";
 

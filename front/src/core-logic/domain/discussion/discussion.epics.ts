@@ -13,12 +13,12 @@ type DiscussionEpic = AppEpic<DiscussionAction>;
 const fetchDiscussionByIdEpic: DiscussionEpic = (
   action$,
   _state$,
-  { inclusionConnectedGateway },
+  { establishmentGateway },
 ) =>
   action$.pipe(
     filter(discussionSlice.actions.fetchDiscussionRequested.match),
     switchMap((action) =>
-      inclusionConnectedGateway.getDiscussionById$(action.payload).pipe(
+      establishmentGateway.getDiscussionById$(action.payload).pipe(
         map((discussion) =>
           discussionSlice.actions.fetchDiscussionSucceeded({
             discussion,
@@ -38,12 +38,12 @@ const fetchDiscussionByIdEpic: DiscussionEpic = (
 const updateDiscussionStatusEpic: DiscussionEpic = (
   action$,
   _state$,
-  { inclusionConnectedGateway },
+  { establishmentGateway },
 ) =>
   action$.pipe(
     filter(discussionSlice.actions.updateDiscussionStatusRequested.match),
     switchMap((action) =>
-      inclusionConnectedGateway.updateDiscussionStatus$(action.payload).pipe(
+      establishmentGateway.updateDiscussionStatus$(action.payload).pipe(
         map(() =>
           discussionSlice.actions.updateDiscussionStatusSucceeded({
             feedbackTopic: action.payload.feedbackTopic,
@@ -62,12 +62,12 @@ const updateDiscussionStatusEpic: DiscussionEpic = (
 const sendMessageEpic: DiscussionEpic = (
   action$,
   _state$,
-  { inclusionConnectedGateway },
+  { establishmentGateway },
 ) =>
   action$.pipe(
     filter(discussionSlice.actions.sendExchangeRequested.match),
     switchMap((action) =>
-      inclusionConnectedGateway.sendMessage$(action.payload.exchangeData).pipe(
+      establishmentGateway.sendMessage$(action.payload.exchangeData).pipe(
         map((result) =>
           "reason" in result
             ? discussionSlice.actions.sendExchangeFailed({
@@ -95,12 +95,12 @@ const sendMessageEpic: DiscussionEpic = (
 const fetchDiscussionListEpic: DiscussionEpic = (
   action$,
   _state$,
-  { inclusionConnectedGateway },
+  { establishmentGateway },
 ) =>
   action$.pipe(
     filter(discussionSlice.actions.fetchDiscussionListRequested.match),
     switchMap((action) =>
-      inclusionConnectedGateway.getDiscussions$(action.payload).pipe(
+      establishmentGateway.getDiscussions$(action.payload).pipe(
         map((discussionsWithPagination) =>
           discussionSlice.actions.fetchDiscussionListSucceeded({
             discussionsWithPagination,

@@ -2,7 +2,7 @@ import { errors, type FormEstablishmentDto, noContactPerMonth } from "shared";
 import { rawAddressToLocation } from "../../../utils/address";
 import type { NafAndNumberOfEmpolyee } from "../../../utils/siret";
 import type { AddressGateway } from "../../core/address/ports/AddressGateway";
-import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
+import { createOrGetUserIdByEmail } from "../../core/authentication/connected-user/entities/user.helper";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";

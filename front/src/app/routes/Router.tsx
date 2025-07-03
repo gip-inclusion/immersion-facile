@@ -35,7 +35,7 @@ import { SearchPage } from "src/app/pages/search/SearchPage";
 import { MyProfile } from "src/app/pages/user/MyProfile";
 import { RequestAgencyRegistrationPage } from "src/app/pages/user/RequestAgencyRegistrationPage";
 import { store } from "src/config/dependencies";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import type { Route } from "type-route";
 import { StandardLayout } from "../components/layout/StandardLayout";
 import { ManageEstablishmentAdminPage } from "../pages/admin/ManageEstablishmentAdminPage";
@@ -81,7 +81,7 @@ const adminRoutes: {
 const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
   useEffect(() => {
     route.push();
-  }, []);
+  }, [route.push]);
   return null;
 };
 
@@ -89,28 +89,28 @@ const getPageSideEffectByRouteName: Partial<Record<keyof Routes, () => void>> =
   {
     establishmentDashboard: () => {
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested({
+        connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
         }),
       );
     },
     establishmentDashboardFormEstablishment: () => {
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested({
+        connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
         }),
       );
     },
     establishmentDashboardDiscussions: () => {
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested({
+        connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
         }),
       );
     },
     establishmentDashboardConventions: () => {
       store.dispatch(
-        inclusionConnectedSlice.actions.currentUserFetchRequested({
+        connectedUserSlice.actions.currentUserFetchRequested({
           feedbackTopic: "unused",
         }),
       );
@@ -226,7 +226,7 @@ const getPageByRouteName: {
   myProfile: (route) => (
     <ConnectedPrivateRoute
       route={route}
-      inclusionConnectConnexionPageHeader={
+      oAuthConnexionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
       }
     >

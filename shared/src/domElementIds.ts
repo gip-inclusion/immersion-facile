@@ -1,4 +1,4 @@
-import type { frontRoutes } from "./routes/routes";
+import type { frontRoutes } from "./routes/route.utils";
 
 type FrontRoutesKeys = keyof typeof frontRoutes | "home" | "header" | "footer";
 
@@ -825,7 +825,7 @@ export const domElementIds = {
         "im-agency-dashboard-form-edit-agency__remove-user-button",
     },
   },
-  manageConventionInclusionConnected: {
+  manageConventionUserConnected: {
     erroredConventionHandledModal:
       "im-errored-convention-handled-confirmation-modal",
   },

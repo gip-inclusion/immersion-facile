@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import {
@@ -20,11 +20,11 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { UpdateAgencyReferringToUpdatedAgency } from "./UpdateAgencyReferringToUpdatedAgency";
 
 describe("UpdateAgencyReferingToUpdatedAgency", () => {
-  const updatedUser = new InclusionConnectedUserBuilder()
+  const updatedUser = new ConnectedUserBuilder()
     .withId("updated-user")
     .withEmail("update@mail.com")
     .buildUser();
-  const notUpdatedUser = new InclusionConnectedUserBuilder()
+  const notUpdatedUser = new ConnectedUserBuilder()
     .withId("not-updated-user")
     .withEmail("not.updated@mail.com")
     .buildUser();

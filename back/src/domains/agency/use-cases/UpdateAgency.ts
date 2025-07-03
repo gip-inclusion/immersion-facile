@@ -1,19 +1,19 @@
 import {
   type AgencyDto,
   agencySchema,
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
 } from "shared";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateAgency extends TransactionalUseCase<
   AgencyDto,
   void,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = agencySchema;
 
@@ -30,7 +30,7 @@ export class UpdateAgency extends TransactionalUseCase<
   public async _execute(
     agency: AgencyDto,
     uow: UnitOfWork,
-    currentUser: InclusionConnectedUser,
+    currentUser: ConnectedUser,
   ): Promise<void> {
     throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
     const {
@@ -51,7 +51,7 @@ export class UpdateAgency extends TransactionalUseCase<
           payload: {
             agencyId: agency.id,
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: currentUser.id,
             },
           },

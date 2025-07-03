@@ -5,9 +5,9 @@ import type {
   AgencyOption,
   AgencyPublicDisplayDto,
   AgencyRoutes,
+  ConnectedUser,
   ConnectedUserJwt,
   CreateAgencyDto,
-  InclusionConnectedUser,
   ListAgencyOptionsRequestDto,
   UpdateAgencyStatusParams,
   UserParamsForAgency,
@@ -41,7 +41,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     params: UserParamsForAgency,
     token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return from(
       this.httpClient
         .createUserForAgency({
@@ -96,7 +96,7 @@ export class HttpAgencyGateway implements AgencyGateway {
   getAgencyUsers$(
     agencyId: AgencyId,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<ConnectedUser[]> {
     return from(
       this.httpClient
         .getAgencyUsersByAgencyId({
@@ -208,6 +208,25 @@ export class HttpAgencyGateway implements AgencyGateway {
             .with({ status: 201 }, () => undefined)
             .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .with({ status: P.union(401, 404) }, logBodyAndThrow)
+            .otherwise(otherwiseThrow),
+        ),
+    );
+  }
+
+  public registerAgenciesToCurrentUser$(
+    agencyIds: AgencyId[],
+    token: string,
+  ): Observable<void> {
+    return from(
+      this.httpClient
+        .registerAgenciesToUser({
+          headers: { authorization: token },
+          body: agencyIds,
+        })
+        .then((response) =>
+          match(response)
+            .with({ status: 200 }, () => undefined)
+            .with({ status: 400 }, throwBadRequestWithExplicitMessage)
             .otherwise(otherwiseThrow),
         ),
     );

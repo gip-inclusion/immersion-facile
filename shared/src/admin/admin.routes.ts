@@ -14,11 +14,8 @@ import {
 } from "../formEstablishment/FormEstablishment.schema";
 import { withAuthorizationHeaders } from "../headers";
 import { httpErrorSchema } from "../httpClient/httpErrors.schema";
-import {
-  inclusionConnectedUserSchema,
-  userInListSchema,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.schema";
 import { notificationsByKindSchema } from "../notifications/notifications.schema";
+import { connectedUserSchema, userInListSchema } from "../user/user.schema";
 import { expressEmptyResponseBody } from "../zodUtils";
 import {
   getUsersFiltersSchema,
@@ -75,13 +72,14 @@ export const adminRoutes = defineRoutes({
     },
   }),
 
+  // Cette route existe aussi dans le agency router, qui enclanche le même usecase >> c'est un bordel ici ...
   createUserForAgency: defineRoute({
     method: "post",
     url: "/admin/inclusion-connected/users",
     requestBodySchema: userParamsForAgencySchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: inclusionConnectedUserSchema,
+      200: connectedUserSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
       404: httpErrorSchema,
@@ -99,13 +97,13 @@ export const adminRoutes = defineRoutes({
       404: httpErrorSchema,
     },
   }),
-  getInclusionConnectedUsers: defineRoute({
+  getConnectedUsers: defineRoute({
     method: "get",
     url: "/admin/inclusion-connected/users",
     queryParamsSchema: withUserFiltersSchema,
     ...withAuthorizationHeaders,
     responses: {
-      200: z.array(inclusionConnectedUserSchema),
+      200: z.array(connectedUserSchema),
       401: httpErrorSchema,
     },
   }),
@@ -159,7 +157,7 @@ export const adminRoutes = defineRoutes({
     url: "/admin/inclusion-connected-users/:userId",
     ...withAuthorizationHeaders,
     responses: {
-      200: inclusionConnectedUserSchema,
+      200: connectedUserSchema,
       401: httpErrorSchema,
       403: httpErrorSchema,
       404: httpErrorSchema,

@@ -16,7 +16,7 @@ import {
 import { routes, useRoute } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
 import { authSlice } from "src/core-logic/domain/auth/auth.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { makeStyles } from "tss-react/dsfr";
 import immersionFacileLightLogo from "/assets/img/logo-if.svg";
 import immersionFacileDarkLogo from "/assets/img/logo-if-dark.svg";
@@ -48,10 +48,8 @@ export const LayoutHeader = () => {
     quickAccess: quickAccessIds,
   } = domElementIds.header.navLinks;
 
-  const isInclusionConnected = useAppSelector(
-    authSelectors.isInclusionConnected,
-  );
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const isConnectedUser = useAppSelector(authSelectors.isConnectedUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const isAdminConnected = useAppSelector(authSelectors.isAdminConnected);
   const isPeConnected = useAppSelector(authSelectors.isPeConnected);
   const federatedIdentity = useAppSelector(authSelectors.federatedIdentity);
@@ -84,7 +82,7 @@ export const LayoutHeader = () => {
           id: quickAccessIds.agency,
           linkProps: routes.agencyDashboardMain().link,
         },
-        ...(isInclusionConnected
+        ...(isConnectedUser
           ? [
               {
                 children: "Mon profil",
@@ -104,7 +102,7 @@ export const LayoutHeader = () => {
     />,
   ];
 
-  if (isPeConnected || isInclusionConnected) {
+  if (isPeConnected || isConnectedUser) {
     tools.push({
       iconId: "fr-icon-lock-line",
       text: isPeConnected ? "Se déconnecter (FT Connect)" : "Se déconnecter",
@@ -115,7 +113,7 @@ export const LayoutHeader = () => {
               mode:
                 federatedIdentity?.provider === "email"
                   ? "device-only"
-                  : "device-and-inclusion",
+                  : "device-and-oauth",
             }),
           );
           if (isPeConnected && currentRoute.name === "conventionImmersion") {

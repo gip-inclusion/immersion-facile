@@ -8,8 +8,8 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import type { IcUsersAdminAction } from "../icUsersAdmin/icUsersAdmin.epics";
-import { icUsersAdminSlice } from "../icUsersAdmin/icUsersAdmin.slice";
+import type { IcUsersAdminAction } from "../connectedUsersAdmin/connectedUsersAdmin.epics";
+import { connectedUsersAdminSlice } from "../connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
 export type AgencyAction = ActionOfSlice<typeof agencyAdminSlice>;
@@ -161,9 +161,15 @@ const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
   action$.pipe(
     filter(
       (action) =>
-        icUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(action) ||
-        icUsersAdminSlice.actions.removeUserFromAgencySucceeded.match(action) ||
-        icUsersAdminSlice.actions.createUserOnAgencySucceeded.match(action),
+        connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded.match(
+          action,
+        ) ||
+        connectedUsersAdminSlice.actions.removeUserFromAgencySucceeded.match(
+          action,
+        ) ||
+        connectedUsersAdminSlice.actions.createUserOnAgencySucceeded.match(
+          action,
+        ),
     ),
     map((action) =>
       agencyAdminSlice.actions.setSelectedAgencyId(action.payload.agencyId),

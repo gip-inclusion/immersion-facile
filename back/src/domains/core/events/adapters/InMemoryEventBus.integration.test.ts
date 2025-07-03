@@ -37,7 +37,7 @@ const domainEvt: DomainEvent = {
       establishmentAdvices: "osef",
     },
     triggeredBy: {
-      kind: "inclusion-connected",
+      kind: "connected-user",
       userId: "user-123",
     },
   },

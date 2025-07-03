@@ -3,7 +3,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 import { type ReactNode, useMemo } from "react";
 import { HeadingSection, SectionHighlight } from "react-design-system";
-import type { EstablishmentDashboardTab, InclusionConnectedUser } from "shared";
+import type { ConnectedUser, EstablishmentDashboardTab } from "shared";
 import { DiscussionList } from "src/app/components/establishment/establishment-dashboard/DiscussionList";
 import { DiscussionManageContent } from "src/app/components/establishment/establishment-dashboard/DiscussionManageContent";
 import { useFeatureFlags } from "src/app/hooks/useFeatureFlags";
@@ -20,7 +20,7 @@ import { MetabaseView } from "../../MetabaseView";
 import { SelectConventionFromIdForm } from "../../SelectConventionFromIdForm";
 
 type EstablishmentDashboardTabsProps = {
-  currentUser: InclusionConnectedUser;
+  currentUser: ConnectedUser;
   route: FrontEstablishmentDashboardRoute;
 };
 
@@ -99,7 +99,7 @@ const makeEstablishmentDashboardTabs = (
       establishments: { conventions },
     },
     establishments,
-  }: InclusionConnectedUser,
+  }: ConnectedUser,
   route: FrontEstablishmentDashboardRoute,
 ): DashboardTab[] => [
   {

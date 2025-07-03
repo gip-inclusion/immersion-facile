@@ -16,7 +16,7 @@ import {
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { EstablishmentUserRight } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
 import type { GroupEntity } from "../entities/GroupEntity";

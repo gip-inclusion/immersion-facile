@@ -17,7 +17,7 @@ export const DashboardPrivateRoute = ({
 }: DashboardPrivateRouteProps) => (
   <ConnectedPrivateRoute
     route={route}
-    inclusionConnectConnexionPageHeader={
+    oAuthConnexionPageHeader={
       <PageHeader
         title="Retrouvez vos conventions en tant que prescripteur"
         breadcrumbs={<Breadcrumbs />}

@@ -1,10 +1,10 @@
 import {
+  type ConnectedUserDomainJwtPayload,
   type DiscussionDto,
   type DiscussionId,
   type DiscussionReadDto,
   discussionIdSchema,
   errors,
-  type InclusionConnectDomainJwtPayload,
   type User,
 } from "shared";
 import { TransactionalUseCase } from "../../../core/UseCase";
@@ -13,13 +13,13 @@ import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
   DiscussionId,
   DiscussionReadDto,
-  InclusionConnectDomainJwtPayload
+  ConnectedUserDomainJwtPayload
 > {
   inputSchema = discussionIdSchema;
   protected async _execute(
     discussionId: DiscussionId,
     uow: UnitOfWork,
-    jwtPayload?: InclusionConnectDomainJwtPayload,
+    jwtPayload?: ConnectedUserDomainJwtPayload,
   ): Promise<DiscussionReadDto> {
     if (!jwtPayload) throw errors.user.unauthorized();
     const user = await uow.userRepository.getById(jwtPayload.userId);

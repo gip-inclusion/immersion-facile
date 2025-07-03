@@ -484,7 +484,7 @@ export const tallyFormCase3 = {
           },
           {
             id: "00c48f67-82ab-46ff-9916-81ec224144ae",
-            text: "J'ai une question sur Inclusion Connect",
+            text: "J'ai une question sur Inclusion Connect", // On a encore "Inclusion Connect dans le form Tally ?"
           },
           {
             id: "d98ea633-00ab-43d2-93b1-7f14f3fe3353",

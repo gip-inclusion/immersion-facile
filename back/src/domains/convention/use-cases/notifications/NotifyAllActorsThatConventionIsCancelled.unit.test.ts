@@ -2,9 +2,9 @@ import {
   AgencyDtoBuilder,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type EmailNotification,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionCancelled } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -57,15 +57,15 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsCancelled", () => {
     .withEstablishmentTutorEmail("establishment-representative@gmail.com")
     .build();
 
-  const counsellor1 = new InclusionConnectedUserBuilder()
+  const counsellor1 = new ConnectedUserBuilder()
     .withId("counsellor1")
     .withEmail("counsellor1@email.fr")
     .build();
-  const counsellor2 = new InclusionConnectedUserBuilder()
+  const counsellor2 = new ConnectedUserBuilder()
     .withId("counsellor2")
     .withEmail("counsellor2@email.fr")
     .build();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@email.fr")
     .build();

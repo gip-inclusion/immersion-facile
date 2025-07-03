@@ -3,7 +3,7 @@ import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import { Highlight } from "@codegouvfr/react-dsfr/Highlight";
 import { Loader } from "react-design-system";
 import { useDispatch } from "react-redux";
-import { type AllowedStartOAuthLoginPage, domElementIds } from "shared";
+import { type AllowedLoginSource, domElementIds } from "shared";
 import { FullPageFeedback } from "src/app/components/feedback/FullpageFeedback";
 import { immersionFacileSupportUrl } from "src/app/components/layout/LayoutFooter";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
@@ -17,7 +17,7 @@ type Mode = "success" | "failed";
 
 type LoginByEmailFeedbackPageProps = {
   mode: Mode;
-  page: AllowedStartOAuthLoginPage;
+  page: AllowedLoginSource;
 };
 
 export const LoginByEmailFeedbackPage = ({

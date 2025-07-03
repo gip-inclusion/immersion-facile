@@ -3,14 +3,14 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 
 import { HeadingSection } from "react-design-system";
-import { domElementIds, type WithEstablishmentData } from "shared";
+import { domElementIds, type EstablishmentData } from "shared";
 import { EstablishmentForm } from "src/app/components/forms/establishment/EstablishmentForm";
 import { routes, useRoute } from "src/app/routes/routes";
 import { getUrlParameters } from "src/app/utils/url.utils";
 import type { Route } from "type-route";
 
 type ManageEstablishmentTabProps = {
-  establishments: WithEstablishmentData[];
+  establishments: EstablishmentData[];
 };
 
 export const ManageEstablishmentsTab = ({

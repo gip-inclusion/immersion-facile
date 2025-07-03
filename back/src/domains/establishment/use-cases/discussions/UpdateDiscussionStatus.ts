@@ -1,10 +1,10 @@
 import {
+  type ConnectedUser,
   type DiscussionDto,
   discussionIdSchema,
   type Email,
   type EstablishmentRole,
   errors,
-  type InclusionConnectedUser,
   rejectDiscussionEmailParams,
   type UpdateDiscussionStatusParams,
   type UserId,
@@ -24,7 +24,7 @@ export type UpdateDiscussionStatus = ReturnType<
 export const makeUpdateDiscussionStatus = createTransactionalUseCase<
   UpdateDiscussionStatusParams,
   void,
-  InclusionConnectedUser,
+  ConnectedUser,
   {
     timeGateway: TimeGateway;
     createNewEvent: CreateNewEvent;
@@ -153,7 +153,7 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
           payload: {
             discussion: updatedDiscussion,
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId,
             },
             ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),

@@ -17,9 +17,9 @@ import { PgGroupRepository } from "../../../establishment/adapters/PgGroupReposi
 import { PgSearchMadeRepository } from "../../../establishment/adapters/PgSearchMadeRepository";
 import { PgEstablishmentMarketingRepository } from "../../../marketing/adapters/PgEstablishmentMarketingRepository";
 import { PgApiConsumerRepository } from "../../api-consumer/adapters/PgApiConsumerRepository";
+import { PgOngoingOAuthRepository } from "../../authentication/connected-user/adapters/PgOngoingOAuthRepository";
+import { PgUserRepository } from "../../authentication/connected-user/adapters/PgUserRepository";
 import { PgConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/adapters/PgConventionFranceTravailAdvisorRepository";
-import { PgOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/PgOngoingOAuthRepository";
-import { PgUserRepository } from "../../authentication/inclusion-connect/adapters/PgUserRepository";
 import { PgOutboxQueries } from "../../events/adapters/PgOutboxQueries";
 import { PgOutboxRepository } from "../../events/adapters/PgOutboxRepository";
 import { PgFeatureFlagRepository } from "../../feature-flags/adapters/PgFeatureFlagRepository";

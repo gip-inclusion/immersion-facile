@@ -4,7 +4,7 @@ import {
 } from "shared";
 import type { ValueSerializer } from "type-route";
 
-export const icUserEstablishmentDashboardTabSerializer: ValueSerializer<EstablishmentDashboardTab> =
+export const userEstablishmentDashboardTabSerializer: ValueSerializer<EstablishmentDashboardTab> =
   {
     parse: (raw) => raw as EstablishmentDashboardTab,
     stringify: (tab) => tab,

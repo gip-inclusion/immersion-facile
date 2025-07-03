@@ -43,10 +43,10 @@ import type { ConventionImmersionForExternalsRoute } from "src/app/pages/convent
 import { ShowErrorOrRedirectToRenewMagicLink } from "src/app/pages/convention/ShowErrorOrRedirectToRenewMagicLink";
 import { routes, useRoute } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { conventionSelectors } from "src/core-logic/domain/convention/convention.selectors";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { match, P } from "ts-pattern";
 import type { Route } from "type-route";
 
@@ -88,13 +88,11 @@ export const ConventionFormWrapper = ({
   const conventionActionEditFeedback = useFeedbackTopic(
     "convention-action-edit",
   );
-  const inclusionConnectedRoles = useAppSelector(
-    inclusionConnectedSelectors.userRolesForFetchedConvention,
+  const userRolesForFetchedConvention = useAppSelector(
+    connectedUserSelectors.userRolesForFetchedConvention,
   );
   const conventionIsLoading = useAppSelector(conventionSelectors.isLoading);
-  const currentUserIsLoading = useAppSelector(
-    inclusionConnectedSelectors.isLoading,
-  );
+  const currentUserIsLoading = useAppSelector(connectedUserSelectors.isLoading);
   const isLoading = conventionIsLoading || currentUserIsLoading;
   const fetchConventionError =
     conventionFormFeedback?.level === "error" &&
@@ -118,7 +116,7 @@ export const ConventionFormWrapper = ({
         errors.convention.conventionGotUpdatedWhileUpdating().message);
 
   const [userRolesOnConvention, setUserRolesOnConvention] = useState<Role[]>(
-    inclusionConnectedRoles,
+    userRolesForFetchedConvention,
   );
 
   useScrollToTop(formSuccessfullySubmitted || hasConventionUpdateConflict);
@@ -155,7 +153,7 @@ export const ConventionFormWrapper = ({
 
       const roles: Role[] = roleFromJwt
         ? [roleFromJwt]
-        : inclusionConnectedRoles;
+        : userRolesForFetchedConvention;
       setUserRolesOnConvention(roles);
       const signatoryRole = roles.find((role) => isSignatory(role));
 
@@ -165,7 +163,7 @@ export const ConventionFormWrapper = ({
         );
       }
     }
-  }, [dispatch, route.params.jwt, inclusionConnectedRoles]);
+  }, [dispatch, route.params.jwt, userRolesForFetchedConvention]);
 
   useEffect(() => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());

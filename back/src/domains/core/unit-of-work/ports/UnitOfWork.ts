@@ -16,9 +16,9 @@ import type { GroupRepository } from "../../../establishment/ports/GroupReposito
 import type { SearchMadeRepository } from "../../../establishment/ports/SearchMadeRepository";
 import type { EstablishmentMarketingRepository } from "../../../marketing/ports/EstablishmentMarketingRepository";
 import type { ApiConsumerRepository } from "../../api-consumer/ports/ApiConsumerRepository";
+import type { OngoingOAuthRepository } from "../../authentication/connected-user/port/OngoingOAuthRepositiory";
+import type { UserRepository } from "../../authentication/connected-user/port/UserRepository";
 import type { ConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/port/ConventionFranceTravailAdvisorRepository";
-import type { OngoingOAuthRepository } from "../../authentication/inclusion-connect/port/OngoingOAuthRepositiory";
-import type { UserRepository } from "../../authentication/inclusion-connect/port/UserRepository";
 import type { OutboxQueries } from "../../events/ports/OutboxQueries";
 import type { OutboxRepository } from "../../events/ports/OutboxRepository";
 import type { FeatureFlagRepository } from "../../feature-flags/ports/FeatureFlagRepository";

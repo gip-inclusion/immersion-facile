@@ -1,11 +1,11 @@
 import {
   addressDtoToString,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
   type FormEstablishmentDto,
   formEstablishmentSchema,
-  InclusionConnectedUserBuilder,
   type SiretDto,
   type User,
   UserBuilder,
@@ -24,10 +24,10 @@ import {
 import { RetrieveFormEstablishmentFromAggregates } from "./RetrieveFormEstablishmentFromAggregates";
 
 describe("Retrieve Form Establishment From Aggregate when payload is valid", () => {
-  const adminBuilder = new InclusionConnectedUserBuilder()
+  const adminBuilder = new ConnectedUserBuilder()
     .withIsAdmin(true)
     .withId("backoffice-admin");
-  const icAdmin = adminBuilder.build();
+  const connectedAdmin = adminBuilder.build();
   const adminUser = adminBuilder.buildUser();
 
   const establishmentAdmin = new UserBuilder()
@@ -106,7 +106,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
       await expectPromiseToFailWithError(
         useCase.execute(siret, {
-          userId: icAdmin.id,
+          userId: connectedAdmin.id,
         }),
         errors.establishment.notFound({ siret }),
       );
@@ -115,13 +115,12 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
   describe("Right paths", () => {
     it("returns a reconstructed schema validated form if establishment with siret exists & IC jwt payload with backoffice rights even if admin don't have firstname or lastname", async () => {
-      const adminWithoutFirstNameAndLastName =
-        new InclusionConnectedUserBuilder()
-          .withId("admin-no-name-id")
-          .withEmail("admin@mail.com")
-          .withLastName("")
-          .withFirstName("")
-          .buildUser();
+      const adminWithoutFirstNameAndLastName = new ConnectedUserBuilder()
+        .withId("admin-no-name-id")
+        .withEmail("admin@mail.com")
+        .withLastName("")
+        .withFirstName("")
+        .buildUser();
 
       const establishmentAggregateWithAdminUserWithoutNames =
         new EstablishmentAggregateBuilder(establishmentAggregate)
@@ -144,7 +143,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
       ];
 
       uow.userRepository.users = [
-        icAdmin,
+        connectedAdmin,
         adminWithoutFirstNameAndLastName,
         establishmentContact,
       ];
@@ -168,7 +167,7 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
 
     it("returns a reconstructed form if establishment with siret exists & IC jwt payload with backoffice rights", async () => {
       const establishmentForm = await useCase.execute(siret, {
-        userId: icAdmin.id,
+        userId: connectedAdmin.id,
       });
 
       expectToEqual(

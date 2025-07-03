@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
   getFormattedFirstnameAndLastname,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import { AppConfigBuilder } from "../../../../utils/AppConfigBuilder";
@@ -54,11 +54,11 @@ describe("NotifyAllActorsThatConventionTransferred", () => {
       role: "establishment-representative",
     })
     .build();
-  const connectedUserPayload: InclusionConnectDomainJwtPayload = {
+  const connectedUserPayload: ConnectedUserDomainJwtPayload = {
     userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
   };
 
-  const connectedUser = new InclusionConnectedUserBuilder()
+  const connectedUser = new ConnectedUserBuilder()
     .withId(connectedUserPayload.userId)
     .build();
   const config: AppConfig = new AppConfigBuilder()

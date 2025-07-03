@@ -23,19 +23,19 @@ import { MetabaseFullScreenButton } from "src/app/components/MetabaseFullScreenB
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSelectors } from "src/core-logic/domain/discussion/discussion.selectors";
 import {
   discussionSlice,
   type FlatGetPaginatedDiscussionsParamsWithStatusesAsArray,
   initialDiscussionsWithPagination,
 } from "src/core-logic/domain/discussion/discussion.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { match, P } from "ts-pattern";
 
 export const DiscussionList = () => {
   const dispatch = useDispatch();
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const token = useAppSelector(authSelectors.inclusionConnectToken);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const {
     data: discussions,
     pagination,
@@ -103,17 +103,17 @@ export const DiscussionList = () => {
     );
   }, [tempFilters, filters]);
   useEffect(() => {
-    if (token) {
+    if (connectedUserJwt) {
       dispatch(
         discussionSlice.actions.fetchDiscussionListRequested({
-          jwt: token,
+          jwt: connectedUserJwt,
           filters: initialDiscussionsWithPagination.filters,
           feedbackTopic: "establishment-dashboard-discussion-list",
         }),
       );
     }
-  }, [token, dispatch]);
-  if (!token) {
+  }, [connectedUserJwt, dispatch]);
+  if (!connectedUserJwt) {
     return;
   }
   const getTableHeaders = () => {
@@ -251,7 +251,7 @@ export const DiscussionList = () => {
                 onSubmit: () => {
                   dispatch(
                     discussionSlice.actions.fetchDiscussionListRequested({
-                      jwt: token,
+                      jwt: connectedUserJwt,
                       filters: {
                         ...filters,
                         ...tempFilters,
@@ -269,7 +269,7 @@ export const DiscussionList = () => {
                 onSubmit: (query: string) => {
                   dispatch(
                     discussionSlice.actions.fetchDiscussionListRequested({
-                      jwt: token,
+                      jwt: connectedUserJwt,
                       filters: {
                         ...filters,
                         search: query,
@@ -290,7 +290,7 @@ export const DiscussionList = () => {
                     event.preventDefault();
                     dispatch(
                       discussionSlice.actions.fetchDiscussionListRequested({
-                        jwt: token,
+                        jwt: connectedUserJwt,
                         filters: { ...filters, page: pageNumber },
                         feedbackTopic:
                           "establishment-dashboard-discussion-list",

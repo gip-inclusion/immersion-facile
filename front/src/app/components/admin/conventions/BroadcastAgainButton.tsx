@@ -29,7 +29,7 @@ export const BroadcastAgainButton = ({
   disabled?: boolean;
 }) => {
   const dispatch = useDispatch();
-  const jwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const jwt = useAppSelector(authSelectors.connectedUserJwt);
   const isLoadingApiConsumer = useAppSelector(apiConsumerSelectors.isLoading);
   const isBroadcasting = useAppSelector(
     conventionActionSelectors.isBroadcasting,

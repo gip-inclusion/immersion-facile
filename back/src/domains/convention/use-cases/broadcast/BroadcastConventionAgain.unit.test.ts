@@ -2,11 +2,11 @@ import { addMinutes, subHours } from "date-fns";
 import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
-  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -33,10 +33,8 @@ describe("BroadcastConventionAgain", () => {
     .withId("11111111-1111-4111-1111-111111111111")
     .withAgencyId(agency.id)
     .build();
-  const adminUser = new InclusionConnectedUserBuilder()
-    .withIsAdmin(true)
-    .build();
-  const userWithEnoughRights = new InclusionConnectedUserBuilder()
+  const adminUser = new ConnectedUserBuilder().withIsAdmin(true).build();
+  const userWithEnoughRights = new ConnectedUserBuilder()
     .withIsAdmin(false)
     .withAgencyRights([
       {
@@ -70,9 +68,7 @@ describe("BroadcastConventionAgain", () => {
 
   describe("Wrong paths", () => {
     it("throws Forbidden if user doesn't have enough rights on convention", async () => {
-      const user = new InclusionConnectedUserBuilder()
-        .withIsAdmin(false)
-        .build();
+      const user = new ConnectedUserBuilder().withIsAdmin(false).build();
       uow.userRepository.users = [user];
 
       await expectPromiseToFailWithError(
@@ -111,7 +107,7 @@ describe("BroadcastConventionAgain", () => {
               status: "never-published",
               payload: {
                 convention: convention,
-                triggeredBy: { kind: "inclusion-connected", userId: user.id },
+                triggeredBy: { kind: "connected-user", userId: user.id },
               },
             },
           ]);
@@ -147,7 +143,7 @@ describe("BroadcastConventionAgain", () => {
               status: "never-published",
               payload: {
                 convention,
-                triggeredBy: { kind: "inclusion-connected", userId: user.id },
+                triggeredBy: { kind: "connected-user", userId: user.id },
               },
             },
           ]);

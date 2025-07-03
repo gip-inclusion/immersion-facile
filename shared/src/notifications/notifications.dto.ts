@@ -1,10 +1,10 @@
 import type { AgencyId } from "../agency/agency.dto";
 import type { ConventionId } from "../convention/convention.dto";
 import type { TemplatedEmail } from "../email/email";
-import type { UserId } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
 import type { SiretDto } from "../siret/siret";
 import type { TemplatedSms } from "../sms/smsTemplateByName";
 import type { Flavor } from "../typeFlavors";
+import type { UserId } from "../user/user.dto";
 import type { DateString, DateTimeIsoString } from "../utils/date";
 
 export type NotificationId = Flavor<string, "NotificationId">;

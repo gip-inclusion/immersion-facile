@@ -1,15 +1,15 @@
 import { values } from "ramda";
-import { from, type Observable, of, Subject, throwError } from "rxjs";
+import { delay, from, type Observable, of, Subject, throwError } from "rxjs";
 import {
   type AgencyDto,
   AgencyDtoBuilder,
   type AgencyId,
   type AgencyOption,
   type AgencyPublicDisplayDto,
+  type ConnectedUser,
   type ConnectedUserJwt,
   type CreateAgencyDto,
   errors,
-  type InclusionConnectedUser,
   type ListAgencyOptionsRequestDto,
   toAgencyDtoForAgencyUsersAndAdmins,
   toAgencyPublicDisplayDto,
@@ -19,6 +19,8 @@ import {
   type WithAgencyIdAndUserId,
 } from "shared";
 import type { AgencyGateway } from "src/core-logic/ports/AgencyGateway";
+
+export const nonExisitingAgencyId: AgencyId = "not-found-agency-id";
 
 const MISSION_LOCAL_AGENCY_ACTIVE = new AgencyDtoBuilder()
   .withId("test-agency-1-front")
@@ -73,7 +75,7 @@ export const AGENCY_NEEDING_REVIEW_2 = new AgencyDtoBuilder()
   .withStatus("needsReview")
   .build();
 
-const simulatedUsers: InclusionConnectedUser[] = [
+const simulatedUsers: ConnectedUser[] = [
   {
     id: "fake-user-id-1",
     email: "jbon8745@wanadoo.fr",
@@ -136,6 +138,8 @@ const simulatedUsers: InclusionConnectedUser[] = [
 ];
 
 export class SimulatedAgencyGateway implements AgencyGateway {
+  constructor(private simulatedLatency = 0) {}
+
   addAgency$(_agency: CreateAgencyDto): Observable<void> {
     return of(undefined);
   }
@@ -162,7 +166,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
   public createUserForAgency$(
     { agencyId }: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return agencyId === "non-existing-agency-id"
       ? throwError(() => new Error(`Agency Id ${agencyId} not found`))
       : of({
@@ -206,7 +210,7 @@ export class SimulatedAgencyGateway implements AgencyGateway {
   getAgencyUsers$(
     agencyId: AgencyId,
     _token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser[]> {
+  ): Observable<ConnectedUser[]> {
     return of(
       simulatedUsers.filter((user) =>
         user.agencyRights.some(
@@ -277,5 +281,19 @@ export class SimulatedAgencyGateway implements AgencyGateway {
     agencyId: AgencyId,
   ): Promise<void> {
     this.#agencies[agencyId].status = "active";
+  }
+
+  public registerAgenciesToCurrentUser$(
+    agencyIds: AgencyId[],
+    _token: string,
+  ): Observable<void> {
+    const agencyIdInError = agencyIds.findIndex(
+      (id) => id === nonExisitingAgencyId,
+    );
+    return agencyIdInError > 0
+      ? throwError(
+          new Error(`Agency Id ${agencyIds[agencyIdInError]} not found`),
+        )
+      : of(undefined).pipe(delay(this.simulatedLatency));
   }
 }

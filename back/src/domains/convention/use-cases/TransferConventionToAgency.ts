@@ -74,7 +74,7 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
     const triggeredBy: TriggeredBy =
       "userId" in jwtPayload
         ? {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: jwtPayload.userId,
           }
         : {

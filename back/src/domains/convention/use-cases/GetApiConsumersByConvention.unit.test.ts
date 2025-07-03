@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
   type AgencyKind,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { ApiConsumerBuilder } from "../../core/api-consumer/adapters/InMemoryApiConsumerRepository";
@@ -21,13 +21,13 @@ import {
 } from "./GetApiConsumersByConvention";
 
 describe("GetApiConsumersByConvention", () => {
-  const userBuilder = new InclusionConnectedUserBuilder();
+  const userBuilder = new ConnectedUserBuilder();
   const user = userBuilder.buildUser();
-  const icUser = userBuilder.build();
+  const connectedUser = userBuilder.build();
 
-  const adminBuilder = new InclusionConnectedUserBuilder().withIsAdmin(true);
+  const adminBuilder = new ConnectedUserBuilder().withIsAdmin(true);
   const admin = adminBuilder.buildUser();
-  const icAdmin = adminBuilder.build();
+  const connectedAdmin = adminBuilder.build();
 
   const uuidGenerator = new TestUuidGenerator();
 
@@ -52,7 +52,7 @@ describe("GetApiConsumersByConvention", () => {
     await expectPromiseToFailWithError(
       getApiConsumersByConvention.execute(
         { conventionId: fakeConventionId },
-        icUser,
+        connectedUser,
       ),
       errors.convention.notFound({ conventionId: fakeConventionId }),
     );
@@ -69,7 +69,7 @@ describe("GetApiConsumersByConvention", () => {
     await expectPromiseToFailWithError(
       getApiConsumersByConvention.execute(
         { conventionId: conventionOfAnotherAgency.id },
-        icUser,
+        connectedUser,
       ),
       errors.user.notFound({ userId: user.id }),
     );
@@ -82,7 +82,7 @@ describe("GetApiConsumersByConvention", () => {
     await expectPromiseToFailWithError(
       getApiConsumersByConvention.execute(
         { conventionId: conventionWithFtAgency.id },
-        icUser,
+        connectedUser,
       ),
       errors.agency.notFound({ agencyId: ftAgency.id }),
     );
@@ -96,7 +96,7 @@ describe("GetApiConsumersByConvention", () => {
     expectToEqual(
       await getApiConsumersByConvention.execute(
         { conventionId: conventionWithFtAgency.id },
-        icUser,
+        connectedUser,
       ),
       [],
     );
@@ -126,7 +126,7 @@ describe("GetApiConsumersByConvention", () => {
       expectToEqual(
         await getApiConsumersByConvention.execute(
           { conventionId: conventionWithAgencyOfKind.id },
-          icUser,
+          connectedUser,
         ),
         ["France Travail"],
       );
@@ -175,7 +175,7 @@ describe("GetApiConsumersByConvention", () => {
     expectToEqual(
       await getApiConsumersByConvention.execute(
         { conventionId: conventionMilo.id },
-        icUser,
+        connectedUser,
       ),
       [apiConsumer.name],
     );
@@ -207,7 +207,7 @@ describe("GetApiConsumersByConvention", () => {
     expectToEqual(
       await getApiConsumersByConvention.execute(
         { conventionId: conventionWithFtAgency.id },
-        icAdmin,
+        connectedAdmin,
       ),
       [apiConsumer.name, "France Travail"],
     );

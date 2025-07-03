@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type ConventionId,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
-  InclusionConnectedUserBuilder,
   validSignatoryRoles,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -39,11 +39,11 @@ describe("UpdateConventionStatus", () => {
         "validator",
         "counsellor",
       ],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-        "icUserWithRoleValidator",
+      allowedConnectedUsers: [
+        "userWithRoleEstablishmentRepresentative",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
+        "userWithRoleValidator",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -63,12 +63,12 @@ describe("UpdateConventionStatus", () => {
         "validator",
         "counsellor",
       ],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleValidator",
+      allowedConnectedUsers: [
+        "userWithRoleEstablishmentRepresentative",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
+        "userWithRoleCounsellor",
+        "userWithRoleValidator",
       ],
       allowedInitialStatuses: [
         "READY_TO_SIGN",
@@ -87,9 +87,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionPartiallySigned",
       allowedMagicLinkRoles: validSignatoryRoles,
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-      ],
+      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
     rejectStatusTransitionTests({
@@ -98,9 +96,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: conventionWithAgencyOneStepValidationId,
       },
       allowedMagicLinkRoles: validSignatoryRoles,
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-      ],
+      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
       allowedInitialStatuses: ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
     });
   });
@@ -113,9 +109,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionFullySigned",
       allowedMagicLinkRoles: validSignatoryRoles,
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-      ],
+      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
     rejectStatusTransitionTests({
@@ -124,9 +118,7 @@ describe("UpdateConventionStatus", () => {
         conventionId: conventionWithAgencyOneStepValidationId,
       },
       allowedMagicLinkRoles: validSignatoryRoles,
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleEstablishmentRepresentative",
-      ],
+      allowedConnectedUsers: ["userWithRoleEstablishmentRepresentative"],
       allowedInitialStatuses: ["PARTIALLY_SIGNED"],
     });
   });
@@ -151,7 +143,7 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionAcceptedByCounsellor",
       allowedMagicLinkRoles: ["counsellor"],
-      allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
+      allowedConnectedUsers: ["userWithRoleCounsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
     });
     rejectStatusTransitionTests({
@@ -162,7 +154,7 @@ describe("UpdateConventionStatus", () => {
         lastname: "Counsellor Lastname",
       },
       allowedMagicLinkRoles: ["counsellor"],
-      allowedInclusionConnectedUsers: ["icUserWithRoleCounsellor"],
+      allowedConnectedUsers: ["userWithRoleCounsellor"],
       allowedInitialStatuses: ["IN_REVIEW"],
     });
   });
@@ -178,9 +170,9 @@ describe("UpdateConventionStatus", () => {
       },
       expectedDomainTopic: "ConventionAcceptedByValidator",
       allowedMagicLinkRoles: ["validator"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
       updatedFields: {
@@ -202,9 +194,9 @@ describe("UpdateConventionStatus", () => {
         lastname: "Validator Lastname",
       },
       allowedMagicLinkRoles: ["validator"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: ["IN_REVIEW", "ACCEPTED_BY_COUNSELLOR"],
     });
@@ -219,9 +211,9 @@ describe("UpdateConventionStatus", () => {
         },
         expectedDomainTopic: "ConventionAcceptedByValidator",
         allowedMagicLinkRoles: ["validator"],
-        allowedInclusionConnectedUsers: [
-          "icUserWithRoleValidator",
-          "icUserWithRoleBackofficeAdminAndValidator",
+        allowedConnectedUsers: [
+          "userWithRoleValidator",
+          "userWithRoleBackofficeAdminAndValidator",
         ],
         allowedInitialStatuses: ["ACCEPTED_BY_COUNSELLOR"],
         updatedFields: {
@@ -239,7 +231,7 @@ describe("UpdateConventionStatus", () => {
       it("keeps date approval when going to status ACCEPTED_BY_VALIDATOR", async () => {
         const { uow, updateConventionStatusUseCase } =
           prepareUseCaseForStandAloneTests();
-        const user = new InclusionConnectedUserBuilder()
+        const user = new ConnectedUserBuilder()
           .withEmail("validator@mail.com")
           .buildUser();
         const agency = toAgencyWithRights(new AgencyDtoBuilder().build(), {
@@ -293,10 +285,10 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
       allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -314,11 +306,11 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
       allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleCounsellor",
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -337,11 +329,11 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: "ConventionRejected",
       updatedFields: { statusJustification: "my rejection justification" },
       allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleCounsellor",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -357,11 +349,11 @@ describe("UpdateConventionStatus", () => {
         conventionId: conventionWithAgencyOneStepValidationId,
       },
       allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleCounsellor",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",
@@ -382,11 +374,11 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: "ConventionCancelled",
       updatedFields: { statusJustification: "Cancelled justification" },
       allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-        "icUserWithRoleCounsellor",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
+        "userWithRoleCounsellor",
       ],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
@@ -397,11 +389,11 @@ describe("UpdateConventionStatus", () => {
         conventionId: conventionWithAgencyTwoStepsValidationId,
       },
       allowedMagicLinkRoles: ["validator", "back-office", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
-        "icUserWithRoleCounsellor",
+      allowedConnectedUsers: [
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
+        "userWithRoleCounsellor",
       ],
       allowedInitialStatuses: ["ACCEPTED_BY_VALIDATOR"],
     });
@@ -448,11 +440,11 @@ describe("UpdateConventionStatus", () => {
       expectedDomainTopic: "ConventionDeprecated",
       updatedFields: { statusJustification: "my deprecation justification" },
       allowedMagicLinkRoles: ["back-office", "validator", "counsellor"],
-      allowedInclusionConnectedUsers: [
-        "icUserWithRoleCounsellor",
-        "icUserWithRoleValidator",
-        "icUserWithRoleBackofficeAdmin",
-        "icUserWithRoleBackofficeAdminAndValidator",
+      allowedConnectedUsers: [
+        "userWithRoleCounsellor",
+        "userWithRoleValidator",
+        "userWithRoleBackofficeAdmin",
+        "userWithRoleBackofficeAdminAndValidator",
       ],
       allowedInitialStatuses: [
         "PARTIALLY_SIGNED",

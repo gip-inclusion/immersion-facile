@@ -44,17 +44,17 @@ import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import {
   canAssessmentBeFilled,
   isConventionEndingInOneDayOrMore,
 } from "src/core-logic/domain/convention/convention.utils";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 export type JwtKindProps =
   | {
       jwt: ConnectedUserJwt;
-      kind: "backoffice";
+      kind: "connected user backoffice";
     }
   | {
       jwt: ConventionJwt;
@@ -62,7 +62,7 @@ export type JwtKindProps =
     }
   | {
       jwt: ConnectedUserJwt;
-      kind: "inclusionConnect";
+      kind: "connected user";
     };
 
 type ConventionManageActionsProps = {
@@ -77,7 +77,7 @@ export const ConventionManageActions = ({
   jwtParams,
 }: ConventionManageActionsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const assessment = useAppSelector(assessmentSelectors.currentAssessment);
   const renewFeedback = useFeedbackTopic("convention-action-renew");
   const conventionActionsFeedback = useFeedbackTopics([
@@ -211,7 +211,7 @@ export const ConventionManageActions = ({
   const shouldShowSignatureAction =
     roles.includes("establishment-representative") &&
     !convention.signatories.establishmentRepresentative.signedAt &&
-    jwtParams.kind !== "backoffice" &&
+    jwtParams.kind !== "connected user backoffice" &&
     allowedToSignStatuses.includes(convention.status);
 
   const shouldShowConventionDocumentButton =
@@ -240,7 +240,7 @@ export const ConventionManageActions = ({
 
   const shouldShowTransferButton = () => {
     if (
-      jwtParams.kind === "backoffice" &&
+      jwtParams.kind === "connected user backoffice" &&
       allowedToTransferStatuses.includes(convention.status)
     )
       return true;

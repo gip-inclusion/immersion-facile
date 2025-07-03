@@ -2,9 +2,9 @@ import {
   AgencyDtoBuilder,
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type EmailNotification,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import { expectNotifyConventionRejected } from "../../../core/notifications/adapters/InMemoryNotificationRepository";
@@ -58,15 +58,15 @@ describe("NotifyBeneficiaryAndEnterpriseThatApplicationIsRejected", () => {
     .withEstablishmentTutorEmail("establishment-representative@gmail.com")
     .build();
 
-  const counsellor1 = new InclusionConnectedUserBuilder()
+  const counsellor1 = new ConnectedUserBuilder()
     .withId("counsellor1")
     .withEmail("counsellor1@email.fr")
     .buildUser();
-  const counsellor2 = new InclusionConnectedUserBuilder()
+  const counsellor2 = new ConnectedUserBuilder()
     .withId("counsellor2")
     .withEmail("counsellor2@email.fr")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator1")
     .withEmail("validator1@email.fr")
     .buildUser();

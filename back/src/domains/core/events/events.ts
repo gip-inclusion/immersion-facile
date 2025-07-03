@@ -22,10 +22,10 @@ import {
   type WithSiretDto,
 } from "shared";
 import { z } from "zod";
+import type { UserAuthenticatedPayload } from "../../connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type { RenewMagicLinkPayload } from "../../convention/use-cases/notifications/DeliverRenewedMagicLink";
 import type { WithEstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { WarnSenderThatMessageCouldNotBeDeliveredParams } from "../../establishment/use-cases/discussions/WarnSenderThatMessageCouldNotBeDelivered";
-import type { UserAuthenticatedPayload } from "../../inclusion-connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
 import type { WithNotificationIdAndKind } from "../notifications/helpers/Notification";
 import type {
   ConventionReminderPayload,
@@ -73,14 +73,14 @@ export type NotificationBatchAddedEvent = GenericEvent<
 >;
 
 export type TriggeredBy =
-  | { kind: "inclusion-connected"; userId: UserId }
+  | { kind: "connected-user"; userId: UserId }
   | { kind: "convention-magic-link"; role: Role }
   | { kind: "crawler" };
 
 export const triggeredBySchema: z.Schema<TriggeredBy> = z.discriminatedUnion(
   "kind",
   [
-    z.object({ kind: z.literal("inclusion-connected"), userId: userIdSchema }),
+    z.object({ kind: z.literal("connected-user"), userId: userIdSchema }),
     z.object({ kind: z.literal("convention-magic-link"), role: roleSchema }),
     z.object({ kind: z.literal("crawler") }),
   ],
@@ -143,12 +143,17 @@ export type DomainEvent =
   // PECONNECT related
   | GenericEvent<"FederatedIdentityBoundToConvention", WithConventionDto & WithTriggeredBy>
   | GenericEvent<"FederatedIdentityNotBoundToConvention", WithConventionDto & WithTriggeredBy>
-  // USER CONNECTED related (only inclusion connect for now).
+  // USER CONNECTED related.
   // We don't put full OAuth in payload to avoid private data in logs etc...
   | GenericEvent<"UserAuthenticatedSuccessfully", UserAuthenticatedPayload & WithTriggeredBy>
-  | GenericEvent<"AgencyRegisteredToInclusionConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy>
-  | GenericEvent<"IcUserAgencyRightChanged", WithAgencyIdAndUserId & WithTriggeredBy>
-  | GenericEvent<"IcUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy>
+
+
+  // Est-ce que les deux events au final c'est pas la même chose ???????!!!!!!! De quoi péter un gros boulard!
+  | GenericEvent<"AgencyRegisteredToConnectedUser", { userId: UserId; agencyIds: AgencyId[] } & WithTriggeredBy> // Old name AgencyRegisteredToInclusionConnectedUser
+  | GenericEvent<"ConnectedUserAgencyRightChanged", WithAgencyIdAndUserId & WithTriggeredBy> // Old name IcUserAgencyRightChanged
+
+
+  | GenericEvent<"ConnectedUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy> // Old name IcUserAgencyRightRejected
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>
   // ERRORED CONVENTION RELATED

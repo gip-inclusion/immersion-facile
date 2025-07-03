@@ -2,9 +2,9 @@ import * as dotenv from "dotenv";
 import { trim } from "ramda";
 import {
   type AbsoluteUrl,
+  authRoutes,
   environments,
   filterNotFalsy,
-  inclusionConnectImmersionRoutes,
   makeGetBooleanVariable,
   makeThrowIfNotAbsoluteUrl,
   makeThrowIfNotDefinedOrDefault,
@@ -283,7 +283,7 @@ export class AppConfig {
         this.proConnectGateway !== "HTTPS" ? "fake secret" : undefined,
       ),
       immersionRedirectUri: {
-        afterLogin: `${this.immersionFacileBaseUrl}/api${inclusionConnectImmersionRoutes.afterLoginRedirection.url}`,
+        afterLogin: `${this.immersionFacileBaseUrl}/api${authRoutes.afterOAuthSuccessRedirection.url}`,
         afterLogout: this.immersionFacileBaseUrl,
       },
       providerBaseUri: this.#throwIfNotAbsoluteUrl(

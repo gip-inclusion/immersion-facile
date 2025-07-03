@@ -7,19 +7,19 @@ import { useAppSelector } from "./reduxHooks";
 
 export const useDiscussion = (
   discussionId: DiscussionId,
-  inclusionConnectedJwt?: ConnectedUserJwt,
+  connectedUserJwt?: ConnectedUserJwt,
 ) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    if (inclusionConnectedJwt)
+    if (connectedUserJwt)
       dispatch(
         discussionSlice.actions.fetchDiscussionRequested({
           discussionId,
-          jwt: inclusionConnectedJwt,
+          jwt: connectedUserJwt,
           feedbackTopic: "dashboard-discussion",
         }),
       );
-  }, [dispatch, discussionId, inclusionConnectedJwt]);
+  }, [dispatch, discussionId, connectedUserJwt]);
 
   const discussion = useAppSelector(discussionSelectors.discussion);
   const fetchError = useAppSelector(discussionSelectors.fetchError);

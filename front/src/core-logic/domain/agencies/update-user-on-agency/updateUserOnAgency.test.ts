@@ -1,14 +1,14 @@
 import {
   AgencyDtoBuilder,
   type AgencyRight,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   expectToEqual,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserParamsForAgency,
 } from "shared";
 import { adminPreloadedState } from "src/core-logic/domain/admin/adminPreloadedState";
-import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { updateUserOnAgencySelectors } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.selectors";
@@ -31,7 +31,7 @@ describe("UpdateUserOnAgency slice", () => {
     roles: ["validator"],
     isNotifiedByEmail: false,
   };
-  const user: InclusionConnectedUser = new InclusionConnectedUserBuilder()
+  const user: ConnectedUser = new ConnectedUserBuilder()
     .withId("user-id")
     .withIsAdmin(false)
     .withAgencyRights([agencyRight])
@@ -45,7 +45,7 @@ describe("UpdateUserOnAgency slice", () => {
     isNotifiedByEmail: true,
   };
 
-  const normalizedUser: NormalizedInclusionConnectedUser = {
+  const normalizedUser: ConnectedUserWithNormalizedAgencyRights = {
     ...user,
     agencyRights: { [agency.id]: agencyRight },
   };

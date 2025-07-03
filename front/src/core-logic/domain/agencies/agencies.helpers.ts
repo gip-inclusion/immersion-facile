@@ -1,13 +1,9 @@
-import {
-  errors,
-  type InclusionConnectedUser,
-  type UserParamsForAgency,
-} from "shared";
+import { type ConnectedUser, errors, type UserParamsForAgency } from "shared";
 
 export const updateUserAgencyRights = (
-  user: InclusionConnectedUser,
+  user: ConnectedUser,
   requestedUpdate: UserParamsForAgency,
-): InclusionConnectedUser => {
+): ConnectedUser => {
   const remainingAgencyRights = user.agencyRights.filter(
     (agencyRight) => agencyRight.agency.id !== requestedUpdate.agencyId,
   );

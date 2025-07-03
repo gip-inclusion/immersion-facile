@@ -20,10 +20,10 @@ import {
   makeConsumerMiddleware,
   makeMagicLinkAuthMiddleware,
 } from "./authMiddleware";
+import { makeConnectedUserAuthMiddleware } from "./connectedUserAuthMiddleware";
 import { createEventCrawler } from "./createEventCrawler";
 import { createGateways, createGetPgPoolFn } from "./createGateways";
 import { createUseCases } from "./createUseCases";
-import { makeInclusionConnectAuthMiddleware } from "./inclusionConnectAuthMiddleware";
 
 const uuidGenerator = new UuidV4Generator();
 
@@ -108,7 +108,7 @@ export const createAppDependencies = async (config: AppConfig) => {
       gateways.timeGateway,
       config,
     ),
-    inclusionConnectAuthMiddleware: await makeInclusionConnectAuthMiddleware(
+    connectedUserAuthMiddleware: await makeConnectedUserAuthMiddleware(
       config.jwtPublicKey,
       uowPerformer,
       gateways.dashboardGateway,

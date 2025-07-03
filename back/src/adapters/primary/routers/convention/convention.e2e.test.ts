@@ -4,6 +4,8 @@ import {
   AgencyDtoBuilder,
   type AuthenticatedConventionRoutes,
   authenticatedConventionRoutes,
+  ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
   type ConventionDto,
   ConventionDtoBuilder,
   type ConventionId,
@@ -19,8 +21,6 @@ import {
   expectToEqual,
   expiredMagicLinkErrorMessage,
   frontRoutes,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   type Role,
   type TechnicalRoutes,
   technicalRoutes,
@@ -72,14 +72,14 @@ describe("convention e2e", () => {
 
   const unknownId: ConventionId = "add5c20e-6dd2-45af-affe-927358005251";
 
-  const backofficeAdminUser = new InclusionConnectedUserBuilder()
+  const backofficeAdminUser = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true)
     .buildUser();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
     userId: backofficeAdminUser.id,
   };
@@ -281,7 +281,7 @@ describe("convention e2e", () => {
       ];
     });
 
-    it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
+    it.each(["ConventionJwt", "BackOfficeJwt", "ConnectedUserJwt"] as const)(
       "200 - succeeds with JWT %s",
       async (scenario) => {
         inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
@@ -304,10 +304,10 @@ describe("convention e2e", () => {
           .with("BackOfficeJwt", () =>
             generateConnectedUserJwt(backofficeAdminJwtPayload),
           )
-          .with("InclusionConnectJwt", () =>
+          .with("ConnectedUserJwt", () =>
             generateConnectedUserJwt({
               userId: validator.id,
-              version: currentJwtVersions.inclusion,
+              version: currentJwtVersions.connectedUser,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
           )
@@ -513,7 +513,7 @@ describe("convention e2e", () => {
       inMemoryUow.userRepository.users = [validator, backofficeAdminUser];
     });
 
-    it.each(["ConventionJwt", "BackOfficeJwt", "InclusionConnectJwt"] as const)(
+    it.each(["ConventionJwt", "BackOfficeJwt", "ConnectedUserJwt"] as const)(
       "200 - Succeeds with JWT %s",
       async (scenario) => {
         const jwt = match(scenario)
@@ -530,16 +530,16 @@ describe("convention e2e", () => {
           .with("BackOfficeJwt", () =>
             generateConnectedUserJwt({
               userId: validator.id,
-              version: currentJwtVersions.inclusion,
+              version: currentJwtVersions.connectedUser,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
               exp:
                 Math.round(gateways.timeGateway.now().getTime() / 1000) + 3600,
             }),
           )
-          .with("InclusionConnectJwt", () =>
+          .with("ConnectedUserJwt", () =>
             generateConnectedUserJwt({
               userId: validator.id,
-              version: currentJwtVersions.inclusion,
+              version: currentJwtVersions.connectedUser,
               iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
             }),
           )
@@ -933,7 +933,7 @@ describe("convention e2e", () => {
       gateways.timeGateway.setNextDate(new Date());
       const jwt = generateConnectedUserJwt({
         userId: validator.id,
-        version: currentJwtVersions.inclusion,
+        version: currentJwtVersions.connectedUser,
         iat: Math.round(gateways.timeGateway.now().getTime() / 1000),
       });
 

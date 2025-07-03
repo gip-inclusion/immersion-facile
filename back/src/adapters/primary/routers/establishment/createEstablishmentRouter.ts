@@ -27,7 +27,7 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   );
 
   establishmentSharedRouter.addFormEstablishment(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.insertEstablishmentAggregateFromForm.execute(
@@ -40,18 +40,18 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   );
 
   establishmentSharedRouter.getFormEstablishment(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.retrieveFormEstablishmentFromAggregates.execute(
           req.params.siret,
-          req.payloads?.inclusion,
+          req.payloads?.connectedUser,
         ),
       ),
   );
 
   establishmentSharedRouter.getEstablishmentNameAndAdmins(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         const currentUser = req.payloads?.currentUser;
@@ -64,18 +64,18 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   );
 
   establishmentSharedRouter.updateFormEstablishment(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateEstablishmentAggregateFromForm.execute(
           { formEstablishment: req.body },
-          req.payloads?.inclusion,
+          req.payloads?.connectedUser,
         ),
       ),
   );
 
   establishmentSharedRouter.deleteEstablishment(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(204), () =>
         deps.useCases.deleteEstablishment.execute(
@@ -83,6 +83,70 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
           req.payloads?.currentUser,
         ),
       ),
+  );
+
+  establishmentSharedRouter.getDiscussionByIdForEstablishment(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussionByIdForEstablishment.execute(
+          req.params.discussionId,
+          req.payloads?.connectedUser,
+        ),
+      ),
+  );
+
+  establishmentSharedRouter.getDiscussions(
+    deps.connectedUserAuthMiddleware,
+    (req, res) => {
+      const currentUser = req.payloads?.currentUser;
+      if (!currentUser) throw errors.user.unauthorized();
+      return sendHttpResponse(req, res, () =>
+        deps.useCases.getDiscussions.execute(req.query, currentUser),
+      );
+    },
+  );
+
+  establishmentSharedRouter.updateDiscussionStatus(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () => {
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
+        return deps.useCases.updateDiscussionStatus.execute(
+          {
+            discussionId: req.params.discussionId,
+            ...req.body,
+          },
+          req.payloads.currentUser,
+        );
+      }),
+  );
+
+  establishmentSharedRouter.replyToDiscussion(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
+        const discussionId = req.params.discussionId;
+        const result = await deps.useCases.addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                ...req.body,
+                discussionId,
+                attachments: [],
+                recipientRole: "potentialBeneficiary",
+              },
+            ],
+          },
+          req.payloads.currentUser,
+        );
+        if ("reason" in result) {
+          res.status(202);
+        }
+        return result;
+      }),
   );
 
   return establishmentRouter;

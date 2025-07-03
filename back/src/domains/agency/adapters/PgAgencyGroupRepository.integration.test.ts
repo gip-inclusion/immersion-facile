@@ -13,7 +13,7 @@ import {
 import { getTestPgPool } from "../../../config/pg/pgUtils";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { PgAgencyGroupRepository } from "./PgAgencyGroupRepository";
 import { PgAgencyRepository } from "./PgAgencyRepository";
 

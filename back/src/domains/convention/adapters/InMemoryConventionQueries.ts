@@ -19,7 +19,7 @@ import {
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../utils/logger";
 import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAgencyRepository";
-import type { InMemoryUserRepository } from "../../core/authentication/inclusion-connect/adapters/InMemoryUserRepository";
+import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import type {
   AssessmentEmailKind,

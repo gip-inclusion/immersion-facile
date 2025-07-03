@@ -2,6 +2,8 @@ import { addDays, subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
   type AgencyRole,
+  ConnectedUserBuilder,
+  type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   type EstablishmentRole,
   errors,
@@ -9,8 +11,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
   type Notification,
   type SignatoryRole,
   UserBuilder,
@@ -95,11 +95,11 @@ describe("SendAssessmentLink", () => {
     .withEmail("validator@mail.com")
     .build();
 
-  const connectedUser = new InclusionConnectedUserBuilder()
+  const connectedUser = new ConnectedUserBuilder()
     .withId("bcc5c20e-6dd2-45cf-affe-927358005262")
     .build();
 
-  const backofficeAdmin = new InclusionConnectedUserBuilder()
+  const backofficeAdmin = new ConnectedUserBuilder()
     .withId("bcc5c20e-6dd2-45cf-affe-927358005263")
     .withIsAdmin(true)
     .build();
@@ -276,7 +276,7 @@ describe("SendAssessmentLink", () => {
 
     describe("from connected user", () => {
       it("throws not found if connected user id does not exist", async () => {
-        const unexistingUserPayload: InclusionConnectDomainJwtPayload = {
+        const unexistingUserPayload: ConnectedUserDomainJwtPayload = {
           userId: "bcc5c20e-6dd2-45cf-affe-927358005267",
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
@@ -492,7 +492,7 @@ describe("SendAssessmentLink", () => {
               convention,
               transport: "sms",
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: connectedUser.id,
               },
             },

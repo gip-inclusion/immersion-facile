@@ -1,20 +1,20 @@
 import {
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   type PartialAgencyDto,
   type UpdateAgencyStatusParams,
   updateAgencyStatusParamsSchema,
 } from "shared";
+import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export class UpdateAgencyStatus extends TransactionalUseCase<
   UpdateAgencyStatusParams,
   void,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = updateAgencyStatusParamsSchema;
 
@@ -31,7 +31,7 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
   public async _execute(
     updateAgencyStatusParams: UpdateAgencyStatusParams,
     uow: UnitOfWork,
-    currentUser: InclusionConnectedUser,
+    currentUser: ConnectedUser,
   ): Promise<void> {
     throwIfNotAdmin(currentUser);
     const existingAgency = await uow.agencyRepository.getById(
@@ -65,7 +65,7 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
           payload: {
             agencyId: existingAgency.id,
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: currentUser.id,
             },
           },

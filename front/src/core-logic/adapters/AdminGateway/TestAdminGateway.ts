@@ -2,17 +2,17 @@ import { type Observable, Subject } from "rxjs";
 import type {
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUser,
   ConnectedUserJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetUsersFilters,
-  InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
-  UserInList,
   UserParamsForAgency,
+  UserWithNumberOfAgencies,
   WithAgencyIdAndUserId,
 } from "shared";
 import type { AdminGateway } from "src/core-logic/ports/AdminGateway";
@@ -24,9 +24,7 @@ export class TestAdminGateway implements AdminGateway {
 
   public establishmentBatchResponse$ = new Subject<EstablishmentBatchReport>();
 
-  public getAgencyUsersToReviewResponse$ = new Subject<
-    InclusionConnectedUser[]
-  >();
+  public getAgencyUsersToReviewResponse$ = new Subject<ConnectedUser[]>();
 
   public getAllApiConsumers$ = (_adminToken: ConnectedUserJwt) =>
     this.apiConsumers$;
@@ -48,11 +46,11 @@ export class TestAdminGateway implements AdminGateway {
 
   public removeUserFromAgencyResponse$ = new Subject<undefined>();
 
-  public createUserForAgencyResponse$ = new Subject<InclusionConnectedUser>();
+  public createUserForAgencyResponse$ = new Subject<ConnectedUser>();
 
-  public listUsersResponse$ = new Subject<UserInList[]>();
+  public listUsersResponse$ = new Subject<UserWithNumberOfAgencies[]>();
 
-  public getIcUserResponse$ = new Subject<InclusionConnectedUser>();
+  public getIcUserResponse$ = new Subject<ConnectedUser>();
 
   public updateFeatureFlags$ = (
     params: SetFeatureFlagParam,
@@ -72,7 +70,7 @@ export class TestAdminGateway implements AdminGateway {
   public createUserForAgency$(
     _params: UserParamsForAgency,
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return this.createUserForAgencyResponse$;
   }
 
@@ -80,9 +78,7 @@ export class TestAdminGateway implements AdminGateway {
     return this.dashboardUrl$;
   }
 
-  public getInclusionConnectedUsersToReview$(): Observable<
-    InclusionConnectedUser[]
-  > {
+  public getConnectedUsersToReview$(): Observable<ConnectedUser[]> {
     return this.getAgencyUsersToReviewResponse$;
   }
 
@@ -123,14 +119,14 @@ export class TestAdminGateway implements AdminGateway {
   public listUsers$(
     _params: GetUsersFilters,
     _token: string,
-  ): Observable<UserInList[]> {
+  ): Observable<UserWithNumberOfAgencies[]> {
     return this.listUsersResponse$;
   }
 
   public getIcUser$(
     _params: { userId: string },
     _token: string,
-  ): Observable<InclusionConnectedUser> {
+  ): Observable<ConnectedUser> {
     return this.getIcUserResponse$;
   }
 }

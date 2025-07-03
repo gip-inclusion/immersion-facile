@@ -12,7 +12,7 @@ import {
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { SuperTest, Test } from "supertest";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import {
   authorizedUnJeuneUneSolutionApiConsumer,
   outdatedApiConsumer,
@@ -131,7 +131,7 @@ describe("Unregister establishment lead", () => {
               role: "establishment-representative",
               email: convention.signatories.establishmentRepresentative.email,
               now: new Date(),
-              exp: Math.round((new Date().getTime() - 48 * 3600 * 1000) / 1000),
+              exp: Math.round((Date.now() - 48 * 3600 * 1000) / 1000),
             }),
           ),
         },

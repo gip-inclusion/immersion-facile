@@ -17,10 +17,10 @@ import { AgencyUsersTable } from "src/app/components/agency/AgencyUsersTable";
 import { UsersWithoutNameHint } from "src/app/components/agency/UsersWithoutNameHint";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import {
-  icUsersAdminSlice,
-  type NormalizedIcUserById,
-  type NormalizedInclusionConnectedUser,
-} from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+  type ConnectedUsersWithNormalizedAgencyRightsById,
+  type ConnectedUserWithNormalizedAgencyRights,
+  connectedUsersAdminSlice,
+} from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
@@ -30,7 +30,7 @@ import { Feedback } from "../feedback/Feedback";
 
 type AgencyUsersProperties = {
   agency: AgencyDto;
-  agencyUsersById: NormalizedIcUserById;
+  agencyUsersById: ConnectedUsersWithNormalizedAgencyRightsById;
   routeName: AgencyOverviewRouteName;
 };
 
@@ -73,7 +73,9 @@ export const AgencyUsers = ({
 
   const [mode, setMode] = useState<"add" | "update" | null>(null);
 
-  const onModifyClicked = (agencyUser: NormalizedInclusionConnectedUser) => {
+  const onModifyClicked = (
+    agencyUser: ConnectedUserWithNormalizedAgencyRights,
+  ) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     setMode("update");
     setSelectedUserData({
@@ -87,7 +89,9 @@ export const AgencyUsers = ({
     manageUserModal.open();
   };
 
-  const onDeleteClicked = (agencyUser: NormalizedInclusionConnectedUser) => {
+  const onDeleteClicked = (
+    agencyUser: ConnectedUserWithNormalizedAgencyRights,
+  ) => {
     dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
     setSelectedUserData({
       agencyId: agency.id,
@@ -113,7 +117,7 @@ export const AgencyUsers = ({
     isLocationAdmin
       ? dispatch(
           //TODO split icUsersAdminSlice to not have a big slice for all admin actions
-          icUsersAdminSlice.actions.updateUserOnAgencyRequested({
+          connectedUsersAdminSlice.actions.updateUserOnAgencyRequested({
             ...userParamsForAgency,
             feedbackTopic: "agency-user",
           }),
@@ -131,7 +135,7 @@ export const AgencyUsers = ({
   ) => {
     isLocationAdmin
       ? dispatch(
-          icUsersAdminSlice.actions.createUserOnAgencyRequested({
+          connectedUsersAdminSlice.actions.createUserOnAgencyRequested({
             ...userParamsForAgency,
             feedbackTopic: "agency-user",
           }),
@@ -149,7 +153,7 @@ export const AgencyUsers = ({
 
     isLocationAdmin
       ? dispatch(
-          icUsersAdminSlice.actions.removeUserFromAgencyRequested({
+          connectedUsersAdminSlice.actions.removeUserFromAgencyRequested({
             userId: selectedUserData.userId,
             agencyId: agency.id,
             feedbackTopic: "agency-user",

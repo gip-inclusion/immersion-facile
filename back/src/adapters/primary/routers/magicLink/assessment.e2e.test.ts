@@ -1,6 +1,7 @@
 import {
   AgencyDtoBuilder,
   type AssessmentDto,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type ConventionJwt,
   type ConventionMagicLinkRoutes,
@@ -9,12 +10,11 @@ import {
   errors,
   expectArraysToMatch,
   expectHttpResponseToEqual,
-  InclusionConnectedUserBuilder,
   type LegacyAssessmentDto,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import type { AssessmentEntity } from "../../../../domains/convention/entities/AssessmentEntity";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import type { InMemoryUnitOfWork } from "../../../../domains/core/unit-of-work/adapters/createInMemoryUow";
@@ -27,7 +27,7 @@ import { createConventionMagicLinkPayload } from "../../../../utils/jwt";
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Assessment routes", () => {
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withEmail("validator@mail.com")
     .withId("validator")
     .buildUser();

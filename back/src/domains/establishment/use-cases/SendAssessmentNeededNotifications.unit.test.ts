@@ -3,13 +3,13 @@ import subDays from "date-fns/subDays";
 import {
   AgencyDtoBuilder,
   AssessmentDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
   type Notification,
   type TemplatedEmail,
 } from "shared";
@@ -53,15 +53,15 @@ describe("SendAssessmentNeededNotifications", () => {
   const agency = new AgencyDtoBuilder()
     .withLogoUrl("http://LOGO AGENCY IF URL")
     .build();
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.com")
     .build();
-  const validator1 = new InclusionConnectedUserBuilder()
+  const validator1 = new ConnectedUserBuilder()
     .withId("validator1")
     .withEmail("validator1@mail.com")
     .build();
-  const validator2 = new InclusionConnectedUserBuilder()
+  const validator2 = new ConnectedUserBuilder()
     .withId("validator2")
     .withEmail("validator2@mail.com")
     .build();

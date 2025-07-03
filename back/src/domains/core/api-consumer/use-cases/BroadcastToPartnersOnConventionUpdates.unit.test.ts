@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   cartographeAppellationAndRome,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type SubscriptionParams,
 } from "shared";
 import { v4 as uuid } from "uuid";
@@ -24,23 +24,23 @@ import type { SubscriberResponse } from "../ports/SubscribersGateway";
 import { BroadcastToPartnersOnConventionUpdates } from "./BroadcastToPartnersOnConventionUpdates";
 
 describe("Broadcast to partners on updated convention", () => {
-  const counsellor1 = new InclusionConnectedUserBuilder()
+  const counsellor1 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("counsellor1@email.com")
     .buildUser();
-  const counsellor2 = new InclusionConnectedUserBuilder()
+  const counsellor2 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("counsellor2@email.com")
     .buildUser();
-  const counsellor3 = new InclusionConnectedUserBuilder()
+  const counsellor3 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("counsellor3@email.com")
     .buildUser();
-  const validator1 = new InclusionConnectedUserBuilder()
+  const validator1 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("validator1@email.com")
     .buildUser();
-  const validator2 = new InclusionConnectedUserBuilder()
+  const validator2 = new ConnectedUserBuilder()
     .withId(uuid())
     .withEmail("validator2@email.com")
     .buildUser();

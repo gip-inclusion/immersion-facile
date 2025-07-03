@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -33,20 +33,20 @@ describe("getAgencyByIdForDashboard", () => {
     .withKind("autre")
     .build();
 
-  const counsellor1 = new InclusionConnectedUserBuilder()
+  const counsellor1 = new ConnectedUserBuilder()
     .withId("councellor1")
     .withEmail("councellor1@email.com")
     .buildUser();
-  const counsellor2 = new InclusionConnectedUserBuilder()
+  const counsellor2 = new ConnectedUserBuilder()
     .withId("councellor2")
     .withEmail("councellor2@email.com")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@email.com")
     .buildUser();
 
-  const agencyAdminBuilder = new InclusionConnectedUserBuilder()
+  const agencyAdminBuilder = new ConnectedUserBuilder()
     .withId("agencyAdminUser")
     .withEmail("agencyAdminUser@email.com")
     .withAgencyRights([
@@ -56,10 +56,10 @@ describe("getAgencyByIdForDashboard", () => {
         roles: ["agency-admin"],
       },
     ]);
-  const icAgencyAdminUser = agencyAdminBuilder.build();
+  const connectedAgencyAdminUser = agencyAdminBuilder.build();
   const agencyAdminUser = agencyAdminBuilder.buildUser();
 
-  const notAgencyAdminUser = new InclusionConnectedUserBuilder()
+  const notAgencyAdminUser = new ConnectedUserBuilder()
     .withId("notAgencyAdminUser")
     .withEmail("not-agencyAdminUser@email.com")
     .build();
@@ -98,7 +98,10 @@ describe("getAgencyByIdForDashboard", () => {
   describe("right paths", () => {
     it("get the agency by id", async () => {
       expectToEqual(
-        await getAgencyById.execute(agencyWithRefersTo.id, icAgencyAdminUser),
+        await getAgencyById.execute(
+          agencyWithRefersTo.id,
+          connectedAgencyAdminUser,
+        ),
         {
           ...agencyWithRefersTo,
           counsellorEmails: [counsellor2.email],

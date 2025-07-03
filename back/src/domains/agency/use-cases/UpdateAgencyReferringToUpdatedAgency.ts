@@ -2,8 +2,8 @@ import { toPairs, uniq } from "ramda";
 import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   keys,
   type WithAgencyId,
   withAgencyIdSchema,
@@ -16,7 +16,7 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
   WithAgencyId,
   void,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = withAgencyIdSchema;
 

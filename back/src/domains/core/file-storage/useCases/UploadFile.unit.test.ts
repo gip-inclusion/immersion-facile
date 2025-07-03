@@ -1,10 +1,10 @@
 import {
   AgencyDtoBuilder,
   allowedFileSignatures,
+  ConnectedUserBuilder,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import { TestUuidGenerator } from "../../uuid-generator/adapters/UuidGeneratorImplementations";
@@ -17,27 +17,26 @@ describe("UploadFile use case", () => {
   let uuidGenerator: TestUuidGenerator;
   let uploadFile: UploadFile;
 
-  const backofficeAdminUserBuilder =
-    new InclusionConnectedUserBuilder().withIsAdmin(true);
-  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+  const backofficeAdminUserBuilder = new ConnectedUserBuilder().withIsAdmin(
+    true,
+  );
+  const connectedBackofficeAdminUser = backofficeAdminUserBuilder.build();
 
   const agency = new AgencyDtoBuilder().withId("agency-id").build();
-  const agencyAdminUserBuilder =
-    new InclusionConnectedUserBuilder().withAgencyRights([
-      {
-        agency: {
-          ...agency,
-          coveredDepartments: [],
-          admins: ["admin@example.com"],
-        },
-        roles: ["agency-admin"],
-        isNotifiedByEmail: false,
+  const agencyAdminUserBuilder = new ConnectedUserBuilder().withAgencyRights([
+    {
+      agency: {
+        ...agency,
+        coveredDepartments: [],
+        admins: ["admin@example.com"],
       },
-    ]);
-  const icAgencyAdminUser = agencyAdminUserBuilder.build();
-  const regularUserBuilder =
-    new InclusionConnectedUserBuilder().withAgencyRights([]);
-  const icRegularUser = regularUserBuilder.build();
+      roles: ["agency-admin"],
+      isNotifiedByEmail: false,
+    },
+  ]);
+  const connectedAgencyAdminUser = agencyAdminUserBuilder.build();
+  const regularUserBuilder = new ConnectedUserBuilder().withAgencyRights([]);
+  const connectedRegularUser = regularUserBuilder.build();
 
   beforeEach(() => {
     documentGateway = new InMemoryDocumentGateway();
@@ -68,7 +67,7 @@ describe("UploadFile use case", () => {
               ...file,
             },
           },
-          icAgencyAdminUser,
+          connectedAgencyAdminUser,
         ),
         `https://fakeS3/${expectedFileId}`,
       );
@@ -89,7 +88,7 @@ describe("UploadFile use case", () => {
           {
             file,
           },
-          icBackofficeAdminUser,
+          connectedBackofficeAdminUser,
         ),
         `https://fakeS3/${expectedFileId}`,
       );
@@ -110,8 +109,8 @@ describe("UploadFile use case", () => {
 
     it("throws ForbiddenError if connected user is not admin nor agency-admin", async () => {
       await expectPromiseToFailWithError(
-        uploadFile.execute({ file }, icRegularUser),
-        errors.user.forbidden({ userId: icRegularUser.id }),
+        uploadFile.execute({ file }, connectedRegularUser),
+        errors.user.forbidden({ userId: connectedRegularUser.id }),
       );
     });
 
@@ -136,7 +135,7 @@ describe("UploadFile use case", () => {
       };
 
       await expectPromiseToFailWithError(
-        uploadFile.execute({ file }, icAgencyAdminUser),
+        uploadFile.execute({ file }, connectedAgencyAdminUser),
         errors.file.fileAlreadyExist(expectedFileId),
       );
 
@@ -149,7 +148,7 @@ describe("UploadFile use case", () => {
       await expectPromiseToFailWithError(
         uploadFile.execute(
           { file: { ...file, name: "file.txt" } },
-          icAgencyAdminUser,
+          connectedAgencyAdminUser,
         ),
         errors.file.invalidFile({
           code: "INVALID_EXTENSION",
@@ -163,7 +162,7 @@ describe("UploadFile use case", () => {
       await expectPromiseToFailWithError(
         uploadFile.execute(
           { file: { ...file, name: "file.pdf", mimetype: "image/gif" } },
-          icAgencyAdminUser,
+          connectedAgencyAdminUser,
         ),
         errors.file.invalidFile({
           code: "INVALID_MIME_TYPE",

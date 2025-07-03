@@ -48,7 +48,7 @@ export const createConventionRouter = (deps: AppDependencies) => {
   );
 
   authenticatedConventionSharedRouter.getApiConsumersByConvention(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -61,13 +61,39 @@ export const createConventionRouter = (deps: AppDependencies) => {
   );
 
   authenticatedConventionSharedRouter.getConventionsForAgencyUser(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
         return await deps.useCases.getConventionsForAgencyUser.execute(
           flatParamsToGetConventionsForAgencyUserParams(req.query),
+          currentUser,
+        );
+      }),
+  );
+
+  authenticatedConventionSharedRouter.markPartnersErroredConventionAsHandled(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const connectedUser = req.payloads?.connectedUser;
+        if (!connectedUser) throw errors.user.unauthorized();
+        await deps.useCases.markPartnersErroredConventionAsHandled.execute(
+          req.body,
+          connectedUser,
+        );
+      }),
+  );
+
+  authenticatedConventionSharedRouter.broadcastConventionAgain(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, async () => {
+        const currentUser = req.payloads?.currentUser;
+        if (!currentUser) throw errors.user.unauthorized();
+        await deps.useCases.broadcastConventionAgain.execute(
+          req.body,
           currentUser,
         );
       }),

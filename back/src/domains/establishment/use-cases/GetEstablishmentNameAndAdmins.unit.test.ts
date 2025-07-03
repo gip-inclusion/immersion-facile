@@ -1,8 +1,8 @@
 import {
+  type ConnectedUser,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  type InclusionConnectedUser,
   UserBuilder,
 } from "shared";
 import {
@@ -102,7 +102,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
             dashboards: { agencies: {}, establishments: {} },
           },
         },
-      ] satisfies { name: string; currentUser: InclusionConnectedUser }[])(
+      ] satisfies { name: string; currentUser: ConnectedUser }[])(
         "$name",
         async ({ currentUser }) => {
           expectToEqual(
@@ -130,7 +130,7 @@ describe("GetEstablishmentNameAndAdmins", () => {
         establishmentWithCustomizedName,
       ];
 
-      const currentConnectedUser: InclusionConnectedUser = {
+      const currentConnectedUser: ConnectedUser = {
         ...userWithoutEstablishmentRight,
         proConnect: {
           externalId: "osef",

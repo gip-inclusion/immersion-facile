@@ -1,8 +1,8 @@
 import { equals } from "ramda";
 import {
   type AbsoluteUrl,
+  type ConnectedUserDomainJwtPayload,
   errors,
-  type InclusionConnectDomainJwtPayload,
   type WithFormEstablishmentDto,
   withFormEstablishmentSchema,
 } from "shared";
@@ -24,7 +24,7 @@ import { makeEstablishmentAggregate } from "../helpers/makeEstablishmentAggregat
 export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   WithFormEstablishmentDto,
   void,
-  InclusionConnectDomainJwtPayload
+  ConnectedUserDomainJwtPayload
 > {
   protected inputSchema = withFormEstablishmentSchema;
 
@@ -62,7 +62,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
   public async _execute(
     { formEstablishment }: WithFormEstablishmentDto,
     uow: UnitOfWork,
-    jwtPayload: InclusionConnectDomainJwtPayload,
+    jwtPayload: ConnectedUserDomainJwtPayload,
   ): Promise<void> {
     if (!jwtPayload) throw errors.user.noJwtProvided();
 
@@ -82,8 +82,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       initialEstablishmentAggregate,
     );
 
-    if (triggeredBy.kind !== "inclusion-connected")
-      throw errors.user.unauthorized();
+    if (triggeredBy.kind !== "connected-user") throw errors.user.unauthorized();
     const triggeredByUser = await uow.userRepository.getById(
       triggeredBy.userId,
     );
@@ -218,7 +217,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
 
   async #getTriggeredBy(
     uow: UnitOfWork,
-    jwtPayload: InclusionConnectDomainJwtPayload,
+    jwtPayload: ConnectedUserDomainJwtPayload,
     establishmentAggregate: EstablishmentAggregate,
   ): Promise<TriggeredBy> {
     const user = await uow.userRepository.getById(jwtPayload.userId);
@@ -231,7 +230,7 @@ export class UpdateEstablishmentAggregateFromForm extends TransactionalUseCase<
       user.isBackofficeAdmin
     )
       return {
-        kind: "inclusion-connected",
+        kind: "connected-user",
         userId: user.id,
       };
 

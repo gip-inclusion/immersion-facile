@@ -2,18 +2,18 @@ import {
   type AgencyDto,
   type AgencyId,
   agencyIdSchema,
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
+import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../connected-users/helpers/authorization.helper";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../inclusion-connected-users/helpers/authorization.helper";
 
 export type GetAgencyById = ReturnType<typeof makeGetAgencyById>;
 export const makeGetAgencyById = createTransactionalUseCase<
   AgencyId,
   AgencyDto,
-  InclusionConnectedUser
+  ConnectedUser
 >(
   {
     name: "GetAgencyById",

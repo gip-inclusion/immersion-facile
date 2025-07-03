@@ -6,7 +6,10 @@ import {
   type ApiConsumer,
   type ApiConsumerJwt,
   adminRoutes,
+  type ConnectedUser,
+  ConnectedUserBuilder,
   type ConnectedUserJwt,
+  type ConnectedUserJwtPayload,
   createApiConsumerParamsFromApiConsumer,
   currentJwtVersions,
   defaultProConnectInfos,
@@ -16,9 +19,6 @@ import {
   expectObjectsToMatch,
   expectToEqual,
   type FeatureFlags,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   makeBooleanFeatureFlag,
   makeTextImageAndRedirectFeatureFlag,
   makeTextWithSeverityFeatureFlag,
@@ -31,7 +31,7 @@ import type { HttpClient } from "shared-routes";
 import type { ResponsesToHttpResponse } from "shared-routes/src/defineRoutes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
-import { invalidTokenMessage } from "../../../../config/bootstrap/inclusionConnectAuthMiddleware";
+import { invalidTokenMessage } from "../../../../config/bootstrap/connectedUserAuthMiddleware";
 import { authorizedUnJeuneUneSolutionApiConsumer } from "../../../../domains/core/api-consumer/adapters/InMemoryApiConsumerRepository";
 import type { BasicEventCrawler } from "../../../../domains/core/events/adapters/EventCrawlerImplementations";
 import {
@@ -49,17 +49,17 @@ import {
 import { processEventsForEmailToBeSent } from "../../../../utils/processEventsForEmailToBeSent";
 
 describe("Admin router", () => {
-  const backofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
+  const backofficeAdminUserBuilder = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true);
-  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+  const connectedBackofficeAdminUser = backofficeAdminUserBuilder.build();
   const backOfficeAdminUser = backofficeAdminUserBuilder.buildUser();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
-    userId: icBackofficeAdminUser.id,
+    userId: connectedBackofficeAdminUser.id,
   };
 
   const now = new Date();
@@ -361,10 +361,10 @@ describe("Admin router", () => {
   });
 
   describe(`${displayRouteName(
-    adminRoutes.getInclusionConnectedUsers,
-  )} List inclusion connected user`, () => {
+    adminRoutes.getConnectedUsers,
+  )} List connected users`, () => {
     it("200 - Gets the list of connected users with role 'to-review'", async () => {
-      const response = await sharedRequest.getInclusionConnectedUsers({
+      const response = await sharedRequest.getConnectedUsers({
         queryParams: { agencyRole: "to-review" },
         headers: { authorization: token },
       });
@@ -375,7 +375,7 @@ describe("Admin router", () => {
     });
 
     it("401 - missing token", async () => {
-      const response = await sharedRequest.getInclusionConnectedUsers({
+      const response = await sharedRequest.getConnectedUsers({
         queryParams: { agencyRole: "to-review" },
         headers: { authorization: "" },
       });
@@ -389,11 +389,11 @@ describe("Admin router", () => {
   describe(`${displayRouteName(
     adminRoutes.updateUserRoleForAgency,
   )} Update user role for agency`, () => {
-    const validatorInAgency = new InclusionConnectedUserBuilder()
+    const validatorInAgency = new ConnectedUserBuilder()
       .withId("validator-in-agency")
       .buildUser();
 
-    const counsellorInAgency = new InclusionConnectedUserBuilder()
+    const counsellorInAgency = new ConnectedUserBuilder()
       .withId("counsellor-in-agency")
       .buildUser();
 
@@ -546,7 +546,7 @@ describe("Admin router", () => {
 
     it("404 - Missing user", async () => {
       const agency = new AgencyDtoBuilder().build();
-      const inclusionConnectedUser: InclusionConnectedUser = {
+      const connectedUser: ConnectedUser = {
         id: "my-user-id",
         email: "john@mail.com",
         firstName: "John",
@@ -568,10 +568,10 @@ describe("Admin router", () => {
       const response = await sharedRequest.updateUserRoleForAgency({
         body: {
           agencyId: agency.id,
-          userId: inclusionConnectedUser.id,
+          userId: connectedUser.id,
           roles: [updatedRole],
           isNotifiedByEmail: false,
-          email: inclusionConnectedUser.email,
+          email: connectedUser.email,
         },
         headers: { authorization: token },
       });
@@ -580,8 +580,7 @@ describe("Admin router", () => {
         status: 404,
         body: {
           status: 404,
-          message: errors.user.notFound({ userId: inclusionConnectedUser.id })
-            .message,
+          message: errors.user.notFound({ userId: connectedUser.id }).message,
         },
       });
     });

@@ -1,11 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { InclusionConnectedUser, UserId } from "shared";
+import type { ConnectedUser, UserId } from "shared";
 import { updateUserAgencyRights } from "src/core-logic/domain/agencies/agencies.helpers";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
 import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-user-on-agency/updateUserOnAgency.slice";
 
 type FetchUserState = {
-  user: InclusionConnectedUser | null;
+  user: ConnectedUser | null;
   isFetching: boolean;
 };
 
@@ -21,10 +21,7 @@ export const fetchUserSlice = createSlice({
     fetchUserRequested: (state, _action: PayloadAction<{ userId: UserId }>) => {
       state.isFetching = true;
     },
-    fetchUserSucceeded: (
-      state,
-      action: PayloadAction<InclusionConnectedUser>,
-    ) => {
+    fetchUserSucceeded: (state, action: PayloadAction<ConnectedUser>) => {
       state.user = action.payload;
       state.isFetching = false;
     },

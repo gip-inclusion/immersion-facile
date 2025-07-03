@@ -7,12 +7,10 @@ import type { Email } from "../email/email.dto";
 import type { FederatedIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import { isFtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { GeoPositionDto } from "../geoPosition/geoPosition.dto";
-import type {
-  AgencyRole,
-  UserId,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { AgencyRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
 import type { Flavor } from "../typeFlavors";
+import type { UserId } from "../user/user.dto";
 import type { ExtractFromExisting, OmitFromExistingKeys } from "../utils";
 
 export type CodeSafir = Flavor<string, "CodeSafir">;
@@ -218,4 +216,27 @@ export const makeListAgencyOptionsKindFilter = ({
   return federatedIdentity && isFtConnectIdentity(federatedIdentity)
     ? "immersionPeOnly"
     : "miniStageExcluded";
+};
+
+export type WithAgencyIds = {
+  agencies: AgencyId[];
+};
+
+export type AgencyRight = {
+  agency: AgencyDtoForAgencyUsersAndAdmins;
+  roles: AgencyRole[];
+  isNotifiedByEmail: boolean;
+};
+
+export type WithAgencyRights = {
+  agencyRights: AgencyRight[];
+};
+
+export type AgencyDashboards = {
+  agencyDashboardUrl?: AbsoluteUrl;
+  erroredConventionsDashboardUrl?: AbsoluteUrl;
+};
+
+export type WithAgencyDashboards = {
+  agencies: AgencyDashboards;
 };

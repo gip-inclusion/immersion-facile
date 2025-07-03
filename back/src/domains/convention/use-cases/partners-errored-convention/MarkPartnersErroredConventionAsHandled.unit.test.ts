@@ -1,12 +1,12 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
   expectToEqual,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
 import type { InMemoryOutboxRepository } from "../../../core/events/adapters/InMemoryOutboxRepository";
@@ -37,9 +37,11 @@ describe("mark partners errored convention as handled", () => {
   const conventionId = "add5c20e-6dd2-45af-affe-927358004444";
   const userId = "decd5596-bf79-45ae-8e77-6913f1069835";
 
-  const icJwtDomainPayload: InclusionConnectDomainJwtPayload = { userId };
+  const connectedUserJwtDomainPayload: ConnectedUserDomainJwtPayload = {
+    userId,
+  };
 
-  const icuser = new InclusionConnectedUserBuilder()
+  const user = new ConnectedUserBuilder()
     .withId(userId)
     .withFirstName("John")
     .withLastName("Doe")
@@ -50,7 +52,7 @@ describe("mark partners errored convention as handled", () => {
 
   const agency = new AgencyDtoBuilder().build();
   const agencyWithRights = toAgencyWithRights(agency, {
-    [icuser.id]: {
+    [user.id]: {
       roles: ["validator"],
       isNotifiedByEmail: false,
     },
@@ -96,14 +98,14 @@ describe("mark partners errored convention as handled", () => {
     await uow.conventionRepository.save(convention);
     await uow.broadcastFeedbacksRepository.save(savedErrorConvention);
 
-    uow.userRepository.users = [icuser];
+    uow.userRepository.users = [user];
     uow.agencyRepository.agencies = [agencyWithRights];
 
     await markPartnersErroredConventionAsHandled.execute(
       {
         conventionId,
       },
-      icJwtDomainPayload,
+      connectedUserJwtDomainPayload,
     );
 
     expectToEqual(uow.broadcastFeedbacksRepository.broadcastFeedbacks, [
@@ -120,8 +122,8 @@ describe("mark partners errored convention as handled", () => {
           conventionId,
           userId,
           triggeredBy: {
-            kind: "inclusion-connected",
-            userId: icJwtDomainPayload.userId,
+            kind: "connected-user",
+            userId: connectedUserJwtDomainPayload.userId,
           },
         },
       }),
@@ -133,7 +135,7 @@ describe("mark partners errored convention as handled", () => {
 
     await conventionRepository.save(convention);
 
-    uow.userRepository.users = [icuser];
+    uow.userRepository.users = [user];
     uow.agencyRepository.agencies = [agencyWithRights];
 
     await expectPromiseToFailWithError(
@@ -141,7 +143,7 @@ describe("mark partners errored convention as handled", () => {
         {
           conventionId,
         },
-        icJwtDomainPayload,
+        connectedUserJwtDomainPayload,
       ),
       errors.broadcastFeedback.notFound({
         conventionId,
@@ -169,7 +171,7 @@ describe("mark partners errored convention as handled", () => {
 
     await conventionRepository.save(convention);
     await broadcastFeedbacksRepository.save(savedHandledErrorConvention);
-    userRepository.users = [icuser];
+    userRepository.users = [user];
     uow.agencyRepository.agencies = [agencyWithRights];
 
     await expectPromiseToFailWithError(
@@ -177,7 +179,7 @@ describe("mark partners errored convention as handled", () => {
         {
           conventionId,
         },
-        icJwtDomainPayload,
+        connectedUserJwtDomainPayload,
       ),
       errors.broadcastFeedback.notFound({
         conventionId,
@@ -200,7 +202,7 @@ describe("mark partners errored convention as handled", () => {
         {
           conventionId,
         },
-        icJwtDomainPayload,
+        connectedUserJwtDomainPayload,
       ),
       errors.convention.notFound({ conventionId }),
     );
@@ -214,7 +216,7 @@ describe("mark partners errored convention as handled", () => {
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         { conventionId },
-        icJwtDomainPayload,
+        connectedUserJwtDomainPayload,
       ),
       errors.user.notFound({ userId }),
     );
@@ -225,14 +227,14 @@ describe("mark partners errored convention as handled", () => {
     const userRepository = uow.userRepository;
 
     await conventionRepository.save(convention);
-    userRepository.users = [icuser];
+    userRepository.users = [user];
 
     await expectPromiseToFailWithError(
       markPartnersErroredConventionAsHandled.execute(
         {
           conventionId,
         },
-        icJwtDomainPayload,
+        connectedUserJwtDomainPayload,
       ),
       errors.user.noRightsOnAgency({
         agencyId: agency.id,

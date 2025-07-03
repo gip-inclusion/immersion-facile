@@ -1,12 +1,12 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { domElementIds, type InclusionConnectedUser } from "shared";
+import { type ConnectedUser, domElementIds } from "shared";
 
 export const PersonnalInformationsSection = ({
   user,
   editInformationsLink,
 }: {
-  user: InclusionConnectedUser;
+  user: ConnectedUser;
   editInformationsLink?: string;
 }) => (
   <>

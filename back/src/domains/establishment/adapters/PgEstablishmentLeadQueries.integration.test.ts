@@ -16,7 +16,7 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { makeUniqueUserForTest } from "../../../utils/user";
 import { PgAgencyRepository } from "../../agency/adapters/PgAgencyRepository";
 import { PgConventionRepository } from "../../convention/adapters/PgConventionRepository";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import type { EstablishmentLead } from "../entities/EstablishmentLeadEntity";
 import { PgEstablishmentLeadQueries } from "./PgEstablishmentLeadQueries";
 import { PgEstablishmentLeadRepository } from "./PgEstablishmentLeadRepository";

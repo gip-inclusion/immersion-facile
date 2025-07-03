@@ -35,7 +35,7 @@ export const createTechnicalRouter = (
   technicalRouter
     .route(`/${uploadFileRoute}`)
     .post(
-      deps.inclusionConnectAuthMiddleware,
+      deps.connectedUserAuthMiddleware,
       upload.single(uploadFileRoute),
       (req, res) =>
         sendHttpResponse(req, res, async () => {
@@ -134,7 +134,7 @@ export const createTechnicalRouter = (
       sendHttpResponse(req, res, () =>
         deps.useCases.htmlToPdf.execute(
           req.body,
-          req.payloads?.inclusion ?? req.payloads?.convention,
+          req.payloads?.connectedUser ?? req.payloads?.convention,
         ),
       ),
   );

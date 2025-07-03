@@ -2,7 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import Table from "@codegouvfr/react-dsfr/Table";
 import type { ReactNode } from "react";
-import type { WithEstablishmentData } from "shared";
+import type { EstablishmentData } from "shared";
 import { establishmentRoleToDisplay } from "../establishment-users";
 import { EstablishmentLineAdminsInfos } from "./establishment-line/EstablishmentLineAdminInfos";
 import { EstablishmentLineBusinessName } from "./establishment-line/EstablishmentLineBusinessName";
@@ -10,7 +10,7 @@ import { EstablishmentLineBusinessName } from "./establishment-line/Establishmen
 export const EstablishmentsRightsTable = ({
   withEstablishmentData,
 }: {
-  withEstablishmentData: WithEstablishmentData[];
+  withEstablishmentData: EstablishmentData[];
 }) => (
   <>
     <h2 className={fr.cx("fr-h4")}>
@@ -30,7 +30,7 @@ export const EstablishmentsRightsTable = ({
 );
 
 const makeEstablishmentRightLine = (
-  withEstablishmentData: WithEstablishmentData,
+  withEstablishmentData: EstablishmentData,
 ): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[withEstablishmentData.role];
   return [

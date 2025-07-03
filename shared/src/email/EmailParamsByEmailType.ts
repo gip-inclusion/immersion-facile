@@ -14,8 +14,7 @@ import type {
   DiscussionExchangeForbiddenParams,
   DiscussionKind,
 } from "../discussion/discussion.dto";
-import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import type { EstablishmentRole } from "../role/role.dto";
+import type { AgencyRole, EstablishmentRole } from "../role/role.dto";
 import type { AppellationLabel } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type { SiretDto } from "../siret/siret";
 import type { DateString } from "../utils/date";

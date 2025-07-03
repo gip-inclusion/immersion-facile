@@ -1,4 +1,5 @@
 import {
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   DiscussionBuilder,
   type DiscussionDto,
@@ -6,7 +7,6 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type UpdateDiscussionStatusParams,
 } from "shared";
 import type { TriggeredBy } from "../../../core/events/events";
@@ -25,11 +25,11 @@ import {
 } from "./UpdateDiscussionStatus";
 
 describe("UpdateDiscussionStatus", () => {
-  const authorizedUser = new InclusionConnectedUserBuilder()
+  const authorizedUser = new ConnectedUserBuilder()
     .withId("authorizedUser")
     .withEmail("authorized@domain.com")
     .build();
-  const unauthorizedUser = new InclusionConnectedUserBuilder()
+  const unauthorizedUser = new ConnectedUserBuilder()
     .withEmail("unauthorized@domain.com")
     .withId("unauthorizedUser")
     .build();
@@ -165,7 +165,7 @@ describe("UpdateDiscussionStatus", () => {
 
       expectDiscussionInRepoAndInOutbox({
         triggeredBy: {
-          kind: "inclusion-connected",
+          kind: "connected-user",
           userId: authorizedUser.id,
         },
         expectedDiscussion: {
@@ -211,7 +211,7 @@ describe("UpdateDiscussionStatus", () => {
 
         expectDiscussionInRepoAndInOutbox({
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: authorizedUser.id,
           },
           expectedDiscussion: {
@@ -241,7 +241,7 @@ describe("UpdateDiscussionStatus", () => {
 
         expectDiscussionInRepoAndInOutbox({
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: authorizedUser.id,
           },
           expectedDiscussion: {
@@ -305,7 +305,7 @@ describe("UpdateDiscussionStatus", () => {
 
           expectDiscussionInRepoAndInOutbox({
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: authorizedUser.id,
             },
             expectedDiscussion: {
@@ -347,7 +347,7 @@ describe("UpdateDiscussionStatus", () => {
 
           expectDiscussionInRepoAndInOutbox({
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: authorizedUser.id,
             },
             expectedDiscussion: {
@@ -397,7 +397,7 @@ describe("UpdateDiscussionStatus", () => {
 
           expectDiscussionInRepoAndInOutbox({
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: authorizedUser.id,
             },
             expectedDiscussion: {
@@ -463,7 +463,7 @@ describe("UpdateDiscussionStatus", () => {
 
           expectDiscussionInRepoAndInOutbox({
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: authorizedUser.id,
             },
             expectedDiscussion: {
@@ -520,7 +520,7 @@ describe("UpdateDiscussionStatus", () => {
 
           expectDiscussionInRepoAndInOutbox({
             triggeredBy: {
-              kind: "inclusion-connected",
+              kind: "connected-user",
               userId: authorizedUser.id,
             },
             expectedDiscussion: {

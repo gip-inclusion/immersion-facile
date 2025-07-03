@@ -3,16 +3,16 @@ import {
   AgencyDtoBuilder,
   BadRequestError,
   ConflictError,
+  ConnectedUserBuilder,
   type CreateAgencyDto,
   errors,
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  InclusionConnectedUserBuilder,
   type User,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
-import { emptyName } from "../../core/authentication/inclusion-connect/entities/user.helper";
+import { emptyName } from "../../core/authentication/connected-user/entities/user.helper";
 import {
   type CreateNewEvent,
   makeCreateNewEvent,
@@ -31,11 +31,11 @@ import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGenera
 import { AddAgency } from "./AddAgency";
 
 describe("AddAgency use case", () => {
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.com")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@mail.com")
     .buildUser();
@@ -258,7 +258,7 @@ describe("AddAgency use case", () => {
     });
 
     it("agency with refers to should have validator emails from referral agency, respecting the notification option", async () => {
-      const validator2 = new InclusionConnectedUserBuilder()
+      const validator2 = new ConnectedUserBuilder()
         .withId("validator-2")
         .withEmail("validator2@mail.com")
         .buildUser();

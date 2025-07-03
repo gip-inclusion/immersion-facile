@@ -66,3 +66,12 @@ export const establishmentsRoles = [
 ] as const;
 
 export type EstablishmentRole = (typeof establishmentsRoles)[number];
+
+export type AgencyRole = (typeof allAgencyRoles)[number];
+export const allAgencyRoles = [
+  "counsellor",
+  "validator",
+  "agency-admin",
+  "to-review",
+  "agency-viewer",
+] as const;

@@ -17,7 +17,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.createUserForAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -30,7 +30,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.getAgencyById(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         const currentUser = req.payloads?.currentUser;
@@ -55,12 +55,12 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.getAgencyUsersByAgencyId(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         const currentUser = req.payloads?.currentUser;
         if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getIcUsers.execute(
+        return deps.useCases.getConnectedUsers.execute(
           { agencyId: req.params.agencyId },
           currentUser,
         );
@@ -74,7 +74,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.updateAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
@@ -82,7 +82,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.updateUserRoleForAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
@@ -93,7 +93,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   );
 
   sharedAgencyRouter.removeUserFromAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -107,6 +107,17 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
           currentUser,
         );
       }),
+  );
+
+  sharedAgencyRouter.registerAgenciesToUser(
+    deps.connectedUserAuthMiddleware,
+    (req, res) =>
+      sendHttpResponse(req, res, () =>
+        deps.useCases.registerAgencyToConnectedUser.execute(
+          req.body,
+          req.payloads?.connectedUser,
+        ),
+      ),
   );
 
   return expressRouter;

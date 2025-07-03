@@ -7,7 +7,6 @@ import {
   clearSignaturesAndValidationDate,
   errors,
   ForbiddenError,
-  NotFoundError,
   type RenewConventionParams,
   type Role,
   renewConventionParamsSchema,
@@ -94,15 +93,10 @@ export class RenewConvention extends TransactionalUseCase<
       return [jwtPayload.role];
     }
 
-    const inclusionConnectedUser = await uow.userRepository.getById(
-      jwtPayload.userId,
-    );
-    if (!inclusionConnectedUser)
-      throw new NotFoundError(
-        `Inclusion connected user '${jwtPayload.userId}' not found.`,
-      );
+    const user = await uow.userRepository.getById(jwtPayload.userId);
+    if (!user) throw errors.user.notFound({ userId: jwtPayload.userId });
 
-    if (inclusionConnectedUser.isBackofficeAdmin) return ["back-office"];
+    if (user.isBackofficeAdmin) return ["back-office"];
     const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
       throw errors.agency.notFound({ agencyId: convention.agencyId });

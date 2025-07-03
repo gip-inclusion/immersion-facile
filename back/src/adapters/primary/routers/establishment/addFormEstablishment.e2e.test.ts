@@ -1,6 +1,7 @@
 import {
   type AdminFormEstablishmentUserRight,
-  createInclusionConnectJwtPayload,
+  ConnectedUserBuilder,
+  createConnectedUserJwtPayload,
   defaultValidFormEstablishment,
   displayRouteName,
   type EstablishmentRoutes,
@@ -8,7 +9,6 @@ import {
   expectHttpResponseToEqual,
   expectToEqual,
   FormEstablishmentDtoBuilder,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import type { HttpClient } from "shared-routes";
 import { createSupertestSharedClient } from "shared-routes/supertest";
@@ -39,7 +39,7 @@ describe("Add form establishment", () => {
   let eventCrawler: BasicEventCrawler;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
-  const user = new InclusionConnectedUserBuilder().withId(uuid()).buildUser();
+  const user = new ConnectedUserBuilder().withId(uuid()).buildUser();
 
   beforeEach(async () => {
     ({
@@ -100,7 +100,7 @@ describe("Add form establishment", () => {
           .build(),
         headers: {
           authorization: generateConnectedUserJwt(
-            createInclusionConnectJwtPayload({
+            createConnectedUserJwtPayload({
               userId: user.id,
               durationDays: 1,
               now: new Date(),
@@ -155,7 +155,7 @@ describe("Add form establishment", () => {
         body: formEstablishment,
         headers: {
           authorization: generateConnectedUserJwt(
-            createInclusionConnectJwtPayload({
+            createConnectedUserJwtPayload({
               userId: user.id,
               durationDays: 1,
               now: new Date(),

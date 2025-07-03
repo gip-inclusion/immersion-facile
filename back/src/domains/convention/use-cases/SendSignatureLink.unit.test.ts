@@ -2,6 +2,8 @@ import { afterEach } from "node:test";
 import { subDays, subHours } from "date-fns";
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  type ConnectedUserDomainJwtPayload,
   ConventionDtoBuilder,
   conventionStatusesWithJustification,
   conventionStatusesWithValidator,
@@ -10,8 +12,6 @@ import {
   expectPromiseToFailWithError,
   expectToEqual,
   frontRoutes,
-  type InclusionConnectDomainJwtPayload,
-  InclusionConnectedUserBuilder,
   type Notification,
   type SignatoryRole,
   UserBuilder,
@@ -78,20 +78,20 @@ const counsellorJwtPayload = createConventionMagicLinkPayload({
   now: new Date(),
 });
 
-const connectedUserPayload: InclusionConnectDomainJwtPayload = {
+const connectedUserPayload: ConnectedUserDomainJwtPayload = {
   userId: "bcc5c20e-6dd2-45cf-affe-927358005262",
 };
 
-const connectedUserBuilder = new InclusionConnectedUserBuilder().withId(
+const connectedUserBuilder = new ConnectedUserBuilder().withId(
   connectedUserPayload.userId,
 );
 const connectedUser = connectedUserBuilder.build();
 
-const backofficeAdminPayload: InclusionConnectDomainJwtPayload = {
+const backofficeAdminPayload: ConnectedUserDomainJwtPayload = {
   userId: "bcc5c20e-6dd2-45cf-affe-927358005263",
 };
 
-const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withId(
+const backofficeAdminBuilder = new ConnectedUserBuilder().withId(
   backofficeAdminPayload.userId,
 );
 const backofficeAdmin = backofficeAdminBuilder.withIsAdmin(true).build();
@@ -222,7 +222,7 @@ describe("Send signature link", () => {
 
     describe("from connected user", () => {
       it("throws not found if connected user id does not exist", async () => {
-        const unexistingUserPayload: InclusionConnectDomainJwtPayload = {
+        const unexistingUserPayload: ConnectedUserDomainJwtPayload = {
           userId: "bcc5c20e-6dd2-45cf-affe-927358005267",
         };
         uow.agencyRepository.agencies = [toAgencyWithRights(agency, {})];
@@ -533,7 +533,7 @@ describe("Send signature link", () => {
               recipientRole: "establishment-representative",
               transport: "sms",
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: connectedUser.id,
               },
             },

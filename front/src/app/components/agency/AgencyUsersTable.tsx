@@ -7,13 +7,13 @@ import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
 import type { AgencyOverviewRouteName } from "src/app/components/forms/agency/AgencyOverview";
 import { agencyRolesToDisplay } from "src/app/contents/userRolesToDisplay";
-import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 
 type AgencyUsersTableProps = {
-  agencyUsers: NormalizedInclusionConnectedUser[];
+  agencyUsers: ConnectedUserWithNormalizedAgencyRights[];
   agency: AgencyDto;
-  onModifyClicked: (user: NormalizedInclusionConnectedUser) => void;
-  onDeleteClicked: (user: NormalizedInclusionConnectedUser) => void;
+  onModifyClicked: (user: ConnectedUserWithNormalizedAgencyRights) => void;
+  onDeleteClicked: (user: ConnectedUserWithNormalizedAgencyRights) => void;
   routeName: AgencyOverviewRouteName;
 };
 

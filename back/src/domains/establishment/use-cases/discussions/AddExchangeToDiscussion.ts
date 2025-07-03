@@ -1,6 +1,7 @@
 import {
   type Attachment,
   attachmentSchema,
+  type ConnectedUser,
   type DateString,
   type DiscussionDto,
   type DiscussionExchangeForbiddenParams,
@@ -10,7 +11,6 @@ import {
   type ExchangeRole,
   errors,
   exchangeRoleSchema,
-  type InclusionConnectedUser,
   type UserId,
   zStringMinLength1,
 } from "shared";
@@ -93,7 +93,7 @@ const defaultSubject = "Sans objet";
 export class AddExchangeToDiscussion extends TransactionalUseCase<
   AddExchangeToDiscussionInput,
   Exchange | DiscussionExchangeForbiddenParams,
-  InclusionConnectedUser | null
+  ConnectedUser | null
 > {
   protected inputSchema = messageInputSchema;
 
@@ -116,9 +116,9 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
   protected async _execute(
     input: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
-    inclusionConnectedUser: InclusionConnectedUser | null,
+    connectedUser: ConnectedUser | null,
   ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
-    if (input.source === "dashboard" && !inclusionConnectedUser) {
+    if (input.source === "dashboard" && !connectedUser) {
       throw errors.user.unauthorized();
     }
     return await Promise.all(
@@ -127,7 +127,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
           uow,
           input.source,
           messageInput,
-          inclusionConnectedUser?.id || null,
+          connectedUser?.id || null,
         ),
       ),
     ).then((exchanges) => exchanges[0]);

@@ -15,8 +15,8 @@ import { useDispatch } from "react-redux";
 import {
   type AgencyId,
   agencyKindToLabelIncludingIFAndPrepa,
+  type ConnectedUser,
   domElementIds,
-  type InclusionConnectedUser,
   looksLikeSiret,
   type SiretDto,
 } from "shared";
@@ -24,12 +24,12 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { agenciesSelectors } from "src/core-logic/domain/agencies/agencies.selectors";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
+import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 
 export const RegisterAgenciesForm = ({
   currentUser,
 }: {
-  currentUser: InclusionConnectedUser;
+  currentUser: ConnectedUser;
 }) => {
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState<SiretDto | undefined>(undefined);
@@ -109,12 +109,10 @@ export const RegisterAgenciesForm = ({
                   priority="secondary"
                   onClick={() => {
                     dispatch(
-                      inclusionConnectedSlice.actions.registerAgenciesRequested(
-                        {
-                          agencies: selectedAgencyIds,
-                          feedbackTopic: "dashboard-agency-register-user",
-                        },
-                      ),
+                      connectedUserSlice.actions.registerAgenciesRequested({
+                        agencies: selectedAgencyIds,
+                        feedbackTopic: "dashboard-agency-register-user",
+                      }),
                     );
                   }}
                   disabled={selectedAgencyIds.length === 0}
@@ -160,7 +158,7 @@ const AgencyTable = ({
   setIsAllChecked: (isAllChecked: boolean) => void;
   checkedAgencies: AgencyId[];
   setCheckedAgencies: (agencies: AgencyId[]) => void;
-  currentUser: InclusionConnectedUser;
+  currentUser: ConnectedUser;
 }) => {
   const isFetching = useAppSelector(agenciesSelectors.isLoading);
   const userAgencyIds = currentUser.agencyRights.map(

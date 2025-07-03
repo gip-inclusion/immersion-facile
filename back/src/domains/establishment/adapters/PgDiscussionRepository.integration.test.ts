@@ -20,7 +20,7 @@ import {
   makeKyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
 import { getTestPgPool } from "../../../config/pg/pgUtils";
-import { PgUserRepository } from "../../core/authentication/inclusion-connect/adapters/PgUserRepository";
+import { PgUserRepository } from "../../core/authentication/connected-user/adapters/PgUserRepository";
 import { UuidV4Generator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
   EstablishmentAggregateBuilder,

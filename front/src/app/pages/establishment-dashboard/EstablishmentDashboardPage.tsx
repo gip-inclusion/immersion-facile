@@ -7,9 +7,9 @@ import { EstablishmentDashboardTabs } from "src/app/components/establishment/est
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontEstablishmentDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { EstablishmentDashboardAccessNotAllowedContent } from "../../components/establishment/establishment-dashboard/EstablishmentDashboardAccessNotAllowedContent";
 
 export const EstablishmentDashboardPage = ({
@@ -18,11 +18,9 @@ export const EstablishmentDashboardPage = ({
   route: FrontEstablishmentDashboardRoute;
 }): ReactNode => {
   const dispatch = useDispatch();
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const isLoadingUser = useAppSelector(inclusionConnectedSelectors.isLoading);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const isLoadingUser = useAppSelector(connectedUserSelectors.isLoading);
   const isLoadingEstablishment = useAppSelector(
     establishmentSelectors.isLoading,
   );
@@ -42,11 +40,11 @@ export const EstablishmentDashboardPage = ({
     establishmentNameAndAdmins !== "establishmentNotFound";
 
   useEffect(() => {
-    if (isEstablishmentNameAndAdminsRequired && inclusionConnectedJwt) {
+    if (isEstablishmentNameAndAdminsRequired && connectedUserJwt) {
       dispatch(
         establishmentSlice.actions.fetchEstablishmentNameAndAdminsRequested({
           siret: proConnectSiret,
-          jwt: inclusionConnectedJwt,
+          jwt: connectedUserJwt,
           feedbackTopic: "form-establishment",
         }),
       );
@@ -54,31 +52,25 @@ export const EstablishmentDashboardPage = ({
   }, [
     proConnectSiret,
     isEstablishmentNameAndAdminsRequired,
-    inclusionConnectedJwt,
+    connectedUserJwt,
     dispatch,
   ]);
-  const isUserConnected = currentUser && inclusionConnectedJwt;
+  const isUserConnected = currentUser && connectedUserJwt;
   return (
     <>
       <div className={fr.cx("fr-grid-row")}>
         <h1>Mon espace établissement</h1>
       </div>
       {isLoadingUser || (isLoadingEstablishment && <Loader />)}
-      {isUserConnected && (
-        <>
-          {isDashboardAccessNotAllowed ? (
-            <EstablishmentDashboardAccessNotAllowedContent
-              establishmentNameAndAdmins={establishmentNameAndAdmins}
-              siret={proConnectSiret}
-            />
-          ) : (
-            <EstablishmentDashboardTabs
-              currentUser={currentUser}
-              route={route}
-            />
-          )}
-        </>
-      )}
+      {isUserConnected &&
+        (isDashboardAccessNotAllowed ? (
+          <EstablishmentDashboardAccessNotAllowedContent
+            establishmentNameAndAdmins={establishmentNameAndAdmins}
+            siret={proConnectSiret}
+          />
+        ) : (
+          <EstablishmentDashboardTabs currentUser={currentUser} route={route} />
+        ))}
       {!isUserConnected && (
         <Alert
           severity="error"

@@ -7,11 +7,11 @@ import { RegisterAgenciesForm } from "src/app/components/forms/register-agencies
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 
 export const RequestAgencyRegistrationPage = () => {
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const isLoading = useAppSelector(connectedUserSelectors.isLoading);
   if (isLoading) {
     return <Loader />;
   }

@@ -16,7 +16,6 @@ import type {
 import type { EstablishmentGateway } from "src/core-logic/ports/EstablishmentGateway";
 import type { EstablishmentLeadGateway } from "src/core-logic/ports/EstablishmentLeadGateway";
 import type { FormCompletionGateway } from "src/core-logic/ports/FormCompletionGateway";
-import type { InclusionConnectedGateway } from "src/core-logic/ports/InclusionConnectedGateway";
 import type { NafGateway } from "src/core-logic/ports/NafGateway";
 import type { NavigationGateway } from "src/core-logic/ports/NavigationGateway";
 import type { SearchGateway } from "src/core-logic/ports/SearchGateway";
@@ -35,7 +34,6 @@ export type Dependencies = {
   establishmentLeadGateway: EstablishmentLeadGateway;
   conventionGateway: ConventionGateway;
   searchGateway: SearchGateway;
-  inclusionConnectedGateway: InclusionConnectedGateway;
   navigationGateway: NavigationGateway;
   localDeviceRepository: DeviceRepository<LocalStoragePair>;
   sessionDeviceRepository: DeviceRepository<SessionStoragePair>;

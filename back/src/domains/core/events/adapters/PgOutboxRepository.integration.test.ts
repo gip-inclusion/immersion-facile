@@ -261,14 +261,14 @@ describe("PgOutboxRepository", () => {
         topic: "ApiConsumerSaved",
         payload: {
           consumerId: "consumerId",
-          triggeredBy: { kind: "inclusion-connected", userId: "Bob" },
+          triggeredBy: { kind: "connected-user", userId: "Bob" },
         },
       });
       const event3 = createNewEvent({
         topic: "ApiConsumerSaved",
         payload: {
           consumerId: "other-consumer-id",
-          triggeredBy: { kind: "inclusion-connected", userId: "Jane" },
+          triggeredBy: { kind: "connected-user", userId: "Jane" },
         },
       });
 
@@ -360,7 +360,7 @@ describe("PgOutboxRepository", () => {
         status: "in-process",
         payload: {
           consumerId: "consumerId",
-          triggeredBy: { kind: "inclusion-connected", userId: "Bob" },
+          triggeredBy: { kind: "connected-user", userId: "Bob" },
         },
       });
       await storeInOutbox([oldEvent, newEvent]);

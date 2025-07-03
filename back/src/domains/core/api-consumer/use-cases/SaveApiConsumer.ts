@@ -4,12 +4,12 @@ import {
   type ApiConsumerJwt,
   type ApiConsumerRight,
   type ApiConsumerRights,
+  type ConnectedUser,
   type CreateWebhookSubscription,
-  type InclusionConnectedUser,
   type WriteApiConsumerParams,
   writeApiConsumerSchema,
 } from "shared";
-import { throwIfNotAdmin } from "../../../inclusion-connected-users/helpers/authorization.helper";
+import { throwIfNotAdmin } from "../../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../events/ports/EventBus";
 import type { GenerateApiConsumerJwt } from "../../jwt";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
@@ -20,7 +20,7 @@ import type { UnitOfWorkPerformer } from "../../unit-of-work/ports/UnitOfWorkPer
 export class SaveApiConsumer extends TransactionalUseCase<
   WriteApiConsumerParams,
   ApiConsumerJwt | undefined,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = writeApiConsumerSchema;
 
@@ -45,7 +45,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
   protected async _execute(
     input: WriteApiConsumerParams,
     uow: UnitOfWork,
-    currentUser: InclusionConnectedUser,
+    currentUser: ConnectedUser,
   ): Promise<ApiConsumerJwt | undefined> {
     throwIfNotAdmin(currentUser);
 
@@ -67,7 +67,7 @@ export class SaveApiConsumer extends TransactionalUseCase<
         payload: {
           consumerId: input.id,
           triggeredBy: {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: currentUser.id,
           },
         },

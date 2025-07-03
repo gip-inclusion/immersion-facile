@@ -24,9 +24,9 @@ import { userRolesToDisplay } from "src/app/contents/userRolesToDisplay";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import { establishmentSlice } from "src/core-logic/domain/establishment/establishment.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 
 const establishmentUsersEditModal = createModal({
   id: "establishment-users-edit-modal",
@@ -122,8 +122,8 @@ const EstablishmentUsersDeleteContent = ({
   alreadyExistingUserRight: FormEstablishmentUserRight | null;
 }) => {
   const dispatch = useDispatch();
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const token = useAppSelector(authSelectors.inclusionConnectToken);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
@@ -149,7 +149,7 @@ const EstablishmentUsersDeleteContent = ({
       establishmentSlice.actions.updateEstablishmentRequested({
         establishmentUpdate: {
           formEstablishment: updatedFormEstablishment,
-          jwt: token ?? "",
+          jwt: connectedUserJwt ?? "",
         },
         feedbackTopic: "establishment-dashboard-users-rights",
       }),
@@ -204,7 +204,7 @@ const EstablishmentUsersEditForm = ({
   const formEstablishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
-  const token = useAppSelector(authSelectors.inclusionConnectToken);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const dispatch = useDispatch();
   const emptyValues = useRef({
     email: "",
@@ -246,7 +246,7 @@ const EstablishmentUsersEditForm = ({
       establishmentSlice.actions.updateEstablishmentRequested({
         establishmentUpdate: {
           formEstablishment: updatedFormEstablishment,
-          jwt: token ?? "",
+          jwt: connectedUserJwt ?? "",
         },
         feedbackTopic: "establishment-dashboard-users-rights",
       }),

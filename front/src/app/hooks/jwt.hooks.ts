@@ -10,8 +10,8 @@ import type { Route } from "type-route";
 
 // this hook should be use only in admin route
 export const useAdminToken = () => {
-  const rawToken = useAppSelector(authSelectors.inclusionConnectToken);
-  return rawToken;
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  return connectedUserJwt;
 };
 
 export const useJwt = (
@@ -20,7 +20,7 @@ export const useJwt = (
   >,
 ) => {
   const jwtQueryParam: ConventionSupportedJwt | undefined = route.params?.jwt;
-  const connectedUserJwt = useAppSelector(authSelectors.inclusionConnectToken);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
   const jwt = jwtQueryParam ?? connectedUserJwt ?? "";
   const jwtPayload =
     decodeMagicLinkJwtWithoutSignatureCheck<ConventionJwtPayload>(jwt ?? "");

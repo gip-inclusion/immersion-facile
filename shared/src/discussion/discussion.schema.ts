@@ -33,6 +33,7 @@ import {
   type FlatGetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
   type PotentialBeneficiaryCommonProps,
+  type WithDiscussionId,
   type WithDiscussionRejection,
   type WithDiscussionStatus,
   type WithDiscussionStatusAccepted,
@@ -41,6 +42,9 @@ import {
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
+export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
+  discussionId: discussionIdSchema,
+});
 
 export const exchangeRoles = ["establishment", "potentialBeneficiary"] as const;
 export const discussionExchangeForbidenReasons = [

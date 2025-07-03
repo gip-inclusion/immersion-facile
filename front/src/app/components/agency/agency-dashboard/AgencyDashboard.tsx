@@ -25,19 +25,19 @@ import { ErroredConventionTabContent } from "./tabs/ErroredConventionTabContent"
 
 export const AgencyDashboard = ({
   route,
-  inclusionConnectedJwt,
+  connectedUserJwt,
   activeAgencyRights,
   dashboards,
 }: {
   route: FrontAgencyDashboardRoute;
-  inclusionConnectedJwt: ConnectedUserJwt | undefined;
+  connectedUserJwt: ConnectedUserJwt | undefined;
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): JSX.Element => {
   const currentTab = route.name;
   const agencyTabs = rawAgencyDashboardTabs({
     activeAgencyRights,
     dashboards,
-    inclusionConnectedJwt,
+    connectedUserJwt,
   });
   const { enableAgencyDashboardHighlight } = useFeatureFlags();
   return (
@@ -88,9 +88,9 @@ export const AgencyDashboard = ({
 const rawAgencyDashboardTabs = ({
   dashboards,
   activeAgencyRights,
-  inclusionConnectedJwt,
+  connectedUserJwt,
 }: {
-  inclusionConnectedJwt?: ConnectedUserJwt;
+  connectedUserJwt?: ConnectedUserJwt;
   activeAgencyRights: AgencyRight[];
 } & WithDashboards): DashboardTab[] => {
   const agenciesUserIsAdminOn = activeAgencyRights
@@ -125,7 +125,7 @@ const rawAgencyDashboardTabs = ({
             content: (
               <ErroredConventionTabContent
                 activeAgencyRights={activeAgencyRights}
-                inclusionConnectedJwt={inclusionConnectedJwt}
+                connectedUserJwt={connectedUserJwt}
                 dashboards={dashboards}
               />
             ),

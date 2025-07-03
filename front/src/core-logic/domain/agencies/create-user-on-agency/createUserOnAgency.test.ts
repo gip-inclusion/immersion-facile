@@ -1,11 +1,11 @@
 import {
   AgencyDtoBuilder,
+  type ConnectedUser,
   errors,
   expectToEqual,
-  type InclusionConnectedUser,
   toAgencyDtoForAgencyUsersAndAdmins,
 } from "shared";
-import type { NormalizedInclusionConnectedUser } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import type { ConnectedUserWithNormalizedAgencyRights } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agenciesPreloadedState } from "src/core-logic/domain/agencies/agenciesPreloadedState";
 import { createUserOnAgencySelectors } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.selectors";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
@@ -29,7 +29,7 @@ describe("CreateUserOnAgency", () => {
     }));
   });
 
-  const userToCreate: NormalizedInclusionConnectedUser = {
+  const userToCreate: ConnectedUserWithNormalizedAgencyRights = {
     id: "fake-id",
     email: "fake-email@mail.com",
     firstName: "fake-first-name",
@@ -62,7 +62,7 @@ describe("CreateUserOnAgency", () => {
       true,
     );
 
-    const icUser: InclusionConnectedUser = {
+    const user: ConnectedUser = {
       ...userToCreate,
       agencyRights: [
         {
@@ -72,7 +72,7 @@ describe("CreateUserOnAgency", () => {
         },
       ],
     };
-    dependencies.agencyGateway.createUserForAgencyResponse$.next(icUser);
+    dependencies.agencyGateway.createUserForAgencyResponse$.next(user);
 
     expectToEqual(
       createUserOnAgencySelectors.isLoading(store.getState()),

@@ -1,5 +1,5 @@
 import type { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { icUsersAdminSlice } from "src/core-logic/domain/admin/icUsersAdmin/icUsersAdmin.slice";
+import { connectedUsersAdminSlice } from "src/core-logic/domain/admin/connectedUsersAdmin/connectedUsersAdmin.slice";
 import { createUserOnAgencySlice } from "src/core-logic/domain/agencies/create-user-on-agency/createUserOnAgency.slice";
 import { fetchAgencySlice } from "src/core-logic/domain/agencies/fetch-agency/fetchAgency.slice";
 import { removeUserFromAgencySlice } from "src/core-logic/domain/agencies/remove-user-from-agency/removeUserFromAgency.slice";
@@ -8,6 +8,7 @@ import { updateUserOnAgencySlice } from "src/core-logic/domain/agencies/update-u
 import { apiConsumerSlice } from "src/core-logic/domain/apiConsumer/apiConsumer.slice";
 import { assessmentSlice } from "src/core-logic/domain/assessment/assessment.slice";
 import { sendAssessmentLinkSlice } from "src/core-logic/domain/assessment/send-assessment-link/sendAssessmentLink.slice";
+import { connectedUserSlice } from "src/core-logic/domain/connected-user/connectedUser.slice";
 import { conventionSlice } from "src/core-logic/domain/convention/convention.slice";
 import { conventionActionSlice } from "src/core-logic/domain/convention/convention-action/conventionAction.slice";
 import { sendSignatureLinkSlice } from "src/core-logic/domain/convention/send-signature-link/sendSignatureLink.slice";
@@ -18,7 +19,6 @@ import type {
   ActionKindAndLevel,
   Feedback,
 } from "src/core-logic/domain/feedback/feedback.slice";
-import { inclusionConnectedSlice } from "src/core-logic/domain/inclusionConnected/inclusionConnected.slice";
 import { partnersErroredConventionSlice } from "src/core-logic/domain/partnersErroredConvention/partnersErroredConvention.slice";
 import { searchSlice } from "src/core-logic/domain/search/search.slice";
 import { authSlice } from "../auth/auth.slice";
@@ -204,33 +204,33 @@ export const feedbacks: Record<
   },
   "agency-user": {
     "update.success": {
-      action: icUsersAdminSlice.actions.updateUserOnAgencySucceeded,
+      action: connectedUsersAdminSlice.actions.updateUserOnAgencySucceeded,
       title: "L'utilisateur a été mis à jour",
       message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
     },
     "update.error": {
-      action: icUsersAdminSlice.actions.updateUserOnAgencyFailed,
+      action: connectedUsersAdminSlice.actions.updateUserOnAgencyFailed,
       title: "Problème lors de la mise à jour de l'utilisateur",
       message:
         "Une erreur est survenue lors de la mise à jour de l'utilisateur",
     },
     "create.success": {
-      action: icUsersAdminSlice.actions.createUserOnAgencySucceeded,
+      action: connectedUsersAdminSlice.actions.createUserOnAgencySucceeded,
       title: "L'utilisateur a été créé",
       message: "L'utilisateur a été créé et associé à cette agence.",
     },
     "create.error": {
-      action: icUsersAdminSlice.actions.createUserOnAgencyFailed,
+      action: connectedUsersAdminSlice.actions.createUserOnAgencyFailed,
       title: "Problème lors de la création de l'utilisateur",
       message: "Une erreur est survenue lors de la création de l'utilisateur",
     },
     "delete.success": {
-      action: icUsersAdminSlice.actions.removeUserFromAgencySucceeded,
+      action: connectedUsersAdminSlice.actions.removeUserFromAgencySucceeded,
       title: "L'utilisateur n'est plus rattaché à cette agence",
       message: "Les données de l'utilisateur (rôles) ont été mises à jour.",
     },
     "delete.error": {
-      action: icUsersAdminSlice.actions.removeUserFromAgencyFailed,
+      action: connectedUsersAdminSlice.actions.removeUserFromAgencyFailed,
       title:
         "Problème lors de la suppression du rattachement l'utilisateur à cette agence",
       message:
@@ -239,18 +239,18 @@ export const feedbacks: Record<
   },
   "dashboard-agency-register-user": {
     "fetch.error": {
-      action: inclusionConnectedSlice.actions.currentUserFetchFailed,
+      action: connectedUserSlice.actions.currentUserFetchFailed,
       title: "Erreur",
       message: "Erreur lors de la récupération des infos de l'utilisateur",
     },
     "create.success": {
-      action: inclusionConnectedSlice.actions.registerAgenciesSucceeded,
+      action: connectedUserSlice.actions.registerAgenciesSucceeded,
       title: "Votre demande de rattachement a bien été prise en compte",
       message:
         "Elle sera étudiée prochainement par un administrateur et vous serez informé de sa décision.",
     },
     "create.error": {
-      action: inclusionConnectedSlice.actions.registerAgenciesFailed,
+      action: connectedUserSlice.actions.registerAgenciesFailed,
       title: "Erreur lors de la demande de rattachement à une agence",
       message: "Une erreur est survenue lors du rattachement de l'utilisateur",
     },

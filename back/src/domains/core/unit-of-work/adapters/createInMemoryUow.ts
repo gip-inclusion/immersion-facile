@@ -16,9 +16,9 @@ import { InMemoryGroupRepository } from "../../../establishment/adapters/InMemor
 import { InMemorySearchMadeRepository } from "../../../establishment/adapters/InMemorySearchMadeRepository";
 import { InMemoryEstablishementMarketingRepository } from "../../../marketing/adapters/InMemoryEstablishmentMarketingRepository";
 import { InMemoryApiConsumerRepository } from "../../api-consumer/adapters/InMemoryApiConsumerRepository";
+import { InMemoryOngoingOAuthRepository } from "../../authentication/connected-user/adapters/InMemoryOngoingOAuthRepository";
+import { InMemoryUserRepository } from "../../authentication/connected-user/adapters/InMemoryUserRepository";
 import { InMemoryConventionFranceTravailAdvisorRepository } from "../../authentication/ft-connect/adapters/InMemoryConventionFranceTravailAdvisorRepository";
-import { InMemoryOngoingOAuthRepository } from "../../authentication/inclusion-connect/adapters/InMemoryOngoingOAuthRepository";
-import { InMemoryUserRepository } from "../../authentication/inclusion-connect/adapters/InMemoryUserRepository";
 import { InMemoryOutboxQueries } from "../../events/adapters/InMemoryOutboxQueries";
 import { InMemoryOutboxRepository } from "../../events/adapters/InMemoryOutboxRepository";
 import { InMemoryFeatureFlagRepository } from "../../feature-flags/adapters/InMemoryFeatureFlagRepository";

@@ -24,7 +24,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.getDashboardUrl(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (req.params.dashboardName === "agency" && !req.query.agencyId)
@@ -39,13 +39,13 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.getLastNotifications(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
   );
 
   sharedAdminRouter.updateFeatureFlags(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.setFeatureFlag.execute(
@@ -56,7 +56,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.addFormEstablishmentBatch(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.addFormEstablishmentBatch.execute(
@@ -66,19 +66,22 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       ),
   );
 
-  sharedAdminRouter.getInclusionConnectedUsers(
-    deps.inclusionConnectAuthMiddleware,
+  sharedAdminRouter.getConnectedUsers(
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.getIcUsers.execute(req.query, req.payloads?.currentUser),
+        deps.useCases.getConnectedUsers.execute(
+          req.query,
+          req.payloads?.currentUser,
+        ),
       ),
   );
 
-  sharedAdminRouter.getIcUser(deps.inclusionConnectAuthMiddleware, (req, res) =>
+  sharedAdminRouter.getIcUser(deps.connectedUserAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       const currentUser = req.payloads?.currentUser;
       if (!currentUser) throw errors.user.unauthorized();
-      return deps.useCases.getInclusionConnectedUser.execute(
+      return deps.useCases.getConnectedUser.execute(
         { userId: req.params.userId },
         currentUser,
       );
@@ -86,7 +89,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.updateUserRoleForAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
@@ -97,7 +100,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.createUserForAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -110,7 +113,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.removeUserFromAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -127,10 +130,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.rejectIcUserForAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res.status(201), () =>
-        deps.useCases.rejectIcUserForAgency.execute(
+        deps.useCases.rejectUserForAgency.execute(
           req.body,
           req.payloads?.currentUser,
         ),
@@ -138,7 +141,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.saveApiConsumer(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.saveApiConsumer.execute(
@@ -149,14 +152,14 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.getAllApiConsumers(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.getAllApiConsumers.execute({}),
       ),
   );
 
-  sharedAdminRouter.getUsers(deps.inclusionConnectAuthMiddleware, (req, res) =>
+  sharedAdminRouter.getUsers(deps.connectedUserAuthMiddleware, (req, res) =>
     sendHttpResponse(req, res, () => {
       const currentUser = req.payloads?.currentUser;
       if (!currentUser) throw errors.user.unauthorized();
@@ -165,7 +168,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAgencyRouter.getAgencyById(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
         const currentUser = req.payloads?.currentUser;
@@ -178,7 +181,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAgencyRouter.updateAgencyStatus(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgencyStatus.execute(
@@ -192,7 +195,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAgencyRouter.updateAgency(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
@@ -200,7 +203,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAgencyRouter.listAgenciesOptionsWithStatus(
-    deps.inclusionConnectAuthMiddleware,
+    deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
         deps.useCases.privateListAgencies.execute(req.query),

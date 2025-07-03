@@ -1,8 +1,8 @@
 import {
+  ConnectedUserBuilder,
   errors,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
-  InclusionConnectedUserBuilder,
   type SetFeatureFlagParam,
 } from "shared";
 import {
@@ -32,13 +32,11 @@ const setEnableSearchByScoreParams = {
   },
 } satisfies SetFeatureFlagParam;
 
-const icUserNotAdmin = new InclusionConnectedUserBuilder()
+const connectedUserNotAdmin = new ConnectedUserBuilder()
   .withIsAdmin(false)
   .build();
 
-const icUserAdmin = new InclusionConnectedUserBuilder()
-  .withIsAdmin(true)
-  .build();
+const connectedUserAdmin = new ConnectedUserBuilder().withIsAdmin(true).build();
 
 describe("SetFeatureFlag use case", () => {
   let uow: InMemoryUnitOfWork;
@@ -60,8 +58,8 @@ describe("SetFeatureFlag use case", () => {
 
   it("throws Forbidden if currentUser user is not admin", async () => {
     await expectPromiseToFailWithError(
-      setFeatureFlag.execute(setEnableMaintenanceParams, icUserNotAdmin),
-      errors.user.forbidden({ userId: icUserNotAdmin.id }),
+      setFeatureFlag.execute(setEnableMaintenanceParams, connectedUserNotAdmin),
+      errors.user.forbidden({ userId: connectedUserNotAdmin.id }),
     );
   });
 
@@ -73,14 +71,20 @@ describe("SetFeatureFlag use case", () => {
         value: { message: "Maintenance message", severity: "warning" },
       },
     });
-    await setFeatureFlag.execute(setEnableMaintenanceParams, icUserAdmin);
+    await setFeatureFlag.execute(
+      setEnableMaintenanceParams,
+      connectedUserAdmin,
+    );
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableMaintenance: setEnableMaintenanceParams.featureFlag,
     });
   });
 
   it("updates the feature flag", async () => {
-    await setFeatureFlag.execute(setEnableSearchByScoreParams, icUserAdmin);
+    await setFeatureFlag.execute(
+      setEnableSearchByScoreParams,
+      connectedUserAdmin,
+    );
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableSearchByScore: setEnableSearchByScoreParams.featureFlag,
     });
@@ -93,7 +97,10 @@ describe("SetFeatureFlag use case", () => {
       },
     } satisfies SetFeatureFlagParam;
 
-    await setFeatureFlag.execute(updateEnableSearchByScoreParams, icUserAdmin);
+    await setFeatureFlag.execute(
+      updateEnableSearchByScoreParams,
+      connectedUserAdmin,
+    );
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableSearchByScore: updateEnableSearchByScoreParams.featureFlag,
     });
@@ -107,7 +114,7 @@ describe("SetFeatureFlag use case", () => {
     } satisfies SetFeatureFlagParam;
     await setFeatureFlag.execute(
       reupdateEnableSearchByScoreParams,
-      icUserAdmin,
+      connectedUserAdmin,
     );
     expectObjectsToMatch(await uow.featureFlagRepository.getAll(), {
       enableSearchByScore: reupdateEnableSearchByScoreParams.featureFlag,

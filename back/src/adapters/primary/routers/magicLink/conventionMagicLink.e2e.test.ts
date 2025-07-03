@@ -1,6 +1,8 @@
 import { addDays } from "date-fns";
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  type ConnectedUserJwtPayload,
   ConventionDtoBuilder,
   type ConventionId,
   type ConventionMagicLinkRoutes,
@@ -11,8 +13,6 @@ import {
   expectHttpResponseToEqual,
   expectObjectsToMatch,
   expectToEqual,
-  InclusionConnectedUserBuilder,
-  type InclusionConnectJwtPayload,
   type RenewConventionParams,
   type Role,
   ScheduleDtoBuilder,
@@ -34,8 +34,8 @@ import {
 
 describe("Magic link router", () => {
   const payloadMeta = {
-    exp: new Date().getTime() / 1000 + 1000,
-    iat: new Date().getTime() / 1000,
+    exp: Date.now() / 1000 + 1000,
+    iat: Date.now() / 1000,
     version: 1,
   };
 
@@ -43,17 +43,17 @@ describe("Magic link router", () => {
     "READY_TO_SIGN",
   );
 
-  const backofficeAdminUserBuilder = new InclusionConnectedUserBuilder()
+  const backofficeAdminUserBuilder = new ConnectedUserBuilder()
     .withId("backoffice-admin-user")
     .withIsAdmin(true);
-  const icBackofficeAdminUser = backofficeAdminUserBuilder.build();
+  const connectedBackofficeAdminUser = backofficeAdminUserBuilder.build();
   const backofficeAdminUser = backofficeAdminUserBuilder.build();
 
-  const backofficeAdminJwtPayload: InclusionConnectJwtPayload = {
-    version: currentJwtVersions.inclusion,
-    iat: new Date().getTime(),
+  const backofficeAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
     exp: addDays(new Date(), 30).getTime(),
-    userId: icBackofficeAdminUser.id,
+    userId: connectedBackofficeAdminUser.id,
   };
 
   let request: SuperTest<Test>;
@@ -132,7 +132,7 @@ describe("Magic link router", () => {
           .withStatusJustification("Justif")
           .build();
 
-        const notAdminUser = new InclusionConnectedUserBuilder()
+        const notAdminUser = new ConnectedUserBuilder()
           .withIsAdmin(false)
           .buildUser();
 
@@ -144,7 +144,7 @@ describe("Magic link router", () => {
           headers: {
             authorization: generateConnectedUserJwt({
               userId: notAdminUser.id,
-              version: currentJwtVersions.inclusion,
+              version: currentJwtVersions.connectedUser,
             }),
           },
         });
@@ -233,8 +233,8 @@ describe("Magic link router", () => {
         applicationId: conventionId,
         role,
         version: 1,
-        iat: new Date().getTime() / 1000,
-        exp: new Date().getTime() / 1000 + 1000,
+        iat: Date.now() / 1000,
+        exp: Date.now() / 1000 + 1000,
         emailHash: "my-hash",
       });
 
@@ -271,8 +271,8 @@ describe("Magic link router", () => {
             applicationId: existingConvention.id,
             role: "validator",
             version: 1,
-            iat: new Date().getTime() / 1000,
-            exp: new Date().getTime() / 1000 + 1000,
+            iat: Date.now() / 1000,
+            exp: Date.now() / 1000 + 1000,
             emailHash: "my-hash",
           }),
         });
@@ -353,7 +353,7 @@ describe("Magic link router", () => {
       ]);
     });
 
-    it("200 - Creates a convention with provided data and inclusion connected JWT", async () => {
+    it("200 - Creates a convention with provided data and connected user JWT", async () => {
       const agency = new AgencyDtoBuilder().build();
       const existingConvention = new ConventionDtoBuilder()
         .withStatus("ACCEPTED_BY_VALIDATOR")
@@ -404,8 +404,8 @@ describe("Magic link router", () => {
           authorization: generateConnectedUserJwt({
             userId: validator.id,
             version: 1,
-            iat: new Date().getTime() / 1000,
-            exp: new Date().getTime() / 1000 + 1000,
+            iat: Date.now() / 1000,
+            exp: Date.now() / 1000 + 1000,
           }),
         });
 
@@ -484,9 +484,9 @@ describe("Magic link router", () => {
   });
 
   describe("POST /auth/sign-application/:conventionId", () => {
-    it("200 - can sign with inclusion connected user (same email as establishement representative in convention)", async () => {
+    it("200 - can sign with connected user (same email as establishement representative in convention)", async () => {
       const agency = new AgencyDtoBuilder().build();
-      const validator = new InclusionConnectedUserBuilder()
+      const validator = new ConnectedUserBuilder()
         .withId("validator")
         .withEmail("validator@mail.com")
         .buildUser();
@@ -529,9 +529,9 @@ describe("Magic link router", () => {
       });
     });
 
-    it("403 - cannot sign with inclusion connected user (icUser email != convention establishment representative email)", async () => {
+    it("403 - cannot sign with connected user (icUser email != convention establishment representative email)", async () => {
       const agency = new AgencyDtoBuilder().build();
-      const validator = new InclusionConnectedUserBuilder()
+      const validator = new ConnectedUserBuilder()
         .withId("validator")
         .withEmail("validator@mail.com")
         .buildUser();
@@ -583,7 +583,7 @@ describe("Magic link router", () => {
   describe("POST /auth/convention/signatories/send-signature-link", () => {
     it("200 - connected validator can send signature link to signatory", async () => {
       const agency = new AgencyDtoBuilder().build();
-      const validator = new InclusionConnectedUserBuilder()
+      const validator = new ConnectedUserBuilder()
         .withId("validator")
         .withEmail("validator@mail.com")
         .buildUser();

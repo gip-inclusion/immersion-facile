@@ -1,7 +1,7 @@
 import {
   type AbsoluteUrl,
+  type ConnectedUser,
   errors,
-  type InclusionConnectedUser,
   validateFile,
   zStringMinLength1,
 } from "shared";
@@ -31,7 +31,7 @@ const uploadFileInput: z.Schema<UploadFileInput> = z.object({
 export class UploadFile extends UseCase<
   UploadFileInput,
   AbsoluteUrl,
-  InclusionConnectedUser
+  ConnectedUser
 > {
   protected inputSchema = z.any();
 
@@ -47,7 +47,7 @@ export class UploadFile extends UseCase<
 
   protected async _execute(
     { file }: UploadFileInput,
-    connectedUser: InclusionConnectedUser,
+    connectedUser: ConnectedUser,
   ): Promise<AbsoluteUrl> {
     if (!connectedUser) throw errors.user.unauthorized();
 
@@ -85,7 +85,7 @@ export class UploadFile extends UseCase<
 }
 
 const throwIfUserIsNotAdminNorAgencyAdmin = (
-  currentUser: InclusionConnectedUser,
+  currentUser: ConnectedUser,
 ): void | never => {
   if (!currentUser) throw errors.user.unauthorized();
   if (currentUser.isBackofficeAdmin) return;

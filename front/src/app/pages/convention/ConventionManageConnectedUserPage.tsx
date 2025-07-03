@@ -17,19 +17,17 @@ export const ConventionManageConnectedUserPage = ({
   route,
 }: ConventionManageConnectedUserPageProps) => {
   const conventionId = route.params.conventionId;
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   return (
     <HeaderFooterLayout>
       <MainWrapper layout="default" vSpacing={8}>
-        {inclusionConnectedJwt ? (
+        {connectedUserJwt ? (
           <WithFeedbackReplacer topic="transfer-convention-to-agency">
             <ConventionManageContent
               jwtParams={{
-                jwt: inclusionConnectedJwt,
-                kind: "inclusionConnect",
+                jwt: connectedUserJwt,
+                kind: "connected user",
               }}
               conventionId={conventionId}
             />
@@ -38,7 +36,7 @@ export const ConventionManageConnectedUserPage = ({
           <Alert
             severity="error"
             title="Non autorisé"
-            description="Cette page est reservée aux utilisteurs connectés avec Inclusion Connect, et dont l'agence est responsable de cette convention."
+            description="Cette page est reservée aux utilisteurs connectés avec ProConnect, et dont l'agence est responsable de cette convention."
           />
         )}
       </MainWrapper>

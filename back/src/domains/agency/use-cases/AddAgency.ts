@@ -9,7 +9,7 @@ import {
   errors,
   type UserId,
 } from "shared";
-import { createOrGetUserIdByEmail } from "../../core/authentication/inclusion-connect/entities/user.helper";
+import { createOrGetUserIdByEmail } from "../../core/authentication/connected-user/entities/user.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SiretGateway } from "../../core/sirene/ports/SiretGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";

@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   errors,
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
-  InclusionConnectedUserBuilder,
   type UpdateAgencyStatusParamsWithoutId,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -20,10 +20,8 @@ import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
 const nextDate = new Date("2022-01-01T10:00:00.000");
 const nextUuid = "event-uuid";
 
-const backofficeAdminBuilder = new InclusionConnectedUserBuilder().withIsAdmin(
-  true,
-);
-const icBackofficeAdmin = backofficeAdminBuilder.build();
+const backofficeAdminBuilder = new ConnectedUserBuilder().withIsAdmin(true);
+const connectedBackofficeAdmin = backofficeAdminBuilder.build();
 const backofficeAdmin = backofficeAdminBuilder.buildUser();
 
 describe("Update agency status", () => {
@@ -70,7 +68,7 @@ describe("Update agency status", () => {
             id: existingAgency.id,
             ...testParams,
           },
-          icBackofficeAdmin,
+          connectedBackofficeAdmin,
         );
 
         // Assert
@@ -87,7 +85,7 @@ describe("Update agency status", () => {
             payload: {
               agencyId: existingAgency.id,
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: backofficeAdmin.id,
               },
             },
@@ -116,7 +114,7 @@ describe("Update agency status", () => {
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: existingAgency.id, status: "active" },
-          { ...icBackofficeAdmin, isBackofficeAdmin: false },
+          { ...connectedBackofficeAdmin, isBackofficeAdmin: false },
         ),
         errors.user.forbidden({ userId: backofficeAdmin.id }),
       );
@@ -127,7 +125,7 @@ describe("Update agency status", () => {
       await expectPromiseToFailWithError(
         updateAgencyStatus.execute(
           { id: agencyId, status: "active" },
-          icBackofficeAdmin,
+          connectedBackofficeAdmin,
         ),
         errors.agency.notFound({
           agencyId,

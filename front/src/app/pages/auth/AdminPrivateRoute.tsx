@@ -17,7 +17,7 @@ export const AdminPrivateRoute = ({
   <ConnectedPrivateRoute
     allowAdminOnly={true}
     route={route}
-    inclusionConnectConnexionPageHeader={
+    oAuthConnexionPageHeader={
       <PageHeader title="Bienvenue cher administrateur de la super team Immersion Facilitée ! 🚀" />
     }
   >

@@ -10,6 +10,7 @@ import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import { geoPositionSchema } from "../geoPosition/geoPosition.schema";
 import { phoneSchema } from "../phone.schema";
+import { allAgencyRoles } from "../role/role.dto";
 import { siretSchema } from "../siret/siret.schema";
 import {
   localization,
@@ -41,6 +42,8 @@ export const refersToAgencyIdSchema: z.ZodSchema<AgencyId> = z.string();
 export const agencyIdsSchema: z.Schema<AgencyId[]> = z
   .array(agencyIdSchema)
   .nonempty();
+
+export const agencyRoleSchema = z.enum(allAgencyRoles);
 
 export const withAgencyIdSchema = zSchemaForType<WithAgencyId>()(
   z.object({

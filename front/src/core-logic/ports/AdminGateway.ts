@@ -2,19 +2,19 @@ import type { Observable } from "rxjs";
 import type {
   ApiConsumer,
   ApiConsumerJwt,
+  ConnectedUser,
   ConnectedUserJwt,
   DashboardUrlAndName,
   EstablishmentBatchReport,
   FormEstablishmentBatchDto,
   GetDashboardParams,
   GetUsersFilters,
-  InclusionConnectedUser,
   NotificationsByKind,
   RejectIcUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserId,
-  UserInList,
   UserParamsForAgency,
+  UserWithNumberOfAgencies,
   WithAgencyIdAndUserId,
   WithUserFilters,
 } from "shared";
@@ -28,16 +28,16 @@ export interface AdminGateway {
   createUserForAgency$(
     params: UserParamsForAgency,
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser>;
+  ): Observable<ConnectedUser>;
 
   getDashboardUrl$: (
     params: GetDashboardParams,
     token: ConnectedUserJwt,
   ) => Observable<DashboardUrlAndName>;
-  getInclusionConnectedUsersToReview$: (
+  getConnectedUsersToReview$: (
     token: ConnectedUserJwt,
     filters: WithUserFilters,
-  ) => Observable<InclusionConnectedUser[]>;
+  ) => Observable<ConnectedUser[]>;
   updateFeatureFlags$: (
     params: SetFeatureFlagParam,
     adminToken: ConnectedUserJwt,
@@ -73,10 +73,10 @@ export interface AdminGateway {
   listUsers$(
     params: GetUsersFilters,
     token: ConnectedUserJwt,
-  ): Observable<UserInList[]>;
+  ): Observable<UserWithNumberOfAgencies[]>;
 
   getIcUser$(
     params: { userId: UserId },
     token: ConnectedUserJwt,
-  ): Observable<InclusionConnectedUser>;
+  ): Observable<ConnectedUser>;
 }

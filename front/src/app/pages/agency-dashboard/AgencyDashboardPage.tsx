@@ -11,8 +11,8 @@ import { useAppSelector } from "src/app/hooks/reduxHooks";
 import type { FrontAgencyDashboardRoute } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { agenciesSlice } from "src/core-logic/domain/agencies/agencies.slice";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { FeedbackTopic } from "src/core-logic/domain/feedback/feedback.content";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { match, P } from "ts-pattern";
 import { AgencyDashboard } from "../../components/agency/agency-dashboard/AgencyDashboard";
 import { RegisterAgenciesForm } from "../../components/forms/register-agencies/RegisterAgenciesForm";
@@ -22,11 +22,9 @@ export const AgencyDashboardPage = ({
   route: FrontAgencyDashboardRoute;
 }) => {
   const dispatch = useDispatch();
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
-  const isLoading = useAppSelector(inclusionConnectedSelectors.isLoading);
-  const inclusionConnectedJwt = useAppSelector(
-    authSelectors.inclusionConnectToken,
-  );
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
+  const isLoading = useAppSelector(connectedUserSelectors.isLoading);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
 
   const feedbackTopic: FeedbackTopic = "dashboard-agency-register-user";
 
@@ -97,7 +95,7 @@ export const AgencyDashboardPage = ({
                 route={route}
                 activeAgencyRights={activeAgencyRights}
                 dashboards={currentUser.dashboards}
-                inclusionConnectedJwt={inclusionConnectedJwt}
+                connectedUserJwt={connectedUserJwt}
               />
             ) : (
               <NoActiveAgencyRights

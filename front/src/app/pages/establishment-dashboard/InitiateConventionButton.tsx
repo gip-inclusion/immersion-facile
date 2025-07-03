@@ -17,12 +17,12 @@ import {
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { routes } from "src/app/routes/routes";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { establishmentSelectors } from "src/core-logic/domain/establishment/establishment.selectors";
 import {
   defaultFormEstablishmentValue,
   establishmentSlice,
 } from "src/core-logic/domain/establishment/establishment.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
 import { z } from "zod";
 
 const {
@@ -43,8 +43,8 @@ const initiateConventionFormSchema = z.object({
 
 export const InitiateConventionButton = () => {
   const dispatch = useDispatch();
-  const token = useAppSelector(authSelectors.inclusionConnectToken);
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const establishment = useAppSelector(
     establishmentSelectors.formEstablishment,
   );
@@ -131,7 +131,7 @@ export const InitiateConventionButton = () => {
               establishmentSlice.actions.fetchEstablishmentRequested({
                 establishmentRequested: {
                   siret: currentUserEstablishments[0].siret,
-                  jwt: token,
+                  jwt: connectedUserJwt,
                 },
                 feedbackTopic: "unused",
               }),
@@ -184,7 +184,7 @@ export const InitiateConventionButton = () => {
                     establishmentSlice.actions.fetchEstablishmentRequested({
                       establishmentRequested: {
                         siret: event.currentTarget.value,
-                        jwt: token,
+                        jwt: connectedUserJwt,
                       },
                       feedbackTopic: "unused",
                     }),

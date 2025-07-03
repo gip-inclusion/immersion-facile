@@ -2,13 +2,13 @@ import {
   AgencyDtoBuilder,
   type AssessmentDto,
   type AssessmentStatus,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   type ExtractFromExisting,
   errors,
   expectPromiseToFailWithError,
   frontRoutes,
   getFormattedFirstnameAndLastname,
-  InclusionConnectedUserBuilder,
   reasonableSchedule,
 } from "shared";
 import { toAgencyWithRights } from "../../../../utils/agency";
@@ -29,7 +29,7 @@ import { createAssessmentEntity } from "../../entities/AssessmentEntity";
 import { NotifyAgencyThatAssessmentIsCreated } from "./NotifyAgencyThatAssessmentIsCreated";
 
 const agency = new AgencyDtoBuilder().build();
-const validator = new InclusionConnectedUserBuilder()
+const validator = new ConnectedUserBuilder()
   .withEmail("validator@email.com")
   .withId("validator")
   .buildUser();
@@ -103,7 +103,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
   });
 
   it("Send an email to validators when beneficiary came", async () => {
-    const validator2 = new InclusionConnectedUserBuilder()
+    const validator2 = new ConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
       .buildUser();
@@ -200,7 +200,7 @@ describe("NotifyAgencyThatAssessmentIsCreated", () => {
       establishmentAdvices: "osef conseil",
     };
 
-    const validator2 = new InclusionConnectedUserBuilder()
+    const validator2 = new ConnectedUserBuilder()
       .withEmail("validator2@email.com")
       .withId("validator2")
       .buildUser();

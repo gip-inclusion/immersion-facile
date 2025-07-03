@@ -63,7 +63,7 @@ export const makeCreateAssessment = createTransactionalUseCase<
             role: conventionJwtPayload.role,
           }
         : {
-            kind: "inclusion-connected",
+            kind: "connected-user",
             userId: conventionJwtPayload.userId,
           };
     await Promise.all([

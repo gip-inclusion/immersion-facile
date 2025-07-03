@@ -1,9 +1,9 @@
 import {
+  type ConnectedUser,
+  ConnectedUserBuilder,
   type Email,
   expectToEqual,
   type FederatedIdentity,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
 } from "shared";
 import type { ConventionParamsInUrl } from "src/app/routes/routeParams/convention";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
@@ -12,7 +12,7 @@ import {
   authSlice,
   type FederatedIdentityWithUser,
 } from "src/core-logic/domain/auth/auth.slice";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { rootAppSlice } from "src/core-logic/domain/rootApp/rootApp.slice";
 import {
   createTestStore,
@@ -31,13 +31,13 @@ describe("Auth slice", () => {
     lastName: "Doe",
   };
 
-  const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
+  const connectedUserFederatedIdentity: FederatedIdentityWithUser = {
     provider: "proConnect",
     token: "123",
     email: "john.doe@mail.com",
     firstName: "John",
     lastName: "Doe",
-    idToken: "inclusion-connect-id-token",
+    idToken: "id-token",
   };
 
   let store: ReduxStore;
@@ -86,20 +86,20 @@ describe("Auth slice", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+        federatedIdentityWithUser: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         requestedEmail: null,
       },
-      inclusionConnected: {
-        currentUser: new InclusionConnectedUserBuilder().build(),
+      connectedUser: {
+        currentUser: new ConnectedUserBuilder().build(),
         isLoading: false,
         agenciesToReview: [],
       },
     }));
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      inclusionConnectedFederatedIdentity,
+      connectedUserFederatedIdentity,
     );
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
@@ -107,7 +107,7 @@ describe("Auth slice", () => {
 
     store.dispatch(
       authSlice.actions.federatedIdentityDeletionTriggered({
-        mode: "device-and-inclusion",
+        mode: "device-and-oauth",
       }),
     );
 
@@ -119,7 +119,7 @@ describe("Auth slice", () => {
       requestedEmail: null,
     });
 
-    dependencies.inclusionConnectedGateway.getLogoutUrlResponse$.next(
+    dependencies.authGateway.getLogoutUrlResponse$.next(
       "http://yolo-logout.com",
     );
     expectFederatedIdentityInDevice(undefined);
@@ -135,29 +135,27 @@ describe("Auth slice", () => {
       isRequestingLoginByEmail: false,
       requestedEmail: null,
     });
-    expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
-      null,
-    );
+    expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
   });
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page.", () => {
     ({ store, dependencies } = createTestStore({
       auth: {
         isRequestingLoginByEmail: false,
-        federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+        federatedIdentityWithUser: connectedUserFederatedIdentity,
         afterLoginRedirectionUrl: null,
         isLoading: true,
         requestedEmail: null,
       },
-      inclusionConnected: {
-        currentUser: new InclusionConnectedUserBuilder().build(),
+      connectedUser: {
+        currentUser: new ConnectedUserBuilder().build(),
         isLoading: false,
         agenciesToReview: [],
       },
     }));
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      inclusionConnectedFederatedIdentity,
+      connectedUserFederatedIdentity,
     );
     dependencies.localDeviceRepository.set("partialConventionInUrl", {
       firstName: "BOB",
@@ -187,9 +185,7 @@ describe("Auth slice", () => {
       isRequestingLoginByEmail: false,
       requestedEmail: null,
     });
-    expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
-      null,
-    );
+    expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
   });
 
   it("deletes federatedIdentity & partialConventionInUrl stored in device and in store when asked for without redirects to provider logout page (when provider is not 'proConnect')", () => {
@@ -201,7 +197,7 @@ describe("Auth slice", () => {
         isLoading: true,
         requestedEmail: null,
       },
-      inclusionConnected: {
+      connectedUser: {
         currentUser: null,
         isLoading: false,
         agenciesToReview: [],
@@ -240,9 +236,7 @@ describe("Auth slice", () => {
       isRequestingLoginByEmail: false,
       requestedEmail: null,
     });
-    expect(inclusionConnectedSelectors.currentUser(store.getState())).toBe(
-      null,
-    );
+    expect(connectedUserSelectors.currentUser(store.getState())).toBe(null);
   });
 
   it("retrieves federatedIdentity if stored in device", () => {
@@ -256,24 +250,24 @@ describe("Auth slice", () => {
 
     dependencies.localDeviceRepository.set(
       "federatedIdentityWithUser",
-      inclusionConnectedFederatedIdentity,
+      connectedUserFederatedIdentity,
     );
     store.dispatch(rootAppSlice.actions.appIsReady());
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       requestedEmail: null,
     });
 
-    expectFederatedIdentityInDevice(inclusionConnectedFederatedIdentity);
-    const icUser: InclusionConnectedUser = {
+    expectFederatedIdentityInDevice(connectedUserFederatedIdentity);
+    const user: ConnectedUser = {
       id: "123",
-      email: inclusionConnectedFederatedIdentity.email,
-      firstName: inclusionConnectedFederatedIdentity.firstName,
-      lastName: inclusionConnectedFederatedIdentity.lastName,
+      email: connectedUserFederatedIdentity.email,
+      firstName: connectedUserFederatedIdentity.firstName,
+      lastName: connectedUserFederatedIdentity.lastName,
       agencyRights: [],
       dashboards: { agencies: {}, establishments: {} },
       proConnect: {
@@ -282,15 +276,12 @@ describe("Auth slice", () => {
       },
       createdAt: new Date().toISOString(),
     };
-    dependencies.inclusionConnectedGateway.currentUser$.next(icUser);
-    expectToEqual(
-      inclusionConnectedSelectors.currentUser(store.getState()),
-      icUser,
-    );
+    dependencies.authGateway.currentUser$.next(user);
+    expectToEqual(connectedUserSelectors.currentUser(store.getState()), user);
 
     expectAuthStateToBe({
       afterLoginRedirectionUrl: null,
-      federatedIdentityWithUser: inclusionConnectedFederatedIdentity,
+      federatedIdentityWithUser: connectedUserFederatedIdentity,
       isLoading: false,
       isRequestingLoginByEmail: false,
       requestedEmail: null,

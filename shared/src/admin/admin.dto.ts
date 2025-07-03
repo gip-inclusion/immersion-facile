@@ -5,11 +5,9 @@ import type {
 } from "../agency/agency.dto";
 import type { ConventionId } from "../convention/convention.dto";
 import type { Email } from "../email/email.dto";
-import type {
-  AgencyRole,
-  UserId,
-} from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
+import type { AgencyRole } from "../role/role.dto";
 import type { SiretDto } from "../siret/siret";
+import type { UserId } from "../user/user.dto";
 
 export type WithAgencyIdAndUserId = {
   agencyId: AgencyId;

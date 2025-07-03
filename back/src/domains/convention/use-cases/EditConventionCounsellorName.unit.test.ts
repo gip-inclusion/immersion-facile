@@ -1,11 +1,13 @@
 import type {
   AgencyRole,
+  ConnectedUser,
+  ConnectedUserDomainJwtPayload,
   ConventionStatus,
-  InclusionConnectDomainJwtPayload,
   Role,
 } from "shared";
 import {
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   ConventionDtoBuilder,
   conventionStatusesWithoutJustificationNorValidator,
   errors,
@@ -13,8 +15,6 @@ import {
   expectObjectInArrayToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  type InclusionConnectedUser,
-  InclusionConnectedUserBuilder,
   UserBuilder,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
@@ -72,7 +72,7 @@ describe("EditCounsellorName", () => {
     now: new Date(),
   });
 
-  const connectedUser = new InclusionConnectedUserBuilder()
+  const connectedUser = new ConnectedUserBuilder()
     .withId("bcc5c20e-6dd2-45cf-affe-927358005262")
     .build();
 
@@ -150,7 +150,7 @@ describe("EditCounsellorName", () => {
 
     describe("with connected user", () => {
       it("throws not found if connected user does not exist", async () => {
-        const unexistingUserPayload: InclusionConnectDomainJwtPayload = {
+        const unexistingUserPayload: ConnectedUserDomainJwtPayload = {
           userId: "bcc5c20e-6dd2-45cf-affe-927358005267",
         };
         uow.agencyRepository.agencies = [
@@ -368,9 +368,9 @@ describe("EditCounsellorName", () => {
   describe("Right paths: edit counsellor names on convention", () => {
     describe("with connected user", () => {
       it.each(["validator", "counsellor", "back-office"] satisfies Role[])(
-        "triggered by inclusion-connected user with role %s",
+        "triggered by connected-user user with role %s",
         async (role) => {
-          const user: InclusionConnectedUser = {
+          const user: ConnectedUser = {
             ...connectedUser,
             isBackofficeAdmin: role === "back-office",
           };
@@ -427,7 +427,7 @@ describe("EditCounsellorName", () => {
               payload: {
                 conventionId: convention.id,
                 triggeredBy: {
-                  kind: "inclusion-connected",
+                  kind: "connected-user",
                   userId: user.id,
                 },
               },
@@ -490,7 +490,7 @@ describe("EditCounsellorName", () => {
             payload: {
               conventionId: conventionWithAgencyReferent.id,
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: connectedUser.id,
               },
             },
@@ -543,7 +543,7 @@ describe("EditCounsellorName", () => {
               payload: {
                 conventionId: initialConvention.id,
                 triggeredBy: {
-                  kind: "inclusion-connected",
+                  kind: "connected-user",
                   userId: connectedUser.id,
                 },
               },
@@ -553,11 +553,11 @@ describe("EditCounsellorName", () => {
       );
 
       it("triggered by backoffice admin for a convention with agency with refersTo", async () => {
-        const backofficeAdmin = new InclusionConnectedUserBuilder()
+        const backofficeAdmin = new ConnectedUserBuilder()
           .withEmail("counsellor@mail.com")
           .withIsAdmin(true)
           .build();
-        const backofficeAdminPayload: InclusionConnectDomainJwtPayload = {
+        const backofficeAdminPayload: ConnectedUserDomainJwtPayload = {
           userId: backofficeAdmin.id,
         };
         const conventionWithAgencyRefersTo = new ConventionDtoBuilder(
@@ -597,7 +597,7 @@ describe("EditCounsellorName", () => {
             payload: {
               conventionId: conventionWithAgencyRefersTo.id,
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: backofficeAdmin.id,
               },
             },
@@ -609,7 +609,7 @@ describe("EditCounsellorName", () => {
         const counsellor = new UserBuilder()
           .withEmail("counsellor@mail.com")
           .build();
-        const counsellorPayload: InclusionConnectDomainJwtPayload = {
+        const counsellorPayload: ConnectedUserDomainJwtPayload = {
           userId: counsellor.id,
         };
         const conventionWithAgencyRefersTo = new ConventionDtoBuilder(
@@ -654,7 +654,7 @@ describe("EditCounsellorName", () => {
             payload: {
               conventionId: conventionWithAgencyRefersTo.id,
               triggeredBy: {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: counsellor.id,
               },
             },

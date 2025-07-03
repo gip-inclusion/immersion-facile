@@ -1,12 +1,15 @@
 import { createTemplatesByName } from "html-templates";
-import type { DiscussionExchangeForbidenReason, ExchangeRole } from "..";
 import {
   type ConventionId,
   type InternshipKind,
   labelsForImmersionObjective,
 } from "../convention/convention.dto";
-import type { AgencyRole } from "../inclusionConnectedAllowed/inclusionConnectedAllowed.dto";
-import { frontRoutes } from "../routes/routes";
+import type {
+  DiscussionExchangeForbidenReason,
+  ExchangeRole,
+} from "../discussion/discussion.dto";
+import type { AgencyRole } from "../role/role.dto";
+import { frontRoutes } from "../routes/route.utils";
 import { isStringDate, toDisplayedDate } from "../utils/date";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
@@ -1467,7 +1470,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       }),
     },
     IC_USER_RIGHTS_HAS_CHANGED: {
-      niceName: "Inclusion Connect - Changement de droit sur agence",
+      niceName: "ProConnect - Changement de droit sur agence",
       tags: ["activation BO prescripteur"],
       createEmailVariables: ({
         agencyName,
@@ -1497,7 +1500,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       }),
     },
     IC_USER_REGISTRATION_TO_AGENCY_REJECTED: {
-      niceName: "Inclusion Connect - Rejet de rattachement a une agence",
+      niceName: "ProConnect - Rejet de rattachement a une agence",
       tags: ["rejet de rattachement a une agence"],
       createEmailVariables: ({ agencyName, justification }) => ({
         subject:

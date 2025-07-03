@@ -1,12 +1,12 @@
 import {
   type AgencyDto,
   AgencyDtoBuilder,
+  ConnectedUserBuilder,
   type ConventionDto,
   ConventionDtoBuilder,
   type EmailNotification,
   expectToEqual,
   frontRoutes,
-  InclusionConnectedUserBuilder,
   type ShortLinkId,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
@@ -31,11 +31,11 @@ import { NotifySignatoriesThatConventionSubmittedNeedsSignature } from "./Notify
 describe("NotifySignatoriesThatConventionSubmittedNeedsSignature", () => {
   const config: AppConfig = new AppConfigBuilder({}).build();
   const agency: AgencyDto = new AgencyDtoBuilder().build();
-  const counsellor = new InclusionConnectedUserBuilder()
+  const counsellor = new ConnectedUserBuilder()
     .withId("counsellor")
     .withEmail("counsellor@mail.com")
     .buildUser();
-  const validator = new InclusionConnectedUserBuilder()
+  const validator = new ConnectedUserBuilder()
     .withId("validator")
     .withEmail("validator@mail.com")
     .buildUser();

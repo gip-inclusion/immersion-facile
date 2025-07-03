@@ -5,17 +5,16 @@ import {
   type ConventionDto,
   type ConventionRelatedJwtPayload,
   errors,
-  getIcUserRoleForAccessingConvention,
+  getConventionManageAllowedRoles,
   hasAllowedRoleOnAssessment,
   isEstablishmentTutorIsEstablishmentRepresentative,
   legacyAssessmentDtoSchema,
   type Role,
 } from "shared";
 import { z } from "zod";
+import { getUserWithRights } from "../domains/connected-users/helpers/userRights.helper";
 import type { AssessmentEntity } from "../domains/convention/entities/AssessmentEntity";
-
 import type { UnitOfWork } from "../domains/core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../domains/inclusion-connected-users/helpers/userRights.helper";
 import { isSomeEmailMatchingEmailHash } from "./jwt";
 
 export const throwForbiddenIfNotAllowedForAssessments = async ({
@@ -48,7 +47,7 @@ export const throwForbiddenIfNotAllowedForAssessments = async ({
   if ("userId" in jwtPayload) {
     const user = await getUserWithRights(uow, jwtPayload.userId);
     if (user.isBackofficeAdmin && mode === "GetAssessment") return;
-    const userRolesOnConvention = getIcUserRoleForAccessingConvention(
+    const userRolesOnConvention = getConventionManageAllowedRoles(
       convention,
       user,
     );

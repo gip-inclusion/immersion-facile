@@ -12,7 +12,7 @@ import { useSiretFetcher } from "src/app/hooks/siret.hooks";
 import { frontErrors } from "src/app/pages/error/front-errors";
 import { routes } from "src/app/routes/routes";
 import { commonIllustrations } from "src/assets/img/illustrations";
-import { inclusionConnectedSelectors } from "src/core-logic/domain/inclusionConnected/inclusionConnected.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import type { OnStepChange } from "../EstablishmentForm";
 
 export const CreateIntroSection = ({
@@ -26,7 +26,7 @@ export const CreateIntroSection = ({
   });
   const { setValue } = useFormContext<FormEstablishmentDto>();
 
-  const currentUser = useAppSelector(inclusionConnectedSelectors.currentUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
 
   if (!currentUser) throw frontErrors.generic.unauthorized();
 

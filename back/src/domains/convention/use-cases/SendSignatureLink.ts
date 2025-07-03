@@ -147,7 +147,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
         triggeredBy:
           "userId" in jwtPayload
             ? {
-                kind: "inclusion-connected",
+                kind: "connected-user",
                 userId: jwtPayload.userId,
               }
             : {

@@ -30,7 +30,7 @@ setup("authenticate as IC user agency", async ({ page }) => {
   await page.context().storageState({ path: agencyAuthFile });
 });
 
-type ProviderMode = "ProConnect" | "InclusionConnect";
+type ProviderMode = "ProConnect";
 
 const loginWithIdentityProvider = async (
   page: Page,
@@ -91,7 +91,7 @@ const loginWithIdentityProvider = async (
   expect(page.url()).toContain(frontRoutes[routeName]);
 };
 
-type InclusionConnectRoute =
+type ConnectedUserRoute =
   | "agencyDashboard"
   | "establishmentDashboard"
   | "admin";
@@ -99,7 +99,7 @@ type InclusionConnectRoute =
 const buttonByRouteName = (
   identityProviderMode: ProviderMode,
 ): Record<
-  InclusionConnectRoute,
+  ConnectedUserRoute,
   {
     proConnectLoginButtonId: string;
     navLink: string;
@@ -137,9 +137,10 @@ const buttonByRouteName = (
   };
 };
 
-const getAuthEnvVarByIdentityProviderMode = (identityProviderMode: string) =>
-  testConfig[
-    identityProviderMode === "InclusionConnect"
-      ? "inclusionConnect"
-      : "proConnect"
-  ];
+const getAuthEnvVarByIdentityProviderMode = (
+  identityProviderMode: ProviderMode,
+) => {
+  if (identityProviderMode === "ProConnect") return testConfig.proConnect;
+
+  throw new Error(`Unsupported Provider mode ${identityProviderMode}`);
+};
