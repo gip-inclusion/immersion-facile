@@ -2,6 +2,7 @@ import { fr } from "@codegouvfr/react-dsfr";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { ButtonsGroup } from "@codegouvfr/react-dsfr/ButtonsGroup";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import { NotificationIndicator } from "react-design-system";
 
 import { type AgencyDto, domElementIds } from "shared";
 import { NameAndEmailInTable } from "src/app/components/admin/NameAndEmailInTable";
@@ -45,9 +46,10 @@ export const AgencyUsersTable = ({
           lastName={agencyUser.lastName}
           email={agencyUser.email}
         />,
-        agencyUser.agencyRights[agency.id].isNotifiedByEmail
-          ? "Reçoit les notifications"
-          : "Ne reçoit pas les notifications",
+        <NotificationIndicator
+          key={`${agencyUser.firstName}-${agencyUser.lastName}-${agencyUser.email}-notification`}
+          isNotified={agencyUser.agencyRights[agency.id].isNotifiedByEmail}
+        />,
         agencyUser.agencyRights[agency.id].roles.map((role) => {
           return (
             <Badge
