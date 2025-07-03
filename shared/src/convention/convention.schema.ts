@@ -215,10 +215,16 @@ export const withOptionalFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstn
     lastname: personNameSchema.optional(),
   });
 
+const conventionValidatorFirstnameAndLastnameSchema: z.Schema<WithOptionalFirstnameAndLastname> =
+  z.object({
+    firstname: z.string().optional(),
+    lastname: z.string().optional(),
+  });
+
 const conventionValidatorsSchema: z.Schema<ConventionValidatorInputNames> =
   z.object({
-    agencyCounsellor: withOptionalFirstnameAndLastnameSchema.optional(),
-    agencyValidator: withOptionalFirstnameAndLastnameSchema.optional(),
+    agencyCounsellor: conventionValidatorFirstnameAndLastnameSchema.optional(),
+    agencyValidator: conventionValidatorFirstnameAndLastnameSchema.optional(),
   });
 
 export const editConventionCounsellorNameRequestSchema: z.Schema<EditConventionCounsellorNameRequestDto> =
@@ -454,8 +460,8 @@ export type WithFirstnameAndLastname = OmitFromExistingKeys<
 
 export const withFirstnameAndLastnameSchema: z.Schema<WithFirstnameAndLastname> =
   z.object({
-    firstname: zStringMinLength1,
-    lastname: zStringMinLength1,
+    firstname: personNameSchema,
+    lastname: personNameSchema,
   });
 
 const updateConventionStatusWithValidatorSchema: z.Schema<UpdateConventionStatusWithValidator> =
