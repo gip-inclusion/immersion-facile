@@ -25,7 +25,7 @@ export const frontErrors = {
   generic: {
     pageNotFound: () =>
       new FrontSpecificError({
-        title: "Page non trouvé",
+        title: "Page non trouvée",
         subtitle: "La page que vous cherchez est introuvable.",
         description: (
           <>
