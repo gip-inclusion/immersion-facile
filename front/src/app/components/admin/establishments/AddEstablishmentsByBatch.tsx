@@ -3,7 +3,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import Papa from "papaparse";
-import { keys, values } from "ramda";
+import { keys } from "ramda";
 import { type ElementRef, Fragment, useEffect, useRef, useState } from "react";
 import { Loader } from "react-design-system";
 import { useForm } from "react-hook-form";
@@ -330,7 +330,6 @@ export const AddEstablishmentsByBatch = () => {
                   >
                     {establishment.formEstablishment && (
                       <tr
-                        key={`${establishment.formEstablishment.siret}-${index}`}
                         className={cx({})}
                         style={{
                           backgroundColor: establishment.zodErrors.length
@@ -338,22 +337,22 @@ export const AddEstablishmentsByBatch = () => {
                             : "",
                         }}
                       >
-                        {values(establishment.formEstablishment).map(
-                          (value) => {
-                            const valueKey = JSON.stringify(value);
-                            return (
-                              <Fragment
-                                key={`${establishment.formEstablishment?.siret}-${valueKey}`}
-                              >
-                                {establishment.formEstablishment && (
-                                  <td className={fr.cx("fr-text--xs")}>
-                                    {value ? JSON.stringify(value) : ""}
-                                  </td>
-                                )}
-                              </Fragment>
-                            );
-                          },
-                        )}
+                        {keys(establishment.formEstablishment).map((key) => {
+                          const valueForKey =
+                            establishment.formEstablishment?.[key];
+                          const valueKey = JSON.stringify(valueForKey);
+                          return (
+                            <Fragment
+                              key={`${establishment.formEstablishment?.siret}-${key}-${valueKey}`}
+                            >
+                              {establishment.formEstablishment && (
+                                <td className={fr.cx("fr-text--xs")}>
+                                  {valueKey}
+                                </td>
+                              )}
+                            </Fragment>
+                          );
+                        })}
                       </tr>
                     )}
                     {establishment.formEstablishment === null && (
