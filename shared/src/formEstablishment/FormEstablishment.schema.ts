@@ -79,6 +79,11 @@ export const formEstablishmentUserRightsSchema: z.Schema<
     (userRights) =>
       uniq(userRights.map((right) => right.email)).length === userRights.length,
     "La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+  )
+  .refine(
+    (userRights) =>
+      userRights.some((right) => right.shouldReceiveDiscussionNotifications),
+    "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
   );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [
