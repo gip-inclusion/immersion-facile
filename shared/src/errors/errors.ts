@@ -644,7 +644,7 @@ export const errors = {
       ),
     noUsers: (agencyId: AgencyId) =>
       new BadRequestError(
-        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateurs`,
+        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateur.`,
       ),
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
