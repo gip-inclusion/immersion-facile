@@ -146,6 +146,7 @@ describe("Update establishments from Sirene API", () => {
                 job: "",
                 phone: "",
                 userId: "osef",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build();
@@ -214,6 +215,7 @@ describe("Update establishments from Sirene API", () => {
                 job: "",
                 phone: "",
                 userId: "osef",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build();
@@ -239,6 +241,7 @@ describe("Update establishments from Sirene API", () => {
                 job: "",
                 phone: "",
                 userId: "osef",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build();
@@ -264,6 +267,7 @@ describe("Update establishments from Sirene API", () => {
                 job: "",
                 phone: "",
                 userId: "osef",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build();
@@ -353,6 +357,7 @@ const makeEstablishmentWithLastInseeCheck = (
         job: "",
         phone: "",
         userId: "osef",
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();

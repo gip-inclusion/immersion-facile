@@ -93,16 +93,19 @@ describe("SuggestEditEstablishment", () => {
           role: "establishment-admin",
           job: "Boss1",
           phone: "+33688779955",
+          shouldReceiveDiscussionNotifications: true,
         },
         {
           userId: admin2.id,
           role: "establishment-admin",
           job: "Boss2",
           phone: "+33688779666",
+          shouldReceiveDiscussionNotifications: true,
         },
         {
           userId: contact.id,
           role: "establishment-contact",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();

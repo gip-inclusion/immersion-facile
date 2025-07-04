@@ -104,6 +104,7 @@ const establishmentAggregate1 = new EstablishmentAggregateBuilder()
       userId: "osef",
       job: "",
       phone: "",
+      shouldReceiveDiscussionNotifications: true,
     },
   ])
   .withOffers([immersionOffer])
@@ -138,6 +139,7 @@ const establishmentAggregate2 = new EstablishmentAggregateBuilder()
       userId: "osef",
       job: "",
       phone: "",
+      shouldReceiveDiscussionNotifications: true,
     },
   ])
   .build();
@@ -284,6 +286,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -304,6 +307,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -324,6 +328,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -442,6 +447,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -462,6 +468,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -482,6 +489,7 @@ describe("search-immersion route", () => {
                 userId: "osef",
                 job: "",
                 phone: "",
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
