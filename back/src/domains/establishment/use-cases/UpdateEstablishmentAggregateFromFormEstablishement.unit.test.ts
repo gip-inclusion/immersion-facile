@@ -401,6 +401,39 @@ describe("Update Establishment aggregate from form data", () => {
         },
       ]);
     });
+
+    it("When users don't have discussion notifications, throw an error", async () => {
+      const updatedFormEstablishmentWithNoDiscussionNotifications = {
+        ...updatedFormEstablishment,
+        userRights: [
+          {
+            ...updatedFormAdmin,
+            shouldReceiveDiscussionNotifications: false,
+          },
+          {
+            ...updatedFormContact,
+            shouldReceiveDiscussionNotifications: false,
+          },
+        ],
+      };
+
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment:
+              updatedFormEstablishmentWithNoDiscussionNotifications,
+          },
+          { userId: previousEstablishmentAdmin.id },
+        ),
+        errors.inputs.badSchema({
+          useCaseName: "UpdateEstablishmentAggregateFromForm",
+          id: siret,
+          flattenErrors: [
+            "formEstablishment.userRights : La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
+          ],
+        }),
+      );
+    });
   });
 
   describe("Behavior of EditFormEstablishment", () => {
@@ -454,7 +487,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             existingFormEstablishment.nextAvailabilityDate &&
-            new Date(existingFormEstablishment.nextAvailabilityDate),
+              new Date(existingFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(creationDate)
@@ -519,7 +552,7 @@ describe("Update Establishment aggregate from form data", () => {
           })
           .withNextAvailabilityDate(
             updatedFormEstablishment.nextAvailabilityDate &&
-            new Date(updatedFormEstablishment.nextAvailabilityDate),
+              new Date(updatedFormEstablishment.nextAvailabilityDate),
           )
           .withCreatedAt(creationDate)
           .withUpdatedAt(now)
