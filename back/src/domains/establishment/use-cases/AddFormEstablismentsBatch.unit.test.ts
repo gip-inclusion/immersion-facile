@@ -211,7 +211,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               {
                 role: "establishment-contact",
                 userId: "2",
-                shouldReceiveDiscussionNotifications: true,
+                shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
@@ -362,7 +362,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               {
                 role: "establishment-contact",
                 userId: "2",
-                shouldReceiveDiscussionNotifications: true,
+                shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
@@ -452,7 +452,7 @@ describe("AddFormEstablishmentsBatch Use Case", () => {
               {
                 role: "establishment-contact",
                 userId: "2",
-                shouldReceiveDiscussionNotifications: true,
+                shouldReceiveDiscussionNotifications: false,
               },
               {
                 role: "establishment-contact",
