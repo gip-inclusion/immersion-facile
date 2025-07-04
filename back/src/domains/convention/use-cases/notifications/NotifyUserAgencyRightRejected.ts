@@ -1,6 +1,6 @@
 import {
   errors,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -9,7 +9,7 @@ import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
 export class NotifyUserAgencyRightRejected extends TransactionalUseCase<
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   void
 > {
   protected inputSchema = rejectIcUserRoleForAgencyParamsSchema;
@@ -25,7 +25,7 @@ export class NotifyUserAgencyRightRejected extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: RejectIcUserRoleForAgencyParams,
+    params: RejectConnectedUserRoleForAgencyParams,
     uow: UnitOfWork,
   ): Promise<void> {
     const agency = await uow.agencyRepository.getById(params.agencyId);

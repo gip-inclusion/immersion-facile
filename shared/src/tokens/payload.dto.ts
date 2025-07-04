@@ -16,19 +16,9 @@ export type JwtPayloads = {
   currentUser?: ConnectedUser;
 };
 
-// ===== ConnectedUser
 export type ConnectedUserDomainJwtPayload = { userId: UserId };
-
 export type ConnectedUserJwtPayload = CommonJwtPayload &
   ConnectedUserDomainJwtPayload;
-
-// ===== Convention
-
-// biome-ignore lint/correctness/noUnusedVariables: ????
-type StandardJwtPayload<R extends Role> = {
-  sub: string;
-  role: R;
-};
 
 export type EmailHash = Flavor<string, "EmailHash">;
 

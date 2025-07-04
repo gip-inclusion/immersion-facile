@@ -11,7 +11,7 @@ import {
   type FormEstablishmentBatchDto,
   type GetDashboardParams,
   type GetUsersFilters,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   type SetFeatureFlagParam,
   type UserId,
   type UserParamsForAgency,
@@ -150,7 +150,7 @@ export class HttpAdminGateway implements AdminGateway {
   }
 
   public rejectUserForAgency$(
-    params: RejectIcUserRoleForAgencyParams,
+    params: RejectConnectedUserRoleForAgencyParams,
     token: string,
   ): Observable<void> {
     return from(

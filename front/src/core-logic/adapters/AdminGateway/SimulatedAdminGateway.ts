@@ -12,7 +12,7 @@ import {
   type GetDashboardParams,
   type GetUsersFilters,
   type NotificationsByKind,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserId,
   type UserParamsForAgency,
@@ -185,7 +185,7 @@ export class SimulatedAdminGateway implements AdminGateway {
   }
 
   public rejectUserForAgency$(
-    { agencyId }: RejectIcUserRoleForAgencyParams,
+    { agencyId }: RejectConnectedUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {
     return agencyId === "non-existing-agency-id"

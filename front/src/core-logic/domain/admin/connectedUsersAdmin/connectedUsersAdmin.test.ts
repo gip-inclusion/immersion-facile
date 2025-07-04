@@ -7,7 +7,7 @@ import {
   type ConnectedUser,
   errors,
   expectToEqual,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   toAgencyDtoForAgencyUsersAndAdmins,
   type UserParamsForAgency,
 } from "shared";
@@ -390,7 +390,7 @@ describe("Agency registration for authenticated users", () => {
           },
         }),
       }));
-      const payload: RejectIcUserRoleForAgencyParams = {
+      const payload: RejectConnectedUserRoleForAgencyParams = {
         agencyId: agency3.id,
         justification: "osef",
         userId: authUser2.id,

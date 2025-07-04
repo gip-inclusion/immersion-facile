@@ -5,7 +5,7 @@ import type {
   AgencyId,
   AgencyRight,
   ConnectedUser,
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   UserParamsForAgency,
   WithUserFilters,
 } from "shared";
@@ -22,35 +22,36 @@ import {
   connectedUsersAdminSlice,
 } from "./connectedUsersAdmin.slice";
 
-export type IcUsersAdminAction = ActionOfSlice<typeof connectedUsersAdminSlice>;
-type IcUsersAdminActionEpic = AppEpic<IcUsersAdminAction>;
+export type ConnectedUsersAdminAction = ActionOfSlice<
+  typeof connectedUsersAdminSlice
+>;
+type ConnectedUsersAdminActionEpic = AppEpic<ConnectedUsersAdminAction>;
 
-const fetchConnectedUsersWithAgencyNeedingReviewEpic: IcUsersAdminActionEpic = (
-  action$,
-  state$,
-  { adminGateway },
-) =>
-  action$.pipe(
-    filter(
-      connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewRequested
-        .match,
-    ),
-    switchMap((action: PayloadAction<WithUserFilters>) =>
-      adminGateway.getConnectedUsersToReview$(
-        getAdminToken(state$.value),
-        action.payload,
+const fetchConnectedUsersWithAgencyNeedingReviewEpic: ConnectedUsersAdminActionEpic =
+  (action$, state$, { adminGateway }) =>
+    action$.pipe(
+      filter(
+        connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewRequested
+          .match,
       ),
-    ),
-    map(normalizeUsers),
-    map(connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewSucceeded),
-    catchEpicError((error) =>
-      connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewFailed(
-        error?.message,
+      switchMap((action: PayloadAction<WithUserFilters>) =>
+        adminGateway.getConnectedUsersToReview$(
+          getAdminToken(state$.value),
+          action.payload,
+        ),
       ),
-    ),
-  );
+      map(normalizeUsers),
+      map(
+        connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewSucceeded,
+      ),
+      catchEpicError((error) =>
+        connectedUsersAdminSlice.actions.fetchConnectedUsersToReviewFailed(
+          error?.message,
+        ),
+      ),
+    );
 
-const fetchConnectedUsersWithAgencyIdEpic: IcUsersAdminActionEpic = (
+const fetchConnectedUsersWithAgencyIdEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -70,7 +71,7 @@ const fetchConnectedUsersWithAgencyIdEpic: IcUsersAdminActionEpic = (
     ),
   );
 
-const registerAgencyToUserEpic: IcUsersAdminActionEpic = (
+const registerAgencyToUserEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -98,7 +99,7 @@ const registerAgencyToUserEpic: IcUsersAdminActionEpic = (
     ),
   );
 
-const rejectAgencyToUserEpic: IcUsersAdminActionEpic = (
+const rejectAgencyToUserEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -108,7 +109,7 @@ const rejectAgencyToUserEpic: IcUsersAdminActionEpic = (
       connectedUsersAdminSlice.actions.rejectAgencyWithRoleToUserRequested
         .match,
     ),
-    switchMap((action: PayloadAction<RejectIcUserRoleForAgencyParams>) =>
+    switchMap((action: PayloadAction<RejectConnectedUserRoleForAgencyParams>) =>
       adminGateway
         .rejectUserForAgency$(action.payload, getAdminToken(state$.value))
         .pipe(
@@ -126,7 +127,7 @@ const rejectAgencyToUserEpic: IcUsersAdminActionEpic = (
     ),
   );
 
-const createUserOnAgencyEpic: IcUsersAdminActionEpic = (
+const createUserOnAgencyEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -163,7 +164,7 @@ const createUserOnAgencyEpic: IcUsersAdminActionEpic = (
     ),
   );
 
-const updateUserOnAgencyEpic: IcUsersAdminActionEpic = (
+const updateUserOnAgencyEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -189,7 +190,7 @@ const updateUserOnAgencyEpic: IcUsersAdminActionEpic = (
     ),
   );
 
-const removeAgencyUserRequestedEpic: IcUsersAdminActionEpic = (
+const removeAgencyUserRequestedEpic: ConnectedUsersAdminActionEpic = (
   action$,
   state$,
   { adminGateway },
@@ -218,7 +219,7 @@ const removeAgencyUserRequestedEpic: IcUsersAdminActionEpic = (
   );
 
 const fetchConnectedUserOnAgencyUpdateEpic: AppEpic<
-  IcUsersAdminAction | AgencyAction
+  ConnectedUsersAdminAction | AgencyAction
 > = (action$) =>
   action$.pipe(
     filter(agencyAdminSlice.actions.updateAgencySucceeded.match),

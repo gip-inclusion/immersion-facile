@@ -4,7 +4,7 @@ import {
   type ConventionId,
   type DateString,
   type Flavor,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   type Role,
   roleSchema,
   type SignatoryRole,
@@ -153,7 +153,7 @@ export type DomainEvent =
   | GenericEvent<"ConnectedUserAgencyRightChanged", WithAgencyIdAndUserId & WithTriggeredBy> // Old name IcUserAgencyRightChanged
 
 
-  | GenericEvent<"ConnectedUserAgencyRightRejected", RejectIcUserRoleForAgencyParams & WithTriggeredBy> // Old name IcUserAgencyRightRejected
+  | GenericEvent<"ConnectedUserAgencyRightRejected", RejectConnectedUserRoleForAgencyParams & WithTriggeredBy> // Old name IcUserAgencyRightRejected
   // API CONSUMER related
   | GenericEvent<"ApiConsumerSaved", { consumerId: string } & WithTriggeredBy>
   // ERRORED CONVENTION RELATED

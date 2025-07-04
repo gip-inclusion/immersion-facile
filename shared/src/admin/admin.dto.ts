@@ -20,7 +20,7 @@ export type UserParamsForAgency = WithAgencyIdAndUserId & {
   email: Email;
 };
 
-export type RejectIcUserRoleForAgencyParams = WithAgencyIdAndUserId & {
+export type RejectConnectedUserRoleForAgencyParams = WithAgencyIdAndUserId & {
   justification: string;
 };
 

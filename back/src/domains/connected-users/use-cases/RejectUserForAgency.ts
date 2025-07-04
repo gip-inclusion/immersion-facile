@@ -1,7 +1,7 @@
 import {
   type ConnectedUser,
   errors,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
@@ -11,7 +11,7 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
 export class RejectUserForAgency extends TransactionalUseCase<
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   void,
   ConnectedUser
 > {
@@ -29,7 +29,7 @@ export class RejectUserForAgency extends TransactionalUseCase<
   }
 
   protected async _execute(
-    params: RejectIcUserRoleForAgencyParams,
+    params: RejectConnectedUserRoleForAgencyParams,
     uow: UnitOfWork,
     currentUser: ConnectedUser,
   ): Promise<void> {

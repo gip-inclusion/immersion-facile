@@ -42,8 +42,8 @@ describe("InclusionConnected", () => {
   let store: ReduxStore;
   let dependencies: TestDependencies;
 
-  const inclusionConnectedUser: ConnectedUser = {
-    email: "fake-user@inclusion-connect.fr",
+  const connectedUser: ConnectedUser = {
+    email: "fake-user@mail.fr",
     firstName: "Fake",
     lastName: "User",
     id: "fake-user-id",
@@ -69,9 +69,9 @@ describe("InclusionConnected", () => {
   };
 
   const inclusionConnectedFederatedIdentity: FederatedIdentityWithUser = {
-    email: inclusionConnectedUser.email,
-    firstName: inclusionConnectedUser.firstName,
-    lastName: inclusionConnectedUser.lastName,
+    email: connectedUser.email,
+    firstName: connectedUser.firstName,
+    lastName: connectedUser.lastName,
     provider: "proConnect",
     token: "fake-token",
     idToken: "inclusion-connect-id-token",
@@ -102,10 +102,10 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(inclusionConnectedUser);
+      dependencies.authGateway.currentUser$.next(connectedUser);
 
       expectIsLoadingToBe(false);
-      expectCurrentUserToBe(inclusionConnectedUser);
+      expectCurrentUserToBe(connectedUser);
     });
 
     it("do nothing when other federated identity is found in device", () => {
@@ -138,10 +138,10 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(inclusionConnectedUser);
+      dependencies.authGateway.currentUser$.next(connectedUser);
 
       expectIsLoadingToBe(false);
-      expectCurrentUserToBe(inclusionConnectedUser);
+      expectCurrentUserToBe(connectedUser);
     });
 
     it("do nothing when other federated identity is successfully stored in device", () => {
@@ -173,10 +173,10 @@ describe("InclusionConnected", () => {
 
       expectIsLoadingToBe(true);
 
-      dependencies.authGateway.currentUser$.next(inclusionConnectedUser);
+      dependencies.authGateway.currentUser$.next(connectedUser);
 
       expectIsLoadingToBe(false);
-      expectCurrentUserToBe(inclusionConnectedUser);
+      expectCurrentUserToBe(connectedUser);
     });
 
     it("disconnects the connected user and auth slice federatedIdentity if the response includes : 'jwt expired'", () => {
@@ -274,10 +274,10 @@ describe("InclusionConnected", () => {
         }),
       );
 
-      dependencies.authGateway.currentUser$.next(inclusionConnectedUser);
+      dependencies.authGateway.currentUser$.next(connectedUser);
 
       expectIsLoadingToBe(false);
-      expectCurrentUserToBe(inclusionConnectedUser);
+      expectCurrentUserToBe(connectedUser);
     });
 
     it("request agencies registration on the current user to throw on error", () => {
@@ -319,7 +319,7 @@ describe("InclusionConnected", () => {
     };
 
     const adminUser: ConnectedUser = {
-      ...inclusionConnectedUser,
+      ...connectedUser,
       agencyRights: [
         {
           roles: ["agency-admin", "validator"],
