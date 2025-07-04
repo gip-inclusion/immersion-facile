@@ -117,8 +117,7 @@ export class PgEstablishmentAggregateRepository
       .returning("siret")
       .execute()
       .then((result) => {
-        if (result.length !== 1)
-          throw errors.establishment.missingAggregate({ siret });
+        if (result.length !== 1) throw errors.establishment.notFound({ siret });
         logger.info({
           message: `Deleted establishment successfully. Siret was : ${siret}`,
         });
@@ -378,7 +377,7 @@ export class PgEstablishmentAggregateRepository
       updatedAggregate.establishment.siret,
     );
     if (!existingAggregate)
-      throw errors.establishment.missingAggregate({
+      throw errors.establishment.notFound({
         siret: updatedAggregate.establishment.siret,
       });
 

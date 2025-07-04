@@ -477,10 +477,6 @@ export const errors = {
       new BadRequestError(
         `La requête '${kind}' n'autorise pas une limite de '${maxLimit}'.`,
       ),
-    missingAggregate: ({ siret }: { siret: SiretDto }) =>
-      new NotFoundError(
-        `L'établissement avec le siret '${siret}' n'existe pas dans le stockage des établissements.`,
-      ),
     pgCreateConflict: ({ siret, error }: { siret: SiretDto; error: Error }) =>
       new ConflictError(
         `Il n'est pas possible de créer l'établissement avec le siret '${siret}'. Erreur: '${error}'.`,
@@ -660,7 +656,7 @@ export const errors = {
       ),
     noUsers: (agencyId: AgencyId) =>
       new BadRequestError(
-        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateurs`,
+        `L'agence '${agencyId}' ne peut pas avoir aucun utilisateur.`,
       ),
     notEnoughValidators: ({ agencyId }: { agencyId: AgencyId }) =>
       new BadRequestError(
@@ -814,6 +810,8 @@ export const errors = {
       ),
     notFound: ({ discussionId }: { discussionId: DiscussionId }) =>
       new NotFoundError(`La discussion '${discussionId}' n'est pas trouvée.`),
+    noExchanges: (discussionId: DiscussionId) =>
+      new Error(`No exchanges on discussion '${discussionId}'.`),
     missingHasWorkingExperience: (id: DiscussionId) =>
       new Error(
         `Propriété hasWorkingExperience manquante pour la discussion de type email '${id}'.`,
@@ -833,14 +831,6 @@ export const errors = {
     }) =>
       new Error(
         `Propriété levelOfEducation manquante pour la discussion de type ${kind} '${id}'.`,
-      ),
-    missingAppellationLabel: ({
-      appellationCode,
-    }: {
-      appellationCode: AppellationCode;
-    }) =>
-      new BadRequestError(
-        `Pas de label trouvé pour le code appélation métier '${appellationCode}'.`,
       ),
     unsupportedSource: ({ source }: { source: string }) =>
       new BadRequestError(`Le source '${source}' n'est pas supporté.`),
