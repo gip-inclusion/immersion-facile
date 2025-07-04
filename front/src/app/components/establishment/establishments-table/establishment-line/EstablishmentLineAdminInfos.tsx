@@ -2,12 +2,12 @@ import { fr } from "@codegouvfr/react-dsfr";
 import type { EstablishmentData } from "shared";
 
 export const EstablishmentLineAdminsInfos = ({
-  withEstablishmentData,
+  data,
 }: {
-  withEstablishmentData: EstablishmentData;
+  data: EstablishmentData;
 }) => (
   <ul className={fr.cx("fr-raw-list")}>
-    {withEstablishmentData.admins.map((admin) => (
+    {data.admins.map((admin) => (
       <li key={`${admin.email}-${admin.firstName}-${admin.lastName}`}>
         <a
           href={`mailto:${admin.email}`}

@@ -9,7 +9,7 @@ import type {
   GetUsersFilters,
   ManageConventionAdminForm,
   ManageEstablishmentAdminForm,
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   UserParamsForAgency,
   WithAgencyIdAndUserId,
   WithUserFilters,
@@ -30,7 +30,7 @@ export const userParamsForAgencySchema: z.Schema<UserParamsForAgency> =
     email: emailSchema,
   });
 
-export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectIcUserRoleForAgencyParams> =
+export const rejectIcUserRoleForAgencyParamsSchema: z.Schema<RejectConnectedUserRoleForAgencyParams> =
   z.object({
     agencyId: agencyIdSchema,
     userId: userIdSchema,

@@ -5,7 +5,7 @@ import type {
   AgencyRight,
   ConnectedUser,
   OmitFromExistingKeys,
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   User,
   UserId,
   UserParamsForAgency,
@@ -137,14 +137,14 @@ export const connectedUsersAdminSlice = createSlice({
     },
     rejectAgencyWithRoleToUserRequested: (
       state,
-      _action: PayloadAction<RejectIcUserRoleForAgencyParams>,
+      _action: PayloadAction<RejectConnectedUserRoleForAgencyParams>,
     ) => {
       state.isUpdatingConnectedUserAgency = true;
     },
 
     rejectAgencyWithRoleToUserSucceeded: (
       state,
-      action: PayloadAction<RejectIcUserRoleForAgencyParams>,
+      action: PayloadAction<RejectConnectedUserRoleForAgencyParams>,
     ) => {
       const { userId, agencyId } = action.payload;
 

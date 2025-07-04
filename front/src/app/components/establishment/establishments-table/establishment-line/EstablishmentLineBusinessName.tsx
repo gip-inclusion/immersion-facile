@@ -3,20 +3,18 @@ import { Tag } from "react-design-system";
 import type { EstablishmentData } from "shared";
 
 export const EstablishmentLineBusinessName = ({
-  withEstablishmentData,
+  data,
 }: {
-  withEstablishmentData: EstablishmentData;
+  data: EstablishmentData;
 }) => (
-  <ul key={withEstablishmentData.siret} className={fr.cx("fr-raw-list")}>
+  <ul key={data.siret} className={fr.cx("fr-raw-list")}>
     <li>
       <Tag theme={"etablissement"} />
     </li>
-    <li> {withEstablishmentData.businessName}</li>
+    <li> {data.businessName}</li>
     <li>
       {" "}
-      <span className={fr.cx("fr-hint-text")}>
-        {withEstablishmentData.siret}
-      </span>
+      <span className={fr.cx("fr-hint-text")}>{data.siret}</span>
     </li>
   </ul>
 );

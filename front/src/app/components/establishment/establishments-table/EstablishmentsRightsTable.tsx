@@ -34,8 +34,8 @@ const makeEstablishmentRightLine = (
 ): ReactNode[] => {
   const roleDisplay = establishmentRoleToDisplay[withEstablishmentData.role];
   return [
-    EstablishmentLineBusinessName({ withEstablishmentData }),
-    EstablishmentLineAdminsInfos({ withEstablishmentData }),
+    EstablishmentLineBusinessName({ data: withEstablishmentData }),
+    EstablishmentLineAdminsInfos({ data: withEstablishmentData }),
     <Badge
       small
       className={fr.cx(roleDisplay.className, "fr-mr-1w")}

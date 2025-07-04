@@ -8,7 +8,7 @@ import type {
   ActionOfSlice,
   AppEpic,
 } from "src/core-logic/storeConfig/redux.helpers";
-import type { IcUsersAdminAction } from "../connectedUsersAdmin/connectedUsersAdmin.epics";
+import type { ConnectedUsersAdminAction } from "../connectedUsersAdmin/connectedUsersAdmin.epics";
 import { connectedUsersAdminSlice } from "../connectedUsersAdmin/connectedUsersAdmin.slice";
 import { agencyAdminSlice } from "./agencyAdmin.slice";
 
@@ -156,7 +156,7 @@ const agencyDoesNotNeedReviewAnymoreEpic: AgencyEpic = (action$, state$) =>
   );
 
 const fetchAgencyOnIcUserUpdatedEpic: AppEpic<
-  IcUsersAdminAction | AgencyAction
+  ConnectedUsersAdminAction | AgencyAction
 > = (action$) =>
   action$.pipe(
     filter(

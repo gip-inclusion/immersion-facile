@@ -31,7 +31,7 @@ export const agencyRoutes = defineRoutes({
       409: httpErrorSchema,
     },
   }),
-  // Cette route existe aussi dans le admin router, qui enclanche le même usecase >> c'est un bordel ici ...
+  // Cette route existe aussi dans le admin router, qui enclenche le même usecase >> c'est un bordel ici ...
   createUserForAgency: defineRoute({
     method: "post",
     url: "/agency/users",

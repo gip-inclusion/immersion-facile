@@ -9,7 +9,7 @@ import type {
   FormEstablishmentBatchDto,
   GetUsersFilters,
   NotificationsByKind,
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserParamsForAgency,
   UserWithNumberOfAgencies,
@@ -89,7 +89,7 @@ export class TestAdminGateway implements AdminGateway {
   }
 
   public rejectUserForAgency$(
-    _params: RejectIcUserRoleForAgencyParams,
+    _params: RejectConnectedUserRoleForAgencyParams,
     _token: string,
   ): Observable<void> {
     return this.rejectUserToAgencyResponse$;

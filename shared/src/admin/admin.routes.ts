@@ -72,7 +72,7 @@ export const adminRoutes = defineRoutes({
     },
   }),
 
-  // Cette route existe aussi dans le agency router, qui enclanche le même usecase >> c'est un bordel ici ...
+  // Cette route existe aussi dans le agency router, qui enclenche le même usecase >> c'est un bordel ici ...
   createUserForAgency: defineRoute({
     method: "post",
     url: "/admin/inclusion-connected/users",

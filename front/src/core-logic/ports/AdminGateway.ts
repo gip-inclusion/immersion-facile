@@ -10,7 +10,7 @@ import type {
   GetDashboardParams,
   GetUsersFilters,
   NotificationsByKind,
-  RejectIcUserRoleForAgencyParams,
+  RejectConnectedUserRoleForAgencyParams,
   SetFeatureFlagParam,
   UserId,
   UserParamsForAgency,
@@ -61,7 +61,7 @@ export interface AdminGateway {
   ): Observable<void>;
 
   rejectUserForAgency$(
-    params: RejectIcUserRoleForAgencyParams,
+    params: RejectConnectedUserRoleForAgencyParams,
     token: ConnectedUserJwt,
   ): Observable<void>;
 

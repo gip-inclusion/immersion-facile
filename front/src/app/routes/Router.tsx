@@ -2,6 +2,7 @@ import {
   lazy,
   type ReactElement,
   type ReactNode,
+  useCallback,
   useEffect,
   useRef,
 } from "react";
@@ -79,9 +80,14 @@ const adminRoutes: {
 );
 
 const RedirectTo = ({ route }: { route: Route<typeof routes> }) => {
-  useEffect(() => {
+  const routePush = useCallback(() => {
     route.push();
-  }, [route.push]);
+  }, [route]);
+
+  useEffect(() => {
+    routePush();
+  }, [routePush]);
+
   return null;
 };
 
@@ -226,7 +232,7 @@ const getPageByRouteName: {
   myProfile: (route) => (
     <ConnectedPrivateRoute
       route={route}
-      oAuthConnexionPageHeader={
+      oAuthConnectionPageHeader={
         <PageHeader title="Vous devez vous connecter pour accéder à votre profil" />
       }
     >

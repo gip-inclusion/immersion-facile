@@ -14,7 +14,7 @@ export const EstablishmentCreationFormPage = ({
 }: EstablishmentCreationFormPage) => (
   <ConnectedPrivateRoute
     route={route}
-    oAuthConnexionPageHeader={
+    oAuthConnectionPageHeader={
       <PageHeader
         title="Proposer une immersion"
         breadcrumbs={<Breadcrumbs />}

@@ -12,7 +12,7 @@ import {
   type AgencyId,
   type AgencyRight,
   domElementIds,
-  type RejectIcUserRoleForAgencyParams,
+  type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
   type User,
   type UserId,
@@ -191,7 +191,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
 }: IcUserRegistrationToAgencyFormProps) => {
   const dispatch = useDispatch();
   const { register, handleSubmit, formState } =
-    useForm<RejectIcUserRoleForAgencyParams>({
+    useForm<RejectConnectedUserRoleForAgencyParams>({
       resolver: zodResolver(rejectIcUserRoleForAgencyParamsSchema),
       mode: "onTouched",
       defaultValues: {
@@ -203,7 +203,7 @@ const RejectIcUserRegistrationToAgencyForm = ({
 
   const getFieldError = makeFieldError(formState);
 
-  const onFormSubmit: SubmitHandler<RejectIcUserRoleForAgencyParams> = (
+  const onFormSubmit: SubmitHandler<RejectConnectedUserRoleForAgencyParams> = (
     values,
   ) => {
     dispatch(
