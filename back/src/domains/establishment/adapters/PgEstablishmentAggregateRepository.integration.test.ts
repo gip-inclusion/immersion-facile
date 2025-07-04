@@ -2068,7 +2068,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       await expectPromiseToFailWithError(
         pgEstablishmentAggregateRepository.delete(siretNotInTable),
-        errors.establishment.missingAggregate({ siret: siretNotInTable }),
+        errors.establishment.notFound({ siret: siretNotInTable }),
       );
     });
 
