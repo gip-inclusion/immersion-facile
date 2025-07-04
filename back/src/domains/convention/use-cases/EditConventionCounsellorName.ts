@@ -1,19 +1,20 @@
 import {
+  agencyModifierRoles,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type EditConventionCounsellorNameRequestDto,
   editConventionCounsellorNameRequestSchema,
   errors,
 } from "shared";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import {
-  throwErrorIfUserIsValidatorOfAgencyWithRefersTo,
-  throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
-} from "../entities/Convention";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type EditConventionCounsellorName = ReturnType<
   typeof makeEditConventionCounsellorName
@@ -46,23 +47,27 @@ export const makeEditConventionCounsellorName = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status, [
-      "IN_REVIEW",
-      "PARTIALLY_SIGNED",
-      "READY_TO_SIGN",
-    ]);
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["IN_REVIEW", "PARTIALLY_SIGNED", "READY_TO_SIGN"],
+      errors.convention.editCounsellorNameNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
-    await throwIfUserIsNotIFAdminNorAgencyModifier({
-      uow,
-      jwtPayload,
-      agencyId: convention.agencyId,
+    const conventionRead = await conventionDtoToConventionReadDto(
       convention,
-    });
-
-    await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
       uow,
-      agencyId: convention.agencyId,
+    );
+
+    await throwIfNotAuthorizedForRole({
+      uow,
       jwtPayload,
+      convention: conventionRead,
+      authorizedRoles: [...agencyModifierRoles, "back-office"],
+      errorToThrow: errors.convention.editCounsellorNameNotAuthorizedForRole(),
+      isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: false,
     });
 
     const triggeredBy: TriggeredBy =
@@ -98,14 +103,3 @@ export const makeEditConventionCounsellorName = createTransactionalUseCase<
     ]);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (
-  status: ConventionStatus,
-  allowedStatuses: ConventionStatus[],
-) => {
-  if (!allowedStatuses.includes(status)) {
-    throw errors.convention.editCounsellorNameNotAllowedForStatus({
-      status: status,
-    });
-  }
-};

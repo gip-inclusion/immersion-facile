@@ -1,15 +1,15 @@
 import { subHours } from "date-fns";
 import {
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
   conventionIdSchema,
   conventionSignatoryRoleBySignatoryKey,
   errors,
   frontRoutes,
-  isSignatory,
   type SignatoryRole,
   signatoryRoleSchema,
   type UserId,
@@ -17,6 +17,10 @@ import {
 import { z } from "zod";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -25,11 +29,11 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import {
   throwErrorIfSignatoryAlreadySigned,
   throwErrorIfSignatoryPhoneNumberNotValid,
   throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
 } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_SIGNATURE_REMINDER = 24;
@@ -70,7 +74,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       jwtPayload,
     });
 
-    const convention = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
 
@@ -79,20 +83,32 @@ export const makeSendSignatureLink = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status);
-
-    const isNotSignatory = !(
-      "role" in jwtPayload && isSignatory(jwtPayload.role)
+    const conventionRead = await conventionDtoToConventionReadDto(
+      convention,
+      uow,
     );
 
-    if (isNotSignatory) {
-      await throwIfUserIsNotIFAdminNorAgencyModifier({
-        uow,
-        jwtPayload,
-        agencyId: convention.agencyId,
-        convention,
-      });
-    }
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["READY_TO_SIGN", "PARTIALLY_SIGNED"],
+      errors.convention.sendSignatureLinkNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
+
+    await throwIfNotAuthorizedForRole({
+      uow,
+      convention: conventionRead,
+      authorizedRoles: [
+        ...agencyModifierRoles,
+        "back-office",
+        ...allSignatoryRoles,
+      ],
+      errorToThrow: errors.convention.sendSignatureLinkNotAuthorizedForRole(),
+      jwtPayload,
+      isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: true,
+    });
 
     const signatoryKey =
       conventionSignatoryRoleBySignatoryKey[inputParams.role];
@@ -105,13 +121,13 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     }
 
     throwErrorIfSignatoryPhoneNumberNotValid({
-      convention,
+      convention: conventionRead,
       signatoryKey,
       signatoryRole: inputParams.role,
     });
 
     throwErrorIfSignatoryAlreadySigned({
-      convention,
+      convention: conventionRead,
       signatoryKey,
       signatoryRole: inputParams.role,
     });
@@ -134,7 +150,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
       userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
       signatoryPhone: signatory.phone,
       uow,
-      convention,
+      convention: conventionRead,
       ...deps,
     });
 
@@ -160,14 +176,6 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     await uow.outboxRepository.save(event);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
-  if (!["READY_TO_SIGN", "PARTIALLY_SIGNED"].includes(status)) {
-    throw errors.convention.sendSignatureLinkNotAllowedForStatus({
-      status: status,
-    });
-  }
-};
 
 const sendSms = async ({
   conventionMagicLinkPayload,

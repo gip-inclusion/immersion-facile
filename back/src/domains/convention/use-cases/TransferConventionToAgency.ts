@@ -1,20 +1,21 @@
 import {
+  agencyModifierRoles,
   type ConventionDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   errors,
   type TransferConventionToAgencyRequestDto,
   transferConventionToAgencyRequestSchema,
 } from "shared";
 import { throwErrorIfAgencyNotFound } from "../../../utils/agency";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import {
-  throwErrorIfUserIsValidatorOfAgencyWithRefersTo,
-  throwErrorOnConventionIdMismatch,
-  throwIfUserIsNotIFAdminNorAgencyModifier,
-} from "../entities/Convention";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
+import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
   typeof makeTransferConventionToAgency
@@ -47,28 +48,31 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
         conventionId: inputParams.conventionId,
       });
 
-    throwErrorIfConventionStatusNotAllowed(convention.status, [
-      "IN_REVIEW",
-      "PARTIALLY_SIGNED",
-      "READY_TO_SIGN",
-    ]);
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["IN_REVIEW", "PARTIALLY_SIGNED", "READY_TO_SIGN"],
+      errors.convention.transferNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
     await throwErrorIfAgencyNotFound({
       agencyId: inputParams.agencyId,
       agencyRepository: uow.agencyRepository,
     });
 
-    await throwIfUserIsNotIFAdminNorAgencyModifier({
-      uow,
-      jwtPayload,
-      agencyId: convention.agencyId,
+    const conventionReadDto = await conventionDtoToConventionReadDto(
       convention,
-    });
-
-    await throwErrorIfUserIsValidatorOfAgencyWithRefersTo({
       uow,
-      agencyId: convention.agencyId,
+    );
+    await throwIfNotAuthorizedForRole({
+      uow,
+      convention: conventionReadDto,
+      authorizedRoles: [...agencyModifierRoles, "back-office"],
+      errorToThrow: errors.convention.transferNotAuthorizedForRole(),
       jwtPayload,
+      isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: false,
     });
 
     const triggeredBy: TriggeredBy =
@@ -104,14 +108,3 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
     ]);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (
-  status: ConventionStatus,
-  allowedStatuses: ConventionStatus[],
-) => {
-  if (!allowedStatuses.includes(status)) {
-    throw errors.convention.transferNotAllowedForStatus({
-      status: status,
-    });
-  }
-};

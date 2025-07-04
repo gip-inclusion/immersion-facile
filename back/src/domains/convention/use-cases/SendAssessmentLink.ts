@@ -1,23 +1,22 @@
 import { addDays, subHours } from "date-fns";
 import {
-  type AgencyDto,
+  agencyModifierRoles,
+  allSignatoryRoles,
   type ConventionId,
   type ConventionReadDto,
   type ConventionRelatedJwtPayload,
-  type ConventionStatus,
   type CreateConventionMagicLinkPayloadProperties,
-  type Email,
   errors,
-  establishmentsRoles,
   frontRoutes,
-  type Role,
   type UserId,
   withConventionIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
-import { agencyWithRightToAgencyDto } from "../../../utils/agency";
-import { isSomeEmailMatchingEmailHash } from "../../../utils/jwt";
+import {
+  conventionDtoToConventionReadDto,
+  throwErrorIfConventionStatusNotAllowed,
+} from "../../../utils/convention";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -26,11 +25,8 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { getUserWithRights } from "../../inclusion-connected-users/helpers/userRights.helper";
-import {
-  throwErrorIfPhoneNumberNotValid,
-  throwErrorOnConventionIdMismatch,
-} from "../entities/Convention";
+import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
+import { throwErrorIfPhoneNumberNotValid } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
@@ -54,7 +50,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     inputSchema: withConventionIdSchema,
   },
   async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
-    const convention = await uow.conventionQueries.getConventionById(
+    const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
 
@@ -69,16 +65,32 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     if (!agencyWithRights)
       throw errors.agency.notFound({ agencyId: convention.agencyId });
 
-    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
-
-    await throwIfNotAllowedToSendAssessmentLink(
-      uow,
+    const conventionRead = await conventionDtoToConventionReadDto(
       convention,
-      agency,
-      jwtPayload,
+      uow,
     );
 
-    throwErrorIfConventionStatusNotAllowed(convention.status);
+    await throwIfNotAuthorizedForRole({
+      uow,
+      convention: conventionRead,
+      authorizedRoles: [
+        ...agencyModifierRoles,
+        ...allSignatoryRoles,
+        "back-office",
+      ],
+      errorToThrow: errors.assessment.sendAssessmentLinkForbidden(),
+      jwtPayload,
+      isPeAdvisorAllowed: true,
+      isValidatorOfAgencyRefersToAllowed: true,
+    });
+
+    throwErrorIfConventionStatusNotAllowed(
+      convention.status,
+      ["ACCEPTED_BY_VALIDATOR"],
+      errors.assessment.sendAssessmentLinkNotAllowedForStatus({
+        status: convention.status,
+      }),
+    );
 
     throwErrorIfConventionEndInMoreThanOneDay(
       new Date(convention.dateEnd),
@@ -110,7 +122,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
       userId: "userId" in jwtPayload ? jwtPayload.userId : undefined,
       recipientPhone: convention.establishmentTutor.phone,
       uow,
-      convention,
+      convention: conventionRead,
       ...deps,
     });
 
@@ -135,14 +147,6 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     await uow.outboxRepository.save(event);
   },
 );
-
-const throwErrorIfConventionStatusNotAllowed = (status: ConventionStatus) => {
-  if (status !== "ACCEPTED_BY_VALIDATOR") {
-    throw errors.assessment.sendAssessmentLinkNotAllowedForStatus({
-      status: status,
-    });
-  }
-};
 
 const throwErrorIfConventionEndInMoreThanOneDay = (
   conventionDateEnd: Date,
@@ -257,101 +261,3 @@ const throwErrorIfAssessmentLinkAlreadySent = async ({
     });
   }
 };
-
-const throwIfNotAllowedToSendAssessmentLink = async (
-  uow: UnitOfWork,
-  convention: ConventionReadDto,
-  agency: AgencyDto,
-  jwtPayload: ConventionRelatedJwtPayload,
-) => {
-  if (!jwtPayload) throw errors.user.unauthorized();
-
-  if ("userId" in jwtPayload) {
-    const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-
-    const isBackofficeAdmin = userWithRights.isBackofficeAdmin;
-
-    const isEstablishmentRepresentative =
-      userWithRights.email ===
-      convention.signatories.establishmentRepresentative.email;
-
-    const hasEstablishmentRole = userWithRights.establishments?.some(
-      (establishmentRight) =>
-        establishmentsRoles.includes(establishmentRight.role),
-    );
-
-    const hasEnoughRightsOnAgency = userWithRights.agencyRights.some(
-      (agencyRight) =>
-        agencyRight.agency.id === convention.agencyId &&
-        agencyRight.roles.some((role) =>
-          ["validator", "counsellor"].includes(role),
-        ),
-    );
-
-    if (
-      isBackofficeAdmin ||
-      isEstablishmentRepresentative ||
-      hasEnoughRightsOnAgency
-    ) {
-      return;
-    }
-
-    if (hasEstablishmentRole) {
-      throw errors.assessment.sendAssessmentLinkForbidden();
-    }
-
-    if (!hasEnoughRightsOnAgency)
-      throw errors.user.notEnoughRightOnAgency({
-        userId: jwtPayload.userId,
-        agencyId: convention.agencyId,
-      });
-
-    throw errors.assessment.sendAssessmentLinkForbidden();
-  }
-
-  if ("applicationId" in jwtPayload) {
-    const { emailHash, role } = jwtPayload;
-
-    throwErrorOnConventionIdMismatch({
-      requestedConventionId: convention.id,
-      jwtPayload,
-    });
-
-    const emailsOrError = getEmailsByRoleForReminder(
-      convention,
-      agency,
-      errors.assessment.sendAssessmentLinkForbidden(),
-    )[role];
-
-    if (emailsOrError instanceof Error) throw emailsOrError;
-
-    if (!isSomeEmailMatchingEmailHash(emailsOrError, emailHash))
-      throw errors.convention.emailNotLinkedToConvention(role);
-  }
-};
-
-const getEmailsByRoleForReminder = (
-  convention: ConventionReadDto,
-  agency: AgencyDto,
-  forbiddenError: Error,
-): Record<Role, Email[] | Error> => ({
-  "back-office": forbiddenError,
-  "to-review": forbiddenError,
-  "agency-viewer": forbiddenError,
-  beneficiary: [convention.signatories.beneficiary.email],
-  "beneficiary-current-employer": [
-    convention.signatories.beneficiaryCurrentEmployer?.email ?? "",
-  ],
-  "beneficiary-representative": [
-    convention.signatories.beneficiaryRepresentative?.email ?? "",
-  ],
-  "agency-admin": forbiddenError,
-  "establishment-representative": [
-    convention.signatories.establishmentRepresentative.email,
-  ],
-  "establishment-tutor": [convention.establishmentTutor.email],
-  counsellor: agency.counsellorEmails,
-  validator: agency.validatorEmails,
-  "establishment-admin": forbiddenError,
-  "establishment-contact": forbiddenError,
-});

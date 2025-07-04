@@ -179,7 +179,7 @@ export const errors = {
       ),
     forbidden: (mode: AssessmentMode) =>
       new ForbiddenError(
-        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs notifiés par email de l'agence prescriptrice peuvent ${
+        `Seul le tuteur de l'entreprise ou bien les conseillers et les validateurs de l'agence prescriptrice peuvent ${
           mode === "GetAssessment" ? "récupérer" : "créer"
         } le bilan.`,
       ),
@@ -197,7 +197,7 @@ export const errors = {
       ),
     sendAssessmentLinkForbidden: () =>
       new ForbiddenError(
-        "Seul les signataires ainsi que les conseillers et les validateurs notifiés par email de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
+        "Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à renvoyer un lien de bilan.",
       ),
     sendAssessmentLinkNotAllowedForStatus: ({
       status,
@@ -231,6 +231,10 @@ export const errors = {
       ),
   },
   convention: {
+    editCounsellorNameNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les conseillers et les validateurs de l'agence prescriptrice sont autorisés à modifier le nom du conseiller.`,
+      ),
     editCounsellorNameNotAllowedForStatus: ({
       status,
     }: {
@@ -347,6 +351,10 @@ export const errors = {
       new BadRequestError(
         `Impossible de transférer les conventions ayant le statut "${status}".`,
       ),
+    transferNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les conseillers et les validateurs de l'agence prescriptrice sont autorisés à transférer la convention.`,
+      ),
     twoStepsValidationBadStatus: ({
       targetStatus,
       conventionId,
@@ -430,6 +438,10 @@ export const errors = {
       new BadRequestError(
         `Le numéro de téléphone du ${titleByRole[role]} renseigné dans la convention '${conventionId}' n'est pas supporté pour l'envoi de sms.`,
       ),
+    sendSignatureLinkNotAuthorizedForRole: () =>
+      new ForbiddenError(
+        `Seul les signataires ainsi que les conseillers et les validateurs de l'agence prescriptrice sont autorisés à envoyer un lien de signature.`,
+      ),
     smsSignatureLinkAlreadySent: ({
       signatoryRole,
       minHoursBetweenReminder,
@@ -441,6 +453,10 @@ export const errors = {
     }) =>
       new TooManyRequestApiError(
         `Une relance de signature au ${titleByRole[signatoryRole]} a été envoyée il y a moins de ${minHoursBetweenReminder}h. Vous pourrez réessayer dans ${timeRemaining}.`,
+      ),
+    validatorOfAgencyRefersToNotAllowed: () =>
+      new ForbiddenError(
+        `Les validateurs de l'agence référente ne sont pas autorisés à accéder à cette fonctionnalité.`,
       ),
   },
   establishment: {
