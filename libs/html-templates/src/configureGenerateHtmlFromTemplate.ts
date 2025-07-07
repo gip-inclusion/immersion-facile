@@ -13,7 +13,7 @@ import { ignoreTabs } from "./helpers/formatters";
 
 type Attachement = { url: string } | { name: string; content: string };
 
-export const emailReplySeparator =
+const emailReplySeparator =
   "##- Veuillez répondre au-dessus de cette ligne -##";
 
 export type GenerateHtmlOptions = {
