@@ -37,6 +37,11 @@ const allAssessmentReminderModes = [
 export type AssessmentReminderMode =
   (typeof allAssessmentReminderModes)[number];
 
+type OutOfTrxDependencies = {
+  assessmentRepository: AssessmentRepository;
+  notificationRepository: NotificationRepository;
+};
+
 export type AssessmentReminder = ReturnType<typeof makeAssessmentReminder>;
 export const makeAssessmentReminder = createTransactionalUseCase<
   { mode: AssessmentReminderMode },
@@ -48,6 +53,7 @@ export const makeAssessmentReminder = createTransactionalUseCase<
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     config: AppConfig;
+    outOfTrx: OutOfTrxDependencies;
   }
 >(
   {
@@ -61,8 +67,7 @@ export const makeAssessmentReminder = createTransactionalUseCase<
     const conventionIdsToRemind = await getConventionIdsToRemind({
       mode: params.mode,
       now,
-      assessmentRepository: uow.assessmentRepository,
-      notificationRepository: uow.notificationRepository,
+      outOfTrx: deps.outOfTrx,
     });
 
     await executeInSequence(conventionIdsToRemind, async (conventionId) => {
@@ -91,19 +96,17 @@ export const makeAssessmentReminder = createTransactionalUseCase<
 const getConventionIdsToRemind = async ({
   mode,
   now,
-  assessmentRepository,
-  notificationRepository,
+  outOfTrx,
 }: {
   mode: AssessmentReminderMode;
   now: Date;
-  assessmentRepository: AssessmentRepository;
-  notificationRepository: NotificationRepository;
+  outOfTrx: OutOfTrxDependencies;
 }): Promise<ConventionId[]> => {
   const daysAfterLastNotifications =
     mode === "3daysAfterInitialAssessmentEmail" ? 3 : 10;
 
   const notificationSentToEstablishments =
-    await notificationRepository.getEmailsByFilters({
+    await outOfTrx.notificationRepository.getEmailsByFilters({
       emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       createdAt: subDays(now, daysAfterLastNotifications),
     });
@@ -113,7 +116,9 @@ const getConventionIdsToRemind = async ({
     .filter((conventionId) => conventionId !== undefined);
 
   const conventionsWithAssessments = (
-    await assessmentRepository.getByConventionIds(potentialConventionsToRemind)
+    await outOfTrx.assessmentRepository.getByConventionIds(
+      potentialConventionsToRemind,
+    )
   ).map((assessment) => assessment.conventionId);
 
   return difference(potentialConventionsToRemind, conventionsWithAssessments);

@@ -54,7 +54,8 @@ const sendAssessmentNeededNotificationsScript = async () => {
 
   const { uowPerformer } = createUowPerformer(config, getPgPool);
 
-  const kyselyDb = makeKyselyDb(getPgPool());
+  const pgPool = getPgPool();
+  const kyselyDb = makeKyselyDb(pgPool);
   const conventionQueries = new PgConventionQueries(kyselyDb);
   const assessmentRepository = new PgAssessmentRepository(kyselyDb);
 
@@ -84,9 +85,13 @@ const sendAssessmentNeededNotificationsScript = async () => {
       new NanoIdShortLinkIdGeneratorGateway(),
     );
 
-  return sendAssessmentNeededNotifications.execute({
+  const result = await sendAssessmentNeededNotifications.execute({
     conventionEndDate: conventionFinishingRange,
   });
+
+  await pgPool.end();
+
+  return result;
 };
 
 handleCRONScript(
