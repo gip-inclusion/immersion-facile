@@ -69,19 +69,20 @@ const sendAssessmentNeededNotificationsScript = async () => {
     timeGateway,
   );
 
-  const sendAssessmentNeededNotifications = new SendAssessmentNeededNotifications(
-    uowPerformer,
-    { conventionQueries, assessmentRepository },
-    saveNotificationAndRelatedEvent,
-    timeGateway,
-    makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
-    makeCreateNewEvent({
+  const sendAssessmentNeededNotifications =
+    new SendAssessmentNeededNotifications(
+      uowPerformer,
+      { conventionQueries, assessmentRepository },
+      saveNotificationAndRelatedEvent,
       timeGateway,
-      uuidGenerator: new UuidV4Generator(),
-    }),
-    config,
-    new NanoIdShortLinkIdGeneratorGateway(),
-  );
+      makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
+      makeCreateNewEvent({
+        timeGateway,
+        uuidGenerator: new UuidV4Generator(),
+      }),
+      config,
+      new NanoIdShortLinkIdGeneratorGateway(),
+    );
 
   return sendAssessmentNeededNotifications.execute({
     conventionEndDate: conventionFinishingRange,
