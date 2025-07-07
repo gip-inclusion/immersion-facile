@@ -53,6 +53,10 @@ describe("AssessmentReminder", () => {
     assessmentReminder = makeAssessmentReminder({
       uowPerformer,
       deps: {
+        outOfTrx: {
+          assessmentRepository: uow.assessmentRepository,
+          notificationRepository: uow.notificationRepository,
+        },
         timeGateway,
         saveNotificationAndRelatedEvent,
         generateConventionMagicLinkUrl: fakeGenerateMagicLinkUrlFn,
