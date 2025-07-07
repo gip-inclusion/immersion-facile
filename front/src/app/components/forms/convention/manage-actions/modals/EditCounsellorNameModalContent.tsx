@@ -31,53 +31,56 @@ export const EditCounsellorNameModalContent = ({
     closeModal();
   };
   return (
-    <>
-      <form onSubmit={handleSubmit(onFormSubmit)}>
-        <Input
-          label={"Nom"}
-          nativeInputProps={{
-            ...register("lastname"),
-            required: true,
-            id: domElementIds.manageConvention
-              .editCounsellorNameModalLastNameInput,
-          }}
-        />
-        <Input
-          label={"Prénom"}
-          nativeInputProps={{
-            ...register("firstname"),
-            required: true,
-            id: domElementIds.manageConvention
-              .editCounsellorNameModalFirstNameInput,
-          }}
-        />
-        <ButtonsGroup
-          alignment="center"
-          inlineLayoutWhen="always"
-          buttons={[
-            {
-              type: "button",
-              priority: "secondary",
-              onClick: () => {
-                closeModal();
-              },
-              nativeButtonProps: {
-                id: domElementIds.manageConvention
-                  .editCounsellorNameModalCancelButton,
-              },
-              children: "Annuler",
+    <form onSubmit={handleSubmit(onFormSubmit)}>
+      <p>
+        Le nom du conseiller est fourni à titre informatif. Toute réaffectation
+        de la convention ne peut être effectuée que par (ou via) l'agence.
+      </p>
+
+      <Input
+        label={"Nom"}
+        nativeInputProps={{
+          ...register("lastname"),
+          required: true,
+          id: domElementIds.manageConvention
+            .editCounsellorNameModalLastNameInput,
+        }}
+      />
+      <Input
+        label={"Prénom"}
+        nativeInputProps={{
+          ...register("firstname"),
+          required: true,
+          id: domElementIds.manageConvention
+            .editCounsellorNameModalFirstNameInput,
+        }}
+      />
+      <ButtonsGroup
+        alignment="center"
+        inlineLayoutWhen="always"
+        buttons={[
+          {
+            type: "button",
+            priority: "secondary",
+            onClick: () => {
+              closeModal();
             },
-            {
-              type: "submit",
-              nativeButtonProps: {
-                id: domElementIds.manageConvention
-                  .editCounsellorNameModalSubmitButton,
-              },
-              children: "Enregistrer",
+            nativeButtonProps: {
+              id: domElementIds.manageConvention
+                .editCounsellorNameModalCancelButton,
             },
-          ]}
-        />
-      </form>
-    </>
+            children: "Annuler",
+          },
+          {
+            type: "submit",
+            nativeButtonProps: {
+              id: domElementIds.manageConvention
+                .editCounsellorNameModalSubmitButton,
+            },
+            children: "Enregistrer",
+          },
+        ]}
+      />
+    </form>
   );
 };
