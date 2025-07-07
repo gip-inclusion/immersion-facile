@@ -116,7 +116,6 @@ import type { UnitOfWorkPerformer } from "../../domains/core/unit-of-work/ports/
 import type { UuidGenerator } from "../../domains/core/uuid-generator/ports/UuidGenerator";
 import { AddEstablishmentLead } from "../../domains/establishment/use-cases/AddEstablishmentLead";
 import { AddFormEstablishmentBatch } from "../../domains/establishment/use-cases/AddFormEstablismentsBatch";
-import { makeAssessmentReminder } from "../../domains/establishment/use-cases/AssessmentReminder";
 import { ContactEstablishment } from "../../domains/establishment/use-cases/ContactEstablishment";
 import { makeContactRequestReminder } from "../../domains/establishment/use-cases/ContactRequestReminder";
 import { DeleteEstablishment } from "../../domains/establishment/use-cases/DeleteEstablishment";
@@ -673,17 +672,6 @@ export const createUseCases = ({
         broadcastToFranceTravailOnConventionUpdatesLegacy,
         eventType: "ASSESSMENT_CREATED",
       }),
-
-    // assessmentReminder: makeAssessmentReminder({
-    //   uowPerformer,
-    //   deps: {
-    //     timeGateway: gateways.timeGateway,
-    //     saveNotificationAndRelatedEvent,
-    //     generateConventionMagicLinkUrl,
-    //     shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
-    //     config,
-    //   },
-    // }),
     notifyEstablishmentThatAssessmentWasCreated:
       makeNotifyEstablishmentThatAssessmentWasCreated({
         uowPerformer,
