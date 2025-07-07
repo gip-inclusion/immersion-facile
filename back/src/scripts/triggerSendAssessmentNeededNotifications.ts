@@ -5,6 +5,9 @@ import type { DateRange } from "shared";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
+import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
+import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessmentRepository";
+import { PgConventionQueries } from "../domains/convention/adapters/PgConventionQueries";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
@@ -47,10 +50,13 @@ const sendAssessmentFormNotificationsScript = async () => {
     throw new Error(message);
   }
 
-  const { uowPerformer } = createUowPerformer(
-    config,
-    createGetPgPoolFn(config),
-  );
+  const getPgPool = createGetPgPoolFn(config);
+
+  const { uowPerformer } = createUowPerformer(config, getPgPool);
+
+  const kyselyDb = makeKyselyDb(getPgPool());
+  const conventionQueries = new PgConventionQueries(kyselyDb);
+  const assessmentRepository = new PgAssessmentRepository(kyselyDb);
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
@@ -65,6 +71,7 @@ const sendAssessmentFormNotificationsScript = async () => {
 
   const sendAssessmentFormNotifications = new SendAssessmentNeededNotifications(
     uowPerformer,
+    { conventionQueries, assessmentRepository },
     saveNotificationAndRelatedEvent,
     timeGateway,
     makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),

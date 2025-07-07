@@ -18,6 +18,8 @@ import type { AppConfig } from "../../../config/bootstrap/appConfig";
 import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/magicLinkUrl";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
+import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
+import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type {
   NotificationContentAndFollowedIds,
@@ -42,6 +44,11 @@ type SendAssessmentParams = {
   conventionEndDate: DateRange;
 };
 
+type OutOfTransaction = {
+  conventionQueries: ConventionQueries;
+  assessmentRepository: AssessmentRepository;
+};
+
 export class SendAssessmentNeededNotifications extends UseCase<
   SendAssessmentParams,
   SendAssessmentFormNotificationsOutput
@@ -56,6 +63,8 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   readonly #generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
 
+  readonly #outOfTrx: OutOfTransaction;
+
   readonly #createNewEvent: CreateNewEvent;
 
   readonly #uowPerformer: UnitOfWorkPerformer;
@@ -66,6 +75,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   constructor(
     uowPerformer: UnitOfWorkPerformer,
+    outOfTrx: OutOfTransaction,
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent,
     timeGateway: TimeGateway,
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl,
@@ -75,6 +85,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
   ) {
     super();
     this.#uowPerformer = uowPerformer;
+    this.#outOfTrx = outOfTrx;
     this.#createNewEvent = createNewEvent;
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#timeGateway = timeGateway;
@@ -122,35 +133,33 @@ export class SendAssessmentNeededNotifications extends UseCase<
   }
 
   async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
-    return this.#uowPerformer.perform(async (uow) => {
-      const conventions =
-        await uow.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
-          params.conventionEndDate,
-          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-        );
-
-      const conventionIdsWithAlreadyExistingAssessment =
-        await uow.assessmentRepository
-          .getByConventionIds(conventions.map((convention) => convention.id))
-          .then(map(({ conventionId }) => conventionId));
-
-      const conventionsToSendAssessmentEmailTo = conventions.filter(
-        (convention) =>
-          !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+    const conventions =
+      await this.#outOfTrx.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+        params.conventionEndDate,
+        "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       );
 
-      logger.info({
-        message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${
-          conventionsToSendAssessmentEmailTo.length
-        } establishments`,
-      });
+    const conventionIdsWithAlreadyExistingAssessment =
+      await this.#outOfTrx.assessmentRepository
+        .getByConventionIds(conventions.map((convention) => convention.id))
+        .then(map(({ conventionId }) => conventionId));
 
-      return {
-        conventions: conventionsToSendAssessmentEmailTo,
-        numberOfConventionsWithAlreadyExistingAssessment:
-          conventionIdsWithAlreadyExistingAssessment.length,
-      };
+    const conventionsToSendAssessmentEmailTo = conventions.filter(
+      (convention) =>
+        !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+    );
+
+    logger.info({
+      message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${
+        conventionsToSendAssessmentEmailTo.length
+      } establishments`,
     });
+
+    return {
+      conventions: conventionsToSendAssessmentEmailTo,
+      numberOfConventionsWithAlreadyExistingAssessment:
+        conventionIdsWithAlreadyExistingAssessment.length,
+    };
   }
 
   async #sendEmailToBeneficiary({
