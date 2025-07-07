@@ -34,7 +34,7 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 
 const logger = createLogger(__filename);
 
-type SendAssessmentFormNotificationsOutput = {
+type SendAssessmentNeededNotificationsOutput = {
   errors?: Record<ConventionId, Error>;
   numberOfImmersionEndingTomorrow: number;
   numberOfConventionsWithAlreadyExistingAssessment: number;
@@ -51,7 +51,7 @@ type OutOfTransaction = {
 
 export class SendAssessmentNeededNotifications extends UseCase<
   SendAssessmentParams,
-  SendAssessmentFormNotificationsOutput
+  SendAssessmentNeededNotificationsOutput
 > {
   protected inputSchema = z.object({
     conventionEndDate: withDateRangeSchema,
@@ -96,7 +96,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   protected async _execute(
     params: SendAssessmentParams,
-  ): Promise<SendAssessmentFormNotificationsOutput> {
+  ): Promise<SendAssessmentNeededNotificationsOutput> {
     const errors: Record<ConventionId, Error> = {};
     const { conventions, numberOfConventionsWithAlreadyExistingAssessment } =
       await this.#getConventionsToSendEmailTo(params);
