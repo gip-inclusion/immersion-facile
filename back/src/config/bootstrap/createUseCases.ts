@@ -674,16 +674,16 @@ export const createUseCases = ({
         eventType: "ASSESSMENT_CREATED",
       }),
 
-    assessmentReminder: makeAssessmentReminder({
-      uowPerformer,
-      deps: {
-        timeGateway: gateways.timeGateway,
-        saveNotificationAndRelatedEvent,
-        generateConventionMagicLinkUrl,
-        shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
-        config,
-      },
-    }),
+    // assessmentReminder: makeAssessmentReminder({
+    //   uowPerformer,
+    //   deps: {
+    //     timeGateway: gateways.timeGateway,
+    //     saveNotificationAndRelatedEvent,
+    //     generateConventionMagicLinkUrl,
+    //     shortLinkIdGeneratorGateway: gateways.shortLinkGenerator,
+    //     config,
+    //   },
+    // }),
     notifyEstablishmentThatAssessmentWasCreated:
       makeNotifyEstablishmentThatAssessmentWasCreated({
         uowPerformer,

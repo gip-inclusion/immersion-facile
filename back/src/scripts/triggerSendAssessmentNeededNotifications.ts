@@ -27,7 +27,7 @@ import { getDateRangeFromScriptParams } from "./utils";
 const logger = createLogger(__filename);
 
 const config = AppConfig.createFromEnv();
-const sendAssessmentFormNotificationsScript = async () => {
+const sendAssessmentNeededNotificationsScript = async () => {
   logger.info({ message: "Starting to send emails with assessment link" });
 
   const timeGateway = new RealTimeGateway();
@@ -69,7 +69,7 @@ const sendAssessmentFormNotificationsScript = async () => {
     timeGateway,
   );
 
-  const sendAssessmentFormNotifications = new SendAssessmentNeededNotifications(
+  const sendAssessmentNeededNotifications = new SendAssessmentNeededNotifications(
     uowPerformer,
     { conventionQueries, assessmentRepository },
     saveNotificationAndRelatedEvent,
@@ -83,15 +83,15 @@ const sendAssessmentFormNotificationsScript = async () => {
     new NanoIdShortLinkIdGeneratorGateway(),
   );
 
-  return sendAssessmentFormNotifications.execute({
+  return sendAssessmentNeededNotifications.execute({
     conventionEndDate: conventionFinishingRange,
   });
 };
 
 handleCRONScript(
-  "sendAssessmentFormNotificationsScript",
+  "sendAssessmentNeededNotificationsScript",
   config,
-  sendAssessmentFormNotificationsScript,
+  sendAssessmentNeededNotificationsScript,
   ({
     numberOfImmersionEndingTomorrow,
     numberOfConventionsWithAlreadyExistingAssessment,
