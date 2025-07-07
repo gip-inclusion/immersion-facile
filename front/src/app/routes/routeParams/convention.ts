@@ -9,6 +9,7 @@ import {
   type BeneficiaryCurrentEmployer,
   type BeneficiaryRepresentative,
   type ConventionDto,
+  type ConventionReadDto,
   errors,
   type FtConnectIdentity,
   type ImmersionObjective,
@@ -217,6 +218,108 @@ const conventionToConventionInUrl = (
     agencyReferentFirstName: convention.agencyReferent?.firstname,
     agencyReferentLastName: convention.agencyReferent?.lastname,
   };
+};
+
+export const conventionReadToConventionRouteParams = (
+  convention: ConventionReadDto,
+) => {
+  const baseParams = {
+    // Beneficiary information
+    email: convention.signatories.beneficiary.email,
+    firstName: convention.signatories.beneficiary.firstName,
+    lastName: convention.signatories.beneficiary.lastName,
+    phone: convention.signatories.beneficiary.phone,
+    birthdate: convention.signatories.beneficiary.birthdate,
+    isRqth: convention.signatories.beneficiary.isRqth,
+    financiaryHelp: convention.signatories.beneficiary.financiaryHelp,
+    emergencyContact: convention.signatories.beneficiary.emergencyContact,
+    emergencyContactPhone:
+      convention.signatories.beneficiary.emergencyContactPhone,
+    emergencyContactEmail:
+      convention.signatories.beneficiary.emergencyContactEmail,
+    fedId: convention.signatories.beneficiary.federatedIdentity?.token,
+    fedIdProvider:
+      convention.signatories.beneficiary.federatedIdentity?.provider,
+    fromPeConnectedUser: false,
+
+    // Beneficiary representative information
+    brEmail: convention.signatories.beneficiaryRepresentative?.email,
+    brFirstName: convention.signatories.beneficiaryRepresentative?.firstName,
+    brLastName: convention.signatories.beneficiaryRepresentative?.lastName,
+    brPhone: convention.signatories.beneficiaryRepresentative?.phone,
+
+    // Beneficiary current employer information
+    bceEmail: convention.signatories.beneficiaryCurrentEmployer?.email,
+    bceFirstName: convention.signatories.beneficiaryCurrentEmployer?.firstName,
+    bceLastName: convention.signatories.beneficiaryCurrentEmployer?.lastName,
+    bcePhone: convention.signatories.beneficiaryCurrentEmployer?.phone,
+    bceSiret: convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
+    bceBusinessName:
+      convention.signatories.beneficiaryCurrentEmployer?.businessName,
+    bceJob: convention.signatories.beneficiaryCurrentEmployer?.job,
+    bceBusinessAddress:
+      convention.signatories.beneficiaryCurrentEmployer?.businessAddress,
+
+    // Establishment information
+    siret: convention.siret,
+    businessName: convention.businessName,
+    businessAdvantages: convention.businessAdvantages,
+    workConditions: convention.workConditions,
+    immersionAddress: convention.immersionAddress,
+
+    // Establishment tutor information
+    etFirstName: convention.establishmentTutor.firstName,
+    etLastName: convention.establishmentTutor.lastName,
+    etJob: convention.establishmentTutor.job,
+    etPhone: convention.establishmentTutor.phone,
+    etEmail: convention.establishmentTutor.email,
+
+    // Establishment representative information
+    erFirstName: convention.signatories.establishmentRepresentative.firstName,
+    erLastName: convention.signatories.establishmentRepresentative.lastName,
+    erPhone: convention.signatories.establishmentRepresentative.phone,
+    erEmail: convention.signatories.establishmentRepresentative.email,
+
+    // Agency information
+    agencyId: convention.agencyId,
+    agencyDepartment: convention.agencyDepartment,
+    agencyKind: convention.agencyKind,
+    agencyReferentFirstName: convention.agencyReferent?.firstname,
+    agencyReferentLastName: convention.agencyReferent?.lastname,
+
+    // Immersion details
+    immersionObjective: convention.immersionObjective,
+    immersionActivities: convention.immersionActivities,
+    immersionSkills: convention.immersionSkills,
+    immersionAppellation: convention.immersionAppellation,
+
+    // Schedule information
+    dateStart: convention.dateStart,
+    dateEnd: convention.dateEnd,
+    schedule: convention.schedule,
+
+    // Health and safety
+    sanitaryPrevention: convention.sanitaryPrevention,
+    sanitaryPreventionDescription: convention.sanitaryPreventionDescription,
+    individualProtection: convention.individualProtection,
+    individualProtectionDescription: convention.individualProtectionDescription,
+  };
+
+  // Add student-specific fields for mini-stage-cci conventions
+  if (convention.internshipKind === "mini-stage-cci") {
+    return {
+      ...baseParams,
+      address: convention.signatories.beneficiary.address
+        ? `${convention.signatories.beneficiary.address.streetNumberAndAddress} ${convention.signatories.beneficiary.address.postcode} ${convention.signatories.beneficiary.address.city}`
+        : undefined,
+      led: convention.signatories.beneficiary.levelOfEducation,
+      schoolName: convention.signatories.beneficiary.schoolName,
+      schoolPostcode: convention.signatories.beneficiary.schoolPostcode,
+    };
+  }
+
+  // For immersion conventions, student-specific fields are not available
+  return baseParams;
 };
 
 export const makeValuesToWatchInUrl = (convention: ConventionPresentation) => {

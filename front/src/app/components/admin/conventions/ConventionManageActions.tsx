@@ -40,6 +40,7 @@ import {
   useFeedbackTopics,
 } from "src/app/hooks/feedback.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
+import { conventionReadToConventionRouteParams } from "src/app/routes/routeParams/convention";
 import { routes } from "src/app/routes/routes";
 import { isAllowedConventionTransition } from "src/app/utils/IsAllowedConventionTransition";
 import { assessmentSelectors } from "src/core-logic/domain/assessment/assessment.selectors";
@@ -357,6 +358,24 @@ export const ConventionManageActions = ({
           gap: "1rem",
         }}
       >
+        {
+          <Button
+            id={domElementIds.manageConvention.duplicateConventionButton}
+            priority="secondary"
+            linkProps={
+              convention.internshipKind === "immersion"
+                ? routes.conventionImmersion({
+                    ...conventionReadToConventionRouteParams(convention),
+                    skipIntro: true,
+                  }).link
+                : routes.conventionMiniStage(
+                    conventionReadToConventionRouteParams(convention),
+                  ).link
+            }
+          >
+            Dupliquer la demande
+          </Button>
+        }
         {isAllowedConventionTransition(convention, "REJECTED", roles) && (
           <>
             <Button

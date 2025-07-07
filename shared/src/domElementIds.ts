@@ -377,6 +377,7 @@ export const domElementIds = {
       "im-convention-validation__cancel--actions-buttons",
     conventionValidationDeprecateButton:
       "im-convention-validation__deprecate-button",
+    duplicateConventionButton: "im-convention-validation__duplicate-button",
     editCounsellorNameButton:
       "im-convention-validation__edit-counsellor-name-button",
     editCounsellorNameModal: "im-edit-counsellor-name-modal",
