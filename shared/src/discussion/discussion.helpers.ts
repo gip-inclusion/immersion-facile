@@ -1,6 +1,7 @@
 import { subDays } from "date-fns";
 import { sort } from "ramda";
 import { match } from "ts-pattern";
+import { emailReplySeparator } from "../email/email.content";
 import type { DateString } from "../utils/date";
 import type {
   DiscussionDisplayStatus,
@@ -45,3 +46,8 @@ export const getDiscussionDisplayStatus = ({
     })
     .exhaustive();
 };
+
+export const emailExchangeSplitters = [
+  /<br>\s*(De(?:&nbsp;|\u00A0|\s)*:|Le(?:&nbsp;|\u00A0|\s).*?,)?\s*Immersion Facilitée\s*(?:<|&lt;)ne-pas-ecrire-a-cet-email@immersion-facile\.beta\.gouv\.fr(?:>|&gt;)[^<]*(?:&nbsp;|\u00A0|\s)*a\s*écrit(?:&nbsp;|\u00A0|\s)*:[^<]*<br>/i,
+  emailReplySeparator,
+];

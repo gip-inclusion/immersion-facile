@@ -14,7 +14,7 @@ import { isStringDate, toDisplayedDate } from "../utils/date";
 import { advices } from "./advices";
 import { defaultConventionFinalLegals } from "./defaultConventionFinalLegals";
 import type { EmailParamsByEmailType } from "./EmailParamsByEmailType";
-import { emailAttachements } from "./emailAttachements";
+import { emailAttachements } from "./email.content";
 import { immersionFacileDelegationEmail } from "./knownEmailsAddresses";
 
 const defaultSignature = (internshipKind: InternshipKind) =>

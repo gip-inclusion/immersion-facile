@@ -4,7 +4,6 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import Button, { type ButtonProps } from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { emailReplySeparator } from "html-templates/src/configureGenerateHtmlFromTemplate";
 import { useEffect } from "react";
 import {
   ButtonWithSubMenu,
@@ -23,6 +22,7 @@ import {
   domElementIds,
   type Email,
   type ExchangeFromDashboard,
+  emailExchangeSplitters,
   escapeHtml,
   exchangeMessageFromDashboardSchema,
   getFormattedFirstnameAndLastname,
@@ -61,11 +61,6 @@ import { match, P } from "ts-pattern";
 import { Feedback } from "../../feedback/Feedback";
 
 type DiscussionManageContentProps = WithDiscussionId;
-
-const exchangeSeparators = [
-  /<br>\s*(De(?:&nbsp;|\u00A0|\s)*:|Le .*?,)?\s*Immersion Facilitée\s*(?:<|&lt;)ne-pas-ecrire-a-cet-email@immersion-facile\.beta\.gouv\.fr(?:>|&gt;)[^<]*<br>/i,
-  emailReplySeparator,
-];
 
 export const DiscussionManageContent = ({
   discussionId,
@@ -360,7 +355,7 @@ const DiscussionExchangesList = ({
         );
         const messageToDisplay = splitTextOnFirstSeparator(
           currentMessage,
-          exchangeSeparators,
+          emailExchangeSplitters,
         );
         return (
           <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
