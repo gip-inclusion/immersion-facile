@@ -174,8 +174,13 @@ describe("SendAssessmentNeededNotifications", () => {
       timeGateway,
     );
     shortLinkIdGeneratorGateway = new DeterministShortLinkIdGeneratorGateway();
+
     sendEmailWithAssessmentCreationLink = new SendAssessmentNeededNotifications(
       new InMemoryUowPerformer(uow),
+      {
+        conventionQueries: uow.conventionQueries,
+        assessmentRepository: uow.assessmentRepository,
+      },
       saveNotificationAndRelatedEvent,
       timeGateway,
       fakeGenerateMagicLinkUrlFn,
