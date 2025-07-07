@@ -14,6 +14,7 @@ import {
   defaultPerPageInWebPagination,
   discussionStatuses,
   domElementIds,
+  getFormattedFirstnameAndLastname,
   toDisplayedDate,
   toDisplayedPhoneNumber,
 } from "shared";
@@ -174,8 +175,10 @@ export const DiscussionList = () => {
                 </Fragment>,
                 <Fragment key={discussion.id}>
                   <strong>
-                    {discussion.potentialBeneficiary.firstName}{" "}
-                    {discussion.potentialBeneficiary.lastName}
+                    {getFormattedFirstnameAndLastname({
+                      firstname: discussion.potentialBeneficiary.firstName,
+                      lastname: discussion.potentialBeneficiary.lastName,
+                    })}
                   </strong>
                   <br />
                   {discussion.potentialBeneficiary.phone
