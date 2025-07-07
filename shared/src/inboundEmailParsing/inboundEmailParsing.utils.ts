@@ -12,7 +12,7 @@ type OpaqueEmailParams = {
   };
 };
 
-const MAX_FULLNAME_LENGTH = 23;
+const MAX_EMAIL_LOCAL_PART = 64;
 
 export const createOpaqueEmail = ({
   discussionId,
@@ -24,13 +24,25 @@ export const createOpaqueEmail = ({
     ? slugify(recipient.firstname)
     : undefined;
   const lastname = recipient.lastname ? slugify(recipient.lastname) : undefined;
+  const separator = "__";
+  const limit =
+    MAX_EMAIL_LOCAL_PART -
+    `${discussionId}_${recipientLetter}`.length -
+    separator.length;
   const fullnameWithSeparator =
-    firstname && lastname ? makeFullnameWithSeparator(firstname, lastname) : "";
+    firstname && lastname
+      ? makeFullnameWithSeparator(firstname, lastname, separator, limit)
+      : "";
   return `${fullnameWithSeparator}${discussionId}_${recipientLetter}@${replyDomain}`;
 };
 
-const makeFullnameWithSeparator = (firstname: string, lastname: string) => {
+const makeFullnameWithSeparator = (
+  firstname: string,
+  lastname: string,
+  separator: string,
+  limit: number,
+) => {
   const fullname = `${firstname}_${lastname}`;
-  const fullnameTruncated = fullname.slice(0, MAX_FULLNAME_LENGTH);
-  return `${fullnameTruncated}__`;
+  const fullnameTruncated = fullname.slice(0, limit);
+  return `${fullnameTruncated}${separator}`;
 };

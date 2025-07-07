@@ -12,8 +12,10 @@ describe("inboundEmailParsing", () => {
       },
     });
 
+    expect(opaqueEmail.split("@")[0].length).toBeLessThanOrEqual(64);
+
     expect(opaqueEmail).toBe(
-      "fulgence-antoinette_pou__ab5ca3ad-d348-43b7-bdd6-5eddbbb0a274_e@reply.immersion-facile.beta.gouv.fr",
+      "fulgence-antoinette_pour__ab5ca3ad-d348-43b7-bdd6-5eddbbb0a274_e@reply.immersion-facile.beta.gouv.fr",
     );
   });
 
@@ -27,6 +29,8 @@ describe("inboundEmailParsing", () => {
         lastname: "Didier",
       },
     });
+
+    expect(opaqueEmail.split("@")[0].length).toBeLessThanOrEqual(64);
 
     expect(opaqueEmail).toBe(
       "philippe_didier__ab5ca3ad-d348-43b7-bdd6-5eddbbb0a274_e@reply.immersion-facile.beta.gouv.fr",
