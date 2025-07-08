@@ -222,7 +222,7 @@ const conventionToConventionInUrl = (
 
 export const conventionReadToConventionRouteParams = (
   convention: ConventionReadDto,
-) => {
+): ConventionParamsInUrl => {
   const baseParams = {
     // Beneficiary information
     email: convention.signatories.beneficiary.email,
