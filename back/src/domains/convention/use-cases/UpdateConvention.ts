@@ -5,7 +5,6 @@ import {
   type ConventionDto,
   type ConventionStatus,
   errors,
-  isModifierRole,
   isSignatoryRole,
   type Signatories,
   statusTransitionConfigs,
@@ -21,16 +20,13 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
-
-import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
-
+import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
-import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import {
   extractUserRolesOnConventionFromJwtPayload,
   signConvention,
@@ -176,60 +172,6 @@ export class UpdateConvention extends TransactionalUseCase<
     return { id: conventionFromRepo.id };
   }
 }
-
-const throwIfNotAllowedToUpdateConvention = async (
-  uow: UnitOfWork,
-  convention: ConventionDto,
-  jwtPayload: ConventionDomainPayload | ConnectedUserDomainJwtPayload,
-) => {
-  if (!jwtPayload) throw errors.user.unauthorized();
-
-  if ("userId" in jwtPayload) {
-    const userWithRights = await getUserWithRights(uow, jwtPayload.userId);
-
-    const isBackofficeAdmin = userWithRights.isBackofficeAdmin;
-
-    const isEstablishmentRepresentative =
-      userWithRights.email ===
-      convention.signatories.establishmentRepresentative.email;
-
-    const hasEnoughRightsOnAgency = userWithRights.agencyRights.some(
-      (agencyRight) =>
-        agencyRight.agency.id === convention.agencyId &&
-        agencyRight.roles.some((role) =>
-          ["validator", "counsellor"].includes(role),
-        ),
-    );
-
-    if (
-      isBackofficeAdmin ||
-      isEstablishmentRepresentative ||
-      hasEnoughRightsOnAgency
-    ) {
-      return;
-    }
-
-    if (!hasEnoughRightsOnAgency)
-      throw errors.user.notEnoughRightOnAgency({
-        userId: jwtPayload.userId,
-        agencyId: convention.agencyId,
-      });
-
-    throw errors.convention.updateForbidden({ id: convention.id });
-  }
-
-  if ("applicationId" in jwtPayload) {
-    if (jwtPayload.applicationId !== convention.id)
-      throw errors.convention.forbiddenMissingRights({
-        conventionId: convention.id,
-      });
-
-    const hasAllowedRole = isModifierRole(jwtPayload.role);
-
-    if (!hasAllowedRole)
-      throw errors.convention.updateForbidden({ id: convention.id });
-  }
-};
 
 const clearSignedAtForAllSignatories = (
   convention: ConventionDto,

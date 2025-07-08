@@ -10,10 +10,10 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
+import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import { createTransactionalUseCase } from "../../core/UseCase";
-import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type EditConventionCounsellorName = ReturnType<

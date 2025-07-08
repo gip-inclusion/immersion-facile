@@ -17,6 +17,7 @@ import {
   conventionDtoToConventionReadDto,
   throwErrorIfConventionStatusNotAllowed,
 } from "../../../utils/convention";
+import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../core/notifications/helpers/Notification";
 import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
@@ -25,7 +26,6 @@ import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/Shor
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import { throwIfNotAuthorizedForRole } from "../../inclusion-connected-users/helpers/authorization.helper";
 import { throwErrorIfPhoneNumberNotValid } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
