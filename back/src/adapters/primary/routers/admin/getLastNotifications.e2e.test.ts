@@ -8,6 +8,7 @@ import {
   currentJwtVersions,
   displayRouteName,
   type EmailNotification,
+  errors,
   expectHttpResponseToEqual,
   type SmsNotification,
 } from "shared";
@@ -18,8 +19,14 @@ import { buildTestApp } from "../../../../utils/buildTestApp";
 
 describe("Get last notification route", () => {
   let adminToken: ConnectedUserJwt;
+  let nonAdminToken: ConnectedUserJwt;
   let inMemoryUow: InMemoryUnitOfWork;
   let httpClient: HttpClient<AdminRoutes>;
+
+  const nonAdminUser = new ConnectedUserBuilder()
+    .withId("non-admin-user")
+    .withIsAdmin(false)
+    .buildUser();
 
   beforeEach(async () => {
     const testApp = await buildTestApp();
@@ -37,9 +44,17 @@ describe("Get last notification route", () => {
       userId: backofficeAdminUser.id,
     };
 
-    inMemoryUow.userRepository.users = [backofficeAdminUser];
+    const nonAdminJwtPayload: ConnectedUserJwtPayload = {
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
+      exp: addDays(new Date(), 30).getTime(),
+      userId: nonAdminUser.id,
+    };
+
+    inMemoryUow.userRepository.users = [backofficeAdminUser, nonAdminUser];
 
     adminToken = testApp.generateConnectedUserJwt(backofficeAdminJwtPayload);
+    nonAdminToken = testApp.generateConnectedUserJwt(nonAdminJwtPayload);
     httpClient = createSupertestSharedClient(adminRoutes, testApp.request);
   });
 
@@ -59,6 +74,20 @@ describe("Get last notification route", () => {
           status: 400,
         },
         status: 400,
+      });
+    });
+
+    it("401 - non-admin user cannot access notifications", async () => {
+      const response = await httpClient.getLastNotifications({
+        headers: { authorization: nonAdminToken },
+      });
+
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+        },
       });
     });
 

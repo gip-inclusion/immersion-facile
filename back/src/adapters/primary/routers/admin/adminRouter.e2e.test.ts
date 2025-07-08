@@ -62,9 +62,23 @@ describe("Admin router", () => {
     userId: connectedBackofficeAdminUser.id,
   };
 
+  const nonAdminUserBuilder = new ConnectedUserBuilder()
+    .withId("non-admin-user")
+    .withIsAdmin(false);
+  const connectedNonAdminUser = nonAdminUserBuilder.build();
+  const nonAdminUser = nonAdminUserBuilder.buildUser();
+
+  const nonAdminJwtPayload: ConnectedUserJwtPayload = {
+    version: currentJwtVersions.connectedUser,
+    iat: Date.now(),
+    exp: addDays(new Date(), 30).getTime(),
+    userId: connectedNonAdminUser.id,
+  };
+
   const now = new Date();
   let sharedRequest: HttpClient<AdminRoutes>;
   let token: ConnectedUserJwt;
+  let nonAdminToken: ConnectedUserJwt;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let appConfig: AppConfig;
@@ -94,11 +108,12 @@ describe("Admin router", () => {
 
     sharedRequest = createSupertestSharedClient(adminRoutes, request);
 
-    inMemoryUow.userRepository.users = [backOfficeAdminUser];
+    inMemoryUow.userRepository.users = [backOfficeAdminUser, nonAdminUser];
     inMemoryUow.agencyRepository.agencies = [];
 
     gateways.timeGateway.defaultDate = now;
     token = generateConnectedUserJwt(backofficeAdminJwtPayload);
+    nonAdminToken = generateConnectedUserJwt(nonAdminJwtPayload);
 
     getFeatureFlags = async () => {
       const { body } = await request.get(technicalRoutes.featureFlags.url);
@@ -216,6 +231,21 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 401,
         body: { status: 401, message: invalidTokenMessage },
+      });
+    });
+
+    it("403 - non-admin user cannot access dashboard", async () => {
+      const response = await sharedRequest.getDashboardUrl({
+        urlParams: { dashboardName: "conventions" },
+        headers: { authorization: nonAdminToken },
+        queryParams: {},
+      });
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+        },
       });
     });
   });
@@ -356,6 +386,30 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 401,
         body: { status: 401, message: invalidTokenMessage },
+      });
+    });
+
+    it("403 - non-admin user cannot update feature flags", async () => {
+      const response = await sharedRequest.updateFeatureFlags({
+        body: {
+          flagName: "enableTemporaryOperation",
+          featureFlag: makeTextImageAndRedirectFeatureFlag(true, {
+            imageAlt: "altImage",
+            imageUrl: "https://imageUrl",
+            message: "message",
+            redirectUrl: "https://redirect-url",
+            overtitle: "overtitle",
+            title: "title",
+          }),
+        },
+        headers: { authorization: nonAdminToken },
+      });
+      expectHttpResponseToEqual(response, {
+        status: 403,
+        body: {
+          status: 403,
+          message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+        },
       });
     });
   });

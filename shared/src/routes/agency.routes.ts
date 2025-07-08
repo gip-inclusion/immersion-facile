@@ -83,6 +83,7 @@ export const agencyRoutes = defineRoutes({
     responses: {
       200: agencyOptionsSchema,
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   updateAgency: defineRoute({

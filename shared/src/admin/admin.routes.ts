@@ -35,6 +35,7 @@ export const adminRoutes = defineRoutes({
       200: dashboardUrlAndNameSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   addFormEstablishmentBatch: defineRoute({
@@ -68,6 +69,7 @@ export const adminRoutes = defineRoutes({
       200: expressEmptyResponseBody,
       400: httpErrorSchema,
       401: httpErrorSchema,
+      403: httpErrorSchema,
       404: httpErrorSchema,
     },
   }),
@@ -111,7 +113,12 @@ export const adminRoutes = defineRoutes({
     method: "get",
     url: "/admin/notifications",
     ...withAuthorizationHeaders,
-    responses: { 200: notificationsByKindSchema, 400: httpErrorSchema },
+    responses: {
+      200: notificationsByKindSchema,
+      400: httpErrorSchema,
+      401: httpErrorSchema,
+      403: httpErrorSchema,
+    },
   }),
   updateFeatureFlags: defineRoute({
     method: "post",
@@ -121,6 +128,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       201: expressEmptyResponseBody,
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   saveApiConsumer: defineRoute({
@@ -131,6 +139,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       200: apiConsumerJwtSchema.or(expressEmptyResponseBody),
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getAllApiConsumers: defineRoute({
@@ -140,6 +149,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       200: z.array(apiConsumerSchema),
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getUsers: defineRoute({
@@ -150,6 +160,7 @@ export const adminRoutes = defineRoutes({
     responses: {
       200: z.array(userInListSchema),
       401: httpErrorSchema,
+      403: httpErrorSchema,
     },
   }),
   getIcUser: defineRoute({

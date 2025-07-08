@@ -1,6 +1,7 @@
 import { keys } from "ramda";
 import {
   type ApiConsumerId,
+  type ConnectedUser,
   type FindSimilarConventionsParams,
   type FindSimilarConventionsResponseDto,
   NotFoundError,
@@ -15,6 +16,7 @@ import { RegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/Re
 import { UpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
 import { UpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
 import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
+import { throwIfNotAdmin } from "../../domains/connected-users/helpers/authorization.helper";
 import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
 import { GetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
 import { GetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
@@ -624,8 +626,12 @@ export const createUseCases = ({
         uowPerformer.perform((uow) => uow.shortLinkQuery.getById(shortLinkId)),
       getApiConsumerById: (id: ApiConsumerId) =>
         uowPerformer.perform((uow) => uow.apiConsumerRepository.getById(id)),
-      getAllApiConsumers: () =>
-        uowPerformer.perform((uow) => uow.apiConsumerRepository.getAll()),
+      getAllApiConsumers: (currentUser: ConnectedUser) => {
+        throwIfNotAdmin(currentUser);
+        return uowPerformer.perform((uow) =>
+          uow.apiConsumerRepository.getAll(),
+        );
+      },
       isFormEstablishmentWithSiretAlreadySaved: (siret: SiretDto) =>
         uowPerformer.perform((uow) =>
           uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
@@ -643,10 +649,12 @@ export const createUseCases = ({
           }
           return agencyId;
         }),
-      getLastNotifications: (_: void) =>
-        uowPerformer.perform((uow) =>
+      getLastNotifications: (currentUser: ConnectedUser) => {
+        throwIfNotAdmin(currentUser);
+        return uowPerformer.perform((uow) =>
           uow.notificationRepository.getLastNotifications(),
-        ),
+        );
+      },
 
       findSimilarConventions: (
         params: FindSimilarConventionsParams,
