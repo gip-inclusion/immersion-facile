@@ -326,7 +326,7 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.establishmentContact.email],
             replyTo: {
-              email: `e-ric_el-ah-e-truc__${discussion.id}_b@reply.my-domain.com`,
+              email: `e-ric_el-ah-e-tru__${discussion.id}_b@reply.my-domain.com`,
               name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
