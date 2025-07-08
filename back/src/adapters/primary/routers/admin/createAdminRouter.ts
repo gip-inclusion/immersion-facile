@@ -9,6 +9,7 @@ import {
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { throwIfNotAdmin } from "../../../../domains/connected-users/helpers/authorization.helper";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
   const expressRouter = Router({ mergeParams: true });
@@ -27,6 +28,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
+        throwIfNotAdmin(req.payloads?.currentUser);
         if (req.params.dashboardName === "agency" && !req.query.agencyId)
           throw errors.agency.missingParamAgencyId();
 
@@ -41,7 +43,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.getLastNotifications(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, deps.useCases.getLastNotifications.execute),
+      sendHttpResponse(req, res, () => {
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getLastNotifications.execute(
+          req.payloads.currentUser,
+        );
+      }),
   );
 
   sharedAdminRouter.updateFeatureFlags(
@@ -154,9 +161,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.getAllApiConsumers(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () =>
-        deps.useCases.getAllApiConsumers.execute({}),
-      ),
+      sendHttpResponse(req, res, () => {
+        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
+        return deps.useCases.getAllApiConsumers.execute(
+          req.payloads.currentUser,
+        );
+      }),
   );
 
   sharedAdminRouter.getUsers(deps.connectedUserAuthMiddleware, (req, res) =>

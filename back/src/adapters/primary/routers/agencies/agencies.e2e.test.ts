@@ -41,11 +41,17 @@ describe("Agency routes", () => {
     .withIsAdmin(true)
     .buildUser();
 
+  const nonAdminUser = new ConnectedUserBuilder()
+    .withId("non-admin-user")
+    .withIsAdmin(false)
+    .buildUser();
+
   let httpClient: HttpClient<AgencyRoutes>;
   let gateways: InMemoryGateways;
   let inMemoryUow: InMemoryUnitOfWork;
   let eventCrawler: BasicEventCrawler;
   let backofficeAdminToken: ConnectedUserJwt;
+  let nonAdminToken: ConnectedUserJwt;
   let generateConnectedUserJwt: GenerateConnectedUserJwt;
 
   beforeEach(async () => {
@@ -55,11 +61,18 @@ describe("Agency routes", () => {
     httpClient = createSupertestSharedClient(agencyRoutes, deps.request);
 
     inMemoryUow.agencyRepository.agencies = [];
-    inMemoryUow.userRepository.users = [backofficeAdminUser];
+    inMemoryUow.userRepository.users = [backofficeAdminUser, nonAdminUser];
     gateways.timeGateway.defaultDate = new Date();
 
     backofficeAdminToken = generateConnectedUserJwt({
       userId: backofficeAdminUser.id,
+      version: currentJwtVersions.connectedUser,
+      iat: Date.now(),
+      exp: addDays(new Date(), 5).getTime(),
+    });
+
+    nonAdminToken = generateConnectedUserJwt({
+      userId: nonAdminUser.id,
       version: currentJwtVersions.connectedUser,
       iat: Date.now(),
       exp: addDays(new Date(), 5).getTime(),
@@ -143,40 +156,6 @@ describe("Agency routes", () => {
     describe(`${displayRouteName(
       agencyRoutes.getAgencyPublicInfoById,
     )} to get agency public info by id`, () => {
-      it("Returns agency public info", async () => {
-        // Prepare
-        inMemoryUow.agencyRepository.agencies = [
-          toAgencyWithRights(agency1ActiveNearBy),
-        ];
-
-        // Act and assert
-        const response = await httpClient.getAgencyPublicInfoById({
-          queryParams: { agencyId: agency1ActiveNearBy.id },
-        });
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: {
-            id: "test-agency-1",
-            name: "Test Agency 1",
-            kind: "autre",
-            address: {
-              city: "Paris",
-              departmentCode: "20",
-              postcode: "75002",
-              streetNumberAndAddress: "",
-            },
-            position: {
-              lat: 10.11,
-              lon: 10.12,
-            },
-            agencySiret: "12345678904444",
-            signature: "empty-signature",
-            refersToAgency: null,
-            logoUrl: null,
-          },
-        });
-      });
-
       it("Returns agency public info without refersToAgency", async () => {
         // Prepare
         inMemoryUow.agencyRepository.agencies = [
@@ -265,6 +244,7 @@ describe("Agency routes", () => {
 
         expectToEqual(inMemoryUow.userRepository.users, [
           backofficeAdminUser,
+          nonAdminUser,
           validator,
           counsellor,
         ]);
@@ -392,6 +372,21 @@ describe("Agency routes", () => {
         expectHttpResponseToEqual(response, {
           status: 401,
           body: { status: 401, message: "Veuillez vous authentifier" },
+        });
+      });
+
+      it("403 - non-admin user cannot access agencies", async () => {
+        const response = await httpClient.listAgenciesOptionsWithStatus({
+          queryParams: { status: "needsReview" },
+          headers: { authorization: nonAdminToken },
+        });
+
+        expectHttpResponseToEqual(response, {
+          status: 403,
+          body: {
+            status: 403,
+            message: errors.user.forbidden({ userId: nonAdminUser.id }).message,
+          },
         });
       });
 
