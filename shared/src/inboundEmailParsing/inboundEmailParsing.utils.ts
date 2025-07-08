@@ -42,7 +42,11 @@ const makeFullnameWithSeparator = (
   separator: string,
   limit: number,
 ) => {
-  const fullname = `${firstname}_${lastname}`;
-  const fullnameTruncated = fullname.slice(0, limit);
-  return `${fullnameTruncated}${separator}`;
+  const limitForParts = Math.ceil(limit / 2) - 1;
+  const truncatedFirstname = firstname
+    .slice(0, limitForParts)
+    .replace(/-$/, "");
+  const truncatedLastname = lastname.slice(0, limitForParts).replace(/-$/, "");
+  const fullname = `${truncatedFirstname}_${truncatedLastname}`;
+  return `${fullname}${separator}`;
 };
