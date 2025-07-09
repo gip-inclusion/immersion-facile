@@ -3,6 +3,7 @@ import { keys } from "ramda";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto, Postcode } from "../address/address.dto";
 import type { AgencyId, AgencyKind } from "../agency/agency.dto";
+import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { DateFilter } from "../filters";
@@ -165,7 +166,7 @@ export type ConventionCommon = {
   dateApproval?: DateString; // undefined until the convention is accepted by counsellor
   updatedAt?: DateString;
   siret: SiretDto;
-  businessName: string;
+  businessName: BusinessName;
   schedule: ScheduleDto;
   workConditions?: string;
   businessAdvantages?: string;

@@ -23,12 +23,12 @@ import {
   candidateWarnedMethods,
   type DiscussionEmailParams,
   type DiscussionExchangeForbiddenParams,
-  type DiscussionExchangeForbidenReason,
+  type DiscussionExchangeForbiddenReason,
   type DiscussionId,
   type DiscussionInList,
   type DiscussionReadDto,
-  type Exchange,
   type ExchangeFromDashboard,
+  type ExchangeRead,
   type ExchangeRole,
   type FlatGetPaginatedDiscussionsParams,
   type LegacyDiscussionEmailParams,
@@ -96,7 +96,7 @@ export const makeExchangeEmailSchema = (
     );
 
 export const exchangeRoleSchema: z.Schema<ExchangeRole> = z.enum(exchangeRoles);
-export const discussionExchangeForbidenReasonSchema: z.Schema<DiscussionExchangeForbidenReason> =
+export const discussionExchangeForbidenReasonSchema: z.Schema<DiscussionExchangeForbiddenReason> =
   z.enum(discussionExchangeForbidenReasons);
 
 export const attachmentSchema: z.Schema<Attachment> = z.object({
@@ -104,15 +104,25 @@ export const attachmentSchema: z.Schema<Attachment> = z.object({
   link: z.string(),
 });
 
-export const exchangeSchema: z.Schema<Exchange> = z.object({
-  subject: zStringMinLength1,
-  message: zStringMinLength1,
-  sender: exchangeRoleSchema,
-  recipient: exchangeRoleSchema,
-  sentAt: makeDateStringSchema(),
-  attachments: z.array(attachmentSchema),
-});
-export const exchangesSchema: z.Schema<Exchange[]> = z.array(exchangeSchema);
+export const exchangeReadSchema: z.Schema<ExchangeRead> = z
+  .object({
+    subject: zStringMinLength1,
+    message: zStringMinLength1,
+    sentAt: makeDateStringSchema(),
+    attachments: z.array(attachmentSchema),
+  })
+  .and(
+    z.discriminatedUnion("sender", [
+      z.object({
+        sender: z.literal("establishment"),
+        firstname: z.string(),
+        lastname: z.string(),
+      }),
+      z.object({
+        sender: z.literal("potentialBeneficiary"),
+      }),
+    ]),
+  );
 
 const candidateWarnedMethodSchema = z.enum(
   candidateWarnedMethods,
@@ -191,7 +201,7 @@ const commonDiscussionSchema: z.Schema<CommonDiscussionDto> = z
     siret: siretSchema,
     businessName: zStringMinLength1,
     address: addressSchema,
-    exchanges: exchangesSchema,
+    // exchanges: exchangesSchema,
     conventionId: conventionIdSchema.optional(),
   })
   .and(withDiscussionStatusSchema);
@@ -206,11 +216,7 @@ export const discussionReadSchema: z.Schema<DiscussionReadDto> =
     .and(
       z.object({
         appellation: appellationDtoSchema,
-        establishmentContact: z.object({
-          firstName: zStringCanBeEmpty.optional(),
-          lastName: zStringCanBeEmpty.optional(),
-          job: zStringMinLength1,
-        }),
+        exchanges: z.array(exchangeReadSchema),
       }),
     )
     .and(
@@ -290,7 +296,7 @@ export const discussionInListSchema: z.Schema<DiscussionInList> = z.object({
   businessName: zStringMinLength1,
   createdAt: makeDateStringSchema(),
   kind: z.union([discussionKindIfSchema, discussionKind1Eleve1StageSchema]),
-  exchanges: exchangesSchema,
+  exchanges: z.array(exchangeReadSchema),
   city: zStringMinLength1,
   potentialBeneficiary: z.object({
     firstName: zStringMinLength1,

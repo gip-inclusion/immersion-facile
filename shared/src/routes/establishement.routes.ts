@@ -3,7 +3,7 @@ import { renewMagicLinkResponseSchema } from "../convention/convention.schema";
 import {
   discussionExchangeForbiddenParamsSchema,
   discussionReadSchema,
-  exchangeSchema,
+  exchangeReadSchema,
   flatGetPaginatedDiscussionsParamsSchema,
   paginatedDiscussionListSchema,
   withDiscussionStatusSchema,
@@ -114,7 +114,7 @@ export const establishmentRoutes = defineRoutes({
     ...withAuthorizationHeaders,
     requestBodySchema: withExchangeMessageSchema,
     responses: {
-      200: exchangeSchema,
+      200: exchangeReadSchema,
       202: discussionExchangeForbiddenParamsSchema,
       400: httpErrorSchema,
       401: httpErrorSchema,

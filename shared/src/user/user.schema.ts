@@ -6,6 +6,7 @@ import {
   agencyRoleSchema,
 } from "../agency/agency.schema";
 import { proConnectInfoSchema } from "../auth/proConnect/proConnect.schema";
+import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
 import type {
   EstablishmentData,
@@ -53,7 +54,7 @@ const agencyRightSchema: z.Schema<AgencyRight> = z.object({
 
 const withEstablishmentSiretAndName: z.Schema<EstablishmentData> = z.object({
   siret: siretSchema,
-  businessName: zStringMinLength1,
+  businessName: businessNameSchema,
   role: z.enum(establishmentsRoles),
   admins: z.array(
     z.object({

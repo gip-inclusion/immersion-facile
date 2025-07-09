@@ -6,6 +6,7 @@ import {
   agencyKindSchema,
   refersToAgencyIdSchema,
 } from "../agency/agency.schema";
+import { businessNameSchema } from "../business/business";
 import { emailPossiblyEmptySchema, emailSchema } from "../email/email.schema";
 import { peConnectIdentitySchema } from "../federatedIdentities/federatedIdentity.schema";
 import { dateFilterSchema } from "../filters";
@@ -257,7 +258,7 @@ const conventionCommonSchema: z.Schema<ConventionCommon> = z
       localization.invalidApprovalFormatDate,
     ).optional(),
     siret: siretSchema,
-    businessName: zStringMinLength1,
+    businessName: businessNameSchema,
     schedule: scheduleSchema,
     workConditions: z.string().optional(),
     businessAdvantages: z.string().optional(),

@@ -1,6 +1,7 @@
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AgencyId } from "../agency/agency.dto";
 import type { Builder } from "../Builder";
+import type { BusinessName } from "../business/business";
 import type { FtConnectIdentity } from "../federatedIdentities/federatedIdentity.dto";
 import type { AppellationAndRomeDto } from "../romeAndAppellationDtos/romeAndAppellation.dto";
 import type {
@@ -415,7 +416,7 @@ export class ConventionDtoBuilder implements Builder<ConventionDto> {
     });
   }
 
-  public withBusinessName(businessName: string): ConventionDtoBuilder {
+  public withBusinessName(businessName: BusinessName): ConventionDtoBuilder {
     return new ConventionDtoBuilder({ ...this.dto, businessName });
   }
 

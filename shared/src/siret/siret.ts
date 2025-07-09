@@ -1,3 +1,4 @@
+import type { BusinessName } from "../business/business";
 import type { NafDto } from "../naf/naf.dto";
 import type { Flavor } from "../typeFlavors";
 
@@ -27,7 +28,7 @@ export type SiretDto = Flavor<string, "SiretDto">;
 export type WithSiretDto = { siret: SiretDto };
 export type SiretEstablishmentDto = {
   siret: SiretDto;
-  businessName: string;
+  businessName: BusinessName;
   businessAddress: string;
   // true if the office is currently open for business.
   isOpen: boolean;

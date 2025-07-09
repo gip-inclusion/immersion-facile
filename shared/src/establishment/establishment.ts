@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { AbsoluteUrl } from "../AbsoluteUrl";
+import type { BusinessName } from "../business/business";
 import type { Email } from "../email/email.dto";
 import { emailSchema } from "../email/email.schema";
 import type { EstablishmentRole } from "../role/role.dto";
@@ -25,7 +26,7 @@ export type EstablishmentAdminPrivateData = {
 
 export type EstablishmentData = {
   siret: SiretDto;
-  businessName: string;
+  businessName: BusinessName;
   role: EstablishmentRole;
   admins: EstablishmentAdminPrivateData[];
 };
