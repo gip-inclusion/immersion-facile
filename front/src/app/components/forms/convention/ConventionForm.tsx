@@ -382,10 +382,10 @@ export const ConventionForm = ({
 
   //TODO: à placer dans ConventionFormFields ????
   useEffect(() => {
-    if (fetchedConvention) {
+    if (fetchedConvention && mode === "edit") {
       reset({ ...fetchedConvention, status: "READY_TO_SIGN" });
     }
-  }, [fetchedConvention, reset]);
+  }, [fetchedConvention, reset, mode]);
 
   useEffect(() => {
     if (defaultValues.siret) {
