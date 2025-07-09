@@ -7,7 +7,7 @@ import {
   type DiscussionReadDto,
   type EstablishmentNameAndAdmins,
   type EstablishmentRoutes,
-  type Exchange,
+  type ExchangeRead,
   errors,
   type FormEstablishmentDto,
   type SendMessageToDiscussionFromDashboardRequestPayload,
@@ -198,7 +198,7 @@ export class HttpEstablishmentGateway implements EstablishmentGateway {
 
   public sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<Exchange | DiscussionExchangeForbiddenParams> {
+  ): Observable<ExchangeRead | DiscussionExchangeForbiddenParams> {
     return from(
       this.httpClient
         .replyToDiscussion({
