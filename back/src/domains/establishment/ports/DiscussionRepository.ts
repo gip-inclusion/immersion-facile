@@ -64,4 +64,5 @@ export interface DiscussionRepository {
   hasDiscussionMatching: (
     params: Partial<HasDiscussionMatchingParams>,
   ) => Promise<boolean>;
+  markObsoleteDiscussionsAsDeprecated: () => Promise<DiscussionId[]>;
 }
