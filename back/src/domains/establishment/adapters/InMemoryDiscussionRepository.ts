@@ -1,3 +1,4 @@
+import { isBefore } from "date-fns";
 import isAfter from "date-fns/isAfter";
 import type {
   DataWithPagination,
@@ -128,5 +129,16 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
       (acc, discussion) => ({ ...acc, [discussion.id]: discussion }),
       {} as DiscussionsById,
     );
+  }
+
+  public async markObsoleteDiscussionsAsDeprecated(): Promise<DiscussionId[]> {
+    return Object.values(this._discussions)
+      .filter((discussion) => {
+        const threeMonthsAgo = new Date(
+          Date.now() - 3 * 30 * 24 * 60 * 60 * 1000,
+        );
+        return isBefore(new Date(discussion.createdAt), threeMonthsAgo);
+      })
+      .map((discussion) => discussion.id);
   }
 }

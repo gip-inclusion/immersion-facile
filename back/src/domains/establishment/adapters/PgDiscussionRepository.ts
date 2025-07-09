@@ -342,6 +342,37 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("discussion_id", "=", discussion.id)
       .execute();
   }
+
+  public async markObsoleteDiscussionsAsDeprecated(): Promise<DiscussionId[]> {
+    const threeMonthsAgo = new Date(Date.now() - 3 * 30 * 24 * 60 * 60 * 1000);
+
+    const obsoleteDiscussion = await this.transaction
+      .selectFrom("discussions")
+      .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+      .select("discussions.id")
+      .where("discussions.created_at", "<=", threeMonthsAgo)
+      .groupBy(["discussions.id"])
+      .having((eb) => eb.fn.count("exchanges.id"), "=", 1)
+      .execute();
+    const obsoleteDiscussionIds = obsoleteDiscussion.map((d) => d.id);
+
+    if (obsoleteDiscussionIds.length === 0) {
+      return [];
+    }
+
+    await this.transaction
+      .updateTable("discussions")
+      .set({
+        status: "REJECTED",
+        rejection_kind: "DEPRECATED",
+        rejection_reason: null,
+        candidate_warned_method: null,
+      })
+      .where("id", "in", obsoleteDiscussionIds)
+      .execute();
+
+    return obsoleteDiscussionIds;
+  }
 }
 
 const discussionToPg = (
