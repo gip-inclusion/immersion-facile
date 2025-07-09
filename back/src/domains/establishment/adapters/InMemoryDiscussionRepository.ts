@@ -82,7 +82,6 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
     appellationCode,
     potentialBeneficiaryEmail,
     since,
-    establishmentRepresentativeEmail,
   }: Partial<HasDiscussionMatchingParams>): Promise<boolean> {
     const filters = [
       (discussion: DiscussionDto) =>
@@ -95,14 +94,6 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
           : true,
       (discussion: DiscussionDto) =>
         since ? new Date(discussion.createdAt) >= since : true,
-      (discussion: DiscussionDto) =>
-        establishmentRepresentativeEmail
-          ? discussion.establishmentContact.email ===
-              establishmentRepresentativeEmail ||
-            discussion.establishmentContact.copyEmails?.includes(
-              establishmentRepresentativeEmail,
-            )
-          : true,
     ];
     return this.discussions.some((discussion) =>
       filters.every((filter) => filter(discussion)),
