@@ -20,106 +20,106 @@ describe("dashboardUrls slice", () => {
 
   describe("get convention url for dashboardUrls", () => {
     it("should store AbsoluteUrl in convention when requesting conventions dashboard", () => {
-      expectUrlsToMatch({ conventions: null });
+      expectUrlsToMatch({ adminConventions: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "conventions",
+          name: "adminConventions",
         }),
       );
       const valueFromApi: DashboardUrlAndName = {
-        name: "conventions",
+        name: "adminConventions",
         url: "https://conventions.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ conventions: valueFromApi.url });
+      expectUrlsToMatch({ adminConventions: valueFromApi.url });
       expectDashboardError(null);
     });
 
     it("should store AbsoluteUrl in establishments when requesting establishments dashboard", () => {
-      expectUrlsToMatch({ establishments: null });
+      expectUrlsToMatch({ adminEstablishments: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "establishments",
+          name: "adminEstablishments",
         }),
       );
       const valueFromApi: DashboardUrlAndName = {
-        name: "establishments",
+        name: "adminEstablishments",
         url: "https://establishments.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ establishments: valueFromApi.url });
+      expectUrlsToMatch({ adminEstablishments: valueFromApi.url });
       expectDashboardError(null);
     });
 
     it("should store AbsoluteUrl in events when requesting events dashboard", () => {
-      expectUrlsToMatch({ agencyForAdmin: null });
+      expectUrlsToMatch({ adminAgencyDetails: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "agencyForAdmin",
+          name: "adminAgencyDetails",
           agencyId: "my-agency-id",
         }),
       );
       const valueFromApi: DashboardUrlAndName = {
-        name: "agencyForAdmin",
+        name: "adminAgencyDetails",
         url: "https://agency.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(valueFromApi);
 
-      expectUrlsToMatch({ agencyForAdmin: valueFromApi.url });
+      expectUrlsToMatch({ adminAgencyDetails: valueFromApi.url });
       expectDashboardError(null);
     });
 
     it("should fails on requesting conventions dashboard with error", () => {
-      expectUrlsToMatch({ conventions: null });
+      expectUrlsToMatch({ adminConventions: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "conventions",
+          name: "adminConventions",
         }),
       );
       const errorMessage = "It Fails";
       dependencies.adminGateway.dashboardUrl$.error(new Error(errorMessage));
 
-      expectUrlsToMatch({ conventions: null });
+      expectUrlsToMatch({ adminConventions: null });
       expectDashboardError(errorMessage);
     });
 
     it("should be able to load 2 different dashboards at the same time (agency and agencies for exemple)", () => {
-      expectUrlsToMatch({ agencyForAdmin: null, agencies: null });
+      expectUrlsToMatch({ adminAgencyDetails: null, adminAgencies: null });
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "agencyForAdmin",
+          name: "adminAgencyDetails",
           agencyId: "my-agency-id",
         }),
       );
 
       store.dispatch(
         dashboardUrlsSlice.actions.dashboardUrlRequested({
-          name: "agencies",
+          name: "adminAgencies",
         }),
       );
 
       const agencyValueFromApi: DashboardUrlAndName = {
-        name: "agencyForAdmin",
+        name: "adminAgencyDetails",
         url: "https://my-agency.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(agencyValueFromApi);
 
       const agenciesValueFromApi: DashboardUrlAndName = {
-        name: "agencies",
+        name: "adminAgencies",
         url: "https://agencies.url",
       };
       dependencies.adminGateway.dashboardUrl$.next(agenciesValueFromApi);
 
       expectUrlsToMatch({
-        agencyForAdmin: agencyValueFromApi.url,
-        agencies: agenciesValueFromApi.url,
+        adminAgencyDetails: agencyValueFromApi.url,
+        adminAgencies: agenciesValueFromApi.url,
       });
     });
   });

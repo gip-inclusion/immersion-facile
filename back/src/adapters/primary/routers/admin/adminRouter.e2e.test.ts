@@ -134,7 +134,7 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          name: "events",
+          name: "adminEvents",
           url: `http://stubDashboard/events/${gateways.timeGateway.now()}`,
         },
       });
@@ -149,7 +149,7 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          name: "establishments",
+          name: "adminEstablishments",
           url: `http://stubDashboard/establishments/${gateways.timeGateway.now()}`,
         },
       });
@@ -165,7 +165,7 @@ describe("Admin router", () => {
       expectHttpResponseToEqual(response, {
         status: 200,
         body: {
-          name: "agencyForAdmin",
+          name: "adminAgencyDetails",
           url: `http://stubAgencyForAdminDashboard/${agencyId}/${gateways.timeGateway.now()}`,
         },
       });

@@ -16,14 +16,14 @@ type MetabaseDashboard = {
 };
 
 const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
-  agencyForAdmin: { kind: "dashboard", id: 4 },
-  agencyForIcUser: { kind: "dashboard", id: 150 }, // https://metabase.immersion-facile.beta.gouv.fr/dashboard/150
-  agencies: { kind: "dashboard", id: 130 },
-  conventions: { kind: "dashboard", id: 5 },
-  erroredConventions: { kind: "dashboard", id: 151 },
+  adminAgencyDetails: { kind: "dashboard", id: 4 },
+  adminAgencies: { kind: "dashboard", id: 130 },
+  adminConventions: { kind: "dashboard", id: 5 },
+  adminEvents: { kind: "question", id: 330 },
+  adminEstablishments: { kind: "dashboard", id: 115 },
+  agencyForUser: { kind: "dashboard", id: 150 }, // https://metabase.immersion-facile.beta.gouv.fr/dashboard/150
+  erroredConventionsForUser: { kind: "dashboard", id: 151 },
   conventionStatus: { kind: "dashboard", id: 45 },
-  events: { kind: "question", id: 330 },
-  establishments: { kind: "dashboard", id: 115 },
   establishmentRepresentativeConventions: {
     kind: "dashboard",
     id: 128,
@@ -46,7 +46,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     private metabaseApiKey: string,
   ) {}
   public getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agencyForAdmin;
+    const dashboard = dashboardByName.adminAgencyDetails;
     const token = this.#createToken({
       dashboard,
       params: { filtrer_par_structure: [agencyId] },
@@ -56,7 +56,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
   }
 
   public getAgencyUserUrl(userId: UserId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agencyForIcUser;
+    const dashboard = dashboardByName.agencyForUser;
     const token = this.#createToken({
       dashboard,
       params: { ic_user_id: userId },
@@ -88,7 +88,7 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     userId: UserId,
     now: Date,
   ): AbsoluteUrl {
-    const dashboard = dashboardByName.erroredConventions;
+    const dashboard = dashboardByName.erroredConventionsForUser;
     const token = this.#createToken({
       dashboard,
       params: { ic_user_id: userId },

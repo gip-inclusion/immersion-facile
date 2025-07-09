@@ -99,7 +99,7 @@ export class HttpAdminGateway implements AdminGateway {
         .getDashboardUrl({
           urlParams: { dashboardName: params.name },
           queryParams: {
-            ...(params.name === "agencyForAdmin"
+            ...(params.name === "adminAgencyDetails"
               ? { agencyId: params.agencyId }
               : {}),
           },

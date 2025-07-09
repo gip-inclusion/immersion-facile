@@ -13,12 +13,11 @@ export type DashboardsState = {
 
 export const dashboardInitialState: DashboardsState = {
   urls: {
-    conventions: null,
-    agencyForAdmin: null,
-    events: null,
-    erroredConventions: null,
-    establishments: null,
-    agencies: null,
+    adminConventions: null,
+    adminAgencies: null,
+    adminAgencyDetails: null,
+    adminEvents: null,
+    adminEstablishments: null,
   },
   errorMessage: null,
 };

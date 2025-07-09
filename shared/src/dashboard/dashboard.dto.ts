@@ -18,19 +18,21 @@ export const establishmentDashboardNames = [
 ] as const;
 
 export type AgencyDashboardName = (typeof agencyDashboardNames)[number];
-export const agencyDashboardNames = ["agencyForIcUser"] as const;
+export const agencyDashboardNames = [
+  "agencyForUser",
+  "erroredConventionsForUser",
+] as const;
 
 export const simpleDashboardNames = [
-  "conventions",
-  "events",
-  "establishments",
-  "agencies",
+  "adminConventions",
+  "adminEvents",
+  "adminEstablishments",
+  "adminAgencies",
 ] as const;
 
 export const adminDashboardNames = [
   ...simpleDashboardNames,
-  "agencyForAdmin",
-  "erroredConventions",
+  "adminAgencyDetails",
 ] as const;
 export type AdminDashboardName = (typeof adminDashboardNames)[number];
 
@@ -65,9 +67,12 @@ export type GetEstablishmentDashboardParams =
 
 export type GetAdminDashboardParams =
   | GenericGetDashboardParams<
-      "events" | "conventions" | "establishments" | "agencies"
+      | "adminEvents"
+      | "adminConventions"
+      | "adminEstablishments"
+      | "adminAgencies"
     >
-  | (GenericGetDashboardParams<"agencyForAdmin" | "erroredConventions"> & {
+  | (GenericGetDashboardParams<"adminAgencyDetails"> & {
       agencyId: AgencyId;
     });
 

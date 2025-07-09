@@ -6,7 +6,7 @@ import { makeStyles } from "tss-react/dsfr";
 import { useAdminDashboard } from "./useAdminDashboard";
 
 export const EstablishmentsTab = () => {
-  const { url, error } = useAdminDashboard({ name: "establishments" });
+  const { url, error } = useAdminDashboard({ name: "adminEstablishments" });
   const { cx } = useStyles();
 
   return error ? (

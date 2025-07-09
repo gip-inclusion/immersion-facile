@@ -14,7 +14,7 @@ import { agencyAdminSelectors } from "src/core-logic/domain/admin/agenciesAdmin/
 export const AgencyTab = () => {
   const agency = useAppSelector(agencyAdminSelectors.agency);
   const feedback = useAppSelector(agencyAdminSelectors.feedback);
-  const { url, error } = useAdminDashboard({ name: "agencies" });
+  const { url, error } = useAdminDashboard({ name: "adminAgencies" });
   return (
     <>
       <SubmitFeedbackNotification
@@ -39,7 +39,7 @@ export const AgencyTab = () => {
 
 const AgencyDashboard = ({ agency }: { agency: AgencyDto }) => {
   const { url, error } = useAdminDashboard({
-    name: "agencyForAdmin",
+    name: "adminAgencyDetails",
     agencyId: agency.id,
   });
 

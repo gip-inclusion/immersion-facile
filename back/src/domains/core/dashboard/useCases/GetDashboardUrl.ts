@@ -36,7 +36,7 @@ export class GetDashboardUrl extends UseCase<
   }
 
   #getDashboardAbsoluteUrl(params: GetDashboardParams): AbsoluteUrl {
-    if (params.name === "agencyForAdmin")
+    if (params.name === "adminAgencyDetails")
       return this.#dashboardGateway.getAgencyForAdminUrl(
         params.agencyId,
         this.#timeGateway.now(),

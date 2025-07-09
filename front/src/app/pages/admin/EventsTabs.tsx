@@ -4,7 +4,7 @@ import { MetabaseView } from "src/app/components/MetabaseView";
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 
 export const EventsTab = () => {
-  const { url, error } = useAdminDashboard({ name: "events" });
+  const { url, error } = useAdminDashboard({ name: "adminEvents" });
   return error ? (
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
