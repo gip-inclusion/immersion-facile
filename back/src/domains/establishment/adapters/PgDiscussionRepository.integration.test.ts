@@ -424,6 +424,54 @@ describe("PgDiscussionRepository", () => {
           );
         });
       });
+      describe("status filter param", () => {
+        const discussionWithStatusPending = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "PENDING" })
+          .build();
+        const discussionWithStatusAccepted = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
+          .build();
+        const discussionWithStatusRejected = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionWithStatusPending);
+          await pgDiscussionRepository.insert(discussionWithStatusAccepted);
+          await pgDiscussionRepository.insert(discussionWithStatusRejected);
+        });
+
+        it("include discussions with status PENDING", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "PENDING" },
+              limit: 5,
+            }),
+            [discussionWithStatusPending],
+          );
+        });
+        it("include discussions with status ACCEPTED", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "ACCEPTED" },
+              limit: 5,
+            }),
+            [discussionWithStatusAccepted],
+          );
+        });
+        it("exclude discussions with status REJECTED", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "REJECTED" },
+              limit: 5,
+            }),
+            [discussionWithStatusRejected],
+          );
+        });
+      });
     });
     describe("combo filters", () => {
       it("exclude discussions that does not match filters", async () => {
@@ -1474,19 +1522,20 @@ describe("PgDiscussionRepository", () => {
   });
 
   describe("markObsoleteDiscussionsAsDeprecated", () => {
-    it("updates discussions status to DEPRECATED", async () => {
+    it("updates discussions status to REJECTED and rejectionKind to DEPRECATED", async () => {
+      const now = new Date();
       const discussionFrom2YearsAgoWithoutExchangesResponse =
         new DiscussionBuilder()
           .withSiret("11112222333344")
           .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
-          .withCreatedAt(subMonths(new Date(), 24))
+          .withCreatedAt(subMonths(now, 24))
           .withExchanges([
             {
               subject: "Mise en relation initiale",
               message:
                 "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
               recipient: "establishment",
-              sentAt: subMonths(new Date(), 24).toISOString(),
+              sentAt: subMonths(now, 24).toISOString(),
               sender: "potentialBeneficiary",
               attachments: [],
             },
@@ -1497,14 +1546,14 @@ describe("PgDiscussionRepository", () => {
         new DiscussionBuilder()
           .withSiret("11112222333344")
           .withId("aaaaad2c-6f02-11ec-90d6-0242ac120004")
-          .withCreatedAt(subMonths(new Date(), 12))
+          .withCreatedAt(subMonths(now, 12))
           .withExchanges([
             {
               subject: "Mise en relation initiale",
               message:
                 "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
               recipient: "potentialBeneficiary",
-              sentAt: subMonths(new Date(), 12).toISOString(),
+              sentAt: subMonths(now, 12).toISOString(),
               sender: "establishment",
               attachments: [],
             },
@@ -1513,7 +1562,7 @@ describe("PgDiscussionRepository", () => {
               message:
                 "Super, je vais vous envoyer un mail avec les informations",
               recipient: "potentialBeneficiary",
-              sentAt: subMonths(new Date(), 12).toISOString(),
+              sentAt: subMonths(now, 12).toISOString(),
               sender: "establishment",
               attachments: [],
             },
@@ -1524,14 +1573,14 @@ describe("PgDiscussionRepository", () => {
         new DiscussionBuilder()
           .withSiret("11112222333344")
           .withId("aaaaad2c-6f02-11ec-90d6-0242ac120005")
-          .withCreatedAt(subMonths(new Date(), 6))
+          .withCreatedAt(subMonths(now, 6))
           .withExchanges([
             {
               subject: "Mise en relation initiale",
               message:
                 "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
               recipient: "establishment",
-              sentAt: subMonths(new Date(), 6).toISOString(),
+              sentAt: subMonths(now, 6).toISOString(),
               sender: "potentialBeneficiary",
               attachments: [],
             },
@@ -1542,14 +1591,14 @@ describe("PgDiscussionRepository", () => {
         new DiscussionBuilder()
           .withSiret("11112222333344")
           .withId("aaaaad2c-6f02-11ec-90d6-0242ac120006")
-          .withCreatedAt(subMonths(new Date(), 4))
+          .withCreatedAt(subMonths(now, 4))
           .withExchanges([
             {
               subject: "Mise en relation initiale",
               message:
                 "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
               recipient: "establishment",
-              sentAt: subMonths(new Date(), 4).toISOString(),
+              sentAt: subMonths(now, 4).toISOString(),
               sender: "potentialBeneficiary",
               attachments: [],
             },
@@ -1558,7 +1607,7 @@ describe("PgDiscussionRepository", () => {
               message:
                 "Super, je vais vous envoyer un mail avec les informations",
               recipient: "potentialBeneficiary",
-              sentAt: subMonths(new Date(), 4).toISOString(),
+              sentAt: subMonths(now, 4).toISOString(),
               sender: "establishment",
               attachments: [],
             },
@@ -1568,7 +1617,7 @@ describe("PgDiscussionRepository", () => {
       const discussionFrom2MonthsAgo = new DiscussionBuilder()
         .withSiret("11112222333344")
         .withId("aaaaad2c-6f02-11ec-90d6-0242ac120007")
-        .withCreatedAt(subMonths(new Date(), 2))
+        .withCreatedAt(subMonths(now, 2))
         .build();
 
       await Promise.all([
@@ -1587,18 +1636,31 @@ describe("PgDiscussionRepository", () => {
         pgDiscussionRepository.insert(discussionFrom2MonthsAgo),
       ]);
 
-      const discussionsInRepo =
-        await pgDiscussionRepository.markObsoleteDiscussionsAsDeprecated();
+      await pgDiscussionRepository.markObsoleteDiscussionsAsDeprecated({
+        now,
+      });
 
-      expectToEqual(discussionsInRepo.length, 2);
+      const discussionsInRepo = await pgDiscussionRepository.getDiscussions({
+        filters: {
+          status: "REJECTED",
+        },
+        limit: 5,
+      });
 
-      expectToEqual(
-        await pgDiscussionRepository.markObsoleteDiscussionsAsDeprecated(),
-        [
-          discussionFrom6MonthsAgoWithoutExchangesResponse.id,
-          discussionFrom2YearsAgoWithoutExchangesResponse.id,
-        ],
-      );
+      expect(discussionsInRepo.length).toBe(2);
+
+      expectToEqual(discussionsInRepo, [
+        {
+          ...discussionFrom6MonthsAgoWithoutExchangesResponse,
+          status: "REJECTED",
+          rejectionKind: "DEPRECATED",
+        },
+        {
+          ...discussionFrom2YearsAgoWithoutExchangesResponse,
+          status: "REJECTED",
+          rejectionKind: "DEPRECATED",
+        },
+      ]);
     });
   });
 });

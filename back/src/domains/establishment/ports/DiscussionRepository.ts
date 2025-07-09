@@ -64,5 +64,7 @@ export interface DiscussionRepository {
   hasDiscussionMatching: (
     params: Partial<HasDiscussionMatchingParams>,
   ) => Promise<boolean>;
-  markObsoleteDiscussionsAsDeprecated: () => Promise<DiscussionId[]>;
+  markObsoleteDiscussionsAsDeprecated: (params: {
+    now: Date;
+  }) => Promise<DiscussionDto[]>;
 }

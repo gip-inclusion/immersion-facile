@@ -1,4 +1,4 @@
-import { isBefore } from "date-fns";
+import { isBefore, subMonths } from "date-fns";
 import isAfter from "date-fns/isAfter";
 import type {
   DataWithPagination,
@@ -131,14 +131,11 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
     );
   }
 
-  public async markObsoleteDiscussionsAsDeprecated(): Promise<DiscussionId[]> {
-    return Object.values(this._discussions)
-      .filter((discussion) => {
-        const threeMonthsAgo = new Date(
-          Date.now() - 3 * 30 * 24 * 60 * 60 * 1000,
-        );
-        return isBefore(new Date(discussion.createdAt), threeMonthsAgo);
-      })
-      .map((discussion) => discussion.id);
+  public async markObsoleteDiscussionsAsDeprecated(params: {
+    now: Date;
+  }): Promise<DiscussionDto[]> {
+    return Object.values(this._discussions).filter((discussion) => {
+      return isBefore(new Date(discussion.createdAt), subMonths(params.now, 3));
+    });
   }
 }

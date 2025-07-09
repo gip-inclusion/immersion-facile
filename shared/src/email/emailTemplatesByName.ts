@@ -1912,6 +1912,74 @@ Profil du candidat :
         L'équipe Immersion Facile`,
       }),
     },
+    DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
+      niceName: "Établissement - Discussion dépréciée - Candidat",
+      tags: ["discussion dépréciée"],
+      createEmailVariables: ({
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        discussionCreatedAt,
+        dashboardUrl,
+        establishmentContactFirstName,
+        establishmentContactLastName,
+        businessName,
+      }) => ({
+        bypassLayout: true,
+        subject: "Discussion dépréciée",
+        content: `Bonjour ${establishmentContactFirstName} ${establishmentContactLastName},
+
+        La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} pour une immersion au sein de votre entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
+
+        <strong>Nous vous recommandons de :</strong>
+
+        • Mettre à jour votre fiche établissement et vos offres
+        • Répondre rapidement aux prochaines demandes d'immersion`,
+        buttons: [
+          {
+            label: "Accéder à votre tableau de bord",
+            url: dashboardUrl,
+          },
+        ],
+        subContent: `
+        Nous restons disponible pour toute question.
+
+        ${defaultSignature("immersion")}
+        `,
+      }),
+    },
+    DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
+      niceName: "Candidat - Discussion dépréciée - Etablissement",
+      tags: ["discussion dépréciée"],
+      createEmailVariables: ({
+        discussionCreatedAt,
+        ctaUrl,
+        beneficiaryFirstName,
+        beneficiaryLastName,
+        businessName,
+      }) => ({
+        bypassLayout: true,
+        subject: "Discussion dépréciée",
+        content: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},
+
+        La candidature pour une immersion au sein de l'entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
+
+        <strong>Si vous êtes toujours intéressé(e) par une immersion, nous vous invitons à :</strong>
+
+        • Relancer l'entreprise par téléphone
+        • Rechercher d'autres opportunités d'immersion`,
+        buttons: [
+          {
+            label: "Voir les offres d'immersion",
+            url: ctaUrl,
+          },
+        ],
+        subContent: `
+        N'hésitez pas à nous contacter si vous avez des questions.
+
+        ${defaultSignature("immersion")}
+        `,
+      }),
+    },
     FULL_PREVIEW_EMAIL: {
       niceName: "Tech - Preview email complet (tous les blocs)",
       tags: ["aperçu pour tests"],
