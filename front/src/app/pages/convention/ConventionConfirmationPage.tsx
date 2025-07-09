@@ -1,5 +1,5 @@
 import { fr } from "@codegouvfr/react-dsfr";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import {
   MainWrapper,
   SectionConventionNextSteps,
@@ -7,9 +7,11 @@ import {
   SubmitConfirmationSection,
   useCopyButton,
 } from "react-design-system";
+import { useDispatch } from "react-redux";
 import { errors, zUuidLike } from "shared";
 import { HeaderFooterLayout } from "src/app/components/layout/HeaderFooterLayout";
 import type { routes } from "src/app/routes/routes";
+import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import type { Route } from "type-route";
 import { nextStepIllustrations } from "../../../assets/img/illustrations";
 
@@ -69,6 +71,13 @@ export const ConventionConfirmationPage = ({
     [conventionId],
   );
   if (!isValidConventionId) throw errors.convention.notFound({ conventionId });
+  const dispatch = useDispatch();
+  useEffect(
+    () => () => {
+      dispatch(feedbackSlice.actions.clearFeedbacksTriggered());
+    },
+    [dispatch],
+  );
   return (
     <HeaderFooterLayout>
       <MainWrapper
