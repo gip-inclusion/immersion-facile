@@ -59,11 +59,6 @@ export type WithAssessmentDto = {
   assessment: AssessmentDto;
 };
 
-export type DateRange = {
-  from: Date;
-  to: Date;
-};
-
 export type AssessmentMode = "CreateAssessment" | "GetAssessment";
 
 export type LegacyAssessmentDto = {

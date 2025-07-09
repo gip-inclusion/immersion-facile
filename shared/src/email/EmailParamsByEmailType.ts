@@ -274,6 +274,22 @@ export type EmailParamsByEmailType = {
     htmlContent: string;
   };
   DISCUSSION_EXCHANGE_FORBIDDEN: DiscussionExchangeForbiddenParams;
+  DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
+    establishmentContactFirstName: string;
+    establishmentContactLastName: string;
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    discussionCreatedAt: string;
+    dashboardUrl: string;
+  };
+  DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
+    beneficiaryFirstName: string;
+    beneficiaryLastName: string;
+    businessName: string;
+    discussionCreatedAt: string;
+    ctaUrl: string;
+  };
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];
     errorMessage: string;
