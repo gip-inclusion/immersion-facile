@@ -22,7 +22,6 @@ import type { InMemoryAgencyRepository } from "../../agency/adapters/InMemoryAge
 import type { InMemoryUserRepository } from "../../core/authentication/connected-user/adapters/InMemoryUserRepository";
 import type { InMemoryNotificationRepository } from "../../core/notifications/adapters/InMemoryNotificationRepository";
 import type {
-  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -66,22 +65,10 @@ export class InMemoryConventionQueries implements ConventionQueries {
       .map((convention) => convention.id);
   }
 
-  public async getAllConventionsForThoseEndingThatDidntGoThrough(
+  public async getEndingAndValidatedConventions(
     finishingRange: DateRange,
-    assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionReadDto[]> {
-    const notifications = (
-      await this.notificationRepository.getLastNotifications()
-    ).emails.filter(
-      (notification) =>
-        notification.templatedContent.kind === assessmentEmailKind,
-    );
-    const immersionIdsThatAlreadyGotAnEmail = notifications
-      ? notifications.map(
-          (notification) => notification.followedIds.conventionId,
-        )
-      : [];
-    return await Promise.all(
+    return Promise.all(
       this.conventionRepository.conventions
         .filter(
           (convention) =>
@@ -89,8 +76,7 @@ export class InMemoryConventionQueries implements ConventionQueries {
               finishingRange.from.getDate() &&
             new Date(convention.dateEnd).getDate() <=
               finishingRange.to.getDate() &&
-            validatedConventionStatuses.includes(convention.status) &&
-            !immersionIdsThatAlreadyGotAnEmail.includes(convention.id),
+            validatedConventionStatuses.includes(convention.status),
         )
         .map((convention) => this.#addAgencyDataToConvention(convention)),
     );

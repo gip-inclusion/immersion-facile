@@ -180,6 +180,7 @@ describe("SendAssessmentNeededNotifications", () => {
       {
         conventionQueries: uow.conventionQueries,
         assessmentRepository: uow.assessmentRepository,
+        notificationRepository: uow.notificationRepository,
       },
       saveNotificationAndRelatedEvent,
       timeGateway,

@@ -61,9 +61,8 @@ export interface ConventionQueries {
 
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
-  getAllConventionsForThoseEndingThatDidntGoThrough: (
+  getEndingAndValidatedConventions: (
     dateEnd: DateRange,
-    assessmentEmailKind: AssessmentEmailKind,
   ) => Promise<ConventionDto[]>;
   getConventionsByScope(params: {
     scope: ConventionScope;

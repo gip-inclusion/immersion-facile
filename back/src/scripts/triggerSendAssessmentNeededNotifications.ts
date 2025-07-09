@@ -10,6 +10,7 @@ import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessm
 import { PgConventionQueries } from "../domains/convention/adapters/PgConventionQueries";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
+import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -58,6 +59,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
   const kyselyDb = makeKyselyDb(pgPool);
   const conventionQueries = new PgConventionQueries(kyselyDb);
   const assessmentRepository = new PgAssessmentRepository(kyselyDb);
+  const notificationRepository = new PgNotificationRepository(kyselyDb);
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
@@ -73,7 +75,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
   const sendAssessmentNeededNotifications =
     new SendAssessmentNeededNotifications(
       uowPerformer,
-      { conventionQueries, assessmentRepository },
+      { conventionQueries, assessmentRepository, notificationRepository },
       saveNotificationAndRelatedEvent,
       timeGateway,
       makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
