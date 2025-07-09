@@ -7,6 +7,11 @@ export type DateString = Flavor<string, "DateString">;
 
 export type DateTimeIsoString = Flavor<string, "DateTimeIsoString">;
 
+export type DateRange = {
+  from: Date;
+  to: Date;
+};
+
 const hourDisplayedSeparator = "h";
 
 export const dateTimeIsoStringSchema: z.Schema<DateTimeIsoString> = z
