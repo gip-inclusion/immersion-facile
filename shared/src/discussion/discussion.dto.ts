@@ -60,15 +60,6 @@ export type DiscussionEmailParams = LegacyDiscussionEmailParams & {
   lastname: string;
 };
 
-export type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
-  DiscussionEmailParams,
-  "rawRecipientKind" | "firstname" | "lastname"
-> & {
-  recipientKind: ExchangeRole;
-  firstname?: string;
-  lastname?: string;
-};
-
 export type WithDiscussionMessage = {
   message: string;
 };

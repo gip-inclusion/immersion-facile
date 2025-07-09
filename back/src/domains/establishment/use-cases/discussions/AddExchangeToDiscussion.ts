@@ -7,8 +7,10 @@ import {
   type DiscussionExchangeForbiddenParams,
   type DiscussionId,
   discussionIdSchema,
+  type Email,
   type Exchange,
   type ExchangeRole,
+  emailSchema,
   errors,
   exchangeRoleSchema,
   type UserId,
@@ -22,7 +24,7 @@ import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
 
-const inputSources = ["dashboard", "inbound-parsing"] as const;
+const inputSources = ["dashboard", "email"] as const;
 
 type MessageInputCommonFields = {
   message: string;
@@ -34,7 +36,8 @@ type MessageInputFromDashboard = MessageInputCommonFields & {
   attachments: never[];
 };
 
-type FullMessageInput = MessageInputCommonFields & {
+export type MessageInputFromEmail = MessageInputCommonFields & {
+  senderEmail: Email;
   recipientRole: ExchangeRole;
   attachments: Attachment[];
   sentAt: DateString;
@@ -49,8 +52,8 @@ export type AddExchangeToDiscussionInput =
       messageInputs: MessageInputFromDashboard[];
     }
   | {
-      source: Extract<InputSource, "inbound-parsing">;
-      messageInputs: FullMessageInput[];
+      source: Extract<InputSource, "email">;
+      messageInputs: MessageInputFromEmail[];
     };
 
 export type MessageInput =
@@ -72,19 +75,20 @@ const inputFromDashboardSchema = z.object({
 });
 
 const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
+  senderEmail: emailSchema,
   recipientRole: exchangeRoleSchema,
   attachments: z.array(attachmentSchema),
   sentAt: z.string().datetime(),
   subject: z.string(),
 });
 
-const inputFromInboundParsingSchema = z.object({
-  source: z.literal("inbound-parsing"),
+const inputFromEmailSchema = z.object({
+  source: z.literal("email"),
   messageInputs: z.array(fullMessageInputSchema),
 });
 
 export const messageInputSchema = z.discriminatedUnion("source", [
-  inputFromInboundParsingSchema,
+  inputFromEmailSchema,
   inputFromDashboardSchema,
 ]);
 
@@ -123,60 +127,39 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
     }
     return await Promise.all(
       input.messageInputs.map((messageInput) =>
-        this.#processSendMessage(
+        this.#processSendMessage({
           uow,
-          input.source,
+          input,
           messageInput,
-          connectedUser?.id || null,
-        ),
+          userId: connectedUser?.id || null,
+        }),
       ),
     ).then((exchanges) => exchanges[0]);
   }
 
-  async #processSendMessage(
-    uow: UnitOfWork,
-    source: InputSource,
-    params: MessageInput,
-    userId: UserId | null,
-  ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
-    const { discussionId, message, recipientRole, attachments } = params;
-
+  async #processSendMessage({
+    uow,
+    input,
+    messageInput,
+    userId,
+  }: {
+    uow: UnitOfWork;
+    input: AddExchangeToDiscussionInput;
+    messageInput: MessageInput;
+    userId: UserId | null;
+  }): Promise<Exchange | DiscussionExchangeForbiddenParams> {
     const sender =
-      recipientRole === "establishment"
+      messageInput.recipientRole === "establishment"
         ? "potentialBeneficiary"
         : "establishment";
 
-    const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion) throw errors.discussion.notFound({ discussionId });
-
-    if (discussion.status !== "PENDING") {
-      const params: DiscussionExchangeForbiddenParams = {
-        reason: "discussion_completed",
-        sender,
-      };
-
-      if (source === "inbound-parsing")
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          followedIds: {
-            userId: userId || undefined,
-            establishmentSiret: discussion.siret,
-          },
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
-            params,
-            recipients:
-              sender === "establishment"
-                ? [
-                    discussion.establishmentContact.email,
-                    ...discussion.establishmentContact.copyEmails,
-                  ]
-                : [discussion.potentialBeneficiary.email],
-          },
-        });
-
-      return params;
-    }
+    const discussion = await uow.discussionRepository.getById(
+      messageInput.discussionId,
+    );
+    if (!discussion)
+      throw errors.discussion.notFound({
+        discussionId: messageInput.discussionId,
+      });
 
     const establishment =
       await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
@@ -189,7 +172,7 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         sender,
       };
 
-      if (source === "inbound-parsing")
+      if (input.source === "email" && isFullMessageInput(messageInput))
         await this.#saveNotificationAndRelatedEvent(uow, {
           followedIds: {
             userId: userId || undefined,
@@ -199,13 +182,38 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
           templatedContent: {
             kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
             params,
-            recipients:
+            recipients: [
               sender === "establishment"
-                ? [
-                    discussion.establishmentContact.email,
-                    ...discussion.establishmentContact.copyEmails,
-                  ]
-                : [discussion.potentialBeneficiary.email],
+                ? messageInput.senderEmail
+                : discussion.potentialBeneficiary.email,
+            ],
+          },
+        });
+
+      return params;
+    }
+
+    if (discussion.status !== "PENDING") {
+      const params: DiscussionExchangeForbiddenParams = {
+        reason: "discussion_completed",
+        sender,
+      };
+
+      if (input.source === "email" && isFullMessageInput(messageInput))
+        await this.#saveNotificationAndRelatedEvent(uow, {
+          followedIds: {
+            userId: userId || undefined,
+            establishmentSiret: discussion.siret,
+          },
+          kind: "email",
+          templatedContent: {
+            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+            params,
+            recipients: [
+              sender === "establishment"
+                ? messageInput.senderEmail
+                : discussion.potentialBeneficiary.email,
+            ],
           },
         });
 
@@ -214,17 +222,25 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
 
     return this.#addExchangeAndSendEvent(uow, discussion, {
       subject: makeFormattedSubject({
-        subject: isFullMessageInput(params) ? params.subject : undefined,
+        subject: isFullMessageInput(messageInput)
+          ? messageInput.subject
+          : undefined,
         discussion,
-        source,
+        source: input.source,
       }),
-      message,
-      sentAt: isFullMessageInput(params)
-        ? params.sentAt
+      message: messageInput.message,
+      sentAt: isFullMessageInput(messageInput)
+        ? messageInput.sentAt
         : this.#timeGateway.now().toISOString(),
-      recipient: recipientRole,
-      sender,
-      attachments,
+      ...(sender === "establishment"
+        ? {
+            sender,
+            email: "",
+            firstname: "",
+            lastname: "",
+          }
+        : { sender }),
+      attachments: messageInput.attachments,
     });
   }
 
@@ -267,5 +283,5 @@ const makeFormattedSubject = ({
 
 const isFullMessageInput = (
   messageInput: MessageInput,
-): messageInput is FullMessageInput =>
+): messageInput is MessageInputFromEmail =>
   "sentAt" in messageInput && "subject" in messageInput;
