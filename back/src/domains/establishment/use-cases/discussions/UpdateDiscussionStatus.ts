@@ -2,10 +2,10 @@ import {
   type ConnectedUser,
   type DiscussionDto,
   discussionIdSchema,
-  type Email,
   type EstablishmentRole,
   errors,
   rejectDiscussionEmailParams,
+  type SiretDto,
   type UpdateDiscussionStatusParams,
   type UserId,
   withDiscussionStatusSchema,
@@ -36,155 +36,142 @@ export const makeUpdateDiscussionStatus = useCaseBuilder(
     createNewEvent: CreateNewEvent;
   }>()
   .withCurrentUser<ConnectedUser>()
-  .build(
-    async ({
-      inputParams,
-      uow,
-      deps,
-      currentUser: { id: userId, email: userEmail },
-    }) => {
-      const discussion = await uow.discussionRepository.getById(
-        inputParams.discussionId,
-      );
-      if (!discussion)
-        throw errors.discussion.notFound({
-          discussionId: inputParams.discussionId,
-        });
+  .build(async ({ inputParams, uow, deps, currentUser }) => {
+    const discussion = await uow.discussionRepository.getById(
+      inputParams.discussionId,
+    );
+    if (!discussion)
+      throw errors.discussion.notFound({
+        discussionId: inputParams.discussionId,
+      });
 
-      if (
-        !(await userHasRights({
-          uow,
-          currentUserId: userId,
-          currentUserEmail: userEmail,
-          discussion,
-        }))
-      )
-        throw errors.discussion.rejectForbidden({
-          discussionId: discussion.id,
-          userId,
-        });
+    if (
+      !(await userHasRights({
+        uow,
+        currentUserId: currentUser.id,
+        siret: discussion.siret,
+      }))
+    )
+      throw errors.discussion.rejectForbidden({
+        discussionId: discussion.id,
+        userId: currentUser.id,
+      });
 
-      if (discussion.status === "REJECTED")
-        throw errors.discussion.alreadyRejected({
-          discussionId: discussion.id,
-        });
+    if (discussion.status === "REJECTED")
+      throw errors.discussion.alreadyRejected({
+        discussionId: discussion.id,
+      });
 
-      const updatedDiscussion = await match<
-        UpdateDiscussionStatusParams,
-        Promise<DiscussionDto>
-      >(inputParams)
-        .with({ status: "REJECTED" }, async (params) => {
-          if (params.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
-            return {
-              ...discussion,
-              status: "REJECTED",
-              rejectionKind: "CANDIDATE_ALREADY_WARNED",
-              candidateWarnedMethod: params.candidateWarnedMethod,
-            };
-          }
-
-          const { htmlContent, subject } = rejectDiscussionEmailParams(
-            params,
-            discussion,
-          );
-
+    const updatedDiscussion = await match<
+      UpdateDiscussionStatusParams,
+      Promise<DiscussionDto>
+    >(inputParams)
+      .with({ status: "REJECTED" }, async (params) => {
+        if (params.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
           return {
             ...discussion,
             status: "REJECTED",
-            ...(params.rejectionKind === "OTHER"
-              ? {
-                  rejectionKind: params.rejectionKind,
-                  rejectionReason: params.rejectionReason,
-                }
-              : {
-                  rejectionKind: params.rejectionKind,
-                }),
-            exchanges: [
-              ...discussion.exchanges,
-              {
-                subject,
-                message: htmlContent,
-                sender: "establishment",
-                recipient: "potentialBeneficiary",
-                sentAt: deps.timeGateway.now().toISOString(),
-                attachments: [],
-              },
-            ],
-          };
-        })
-        .with({ status: "ACCEPTED" }, async (params) => {
-          if (params.conventionId) {
-            const convention = await uow.conventionRepository.getById(
-              params.conventionId,
-            );
-            if (!convention)
-              throw errors.convention.notFound({
-                conventionId: params.conventionId,
-              });
-          }
-          return {
-            ...discussion,
-            status: "ACCEPTED",
+            rejectionKind: "CANDIDATE_ALREADY_WARNED",
             candidateWarnedMethod: params.candidateWarnedMethod,
-            conventionId: params.conventionId,
           };
-        })
-        .with({ status: "PENDING" }, () => {
-          throw new Error(
-            `Le passage d'une discussion à l'état PENDING n'est pas supporté. (DiscussionID : ${discussion.id})`,
-          );
-        })
-        .exhaustive();
-
-      const shouldSkipSendingEmail = () => {
-        if (updatedDiscussion.status === "ACCEPTED") return true;
-        if (updatedDiscussion.status === "REJECTED") {
-          return updatedDiscussion.rejectionKind === "CANDIDATE_ALREADY_WARNED";
         }
-        return false;
-      };
 
-      await Promise.all([
-        uow.discussionRepository.update(updatedDiscussion),
-        uow.outboxRepository.save(
-          deps.createNewEvent({
-            topic: "DiscussionStatusManuallyUpdated",
-            payload: {
-              discussion: updatedDiscussion,
-              triggeredBy: {
-                kind: "connected-user",
-                userId,
-              },
-              ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
+        const { htmlContent, subject } = rejectDiscussionEmailParams(
+          params,
+          discussion,
+          currentUser,
+        );
+
+        return {
+          ...discussion,
+          status: "REJECTED",
+          ...(params.rejectionKind === "OTHER"
+            ? {
+                rejectionKind: params.rejectionKind,
+                rejectionReason: params.rejectionReason,
+              }
+            : {
+                rejectionKind: params.rejectionKind,
+              }),
+          exchanges: [
+            ...discussion.exchanges,
+            {
+              subject,
+              message: htmlContent,
+              sender: "establishment",
+              email: currentUser.email,
+              firstname: currentUser.firstName,
+              lastname: currentUser.lastName,
+              sentAt: deps.timeGateway.now().toISOString(),
+              attachments: [],
             },
-          }),
-        ),
-      ]);
-    },
-  );
+          ],
+        };
+      })
+      .with({ status: "ACCEPTED" }, async (params) => {
+        if (params.conventionId) {
+          const convention = await uow.conventionRepository.getById(
+            params.conventionId,
+          );
+          if (!convention)
+            throw errors.convention.notFound({
+              conventionId: params.conventionId,
+            });
+        }
+        return {
+          ...discussion,
+          status: "ACCEPTED",
+          candidateWarnedMethod: params.candidateWarnedMethod,
+          conventionId: params.conventionId,
+        };
+      })
+      .with({ status: "PENDING" }, () => {
+        throw new Error(
+          `Le passage d'une discussion à l'état PENDING n'est pas supporté. (DiscussionID : ${discussion.id})`,
+        );
+      })
+      .exhaustive();
+
+    const shouldSkipSendingEmail = () => {
+      if (updatedDiscussion.status === "ACCEPTED") return true;
+      if (updatedDiscussion.status === "REJECTED") {
+        return updatedDiscussion.rejectionKind === "CANDIDATE_ALREADY_WARNED";
+      }
+      return false;
+    };
+
+    await Promise.all([
+      uow.discussionRepository.update(updatedDiscussion),
+      uow.outboxRepository.save(
+        deps.createNewEvent({
+          topic: "DiscussionStatusManuallyUpdated",
+          payload: {
+            discussion: updatedDiscussion,
+            triggeredBy: {
+              kind: "connected-user",
+              userId: currentUser.id,
+            },
+            ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
+          },
+        }),
+      ),
+    ]);
+  });
 
 const userHasRights = async ({
   uow,
   currentUserId,
-  currentUserEmail,
-  discussion,
+  siret,
 }: {
   uow: UnitOfWork;
   currentUserId: UserId;
-  currentUserEmail: Email;
-  discussion: DiscussionDto;
+  siret: SiretDto;
 }) => {
-  if (discussion.establishmentContact.email === currentUserEmail) return true;
-  if (discussion.establishmentContact.copyEmails.includes(currentUserEmail))
-    return true;
-
   const establishment =
     await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-      discussion.siret,
+      siret,
     );
-  if (!establishment)
-    throw errors.establishment.notFound({ siret: discussion.siret });
-
+  if (!establishment) throw errors.establishment.notFound({ siret });
   if (
     establishment.userRights.some(
       ({ role, userId }) =>
