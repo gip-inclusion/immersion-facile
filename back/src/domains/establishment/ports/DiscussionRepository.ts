@@ -19,7 +19,6 @@ export type HasDiscussionMatchingParams = {
   siret: SiretDto;
   appellationCode: AppellationCode;
   potentialBeneficiaryEmail: Email;
-  establishmentRepresentativeEmail: Email;
   since: Date;
   addressId: LocationId;
 };
