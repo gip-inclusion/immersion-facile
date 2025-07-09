@@ -125,28 +125,29 @@ export const createEstablishmentRouter = (deps: AppDependencies) => {
   establishmentSharedRouter.replyToDiscussion(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        const discussionId = req.params.discussionId;
-        const result = await deps.useCases.addExchangeToDiscussion.execute(
-          {
-            source: "dashboard",
-            messageInputs: [
-              {
-                ...req.body,
-                discussionId,
-                attachments: [],
-                recipientRole: "potentialBeneficiary",
-              },
-            ],
-          },
-          req.payloads.currentUser,
-        );
-        if ("reason" in result) {
-          res.status(202);
-        }
-        return result;
-      }),
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.addExchangeToDiscussion
+          .execute(
+            {
+              source: "dashboard",
+              messageInputs: [
+                {
+                  ...req.body,
+                  discussionId: req.params.discussionId,
+                  recipientRole: "potentialBeneficiary",
+                  attachments: [],
+                },
+              ],
+            },
+            req.payloads?.currentUser,
+          )
+          .then((result) => {
+            if ("reason" in result) {
+              res.status(202);
+            }
+            return result;
+          }),
+      ),
   );
 
   return establishmentRouter;
