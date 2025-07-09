@@ -94,9 +94,7 @@ describe("discussion e2e", () => {
         proConnect: defaultProConnectInfos,
         createdAt: new Date().toISOString(),
       };
-      const discussion = new DiscussionBuilder()
-        .withEstablishmentContact(user)
-        .build();
+      const discussion = new DiscussionBuilder().build();
 
       inMemoryUow.discussionRepository.discussions = [discussion];
       inMemoryUow.userRepository.users = [user];
@@ -125,9 +123,6 @@ describe("discussion e2e", () => {
       it("400 - throws if discussion is already rejected", async () => {
         const user = new ConnectedUserBuilder().buildUser();
         const discussion = new DiscussionBuilder()
-          .withEstablishmentContact({
-            email: user.email,
-          })
           .withStatus({
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
@@ -235,11 +230,7 @@ describe("discussion e2e", () => {
       });
       it("200 - rejects discussion", async () => {
         const user = new ConnectedUserBuilder().buildUser();
-        const discussion = new DiscussionBuilder()
-          .withEstablishmentContact({
-            email: user.email,
-          })
-          .build();
+        const discussion = new DiscussionBuilder().build();
         const existingToken = generateConnectedUserJwt({
           userId: user.id,
           version: currentJwtVersions.connectedUser,
@@ -287,7 +278,9 @@ describe("discussion e2e", () => {
                     subject: emailSubject,
                     message: expect.any(String),
                     sender: "establishment",
-                    recipient: "potentialBeneficiary",
+                    firstname: "Firstname",
+                    lastname: "Lastname",
+                    email: "establishment@mail.com",
                     sentAt: expect.any(String),
                     attachments: [],
                   },
@@ -349,9 +342,6 @@ describe("discussion e2e", () => {
         message: "My fake message",
       };
       const discussion = new DiscussionBuilder()
-        .withEstablishmentContact({
-          email: user.email,
-        })
         .withSiret(establishment.establishment.siret)
         .build();
 
@@ -374,7 +364,9 @@ describe("discussion e2e", () => {
         message: "My fake message",
         sentAt: gateways.timeGateway.now().toISOString(),
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        firstname: "Firstname",
+        lastname: "Lastname",
+        email: "establishment@mail.com",
         attachments: [],
       };
 
@@ -396,9 +388,6 @@ describe("discussion e2e", () => {
 
       const discussion = new DiscussionBuilder()
         .withSiret(establishment.establishment.siret)
-        .withEstablishmentContact({
-          email: user.email,
-        })
         .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
         .build();
 
