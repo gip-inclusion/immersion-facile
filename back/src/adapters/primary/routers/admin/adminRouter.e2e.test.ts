@@ -126,7 +126,7 @@ describe("Admin router", () => {
   )} Get dashboard Absolute Url`, () => {
     it("200 - Gets the absolute Url of the events dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
-        urlParams: { dashboardName: "events" },
+        urlParams: { dashboardName: "adminEvents" },
         headers: { authorization: token },
         queryParams: {},
       });
@@ -135,14 +135,14 @@ describe("Admin router", () => {
         status: 200,
         body: {
           name: "adminEvents",
-          url: `http://stubDashboard/events/${gateways.timeGateway.now()}`,
+          url: `http://stubDashboard/adminEvents/${gateways.timeGateway.now()}`,
         },
       });
     });
 
     it("200 - Gets the absolute Url of the establishments dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
-        urlParams: { dashboardName: "establishments" },
+        urlParams: { dashboardName: "adminEstablishments" },
         headers: { authorization: token },
         queryParams: {},
       });
@@ -150,7 +150,7 @@ describe("Admin router", () => {
         status: 200,
         body: {
           name: "adminEstablishments",
-          url: `http://stubDashboard/establishments/${gateways.timeGateway.now()}`,
+          url: `http://stubDashboard/adminEstablishments/${gateways.timeGateway.now()}`,
         },
       });
     });
@@ -158,7 +158,7 @@ describe("Admin router", () => {
     it("200 - Gets the absolute Url of the agency dashboard", async () => {
       const agencyId = "my-agency-id";
       const response = await sharedRequest.getDashboardUrl({
-        urlParams: { dashboardName: "agencyForAdmin" },
+        urlParams: { dashboardName: "adminAgencyDetails" },
         headers: { authorization: token },
         queryParams: { agencyId: agencyId },
       });
@@ -236,7 +236,7 @@ describe("Admin router", () => {
 
     it("403 - non-admin user cannot access dashboard", async () => {
       const response = await sharedRequest.getDashboardUrl({
-        urlParams: { dashboardName: "conventions" },
+        urlParams: { dashboardName: "adminConventions" },
         headers: { authorization: nonAdminToken },
         queryParams: {},
       });

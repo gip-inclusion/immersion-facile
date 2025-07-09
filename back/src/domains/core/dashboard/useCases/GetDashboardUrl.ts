@@ -1,17 +1,21 @@
 import {
   type AbsoluteUrl,
+  type ConnectedUser,
+  type ConventionDomainPayload,
   type DashboardUrlAndName,
   errors,
   type GetDashboardParams,
   getDashboardParams,
 } from "shared";
+import { throwIfNotAdmin } from "../../../connected-users/helpers/authorization.helper";
 import type { TimeGateway } from "../../time-gateway/ports/TimeGateway";
 import { UseCase } from "../../UseCase";
 import type { DashboardGateway } from "../port/DashboardGateway";
 
 export class GetDashboardUrl extends UseCase<
   GetDashboardParams,
-  DashboardUrlAndName
+  DashboardUrlAndName,
+  ConnectedUser | ConventionDomainPayload
 > {
   protected inputSchema = getDashboardParams;
 
@@ -28,14 +32,32 @@ export class GetDashboardUrl extends UseCase<
 
   protected async _execute(
     params: GetDashboardParams,
+    currentUser: ConnectedUser | ConventionDomainPayload,
   ): Promise<DashboardUrlAndName> {
+    if (!currentUser) throw errors.user.unauthorized();
+
+    if ("applicationId" in currentUser) {
+      if (params.name !== "conventionStatus") throw errors.user.unauthorized();
+      if (currentUser.applicationId !== params.conventionId)
+        throw errors.user.unauthorized();
+
+      return {
+        name: params.name,
+        url: this.#dashboardGateway.getConventionStatusUrl(
+          params.conventionId,
+          this.#timeGateway.now(),
+        ),
+      };
+    }
+
+    throwIfNotAdmin(currentUser);
     return {
-      url: this.#getDashboardAbsoluteUrl(params),
+      url: this.#getAdminDashboardAbsoluteUrl(params),
       name: params.name,
     };
   }
 
-  #getDashboardAbsoluteUrl(params: GetDashboardParams): AbsoluteUrl {
+  #getAdminDashboardAbsoluteUrl(params: GetDashboardParams): AbsoluteUrl {
     if (params.name === "adminAgencyDetails")
       return this.#dashboardGateway.getAgencyForAdminUrl(
         params.agencyId,

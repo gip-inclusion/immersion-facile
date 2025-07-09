@@ -92,11 +92,13 @@ export const createMagicLinkRouter = (deps: AppDependencies) => {
     (req, res) =>
       sendHttpResponse(req, res, () => {
         if (!req?.payloads?.convention) throw errors.user.unauthorized();
-        getConventionRelatedJwtPayload(req.payloads);
-        return deps.useCases.getDashboard.execute({
-          name: "conventionStatus",
-          conventionId: req.payloads.convention.applicationId,
-        });
+        return deps.useCases.getDashboard.execute(
+          {
+            name: "conventionStatus",
+            conventionId: req.payloads.convention.applicationId,
+          },
+          req?.payloads?.convention,
+        );
       }),
   );
 
