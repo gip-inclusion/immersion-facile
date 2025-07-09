@@ -5,7 +5,7 @@ import {
   labelsForImmersionObjective,
 } from "../convention/convention.dto";
 import type {
-  DiscussionExchangeForbidenReason,
+  DiscussionExchangeForbiddenReason,
   ExchangeRole,
 } from "../discussion/discussion.dto";
 import type { AgencyRole } from "../role/role.dto";
@@ -1752,7 +1752,7 @@ Profil du candidat :
       }),
     },
     CONTACT_BY_EMAIL_REQUEST_LEGACY: {
-      niceName: "Établissement - Mise en relation par mail",
+      niceName: "Établissement - Mise en relation par mail (Legacy)",
       tags: ["mise en relation mail"],
       createEmailVariables: ({
         appellationLabel,
@@ -2110,7 +2110,7 @@ function hasWorkingExperienceWording(
 
 export const discussionExchangeForbidenContents: Record<
   ExchangeRole,
-  Record<DiscussionExchangeForbidenReason, string>
+  Record<DiscussionExchangeForbiddenReason, string>
 > = {
   establishment: {
     discussion_completed: `

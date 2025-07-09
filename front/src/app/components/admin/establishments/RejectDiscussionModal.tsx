@@ -28,6 +28,7 @@ import { booleanSelectOptions } from "src/app/contents/forms/common/values";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { useAppSelector } from "src/app/hooks/reduxHooks";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 
 const modal = createModal({
@@ -79,6 +80,7 @@ export const RejectDiscussionModal = ({
       resolver: zodResolver(discussionRejectionSchema),
     });
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const getFieldError = makeFieldError(formState);
   const dispatch = useDispatch();
   const watchedFormValues = watch();
@@ -113,10 +115,11 @@ export const RejectDiscussionModal = ({
 
   const modalTitle = "Marquer comme refusée";
 
-  if (rejectParams) {
+  if (rejectParams && currentUser) {
     const { htmlContent, subject } = rejectDiscussionEmailParams(
       rejectParams,
       discussion,
+      currentUser,
     );
 
     return (

@@ -106,7 +106,9 @@ export class SimulatedEstablishmentGateway implements EstablishmentGateway {
       message: "My message",
       sentAt: new Date().toISOString(),
       sender: "establishment",
-      recipient: "potentialBeneficiary",
+      email: "establishment@mail.com",
+      firstname: "Peter",
+      lastname: "Parker",
       attachments: [],
     } satisfies Exchange).pipe(delay(this.delay));
   }

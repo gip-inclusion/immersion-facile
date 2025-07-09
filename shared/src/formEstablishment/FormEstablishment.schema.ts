@@ -2,6 +2,7 @@ import { uniq } from "ramda";
 import { z } from "zod";
 import { absoluteUrlSchema } from "../AbsoluteUrl";
 import { withAcquisitionSchema } from "../acquisition.dto";
+import { businessNameSchema } from "../business/business";
 import { emailSchema } from "../email/email.schema";
 import { nafSchema } from "../naf/naf.schema";
 import { phoneNumberSchema } from "../phone/phone.schema";
@@ -100,7 +101,7 @@ export const formEstablishmentSchema: z.Schema<FormEstablishmentDto> = z
   .object({
     source: formEstablishmentSourceSchema,
     siret: siretSchema,
-    businessName: zStringMinLength1,
+    businessName: businessNameSchema,
     businessNameCustomized: zStringMinLength1
       .refine(
         (s) => !frenchEstablishmentKinds.includes(s.toUpperCase()),

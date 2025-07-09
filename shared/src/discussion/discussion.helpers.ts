@@ -6,7 +6,7 @@ import type { DateString } from "../utils/date";
 import type {
   DiscussionDisplayStatus,
   DiscussionReadDto,
-  Exchange,
+  ExchangeRead,
 } from "./discussion.dto";
 
 const isNowUrgent = ({ now, from }: { now: Date; from: DateString }) =>
@@ -27,7 +27,7 @@ export const getDiscussionDisplayStatus = ({
         (a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime(),
         discussion.exchanges,
       );
-      const latestExchange: Exchange | undefined =
+      const latestExchange: ExchangeRead | undefined =
         orderedExchanges[orderedExchanges.length - 1];
 
       if (!latestExchange)

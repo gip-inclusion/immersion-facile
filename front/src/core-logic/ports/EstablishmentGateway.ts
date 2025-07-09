@@ -7,7 +7,7 @@ import type {
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
-  Exchange,
+  ExchangeRead,
   FormEstablishmentDto,
   SendMessageToDiscussionFromDashboardRequestPayload,
   SiretDto,
@@ -44,7 +44,7 @@ export interface EstablishmentGateway {
   ): Observable<DiscussionReadDto | undefined>;
   sendMessage$(
     payload: SendMessageToDiscussionFromDashboardRequestPayload,
-  ): Observable<Exchange | DiscussionExchangeForbiddenParams>;
+  ): Observable<ExchangeRead | DiscussionExchangeForbiddenParams>;
   updateDiscussionStatus$(
     payload: {
       jwt: ConventionSupportedJwt;

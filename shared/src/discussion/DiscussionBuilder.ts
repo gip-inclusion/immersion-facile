@@ -1,7 +1,9 @@
+import { omit } from "ramda";
 import { match, P } from "ts-pattern";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
 import type { Builder } from "../Builder";
+import type { BusinessName } from "../business/business";
 import {
   type ConventionId,
   discoverObjective,
@@ -18,11 +20,11 @@ import type {
   DiscussionDto,
   DiscussionDtoEmail,
   DiscussionDtoInPerson,
-  DiscussionEstablishmentContact,
   DiscussionId,
   DiscussionKind,
   DiscussionReadDto,
   Exchange,
+  ExchangeRead,
   WithDiscussionStatus,
 } from "./discussion.dto";
 
@@ -51,23 +53,14 @@ const defaultDiscussion = {
     datePreferences: "my fake date preferences",
     immersionObjective: "Confirmer un projet professionnel",
   },
-  establishmentContact: {
-    email: "estab@mail.com",
-    copyEmails: ["copy@yolo.com"],
-    firstName: "estab",
-    lastName: "lishment",
-    job: "job",
-    phone: "+33654533457",
-  },
   exchanges: [
     {
       subject: "Sujet de discussion",
       sentAt: createdAt,
       sender: "potentialBeneficiary",
-      recipient: "establishment",
       message: "default message",
       attachments: [],
-    } satisfies Exchange,
+    },
   ],
   status: "PENDING",
   kind: "IF",
@@ -87,21 +80,22 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
   public buildRead(
     appellation: AppellationAndRomeDto = cartographeAppellationAndRome,
   ): DiscussionReadDto {
-    const { appellationCode, ...rest } = this.discussion;
+    const { appellationCode, exchanges, ...rest } = this.discussion;
     if (appellation.appellationCode !== appellationCode)
       throw new Error("Appellation code mismatch");
     return {
       ...rest,
-      appellation: appellation,
-      establishmentContact: {
-        firstName: this.discussion.establishmentContact.firstName,
-        lastName: this.discussion.establishmentContact.lastName,
-        job: this.discussion.establishmentContact.job,
-      },
+      exchanges: exchanges.map(
+        (exchange): ExchangeRead =>
+          exchange.sender === "establishment"
+            ? omit(["email"], exchange)
+            : exchange,
+      ),
+      appellation,
     };
   }
 
-  public withBusinessName(businessName: string) {
+  public withBusinessName(businessName: BusinessName) {
     return new DiscussionBuilder({
       ...this.discussion,
       businessName,
@@ -335,18 +329,6 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
     throw new Error(
       `Invalid discussion kind ${discussionKind} for contact mode ${this.discussion.contactMode}`,
     );
-  }
-
-  public withEstablishmentContact(
-    establishmentContact: Partial<DiscussionEstablishmentContact>,
-  ) {
-    return new DiscussionBuilder({
-      ...this.discussion,
-      establishmentContact: {
-        ...this.discussion.establishmentContact,
-        ...establishmentContact,
-      },
-    });
   }
 
   public withExchanges(exchanges: Exchange[]) {

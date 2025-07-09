@@ -125,16 +125,15 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
     new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(franceMerguez.establishment.siret)
-      .withEstablishmentContact({
-        email: seedUsers.icUser.email,
-      })
       .withPotentialBeneficiaryResumeLink(
         "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
       )
+      .withPotentialBeneficiaryFirstname("Billy")
+      .withPotentialBeneficiaryLastName("Idol")
+      .withPotentialBeneficiaryEmail("billy.idol@mail.com")
       .withExchanges([
         {
           sender: "potentialBeneficiary",
-          recipient: "establishment",
           sentAt: new Date("2024-02-02").toISOString(),
           subject: "Présentation",
           message: "Bonjour, je me présente!",
@@ -142,7 +141,9 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
         },
         {
           sender: "establishment",
-          recipient: "potentialBeneficiary",
+          email: seedUsers.franceMerguezUser.email,
+          firstname: seedUsers.franceMerguezUser.firstName,
+          lastname: seedUsers.franceMerguezUser.lastName,
           sentAt: new Date("2024-02-03").toISOString(),
           subject: "Réponse entreprise",
           message: "Allez viens on est bien.",
