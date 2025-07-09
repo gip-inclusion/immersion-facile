@@ -5,7 +5,7 @@ import {
   cciCustomHtmlHeader,
   defaultEmailFooter,
 } from "html-templates/src/components/email";
-import { keys } from "ramda";
+import { toPairs } from "ramda";
 import { useState } from "react";
 import { ImmersionTextField } from "react-design-system";
 import {
@@ -60,10 +60,12 @@ export const EmailPreviewTab = () => {
             <Select
               label="Liste de templates email :"
               placeholder="Veuillez sélectionner un template email"
-              options={keys(emailTemplatesByName).map((templateName) => ({
-                label: emailTemplatesByName[templateName].niceName,
-                value: templateName,
-              }))}
+              options={toPairs(emailTemplatesByName)
+                .map(([key, { niceName }]) => ({
+                  label: niceName,
+                  value: key,
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label))}
               nativeSelectProps={{
                 id: domElementIds.admin.emailPreviewTab.emailTemplateNameSelect,
                 name: "templateName",
