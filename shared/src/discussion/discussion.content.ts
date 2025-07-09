@@ -1,5 +1,6 @@
 import { errors } from "../errors/errors";
 import { frontRoutes } from "../routes/route.utils";
+import type { User } from "../user/user.dto";
 import type {
   DiscussionDto,
   DiscussionReadDto,
@@ -10,6 +11,7 @@ import type {
 export const rejectDiscussionEmailParams = (
   params: WithDiscussionStatusRejected & WithDiscussionId,
   discussion: DiscussionDto | DiscussionReadDto,
+  fromUser: User,
 ) => ({
   subject: `L’entreprise ${discussion.businessName} ne souhaite pas donner suite à votre candidature à l’immersion`, // TODO check content
   htmlContent: `Bonjour, 
@@ -23,9 +25,7 @@ N’hésitez pas à <a href="https://immersion-facile.beta.gouv.fr/${
   }">rechercher une immersion dans une autre entreprise</a> !
 
 Bonne journée, 
-${discussion.establishmentContact.firstName} ${
-    discussion.establishmentContact.lastName
-  }, représentant de l'entreprise ${discussion.businessName}`,
+${fromUser.firstName} ${fromUser.lastName}, représentant de l'entreprise ${discussion.businessName}`,
 });
 
 const makeRejectionText = (
