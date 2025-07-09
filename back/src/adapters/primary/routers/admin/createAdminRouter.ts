@@ -217,7 +217,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.privateListAgencies.execute(req.query),
+        deps.useCases.privateListAgencies.execute(
+          req.query,
+          req.payloads?.currentUser,
+        ),
       ),
   );
 
