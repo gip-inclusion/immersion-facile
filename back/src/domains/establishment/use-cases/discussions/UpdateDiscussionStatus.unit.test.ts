@@ -26,18 +26,34 @@ import {
 
 describe("UpdateDiscussionStatus", () => {
   const authorizedUser = new ConnectedUserBuilder()
+
     .withId("authorizedUser")
+    .withFirstName("auto")
+    .withLastName("rized")
     .withEmail("authorized@domain.com")
     .build();
   const unauthorizedUser = new ConnectedUserBuilder()
-    .withEmail("unauthorized@domain.com")
     .withId("unauthorizedUser")
+    .withFirstName("notauto")
+    .withLastName("notrized")
+    .withEmail("unauthorized@domain.com")
     .build();
 
+  const establishmentWithAuthorizedUserRight =
+    new EstablishmentAggregateBuilder()
+      .withUserRights([
+        {
+          role: "establishment-admin",
+          job: "osef",
+          phone: "osef",
+          shouldReceiveDiscussionNotifications: false,
+          userId: authorizedUser.id,
+        },
+      ])
+      .build();
+
   const discussion = new DiscussionBuilder()
-    .withEstablishmentContact({
-      email: authorizedUser.email,
-    })
+    .withSiret(establishmentWithAuthorizedUserRight.establishment.siret)
     .build();
 
   let uow: InMemoryUnitOfWork;
@@ -59,6 +75,9 @@ describe("UpdateDiscussionStatus", () => {
     });
 
     uow.discussionRepository.discussions = [discussion];
+    uow.establishmentAggregateRepository.establishmentAggregates = [
+      establishmentWithAuthorizedUserRight,
+    ];
   });
 
   describe("Wrong paths", () => {
@@ -78,7 +97,7 @@ describe("UpdateDiscussionStatus", () => {
       );
     });
 
-    it("throws ForbiddenError if user is not allowed to reject this discussion", async () => {
+    it("throws ForbiddenError if user has no right on establishment related to discussion", async () => {
       uow.establishmentAggregateRepository.establishmentAggregates = [
         new EstablishmentAggregateBuilder()
           .withEstablishmentSiret(discussion.siret)
@@ -88,7 +107,7 @@ describe("UpdateDiscussionStatus", () => {
               userId: "other-user",
               job: "",
               phone: "",
-              shouldReceiveDiscussionNotifications: true,
+              shouldReceiveDiscussionNotifications: false,
             },
           ])
           .build(),
@@ -300,8 +319,8 @@ describe("UpdateDiscussionStatus", () => {
 
           const { htmlContent, subject } = makeExpectedEmailParams(
             expectedRejectionReason,
-            discussion.establishmentContact.firstName,
-            discussion.establishmentContact.lastName,
+            authorizedUser.firstName,
+            authorizedUser.lastName,
           );
 
           expectDiscussionInRepoAndInOutbox({
@@ -319,7 +338,9 @@ describe("UpdateDiscussionStatus", () => {
                   message: htmlContent,
                   attachments: [],
                   sender: "establishment",
-                  recipient: "potentialBeneficiary",
+                  email: authorizedUser.email,
+                  firstname: authorizedUser.firstName,
+                  lastname: authorizedUser.lastName,
                   sentAt: timeGateway.now().toISOString(),
                 },
               ],
@@ -330,220 +351,106 @@ describe("UpdateDiscussionStatus", () => {
     });
 
     describe("validate user rights", () => {
-      describe("when user email is on discussion", () => {
-        it("allow rejection when user email is on discussion main contact", async () => {
-          const params: UpdateDiscussionStatusParams = {
-            discussionId: discussion.id,
+      it("allow rejection when user is establishment admin", async () => {
+        const params: UpdateDiscussionStatusParams = {
+          discussionId: discussion.id,
+          status: "REJECTED",
+          rejectionKind: "NO_TIME",
+        };
+
+        await updateDiscussionStatus.execute(params, authorizedUser);
+
+        const { htmlContent, subject } = makeExpectedEmailParams(
+          "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
+          authorizedUser.firstName,
+          authorizedUser.lastName,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "connected-user",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
             status: "REJECTED",
-            rejectionKind: "NO_TIME",
-          };
-
-          await updateDiscussionStatus.execute(params, authorizedUser);
-
-          const { htmlContent, subject } = makeExpectedEmailParams(
-            "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
-            discussion.establishmentContact.firstName,
-            discussion.establishmentContact.lastName,
-          );
-
-          expectDiscussionInRepoAndInOutbox({
-            triggeredBy: {
-              kind: "connected-user",
-              userId: authorizedUser.id,
-            },
-            expectedDiscussion: {
-              ...discussion,
-              status: "REJECTED",
-              rejectionKind: params.rejectionKind,
-              exchanges: [
-                ...discussion.exchanges,
-                {
-                  subject,
-                  message: htmlContent,
-                  attachments: [],
-                  sender: "establishment",
-                  recipient: "potentialBeneficiary",
-                  sentAt: timeGateway.now().toISOString(),
-                },
-              ],
-            },
-          });
-        });
-
-        it("allow rejection when user email is on discussion copy contacts", async () => {
-          const discussionWithEmailInCopy = new DiscussionBuilder(discussion)
-            .withEstablishmentContact({
-              firstName: "other",
-              lastName: "guy",
-              email: "other.mail.com",
-              copyEmails: [authorizedUser.email],
-            })
-            .build();
-
-          uow.discussionRepository.discussions = [discussionWithEmailInCopy];
-
-          const params: UpdateDiscussionStatusParams = {
-            discussionId: discussionWithEmailInCopy.id,
-            status: "REJECTED",
-            rejectionKind: "NO_TIME",
-          };
-
-          await updateDiscussionStatus.execute(params, authorizedUser);
-
-          const { htmlContent, subject } = makeExpectedEmailParams(
-            "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
-            discussionWithEmailInCopy.establishmentContact.firstName,
-            discussionWithEmailInCopy.establishmentContact.lastName,
-          );
-
-          expectDiscussionInRepoAndInOutbox({
-            triggeredBy: {
-              kind: "connected-user",
-              userId: authorizedUser.id,
-            },
-            expectedDiscussion: {
-              ...discussionWithEmailInCopy,
-              status: "REJECTED",
-              rejectionKind: params.rejectionKind,
-              exchanges: [
-                ...discussionWithEmailInCopy.exchanges,
-                {
-                  subject,
-                  message: htmlContent,
-                  attachments: [],
-                  sender: "establishment",
-                  recipient: "potentialBeneficiary",
-                  sentAt: timeGateway.now().toISOString(),
-                },
-              ],
-            },
-          });
+            rejectionKind: params.rejectionKind,
+            exchanges: [
+              ...discussion.exchanges,
+              {
+                subject,
+                message: htmlContent,
+                attachments: [],
+                sender: "establishment",
+                email: authorizedUser.email,
+                firstname: authorizedUser.firstName,
+                lastname: authorizedUser.lastName,
+                sentAt: timeGateway.now().toISOString(),
+              },
+            ],
+          },
         });
       });
 
-      describe("when user have establishment right", () => {
-        const discussionWithoutUserEmail = new DiscussionBuilder()
-          .withEstablishmentContact({
-            email: "other1@mail.com",
-            copyEmails: ["other2@mail.com"],
-          })
-          .build();
+      it("allow rejection when user is establishment contact", async () => {
+        uow.establishmentAggregateRepository.establishmentAggregates = [
+          new EstablishmentAggregateBuilder(
+            establishmentWithAuthorizedUserRight,
+          )
+            .withUserRights([
+              {
+                role: "establishment-admin",
+                userId: "other-user-id",
+                job: "osef",
+                phone: "osef",
+                shouldReceiveDiscussionNotifications: false,
+              },
+              {
+                role: "establishment-contact",
+                userId: authorizedUser.id,
+                shouldReceiveDiscussionNotifications: false,
+              },
+            ])
+            .build(),
+        ];
 
-        beforeEach(() => {
-          uow.discussionRepository.discussions = [discussionWithoutUserEmail];
-        });
+        const params: UpdateDiscussionStatusParams = {
+          discussionId: discussion.id,
+          status: "REJECTED",
+          rejectionKind: "NO_TIME",
+        };
 
-        it("allow rejection when user is establishment admin", async () => {
-          uow.establishmentAggregateRepository.establishmentAggregates = [
-            new EstablishmentAggregateBuilder()
-              .withEstablishmentSiret(discussionWithoutUserEmail.siret)
-              .withUserRights([
-                {
-                  role: "establishment-admin",
-                  userId: authorizedUser.id,
-                  job: "",
-                  phone: "",
-                  shouldReceiveDiscussionNotifications: true,
-                },
-              ])
-              .build(),
-          ];
+        await updateDiscussionStatus.execute(params, authorizedUser);
 
-          const params: UpdateDiscussionStatusParams = {
-            discussionId: discussionWithoutUserEmail.id,
+        const { htmlContent, subject } = makeExpectedEmailParams(
+          "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
+          authorizedUser.firstName,
+          authorizedUser.lastName,
+        );
+
+        expectDiscussionInRepoAndInOutbox({
+          triggeredBy: {
+            kind: "connected-user",
+            userId: authorizedUser.id,
+          },
+          expectedDiscussion: {
+            ...discussion,
             status: "REJECTED",
-            rejectionKind: "NO_TIME",
-          };
-
-          await updateDiscussionStatus.execute(params, authorizedUser);
-
-          const { htmlContent, subject } = makeExpectedEmailParams(
-            "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
-            discussionWithoutUserEmail.establishmentContact.firstName,
-            discussionWithoutUserEmail.establishmentContact.lastName,
-          );
-
-          expectDiscussionInRepoAndInOutbox({
-            triggeredBy: {
-              kind: "connected-user",
-              userId: authorizedUser.id,
-            },
-            expectedDiscussion: {
-              ...discussionWithoutUserEmail,
-              status: "REJECTED",
-              rejectionKind: params.rejectionKind,
-              exchanges: [
-                ...discussionWithoutUserEmail.exchanges,
-                {
-                  subject,
-                  message: htmlContent,
-                  attachments: [],
-                  sender: "establishment",
-                  recipient: "potentialBeneficiary",
-                  sentAt: timeGateway.now().toISOString(),
-                },
-              ],
-            },
-          });
-        });
-
-        it("allow rejection when user is establishment contact", async () => {
-          uow.establishmentAggregateRepository.establishmentAggregates = [
-            new EstablishmentAggregateBuilder()
-              .withEstablishmentSiret(discussionWithoutUserEmail.siret)
-              .withUserRights([
-                {
-                  role: "establishment-admin",
-                  userId: "other-user-id",
-                  job: "",
-                  phone: "",
-                  shouldReceiveDiscussionNotifications: true,
-                },
-                {
-                  role: "establishment-contact",
-                  userId: authorizedUser.id,
-                  shouldReceiveDiscussionNotifications: true,
-                },
-              ])
-              .build(),
-          ];
-
-          const params: UpdateDiscussionStatusParams = {
-            discussionId: discussionWithoutUserEmail.id,
-            status: "REJECTED",
-            rejectionKind: "NO_TIME",
-          };
-
-          await updateDiscussionStatus.execute(params, authorizedUser);
-
-          const { htmlContent, subject } = makeExpectedEmailParams(
-            "l’entreprise traverse une période chargée et n’a pas le temps d’accueillir une immersion.",
-            discussionWithoutUserEmail.establishmentContact.firstName,
-            discussionWithoutUserEmail.establishmentContact.lastName,
-          );
-
-          expectDiscussionInRepoAndInOutbox({
-            triggeredBy: {
-              kind: "connected-user",
-              userId: authorizedUser.id,
-            },
-            expectedDiscussion: {
-              ...discussionWithoutUserEmail,
-              status: "REJECTED",
-              rejectionKind: params.rejectionKind,
-              exchanges: [
-                ...discussionWithoutUserEmail.exchanges,
-                {
-                  subject,
-                  message: htmlContent,
-                  attachments: [],
-                  sender: "establishment",
-                  recipient: "potentialBeneficiary",
-                  sentAt: timeGateway.now().toISOString(),
-                },
-              ],
-            },
-          });
+            rejectionKind: params.rejectionKind,
+            exchanges: [
+              ...discussion.exchanges,
+              {
+                subject,
+                message: htmlContent,
+                attachments: [],
+                sender: "establishment",
+                email: authorizedUser.email,
+                firstname: authorizedUser.firstName,
+                lastname: authorizedUser.lastName,
+                sentAt: timeGateway.now().toISOString(),
+              },
+            ],
+          },
         });
       });
     });

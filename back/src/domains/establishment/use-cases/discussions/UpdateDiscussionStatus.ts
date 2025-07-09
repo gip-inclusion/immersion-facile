@@ -2,10 +2,10 @@ import {
   type ConnectedUser,
   type DiscussionDto,
   discussionIdSchema,
-  type Email,
   type EstablishmentRole,
   errors,
   rejectDiscussionEmailParams,
+  type SiretDto,
   type UpdateDiscussionStatusParams,
   type UserId,
   withDiscussionStatusSchema,
@@ -38,12 +38,7 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
       })
       .and(withDiscussionStatusSchema),
   },
-  async ({
-    inputParams,
-    uow,
-    deps,
-    currentUser: { id: userId, email: userEmail },
-  }) => {
+  async ({ inputParams, uow, deps, currentUser }) => {
     const discussion = await uow.discussionRepository.getById(
       inputParams.discussionId,
     );
@@ -55,14 +50,13 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
     if (
       !(await userHasRights({
         uow,
-        currentUserId: userId,
-        currentUserEmail: userEmail,
-        discussion,
+        currentUserId: currentUser.id,
+        siret: discussion.siret,
       }))
     )
       throw errors.discussion.rejectForbidden({
         discussionId: discussion.id,
-        userId,
+        userId: currentUser.id,
       });
 
     if (discussion.status === "REJECTED")
@@ -87,6 +81,7 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
         const { htmlContent, subject } = rejectDiscussionEmailParams(
           params,
           discussion,
+          currentUser,
         );
 
         return {
@@ -106,7 +101,9 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
               subject,
               message: htmlContent,
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: currentUser.email,
+              firstname: currentUser.firstName,
+              lastname: currentUser.lastName,
               sentAt: deps.timeGateway.now().toISOString(),
               attachments: [],
             },
@@ -154,7 +151,7 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
             discussion: updatedDiscussion,
             triggeredBy: {
               kind: "connected-user",
-              userId,
+              userId: currentUser.id,
             },
             ...(shouldSkipSendingEmail() ? { skipSendingEmail: true } : {}),
           },
@@ -167,25 +164,17 @@ export const makeUpdateDiscussionStatus = createTransactionalUseCase<
 const userHasRights = async ({
   uow,
   currentUserId,
-  currentUserEmail,
-  discussion,
+  siret,
 }: {
   uow: UnitOfWork;
   currentUserId: UserId;
-  currentUserEmail: Email;
-  discussion: DiscussionDto;
+  siret: SiretDto;
 }) => {
-  if (discussion.establishmentContact.email === currentUserEmail) return true;
-  if (discussion.establishmentContact.copyEmails.includes(currentUserEmail))
-    return true;
-
   const establishment =
     await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
-      discussion.siret,
+      siret,
     );
-  if (!establishment)
-    throw errors.establishment.notFound({ siret: discussion.siret });
-
+  if (!establishment) throw errors.establishment.notFound({ siret });
   if (
     establishment.userRights.some(
       ({ role, userId }) =>
