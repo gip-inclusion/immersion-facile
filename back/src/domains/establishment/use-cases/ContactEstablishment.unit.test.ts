@@ -265,20 +265,7 @@ describe("ContactEstablishment", () => {
           establishmentAggregateWithEmail.establishment.locations[0].address,
         createdAt: now.toISOString(),
         status: "PENDING",
-        exchanges: [],
       });
-
-      const withExpectedAppellationCodeAndEstablishmentContact = {
-        appellationCode: immersionOffer.appellationCode,
-        establishmentContact: {
-          email: adminUser.email,
-          firstName: adminUser.firstName,
-          lastName: adminUser.lastName,
-          phone: establishmentAdminRight.phone,
-          job: establishmentAdminRight.job,
-          copyEmails: [contactUser.email],
-        },
-      };
 
       describe("with discussion kind IF", () => {
         it("and contact mode EMAIL", async () => {
@@ -292,14 +279,6 @@ describe("ContactEstablishment", () => {
             {
               ...makeExpectedCommon(timeGateway.now()),
               appellationCode: immersionOffer.appellationCode,
-              establishmentContact: {
-                email: adminUser.email,
-                firstName: adminUser.firstName,
-                lastName: adminUser.lastName,
-                phone: establishmentAdminRight.phone,
-                job: establishmentAdminRight.job,
-                copyEmails: [contactUser.email],
-              },
               contactMode: "EMAIL",
               kind: "IF",
               potentialBeneficiary: {
@@ -335,7 +314,7 @@ describe("ContactEstablishment", () => {
     </td>
   </tr>
 </table>`,
-                  recipient: "establishment",
+
                   sender: "potentialBeneficiary",
                   attachments: [],
                 },
@@ -356,7 +335,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "PHONE",
               kind: "IF",
               potentialBeneficiary: {
@@ -384,14 +364,7 @@ describe("ContactEstablishment", () => {
             {
               ...makeExpectedCommon(timeGateway.now()),
               appellationCode: immersionOffer.appellationCode,
-              establishmentContact: {
-                email: adminUser.email,
-                firstName: adminUser.firstName,
-                lastName: adminUser.lastName,
-                phone: establishmentAdminRight.phone,
-                job: establishmentAdminRight.job,
-                copyEmails: [contactUser.email],
-              },
+              exchanges: [],
               contactMode: "IN_PERSON",
               kind: "IF",
               potentialBeneficiary: {
@@ -423,7 +396,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
               contactMode: "EMAIL",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -456,7 +429,6 @@ describe("ContactEstablishment", () => {
     </td>
   </tr>
 </table>`,
-                  recipient: "establishment",
                   sender: "potentialBeneficiary",
                   attachments: [],
                 },
@@ -483,7 +455,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "PHONE",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -516,7 +489,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "IN_PERSON",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {

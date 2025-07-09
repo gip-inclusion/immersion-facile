@@ -29,6 +29,24 @@ export const makeContactByEmailRequestParams = async ({
       appellationCode: discussion.appellationCode,
     });
 
+  const establishement =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+      discussion.siret,
+    );
+  if (!establishement)
+    throw errors.establishment.notFound({ siret: discussion.siret });
+
+  const firstAdminId = establishement.userRights.find(
+    (right) => right.role === "establishment-admin",
+  )?.userId;
+  if (!firstAdminId)
+    throw errors.establishment.adminNotFound({
+      siret: establishement.establishment.siret,
+    });
+
+  const firstAdmin = await uow.userRepository.getById(firstAdminId);
+  if (!firstAdmin) throw errors.user.notFound({ userId: firstAdminId });
+
   const common: OmitFromExistingKeys<
     EmailParamsByEmailType["CONTACT_BY_EMAIL_REQUEST"],
     "immersionObjective" | "kind"
@@ -39,10 +57,10 @@ export const makeContactByEmailRequestParams = async ({
     businessName: discussion.businessName,
     businessAddress: `${discussion.address.streetNumberAndAddress} ${discussion.address.postcode} ${discussion.address.city}`,
     contactFirstName: getFormattedFirstnameAndLastname({
-      firstname: discussion.establishmentContact.firstName,
+      firstname: firstAdmin.firstName,
     }),
     contactLastName: getFormattedFirstnameAndLastname({
-      lastname: discussion.establishmentContact.lastName,
+      lastname: firstAdmin.lastName,
     }),
     potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({
       firstname: discussion.potentialBeneficiary.firstName,
