@@ -311,21 +311,12 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "Dates d’immersion envisagées non renseignées",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           createdAt: connectionDateStr,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               sentAt: connectionDateStr,
               message: validEmailRequest.message,
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               attachments: [],
             },
@@ -376,20 +367,11 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "fake date preferences",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           createdAt: discussionToOldDate,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               message: "Bonjour, c'est une vieille disucssion",
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               sentAt: discussionToOldDate,
               attachments: [],
@@ -416,20 +398,11 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "fake date preferences",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               message:
                 "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               sentAt: discussion1Date,
               attachments: [],
