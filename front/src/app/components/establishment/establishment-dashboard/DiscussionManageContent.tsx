@@ -16,11 +16,11 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
   addressDtoToString,
+  type ConnectedUser,
   createOpaqueEmail,
   type DiscussionId,
   type DiscussionReadDto,
   domElementIds,
-  type Email,
   type ExchangeFromDashboard,
   emailExchangeSplitters,
   escapeHtml,
@@ -55,6 +55,7 @@ import {
   convertHtmlToText,
 } from "src/app/utils/html.utils";
 import { authSelectors } from "src/core-logic/domain/auth/auth.selectors";
+import { connectedUserSelectors } from "src/core-logic/domain/connected-user/connectedUser.selectors";
 import { discussionSlice } from "src/core-logic/domain/discussion/discussion.slice";
 import { feedbackSlice } from "src/core-logic/domain/feedback/feedback.slice";
 import { match, P } from "ts-pattern";
@@ -66,7 +67,7 @@ export const DiscussionManageContent = ({
   discussionId,
 }: DiscussionManageContentProps): JSX.Element => {
   const connectedUserJwt = useAppSelector(authSelectors.connectedUserJwt);
-  const connectedUser = useAppSelector(authSelectors.connectedUser);
+  const currentUser = useAppSelector(connectedUserSelectors.currentUser);
   const { discussion, isLoading, fetchError } = useDiscussion(
     discussionId,
     connectedUserJwt,
@@ -106,10 +107,10 @@ export const DiscussionManageContent = ({
       />
     ))
     .with(P.not(null), (discussion) =>
-      connectedUser ? (
+      currentUser ? (
         <DiscussionDetails
           discussion={discussion}
-          userEmail={connectedUser.email}
+          connectedUser={currentUser}
         />
       ) : (
         <Alert severity="error" title={`Vous n'êtes pas connecté.`} />
@@ -120,14 +121,14 @@ export const DiscussionManageContent = ({
 
 type DiscussionDetailsProps = {
   discussion: DiscussionReadDto;
-  userEmail: string;
+  connectedUser: ConnectedUser;
 };
 
 type ButtonPropsWithId = ButtonProps & { id: string };
 
 const getActivateDraftConventionButtonProps = ({
   discussion,
-  userEmail,
+  connectedUser,
 }: DiscussionDetailsProps): ButtonProps => {
   const draftConvention = makeConventionFromDiscussion({
     initialConvention: getConventionInitialValuesFromUrl({
@@ -135,7 +136,7 @@ const getActivateDraftConventionButtonProps = ({
       internshipKind: "immersion",
     }),
     discussion,
-    userEmail,
+    connectedUser,
   });
 
   return {
@@ -152,11 +153,11 @@ const getActivateDraftConventionButtonProps = ({
 
 const getDiscussionButtons = ({
   discussion,
-  userEmail,
+  connectedUser,
 }: DiscussionDetailsProps): [ButtonPropsWithId, ...ButtonPropsWithId[]] => {
   return [
     ...(discussion.status === "PENDING" && discussion.kind === "IF"
-      ? [getActivateDraftConventionButtonProps({ discussion, userEmail })]
+      ? [getActivateDraftConventionButtonProps({ discussion, connectedUser })]
       : []),
     ...(discussion.status === "PENDING"
       ? [
@@ -193,9 +194,8 @@ const getDiscussionButtons = ({
           },
           replyDomain: `reply.${window.location.hostname}`,
         })}?subject=${encodeURI(
-          discussion.establishmentContact.firstName &&
-            discussion.establishmentContact.lastName
-            ? `Réponse de ${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`
+          connectedUser.firstName && connectedUser.lastName
+            ? `Réponse de ${connectedUser.firstName} ${connectedUser.lastName} - Immersion potentielle chez ${discussion.businessName} en tant que ${discussion.appellation.appellationLabel}`
             : `Réponse de l'entreprise ${discussion.businessName} - Immersion potentielle en tant que ${discussion.appellation.appellationLabel}`,
         )}`,
         target: "_blank",
@@ -351,22 +351,25 @@ const DiscussionExchangesList = ({
 }: {
   discussion: DiscussionReadDto;
 }): JSX.Element => {
-  const sortedBySentAtDesc = [...discussion.exchanges].sort(
+  const sortedExchangesBySentAtDesc = [...discussion.exchanges].sort(
     (a, b) => new Date(b.sentAt).getTime() - new Date(a.sentAt).getTime(),
   );
   return (
     <section>
       <hr className={fr.cx("fr-hr", "fr-mt-6w")} />
-      {sortedBySentAtDesc.map(({ sender, sentAt, message }) => {
+      {sortedExchangesBySentAtDesc.map((exchange) => {
         const currentMessage = addLineBreakOnNewLines(
-          convertHtmlToText(message),
+          convertHtmlToText(exchange.message),
         );
         const messageToDisplay = splitTextOnFirstSeparator(
           currentMessage,
           emailExchangeSplitters,
         );
         return (
-          <ExchangeMessage sender={sender} key={`${sender}-${sentAt}`}>
+          <ExchangeMessage
+            sender={exchange.sender}
+            key={`${exchange.sender}-${exchange.sentAt}`}
+          >
             <header
               className={fr.cx(
                 "fr-grid-row",
@@ -376,8 +379,8 @@ const DiscussionExchangesList = ({
             >
               <div>
                 <h2 className={fr.cx("fr-mb-0", "fr-mb-1v")}>
-                  {sender === "establishment"
-                    ? `${discussion.businessName}`
+                  {exchange.sender === "establishment"
+                    ? `${discussion.businessName} - ${exchange.firstname} ${exchange.lastname}`
                     : getFormattedFirstnameAndLastname({
                         firstname: discussion.potentialBeneficiary.firstName,
                         lastname: discussion.potentialBeneficiary.lastName,
@@ -388,18 +391,20 @@ const DiscussionExchangesList = ({
                 <div className={fr.cx("fr-mb-2w")}>
                   <Badge
                     className={`fr-badge--${
-                      sender === "establishment"
+                      exchange.sender === "establishment"
                         ? "blue-cumulus"
                         : "green-archipel"
                     }`}
                   >
-                    {sender === "establishment" ? "Entreprise" : "Candidat"}
+                    {exchange.sender === "establishment"
+                      ? "Entreprise"
+                      : "Candidat"}
                   </Badge>
                 </div>
 
                 <span className={fr.cx("fr-hint-text")}>
                   {toDisplayedDate({
-                    date: new Date(sentAt),
+                    date: new Date(exchange.sentAt),
                     withHours: true,
                   })}
                 </span>
@@ -433,11 +438,11 @@ const makeDraftConventionLink = (
 const makeConventionFromDiscussion = ({
   initialConvention,
   discussion,
-  userEmail,
+  connectedUser,
 }: {
   initialConvention: ConventionPresentation;
   discussion: DiscussionReadDto;
-  userEmail: Email;
+  connectedUser: ConnectedUser;
 }): ConventionPresentation => ({
   ...initialConvention,
   signatories: {
@@ -454,16 +459,16 @@ const makeConventionFromDiscussion = ({
     },
     establishmentRepresentative: {
       ...initialConvention.signatories.establishmentRepresentative,
-      firstName: discussion.establishmentContact.firstName ?? "",
-      lastName: discussion.establishmentContact.lastName ?? "",
-      email: userEmail,
+      firstName: connectedUser.firstName,
+      lastName: connectedUser.lastName,
+      email: connectedUser.email,
     },
   },
   establishmentTutor: {
-    firstName: discussion.establishmentContact.firstName ?? "",
-    lastName: discussion.establishmentContact.lastName ?? "",
+    firstName: connectedUser.firstName,
+    lastName: connectedUser.lastName,
+    email: connectedUser.email,
     job: "",
-    email: userEmail,
     phone: "",
     role: "establishment-tutor",
   },
