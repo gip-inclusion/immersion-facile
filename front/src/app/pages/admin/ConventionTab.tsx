@@ -6,7 +6,7 @@ import { SelectConventionFromIdForm } from "src/app/components/SelectConventionF
 import { useAdminDashboard } from "src/app/pages/admin/useAdminDashboard";
 
 export const ConventionTab = () => {
-  const { url, error } = useAdminDashboard({ name: "conventions" });
+  const { url, error } = useAdminDashboard({ name: "adminConventions" });
   return error ? (
     <Alert severity="error" title="Erreur" description={error} />
   ) : (
