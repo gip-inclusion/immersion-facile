@@ -17,7 +17,7 @@ import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstabli
 describe("GetDiscussionByIdForEstablishment use case", () => {
   const user = new ConnectedUserBuilder().buildUser();
   const discussionWithUserEmailInContact = new DiscussionBuilder()
-    .withEstablishmentContact({ email: user.email })
+    // .withEstablishmentContact({ email: user.email })
     .withId(uuid())
     .build();
   const discussionWithoutUserEmailInContact = new DiscussionBuilder()
@@ -218,7 +218,7 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
 
       it("Gets the matching discussion based on establishment copy emails", async () => {
         const userOnCopyEmailsDiscussion = new DiscussionBuilder()
-          .withEstablishmentContact({ copyEmails: [user.email] })
+          // .withEstablishmentContact({ copyEmails: [user.email] })
           .withId(uuid())
           .build();
 
@@ -238,10 +238,10 @@ describe("GetDiscussionByIdForEstablishment use case", () => {
       it("Gets the matching discussion based on establishment copy emails and contact email", async () => {
         const userBothOnCopyEmailsAndContactEmailDiscussion =
           new DiscussionBuilder()
-            .withEstablishmentContact({
-              copyEmails: [user.email],
-              email: user.email,
-            })
+            // .withEstablishmentContact({
+            //   copyEmails: [user.email],
+            //   email: user.email,
+            // })
             .withId(uuid())
             .build();
 

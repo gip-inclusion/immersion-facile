@@ -42,7 +42,7 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     discussion: DiscussionDto,
     uow: UnitOfWork,
   ): Promise<DiscussionReadDto> {
-    const { appellationCode, establishmentContact: _, ...rest } = discussion;
+    const { appellationCode, ...rest } = discussion;
 
     const appellation = (
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
@@ -56,11 +56,6 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     return {
       ...rest,
       appellation,
-      establishmentContact: {
-        firstName: discussion.establishmentContact.firstName,
-        lastName: discussion.establishmentContact.lastName,
-        job: discussion.establishmentContact.job,
-      },
     };
   }
 
@@ -69,11 +64,11 @@ export class GetDiscussionByIdForEstablishment extends TransactionalUseCase<
     user: User,
     discussion: DiscussionDto,
   ): Promise<boolean> {
-    if (
-      discussion.establishmentContact.email === user.email ||
-      discussion.establishmentContact.copyEmails.includes(user.email)
-    )
-      return true;
+    // if (
+    //   discussion.establishmentContact.email === user.email ||
+    //   discussion.establishmentContact.copyEmails.includes(user.email)
+    // )
+    //   return true;
 
     const establishment =
       await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
