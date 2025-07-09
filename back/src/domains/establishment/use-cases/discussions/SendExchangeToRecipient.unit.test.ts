@@ -80,7 +80,9 @@ describe("SendExchangeToRecipient", () => {
     it("sends the email to the right recipient (response from establishment to potential beneficiary)", async () => {
       const lastExchange: Exchange = {
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        firstname: "ali",
+        lastname: "baba",
+        email: "ali.baba@establishment.com",
         sentAt: "2023-06-28T08:06:52.000Z",
         message: "message",
         subject: "subject",
@@ -95,7 +97,6 @@ describe("SendExchangeToRecipient", () => {
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: addHours(timeGateway.now(), -2).toISOString(),
-            recipient: "establishment",
             attachments: [],
           },
           lastExchange,
@@ -126,8 +127,8 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
-              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
+              email: `${lastExchange.firstname}_${lastExchange.lastname}__${discussion.id}_e@reply.my-domain.com`,
+              name: `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
             cc: [],
@@ -145,7 +146,9 @@ describe("SendExchangeToRecipient", () => {
     it("sends the email with a default message if not provided", async () => {
       const lastExchange: Exchange = {
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        firstname: "ali",
+        lastname: "baba",
+        email: "ali.baba@establishment.com",
         sentAt: "2023-06-28T08:06:52.000Z",
         message: "",
         subject: "subject",
@@ -160,7 +163,6 @@ describe("SendExchangeToRecipient", () => {
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: addHours(timeGateway.now(), -2).toISOString(),
-            recipient: "establishment",
             attachments: [],
           },
           lastExchange,
@@ -191,8 +193,8 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
-              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
+              email: `${lastExchange.firstname}_${lastExchange.lastname}__${discussion.id}_e@reply.my-domain.com`,
+              name: `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
             cc: [],
@@ -210,7 +212,9 @@ describe("SendExchangeToRecipient", () => {
     it("sends the email to the right recipient without attachment", async () => {
       const lastExchange: Exchange = {
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        firstname: "ali",
+        lastname: "baba",
+        email: "ali.baba@establishment.com",
         sentAt: "2023-06-28T08:06:52.000Z",
         message: "message",
         subject: "subject",
@@ -225,7 +229,6 @@ describe("SendExchangeToRecipient", () => {
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: addHours(timeGateway.now(), -2).toISOString(),
-            recipient: "establishment",
             attachments: [],
           },
           lastExchange,
@@ -256,8 +259,8 @@ describe("SendExchangeToRecipient", () => {
             },
             recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
-              email: `${discussion.establishmentContact.firstName}_${discussion.establishmentContact.lastName}__${discussion.id}_e@reply.my-domain.com`,
-              name: `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`,
+              email: `${lastExchange.firstname}_${lastExchange.lastname}__${discussion.id}_e@reply.my-domain.com`,
+              name: `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
             cc: [],
@@ -273,7 +276,6 @@ describe("SendExchangeToRecipient", () => {
         message: "My response",
         sender: "potentialBeneficiary",
         sentAt: new Date().toISOString(),
-        recipient: "establishment",
         attachments: [],
       };
 
@@ -288,12 +290,14 @@ describe("SendExchangeToRecipient", () => {
             message: "Hello",
             sender: "potentialBeneficiary",
             sentAt: addHours(timeGateway.now(), -2).toISOString(),
-            recipient: "establishment",
+
             attachments: [],
           },
           {
             sender: "establishment",
-            recipient: "potentialBeneficiary",
+            firstname: "ali",
+            lastname: "baba",
+            email: "ali.baba@establishment.com",
             sentAt: "2023-06-28T08:06:52.000Z",
             message: "message",
             subject: "subject",
@@ -302,9 +306,11 @@ describe("SendExchangeToRecipient", () => {
           {
             subject: "My subject - discussion 1",
             message: "My response",
-            sender: "potentialBeneficiary",
+            sender: "establishment",
+            firstname: "ali",
+            lastname: "baba",
+            email: "ali.baba@establishment.com",
             sentAt: new Date().toISOString(),
-            recipient: "establishment",
             attachments: [],
           },
         ])
@@ -324,13 +330,12 @@ describe("SendExchangeToRecipient", () => {
               htmlContent: expect.any(String),
               subject: lastExchange.subject,
             },
-            recipients: [discussion.establishmentContact.email],
+            recipients: [discussion.potentialBeneficiary.email],
             replyTo: {
               email: `e-ric_el-ah-e-tru__${discussion.id}_b@reply.my-domain.com`,
               name: `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
             },
             sender: immersionFacileNoReplyEmailSender,
-            cc: discussion.establishmentContact.copyEmails,
             attachments: [],
           },
         ],

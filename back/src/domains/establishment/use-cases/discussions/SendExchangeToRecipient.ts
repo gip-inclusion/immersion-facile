@@ -1,5 +1,6 @@
 import {
   createOpaqueEmail,
+  type Email,
   type EmailAttachment,
   type Exchange,
   errors,
@@ -17,6 +18,7 @@ import type { NotificationGateway } from "../../../core/notifications/ports/Noti
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 
 type SendExchangeToRecipientParams = WithDiscussionId &
   Partial<WithTriggeredBy> & {
@@ -45,7 +47,6 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
   ) {
     super(uowPerformer);
     this.#replyDomain = `reply.${domain}`;
-
     this.#saveNotificationAndRelatedEvent = saveNotificationAndRelatedEvent;
     this.#notificationGateway = notificationGateway;
   }
@@ -61,6 +62,13 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
     if (skipSendingEmail) return;
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
+
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        discussion.siret,
+      );
+    if (!establishment)
+      throw errors.establishment.notFound({ siret: discussion.siret });
 
     const lastExchange = discussion.exchanges.reduce<Exchange | undefined>(
       (acc, current) => (acc && acc.sentAt >= current.sentAt ? acc : current),
@@ -115,15 +123,10 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
                 : "--- pas de message ---"
             }`,
         },
-        recipients: [
-          lastExchange.recipient === "establishment"
-            ? discussion.establishmentContact.email
-            : discussion.potentialBeneficiary.email,
-        ],
-        cc:
-          lastExchange.recipient === "establishment"
-            ? discussion.establishmentContact.copyEmails
-            : [],
+        recipients:
+          lastExchange.sender === "establishment"
+            ? [discussion.potentialBeneficiary.email]
+            : await getEstablishmentContactEmails(uow, establishment),
         replyTo: {
           email: createOpaqueEmail({
             discussionId: discussion.id,
@@ -131,18 +134,18 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
               kind: lastExchange.sender,
               firstname:
                 lastExchange.sender === "establishment"
-                  ? discussion.establishmentContact.firstName
+                  ? lastExchange.firstname
                   : discussion.potentialBeneficiary.firstName,
               lastname:
                 lastExchange.sender === "establishment"
-                  ? discussion.establishmentContact.lastName
-                  : discussion.potentialBeneficiary.lastName,
+                  ? lastExchange.lastname
+                  : discussion.potentialBeneficiary.firstName,
             },
             replyDomain: this.#replyDomain,
           }),
           name:
             lastExchange.sender === "establishment"
-              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
+              ? `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`
               : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
         },
         attachments,
@@ -156,3 +159,16 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
     });
   }
 }
+
+const getEstablishmentContactEmails = async (
+  uow: UnitOfWork,
+  establishment: EstablishmentAggregate,
+): Promise<Email[]> => {
+  const establishmentContactIds = establishment.userRights.map(
+    ({ userId }) => userId,
+  );
+
+  const users = await uow.userRepository.getByIds(establishmentContactIds);
+
+  return users.map((user) => user.email);
+};
