@@ -9,7 +9,6 @@ import {
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
-import { throwIfNotAdmin } from "../../../../domains/connected-users/helpers/authorization.helper";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
   const expressRouter = Router({ mergeParams: true });
@@ -28,7 +27,6 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () => {
-        throwIfNotAdmin(req.payloads?.currentUser);
         if (req.params.dashboardName === "agency" && !req.query.agencyId)
           throw errors.agency.missingParamAgencyId();
 
@@ -36,7 +34,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
           name: req.params.dashboardName as any,
           ...(req.query.agencyId ? req.query : {}),
         };
-        return deps.useCases.getDashboard.execute(useCaseParams);
+        return deps.useCases.getDashboard.execute(
+          useCaseParams,
+          req.payloads?.currentUser,
+        );
       }),
   );
 
