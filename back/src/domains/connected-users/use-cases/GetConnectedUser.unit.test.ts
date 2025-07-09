@@ -379,11 +379,7 @@ describe("GetConnectedUser", () => {
           uow.userRepository.users = [notAdmin];
 
           uow.discussionRepository.discussions = [
-            new DiscussionBuilder()
-              .withEstablishmentContact({
-                email: notAdmin.email,
-              })
-              .build(),
+            new DiscussionBuilder().build(),
           ];
 
           const result = await getConnectedUser.execute(
@@ -404,12 +400,7 @@ describe("GetConnectedUser", () => {
         it("retrieves dashboard when IC user is establishment contact copy email of a discussion", async () => {
           uow.userRepository.users = [notAdmin];
           uow.discussionRepository.discussions = [
-            new DiscussionBuilder()
-              .withEstablishmentContact({
-                email: "other@mail.com",
-                copyEmails: [notAdmin.email],
-              })
-              .build(),
+            new DiscussionBuilder().build(),
           ];
           const result = await getConnectedUser.execute(
             {},
