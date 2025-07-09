@@ -1,4 +1,4 @@
-import { addDays, addHours, subDays } from "date-fns";
+import { addDays, addHours, subDays, subMonths } from "date-fns";
 import type { Pool } from "pg";
 import {
   type AppellationAndRomeDto,
@@ -1469,6 +1469,135 @@ describe("PgDiscussionRepository", () => {
           new Date("2023-03-08"),
         ),
         0,
+      );
+    });
+  });
+
+  describe("markObsoleteDiscussionsAsDeprecated", () => {
+    it("updates discussions status to DEPRECATED", async () => {
+      const discussionFrom2YearsAgoWithoutExchangesResponse =
+        new DiscussionBuilder()
+          .withSiret("11112222333344")
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
+          .withCreatedAt(subMonths(new Date(), 24))
+          .withExchanges([
+            {
+              subject: "Mise en relation initiale",
+              message:
+                "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+              recipient: "establishment",
+              sentAt: subMonths(new Date(), 24).toISOString(),
+              sender: "potentialBeneficiary",
+              attachments: [],
+            },
+          ])
+          .build();
+
+      const discussionFrom1YearAgoWithExchangesResponse =
+        new DiscussionBuilder()
+          .withSiret("11112222333344")
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120004")
+          .withCreatedAt(subMonths(new Date(), 12))
+          .withExchanges([
+            {
+              subject: "Mise en relation initiale",
+              message:
+                "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+              recipient: "potentialBeneficiary",
+              sentAt: subMonths(new Date(), 12).toISOString(),
+              sender: "establishment",
+              attachments: [],
+            },
+            {
+              subject: "Réponse de l'entreprise",
+              message:
+                "Super, je vais vous envoyer un mail avec les informations",
+              recipient: "potentialBeneficiary",
+              sentAt: subMonths(new Date(), 12).toISOString(),
+              sender: "establishment",
+              attachments: [],
+            },
+          ])
+          .build();
+
+      const discussionFrom6MonthsAgoWithoutExchangesResponse =
+        new DiscussionBuilder()
+          .withSiret("11112222333344")
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120005")
+          .withCreatedAt(subMonths(new Date(), 6))
+          .withExchanges([
+            {
+              subject: "Mise en relation initiale",
+              message:
+                "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+              recipient: "establishment",
+              sentAt: subMonths(new Date(), 6).toISOString(),
+              sender: "potentialBeneficiary",
+              attachments: [],
+            },
+          ])
+          .build();
+
+      const discussionFrom4MonthsAgoWithExchangesResponse =
+        new DiscussionBuilder()
+          .withSiret("11112222333344")
+          .withId("aaaaad2c-6f02-11ec-90d6-0242ac120006")
+          .withCreatedAt(subMonths(new Date(), 4))
+          .withExchanges([
+            {
+              subject: "Mise en relation initiale",
+              message:
+                "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+              recipient: "establishment",
+              sentAt: subMonths(new Date(), 4).toISOString(),
+              sender: "potentialBeneficiary",
+              attachments: [],
+            },
+            {
+              subject: "Réponse de l'entreprise",
+              message:
+                "Super, je vais vous envoyer un mail avec les informations",
+              recipient: "potentialBeneficiary",
+              sentAt: subMonths(new Date(), 4).toISOString(),
+              sender: "establishment",
+              attachments: [],
+            },
+          ])
+          .build();
+
+      const discussionFrom2MonthsAgo = new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120007")
+        .withCreatedAt(subMonths(new Date(), 2))
+        .build();
+
+      await Promise.all([
+        pgDiscussionRepository.insert(
+          discussionFrom2YearsAgoWithoutExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom1YearAgoWithExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom6MonthsAgoWithoutExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom4MonthsAgoWithExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(discussionFrom2MonthsAgo),
+      ]);
+
+      const discussionsInRepo =
+        await pgDiscussionRepository.markObsoleteDiscussionsAsDeprecated();
+
+      expectToEqual(discussionsInRepo.length, 2);
+
+      expectToEqual(
+        await pgDiscussionRepository.markObsoleteDiscussionsAsDeprecated(),
+        [
+          discussionFrom6MonthsAgoWithoutExchangesResponse.id,
+          discussionFrom2YearsAgoWithoutExchangesResponse.id,
+        ],
       );
     });
   });
