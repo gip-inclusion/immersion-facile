@@ -1,4 +1,10 @@
-import { AgencyDtoBuilder, expectToEqual } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  errors,
+  expectPromiseToFailWithError,
+  expectToEqual,
+} from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
@@ -8,12 +14,35 @@ import { PrivateListAgencies } from "./PrivateListAgencies";
 describe("PrivateListAgencies use case", () => {
   let agencyRepository: InMemoryAgencyRepository;
   let privateListAgencies: PrivateListAgencies;
+  const adminUser = new ConnectedUserBuilder().withIsAdmin(true).build();
+  const notAdminUser = new ConnectedUserBuilder().withIsAdmin(false).build();
 
   beforeEach(() => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
     privateListAgencies = new PrivateListAgencies(uowPerformer);
+  });
+
+  it("throw if no connected user is connected", async () => {
+    await expectPromiseToFailWithError(
+      privateListAgencies.execute({
+        status: "needsReview",
+      }),
+      errors.user.unauthorized(),
+    );
+  });
+
+  it("throws if connected user is not admin", async () => {
+    await expectPromiseToFailWithError(
+      privateListAgencies.execute(
+        {
+          status: "needsReview",
+        },
+        notAdminUser,
+      ),
+      errors.user.forbidden({ userId: notAdminUser.id }),
+    );
   });
 
   it("should return agencies needing review as id an name object", async () => {
@@ -30,9 +59,12 @@ describe("PrivateListAgencies use case", () => {
           .build(),
       ),
     ];
-    const fetchedAgencies = await privateListAgencies.execute({
-      status: "needsReview",
-    });
+    const fetchedAgencies = await privateListAgencies.execute(
+      {
+        status: "needsReview",
+      },
+      adminUser,
+    );
     expectToEqual(fetchedAgencies, [
       {
         id: expectedAgency.id,
