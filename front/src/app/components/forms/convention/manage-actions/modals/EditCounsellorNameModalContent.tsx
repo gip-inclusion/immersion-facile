@@ -38,21 +38,21 @@ export const EditCounsellorNameModalContent = ({
       </p>
 
       <Input
-        label={"Nom"}
-        nativeInputProps={{
-          ...register("lastname"),
-          required: true,
-          id: domElementIds.manageConvention
-            .editCounsellorNameModalLastNameInput,
-        }}
-      />
-      <Input
         label={"Prénom"}
         nativeInputProps={{
           ...register("firstname"),
           required: true,
           id: domElementIds.manageConvention
             .editCounsellorNameModalFirstNameInput,
+        }}
+      />
+      <Input
+        label={"Nom"}
+        nativeInputProps={{
+          ...register("lastname"),
+          required: true,
+          id: domElementIds.manageConvention
+            .editCounsellorNameModalLastNameInput,
         }}
       />
       <ButtonsGroup
