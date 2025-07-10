@@ -66,19 +66,6 @@ export const ValidatorModalContent = ({
       <Input
         label={
           newStatus === "ACCEPTED_BY_VALIDATOR"
-            ? "Nom de la personne qui valide la demande *"
-            : "Nom de la personne qui pré-valide la demande *"
-        }
-        nativeInputProps={{
-          ...register("lastname"),
-          required: true,
-          id: domElementIds.manageConvention.validatorModalLastNameInput,
-        }}
-        {...getFieldError("lastname")}
-      />
-      <Input
-        label={
-          newStatus === "ACCEPTED_BY_VALIDATOR"
             ? "Prénom de la personne qui valide la demande *"
             : "Prénom de la personne qui pré-valide la demande *"
         }
@@ -88,6 +75,19 @@ export const ValidatorModalContent = ({
           id: domElementIds.manageConvention.validatorModalFirstNameInput,
         }}
         {...getFieldError("firstname")}
+      />
+      <Input
+        label={
+          newStatus === "ACCEPTED_BY_VALIDATOR"
+            ? "Nom de la personne qui valide la demande *"
+            : "Nom de la personne qui pré-valide la demande *"
+        }
+        nativeInputProps={{
+          ...register("lastname"),
+          required: true,
+          id: domElementIds.manageConvention.validatorModalLastNameInput,
+        }}
+        {...getFieldError("lastname")}
       />
       <ButtonsGroup
         alignment="center"
