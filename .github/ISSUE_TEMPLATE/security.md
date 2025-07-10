@@ -1,7 +1,6 @@
 ---
 name: Sécurité
 about: Modèle de rapport de vulnérabilité
-title: ETQ 'qui?', un titre court svp
 type: security
 ---
 
