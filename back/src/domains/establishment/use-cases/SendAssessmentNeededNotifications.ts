@@ -4,6 +4,7 @@ import {
   type AgencyWithUsersRights,
   type ConventionDto,
   type ConventionId,
+  calculateDurationInSecondsFrom,
   castError,
   type DateRange,
   type Email,
@@ -136,11 +137,51 @@ export class SendAssessmentNeededNotifications extends UseCase<
   }
 
   async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
-    const conventions =
-      await this.#outOfTrx.conventionRepository.getValidatedEndedOrUpdatedAround(
-        params.conventionEndDate,
+    const conventions = await this.#getConventionsValidatedEndedOrUpdatedAround(
+      params.conventionEndDate,
+    );
+
+    const conventionsWithValidationEmails =
+      await this.#filterConventionsWithValidationEmails(conventions);
+
+    const conventionsWithoutAssessmentRequest =
+      await this.#filterConventionWithoutEstablishmentAssessmentRequests(
+        conventionsWithValidationEmails,
       );
 
+    const conventionsToSendAssessmentEmailTo =
+      await this.#filterConventionsWithAlreadyFilledAssessment(
+        conventionsWithoutAssessmentRequest,
+      );
+
+    return {
+      conventions: conventionsToSendAssessmentEmailTo,
+      numberOfConventionsWithAlreadyExistingAssessment:
+        conventionsWithoutAssessmentRequest.length -
+        conventionsToSendAssessmentEmailTo.length,
+    };
+  }
+
+  async #getConventionsValidatedEndedOrUpdatedAround(
+    conventionEndDate: DateRange,
+  ): Promise<ConventionDto[]> {
+    const startDate = new Date();
+    const conventions =
+      await this.#outOfTrx.conventionRepository.getValidatedEndedOrUpdatedAround(
+        conventionEndDate,
+      );
+    logger.info({
+      useCaseName: "SendAssessmentNeededNotifications",
+      durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      message: "after conventionRepository.getValidatedEndedOrUpdatedAround",
+    });
+    return conventions;
+  }
+
+  async #filterConventionsWithValidationEmails(
+    conventions: ConventionDto[],
+  ): Promise<ConventionDto[]> {
+    const startDate = new Date();
     const conventionsWithValidationEmails = (
       await Promise.all(
         conventions.map(async (convention) => {
@@ -153,10 +194,22 @@ export class SendAssessmentNeededNotifications extends UseCase<
         }),
       )
     ).filter((dto): dto is ConventionDto => dto !== null);
+    logger.info({
+      useCaseName: "SendAssessmentNeededNotifications",
+      durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      message: "after filterConventionsWithValidationEmails",
+    });
 
+    return conventionsWithValidationEmails;
+  }
+
+  async #filterConventionWithoutEstablishmentAssessmentRequests(
+    conventions: ConventionDto[],
+  ): Promise<ConventionDto[]> {
+    const startDate = new Date();
     const conventionsWithoutAssessmentRequest = (
       await Promise.all(
-        conventionsWithValidationEmails.map(async (convention) => {
+        conventions.map(async (convention) => {
           const emails =
             await this.#outOfTrx.notificationRepository.getEmailsByFilters({
               conventionId: convention.id,
@@ -166,32 +219,39 @@ export class SendAssessmentNeededNotifications extends UseCase<
         }),
       )
     ).filter((dto): dto is ConventionDto => dto !== null);
+    logger.info({
+      useCaseName: "SendAssessmentNeededNotifications",
+      durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      message: "after filterConventionWithoutEstablishmentAssessmentRequests",
+    });
+    return conventionsWithoutAssessmentRequest;
+  }
 
+  async #filterConventionsWithAlreadyFilledAssessment(
+    conventions: ConventionDto[],
+  ): Promise<ConventionDto[]> {
+    const startDate = new Date();
     const conventionIdsWithAlreadyExistingAssessment =
       await this.#outOfTrx.assessmentRepository
-        .getByConventionIds(
-          conventionsWithoutAssessmentRequest.map(
-            (convention) => convention.id,
-          ),
-        )
+        .getByConventionIds(conventions.map((convention) => convention.id))
         .then(map(({ conventionId }) => conventionId));
 
-    const conventionsToSendAssessmentEmailTo =
-      conventionsWithoutAssessmentRequest.filter(
-        ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
-      );
+    const conventionsToSendAssessmentEmailTo = conventions.filter(
+      ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
+    );
 
     logger.info({
       message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${
         conventionsToSendAssessmentEmailTo.length
       } establishments`,
     });
+    logger.info({
+      useCaseName: "SendAssessmentNeededNotifications",
+      durationInSeconds: calculateDurationInSecondsFrom(startDate),
+      message: "after filterConventionsWithAlreadyFilledAssessment",
+    });
 
-    return {
-      conventions: conventionsToSendAssessmentEmailTo,
-      numberOfConventionsWithAlreadyExistingAssessment:
-        conventionIdsWithAlreadyExistingAssessment.length,
-    };
+    return conventionsToSendAssessmentEmailTo;
   }
 
   async #sendEmailToBeneficiary({
