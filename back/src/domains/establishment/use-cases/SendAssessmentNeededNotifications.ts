@@ -7,6 +7,7 @@ import {
   castError,
   type DateRange,
   type Email,
+  errors,
   executeInSequence,
   frontRoutes,
   getFormattedFirstnameAndLastname,
@@ -19,7 +20,7 @@ import type { GenerateConventionMagicLinkUrl } from "../../../config/bootstrap/m
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { createLogger } from "../../../utils/logger";
 import type { AssessmentRepository } from "../../convention/ports/AssessmentRepository";
-import type { ConventionQueries } from "../../convention/ports/ConventionQueries";
+import type { ConventionRepository } from "../../convention/ports/ConventionRepository";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type {
   NotificationContentAndFollowedIds,
@@ -46,7 +47,7 @@ type SendAssessmentParams = {
 };
 
 type OutOfTransaction = {
-  conventionQueries: ConventionQueries;
+  conventionRepository: ConventionRepository;
   assessmentRepository: AssessmentRepository;
   notificationRepository: NotificationRepository;
 };
@@ -136,13 +137,26 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
     const conventions =
-      await this.#outOfTrx.conventionQueries.getEndingAndValidatedConventions(
+      await this.#outOfTrx.conventionRepository.getValidatedEndedOrUpdatedAround(
         params.conventionEndDate,
       );
 
-    const conventionsWithoutAssessmentRequest = (
+    const conventionsWithValidationEmails = (
       await Promise.all(
         conventions.map(async (convention) => {
+          const emails =
+            await this.#outOfTrx.notificationRepository.getEmailsByFilters({
+              conventionId: convention.id,
+              emailType: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+            });
+          return emails.length > 0 ? convention : null;
+        }),
+      )
+    ).filter((dto): dto is ConventionDto => dto !== null);
+
+    const conventionsWithoutAssessmentRequest = (
+      await Promise.all(
+        conventionsWithValidationEmails.map(async (convention) => {
           const emails =
             await this.#outOfTrx.notificationRepository.getEmailsByFilters({
               conventionId: convention.id,
@@ -151,7 +165,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
           return emails.length === 0 ? convention : null;
         }),
       )
-    ).filter((c): c is ConventionDto => c !== null);
+    ).filter((dto): dto is ConventionDto => dto !== null);
 
     const conventionIdsWithAlreadyExistingAssessment =
       await this.#outOfTrx.assessmentRepository
@@ -164,8 +178,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
     const conventionsToSendAssessmentEmailTo =
       conventionsWithoutAssessmentRequest.filter(
-        (convention) =>
-          !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+        ({ id }) => !conventionIdsWithAlreadyExistingAssessment.includes(id),
       );
 
     logger.info({
@@ -238,9 +251,9 @@ export class SendAssessmentNeededNotifications extends UseCase<
     uow: UnitOfWork;
     convention: ConventionDto;
   }) {
-    const [agency] = await uow.agencyRepository.getByIds([convention.agencyId]);
+    const agency = await uow.agencyRepository.getById(convention.agencyId);
     if (!agency)
-      throw new Error(`Missing agency ${convention.agencyId} on repository.`);
+      throw errors.agency.notFound({ agencyId: convention.agencyId });
 
     await this.#saveNotificationAndRelatedEvent(
       uow,

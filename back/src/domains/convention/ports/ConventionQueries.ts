@@ -5,7 +5,6 @@ import type {
   ConventionScope,
   ConventionStatus,
   DataWithPagination,
-  DateRange,
   ExtractFromExisting,
   FindSimilarConventionsParams,
   GetConventionsForAgencyUserParams,
@@ -58,12 +57,8 @@ export interface ConventionQueries {
   getPaginatedConventionsForAgencyUser(
     params: GetPaginatedConventionsForAgencyUserParams,
   ): Promise<DataWithPagination<ConventionDto>>;
-
   // TODO: a voir si on veut pas à terme unifier en une seule query les 3 queries si dessous
   getConventions(params: GetConventionsParams): Promise<ConventionDto[]>;
-  getEndingAndValidatedConventions: (
-    dateEnd: DateRange,
-  ) => Promise<ConventionDto[]>;
   getConventionsByScope(params: {
     scope: ConventionScope;
     limit: number;
