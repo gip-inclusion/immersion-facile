@@ -231,6 +231,14 @@ const getDiscussionStatusUpdatedFeedbackMessage = (
       () =>
         "Candidature refusée, le message a bien été envoyé au candidat. Merci pour votre retour.",
     )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "DEPRECATED",
+      },
+      () =>
+        "Candidature automatiquement refusée par manque de réponse de votre part dans un délai de 3 mois.",
+    )
     .exhaustive();
 };
 

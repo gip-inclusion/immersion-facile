@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import {
   domElementIds,
   type WithDiscussionId,
-  withDiscussionSchemaId,
+  withDiscussionIdSchema,
 } from "shared";
 import { makeFieldError } from "src/app/hooks/formContents.hooks";
 import { routes } from "src/app/routes/routes";
@@ -14,7 +14,7 @@ import { routes } from "src/app/routes/routes";
 export const ManageDiscussionFormSection = (): JSX.Element => {
   const { register, handleSubmit, formState, setValue } =
     useForm<WithDiscussionId>({
-      resolver: zodResolver(withDiscussionSchemaId),
+      resolver: zodResolver(withDiscussionIdSchema),
       mode: "onTouched",
     });
   const { isValid } = formState;
