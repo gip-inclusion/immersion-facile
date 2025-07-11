@@ -90,55 +90,55 @@ type ApiConsumerCall = {
 };
 
 type LoggerParams = Partial<{
-  crispTicket: {
-    kind: "Ticket self solved" | "Ticket sent to Crisp" | "Ticket errored";
-    segments?: string[];
-    errorMessage?: string;
-  };
-  partnerApiCall: PartnerApiCall;
-  cacheKey: string;
-  apiConsumerCall: ApiConsumerCall;
   adapters: {
-    repositories: "IN_MEMORY" | "PG";
-    notificationGateway: "IN_MEMORY" | "BREVO";
     apiAddress: "IN_MEMORY" | "OPEN_CAGE_DATA";
-    siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
+    notificationGateway: "IN_MEMORY" | "BREVO";
+    repositories: "IN_MEMORY" | "PG";
     romeRepository: "IN_MEMORY" | "PG";
+    siretGateway: "IN_MEMORY" | "HTTPS" | "INSEE" | "ANNUAIRE_DES_ENTREPRISES";
   };
   agencyId: AgencyId;
+  apiConsumerCall: ApiConsumerCall;
+  authorisationStatus: AuthorisationStatus;
+  axiosResponse: LoggedAxiosResponse;
+  cacheKey: string;
   conventionId: ConventionId;
   crawlerInfo: {
     numberOfEventsBeforeAggregation?: number;
     numberOfEvents?: number;
-    typeOfEvents: TypeOfEvent;
     processEventsDurationInSeconds?: number;
     retrieveEventsDurationInSeconds?: number;
+    typeOfEvents: TypeOfEvent;
+  };
+  crispTicket: {
+    errorMessage?: string;
+    kind: "Ticket self solved" | "Ticket sent to Crisp" | "Ticket errored";
+    segments?: string[];
   };
   durationInSeconds: number;
   error: Error | Partial<SQLError>;
   events: DomainEvent[];
-  nodeProcessReport: NodeProcessReport;
-  notificationId: string;
+  franceTravailGatewayStatus: "success" | "total" | "error";
   ftConnect: Partial<{
     ftId: ConventionId;
     originalId: ConventionId;
     peExternalId: FtExternalId;
     isJobSeeker: boolean;
   }>;
+  logStatus: LogStatus;
+  nodeProcessReport: NodeProcessReport;
+  notificationId: string;
+  partnerApiCall: PartnerApiCall;
   reportContent: string;
   request: Pick<Request, "path" | "method">;
   requestId: string;
-  sharedRouteResponse: HttpResponse<any, any>;
-  axiosResponse: LoggedAxiosResponse;
-  subscriberResponse: SubscriberResponse;
+  romeLabel: string;
   searchLBB: SearchCompaniesParams;
   searchMade: SearchMadeEntity;
   searchParams: SearchQueryParamsDto | undefined;
+  sharedRouteResponse: HttpResponse<any, any>;
   siret: SiretDto;
-  romeLabel: string;
-  franceTravailGatewayStatus: "success" | "total" | "error";
-  logStatus: LogStatus;
-  authorisationStatus: AuthorisationStatus;
+  subscriberResponse: SubscriberResponse;
   subscriptionId: string;
   topic: DomainTopic;
   useCaseName: string;
