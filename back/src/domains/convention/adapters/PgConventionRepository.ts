@@ -7,6 +7,8 @@ import {
   type BeneficiaryRepresentative,
   type ConventionDto,
   type ConventionId,
+  conventionSchema,
+  type DateRange,
   type DateString,
   type Email,
   type EstablishmentRepresentative,
@@ -17,12 +19,17 @@ import {
   isEstablishmentTutorIsEstablishmentRepresentative,
   validatedConventionStatuses,
 } from "shared";
+import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import {
   falsyToNull,
   type KyselyDb,
 } from "../../../config/pg/kysely/kyselyUtils";
+import { createLogger } from "../../../utils/logger";
 import type { ConventionRepository } from "../ports/ConventionRepository";
-import { getReadConventionById } from "./pgConventionSql";
+import {
+  createConventionQueryBuilder,
+  getReadConventionById,
+} from "./pgConventionSql";
 
 export class PgConventionRepository implements ConventionRepository {
   constructor(private transaction: KyselyDb) {}
@@ -113,6 +120,45 @@ export class PgConventionRepository implements ConventionRepository {
       .execute();
 
     return result.map(({ id }) => id);
+  }
+
+  public async getValidatedEndedOrUpdatedAround(
+    finishingRange: DateRange,
+  ): Promise<ConventionDto[]> {
+    const pgResults = await createConventionQueryBuilder(this.transaction)
+      .where("conventions.status", "in", validatedConventionStatuses)
+      .where((eb) =>
+        eb.or([
+          eb.between(
+            sql`conventions.date_end`,
+            finishingRange.from.toISOString().split("T")[0],
+            finishingRange.to.toISOString().split("T")[0],
+          ),
+          eb.and([
+            eb.between(
+              sql`conventions.updated_at`,
+              finishingRange.from.toISOString().split("T")[0],
+              finishingRange.to.toISOString().split("T")[0],
+            ),
+            eb(
+              sql`conventions.date_end`,
+              "<=",
+              finishingRange.to.toISOString().split("T")[0],
+            ),
+          ]),
+        ]),
+      )
+      .execute();
+
+    return pgResults.map(({ dto }) => {
+      return validateAndParseZodSchemaV2({
+        schemaName: "conventionSchema",
+        inputSchema: conventionSchema,
+        schemaParsingInput: dto,
+        id: dto.id,
+        logger: createLogger(__filename),
+      });
+    });
   }
 
   public async save(
