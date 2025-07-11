@@ -1,6 +1,7 @@
 import subDays from "date-fns/subDays";
 import {
   type DiscussionDto,
+  type Exchange,
   errors,
   type LegacyContactEstablishmentRequestDto,
   legacyContactEstablishmentRequestSchema,
@@ -15,7 +16,6 @@ import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
-import { getDiscussionContactsFromAggregate } from "../helpers/businessContact.helpers";
 
 export class LegacyContactEstablishment extends TransactionalUseCase<LegacyContactEstablishmentRequestDto> {
   protected inputSchema = legacyContactEstablishmentRequestSchema;
@@ -160,9 +160,6 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
     establishment: EstablishmentAggregate;
     now: Date;
   }): Promise<DiscussionDto> {
-    const { otherUsers, firstAdminRight, firstAdminUser } =
-      await getDiscussionContactsFromAggregate(uow, establishment);
-
     const matchingAddress = establishment.establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -211,14 +208,6 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
             contactMode: contactRequest.contactMode,
             potentialBeneficiary,
           }),
-      establishmentContact: {
-        copyEmails: otherUsers.map((user) => user.email),
-        job: firstAdminRight.job,
-        phone: firstAdminRight.phone,
-        email: firstAdminUser.email,
-        firstName: firstAdminUser.firstName,
-        lastName: firstAdminUser.lastName,
-      },
       exchanges:
         contactRequest.contactMode === "EMAIL"
           ? [
@@ -226,10 +215,9 @@ export class LegacyContactEstablishment extends TransactionalUseCase<LegacyConta
                 subject: "Demande de contact initiée par le bénéficiaire",
                 sentAt: now.toISOString(),
                 message: contactRequest.message,
-                recipient: "establishment",
                 sender: "potentialBeneficiary",
                 attachments: [],
-              },
+              } satisfies Exchange,
             ]
           : [],
       acquisitionCampaign: contactRequest.acquisitionCampaign,

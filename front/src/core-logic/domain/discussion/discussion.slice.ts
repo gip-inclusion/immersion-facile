@@ -7,8 +7,8 @@ import {
   type DiscussionReadDto,
   type DiscussionStatus,
   defaultPerPageInWebPagination,
-  type Exchange,
   type ExchangeFromDashboard,
+  type ExchangeRead,
   type FlatGetPaginatedDiscussionsParams,
   type WithDiscussionStatus,
 } from "shared";
@@ -163,7 +163,7 @@ export const discussionSlice = createSlice({
     sendExchangeSucceeded: (
       state,
       action: PayloadActionWithFeedbackTopic<{
-        exchangeData: Exchange;
+        exchangeData: ExchangeRead;
       }>,
     ) => {
       state.isLoading = false;

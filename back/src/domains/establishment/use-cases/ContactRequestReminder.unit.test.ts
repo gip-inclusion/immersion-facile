@@ -1,11 +1,13 @@
 import { subDays } from "date-fns";
 import {
+  ConnectedUserBuilder,
   type ContactMode,
   cartographeAppellationAndRome,
   createOpaqueEmail,
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionKind,
+  type Email,
   expectToEqual,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
@@ -35,6 +37,19 @@ describe("ContactRequestReminder", () => {
   let timeGateway: CustomTimeGateway;
   const now = new Date();
   const domain = "domain.fr";
+
+  const user = new ConnectedUserBuilder().build();
+  const establishment = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        userId: user.id,
+        job: "boss",
+        phone: "0677889944",
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
 
   const [
     discussionWith2DaysSinceBeneficiaryExchange,
@@ -69,12 +84,7 @@ describe("ContactRequestReminder", () => {
   ).map(({ date, contactMode }, index) => {
     const builder = new DiscussionBuilder()
       .withId(uuid())
-      .withEstablishmentContact({
-        email: `test-${index}@email.com`,
-        firstName: `test-${index}`,
-        lastName: `test-${index}`,
-        phone: "0677889944",
-      })
+      .withSiret(establishment.establishment.siret)
       .withContactMode(contactMode)
       .withPotentialBeneficiaryEmail(`benef-${index}@email.com`)
       .withPotentialBeneficiaryFirstname(`mike-${index}`)
@@ -82,7 +92,6 @@ describe("ContactRequestReminder", () => {
       .withExchanges([
         {
           sender: "potentialBeneficiary",
-          recipient: "establishment",
           subject: "This is a contact request",
           message: "Beneficiary message",
           sentAt: date.toISOString(),
@@ -128,7 +137,13 @@ describe("ContactRequestReminder", () => {
           discussionWith2DaysSinceBeneficiaryExchange.siret,
         )
         .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            userId: "osef",
+            shouldReceiveDiscussionNotifications: true,
+          },
         ])
         .build(),
     ];
@@ -180,7 +195,6 @@ describe("ContactRequestReminder", () => {
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               sentAt: new Date("2024-07-01 09:19:35").toISOString(),
               attachments: [],
               message: "",
@@ -188,7 +202,9 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               sentAt: new Date("2024-07-23 15:34:15").toISOString(),
               attachments: [],
               message: "",
@@ -196,7 +212,6 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               sentAt: new Date("2024-07-25 09:25:17").toISOString(),
               attachments: [],
               message: "",
@@ -204,7 +219,9 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               sentAt: new Date("2024-07-31 08:55:47").toISOString(),
               attachments: [],
               message: "",
@@ -219,7 +236,6 @@ describe("ContactRequestReminder", () => {
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               sentAt: new Date("2024-07-26 06:48:59").toISOString(),
               attachments: [],
               message: "",
@@ -227,7 +243,9 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               sentAt: new Date("2024-07-26 07:24:36").toISOString(),
               attachments: [],
               message: "",
@@ -235,7 +253,9 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
+              email: "",
+              firstname: "",
+              lastname: "",
               sentAt: new Date("2024-07-29 10:13:46").toISOString(),
               attachments: [],
               message: "",
@@ -243,7 +263,6 @@ describe("ContactRequestReminder", () => {
             },
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
               sentAt: new Date("2024-07-29 14:12:26").toISOString(),
               attachments: [],
               message: "",
@@ -326,21 +345,24 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty, { numberOfNotifications: 3 });
       expectSavedNotificationsAndEvents({
         emails: [
-          makeEstablishmentContactRequestReminder(
-            discussionWith3DaysSinceBeneficiaryExchange,
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith3DaysSinceBeneficiaryExchange,
+            establishmentEmails: [],
             domain,
-            "3days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith4DaysSinceBeneficiaryExchange,
+            mode: "3days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith4DaysSinceBeneficiaryExchange,
+            establishmentEmails: [],
             domain,
-            "3days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
+            mode: "3days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
+            establishmentEmails: [],
             domain,
-            "3days",
-          ),
+            mode: "3days",
+          }),
         ],
       });
     });
@@ -354,27 +376,35 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty, { numberOfNotifications: 2 });
       expectSavedNotificationsAndEvents({
         emails: [
-          makeEstablishmentContactRequestReminder(
-            discussionWith7DaysSinceBeneficiaryExchange,
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith7DaysSinceBeneficiaryExchange,
+            establishmentEmails: [],
             domain,
-            "7days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith8DaysSinceBeneficiaryExchange,
+            mode: "7days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith8DaysSinceBeneficiaryExchange,
+            establishmentEmails: [],
             domain,
-            "7days",
-          ),
+            mode: "7days",
+          }),
         ],
       });
     });
   });
 });
 
-const makeEstablishmentContactRequestReminder = (
-  discussion: DiscussionDto,
-  domain: string,
-  mode: ContactRequestReminderMode,
-): TemplatedEmail => {
+const makeEstablishmentContactRequestReminder = ({
+  discussion,
+  establishmentEmails,
+  domain,
+  mode,
+}: {
+  discussion: DiscussionDto;
+  establishmentEmails: Email[];
+  domain: string;
+  mode: ContactRequestReminderMode;
+}): TemplatedEmail => {
   const replyEmail = createOpaqueEmail({
     discussionId: discussion.id,
     recipient: {
@@ -402,7 +432,7 @@ const makeEstablishmentContactRequestReminder = (
       domain,
       mode,
     },
-    recipients: [discussion.establishmentContact.email],
+    recipients: establishmentEmails,
     sender: immersionFacileNoReplyEmailSender,
     replyTo: {
       email: replyEmail,

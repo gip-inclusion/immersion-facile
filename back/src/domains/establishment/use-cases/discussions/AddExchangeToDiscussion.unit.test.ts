@@ -29,7 +29,61 @@ import {
 describe("AddExchangeToDiscussion", () => {
   const inclusionConnectedUser = new ConnectedUserBuilder().build();
   const replyDomain = "reply.my-domain.com";
+
+  const adminUserEstablishment1 = new ConnectedUserBuilder()
+    .withId("estab1-admin")
+    .withEmail("estab1-admin@mail.com")
+    .buildUser();
+  const contactUserEstablishment1 = new ConnectedUserBuilder()
+    .withId("estab1-contact")
+    .withEmail("estab2-contact@mail.com")
+    .buildUser();
+  const adminUserEstablishment2 = new ConnectedUserBuilder()
+    .withId("estab2-admin")
+    .withEmail("estab1-admin@mail.com")
+    .buildUser();
+  const contactUserEstablishment2 = new ConnectedUserBuilder()
+    .withId("estab2-contact")
+    .withEmail("estab2-contact@mail.com")
+    .buildUser();
+
+  const establishment1 = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000000")
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "boss",
+        phone: "+33655885588",
+        userId: adminUserEstablishment1.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: contactUserEstablishment1.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
+  const establishment2 = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000001")
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "boss",
+        phone: "+33655885588",
+        userId: adminUserEstablishment2.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: contactUserEstablishment2.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
+
   const pendingDiscussion1 = new DiscussionBuilder()
+    .withSiret(establishment1.establishment.siret)
     .withAppellationCode("20567")
     .withId("11111111-e89b-12d3-a456-426614174000")
     .withStatus({ status: "PENDING" })
@@ -39,13 +93,14 @@ describe("AddExchangeToDiscussion", () => {
         message: "Hello",
         sender: "potentialBeneficiary",
         sentAt: new Date().toISOString(),
-        recipient: "establishment",
+        // recipient: "establishment",
         attachments: [],
       },
     ])
     .build();
 
   const pendingDiscussion2 = new DiscussionBuilder()
+    .withSiret(establishment2.establishment.siret)
     .withAppellationCode("13252")
     .withId("22222222-e89b-12d3-a456-426614174000")
     .withStatus({ status: "PENDING" })
@@ -55,7 +110,7 @@ describe("AddExchangeToDiscussion", () => {
         message: "Hello",
         sender: "potentialBeneficiary",
         sentAt: new Date().toISOString(),
-        recipient: "establishment",
+        // recipient: "establishment",
         attachments: [],
       },
     ])
@@ -87,19 +142,10 @@ describe("AddExchangeToDiscussion", () => {
       pendingDiscussion1,
       pendingDiscussion2,
     ];
+
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(pendingDiscussion1.siret)
-        .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
-        ])
-        .build(),
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(pendingDiscussion2.siret)
-        .withUserRights([
-          { role: "establishment-admin", job: "", phone: "", userId: "osef" },
-        ])
-        .build(),
+      establishment1,
+      establishment2,
     ];
   });
 
@@ -114,13 +160,14 @@ describe("AddExchangeToDiscussion", () => {
             ]).items;
 
           const payload: AddExchangeToDiscussionInput = {
-            source: "inbound-parsing",
+            source: "email",
             messageInputs: [
               {
                 // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: "?????????????",
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -136,6 +183,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: secondInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion2.id,
                 recipientRole: "establishment",
+                senderEmail: "?????????????",
                 sentAt: new Date(
                   secondInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -255,13 +303,14 @@ describe("AddExchangeToDiscussion", () => {
             ).items;
 
           const payload: AddExchangeToDiscussionInput = {
-            source: "inbound-parsing",
+            source: "email",
             messageInputs: [
               {
                 // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: "?????????????",
                 attachments:
                   firstInboundParsingItem.Attachments?.map((attachment) => ({
                     name: attachment.Name,
@@ -277,6 +326,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: secondInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion2.id,
                 recipientRole: "establishment",
+                senderEmail: "?????????????",
                 attachments:
                   secondInboundParsingItem.Attachments?.map((attachment) => ({
                     name: attachment.Name,
@@ -372,7 +422,10 @@ describe("AddExchangeToDiscussion", () => {
           expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
             message: "Hello without sentAt and subject",
             sender: "establishment",
-            recipient: "potentialBeneficiary",
+            email: "",
+            firstname: "",
+            lastname: "",
+            // recipient: "potentialBeneficiary",
             subject:
               "Réponse de My default business name à votre demande d'immersion",
             sentAt: "2021-09-01T10:10:00.000Z",
@@ -410,13 +463,14 @@ describe("AddExchangeToDiscussion", () => {
             ]).items;
 
             const result = await addExchangeToDiscussion.execute({
-              source: "inbound-parsing",
+              source: "email",
               messageInputs: [
                 {
                   // biome-ignore lint/style/noNonNullAssertion: testing purpose
                   message: firstInboundParsingItem.RawHtmlBody!,
                   discussionId: discussion1Accepted.id,
                   recipientRole: "potentialBeneficiary",
+                  senderEmail: "?????????????",
                   sentAt: new Date(
                     firstInboundParsingItem.SentAtDate,
                   ).toISOString(),
@@ -455,8 +509,8 @@ describe("AddExchangeToDiscussion", () => {
                     sender: "establishment",
                   },
                   recipients: [
-                    discussion1Accepted.establishmentContact.email,
-                    ...discussion1Accepted.establishmentContact.copyEmails,
+                    adminUserEstablishment1.email,
+                    contactUserEstablishment1.email,
                   ],
                 },
               ],
@@ -506,12 +560,13 @@ describe("AddExchangeToDiscussion", () => {
             ]).items;
 
             const result = await addExchangeToDiscussion.execute({
-              source: "inbound-parsing",
+              source: "email",
               messageInputs: [
                 {
                   // biome-ignore lint/style/noNonNullAssertion: testing purpose
                   message: firstInboundParsingItem.RawHtmlBody!,
                   discussionId: discussion2Rejected.id,
+                  senderEmail: "?????????????",
                   recipientRole: "establishment",
                   sentAt: new Date(
                     firstInboundParsingItem.SentAtDate,
@@ -572,13 +627,14 @@ describe("AddExchangeToDiscussion", () => {
           ]).items;
 
           const result = await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
+            source: "email",
             messageInputs: [
               {
                 // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: "?????????????",
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -617,8 +673,8 @@ describe("AddExchangeToDiscussion", () => {
                   sender: "establishment",
                 },
                 recipients: [
-                  pendingDiscussion1.establishmentContact.email,
-                  ...pendingDiscussion1.establishmentContact.copyEmails,
+                  adminUserEstablishment1.email,
+                  contactUserEstablishment1.email,
                 ],
               },
             ],
@@ -668,13 +724,14 @@ describe("AddExchangeToDiscussion", () => {
           ]).items;
 
           const result = await addExchangeToDiscussion.execute({
-            source: "inbound-parsing",
+            source: "email",
             messageInputs: [
               {
                 // biome-ignore lint/style/noNonNullAssertion: testing purpose
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "establishment",
+                senderEmail: "?????????????",
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -728,7 +785,7 @@ describe("AddExchangeToDiscussion", () => {
 
       await expectPromiseToFailWithError(
         addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
+          source: "email",
           messageInputs: [
             {
               // biome-ignore lint/style/noNonNullAssertion: testing purpose
@@ -737,6 +794,7 @@ describe("AddExchangeToDiscussion", () => {
               ]).items[0].RawHtmlBody!,
               discussionId: notFoundDiscussionId,
               recipientRole: "establishment",
+              senderEmail: "?????????????",
               attachments: [],
               subject: "",
               sentAt: new Date().toISOString(),

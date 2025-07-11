@@ -51,6 +51,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
     .object({
       role: z.literal("establishment-admin"),
       email: emailSchema,
+      shouldReceiveDiscussionNotifications: zBoolean,
       phone: phoneSchema,
       job: zStringMinLength1,
     })
@@ -58,6 +59,7 @@ export const formEstablishmentUserRightSchema: z.Schema<FormEstablishmentUserRig
       z.object({
         role: z.literal("establishment-contact"),
         email: emailSchema,
+        shouldReceiveDiscussionNotifications: zBoolean,
         phone: phoneSchema.optional(),
         job: zStringMinLength1.optional(),
       }),
@@ -77,6 +79,11 @@ export const formEstablishmentUserRightsSchema: z.Schema<
     (userRights) =>
       uniq(userRights.map((right) => right.email)).length === userRights.length,
     "La structure accueillante ne peut pas avoir plusieurs droits pour la même personne.",
+  )
+  .refine(
+    (userRights) =>
+      userRights.some((right) => right.shouldReceiveDiscussionNotifications),
+    "La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
   );
 
 const formEstablishmentSources: NotEmptyArray<FormEstablishmentSource> = [

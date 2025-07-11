@@ -1,4 +1,4 @@
-import type { discussionExchangeForbidenReasons } from "..";
+import type { discussionExchangeForbidenReasons, Email } from "..";
 import type { WithAcquisition } from "../acquisition.dto";
 import type { AddressDto } from "../address/address.dto";
 import type { ContactLevelOfEducation } from "../contactEstablishmentRequest/contactEstablishmentRequest.dto";
@@ -35,12 +35,12 @@ export type CandidateWarnedMethod = (typeof candidateWarnedMethods)[number];
 
 export type ExchangeRole = (typeof exchangeRoles)[number];
 
-export type DiscussionExchangeForbidenReason =
+export type DiscussionExchangeForbiddenReason =
   (typeof discussionExchangeForbidenReasons)[number];
 
 export type DiscussionExchangeForbiddenParams = {
   sender: ExchangeRole;
-  reason: DiscussionExchangeForbidenReason;
+  reason: DiscussionExchangeForbiddenReason;
 };
 
 export type DiscussionId = Flavor<string, "DiscussionId">;
@@ -58,15 +58,6 @@ export type LegacyDiscussionEmailParams = {
 export type DiscussionEmailParams = LegacyDiscussionEmailParams & {
   firstname: string;
   lastname: string;
-};
-
-export type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
-  DiscussionEmailParams,
-  "rawRecipientKind" | "firstname" | "lastname"
-> & {
-  recipientKind: ExchangeRole;
-  firstname?: string;
-  lastname?: string;
 };
 
 export type WithDiscussionMessage = {
@@ -128,28 +119,18 @@ export type DiscussionPotentialBeneficiary<
   WithContactByEmailAndIFProps<D, C> &
   With1Eleve1StageProps<D>;
 
-export type DiscussionEstablishmentContact = {
-  email: string;
-  copyEmails: string[];
-  firstName?: string;
-  lastName?: string;
-  phone: string;
-  job: string;
-};
-
 export type CommonDiscussionDto = {
   address: AddressDto;
   businessName: string;
   conventionId?: ConventionId;
   createdAt: DateString;
-  exchanges: Exchange[];
   id: DiscussionId;
   siret: SiretDto;
 } & WithDiscussionStatus;
 
 export type ExtraDiscussionDtoProperties = WithAcquisition & {
   appellationCode: AppellationCode;
-  establishmentContact: DiscussionEstablishmentContact;
+  exchanges: Exchange[];
 };
 
 type SpecificDiscussionDto<C extends ContactMode, D extends DiscussionKind> = {
@@ -249,10 +230,7 @@ export type GenericDiscussionReadDto<
 > = CommonDiscussionDto &
   SpecificDiscussionDto<C, D> & {
     appellation: AppellationAndRomeDto;
-    establishmentContact: OmitFromExistingKeys<
-      DiscussionEstablishmentContact,
-      "email" | "copyEmails" | "phone"
-    >;
+    exchanges: ExchangeRead[];
   };
 
 export type DiscussionReadDto =
@@ -268,14 +246,33 @@ export type Attachment = {
   link: string;
 };
 
-export type Exchange = {
+type CommonExchange = {
   subject: string;
   message: string;
-  sender: ExchangeRole;
-  recipient: ExchangeRole;
   sentAt: DateString;
   attachments: Attachment[];
 };
+
+export type SpecificExchangeSender<S extends ExchangeRole> =
+  S extends "establishment"
+    ? {
+        sender: S;
+        firstname: string;
+        lastname: string;
+        email: Email;
+      }
+    : {
+        sender: S;
+      };
+
+export type Exchange = CommonExchange &
+  SpecificExchangeSender<"establishment" | "potentialBeneficiary">;
+
+export type ExchangeRead = CommonExchange &
+  (
+    | SpecificExchangeSender<"potentialBeneficiary">
+    | OmitFromExistingKeys<SpecificExchangeSender<"establishment">, "email">
+  );
 
 export type ExchangeMessageFromDashboard = Pick<Exchange, "message">;
 

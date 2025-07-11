@@ -15,6 +15,7 @@ import type { SaveNotificationAndRelatedEvent } from "../../../core/notification
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 import { makeContactByEmailRequestParams } from "../../helpers/contactRequest";
 
 export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishmentEventPayload> {
@@ -49,6 +50,19 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     if (!discussion)
       throw errors.discussion.notFound({ discussionId: payload.discussionId });
 
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        discussion.siret,
+      );
+
+    if (!establishment)
+      throw errors.establishment.notFound({ siret: discussion.siret });
+
+    const { allContactEmails, firstAdminContact } = await getContacts(
+      uow,
+      establishment,
+    );
+
     const followedIds = {
       establishmentSiret: discussion.siret,
     };
@@ -58,10 +72,10 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
       const params = {
         businessName: discussion.businessName,
         contactFirstName: getFormattedFirstnameAndLastname({
-          firstname: discussion.establishmentContact.firstName,
+          firstname: firstAdminContact.firstName,
         }),
         contactLastName: getFormattedFirstnameAndLastname({
-          lastname: discussion.establishmentContact.lastName,
+          lastname: firstAdminContact.lastName,
         }),
         kind: discussion.kind,
         potentialBeneficiaryFirstName: getFormattedFirstnameAndLastname({
@@ -91,7 +105,7 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
                 kind: "CONTACT_BY_PHONE_INSTRUCTIONS",
                 params: {
                   ...params,
-                  contactPhone: discussion.establishmentContact.phone,
+                  contactPhone: firstAdminContact.phone,
                 },
               },
         followedIds,
@@ -123,14 +137,11 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
 
     const templatedContent: TemplatedEmail = {
       sender: immersionFacileNoReplyEmailSender,
-      recipients: [discussion.establishmentContact.email],
+      recipients: allContactEmails,
       replyTo: {
         email: opaqueEmail,
         name: `${getFormattedFirstnameAndLastname({ firstname: discussion.potentialBeneficiary.firstName, lastname: discussion.potentialBeneficiary.lastName })} - via Immersion Facilitée`,
       },
-      cc: discussion.establishmentContact.copyEmails.filter(
-        (email) => email !== discussion.establishmentContact.email,
-      ),
       kind: "CONTACT_BY_EMAIL_REQUEST",
       params: {
         ...(await makeContactByEmailRequestParams({
@@ -159,3 +170,34 @@ export class NotifyContactRequest extends TransactionalUseCase<ContactEstablishm
     });
   }
 }
+
+const getContacts = async (
+  uow: UnitOfWork,
+  establishment: EstablishmentAggregate,
+) => {
+  const firstAdminRight = establishment.userRights.find(
+    (right) => right.role === "establishment-admin",
+  );
+  if (!firstAdminRight)
+    throw errors.establishment.adminNotFound({
+      siret: establishment.establishment.siret,
+    });
+  const firstAdminUser = await uow.userRepository.getById(
+    firstAdminRight.userId,
+  );
+
+  if (!firstAdminUser)
+    throw errors.user.notFound({ userId: firstAdminRight.userId });
+  return {
+    firstAdminContact: {
+      firstName: firstAdminUser.firstName,
+      lastName: firstAdminUser.lastName,
+      phone: firstAdminRight.phone,
+    },
+    allContactEmails: (
+      await uow.userRepository.getByIds(
+        establishment.userRights.map(({ userId }) => userId),
+      )
+    ).map((user) => user.email),
+  };
+};

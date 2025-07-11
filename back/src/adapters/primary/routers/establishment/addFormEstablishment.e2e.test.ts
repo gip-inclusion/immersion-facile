@@ -91,6 +91,7 @@ describe("Add form establishment", () => {
         email: "mail@mail.com",
         job: "osef",
         phone: "+33600000000",
+        shouldReceiveDiscussionNotifications: true,
       };
 
       const response = await httpClient.addFormEstablishment({

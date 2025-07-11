@@ -6,9 +6,11 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { Table } from "@codegouvfr/react-dsfr/Table";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { uniqBy } from "ramda";
 import { Fragment, useEffect, useRef, useState } from "react";
+import { NotificationIndicator } from "react-design-system";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import {
@@ -47,7 +49,13 @@ export const EstablishmentUsersList = () => {
 
   if (!formEstablishment?.userRights) return null;
 
-  const headers = ["Utilisateur", "Informations de contact", "Rôle", "Actions"];
+  const headers = [
+    "Utilisateur",
+    "Informations de contact",
+    "Rôle",
+    "Notifications (candidatures)",
+    "Actions",
+  ];
 
   const data = formEstablishment.userRights.map((userRight, index) => {
     const isLastAdmin =
@@ -312,6 +320,14 @@ const EstablishmentUsersEditForm = ({
             },
           }))}
         />
+        <ToggleSwitch
+          label="Recevoir les notifications pour toutes les candidatures de cet établissement"
+          inputTitle="Recevoir les notifications pour toutes les candidatures de cet établissement"
+          onChange={(checked) => {
+            setValue("shouldReceiveDiscussionNotifications", checked);
+          }}
+          checked={values.shouldReceiveDiscussionNotifications}
+        />
         <ButtonsGroup
           alignment="right"
           inlineLayoutWhen="always"
@@ -357,6 +373,10 @@ const getEstablishmentUserRow = ({
   >
     {userRolesToDisplay[userRight.role].label}
   </Badge>,
+  <NotificationIndicator
+    key={`${userRight.email}-${userRight.role}`}
+    isNotified={userRight.shouldReceiveDiscussionNotifications}
+  />,
   <ButtonsGroup
     key={`${userRight.email}-${userRight.role}`}
     inlineLayoutWhen="always"

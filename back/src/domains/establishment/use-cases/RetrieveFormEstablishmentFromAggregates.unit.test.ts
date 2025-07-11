@@ -65,10 +65,12 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
         role: "establishment-admin",
         job,
         phone,
+        shouldReceiveDiscussionNotifications: true,
       },
       {
         userId: establishmentContact.id,
         role: "establishment-contact",
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();
@@ -130,10 +132,12 @@ describe("Retrieve Form Establishment From Aggregate when payload is valid", () 
               userId: adminWithoutFirstNameAndLastName.id,
               job,
               phone,
+              shouldReceiveDiscussionNotifications: true,
             },
             {
               userId: establishmentContact.id,
               role: "establishment-contact",
+              shouldReceiveDiscussionNotifications: true,
             },
           ])
           .build();
@@ -238,10 +242,12 @@ const makeExpectedFormEstablishment = ({
       email: establishmentAdmin.email,
       job,
       phone,
+      shouldReceiveDiscussionNotifications: true,
     },
     {
       role: "establishment-contact",
       email: establishmentContact.email,
+      shouldReceiveDiscussionNotifications: true,
     },
   ],
   contactMode: establishmentAggregate.establishment.contactMode,

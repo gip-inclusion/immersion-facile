@@ -11,6 +11,7 @@ import {
   frontRoutes,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
+  UserBuilder,
 } from "shared";
 import {
   type ExpectSavedNotificationsAndEvents,
@@ -25,16 +26,33 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
+  EstablishmentAggregateBuilder,
   TEST_APPELLATION_CODE,
   TEST_APPELLATION_LABEL,
 } from "../../helpers/EstablishmentBuilders";
 import { NotifyContactRequest } from "./NotifyContactRequest";
 
 describe("NotifyContactRequest", () => {
-  const siret = "11112222333344";
   const discussionId = "discussion-id";
-  const allowedContactEmail = "toto@gmail.com";
-  const allowedCopyEmail = "copy@gmail.com";
+  const estabAdmin = new UserBuilder().withId("admin").build();
+  const estabContact = new UserBuilder().withId("contact").build();
+  const adminPhone = "+66355445544";
+  const establishment = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "osef",
+        phone: adminPhone,
+        shouldReceiveDiscussionNotifications: true,
+        userId: estabAdmin.id,
+      },
+      {
+        role: "establishment-contact",
+        userId: estabContact.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
 
   let uow: InMemoryUnitOfWork;
   let notifyContactRequest: NotifyContactRequest;
@@ -77,13 +95,9 @@ describe("NotifyContactRequest", () => {
         async (kind) => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
-            .withSiret(siret)
+            .withSiret(establishment.establishment.siret)
             .withContactMode("EMAIL")
             .withDiscussionKind(kind)
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
             .withAppellationCode(TEST_APPELLATION_CODE)
             .build() as DiscussionDtoEmail;
 
@@ -96,15 +110,13 @@ describe("NotifyContactRequest", () => {
 
           await notifyContactRequest.execute(validEmailPayload);
 
-          const { establishmentContact } = discussion;
-
           const expectedReplyToEmail = `${discussion.potentialBeneficiary.firstName}_${discussion.potentialBeneficiary.lastName}__${discussion.id}_b@reply.reply.domain.com`;
 
           expectSavedNotificationsAndEvents({
             emails: [
               {
                 kind: "CONTACT_BY_EMAIL_REQUEST",
-                recipients: [establishmentContact.email],
+                recipients: [estabAdmin.email],
                 sender: immersionFacileNoReplyEmailSender,
                 replyTo: {
                   email: expectedReplyToEmail,
@@ -118,10 +130,10 @@ describe("NotifyContactRequest", () => {
                         businessAddress: addressDtoToString(discussion.address),
                         businessName: discussion.businessName,
                         contactFirstName: getFormattedFirstnameAndLastname({
-                          firstname: establishmentContact.firstName,
+                          firstname: estabAdmin.firstName,
                         }),
                         contactLastName: getFormattedFirstnameAndLastname({
-                          lastname: establishmentContact.lastName,
+                          lastname: estabAdmin.lastName,
                         }),
                         discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
@@ -155,10 +167,10 @@ describe("NotifyContactRequest", () => {
                         businessAddress: addressDtoToString(discussion.address),
                         businessName: discussion.businessName,
                         contactFirstName: getFormattedFirstnameAndLastname({
-                          firstname: establishmentContact.firstName,
+                          firstname: estabAdmin.firstName,
                         }),
                         contactLastName: getFormattedFirstnameAndLastname({
-                          lastname: establishmentContact.lastName,
+                          lastname: estabAdmin.lastName,
                         }),
                         discussionUrl: `${immersionFacileBaseUrl}/${frontRoutes.establishmentDashboardDiscussions}/${discussion.id}?mtm_campaign=inbound-parsing-reponse-via-espace-entreprise&mtm_kwd=inbound-parsing-reponse-via-espace-entreprise`,
                         kind: discussion.kind,
@@ -180,7 +192,7 @@ describe("NotifyContactRequest", () => {
                         levelOfEducation:
                           discussion.potentialBeneficiary.levelOfEducation,
                       },
-                cc: establishmentContact.copyEmails,
+                cc: [estabContact.email],
               },
             ],
           });
@@ -194,12 +206,8 @@ describe("NotifyContactRequest", () => {
         async () => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
-            .withSiret(siret)
+            .withSiret(establishment.establishment.siret)
             .withContactMode("PHONE")
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
             .withAppellationCode(TEST_APPELLATION_CODE)
             .build() as DiscussionDtoPhone;
 
@@ -221,12 +229,12 @@ describe("NotifyContactRequest", () => {
                 params: {
                   businessName: discussion.businessName,
                   contactFirstName: getFormattedFirstnameAndLastname({
-                    firstname: discussion.establishmentContact.firstName,
+                    firstname: estabAdmin.firstName,
                   }),
                   contactLastName: getFormattedFirstnameAndLastname({
-                    lastname: discussion.establishmentContact.lastName,
+                    lastname: estabAdmin.lastName,
                   }),
-                  contactPhone: discussion.establishmentContact.phone,
+                  contactPhone: adminPhone,
                   kind: discussion.kind,
                   potentialBeneficiaryFirstName:
                     getFormattedFirstnameAndLastname({
@@ -250,12 +258,8 @@ describe("NotifyContactRequest", () => {
         async () => {
           const discussion = new DiscussionBuilder()
             .withId(discussionId)
-            .withSiret(siret)
+            .withSiret(establishment.establishment.siret)
             .withContactMode("IN_PERSON")
-            .withEstablishmentContact({
-              email: allowedContactEmail,
-              copyEmails: [allowedCopyEmail],
-            })
             .withAppellationCode(TEST_APPELLATION_CODE)
             .build() as DiscussionDtoInPerson;
 
@@ -277,10 +281,10 @@ describe("NotifyContactRequest", () => {
                 params: {
                   businessName: discussion.businessName,
                   contactFirstName: getFormattedFirstnameAndLastname({
-                    firstname: discussion.establishmentContact.firstName,
+                    firstname: estabAdmin.firstName,
                   }),
                   contactLastName: getFormattedFirstnameAndLastname({
-                    lastname: discussion.establishmentContact.lastName,
+                    lastname: estabAdmin.lastName,
                   }),
                   businessAddress: addressDtoToString(discussion.address),
                   kind: discussion.kind,
@@ -319,12 +323,8 @@ describe("NotifyContactRequest", () => {
     it("Bad immersion offer with contactMode EMAIL", async () => {
       const discussion = new DiscussionBuilder()
         .withId(discussionId)
-        .withSiret(siret)
+        .withSiret(establishment.establishment.siret)
         .withContactMode("EMAIL")
-        .withEstablishmentContact({
-          email: allowedContactEmail,
-          copyEmails: [allowedCopyEmail],
-        })
         .withAppellationCode(TEST_APPELLATION_CODE)
         .build() as DiscussionDtoEmail;
 

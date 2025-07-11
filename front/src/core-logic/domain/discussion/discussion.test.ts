@@ -235,7 +235,9 @@ describe("Discussion slice", () => {
         subject: "Réponse de My businessName à votre demande",
         sentAt: new Date().toISOString(),
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        email: "establishment@mail.com",
+        firstname: "Patrick",
+        lastname: "Duchenne",
         attachments: [],
       };
 
@@ -277,14 +279,6 @@ describe("Discussion slice", () => {
         discussionId: discussion.id,
         message: "My message",
       };
-      const expectedExchange: Exchange = {
-        message: exchangePayload.message,
-        subject: "Réponse de My businessName à votre demande",
-        sentAt: new Date().toISOString(),
-        sender: "establishment",
-        recipient: "potentialBeneficiary",
-        attachments: [],
-      };
 
       store.dispatch(
         discussionSlice.actions.fetchDiscussionRequested({
@@ -308,6 +302,17 @@ describe("Discussion slice", () => {
         discussion,
         isLoading: true,
       });
+
+      const expectedExchange: Exchange = {
+        message: exchangePayload.message,
+        subject: "Réponse de My businessName à votre demande",
+        sentAt: new Date().toISOString(),
+        sender: "establishment",
+        email: "establishment@mail.com",
+        firstname: "Jude",
+        lastname: "Law",
+        attachments: [],
+      };
 
       dependencies.establishmentGateway.sendMessageResponse$.next(
         expectedExchange,

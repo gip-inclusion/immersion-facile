@@ -169,6 +169,7 @@ const makeUserRightsFromCSV = (
               job,
               phone,
               email,
+              shouldReceiveDiscussionNotifications: true,
             },
           ] as FormEstablishmentUserRight[])
         : []),
@@ -181,6 +182,7 @@ const makeUserRightsFromCSV = (
       email: csvRow.right1_email,
       job: csvRow.right1_job,
       phone: csvRow.right1_phone,
+      shouldReceiveDiscussionNotifications: true,
     },
     ...otherThanAdminUserRights,
   ];

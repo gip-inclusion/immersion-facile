@@ -62,6 +62,7 @@ describe("Edit form establishments", () => {
         job: "Boss",
         phone: "+33688774455",
         userId: establishmentAdminUser.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();

@@ -30,15 +30,13 @@ describe("getDiscussionParamsFromEmail", () => {
       Attachments: [],
       SentAtDate: "2021-01-01",
     };
-    const result = getDiscussionParamsFromEmail(
-      email.To[0].Address,
-      "reply.domain.com",
+
+    expectToEqual(
+      getDiscussionParamsFromEmail(email.To[0].Address, "reply.domain.com"),
+      {
+        discussionId: "discussion-id",
+        recipientRole: "establishment",
+      },
     );
-    expectToEqual(result, {
-      discussionId: "discussion-id",
-      firstname: "john",
-      lastname: "doe",
-      recipientKind: "establishment",
-    });
   });
 });

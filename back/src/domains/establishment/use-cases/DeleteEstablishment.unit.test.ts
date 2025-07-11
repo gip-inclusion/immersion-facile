@@ -60,14 +60,17 @@ describe("Delete Establishment", () => {
         job: "boss",
         phone: "+33655447788",
         userId: establishmentAdmin.id,
+        shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
         userId: establishmentContact1.id,
+        shouldReceiveDiscussionNotifications: true,
       },
       {
         role: "establishment-contact",
         userId: establishmentContact2.id,
+        shouldReceiveDiscussionNotifications: true,
       },
     ])
     .build();

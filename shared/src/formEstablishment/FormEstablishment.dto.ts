@@ -25,6 +25,7 @@ export const isContactMode = includesTypeGuard(contactModes);
 type GenericFormEstablishmentUserRight<Role extends EstablishmentRole> = {
   email: Email;
   role: Role;
+  shouldReceiveDiscussionNotifications: boolean;
 };
 
 export type WithJobAndPhone = {
