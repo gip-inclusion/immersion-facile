@@ -1,7 +1,11 @@
-import { Pool } from "pg";
 import { AppConfig } from "../config/bootstrap/appConfig";
-import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
-import { PgDiscussionRepository } from "../domains/establishment/adapters/PgDiscussionRepository";
+import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
+import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
+import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
+import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
+import { createUowPerformer } from "../domains/core/unit-of-work/adapters/createUowPerformer";
+import { UuidV4Generator } from "../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
+import { makeGetObsoleteDiscussionsAndEmitDeprecatedEvent } from "../domains/establishment/use-cases/discussions/GetObsoleteDiscussionsAndEmitDeprecatedEvents";
 import { createLogger } from "../utils/logger";
 import { handleCRONScript } from "./handleCRONScript";
 
@@ -10,27 +14,39 @@ const logger = createLogger(__filename);
 const config = AppConfig.createFromEnv();
 
 const triggerMarkObsoleteDiscussionsAsDeprecated = async () => {
-  const dbUrl = config.pgImmersionDbUrl;
+  const { uowPerformer } = createUowPerformer(
+    config,
+    createGetPgPoolFn(config),
+  );
 
-  const pool = new Pool({
-    connectionString: dbUrl,
+  const uuidGenerator = new UuidV4Generator();
+  const timeGateway = new RealTimeGateway();
+  const createNewEvent = makeCreateNewEvent({
+    timeGateway,
+    uuidGenerator,
   });
 
-  const discussionRepository = new PgDiscussionRepository(makeKyselyDb(pool));
-
-  const numberOfUpdatedConventions =
-    await discussionRepository.markObsoleteDiscussionsAsDeprecated({
-      now: new Date(),
+  const getObsoleteDiscussionsAndEmitDeprecatedEvent =
+    makeGetObsoleteDiscussionsAndEmitDeprecatedEvent({
+      uowPerformer,
+      deps: {
+        timeGateway,
+        saveNotificationAndRelatedEvent: makeSaveNotificationAndRelatedEvent(
+          uuidGenerator,
+          timeGateway,
+        ),
+        createNewEvent,
+      },
     });
 
-  return { numberOfDeprecatedDiscussions: numberOfUpdatedConventions.length };
+  return await getObsoleteDiscussionsAndEmitDeprecatedEvent.execute();
 };
 
 handleCRONScript(
   "triggerMarkObsoleteDiscussionsAsDeprecated",
   config,
   triggerMarkObsoleteDiscussionsAsDeprecated,
-  ({ numberOfDeprecatedDiscussions }) =>
-    `Marked ${numberOfDeprecatedDiscussions} as deprecated`,
+  ({ numberOfObsoleteDiscussions }) =>
+    `Marked ${numberOfObsoleteDiscussions} discussions as deprecated`,
   logger,
 );
