@@ -7,9 +7,10 @@ import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessmentRepository";
-import { PgConventionQueries } from "../domains/convention/adapters/PgConventionQueries";
+import { PgConventionRepository } from "../domains/convention/adapters/PgConventionRepository";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
+import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
 import { makeSaveNotificationAndRelatedEvent } from "../domains/core/notifications/helpers/Notification";
 import { NanoIdShortLinkIdGeneratorGateway } from "../domains/core/short-link/adapters/short-link-generator-gateway/NanoIdShortLinkIdGeneratorGateway";
 import { RealTimeGateway } from "../domains/core/time-gateway/adapters/RealTimeGateway";
@@ -56,8 +57,9 @@ const sendAssessmentNeededNotificationsScript = async () => {
 
   const pgPool = getPgPool();
   const kyselyDb = makeKyselyDb(pgPool);
-  const conventionQueries = new PgConventionQueries(kyselyDb);
+  const conventionRepository = new PgConventionRepository(kyselyDb);
   const assessmentRepository = new PgAssessmentRepository(kyselyDb);
+  const notificationRepository = new PgNotificationRepository(kyselyDb);
 
   const generateConventionJwt = makeGenerateJwtES256<"convention">(
     config.jwtPrivateKey,
@@ -73,7 +75,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
   const sendAssessmentNeededNotifications =
     new SendAssessmentNeededNotifications(
       uowPerformer,
-      { conventionQueries, assessmentRepository },
+      { conventionRepository, assessmentRepository, notificationRepository },
       saveNotificationAndRelatedEvent,
       timeGateway,
       makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),

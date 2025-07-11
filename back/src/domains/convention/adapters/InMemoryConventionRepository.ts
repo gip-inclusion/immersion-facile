@@ -5,6 +5,7 @@ import {
   type ConventionDto,
   type ConventionId,
   type ConventionReadDto,
+  type DateRange,
   type Email,
   errors,
   validatedConventionStatuses,
@@ -20,6 +21,21 @@ export class InMemoryConventionRepository implements ConventionRepository {
 
   public async deprecateConventionsWithoutDefinitiveStatusEndedSince(): Promise<number> {
     throw errors.generic.fakeError("not implemented");
+  }
+
+  public async getValidatedEndedOrUpdatedAround(
+    finishingRange: DateRange,
+  ): Promise<ConventionDto[]> {
+    return Promise.all(
+      this.conventions.filter(
+        (convention) =>
+          new Date(convention.dateEnd).getDate() >=
+            finishingRange.from.getDate() &&
+          new Date(convention.dateEnd).getDate() <=
+            finishingRange.to.getDate() &&
+          validatedConventionStatuses.includes(convention.status),
+      ),
+    );
   }
 
   public async getIdsValidatedByEndDateAround(

@@ -11,7 +11,6 @@ import {
   conventionSchema,
   type DataWithPagination,
   type DateFilter,
-  type DateRange,
   errors,
   type FindSimilarConventionsParams,
   type GetPaginatedConventionsFilters,
@@ -21,14 +20,12 @@ import {
   pipeWithValue,
   type SiretDto,
   type UserId,
-  validatedConventionStatuses,
 } from "shared";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
-  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -82,69 +79,6 @@ export class PgConventionQueries implements ConventionQueries {
       .execute();
 
     return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto).id);
-  }
-
-  public async getAllConventionsForThoseEndingThatDidntGoThrough(
-    finishingRange: DateRange,
-    assessmentEmailKind: AssessmentEmailKind,
-  ): Promise<ConventionDto[]> {
-    const pgResults = await createConventionQueryBuilder(this.transaction)
-      .where("conventions.status", "in", validatedConventionStatuses)
-      .where((eb) =>
-        eb.or([
-          eb.between(
-            sql`conventions.date_end`,
-            finishingRange.from.toISOString().split("T")[0],
-            finishingRange.to.toISOString().split("T")[0],
-          ),
-          eb.and([
-            eb.between(
-              sql`conventions.updated_at`,
-              finishingRange.from.toISOString().split("T")[0],
-              finishingRange.to.toISOString().split("T")[0],
-            ),
-            eb(
-              sql`conventions.date_end`,
-              "<=",
-              finishingRange.to.toISOString().split("T")[0],
-            ),
-          ]),
-        ]),
-      )
-      .where(({ selectFrom, not, exists }) =>
-        not(
-          exists(
-            selectFrom("notifications_email")
-              .select("notifications_email.convention_id")
-              .where("notifications_email.email_kind", "=", assessmentEmailKind)
-              .whereRef(
-                "conventions.id",
-                "=",
-                "notifications_email.convention_id",
-              ),
-          ),
-        ),
-      )
-      .where((eb) =>
-        eb.exists(
-          eb
-            .selectFrom("notifications_email")
-            .select("notifications_email.convention_id")
-            .where(
-              "notifications_email.email_kind",
-              "=",
-              "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-            )
-            .whereRef(
-              "conventions.id",
-              "=",
-              "notifications_email.convention_id",
-            ),
-        ),
-      )
-      .execute();
-
-    return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto));
   }
 
   public async getConventionById(
