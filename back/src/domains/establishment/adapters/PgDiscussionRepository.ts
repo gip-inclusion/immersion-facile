@@ -362,23 +362,6 @@ export class PgDiscussionRepository implements DiscussionRepository {
 
     return obsoleteDiscussions.map((d) => d.id);
   }
-
-  public async markObsoleteDiscussionsAsDeprecated(params: {
-    discussionIds: DiscussionId[];
-  }): Promise<void> {
-    const { discussionIds } = params;
-
-    await this.transaction
-      .updateTable("discussions")
-      .set({
-        status: "REJECTED",
-        rejection_kind: "DEPRECATED",
-        rejection_reason: null,
-        candidate_warned_method: null,
-      })
-      .where("id", "in", discussionIds)
-      .execute();
-  }
 }
 
 const discussionToPg = (
@@ -440,55 +423,43 @@ const discussionToPg = (
 const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
 ): WithDiscussionStatus => {
-  if (discussion.status === "PENDING") {
-    return {
-      status: discussion.status,
-    };
-  }
+  const { status } = discussion;
 
-  if (discussion.status === "REJECTED") {
-    if (!discussion.rejectionKind) {
+  if (status === "PENDING") return { status };
+
+  if (status === "REJECTED") {
+    const { rejectionKind } = discussion;
+    if (!rejectionKind) {
       throw new Error(
         `Missing rejectionKind for rejected discussion ${discussion.id}`,
       );
     }
 
-    if (discussion.rejectionKind === "CANDIDATE_ALREADY_WARNED") {
-      if (!discussion.candidateWarnedMethod) {
+    if (rejectionKind === "CANDIDATE_ALREADY_WARNED") {
+      const { candidateWarnedMethod } = discussion;
+      if (!candidateWarnedMethod) {
         throw new Error(
           `Missing candidateWarnedMethod for CANDIDATE_ALREADY_WARNED rejection in discussion ${discussion.id}`,
         );
       }
-      return {
-        status: discussion.status,
-        rejectionKind: discussion.rejectionKind,
-        candidateWarnedMethod: discussion.candidateWarnedMethod,
-      };
+      return { status, rejectionKind, candidateWarnedMethod };
     }
 
-    if (discussion.rejectionKind === "OTHER") {
-      if (!discussion.rejectionReason) {
+    if (rejectionKind === "OTHER") {
+      const { rejectionReason } = discussion;
+      if (!rejectionReason) {
         throw new Error(
           `Missing rejectionReason for OTHER rejection in discussion ${discussion.id}`,
         );
       }
-      return {
-        status: discussion.status,
-        rejectionKind: discussion.rejectionKind,
-        rejectionReason: discussion.rejectionReason,
-      };
+      return { status, rejectionKind, rejectionReason };
     }
 
-    // For other rejection kinds (UNABLE_TO_HELP, NO_TIME, DEPRECATED)
-    return {
-      status: discussion.status,
-      rejectionKind: discussion.rejectionKind,
-    };
+    return { status, rejectionKind };
   }
 
-  // ACCEPTED status
   return {
-    status: discussion.status,
+    status,
     candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
   };
 };

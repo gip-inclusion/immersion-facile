@@ -17,6 +17,7 @@ import type {
 import type {
   DiscussionId,
   DiscussionKind,
+  DiscussionStatus,
   RejectionKind,
 } from "../discussion/discussion.dto";
 import type { EmailParamsByEmailType } from "../email/EmailParamsByEmailType";
@@ -885,6 +886,16 @@ export const errors = {
       ),
     unsupportedRejectionKind: (rejectionKind: RejectionKind) =>
       new BadRequestError(`La raison ${rejectionKind} n'est pas supportée.`),
+    badStatus: ({
+      discussionId,
+      status,
+    }: {
+      discussionId: DiscussionId;
+      status: DiscussionStatus;
+    }) =>
+      new BadRequestError(
+        `La discussion '${discussionId}' n'a pas le statut '${status}'.`,
+      ),
   },
   establishmentGroup: {
     missingBySlug: ({ groupSlug }: { groupSlug: GroupSlug }) =>
