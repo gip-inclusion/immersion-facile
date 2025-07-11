@@ -684,4 +684,20 @@ export const defaultEmailValueByEmailKind: {
     role: "establishment-admin",
     immersionBaseUrl: "http://some-base-url.com",
   },
+  DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    ctaUrl: "http://example.com",
+    discussionCreatedAt: "2023-06-23T10:00:00.000Z",
+    establishmentContactFirstName: "ESTABLISHMENT_CONTACT_FIRST_NAME",
+    establishmentContactLastName: "ESTABLISHMENT_CONTACT_LAST_NAME",
+  },
+  DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
+    beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
+    beneficiaryLastName: "BENEFICIARY_LAST_NAME",
+    businessName: "BUSINESS_NAME",
+    ctaUrl: "http://example.com",
+    discussionCreatedAt: "2023-06-23T10:00:00.000Z",
+  },
 };

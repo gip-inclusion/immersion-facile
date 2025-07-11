@@ -131,11 +131,18 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
     );
   }
 
-  public async markObsoleteDiscussionsAsDeprecated(params: {
+  public async getObsoleteDiscussions(params: {
     now: Date;
-  }): Promise<DiscussionDto[]> {
-    return Object.values(this._discussions).filter((discussion) => {
-      return isBefore(new Date(discussion.createdAt), subMonths(params.now, 3));
-    });
+  }): Promise<DiscussionId[]> {
+    return Object.values(this._discussions)
+      .filter((discussion) => {
+        return isBefore(
+          new Date(discussion.createdAt),
+          subMonths(params.now, 3),
+        );
+      })
+      .filter((discussion) => discussion.status === "PENDING")
+      .filter((discussion) => discussion.exchanges.length === 1)
+      .map((discussion) => discussion.id);
   }
 }

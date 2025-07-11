@@ -124,6 +124,7 @@ import { DeleteEstablishment } from "../../domains/establishment/use-cases/Delet
 import { AddExchangeToDiscussion } from "../../domains/establishment/use-cases/discussions/AddExchangeToDiscussion";
 import { GetDiscussionByIdForEstablishment } from "../../domains/establishment/use-cases/discussions/GetDiscussionByIdForEstablishment";
 import { makeGetDiscussionsForUser } from "../../domains/establishment/use-cases/discussions/GetDiscussionsForUser";
+import { makeMarkDiscussionDeprecatedAndNotify } from "../../domains/establishment/use-cases/discussions/MarkDiscussionDeprecatedAndNotify";
 import { makeMarkDiscussionLinkedToConvention } from "../../domains/establishment/use-cases/discussions/MarkDiscussionLinkedToConvention";
 import { SendExchangeToRecipient } from "../../domains/establishment/use-cases/discussions/SendExchangeToRecipient";
 import { makeUpdateDiscussionStatus } from "../../domains/establishment/use-cases/discussions/UpdateDiscussionStatus";
@@ -845,6 +846,13 @@ export const createUseCases = ({
     }),
     getDiscussions: makeGetDiscussionsForUser({
       uowPerformer,
+    }),
+    markDiscussionDeprecatedAndNotify: makeMarkDiscussionDeprecatedAndNotify({
+      uowPerformer,
+      deps: {
+        saveNotificationsBatchAndRelatedEvent,
+        config,
+      },
     }),
   } satisfies Record<string, InstantiatedUseCase<any, any, any>>;
 };
