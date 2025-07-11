@@ -554,6 +554,19 @@ export class DiscussionBuilder implements Builder<DiscussionDto> {
           };
         },
       )
+      .with(
+        {
+          status: "REJECTED",
+          rejectionKind: "DEPRECATED",
+        },
+        ({ status, rejectionKind }) => {
+          updatedDiscussion = {
+            ...updatedDiscussion,
+            status,
+            rejectionKind,
+          };
+        },
+      )
       .exhaustive();
 
     return new DiscussionBuilder(updatedDiscussion);

@@ -199,7 +199,7 @@ export type WithDiscussionRejection =
   | RejectionCandidateAlreadyWarned;
 
 type RejectionWithoutReason = {
-  rejectionKind: "UNABLE_TO_HELP" | "NO_TIME";
+  rejectionKind: "UNABLE_TO_HELP" | "NO_TIME" | "DEPRECATED";
 };
 
 type RejectionWithReason = {
