@@ -42,7 +42,7 @@ import {
 } from "./discussion.dto";
 
 export const discussionIdSchema: z.Schema<DiscussionId> = z.string().uuid();
-export const withDiscussionSchemaId: z.Schema<WithDiscussionId> = z.object({
+export const withDiscussionIdSchema: z.Schema<WithDiscussionId> = z.object({
   discussionId: discussionIdSchema,
 });
 

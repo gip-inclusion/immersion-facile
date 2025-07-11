@@ -5,7 +5,7 @@ import {
   errors,
   immersionFacileNoReplyEmailSender,
   type WithDiscussionId,
-  withDiscussionSchemaId,
+  withDiscussionIdSchema,
 } from "shared";
 import { z } from "zod";
 import {
@@ -24,7 +24,7 @@ type SendExchangeToRecipientParams = WithDiscussionId &
   };
 
 export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeToRecipientParams> {
-  protected inputSchema = withDiscussionSchemaId.and(
+  protected inputSchema = withDiscussionIdSchema.and(
     z.object({
       triggeredBy: triggeredBySchema.optional(),
       skipSendingEmail: z.boolean().optional(),

@@ -1,9 +1,6 @@
 import { subMonths } from "date-fns";
 import { DiscussionBuilder, expectToEqual } from "shared";
-import {
-  type ExpectSavedNotificationsAndEvents,
-  makeExpectSavedNotificationsAndEvents,
-} from "../../../../utils/makeExpectSavedNotificationAndEvent.helpers";
+import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import { CustomTimeGateway } from "../../../core/time-gateway/adapters/CustomTimeGateway";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
@@ -14,26 +11,25 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
-  type MarkObsoleteDiscussionsAsDeprecatedAndNotify,
-  makeMarkObsoleteDiscussionsAsDeprecatedAndNotify,
-} from "./MarkObsoleteDiscussionsAsDeprecatedAndNotify";
+  type GetObsoleteDiscussionsAndEmitDeprecatedEvents,
+  makeGetObsoleteDiscussionsAndEmitDeprecatedEvent,
+} from "./GetObsoleteDiscussionsAndEmitDeprecatedEvents";
 
-describe("MarkObsoleteDiscussionsAsDeprecatedAndNotify", () => {
+describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
   let timeGateway: TimeGateway;
   let uow: InMemoryUnitOfWork;
-  let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
-  let markObsoleteDiscussionsAsDeprecatedAndNotify: MarkObsoleteDiscussionsAsDeprecatedAndNotify;
+  let getObsoleteDiscussionsAndEmitDeprecatedEvents: GetObsoleteDiscussionsAndEmitDeprecatedEvents;
   let uuidGenerator: TestUuidGenerator;
   beforeEach(() => {
     timeGateway = new CustomTimeGateway();
     uow = createInMemoryUow();
     uuidGenerator = new TestUuidGenerator();
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
-    markObsoleteDiscussionsAsDeprecatedAndNotify =
-      makeMarkObsoleteDiscussionsAsDeprecatedAndNotify({
+    const createNewEvent = makeCreateNewEvent({
+      timeGateway,
+      uuidGenerator,
+    });
+    getObsoleteDiscussionsAndEmitDeprecatedEvents =
+      makeGetObsoleteDiscussionsAndEmitDeprecatedEvent({
         uowPerformer: new InMemoryUowPerformer(uow),
         deps: {
           timeGateway,
@@ -41,10 +37,12 @@ describe("MarkObsoleteDiscussionsAsDeprecatedAndNotify", () => {
             uuidGenerator,
             timeGateway,
           ),
+          createNewEvent,
         },
       });
   });
-  it("should mark obsolete discussions as deprecated and emits notifications", async () => {
+
+  it("should get obsolete discussions and emit deprecated events", async () => {
     const now = timeGateway.now();
     const discussionFrom2YearsAgoWithoutExchangesResponse =
       new DiscussionBuilder()
@@ -148,16 +146,105 @@ describe("MarkObsoleteDiscussionsAsDeprecatedAndNotify", () => {
       discussionFrom2MonthsAgo,
     ];
 
-    await markObsoleteDiscussionsAsDeprecatedAndNotify.execute();
+    const expectedEventIds = ["event-id-1", "event-id-2"];
+    uuidGenerator.setNextUuids(expectedEventIds);
 
-    expectSavedNotificationsAndEvents({
-      emails: [],
-    });
+    const expectedObsoleteDiscussionIds = [
+      discussionFrom2YearsAgoWithoutExchangesResponse.id,
+      discussionFrom6MonthsAgoWithoutExchangesResponse.id,
+    ];
 
-    expectToEqual(uow.discussionRepository.discussions, [
-      discussionFrom2YearsAgoWithoutExchangesResponse,
+    const { numberOfObsoleteDiscussions } =
+      await getObsoleteDiscussionsAndEmitDeprecatedEvents.execute();
+
+    expectToEqual(
+      numberOfObsoleteDiscussions,
+      expectedObsoleteDiscussionIds.length,
+    );
+
+    expectToEqual(
+      uow.outboxRepository.events,
+      expectedObsoleteDiscussionIds.map((discussionId, index) => ({
+        topic: "DiscussionMarkedAsDeprecated" as const,
+        payload: {
+          discussionId,
+          triggeredBy: {
+            kind: "crawler" as const,
+          },
+        },
+        id: expectedEventIds[index],
+        occurredAt: expect.any(String),
+        publications: [],
+        wasQuarantined: false,
+        status: "never-published" as const,
+      })),
+    );
+  });
+
+  it("should not emit events if there are no obsolete discussions", async () => {
+    const now = timeGateway.now();
+
+    const discussionFrom1YearAgoWithExchangesResponse = new DiscussionBuilder()
+      .withSiret("11112222333344")
+      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120004")
+      .withCreatedAt(subMonths(now, 12))
+      .withExchanges([
+        {
+          subject: "Mise en relation initiale",
+          message:
+            "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+          recipient: "potentialBeneficiary",
+          sentAt: subMonths(now, 12).toISOString(),
+          sender: "establishment",
+          attachments: [],
+        },
+        {
+          subject: "Réponse de l'entreprise",
+          message: "Super, je vais vous envoyer un mail avec les informations",
+          recipient: "potentialBeneficiary",
+          sentAt: subMonths(now, 12).toISOString(),
+          sender: "establishment",
+          attachments: [],
+        },
+      ])
+      .build();
+
+    const discussionFrom4MonthsAgoWithExchangesResponse =
+      new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120006")
+        .withCreatedAt(subMonths(now, 4))
+        .withExchanges([
+          {
+            subject: "Mise en relation initiale",
+            message:
+              "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+            recipient: "establishment",
+            sentAt: subMonths(now, 4).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+          {
+            subject: "Réponse de l'entreprise",
+            message:
+              "Super, je vais vous envoyer un mail avec les informations",
+            recipient: "potentialBeneficiary",
+            sentAt: subMonths(now, 4).toISOString(),
+            sender: "establishment",
+            attachments: [],
+          },
+        ])
+        .build();
+
+    uow.discussionRepository.discussions = [
       discussionFrom1YearAgoWithExchangesResponse,
-      discussionFrom6MonthsAgoWithoutExchangesResponse,
-    ]);
+      discussionFrom4MonthsAgoWithExchangesResponse,
+    ];
+
+    const { numberOfObsoleteDiscussions } =
+      await getObsoleteDiscussionsAndEmitDeprecatedEvents.execute();
+
+    expectToEqual(numberOfObsoleteDiscussions, 0);
+    expectToEqual(uow.outboxRepository.events, []);
   });
 });

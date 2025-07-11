@@ -1919,7 +1919,7 @@ Profil du candidat :
         beneficiaryFirstName,
         beneficiaryLastName,
         discussionCreatedAt,
-        dashboardUrl,
+        ctaUrl,
         establishmentContactFirstName,
         establishmentContactLastName,
         businessName,
@@ -1937,7 +1937,7 @@ Profil du candidat :
         buttons: [
           {
             label: "Accéder à votre tableau de bord",
-            url: dashboardUrl,
+            url: ctaUrl,
           },
         ],
         subContent: `

@@ -344,138 +344,29 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .execute();
   }
 
-  public async markObsoleteDiscussionsAsDeprecated(params: {
+  public async getObsoleteDiscussions(params: {
     now: Date;
-  }): Promise<DiscussionDto[]> {
+  }): Promise<DiscussionId[]> {
     const threeMonthsAgo = subMonths(params.now, 3);
 
     const obsoleteDiscussions = await this.transaction
       .selectFrom("discussions")
+      .select("discussions.id")
       .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
-      .select(({ ref, fn }) =>
-        jsonStripNulls(
-          jsonBuildObject({
-            id: ref("discussions.id"),
-            createdAt: ref("discussions.created_at"),
-            siret: ref("discussions.siret"),
-            businessName: ref("discussions.business_name"),
-            appellationCode: sql<string>`CAST(${ref(
-              "appellation_code",
-            )} AS text)`,
-            immersionObjective: ref("discussions.immersion_objective"),
-            contactMode: sql<ContactMode>`${ref("discussions.contact_method")}`,
-            potentialBeneficiary: jsonBuildObject({
-              firstName: ref("discussions.potential_beneficiary_first_name"),
-              lastName: ref("discussions.potential_beneficiary_last_name"),
-              email: ref("discussions.potential_beneficiary_email"),
-              phone: ref("discussions.potential_beneficiary_phone"),
-              resumeLink: ref("discussions.potential_beneficiary_resume_link"),
-              hasWorkingExperience: ref(
-                "potential_beneficiary_has_working_experience",
-              ),
-              experienceAdditionalInformation: ref(
-                "potential_beneficiary_experience_additional_information",
-              ),
-              datePreferences: ref(
-                "discussions.potential_beneficiary_date_preferences",
-              ),
-              levelOfEducation: ref(
-                "discussions.potential_beneficiary_level_of_education",
-              ),
-            }),
-            establishmentContact: jsonBuildObject({
-              firstName: ref("discussions.establishment_contact_first_name"),
-              lastName: ref("discussions.establishment_contact_last_name"),
-              email: ref("discussions.establishment_contact_email"),
-              phone: ref("discussions.establishment_contact_phone"),
-              job: ref("discussions.establishment_contact_job"),
-              copyEmails: sql<string[]>`${ref(
-                "establishment_contact_copy_emails",
-              )}`,
-            }),
-            address: jsonBuildObject({
-              streetNumberAndAddress: ref(
-                "discussions.street_number_and_address",
-              ),
-              postcode: ref("discussions.postcode"),
-              departmentCode: ref("discussions.department_code"),
-              city: ref("discussions.city"),
-            }),
-            exchanges: fn
-              .jsonAgg(
-                sql`
-                    JSON_BUILD_OBJECT(
-                      'subject', exchanges.subject,
-                      'message', exchanges.message,
-                      'recipient', exchanges.recipient,
-                      'sender', exchanges.sender,
-                      'sentAt', exchanges.sent_at,
-                      'attachments', exchanges.attachments
-                    )
-                    ORDER BY exchanges.sent_at
-                  `.$castTo<Exchange>(),
-              )
-              .filterWhere("exchanges.id", "is not", null)
-              // TODO: le cast ne change pas le typage - trouver un moyen d'avoir l'optional[] dans le typage kysely naturel
-              .$castTo<Exchange[] | undefined>(),
-            conventionId: ref("discussions.convention_id"),
-            status: sql<DiscussionStatus>`${ref("discussions.status")}`,
-            rejectionKind: sql<RejectionKind | null>`${ref("discussions.rejection_kind")}`,
-            rejectionReason: ref("discussions.rejection_reason"),
-            acquisition_campaign: ref("discussions.acquisition_campaign"),
-            acquisition_keyword: ref("discussions.acquisition_keyword"),
-            candidateWarnedMethod: ref("discussions.candidate_warned_method"),
-            kind: ref("discussions.kind"),
-          }),
-        ).as("discussion"),
-      )
-      .where("discussions.created_at", "<=", threeMonthsAgo)
-      .groupBy([
-        "discussions.id",
-        "discussions.created_at",
-        "discussions.siret",
-        "discussions.business_name",
-        "discussions.appellation_code",
-        "discussions.immersion_objective",
-        "discussions.contact_method",
-        "discussions.potential_beneficiary_first_name",
-        "discussions.potential_beneficiary_last_name",
-        "discussions.potential_beneficiary_phone",
-        "discussions.potential_beneficiary_resume_link",
-        "discussions.potential_beneficiary_has_working_experience",
-        "discussions.potential_beneficiary_experience_additional_information",
-        "discussions.potential_beneficiary_date_preferences",
-        "discussions.potential_beneficiary_level_of_education",
-        "discussions.establishment_contact_first_name",
-        "discussions.establishment_contact_last_name",
-        "discussions.establishment_contact_email",
-        "discussions.establishment_contact_phone",
-        "discussions.establishment_contact_job",
-        "discussions.establishment_contact_copy_emails",
-        "discussions.street_number_and_address",
-        "discussions.postcode",
-        "discussions.department_code",
-        "discussions.city",
-        "discussions.convention_id",
-        "discussions.status",
-        "discussions.rejection_kind",
-        "discussions.rejection_reason",
-        "discussions.acquisition_campaign",
-        "discussions.acquisition_keyword",
-        "discussions.candidate_warned_method",
-        "discussions.kind",
-      ])
+      .where("created_at", "<=", threeMonthsAgo)
+      .where("status", "=", "PENDING")
       .having((eb) => eb.fn.count("exchanges.id"), "=", 1)
-      .orderBy("discussions.created_at", "desc")
+      .orderBy("created_at", "asc")
+      .groupBy(["discussions.id", "discussions.created_at"])
       .execute();
 
-    if (obsoleteDiscussions.length === 0) {
-      return [];
-    }
+    return obsoleteDiscussions.map((d) => d.id);
+  }
 
-    const obsoleteDiscussionIds = obsoleteDiscussions
-      .map((d) => d.discussion.id)
-      .filter((id): id is string => id !== null);
+  public async markObsoleteDiscussionsAsDeprecated(params: {
+    discussionIds: DiscussionId[];
+  }): Promise<void> {
+    const { discussionIds } = params;
 
     await this.transaction
       .updateTable("discussions")
@@ -485,16 +376,8 @@ export class PgDiscussionRepository implements DiscussionRepository {
         rejection_reason: null,
         candidate_warned_method: null,
       })
-      .where("id", "in", obsoleteDiscussionIds)
+      .where("id", "in", discussionIds)
       .execute();
-
-    return makeDiscussionDtoFromPgDiscussion(
-      obsoleteDiscussions.map((obsoleteDiscussion) => ({
-        ...obsoleteDiscussion,
-        status: "REJECTED",
-        rejectionKind: "DEPRECATED",
-      })),
-    );
   }
 }
 
