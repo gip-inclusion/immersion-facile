@@ -72,6 +72,23 @@ export class PgOutboxRepository implements OutboxRepository {
       .execute();
   }
 
+  public async saveNewEventsBatch(events: DomainEvent[]): Promise<void> {
+    await this.transaction
+      .insertInto("outbox")
+      .values(
+        events.map((event) => ({
+          id: event.id,
+          occurred_at: event.occurredAt,
+          was_quarantined: event.wasQuarantined,
+          topic: event.topic,
+          payload: JSON.stringify(event.payload),
+          status: event.status,
+          priority: event.priority,
+        })),
+      )
+      .execute();
+  }
+
   public async save(event: DomainEvent): Promise<void> {
     const eventInDb =
       await this.#storeEventInOutboxOrRecoverItIfAlreadyThere(event);
