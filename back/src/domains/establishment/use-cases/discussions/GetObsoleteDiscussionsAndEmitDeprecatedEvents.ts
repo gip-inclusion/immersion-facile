@@ -41,9 +41,7 @@ export const makeGetObsoleteDiscussionsAndEmitDeprecatedEvent =
         }),
       );
 
-      await Promise.all(
-        events.map((event) => uow.outboxRepository.save(event)),
-      );
+      await uow.outboxRepository.saveNewEventsBatch(events);
 
       return {
         numberOfObsoleteDiscussions: events.length,
