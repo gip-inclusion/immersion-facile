@@ -15,7 +15,7 @@ import type {
 export type EmailNotificationFilters = {
   email?: Email;
   emailType?: EmailType;
-  conventionId?: ConventionId;
+  conventionIds?: ConventionId[];
   createdAt?: Date;
 };
 

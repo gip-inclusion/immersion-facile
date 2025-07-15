@@ -66,7 +66,6 @@ const sendAssessmentNeededNotificationsScript = async () => {
     3600 * 24 * 30,
   );
   const uuidGenerator = new UuidV4Generator();
-
   const saveNotificationAndRelatedEvent = makeSaveNotificationAndRelatedEvent(
     uuidGenerator,
     timeGateway,
