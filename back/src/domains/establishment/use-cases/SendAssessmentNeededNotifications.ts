@@ -1,4 +1,4 @@
-import { map } from "ramda";
+import { map, uniq } from "ramda";
 import {
   type AgencyRole,
   type AgencyWithUsersRights,
@@ -182,43 +182,45 @@ export class SendAssessmentNeededNotifications extends UseCase<
     conventions: ConventionDto[],
   ): Promise<ConventionDto[]> {
     const startDate = new Date();
-    const conventionsWithValidationEmails = (
-      await Promise.all(
-        conventions.map(async (convention) => {
-          const emails =
-            await this.#outOfTrx.notificationRepository.getEmailsByFilters({
-              conventionId: convention.id,
-              emailType: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
-            });
-          return emails.length > 0 ? convention : null;
-        }),
-      )
-    ).filter((dto): dto is ConventionDto => dto !== null);
+    const validatedConventionEmails =
+      await this.#outOfTrx.notificationRepository.getEmailsByFilters({
+        conventionIds: conventions.map(({ id }) => id),
+        emailType: "VALIDATED_CONVENTION_FINAL_CONFIRMATION",
+      });
+    const conventionIdsWithValidationEmail = uniq(
+      validatedConventionEmails
+        .map((email) => email.followedIds.conventionId)
+        .filter((id): id is ConventionId => id !== null),
+    );
+    const conventionsWithValidationEmail = conventions.filter(({ id }) =>
+      conventionIdsWithValidationEmail.includes(id),
+    );
     logger.info({
       useCaseName: "SendAssessmentNeededNotifications",
       durationInSeconds: calculateDurationInSecondsFrom(startDate),
       message: "after filterConventionsWithValidationEmails",
     });
 
-    return conventionsWithValidationEmails;
+    return conventionsWithValidationEmail;
   }
 
   async #filterConventionWithoutEstablishmentAssessmentRequests(
     conventions: ConventionDto[],
   ): Promise<ConventionDto[]> {
     const startDate = new Date();
-    const conventionsWithoutAssessmentRequest = (
-      await Promise.all(
-        conventions.map(async (convention) => {
-          const emails =
-            await this.#outOfTrx.notificationRepository.getEmailsByFilters({
-              conventionId: convention.id,
-              emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-            });
-          return emails.length === 0 ? convention : null;
-        }),
-      )
-    ).filter((dto): dto is ConventionDto => dto !== null);
+    const establishmentAssessmentNotifications =
+      await this.#outOfTrx.notificationRepository.getEmailsByFilters({
+        conventionIds: conventions.map(({ id }) => id),
+        emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+      });
+    const conventionIdsWithAssessmentNotifications = uniq(
+      establishmentAssessmentNotifications
+        .map((email) => email.followedIds.conventionId)
+        .filter((id): id is ConventionId => id !== null),
+    );
+    const conventionsWithoutAssessmentRequest = conventions.filter(
+      ({ id }) => !conventionIdsWithAssessmentNotifications.includes(id),
+    );
     logger.info({
       useCaseName: "SendAssessmentNeededNotifications",
       durationInSeconds: calculateDurationInSecondsFrom(startDate),
@@ -264,7 +266,7 @@ export class SendAssessmentNeededNotifications extends UseCase<
     const emails = await uow.notificationRepository.getEmailsByFilters({
       email: convention.signatories.beneficiary.email,
       emailType: "ASSESSMENT_BENEFICIARY_NOTIFICATION",
-      conventionId: convention.id,
+      conventionIds: [convention.id],
     });
     const emailAlreadySent = emails.length > 0;
 

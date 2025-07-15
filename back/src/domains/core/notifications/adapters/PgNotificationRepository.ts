@@ -125,8 +125,8 @@ export class PgNotificationRepository implements NotificationRepository {
           : qb,
       (qb) => (filters.email ? qb.where("r.email", "=", filters?.email) : qb),
       (qb) =>
-        filters.conventionId
-          ? qb.where("e.convention_id", "=", filters?.conventionId)
+        filters.conventionIds
+          ? qb.where("e.convention_id", "in", filters.conventionIds)
           : qb,
     )
       .orderBy("e.created_at", "desc")
