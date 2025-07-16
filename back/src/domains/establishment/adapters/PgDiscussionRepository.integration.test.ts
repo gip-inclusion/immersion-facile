@@ -1662,9 +1662,10 @@ describe("PgDiscussionRepository", () => {
 
     describe("getObsoleteDiscussions", () => {
       it("returns the discussions that are obsolete, oldest first", async () => {
+        const threeMonthsAgo = subMonths(now, 3);
         const obsoleteDiscussions =
           await pgDiscussionRepository.getObsoleteDiscussions({
-            now,
+            olderThan: threeMonthsAgo,
           });
 
         expectToEqual(obsoleteDiscussions, [
