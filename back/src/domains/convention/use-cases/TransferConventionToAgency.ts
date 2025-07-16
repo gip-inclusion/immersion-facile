@@ -14,26 +14,25 @@ import {
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type TransferConventionToAgency = ReturnType<
   typeof makeTransferConventionToAgency
 >;
 
-export const makeTransferConventionToAgency = createTransactionalUseCase<
-  TransferConventionToAgencyRequestDto,
-  void,
-  ConventionRelatedJwtPayload,
-  {
+export const makeTransferConventionToAgency = useCaseBuilder(
+  "TransferConventionToAgency",
+)
+  .withInput<TransferConventionToAgencyRequestDto>(
+    transferConventionToAgencyRequestSchema,
+  )
+  .withOutput<void>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
+  .withDeps<{
     createNewEvent: CreateNewEvent;
-  }
->(
-  {
-    name: "TransferConventionToAgency",
-    inputSchema: transferConventionToAgencyRequestSchema,
-  },
-  async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+  }>()
+  .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
       requestedConventionId: inputParams.conventionId,
       jwtPayload,
@@ -106,5 +105,4 @@ export const makeTransferConventionToAgency = createTransactionalUseCase<
         }),
       ),
     ]);
-  },
-);
+  });

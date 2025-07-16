@@ -1,14 +1,11 @@
 import * as Sentry from "@sentry/node";
-import {
-  calculateDurationInSecondsFrom,
-  castError,
-  type SearchQueryParamsDto,
-} from "shared";
+import { calculateDurationInSecondsFrom, castError } from "shared";
 import { z } from "zod";
 import { validateAndParseZodSchemaV2 } from "../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../utils/logger";
 import type { UnitOfWork } from "./unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "./unit-of-work/ports/UnitOfWorkPerformer";
+import { extractValue, getSearchParams } from "./useCase.helpers";
 
 const logger = createLogger(__filename);
 
@@ -25,7 +22,7 @@ type UseCaseBuilder<Output, Input, Deps, CurrentUser> = {
       currentUser: CurrentUser;
       deps: Deps;
       uow: UnitOfWork;
-    }) => Output,
+    }) => Promise<Output>,
   >(
     cb: Cb,
   ) => (
@@ -35,10 +32,7 @@ type UseCaseBuilder<Output, Input, Deps, CurrentUser> = {
     } & (Deps extends void ? {} : { deps: Deps }),
   ) => {
     useCaseName: string;
-    execute: (
-      params: Input,
-      currentUser: CurrentUser,
-    ) => Promise<ReturnType<Cb>>;
+    execute: (params: Input, currentUser: CurrentUser) => ReturnType<Cb>;
   };
 };
 
@@ -63,13 +57,15 @@ export const useCaseBuilder = <
     useCaseBuilder<Output, Input, Deps, CU>(useCaseName, options),
   build: (cb) => (config) => ({
     useCaseName,
-    execute: async (inputParams, currentUser): Promise<any> => {
+    execute: (async (inputParams: Input, currentUser: CurrentUser) => {
       const startDate = new Date();
       const validParams = validateAndParseZodSchemaV2({
         useCaseName,
         inputSchema: options.inputSchema,
         schemaParsingInput: inputParams,
         logger,
+        id:
+          extractValue("id", inputParams) ?? extractValue("siret", inputParams),
       });
       const searchParams = getSearchParams(useCaseName, validParams);
 
@@ -101,13 +97,6 @@ export const useCaseBuilder = <
           });
           throw error;
         });
-    },
+    }) as any,
   }),
 });
-
-const getSearchParams = (
-  useCaseName: string,
-  params: unknown,
-): SearchQueryParamsDto | undefined => {
-  if (useCaseName === "SearchImmersion") return params as SearchQueryParamsDto;
-};

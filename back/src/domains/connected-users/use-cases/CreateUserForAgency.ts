@@ -11,27 +11,22 @@ import { emptyName } from "../../core/authentication/connected-user/entities/use
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
-export const makeCreateUserForAgency = createTransactionalUseCase<
-  UserParamsForAgency,
-  ConnectedUser,
-  ConnectedUser,
-  {
+export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
+  .withInput<UserParamsForAgency>(userParamsForAgencySchema)
+  .withOutput<ConnectedUser>()
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{
     timeGateway: TimeGateway;
     createNewEvent: CreateNewEvent;
     dashboardGateway: DashboardGateway;
-  }
->(
-  {
-    name: "CreateUserForAgency",
-    inputSchema: userParamsForAgencySchema,
-  },
-  async ({ inputParams, uow, currentUser, deps }) => {
+  }>()
+  .build(async ({ inputParams, uow, currentUser, deps }) => {
     throwIfNotAgencyAdminOrBackofficeAdmin(inputParams.agencyId, currentUser);
 
     const agency = await uow.agencyRepository.getById(inputParams.agencyId);
@@ -86,8 +81,7 @@ export const makeCreateUserForAgency = createTransactionalUseCase<
       agencyRights: await getAgencyRightByUserId(uow, user.id),
       dashboards: { agencies: {}, establishments: {} },
     };
-  },
-);
+  });
 
 const getUserByEmailAndCreateIfMissing = async (
   uow: UnitOfWork,

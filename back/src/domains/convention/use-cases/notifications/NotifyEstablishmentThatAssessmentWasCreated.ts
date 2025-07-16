@@ -9,26 +9,22 @@ import {
 import type { GenerateConventionMagicLinkUrl } from "../../../../config/bootstrap/magicLinkUrl";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
 export type NotifyEstablishmentThatAssessmentWasCreated = ReturnType<
   typeof makeNotifyEstablishmentThatAssessmentWasCreated
 >;
-export const makeNotifyEstablishmentThatAssessmentWasCreated =
-  createTransactionalUseCase<
-    WithAssessmentDto,
-    void,
-    void,
-    {
-      saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-      generateLink: GenerateConventionMagicLinkUrl;
-      timeGateway: TimeGateway;
-    }
-  >(
-    {
-      name: "NotifyEstablishmentThatAssessmentWasCreated",
-      inputSchema: withAssessmentSchema,
-    },
+export const makeNotifyEstablishmentThatAssessmentWasCreated = useCaseBuilder(
+  "NotifyEstablishmentThatAssessmentWasCreated",
+)
+  .withInput<WithAssessmentDto>(withAssessmentSchema)
+  .withOutput<void>()
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    generateLink: GenerateConventionMagicLinkUrl;
+    timeGateway: TimeGateway;
+  }>()
+  .build(
     async ({
       inputParams: { assessment },
       uow,

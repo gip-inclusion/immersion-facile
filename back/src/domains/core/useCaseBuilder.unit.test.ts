@@ -8,7 +8,7 @@ describe("useCaseBuilder", () => {
     const uow = createInMemoryUow();
     const makeAddTruc = useCaseBuilder("AddTruc")
       .withInput(z.object({ truc: z.string() }))
-      .withOutput<Promise<boolean>>()
+      .withOutput<boolean>()
       .withDeps<{ getBidule: () => string }>()
       .withCurrentUser<{ id: string; email: string }>()
       .build(async ({ inputParams, currentUser, uow, deps }) => {

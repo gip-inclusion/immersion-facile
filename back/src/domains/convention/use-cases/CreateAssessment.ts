@@ -10,8 +10,8 @@ import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { throwForbiddenIfNotAllowedForAssessments } from "../../../utils/assessment";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   type AssessmentEntity,
   createAssessmentEntity,
@@ -21,66 +21,65 @@ import { retrieveConventionWithAgency } from "../entities/Convention";
 type WithCreateNewEvent = { createNewEvent: CreateNewEvent };
 
 export type CreateAssessment = ReturnType<typeof makeCreateAssessment>;
-export const makeCreateAssessment = createTransactionalUseCase<
-  AssessmentDto,
-  void,
-  ConventionRelatedJwtPayload | undefined,
-  WithCreateNewEvent
->(
-  { name: "CreateAssessment", inputSchema: assessmentDtoSchema },
-  async ({
-    inputParams: assessment,
-    uow,
-    deps,
-    currentUser: conventionJwtPayload,
-  }) => {
-    if (!conventionJwtPayload)
-      throw new ForbiddenError("No magic link provided");
-
-    const { agency, convention } = await retrieveConventionWithAgency(
+export const makeCreateAssessment = useCaseBuilder("CreateAssessment")
+  .withInput<AssessmentDto>(assessmentDtoSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConventionRelatedJwtPayload | undefined>()
+  .withDeps<WithCreateNewEvent>()
+  .build(
+    async ({
+      inputParams: assessment,
       uow,
-      assessment.conventionId,
-    );
+      deps,
+      currentUser: conventionJwtPayload,
+    }) => {
+      if (!conventionJwtPayload)
+        throw new ForbiddenError("No magic link provided");
 
-    await throwForbiddenIfNotAllowedForAssessments({
-      mode: "CreateAssessment",
-      convention,
-      agency: await agencyWithRightToAgencyDto(uow, agency),
-      jwtPayload: conventionJwtPayload,
-      uow,
-    });
+      const { agency, convention } = await retrieveConventionWithAgency(
+        uow,
+        assessment.conventionId,
+      );
 
-    const assessmentEntity = await createAssessmentEntityIfNotExist(
-      uow,
-      convention,
-      assessment,
-    );
+      await throwForbiddenIfNotAllowedForAssessments({
+        mode: "CreateAssessment",
+        convention,
+        agency: await agencyWithRightToAgencyDto(uow, agency),
+        jwtPayload: conventionJwtPayload,
+        uow,
+      });
 
-    const triggeredBy: TriggeredBy =
-      "role" in conventionJwtPayload
-        ? {
-            kind: "convention-magic-link",
-            role: conventionJwtPayload.role,
-          }
-        : {
-            kind: "connected-user",
-            userId: conventionJwtPayload.userId,
-          };
-    await Promise.all([
-      uow.assessmentRepository.save(assessmentEntity),
-      uow.outboxRepository.save(
-        deps.createNewEvent({
-          topic: "AssessmentCreated",
-          payload: {
-            convention,
-            assessment: assessment,
-            triggeredBy,
-          },
-        }),
-      ),
-    ]);
-  },
-);
+      const assessmentEntity = await createAssessmentEntityIfNotExist(
+        uow,
+        convention,
+        assessment,
+      );
+
+      const triggeredBy: TriggeredBy =
+        "role" in conventionJwtPayload
+          ? {
+              kind: "convention-magic-link",
+              role: conventionJwtPayload.role,
+            }
+          : {
+              kind: "connected-user",
+              userId: conventionJwtPayload.userId,
+            };
+      await Promise.all([
+        uow.assessmentRepository.save(assessmentEntity),
+        uow.outboxRepository.save(
+          deps.createNewEvent({
+            topic: "AssessmentCreated",
+            payload: {
+              convention,
+              assessment: assessment,
+              triggeredBy,
+            },
+          }),
+        ),
+      ]);
+    },
+  );
 
 const createAssessmentEntityIfNotExist = async (
   uow: UnitOfWork,

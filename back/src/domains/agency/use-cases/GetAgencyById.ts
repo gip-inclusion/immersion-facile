@@ -7,19 +7,14 @@ import {
 } from "shared";
 import { agencyWithRightToAgencyDto } from "../../../utils/agency";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../connected-users/helpers/authorization.helper";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type GetAgencyById = ReturnType<typeof makeGetAgencyById>;
-export const makeGetAgencyById = createTransactionalUseCase<
-  AgencyId,
-  AgencyDto,
-  ConnectedUser
->(
-  {
-    name: "GetAgencyById",
-    inputSchema: agencyIdSchema,
-  },
-  async ({ uow, currentUser, inputParams }) => {
+export const makeGetAgencyById = useCaseBuilder("GetAgencyById")
+  .withInput<AgencyId>(agencyIdSchema)
+  .withOutput<AgencyDto>()
+  .withCurrentUser<ConnectedUser>()
+  .build(async ({ uow, currentUser, inputParams }) => {
     const agency = await uow.agencyRepository.getById(inputParams);
 
     if (!agency) throw errors.agency.notFound({ agencyId: inputParams });
@@ -27,5 +22,4 @@ export const makeGetAgencyById = createTransactionalUseCase<
     throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
 
     return agencyWithRightToAgencyDto(uow, agency);
-  },
-);
+  });

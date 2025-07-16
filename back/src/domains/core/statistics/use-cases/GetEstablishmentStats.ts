@@ -5,7 +5,7 @@ import {
   type PaginationQueryParams,
   paginationRequiredQueryParamsSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 
 export type EstablishmentStat = {
   siret: string;
@@ -17,18 +17,20 @@ export type EstablishmentStat = {
 export type GetEstablishmentStats = ReturnType<
   typeof makeGetEstablishmentStats
 >;
-export const makeGetEstablishmentStats = createTransactionalUseCase<
-  Required<PaginationQueryParams>,
-  DataWithPagination<EstablishmentStat>,
-  ApiConsumer
->(
-  {
-    name: "GetEstablishmentStats",
-    inputSchema: paginationRequiredQueryParamsSchema,
-  },
-  async ({ inputParams: paginationParams, uow, currentUser: apiConsumer }) => {
-    if (!apiConsumer.rights.statistics.kinds.includes("READ"))
-      throw errors.apiConsumer.notEnoughPrivilege();
-    return uow.statisticQueries.getEstablishmentStats(paginationParams);
-  },
-);
+export const makeGetEstablishmentStats = useCaseBuilder("GetEstablishmentStats")
+  .withInput<Required<PaginationQueryParams>>(
+    paginationRequiredQueryParamsSchema,
+  )
+  .withOutput<DataWithPagination<EstablishmentStat>>()
+  .withCurrentUser<ApiConsumer>()
+  .build(
+    async ({
+      inputParams: paginationParams,
+      uow,
+      currentUser: apiConsumer,
+    }) => {
+      if (!apiConsumer.rights.statistics.kinds.includes("READ"))
+        throw errors.apiConsumer.notEnoughPrivilege();
+      return uow.statisticQueries.getEstablishmentStats(paginationParams);
+    },
+  );

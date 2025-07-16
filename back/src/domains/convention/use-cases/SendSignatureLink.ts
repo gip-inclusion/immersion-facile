@@ -28,8 +28,8 @@ import type { NotificationRepository } from "../../core/notifications/ports/Noti
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   throwErrorIfSignatoryAlreadySigned,
   throwErrorIfSignatoryPhoneNumberNotValid,
@@ -51,24 +51,19 @@ const sendSignatureLinkParamsSchema: z.Schema<SendSignatureLinkParams> =
 
 export type SendSignatureLink = ReturnType<typeof makeSendSignatureLink>;
 
-export const makeSendSignatureLink = createTransactionalUseCase<
-  SendSignatureLinkParams,
-  void,
-  ConventionRelatedJwtPayload,
-  {
+export const makeSendSignatureLink = useCaseBuilder("RemindSignatories")
+  .withInput<SendSignatureLinkParams>(sendSignatureLinkParamsSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
+  .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
     timeGateway: TimeGateway;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     config: AppConfig;
     createNewEvent: CreateNewEvent;
-  }
->(
-  {
-    name: "RemindSignatories",
-    inputSchema: sendSignatureLinkParamsSchema,
-  },
-  async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+  }>()
+  .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
       requestedConventionId: inputParams.conventionId,
       jwtPayload,
@@ -174,8 +169,7 @@ export const makeSendSignatureLink = createTransactionalUseCase<
     });
 
     await uow.outboxRepository.save(event);
-  },
-);
+  });
 
 const sendSms = async ({
   conventionMagicLinkPayload,
