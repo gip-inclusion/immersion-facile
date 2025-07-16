@@ -17,6 +17,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import { PhoneInput } from "../../../commons/PhoneInput";
 
 type BeneficiaryRepresentativeFieldsProps = {
   disabled?: boolean;
@@ -62,7 +63,7 @@ export const BeneficiaryRepresentativeFields = ({
   useEffect(() => {
     setValue(
       "signatories.beneficiary.emergencyContactPhone",
-      beneficiaryRepresentativePhone || "",
+      beneficiaryRepresentativePhone?.phoneNumber || "",
     );
   }, [beneficiaryRepresentativePhone, setValue]);
 
@@ -143,20 +144,27 @@ export const BeneficiaryRepresentativeFields = ({
       {values.signatories.beneficiaryRepresentative?.email && (
         <ConventionEmailWarning />
       )}
-      <Input
+      <PhoneInput
         label={
           formContents["signatories.beneficiaryRepresentative.phone"].label
         }
         hintText={
           formContents["signatories.beneficiaryRepresentative.phone"].hintText
         }
-        nativeInputProps={{
-          ...formContents["signatories.beneficiaryRepresentative.phone"],
-          ...register("signatories.beneficiaryRepresentative.phone"),
-          type: "tel",
-        }}
+        selectedCountry={
+          values.signatories.beneficiaryRepresentative?.phone?.codeCountry ||
+          "fr"
+        }
+        registerPhoneNumber={register(
+          "signatories.beneficiaryRepresentative.phone.phoneNumber",
+        )}
+        registerCountryCode={register(
+          "signatories.beneficiaryRepresentative.phone.codeCountry",
+        )}
         disabled={disabled}
-        {...getFieldError("signatories.beneficiaryRepresentative.phone")}
+        {...getFieldError(
+          "signatories.beneficiaryRepresentative.phone.phoneNumber",
+        )}
       />
     </>
   );

@@ -1,11 +1,10 @@
 import { fr } from "@codegouvfr/react-dsfr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-
 import { useFormContext } from "react-hook-form";
 import {
   addressDtoToString,
-  type ConventionDto,
+  type ConventionReadDto,
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { EmailValidationInput } from "src/app/components/forms/commons/EmailValidationInput";
@@ -19,6 +18,7 @@ import {
   makeFieldError,
 } from "src/app/hooks/formContents.hooks";
 import { AddressAutocomplete } from "../../../autocomplete/AddressAutocomplete";
+import { PhoneInput } from "../../../commons/PhoneInput";
 
 export const BeneficiaryCurrentEmployerFields = ({
   setEmailValidationErrors,
@@ -28,7 +28,7 @@ export const BeneficiaryCurrentEmployerFields = ({
   emailValidationErrors: EmailValidationErrorsState;
 }): JSX.Element => {
   const { setValue, getValues, register, formState } =
-    useFormContext<ConventionDto>();
+    useFormContext<ConventionReadDto>();
   const values = getValues();
   const { getFormFields } = getFormContents(
     formConventionFieldsLabels(values.internshipKind),
@@ -167,16 +167,24 @@ export const BeneficiaryCurrentEmployerFields = ({
         }}
         {...getFieldError("signatories.beneficiaryCurrentEmployer.job")}
       />
-      <Input
+      <PhoneInput
         label={formFields["signatories.beneficiaryCurrentEmployer.phone"].label}
         hintText={
           formFields["signatories.beneficiaryCurrentEmployer.phone"].hintText
         }
-        nativeInputProps={{
-          ...formFields["signatories.beneficiaryCurrentEmployer.phone"],
-          ...register("signatories.beneficiaryCurrentEmployer.phone"),
-        }}
-        {...getFieldError("signatories.beneficiaryCurrentEmployer.phone")}
+        selectedCountry={
+          values.signatories.beneficiaryCurrentEmployer?.phone?.codeCountry ||
+          "fr"
+        }
+        registerPhoneNumber={register(
+          "signatories.beneficiaryCurrentEmployer.phone.phoneNumber",
+        )}
+        registerCountryCode={register(
+          "signatories.beneficiaryCurrentEmployer.phone.codeCountry",
+        )}
+        {...getFieldError(
+          "signatories.beneficiaryCurrentEmployer.phone.phoneNumber",
+        )}
       />
       <EmailValidationInput
         hintText={

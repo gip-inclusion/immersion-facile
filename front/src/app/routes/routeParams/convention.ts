@@ -19,6 +19,8 @@ import {
   type LevelOfEducation,
   mergeObjectsExceptFalsyValues,
   type NafCode,
+  phoneDtoToString,
+  phoneStringToDto,
   reasonableSchedule,
   type ScheduleDto,
   toDateUTCString,
@@ -76,7 +78,7 @@ const withDevPrefilledValues = (
   const defaultTutor = {
     firstName: "Joe",
     lastName: "Le tuteur",
-    phone: "0101100110",
+    phone: { codeCountry: "fr", phoneNumber: "0101100110" },
     email: "establishmentRepresentative@superbusiness.fr",
     job: "Le job du tuteur",
   };
@@ -92,7 +94,10 @@ const withDevPrefilledValues = (
         firstName: beneficiary.firstName || "Sylvanie",
         lastName: beneficiary.lastName || "Durand",
         email: beneficiary.email || "sylvanie@monemail.fr",
-        phone: beneficiary.phone || "0612345678",
+        phone: beneficiary.phone || {
+          codeCountry: "fr",
+          phoneNumber: "0612345678",
+        },
         birthdate: beneficiary.birthdate || "1990-02-21T00:00:00.000Z",
         emergencyContact: beneficiary.emergencyContact || "Éric Durand",
         emergencyContactPhone:
@@ -177,7 +182,9 @@ const conventionToConventionInUrl = (
     ...(beneficiaryRepresentative && {
       brFirstName: beneficiaryRepresentative.firstName,
       brLastName: beneficiaryRepresentative.lastName,
-      brPhone: beneficiaryRepresentative.phone,
+      brPhone: beneficiaryRepresentative.phone
+        ? phoneDtoToString(beneficiaryRepresentative.phone)
+        : undefined,
       brEmail: beneficiaryRepresentative.email,
     }),
     ...(beneficiaryCurrentEmployer && {
@@ -187,25 +194,31 @@ const conventionToConventionInUrl = (
       bceFirstName: beneficiaryCurrentEmployer.firstName,
       bceLastName: beneficiaryCurrentEmployer.lastName,
       bceEmail: beneficiaryCurrentEmployer.email,
-      bcePhone: beneficiaryCurrentEmployer.phone,
+      bcePhone: beneficiaryCurrentEmployer.phone
+        ? phoneDtoToString(beneficiaryCurrentEmployer.phone)
+        : undefined,
       bceJob: beneficiaryCurrentEmployer.job,
     }),
     etFirstName: convention.establishmentTutor.firstName,
     etLastName: convention.establishmentTutor.lastName,
-    etPhone: convention.establishmentTutor.phone,
+    etPhone: convention.establishmentTutor.phone
+      ? phoneDtoToString(convention.establishmentTutor.phone)
+      : undefined,
     etEmail: convention.establishmentTutor.email,
     etJob: convention.establishmentTutor.job,
     erFirstName: establishmentRepresentative.firstName,
     erLastName: establishmentRepresentative.lastName,
     erEmail: establishmentRepresentative.email,
-    erPhone: establishmentRepresentative.phone,
+    erPhone: establishmentRepresentative.phone
+      ? phoneDtoToString(establishmentRepresentative.phone)
+      : undefined,
     firstName: beneficiary.firstName,
     lastName: beneficiary.lastName,
     birthdate: beneficiary.birthdate,
     isRqth: beneficiary.isRqth,
     financiaryHelp: beneficiary.financiaryHelp,
     email: beneficiary.email,
-    phone: beneficiary.phone,
+    phone: beneficiary.phone ? phoneDtoToString(beneficiary.phone) : undefined,
     businessAdvantages: flatValues.businessAdvantages,
     ...(beneficiarySchoolInformations
       ? { ...beneficiarySchoolInformations }
@@ -228,7 +241,9 @@ export const conventionReadToConventionRouteParams = (
     email: convention.signatories.beneficiary.email,
     firstName: convention.signatories.beneficiary.firstName,
     lastName: convention.signatories.beneficiary.lastName,
-    phone: convention.signatories.beneficiary.phone,
+    phone: convention.signatories.beneficiary.phone
+      ? phoneDtoToString(convention.signatories.beneficiary.phone)
+      : undefined,
     birthdate: convention.signatories.beneficiary.birthdate,
     isRqth: convention.signatories.beneficiary.isRqth,
     financiaryHelp: convention.signatories.beneficiary.financiaryHelp,
@@ -246,13 +261,19 @@ export const conventionReadToConventionRouteParams = (
     brEmail: convention.signatories.beneficiaryRepresentative?.email,
     brFirstName: convention.signatories.beneficiaryRepresentative?.firstName,
     brLastName: convention.signatories.beneficiaryRepresentative?.lastName,
-    brPhone: convention.signatories.beneficiaryRepresentative?.phone,
+    brPhone: convention.signatories.beneficiaryRepresentative?.phone
+      ? phoneDtoToString(convention.signatories.beneficiaryRepresentative.phone)
+      : undefined,
 
     // Beneficiary current employer information
     bceEmail: convention.signatories.beneficiaryCurrentEmployer?.email,
     bceFirstName: convention.signatories.beneficiaryCurrentEmployer?.firstName,
     bceLastName: convention.signatories.beneficiaryCurrentEmployer?.lastName,
-    bcePhone: convention.signatories.beneficiaryCurrentEmployer?.phone,
+    bcePhone: convention.signatories.beneficiaryCurrentEmployer?.phone
+      ? phoneDtoToString(
+          convention.signatories.beneficiaryCurrentEmployer.phone,
+        )
+      : undefined,
     bceSiret: convention.signatories.beneficiaryCurrentEmployer?.businessSiret,
     bceBusinessName:
       convention.signatories.beneficiaryCurrentEmployer?.businessName,
@@ -271,13 +292,19 @@ export const conventionReadToConventionRouteParams = (
     etFirstName: convention.establishmentTutor.firstName,
     etLastName: convention.establishmentTutor.lastName,
     etJob: convention.establishmentTutor.job,
-    etPhone: convention.establishmentTutor.phone,
+    etPhone: convention.establishmentTutor.phone
+      ? phoneDtoToString(convention.establishmentTutor.phone)
+      : undefined,
     etEmail: convention.establishmentTutor.email,
 
     // Establishment representative information
     erFirstName: convention.signatories.establishmentRepresentative.firstName,
     erLastName: convention.signatories.establishmentRepresentative.lastName,
-    erPhone: convention.signatories.establishmentRepresentative.phone,
+    erPhone: convention.signatories.establishmentRepresentative.phone
+      ? phoneDtoToString(
+          convention.signatories.establishmentRepresentative.phone,
+        )
+      : undefined,
     erEmail: convention.signatories.establishmentRepresentative.email,
 
     // Agency information
@@ -466,7 +493,9 @@ const beneficiaryRepresentativeFromParams = (
         firstName: params.brFirstName ?? "",
         lastName: params.brLastName ?? "",
         email: params.brEmail ?? "",
-        phone: params.brPhone ?? "",
+        phone: params.brPhone
+          ? phoneStringToDto(params.brPhone)
+          : { codeCountry: "fr", phoneNumber: "" },
       }
     : undefined;
 
@@ -487,7 +516,9 @@ const beneficiaryCurrentEmployerFromParams = (
         firstName: params.bceFirstName ?? "",
         lastName: params.bceLastName ?? "",
         email: params.bceEmail ?? "",
-        phone: params.bcePhone ?? "",
+        phone: params.bcePhone
+          ? phoneStringToDto(params.bcePhone)
+          : { codeCountry: "fr", phoneNumber: "" },
         job: params.bceJob ?? "",
         role: "beneficiary-current-employer",
         businessAddress: params.bceBusinessAddress ?? "",
@@ -534,7 +565,9 @@ const conventionPresentationFromParams = (
     firstName: params.etFirstName ?? "",
     lastName: params.etLastName ?? "",
     email: params.etEmail ?? "",
-    phone: params.etPhone ?? "",
+    phone: params.etPhone
+      ? phoneStringToDto(params.etPhone)
+      : { codeCountry: "fr", phoneNumber: "" },
     job: params.etJob ?? "",
   },
   signatories: {
@@ -543,7 +576,9 @@ const conventionPresentationFromParams = (
       firstName: params.firstName ?? "",
       lastName: params.lastName ?? "",
       email: params.email ?? "",
-      phone: params.phone ?? "",
+      phone: params.phone
+        ? phoneStringToDto(params.phone)
+        : { codeCountry: "fr", phoneNumber: "" },
       emergencyContact: params.emergencyContact ?? "",
       emergencyContactPhone: params.emergencyContactPhone ?? "",
       emergencyContactEmail: params.emergencyContactEmail ?? "",
@@ -568,7 +603,9 @@ const conventionPresentationFromParams = (
       firstName: params.erFirstName ?? "",
       lastName: params.erLastName ?? "",
       email: params.erEmail ?? "",
-      phone: params.erPhone ?? "",
+      phone: params.erPhone
+        ? phoneStringToDto(params.erPhone)
+        : { codeCountry: "fr", phoneNumber: "" },
     },
     beneficiaryRepresentative: beneficiaryRepresentativeFromParams(params),
     beneficiaryCurrentEmployer: beneficiaryCurrentEmployerFromParams(params),
