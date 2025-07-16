@@ -441,6 +441,19 @@ describe("PgNotificationRepository", () => {
         expectToEqual(response, []);
       });
 
+      it("returns all emails when conventionIds is empty array and there is no other filters", async () => {
+        const response = await pgNotificationRepository.getEmailsByFilters({
+          conventionIds: [],
+        });
+
+        expectToEqual(
+          response,
+          emailNotificationsReOrderedByDate
+            .slice(0, maxRetrievedNotifications)
+            .map(addWithToBeSentState),
+        );
+      });
+
       it("returns matching email when email + emailType + conventionIds match", async () => {
         const emailNotification: EmailNotification = {
           createdAt: new Date().toISOString(),
