@@ -449,8 +449,11 @@ const makeConventionFromDiscussion = ({
       email: discussion.potentialBeneficiary.email,
       phone:
         discussion.contactMode === "EMAIL"
-          ? discussion.potentialBeneficiary.phone
-          : "",
+          ? {
+              codeCountry: "fr",
+              phoneNumber: discussion.potentialBeneficiary.phone,
+            }
+          : { codeCountry: "fr", phoneNumber: "" },
     },
     establishmentRepresentative: {
       ...initialConvention.signatories.establishmentRepresentative,
@@ -464,7 +467,7 @@ const makeConventionFromDiscussion = ({
     lastName: discussion.establishmentContact.lastName ?? "",
     job: "",
     email: userEmail,
-    phone: "",
+    phone: { codeCountry: "fr", phoneNumber: "" },
     role: "establishment-tutor",
   },
   immersionObjective:

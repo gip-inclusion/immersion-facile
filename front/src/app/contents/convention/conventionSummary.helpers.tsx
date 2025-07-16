@@ -1,6 +1,5 @@
 import type { BadgeProps } from "@codegouvfr/react-dsfr/Badge";
 import type { ButtonProps } from "@codegouvfr/react-dsfr/Button";
-
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import {
   type ConventionSummaryField,
@@ -93,7 +92,7 @@ const makeSignatoriesSubsections = (
           signatoriesSubsectionButtonProps
             ? (signatoriesSubsectionButtonProps(
                 "beneficiary",
-                convention.signatories.beneficiary.phone,
+                convention.signatories.beneficiary.phone.phoneNumber,
                 !!convention.signatories.beneficiary.signedAt,
               ) ?? undefined)
             : undefined,
@@ -138,7 +137,7 @@ const makeSignatoriesSubsections = (
         {
           key: "beneficiaryPhone",
           label: "Téléphone",
-          value: convention.signatories.beneficiary.phone,
+          value: convention.signatories.beneficiary.phone.phoneNumber,
         },
       ]),
     },
@@ -166,7 +165,8 @@ const makeSignatoriesSubsections = (
               ) && signatoriesSubsectionButtonProps
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-representative",
-                    convention.signatories.beneficiaryRepresentative.phone,
+                    convention.signatories.beneficiaryRepresentative.phone
+                      .phoneNumber,
                     !!convention.signatories.beneficiaryRepresentative.signedAt,
                   ) ?? undefined)
                 : undefined,
@@ -214,7 +214,9 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryRepPhone",
               label: "Téléphone",
-              value: convention.signatories.beneficiaryRepresentative.phone,
+              value:
+                convention.signatories.beneficiaryRepresentative.phone
+                  .phoneNumber,
             },
           ]),
         }
@@ -240,7 +242,8 @@ const makeSignatoriesSubsections = (
           signatoriesSubsectionButtonProps
             ? (signatoriesSubsectionButtonProps(
                 "establishment-representative",
-                convention.signatories.establishmentRepresentative.phone,
+                convention.signatories.establishmentRepresentative.phone
+                  .phoneNumber,
                 !!convention.signatories.establishmentRepresentative.signedAt,
               ) ?? undefined)
             : undefined,
@@ -288,7 +291,9 @@ const makeSignatoriesSubsections = (
         {
           key: "establishmentRepPhone",
           label: "Téléphone",
-          value: convention.signatories.establishmentRepresentative.phone,
+          value:
+            convention.signatories.establishmentRepresentative.phone
+              .phoneNumber,
         },
         {
           key: "establishmentRepSiret",
@@ -322,7 +327,8 @@ const makeSignatoriesSubsections = (
               ) && signatoriesSubsectionButtonProps
                 ? (signatoriesSubsectionButtonProps(
                     "beneficiary-current-employer",
-                    convention.signatories.beneficiaryCurrentEmployer.phone,
+                    convention.signatories.beneficiaryCurrentEmployer.phone
+                      .phoneNumber,
                     !!convention.signatories.beneficiaryCurrentEmployer
                       .signedAt,
                   ) ?? undefined)
@@ -373,7 +379,9 @@ const makeSignatoriesSubsections = (
             {
               key: "beneficiaryCurrentEmployerPhone",
               label: "Téléphone",
-              value: convention.signatories.beneficiaryCurrentEmployer.phone,
+              value:
+                convention.signatories.beneficiaryCurrentEmployer.phone
+                  .phoneNumber,
             },
             {
               key: "beneficiaryCurrentEmployerSiret",
@@ -607,7 +615,9 @@ const makeEstablishmentSubSections = (
       header: {
         title: "Tuteur",
         action: assesmentReminderButtonProps
-          ? assesmentReminderButtonProps(convention.establishmentTutor.phone)
+          ? assesmentReminderButtonProps(
+              convention.establishmentTutor.phone.phoneNumber,
+            )
           : undefined,
       },
       fields: [
@@ -654,7 +664,7 @@ const makeEstablishmentSubSections = (
         {
           key: "establishmentTutorPhone",
           label: "Téléphone",
-          value: convention.establishmentTutor.phone,
+          value: convention.establishmentTutor.phone.phoneNumber,
         },
       ],
     },
