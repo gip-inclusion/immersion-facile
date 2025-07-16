@@ -8,7 +8,7 @@ import {
 } from "shared";
 import { z } from "zod";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
 export type WarnSenderThatMessageCouldNotBeDeliveredParams = {
   notificationId: NotificationId;
@@ -23,14 +23,16 @@ const inputSchema: z.Schema<WarnSenderThatMessageCouldNotBeDeliveredParams> =
     errored: notificationErroredSchema,
   });
 
-export const makeWarnSenderThatMessageCouldNotBeDelivered =
-  createTransactionalUseCase<
-    WarnSenderThatMessageCouldNotBeDeliveredParams,
-    void,
-    void,
-    { saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent }
-  >(
-    { name: "WarnSenderThatMessageCouldNotBeDelivered", inputSchema },
+export const makeWarnSenderThatMessageCouldNotBeDelivered = useCaseBuilder(
+  "WarnSenderThatMessageCouldNotBeDelivered",
+)
+  .withInput<WarnSenderThatMessageCouldNotBeDeliveredParams>(inputSchema)
+  .withOutput<void>()
+  .withCurrentUser<void>()
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+  }>()
+  .build(
     async ({
       inputParams: { notificationId, notificationKind },
       uow,

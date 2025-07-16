@@ -6,8 +6,8 @@ import {
 } from "shared";
 import { z } from "zod";
 import { createLogger } from "../../../../utils/logger";
-import { createTransactionalUseCase } from "../../UseCase";
 import type { UnitOfWork } from "../../unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../useCaseBuilder";
 import type { CrispGateway } from "../ports/CrispGateway";
 
 const logger = createLogger(__filename);
@@ -54,14 +54,13 @@ const makeGetInputValue =
 export type SendSupportTicketToCrisp = ReturnType<
   typeof makeSendSupportTicketToCrisp
 >;
-export const makeSendSupportTicketToCrisp = createTransactionalUseCase<
-  TallyForm,
-  void,
-  void,
-  { crispApi: CrispGateway }
->(
-  { name: "SendSupportTicketToCrisp", inputSchema: tallyFormSchema },
-  async ({ inputParams, deps: { crispApi }, uow }) => {
+export const makeSendSupportTicketToCrisp = useCaseBuilder(
+  "SendSupportTicketToCrisp",
+)
+  .withInput<TallyForm>(tallyFormSchema)
+  .withOutput<void>()
+  .withDeps<{ crispApi: CrispGateway }>()
+  .build(async ({ inputParams, deps: { crispApi }, uow }) => {
     const { fields } = inputParams.data;
     const getValueFromMultipleChoice =
       makeGetValueFromMultipleChoiceField(fields);
@@ -155,8 +154,7 @@ https://app-smtp.brevo.com/log
         .filter(Boolean)
         .join("\n"),
     });
-  },
-);
+  });
 
 const getEmail = (fields: TallyForm["data"]["fields"], eventId: string) => {
   const email: string = fields.find(

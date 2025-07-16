@@ -6,39 +6,36 @@ import {
   type WithSiretDto,
   withSiretSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type GetEstablishmentNameAndAdmins = ReturnType<
   typeof makeGetEstablishmentNameAndAdmins
 >;
 
-export const makeGetEstablishmentNameAndAdmins = createTransactionalUseCase<
-  WithSiretDto,
-  EstablishmentNameAndAdmins,
-  ConnectedUser,
-  void
->(
-  {
-    inputSchema: withSiretSchema,
-    name: "UpdateMarketingEstablishmentContactList",
-  },
-  async ({
-    inputParams: { siret },
-    uow,
-    currentUser,
-  }): Promise<EstablishmentNameAndAdmins> => {
-    const isUserAllowedToGetEstablishmentNameAndAdmins =
-      currentUser.isBackofficeAdmin ||
-      currentUser.proConnect?.siret === siret ||
-      currentUser.establishments?.some((right) => right.siret === siret);
+export const makeGetEstablishmentNameAndAdmins = useCaseBuilder(
+  "UpdateMarketingEstablishmentContactList",
+)
+  .withInput<WithSiretDto>(withSiretSchema)
+  .withOutput<EstablishmentNameAndAdmins>()
+  .withCurrentUser<ConnectedUser>()
+  .build(
+    async ({
+      inputParams: { siret },
+      uow,
+      currentUser,
+    }): Promise<EstablishmentNameAndAdmins> => {
+      const isUserAllowedToGetEstablishmentNameAndAdmins =
+        currentUser.isBackofficeAdmin ||
+        currentUser.proConnect?.siret === siret ||
+        currentUser.establishments?.some((right) => right.siret === siret);
 
-    if (isUserAllowedToGetEstablishmentNameAndAdmins)
-      return await getEstablishmentNameAndAdmins({ uow, siret });
+      if (isUserAllowedToGetEstablishmentNameAndAdmins)
+        return await getEstablishmentNameAndAdmins({ uow, siret });
 
-    throw errors.user.forbidden({ userId: currentUser.id });
-  },
-);
+      throw errors.user.forbidden({ userId: currentUser.id });
+    },
+  );
 
 const getEstablishmentNameAndAdmins = async ({
   uow,

@@ -7,19 +7,16 @@ import {
   getPaginationParamsForWeb,
   type OmitFromExistingKeys,
 } from "shared";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import type { GetPaginatedDiscussionsForUserParams } from "../../ports/DiscussionRepository";
 
-export const makeGetDiscussionsForUser = createTransactionalUseCase<
-  FlatGetPaginatedDiscussionsParams,
-  DataWithPagination<DiscussionInList>,
-  ConnectedUser
->(
-  {
-    inputSchema: flatGetPaginatedDiscussionsParamsSchema,
-    name: "GetDiscussionsForUser",
-  },
-  async ({ inputParams, uow, currentUser }) => {
+export const makeGetDiscussionsForUser = useCaseBuilder("GetDiscussionsForUser")
+  .withInput<FlatGetPaginatedDiscussionsParams>(
+    flatGetPaginatedDiscussionsParamsSchema,
+  )
+  .withOutput<DataWithPagination<DiscussionInList>>()
+  .withCurrentUser<ConnectedUser>()
+  .build(async ({ inputParams, uow, currentUser }) => {
     const getPaginatedDiscussionsParams =
       flatDiscussionQueryParamsToGetPaginatedDiscussionsParams(inputParams);
 
@@ -27,8 +24,7 @@ export const makeGetDiscussionsForUser = createTransactionalUseCase<
       ...getPaginatedDiscussionsParams,
       userId: currentUser.id,
     });
-  },
-);
+  });
 
 export const flatDiscussionQueryParamsToGetPaginatedDiscussionsParams = (
   flatParams: FlatGetPaginatedDiscussionsParams,

@@ -17,120 +17,112 @@ import type { SaveNotificationAndRelatedEvent } from "../../../core/notification
 import type { ShortLinkIdGeneratorGateway } from "../../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 export type NotifyAllActorsThatConventionTransferred = ReturnType<
   typeof makeNotifyAllActorsThatConventionTransferred
 >;
 
-export const makeNotifyAllActorsThatConventionTransferred =
-  createTransactionalUseCase<
-    TransferConventionToAgencyPayload,
-    void,
-    void,
-    {
-      saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-      generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
-      timeGateway: TimeGateway;
-      shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
-      config: AppConfig;
+export const makeNotifyAllActorsThatConventionTransferred = useCaseBuilder(
+  "NotifyAllActorsThatConventionTransferred",
+)
+  .withInput<TransferConventionToAgencyPayload>(
+    transferConventionToAgencyPayloadSchema,
+  )
+  .withOutput<void>()
+  .withCurrentUser<void>()
+  .withDeps<{
+    saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
+    generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
+    timeGateway: TimeGateway;
+    shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
+    config: AppConfig;
+  }>()
+  .build(async ({ inputParams, uow, deps }) => {
+    const { agencyId, conventionId, justification, previousAgencyId } =
+      inputParams;
+
+    const previousAgency = await uow.agencyRepository.getById(previousAgencyId);
+    if (!previousAgency) {
+      throw errors.agency.notFound({ agencyId: previousAgencyId });
     }
-  >(
-    {
-      name: "NotifyAllActorsThatConventionTransferred",
-      inputSchema: transferConventionToAgencyPayloadSchema,
-    },
-    async ({ inputParams, uow, deps }) => {
-      const { agencyId, conventionId, justification, previousAgencyId } =
-        inputParams;
 
-      const previousAgency =
-        await uow.agencyRepository.getById(previousAgencyId);
-      if (!previousAgency) {
-        throw errors.agency.notFound({ agencyId: previousAgencyId });
-      }
+    const agencyWithRights = await uow.agencyRepository.getById(agencyId);
+    if (!agencyWithRights) {
+      throw errors.agency.notFound({ agencyId });
+    }
 
-      const agencyWithRights = await uow.agencyRepository.getById(agencyId);
-      if (!agencyWithRights) {
-        throw errors.agency.notFound({ agencyId });
-      }
+    const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
 
-      const agency = await agencyWithRightToAgencyDto(uow, agencyWithRights);
+    const convention = await uow.conventionRepository.getById(conventionId);
+    if (!convention) {
+      throw errors.convention.notFound({ conventionId });
+    }
 
-      const convention = await uow.conventionRepository.getById(conventionId);
-      if (!convention) {
-        throw errors.convention.notFound({ conventionId });
-      }
-
-      const signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[] =
-        uniq([
-          ...Object.values(convention.signatories).map((signatory) => ({
-            role: signatory.role,
-            email: signatory.email,
-          })),
-          ...(convention.signatories.establishmentRepresentative.email !==
-          convention.establishmentTutor.email
-            ? [
-                {
-                  role: convention.establishmentTutor.role,
-                  email: convention.establishmentTutor.email,
-                },
-              ]
-            : []),
-        ]);
-
-      const agencyRecipientsRoleAndEmail: { role: Role; email: Email }[] = uniq(
-        [
-          ...agency.counsellorEmails.map(
-            (counsellorEmail): { role: Role; email: Email } => ({
-              role: "counsellor",
-              email: counsellorEmail,
-            }),
-          ),
-          ...agency.validatorEmails.map(
-            (validatorEmail): { role: Role; email: Email } => ({
-              role: "validator",
-              email: validatorEmail,
-            }),
-          ),
-        ],
-      );
-
-      await Promise.all([
-        ...sendAgencyEmails(
-          agencyRecipientsRoleAndEmail,
-          convention,
-          uow,
-          justification,
-          previousAgency.name,
-          {
-            config: deps.config,
-            timeGateway: deps.timeGateway,
-            generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-            shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-            saveNotificationAndRelatedEvent:
-              deps.saveNotificationAndRelatedEvent,
-          },
-        ),
-        ...sendSignatoriesEmail(
-          signatoriesRecipientsRoleAndEmail,
-          convention,
-          uow,
-          justification,
-          agency,
-          previousAgency.name,
-          {
-            config: deps.config,
-            timeGateway: deps.timeGateway,
-            generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
-            shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
-            saveNotificationAndRelatedEvent:
-              deps.saveNotificationAndRelatedEvent,
-          },
-        ),
+    const signatoriesRecipientsRoleAndEmail: { role: Role; email: Email }[] =
+      uniq([
+        ...Object.values(convention.signatories).map((signatory) => ({
+          role: signatory.role,
+          email: signatory.email,
+        })),
+        ...(convention.signatories.establishmentRepresentative.email !==
+        convention.establishmentTutor.email
+          ? [
+              {
+                role: convention.establishmentTutor.role,
+                email: convention.establishmentTutor.email,
+              },
+            ]
+          : []),
       ]);
-    },
-  );
+
+    const agencyRecipientsRoleAndEmail: { role: Role; email: Email }[] = uniq([
+      ...agency.counsellorEmails.map(
+        (counsellorEmail): { role: Role; email: Email } => ({
+          role: "counsellor",
+          email: counsellorEmail,
+        }),
+      ),
+      ...agency.validatorEmails.map(
+        (validatorEmail): { role: Role; email: Email } => ({
+          role: "validator",
+          email: validatorEmail,
+        }),
+      ),
+    ]);
+
+    await Promise.all([
+      ...sendAgencyEmails(
+        agencyRecipientsRoleAndEmail,
+        convention,
+        uow,
+        justification,
+        previousAgency.name,
+        {
+          config: deps.config,
+          timeGateway: deps.timeGateway,
+          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        },
+      ),
+      ...sendSignatoriesEmail(
+        signatoriesRecipientsRoleAndEmail,
+        convention,
+        uow,
+        justification,
+        agency,
+        previousAgency.name,
+        {
+          config: deps.config,
+          timeGateway: deps.timeGateway,
+          generateConventionMagicLinkUrl: deps.generateConventionMagicLinkUrl,
+          shortLinkIdGeneratorGateway: deps.shortLinkIdGeneratorGateway,
+          saveNotificationAndRelatedEvent: deps.saveNotificationAndRelatedEvent,
+        },
+      ),
+    ]);
+  });
 
 const sendAgencyEmails = (
   agencyRecipientsRoleAndEmail: { role: Role; email: Email }[],

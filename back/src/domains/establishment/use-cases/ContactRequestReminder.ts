@@ -13,8 +13,8 @@ import type {
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type ContactRequestReminderMode = "3days" | "7days";
 export type ContactRequestReminder = ReturnType<
@@ -23,18 +23,18 @@ export type ContactRequestReminder = ReturnType<
 
 const MAX_DISCUSSIONS = 5000;
 
-export const makeContactRequestReminder = createTransactionalUseCase<
-  ContactRequestReminderMode,
-  { numberOfNotifications: number },
-  void,
-  {
+export const makeContactRequestReminder = useCaseBuilder(
+  "ContactRequestReminder",
+)
+  .withInput<ContactRequestReminderMode>(z.enum(["3days", "7days"]))
+  .withOutput<{ numberOfNotifications: number }>()
+  .withCurrentUser<void>()
+  .withDeps<{
     domain: string;
     timeGateway: TimeGateway;
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
-  }
->(
-  { name: "ContactRequestReminder", inputSchema: z.enum(["3days", "7days"]) },
-  async ({ inputParams: mode, uow, deps }) =>
+  }>()
+  .build(async ({ inputParams: mode, uow, deps }) =>
     uow.discussionRepository
       .getDiscussions({
         filters: {
@@ -66,7 +66,7 @@ export const makeContactRequestReminder = createTransactionalUseCase<
 
         return { numberOfNotifications: notifications.length };
       }),
-);
+  );
 
 const makeNotification = async ({
   uow,
