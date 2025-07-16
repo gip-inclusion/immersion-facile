@@ -1936,7 +1936,7 @@ Profil du candidat :
         • Répondre rapidement aux prochaines demandes d'immersion`,
         buttons: [
           {
-            label: "Accéder à votre tableau de bord",
+            label: "Accéder au tableau de bord établissement",
             url: ctaUrl,
           },
         ],
@@ -1969,7 +1969,7 @@ Profil du candidat :
         • Rechercher d'autres opportunités d'immersion`,
         buttons: [
           {
-            label: "Voir les offres d'immersion",
+            label: "Rechercher des offres d'immersion",
             url: ctaUrl,
           },
         ],

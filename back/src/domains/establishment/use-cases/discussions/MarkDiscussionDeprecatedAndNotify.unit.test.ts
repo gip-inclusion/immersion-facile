@@ -109,7 +109,6 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
       discussionId: obsoleteDiscussionId,
     });
 
-    expect(uow.notificationRepository.notifications).toHaveLength(2);
     expectToEqual(uow.notificationRepository.notifications, [
       {
         createdAt: "2021-09-01T10:10:00.000Z",
