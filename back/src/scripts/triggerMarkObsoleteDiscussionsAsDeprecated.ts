@@ -39,7 +39,7 @@ const triggerMarkObsoleteDiscussionsAsDeprecated = async () => {
       },
     });
 
-  return await getObsoleteDiscussionsAndEmitDeprecatedEvent.execute();
+  return getObsoleteDiscussionsAndEmitDeprecatedEvent.execute();
 };
 
 handleCRONScript(

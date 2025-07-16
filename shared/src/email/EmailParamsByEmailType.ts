@@ -281,7 +281,7 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     discussionCreatedAt: string;
-    ctaUrl: string;
+    ctaUrl: AbsoluteUrl;
   };
   DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
     beneficiaryFirstName: string;
