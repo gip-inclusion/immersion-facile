@@ -37,7 +37,7 @@ export const displayEmergencyContactInfos = <T extends InternshipKind>({
     ? getEmergencyContactInfos({
         fullName: `${beneficiaryRepresentative.firstName} ${beneficiaryRepresentative.lastName}`,
         email: beneficiaryRepresentative.email,
-        phone: beneficiaryRepresentative.phone,
+        phone: beneficiaryRepresentative.phone?.phoneNumber,
       })
     : getEmergencyContactInfos({
         fullName: beneficiary.emergencyContact,

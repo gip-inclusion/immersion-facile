@@ -233,7 +233,7 @@ export const ConventionDocumentPage = ({
             en qualité de <strong>bénéficiaire</strong> {""}
             {beneficiary.isRqth && "reconnu en situation de handicap"}
             <ul>
-              <li>tel.&nbsp;: {beneficiary.phone}</li>
+              <li>tel.&nbsp;: {beneficiary.phone.phoneNumber}</li>
               <li>email&nbsp;: {beneficiary.email}</li>
               {convention.internshipKind === "mini-stage-cci" && (
                 <li>
@@ -257,7 +257,9 @@ export const ConventionDocumentPage = ({
               en qualité de{" "}
               <strong>représentant(e) légal(e) du bénéficiaire</strong>
               <ul>
-                <li>tel.&nbsp;: {beneficiaryRepresentative.phone}</li>
+                <li>
+                  tel.&nbsp;: {beneficiaryRepresentative.phone.phoneNumber}
+                </li>
                 <li>email&nbsp;: {beneficiaryRepresentative.email}</li>
               </ul>
             </li>
@@ -274,7 +276,9 @@ export const ConventionDocumentPage = ({
               {beneficiaryCurrentEmployer.businessName}{" "}
               <strong>employant actuellement le bénéficiaire</strong>
               <ul>
-                <li>tel.&nbsp;: {beneficiaryCurrentEmployer.phone}</li>
+                <li>
+                  tel.&nbsp;: {beneficiaryCurrentEmployer.phone.phoneNumber}
+                </li>
                 <li>email&nbsp;: {beneficiaryCurrentEmployer.email}</li>
                 <li>
                   adresse&nbsp;: {beneficiaryCurrentEmployer.businessAddress}
@@ -293,7 +297,9 @@ export const ConventionDocumentPage = ({
               en qualité de <strong>représentant de l'entreprise</strong>{" "}
               {convention.businessName}
               <ul>
-                <li>tel.&nbsp;: {establishmentRepresentative.phone}</li>
+                <li>
+                  tel.&nbsp;: {establishmentRepresentative.phone.phoneNumber}
+                </li>
                 <li>email&nbsp;: {establishmentRepresentative.email}</li>
               </ul>
             </li>
@@ -517,7 +523,7 @@ export const ConventionDocumentPage = ({
           {isStartingByVowel(convention.establishmentTutor.job)
             ? `d'${convention.establishmentTutor.job}`
             : `de ${convention.establishmentTutor.job}`}{" "}
-          (tel.&nbsp;: {convention.establishmentTutor.phone}
+          (tel.&nbsp;: {convention.establishmentTutor.phone.phoneNumber}
           {convention.establishmentTutor.email !==
             establishmentRepresentative.email &&
             `, mail: ${convention.establishmentTutor.email}`}
