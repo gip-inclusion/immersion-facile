@@ -1,4 +1,4 @@
-import { subMonths } from "date-fns";
+import { addDays, subMonths } from "date-fns";
 import { DiscussionBuilder, expectToEqual } from "shared";
 import { makeCreateNewEvent } from "../../../core/events/ports/EventBus";
 import { makeSaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -240,6 +240,38 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
       discussionFrom1YearAgoWithExchangesResponse,
       discussionFrom4MonthsAgoWithExchangesResponse,
     ];
+
+    const { numberOfObsoleteDiscussions } =
+      await getObsoleteDiscussionsAndEmitDeprecatedEvents.execute();
+
+    expectToEqual(numberOfObsoleteDiscussions, 0);
+    expectToEqual(uow.outboxRepository.events, []);
+  });
+
+  it("should not deprecate discussions that are 2 months and 29 days old", async () => {
+    const now = timeGateway.now();
+
+    const threeMonthsAgo = subMonths(now, 3);
+    const almostThreeMonthsAgo = addDays(threeMonthsAgo, 1);
+
+    const discussionAlmostThreeMonthsOld = new DiscussionBuilder()
+      .withSiret("11112222333344")
+      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120010")
+      .withCreatedAt(almostThreeMonthsAgo)
+      .withExchanges([
+        {
+          subject: "Mise en relation initiale",
+          message:
+            "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+          recipient: "establishment",
+          sentAt: almostThreeMonthsAgo.toISOString(),
+          sender: "potentialBeneficiary",
+          attachments: [],
+        },
+      ])
+      .build();
+
+    uow.discussionRepository.discussions = [discussionAlmostThreeMonthsOld];
 
     const { numberOfObsoleteDiscussions } =
       await getObsoleteDiscussionsAndEmitDeprecatedEvents.execute();

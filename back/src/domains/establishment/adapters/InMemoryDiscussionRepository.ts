@@ -1,4 +1,4 @@
-import { isBefore, subMonths } from "date-fns";
+import { isBefore } from "date-fns";
 import isAfter from "date-fns/isAfter";
 import type {
   DataWithPagination,
@@ -132,14 +132,11 @@ export class InMemoryDiscussionRepository implements DiscussionRepository {
   }
 
   public async getObsoleteDiscussions(params: {
-    now: Date;
+    olderThan: Date;
   }): Promise<DiscussionId[]> {
     return Object.values(this._discussions)
       .filter((discussion) => {
-        return isBefore(
-          new Date(discussion.createdAt),
-          subMonths(params.now, 3),
-        );
+        return isBefore(new Date(discussion.createdAt), params.olderThan);
       })
       .filter((discussion) => discussion.status === "PENDING")
       .filter((discussion) => discussion.exchanges.length === 1)

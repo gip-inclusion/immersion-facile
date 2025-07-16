@@ -1,4 +1,3 @@
-import { subMonths } from "date-fns";
 import type { InsertObject } from "kysely";
 import { sql } from "kysely";
 import { keys } from "ramda";
@@ -345,15 +344,13 @@ export class PgDiscussionRepository implements DiscussionRepository {
   }
 
   public async getObsoleteDiscussions(params: {
-    now: Date;
+    olderThan: Date;
   }): Promise<DiscussionId[]> {
-    const threeMonthsAgo = subMonths(params.now, 3);
-
     const obsoleteDiscussions = await this.transaction
       .selectFrom("discussions")
       .select("discussions.id")
       .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
-      .where("created_at", "<=", threeMonthsAgo)
+      .where("created_at", "<=", params.olderThan)
       .where("status", "=", "PENDING")
       .having((eb) => eb.fn.count("exchanges.id"), "=", 1)
       .orderBy("created_at", "asc")

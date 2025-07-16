@@ -1,3 +1,4 @@
+import { subMonths } from "date-fns";
 import { z } from "zod";
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { SaveNotificationAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
@@ -24,9 +25,12 @@ export const makeGetObsoleteDiscussionsAndEmitDeprecatedEvent =
       inputSchema: z.void(),
     },
     async ({ uow, deps }) => {
+      const now = deps.timeGateway.now();
+      const threeMonthsAgo = subMonths(now, 3);
+
       const obsoleteDiscussions =
         await uow.discussionRepository.getObsoleteDiscussions({
-          now: deps.timeGateway.now(),
+          olderThan: threeMonthsAgo,
         });
 
       const events = obsoleteDiscussions.map((discussionId) =>
