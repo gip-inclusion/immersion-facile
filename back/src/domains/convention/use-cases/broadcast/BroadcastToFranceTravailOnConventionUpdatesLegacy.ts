@@ -5,7 +5,7 @@ import {
 } from "shared";
 import { broadcastToFtLegacyServiceName } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 import {
   getLinkedAgencies,
   shouldBroadcastToFranceTravail,
@@ -30,21 +30,14 @@ export type BroadcastToFranceTravailOnConventionUpdatesLegacy = ReturnType<
   typeof makeBroadcastToFranceTravailOnConventionUpdatesLegacy
 >;
 export const makeBroadcastToFranceTravailOnConventionUpdatesLegacy =
-  createTransactionalUseCase<
-    WithConventionDto,
-    void,
-    void,
-    {
+  useCaseBuilder("BroadcastToFranceTravailOnConventionUpdatesLegacy")
+    .withInput<WithConventionDto>(withConventionSchema)
+    .withDeps<{
       franceTravailGateway: FranceTravailGateway;
       timeGateway: TimeGateway;
       options: { resyncMode: boolean };
-    }
-  >(
-    {
-      name: "BroadcastToFranceTravailOnConventionUpdatesLegacy",
-      inputSchema: withConventionSchema,
-    },
-    async ({ uow, inputParams: { convention }, deps }) => {
+    }>()
+    .build(async ({ uow, inputParams: { convention }, deps }) => {
       const { agency, refersToAgency } = await getLinkedAgencies(
         uow,
         convention,
@@ -152,5 +145,4 @@ export const makeBroadcastToFranceTravailOnConventionUpdatesLegacy =
           ? { subscriberErrorFeedback: response.subscriberErrorFeedback }
           : {}),
       });
-    },
-  );
+    });

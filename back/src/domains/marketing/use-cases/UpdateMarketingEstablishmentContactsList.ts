@@ -8,8 +8,8 @@ import {
   withSiretSchema,
 } from "shared";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { EstablishmentAggregate } from "../../establishment/entities/EstablishmentAggregate";
 import type { MarketingContact } from "../entities/MarketingContact";
 import type {
@@ -22,20 +22,17 @@ export type UpdateMarketingEstablishmentContactList = ReturnType<
   typeof makeUpdateMarketingEstablishmentContactList
 >;
 
-export const makeUpdateMarketingEstablishmentContactList =
-  createTransactionalUseCase<
-    WithSiretDto,
-    void,
-    void,
-    {
-      establishmentMarketingGateway: EstablishmentMarketingGateway;
-      timeGateway: TimeGateway;
-    }
-  >(
-    {
-      inputSchema: withSiretSchema,
-      name: "UpdateMarketingEstablishmentContactList",
-    },
+export const makeUpdateMarketingEstablishmentContactList = useCaseBuilder(
+  "UpdateMarketingEstablishmentContactList",
+)
+  .withInput<WithSiretDto>(withSiretSchema)
+  .withOutput<void>()
+  .withCurrentUser<void>()
+  .withDeps<{
+    establishmentMarketingGateway: EstablishmentMarketingGateway;
+    timeGateway: TimeGateway;
+  }>()
+  .build(
     async ({
       inputParams: { siret },
       deps: { establishmentMarketingGateway, timeGateway },

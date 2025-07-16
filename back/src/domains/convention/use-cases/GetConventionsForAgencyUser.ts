@@ -6,18 +6,18 @@ import {
   getConventionsForAgencyUserParamsSchema,
   getPaginationParamsForWeb,
 } from "shared";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export const makeGetConventionsForAgencyUser = createTransactionalUseCase<
-  GetConventionsForAgencyUserParams,
-  DataWithPagination<ConventionDto>,
-  ConnectedUser
->(
-  {
-    inputSchema: getConventionsForAgencyUserParamsSchema,
-    name: "GetConventionsForAgencyUser",
-  },
-  async ({ inputParams, uow, currentUser }) => {
+export const makeGetConventionsForAgencyUser = useCaseBuilder(
+  "GetConventionsForAgencyUser",
+)
+  .withInput<GetConventionsForAgencyUserParams>(
+    getConventionsForAgencyUserParamsSchema,
+  )
+  .withOutput<DataWithPagination<ConventionDto>>()
+  .withCurrentUser<ConnectedUser>()
+
+  .build(async ({ inputParams, uow, currentUser }) => {
     const { filters, sortBy } = inputParams;
 
     const pagination = getPaginationParamsForWeb(inputParams.pagination);
@@ -28,5 +28,4 @@ export const makeGetConventionsForAgencyUser = createTransactionalUseCase<
       agencyUserId: currentUser.id,
       pagination,
     });
-  },
-);
+  });

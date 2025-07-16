@@ -3,23 +3,15 @@ import {
   type NafSectionSuggestionsParams,
   nafSectionSuggestionsParamsSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../UseCase";
+import { useCaseBuilder } from "../../useCaseBuilder";
 
 export type GetNafSuggestions = ReturnType<typeof makeGetNafSuggestions>;
 
-export const makeGetNafSuggestions = createTransactionalUseCase<
-  NafSectionSuggestionsParams,
-  NafSectionSuggestion[],
-  void,
-  void
->(
-  {
-    inputSchema: nafSectionSuggestionsParamsSchema,
-    name: "NafSuggestions",
-  },
-  async ({ inputParams: { searchText }, uow }) => {
+export const makeGetNafSuggestions = useCaseBuilder("NafSuggestions")
+  .withInput<NafSectionSuggestionsParams>(nafSectionSuggestionsParamsSchema)
+  .withOutput<NafSectionSuggestion[]>()
+  .build(async ({ inputParams: { searchText }, uow }) => {
     const sanitizedSearchText = searchText.toLowerCase();
 
     return uow.nafRepository.getNafSuggestions(sanitizedSearchText);
-  },
-);
+  });
