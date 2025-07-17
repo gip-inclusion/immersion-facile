@@ -1,339 +1,182 @@
 import {
-  ConnectedUserBuilder,
-  DiscussionBuilder,
-  errors,
-  expectPromiseToFailWithError,
-  expectToEqual,
+	ConnectedUserBuilder,
+	DiscussionBuilder,
+	errors,
+	expectPromiseToFailWithError,
+	expectToEqual,
 } from "shared";
 import { v4 as uuid } from "uuid";
 import {
-  createInMemoryUow,
-  type InMemoryUnitOfWork,
+	createInMemoryUow,
+	type InMemoryUnitOfWork,
 } from "../../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
 import { GetDiscussionByIdForEstablishment } from "./GetDiscussionByIdForEstablishment";
 
 describe("GetDiscussionByIdForEstablishment use case", () => {
-  const user = new ConnectedUserBuilder().buildUser();
-  const discussionWithUserEmailInContact = new DiscussionBuilder()
-    .withEstablishmentContact({ email: user.email })
-    .withId(uuid())
-    .build();
-  const discussionWithoutUserEmailInContact = new DiscussionBuilder()
-    .withId(uuid())
-    .build();
+	const establishmentAdmin = new ConnectedUserBuilder()
+		.withId(uuid())
+		.buildUser();
+	const establishmentContact = new ConnectedUserBuilder()
+		.withId(uuid())
+		.buildUser();
+	const discussion = new DiscussionBuilder().withId(uuid()).build();
 
-  let getDiscussionByIdForEstablishment: GetDiscussionByIdForEstablishment;
-  let uow: InMemoryUnitOfWork;
+	let getDiscussionByIdForEstablishment: GetDiscussionByIdForEstablishment;
+	let uow: InMemoryUnitOfWork;
 
-  beforeEach(() => {
-    uow = createInMemoryUow();
-    getDiscussionByIdForEstablishment = new GetDiscussionByIdForEstablishment(
-      new InMemoryUowPerformer(uow),
-    );
+	beforeEach(() => {
+		uow = createInMemoryUow();
+		getDiscussionByIdForEstablishment = new GetDiscussionByIdForEstablishment(
+			new InMemoryUowPerformer(uow),
+		);
+		uow.userRepository.users = [establishmentAdmin, establishmentContact];
+		uow.discussionRepository.discussions = [discussion];
+		uow.establishmentAggregateRepository.establishmentAggregates = [
+			new EstablishmentAggregateBuilder()
+				.withEstablishmentSiret(discussion.siret)
+				.withUserRights([
+					{
+						role: "establishment-admin",
+						job: "",
+						phone: "",
+						userId: establishmentAdmin.id,
+						shouldReceiveDiscussionNotifications: false,
+					},
+					{
+						role: "establishment-contact",
+						userId: establishmentContact.id,
+						shouldReceiveDiscussionNotifications: false,
+					},
+				])
+				.build(),
+		];
+	});
 
-    uow.userRepository.users = [user];
-    uow.discussionRepository.discussions = [discussionWithUserEmailInContact];
-  });
+	describe("Wrong paths", () => {
+		it("throws unauthorized if no jwt provided", async () => {
+			await expectPromiseToFailWithError(
+				getDiscussionByIdForEstablishment.execute(uuid()),
+				errors.user.unauthorized(),
+			);
+		});
 
-  describe("Wrong paths", () => {
-    it("throws unauthorized if no jwt provided", async () => {
-      await expectPromiseToFailWithError(
-        getDiscussionByIdForEstablishment.execute(uuid()),
-        errors.user.unauthorized(),
-      );
-    });
+		describe("throws NotFound", () => {
+			it("when user cannot be found", async () => {
+				uow.userRepository.users = [];
+				await expectPromiseToFailWithError(
+					getDiscussionByIdForEstablishment.execute(discussion.id, {
+						userId: establishmentAdmin.id,
+					}),
+					errors.user.notFound({ userId: establishmentAdmin.id }),
+				);
+			});
 
-    describe("throws NotFound", () => {
-      it("when user cannot be found", async () => {
-        const userId = "user-404";
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(
-            discussionWithUserEmailInContact.id,
-            {
-              userId,
-            },
-          ),
-          errors.user.notFound({ userId }),
-        );
-      });
+			it("when discussion cannot be found", async () => {
+				const missingDiscussionId = uuid();
 
-      it("when discussion cannot be found", async () => {
-        uow.userRepository.users = [user];
+				await expectPromiseToFailWithError(
+					getDiscussionByIdForEstablishment.execute(missingDiscussionId, {
+						userId: establishmentAdmin.id,
+					}),
+					errors.discussion.notFound({ discussionId: missingDiscussionId }),
+				);
+			});
 
-        const missingDiscussionId = uuid();
+			it("when missing establishment", async () => {
+				uow.establishmentAggregateRepository.establishmentAggregates = [];
 
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(missingDiscussionId, {
-            userId: user.id,
-          }),
-          errors.discussion.notFound({ discussionId: missingDiscussionId }),
-        );
-      });
+				await expectPromiseToFailWithError(
+					getDiscussionByIdForEstablishment.execute(discussion.id, {
+						userId: establishmentAdmin.id,
+					}),
+					errors.establishment.notFound({
+						siret: discussion.siret,
+					}),
+				);
+			});
+		});
 
-      it("when missing establishment", async () => {
-        uow.discussionRepository.discussions = [
-          discussionWithoutUserEmailInContact,
-        ];
-        uow.establishmentAggregateRepository.establishmentAggregates = [];
+		it("throws accessForbidden when user have no rights on establishment", async () => {
+			const userWithNoRight = new ConnectedUserBuilder()
+				.withId(uuid())
+				.buildUser();
 
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(
-            discussionWithoutUserEmailInContact.id,
-            {
-              userId: user.id,
-            },
-          ),
-          errors.establishment.notFound({
-            siret: discussionWithoutUserEmailInContact.siret,
-          }),
-        );
-      });
-    });
+			uow.userRepository.users = [userWithNoRight];
 
-    describe("throws accessForbidden", () => {
-      it("when user have no email matching discussions's contact or copy emails and no rights on establishment", async () => {
-        const otherDiscussion = new DiscussionBuilder().build();
+			await expectPromiseToFailWithError(
+				getDiscussionByIdForEstablishment.execute(discussion.id, {
+					userId: userWithNoRight.id,
+				}),
+				errors.discussion.accessForbidden({
+					discussionId: discussion.id,
+					userId: userWithNoRight.id,
+				}),
+			);
+		});
+	});
 
-        uow.discussionRepository.discussions = [otherDiscussion];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret(otherDiscussion.siret)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: "",
-                phone: "",
-                userId: "",
-                shouldReceiveDiscussionNotifications: true,
-              },
-            ])
-            .build(),
-        ];
+	describe("Right paths", () => {
+		describe("Discussion with kinds and methods", () => {
+			it.each([
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("IF")
+					.withContactMode("EMAIL")
+					.build(),
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("IF")
+					.withContactMode("IN_PERSON")
+					.build(),
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("IF")
+					.withContactMode("PHONE")
+					.build(),
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("1_ELEVE_1_STAGE")
+					.withContactMode("EMAIL")
+					.build(),
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("1_ELEVE_1_STAGE")
+					.withContactMode("IN_PERSON")
+					.build(),
+				new DiscussionBuilder(discussion)
+					.withDiscussionKind("1_ELEVE_1_STAGE")
+					.withContactMode("PHONE")
+					.build(),
+			])(
+				"Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email",
+				async (discussion) => {
+					uow.discussionRepository.discussions = [discussion];
 
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(otherDiscussion.id, {
-            userId: user.id,
-          }),
-          errors.discussion.accessForbidden({
-            discussionId: otherDiscussion.id,
-            userId: user.id,
-          }),
-        );
-      });
+					expectToEqual(
+						await getDiscussionByIdForEstablishment.execute(discussion.id, {
+							userId: establishmentAdmin.id,
+						}),
+						new DiscussionBuilder(discussion).buildRead(),
+					);
+				},
+			);
+		});
 
-      it("when user doesn't have rights on discussion's establishment", async () => {
-        uow.discussionRepository.discussions = [
-          discussionWithoutUserEmailInContact,
-        ];
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret(discussionWithoutUserEmailInContact.siret)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: "",
-                phone: "",
-                userId: "",
-                shouldReceiveDiscussionNotifications: true,
-              },
-            ])
-            .build(),
-        ];
+		describe("user has rights on discussion's establishment", () => {
+			it("user has establishment admin right", async () => {
+				expectToEqual(
+					await getDiscussionByIdForEstablishment.execute(discussion.id, {
+						userId: establishmentAdmin.id,
+					}),
+					new DiscussionBuilder(discussion).buildRead(),
+				);
+			});
 
-        await expectPromiseToFailWithError(
-          getDiscussionByIdForEstablishment.execute(
-            discussionWithoutUserEmailInContact.id,
-            {
-              userId: user.id,
-            },
-          ),
-          errors.discussion.accessForbidden({
-            discussionId: discussionWithoutUserEmailInContact.id,
-            userId: user.id,
-          }),
-        );
-      });
-    });
-  });
-
-  describe("Right paths", () => {
-    describe("Discussion with kinds and methods", () => {
-      it.each([
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("IF")
-          .withContactMode("EMAIL")
-          .build(),
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("IF")
-          .withContactMode("IN_PERSON")
-          .build(),
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("IF")
-          .withContactMode("PHONE")
-          .build(),
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMode("EMAIL")
-          .build(),
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMode("IN_PERSON")
-          .build(),
-        new DiscussionBuilder(discussionWithUserEmailInContact)
-          .withDiscussionKind("1_ELEVE_1_STAGE")
-          .withContactMode("PHONE")
-          .build(),
-      ])(
-        "Gets discussion with kind $kind and contact mode $contactMode based on establishment contact email",
-        async (discussion) => {
-          uow.discussionRepository.discussions = [discussion];
-
-          expectToEqual(
-            await getDiscussionByIdForEstablishment.execute(
-              discussionWithUserEmailInContact.id,
-              {
-                userId: user.id,
-              },
-            ),
-            new DiscussionBuilder(discussion).buildRead(),
-          );
-        },
-      );
-    });
-
-    describe("email matching on discussion", () => {
-      it("Gets the matching discussion based on establishment contact email", async () => {
-        expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(
-            discussionWithUserEmailInContact.id,
-            {
-              userId: user.id,
-            },
-          ),
-          new DiscussionBuilder(discussionWithUserEmailInContact).buildRead(),
-        );
-      });
-
-      it("Gets the matching discussion based on establishment copy emails", async () => {
-        const userOnCopyEmailsDiscussion = new DiscussionBuilder()
-          .withEstablishmentContact({ copyEmails: [user.email] })
-          .withId(uuid())
-          .build();
-
-        uow.discussionRepository.discussions = [userOnCopyEmailsDiscussion];
-
-        expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(
-            userOnCopyEmailsDiscussion.id,
-            {
-              userId: user.id,
-            },
-          ),
-          new DiscussionBuilder(userOnCopyEmailsDiscussion).buildRead(),
-        );
-      });
-
-      it("Gets the matching discussion based on establishment copy emails and contact email", async () => {
-        const userBothOnCopyEmailsAndContactEmailDiscussion =
-          new DiscussionBuilder()
-            .withEstablishmentContact({
-              copyEmails: [user.email],
-              email: user.email,
-            })
-            .withId(uuid())
-            .build();
-
-        uow.discussionRepository.discussions = [
-          userBothOnCopyEmailsAndContactEmailDiscussion,
-        ];
-
-        expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(
-            userBothOnCopyEmailsAndContactEmailDiscussion.id,
-            {
-              userId: user.id,
-            },
-          ),
-          new DiscussionBuilder(
-            userBothOnCopyEmailsAndContactEmailDiscussion,
-          ).buildRead(),
-        );
-      });
-    });
-
-    describe("user has rights on discussion's establishment", () => {
-      beforeEach(() => {
-        uow.discussionRepository.discussions = [
-          discussionWithoutUserEmailInContact,
-        ];
-      });
-
-      it("user has establishment admin right", async () => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret(discussionWithoutUserEmailInContact.siret)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: "",
-                phone: "",
-                userId: user.id,
-                shouldReceiveDiscussionNotifications: true,
-              },
-            ])
-            .build(),
-        ];
-
-        expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(
-            discussionWithoutUserEmailInContact.id,
-            {
-              userId: user.id,
-            },
-          ),
-          new DiscussionBuilder(
-            discussionWithoutUserEmailInContact,
-          ).buildRead(),
-        );
-      });
-
-      it("user has establishment contact right", async () => {
-        uow.establishmentAggregateRepository.establishmentAggregates = [
-          new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret(discussionWithoutUserEmailInContact.siret)
-            .withUserRights([
-              {
-                role: "establishment-admin",
-                job: "",
-                phone: "",
-                userId: "",
-                shouldReceiveDiscussionNotifications: true,
-              },
-              {
-                role: "establishment-contact",
-                job: "",
-                phone: "",
-                userId: user.id,
-                shouldReceiveDiscussionNotifications: true,
-              },
-            ])
-            .build(),
-        ];
-
-        expectToEqual(
-          await getDiscussionByIdForEstablishment.execute(
-            discussionWithoutUserEmailInContact.id,
-            {
-              userId: user.id,
-            },
-          ),
-          new DiscussionBuilder(
-            discussionWithoutUserEmailInContact,
-          ).buildRead(),
-        );
-      });
-    });
-  });
+			it("user has establishment contact right", async () => {
+				expectToEqual(
+					await getDiscussionByIdForEstablishment.execute(discussion.id, {
+						userId: establishmentContact.id,
+					}),
+					new DiscussionBuilder(discussion).buildRead(),
+				);
+			});
+		});
+	});
 });
