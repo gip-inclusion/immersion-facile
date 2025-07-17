@@ -831,20 +831,20 @@ describe("Pg implementation of ConventionQueries", () => {
       ]);
     });
 
-    it("Gets all conventions of validated immersions ending at given date", async () => {
+    it("Gets all conventions of validated immersions ending at given date that did not receive any assessment link yet", async () => {
       // Act
       const date = new Date("2022-05-15T12:43:11");
       const queryResults =
-        await conventionQueries.getEndingAndValidatedConventions({
-          from: date,
-          to: addHours(date, 24),
-        });
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          {
+            from: date,
+            to: addHours(date, 24),
+          },
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+        );
 
       // Assert
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-        validatedImmersionEndingThe15th,
-      ]);
+      expectToEqual(queryResults, [validatedImmersionEndingThe15th]);
     });
 
     it("Gets all conventions of validated conventions that are already passed but has been ACCEPTED_BY_VALIDATOR at a later date", async () => {
@@ -887,14 +887,16 @@ describe("Pg implementation of ConventionQueries", () => {
       await notificationRepo.save(futureConventionNotification);
 
       const queryResults =
-        await conventionQueries.getEndingAndValidatedConventions({
-          from: subDays(validationDate, 5),
-          to: addHours(validationDate, 24),
-        });
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          {
+            from: subDays(validationDate, 5),
+            to: addHours(validationDate, 24),
+          },
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+        );
 
       expectArraysToEqualIgnoringOrder(queryResults, [
         validatedImmersionEndingThe14th,
-        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
         validatedImmersionEndingThe15th,
         pastConvention,
       ]);
@@ -932,10 +934,13 @@ describe("Pg implementation of ConventionQueries", () => {
       await notificationRepo.save(pastConventionNotification);
 
       const queryResults =
-        await conventionQueries.getEndingAndValidatedConventions({
-          from: today,
-          to: addDays(today, 1),
-        });
+        await conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
+          {
+            from: today,
+            to: addDays(today, 1),
+          },
+          "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
+        );
 
       expectArraysToEqualIgnoringOrder(queryResults, [
         { ...pastConvention, updatedAt: today.toISOString() },
