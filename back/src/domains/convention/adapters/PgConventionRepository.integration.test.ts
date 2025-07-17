@@ -1,4 +1,4 @@
-import { addDays, addHours, subDays } from "date-fns";
+import { addDays, subDays } from "date-fns";
 import type { Pool } from "pg";
 import {
   AgencyDtoBuilder,
@@ -11,7 +11,6 @@ import {
   type EstablishmentRepresentative,
   type EstablishmentTutor,
   errors,
-  expectArraysToEqualIgnoringOrder,
   expectPromiseToFailWithError,
   expectToEqual,
   type FtConnectToken,
@@ -1210,151 +1209,6 @@ describe("PgConventionRepository", () => {
         await conventionRepository.getIdsByEstablishmentTutorEmail(email);
 
       expectToEqual(result, []);
-    });
-  });
-
-  describe("getIdsValidatedEndedOrUpdatedAround", () => {
-    const dateStart10th = new Date("2022-05-10").toISOString();
-    const dateEnd14th = new Date("2022-05-14").toISOString();
-    const dateEnd15th = new Date("2022-05-15").toISOString();
-    const validatedImmersionEndingThe14th = conventionStylisteBuilder
-      .withId("aaaaac14-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .validated()
-      .withDateStart(dateStart10th)
-      .withDateEnd(dateEnd14th)
-      .withSchedule(reasonableSchedule)
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    const validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail =
-      conventionStylisteBuilder
-        .withId("aaaaac15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-        .validated()
-        .withDateStart(dateStart10th)
-        .withDateEnd(dateEnd15th)
-        .withSchedule(reasonableSchedule)
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-
-    const validatedImmersionEndingThe15th = conventionStylisteBuilder
-      .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .validated()
-      .withDateStart(dateStart10th)
-      .withDateEnd(dateEnd15th)
-      .withSchedule(reasonableSchedule)
-      .withEstablishmentTutorFirstName("Romain")
-      .withEstablishmentTutorLastName("Grandjean")
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    const ongoingImmersionEndingThe15th = conventionStylisteBuilder
-      .withId("cccccc15-9c0a-1aaa-aa6d-6aa9ad38aaaa")
-      .withDateStart(dateStart10th)
-      .withDateEnd(dateEnd15th)
-      .withSchedule(reasonableSchedule)
-      .withStatus("IN_REVIEW")
-      .withUpdatedAt(anyConventionUpdatedAt)
-      .build();
-
-    beforeEach(async () => {
-      await Promise.all(
-        [
-          validatedImmersionEndingThe14th,
-          validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-          validatedImmersionEndingThe15th,
-          ongoingImmersionEndingThe15th,
-        ].map((params) =>
-          conventionRepository.save(params, anyConventionUpdatedAt),
-        ),
-      );
-    });
-
-    it("Gets all conventions of validated immersions ending at given date", async () => {
-      // Act
-      const date = new Date("2022-05-15T12:43:11");
-      const queryResults =
-        await conventionRepository.getValidatedEndedOrUpdatedAround({
-          from: date,
-          to: addHours(date, 24),
-        });
-
-      // Assert
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-        validatedImmersionEndingThe15th,
-      ]);
-    });
-
-    it("Gets all validated conventions that are already passed", async () => {
-      const validationDate20th = new Date("2022-05-20T12:43:11");
-      const futureConvention = conventionStylisteBuilder
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad0")
-        .validated()
-        .withDateStart(addDays(validationDate20th, 2).toISOString())
-        .withDateEnd(addDays(validationDate20th, 4).toISOString())
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      const pastConvention = conventionStylisteBuilder
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
-        .validated()
-        .withDateStart(dateStart10th)
-        .withDateEnd(dateEnd15th)
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      await conventionRepository.save(pastConvention, anyConventionUpdatedAt);
-      await conventionRepository.save(futureConvention, anyConventionUpdatedAt);
-
-      const queryResults =
-        await conventionRepository.getValidatedEndedOrUpdatedAround({
-          from: subDays(validationDate20th, 5),
-          to: addHours(validationDate20th, 24),
-        });
-
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        validatedImmersionEndingThe14th,
-        validatedImmersionEndingThe15thThatAlreadyReceivedAnAssessmentEmail,
-        validatedImmersionEndingThe15th,
-        pastConvention,
-      ]);
-    });
-
-    it("Gets all validated conventions that ended a long time ago but has been updated today", async () => {
-      await db.deleteFrom("conventions").execute();
-      const today = new Date();
-      const pastConvention = conventionStylisteBuilder
-        .withId("bbbbbc15-9c0a-1aaa-aa6d-6aa9ad38aad5")
-        .validated()
-        .withDateStart(subDays(today, 15).toISOString())
-        .withDateEnd(subDays(today, 10).toISOString())
-        .withSchedule(reasonableSchedule)
-        .withEstablishmentTutorFirstName("Romain")
-        .withEstablishmentTutorLastName("Grandjean")
-        .withUpdatedAt(anyConventionUpdatedAt)
-        .build();
-      await conventionRepository.save(pastConvention, anyConventionUpdatedAt);
-      await conventionRepository.update(
-        {
-          ...pastConvention,
-          status: "ACCEPTED_BY_VALIDATOR",
-        },
-        today.toISOString(),
-      );
-
-      const queryResults =
-        await conventionRepository.getValidatedEndedOrUpdatedAround({
-          from: today,
-          to: addDays(today, 1),
-        });
-
-      expectArraysToEqualIgnoringOrder(queryResults, [
-        { ...pastConvention, updatedAt: today.toISOString() },
-      ]);
     });
   });
 

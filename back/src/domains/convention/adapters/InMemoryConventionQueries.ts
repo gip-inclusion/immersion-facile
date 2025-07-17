@@ -8,11 +8,13 @@ import {
   type ConventionScope,
   conventionSchema,
   type DataWithPagination,
+  type DateRange,
   errors,
   type FindSimilarConventionsParams,
   NotFoundError,
   type SiretDto,
   type UserId,
+  validatedConventionStatuses,
 } from "shared";
 import { validateAndParseZodSchemaV2 } from "../../../config/helpers/validateAndParseZodSchema";
 import { createLogger } from "../../../utils/logger";
@@ -61,6 +63,23 @@ export class InMemoryConventionQueries implements ConventionQueries {
           dateStartToMatch <= addDays(new Date(dateStart), 7),
       )
       .map((convention) => convention.id);
+  }
+
+  public async getEndingAndValidatedConventions(
+    finishingRange: DateRange,
+  ): Promise<ConventionReadDto[]> {
+    return Promise.all(
+      this.conventionRepository.conventions
+        .filter(
+          (convention) =>
+            new Date(convention.dateEnd).getDate() >=
+              finishingRange.from.getDate() &&
+            new Date(convention.dateEnd).getDate() <=
+              finishingRange.to.getDate() &&
+            validatedConventionStatuses.includes(convention.status),
+        )
+        .map((convention) => this.#addAgencyDataToConvention(convention)),
+    );
   }
 
   public async getConventionById(
