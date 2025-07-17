@@ -219,7 +219,7 @@ Convention ID: ${conventionId} - Non trouvée dans la base de données
 
   const assessmentEmail = (
     await uow.notificationRepository.getEmailsByFilters({
-      conventionIds: [conventionId],
+      conventionId,
       email: convention.establishmentTutor.email,
       emailType: "ASSESSMENT_CREATED_ESTABLISHMENT_NOTIFICATION",
     })

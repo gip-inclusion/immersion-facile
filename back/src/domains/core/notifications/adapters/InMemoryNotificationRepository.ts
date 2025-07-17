@@ -90,9 +90,8 @@ export class InMemoryNotificationRepository implements NotificationRepository {
           return false;
 
         if (
-          filters.conventionIds &&
-          notification.followedIds.conventionId &&
-          !filters.conventionIds.includes(notification.followedIds.conventionId)
+          filters.conventionId &&
+          notification.followedIds.conventionId !== filters.conventionId
         )
           return false;
 
