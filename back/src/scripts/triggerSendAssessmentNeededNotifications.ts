@@ -7,7 +7,7 @@ import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
 import { makeGenerateConventionMagicLinkUrl } from "../config/bootstrap/magicLinkUrl";
 import { makeKyselyDb } from "../config/pg/kysely/kyselyUtils";
 import { PgAssessmentRepository } from "../domains/convention/adapters/PgAssessmentRepository";
-import { PgConventionRepository } from "../domains/convention/adapters/PgConventionRepository";
+import { PgConventionQueries } from "../domains/convention/adapters/PgConventionQueries";
 import { makeCreateNewEvent } from "../domains/core/events/ports/EventBus";
 import { makeGenerateJwtES256 } from "../domains/core/jwt";
 import { PgNotificationRepository } from "../domains/core/notifications/adapters/PgNotificationRepository";
@@ -57,7 +57,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
 
   const pgPool = getPgPool();
   const kyselyDb = makeKyselyDb(pgPool);
-  const conventionRepository = new PgConventionRepository(kyselyDb);
+  const conventionQueries = new PgConventionQueries(kyselyDb);
   const assessmentRepository = new PgAssessmentRepository(kyselyDb);
   const notificationRepository = new PgNotificationRepository(kyselyDb);
 
@@ -75,7 +75,7 @@ const sendAssessmentNeededNotificationsScript = async () => {
   const sendAssessmentNeededNotifications =
     new SendAssessmentNeededNotifications(
       uowPerformer,
-      { conventionRepository, assessmentRepository, notificationRepository },
+      { conventionQueries, assessmentRepository, notificationRepository },
       saveNotificationAndRelatedEvent,
       timeGateway,
       makeGenerateConventionMagicLinkUrl(config, generateConventionJwt),
