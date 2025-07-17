@@ -22,8 +22,15 @@ export const validateAndParseZodSchemaV2 = <T>(
       ? { schemaName: props.schemaName }
       : { useCaseName: props.useCaseName }),
   });
+
   props.logger.error({
-    message: error.message,
+    message: `${error.message}${
+      error.issues?.length
+        ? `
+    Issues:
+    ${error.issues.join("\n")}`
+        : ""
+    }`,
   });
 
   throw error;
