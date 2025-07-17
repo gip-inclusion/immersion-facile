@@ -348,7 +348,7 @@ describe("PgNotificationRepository", () => {
     });
 
     describe("with filters", () => {
-      it("returns matching email when email + emailType filters match", async () => {
+      it("returns matching email when required filters match", async () => {
         const emailNotification = emailNotifications[0];
         const response = await pgNotificationRepository.getEmailsByFilters({
           email: emailNotification.templatedContent.recipients[0],
@@ -359,89 +359,7 @@ describe("PgNotificationRepository", () => {
         ]);
       });
 
-      it("returns matching email when conventionIds match", async () => {
-        const conventionId1 = "cccccccc-1111-4111-1111-cccccccccccc";
-        const conventionId2 = "cccccccc-1111-4111-1111-dddddddddddd";
-        const emailNotification1: EmailNotification = {
-          createdAt: new Date().toISOString(),
-          followedIds: { conventionId: conventionId1 },
-          id: "11111111-1111-4444-1111-111111111111",
-          kind: "email",
-          templatedContent: {
-            kind: "CONVENTION_TRANSFERRED_AGENCY_NOTIFICATION",
-            recipients: ["bob@mail.com"],
-            sender: {
-              email: "fake-email@email.com",
-              name: "Fake name",
-            },
-            cc: [],
-            params: {
-              beneficiaryFirstName: "Bob",
-              beneficiaryLastName: "L'éponge",
-              beneficiaryEmail: "bob@mail.com",
-              conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
-              beneficiaryPhone: "0606060606",
-              previousAgencyName: "Agence du Grand Est",
-              internshipKind: "immersion",
-              justification: "Justification",
-              magicLink: "https://magic-link.com",
-            },
-          },
-        };
-        const emailNotification2: EmailNotification = {
-          createdAt: new Date().toISOString(),
-          followedIds: { conventionId: conventionId2 },
-          id: "11111111-1111-4444-1111-111111111122",
-          kind: "email",
-          templatedContent: {
-            kind: "ASSESSMENT_ESTABLISHMENT_REMINDER",
-            recipients: ["bob@mail.com"],
-            sender: {
-              email: "fake-email@email.com",
-              name: "Fake name",
-            },
-            cc: [],
-            params: {
-              assessmentCreationLink: "",
-              beneficiaryFirstName: "Bob",
-              beneficiaryLastName: "L'éponge",
-              establishmentTutorFirstName: "",
-              establishmentTutorLastName: "",
-              conventionId: "cccccccc-1111-4111-1111-cccccccccccc",
-              internshipKind: "immersion",
-            },
-          },
-        };
-        await pgNotificationRepository.save(emailNotification1);
-        await pgNotificationRepository.save(emailNotification2);
-
-        const response = await pgNotificationRepository.getEmailsByFilters({
-          conventionIds: [conventionId1, conventionId2],
-        });
-
-        expectToEqual(response, [
-          {
-            ...emailNotification1,
-            ...withToBeSendState,
-          },
-          {
-            ...emailNotification2,
-            ...withToBeSendState,
-          },
-        ]);
-      });
-
-      it("returns empty array when no conventionIds match", async () => {
-        const conventionId = "cccccccc-1111-4111-1111-cccccccccccc";
-
-        const response = await pgNotificationRepository.getEmailsByFilters({
-          conventionIds: [conventionId],
-        });
-
-        expectToEqual(response, []);
-      });
-
-      it("returns matching email when email + emailType + conventionIds match", async () => {
+      it("returns matching email when required filters + conventionId match", async () => {
         const emailNotification: EmailNotification = {
           createdAt: new Date().toISOString(),
           followedIds: { conventionId: "cccccccc-1111-4111-1111-cccccccccccc" },
@@ -473,9 +391,7 @@ describe("PgNotificationRepository", () => {
         const response = await pgNotificationRepository.getEmailsByFilters({
           email: emailNotification.templatedContent.recipients[0],
           emailType: emailNotification.templatedContent.kind,
-          conventionIds: emailNotification.followedIds.conventionId
-            ? [emailNotification.followedIds.conventionId]
-            : undefined,
+          conventionId: emailNotification.followedIds.conventionId,
         });
 
         expectToEqual(response, [
@@ -483,7 +399,7 @@ describe("PgNotificationRepository", () => {
         ]);
       });
 
-      it("returns matching email when email + emailType + aroundCreatedAt match", async () => {
+      it("returns matching email when required filters + aroundCreatedAt match", async () => {
         const today = new Date();
         const oldEmailNotification: EmailNotification = {
           createdAt: subDays(today, 15).toISOString(),
