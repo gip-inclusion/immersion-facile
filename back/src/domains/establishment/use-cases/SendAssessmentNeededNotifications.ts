@@ -25,7 +25,6 @@ import type {
   NotificationContentAndFollowedIds,
   SaveNotificationAndRelatedEvent,
 } from "../../core/notifications/helpers/Notification";
-import type { NotificationRepository } from "../../core/notifications/ports/NotificationRepository";
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
@@ -48,7 +47,6 @@ type SendAssessmentParams = {
 type OutOfTransaction = {
   conventionQueries: ConventionQueries;
   assessmentRepository: AssessmentRepository;
-  notificationRepository: NotificationRepository;
 };
 
 export class SendAssessmentNeededNotifications extends UseCase<
@@ -136,37 +134,20 @@ export class SendAssessmentNeededNotifications extends UseCase<
 
   async #getConventionsToSendEmailTo(params: SendAssessmentParams) {
     const conventions =
-      await this.#outOfTrx.conventionQueries.getEndingAndValidatedConventions(
+      await this.#outOfTrx.conventionQueries.getAllConventionsForThoseEndingThatDidntGoThrough(
         params.conventionEndDate,
+        "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
       );
-
-    const conventionsWithoutAssessmentRequest = (
-      await Promise.all(
-        conventions.map(async (convention) => {
-          const emails =
-            await this.#outOfTrx.notificationRepository.getEmailsByFilters({
-              conventionId: convention.id,
-              emailType: "ASSESSMENT_ESTABLISHMENT_NOTIFICATION",
-            });
-          return emails.length === 0 ? convention : null;
-        }),
-      )
-    ).filter((c): c is ConventionDto => c !== null);
 
     const conventionIdsWithAlreadyExistingAssessment =
       await this.#outOfTrx.assessmentRepository
-        .getByConventionIds(
-          conventionsWithoutAssessmentRequest.map(
-            (convention) => convention.id,
-          ),
-        )
+        .getByConventionIds(conventions.map((convention) => convention.id))
         .then(map(({ conventionId }) => conventionId));
 
-    const conventionsToSendAssessmentEmailTo =
-      conventionsWithoutAssessmentRequest.filter(
-        (convention) =>
-          !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
-      );
+    const conventionsToSendAssessmentEmailTo = conventions.filter(
+      (convention) =>
+        !conventionIdsWithAlreadyExistingAssessment.includes(convention.id),
+    );
 
     logger.info({
       message: `[${this.#timeGateway.now().toISOString()}]: About to send assessment email to ${

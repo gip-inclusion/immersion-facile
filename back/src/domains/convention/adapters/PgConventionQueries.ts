@@ -28,6 +28,7 @@ import type { KyselyDb } from "../../../config/pg/kysely/kyselyUtils";
 import type { Database } from "../../../config/pg/kysely/model/database";
 import { createLogger } from "../../../utils/logger";
 import type {
+  AssessmentEmailKind,
   ConventionQueries,
   GetConventionsFilters,
   GetConventionsParams,
@@ -83,8 +84,9 @@ export class PgConventionQueries implements ConventionQueries {
     return pgResults.map((pgResult) => conventionSchema.parse(pgResult.dto).id);
   }
 
-  public async getEndingAndValidatedConventions(
+  public async getAllConventionsForThoseEndingThatDidntGoThrough(
     finishingRange: DateRange,
+    assessmentEmailKind: AssessmentEmailKind,
   ): Promise<ConventionDto[]> {
     const pgResults = await createConventionQueryBuilder(this.transaction)
       .where("conventions.status", "in", validatedConventionStatuses)
@@ -108,6 +110,20 @@ export class PgConventionQueries implements ConventionQueries {
             ),
           ]),
         ]),
+      )
+      .where(({ selectFrom, not, exists }) =>
+        not(
+          exists(
+            selectFrom("notifications_email")
+              .select("notifications_email.convention_id")
+              .where("notifications_email.email_kind", "=", assessmentEmailKind)
+              .whereRef(
+                "conventions.id",
+                "=",
+                "notifications_email.convention_id",
+              ),
+          ),
+        ),
       )
       .where((eb) =>
         eb.exists(
