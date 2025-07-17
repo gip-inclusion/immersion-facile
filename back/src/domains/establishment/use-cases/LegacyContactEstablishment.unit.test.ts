@@ -12,7 +12,6 @@ import {
   type Location,
   UserBuilder,
 } from "shared";
-
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -34,7 +33,14 @@ import {
 import { LegacyContactEstablishment } from "./LegacyContactEstablishment";
 
 describe("LegacyContactEstablishment", () => {
-  const siret = "11112222333344";
+  const establishmentAdmin = new UserBuilder()
+    .withId("establishment.admin")
+    .withEmail("admin@establishment.com")
+    .build();
+  const establishmentContact = new UserBuilder()
+    .withId("establishment.contact")
+    .withEmail("contact@establishment.com")
+    .build();
 
   const location: Location = {
     id: "11111111-1111-4444-1111-111111111111",
@@ -50,18 +56,8 @@ describe("LegacyContactEstablishment", () => {
     },
   };
 
-  const validRequest: LegacyContactEstablishmentRequestDto = {
-    appellationCode: "12898",
-    siret,
-    contactMode: "PHONE",
-    potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
-    potentialBeneficiaryLastName: "potential_beneficiary_last_name",
-    potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
-    locationId: location.id,
-  };
-
   const appellationAndRome: AppellationAndRomeDto = {
-    appellationCode: validRequest.appellationCode,
+    appellationCode: "12898",
     appellationLabel: "My appellation label",
     romeCode: "A0000",
     romeLabel: "Rome de test",
@@ -69,25 +65,8 @@ describe("LegacyContactEstablishment", () => {
 
   const immersionOffer = new OfferEntityBuilder()
     .withRomeCode(appellationAndRome.romeCode)
-    .withAppellationCode(validRequest.appellationCode)
+    .withAppellationCode(appellationAndRome.appellationCode)
     .withAppellationLabel(appellationAndRome.appellationLabel)
-    .build();
-
-  const validEmailRequest: LegacyContactEstablishmentRequestDto = {
-    ...validRequest,
-    contactMode: "EMAIL",
-    message: "message_to_send",
-    immersionObjective: "Confirmer un projet professionnel",
-    potentialBeneficiaryPhone: "+33654783402",
-  };
-
-  const establishmentAdmin = new UserBuilder()
-    .withId("establishment.admin")
-    .withEmail("admin@establishment.com")
-    .build();
-  const establishmentContact = new UserBuilder()
-    .withId("establishment.contact")
-    .withEmail("contact@establishment.com")
     .build();
 
   const establishmentAdminRight: EstablishmentAdminRight = {
@@ -110,7 +89,7 @@ describe("LegacyContactEstablishment", () => {
     new EstablishmentAggregateBuilder()
       .withEstablishment(
         new EstablishmentEntityBuilder()
-          .withSiret(siret)
+          .withSiret("11112222333344")
           .withLocations([location])
           .withContactMode("EMAIL")
           .build(),
@@ -118,6 +97,24 @@ describe("LegacyContactEstablishment", () => {
       .withUserRights(establishmentRights)
       .withOffers([immersionOffer])
       .build();
+
+  const validRequest: LegacyContactEstablishmentRequestDto = {
+    appellationCode: appellationAndRome.appellationCode,
+    siret: establishmentAggregateWithEmailContact.establishment.siret,
+    contactMode: "PHONE",
+    potentialBeneficiaryFirstName: "potential_beneficiary_first_name",
+    potentialBeneficiaryLastName: "potential_beneficiary_last_name",
+    potentialBeneficiaryEmail: "potential_beneficiary@email.fr",
+    locationId: location.id,
+  };
+
+  const validEmailRequest: LegacyContactEstablishmentRequestDto = {
+    ...validRequest,
+    contactMode: "EMAIL",
+    message: "message_to_send",
+    immersionObjective: "Confirmer un projet professionnel",
+    potentialBeneficiaryPhone: "+33654783402",
+  };
 
   const minimumNumberOfDaysBetweenSimilarContactRequests = 3;
 
@@ -184,7 +181,9 @@ describe("LegacyContactEstablishment", () => {
       const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder()
-            .withSiret(siret)
+            .withSiret(
+              establishmentAggregateWithEmailContact.establishment.siret,
+            )
             .withLocations([location])
             .withContactMode("PHONE")
             .build(),
@@ -192,9 +191,10 @@ describe("LegacyContactEstablishment", () => {
         .withUserRights(establishmentRights)
         .withOffers([immersionOffer])
         .build();
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
-      );
+      ];
 
       const discussionId = "discussion_id";
       const eventId = "contact_event_id";
@@ -216,7 +216,7 @@ describe("LegacyContactEstablishment", () => {
           occurredAt: now.toISOString(),
           topic: "ContactRequestedByBeneficiary",
           payload: {
-            siret,
+            siret: establishment.establishment.siret,
             discussionId,
             triggeredBy: null,
           },
@@ -228,19 +228,23 @@ describe("LegacyContactEstablishment", () => {
     });
 
     it("schedules event for valid IN_PERSON contact requests", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
-        new EstablishmentAggregateBuilder()
-          .withEstablishment(
-            new EstablishmentEntityBuilder()
-              .withSiret(siret)
-              .withLocations([location])
-              .withContactMode("IN_PERSON")
-              .build(),
-          )
-          .withUserRights(establishmentRights)
-          .withOffers([immersionOffer])
-          .build(),
-      );
+      const establishment = new EstablishmentAggregateBuilder()
+        .withEstablishment(
+          new EstablishmentEntityBuilder()
+            .withSiret(
+              establishmentAggregateWithEmailContact.establishment.siret,
+            )
+            .withLocations([location])
+            .withContactMode("IN_PERSON")
+            .build(),
+        )
+        .withUserRights(establishmentRights)
+        .withOffers([immersionOffer])
+        .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
 
       const discussionId = "discussion_id";
       const eventId = "contact_event_id";
@@ -262,7 +266,7 @@ describe("LegacyContactEstablishment", () => {
           occurredAt: now.toISOString(),
           topic: "ContactRequestedByBeneficiary",
           payload: {
-            siret,
+            siret: establishment.establishment.siret,
             discussionId,
             triggeredBy: null,
           },
@@ -311,21 +315,12 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "Dates d’immersion envisagées non renseignées",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           createdAt: connectionDateStr,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               sentAt: connectionDateStr,
               message: validEmailRequest.message,
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               attachments: [],
             },
@@ -345,10 +340,9 @@ describe("LegacyContactEstablishment", () => {
         .withOffers([immersionOffer])
         .build();
 
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishmentAggregate,
-      );
-      const establishment = establishmentAggregate.establishment;
+      ];
 
       const connectionDate = new Date("2022-01-10T12:00:00.000");
       timeGateway.setNextDate(connectionDate);
@@ -361,9 +355,9 @@ describe("LegacyContactEstablishment", () => {
         {
           id: "discussionToOld",
           appellationCode: appellationAndRome.appellationCode,
-          siret,
+          siret: establishmentAggregate.establishment.siret,
           businessName: "Entreprise 1",
-          address: establishment.locations[0].address,
+          address: establishmentAggregate.establishment.locations[0].address,
           contactMode: "EMAIL",
           kind: "IF",
           potentialBeneficiary: {
@@ -376,20 +370,11 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "fake date preferences",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           createdAt: discussionToOldDate,
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               message: "Bonjour, c'est une vieille disucssion",
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               sentAt: discussionToOldDate,
               attachments: [],
@@ -401,9 +386,9 @@ describe("LegacyContactEstablishment", () => {
           id: "discussion1",
           appellationCode: appellationAndRome.appellationCode,
           createdAt: discussion1Date,
-          siret,
+          siret: establishmentAggregate.establishment.siret,
           businessName: "Entreprise 2",
-          address: establishment.locations[0].address,
+          address: establishmentAggregate.establishment.locations[0].address,
           contactMode: "EMAIL",
           kind: "IF",
           potentialBeneficiary: {
@@ -416,20 +401,11 @@ describe("LegacyContactEstablishment", () => {
             datePreferences: "fake date preferences",
             immersionObjective: "Confirmer un projet professionnel",
           },
-          establishmentContact: {
-            email: establishmentAdmin.email,
-            firstName: establishmentAdmin.firstName,
-            lastName: establishmentAdmin.lastName,
-            phone: establishmentAdminRight.phone,
-            job: establishmentAdminRight.job,
-            copyEmails: [establishmentContact.email],
-          },
           exchanges: [
             {
               subject: "Demande de contact initiée par le bénéficiaire",
               message:
                 "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
-              recipient: "establishment",
               sender: "potentialBeneficiary",
               sentAt: discussion1Date,
               attachments: [],
@@ -442,7 +418,7 @@ describe("LegacyContactEstablishment", () => {
       uuidGenerator.setNextUuid("discussion2");
       const secondContactRequestDto: LegacyContactEstablishmentRequestDto = {
         appellationCode: appellationAndRome.appellationCode,
-        siret,
+        siret: establishmentAggregate.establishment.siret,
         potentialBeneficiaryFirstName: "Bob",
         potentialBeneficiaryLastName: "Marley",
         potentialBeneficiaryEmail: "bob.marley@email.com",
@@ -450,7 +426,7 @@ describe("LegacyContactEstablishment", () => {
         message: "Bonjour, j'aimerais venir jouer chez vous. Je suis sympa.",
         immersionObjective: "Confirmer un projet professionnel",
         potentialBeneficiaryPhone: "+33654783402",
-        locationId: establishment.locations[0].id,
+        locationId: establishmentAggregate.establishment.locations[0].id,
       };
       await contactEstablishment.execute(secondContactRequestDto);
 
@@ -508,16 +484,19 @@ describe("LegacyContactEstablishment", () => {
       const establishment = new EstablishmentAggregateBuilder()
         .withEstablishment(
           new EstablishmentEntityBuilder()
-            .withSiret(siret)
+            .withSiret(
+              establishmentAggregateWithEmailContact.establishment.siret,
+            )
             .withContactMode("EMAIL")
             .build(),
         )
         .withUserRights(establishmentRights)
         .withOffers([immersionOffer])
         .build();
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         establishment,
-      );
+      ];
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
@@ -545,11 +524,13 @@ describe("LegacyContactEstablishment", () => {
     });
 
     it("throws BadRequestError when no offers found in establishment with given appellationCode", async () => {
-      await uow.establishmentAggregateRepository.insertEstablishmentAggregate(
+      uow.establishmentAggregateRepository.establishmentAggregates = [
         new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder()
-              .withSiret(siret)
+              .withSiret(
+                establishmentAggregateWithEmailContact.establishment.siret,
+              )
               .withContactMode("PHONE")
               .build(),
           )
@@ -558,7 +539,7 @@ describe("LegacyContactEstablishment", () => {
             new OfferEntityBuilder().withAppellationCode("wrong").build(),
           ])
           .build(),
-      );
+      ];
 
       await expectPromiseToFailWithError(
         contactEstablishment.execute({
