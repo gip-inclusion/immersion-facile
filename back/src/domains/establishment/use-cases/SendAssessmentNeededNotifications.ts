@@ -141,13 +141,6 @@ export class SendAssessmentNeededNotifications extends UseCase<
       params.conventionEndDate,
     );
 
-    if (conventions.length === 0) {
-      return {
-        conventions: [],
-        numberOfConventionsWithAlreadyExistingAssessment: 0,
-      };
-    }
-
     const conventionsWithValidationEmails =
       await this.#filterConventionsWithValidationEmails(conventions);
 
