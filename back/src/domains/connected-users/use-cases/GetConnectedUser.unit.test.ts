@@ -1,9 +1,9 @@
 import {
   AgencyDtoBuilder,
   allAgencyRoles,
+  type ConnectedUser,
   ConnectedUserBuilder,
   ConventionDtoBuilder,
-  DiscussionBuilder,
   defaultProConnectInfos,
   errors,
   expectPromiseToFailWithError,
@@ -24,6 +24,8 @@ import { EstablishmentAggregateBuilder } from "../../establishment/helpers/Estab
 import { GetConnectedUser } from "./GetConnectedUser";
 
 describe("GetConnectedUser", () => {
+  const now = new Date();
+
   const notAdminBuilder = new ConnectedUserBuilder()
     .withId("not-an-admin-id")
     .withFirstName("Francis")
@@ -38,9 +40,16 @@ describe("GetConnectedUser", () => {
     .withEmail("billy.idol@mail.com")
     .withIsAdmin(false)
     .withEstablishments(undefined);
-  const connectedUserNotAdmin = notAdminBuilder.build();
-  const notAdmin = notAdminBuilder.buildUser();
+  const adminUserBuilder = new ConnectedUserBuilder()
+    .withId("admin-id")
+    .withFirstName("Admin")
+    .withIsAdmin(true);
+  const connectedNotAdminUser = notAdminBuilder.build();
+  const connectedAdminUser = adminUserBuilder.build();
+
+  const notAdminUser = notAdminBuilder.buildUser();
   const anotherUser = anotherUserBuilder.build();
+  const admin = adminUserBuilder.buildUser();
 
   const agencyWithoutCounsellorAndValidatorBuilder = new AgencyDtoBuilder();
 
@@ -50,539 +59,430 @@ describe("GetConnectedUser", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    timeGateway = new CustomTimeGateway();
+    timeGateway = new CustomTimeGateway(now);
     getConnectedUser = new GetConnectedUser(
       new InMemoryUowPerformer(uow),
       new StubDashboardGateway(),
       timeGateway,
     );
+    uow.userRepository.users = [notAdminUser, anotherUser, admin];
   });
 
-  describe("For getting the current user's data", () => {
-    it("throws NotFoundError if the user is not found", async () => {
-      await expectPromiseToFailWithError(
-        getConnectedUser.execute({}, connectedUserNotAdmin),
-        errors.user.notFound({ userId: notAdmin.id }),
-      );
+  describe("When a user get it's own user datas", () => {
+    describe("wrong paths", () => {
+      it("throws NotFoundError if the user is not found", async () => {
+        uow.userRepository.users = [];
+
+        await expectPromiseToFailWithError(
+          getConnectedUser.execute({}, connectedNotAdminUser),
+          errors.user.notFound({ userId: notAdminUser.id }),
+        );
+      });
+      it("throws Forbidden if no user is provided", async () => {
+        await expectPromiseToFailWithError(
+          getConnectedUser.execute({}),
+          errors.user.noJwtProvided(),
+        );
+      });
     });
 
-    it("throws Forbidden if no user is provided", async () => {
-      await expectPromiseToFailWithError(
-        getConnectedUser.execute({}),
-        errors.user.noJwtProvided(),
-      );
-    });
+    describe("agency user infos", () => {
+      const [
+        agencyRolesAllowedToGetDashboard,
+        agencyRolesForbiddenToGetDashboard,
+      ] = splitCasesBetweenPassingAndFailing(allAgencyRoles, [
+        "agency-admin",
+        "validator",
+        "counsellor",
+        "agency-viewer",
+      ]);
 
-    const [
-      agencyRolesAllowedToGetDashboard,
-      agencyRolesForbiddenToGetDashboard,
-    ] = splitCasesBetweenPassingAndFailing(allAgencyRoles, [
-      "agency-admin",
-      "validator",
-      "counsellor",
-      "agency-viewer",
-    ]);
+      const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
 
-    const agency = agencyWithoutCounsellorAndValidatorBuilder.build();
+      describe("returns agency rights with agency dashboards", () => {
+        it.each(agencyRolesAllowedToGetDashboard)(
+          "when role is '%s'",
+          async (agencyUserRole) => {
+            const agency = agencyWithoutCounsellorAndValidatorBuilder
+              .withKind("pole-emploi")
+              .build();
 
-    describe("returns the dashboard url", () => {
-      it.each(agencyRolesAllowedToGetDashboard)(
-        "when role is '%s'",
-        async (agencyUserRole) => {
-          const agency = agencyWithoutCounsellorAndValidatorBuilder
-            .withKind("pole-emploi")
-            .build();
+            uow.agencyRepository.agencies = [
+              toAgencyWithRights(agency, {
+                [notAdminUser.id]: {
+                  roles: [agencyUserRole],
+                  isNotifiedByEmail: true,
+                },
+              }),
+            ];
 
-          uow.userRepository.users = [notAdmin];
+            const user = await getConnectedUser.execute(
+              {},
+              connectedNotAdminUser,
+            );
+
+            expectToEqual(user, {
+              ...connectedNotAdminUser,
+              agencyRights: [
+                {
+                  agency: toAgencyDtoForAgencyUsersAndAdmins(
+                    agency,
+                    agencyUserRole === "agency-admin"
+                      ? [connectedNotAdminUser.email]
+                      : [],
+                  ),
+                  roles: [agencyUserRole],
+                  isNotifiedByEmail: true,
+                },
+              ],
+              dashboards: {
+                agencies: {
+                  agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+                    notAdminUser.id
+                  }/${timeGateway.now()}`,
+                  erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                    notAdminUser.id
+                  }/${timeGateway.now()}`,
+                },
+                establishments: {},
+              },
+            });
+          },
+        );
+
+        it("returns the erroredConventionsDashboardUrl to undefined when agency is not of kind with synchronisation enabled", async () => {
+          const agency = new AgencyDtoBuilder().withKind("autre").build();
+
           uow.agencyRepository.agencies = [
             toAgencyWithRights(agency, {
-              [notAdmin.id]: {
-                roles: [agencyUserRole],
-                isNotifiedByEmail: true,
+              [notAdminUser.id]: {
+                roles: ["validator"],
+                isNotifiedByEmail: false,
               },
             }),
           ];
+          const url = await getConnectedUser.execute({}, connectedNotAdminUser);
 
-          const user = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(user, {
-            ...connectedUserNotAdmin,
+          expectToEqual(url, {
+            ...connectedNotAdminUser,
             agencyRights: [
               {
-                agency: toAgencyDtoForAgencyUsersAndAdmins(
-                  agency,
-                  agencyUserRole === "agency-admin"
-                    ? [connectedUserNotAdmin.email]
-                    : [],
-                ),
-                roles: [agencyUserRole],
-                isNotifiedByEmail: true,
+                agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+                roles: ["validator"],
+                isNotifiedByEmail: false,
               },
             ],
             dashboards: {
               agencies: {
                 agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-                  notAdmin.id
+                  connectedNotAdminUser.id
                 }/${timeGateway.now()}`,
-                erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
+                erroredConventionsDashboardUrl: undefined,
               },
               establishments: {},
             },
           });
-        },
-      );
-    });
+        });
+      });
 
-    describe("gets the user without dashboard url", () => {
-      it.each(agencyRolesForbiddenToGetDashboard)(
-        "for role '%s'",
-        async (agencyUserRole) => {
-          uow.userRepository.users = [notAdmin];
-          uow.agencyRepository.agencies = [
-            toAgencyWithRights(agency, {
-              [notAdmin.id]: {
-                roles: [agencyUserRole],
-                isNotifiedByEmail: true,
-              },
-            }),
-          ];
-
-          expectToEqual(
-            await getConnectedUser.execute({}, connectedUserNotAdmin),
-            {
-              ...notAdmin,
-              proConnect: defaultProConnectInfos,
-              agencyRights: [
-                {
-                  agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+      describe("returns agency rights without agency dashboards", () => {
+        it.each(agencyRolesForbiddenToGetDashboard)(
+          "for role '%s'",
+          async (agencyUserRole) => {
+            uow.agencyRepository.agencies = [
+              toAgencyWithRights(agency, {
+                [notAdminUser.id]: {
                   roles: [agencyUserRole],
                   isNotifiedByEmail: true,
                 },
-              ],
-              dashboards: { agencies: {}, establishments: {} },
-            },
-          );
-        },
-      );
-    });
-
-    it("returns the erroredConventionsDashboardUrl to undefined when agency is not of kind with synchronisation enabled", async () => {
-      const agency = new AgencyDtoBuilder().withKind("autre").build();
-
-      uow.userRepository.users = [connectedUserNotAdmin];
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(agency, {
-          [notAdmin.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: false,
-          },
-        }),
-      ];
-      const url = await getConnectedUser.execute({}, connectedUserNotAdmin);
-
-      expectToEqual(url, {
-        ...connectedUserNotAdmin,
-        agencyRights: [
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
-            roles: ["validator"],
-            isNotifiedByEmail: false,
-          },
-        ],
-        dashboards: {
-          agencies: {
-            agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-              connectedUserNotAdmin.id
-            }/${timeGateway.now()}`,
-            erroredConventionsDashboardUrl: undefined,
-          },
-          establishments: {},
-        },
-      });
-    });
-
-    it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
-      const agencyBuilder = new AgencyDtoBuilder();
-
-      const agency1 = agencyBuilder
-        .withId("1111")
-        .withKind("pole-emploi")
-        .build();
-      const agency2 = agencyBuilder.withId("2222").build();
-      const agency3 = agencyBuilder.withId("3333").build();
-      const agency4 = agencyBuilder.withId("4444").build();
-
-      uow.userRepository.users = [notAdmin];
-      uow.agencyRepository.agencies = [
-        toAgencyWithRights(agency1, {
-          [notAdmin.id]: {
-            roles: ["counsellor"],
-            isNotifiedByEmail: true,
-          },
-        }),
-        toAgencyWithRights(agency2, {
-          [notAdmin.id]: {
-            roles: ["validator"],
-            isNotifiedByEmail: true,
-          },
-        }),
-        toAgencyWithRights(agency3, {
-          [notAdmin.id]: {
-            roles: ["to-review"],
-            isNotifiedByEmail: true,
-          },
-        }),
-        toAgencyWithRights(agency4, {
-          [notAdmin.id]: {
-            roles: ["agency-admin"],
-            isNotifiedByEmail: true,
-          },
-        }),
-      ];
-
-      const user = await getConnectedUser.execute({}, connectedUserNotAdmin);
-
-      expectToEqual(user, {
-        ...notAdmin,
-        proConnect: defaultProConnectInfos,
-        agencyRights: [
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
-            isNotifiedByEmail: true,
-            roles: ["counsellor"],
-          },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
-            isNotifiedByEmail: true,
-            roles: ["validator"],
-          },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency3, []),
-            roles: ["to-review"],
-            isNotifiedByEmail: true,
-          },
-          {
-            agency: toAgencyDtoForAgencyUsersAndAdmins(agency4, [
-              notAdmin.email,
-            ]),
-            roles: ["agency-admin"],
-            isNotifiedByEmail: true,
-          },
-        ],
-        dashboards: {
-          agencies: {
-            agencyDashboardUrl: `http://stubAgencyUserDashboard/${
-              notAdmin.id
-            }/${timeGateway.now()}`,
-            erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
-              notAdmin.id
-            }/${timeGateway.now()}`,
-          },
-          establishments: {},
-        },
-      });
-    });
-
-    describe("establishment dashboards", () => {
-      describe("convention", () => {
-        it("retrieve dashboard when IC user is establishement rep in at least one convention", async () => {
-          uow.userRepository.users = [notAdmin];
-          const convention = new ConventionDtoBuilder()
-            .withEstablishmentRepresentativeEmail(notAdmin.email)
-            .build();
-          uow.conventionRepository.setConventions([convention]);
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-            },
-          });
-        });
-
-        it("retrieve dashboard when IC user is establishement tutor in at least one convention", async () => {
-          uow.userRepository.users = [notAdmin];
-
-          const convention = new ConventionDtoBuilder()
-            .withEstablishmentTutorEmail(notAdmin.email)
-            .build();
-          uow.conventionRepository.setConventions([convention]);
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-            },
-          });
-        });
-
-        it("should retrieve dashboard when ic user is establishment representative and tutor for at least one convention", async () => {
-          uow.userRepository.users = [notAdmin];
-
-          const convention = new ConventionDtoBuilder()
-            .withEstablishmentTutorEmail(notAdmin.email)
-            .withEstablishmentRepresentativeEmail(notAdmin.email)
-            .build();
-          uow.conventionRepository.setConventions([convention]);
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-            },
-          });
-        });
-
-        it("do NOT retrieve dashboard when user is not establishment tutor or respresentative in any conventions nor has any role in the establishment", async () => {
-          uow.userRepository.users = [notAdmin];
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {},
-          });
-        });
-      });
-
-      describe("discussions", () => {
-        it("retrieve dashboard when IC user is establishment contact for at least one discussion", async () => {
-          uow.userRepository.users = [notAdmin];
-
-          uow.discussionRepository.discussions = [
-            new DiscussionBuilder()
-              .withEstablishmentContact({
-                email: notAdmin.email,
-              })
-              .build(),
-          ];
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-            },
-          });
-        });
-
-        it("retrieves dashboard when IC user is establishment contact copy email of a discussion", async () => {
-          uow.userRepository.users = [notAdmin];
-          uow.discussionRepository.discussions = [
-            new DiscussionBuilder()
-              .withEstablishmentContact({
-                email: "other@mail.com",
-                copyEmails: [notAdmin.email],
-              })
-              .build(),
-          ];
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {
-              discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
-                notAdmin.id
-              }/${timeGateway.now()}`,
-            },
-          });
-        });
-
-        it("do NOT retrieve dashboard when user is not establishment contact in any discussion, nor has any role in the establishment", async () => {
-          uow.userRepository.users = [notAdmin];
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result.dashboards, {
-            agencies: {},
-            establishments: {},
-          });
-        });
-      });
-
-      describe("establishments", () => {
-        it("retrieve establishments and discussions and conventions dashboards when IC user is establishement rep in at least one establishment", async () => {
-          uow.userRepository.users = [notAdmin, anotherUser];
-
-          const establishmentUserRightsForFirstEstablishment: EstablishmentUserRight[] =
-            [
-              {
-                job: "Chef",
-                role: "establishment-admin",
-                userId: notAdmin.id,
-                phone: "+33600000000",
-                shouldReceiveDiscussionNotifications: true,
-              },
-              {
-                job: "Dev",
-                role: "establishment-admin",
-                userId: anotherUser.id,
-                phone: "+33600000001",
-                shouldReceiveDiscussionNotifications: true,
-              },
+              }),
             ];
 
-          const establishmentUserRightsForSecondEstablishment: EstablishmentUserRight[] =
-            [
+            expectToEqual(
+              await getConnectedUser.execute({}, connectedNotAdminUser),
               {
-                job: "Chef",
-                role: "establishment-contact",
-                userId: notAdmin.id,
-                phone: "+33600000000",
-                shouldReceiveDiscussionNotifications: true,
+                ...notAdminUser,
+                proConnect: defaultProConnectInfos,
+                agencyRights: [
+                  {
+                    agency: toAgencyDtoForAgencyUsersAndAdmins(agency, []),
+                    roles: [agencyUserRole],
+                    isNotifiedByEmail: true,
+                  },
+                ],
+                dashboards: { agencies: {}, establishments: {} },
               },
-            ];
+            );
+          },
+        );
+      });
 
-          const establishmentAggregate1 = new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret("89114285300012")
-            .withUserRights(establishmentUserRightsForFirstEstablishment)
+      it("the dashboard url should not include the agency ids where role is 'to-review'", async () => {
+        const agencyBuilder = new AgencyDtoBuilder();
+
+        const agency1 = agencyBuilder
+          .withId("1111")
+          .withKind("pole-emploi")
+          .build();
+        const agency2 = agencyBuilder.withId("2222").build();
+        const agency3 = agencyBuilder.withId("3333").build();
+        const agency4 = agencyBuilder.withId("4444").build();
+
+        uow.agencyRepository.agencies = [
+          toAgencyWithRights(agency1, {
+            [notAdminUser.id]: {
+              roles: ["counsellor"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency2, {
+            [notAdminUser.id]: {
+              roles: ["validator"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency3, {
+            [notAdminUser.id]: {
+              roles: ["to-review"],
+              isNotifiedByEmail: true,
+            },
+          }),
+          toAgencyWithRights(agency4, {
+            [notAdminUser.id]: {
+              roles: ["agency-admin"],
+              isNotifiedByEmail: true,
+            },
+          }),
+        ];
+
+        const user = await getConnectedUser.execute({}, connectedNotAdminUser);
+
+        expectToEqual(user, {
+          ...notAdminUser,
+          proConnect: defaultProConnectInfos,
+          agencyRights: [
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
+              isNotifiedByEmail: true,
+              roles: ["counsellor"],
+            },
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency2, []),
+              isNotifiedByEmail: true,
+              roles: ["validator"],
+            },
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency3, []),
+              roles: ["to-review"],
+              isNotifiedByEmail: true,
+            },
+            {
+              agency: toAgencyDtoForAgencyUsersAndAdmins(agency4, [
+                notAdminUser.email,
+              ]),
+              roles: ["agency-admin"],
+              isNotifiedByEmail: true,
+            },
+          ],
+          dashboards: {
+            agencies: {
+              agencyDashboardUrl: `http://stubAgencyUserDashboard/${
+                notAdminUser.id
+              }/${timeGateway.now()}`,
+              erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                notAdminUser.id
+              }/${timeGateway.now()}`,
+            },
+            establishments: {},
+          },
+        });
+      });
+    });
+
+    describe("establishment user infos", () => {
+      it("do NOT retrieve any establishment user infos when user is not establishment tutor or respresentative in any conventions nor has any role in the establishment", async () => {
+        expectToEqual(
+          await getConnectedUser.execute({}, connectedNotAdminUser),
+          {
+            ...notAdminUser,
+            agencyRights: [],
+            dashboards: {
+              agencies: {},
+              establishments: {},
+            },
+          },
+        );
+      });
+
+      describe("get only convention dashboard without establishment rights when user don't have establishment rights", () => {
+        const expectedUserWithEstablishmentConventionDashboardOnly: ConnectedUser =
+          {
+            ...notAdminUser,
+            agencyRights: [],
+            dashboards: {
+              agencies: {},
+              establishments: {
+                conventions: `http://stubEstablishmentConventionsDashboardUrl/${notAdminUser.id}/${now}`,
+              },
+            },
+          };
+
+        it("and user is establishement representative in at least one convention", async () => {
+          const convention = new ConventionDtoBuilder()
+            .withEstablishmentRepresentativeEmail(notAdminUser.email)
             .build();
 
-          const establishmentAggregate2 = new EstablishmentAggregateBuilder()
-            .withEstablishmentSiret("89114285300013")
-            .withUserRights(establishmentUserRightsForSecondEstablishment)
-            .build();
+          uow.conventionRepository.setConventions([convention]);
 
+          expectToEqual(
+            await getConnectedUser.execute({}, connectedNotAdminUser),
+            expectedUserWithEstablishmentConventionDashboardOnly,
+          );
+        });
+
+        it("and user is establishement tutor in at least one convention", async () => {
+          const convention = new ConventionDtoBuilder()
+            .withEstablishmentTutorEmail(notAdminUser.email)
+            .build();
+          uow.conventionRepository.setConventions([convention]);
+
+          expectToEqual(
+            await getConnectedUser.execute({}, connectedNotAdminUser),
+            expectedUserWithEstablishmentConventionDashboardOnly,
+          );
+        });
+
+        it("and user is establishment representative and tutor for at least one convention", async () => {
+          const convention = new ConventionDtoBuilder()
+            .withEstablishmentTutorEmail(notAdminUser.email)
+            .withEstablishmentRepresentativeEmail(notAdminUser.email)
+            .build();
+          uow.conventionRepository.setConventions([convention]);
+
+          expectToEqual(
+            await getConnectedUser.execute({}, connectedNotAdminUser),
+            expectedUserWithEstablishmentConventionDashboardOnly,
+          );
+        });
+      });
+
+      describe("when user have establishment rights", () => {
+        const establishmentUserRightsForFirstEstablishment: EstablishmentUserRight[] =
+          [
+            {
+              job: "Chef",
+              role: "establishment-admin",
+              userId: notAdminUser.id,
+              phone: "+33600000000",
+              shouldReceiveDiscussionNotifications: true,
+            },
+            {
+              job: "Dev",
+              role: "establishment-admin",
+              userId: anotherUser.id,
+              phone: "+33600000001",
+              shouldReceiveDiscussionNotifications: true,
+            },
+          ];
+
+        const establishmentUserRightsForSecondEstablishment: EstablishmentUserRight[] =
+          [
+            {
+              job: "Chef",
+              role: "establishment-contact",
+              userId: notAdminUser.id,
+              phone: "+33600000000",
+              shouldReceiveDiscussionNotifications: true,
+            },
+          ];
+
+        const establishmentAggregate1 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("89114285300012")
+          .withUserRights(establishmentUserRightsForFirstEstablishment)
+          .build();
+
+        const establishmentAggregate2 = new EstablishmentAggregateBuilder()
+          .withEstablishmentSiret("89114285300013")
+          .withUserRights(establishmentUserRightsForSecondEstablishment)
+          .build();
+
+        beforeEach(() => {
           uow.establishmentAggregateRepository.establishmentAggregates = [
             establishmentAggregate1,
             establishmentAggregate2,
           ];
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
-          );
-
-          expectToEqual(result, {
-            ...connectedUserNotAdmin,
-            establishments: [
-              {
-                siret: establishmentAggregate1.establishment.siret,
-                businessName:
-                  establishmentAggregate1.establishment.customizedName ??
-                  establishmentAggregate1.establishment.name,
-                role: "establishment-admin",
-                admins: [
-                  {
-                    email: notAdmin.email,
-                    firstName: notAdmin.firstName,
-                    lastName: notAdmin.lastName,
-                  },
-                  {
-                    email: anotherUser.email,
-                    firstName: anotherUser.firstName,
-                    lastName: anotherUser.lastName,
-                  },
-                ],
-              },
-              {
-                siret: establishmentAggregate2.establishment.siret,
-                businessName:
-                  establishmentAggregate2.establishment.customizedName ??
-                  establishmentAggregate2.establishment.name,
-                role: "establishment-contact",
-                admins: [],
-              },
-            ],
-            dashboards: {
-              agencies: {},
-              establishments: {
-                conventions: `http://stubEstablishmentConventionsDashboardUrl/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
-                discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
-                  notAdmin.id
-                }/${timeGateway.now()}`,
-              },
-            },
-          });
         });
 
-        it("do not retrieve establishment when IC user is not establishment representative in at least one establishment", async () => {
-          uow.userRepository.users = [notAdmin];
+        it("retrieve establishments rights and discussions / conventions dashboards when user have right on at least one establishment even if there is no conventions/discussion for establishment", async () => {
+          uow.conventionRepository.setConventions([]);
+          uow.discussionRepository.discussions = [];
 
-          const convention = new ConventionDtoBuilder()
-            .withEstablishmentTutorEmail(notAdmin.email)
-            .build();
-          uow.conventionRepository.setConventions([convention]);
-
-          const result = await getConnectedUser.execute(
-            {},
-            connectedUserNotAdmin,
+          expectToEqual(
+            await getConnectedUser.execute({}, connectedNotAdminUser),
+            {
+              ...connectedNotAdminUser,
+              establishments: [
+                {
+                  siret: establishmentAggregate1.establishment.siret,
+                  businessName:
+                    establishmentAggregate1.establishment.customizedName ??
+                    establishmentAggregate1.establishment.name,
+                  role: "establishment-admin",
+                  admins: [
+                    {
+                      email: notAdminUser.email,
+                      firstName: notAdminUser.firstName,
+                      lastName: notAdminUser.lastName,
+                    },
+                    {
+                      email: anotherUser.email,
+                      firstName: anotherUser.firstName,
+                      lastName: anotherUser.lastName,
+                    },
+                  ],
+                },
+                {
+                  siret: establishmentAggregate2.establishment.siret,
+                  businessName:
+                    establishmentAggregate2.establishment.customizedName ??
+                    establishmentAggregate2.establishment.name,
+                  role: "establishment-contact",
+                  admins: [],
+                },
+              ],
+              dashboards: {
+                agencies: {},
+                establishments: {
+                  conventions: `http://stubEstablishmentConventionsDashboardUrl/${
+                    notAdminUser.id
+                  }/${timeGateway.now()}`,
+                  discussions: `http://stubEstablishmentDiscussionsDashboardUrl/${
+                    notAdminUser.id
+                  }/${timeGateway.now()}`,
+                },
+              },
+            },
           );
-
-          expectToEqual(result.establishments, undefined);
         });
       });
     });
   });
-  describe("for an admin getting another user's data", () => {
-    const adminUserBuilder = new ConnectedUserBuilder()
-      .withId("admin-id")
-      .withFirstName("Admin")
-      .withIsAdmin(true);
-    const connectedAdminUser = adminUserBuilder.build();
-    const admin = adminUserBuilder.buildUser();
 
-    beforeEach(() => {
-      uow.userRepository.users = [notAdmin, admin];
-    });
-
+  describe("When a backoffice admin user gets another user's datas", () => {
     it("throws if currentUser is not admin", async () => {
       await expectPromiseToFailWithError(
-        getConnectedUser.execute({ userId: admin.id }, connectedUserNotAdmin),
-        errors.user.forbidden({ userId: connectedUserNotAdmin.id }),
+        getConnectedUser.execute({ userId: admin.id }, connectedNotAdminUser),
+        errors.user.forbidden({ userId: connectedNotAdminUser.id }),
       );
     });
 
     it("gets another user's data if currentUser is admin", async () => {
       const fetchedUser = await getConnectedUser.execute(
-        { userId: notAdmin.id },
+        { userId: notAdminUser.id },
         connectedAdminUser,
       );
       expectToEqual(fetchedUser, {
-        ...notAdmin,
+        ...notAdminUser,
         proConnect: defaultProConnectInfos,
         dashboards: {
           agencies: {},
