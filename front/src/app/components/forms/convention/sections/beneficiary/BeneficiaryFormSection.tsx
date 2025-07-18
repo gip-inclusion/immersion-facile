@@ -20,6 +20,7 @@ import {
   toLowerCaseWithoutDiacritics,
 } from "shared";
 import { AddressAutocomplete } from "src/app/components/forms/autocomplete/AddressAutocomplete";
+import { PhoneInput } from "src/app/components/forms/commons/PhoneInput";
 import { ConventionEmailWarning } from "src/app/components/forms/convention/ConventionEmailWarning";
 import type {
   EmailValidationErrorsState,
@@ -224,16 +225,23 @@ export const BeneficiaryFormSection = ({
       />
 
       {values.signatories.beneficiary.email && <ConventionEmailWarning />}
-      <Input
-        label={formContents["signatories.beneficiary.phone"].label}
-        hintText={formContents["signatories.beneficiary.phone"].hintText}
-        nativeInputProps={{
-          ...formContents["signatories.beneficiary.phone"],
-          ...register("signatories.beneficiary.phone"),
-          type: "tel",
-        }}
-        {...getFieldError("signatories.beneficiary.phone")}
-      />
+      <div>
+        <PhoneInput
+          label={formContents["signatories.beneficiary.phone"].label}
+          hintText={formContents["signatories.beneficiary.phone"].hintText}
+          selectedCountry={
+            values.signatories.beneficiary.phone?.codeCountry || "fr"
+          }
+          registerPhoneNumber={register(
+            "signatories.beneficiary.phone.phoneNumber",
+          )}
+          registerCountryCode={register(
+            "signatories.beneficiary.phone.codeCountry",
+          )}
+          {...getFieldError("signatories.beneficiary.phone.phoneNumber")}
+        />
+      </div>
+
       {values.internshipKind === "mini-stage-cci" && (
         <>
           <AddressAutocomplete
@@ -344,7 +352,7 @@ export const BeneficiaryFormSection = ({
                     ? {
                         firstName: "",
                         lastName: "",
-                        phone: "",
+                        phone: { codeCountry: "fr", phoneNumber: "" },
                         email: "",
                         role: "beneficiary-representative",
                       }
@@ -409,7 +417,7 @@ export const BeneficiaryFormSection = ({
                       ? {
                           firstName: "",
                           lastName: "",
-                          phone: "",
+                          phone: { codeCountry: "fr", phoneNumber: "" },
                           email: "",
                           businessName: "",
                           businessSiret: "",

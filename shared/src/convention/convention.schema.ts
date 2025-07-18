@@ -123,10 +123,15 @@ export const conventionIdSchema: z.ZodSchema<ConventionId> = z
 
 const roleSchema = z.enum(allRoles);
 
+const phoneDtoSchema = z.object({
+  codeCountry: z.string(),
+  phoneNumber: phoneSchema,
+});
+
 const actorSchema = z.object({
   role: roleSchema,
   email: emailSchema,
-  phone: phoneSchema,
+  phone: phoneDtoSchema,
   firstName: zTrimmedStringMax255,
   lastName: zTrimmedStringMax255,
 });
@@ -587,7 +592,7 @@ const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
     .filter(([_, value]) => !!value)
     .map(([key, value]) => ({
       key: key as keyof Signatories,
-      phoneNumber: value.phone,
+      phoneNumber: value.phone.phoneNumber,
     }));
   signatoriesWithPhoneNumber.forEach((signatory) => {
     if (
@@ -600,7 +605,9 @@ const addIssuesIfDuplicateSignatoriesPhoneNumbers = (
     )
       addIssue(
         localization.signatoriesDistinctPhoneNumbers,
-        getConventionFieldName(`signatories.${signatory.key}.phone`),
+        getConventionFieldName(
+          `signatories.${signatory.key}.phone.phoneNumber`,
+        ),
       );
   });
 };

@@ -15,6 +15,7 @@ import {
 } from "src/app/hooks/formContents.hooks";
 import { siretSelectors } from "src/core-logic/domain/siret/siret.selectors";
 import { EmailValidationInput } from "../../../commons/EmailValidationInput";
+import { PhoneInput } from "../../../commons/PhoneInput";
 
 export const EstablishementTutorFields = ({
   setEmailValidationErrors,
@@ -58,15 +59,21 @@ export const EstablishementTutorFields = ({
             disabled={isFetchingSiret}
             {...getFieldError("establishmentTutor.lastName")}
           />
-          <Input
+          <PhoneInput
             label={formContents["establishmentTutor.phone"].label}
             hintText={formContents["establishmentTutor.phone"].hintText}
-            nativeInputProps={{
-              ...formContents["establishmentTutor.phone"],
-              ...register("establishmentTutor.phone"),
-              type: "tel",
-            }}
-            {...getFieldError("establishmentTutor.phone")}
+            selectedCountry={
+              values.establishmentTutor?.phone?.codeCountry || "fr"
+            }
+            registerPhoneNumber={register(
+              "establishmentTutor.phone.phoneNumber",
+            )}
+            registerCountryCode={register(
+              "establishmentTutor.phone.codeCountry",
+            )}
+            disabled={isFetchingSiret}
+            {...getFieldError("establishmentTutor.phone.phoneNumber")}
+            shouldDisplaySelect={true}
           />
           <EmailValidationInput
             label={formContents["establishmentTutor.email"].label}

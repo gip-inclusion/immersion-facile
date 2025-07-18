@@ -234,7 +234,7 @@ export const ConventionValidation = ({
         onConfirm={onSubmitSendSignatureLink}
       />
       <SendAssessmentLinkModalWrapper
-        phone={convention.establishmentTutor.phone}
+        phone={convention.establishmentTutor.phone.phoneNumber}
         onConfirm={onSubmitSendAssessmentLink}
       />
     </>
