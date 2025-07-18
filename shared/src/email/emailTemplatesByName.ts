@@ -1671,7 +1671,7 @@ Pour toute question concernant ce rejet, il est possible de nous contacter : con
       tags: ["mise en relation mail"],
       createEmailVariables: (params) => ({
         subject: `${params.potentialBeneficiaryFirstName} ${params.potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${params.appellationLabel}`,
-        greetings: `Bonjour${params.contactFirstName && params.contactLastName ? ` ${params.contactFirstName} ${params.contactLastName}` : ""},`,
+        greetings: "Bonjour,",
         content: `Un candidat souhaite faire une immersion dans votre entreprise ${params.businessName} (${params.businessAddress}).
 
 Immersion souhaitée :
@@ -1757,8 +1757,6 @@ Profil du candidat :
       createEmailVariables: ({
         appellationLabel,
         businessName,
-        contactFirstName,
-        contactLastName,
         immersionObjective,
         message,
         potentialBeneficiaryFirstName,
@@ -1769,7 +1767,7 @@ Profil du candidat :
         replyToEmail,
       }) => ({
         subject: `${potentialBeneficiaryFirstName} ${potentialBeneficiaryLastName} vous contacte pour une demande d'immersion sur le métier de ${appellationLabel}`,
-        greetings: `Bonjour${contactFirstName && contactLastName ? ` ${contactFirstName} ${contactLastName}` : ""},`,
+        greetings: "Bonjour,",
         content: `
         Un candidat souhaite faire une immersion ${
           immersionObjective
