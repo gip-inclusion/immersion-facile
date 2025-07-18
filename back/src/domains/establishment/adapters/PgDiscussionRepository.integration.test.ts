@@ -1,4 +1,4 @@
-import { addDays, addHours, subDays } from "date-fns";
+import { addDays, addHours, subDays, subMonths } from "date-fns";
 import type { Pool } from "pg";
 import {
   type AppellationAndRomeDto,
@@ -421,6 +421,54 @@ describe("PgDiscussionRepository", () => {
               limit: 5,
             }),
             [discussionNotAnsweredByEstablishment],
+          );
+        });
+      });
+      describe("status filter param", () => {
+        const discussionWithStatusPending = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "PENDING" })
+          .build();
+        const discussionWithStatusAccepted = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "ACCEPTED", candidateWarnedMethod: "email" })
+          .build();
+        const discussionWithStatusRejected = new DiscussionBuilder()
+          .withId(uuid())
+          .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
+          .build();
+
+        beforeEach(async () => {
+          await pgDiscussionRepository.insert(discussionWithStatusPending);
+          await pgDiscussionRepository.insert(discussionWithStatusAccepted);
+          await pgDiscussionRepository.insert(discussionWithStatusRejected);
+        });
+
+        it("include discussions with status PENDING", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "PENDING" },
+              limit: 5,
+            }),
+            [discussionWithStatusPending],
+          );
+        });
+        it("include discussions with status ACCEPTED", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "ACCEPTED" },
+              limit: 5,
+            }),
+            [discussionWithStatusAccepted],
+          );
+        });
+        it("exclude discussions with status REJECTED", async () => {
+          expectToEqual(
+            await pgDiscussionRepository.getDiscussions({
+              filters: { status: "REJECTED" },
+              limit: 5,
+            }),
+            [discussionWithStatusRejected],
           );
         });
       });
@@ -1470,6 +1518,161 @@ describe("PgDiscussionRepository", () => {
         ),
         0,
       );
+    });
+  });
+
+  describe("obsolete discussions", () => {
+    const now = new Date();
+    const discussionFrom2YearsAgoWithoutExchangesResponse =
+      new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120003")
+        .withCreatedAt(subMonths(now, 24))
+        .withExchanges([
+          {
+            subject: "Mise en relation initiale",
+            message:
+              "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+            recipient: "establishment",
+            sentAt: subMonths(now, 24).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+    const discussionFrom1YearAgoWithExchangesResponse = new DiscussionBuilder()
+      .withSiret("11112222333344")
+      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120004")
+      .withCreatedAt(subMonths(now, 12))
+      .withExchanges([
+        {
+          subject: "Mise en relation initiale",
+          message:
+            "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+          recipient: "potentialBeneficiary",
+          sentAt: subMonths(now, 12).toISOString(),
+          sender: "establishment",
+          attachments: [],
+        },
+        {
+          subject: "Réponse de l'entreprise",
+          message: "Super, je vais vous envoyer un mail avec les informations",
+          recipient: "potentialBeneficiary",
+          sentAt: subMonths(now, 12).toISOString(),
+          sender: "establishment",
+          attachments: [],
+        },
+      ])
+      .build();
+
+    const discussionFrom6MonthsAgoWithoutExchangesResponse =
+      new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120005")
+        .withCreatedAt(subMonths(now, 6))
+        .withExchanges([
+          {
+            subject: "Mise en relation initiale",
+            message:
+              "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+            recipient: "establishment",
+            sentAt: subMonths(now, 6).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+    const discussionFrom4MonthsAgoWithExchangesResponse =
+      new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120006")
+        .withCreatedAt(subMonths(now, 4))
+        .withExchanges([
+          {
+            subject: "Mise en relation initiale",
+            message:
+              "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+            recipient: "establishment",
+            sentAt: subMonths(now, 4).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+          {
+            subject: "Réponse de l'entreprise",
+            message:
+              "Super, je vais vous envoyer un mail avec les informations",
+            recipient: "potentialBeneficiary",
+            sentAt: subMonths(now, 4).toISOString(),
+            sender: "establishment",
+            attachments: [],
+          },
+        ])
+        .build();
+
+    const discussionFrom6MonthsAgoWithoutExchangesResponseAndStatusAccepted =
+      new DiscussionBuilder()
+        .withSiret("11112222333344")
+        .withId("aaaaad2c-6f02-11ec-90d6-0242ac120008")
+        .withCreatedAt(subMonths(now, 6))
+        .withStatus({
+          status: "ACCEPTED",
+          candidateWarnedMethod: null,
+        })
+        .withExchanges([
+          {
+            subject: "Mise en relation initiale",
+            message:
+              "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
+            recipient: "establishment",
+            sentAt: subMonths(now, 6).toISOString(),
+            sender: "potentialBeneficiary",
+            attachments: [],
+          },
+        ])
+        .build();
+
+    const discussionFrom2MonthsAgo = new DiscussionBuilder()
+      .withSiret("11112222333344")
+      .withId("aaaaad2c-6f02-11ec-90d6-0242ac120007")
+      .withCreatedAt(subMonths(now, 2))
+      .build();
+
+    beforeEach(async () => {
+      await Promise.all([
+        pgDiscussionRepository.insert(
+          discussionFrom2YearsAgoWithoutExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom1YearAgoWithExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom6MonthsAgoWithoutExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom4MonthsAgoWithExchangesResponse,
+        ),
+        pgDiscussionRepository.insert(
+          discussionFrom6MonthsAgoWithoutExchangesResponseAndStatusAccepted,
+        ),
+        pgDiscussionRepository.insert(discussionFrom2MonthsAgo),
+      ]);
+    });
+
+    describe("getObsoleteDiscussions", () => {
+      it("returns the discussions that are obsolete, oldest first", async () => {
+        const threeMonthsAgo = subMonths(now, 3);
+        const obsoleteDiscussions =
+          await pgDiscussionRepository.getObsoleteDiscussions({
+            olderThan: threeMonthsAgo,
+          });
+
+        expectToEqual(obsoleteDiscussions, [
+          discussionFrom2YearsAgoWithoutExchangesResponse.id,
+          discussionFrom6MonthsAgoWithoutExchangesResponse.id,
+        ]);
+      });
     });
   });
 });

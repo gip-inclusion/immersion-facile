@@ -90,6 +90,57 @@ describe("PgOutboxRepository", () => {
     );
   });
 
+  describe("saveNewEventsBatch", () => {
+    it("saves a new event to be processed, then adds a failing publication, then a working one", async () => {
+      const conventionEventId = "aaaaac99-9c0a-aaaa-aa6d-6aa9ad38aaaa";
+      const discussionEventId = "bbbbbc99-9c0b-bbbb-bb6d-6bb9bd38bbbb";
+      uuidGenerator.setNextUuids([conventionEventId, discussionEventId]);
+
+      const convention = new ConventionDtoBuilder().build();
+      const event1 = createNewEvent({
+        topic: "ConventionSubmittedByBeneficiary",
+        payload: { convention, triggeredBy: null },
+      });
+      const event2 = createNewEvent({
+        topic: "DiscussionMarkedAsDeprecated",
+        payload: { discussionId: "discussionId", triggeredBy: null },
+      });
+
+      await outboxRepository.saveNewEventsBatch([event1, event2]);
+
+      const resultsInDb = await db.selectFrom("outbox").selectAll().execute();
+      const conventionEvent = resultsInDb.find(
+        ({ topic }) => topic === "ConventionSubmittedByBeneficiary",
+      );
+      const discussionEvent = resultsInDb.find(
+        ({ topic }) => topic === "DiscussionMarkedAsDeprecated",
+      );
+
+      if (!conventionEvent || !discussionEvent)
+        throw new Error("Event not found in db");
+
+      expectToEqual(conventionEvent, {
+        id: conventionEventId,
+        status: "never-published",
+        priority: null,
+        topic: "ConventionSubmittedByBeneficiary",
+        occurred_at: expect.any(Date),
+        was_quarantined: false,
+        payload: { convention, triggeredBy: null },
+      });
+
+      expectToEqual(discussionEvent, {
+        id: discussionEventId,
+        status: "never-published",
+        priority: null,
+        topic: "DiscussionMarkedAsDeprecated",
+        occurred_at: expect.any(Date),
+        was_quarantined: false,
+        payload: { discussionId: "discussionId", triggeredBy: null },
+      });
+    });
+  });
+
   describe("save", () => {
     it("saves an event with published data", async () => {
       const convention = new ConventionDtoBuilder().build();

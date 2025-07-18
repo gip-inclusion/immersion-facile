@@ -342,6 +342,23 @@ export class PgDiscussionRepository implements DiscussionRepository {
       .where("discussion_id", "=", discussion.id)
       .execute();
   }
+
+  public async getObsoleteDiscussions(params: {
+    olderThan: Date;
+  }): Promise<DiscussionId[]> {
+    const obsoleteDiscussions = await this.transaction
+      .selectFrom("discussions")
+      .select("discussions.id")
+      .leftJoin("exchanges", "discussions.id", "exchanges.discussion_id")
+      .where("created_at", "<=", params.olderThan)
+      .where("status", "=", "PENDING")
+      .having((eb) => eb.fn.count("exchanges.id"), "=", 1)
+      .orderBy("created_at", "asc")
+      .groupBy(["discussions.id", "discussions.created_at"])
+      .execute();
+
+    return obsoleteDiscussions.map((d) => d.id);
+  }
 }
 
 const discussionToPg = (
@@ -402,17 +419,47 @@ const discussionToPg = (
 
 const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
-): WithDiscussionStatus =>
-  ({
-    status: discussion.status,
-    rejectionKind: discussion.rejectionKind,
-    rejectionReason: discussion.rejectionReason,
-    ...(discussion.status === "PENDING"
-      ? {}
-      : {
-          candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
-        }),
-  }) as WithDiscussionStatus;
+): WithDiscussionStatus => {
+  const { status } = discussion;
+
+  if (status === "PENDING") return { status };
+
+  if (status === "REJECTED") {
+    const { rejectionKind } = discussion;
+    if (!rejectionKind) {
+      throw new Error(
+        `Missing rejectionKind for rejected discussion ${discussion.id}`,
+      );
+    }
+
+    if (rejectionKind === "CANDIDATE_ALREADY_WARNED") {
+      const { candidateWarnedMethod } = discussion;
+      if (!candidateWarnedMethod) {
+        throw new Error(
+          `Missing candidateWarnedMethod for CANDIDATE_ALREADY_WARNED rejection in discussion ${discussion.id}`,
+        );
+      }
+      return { status, rejectionKind, candidateWarnedMethod };
+    }
+
+    if (rejectionKind === "OTHER") {
+      const { rejectionReason } = discussion;
+      if (!rejectionReason) {
+        throw new Error(
+          `Missing rejectionReason for OTHER rejection in discussion ${discussion.id}`,
+        );
+      }
+      return { status, rejectionKind, rejectionReason };
+    }
+
+    return { status, rejectionKind };
+  }
+
+  return {
+    status,
+    candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
+  };
+};
 
 const makeDiscussionDtoFromPgDiscussion = (
   results: GetDiscussionsResults,

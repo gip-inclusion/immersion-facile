@@ -64,4 +64,7 @@ export interface DiscussionRepository {
   hasDiscussionMatching: (
     params: Partial<HasDiscussionMatchingParams>,
   ) => Promise<boolean>;
+  getObsoleteDiscussions: (params: {
+    olderThan: Date;
+  }) => Promise<DiscussionId[]>;
 }

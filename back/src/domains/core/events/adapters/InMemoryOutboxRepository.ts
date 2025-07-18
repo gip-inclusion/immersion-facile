@@ -29,6 +29,12 @@ export class InMemoryOutboxRepository implements OutboxRepository {
     });
   }
 
+  public async saveNewEventsBatch(events: DomainEvent[]): Promise<void> {
+    events.forEach((event) => {
+      this._events[event.id] = event;
+    });
+  }
+
   public async markEventsAsInProcess(events: DomainEvent[]): Promise<void> {
     events.forEach((event) => {
       this._events[event.id] = {

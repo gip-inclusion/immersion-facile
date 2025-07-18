@@ -49,6 +49,10 @@
       "size": "M"
     },
     {
+      "command": "15 23 * * * pnpm back run trigger-mark-obsolete-discussions-as-deprecated",
+      "size": "M"
+    },
+    {
       "command": "01 23 * * * pnpm back run trigger-update-all-establishments-scores",
       "size": "M"
     },

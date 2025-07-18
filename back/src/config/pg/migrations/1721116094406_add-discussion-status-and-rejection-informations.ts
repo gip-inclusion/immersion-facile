@@ -12,6 +12,7 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
     "NO_TIME",
     "OTHER",
     "CANDIDATE_ALREADY_WARNED", // added later, to not break local migrations
+    "DEPRECATED", // added later, to not break local migrations
   ] satisfies RejectionKind[]);
   pgm.addColumns("discussions", {
     status: { type: "discussion_status", default: "PENDING" },

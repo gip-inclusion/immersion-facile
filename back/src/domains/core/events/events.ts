@@ -125,7 +125,7 @@ export type DomainEvent =
   | GenericEvent<"ExchangeAddedToDiscussion", WithSiretDto & WithDiscussionId>
   | GenericEvent<"DiscussionExchangeDeliveryFailed", WarnSenderThatMessageCouldNotBeDeliveredParams>
   | GenericEvent<"DiscussionStatusManuallyUpdated", WithDiscussionDto & { skipSendingEmail?: boolean } & WithTriggeredBy>
-
+  | GenericEvent<"DiscussionMarkedAsDeprecated", WithDiscussionId & WithTriggeredBy>
   // ESTABLISHMENT LEAD RELATED
   | GenericEvent<"EstablishmentLeadReminderSent", WithConventionIdLegacy>
 

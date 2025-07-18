@@ -42,6 +42,7 @@ const getUseCasesByTopics = (
         }),
     },
   ],
+  DiscussionMarkedAsDeprecated: [useCases.markDiscussionDeprecatedAndNotify],
   NotificationBatchAdded: [useCases.sendNotificationsInBatch],
 
   // "Happy case" for conventions.

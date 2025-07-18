@@ -15,7 +15,7 @@ export class TestUuidGenerator implements UuidGenerator {
   }
 
   public setNextUuids(uuids: string[]) {
-    this._nextUuids = uuids;
+    this._nextUuids = [...uuids];
   }
 }
 
