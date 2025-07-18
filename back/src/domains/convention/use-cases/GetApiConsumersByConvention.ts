@@ -10,21 +10,19 @@ import {
   withConventionIdSchema,
 } from "shared";
 import { getUserWithRights } from "../../connected-users/helpers/userRights.helper";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 export type GetApiConsumersByConvention = ReturnType<
   typeof makeGetApiConsumersByConvention
 >;
-export const makeGetApiConsumersByConvention = createTransactionalUseCase<
-  WithConventionId,
-  ApiConsumerName[],
-  ConnectedUser
->(
-  {
-    name: "GetApiConsumersByConvention",
-    inputSchema: withConventionIdSchema,
-  },
-  async ({ uow, currentUser, inputParams: { conventionId } }) => {
+export const makeGetApiConsumersByConvention = useCaseBuilder(
+  "GetApiConsumersByConvention",
+)
+  .withInput<WithConventionId>(withConventionIdSchema)
+  .withOutput<ApiConsumerName[]>()
+  .withCurrentUser<ConnectedUser>()
+
+  .build(async ({ uow, currentUser, inputParams: { conventionId } }) => {
     const convention = await uow.conventionRepository.getById(conventionId);
 
     if (!convention)
@@ -73,8 +71,7 @@ export const makeGetApiConsumersByConvention = createTransactionalUseCase<
         ? ["France Travail"]
         : []),
     ];
-  },
-);
+  });
 
 const isConventionInScope = (
   apiConsumer: ApiConsumer,

@@ -5,22 +5,17 @@ import {
   type WithIdToken,
   withIdTokenSchema,
 } from "shared";
-import { createTransactionalUseCase } from "../../../UseCase";
+import { useCaseBuilder } from "../../../useCaseBuilder";
 import type { OAuthGateway } from "../port/OAuthGateway";
 
 export type GetOAuthLogoutUrl = ReturnType<typeof makeGetOAuthLogoutUrl>;
 
-export const makeGetOAuthLogoutUrl = createTransactionalUseCase<
-  WithIdToken,
-  AbsoluteUrl,
-  User,
-  { oAuthGateway: OAuthGateway }
->(
-  {
-    name: "GetOAuthLogoutUrl",
-    inputSchema: withIdTokenSchema,
-  },
-  async ({ inputParams, uow, deps: { oAuthGateway }, currentUser }) => {
+export const makeGetOAuthLogoutUrl = useCaseBuilder("GetOAuthLogoutUrl")
+  .withInput<WithIdToken>(withIdTokenSchema)
+  .withOutput<AbsoluteUrl>()
+  .withCurrentUser<User>()
+  .withDeps<{ oAuthGateway: OAuthGateway }>()
+  .build(async ({ inputParams, uow, deps: { oAuthGateway }, currentUser }) => {
     const ongoingOAuth = await uow.ongoingOAuthRepository.findByUserId(
       currentUser.id,
     );
@@ -29,5 +24,4 @@ export const makeGetOAuthLogoutUrl = createTransactionalUseCase<
       idToken: inputParams.idToken,
       state: ongoingOAuth.state,
     });
-  },
-);
+  });

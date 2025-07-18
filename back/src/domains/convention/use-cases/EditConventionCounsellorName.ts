@@ -13,26 +13,25 @@ import {
 import { throwIfNotAuthorizedForRole } from "../../connected-users/helpers/authorization.helper";
 import type { TriggeredBy } from "../../core/events/events";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { createTransactionalUseCase } from "../../core/UseCase";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwErrorOnConventionIdMismatch } from "../entities/Convention";
 
 export type EditConventionCounsellorName = ReturnType<
   typeof makeEditConventionCounsellorName
 >;
 
-export const makeEditConventionCounsellorName = createTransactionalUseCase<
-  EditConventionCounsellorNameRequestDto,
-  void,
-  ConventionRelatedJwtPayload,
-  {
+export const makeEditConventionCounsellorName = useCaseBuilder(
+  "EditCounsellorName",
+)
+  .withInput<EditConventionCounsellorNameRequestDto>(
+    editConventionCounsellorNameRequestSchema,
+  )
+  .withOutput<void>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
+  .withDeps<{
     createNewEvent: CreateNewEvent;
-  }
->(
-  {
-    name: "EditCounsellorName",
-    inputSchema: editConventionCounsellorNameRequestSchema,
-  },
-  async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+  }>()
+  .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     throwErrorOnConventionIdMismatch({
       requestedConventionId: inputParams.conventionId,
       jwtPayload,
@@ -101,5 +100,4 @@ export const makeEditConventionCounsellorName = createTransactionalUseCase<
         }),
       ),
     ]);
-  },
-);
+  });

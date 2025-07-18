@@ -9,26 +9,20 @@ import {
 import type { OAuthConfig } from "../../../../../config/bootstrap/appConfig";
 import type { GenerateEmailAuthCodeJwt } from "../../../jwt";
 import type { SaveNotificationAndRelatedEvent } from "../../../notifications/helpers/Notification";
-import { createTransactionalUseCase } from "../../../UseCase";
+import { useCaseBuilder } from "../../../useCaseBuilder";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
 
 export type InitiateLoginByEmail = ReturnType<typeof makeInitiateLoginByEmail>;
-export const makeInitiateLoginByEmail = createTransactionalUseCase<
-  InitiateLoginByEmailParams,
-  void,
-  void,
-  {
+export const makeInitiateLoginByEmail = useCaseBuilder("InitiateLoginByEmail")
+  .withInput<InitiateLoginByEmailParams>(initiateLoginByEmailParamsSchema)
+  .withOutput<void>()
+  .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     uuidGenerator: UuidGenerator;
     oAuthConfig: OAuthConfig;
     generateEmailAuthCodeJwt: GenerateEmailAuthCodeJwt;
-  }
->(
-  {
-    inputSchema: initiateLoginByEmailParamsSchema,
-    name: "InitiateLoginByEmail",
-  },
-  async ({ inputParams: { email, redirectUri }, uow, deps }) => {
+  }>()
+  .build(async ({ inputParams: { email, redirectUri }, uow, deps }) => {
     const nonce = deps.uuidGenerator.new();
     const state = deps.uuidGenerator.new();
 
@@ -69,5 +63,4 @@ export const makeInitiateLoginByEmail = createTransactionalUseCase<
       },
       { priority: 1 },
     );
-  },
-);
+  });

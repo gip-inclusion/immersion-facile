@@ -23,8 +23,8 @@ import type { NotificationRepository } from "../../core/notifications/ports/Noti
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
 type AssessmentReminderOutput = {
   numberOfReminders: number;
@@ -43,26 +43,23 @@ type OutOfTrxDependencies = {
 };
 
 export type AssessmentReminder = ReturnType<typeof makeAssessmentReminder>;
-export const makeAssessmentReminder = createTransactionalUseCase<
-  { mode: AssessmentReminderMode },
-  AssessmentReminderOutput,
-  void,
-  {
+export const makeAssessmentReminder = useCaseBuilder("AssessmentReminder")
+  .withInput<{ mode: AssessmentReminderMode }>(
+    z.object({
+      mode: z.enum(allAssessmentReminderModes),
+    }),
+  )
+  .withOutput<AssessmentReminderOutput>()
+  .withCurrentUser<void>()
+  .withDeps<{
     timeGateway: TimeGateway;
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     config: AppConfig;
     outOfTrx: OutOfTrxDependencies;
-  }
->(
-  {
-    name: "AssessmentReminder",
-    inputSchema: z.object({
-      mode: z.enum(allAssessmentReminderModes),
-    }),
-  },
-  async ({ inputParams: params, uow, deps }) => {
+  }>()
+  .build(async ({ inputParams: params, uow, deps }) => {
     const now = deps.timeGateway.now();
     const conventionIdsToRemind = await getConventionIdsToRemind({
       mode: params.mode,
@@ -90,8 +87,7 @@ export const makeAssessmentReminder = createTransactionalUseCase<
     return {
       numberOfReminders: conventionIdsToRemind.length,
     };
-  },
-);
+  });
 
 const getConventionIdsToRemind = async ({
   mode,

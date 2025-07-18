@@ -15,7 +15,7 @@ import {
 import type { CreateNewEvent } from "../../../core/events/ports/EventBus";
 import type { BroadcastFeedback } from "../../../core/saved-errors/ports/BroadcastFeedbacksRepository";
 import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
 const BROADCAST_FEEDBACK_DEBOUNCE_HOUR = 4;
 
@@ -23,17 +23,14 @@ export type BroadcastConventionAgain = ReturnType<
   typeof makeBroadcastConventionAgain
 >;
 
-export const makeBroadcastConventionAgain = createTransactionalUseCase<
-  WithConventionId,
-  void,
-  ConnectedUser,
-  { createNewEvent: CreateNewEvent; timeGateway: TimeGateway }
->(
-  {
-    name: "BroadcastConventionAgain",
-    inputSchema: withConventionIdSchema,
-  },
-  async ({ inputParams: { conventionId }, uow, deps, currentUser }) => {
+export const makeBroadcastConventionAgain = useCaseBuilder(
+  "BroadcastConventionAgain",
+)
+  .withInput<WithConventionId>(withConventionIdSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{ createNewEvent: CreateNewEvent; timeGateway: TimeGateway }>()
+  .build(async ({ inputParams: { conventionId }, uow, deps, currentUser }) => {
     const convention = await uow.conventionRepository.getById(conventionId);
 
     if (!convention)
@@ -69,8 +66,7 @@ export const makeBroadcastConventionAgain = createTransactionalUseCase<
         },
       }),
     );
-  },
-);
+  });
 
 const throwErrorIfTooManyRequests = (params: {
   lastBroadcastFeedback: BroadcastFeedback | null;

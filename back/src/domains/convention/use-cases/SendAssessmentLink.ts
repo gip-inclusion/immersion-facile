@@ -24,32 +24,27 @@ import type { NotificationRepository } from "../../core/notifications/ports/Noti
 import type { ShortLinkIdGeneratorGateway } from "../../core/short-link/ports/ShortLinkIdGeneratorGateway";
 import { prepareConventionMagicShortLinkMaker } from "../../core/short-link/ShortLink";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import { createTransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwErrorIfPhoneNumberNotValid } from "../entities/Convention";
 
 export const MIN_HOURS_BETWEEN_ASSESSMENT_REMINDER = 24;
 
 export type SendAssessmentLink = ReturnType<typeof makeSendAssessmentLink>;
 
-export const makeSendAssessmentLink = createTransactionalUseCase<
-  { conventionId: ConventionId },
-  void,
-  ConventionRelatedJwtPayload,
-  {
+export const makeSendAssessmentLink = useCaseBuilder("SendAssessmentLink")
+  .withInput<{ conventionId: ConventionId }>(withConventionIdSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConventionRelatedJwtPayload>()
+  .withDeps<{
     saveNotificationAndRelatedEvent: SaveNotificationAndRelatedEvent;
     generateConventionMagicLinkUrl: GenerateConventionMagicLinkUrl;
     timeGateway: TimeGateway;
     shortLinkIdGeneratorGateway: ShortLinkIdGeneratorGateway;
     config: AppConfig;
     createNewEvent: CreateNewEvent;
-  }
->(
-  {
-    name: "SendAssessmentLink",
-    inputSchema: withConventionIdSchema,
-  },
-  async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
+  }>()
+  .build(async ({ inputParams, uow, deps, currentUser: jwtPayload }) => {
     const convention = await uow.conventionRepository.getById(
       inputParams.conventionId,
     );
@@ -145,8 +140,7 @@ export const makeSendAssessmentLink = createTransactionalUseCase<
     });
 
     await uow.outboxRepository.save(event);
-  },
-);
+  });
 
 const throwErrorIfConventionEndInMoreThanOneDay = (
   conventionDateEnd: Date,
