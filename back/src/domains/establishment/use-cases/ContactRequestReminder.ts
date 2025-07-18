@@ -79,12 +79,11 @@ const makeNotification = async ({
   mode: ContactRequestReminderMode;
   discussion: DiscussionDto;
 }): Promise<NotificationContentAndFollowedIds | null> => {
-  if (
-    !(await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+  const establishement =
+    await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
       discussion.siret,
-    ))
-  )
-    return null;
+    );
+  if (!establishement) return null;
 
   const appellations =
     await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
@@ -102,6 +101,15 @@ const makeNotification = async ({
     replyDomain: `reply.${domain}`,
   });
 
+  const contactUsers = await uow.userRepository.getByIds(
+    establishement.userRights
+      .filter(
+        ({ shouldReceiveDiscussionNotifications }) =>
+          shouldReceiveDiscussionNotifications,
+      )
+      .map(({ userId }) => userId),
+  );
+
   return appellation
     ? ({
         followedIds: { establishmentSiret: discussion.siret },
@@ -109,7 +117,7 @@ const makeNotification = async ({
         templatedContent: {
           kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
           sender: immersionFacileNoReplyEmailSender,
-          recipients: [discussion.establishmentContact.email],
+          recipients: contactUsers.map(({ email }) => email),
           replyTo: {
             email: replyTo,
             name: getFormattedFirstnameAndLastname({

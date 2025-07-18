@@ -1,11 +1,13 @@
 import { subDays } from "date-fns";
 import {
+  ConnectedUserBuilder,
   type ContactMode,
   cartographeAppellationAndRome,
   createOpaqueEmail,
   DiscussionBuilder,
   type DiscussionDto,
   type DiscussionKind,
+  type Email,
   expectToEqual,
   getFormattedFirstnameAndLastname,
   immersionFacileNoReplyEmailSender,
@@ -32,9 +34,39 @@ import {
 } from "./ContactRequestReminder";
 
 describe("ContactRequestReminder", () => {
-  let timeGateway: CustomTimeGateway;
   const now = new Date();
   const domain = "domain.fr";
+
+  const establishmentAdmin = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withEmail("admin@mail.com")
+    .build();
+  const establishmentContact = new ConnectedUserBuilder()
+    .withId(uuid())
+    .withEmail("contact@mail.com")
+    .build();
+
+  const establishment = new EstablishmentAggregateBuilder()
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        userId: establishmentAdmin.id,
+        job: "boss",
+        phone: "0677889944",
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: establishmentContact.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: "not-notified-user-id",
+        shouldReceiveDiscussionNotifications: false,
+      },
+    ])
+    .build();
 
   const [
     discussionWith2DaysSinceBeneficiaryExchange,
@@ -69,12 +101,7 @@ describe("ContactRequestReminder", () => {
   ).map(({ date, contactMode }, index) => {
     const builder = new DiscussionBuilder()
       .withId(uuid())
-      .withEstablishmentContact({
-        email: `test-${index}@email.com`,
-        firstName: `test-${index}`,
-        lastName: `test-${index}`,
-        phone: "0677889944",
-      })
+      .withSiret(establishment.establishment.siret)
       .withContactMode(contactMode)
       .withPotentialBeneficiaryEmail(`benef-${index}@email.com`)
       .withPotentialBeneficiaryFirstname(`mike-${index}`)
@@ -82,7 +109,6 @@ describe("ContactRequestReminder", () => {
       .withExchanges([
         {
           sender: "potentialBeneficiary",
-          recipient: "establishment",
           subject: "This is a contact request",
           message: "Beneficiary message",
           sentAt: date.toISOString(),
@@ -102,11 +128,16 @@ describe("ContactRequestReminder", () => {
   let expectSavedNotificationsAndEvents: ExpectSavedNotificationsAndEvents;
 
   beforeEach(() => {
-    timeGateway = new CustomTimeGateway(now);
+    const timeGateway = new CustomTimeGateway(now);
     const uuidGenerator = new TestUuidGenerator();
-    uuidGenerator.setNextUuids(["1", "2", "3", "4"]);
 
     uow = createInMemoryUow();
+    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
+      uow.notificationRepository,
+      uow.outboxRepository,
+    );
+    uuidGenerator.setNextUuids(["1", "2", "3", "4"]);
+
     contactRequestReminder = makeContactRequestReminder({
       uowPerformer: new InMemoryUowPerformer(uow),
       deps: {
@@ -118,26 +149,11 @@ describe("ContactRequestReminder", () => {
         timeGateway,
       },
     });
-    expectSavedNotificationsAndEvents = makeExpectSavedNotificationsAndEvents(
-      uow.notificationRepository,
-      uow.outboxRepository,
-    );
+
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(
-          discussionWith2DaysSinceBeneficiaryExchange.siret,
-        )
-        .withUserRights([
-          {
-            role: "establishment-admin",
-            job: "",
-            phone: "",
-            userId: "osef",
-            shouldReceiveDiscussionNotifications: true,
-          },
-        ])
-        .build(),
+      establishment,
     ];
+    uow.userRepository.users = [establishmentAdmin, establishmentContact];
   });
 
   describe("does not send a reminder", () => {
@@ -177,41 +193,42 @@ describe("ContactRequestReminder", () => {
     });
 
     it("when no discussion when establishment already answered", async () => {
-      timeGateway.setNextDate(new Date("2024-08-08 10:15:00"));
       uow.discussionRepository.discussions = [
         new DiscussionBuilder()
           .withId(uuid())
-          .withCreatedAt(new Date("2024-07-01 09:19:35"))
+          .withCreatedAt(subDays(now, 30))
           .withStatus({ status: "PENDING" })
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
-              sentAt: new Date("2024-07-01 09:19:35").toISOString(),
+              sentAt: subDays(now, 30).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
-              sentAt: new Date("2024-07-23 15:34:15").toISOString(),
+              email: establishmentAdmin.email,
+              firstname: establishmentAdmin.firstName,
+              lastname: establishmentAdmin.lastName,
+              sentAt: subDays(now, 10).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
-              sentAt: new Date("2024-07-25 09:25:17").toISOString(),
+              sentAt: subDays(now, 9).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
-              sentAt: new Date("2024-07-31 08:55:47").toISOString(),
+              email: establishmentAdmin.email,
+              firstname: establishmentAdmin.firstName,
+              lastname: establishmentAdmin.lastName,
+              sentAt: subDays(now, 8).toISOString(),
               attachments: [],
               message: "",
               subject: "",
@@ -220,37 +237,39 @@ describe("ContactRequestReminder", () => {
           .build(),
         new DiscussionBuilder()
           .withId(uuid())
-          .withCreatedAt(new Date("2024-07-26 06:48:59"))
+          .withCreatedAt(subDays(now, 10))
           .withStatus({ status: "PENDING" })
           .withExchanges([
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
-              sentAt: new Date("2024-07-26 06:48:59").toISOString(),
+              sentAt: subDays(now, 10).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
-              sentAt: new Date("2024-07-26 07:24:36").toISOString(),
+              email: establishmentAdmin.email,
+              firstname: establishmentAdmin.firstName,
+              lastname: establishmentAdmin.lastName,
+              sentAt: subDays(now, 9).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "establishment",
-              recipient: "potentialBeneficiary",
-              sentAt: new Date("2024-07-29 10:13:46").toISOString(),
+              email: establishmentAdmin.email,
+              firstname: establishmentAdmin.firstName,
+              lastname: establishmentAdmin.lastName,
+              sentAt: subDays(now, 8).toISOString(),
               attachments: [],
               message: "",
               subject: "",
             },
             {
               sender: "potentialBeneficiary",
-              recipient: "establishment",
-              sentAt: new Date("2024-07-29 14:12:26").toISOString(),
+              sentAt: subDays(now, 7).toISOString(),
               attachments: [],
               message: "",
               subject: "",
@@ -332,21 +351,33 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty, { numberOfNotifications: 3 });
       expectSavedNotificationsAndEvents({
         emails: [
-          makeEstablishmentContactRequestReminder(
-            discussionWith3DaysSinceBeneficiaryExchange,
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith3DaysSinceBeneficiaryExchange,
+            establishmentContactEmails: [
+              establishmentAdmin.email,
+              establishmentContact.email,
+            ],
             domain,
-            "3days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith4DaysSinceBeneficiaryExchange,
+            mode: "3days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith4DaysSinceBeneficiaryExchange,
+            establishmentContactEmails: [
+              establishmentAdmin.email,
+              establishmentContact.email,
+            ],
             domain,
-            "3days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
+            mode: "3days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith3DaysSinceBeneficiaryExchangeKind1E1S,
+            establishmentContactEmails: [
+              establishmentAdmin.email,
+              establishmentContact.email,
+            ],
             domain,
-            "3days",
-          ),
+            mode: "3days",
+          }),
         ],
       });
     });
@@ -360,27 +391,41 @@ describe("ContactRequestReminder", () => {
       expectToEqual(reminderQty, { numberOfNotifications: 2 });
       expectSavedNotificationsAndEvents({
         emails: [
-          makeEstablishmentContactRequestReminder(
-            discussionWith7DaysSinceBeneficiaryExchange,
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith7DaysSinceBeneficiaryExchange,
+            establishmentContactEmails: [
+              establishmentAdmin.email,
+              establishmentContact.email,
+            ],
             domain,
-            "7days",
-          ),
-          makeEstablishmentContactRequestReminder(
-            discussionWith8DaysSinceBeneficiaryExchange,
+            mode: "7days",
+          }),
+          makeEstablishmentContactRequestReminder({
+            discussion: discussionWith8DaysSinceBeneficiaryExchange,
+            establishmentContactEmails: [
+              establishmentAdmin.email,
+              establishmentContact.email,
+            ],
             domain,
-            "7days",
-          ),
+            mode: "7days",
+          }),
         ],
       });
     });
   });
 });
 
-const makeEstablishmentContactRequestReminder = (
-  discussion: DiscussionDto,
-  domain: string,
-  mode: ContactRequestReminderMode,
-): TemplatedEmail => {
+const makeEstablishmentContactRequestReminder = ({
+  discussion,
+  establishmentContactEmails,
+  domain,
+  mode,
+}: {
+  discussion: DiscussionDto;
+  establishmentContactEmails: Email[];
+  domain: string;
+  mode: ContactRequestReminderMode;
+}): TemplatedEmail => {
   const replyEmail = createOpaqueEmail({
     discussionId: discussion.id,
     recipient: {
@@ -394,6 +439,7 @@ const makeEstablishmentContactRequestReminder = (
     },
     replyDomain: `reply.${domain}`,
   });
+
   return {
     kind: "ESTABLISHMENT_CONTACT_REQUEST_REMINDER",
     params: {
@@ -408,7 +454,7 @@ const makeEstablishmentContactRequestReminder = (
       domain,
       mode,
     },
-    recipients: [discussion.establishmentContact.email],
+    recipients: establishmentContactEmails,
     sender: immersionFacileNoReplyEmailSender,
     replyTo: {
       email: replyEmail,
