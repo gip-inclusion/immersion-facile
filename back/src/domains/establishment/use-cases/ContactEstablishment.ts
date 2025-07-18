@@ -25,7 +25,6 @@ import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWo
 import type { UuidGenerator } from "../../core/uuid-generator/ports/UuidGenerator";
 import type { EstablishmentAggregate } from "../entities/EstablishmentAggregate";
 import type { EstablishmentEntity } from "../entities/EstablishmentEntity";
-import { getDiscussionContactsFromAggregate } from "../helpers/businessContact.helpers";
 import { makeContactByEmailRequestParams } from "../helpers/contactRequest";
 
 export class ContactEstablishment extends TransactionalUseCase<ContactEstablishmentRequestDto> {
@@ -159,9 +158,6 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
     now: Date;
     uow: UnitOfWork;
   }): Promise<DiscussionDto> {
-    const { otherUsers, firstAdminRight, firstAdminUser } =
-      await getDiscussionContactsFromAggregate(uow, establishment);
-
     const matchingAddress = establishment.establishment.locations.find(
       (address) => address.id === contactRequest.locationId,
     );
@@ -179,22 +175,14 @@ export class ContactEstablishment extends TransactionalUseCase<ContactEstablishm
         establishment.establishment.name,
       createdAt: now.toISOString(),
       address: matchingAddress.address,
-      exchanges: [],
       status: "PENDING",
     };
 
     const extraDiscussionDtoProperties: ExtraDiscussionDtoProperties = {
-      establishmentContact: {
-        email: firstAdminUser.email,
-        firstName: firstAdminUser.firstName,
-        lastName: firstAdminUser.lastName,
-        phone: firstAdminRight.phone,
-        job: firstAdminRight.job,
-        copyEmails: otherUsers.map((user) => user.email),
-      },
       appellationCode: contactRequest.appellationCode,
       acquisitionCampaign: contactRequest.acquisitionCampaign,
       acquisitionKeyword: contactRequest.acquisitionKeyword,
+      exchanges: [],
     };
 
     if (contactRequest.contactMode === "EMAIL") {
@@ -347,15 +335,20 @@ const makeDiscussionDtoEmail = async ({
         }),
   };
 
+  const [appellation] =
+    await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
+      [discussion.appellationCode],
+    );
+
   const emailContent = configureGenerateHtmlFromTemplate(emailTemplatesByName, {
     header: undefined,
     footer: undefined,
   })(
     "CONTACT_BY_EMAIL_REQUEST",
     await makeContactByEmailRequestParams({
-      uow,
       discussion,
       immersionFacileBaseUrl,
+      appellation,
     }),
     { showContentParts: true },
   );
@@ -372,7 +365,6 @@ const makeDiscussionDtoEmail = async ({
         message: `${emailContent.contentParts.greetings}
               ${emailContent.contentParts.content}
               ${emailContent.contentParts.subContent}`,
-        recipient: "establishment",
         sender: "potentialBeneficiary",
         attachments: [],
       },

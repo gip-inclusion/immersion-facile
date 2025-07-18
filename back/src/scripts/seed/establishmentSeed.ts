@@ -51,18 +51,21 @@ export const franceMerguez = new EstablishmentAggregateBuilder()
       role: "establishment-admin",
       phone: "+33600110011",
       job: "Le Boss des merguez",
+      shouldReceiveDiscussionNotifications: true,
     },
     {
       userId: seedUsers.adminUser.id,
       role: "establishment-contact",
       job: "la compta",
       phone: "+33672787844",
+      shouldReceiveDiscussionNotifications: true,
     },
     {
       userId: seedUsers.icUser.id,
       role: "establishment-contact",
       job: "Contact RH",
       phone: "+33672787846",
+      shouldReceiveDiscussionNotifications: true,
     },
   ])
   .build();
@@ -88,6 +91,7 @@ export const decathlon = new EstablishmentAggregateBuilder()
       role: "establishment-admin",
       phone: "+33600110011",
       job: "The Big Boss @Decathlon",
+      shouldReceiveDiscussionNotifications: true,
     },
   ])
   .build();
@@ -121,16 +125,15 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
     new DiscussionBuilder()
       .withId(discussionId)
       .withSiret(franceMerguez.establishment.siret)
-      .withEstablishmentContact({
-        email: seedUsers.icUser.email,
-      })
       .withPotentialBeneficiaryResumeLink(
         "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
       )
+      .withPotentialBeneficiaryFirstname("Billy")
+      .withPotentialBeneficiaryLastName("Idol")
+      .withPotentialBeneficiaryEmail("billy.idol@mail.com")
       .withExchanges([
         {
           sender: "potentialBeneficiary",
-          recipient: "establishment",
           sentAt: new Date("2024-02-02").toISOString(),
           subject: "Présentation",
           message: "Bonjour, je me présente!",
@@ -138,7 +141,9 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
         },
         {
           sender: "establishment",
-          recipient: "potentialBeneficiary",
+          email: seedUsers.franceMerguezUser.email,
+          firstname: seedUsers.franceMerguezUser.firstName,
+          lastname: seedUsers.franceMerguezUser.lastName,
           sentAt: new Date("2024-02-03").toISOString(),
           subject: "Réponse entreprise",
           message: "Allez viens on est bien.",

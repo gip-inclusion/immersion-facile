@@ -5,7 +5,7 @@ import type {
   DiscussionInList,
   DiscussionReadDto,
   EstablishmentNameAndAdmins,
-  Exchange,
+  ExchangeRead,
   FormEstablishmentDto,
   SiretDto,
   WithDiscussionStatusRejected,
@@ -32,7 +32,7 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public discussion$ = new Subject<DiscussionReadDto | undefined>();
 
-  public sendMessageResponse$ = new Subject<Exchange>();
+  public sendMessageResponse$ = new Subject<ExchangeRead>();
 
   public updateDiscussionStatusResponse$ = new Subject<void>();
 
@@ -83,7 +83,7 @@ export class TestEstablishmentGateway implements EstablishmentGateway {
 
   public sendMessage$(
     _payload: SendExchangeRequestedPayload,
-  ): Observable<Exchange> {
+  ): Observable<ExchangeRead> {
     return this.sendMessageResponse$;
   }
 

@@ -12,7 +12,6 @@ import {
   expectArraysToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  getFormattedFirstnameAndLastname,
   type Location,
   UserBuilder,
 } from "shared";
@@ -72,6 +71,7 @@ describe("ContactEstablishment", () => {
     userId: adminUser.id,
     job: "",
     phone: "",
+    shouldReceiveDiscussionNotifications: true,
   };
 
   const userRights: EstablishmentUserRight[] = [
@@ -79,6 +79,7 @@ describe("ContactEstablishment", () => {
     {
       role: "establishment-contact",
       userId: contactUser.id,
+      shouldReceiveDiscussionNotifications: true,
     },
   ];
 
@@ -263,20 +264,7 @@ describe("ContactEstablishment", () => {
           establishmentAggregateWithEmail.establishment.locations[0].address,
         createdAt: now.toISOString(),
         status: "PENDING",
-        exchanges: [],
       });
-
-      const withExpectedAppellationCodeAndEstablishmentContact = {
-        appellationCode: immersionOffer.appellationCode,
-        establishmentContact: {
-          email: adminUser.email,
-          firstName: adminUser.firstName,
-          lastName: adminUser.lastName,
-          phone: establishmentAdminRight.phone,
-          job: establishmentAdminRight.job,
-          copyEmails: [contactUser.email],
-        },
-      };
 
       describe("with discussion kind IF", () => {
         it("and contact mode EMAIL", async () => {
@@ -290,14 +278,6 @@ describe("ContactEstablishment", () => {
             {
               ...makeExpectedCommon(timeGateway.now()),
               appellationCode: immersionOffer.appellationCode,
-              establishmentContact: {
-                email: adminUser.email,
-                firstName: adminUser.firstName,
-                lastName: adminUser.lastName,
-                phone: establishmentAdminRight.phone,
-                job: establishmentAdminRight.job,
-                copyEmails: [contactUser.email],
-              },
               contactMode: "EMAIL",
               kind: "IF",
               potentialBeneficiary: {
@@ -316,7 +296,7 @@ describe("ContactEstablishment", () => {
                 {
                   subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
-                  message: `<p>Bonjour ${getFormattedFirstnameAndLastname({ firstname: adminUser.firstName, lastname: adminUser.lastName })},</p>
+                  message: `<p>Bonjour,</p>
               
 <table width="600">
   <tr>
@@ -333,7 +313,6 @@ describe("ContactEstablishment", () => {
     </td>
   </tr>
 </table>`,
-                  recipient: "establishment",
                   sender: "potentialBeneficiary",
                   attachments: [],
                 },
@@ -354,7 +333,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "PHONE",
               kind: "IF",
               potentialBeneficiary: {
@@ -382,14 +362,7 @@ describe("ContactEstablishment", () => {
             {
               ...makeExpectedCommon(timeGateway.now()),
               appellationCode: immersionOffer.appellationCode,
-              establishmentContact: {
-                email: adminUser.email,
-                firstName: adminUser.firstName,
-                lastName: adminUser.lastName,
-                phone: establishmentAdminRight.phone,
-                job: establishmentAdminRight.job,
-                copyEmails: [contactUser.email],
-              },
+              exchanges: [],
               contactMode: "IN_PERSON",
               kind: "IF",
               potentialBeneficiary: {
@@ -421,7 +394,7 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
               contactMode: "EMAIL",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -437,7 +410,7 @@ describe("ContactEstablishment", () => {
                 {
                   subject: `Potential_beneficiary_first_name POTENTIAL_BENEFICIARY_LAST_NAME vous contacte pour une demande d'immersion sur le métier de ${immersionOffer.appellationLabel}`,
                   sentAt: timeGateway.now().toISOString(),
-                  message: `<p>Bonjour ${getFormattedFirstnameAndLastname({ firstname: adminUser.firstName, lastname: adminUser.lastName })},</p>
+                  message: `<p>Bonjour,</p>
               
 <table width="600">
   <tr>
@@ -454,7 +427,6 @@ describe("ContactEstablishment", () => {
     </td>
   </tr>
 </table>`,
-                  recipient: "establishment",
                   sender: "potentialBeneficiary",
                   attachments: [],
                 },
@@ -481,7 +453,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "PHONE",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {
@@ -514,7 +487,8 @@ describe("ContactEstablishment", () => {
           expectToEqual(uow.discussionRepository.discussions, [
             {
               ...makeExpectedCommon(timeGateway.now()),
-              ...withExpectedAppellationCodeAndEstablishmentContact,
+              appellationCode: immersionOffer.appellationCode,
+              exchanges: [],
               contactMode: "IN_PERSON",
               kind: "1_ELEVE_1_STAGE",
               potentialBeneficiary: {

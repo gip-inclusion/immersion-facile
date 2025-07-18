@@ -44,6 +44,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
     job: "Marketing Contact",
     phone: "",
     role: "establishment-admin",
+    shouldReceiveDiscussionNotifications: true,
   };
 
   const establishment = new EstablishmentAggregateBuilder()
@@ -319,7 +320,6 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
@@ -327,7 +327,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "establishment",
-            recipient: "potentialBeneficiary",
+            email: "",
+            firstname: "",
+            lastname: "",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
@@ -341,7 +343,6 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
@@ -396,6 +397,7 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             role: "establishment-contact",
             userId: userMarketingContact.id,
+            shouldReceiveDiscussionNotifications: true,
           },
         ])
         .build();

@@ -128,6 +128,7 @@ describe("Update Establishment aggregate from form data", () => {
           role: "establishment-admin",
           job: "job",
           phone: "+336558464365",
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -179,10 +180,12 @@ describe("Update Establishment aggregate from form data", () => {
       email: newEstablishmentAdmin.email,
       job: "new job",
       phone: "+33677445511",
+      shouldReceiveDiscussionNotifications: true,
     };
     const updatedFormContact: ContactFormEstablishmentUserRight = {
       role: "establishment-contact",
       email: newEstablishmentContact.email,
+      shouldReceiveDiscussionNotifications: true,
     };
     const updatedFormEstablishment = FormEstablishmentDtoBuilder.valid()
       .withSiret(siret)
@@ -271,10 +274,12 @@ describe("Update Establishment aggregate from form data", () => {
                 userId: newEstablishmentAdmin.id,
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: newEstablishmentContact.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -371,10 +376,12 @@ describe("Update Establishment aggregate from form data", () => {
                 userId: newEstablishmentAdmin.id,
                 job: updatedFormAdmin.job,
                 phone: updatedFormAdmin.phone,
+                shouldReceiveDiscussionNotifications: true,
               },
               {
                 role: "establishment-contact",
                 userId: newEstablishmentContact.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .build(),
@@ -393,6 +400,39 @@ describe("Update Establishment aggregate from form data", () => {
           },
         },
       ]);
+    });
+
+    it("When users don't have discussion notifications, throw an error", async () => {
+      const updatedFormEstablishmentWithNoDiscussionNotifications = {
+        ...updatedFormEstablishment,
+        userRights: [
+          {
+            ...updatedFormAdmin,
+            shouldReceiveDiscussionNotifications: false,
+          },
+          {
+            ...updatedFormContact,
+            shouldReceiveDiscussionNotifications: false,
+          },
+        ],
+      };
+
+      await expectPromiseToFailWithError(
+        updateEstablishmentAggregateFromFormUseCase.execute(
+          {
+            formEstablishment:
+              updatedFormEstablishmentWithNoDiscussionNotifications,
+          },
+          { userId: previousEstablishmentAdmin.id },
+        ),
+        errors.inputs.badSchema({
+          useCaseName: "UpdateEstablishmentAggregateFromForm",
+          id: siret,
+          flattenErrors: [
+            "formEstablishment.userRights : La structure accueillante nécessite au moins qu'une personne reçoive les notifications liées aux candidatures.",
+          ],
+        }),
+      );
     });
   });
 
@@ -470,6 +510,7 @@ describe("Update Establishment aggregate from form data", () => {
           job: "",
           phone: "",
           userId: user.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -479,10 +520,12 @@ describe("Update Establishment aggregate from form data", () => {
       job: "new job",
       phone: "+33612345679",
       userId: "nextuser1",
+      shouldReceiveDiscussionNotifications: true,
     };
     const newContactRight: EstablishmentContactRight = {
       role: "establishment-contact",
       userId: "nextuser2",
+      shouldReceiveDiscussionNotifications: true,
     };
     const updatedEstablishmentAggregate = new EstablishmentAggregateBuilder()
       .withEstablishment(
@@ -682,6 +725,7 @@ describe("Update Establishment aggregate from form data", () => {
           job: "new job",
           phone: "+33612345679",
           userId: "next-user-1",
+          shouldReceiveDiscussionNotifications: true,
         };
         const updatedFormEstablishmentWithUserRights: FormEstablishmentDto = {
           ...updatedFormEstablishment,
@@ -689,12 +733,14 @@ describe("Update Establishment aggregate from form data", () => {
             {
               role: "establishment-contact",
               email: user.email,
+              shouldReceiveDiscussionNotifications: true,
             },
             {
               role: newAdminRight.role,
               email: newAdminEmail,
               job: newAdminRight.job,
               phone: newAdminRight.phone,
+              shouldReceiveDiscussionNotifications: true,
             },
           ],
         };
@@ -714,6 +760,7 @@ describe("Update Establishment aggregate from form data", () => {
                 {
                   userId: user.id,
                   role: "establishment-contact",
+                  shouldReceiveDiscussionNotifications: true,
                 },
                 newAdminRight,
               ],
@@ -782,6 +829,7 @@ describe("Update Establishment aggregate from form data", () => {
           role: "establishment-admin",
           job: "new job",
           phone: "+33612345679",
+          shouldReceiveDiscussionNotifications: true,
         };
 
         uow.establishmentAggregateRepository.establishmentAggregates = [
@@ -792,6 +840,7 @@ describe("Update Establishment aggregate from form data", () => {
               {
                 userId: establishmentContactUser.id,
                 role: "establishment-contact",
+                shouldReceiveDiscussionNotifications: true,
               },
             ],
           },
@@ -805,6 +854,7 @@ describe("Update Establishment aggregate from form data", () => {
               email: user.email,
               job: existingEstablishmentAdminRight.job,
               phone: existingEstablishmentAdminRight.phone,
+              shouldReceiveDiscussionNotifications: true,
             },
           ],
         };

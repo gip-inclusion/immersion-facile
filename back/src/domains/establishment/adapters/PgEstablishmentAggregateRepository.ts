@@ -117,8 +117,7 @@ export class PgEstablishmentAggregateRepository
       .returning("siret")
       .execute()
       .then((result) => {
-        if (result.length !== 1)
-          throw errors.establishment.missingAggregate({ siret });
+        if (result.length !== 1) throw errors.establishment.notFound({ siret });
         logger.info({
           message: `Deleted establishment successfully. Siret was : ${siret}`,
         });
@@ -378,7 +377,7 @@ export class PgEstablishmentAggregateRepository
       updatedAggregate.establishment.siret,
     );
     if (!existingAggregate)
-      throw errors.establishment.missingAggregate({
+      throw errors.establishment.notFound({
         siret: updatedAggregate.establishment.siret,
       });
 
@@ -540,6 +539,8 @@ export class PgEstablishmentAggregateRepository
           role: userRight.role,
           job: userRight.job,
           phone: userRight.phone,
+          should_receive_discussion_notifications:
+            userRight.shouldReceiveDiscussionNotifications,
         })),
       )
       .execute()
@@ -1135,6 +1136,9 @@ const establishmentByFiltersQueryBuilder = (db: KyselyDb) =>
                   role: ref("eu.role"),
                   job: ref("eu.job"),
                   phone: ref("eu.phone"),
+                  shouldReceiveDiscussionNotifications: ref(
+                    "eu.should_receive_discussion_notifications",
+                  ),
                 }).as("userRight"),
               ),
           ),

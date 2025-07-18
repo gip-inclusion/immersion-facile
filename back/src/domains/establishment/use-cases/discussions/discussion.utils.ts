@@ -2,15 +2,22 @@ import { renderContent } from "html-templates/src/components/email";
 import {
   type BrevoEmailItem,
   type DiscussionEmailParams,
-  type DiscussionEmailParamsWithRecipientKind,
   type Email,
+  type ExchangeRole,
   errors,
   immersionFacileContactEmail,
-  type LegacyDiscussionEmailParams,
   makeExchangeEmailSchema,
+  type OmitFromExistingKeys,
 } from "shared";
 
 const defaultSubject = "Sans objet";
+
+type DiscussionEmailParamsWithRecipientKind = OmitFromExistingKeys<
+  DiscussionEmailParams,
+  "rawRecipientKind" | "firstname" | "lastname"
+> & {
+  recipientRole: ExchangeRole;
+};
 
 export const getDiscussionParamsFromEmail = (
   email: Email,
@@ -29,28 +36,13 @@ export const getDiscussionParamsFromEmail = (
   if (!["e", "b"].includes(rawRecipientKind))
     throw errors.discussion.badRecipientKindFormat({ kind: rawRecipientKind });
 
-  const recipientKind =
-    rawRecipientKind === "e" ? "establishment" : "potentialBeneficiary";
-
   return {
     discussionId,
-    recipientKind,
-    ...(hasDiscussionParamsFirstnameAndLastname(recipientEmailParams)
-      ? {
-          firstname: recipientEmailParams.firstname,
-          lastname: recipientEmailParams.lastname,
-        }
-      : {}),
+    recipientRole:
+      rawRecipientKind === "e" ? "establishment" : "potentialBeneficiary",
   };
 };
 
-const hasDiscussionParamsFirstnameAndLastname = (
-  recipientEmailParams: DiscussionEmailParams | LegacyDiscussionEmailParams,
-): recipientEmailParams is DiscussionEmailParams => {
-  return (
-    "firstname" in recipientEmailParams && "lastname" in recipientEmailParams
-  );
-};
 export const cleanContactEmailFromMessage = (message: string) =>
   message
     .replaceAll(`<${immersionFacileContactEmail}>`, "")

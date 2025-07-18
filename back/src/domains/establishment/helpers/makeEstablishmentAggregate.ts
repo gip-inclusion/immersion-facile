@@ -44,19 +44,28 @@ export const makeEstablishmentAggregate = async ({
   );
 
   const updatedUserRights: EstablishmentUserRight[] =
-    formEstablishment.userRights.map(({ email, role, job, phone }) => {
-      const user = establishmentUsers.find((user) => user.email === email);
+    formEstablishment.userRights.map(
+      ({ email, role, job, phone, shouldReceiveDiscussionNotifications }) => {
+        const user = establishmentUsers.find((user) => user.email === email);
 
-      if (!user) throw errors.user.notFoundByEmail({ email });
-      return role === "establishment-admin"
-        ? {
-            role,
-            userId: user.id,
-            job,
-            phone,
-          }
-        : { role, userId: user.id, job, phone };
-    });
+        if (!user) throw errors.user.notFoundByEmail({ email });
+        return role === "establishment-admin"
+          ? {
+              role,
+              userId: user.id,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications,
+            }
+          : {
+              role,
+              userId: user.id,
+              job,
+              phone,
+              shouldReceiveDiscussionNotifications,
+            };
+      },
+    );
 
   const locations = await Promise.all(
     formEstablishment.businessAddresses.map(async (address) =>

@@ -140,6 +140,7 @@ export const EmailPreviewTab = () => {
           <section className={fr.cx("fr-col-12", "fr-col-lg-8")}>
             <div
               className={cx("admin-tab__email-preview-wrapper")}
+              // biome-ignore lint/security/noDangerouslySetInnerHtml: Email template HTML content
               dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
             />
           </section>
@@ -335,8 +336,6 @@ export const defaultEmailValueByEmailKind: {
     replyToEmail: "REPLY_TO_EMAIL",
     appellationLabel: "APPELLATION_LABEL",
     businessName: "BUSINESS_NAME",
-    contactFirstName: "CONTACT_FIRST_NAME",
-    contactLastName: "CONTACT_LAST_NAME",
     immersionObjective: "Découvrir un métier ou un secteur d'activité",
     message: "MESSAGE",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
@@ -349,8 +348,6 @@ export const defaultEmailValueByEmailKind: {
     replyToEmail: "REPLY_TO_EMAIL",
     appellationLabel: "APPELLATION_LABEL",
     businessName: "BUSINESS_NAME",
-    contactFirstName: "CONTACT_FIRST_NAME",
-    contactLastName: "CONTACT_LAST_NAME",
     immersionObjective: "Découvrir un métier ou un secteur d'activité",
     potentialBeneficiaryFirstName: "POTENTIAL_BENEFICIARY_FIRST_NAME",
     potentialBeneficiaryLastName: "POTENTIAL_BENEFICIARY_LAST_NAME",

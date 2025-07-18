@@ -5,7 +5,7 @@ import type {
   DiscussionDisplayStatus,
   DiscussionReadDto,
   Exchange,
-  ExchangeRole,
+  SpecificExchangeSender,
 } from "./discussion.dto";
 import { getDiscussionDisplayStatus } from "./discussion.helpers";
 import {
@@ -23,20 +23,18 @@ describe("Discussions", () => {
 
     const createExchange = ({
       sentAt,
-      sender,
+      specificExchangeSender,
     }: {
       sentAt: Date;
-      sender: ExchangeRole;
+      specificExchangeSender: SpecificExchangeSender<
+        "establishment" | "potentialBeneficiary"
+      >;
     }): Exchange => ({
       subject: "Some subject",
       message: "Some message",
       attachments: [],
       sentAt: sentAt.toISOString(),
-      sender,
-      recipient:
-        sender === "potentialBeneficiary"
-          ? "establishment"
-          : "potentialBeneficiary",
+      ...specificExchangeSender,
     });
 
     const now = new Date("2025-05-12");
@@ -67,7 +65,9 @@ describe("Discussions", () => {
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 1),
-              sender: "potentialBeneficiary",
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
             }),
           ])
           .buildRead(),
@@ -81,15 +81,24 @@ describe("Discussions", () => {
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 3),
-              sender: "potentialBeneficiary",
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
             }),
             createExchange({
               sentAt: subDays(now, 2),
-              sender: "establishment",
+              specificExchangeSender: {
+                sender: "establishment",
+                email: "establishment@mail.com",
+                firstname: "billy",
+                lastname: "idol",
+              },
             }),
             createExchange({
               sentAt: subDays(now, 1),
-              sender: "potentialBeneficiary",
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
             }),
           ])
           .buildRead(),
@@ -102,11 +111,18 @@ describe("Discussions", () => {
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 2),
-              sender: "potentialBeneficiary",
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
             }),
             createExchange({
               sentAt: subDays(now, 1),
-              sender: "establishment",
+              specificExchangeSender: {
+                sender: "establishment",
+                email: "establishment@mail.com",
+                firstname: "billy",
+                lastname: "idol",
+              },
             }),
           ])
           .buildRead(),
@@ -120,7 +136,9 @@ describe("Discussions", () => {
           .withExchanges([
             createExchange({
               sentAt: subDays(now, 15),
-              sender: "potentialBeneficiary",
+              specificExchangeSender: {
+                sender: "potentialBeneficiary",
+              },
             }),
           ])
           .buildRead(),
@@ -197,32 +215,27 @@ describe("Discussions", () => {
       discussionInPersonIF,
       discussionPhone1E1S,
       discussionPhoneIF,
-    ])(
-      "Test discussionReadSchema",
-      ({ establishmentContact, appellationCode, ...rest }) => {
-        const discussionRead: DiscussionReadDto = {
-          ...rest,
-          establishmentContact: {
-            firstName: establishmentContact.firstName,
-            lastName: establishmentContact.lastName,
-            job: establishmentContact.job,
-          },
-          appellation: {
-            appellationCode: appellationCode,
-            appellationLabel: "osef",
-            romeCode: "A2023",
-            romeLabel: "osef",
-          },
-        };
+    ])("Test discussionReadSchema", ({ appellationCode, ...rest }) => {
+      const discussionRead: DiscussionReadDto = {
+        ...rest,
+        // establishmentContact: {
+        //   firstName: establishmentContact.firstName,
+        //   lastName: establishmentContact.lastName,
+        //   job: establishmentContact.job,
+        // },
+        appellation: {
+          appellationCode: appellationCode,
+          appellationLabel: "osef",
+          romeCode: "A2023",
+          romeLabel: "osef",
+        },
+      };
 
-        expectToEqual(
-          discussionReadSchema.parse(discussionRead),
-          discussionRead,
-        );
-      },
-    );
+      expectToEqual(discussionReadSchema.parse(discussionRead), discussionRead);
+    });
   });
 });
+
 describe("makeExchangeEmailSchema", () => {
   it("should parse the email", () => {
     const email = "firstname_lastname__discussionId_e@reply.domain.com";

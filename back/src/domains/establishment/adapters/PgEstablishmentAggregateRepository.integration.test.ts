@@ -60,6 +60,7 @@ const osefUserRight: EstablishmentUserRight = {
   job: "osef",
   phone: "3615-OSEF",
   userId: osefUser.id,
+  shouldReceiveDiscussionNotifications: true,
 };
 
 describe("PgEstablishmentAggregateRepository", () => {
@@ -1661,7 +1662,7 @@ describe("PgEstablishmentAggregateRepository", () => {
       });
 
       it("adds the establishment values in `establishments` table when one new establishment is given", async () => {
-        const establishment = new EstablishmentAggregateBuilder()
+        const establishmentAggregate = new EstablishmentAggregateBuilder()
           .withEstablishment(
             new EstablishmentEntityBuilder()
               .withMaxContactsPerMonth(24)
@@ -1672,12 +1673,12 @@ describe("PgEstablishmentAggregateRepository", () => {
           .build();
 
         await pgEstablishmentAggregateRepository.insertEstablishmentAggregate(
-          establishment,
+          establishmentAggregate,
         );
 
         expectToEqual(
           await pgEstablishmentAggregateRepository.getAllEstablishmentAggregatesForTest(),
-          [establishment],
+          [establishmentAggregate],
         );
       });
 
@@ -1796,6 +1797,12 @@ describe("PgEstablishmentAggregateRepository", () => {
         .withId(uuid())
         .withEmail("email@mail.com")
         .build();
+
+      const user2 = new UserBuilder()
+        .withId(uuid())
+        .withEmail("email2@mail.com")
+        .build();
+
       const updatedAt = new Date();
       const aquisition: WithAcquisition = {
         acquisitionCampaign: "my-campaign",
@@ -1804,6 +1811,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       beforeEach(async () => {
         await pgUserRepository.save(user);
+        await pgUserRepository.save(user2);
       });
 
       it.each([
@@ -1817,6 +1825,14 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
+              },
+              {
+                role: "establishment-contact",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user2.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withOffers([analysteEnGeomatiqueImmersionOffer, cuvisteOffer])
@@ -1830,6 +1846,14 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
+              },
+              {
+                role: "establishment-contact",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user2.id,
+                shouldReceiveDiscussionNotifications: false,
               },
             ])
             .withOffers([
@@ -1850,6 +1874,14 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "aaaaaaaaaaaaa",
                 phone: "+33600000000",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
+              },
+              {
+                role: "establishment-contact",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user2.id,
+                shouldReceiveDiscussionNotifications: false,
               },
             ])
             .build(),
@@ -1863,6 +1895,14 @@ describe("PgEstablishmentAggregateRepository", () => {
                 job: "sdlm!fjsdlfkjsdmlfj",
                 phone: "+33666887744",
                 userId: user.id,
+                shouldReceiveDiscussionNotifications: true,
+              },
+              {
+                role: "establishment-contact",
+                job: "aaaaaaaaaaaaa",
+                phone: "+33600000000",
+                userId: user2.id,
+                shouldReceiveDiscussionNotifications: true,
               },
             ])
             .withLocations([
@@ -2063,7 +2103,7 @@ describe("PgEstablishmentAggregateRepository", () => {
 
       await expectPromiseToFailWithError(
         pgEstablishmentAggregateRepository.delete(siretNotInTable),
-        errors.establishment.missingAggregate({ siret: siretNotInTable }),
+        errors.establishment.notFound({ siret: siretNotInTable }),
       );
     });
 
@@ -2175,6 +2215,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing stuff",
           phone: "+336887875544",
           userId: user1.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -2188,6 +2229,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing other stuff",
           phone: "+33688445577",
           userId: user2.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();
@@ -2201,6 +2243,7 @@ describe("PgEstablishmentAggregateRepository", () => {
           job: "doing other stuffffffffffffff",
           phone: "+33688445566",
           userId: user2.id,
+          shouldReceiveDiscussionNotifications: true,
         },
       ])
       .build();

@@ -82,7 +82,7 @@ export class DiagorienteAppellationsGateway implements AppellationsGateway {
               : [];
           })
           .catch(() =>
-            // Must not throw since usecase make a failback to internal appelation search
+            // Must not throw since usecase make a failback to internal appellation search
             [],
           ),
     });
