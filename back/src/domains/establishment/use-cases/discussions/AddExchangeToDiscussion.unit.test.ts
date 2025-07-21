@@ -21,15 +21,69 @@ import {
 import { InMemoryUowPerformer } from "../../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { UuidV4Generator } from "../../../core/uuid-generator/adapters/UuidGeneratorImplementations";
 import { EstablishmentAggregateBuilder } from "../../helpers/EstablishmentBuilders";
-import {
-  AddExchangeToDiscussion,
-  type AddExchangeToDiscussionInput,
-} from "./AddExchangeToDiscussion";
+import { AddExchangeToDiscussion } from "./AddExchangeToDiscussion";
 
 describe("AddExchangeToDiscussion", () => {
-  const inclusionConnectedUser = new ConnectedUserBuilder().build();
   const replyDomain = "reply.my-domain.com";
+
+  const adminUserEstablishment1Builder = new ConnectedUserBuilder()
+    .withId("estab1-admin")
+    .withEmail("estab1-admin@mail.com");
+
+  const adminConnectedUserEstablishment1 =
+    adminUserEstablishment1Builder.build();
+  const adminUserEstablishment1 = adminUserEstablishment1Builder.buildUser();
+  const contactUserEstablishment1 = new ConnectedUserBuilder()
+    .withId("estab1-contact")
+    .withEmail("estab1-contact@mail.com")
+    .buildUser();
+  const adminUserEstablishment2 = new ConnectedUserBuilder()
+    .withId("estab2-admin")
+    .withEmail("estab2-admin@mail.com")
+    .buildUser();
+  const contactUserEstablishment2 = new ConnectedUserBuilder()
+    .withId("estab2-contact")
+    .withEmail("estab2-contact@mail.com")
+    .buildUser();
+
+  const establishment1 = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000000")
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "boss",
+        phone: "+33655885588",
+        userId: adminUserEstablishment1.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: contactUserEstablishment1.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
+
+  const establishment2 = new EstablishmentAggregateBuilder()
+    .withEstablishmentSiret("00000000000001")
+    .withUserRights([
+      {
+        role: "establishment-admin",
+        job: "boss",
+        phone: "+33655885588",
+        userId: adminUserEstablishment2.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+      {
+        role: "establishment-contact",
+        userId: contactUserEstablishment2.id,
+        shouldReceiveDiscussionNotifications: true,
+      },
+    ])
+    .build();
+
   const pendingDiscussion1 = new DiscussionBuilder()
+    .withSiret(establishment1.establishment.siret)
     .withAppellationCode("20567")
     .withId("11111111-e89b-12d3-a456-426614174000")
     .withStatus({ status: "PENDING" })
@@ -39,13 +93,13 @@ describe("AddExchangeToDiscussion", () => {
         message: "Hello",
         sender: "potentialBeneficiary",
         sentAt: new Date().toISOString(),
-        recipient: "establishment",
         attachments: [],
       },
     ])
     .build();
 
   const pendingDiscussion2 = new DiscussionBuilder()
+    .withSiret(establishment2.establishment.siret)
     .withAppellationCode("13252")
     .withId("22222222-e89b-12d3-a456-426614174000")
     .withStatus({ status: "PENDING" })
@@ -55,7 +109,6 @@ describe("AddExchangeToDiscussion", () => {
         message: "Hello",
         sender: "potentialBeneficiary",
         sentAt: new Date().toISOString(),
-        recipient: "establishment",
         attachments: [],
       },
     ])
@@ -87,31 +140,17 @@ describe("AddExchangeToDiscussion", () => {
       pendingDiscussion1,
       pendingDiscussion2,
     ];
+
     uow.establishmentAggregateRepository.establishmentAggregates = [
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(pendingDiscussion1.siret)
-        .withUserRights([
-          {
-            role: "establishment-admin",
-            job: "",
-            phone: "",
-            userId: "osef",
-            shouldReceiveDiscussionNotifications: true,
-          },
-        ])
-        .build(),
-      new EstablishmentAggregateBuilder()
-        .withEstablishmentSiret(pendingDiscussion2.siret)
-        .withUserRights([
-          {
-            role: "establishment-admin",
-            job: "",
-            phone: "",
-            userId: "osef",
-            shouldReceiveDiscussionNotifications: true,
-          },
-        ])
-        .build(),
+      establishment1,
+      establishment2,
+    ];
+
+    uow.userRepository.users = [
+      adminUserEstablishment1,
+      adminUserEstablishment2,
+      contactUserEstablishment1,
+      contactUserEstablishment2,
     ];
   });
 
@@ -125,7 +164,7 @@ describe("AddExchangeToDiscussion", () => {
               `firstname2_lastname2__${pendingDiscussion2.id}_e@${replyDomain}`,
             ]).items;
 
-          const payload: AddExchangeToDiscussionInput = {
+          await addExchangeToDiscussion.execute({
             source: "inbound-parsing",
             messageInputs: [
               {
@@ -133,6 +172,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: contactUserEstablishment1.email,
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -148,6 +188,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: secondInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion2.id,
                 recipientRole: "establishment",
+                senderEmail: pendingDiscussion2.potentialBeneficiary.email,
                 sentAt: new Date(
                   secondInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -159,9 +200,7 @@ describe("AddExchangeToDiscussion", () => {
                 subject: secondInboundParsingItem.Subject,
               },
             ],
-          };
-
-          await addExchangeToDiscussion.execute(payload);
+          });
 
           expectToEqual(uow.discussionRepository.discussions, [
             {
@@ -171,8 +210,10 @@ describe("AddExchangeToDiscussion", () => {
                 {
                   message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
                   sender: "establishment",
+                  email: contactUserEstablishment1.email,
+                  firstname: contactUserEstablishment1.firstName,
+                  lastname: contactUserEstablishment1.lastName,
                   sentAt: "2023-06-28T08:06:52.000Z",
-                  recipient: "potentialBeneficiary",
                   subject: firstInboundParsingItem.Subject,
                   attachments:
                     firstInboundParsingItem.Attachments?.map((attachment) => ({
@@ -190,7 +231,6 @@ describe("AddExchangeToDiscussion", () => {
                   message: (secondInboundParsingItem.RawHtmlBody ?? "").trim(), // zStringMinLength1 is performing a trim!
                   sender: "potentialBeneficiary",
                   sentAt: "2023-06-28T08:06:52.000Z",
-                  recipient: "establishment",
                   subject: secondInboundParsingItem.Subject,
                   attachments:
                     secondInboundParsingItem.Attachments?.map((attachment) => ({
@@ -206,15 +246,15 @@ describe("AddExchangeToDiscussion", () => {
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion1.id,
-                siret: pendingDiscussion1.siret,
+                discussionId: pendingDiscussion2.id,
+                siret: pendingDiscussion2.siret,
               },
             },
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion2.id,
-                siret: pendingDiscussion2.siret,
+                discussionId: pendingDiscussion1.id,
+                siret: pendingDiscussion1.siret,
               },
             },
           ]);
@@ -233,7 +273,7 @@ describe("AddExchangeToDiscussion", () => {
                 },
               ],
             },
-            inclusionConnectedUser,
+            adminConnectedUserEstablishment1,
           );
 
           expectToEqual(uow.discussionRepository.discussions, [
@@ -244,8 +284,10 @@ describe("AddExchangeToDiscussion", () => {
                 {
                   message: "Hello",
                   sender: "establishment",
+                  email: adminConnectedUserEstablishment1.email,
+                  firstname: adminConnectedUserEstablishment1.firstName,
+                  lastname: adminConnectedUserEstablishment1.lastName,
                   sentAt: "2021-09-01T10:10:00.000Z",
-                  recipient: "potentialBeneficiary",
                   subject:
                     "Réponse de My default business name à votre demande d'immersion",
                   attachments: [],
@@ -266,7 +308,7 @@ describe("AddExchangeToDiscussion", () => {
               "",
             ).items;
 
-          const payload: AddExchangeToDiscussionInput = {
+          await addExchangeToDiscussion.execute({
             source: "inbound-parsing",
             messageInputs: [
               {
@@ -274,6 +316,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: contactUserEstablishment1.email,
                 attachments:
                   firstInboundParsingItem.Attachments?.map((attachment) => ({
                     name: attachment.Name,
@@ -289,6 +332,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: secondInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion2.id,
                 recipientRole: "establishment",
+                senderEmail: pendingDiscussion2.potentialBeneficiary.email,
                 attachments:
                   secondInboundParsingItem.Attachments?.map((attachment) => ({
                     name: attachment.Name,
@@ -300,9 +344,7 @@ describe("AddExchangeToDiscussion", () => {
                 ).toISOString(),
               },
             ],
-          };
-
-          await addExchangeToDiscussion.execute(payload);
+          });
 
           expectToEqual(uow.discussionRepository.discussions, [
             {
@@ -311,7 +353,9 @@ describe("AddExchangeToDiscussion", () => {
                 ...pendingDiscussion1.exchanges,
                 {
                   sender: "establishment",
-                  recipient: "potentialBeneficiary",
+                  email: contactUserEstablishment1.email,
+                  firstname: contactUserEstablishment1.firstName,
+                  lastname: contactUserEstablishment1.lastName,
                   subject: "Sans objet",
                   message: (firstInboundParsingItem.RawHtmlBody ?? "").trim(),
                   sentAt: new Date(
@@ -331,7 +375,6 @@ describe("AddExchangeToDiscussion", () => {
                 ...pendingDiscussion2.exchanges,
                 {
                   sender: "potentialBeneficiary",
-                  recipient: "establishment",
                   subject: "Sans objet",
                   sentAt: new Date(
                     secondInboundParsingItem.SentAtDate,
@@ -351,15 +394,15 @@ describe("AddExchangeToDiscussion", () => {
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion1.id,
-                siret: pendingDiscussion1.siret,
+                discussionId: pendingDiscussion2.id,
+                siret: pendingDiscussion2.siret,
               },
             },
             {
               topic: "ExchangeAddedToDiscussion",
               payload: {
-                discussionId: pendingDiscussion2.id,
-                siret: pendingDiscussion2.siret,
+                discussionId: pendingDiscussion1.id,
+                siret: pendingDiscussion1.siret,
               },
             },
           ]);
@@ -378,13 +421,15 @@ describe("AddExchangeToDiscussion", () => {
                 },
               ],
             },
-            inclusionConnectedUser,
+            adminConnectedUserEstablishment1,
           );
 
           expectToEqual(uow.discussionRepository.discussions[0].exchanges[1], {
             message: "Hello without sentAt and subject",
             sender: "establishment",
-            recipient: "potentialBeneficiary",
+            email: adminUserEstablishment1.email,
+            firstname: adminUserEstablishment1.firstName,
+            lastname: adminUserEstablishment1.lastName,
             subject:
               "Réponse de My default business name à votre demande d'immersion",
             sentAt: "2021-09-01T10:10:00.000Z",
@@ -429,6 +474,7 @@ describe("AddExchangeToDiscussion", () => {
                   message: firstInboundParsingItem.RawHtmlBody!,
                   discussionId: discussion1Accepted.id,
                   recipientRole: "potentialBeneficiary",
+                  senderEmail: adminUserEstablishment1.email,
                   sentAt: new Date(
                     firstInboundParsingItem.SentAtDate,
                   ).toISOString(),
@@ -466,10 +512,7 @@ describe("AddExchangeToDiscussion", () => {
                     reason: "discussion_completed",
                     sender: "establishment",
                   },
-                  recipients: [
-                    discussion1Accepted.establishmentContact.email,
-                    ...discussion1Accepted.establishmentContact.copyEmails,
-                  ],
+                  recipients: [adminUserEstablishment1.email],
                 },
               ],
               sms: [],
@@ -489,7 +532,7 @@ describe("AddExchangeToDiscussion", () => {
                   },
                 ],
               },
-              inclusionConnectedUser,
+              adminConnectedUserEstablishment1,
             );
 
             expectToEqual(result, {
@@ -525,6 +568,7 @@ describe("AddExchangeToDiscussion", () => {
                   message: firstInboundParsingItem.RawHtmlBody!,
                   discussionId: discussion2Rejected.id,
                   recipientRole: "establishment",
+                  senderEmail: discussion2Rejected.potentialBeneficiary.email,
                   sentAt: new Date(
                     firstInboundParsingItem.SentAtDate,
                   ).toISOString(),
@@ -591,6 +635,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "potentialBeneficiary",
+                senderEmail: adminUserEstablishment1.email,
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -628,10 +673,7 @@ describe("AddExchangeToDiscussion", () => {
                   reason: "establishment_missing",
                   sender: "establishment",
                 },
-                recipients: [
-                  pendingDiscussion1.establishmentContact.email,
-                  ...pendingDiscussion1.establishmentContact.copyEmails,
-                ],
+                recipients: [adminUserEstablishment1.email],
               },
             ],
             sms: [],
@@ -651,7 +693,7 @@ describe("AddExchangeToDiscussion", () => {
                 },
               ],
             },
-            inclusionConnectedUser,
+            adminConnectedUserEstablishment1,
           );
 
           expectToEqual(result, {
@@ -687,6 +729,7 @@ describe("AddExchangeToDiscussion", () => {
                 message: firstInboundParsingItem.RawHtmlBody!,
                 discussionId: pendingDiscussion1.id,
                 recipientRole: "establishment",
+                senderEmail: pendingDiscussion1.potentialBeneficiary.email,
                 sentAt: new Date(
                   firstInboundParsingItem.SentAtDate,
                 ).toISOString(),
@@ -749,6 +792,7 @@ describe("AddExchangeToDiscussion", () => {
               ]).items[0].RawHtmlBody!,
               discussionId: notFoundDiscussionId,
               recipientRole: "establishment",
+              senderEmail: pendingDiscussion1.potentialBeneficiary.email,
               attachments: [],
               subject: "",
               sentAt: new Date().toISOString(),
@@ -772,6 +816,94 @@ describe("AddExchangeToDiscussion", () => {
           ],
         }),
         errors.user.unauthorized(),
+      );
+    });
+
+    it("throws an error if user establishment does not exist by email", async () => {
+      uow.userRepository.users = [];
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(
+          {
+            source: "inbound-parsing",
+            messageInputs: [
+              {
+                senderEmail: adminConnectedUserEstablishment1.email,
+                attachments: [],
+                discussionId: pendingDiscussion1.id,
+                message: "Hello",
+                recipientRole: "potentialBeneficiary",
+                sentAt: new Date().toISOString(),
+                subject: "OSEF",
+              },
+            ],
+          },
+          adminConnectedUserEstablishment1,
+        ),
+        errors.user.notFoundByEmail({
+          email: adminConnectedUserEstablishment1.email,
+        }),
+      );
+    });
+
+    it("throws an error if user establishment does not exist by userId", async () => {
+      uow.userRepository.users = [];
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                message: "Hello",
+                discussionId: pendingDiscussion1.id,
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+              },
+            ],
+          },
+          adminConnectedUserEstablishment1,
+        ),
+        errors.user.notFound({ userId: adminConnectedUserEstablishment1.id }),
+      );
+    });
+
+    it("throws an error if user establishment does not have admin or contact establishment rights", async () => {
+      const establishment = new EstablishmentAggregateBuilder(establishment1)
+        .withUserRights([
+          {
+            role: "establishment-admin",
+            job: "",
+            phone: "",
+            shouldReceiveDiscussionNotifications: true,
+            userId: "osef",
+          },
+        ])
+        .build();
+
+      uow.establishmentAggregateRepository.establishmentAggregates = [
+        establishment,
+      ];
+
+      await expectPromiseToFailWithError(
+        addExchangeToDiscussion.execute(
+          {
+            source: "dashboard",
+            messageInputs: [
+              {
+                message: "Hello",
+                discussionId: pendingDiscussion1.id,
+                recipientRole: "potentialBeneficiary",
+                attachments: [],
+              },
+            ],
+          },
+          adminConnectedUserEstablishment1,
+        ),
+        errors.establishment.notAdminOrContactRight({
+          userId: adminConnectedUserEstablishment1.id,
+          siret: establishment.establishment.siret,
+        }),
       );
     });
   });
