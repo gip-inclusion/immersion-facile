@@ -281,14 +281,14 @@ export type EmailParamsByEmailType = {
     beneficiaryLastName: string;
     businessName: string;
     discussionCreatedAt: string;
-    ctaUrl: AbsoluteUrl;
+    establishmentDashboardUrl: AbsoluteUrl;
   };
   DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
     discussionCreatedAt: string;
-    ctaUrl: string;
+    searchPageUrl: string;
   };
   WARN_DISCUSSION_DELIVERY_FAILED: {
     recipientsInEmailInError: string[];

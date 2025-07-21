@@ -50,7 +50,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = createTransactionalUseCase<
             beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
             beneficiaryLastName: discussion.potentialBeneficiary.lastName,
             businessName: discussion.businessName,
-            ctaUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
+            establishmentDashboardUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.establishmentDashboard}`,
             discussionCreatedAt: discussion.createdAt,
             establishmentContactFirstName:
               discussion.establishmentContact.firstName ?? "",
@@ -71,7 +71,7 @@ export const makeMarkDiscussionDeprecatedAndNotify = createTransactionalUseCase<
             beneficiaryFirstName: discussion.potentialBeneficiary.firstName,
             beneficiaryLastName: discussion.potentialBeneficiary.lastName,
             businessName: discussion.businessName,
-            ctaUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.search}`,
+            searchPageUrl: `${deps.config.immersionFacileBaseUrl}/${frontRoutes.search}`,
             discussionCreatedAt: discussion.createdAt,
           },
         },

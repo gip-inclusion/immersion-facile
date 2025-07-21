@@ -688,7 +688,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
-    ctaUrl: "http://example.com",
+    establishmentDashboardUrl: "http://example.com",
     discussionCreatedAt: "2023-06-23T10:00:00.000Z",
     establishmentContactFirstName: "ESTABLISHMENT_CONTACT_FIRST_NAME",
     establishmentContactLastName: "ESTABLISHMENT_CONTACT_LAST_NAME",
@@ -697,7 +697,7 @@ export const defaultEmailValueByEmailKind: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",
     beneficiaryLastName: "BENEFICIARY_LAST_NAME",
     businessName: "BUSINESS_NAME",
-    ctaUrl: "http://example.com",
+    searchPageUrl: "http://example.com",
     discussionCreatedAt: "2023-06-23T10:00:00.000Z",
   },
 };
