@@ -14,9 +14,8 @@ import {
   updateRightsOnMultipleAgenciesForUser,
 } from "../../../utils/agency";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { getUserWithRights } from "../helpers/userRights.helper";
 
 export type UserAuthenticatedPayload = {
@@ -29,20 +28,18 @@ const userAuthenticatedSchema: z.Schema<UserAuthenticatedPayload> = z.object({
   codeSafir: z.string().or(z.null()),
 });
 
-export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<UserAuthenticatedPayload> {
-  inputSchema = userAuthenticatedSchema;
-  #createNewEvent: CreateNewEvent;
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-  protected async _execute(
-    { userId, codeSafir }: UserAuthenticatedPayload,
-    uow: UnitOfWork,
-  ): Promise<void> {
+export type LinkFranceTravailUsersToTheirAgencies = ReturnType<
+  typeof makeLinkFranceTravailUsersToTheirAgencies
+>;
+export const makeLinkFranceTravailUsersToTheirAgencies = useCaseBuilder(
+  "LinkFranceTravailUsersToTheirAgencies",
+)
+  .withInput(userAuthenticatedSchema)
+  .withOutput<void>()
+  .withDeps<{
+    createNewEvent: CreateNewEvent;
+  }>()
+  .build(async ({ uow, deps, inputParams: { userId, codeSafir } }) => {
     if (!codeSafir) return;
     const user = await getUserWithRights(uow, userId);
     if (isIcUserAlreadyHasValidRight(user, codeSafir)) return;
@@ -56,14 +53,13 @@ export class LinkFranceTravailUsersToTheirAgencies extends TransactionalUseCase<
         uow,
         agencyWithSafir,
         userId,
-        this.#createNewEvent,
+        deps.createNewEvent,
       );
 
     const groupWithSafir =
       await uow.agencyGroupRepository.getByCodeSafir(codeSafir);
     if (groupWithSafir) return updateAgenciesOfGroup(uow, groupWithSafir, user);
-  }
-}
+  });
 
 const isIcUserAlreadyHasValidRight = (
   userWithRights: UserWithRights,

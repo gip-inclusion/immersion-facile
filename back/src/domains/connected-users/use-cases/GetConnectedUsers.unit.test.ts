@@ -13,7 +13,10 @@ import {
   type InMemoryUnitOfWork,
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
-import { GetConnectedUsers } from "./GetConnectedUsers";
+import {
+  type GetConnectedUsers,
+  makeGetConnectedUsers,
+} from "./GetConnectedUsers";
 
 describe("GetConnectedUsers", () => {
   const johnBuilder = new ConnectedUserBuilder()
@@ -132,14 +135,9 @@ describe("GetConnectedUsers", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    getConnectedUsers = new GetConnectedUsers(new InMemoryUowPerformer(uow));
-  });
-
-  it("throws Unauthorized if no jwt token provided", async () => {
-    await expectPromiseToFailWithError(
-      getConnectedUsers.execute({ agencyRole: "to-review" }),
-      errors.user.unauthorized(),
-    );
+    getConnectedUsers = makeGetConnectedUsers({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
   });
 
   it("throws Forbidden if token payload is not backoffice token", async () => {

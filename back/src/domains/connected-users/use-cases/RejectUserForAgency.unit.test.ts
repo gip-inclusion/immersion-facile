@@ -18,7 +18,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { RejectUserForAgency } from "./RejectUserForAgency";
+import {
+  makeRejectUserForAgency,
+  type RejectUserForAgency,
+} from "./RejectUserForAgency";
 
 describe("RejectUserForAgency", () => {
   const proConnect: ProConnectInfos = {
@@ -55,41 +58,14 @@ describe("RejectUserForAgency", () => {
     timeGateway = new CustomTimeGateway();
     uuidGenerator = new TestUuidGenerator();
 
-    rejectUserForAgencyUsecase = new RejectUserForAgency(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({ timeGateway, uuidGenerator }),
-    );
+    rejectUserForAgencyUsecase = makeRejectUserForAgency({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({ timeGateway, uuidGenerator }),
+      },
+    });
 
     uow.userRepository.users = [admin];
-  });
-
-  it("throws when no jwt token provided", async () => {
-    const agency1 = new AgencyDtoBuilder().withId("agency1").build();
-
-    const connectedUser: ConnectedUser = {
-      ...user,
-      proConnect,
-      agencyRights: [
-        {
-          agency: toAgencyDtoForAgencyUsersAndAdmins(agency1, []),
-          roles: ["to-review"],
-          isNotifiedByEmail: false,
-        },
-      ],
-      dashboards: {
-        agencies: {},
-        establishments: {},
-      },
-    };
-
-    await expectPromiseToFailWithError(
-      rejectUserForAgencyUsecase.execute({
-        userId: connectedUser.id,
-        agencyId: agency1.id,
-        justification: "osef",
-      }),
-      errors.user.unauthorized(),
-    );
   });
 
   it("Throws if current user is not a backoffice admin", async () => {

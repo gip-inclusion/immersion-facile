@@ -4,6 +4,7 @@ import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
 import { sendRedirectResponse } from "../../../../config/helpers/sendRedirectResponse";
+import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAuthRouter = (deps: AppDependencies) => {
   const router = Router({ mergeParams: true });
@@ -34,7 +35,7 @@ export const createAuthRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, async () =>
         deps.useCases.getConnectedUser.execute(
           req.query,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

@@ -24,7 +24,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateUserForAgency } from "./UpdateUserForAgency";
+import {
+  makeUpdateUserForAgency,
+  type UpdateUserForAgency,
+} from "./UpdateUserForAgency";
 
 describe("UpdateUserForAgency", () => {
   const adminBuilder = new ConnectedUserBuilder()
@@ -68,26 +71,15 @@ describe("UpdateUserForAgency", () => {
     });
 
     uow.userRepository.users = [adminUser, notAdminUser, agencyAdminUser];
-    updateUserForAgency = new UpdateUserForAgency(
-      new InMemoryUowPerformer(uow),
-      createNewEvent,
-    );
+    updateUserForAgency = makeUpdateUserForAgency({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent,
+      },
+    });
   });
 
   describe("Wrong paths", () => {
-    it("throws Forbidden if no jwt payload provided", async () => {
-      await expectPromiseToFailWithError(
-        updateUserForAgency.execute({
-          roles: ["counsellor"],
-          agencyId: "agency-1",
-          userId: notAdmin.id,
-          isNotifiedByEmail: true,
-          email: "notAdminUser@email.fr",
-        }),
-        errors.user.unauthorized(),
-      );
-    });
-
     it("throws Forbidden if token payload is user has no right on agency", async () => {
       await expectPromiseToFailWithError(
         updateUserForAgency.execute(

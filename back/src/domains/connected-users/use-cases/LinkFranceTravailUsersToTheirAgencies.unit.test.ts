@@ -17,7 +17,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { LinkFranceTravailUsersToTheirAgencies } from "./LinkFranceTravailUsersToTheirAgencies";
+import {
+  type LinkFranceTravailUsersToTheirAgencies,
+  makeLinkFranceTravailUsersToTheirAgencies,
+} from "./LinkFranceTravailUsersToTheirAgencies";
 
 describe("LinkFranceTravailUsersToTheirAgencies", () => {
   const codeSafir = "546546645";
@@ -65,10 +68,12 @@ describe("LinkFranceTravailUsersToTheirAgencies", () => {
       uuidGenerator: new TestUuidGenerator(),
     });
     linkFranceTravailUsersToTheirAgencies =
-      new LinkFranceTravailUsersToTheirAgencies(
-        new InMemoryUowPerformer(uow),
-        createNewEvent,
-      );
+      makeLinkFranceTravailUsersToTheirAgencies({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          createNewEvent,
+        },
+      });
     uow.userRepository.users = [defaultUser];
     uow.agencyRepository.agencies = agenciesInRepo.map((agency) =>
       toAgencyWithRights(agency, {}),

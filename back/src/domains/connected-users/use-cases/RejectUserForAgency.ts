@@ -1,48 +1,33 @@
 import {
   type ConnectedUser,
   errors,
-  type RejectConnectedUserRoleForAgencyParams,
   rejectIcUserRoleForAgencyParamsSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwIfNotAdmin } from "../helpers/authorization.helper";
 
-export class RejectUserForAgency extends TransactionalUseCase<
-  RejectConnectedUserRoleForAgencyParams,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = rejectIcUserRoleForAgencyParamsSchema;
-
-  readonly #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-
-    this.#createNewEvent = createNewEvent;
-  }
-
-  protected async _execute(
-    params: RejectConnectedUserRoleForAgencyParams,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type RejectUserForAgency = ReturnType<typeof makeRejectUserForAgency>;
+export const makeRejectUserForAgency = useCaseBuilder("RejectUserForAgency")
+  .withInput(rejectIcUserRoleForAgencyParamsSchema)
+  .withOutput<void>()
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{
+    createNewEvent: CreateNewEvent;
+  }>()
+  .build(async ({ uow, currentUser, deps, inputParams }) => {
     throwIfNotAdmin(currentUser);
-    const user = await uow.userRepository.getById(params.userId);
+    const userToUpdate = await uow.userRepository.getById(inputParams.userId);
 
-    if (!user) throw errors.user.notFound({ userId: params.userId });
+    if (!userToUpdate)
+      throw errors.user.notFound({ userId: inputParams.userId });
 
-    const agency = await uow.agencyRepository.getById(params.agencyId);
+    const agency = await uow.agencyRepository.getById(inputParams.agencyId);
 
-    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: inputParams.agencyId });
 
-    const { [user.id]: _, ...updatedUserRights } = agency.usersRights;
+    const { [userToUpdate.id]: _, ...updatedUserRights } = agency.usersRights;
 
     await Promise.all([
       uow.agencyRepository.update({
@@ -50,10 +35,10 @@ export class RejectUserForAgency extends TransactionalUseCase<
         usersRights: updatedUserRights,
       }),
       uow.outboxRepository.save(
-        this.#createNewEvent({
+        deps.createNewEvent({
           topic: "ConnectedUserAgencyRightRejected",
           payload: {
-            ...params,
+            ...inputParams,
             triggeredBy: {
               kind: "connected-user",
               userId: currentUser.id,
@@ -62,5 +47,4 @@ export class RejectUserForAgency extends TransactionalUseCase<
         }),
       ),
     ]);
-  }
-}
+  });
