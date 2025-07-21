@@ -271,8 +271,6 @@ export type EmailParamsByEmailType = {
   };
   DISCUSSION_EXCHANGE_FORBIDDEN: DiscussionExchangeForbiddenParams;
   DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
-    establishmentContactFirstName: string;
-    establishmentContactLastName: string;
     beneficiaryFirstName: string;
     beneficiaryLastName: string;
     businessName: string;
