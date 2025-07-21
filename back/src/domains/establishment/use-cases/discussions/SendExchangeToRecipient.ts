@@ -1,9 +1,11 @@
 import {
   createOpaqueEmail,
+  type Email,
   type EmailAttachment,
   type Exchange,
   errors,
   immersionFacileNoReplyEmailSender,
+  type SiretDto,
   type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
@@ -67,8 +69,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
       undefined,
     );
 
-    if (!lastExchange)
-      throw new Error(`No exchanges on discussion '${discussion.id}'.`);
+    if (!lastExchange) throw errors.discussion.noExchanges(discussion.id);
 
     const appellation = (
       await uow.romeRepository.getAppellationAndRomeDtosFromAppellationCodesIfExist(
@@ -77,7 +78,7 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
     ).at(0);
 
     if (!appellation)
-      throw errors.discussion.missingAppellationLabel({
+      throw errors.rome.missingAppellation({
         appellationCode: discussion.appellationCode,
       });
 
@@ -115,15 +116,13 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
                 : "--- pas de message ---"
             }`,
         },
-        recipients: [
-          lastExchange.recipient === "establishment"
-            ? discussion.establishmentContact.email
-            : discussion.potentialBeneficiary.email,
-        ],
-        cc:
-          lastExchange.recipient === "establishment"
-            ? discussion.establishmentContact.copyEmails
-            : [],
+        recipients:
+          lastExchange.sender === "establishment"
+            ? [discussion.potentialBeneficiary.email]
+            : await this.#getEstablishmentNotifiedContactEmails(
+                uow,
+                discussion.siret,
+              ),
         replyTo: {
           email: createOpaqueEmail({
             discussionId: discussion.id,
@@ -131,18 +130,18 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
               kind: lastExchange.sender,
               firstname:
                 lastExchange.sender === "establishment"
-                  ? discussion.establishmentContact.firstName
+                  ? lastExchange.firstname
                   : discussion.potentialBeneficiary.firstName,
               lastname:
                 lastExchange.sender === "establishment"
-                  ? discussion.establishmentContact.lastName
+                  ? lastExchange.lastname
                   : discussion.potentialBeneficiary.lastName,
             },
             replyDomain: this.#replyDomain,
           }),
           name:
             lastExchange.sender === "establishment"
-              ? `${discussion.establishmentContact.firstName} ${discussion.establishmentContact.lastName} - ${discussion.businessName}`
+              ? `${lastExchange.firstname} ${lastExchange.lastname} - ${discussion.businessName}`
               : `${discussion.potentialBeneficiary.firstName} ${discussion.potentialBeneficiary.lastName}`,
         },
         attachments,
@@ -154,5 +153,29 @@ export class SendExchangeToRecipient extends TransactionalUseCase<SendExchangeTo
         establishmentSiret: discussion.siret,
       },
     });
+  }
+
+  async #getEstablishmentNotifiedContactEmails(
+    uow: UnitOfWork,
+    siret: SiretDto,
+  ): Promise<Email[]> {
+    const establishment =
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
+        siret,
+      );
+    if (!establishment) throw errors.establishment.notFound({ siret });
+
+    const establishmentNotifiedContactIds = establishment.userRights
+      .filter(
+        ({ shouldReceiveDiscussionNotifications }) =>
+          shouldReceiveDiscussionNotifications,
+      )
+      .map(({ userId }) => userId);
+
+    const users = await uow.userRepository.getByIds(
+      establishmentNotifiedContactIds,
+    );
+
+    return users.map(({ email }) => email);
   }
 }
