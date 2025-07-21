@@ -1,14 +1,19 @@
 import {
   type Attachment,
   attachmentSchema,
+  type BusinessName,
   type ConnectedUser,
   type DateString,
   type DiscussionDto,
   type DiscussionExchangeForbiddenParams,
   type DiscussionId,
   discussionIdSchema,
+  type Email,
+  type EstablishmentExchange,
   type Exchange,
   type ExchangeRole,
+  type ExtractFromExisting,
+  emailSchema,
   errors,
   exchangeRoleSchema,
   type UserId,
@@ -21,6 +26,7 @@ import type { TimeGateway } from "../../../core/time-gateway/ports/TimeGateway";
 import { TransactionalUseCase } from "../../../core/UseCase";
 import type { UnitOfWork } from "../../../core/unit-of-work/ports/UnitOfWork";
 import type { UnitOfWorkPerformer } from "../../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import type { EstablishmentAggregate } from "../../entities/EstablishmentAggregate";
 
 const inputSources = ["dashboard", "inbound-parsing"] as const;
 
@@ -34,7 +40,8 @@ type MessageInputFromDashboard = MessageInputCommonFields & {
   attachments: never[];
 };
 
-type FullMessageInput = MessageInputCommonFields & {
+export type MessageInputFromInboundParsing = MessageInputCommonFields & {
+  senderEmail: Email;
   recipientRole: ExchangeRole;
   attachments: Attachment[];
   sentAt: DateString;
@@ -45,12 +52,12 @@ type InputSource = (typeof inputSources)[number];
 
 export type AddExchangeToDiscussionInput =
   | {
-      source: Extract<InputSource, "dashboard">;
+      source: ExtractFromExisting<InputSource, "dashboard">;
       messageInputs: MessageInputFromDashboard[];
     }
   | {
-      source: Extract<InputSource, "inbound-parsing">;
-      messageInputs: FullMessageInput[];
+      source: ExtractFromExisting<InputSource, "inbound-parsing">;
+      messageInputs: MessageInputFromInboundParsing[];
     };
 
 export type MessageInput =
@@ -72,6 +79,7 @@ const inputFromDashboardSchema = z.object({
 });
 
 const fullMessageInputSchema = messageInputCommonFieldsSchema.extend({
+  senderEmail: emailSchema,
   recipientRole: exchangeRoleSchema,
   attachments: z.array(attachmentSchema),
   sentAt: z.string().datetime(),
@@ -89,6 +97,10 @@ export const messageInputSchema = z.discriminatedUnion("source", [
 ]);
 
 const defaultSubject = "Sans objet";
+
+type MessageInputFromDashboardWithUserId = MessageInputFromDashboard & {
+  userId: UserId;
+};
 
 export class AddExchangeToDiscussion extends TransactionalUseCase<
   AddExchangeToDiscussionInput,
@@ -114,20 +126,18 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
   }
 
   protected async _execute(
-    input: AddExchangeToDiscussionInput,
+    { messageInputs, source }: AddExchangeToDiscussionInput,
     uow: UnitOfWork,
     connectedUser: ConnectedUser | null,
   ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
-    if (input.source === "dashboard" && !connectedUser) {
-      throw errors.user.unauthorized();
-    }
     return await Promise.all(
-      input.messageInputs.map((messageInput) =>
+      messageInputs.map((messageInput) =>
         this.#processSendMessage(
           uow,
-          input.source,
-          messageInput,
-          connectedUser?.id || null,
+          source,
+          isMessageInputFromEmail(messageInput)
+            ? messageInput
+            : makeDashboardMessageWithUserId(messageInput, connectedUser),
         ),
       ),
     ).then((exchanges) => exchanges[0]);
@@ -136,103 +146,75 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
   async #processSendMessage(
     uow: UnitOfWork,
     source: InputSource,
-    params: MessageInput,
-    userId: UserId | null,
+    messageInput:
+      | MessageInputFromDashboardWithUserId
+      | MessageInputFromInboundParsing,
   ): Promise<Exchange | DiscussionExchangeForbiddenParams> {
-    const { discussionId, message, recipientRole, attachments } = params;
-
-    const sender =
-      recipientRole === "establishment"
-        ? "potentialBeneficiary"
-        : "establishment";
-
-    const discussion = await uow.discussionRepository.getById(discussionId);
-    if (!discussion) throw errors.discussion.notFound({ discussionId });
-
-    if (discussion.status !== "PENDING") {
-      const params: DiscussionExchangeForbiddenParams = {
-        reason: "discussion_completed",
-        sender,
-      };
-
-      if (source === "inbound-parsing")
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          followedIds: {
-            userId: userId || undefined,
-            establishmentSiret: discussion.siret,
-          },
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
-            params,
-            recipients:
-              sender === "establishment"
-                ? [
-                    discussion.establishmentContact.email,
-                    ...discussion.establishmentContact.copyEmails,
-                  ]
-                : [discussion.potentialBeneficiary.email],
-          },
-        });
-
-      return params;
-    }
+    const discussion = await uow.discussionRepository.getById(
+      messageInput.discussionId,
+    );
+    if (!discussion)
+      throw errors.discussion.notFound({
+        discussionId: messageInput.discussionId,
+      });
 
     const establishment =
-      await uow.establishmentAggregateRepository.hasEstablishmentAggregateWithSiret(
+      await uow.establishmentAggregateRepository.getEstablishmentAggregateBySiret(
         discussion.siret,
       );
 
-    if (!establishment) {
-      const params: DiscussionExchangeForbiddenParams = {
-        reason: "establishment_missing",
-        sender,
-      };
-
-      if (source === "inbound-parsing")
-        await this.#saveNotificationAndRelatedEvent(uow, {
-          followedIds: {
-            userId: userId || undefined,
-            establishmentSiret: discussion.siret,
-          },
-          kind: "email",
-          templatedContent: {
-            kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
-            params,
-            recipients:
-              sender === "establishment"
-                ? [
-                    discussion.establishmentContact.email,
-                    ...discussion.establishmentContact.copyEmails,
-                  ]
-                : [discussion.potentialBeneficiary.email],
-          },
-        });
-
-      return params;
-    }
-
-    return this.#addExchangeAndSendEvent(uow, discussion, {
-      subject: makeFormattedSubject({
-        subject: isFullMessageInput(params) ? params.subject : undefined,
+    if (establishment && discussion.status === "PENDING")
+      return this.#addExchangeAndSendEvent(
+        uow,
         discussion,
+        messageInput,
+        establishment,
         source,
-      }),
-      message,
-      sentAt: isFullMessageInput(params)
-        ? params.sentAt
-        : this.#timeGateway.now().toISOString(),
-      recipient: recipientRole,
-      sender,
-      attachments,
+      );
+
+    return this.#notifyForbidden({
+      uow,
+      discussion,
+      source,
+      messageInput,
+      establishment,
     });
   }
 
   async #addExchangeAndSendEvent(
     uow: UnitOfWork,
     discussion: DiscussionDto,
-    exchange: Exchange,
+    messageInput:
+      | MessageInputFromDashboardWithUserId
+      | MessageInputFromInboundParsing,
+    establishment: EstablishmentAggregate,
+    source: InputSource,
   ): Promise<Exchange> {
+    const exchange: Exchange = {
+      subject: makeFormattedSubject({
+        subject: isMessageInputFromEmail(messageInput)
+          ? messageInput.subject
+          : undefined,
+        businessName: discussion.businessName,
+        source,
+      }),
+      sentAt: isMessageInputFromEmail(messageInput)
+        ? messageInput.sentAt
+        : this.#timeGateway.now().toISOString(),
+      message: messageInput.message,
+      attachments: messageInput.attachments,
+      ...(messageInput.recipientRole === "potentialBeneficiary"
+        ? {
+            sender: "establishment",
+            ...(await this.#getEstablishmentUserInfosByEmailOrId(
+              uow,
+              messageInput,
+              establishment,
+            )),
+          }
+        : { sender: "potentialBeneficiary" }),
+    };
+
     await Promise.all([
       uow.discussionRepository.update({
         ...discussion,
@@ -245,27 +227,113 @@ export class AddExchangeToDiscussion extends TransactionalUseCase<
         }),
       ),
     ]);
+
     return exchange;
+  }
+
+  async #getEstablishmentUserInfosByEmailOrId(
+    uow: UnitOfWork,
+    messageInput:
+      | MessageInputFromDashboardWithUserId
+      | MessageInputFromInboundParsing,
+    establishment: EstablishmentAggregate,
+  ): Promise<Pick<EstablishmentExchange, "firstname" | "lastname" | "email">> {
+    const user = isMessageInputFromEmail(messageInput)
+      ? await uow.userRepository.findByEmail(messageInput.senderEmail)
+      : await uow.userRepository.getById(messageInput.userId);
+
+    if (!user)
+      throw isMessageInputFromEmail(messageInput)
+        ? errors.user.notFoundByEmail({ email: messageInput.senderEmail })
+        : errors.user.notFound({ userId: messageInput.userId });
+
+    if (
+      !establishment.userRights.some(
+        (userRight) =>
+          (userRight.userId === user.id &&
+            userRight.role === "establishment-admin") ||
+          userRight.role === "establishment-contact",
+      )
+    )
+      throw errors.establishment.notAdminOrContactRight({
+        siret: establishment.establishment.siret,
+        userId: user.id,
+      });
+
+    return {
+      firstname: user.firstName,
+      lastname: user.lastName,
+      email: user.email,
+    };
+  }
+
+  async #notifyForbidden({
+    uow,
+    discussion,
+    establishment,
+    source,
+    messageInput,
+  }: {
+    uow: UnitOfWork;
+    discussion: DiscussionDto;
+    source: InputSource;
+    messageInput: MessageInput;
+    establishment: EstablishmentAggregate | undefined;
+  }): Promise<DiscussionExchangeForbiddenParams> {
+    const params: DiscussionExchangeForbiddenParams = {
+      reason: !establishment ? "establishment_missing" : "discussion_completed",
+      sender:
+        messageInput.recipientRole === "establishment"
+          ? "potentialBeneficiary"
+          : "establishment",
+    };
+
+    if (source === "inbound-parsing" && isMessageInputFromEmail(messageInput))
+      await this.#saveNotificationAndRelatedEvent(uow, {
+        followedIds: {
+          establishmentSiret: discussion.siret,
+        },
+        kind: "email",
+        templatedContent: {
+          kind: "DISCUSSION_EXCHANGE_FORBIDDEN",
+          params,
+          recipients: [
+            messageInput.recipientRole === "potentialBeneficiary"
+              ? messageInput.senderEmail
+              : discussion.potentialBeneficiary.email,
+          ],
+        },
+      });
+
+    return params;
   }
 }
 
 const makeFormattedSubject = ({
   subject,
-  discussion,
+  businessName,
   source,
 }: {
   subject?: string;
-  discussion: DiscussionDto;
+  businessName: BusinessName;
   source: InputSource;
 }): string => {
   const hasNoSubject = !subject || subject === "";
   if (source === "dashboard" && hasNoSubject) {
-    return `Réponse de ${discussion.businessName} à votre demande d'immersion`;
+    return `Réponse de ${businessName} à votre demande d'immersion`;
   }
   return hasNoSubject ? defaultSubject : subject;
 };
 
-const isFullMessageInput = (
+const isMessageInputFromEmail = (
   messageInput: MessageInput,
-): messageInput is FullMessageInput =>
+): messageInput is MessageInputFromInboundParsing =>
   "sentAt" in messageInput && "subject" in messageInput;
+
+const makeDashboardMessageWithUserId = (
+  messageInput: MessageInputFromDashboard,
+  connectedUser: ConnectedUser | null,
+): MessageInputFromDashboardWithUserId => {
+  if (!connectedUser) throw errors.user.unauthorized();
+  return { ...messageInput, userId: connectedUser.id };
+};
