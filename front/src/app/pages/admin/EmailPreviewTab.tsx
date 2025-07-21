@@ -140,7 +140,6 @@ export const EmailPreviewTab = () => {
           <section className={fr.cx("fr-col-12", "fr-col-lg-8")}>
             <div
               className={cx("admin-tab__email-preview-wrapper")}
-              // biome-ignore lint/security/noDangerouslySetInnerHtml: Email template HTML content
               dangerouslySetInnerHTML={{ __html: fakeContent.htmlContent }}
             />
           </section>
@@ -687,8 +686,6 @@ export const defaultEmailValueByEmailKind: {
     businessName: "BUSINESS_NAME",
     establishmentDashboardUrl: "http://example.com",
     discussionCreatedAt: "2023-06-23T10:00:00.000Z",
-    establishmentContactFirstName: "ESTABLISHMENT_CONTACT_FIRST_NAME",
-    establishmentContactLastName: "ESTABLISHMENT_CONTACT_LAST_NAME",
   },
   DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
     beneficiaryFirstName: "BENEFICIARY_FIRST_NAME",

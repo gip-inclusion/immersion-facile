@@ -54,7 +54,6 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 24).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -71,17 +70,18 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
           subject: "Mise en relation initiale",
           message:
             "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
-          sender: "establishment",
+          sender: "potentialBeneficiary",
           attachments: [],
         },
         {
           subject: "Réponse de l'entreprise",
           message: "Super, je vais vous envoyer un mail avec les informations",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
           sender: "establishment",
+          email: "osef",
+          firstname: "osef",
+          lastname: "osef",
           attachments: [],
         },
       ])
@@ -97,7 +97,6 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 6).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -115,7 +114,6 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -124,9 +122,11 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Réponse de l'entreprise",
             message:
               "Super, je vais vous envoyer un mail avec les informations",
-            recipient: "potentialBeneficiary",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "establishment",
+            email: "osef",
+            firstname: "osef",
+            lastname: "osef",
             attachments: [],
           },
         ])
@@ -193,17 +193,18 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
           subject: "Mise en relation initiale",
           message:
             "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
-          sender: "establishment",
+          sender: "potentialBeneficiary",
           attachments: [],
         },
         {
           subject: "Réponse de l'entreprise",
           message: "Super, je vais vous envoyer un mail avec les informations",
-          recipient: "potentialBeneficiary",
           sentAt: subMonths(now, 12).toISOString(),
           sender: "establishment",
+          email: "osef",
+          firstname: "osef",
+          lastname: "osef",
           attachments: [],
         },
       ])
@@ -219,7 +220,6 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Mise en relation initiale",
             message:
               "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-            recipient: "establishment",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "potentialBeneficiary",
             attachments: [],
@@ -228,9 +228,11 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
             subject: "Réponse de l'entreprise",
             message:
               "Super, je vais vous envoyer un mail avec les informations",
-            recipient: "potentialBeneficiary",
             sentAt: subMonths(now, 4).toISOString(),
             sender: "establishment",
+            email: "osef",
+            firstname: "osef",
+            lastname: "osef",
             attachments: [],
           },
         ])
@@ -263,7 +265,6 @@ describe("GetObsoleteDiscussionsAndEmitDeprecatedEvents", () => {
           subject: "Mise en relation initiale",
           message:
             "Bonjour, je souhaite m'informer sur l'immersion professionnelle",
-          recipient: "establishment",
           sentAt: almostThreeMonthsAgo.toISOString(),
           sender: "potentialBeneficiary",
           attachments: [],

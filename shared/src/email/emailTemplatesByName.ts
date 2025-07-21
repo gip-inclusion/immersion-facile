@@ -1918,12 +1918,10 @@ Profil du candidat :
         beneficiaryLastName,
         discussionCreatedAt,
         establishmentDashboardUrl,
-        establishmentContactFirstName,
-        establishmentContactLastName,
         businessName,
       }) => ({
         subject: `La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} a été clôturée`,
-        content: `Bonjour ${establishmentContactFirstName} ${establishmentContactLastName},
+        content: `Bonjour,
 
         La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} pour une immersion au sein de votre entreprise ${businessName}, envoyée le ${toDisplayedDate({ date: new Date(discussionCreatedAt) })}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
 
