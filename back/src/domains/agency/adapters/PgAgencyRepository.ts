@@ -180,7 +180,7 @@ export class PgAgencyRepository implements AgencyRepository {
       doesNotReferToOtherAgency,
       nameIncludes,
       position,
-      siret,
+      sirets,
       status,
     } = filters;
 
@@ -204,7 +204,7 @@ export class PgAgencyRepository implements AgencyRepository {
         doesNotReferToOtherAgency
           ? b.where("agencies.refers_to_agency_id", "is", null)
           : b,
-      (b) => (siret ? b.where("agencies.agency_siret", "=", siret) : b),
+      (b) => (sirets && sirets.length > 0 ? b.where("agencies.agency_siret", "in", sirets) : b),
       (b) =>
         position
           ? b.where(

@@ -29,7 +29,7 @@ export const makeListAgencyOptionsByFilter = useCaseBuilder(
         nameIncludes,
         departmentCode,
         status: status ? status : activeAgencyStatuses,
-        siret: siret ? removeSpaces(siret) : undefined,
+        sirets: siret ? [removeSpaces(siret)] : undefined,
         ...extraFilters,
       },
     });

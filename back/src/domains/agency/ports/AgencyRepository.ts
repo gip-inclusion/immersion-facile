@@ -22,7 +22,7 @@ export type GetAgenciesFilters = {
   departmentCode?: DepartmentCode;
   kinds?: AgencyKind[];
   status?: AgencyStatus[];
-  siret?: SiretDto;
+  sirets?: SiretDto[];
   doesNotReferToOtherAgency?: true;
 };
 
