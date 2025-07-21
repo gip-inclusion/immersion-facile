@@ -2,31 +2,25 @@ import {
   type DiscussionStatus,
   errors,
   frontRoutes,
-  type WithDiscussionId,
   withDiscussionIdSchema,
 } from "shared";
 import type { AppConfig } from "../../../../config/bootstrap/appConfig";
 import type { SaveNotificationsBatchAndRelatedEvent } from "../../../core/notifications/helpers/Notification";
-import { createTransactionalUseCase } from "../../../core/UseCase";
+import { useCaseBuilder } from "../../../core/useCaseBuilder";
 
 export type MarkDiscussionDeprecatedAndNotify = ReturnType<
   typeof makeMarkDiscussionDeprecatedAndNotify
 >;
 
-export const makeMarkDiscussionDeprecatedAndNotify = createTransactionalUseCase<
-  WithDiscussionId,
-  void,
-  void,
-  {
+export const makeMarkDiscussionDeprecatedAndNotify = useCaseBuilder(
+  "MarkDiscussionDeprecatedAndNotify",
+)
+  .withInput(withDiscussionIdSchema)
+  .withDeps<{
     saveNotificationsBatchAndRelatedEvent: SaveNotificationsBatchAndRelatedEvent;
     config: AppConfig;
-  }
->(
-  {
-    name: "MarkDiscussionDeprecatedAndNotify",
-    inputSchema: withDiscussionIdSchema,
-  },
-  async ({ inputParams: { discussionId }, uow, deps }) => {
+  }>()
+  .build(async ({ inputParams: { discussionId }, uow, deps }) => {
     const discussion = await uow.discussionRepository.getById(discussionId);
     if (!discussion) throw errors.discussion.notFound({ discussionId });
     const statusToMatch: DiscussionStatus = "PENDING";
@@ -80,5 +74,4 @@ export const makeMarkDiscussionDeprecatedAndNotify = createTransactionalUseCase<
         },
       },
     ]);
-  },
-);
+  });

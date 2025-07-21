@@ -422,7 +422,7 @@ const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
 ): WithDiscussionStatus => {
   return match(discussion)
-    .with({ status: "PENDING" }, () => ({ status: "PENDING" as const }))
+    .with({ status: "PENDING" }, ({ status }) => ({ status }))
     .with({ status: "REJECTED", rejectionKind: P.nullish }, (discussion) => {
       throw new Error(
         `Missing rejectionKind for rejected discussion ${discussion.id}`,
@@ -489,7 +489,7 @@ const getWithDiscussionStatusFromPgDiscussion = (
       }),
     )
     .with({ status: "ACCEPTED" }, (discussion) => ({
-      status: "ACCEPTED" as const,
+      status: discussion.status,
       candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
     }))
     .exhaustive();
