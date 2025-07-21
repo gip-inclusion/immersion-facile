@@ -1,12 +1,12 @@
 import {
   AgencyDtoBuilder,
+  type ConnectedUser,
   defaultProConnectInfos,
   errors,
   expectArraysToMatch,
   expectObjectsToMatch,
   expectPromiseToFailWithError,
   expectToEqual,
-  type User,
 } from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { makeCreateNewEvent } from "../../core/events/ports/EventBus";
@@ -17,16 +17,24 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { RegisterAgencyToConnectedUser } from "./RegisterAgencyToConnectedUser";
+import {
+  makeRegisterAgencyToConnectedUser,
+  type RegisterAgencyToConnectedUser,
+} from "./RegisterAgencyToConnectedUser";
 
 describe("RegisterAgencyToConnectedUser use case", () => {
-  const user: User = {
+  const user: ConnectedUser = {
     id: "456",
     email: "john.doe@mail.com",
     firstName: "Joe",
     lastName: "Doe",
     proConnect: defaultProConnectInfos,
     createdAt: new Date().toISOString(),
+    agencyRights: [],
+    dashboards: {
+      agencies: {},
+      establishments: {},
+    },
   };
 
   const agency1 = new AgencyDtoBuilder().withId("agency-111").build();
@@ -37,38 +45,22 @@ describe("RegisterAgencyToConnectedUser use case", () => {
 
   beforeEach(() => {
     uow = createInMemoryUow();
-    registerAgencyToConnectedUser = new RegisterAgencyToConnectedUser(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
-        uuidGenerator: new TestUuidGenerator(),
-      }),
-    );
+    registerAgencyToConnectedUser = makeRegisterAgencyToConnectedUser({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway: new CustomTimeGateway(),
+          uuidGenerator: new TestUuidGenerator(),
+        }),
+      },
+    });
   });
 
   describe("Wrong path", () => {
-    it("fails if no Jwt Token provided", async () => {
-      await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id]),
-        errors.user.noJwtProvided(),
-      );
-    });
-
-    it("fails if user does not exist", async () => {
-      await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id], {
-          userId: user.id,
-        }),
-        errors.user.notFound({ userId: user.id }),
-      );
-    });
-
     it("fails if no agency exist", async () => {
       uow.userRepository.users = [user];
       await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id], {
-          userId: user.id,
-        }),
+        registerAgencyToConnectedUser.execute([agency1.id], user),
         errors.agencies.notFound({ missingAgencyIds: [agency1.id] }),
       );
     });
@@ -82,9 +74,7 @@ describe("RegisterAgencyToConnectedUser use case", () => {
       ];
 
       await expectPromiseToFailWithError(
-        registerAgencyToConnectedUser.execute([agency1.id], {
-          userId: user.id,
-        }),
+        registerAgencyToConnectedUser.execute([agency1.id], user),
         errors.user.alreadyHaveAgencyRights({ userId: user.id }),
       );
     });
@@ -100,9 +90,7 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     });
 
     it("makes the link between user and provided agency id, and saves the corresponding event", async () => {
-      await registerAgencyToConnectedUser.execute([agency1.id], {
-        userId: user.id,
-      });
+      await registerAgencyToConnectedUser.execute([agency1.id], user);
 
       expectToEqual(await uow.userRepository.users, [user]);
       expectToEqual(uow.agencyRepository.agencies, [
@@ -132,9 +120,7 @@ describe("RegisterAgencyToConnectedUser use case", () => {
         toAgencyWithRights(agency2, {}),
       ];
 
-      await registerAgencyToConnectedUser.execute([agency2.id], {
-        userId: user.id,
-      });
+      await registerAgencyToConnectedUser.execute([agency2.id], user);
 
       expectToEqual(uow.userRepository.users, [user]);
       expectToEqual(uow.agencyRepository.agencies, [
@@ -158,9 +144,10 @@ describe("RegisterAgencyToConnectedUser use case", () => {
     });
 
     it("makes the links with all the given agencies, and events has all relevant ids", async () => {
-      await registerAgencyToConnectedUser.execute([agency1.id, agency2.id], {
-        userId: user.id,
-      });
+      await registerAgencyToConnectedUser.execute(
+        [agency1.id, agency2.id],
+        user,
+      );
 
       expectToEqual(await uow.userRepository.users, [user]);
       expectToEqual(uow.agencyRepository.agencies, [

@@ -2,38 +2,27 @@ import { toPairs, uniq } from "ramda";
 import {
   type AgencyUsersRights,
   type AgencyWithUsersRights,
-  type ConnectedUser,
   errors,
   keys,
-  type WithAgencyId,
   withAgencyIdSchema,
 } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
-  WithAgencyId,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = withAgencyIdSchema;
+export type UpdateAgencyReferringToUpdatedAgency = ReturnType<
+  typeof makeUpdateAgencyReferringToUpdatedAgency
+>;
+export const makeUpdateAgencyReferringToUpdatedAgency = useCaseBuilder(
+  "UpdateAgencyReferringToUpdatedAgency",
+)
+  .withInput(withAgencyIdSchema)
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(async ({ uow, deps, inputParams }) => {
+    const updatedAgency = await uow.agencyRepository.getById(
+      inputParams.agencyId,
+    );
 
-  readonly #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-
-  public async _execute(params: WithAgencyId, uow: UnitOfWork): Promise<void> {
-    const updatedAgency = await uow.agencyRepository.getById(params.agencyId);
-
-    if (!updatedAgency) throw errors.agency.notFound(params);
+    if (!updatedAgency) throw errors.agency.notFound(inputParams);
 
     const relatedAgencies =
       await uow.agencyRepository.getAgenciesRelatedToAgency(updatedAgency.id);
@@ -42,10 +31,10 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
       relatedAgencies.map(async ({ usersRights, id }) => {
         await uow.agencyRepository.update({
           id,
-          usersRights: this.#updateRights(usersRights, updatedAgency),
+          usersRights: updateRights(usersRights, updatedAgency),
         });
         await uow.outboxRepository.save(
-          this.#createNewEvent({
+          deps.createNewEvent({
             topic: "AgencyUpdated",
             payload: {
               agencyId: id,
@@ -57,68 +46,67 @@ export class UpdateAgencyReferringToUpdatedAgency extends TransactionalUseCase<
         );
       }),
     );
-  }
+  });
 
-  #updateRights(
-    rightsOfRelatedAgency: AgencyUsersRights,
-    updatedAgency: AgencyWithUsersRights,
-  ): AgencyUsersRights {
-    const validatorsOfUpdatedAgency = toPairs(updatedAgency.usersRights)
-      .filter(([_, rights]) => rights?.roles.includes("validator"))
-      .map(([id, rights]) => ({
-        id,
-        isNotifiedByEmail: rights?.isNotifiedByEmail,
-      }));
+const updateRights = (
+  rightsOfRelatedAgency: AgencyUsersRights,
+  updatedAgency: AgencyWithUsersRights,
+): AgencyUsersRights => {
+  const validatorsOfUpdatedAgency = toPairs(updatedAgency.usersRights)
+    .filter(([_, rights]) => rights?.roles.includes("validator"))
+    .map(([id, rights]) => ({
+      id,
+      isNotifiedByEmail: rights?.isNotifiedByEmail,
+    }));
 
-    //TODO: de tête on a un utilitaire qui fait 2 en 1 ici
-    const idsToUpdate = validatorsOfUpdatedAgency.filter(({ id }) =>
-      keys(rightsOfRelatedAgency).includes(id),
-    );
-    const idsToAdd = validatorsOfUpdatedAgency.filter(
-      ({ id }) => !keys(rightsOfRelatedAgency).includes(id),
-    );
-    const idsToRemove = toPairs(rightsOfRelatedAgency)
-      .filter(
-        ([id, rights]) =>
-          rights?.roles.includes("validator") &&
-          !validatorsOfUpdatedAgency.some((validator) => validator.id === id),
-      )
-      .map(([id]) => id);
+  //TODO: de tête on a un utilitaire qui fait 2 en 1 ici
+  const idsToUpdate = validatorsOfUpdatedAgency.filter(({ id }) =>
+    keys(rightsOfRelatedAgency).includes(id),
+  );
+  const idsToAdd = validatorsOfUpdatedAgency.filter(
+    ({ id }) => !keys(rightsOfRelatedAgency).includes(id),
+  );
+  const idsToRemove = toPairs(rightsOfRelatedAgency)
+    .filter(
+      ([id, rights]) =>
+        rights?.roles.includes("validator") &&
+        !validatorsOfUpdatedAgency.some((validator) => validator.id === id),
+    )
+    .map(([id]) => id);
 
-    return {
-      ...toPairs(rightsOfRelatedAgency).reduce<AgencyUsersRights>(
-        (acc, [id, right]) => {
-          const idToUpdate = idsToUpdate.find(
-            (idToUpdate) => idToUpdate.id === id,
-          );
-          const isIdToRemove = idsToRemove.find(
-            (idToRemove) => idToRemove === id,
-          );
-          return isIdToRemove
-            ? acc
-            : {
-                ...acc,
-                [id]:
-                  right && idToUpdate
-                    ? {
-                        isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
-                        roles: uniq([...right.roles, "validator"]),
-                      }
-                    : right,
-              };
+  return {
+    ...toPairs(rightsOfRelatedAgency).reduce<AgencyUsersRights>(
+      (acc, [id, right]) => {
+        const idToUpdate = idsToUpdate.find(
+          (idToUpdate) => idToUpdate.id === id,
+        );
+        const isIdToRemove = idsToRemove.find(
+          (idToRemove) => idToRemove === id,
+        );
+        return isIdToRemove
+          ? acc
+          : {
+              ...acc,
+              [id]:
+                right && idToUpdate
+                  ? {
+                      isNotifiedByEmail: idToUpdate.isNotifiedByEmail,
+                      roles: uniq([...right.roles, "validator"]),
+                    }
+                  : right,
+            };
+      },
+      {},
+    ),
+    ...idsToAdd.reduce<AgencyUsersRights>(
+      (acc, idsToAdd) => ({
+        ...acc,
+        [idsToAdd.id]: {
+          isNotifiedByEmail: idsToAdd.isNotifiedByEmail,
+          roles: ["validator"],
         },
-        {},
-      ),
-      ...idsToAdd.reduce<AgencyUsersRights>(
-        (acc, idsToAdd) => ({
-          ...acc,
-          [idsToAdd.id]: {
-            isNotifiedByEmail: idsToAdd.isNotifiedByEmail,
-            roles: ["validator"],
-          },
-        }),
-        {},
-      ),
-    };
-  }
-}
+      }),
+      {},
+    ),
+  };
+};

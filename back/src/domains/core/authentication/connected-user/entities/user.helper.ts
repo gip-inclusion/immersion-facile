@@ -1,4 +1,4 @@
-import type { Email, UserId } from "shared";
+import { type ConnectedUser, type Email, errors, type UserId } from "shared";
 import type { TimeGateway } from "../../../time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../../unit-of-work/ports/UnitOfWork";
 import type { UuidGenerator } from "../../../uuid-generator/ports/UuidGenerator";
@@ -39,4 +39,11 @@ const createUser = async (
   });
 
   return userId;
+};
+
+export const getCurrentUserOrThrow = (
+  currentUser: ConnectedUser | undefined,
+): ConnectedUser => {
+  if (!currentUser) throw errors.user.unauthorized();
+  return currentUser;
 };

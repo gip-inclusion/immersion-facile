@@ -9,6 +9,7 @@ import {
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAdminRouter = (deps: AppDependencies): Router => {
   const expressRouter = Router({ mergeParams: true });
@@ -86,14 +87,12 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   );
 
   sharedAdminRouter.getIcUser(deps.connectedUserAuthMiddleware, (req, res) =>
-    sendHttpResponse(req, res, () => {
-      const currentUser = req.payloads?.currentUser;
-      if (!currentUser) throw errors.user.unauthorized();
-      return deps.useCases.getConnectedUser.execute(
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getConnectedUser.execute(
         { userId: req.params.userId },
-        currentUser,
-      );
-    }),
+        getCurrentUserOrThrow(req.payloads?.currentUser),
+      ),
+    ),
   );
 
   sharedAdminRouter.updateUserRoleForAgency(
@@ -110,29 +109,28 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.createUserForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return await deps.useCases.createUserForAgency.execute(
-          req.body,
-          currentUser,
-        );
-      }),
+      sendHttpResponse(
+        req,
+        res,
+        async () =>
+          await deps.useCases.createUserForAgency.execute(
+            req.body,
+            getCurrentUserOrThrow(req.payloads?.currentUser),
+          ),
+      ),
   );
 
   sharedAdminRouter.removeUserFromAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
         const userWithAgency: WithAgencyIdAndUserId = {
           agencyId: req.params.agencyId,
           userId: req.params.userId,
         };
         return await deps.useCases.removeUserFromAgency.execute(
           userWithAgency,
-          currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         );
       }),
   );
@@ -162,33 +160,31 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
   sharedAdminRouter.getAllApiConsumers(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        if (!req.payloads?.currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getAllApiConsumers.execute(
-          req.payloads.currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getAllApiConsumers.execute(
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAdminRouter.getUsers(deps.connectedUserAuthMiddleware, (req, res) =>
-    sendHttpResponse(req, res, () => {
-      const currentUser = req.payloads?.currentUser;
-      if (!currentUser) throw errors.user.unauthorized();
-      return deps.useCases.getUsers.execute(req.query, currentUser);
-    }),
+    sendHttpResponse(req, res, () =>
+      deps.useCases.getUsers.execute(
+        req.query,
+        getCurrentUserOrThrow(req.payloads?.currentUser),
+      ),
+    ),
   );
 
   sharedAgencyRouter.getAgencyById(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getAgencyById.execute(
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.getAgencyById.execute(
           req.params.agencyId,
-          currentUser,
-        );
-      }),
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAgencyRouter.updateAgencyStatus(
@@ -200,7 +196,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
             ...req.body,
             id: req.params.agencyId,
           },
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -209,7 +205,10 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
+        deps.useCases.updateAgency.execute(
+          req.body,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
       ),
   );
 
@@ -219,7 +218,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.privateListAgencies.execute(
           req.query,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

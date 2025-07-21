@@ -15,7 +15,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateAgencyStatus } from "./UpdateAgencyStatus";
+import {
+  makeUpdateAgencyStatus,
+  type UpdateAgencyStatus,
+} from "./UpdateAgencyStatus";
 
 const nextDate = new Date("2022-01-01T10:00:00.000");
 const nextUuid = "event-uuid";
@@ -42,10 +45,12 @@ describe("Update agency status", () => {
       timeGateway,
     });
 
-    updateAgencyStatus = new UpdateAgencyStatus(
-      new InMemoryUowPerformer(uow),
-      createNewEvent,
-    );
+    updateAgencyStatus = makeUpdateAgencyStatus({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent,
+      },
+    });
   });
 
   describe("right path", () => {
@@ -99,16 +104,6 @@ describe("Update agency status", () => {
     const existingAgency = AgencyDtoBuilder.create("agency-123")
       .withStatus("active")
       .build();
-
-    it("returns 401 if no jwt payload", async () => {
-      await expectPromiseToFailWithError(
-        updateAgencyStatus.execute(
-          { id: existingAgency.id, status: "active" },
-          undefined,
-        ),
-        errors.user.unauthorized(),
-      );
-    });
 
     it("returns Forbbiden if user is not admin", async () => {
       await expectPromiseToFailWithError(

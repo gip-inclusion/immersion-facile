@@ -1,38 +1,16 @@
-import {
-  type AgencyDto,
-  agencySchema,
-  type ConnectedUser,
-  errors,
-} from "shared";
+import { agencySchema, type ConnectedUser, errors } from "shared";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class UpdateAgency extends TransactionalUseCase<
-  AgencyDto,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = agencySchema;
-
-  #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-
-  public async _execute(
-    agency: AgencyDto,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type UpdateAgency = ReturnType<typeof makeUpdateAgency>;
+export const makeUpdateAgency = useCaseBuilder("UpdateAgency")
+  .withInput(agencySchema)
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(async ({ uow, currentUser, deps, inputParams: agency }) => {
     throwIfNotAgencyAdminOrBackofficeAdmin(agency.id, currentUser);
+
     const {
       validatorEmails: _,
       counsellorEmails: __,
@@ -46,7 +24,7 @@ export class UpdateAgency extends TransactionalUseCase<
         throw error;
       }),
       uow.outboxRepository.save(
-        this.#createNewEvent({
+        deps.createNewEvent({
           topic: "AgencyUpdated",
           payload: {
             agencyId: agency.id,
@@ -58,5 +36,4 @@ export class UpdateAgency extends TransactionalUseCase<
         }),
       ),
     ]);
-  }
-}
+  });
