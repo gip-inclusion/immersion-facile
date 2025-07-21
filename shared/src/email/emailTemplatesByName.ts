@@ -1913,8 +1913,8 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_ESTABLISHMENT: {
-      niceName: "Établissement - Discussion dépréciée - Candidat",
-      tags: ["discussion dépréciée"],
+      niceName: "MER - Etablissement - Clôture automatique",
+      tags: ["MER_etablissement_clotureAutomatique"],
       createEmailVariables: ({
         beneficiaryFirstName,
         beneficiaryLastName,
@@ -1924,8 +1924,7 @@ Profil du candidat :
         establishmentContactLastName,
         businessName,
       }) => ({
-        bypassLayout: true,
-        subject: "Discussion dépréciée",
+        subject: `La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} a été clôturée`,
         content: `Bonjour ${establishmentContactFirstName} ${establishmentContactLastName},
 
         La candidature de ${beneficiaryFirstName} ${beneficiaryLastName} pour une immersion au sein de votre entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
@@ -1948,8 +1947,8 @@ Profil du candidat :
       }),
     },
     DISCUSSION_DEPRECATED_NOTIFICATION_BENEFICIARY: {
-      niceName: "Candidat - Discussion dépréciée - Etablissement",
-      tags: ["discussion dépréciée"],
+      niceName: "MER - Candidat - Clôture automatique",
+      tags: ["MER_candidat_clotureAutomatique"],
       createEmailVariables: ({
         discussionCreatedAt,
         searchPageUrl,
@@ -1957,8 +1956,7 @@ Profil du candidat :
         beneficiaryLastName,
         businessName,
       }) => ({
-        bypassLayout: true,
-        subject: "Discussion dépréciée",
+        subject: `Votre demande d’immersion chez ${businessName} a été clôturée`,
         content: `Bonjour ${beneficiaryFirstName} ${beneficiaryLastName},
 
         La candidature pour une immersion au sein de l'entreprise ${businessName}, envoyée le ${discussionCreatedAt}, est restée sans réponse pendant plus de 3 mois. Nous l’avons donc automatiquement clôturée afin de garantir des échanges à jour sur Immersion Facilitée.
