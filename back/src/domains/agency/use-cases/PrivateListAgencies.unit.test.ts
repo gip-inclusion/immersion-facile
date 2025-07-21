@@ -9,7 +9,10 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { InMemoryAgencyRepository } from "../adapters/InMemoryAgencyRepository";
-import { PrivateListAgencies } from "./PrivateListAgencies";
+import {
+  makePrivateListAgencies,
+  type PrivateListAgencies,
+} from "./PrivateListAgencies";
 
 describe("PrivateListAgencies use case", () => {
   let agencyRepository: InMemoryAgencyRepository;
@@ -21,16 +24,9 @@ describe("PrivateListAgencies use case", () => {
     const uow = createInMemoryUow();
     agencyRepository = uow.agencyRepository;
     const uowPerformer = new InMemoryUowPerformer(uow);
-    privateListAgencies = new PrivateListAgencies(uowPerformer);
-  });
-
-  it("throw if no connected user is connected", async () => {
-    await expectPromiseToFailWithError(
-      privateListAgencies.execute({
-        status: "needsReview",
-      }),
-      errors.user.unauthorized(),
-    );
+    privateListAgencies = makePrivateListAgencies({
+      uowPerformer,
+    });
   });
 
   it("throws if connected user is not admin", async () => {

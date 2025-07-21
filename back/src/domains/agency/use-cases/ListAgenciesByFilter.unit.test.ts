@@ -8,7 +8,8 @@ import { toAgencyWithRights } from "../../../utils/agency";
 import { createInMemoryUow } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import {
-  ListAgencyOptionsByFilter,
+  type ListAgencyOptionsByFilter,
+  makeListAgencyOptionsByFilter,
   toAgencyOption,
 } from "./ListAgenciesByFilter";
 
@@ -142,9 +143,9 @@ describe("Query: List agencies by filter", () => {
 
   beforeEach(() => {
     const uow = createInMemoryUow();
-    listAgencyOptionsByFilter = new ListAgencyOptionsByFilter(
-      new InMemoryUowPerformer(uow),
-    );
+    listAgencyOptionsByFilter = makeListAgencyOptionsByFilter({
+      uowPerformer: new InMemoryUowPerformer(uow),
+    });
     uow.agencyRepository.agencies = allAgencies;
   });
 

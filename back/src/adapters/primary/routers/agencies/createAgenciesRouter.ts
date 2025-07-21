@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { agencyRoutes, errors, type WithAgencyIdAndUserId } from "shared";
+import { agencyRoutes } from "shared";
 import { createExpressSharedRouter } from "shared-routes/express";
 import type { AppDependencies } from "../../../../config/bootstrap/createAppDependencies";
 import { sendHttpResponse } from "../../../../config/helpers/sendHttpResponse";
+import { getCurrentUserOrThrow } from "../../../../domains/core/authentication/connected-user/entities/user.helper";
 
 export const createAgenciesRouter = (deps: AppDependencies) => {
   const expressRouter = Router();
@@ -19,27 +20,23 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.createUserForAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return await deps.useCases.createUserForAgency.execute(
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.createUserForAgency.execute(
           req.body,
-          currentUser,
-        );
-      }),
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAgencyRouter.getAgencyById(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getAgencyById.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getAgencyById.execute(
           req.params.agencyId,
-          currentUser,
-        );
-      }),
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAgencyRouter.getAgencyOptionsByFilter((req, res) =>
@@ -57,14 +54,12 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.getAgencyUsersByAgencyId(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        return deps.useCases.getConnectedUsers.execute(
+      sendHttpResponse(req, res, () =>
+        deps.useCases.getConnectedUsers.execute(
           { agencyId: req.params.agencyId },
-          currentUser,
-        );
-      }),
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAgencyRouter.getImmersionFacileAgencyId((req, res) =>
@@ -77,7 +72,10 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
     deps.connectedUserAuthMiddleware,
     (req, res) =>
       sendHttpResponse(req, res, () =>
-        deps.useCases.updateAgency.execute(req.body, req.payloads?.currentUser),
+        deps.useCases.updateAgency.execute(
+          req.body,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
       ),
   );
 
@@ -95,18 +93,15 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
   sharedAgencyRouter.removeUserFromAgency(
     deps.connectedUserAuthMiddleware,
     (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        const currentUser = req.payloads?.currentUser;
-        if (!currentUser) throw errors.user.unauthorized();
-        const userWithAgency: WithAgencyIdAndUserId = {
-          agencyId: req.params.agencyId,
-          userId: req.params.userId,
-        };
-        return await deps.useCases.removeUserFromAgency.execute(
-          userWithAgency,
-          currentUser,
-        );
-      }),
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.removeUserFromAgency.execute(
+          {
+            agencyId: req.params.agencyId,
+            userId: req.params.userId,
+          },
+          getCurrentUserOrThrow(req.payloads?.currentUser),
+        ),
+      ),
   );
 
   sharedAgencyRouter.registerAgenciesToUser(
@@ -115,7 +110,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res, () =>
         deps.useCases.registerAgencyToConnectedUser.execute(
           req.body,
-          req.payloads?.connectedUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

@@ -1,54 +1,26 @@
-import {
-  type AgencyId,
-  agencyIdsSchema,
-  type ConnectedUserDomainJwtPayload,
-  errors,
-} from "shared";
+import { agencyIdsSchema, type ConnectedUser, errors } from "shared";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class RegisterAgencyToConnectedUser extends TransactionalUseCase<
-  AgencyId[],
-  void,
-  ConnectedUserDomainJwtPayload
-> {
-  protected inputSchema = agencyIdsSchema;
-
-  #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-
-  protected async _execute(
-    agencyIds: AgencyId[],
-    uow: UnitOfWork,
-    connectedUserPayload: ConnectedUserDomainJwtPayload,
-  ): Promise<void> {
-    if (!connectedUserPayload) throw errors.user.noJwtProvided();
-
-    const user = await uow.userRepository.getById(connectedUserPayload.userId);
-
-    if (!user)
-      throw errors.user.notFound({
-        userId: connectedUserPayload.userId,
-      });
-
+export type RegisterAgencyToConnectedUser = ReturnType<
+  typeof makeRegisterAgencyToConnectedUser
+>;
+export const makeRegisterAgencyToConnectedUser = useCaseBuilder(
+  "RegisterAgencyToConnectedUser",
+)
+  .withInput(agencyIdsSchema)
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(async ({ uow, currentUser, deps, inputParams: agencyIds }) => {
     const agencyRights = await uow.agencyRepository.getAgenciesRightsByUserId(
-      user.id,
+      currentUser.id,
     );
     const alreadyHasRequestedAgencyRight = agencyRights.filter((agencyRight) =>
       agencyIds.includes(agencyRight.agencyId),
     ).length;
     if (alreadyHasRequestedAgencyRight) {
       throw errors.user.alreadyHaveAgencyRights({
-        userId: user.id,
+        userId: currentUser.id,
       });
     }
 
@@ -60,7 +32,7 @@ export class RegisterAgencyToConnectedUser extends TransactionalUseCase<
           id,
           usersRights: {
             ...usersRights,
-            [user.id]: {
+            [currentUser.id]: {
               isNotifiedByEmail: false,
               roles: ["to-review"],
             },
@@ -68,18 +40,17 @@ export class RegisterAgencyToConnectedUser extends TransactionalUseCase<
         }),
       ),
       uow.outboxRepository.save(
-        this.#createNewEvent({
+        deps.createNewEvent({
           topic: "AgencyRegisteredToConnectedUser",
           payload: {
-            userId: user.id,
+            userId: currentUser.id,
             agencyIds,
             triggeredBy: {
               kind: "connected-user",
-              userId: user.id,
+              userId: currentUser.id,
             },
           },
         }),
       ),
     ]);
-  }
-}
+  });

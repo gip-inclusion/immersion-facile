@@ -17,7 +17,10 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateAgencyReferringToUpdatedAgency } from "./UpdateAgencyReferringToUpdatedAgency";
+import {
+  makeUpdateAgencyReferringToUpdatedAgency,
+  type UpdateAgencyReferringToUpdatedAgency,
+} from "./UpdateAgencyReferringToUpdatedAgency";
 
 describe("UpdateAgencyReferingToUpdatedAgency", () => {
   const updatedUser = new ConnectedUserBuilder()
@@ -76,10 +79,12 @@ describe("UpdateAgencyReferingToUpdatedAgency", () => {
       uuidGenerator,
     });
     updateAgencyReferringToUpdatedAgency =
-      new UpdateAgencyReferringToUpdatedAgency(
-        new InMemoryUowPerformer(uow),
-        createNewEvent,
-      );
+      makeUpdateAgencyReferringToUpdatedAgency({
+        uowPerformer: new InMemoryUowPerformer(uow),
+        deps: {
+          createNewEvent,
+        },
+      });
   });
 
   it("throw error when agency not found", () => {

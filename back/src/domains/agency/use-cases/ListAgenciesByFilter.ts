@@ -5,31 +5,24 @@ import {
   type AgencyWithUsersRights,
   activeAgencyStatuses,
   agencyKindList,
-  type ListAgencyOptionsRequestDto,
   listAgencyOptionsRequestSchema,
   miniStageAgencyKinds,
   removeSpaces,
 } from "shared";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import type { GetAgenciesFilters } from "../ports/AgencyRepository";
 
-export class ListAgencyOptionsByFilter extends TransactionalUseCase<
-  ListAgencyOptionsRequestDto,
-  AgencyOption[]
-> {
-  protected inputSchema = listAgencyOptionsRequestSchema;
+export type ListAgencyOptionsByFilter = ReturnType<
+  typeof makeListAgencyOptionsByFilter
+>;
+export const makeListAgencyOptionsByFilter = useCaseBuilder(
+  "ListAgencyOptionsByFilter",
+)
+  .withInput(listAgencyOptionsRequestSchema)
+  .build(async ({ uow, inputParams }) => {
+    const { departmentCode, nameIncludes, filterKind, siret, status } =
+      inputParams;
 
-  public async _execute(
-    {
-      departmentCode,
-      nameIncludes,
-      filterKind,
-      siret,
-      status,
-    }: ListAgencyOptionsRequestDto,
-    uow: UnitOfWork,
-  ): Promise<AgencyOption[]> {
     const extraFilters = getFiltersFromFilterKind(filterKind);
     const agencies = await uow.agencyRepository.getAgencies({
       filters: {
@@ -42,8 +35,7 @@ export class ListAgencyOptionsByFilter extends TransactionalUseCase<
     });
 
     return agencies.map(toAgencyOption);
-  }
-}
+  });
 
 const getFiltersFromFilterKind = (
   filterKind?: AgencyKindFilter,
@@ -69,8 +61,7 @@ const getAgencyKindsFromFilterKind = (
     return agencyKindList.filter(
       (agencyKind) => !miniStageAgencyKinds.includes(agencyKind),
     );
-
-  const _exhaustiveCheck: never = filterKind;
+  filterKind satisfies never;
 };
 
 export const toAgencyOption = (

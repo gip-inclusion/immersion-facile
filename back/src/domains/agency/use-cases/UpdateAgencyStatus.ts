@@ -2,64 +2,40 @@ import {
   type ConnectedUser,
   errors,
   type PartialAgencyDto,
-  type UpdateAgencyStatusParams,
   updateAgencyStatusParamsSchema,
 } from "shared";
 import { throwIfNotAdmin } from "../../connected-users/helpers/authorization.helper";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 
-export class UpdateAgencyStatus extends TransactionalUseCase<
-  UpdateAgencyStatusParams,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = updateAgencyStatusParamsSchema;
-
-  #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-    this.#createNewEvent = createNewEvent;
-  }
-
-  public async _execute(
-    updateAgencyStatusParams: UpdateAgencyStatusParams,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type UpdateAgencyStatus = ReturnType<typeof makeUpdateAgencyStatus>;
+export const makeUpdateAgencyStatus = useCaseBuilder("UpdateAgencyStatus")
+  .withInput(updateAgencyStatusParamsSchema)
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(async ({ uow, currentUser, deps, inputParams }) => {
     throwIfNotAdmin(currentUser);
-    const existingAgency = await uow.agencyRepository.getById(
-      updateAgencyStatusParams.id,
-    );
+    const existingAgency = await uow.agencyRepository.getById(inputParams.id);
     if (!existingAgency)
       throw errors.agency.notFound({
-        agencyId: updateAgencyStatusParams.id,
+        agencyId: inputParams.id,
       });
 
     const updatedAgencyParams: PartialAgencyDto = {
-      id: updateAgencyStatusParams.id,
-      status: updateAgencyStatusParams.status,
+      id: inputParams.id,
+      status: inputParams.status,
       rejectionJustification:
-        updateAgencyStatusParams.status === "rejected"
-          ? updateAgencyStatusParams.rejectionJustification
+        inputParams.status === "rejected"
+          ? inputParams.rejectionJustification
           : null,
     };
     await uow.agencyRepository.update(updatedAgencyParams);
 
-    if (
-      updateAgencyStatusParams.status === "active" ||
-      updateAgencyStatusParams.status === "rejected"
-    ) {
+    if (inputParams.status === "active" || inputParams.status === "rejected") {
       await uow.outboxRepository.save(
-        this.#createNewEvent({
+        deps.createNewEvent({
           topic:
-            updateAgencyStatusParams.status === "active"
+            inputParams.status === "active"
               ? "AgencyActivated"
               : "AgencyRejected",
           payload: {
@@ -72,5 +48,4 @@ export class UpdateAgencyStatus extends TransactionalUseCase<
         }),
       );
     }
-  }
-}
+  });

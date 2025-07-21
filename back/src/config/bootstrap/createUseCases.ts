@@ -8,14 +8,14 @@ import {
   type ShortLinkId,
   type SiretDto,
 } from "shared";
-import { AddAgency } from "../../domains/agency/use-cases/AddAgency";
+import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
-import { ListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
-import { PrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
-import { RegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
-import { UpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
-import { UpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
-import { UpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
+import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
+import { makePrivateListAgencies } from "../../domains/agency/use-cases/PrivateListAgencies";
+import { makeRegisterAgencyToConnectedUser } from "../../domains/agency/use-cases/RegisterAgencyToConnectedUser";
+import { makeUpdateAgency } from "../../domains/agency/use-cases/UpdateAgency";
+import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/use-cases/UpdateAgencyReferringToUpdatedAgency";
+import { makeUpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { throwIfNotAdmin } from "../../domains/connected-users/helpers/authorization.helper";
 import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
 import { GetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
@@ -263,10 +263,6 @@ export const createUseCases = ({
         uowPerformer,
         gateways.notification,
       ),
-      registerAgencyToConnectedUser: new RegisterAgencyToConnectedUser(
-        uowPerformer,
-        createNewEvent,
-      ),
       updateUserForAgency: new UpdateUserForAgency(
         uowPerformer,
         createNewEvent,
@@ -464,8 +460,6 @@ export const createUseCases = ({
       validateEmail: new ValidateEmail(gateways.emailValidationGateway),
 
       // agencies
-      listAgencyOptionsByFilter: new ListAgencyOptionsByFilter(uowPerformer),
-      privateListAgencies: new PrivateListAgencies(uowPerformer),
       getAgencyPublicInfoById: new GetAgencyPublicInfoById(uowPerformer),
       sendEmailsWhenAgencyIsActivated: new SendEmailsWhenAgencyIsActivated(
         uowPerformer,
@@ -480,8 +474,6 @@ export const createUseCases = ({
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      updateAgencyReferringToUpdatedAgency:
-        new UpdateAgencyReferringToUpdatedAgency(uowPerformer, createNewEvent),
       // METABASE
       ...dashboardUseCases(gateways.dashboardGateway, gateways.timeGateway),
       // notifications
@@ -603,15 +595,6 @@ export const createUseCases = ({
         gateways.shortLinkGenerator,
         config,
       ),
-      addAgency: new AddAgency(
-        uowPerformer,
-        createNewEvent,
-        gateways.siret,
-        gateways.timeGateway,
-        uuidGenerator,
-      ),
-      updateAgencyStatus: new UpdateAgencyStatus(uowPerformer, createNewEvent),
-      updateAgency: new UpdateAgency(uowPerformer, createNewEvent),
       setFeatureFlag: new SetFeatureFlag(uowPerformer),
       saveApiConsumer: new SaveApiConsumer(
         uowPerformer,
@@ -664,6 +647,52 @@ export const createUseCases = ({
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    updateAgencyStatus: makeUpdateAgencyStatus({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
+    }),
+
+    updateAgencyReferringToUpdatedAgency:
+      makeUpdateAgencyReferringToUpdatedAgency({
+        uowPerformer,
+        deps: {
+          createNewEvent,
+        },
+      }),
+
+    updateAgency: makeUpdateAgency({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
+    }),
+
+    listAgencyOptionsByFilter: makeListAgencyOptionsByFilter({
+      uowPerformer,
+    }),
+    privateListAgencies: makePrivateListAgencies({
+      uowPerformer,
+    }),
+
+    addAgency: makeAddAgency({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+        siretGateway: gateways.siret,
+        timeGateway: gateways.timeGateway,
+        uuidGenerator,
+      },
+    }),
+
+    registerAgencyToConnectedUser: makeRegisterAgencyToConnectedUser({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
     }),
 
     broadcastToFranceTravailOnConventionUpdates:

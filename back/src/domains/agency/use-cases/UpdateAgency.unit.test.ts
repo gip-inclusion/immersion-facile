@@ -20,7 +20,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { UpdateAgency } from "./UpdateAgency";
+import { makeUpdateAgency, type UpdateAgency } from "./UpdateAgency";
 
 describe("Update agency", () => {
   const initialAgencyInRepo = new AgencyDtoBuilder().build();
@@ -57,24 +57,18 @@ describe("Update agency", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     uow.userRepository.users = [admin, notAdmin];
-    updateAgency = new UpdateAgency(
-      new InMemoryUowPerformer(uow),
-      makeCreateNewEvent({
-        timeGateway: new CustomTimeGateway(),
-        uuidGenerator: new TestUuidGenerator(),
-      }),
-    );
+    updateAgency = makeUpdateAgency({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent: makeCreateNewEvent({
+          timeGateway: new CustomTimeGateway(),
+          uuidGenerator: new TestUuidGenerator(),
+        }),
+      },
+    });
   });
 
   describe("Wrong path", () => {
-    it("throws Unauthorized if no current user", async () => {
-      const agency = new AgencyDtoBuilder().build();
-      await expectPromiseToFailWithError(
-        updateAgency.execute({ ...agency, validatorEmails: ["mail@mail.com"] }),
-        errors.user.unauthorized(),
-      );
-    });
-
     it("throws Forbidden if current user is not admin nore agency admin on agency", async () => {
       const agency = new AgencyDtoBuilder().build();
       await expectPromiseToFailWithError(

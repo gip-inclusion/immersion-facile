@@ -28,7 +28,7 @@ import {
 } from "../../core/unit-of-work/adapters/createInMemoryUow";
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import { TestUuidGenerator } from "../../core/uuid-generator/adapters/UuidGeneratorImplementations";
-import { AddAgency } from "./AddAgency";
+import { type AddAgency, makeAddAgency } from "./AddAgency";
 
 describe("AddAgency use case", () => {
   const counsellor = new ConnectedUserBuilder()
@@ -100,13 +100,15 @@ describe("AddAgency use case", () => {
       timeGateway: timeGateway,
       uuidGenerator: uuidGenerator,
     });
-    addAgency = new AddAgency(
-      new InMemoryUowPerformer(uow),
-      createNewEvent,
-      siretGateway,
-      timeGateway,
-      uuidGenerator,
-    );
+    addAgency = makeAddAgency({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        createNewEvent,
+        siretGateway,
+        timeGateway,
+        uuidGenerator,
+      },
+    });
     uuidGenerator.setNextUuids([...uuids]);
   });
 
