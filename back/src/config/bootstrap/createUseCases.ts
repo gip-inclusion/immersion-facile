@@ -8,6 +8,7 @@ import {
   type ShortLinkId,
   type SiretDto,
 } from "shared";
+import { makeAddAgenciesAndUsers } from "../../domains/agency/use-cases/AddAgenciesAndUsers";
 import { makeAddAgency } from "../../domains/agency/use-cases/AddAgency";
 import { makeGetAgencyById } from "../../domains/agency/use-cases/GetAgencyById";
 import { makeListAgencyOptionsByFilter } from "../../domains/agency/use-cases/ListAgenciesByFilter";
@@ -631,6 +632,14 @@ export const createUseCases = ({
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    addAgenciesAndUsers: makeAddAgenciesAndUsers({
+      uowPerformer,
+      deps: {
+        uuidGenerator,
+        timeGateway: gateways.timeGateway,
+      },
     }),
 
     updateUserForAgency: makeUpdateUserForAgency({
