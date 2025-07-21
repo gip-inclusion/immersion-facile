@@ -20,6 +20,7 @@ import {
   type SiretDto,
   type WithDiscussionStatus,
 } from "shared";
+import { match, P } from "ts-pattern";
 import {
   jsonBuildObject,
   jsonStripNulls,
@@ -420,45 +421,78 @@ const discussionToPg = (
 const getWithDiscussionStatusFromPgDiscussion = (
   discussion: GetDiscussionsResults[number]["discussion"],
 ): WithDiscussionStatus => {
-  const { status } = discussion;
-
-  if (status === "PENDING") return { status };
-
-  if (status === "REJECTED") {
-    const { rejectionKind } = discussion;
-    if (!rejectionKind) {
+  return match(discussion)
+    .with({ status: "PENDING" }, () => ({ status: "PENDING" as const }))
+    .with({ status: "REJECTED", rejectionKind: P.nullish }, (discussion) => {
       throw new Error(
         `Missing rejectionKind for rejected discussion ${discussion.id}`,
       );
-    }
-
-    if (rejectionKind === "CANDIDATE_ALREADY_WARNED") {
-      const { candidateWarnedMethod } = discussion;
-      if (!candidateWarnedMethod) {
+    })
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "CANDIDATE_ALREADY_WARNED",
+        candidateWarnedMethod: P.nullish,
+      },
+      (discussion) => {
         throw new Error(
           `Missing candidateWarnedMethod for CANDIDATE_ALREADY_WARNED rejection in discussion ${discussion.id}`,
         );
-      }
-      return { status, rejectionKind, candidateWarnedMethod };
-    }
-
-    if (rejectionKind === "OTHER") {
-      const { rejectionReason } = discussion;
-      if (!rejectionReason) {
+      },
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "CANDIDATE_ALREADY_WARNED",
+        candidateWarnedMethod: P.not(P.nullish),
+      },
+      ({ candidateWarnedMethod, status, rejectionKind }) => ({
+        status,
+        rejectionKind,
+        candidateWarnedMethod,
+      }),
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "OTHER",
+        rejectionReason: P.nullish,
+      },
+      (discussion) => {
         throw new Error(
           `Missing rejectionReason for OTHER rejection in discussion ${discussion.id}`,
         );
-      }
-      return { status, rejectionKind, rejectionReason };
-    }
-
-    return { status, rejectionKind };
-  }
-
-  return {
-    status,
-    candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
-  };
+      },
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: "OTHER",
+        rejectionReason: P.not(P.nullish),
+      },
+      ({ rejectionReason, status, rejectionKind, candidateWarnedMethod }) => ({
+        status,
+        rejectionKind,
+        rejectionReason,
+        candidateWarnedMethod,
+      }),
+    )
+    .with(
+      {
+        status: "REJECTED",
+        rejectionKind: P.union("UNABLE_TO_HELP", "NO_TIME", "DEPRECATED"),
+      },
+      ({ status, rejectionKind, candidateWarnedMethod }) => ({
+        status,
+        rejectionKind,
+        candidateWarnedMethod,
+      }),
+    )
+    .with({ status: "ACCEPTED" }, (discussion) => ({
+      status: "ACCEPTED" as const,
+      candidateWarnedMethod: discussion.candidateWarnedMethod ?? null,
+    }))
+    .exhaustive();
 };
 
 const makeDiscussionDtoFromPgDiscussion = (
