@@ -3,7 +3,6 @@ import { Router } from "express";
 import { IpFilter } from "express-ipfilter";
 import multer from "multer";
 import {
-  type BrevoEmailItem,
   errors,
   ForbiddenError,
   type TallyForm,
@@ -87,29 +86,29 @@ export const createTechnicalRouter = (
       },
     }),
     async (req, res) =>
-      sendHttpResponse(req, res, async () => {
-        await deps.useCases.addExchangeToDiscussion.execute({
-          source: "inbound-parsing",
-          messageInputs: req.body.items.map((emailItem: BrevoEmailItem) => {
-            const { discussionId, recipientKind } =
-              getDiscussionParamsFromEmail(
-                emailItem.To[0].Address,
+      sendHttpResponse(req, res, async () =>
+        deps.useCases.addExchangeToDiscussion
+          .execute({
+            source: "inbound-parsing",
+            messageInputs: req.body.items.map((brevoEmailItem) => ({
+              senderEmail: brevoEmailItem.From.Address,
+              message: processInboundParsingEmailMessage(brevoEmailItem),
+              ...getDiscussionParamsFromEmail(
+                brevoEmailItem.To[0].Address,
                 `reply.${deps.config.immersionFacileDomain}`,
-              );
-            return {
-              message: processInboundParsingEmailMessage(emailItem),
-              discussionId,
-              recipientRole: recipientKind,
-              sentAt: new Date(emailItem.SentAtDate).toISOString(),
-              attachments: (emailItem.Attachments || []).map((attachment) => ({
-                name: attachment.Name,
-                link: attachment.DownloadToken,
-              })),
-              subject: getSubjectFromEmail(emailItem),
-            };
-          }),
-        });
-      }),
+              ),
+              sentAt: new Date(brevoEmailItem.SentAtDate).toISOString(),
+              attachments: (brevoEmailItem.Attachments || []).map(
+                (attachment) => ({
+                  name: attachment.Name,
+                  link: attachment.DownloadToken,
+                }),
+              ),
+              subject: getSubjectFromEmail(brevoEmailItem),
+            })),
+          })
+          .then((_result) => {}),
+      ),
   );
 
   technicalSharedRouter.openApiSpec(async (req, res) =>
