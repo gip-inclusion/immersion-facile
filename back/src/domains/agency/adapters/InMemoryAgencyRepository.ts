@@ -122,7 +122,7 @@ export class InMemoryAgencyRepository implements AgencyRepository {
             agencyIsOfKind(agency, filters?.kinds),
             agencyIsOfPosition(agency, filters?.position),
             agencyIsOfStatus(agency, filters?.status),
-            agencyHasSiret(agency, filters?.siret),
+            agencyHasSiret(agency, filters?.sirets),
             agencyDoesNotReferToOtherAgency(
               agency,
               filters?.doesNotReferToOtherAgency,
@@ -249,10 +249,10 @@ const agencyHasName = (
 
 const agencyHasSiret = (
   agency: AgencyWithUsersRights,
-  siret?: SiretDto,
+  sirets?: SiretDto[],
 ): boolean => {
-  if (!siret) return true;
-  return agency.agencySiret === siret;
+  if (!sirets || sirets.length === 0) return true;
+  return sirets.includes(agency.agencySiret);
 };
 
 const agencyDoesNotReferToOtherAgency = (

@@ -36,7 +36,7 @@ export class ListAgencyOptionsByFilter extends TransactionalUseCase<
         nameIncludes,
         departmentCode,
         status: status ? status : activeAgencyStatuses,
-        siret: siret ? removeSpaces(siret) : undefined,
+        sirets: siret ? [removeSpaces(siret)] : undefined,
         ...extraFilters,
       },
     });
