@@ -320,7 +320,6 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
@@ -328,7 +327,9 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "establishment",
-            recipient: "potentialBeneficiary",
+            email: "",
+            firstname: "",
+            lastname: "",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
@@ -342,7 +343,6 @@ describe("UpdateMarketingEstablishmentContactsList", () => {
           {
             message: "",
             sender: "potentialBeneficiary",
-            recipient: "establishment",
             sentAt: now.toISOString(),
             subject: "",
             attachments: [],
