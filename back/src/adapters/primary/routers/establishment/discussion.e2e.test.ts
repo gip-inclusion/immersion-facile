@@ -3,17 +3,15 @@ import {
   ConnectedUserBuilder,
   currentJwtVersions,
   DiscussionBuilder,
-  defaultProConnectInfos,
   displayRouteName,
   type EstablishmentRoutes,
   type Exchange,
-  type ExchangeMessageFromDashboard,
   errors,
   establishmentRoutes,
   expectArraysToMatch,
   expectHttpResponseToEqual,
+  expectToEqual,
   FormEstablishmentDtoBuilder,
-  type User,
   updatedAddress1,
 } from "shared";
 import type { HttpClient } from "shared-routes";
@@ -41,10 +39,12 @@ describe("discussion e2e", () => {
     .withSiret(TEST_OPEN_ESTABLISHMENT_1.siret)
     .build();
 
-  const establishmentAdminUser = new ConnectedUserBuilder()
+  const establishmentAdminUserBuilder = new ConnectedUserBuilder()
     .withId("admin")
-    .withEmail("admin@establishment.mail")
-    .buildUser();
+    .withEmail("admin@establishment.mail");
+
+  const establishmentAdminUser = establishmentAdminUserBuilder.buildUser();
+  const establishmentAdminConnectedUser = establishmentAdminUserBuilder.build();
 
   const existingEstablishment = new EstablishmentAggregateBuilder()
     .withEstablishmentSiret(formEstablishment.siret)
@@ -86,35 +86,27 @@ describe("discussion e2e", () => {
     establishmentRoutes.getDiscussionByIdForEstablishment,
   )} returns the discussion`, () => {
     it("gets the discussion for the establishment", async () => {
-      const user: User = {
-        id: "11111111-1111-4111-1111-111111111111",
-        email: "user@mail.com",
-        firstName: "User",
-        lastName: "Name",
-        proConnect: defaultProConnectInfos,
-        createdAt: new Date().toISOString(),
-      };
       const discussion = new DiscussionBuilder()
-        .withEstablishmentContact(user)
+        .withSiret(existingEstablishment.establishment.siret)
         .build();
 
       inMemoryUow.discussionRepository.discussions = [discussion];
-      inMemoryUow.userRepository.users = [user];
 
-      const token = generateConnectedUserJwt({
-        userId: user.id,
-        version: currentJwtVersions.connectedUser,
-      });
-
-      const response = await httpClient.getDiscussionByIdForEstablishment({
-        headers: { authorization: token },
-        urlParams: { discussionId: discussion.id },
-      });
-
-      expectHttpResponseToEqual(response, {
-        status: 200,
-        body: new DiscussionBuilder(discussion).buildRead(),
-      });
+      expectHttpResponseToEqual(
+        await httpClient.getDiscussionByIdForEstablishment({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+        }),
+        {
+          status: 200,
+          body: new DiscussionBuilder(discussion).buildRead(),
+        },
+      );
     });
   });
 
@@ -123,47 +115,48 @@ describe("discussion e2e", () => {
       establishmentRoutes.updateDiscussionStatus,
     )}`, () => {
       it("400 - throws if discussion is already rejected", async () => {
-        const user = new ConnectedUserBuilder().buildUser();
         const discussion = new DiscussionBuilder()
-          .withEstablishmentContact({
-            email: user.email,
-          })
+          .withSiret(existingEstablishment.establishment.siret)
           .withStatus({
             status: "REJECTED",
             rejectionKind: "UNABLE_TO_HELP",
           })
           .build();
-        const existingToken = generateConnectedUserJwt({
-          userId: user.id,
-          version: currentJwtVersions.connectedUser,
-        });
+
         inMemoryUow.discussionRepository.discussions = [discussion];
-        inMemoryUow.userRepository.users = [user];
 
-        const response = await httpClient.updateDiscussionStatus({
-          headers: { authorization: existingToken },
-          urlParams: {
-            discussionId: discussion.id,
-          },
-          body: {
-            status: "REJECTED",
-            rejectionKind: "OTHER",
-            rejectionReason: "No reason",
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 400,
-          body: {
-            message: errors.discussion.alreadyRejected({
+        expectHttpResponseToEqual(
+          await httpClient.updateDiscussionStatus({
+            headers: {
+              authorization: generateConnectedUserJwt({
+                userId: establishmentAdminConnectedUser.id,
+                version: currentJwtVersions.connectedUser,
+              }),
+            },
+            urlParams: {
               discussionId: discussion.id,
-            }).message,
+            },
+            body: {
+              status: "REJECTED",
+              rejectionKind: "OTHER",
+              rejectionReason: "No reason",
+            },
+          }),
+          {
             status: 400,
+            body: {
+              message: errors.discussion.alreadyRejected({
+                discussionId: discussion.id,
+              }).message,
+              status: 400,
+            },
           },
-        });
+        );
       });
       it("401 - throws if user is not known", async () => {
-        const discussion = new DiscussionBuilder().build();
+        const discussion = new DiscussionBuilder()
+          .withSiret(existingEstablishment.establishment.siret)
+          .build();
 
         inMemoryUow.discussionRepository.discussions = [discussion];
 
@@ -188,12 +181,11 @@ describe("discussion e2e", () => {
         });
       });
       it("403 - throws if user is not bound to discussion", async () => {
-        const user = new ConnectedUserBuilder().buildUser();
-        const discussion = new DiscussionBuilder().build();
-        const existingToken = generateConnectedUserJwt({
-          userId: user.id,
-          version: currentJwtVersions.connectedUser,
-        });
+        const discussion = new DiscussionBuilder()
+          .withSiret(existingEstablishment.establishment.siret)
+          .build();
+
+        inMemoryUow.discussionRepository.discussions = [discussion];
         inMemoryUow.establishmentAggregateRepository.establishmentAggregates = [
           new EstablishmentAggregateBuilder()
             .withEstablishmentSiret(discussion.siret)
@@ -208,11 +200,14 @@ describe("discussion e2e", () => {
             ])
             .build(),
         ];
-        inMemoryUow.discussionRepository.discussions = [discussion];
-        inMemoryUow.userRepository.users = [user];
 
         const response = await httpClient.updateDiscussionStatus({
-          headers: { authorization: existingToken },
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: establishmentAdminConnectedUser.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
           urlParams: {
             discussionId: discussion.id,
           },
@@ -227,47 +222,46 @@ describe("discussion e2e", () => {
           body: {
             message: errors.discussion.rejectForbidden({
               discussionId: discussion.id,
-              userId: user.id,
+              userId: establishmentAdminConnectedUser.id,
             }).message,
             status: 403,
           },
         });
       });
       it("200 - rejects discussion", async () => {
-        const user = new ConnectedUserBuilder().buildUser();
         const discussion = new DiscussionBuilder()
-          .withEstablishmentContact({
-            email: user.email,
-          })
+          .withSiret(existingEstablishment.establishment.siret)
           .build();
-        const existingToken = generateConnectedUserJwt({
-          userId: user.id,
-          version: currentJwtVersions.connectedUser,
-        });
+
         inMemoryUow.discussionRepository.discussions = [discussion];
-        inMemoryUow.userRepository.users = [user];
 
         gateways.timeGateway.defaultDate = addDays(
           new Date(discussion.createdAt),
           2,
         );
 
-        const response = await httpClient.updateDiscussionStatus({
-          headers: { authorization: existingToken },
-          urlParams: {
-            discussionId: discussion.id,
+        expectHttpResponseToEqual(
+          await httpClient.updateDiscussionStatus({
+            headers: {
+              authorization: generateConnectedUserJwt({
+                userId: establishmentAdminConnectedUser.id,
+                version: currentJwtVersions.connectedUser,
+              }),
+            },
+            urlParams: {
+              discussionId: discussion.id,
+            },
+            body: {
+              status: "REJECTED",
+              rejectionKind: "OTHER",
+              rejectionReason: "No reason",
+            },
+          }),
+          {
+            status: 200,
+            body: "",
           },
-          body: {
-            status: "REJECTED",
-            rejectionKind: "OTHER",
-            rejectionReason: "No reason",
-          },
-        });
-
-        expectHttpResponseToEqual(response, {
-          status: 200,
-          body: "",
-        });
+        );
 
         const emailSubject =
           "L’entreprise My default business name ne souhaite pas donner suite à votre candidature à l’immersion";
@@ -287,13 +281,18 @@ describe("discussion e2e", () => {
                     subject: emailSubject,
                     message: expect.any(String),
                     sender: "establishment",
-                    recipient: "potentialBeneficiary",
+                    firstname: establishmentAdminConnectedUser.firstName,
+                    lastname: establishmentAdminConnectedUser.lastName,
+                    email: establishmentAdminConnectedUser.email,
                     sentAt: expect.any(String),
                     attachments: [],
                   },
                 ],
               },
-              triggeredBy: { kind: "connected-user", userId: user.id },
+              triggeredBy: {
+                kind: "connected-user",
+                userId: establishmentAdminConnectedUser.id,
+              },
             },
           },
         ]);
@@ -310,11 +309,10 @@ describe("discussion e2e", () => {
                 subject: emailSubject,
               },
               recipients: [discussion.potentialBeneficiary.email],
-              cc: [],
               attachments: [],
             },
             followedIds: {
-              userId: user.id,
+              userId: establishmentAdminConnectedUser.id,
               establishmentSiret: discussion.siret,
             },
           },
@@ -329,9 +327,9 @@ describe("discussion e2e", () => {
       .withUserRights([
         {
           role: "establishment-admin",
-          job: "",
-          phone: "",
-          userId: "",
+          job: "osef",
+          phone: "osef",
+          userId: user.id,
           shouldReceiveDiscussionNotifications: true,
         },
       ])
@@ -345,28 +343,11 @@ describe("discussion e2e", () => {
     });
 
     it("200 - saves the exchange to a discussion", async () => {
-      const payload: ExchangeMessageFromDashboard = {
-        message: "My fake message",
-      };
       const discussion = new DiscussionBuilder()
-        .withEstablishmentContact({
-          email: user.email,
-        })
         .withSiret(establishment.establishment.siret)
         .build();
 
       inMemoryUow.discussionRepository.discussions = [discussion];
-
-      const response = await httpClient.replyToDiscussion({
-        headers: {
-          authorization: generateConnectedUserJwt({
-            userId: user.id,
-            version: currentJwtVersions.connectedUser,
-          }),
-        },
-        urlParams: { discussionId: discussion.id },
-        body: payload,
-      });
 
       const expectedExchange: Exchange = {
         subject:
@@ -374,14 +355,31 @@ describe("discussion e2e", () => {
         message: "My fake message",
         sentAt: gateways.timeGateway.now().toISOString(),
         sender: "establishment",
-        recipient: "potentialBeneficiary",
+        firstname: user.firstName,
+        lastname: user.lastName,
+        email: user.email,
         attachments: [],
       };
 
-      expectHttpResponseToEqual(response, {
-        status: 200,
-        body: expectedExchange,
-      });
+      expectHttpResponseToEqual(
+        await httpClient.replyToDiscussion({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: user.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+          body: {
+            message: expectedExchange.message,
+          },
+        }),
+        {
+          status: 200,
+          body: expectedExchange,
+        },
+      );
+
       expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
         new DiscussionBuilder(discussion)
           .withExchanges([...discussion.exchanges, expectedExchange])
@@ -390,38 +388,33 @@ describe("discussion e2e", () => {
     });
 
     it("202 - not save the exchange to a discussion - bad discusssion status", async () => {
-      const payload: ExchangeMessageFromDashboard = {
-        message: "My fake message",
-      };
-
       const discussion = new DiscussionBuilder()
         .withSiret(establishment.establishment.siret)
-        .withEstablishmentContact({
-          email: user.email,
-        })
         .withStatus({ status: "REJECTED", rejectionKind: "NO_TIME" })
         .build();
 
       inMemoryUow.discussionRepository.discussions = [discussion];
 
-      const response = await httpClient.replyToDiscussion({
-        headers: {
-          authorization: generateConnectedUserJwt({
-            userId: user.id,
-            version: currentJwtVersions.connectedUser,
-          }),
+      expectHttpResponseToEqual(
+        await httpClient.replyToDiscussion({
+          headers: {
+            authorization: generateConnectedUserJwt({
+              userId: user.id,
+              version: currentJwtVersions.connectedUser,
+            }),
+          },
+          urlParams: { discussionId: discussion.id },
+          body: {
+            message: "My fake message",
+          },
+        }),
+        {
+          status: 202,
+          body: { reason: "discussion_completed", sender: "establishment" },
         },
-        urlParams: { discussionId: discussion.id },
-        body: payload,
-      });
+      );
 
-      expectHttpResponseToEqual(response, {
-        status: 202,
-        body: { reason: "discussion_completed", sender: "establishment" },
-      });
-      expectArraysToMatch(inMemoryUow.discussionRepository.discussions, [
-        discussion,
-      ]);
+      expectToEqual(inMemoryUow.discussionRepository.discussions, [discussion]);
     });
   });
 });
