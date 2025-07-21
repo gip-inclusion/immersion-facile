@@ -125,7 +125,8 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             beneficiaryLastName:
               obsoleteDiscussion.potentialBeneficiary.lastName,
             businessName: obsoleteDiscussion.businessName,
-            ctaUrl: "http://localhost/tableau-de-bord-etablissement",
+            establishmentDashboardUrl:
+              "http://localhost/tableau-de-bord-etablissement",
             discussionCreatedAt: obsoleteDiscussion.createdAt,
             establishmentContactFirstName:
               // biome-ignore lint/style/noNonNullAssertion: test purpose
@@ -152,7 +153,7 @@ describe("MarkDiscussionDeprecatedAndNotify", () => {
             beneficiaryLastName:
               obsoleteDiscussion.potentialBeneficiary.lastName,
             businessName: obsoleteDiscussion.businessName,
-            ctaUrl: "http://localhost/recherche",
+            searchPageUrl: "http://localhost/recherche",
             discussionCreatedAt: obsoleteDiscussion.createdAt,
           },
           recipients: [obsoleteDiscussion.potentialBeneficiary.email],

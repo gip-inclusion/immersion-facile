@@ -1919,7 +1919,7 @@ Profil du candidat :
         beneficiaryFirstName,
         beneficiaryLastName,
         discussionCreatedAt,
-        ctaUrl,
+        establishmentDashboardUrl,
         establishmentContactFirstName,
         establishmentContactLastName,
         businessName,
@@ -1937,7 +1937,7 @@ Profil du candidat :
         buttons: [
           {
             label: "Accéder au tableau de bord établissement",
-            url: ctaUrl,
+            url: establishmentDashboardUrl,
           },
         ],
         subContent: `
@@ -1952,7 +1952,7 @@ Profil du candidat :
       tags: ["discussion dépréciée"],
       createEmailVariables: ({
         discussionCreatedAt,
-        ctaUrl,
+        searchPageUrl,
         beneficiaryFirstName,
         beneficiaryLastName,
         businessName,
@@ -1970,7 +1970,7 @@ Profil du candidat :
         buttons: [
           {
             label: "Rechercher des offres d'immersion",
-            url: ctaUrl,
+            url: searchPageUrl,
           },
         ],
         subContent: `
