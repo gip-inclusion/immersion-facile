@@ -21,7 +21,10 @@ import {
 import { InMemoryUowPerformer } from "../../core/unit-of-work/adapters/InMemoryUowPerformer";
 import type { EstablishmentUserRight } from "../../establishment/entities/EstablishmentAggregate";
 import { EstablishmentAggregateBuilder } from "../../establishment/helpers/EstablishmentBuilders";
-import { GetConnectedUser } from "./GetConnectedUser";
+import {
+  type GetConnectedUser,
+  makeGetConnectedUser,
+} from "./GetConnectedUser";
 
 describe("GetConnectedUser", () => {
   const now = new Date();
@@ -62,30 +65,25 @@ describe("GetConnectedUser", () => {
   beforeEach(() => {
     uow = createInMemoryUow();
     timeGateway = new CustomTimeGateway(now);
-    getConnectedUser = new GetConnectedUser(
-      new InMemoryUowPerformer(uow),
-      new StubDashboardGateway(),
-      timeGateway,
-    );
+    getConnectedUser = makeGetConnectedUser({
+      uowPerformer: new InMemoryUowPerformer(uow),
+      deps: {
+        dashboardGateway: new StubDashboardGateway(),
+        timeGateway,
+      },
+    });
+
     uow.userRepository.users = [notAdminUser, anotherUser, admin];
   });
 
-  describe("When a user get it's own user datas", () => {
-    describe("wrong paths", () => {
-      it("throws NotFoundError if the user is not found", async () => {
-        uow.userRepository.users = [];
+  describe("For getting the current user's data", () => {
+    it("throws NotFoundError if the user is not found", async () => {
+      uow.userRepository.users = [];
 
-        await expectPromiseToFailWithError(
-          getConnectedUser.execute({}, connectedNotAdminUser),
-          errors.user.notFound({ userId: notAdminUser.id }),
-        );
-      });
-      it("throws Forbidden if no user is provided", async () => {
-        await expectPromiseToFailWithError(
-          getConnectedUser.execute({}),
-          errors.user.noJwtProvided(),
-        );
-      });
+      await expectPromiseToFailWithError(
+        getConnectedUser.execute({}, connectedNotAdminUser),
+        errors.user.notFound({ userId: notAdminUser.id }),
+      );
     });
 
     describe("agency user infos", () => {

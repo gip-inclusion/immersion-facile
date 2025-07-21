@@ -11,9 +11,8 @@ import {
 } from "shared";
 import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
-import { TransactionalUseCase } from "../../core/UseCase";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
-import type { UnitOfWorkPerformer } from "../../core/unit-of-work/ports/UnitOfWorkPerformer";
+import { useCaseBuilder } from "../../core/useCaseBuilder";
 import {
   rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences,
   rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin,
@@ -21,39 +20,24 @@ import {
   validateAgencyRights,
 } from "../helpers/agencyRights.helper";
 
-export class UpdateUserForAgency extends TransactionalUseCase<
-  UserParamsForAgency,
-  void,
-  ConnectedUser
-> {
-  protected inputSchema = userParamsForAgencySchema;
-
-  readonly #createNewEvent: CreateNewEvent;
-
-  constructor(
-    uowPerformer: UnitOfWorkPerformer,
-    createNewEvent: CreateNewEvent,
-  ) {
-    super(uowPerformer);
-
-    this.#createNewEvent = createNewEvent;
-  }
-
-  protected async _execute(
-    params: UserParamsForAgency,
-    uow: UnitOfWork,
-    currentUser: ConnectedUser,
-  ): Promise<void> {
+export type UpdateUserForAgency = ReturnType<typeof makeUpdateUserForAgency>;
+export const makeUpdateUserForAgency = useCaseBuilder("UpdateUserForAgency")
+  .withInput(userParamsForAgencySchema)
+  .withCurrentUser<ConnectedUser>()
+  .withDeps<{ createNewEvent: CreateNewEvent }>()
+  .build(async ({ uow, currentUser, deps, inputParams }) => {
     const { isBackOfficeOrAgencyAdmin } = throwIfUserHasNoRightOnAgency(
       currentUser,
-      params,
+      inputParams,
     );
 
-    const userToUpdate = await uow.userRepository.getById(params.userId);
-    if (!userToUpdate) throw errors.user.notFound({ userId: params.userId });
+    const userToUpdate = await uow.userRepository.getById(inputParams.userId);
+    if (!userToUpdate)
+      throw errors.user.notFound({ userId: inputParams.userId });
 
-    const agency = await uow.agencyRepository.getById(params.agencyId);
-    if (!agency) throw errors.agency.notFound({ agencyId: params.agencyId });
+    const agency = await uow.agencyRepository.getById(inputParams.agencyId);
+    if (!agency)
+      throw errors.agency.notFound({ agencyId: inputParams.agencyId });
 
     const agencyRightToUpdate = agency.usersRights[userToUpdate.id];
     if (!agencyRightToUpdate)
@@ -64,19 +48,19 @@ export class UpdateUserForAgency extends TransactionalUseCase<
 
     rejectIfEditionOfRolesWhenNotBackofficeAdminNorAgencyAdmin(
       agencyRightToUpdate.roles,
-      params.roles,
+      inputParams.roles,
       isBackOfficeOrAgencyAdmin,
     );
     rejectIfEditionOfNotificationPreferencesWhenNotAdminNorOwnPreferences(
       currentUser.id === userToUpdate.id,
-      agencyRightToUpdate.isNotifiedByEmail !== params.isNotifiedByEmail,
+      agencyRightToUpdate.isNotifiedByEmail !== inputParams.isNotifiedByEmail,
       isBackOfficeOrAgencyAdmin,
     );
-    rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, params.roles);
-    rejectEmailModificationIfProConnectedUser(userToUpdate, params.email);
+    rejectIfEditionOfValidatorsOfAgencyWithRefersTo(agency, inputParams.roles);
+    rejectEmailModificationIfProConnectedUser(userToUpdate, inputParams.email);
     await rejectIfEmailModificationToAnotherEmailAlreadyLinkedToAgency(
       agency,
-      params,
+      inputParams,
       uow,
     );
 
@@ -84,9 +68,9 @@ export class UpdateUserForAgency extends TransactionalUseCase<
       ...agency.usersRights,
       [userToUpdate.id]: {
         roles: isBackOfficeOrAgencyAdmin
-          ? params.roles
+          ? inputParams.roles
           : agencyRightToUpdate.roles,
-        isNotifiedByEmail: params.isNotifiedByEmail,
+        isNotifiedByEmail: inputParams.isNotifiedByEmail,
       },
     };
 
@@ -97,12 +81,16 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         id: agency.id,
         usersRights: updatedRights,
       }),
-      updateIfUserEmailChanged(userToUpdate, params.email, uow.userRepository),
+      updateIfUserEmailChanged(
+        userToUpdate,
+        inputParams.email,
+        uow.userRepository,
+      ),
       uow.outboxRepository.save(
-        this.#createNewEvent({
+        deps.createNewEvent({
           topic: "ConnectedUserAgencyRightChanged",
           payload: {
-            ...params,
+            ...inputParams,
             triggeredBy: {
               kind: "connected-user",
               userId: currentUser.id,
@@ -111,8 +99,7 @@ export class UpdateUserForAgency extends TransactionalUseCase<
         }),
       ),
     ]);
-  }
-}
+  });
 
 const rejectEmailModificationIfProConnectedUser = (
   user: User,

@@ -85,7 +85,7 @@ export const createAgenciesRouter = (deps: AppDependencies) => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
           req.body,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );

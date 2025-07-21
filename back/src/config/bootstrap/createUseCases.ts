@@ -18,13 +18,13 @@ import { makeUpdateAgencyReferringToUpdatedAgency } from "../../domains/agency/u
 import { makeUpdateAgencyStatus } from "../../domains/agency/use-cases/UpdateAgencyStatus";
 import { throwIfNotAdmin } from "../../domains/connected-users/helpers/authorization.helper";
 import { makeCreateUserForAgency } from "../../domains/connected-users/use-cases/CreateUserForAgency";
-import { GetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
-import { GetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
+import { makeGetConnectedUser } from "../../domains/connected-users/use-cases/GetConnectedUser";
+import { makeGetConnectedUsers } from "../../domains/connected-users/use-cases/GetConnectedUsers";
 import { makeGetUsers } from "../../domains/connected-users/use-cases/GetUsers";
-import { LinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
-import { RejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
+import { makeLinkFranceTravailUsersToTheirAgencies } from "../../domains/connected-users/use-cases/LinkFranceTravailUsersToTheirAgencies";
+import { makeRejectUserForAgency } from "../../domains/connected-users/use-cases/RejectUserForAgency";
 import { makeRemoveUserFromAgency } from "../../domains/connected-users/use-cases/RemoveUserFromAgency";
-import { UpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
+import { makeUpdateUserForAgency } from "../../domains/connected-users/use-cases/UpdateUserForAgency";
 import { AddConvention } from "../../domains/convention/use-cases/AddConvention";
 import { AddValidatedConventionNps } from "../../domains/convention/use-cases/AddValidatedConventionNps";
 import { makeBroadcastConventionAgain } from "../../domains/convention/use-cases/broadcast/BroadcastConventionAgain";
@@ -263,27 +263,13 @@ export const createUseCases = ({
         uowPerformer,
         gateways.notification,
       ),
-      updateUserForAgency: new UpdateUserForAgency(
-        uowPerformer,
-        createNewEvent,
-      ),
       notifyUserAgencyRightChanged: new NotifyUserAgencyRightChanged(
         uowPerformer,
         saveNotificationAndRelatedEvent,
       ),
-      rejectUserForAgency: new RejectUserForAgency(
-        uowPerformer,
-        createNewEvent,
-      ),
       notifyUserAgencyRightRejected: new NotifyUserAgencyRightRejected(
         uowPerformer,
         saveNotificationAndRelatedEvent,
-      ),
-      getConnectedUsers: new GetConnectedUsers(uowPerformer),
-      getConnectedUser: new GetConnectedUser(
-        uowPerformer,
-        gateways.dashboardGateway,
-        gateways.timeGateway,
       ),
       initiateLoginByOAuth: new InitiateLoginByOAuth(
         uowPerformer,
@@ -300,8 +286,6 @@ export const createUseCases = ({
         config.immersionFacileBaseUrl,
         gateways.timeGateway,
       ),
-      linkFranceTravailUsersToTheirAgencies:
-        new LinkFranceTravailUsersToTheirAgencies(uowPerformer, createNewEvent),
       bindConventionToFederatedIdentity: new BindConventionToFederatedIdentity(
         uowPerformer,
         createNewEvent,
@@ -647,6 +631,40 @@ export const createUseCases = ({
           similarConventionIds:
             await uow.conventionQueries.findSimilarConventions(params),
         })),
+    }),
+
+    updateUserForAgency: makeUpdateUserForAgency({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
+    }),
+
+    linkFranceTravailUsersToTheirAgencies:
+      makeLinkFranceTravailUsersToTheirAgencies({
+        uowPerformer,
+        deps: {
+          createNewEvent,
+        },
+      }),
+
+    getConnectedUser: makeGetConnectedUser({
+      uowPerformer,
+      deps: {
+        dashboardGateway: gateways.dashboardGateway,
+        timeGateway: gateways.timeGateway,
+      },
+    }),
+
+    getConnectedUsers: makeGetConnectedUsers({
+      uowPerformer,
+    }),
+
+    rejectUserForAgency: makeRejectUserForAgency({
+      uowPerformer,
+      deps: {
+        createNewEvent,
+      },
     }),
 
     updateAgencyStatus: makeUpdateAgencyStatus({

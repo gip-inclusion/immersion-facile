@@ -81,7 +81,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res, () =>
         deps.useCases.getConnectedUsers.execute(
           req.query,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -101,7 +101,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.updateUserForAgency.execute(
           req.body,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
@@ -141,7 +141,7 @@ export const createAdminRouter = (deps: AppDependencies): Router => {
       sendHttpResponse(req, res.status(201), () =>
         deps.useCases.rejectUserForAgency.execute(
           req.body,
-          req.payloads?.currentUser,
+          getCurrentUserOrThrow(req.payloads?.currentUser),
         ),
       ),
   );
