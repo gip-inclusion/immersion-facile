@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import Papa from "papaparse";
-import { keys } from "ramda";
+import { keys, splitEvery } from "ramda";
 import { z } from "zod";
 import { AppConfig } from "../config/bootstrap/appConfig";
 import { createGetPgPoolFn } from "../config/bootstrap/createGateways";
@@ -61,6 +61,20 @@ const triggerAddAgenciesAndUsers = async () => {
     })
     .filter((row) => row !== null);
 
+  if (keys(parsedErrors).length !== 0) {
+    const batchSize = 30;
+    logger.warn({
+      message: `${keys(parsedErrors).length} error(s) during CSV parsing`,
+    });
+    splitEvery(batchSize, keys(parsedErrors)).forEach((errors) => {
+      logger.warn({
+        message: errors
+          .map((error) => `line ${error}: ${parsedErrors[error]}`)
+          .join("\n"),
+      });
+    });
+  }
+
   logger.info({ message: `Ready to import ${validatedRows.length} lines` });
 
   const { createdAgenciesCount, createdUsersCount, updatedUsersCount } =
@@ -77,14 +91,7 @@ const triggerAddAgenciesAndUsers = async () => {
     createdAgenciesCount,
     createdUsersCount,
     updatedUsersCount,
-    errors:
-      keys(parsedErrors).length !== 0
-        ? `${keys(parsedErrors).length} error(s) during CSV parsing: ${keys(
-            parsedErrors,
-          )
-            .map((key) => `line ${key}: ${parsedErrors[key]}`)
-            .join("\n")}`
-        : 0,
+    errorsCount: keys(parsedErrors).length,
   };
 };
 
@@ -92,13 +99,18 @@ handleCRONScript(
   "addAgenciesAndUsers",
   config,
   triggerAddAgenciesAndUsers,
-  ({ createdAgenciesCount, createdUsersCount, updatedUsersCount, errors }) =>
+  ({
+    createdAgenciesCount,
+    createdUsersCount,
+    updatedUsersCount,
+    errorsCount,
+  }) =>
     [
       //`Already existing agencies: ${alreadyExistingAgencies}`,
       `Created agencies: ${createdAgenciesCount}`,
       `Already existing users: ${updatedUsersCount}`,
       `Created users: ${createdUsersCount}`,
-      `Errors: ${errors}`,
+      `Errors: ${errorsCount}`,
     ].join("\n"),
   logger,
 );
