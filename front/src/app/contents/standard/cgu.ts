@@ -1,6 +1,13 @@
+import type { VersionnedStandardContent } from "./textSetup";
+
 export default {
-  title: "Conditions générales d'utilisation d'Immersion Facilitée",
-  content: `<strong>Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique de la Plateforme “Immersion Facilitée” et définissent les conditions d’accès et d’utilisation des services par l’Utilisateur.</strong>
+  "2022-11-30": {
+    title: "My title",
+    content: "My content",
+  },
+  latest: {
+    title: "Conditions générales d'utilisation d'Immersion Facilitée",
+    content: `<strong>Les présentes conditions générales d’utilisation (dites « CGU ») fixent le cadre juridique de la Plateforme “Immersion Facilitée” et définissent les conditions d’accès et d’utilisation des services par l’Utilisateur.</strong>
   
   <strong>Article 1 - Champ d’application</strong>
 
@@ -63,4 +70,5 @@ export default {
 
   Les termes des présentes conditions d’utilisation peuvent être amendés à tout moment, sans préavis, en fonction des modifications apportées à la plateforme, de l’évolution de la législation ou pour tout autre motif jugé nécessaire. Chaque modification donne lieu à une nouvelle version acceptée par les parties.
   `,
-};
+  },
+} satisfies VersionnedStandardContent;

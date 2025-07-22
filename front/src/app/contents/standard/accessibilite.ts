@@ -1,8 +1,10 @@
 import { immersionFacileContactEmail } from "shared";
+import type { VersionnedStandardContent } from "./textSetup";
 
 export default {
-  title: "Accessibilité",
-  content: `
+  latest: {
+    title: "Accessibilité",
+    content: `
 
   <strong>Déclaration d’accessibilité</strong>
 
@@ -71,4 +73,5 @@ export default {
     • Contacter le délégué du Défenseur des droits dans votre région 
     • Envoyer un courrier par la poste (gratuit, ne pas mettre de timbre) Défenseur des droits Libre réponse 71120 75342 Paris CEDEX 07 
 `,
-};
+  },
+} satisfies VersionnedStandardContent;

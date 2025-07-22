@@ -1,6 +1,7 @@
 import type { RegisteredLinkProps } from "@codegouvfr/react-dsfr/link";
 import { domElementIds } from "shared";
 import { routes } from "src/app/routes/routes";
+import type { VersionnedStandardContent } from "./textSetup";
 
 const { siteMap: siteMapIds } = domElementIds.standard;
 
@@ -73,8 +74,9 @@ const siteMapLinks: RegisteredLinkProps[] = [
 ];
 
 export default {
-  title: "Plan du site",
-  content: `
+  latest: {
+    title: "Plan du site",
+    content: `
   <ul>${siteMapLinks
     .map(
       (link) =>
@@ -83,4 +85,5 @@ export default {
     .join("")} 
   </ul>
   `,
-};
+  },
+} satisfies VersionnedStandardContent;

@@ -1,6 +1,9 @@
+import type { VersionnedStandardContent } from "./textSetup";
+
 export default {
-  title: "Politique de confidentialité Immersion Facilitée",
-  content: `
+  latest: {
+    title: "Politique de confidentialité Immersion Facilitée",
+    content: `
 
 <strong>Qui est responsable d’Immersion Facilitée ?</strong> 
 
@@ -157,4 +160,5 @@ Les cookies ne permettent pas de suivre la navigation de l’internaute sur d’
 Pour aller plus loin, vous pouvez consulter les ﬁches proposées par la Commission Nationale de l'Informatique et des Libertés (CNIL) :
 • <a href="https://www.cnil.fr/fr/cookies-traceurs-que-dit-la-loi" target="_blank">Cookies & traceurs : que dit la loi ?</a>
 • <a href="https://www.cnil.fr/fr/cookies-et-autres-traceurs/comment-se-proteger/maitriser-votre-navigateur" target="_blank">Cookies : les outils pour les maîtriser</a>`,
-};
+  },
+} satisfies VersionnedStandardContent;
