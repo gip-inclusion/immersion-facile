@@ -2,18 +2,16 @@ import { keys } from "ramda";
 import {
   type ConnectedUser,
   errors,
-  type User,
   type UserParamsForAgency,
   userParamsForAgencySchema,
 } from "shared";
 import { getAgencyRightByUserId } from "../../../utils/agency";
-import { emptyName } from "../../core/authentication/connected-user/entities/user.helper";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { CreateNewEvent } from "../../core/events/ports/EventBus";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
-import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
 import { useCaseBuilder } from "../../core/useCaseBuilder";
 import { throwIfNotAgencyAdminOrBackofficeAdmin } from "../helpers/authorization.helper";
+import { getUserByEmailAndCreateIfMissing } from "../helpers/connectedUser.helper";
 
 export type CreateUserForAgency = ReturnType<typeof makeCreateUserForAgency>;
 
@@ -39,11 +37,12 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
         role: "validator",
       });
 
-    const user = await getUserByEmailAndCreateIfMissing(
-      uow,
-      deps.timeGateway,
-      inputParams,
-    );
+    const user = await getUserByEmailAndCreateIfMissing({
+      userRepository: uow.userRepository,
+      timeGateway: deps.timeGateway,
+      userIdIfNew: inputParams.userId,
+      userEmail: inputParams.email,
+    });
 
     const isUserAlreadyLinkedToAgency = keys(agency.usersRights).some(
       (id) => id === user.id,
@@ -82,23 +81,3 @@ export const makeCreateUserForAgency = useCaseBuilder("CreateUserForAgency")
       dashboards: { agencies: {}, establishments: {} },
     };
   });
-
-const getUserByEmailAndCreateIfMissing = async (
-  uow: UnitOfWork,
-  timeGateway: TimeGateway,
-  inputParams: UserParamsForAgency,
-): Promise<User> =>
-  (await uow.userRepository.findByEmail(inputParams.email)) ||
-  (await saveAndProvideNewUser(uow, {
-    id: inputParams.userId, //Cet id provient du front. Comment le front le génère? Pourquoi on le gènere pas dans le back vu qu'on check l'existance par email?
-    email: inputParams.email,
-    createdAt: timeGateway.now().toISOString(),
-    firstName: emptyName,
-    lastName: emptyName,
-    proConnect: null,
-  }));
-
-const saveAndProvideNewUser = async (uow: UnitOfWork, newUser: User) => {
-  await uow.userRepository.save(newUser);
-  return newUser;
-};
