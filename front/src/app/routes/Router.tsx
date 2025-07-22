@@ -176,6 +176,21 @@ const getPageByRouteName: {
       <AgencyDetailForAgencyDashboard route={route} />
     </DashboardPrivateRoute>
   ),
+  agencyDashboardStatsAgencies: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
+  agencyDashboardStatsEstablishmentDetails: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
+  agencyDashboardStatsConventionsByEstablishmentByDepartment: (route) => (
+    <DashboardPrivateRoute route={route}>
+      <AgencyDashboardPage route={route} />
+    </DashboardPrivateRoute>
+  ),
   assessmentDocument: (route) => <AssessmentDocumentPage route={route} />,
   beneficiaryDashboard: () => <BeneficiaryDashboardPage />,
   initiateConvention: () => <InitiateConventionPage />,
