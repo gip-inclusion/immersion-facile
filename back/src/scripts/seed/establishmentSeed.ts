@@ -1,4 +1,5 @@
-import { DiscussionBuilder } from "shared";
+import { faker } from "@faker-js/faker";
+import { DiscussionBuilder, type Exchange } from "shared";
 import type { UnitOfWork } from "../../domains/core/unit-of-work/ports/UnitOfWork";
 import { UuidV4Generator } from "../../domains/core/uuid-generator/adapters/UuidGeneratorImplementations";
 import {
@@ -117,35 +118,75 @@ export const establishmentSeed = async (uow: UnitOfWork) => {
   });
 
   const discussionId = "aaaaaaaa-9c0a-1aaa-aa6d-aaaaaaaaaaaa";
-  await uow.discussionRepository.insert(
-    new DiscussionBuilder()
-      .withId(discussionId)
-      .withSiret(franceMerguez.establishment.siret)
-      .withEstablishmentContact({
-        email: seedUsers.icUser.email,
-      })
-      .withPotentialBeneficiaryResumeLink(
-        "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
+  const discussion = new DiscussionBuilder()
+    .withId(discussionId)
+    .withSiret(franceMerguez.establishment.siret)
+    .withEstablishmentContact({
+      email: seedUsers.icUser.email,
+    })
+    .withPotentialBeneficiaryResumeLink(
+      "https://www.docdroid.net/WyjIuyO/fake-resume-pdf",
+    )
+    .withExchanges([
+      {
+        sender: "potentialBeneficiary",
+        recipient: "establishment",
+        sentAt: new Date("2024-02-02").toISOString(),
+        subject: "Présentation",
+        message: "Bonjour, je me présente!",
+        attachments: [],
+      },
+      {
+        sender: "establishment",
+        recipient: "potentialBeneficiary",
+        sentAt: new Date("2024-02-03").toISOString(),
+        subject: "Réponse entreprise",
+        message: "Allez viens on est bien.",
+        attachments: [],
+      },
+    ])
+    .build();
+  await uow.discussionRepository.insert(discussion);
+
+  await Promise.all(
+    [...Array(10000)]
+      .map(() =>
+        new DiscussionBuilder(discussion)
+          .withId(new UuidV4Generator().new())
+          .withEstablishmentContact({
+            copyEmails: [Math.floor(Math.random() * 11)].map(() =>
+              faker.internet.email(),
+            ),
+            email: faker.internet.email(),
+            firstName: faker.person.firstName(),
+            lastName: faker.person.lastName(),
+            job: faker.person.jobTitle(),
+            phone: faker.helpers.fromRegExp(new RegExp(/[0][1-9][0-9]{8}/)),
+          })
+          .withExchanges([
+            {
+              sender: "potentialBeneficiary",
+              recipient: "establishment",
+              sentAt: new Date("2024-02-02").toISOString(),
+              subject: "Présentation",
+              message: "Bonjour, je me présente!",
+              attachments: [],
+            },
+            ...[Array(faker.number.int({ min: 0, max: 100 }))].map(
+              () =>
+                ({
+                  sender: "establishment",
+                  recipient: "potentialBeneficiary",
+                  sentAt: new Date("2024-02-03").toISOString(),
+                  subject: "Réponse entreprise",
+                  message: faker.commerce.productDescription(),
+                  attachments: [],
+                }) satisfies Exchange,
+            ),
+          ])
+          .build(),
       )
-      .withExchanges([
-        {
-          sender: "potentialBeneficiary",
-          recipient: "establishment",
-          sentAt: new Date("2024-02-02").toISOString(),
-          subject: "Présentation",
-          message: "Bonjour, je me présente!",
-          attachments: [],
-        },
-        {
-          sender: "establishment",
-          recipient: "potentialBeneficiary",
-          sentAt: new Date("2024-02-03").toISOString(),
-          subject: "Réponse entreprise",
-          message: "Allez viens on est bien.",
-          attachments: [],
-        },
-      ])
-      .build(),
+      .map((discussion) => uow.discussionRepository.insert(discussion)),
   );
 
   // biome-ignore lint/suspicious/noConsole: <explanation>
