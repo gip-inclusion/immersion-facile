@@ -10,10 +10,13 @@ import {
   type EstablishmentDashboards,
   type User,
   type UserId,
+  type UserWithAdminRights,
   type UserWithRights,
   type WithDashboards,
 } from "shared";
 import type { AgencyRightOfUser } from "../../agency/ports/AgencyRepository";
+import { emptyName } from "../../core/authentication/connected-user/entities/user.helper";
+import type { UserRepository } from "../../core/authentication/connected-user/port/UserRepository";
 import type { DashboardGateway } from "../../core/dashboard/port/DashboardGateway";
 import type { TimeGateway } from "../../core/time-gateway/ports/TimeGateway";
 import type { UnitOfWork } from "../../core/unit-of-work/ports/UnitOfWork";
@@ -277,3 +280,32 @@ const makeDiscussionsEstablishmentDashboard = async ({
         timeGateway.now(),
       )
     : undefined;
+
+export const getUserByEmailAndCreateIfMissing = async ({
+  userRepository,
+  timeGateway,
+  userIdIfNew,
+  userEmail,
+}: {
+  userRepository: UserRepository;
+  timeGateway: TimeGateway;
+  userIdIfNew: UserId;
+  userEmail: string;
+}): Promise<User> =>
+  (await userRepository.findByEmail(userEmail)) ||
+  (await saveAndProvideNewUser(userRepository, {
+    id: userIdIfNew,
+    email: userEmail,
+    createdAt: timeGateway.now().toISOString(),
+    firstName: emptyName,
+    lastName: emptyName,
+    proConnect: null,
+  }));
+
+const saveAndProvideNewUser = async (
+  userRepository: UserRepository,
+  newUser: UserWithAdminRights,
+) => {
+  await userRepository.save(newUser);
+  return newUser;
+};

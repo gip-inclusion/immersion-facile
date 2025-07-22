@@ -1,4 +1,8 @@
-import { AgencyDtoBuilder, ConnectedUserBuilder } from "shared";
+import {
+  AgencyDtoBuilder,
+  ConnectedUserBuilder,
+  expectArraysToMatch,
+} from "shared";
 import { toAgencyWithRights } from "../../../utils/agency";
 import { CustomTimeGateway } from "../../core/time-gateway/adapters/CustomTimeGateway";
 import {
@@ -18,30 +22,6 @@ describe("AddAgenciesAndUsers", () => {
   const siret2 = "12345678902222";
   const user1Email = "user1@test.com";
   const user2Email = "user2@test.com";
-  const rows: ImportedAgencyAndUserRow[] = [
-    {
-      ID: "1",
-      SIRET: siret1,
-      "Type structure": "AI",
-      "Nom structure": "Structure avec user existant sur IF",
-      "E-mail authentification": user1Email,
-      "Adresse ligne 1": "Adresse ligne 1",
-      "Adresse ligne 2": "Adresse ligne 2",
-      Ville: "Ville",
-      Téléphone: "+33600000000",
-    },
-    {
-      ID: "2",
-      SIRET: siret2,
-      "Type structure": "EI",
-      "Nom structure": "Structure avec user non existant sur IF",
-      "E-mail authentification": user2Email,
-      "Adresse ligne 1": "Adresse ligne 1",
-      "Adresse ligne 2": "Adresse ligne 2",
-      Ville: "Ville",
-      Téléphone: "+33600000000",
-    },
-  ];
 
   let uuidGenerator: TestUuidGenerator;
   let uow: InMemoryUnitOfWork;
@@ -64,6 +44,41 @@ describe("AddAgenciesAndUsers", () => {
   });
 
   describe("sirets already in IF", () => {
+    const rows: ImportedAgencyAndUserRow[] = [
+      {
+        ID: "1",
+        SIRET: siret1,
+        "Type structure": "AI",
+        "Nom structure": "Structure avec user existant sur IF",
+        "E-mail authentification": user1Email,
+        "Adresse ligne 1": "Adresse ligne 1",
+        "Adresse ligne 2": "Adresse ligne 2",
+        Ville: "Ville",
+        "Code postal": "75000",
+        Coordonées: {
+          lat: 23,
+          lon: 12,
+        },
+        Téléphone: "+33600000000",
+      },
+      {
+        ID: "2",
+        SIRET: siret2,
+        "Type structure": "EI",
+        "Nom structure": "Structure avec user non existant sur IF",
+        "E-mail authentification": user2Email,
+        "Adresse ligne 1": "Adresse ligne 1",
+        "Adresse ligne 2": "Adresse ligne 2",
+        Ville: "Ville",
+        "Code postal": "75000",
+        Coordonées: {
+          lat: 23,
+          lon: 12,
+        },
+        Téléphone: "+33600000000",
+      },
+    ];
+
     it("should add and update users with role agency-admin and validator", async () => {
       const user1 = new ConnectedUserBuilder()
         .withId("10000000-0000-0000-0000-000000000021")
@@ -94,6 +109,7 @@ describe("AddAgenciesAndUsers", () => {
 
       const newUserId = "10000000-0000-0000-0000-000000000022";
       uuidGenerator.setNextUuids([newUserId, newUserId]);
+
       const result = await addAgenciesAndUsers.execute(rows);
 
       expect(result).toEqual({
@@ -133,6 +149,88 @@ describe("AddAgenciesAndUsers", () => {
           .withProConnectInfos(null)
           .withEstablishments(undefined)
           .buildUser(),
+      ]);
+    });
+  });
+
+  describe("rows with duplicates (same siret + nom structure + e-mail authentification + adresse ligne 1 + code postal + ville + téléphone)", () => {
+    const row = {
+      ID: "1",
+      SIRET: siret1,
+      "Type structure": "AI",
+      "Nom structure": "Structure Avec User Existant",
+      "E-mail authentification": user1Email,
+      "Adresse ligne 1": "adresse ligne 1",
+      "Adresse ligne 2": "adresse ligne 2",
+      Ville: "Ville",
+      "Code postal": "75000",
+      Coordonées: {
+        lat: 23,
+        lon: 12,
+      },
+      Téléphone: "+33600000000",
+    };
+    const rowsWithDuplicates: ImportedAgencyAndUserRow[] = [
+      row,
+      {
+        ...row,
+        ID: "2",
+        "Type structure": "EI",
+        "Nom structure": row["Nom structure"].toLowerCase(),
+        "E-mail authentification": row["E-mail authentification"].toUpperCase(),
+        "Adresse ligne 1": row["Adresse ligne 1"].toUpperCase(),
+        "Adresse ligne 2": row["Adresse ligne 2"].toUpperCase(),
+        Ville: row.Ville.toUpperCase(),
+        Téléphone: "+336 00 00 00 00",
+      },
+    ];
+
+    it("should create only one agency per duplicate", async () => {
+      const newUserId = "10000000-0000-0000-0000-000000000011";
+      const newAgencyId = "20000000-0000-0000-0000-000000000011";
+      uuidGenerator.setNextUuids([newUserId, newAgencyId]);
+      const result = await addAgenciesAndUsers.execute(rowsWithDuplicates);
+
+      expect(result).toEqual({
+        createdAgenciesCount: 1,
+        createdUsersCount: 1,
+        updatedUsersCount: 0,
+      });
+      expect(uow.userRepository.users).toEqual([
+        new ConnectedUserBuilder()
+          .withId(newUserId)
+          .withFirstName("")
+          .withLastName("")
+          .withEmail(user1Email)
+          .withCreatedAt(timeGateway.now())
+          .withProConnectInfos(null)
+          .withEstablishments(undefined)
+          .buildUser(),
+      ]);
+      expectArraysToMatch(uow.agencyRepository.agencies, [
+        toAgencyWithRights(
+          new AgencyDtoBuilder()
+            .withId(newAgencyId)
+            .withKind("structure-IAE")
+            .withAgencySiret(siret1)
+            .withAddress({
+              streetNumberAndAddress: row["Adresse ligne 1"],
+              postcode: row["Code postal"],
+              city: row.Ville,
+              departmentCode: row["Code postal"].slice(0, 2),
+            })
+            .withCoveredDepartments(["75"])
+            .withPosition(23, 12)
+            .withName(row["Nom structure"])
+            .withSignature("L'équipe")
+            .build(),
+          {
+            [newUserId]: {
+              isNotifiedByEmail: true,
+              roles: ["agency-admin", "validator"],
+            },
+          },
+        ),
       ]);
     });
   });
