@@ -19,6 +19,7 @@ import {
 } from "src/app/pages/auth/ConnectedPrivateRoute";
 import { routes } from "src/app/routes/routes";
 import type { DashboardTab } from "src/app/utils/dashboard";
+import { MetabaseView } from "../../MetabaseView";
 import { AgencyAdminTabContent } from "./tabs/AgencyAdminTabContent";
 import { ConventionTabContent } from "./tabs/ConventionTabContent";
 import { ErroredConventionTabContent } from "./tabs/ErroredConventionTabContent";
@@ -127,6 +128,54 @@ const rawAgencyDashboardTabs = ({
                 activeAgencyRights={activeAgencyRights}
                 connectedUserJwt={connectedUserJwt}
                 dashboards={dashboards}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(dashboards.agencies.statsAgenciesUrl
+      ? [
+          {
+            tabId:
+              "agencyDashboardStatsAgencies" satisfies AgencyDashboardRouteName,
+            label: "Vue comparée",
+            content: (
+              <MetabaseView
+                title="Vue comparée"
+                url={dashboards.agencies.statsAgenciesUrl}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(dashboards.agencies.statsEstablishmentDetailsUrl
+      ? [
+          {
+            tabId:
+              "agencyDashboardStatsEstablishmentDetails" satisfies AgencyDashboardRouteName,
+            label: "Détails par établissement",
+            content: (
+              <MetabaseView
+                title="Détails par établissement"
+                url={dashboards.agencies.statsEstablishmentDetailsUrl}
+              />
+            ),
+          },
+        ]
+      : []),
+    ...(dashboards.agencies.statsConventionsByEstablishmentByDepartmentUrl
+      ? [
+          {
+            tabId:
+              "agencyDashboardStatsConventionsByEstablishmentByDepartment" satisfies AgencyDashboardRouteName,
+            label: "Conventions par établissement",
+            content: (
+              <MetabaseView
+                title="Conventions par établissement"
+                url={
+                  dashboards.agencies
+                    .statsConventionsByEstablishmentByDepartmentUrl
+                }
               />
             ),
           },
