@@ -125,12 +125,6 @@ interface Discussions extends WithAcquisition {
   potential_beneficiary_experience_additional_information: string | null;
   potential_beneficiary_date_preferences: string | null;
   potential_beneficiary_level_of_education: ContactLevelOfEducation | null;
-  establishment_contact_email: string;
-  establishment_contact_first_name: string | null;
-  establishment_contact_last_name: string | null;
-  establishment_contact_phone: string;
-  establishment_contact_job: string;
-  establishment_contact_copy_emails: Json;
   appellation_code: number;
   immersion_objective: ImmersionObjectives | null;
   street_number_and_address: string;
@@ -151,7 +145,9 @@ interface Exchanges {
   discussion_id: string;
   message: string;
   sender: ExchangeRole;
-  recipient: ExchangeRole;
+  establishment_first_name: string | null;
+  establishment_last_name: string | null;
+  establishment_email: string | null;
   sent_at: Timestamp;
   subject: Generated<string>;
   id: Generated<number>;
@@ -449,6 +445,7 @@ interface EstablishmentsUsers {
   role: string;
   job: string | null;
   phone: string | null;
+  should_receive_discussion_notifications: boolean;
 }
 
 type AgencyGroupKind = "france-travail";
