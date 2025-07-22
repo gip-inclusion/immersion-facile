@@ -1,9 +1,11 @@
 import jwt from "jsonwebtoken";
 import type {
   AbsoluteUrl,
+  AgencyDashboards,
   AgencyId,
   ConventionId,
   DashboardName,
+  OmitFromExistingKeys,
   UserId,
 } from "shared";
 import type { DashboardGateway } from "../port/DashboardGateway";
@@ -32,6 +34,9 @@ const dashboardByName: Record<DashboardName, MetabaseDashboard> = {
     kind: "dashboard",
     id: 138,
   },
+  statsAgencies: { kind: "dashboard", id: 237 },
+  statsEstablishmentDetails: { kind: "dashboard", id: 223 },
+  statsConventionsByEstablishmentByDepartment: { kind: "dashboard", id: 224 },
 };
 
 type MetabasePayload = {
@@ -55,14 +60,30 @@ export class MetabaseDashboardGateway implements DashboardGateway {
     return this.#makeUrl(token, dashboard);
   }
 
-  public getAgencyUserUrl(userId: UserId, now: Date): AbsoluteUrl {
-    const dashboard = dashboardByName.agencyForUser;
-    const token = this.#createToken({
-      dashboard,
-      params: { ic_user_id: userId },
-      now,
-    });
-    return this.#makeUrl(token, dashboard);
+  public getAgencyUserUrls(
+    userId: UserId,
+    now: Date,
+  ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl"> {
+    const getDashboardUrl = (dashboardName: DashboardName) => {
+      const dashboard = dashboardByName[dashboardName];
+      const token = this.#createToken({
+        dashboard,
+        params: { ic_user_id: userId },
+        now,
+      });
+      return this.#makeUrl(token, dashboard);
+    };
+
+    return {
+      agencyDashboardUrl: getDashboardUrl("agencyForUser"),
+      statsEstablishmentDetailsUrl: getDashboardUrl(
+        "statsEstablishmentDetails",
+      ),
+      statsConventionsByEstablishmentByDepartmentUrl: getDashboardUrl(
+        "statsConventionsByEstablishmentByDepartment",
+      ),
+      statsAgenciesUrl: getDashboardUrl("statsAgencies"),
+    };
   }
 
   public getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl {

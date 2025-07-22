@@ -1,8 +1,10 @@
 import type {
   AbsoluteUrl,
   AdminDashboardName,
+  AgencyDashboards,
   AgencyId,
   ConventionId,
+  OmitFromExistingKeys,
   UserId,
 } from "shared";
 
@@ -11,7 +13,10 @@ export interface DashboardGateway {
     adminDashboardKind: AdminDashboardName,
     now: Date,
   ): AbsoluteUrl;
-  getAgencyUserUrl(userId: UserId, now: Date): AbsoluteUrl;
+  getAgencyUserUrls(
+    userId: UserId,
+    now: Date,
+  ): OmitFromExistingKeys<AgencyDashboards, "erroredConventionsDashboardUrl">;
   getAgencyForAdminUrl(agencyId: AgencyId, now: Date): AbsoluteUrl;
   getErroredConventionsDashboardUrl(userId: UserId, now: Date): AbsoluteUrl;
   getConventionStatusUrl(id: ConventionId, now: Date): AbsoluteUrl;
