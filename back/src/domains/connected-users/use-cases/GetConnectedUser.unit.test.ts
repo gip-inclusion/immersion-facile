@@ -124,10 +124,19 @@ describe("GetConnectedUser", () => {
             ],
             dashboards: {
               agencies: {
+                erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                  notAdmin.id
+                }/${timeGateway.now()}`,
                 agencyDashboardUrl: `http://stubAgencyUserDashboard/${
                   notAdmin.id
                 }/${timeGateway.now()}`,
-                erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+                statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${
+                  notAdmin.id
+                }/${timeGateway.now()}`,
+                statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${
+                  notAdmin.id
+                }/${timeGateway.now()}`,
+                statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${
                   notAdmin.id
                 }/${timeGateway.now()}`,
               },
@@ -196,10 +205,19 @@ describe("GetConnectedUser", () => {
         ],
         dashboards: {
           agencies: {
+            erroredConventionsDashboardUrl: undefined,
             agencyDashboardUrl: `http://stubAgencyUserDashboard/${
               connectedUserNotAdmin.id
             }/${timeGateway.now()}`,
-            erroredConventionsDashboardUrl: undefined,
+            statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
+            statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
+            statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
           },
           establishments: {},
         },
@@ -280,6 +298,15 @@ describe("GetConnectedUser", () => {
               notAdmin.id
             }/${timeGateway.now()}`,
             erroredConventionsDashboardUrl: `http://stubErroredConventionDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
+            statsAgenciesUrl: `http://stubStatsAgenciesDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
+            statsEstablishmentDetailsUrl: `http://stubStatsEstablishmentDetailsDashboard/${
+              notAdmin.id
+            }/${timeGateway.now()}`,
+            statsConventionsByEstablishmentByDepartmentUrl: `http://stubStatsConventionsByEstablishmentByDepartmentDashboard/${
               notAdmin.id
             }/${timeGateway.now()}`,
           },
